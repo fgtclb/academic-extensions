@@ -31,8 +31,8 @@
     "require": {
         "php": "^8.0",
         "typo3/cms-core": "^11.5",
-        "fgtclb/academic-persons": "^0.1.0 | dev-main",
-        "fgtclb/academic-persons-edit": "^0.1.0 | dev-main"
+        "fgtclb/academic-persons": "^0.1.0",
+        "fgtclb/academic-persons-edit": "^0.1.0"
     },
     "require-dev": {
         "typo3/minimal": "v11.5.0",
@@ -44,6 +44,7 @@
         "typo3/cms-felogin": "^11.5",
         "andreaswolf/typo3-uuid": "^0.3.0",
         "bk2k/bootstrap-package": "^14.0",
+        "causal/ig_ldap_sso_auth": "^3.7",
         "cweagans/composer-patches": "^1.7"
     },
     "autoload": {
@@ -53,7 +54,6 @@
     },
     "config": {
         "vendor-dir": ".Build/vendor",
-        "bin-dir": ".Build/bin",
         "allow-plugins": true
     },
     "scripts": {
@@ -63,7 +63,6 @@
     "extra": {
         "typo3/cms": {
             "web-dir": ".Build/public",
-            "app-dir": ".Build",
             "extension-key": "academic_persons_sync"
         },
         "patches": {

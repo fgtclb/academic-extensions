@@ -1,6 +1,13 @@
-
 <?php
-$EM_CONF['academic_persons_sync'] = [
+
+/*
+ * This file is part of the "academic_persons_sync" Extension for TYPO3 CMS.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
+$EM_CONF[$_EXTKEY] = [
     'title' => 'FGTCLB: Academic Persons Sync',
     'description' => 'Adds some configuration for external users providers like Active Directory.',
     'category' => 'plugin',
@@ -13,8 +20,8 @@ $EM_CONF['academic_persons_sync'] = [
     'constraints' => [
         'depends' => [
             'typo3' => '11.5.0-11.5.99',
-            "academic_persons" => "0.1.0 - 0.1.99",
-            "academic_persons_edit" => "0.1.0 - 0.1.99",
+            'academic_persons' => '0.1.0 - 0.1.99',
+            'academic_persons_edit' => '0.1.0 - 0.1.99',
         ],
         'conflicts' => [
         ],
