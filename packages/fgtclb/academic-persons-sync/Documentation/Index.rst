@@ -45,11 +45,3 @@ Ldap Imports.
 
     Installation/Index
     KnownProblems/Index
-
-..  Meta Menu
-
-..  toctree::
-    :hidden:
-
-    Sitemap
-    genindex
