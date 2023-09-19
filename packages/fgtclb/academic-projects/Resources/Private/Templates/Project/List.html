@@ -1,0 +1,27 @@
+<html
+    lang="en"
+    xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+    <f:layout name="Default" />
+    <f:section name="Header">
+        <h1>{data.title}</h1>
+    </f:section>
+    <f:section name="Main">
+        <f:if condition="{settings.filter.options}==false">
+            <div class="project-filter">
+                <f:form
+                    action="list"
+                    id="project-filter"
+                    name="filter"
+                    object="{filter}"
+                >
+                    <f:render partial="Project/FilterSorting" arguments="{_all}" />
+                    <f:render partial="Project/FilterCategories" arguments="{_all}" />
+                    <input type="submit" value="Filter" />
+                </f:form>
+            </div>
+        </f:if>
+        <f:render partial="Project/Items" arguments="{_all}" />
+    </f:section>
+</html>

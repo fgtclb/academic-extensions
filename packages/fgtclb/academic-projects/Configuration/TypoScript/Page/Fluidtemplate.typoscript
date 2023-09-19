@@ -1,0 +1,9 @@
+[traverse(page, "doktype") == 30]
+page {
+  10 {
+    dataProcessing {
+      300 = FGTCLB\AcademicProjects\DataProcessing\ProjectProcessor
+    }
+  }
+}
+[END]

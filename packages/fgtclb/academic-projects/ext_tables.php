@@ -1,8 +1,10 @@
 <?php
 
-defined('TYPO3') || die();
+(static function (): void {
+    $projectDokType = \FGTCLB\AcademicProjects\Domain\Enumeration\Page::TYPE_EDUCATIONAL_PROJECT;
 
-(static function () {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_academicjobs_domain_model_job');
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_academicjobs_domain_model_contact');
+    $GLOBALS['PAGES_TYPES'][$projectDokType] = [
+        'type' => 'web',
+        'allowedTables' => '*',
+    ];
 })();

@@ -1,38 +1,23 @@
 <?php
 
-use FGTCLB\AcademicJobs\Controller\JobController;
-use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
-
-if (!defined('TYPO3')) {
-    die(__CLASS__);
-}
-
 (static function (): void {
-    ExtensionUtility::configurePlugin(
-        'AcademicJobs',
-        'NewJobForm',
+    $projectDokType = \FGTCLB\AcademicProjects\Domain\Enumeration\Page::TYPE_EDUCATIONAL_PROJECT;
+    // Allow backend users to drag and drop the new page type:
+    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig(
+        sprintf(
+            'options.pageTree.doktypesToShowInNewPageDragArea := addToList(%d)',
+            $projectDokType
+        )
+    );
+
+    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+        'AcademicProjects',
+        'ProjectList',
         [
-            JobController::class => 'newJobForm, saveJob, list, show',
+            \FGTCLB\AcademicProjects\Controller\ProjectController::class => 'list',
         ],
         [
-            JobController::class => 'newJobForm, saveJob',
-        ]
-    );
-    ExtensionUtility::configurePlugin(
-        'AcademicJobs',
-        'List',
-        [
-            JobController::class => 'list, show',
-        ],
-        [
-            JobController::class => 'list',
-        ]
-    );
-    ExtensionUtility::configurePlugin(
-        'AcademicJobs',
-        'Detail',
-        [
-            JobController::class => 'show',
+            \FGTCLB\AcademicProjects\Controller\ProjectController::class => 'list',
         ]
     );
 })();

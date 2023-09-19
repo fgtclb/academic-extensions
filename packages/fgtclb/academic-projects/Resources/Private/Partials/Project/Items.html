@@ -1,0 +1,20 @@
+<html
+    lang="en"
+    xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+    <f:if condition="{projects}">
+        <f:then>
+            <div class="project-list">
+                <f:for each="{projects}" as="project" iteration="iterator">
+                    <div class="project-item">
+                        <f:render partial="Project/SingleItem" arguments="{_all}"/>
+                    </div>
+                </f:for>
+            </div>
+        </f:then>
+        <f:else>
+            <p>No projects found.</p>
+        </f:else>
+    </f:if>
+</html>

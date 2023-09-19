@@ -1,0 +1,104 @@
+<div class="pagination">
+    <div class="pagination__buttons">
+        <div class="pagination__button">
+            <f:if condition="{demand.currentPage}>1">
+                <f:then>
+                    <f:form name="demand" object="{demand}">
+                        <f:form.hidden property="updateProperty" value="currentPage" />
+                        <f:form.hidden property="currentPage" value="1" />
+                        <button type="submit" class="button">
+                            First page
+                        </button>
+                    </f:form>
+                </f:then>
+                <f:else>
+                </f:else>
+            </f:if>
+        </div>
+        <div class="pagination__button">
+            <f:if condition="{demand.currentPage}>1">
+                <f:then>
+                    <f:form name="demand" object="{demand}">
+                        <f:form.hidden property="updateProperty" value="currentPage" />
+                        <f:form.hidden property="currentPage" value="{demand.previousPage}" />
+                        <button type="submit" class="button">
+                            Previous page
+                        </button>
+                    </f:form>
+                </f:then>
+                <f:else>
+                </f:else>
+            </f:if>
+        </div>
+        <div class="pagination__button">
+            <f:if condition="{demand.currentPage}<{demand.numberOfPages}">
+                <f:then>
+                    <f:form name="demand" object="{demand}">
+                        <f:form.hidden property="updateProperty" value="currentPage" />
+                        <f:form.hidden property="currentPage" value="{demand.nextPage}" />
+                        <button type="submit" class="button">
+                            Next page
+                        </button>
+                    </f:form>
+                </f:then>
+                <f:else>
+                </f:else>
+            </f:if>
+        </div>
+        <div class="pagination__button">
+            <f:if condition="{demand.currentPage}<{demand.numberOfPages}">
+                <f:then>
+                    <f:form name="demand" object="{demand}">
+                        <f:form.hidden property="updateProperty" value="currentPage" />
+                        <f:form.hidden property="currentPage" value="{demand.numberOfPages}" />
+                        <button type="submit" class="button">
+                            Last page
+                        </button>
+                    </f:form>
+                </f:then>
+                <f:else>
+                </f:else>
+            </f:if>
+        </div>
+    </div>
+    <div class="pagination__text u-no-wrap">
+        <f:if condition="{demand.numberOfPages}>0">
+            <f:then>
+                Page {demand.currentPage} from {demand.numberOfPages}
+            </f:then>
+            <f:else>
+                No pages
+            </f:else>
+        </f:if>
+    </div>
+    <div class="pagination__input">
+        <f:form name="demand" object="{demand}">
+            <f:form.hidden property="updateProperty" value="currentPage" />
+            <div class="field">
+                <div class="field__control">
+                    <f:form.textfield
+                        id="currentPage"
+                        property="currentPage"
+                        type="text"
+                        class="input"
+                        additionalAttributes="{placeholder:'Current page'}" />
+                </div>
+            </div>
+        </f:form>
+    </div>
+    <div class="pagination__input">
+        <f:form name="demand" object="{demand}">
+            <f:form.hidden property="updateProperty" value="itemsPerPage" />
+            <div class="field">
+                <div class="field__control">
+                    <f:form.textfield
+                        id="itemsPerPage"
+                        property="itemsPerPage"
+                        type="text"
+                        class="input"
+                        additionalAttributes="{placeholder:'Items per page'}" />
+                </div>
+            </div>
+        </f:form>
+    </div>
+</div>

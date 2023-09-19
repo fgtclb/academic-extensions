@@ -1,29 +1,29 @@
 {
-    "name": "fgtclb/academic-jobs",
-    "description": "The AcademicJobs extension allows users to create and manage job postings.",
-    "type": "typo3-cms-extension",
-    "license": [
-        "GPL-2.0-or-later"
-    ],
-    "require": {
-        "typo3/cms-core": "^11.5 || ^12.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "FGTCLB\\AcademicJobs\\": "Classes/"
-        }
-    },
+	"name": "fgtclb/academic-projects",
+	"description": "Research project page for universities. Ships structured data preparation",
+	"type": "typo3-cms-extension",
+	"license": [
+		"GPL-2.0-or-later"
+	],
+	"require": {
+		"typo3/cms-core": "^11.5 || ^12.0",
+		"fgtclb/category-types ": "^1.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"FGTCLB\\AcademicProjects\\": "Classes/"
+		}
+	},
 	"config": {
-        "vendor-dir": ".Build/vendor",
-        "bin-dir": ".Build/bin",
-        "allow-plugins": true
-    },
-    "extra": {
-        "typo3/cms": {
+		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin",
+		"allow-plugins": true
+	},
+	"extra": {
+		"typo3/cms": {
 			"web-dir": ".Build/Web",
-            "app-dir": ".Build",
-            "extension-key": "academic_jobs"
-
-        }
-    }
+			"app-dir": ".Build",
+			"extension-key": "academic_projects"
+		}
+	}
 }

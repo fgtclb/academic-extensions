@@ -1,0 +1,43 @@
+<html
+    lang="en"
+    xmlns:f="https://typo3.org/ns/TYPO3Fluid/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:fec="http://typo3.org/ns/FGTCLB/AcademicProjects/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<f:if condition="{context.pageRecord.doktype} == 30">
+    <div class="callout callout-notice">
+        <div class="media">
+            <div class="media-left">
+                <core:icon identifier="actions-lightbulb-on"/>
+            </div>
+            <div class="media-right">
+                <fec:be.category page="{context.pageId}">
+                    <f:for as="attributes" key="category" each="{projectCategory.allAttributesByType}">
+                        <div class="row">
+                            <p class="col-md-4">
+                                <strong>
+                                    <core:icon identifier="academic-project-{category}"/>
+                                    {f:translate(key: 'sys_category.type.{category}', extensionName: 'academic_projects')}
+                                </strong>
+                            </p>
+                            <f:if condition="{attributes -> f:count()} > 0">
+                                <f:then>
+                                    <ul class="col-md-8">
+                                        <f:for each="{attributes}" as="attribute">
+                                            <li>{attribute.title}</li>
+                                        </f:for>
+                                    </ul>
+                                </f:then>
+                                <f:else>
+                                    <p class="col-md-8">{f:translate(extensionName: 'fgtclb_educational', key: 'sys_category.not_set')}</p>
+                                </f:else>
+                            </f:if>
+                        </div>
+                    </f:for>
+                </fec:be.category>
+            </div>
+        </div>
+    </div>
+</f:if>
+</html>

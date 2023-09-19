@@ -1,0 +1,62 @@
+<html
+    lang="en"
+    xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+    <f:layout name="Default"/>
+    <f:section name="Main">
+        <f:debug>{_all}</f:debug>
+        <section>
+            <h1>{data.title}</h1>
+            <p><strong>{project.projectTitle}</strong></p>
+            <p>
+                Laufzeit
+                {project.startDate -> f:format.date(format: '%m/%Y')}-{project.endDate -> f:format.date(format: '%m/%Y')}
+            </p>
+            <p>
+                Projektvolumen
+                {project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}
+            </p>
+            <f:format.raw>{project.shortDescription}</f:format.raw>
+        </section>
+        <section>
+        <h2>Persons</h2>
+        {f:render(
+            section: 'card',
+            arguments: {
+                title: 'Project management',
+                address: '{project.projectManagement}'
+            }
+        )}
+        {f:render(
+            section: 'card',
+            arguments: {
+                title: 'Contact',
+                address: '{project.contact}'
+            }
+        )}
+        </section>
+    </f:section>
+    <f:section name="card">
+        <address>
+            <h3>{title}</h3>
+            <p>
+                <strong>
+                    {address.title}
+                    {eaddress.firstName}
+                    {address.lastName}
+                </strong>
+            </p>
+            <f:for each="{address.emailAddresses}" as="emailAddress">
+                <p>
+                    {f:link.typolink(parameter:'{emailAddress.email}')}
+                </p>
+            </f:for>
+            <f:for each="{address.phoneNumbers}" as="phoneNumber">
+                <p>
+                    {phoneNumber.phoneNumber}
+                </p>
+            </f:for>
+        </address>
+    </f:section>
+</html>

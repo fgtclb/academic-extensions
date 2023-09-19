@@ -1,20 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 $EM_CONF[$_EXTKEY] = [
-    'title' => 'Academic Jobs',
-    'description' => 'The Academic Jobs extension allows users to create and manage job postings.',
+    'title' => '(FGTCLB) Academic Projects',
+    'description' => 'Academic project pages for TYPO3 with specific structured data and typed sys_categories',
+    'category' => 'fe',
+    'state' => 'beta',
+    'version' => '1.0.0',
     'constraints' => [
         'depends' => [
-            'typo3' => '11.5.0-12.4.99',
+            'typo3' => '11.5.0-11.5.99',
+            'fgtclb_educational' => '*',
         ],
-    ],
-    'category' => 'fe,be',
-    'author' => 'Riad Zejnilagic Trumic',
-    'author_company' => 'FGTCLB GmbH',
-    'author_email' => 'hello@fgtclb.com',
-    'autoload' => [
-        'psr-4' => [
-            'Fgtclb\\AcademicJobs\\' => 'Classes/',
-        ],
+        'conflicts' => [],
+        'suggests' => [],
     ],
 ];
