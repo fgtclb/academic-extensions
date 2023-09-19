@@ -1,0 +1,45 @@
+
+<f:if condition="{settings.jobs.groupBy} != 'none'">
+    <f:then>
+        <f:groupedFor as="groupedJobs" groupBy="relationName" each="{jobs}">
+            <f:render section="JobsCard" arguments="{jobs: groupedJobs, header: groupKey}" />
+            <hr>
+
+        </f:groupedFor>
+    </f:then>
+    <f:else>
+        <f:render section="JobsCard" arguments="{jobs: jobs}" />
+    </f:else>
+</f:if>
+
+<f:section name="JobsCard">
+
+<section class="row g-4">
+    <f:if condition="{header}">
+        <h3 class="mb-6">{header}</h3>
+    </f:if>
+    <f:for each="{jobs}" as="job" iteration="i">
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="card-group h-100">
+                <div class="card teaser-cta bg-dark-green border-white h-100 overlay-link">
+                    <div class="card-body">
+                        <small><time class="card-text text-white">{job.endsOn -> f:format.date(format: 'd.m.Y')}</time></small>
+                        <h4 class="card-title text-white">{job.custom.bereich}</h4>
+                        <p class="card-subtitle mb-2 text-white">{job.title}</p>
+                    </div>
+                    <div class="card-footer">
+                        <p class="card-text">
+                            <f:for each="{job.umfang}" as="scope" key="key" iteration="i">
+                                <f:if condition="{key} == {job.custom.umfang}">
+                                    Umfang: {scope}
+                                </f:if>
+                            </f:for>
+                        </p>
+                        <a href="{job.url}" target="_blank" class="card-link link-white"><div class="visually-hidden">{job.title}</div> </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </f:for>
+</section>
+</f:section>

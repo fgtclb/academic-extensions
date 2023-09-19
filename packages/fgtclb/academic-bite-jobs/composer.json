@@ -1,0 +1,30 @@
+{
+	"name": "fgtclb/academic-bite-jobs",
+	"type": "typo3-cms-extension",
+	"description": "",
+	"minimum-stability": "stable",
+    "license": [
+        "GPL-2.0-or-later"
+    ],
+	"require": {
+		"php" : "^8.1",
+		"typo3/cms-core": "^11.5"
+	},
+	"autoload": {
+		"psr-4": {
+			"FGTCLB\\AcademicBiteJobs\\": "Classes/"
+		}
+	},
+	"config": {
+        "vendor-dir": ".Build/vendor",
+        "bin-dir": ".Build/bin",
+        "allow-plugins": true
+    },
+    "extra": {
+        "typo3/cms": {
+			"web-dir": ".Build/Web",
+            "app-dir": ".Build",
+			"extension-key": "academic_bite_jobs"
+        }
+    }
+}

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" target-language="de" datatype="plaintext"
+		  original="messages" date="2023-09-15T08:53:00Z">
+		<header/>
+		<body>
+			<!-- BITE Plugin -->
+
+			<trans-unit id="plugin.bite.list.label">
+				<source>Bite: List of Jobs</source>
+				<target>Bite: Jobliste</target>
+			</trans-unit>
+
+			<trans-unit id="flexform.tab.settings">
+				<source>Settings</source>
+				<target>Einstellungen</target>
+			</trans-unit>
+
+			<trans-unit id="flexform.el.jobs.key.label">
+				<source>Job Listing Key</source>
+				<target>Stellenangebotsschlüssel</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.jobs.key.description">
+				<source>Unique key from B-Ite Application</source>
+				<target>Eindeutiger Schlüssel von B-Ite Application</target>
+			</trans-unit>
+
+			<trans-unit id="flexform.el.view.label">
+				<source>Select view</source>
+				<target>Ansicht auswählen</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.view.items.list">
+				<source>List view</source>
+				<target>Listenansicht</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.view.items.card">
+				<source>Card view</source>
+				<target>Kartenansicht</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.view.items.table">
+				<source>Table view</source>
+				<target>Tabellenansicht</target>
+			</trans-unit>
+
+			<trans-unit id="flexform.el.groupBy.label">
+				<source>Group By</source>
+				<target>Gruppiere nach</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.groupBy.items.none">
+				<source>No grouping</source>
+				<target>Keine Gruppierung</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.groupBy.items.thema">
+				<source>Thema</source>
+				<target>Thema</target>
+			</trans-unit>
+
+			<trans-unit id="flexform.el.sortBy.label">
+				<source>Sort By</source>
+				<target>Sortiere nach</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortBy.items.none">
+				<source>No sorting</source>
+				<target>Keine Sortierung</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortBy.items.ends_on">
+				<source>Ends On</source>
+				<target>Endet am</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortBy.items.title">
+				<source>Title</source>
+				<target>Title</target>
+			</trans-unit>
+
+			<trans-unit id="flexform.el.sortByDirection.label">
+				<source>Sort By Direction</source>
+				<target>Nach Richtung sortieren</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortByDirection.items.asc">
+				<source>Ascending</source>
+				<target>Aufsteigend</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortByDirection.items.desc">
+				<source>Descending</source>
+				<target>Absteigend</target>
+			</trans-unit>
+
+			<trans-unit id="flexform.el.jobs.limit.label">
+				<target>Limit für Stellenanzeigen</target>
+			</trans-unit>
+			<trans-unit id="flexform.el.jobs.limit.description">
+				<target>Maximale Anzahl an Stellenangeboten (0 = kein Limit)</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

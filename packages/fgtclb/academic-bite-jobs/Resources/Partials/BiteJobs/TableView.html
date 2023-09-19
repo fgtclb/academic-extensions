@@ -1,0 +1,56 @@
+<f:if condition="{settings.jobs.groupBy} != 'none'">
+    <f:then>
+        <f:groupedFor as="groupedJobs" groupBy="relationName" each="{jobs}">
+            <f:render section="JobsTable" arguments="{jobs: groupedJobs, header: groupKey}"/>
+        </f:groupedFor>
+    </f:then>
+    <f:else>
+        <f:render section="JobsTable" arguments="{jobs: jobs}/>
+    </f:else>
+</f:if>
+
+<f:section name="JobsTable">
+    <f:if condition="{header}">
+        <caption class="h2">{header}</caption>
+    </f:if>
+    <table class="table table-striped-primary border-primary caption-top">
+        <thead class="table-primary">
+            <tr>
+                <th>
+                    Bereich
+                </th>
+                <th>
+                    Stellenbezeichnung
+                </th>
+                <th>
+                    Umfang
+                </th>
+                <th>
+                    Bewerbungsfrist
+                </th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider table-secondary" >
+            <f:for each="{jobs}" as="job">
+                <tr class="overlay-link">
+                    <td>
+                        {job.custom.bereich}
+                    </td>
+                    <td>
+                        <a href="{job.url}" target="_blank" class="card-link">{job.title}</a>
+                    </td>
+                    <td>
+                        <f:for each="{job.umfang}" as="scope" key="key" iteration="i">
+                            <f:if condition="{key} == {job.custom.umfang}">
+                                {scope}
+                            </f:if>
+                        </f:for>
+                    </td>
+                    <td>
+                        {job.endsOn -> f:format.date(format: 'd.m.Y')}
+                    </td>
+                </tr>
+            </f:for>
+        </tbody>
+    </table>
+</f:section>
