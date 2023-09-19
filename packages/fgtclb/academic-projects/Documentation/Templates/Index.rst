@@ -6,7 +6,7 @@
 Templates
 =========
 
-This chapter is all about templating EXT:academic_jobs
+This chapter is all about templating EXT:academic_projects
 
 ..  toctree::
     :maxdepth: 5

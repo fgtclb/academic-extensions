@@ -6,7 +6,7 @@
 Overriding templates
 ====================
 
-EXT:academic_jobs is using Fluid as template engine.
+EXT:academic_projects is using Fluid as template engine.
 
 This documentation won't bring you all information about Fluid but only the
 most important things you need for using it. You can get
@@ -32,7 +32,7 @@ We suggest that you use a sitepackage extension. Learn how to
 ..  code-block:: typoscript
 
     # TypoScript constants
-    plugin.tx_academicjobs {
+    plugin.tx_academicprojects {
         view {
             templateRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Templates/
             partialRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Partials/
