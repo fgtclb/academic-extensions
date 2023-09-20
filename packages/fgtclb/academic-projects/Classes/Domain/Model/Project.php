@@ -9,8 +9,6 @@ use FGTCLB\AcademicProjects\Domain\Collection\CategoryCollection;
 use FGTCLB\AcademicProjects\Domain\Enumeration\Page;
 use FGTCLB\AcademicProjects\Domain\Repository\CategoryRepository;
 use FGTCLB\EducationalCourse\Exception\Domain\CategoryExistException;
-use Fgtclb\EducationalProfile\Domain\Model\Profile;
-use Fgtclb\EducationalProfile\Domain\Repository\ProfileRepository;
 use InvalidArgumentException;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -22,10 +20,6 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 class Project extends AbstractEntity
 {
     protected string $title = '';
-
-    protected ?Profile $projectManagement = null;
-
-    protected ?Profile $contact = null;
 
     protected string $projectTitle = '';
 
@@ -65,10 +59,6 @@ class Project extends AbstractEntity
         $this->shortDescription = $page['tx_academicprojects_short_description'] ?? '';
         $this->startDate = $page['tx_academicprojects_start_date'] ? new \DateTime('@' . $page['tx_academicprojects_start_date']) : null;
         $this->endDate = $page['tx_academicprojects_end_date'] ? new \DateTime('@' . $page['tx_academicprojects_end_date']) : null;
-
-        $profileRepository = GeneralUtility::makeInstance(ProfileRepository::class);
-        $this->projectManagement = $page['tx_academicprojects_project_management'] ? $profileRepository->findByUid((int)$page['tx_academicprojects_project_management']) : null;
-        $this->contact = $page['tx_academicprojects_contact'] ? $profileRepository->findByUid((int)$page['tx_academicprojects_contact']) : null;
 
         $this->attributes = GeneralUtility::makeInstance(CategoryRepository::class)
             ->findAllByPageId($databaseId);
@@ -113,16 +103,6 @@ class Project extends AbstractEntity
     public function getTitle(): string
     {
         return $this->title;
-    }
-
-    public function getProjectManagement(): ?Profile
-    {
-        return $this->projectManagement;
-    }
-
-    public function getContact(): ?Profile
-    {
-        return $this->contact;
     }
 
     public function getProjectTitle(): string

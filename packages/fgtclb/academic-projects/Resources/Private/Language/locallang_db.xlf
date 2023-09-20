@@ -10,17 +10,11 @@
 			<trans-unit id="tx_academicprojects_domain_model_project.budget">
 				<source>Project budget</source>
 			</trans-unit>
-			<trans-unit id="tx_academicprojects_domain_model_project.contact">
-				<source>Project contact</source>
-			</trans-unit>
 			<trans-unit id="tx_academicprojects_domain_model_project.end_date">
 				<source>Project end</source>
 			</trans-unit>
 			<trans-unit id="tx_academicprojects_domain_model_project.funders">
 				<source>Project funders</source>
-			</trans-unit>
-			<trans-unit id="tx_academicprojects_domain_model_project.project_management">
-				<source>Project mamangement</source>
 			</trans-unit>
 			<trans-unit id="tx_academicprojects_domain_model_project.short_description">
 				<source>Project short description</source>

@@ -9,12 +9,6 @@ return [
             'lastUpdated' => [
                 'fieldName' => 'lastUpdated',
             ],
-            'projectManagement' => [
-                'fieldName' => 'tx_academicprojects_project_management',
-            ],
-            'contact' => [
-                'fieldName' => 'tx_academicprojects_contact',
-            ],
             'projectTitle' => [
                 'fieldName' => 'tx_academicprojects_project_title',
             ],

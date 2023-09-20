@@ -41,30 +41,6 @@ if (!defined('TYPO3')) {
     );
 
     $columns = [
-        'tx_academicprojects_project_management' => [
-            'exclude' => true,
-            'label' => $ll('tx_academicprojects_domain_model_project.project_management'),
-            'config' => [
-                'type' => 'select',
-                'renderType' => 'selectSingle',
-                'foreign_table' => 'tx_educationalprofile_domain_model_profile',
-                'items' => [
-                    ['', ''],
-                ],
-            ],
-        ],
-        'tx_academicprojects_contact' => [
-            'exclude' => true,
-            'label' => $ll('tx_academicprojects_domain_model_project.contact'),
-            'config' => [
-                'type' => 'select',
-                'renderType' => 'selectSingle',
-                'foreign_table' => 'tx_educationalprofile_domain_model_profile',
-                'items' => [
-                    ['', ''],
-                ],
-            ],
-        ],
         'tx_academicprojects_project_title' => [
             'exclude' => true,
             'label' => $ll('tx_academicprojects_domain_model_project.project_title'),
@@ -167,8 +143,6 @@ if (!defined('TYPO3')) {
 
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('pages', implode(',', [
         '--div--;Project',
-        'tx_academicprojects_project_management',
-        'tx_academicprojects_contact',
         '--palette--;;project_info',
         '--palette--;;project_date',
     ]), (string)$doktype, 'after:title');
