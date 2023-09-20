@@ -31,7 +31,7 @@ Academic Bite Jobs
 
 ----
 
-This extension adds an academic person database to TYPO3.
+This extension adds an academic jobs database to TYPO3.
 Records can be created, edit and displayed in the frontend.
 There is a list and a detail view for the frontend .
 
