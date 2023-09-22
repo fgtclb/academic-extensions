@@ -1,6 +1,0 @@
-TCEFORM.tx_educationalprofile_domain_model_contract {
-  organisational_level_1.disabled = 1
-  organisational_level_2.disabled = 1
-  organisational_level_3.disabled = 1
-  physical_addresses_from_organisation.disabled = 1
-}
