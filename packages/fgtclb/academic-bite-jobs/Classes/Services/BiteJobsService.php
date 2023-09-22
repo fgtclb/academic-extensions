@@ -54,6 +54,16 @@ final class BiteJobsService implements LoggerAwareInterface
 
         $jobsSettings = $settings['settings']['jobs'];
 
+        $filter = [];
+
+        if ($jobsSettings['custom']['zuordnung'] !== 'all') {
+            $filter = [
+                'custom.zuordnung' => [
+                    'in' => [$jobsSettings['custom']['zuordnung']],
+                ],
+            ];
+        }
+
         $jobs = [];
         $additionalOptions = json_encode([
             'key' => $jobsSettings['jobListingKey'],
@@ -62,11 +72,7 @@ final class BiteJobsService implements LoggerAwareInterface
             'page' => [
                 'offset' => 0,
             ],
-            'filter' => [
-                'custom.zuordnung' => [
-                    'in' => [$jobsSettings['custom']['zuordnung']],
-                ],
-            ],
+            'filter' => $filter,
             'sort' => [
                 'order' => $jobsSettings['sortingDirection'],
                 'by' => $jobsSettings['sortBy'],

@@ -91,6 +91,11 @@
 			<trans-unit id="flexform.el.jobs.limit.description">
 				<target>Maximale Anzahl an Stellenangeboten (0 = kein Limit)</target>
 			</trans-unit>
+
+            <trans-unit id="flexform.el.all">
+                <source>All</source>
+				<target>Alle</target>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
