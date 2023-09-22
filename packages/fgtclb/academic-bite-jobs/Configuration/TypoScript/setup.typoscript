@@ -1,0 +1,16 @@
+plugin.tx_academicbitejobs {
+  view {
+    templateRootPaths {
+      0 = EXT:academic_bite_jobs/Resources/Private/Templates/
+      1 = {$plugin.tx_academicbitejobs.view.templateRootPath}
+    }
+    partialRootPaths {
+      0 = EXT:academic_bite_jobs/Resources/Private/Partials/
+      1 = {$plugin.tx_academicbitejobs.view.partialRootPath}
+    }
+    layoutRootPaths {
+      0 = EXT:academic_bite_jobs/Resources/Private/Layouts/
+      1 = {$plugin.tx_academicbitejobs.view.layoutRootPath}
+    }
+  }
+}

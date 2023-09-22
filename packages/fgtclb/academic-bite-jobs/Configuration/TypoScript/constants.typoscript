@@ -1,0 +1,10 @@
+plugin.tx_academicbitejobs {
+    view {
+        # cat=plugin.tx_academicjobs_createjob/file; type=string; label=Path to template root (FE)
+        templateRootPath = EXT:academic_bite_jobs/Resources/Private/Templates/BiteJobs/
+        # cat=plugin.tx_academicjobs_createjob/file; type=string; label=Path to template partials (FE)
+        partialRootPath = EXT:academic_bite_jobs/Resources/Private/Partials/BiteJobs/
+        # cat=plugin.tx_academicjobs_createjob/file; type=string; label=Path to template layouts (FE)
+        layoutRootPath = EXT:academic_bite_jobs/Resources/Private/Layouts/BiteJobs/
+    }
+}
