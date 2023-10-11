@@ -3,6 +3,11 @@ page {
   10 {
     dataProcessing {
       300 = FGTCLB\AcademicProjects\DataProcessing\ProjectProcessor
+      310 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
+      310 {
+        references.fieldName = media
+        as = images
+      }
     }
   }
 }

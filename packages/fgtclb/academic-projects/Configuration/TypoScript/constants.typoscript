@@ -1,0 +1,7 @@
+plugin.tx_academicprojects {
+  view {
+    templateRootPath = EXT:academic_projects/Resources/Private/Templates/
+    partialRootPath = EXT:academic_projects/Resources/Private/Partials/
+    layoutRootPath = EXT:academic_projects/Resources/Private/Layouts/
+  }
+}

@@ -1,7 +1,23 @@
 @import 'EXT:academic_projects/Configuration/TypoScript/Page/'
 
 plugin.tx_academicprojects {
-    features {
-        skipDefaultArguments = 1
+  features {
+    skipDefaultArguments = 1
+  }
+}
+
+plugin.tx_academicprojects {
+  view {
+    templateRootPaths {
+      0 = {$plugin.tx_academicprojects.view.templateRootPath}
     }
+
+    partialRootPaths {
+      0 = {$plugin.tx_academicprojects.view.partialRootPath}
+    }
+
+    layoutRootPaths {
+      0 = {$plugin.tx_academicprojects.view.layoutRootPath}
+    }
+  }
 }
