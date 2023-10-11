@@ -8,7 +8,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use FGTCLB\AcademicProjects\Domain\Collection\CategoryCollection;
 use FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes;
-use FGTCLB\AcademicProjects\Domain\Model\EducationalCategory;
+use FGTCLB\AcademicProjects\Domain\Model\AcademicCategory;
 use FGTCLB\AcademicProjects\Exception\Domain\CategoryExistException;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -74,7 +74,7 @@ class CategoryRepository
         foreach ($statement->executeQuery()->fetchAllAssociative() as $attribute) {
             if (in_array($attribute['type'], CategoryTypes::getConstants())) {
                 $attributes->attach(
-                    new EducationalCategory(
+                    new AcademicCategory(
                         $attribute['uid'],
                         CategoryTypes::cast($attribute['type']),
                         $attribute['title']
@@ -137,7 +137,7 @@ class CategoryRepository
         foreach ($statement->executeQuery()->fetchAllAssociative() as $attribute) {
             if (in_array($attribute['type'], CategoryTypes::getConstants())) {
                 $attributes->attach(
-                    new EducationalCategory(
+                    new AcademicCategory(
                         $attribute['uid'],
                         CategoryTypes::cast($attribute['type']),
                         $attribute['title']
@@ -176,7 +176,7 @@ class CategoryRepository
         foreach ($statement->executeQuery()->fetchAllAssociative() as $attribute) {
             if (in_array($attribute['type'], CategoryTypes::getConstants())) {
                 $attributes->attach(
-                    new EducationalCategory(
+                    new AcademicCategory(
                         $attribute['uid'],
                         CategoryTypes::cast($attribute['type']),
                         $attribute['title']
@@ -238,7 +238,7 @@ class CategoryRepository
         foreach ($statement->executeQuery()->fetchAllAssociative() as $attribute) {
             if (in_array($attribute['type'], CategoryTypes::getConstants())) {
                 $attributes->attach(
-                    new EducationalCategory(
+                    new AcademicCategory(
                         $attribute['uid'],
                         CategoryTypes::cast($attribute['type']),
                         $attribute['title']
@@ -271,7 +271,7 @@ class CategoryRepository
         foreach ($result as $child) {
             if (in_array($child['type'], CategoryTypes::getConstants())) {
                 $children->attach(
-                    new EducationalCategory(
+                    new AcademicCategory(
                         $child['uid'],
                         CategoryTypes::cast($child['type']),
                         $child['title']
