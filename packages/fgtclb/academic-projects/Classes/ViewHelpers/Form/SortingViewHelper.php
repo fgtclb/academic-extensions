@@ -36,71 +36,35 @@ class SortingViewHelper extends AbstractFormFieldViewHelper
     public function render()
     {
         $name = $this->getName();
-
         $this->tag->addAttribute('name', $name);
 
         $this->registerFieldNameForFormTokenGeneration($name);
         $this->addAdditionalIdentityPropertiesIfNeeded();
         $this->setErrorClassAttribute();
+        $this->setRespectSubmittedDataValue(true);
 
-        $sortingOptions = [];
+        $options = '';
         foreach (SortingOptions::getConstants() as $value) {
             
             $label = LocalizationUtility::translate(
                 'filter.sorting.' . str_replace(' ', '.', $value),
                 'academic_projects'
             );
-            $sortingOptions[$value] = $label;
+
+            $isSelected = (string)$value === $this->getValueAttribute();
+
+            $option = '<option value="' . htmlspecialchars((string)$value) . '"';
+            if ($isSelected) {
+                $option .= ' selected="selected"';
+            }
+            $option .= '>' . htmlspecialchars((string)$label) . '</option>';
+
+            $options .= $option . LF;
         }
 
-        $content = '';
-        foreach ($sortingOptions as $value => $label) {
-            $isSelected = $this->isSelected($value);
-            $content .= $this->renderOptionTag($value, $label, $isSelected) . LF;
-        }
-
-        $this->tag->setContent($content);
+        $this->tag->setContent($options);
         $this->tag->forceClosingTag(true);
 
         return $this->tag->render();
-    }
-
-    /**
-     * @param string $value Value to check for
-     * @return bool TRUE if the value should be marked a s selected; FALSE otherwise
-     */
-    protected function isSelected($value)
-    {
-        if ((string)$value === $this->getSelectedValue()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getSelectedValue()
-    {
-        $this->setRespectSubmittedDataValue(true);
-
-        return $this->getValueAttribute();
-    }
-
-    /**
-     * @param string $value
-     * @param string $label
-     * @param bool $isSelected
-     * @return string
-     */
-    protected function renderOptionTag($value, $label, $isSelected)
-    {
-        $output = '<option value="' . htmlspecialchars((string)$value) . '"';
-        if ($isSelected) {
-            $output .= ' selected="selected"';
-        }
-        $output .= '>' . htmlspecialchars((string)$label) . '</option>';
-        return $output;
     }
 }
