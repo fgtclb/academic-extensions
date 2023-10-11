@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Model;
 
-use Doctrine\DBAL\DBALException;
 use FGTCLB\AcademicProjects\Domain\Collection\CategoryCollection;
-use FGTCLB\AcademicProjects\Domain\Enumeration\Page;
 use FGTCLB\AcademicProjects\Domain\Repository\CategoryRepository;
-use FGTCLB\EducationalCourse\Exception\Domain\CategoryExistException;
-use InvalidArgumentException;
-use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Domain\Model\FileReference;
+use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 
 /**
  * Model class for the page type "project"
  */
 class Project extends AbstractEntity
 {
+    protected int $doktype;
+
     protected string $title = '';
+
+    /** @var ObjectStorage<FileReference> */
+    protected $media;
 
     protected string $projectTitle = '';
 
@@ -35,61 +37,6 @@ class Project extends AbstractEntity
 
     protected ?CategoryCollection $attributes = null;
 
-    /**
-     * @throws CategoryExistException
-     * @throws \Exception
-     * @throws DBALException
-     * @throws InvalidArgumentException
-     */
-    public function __construct(int $databaseId)
-    {
-        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
-        $page = $pageRepository->getPage($databaseId);
-        if (count($page) === 0) {
-            throw new InvalidArgumentException(
-                'Page not found',
-                1683811343841
-            );
-        }
-
-        $this->pid = $page['pid'];
-        $this->uid = $page['uid'];
-        $this->title = $page['title'] ?? '';
-        $this->projectTitle = $page['tx_academicprojects_project_title'] ?? '';
-        $this->shortDescription = $page['tx_academicprojects_short_description'] ?? '';
-        $this->startDate = $page['tx_academicprojects_start_date'] ? new \DateTime('@' . $page['tx_academicprojects_start_date']) : null;
-        $this->endDate = $page['tx_academicprojects_end_date'] ? new \DateTime('@' . $page['tx_academicprojects_end_date']) : null;
-
-        $this->attributes = GeneralUtility::makeInstance(CategoryRepository::class)
-            ->findAllByPageId($databaseId);
-    }
-
-    /**
-     * @throws \Exception
-     * @throws DBALException
-     * @throws CategoryExistException
-     */
-    public static function loadFromLink(int $linkId): Project
-    {
-        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
-        $pageToResolve = $pageRepository->getPage($linkId);
-        $originalPage = match ($pageToResolve['doktype']) {
-            PageRepository::DOKTYPE_SHORTCUT => $pageRepository->resolveShortcutPage($pageToResolve),
-            default => throw new InvalidArgumentException(
-                'Calling with doktypes other than 4 or 7 not allowed',
-                1685532706120
-            ),
-        };
-        if ($originalPage['doktype'] !== Page::TYPE_EDUCATIONAL_PROJECT) {
-            throw new \RuntimeException(
-                sprintf('Page "%d" has no Project page linked', $linkId),
-                1685532982084
-            );
-        }
-
-        return new self($originalPage['uid']);
-    }
-
     public function getPid(): int
     {
         return $this->pid;
@@ -100,9 +47,19 @@ class Project extends AbstractEntity
         return $this->uid;
     }
 
+    public function getDoktype(): int
+    {
+        return $this->doktype;
+    }
+
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    public function getMedia(): ObjectStorage
+    {
+        return $this->media;
     }
 
     public function getProjectTitle(): string
@@ -137,6 +94,6 @@ class Project extends AbstractEntity
 
     public function getAttributes(): ?CategoryCollection
     {
-        return $this->attributes;
+        return GeneralUtility::makeInstance(CategoryRepository::class)->findAllByPageId($this->uid);
     }
 }

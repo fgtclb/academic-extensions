@@ -6,8 +6,14 @@ return [
     \FGTCLB\AcademicProjects\Domain\Model\Project::class => [
         'tableName' => 'pages',
         'properties' => [
+            'doktype' => [
+                'fieldName' => 'doktype',
+            ],
             'lastUpdated' => [
                 'fieldName' => 'lastUpdated',
+            ],
+            'media' => [
+                'fieldName' => 'media',
             ],
             'projectTitle' => [
                 'fieldName' => 'tx_academicprojects_project_title',
