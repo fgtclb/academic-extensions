@@ -6,7 +6,7 @@ namespace FGTCLB\AcademicProjects\Domain\Enumeration;
 
 use TYPO3\CMS\Core\Type\Enumeration;
 
-class CategoryTypes extends Enumeration
+final class CategoryTypes extends Enumeration
 {
     public const TYPE_SYSTEM_CATEGORY = 'system_category';
 

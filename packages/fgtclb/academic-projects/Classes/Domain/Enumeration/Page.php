@@ -6,7 +6,7 @@ namespace FGTCLB\AcademicProjects\Domain\Enumeration;
 
 use TYPO3\CMS\Core\Type\Enumeration;
 
-class Page extends Enumeration
+final class Page extends Enumeration
 {
-    public const TYPE_EDUCATIONAL_PROJECT = 30;
+    public const TYPE_ACEDEMIC_PROJECT = 30;
 }
