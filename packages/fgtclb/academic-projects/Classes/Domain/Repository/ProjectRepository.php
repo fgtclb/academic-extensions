@@ -24,19 +24,15 @@ class ProjectRepository extends Repository
         $query = $this->createQuery();
 
         $constraints = [];
-        $constraints[] = $query->equals('doktype', Page::TYPE_EDUCATIONAL_PROJECT);
+        $constraints[] = $query->equals('doktype', Page::TYPE_ACEDEMIC_PROJECT);
 
         if ($filter) {
-            $categories = [];
             if (!empty($filter->getFilterCategories())) {
                 foreach ($filter->getFilterCategories() as $category) {
                     if (is_numeric($category) && (int)$category) {
-                        $categories[] = $category;
+                        $constraints[] = $query->contains('categories', $category);
                     }
                 }
-            }
-            if (!empty($categories)) {
-                $constraints[] = $query->contains('categories', $categories);
             }
         }
 
