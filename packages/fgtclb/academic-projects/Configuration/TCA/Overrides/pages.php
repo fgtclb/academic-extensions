@@ -11,7 +11,7 @@ if (!defined('TYPO3')) {
         return 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
     };
 
-    $doktype = \FGTCLB\AcademicProjects\Domain\Enumeration\Page::TYPE_EDUCATIONAL_PROJECT;
+    $doktype = \FGTCLB\AcademicProjects\Domain\Enumeration\Page::TYPE_ACEDEMIC_PROJECT;
 
     // Add new page type as possible select item:
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTcaSelectItem(

@@ -13,9 +13,9 @@ use FGTCLB\AcademicProjects\Exception\Domain\CategoryExistException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * EducationalCategory
+ * AcademicCategory
  */
-class EducationalCategory
+class AcademicCategory
 {
     protected int $uid;
 

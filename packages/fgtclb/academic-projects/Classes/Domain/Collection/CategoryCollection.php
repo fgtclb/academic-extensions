@@ -7,24 +7,24 @@ namespace FGTCLB\AcademicProjects\Domain\Collection;
 use ArrayAccess;
 use Countable;
 use FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes;
-use FGTCLB\AcademicProjects\Domain\Model\EducationalCategory;
+use FGTCLB\AcademicProjects\Domain\Model\AcademicCategory;
 use FGTCLB\AcademicProjects\Exception\Domain\CategoryExistException;
 use Iterator;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * @implements Iterator<int, EducationalCategory>
+ * @implements Iterator<int, AcademicCategory>
  */
 class CategoryCollection implements Countable, Iterator, ArrayAccess
 {
     /**
-     * @var EducationalCategory[]
+     * @var AcademicCategory[]
      */
     protected array $container = [];
 
     /**
-     * @var array<string, EducationalCategory[]>
+     * @var array<string, AcademicCategory[]>
      */
     protected array $typeSortedContainer = [
         CategoryTypes::TYPE_SYSTEM_CATEGORY => [],
@@ -33,7 +33,7 @@ class CategoryCollection implements Countable, Iterator, ArrayAccess
         CategoryTypes::TYPE_INSTITUTE => [],
     ];
 
-    public function current(): EducationalCategory|false
+    public function current(): AcademicCategory|false
     {
         return current($this->container);
     }
@@ -66,7 +66,7 @@ class CategoryCollection implements Countable, Iterator, ArrayAccess
     /**
      * @throws CategoryExistException
      */
-    public function attach(EducationalCategory $category): void
+    public function attach(AcademicCategory $category): void
     {
         if (in_array($category, $this->container, true)) {
             throw new CategoryExistException(
@@ -79,7 +79,7 @@ class CategoryCollection implements Countable, Iterator, ArrayAccess
     }
 
     /**
-     * @return array<string, EducationalCategory[]>
+     * @return array<string, AcademicCategory[]>
      */
     public function getAllAttributesByType(): array
     {
@@ -88,7 +88,7 @@ class CategoryCollection implements Countable, Iterator, ArrayAccess
 
     /**
      * @param CategoryTypes|string $type
-     * @return Iterator<int, EducationalCategory>|Countable
+     * @return Iterator<int, AcademicCategory>|Countable
      */
     public function getAttributesByType(CategoryTypes|string $type): Iterator|Countable
     {
@@ -106,18 +106,18 @@ class CategoryCollection implements Countable, Iterator, ArrayAccess
             $this->typeSortedContainer[(string)$type]
         ) implements Iterator, Countable, \JsonSerializable {
             /**
-             * @var EducationalCategory[]
+             * @var AcademicCategory[]
              */
             private array $container;
 
             /**
-             * @param EducationalCategory[] $attributes
+             * @param AcademicCategory[] $attributes
              */
             public function __construct(array $attributes)
             {
                 $this->container = $attributes;
             }
-            public function current(): EducationalCategory|false
+            public function current(): AcademicCategory|false
             {
                 return current($this->container);
             }
