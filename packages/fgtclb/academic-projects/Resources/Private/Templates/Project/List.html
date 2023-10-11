@@ -5,7 +5,9 @@
 >
     <f:layout name="Default" />
     <f:section name="Header">
-        <h1>{data.title}</h1>
+        <header>
+            <h1>{data.title}</h1>
+        </header>
     </f:section>
     <f:section name="Main">
         <f:if condition="{settings.filter.options}==false">
@@ -16,9 +18,13 @@
                     name="filter"
                     object="{filter}"
                 >
-                    <f:render partial="Project/FilterSorting" arguments="{_all}" />
-                    <f:render partial="Project/FilterCategories" arguments="{_all}" />
-                    <input type="submit" value="Filter" />
+                    <div class="row">
+                        <f:render partial="Project/FilterSorting" arguments="{_all}" />
+                        <f:render partial="Project/FilterCategories" arguments="{_all}" />
+                        <div class="col">
+                            <input class="btn btn-primary" type="submit" value="Filter" />
+                        </div>
+                    </div>
                 </f:form>
             </div>
         </f:if>

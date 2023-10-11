@@ -4,8 +4,41 @@
     data-namespace-typo3-fluid="true"
 >
     <div class="project-item">
-        <f:link.page pageUid="{project.uid}">
-            <h3>{project.title}</h3>
+        <f:if condition="{project.projectTitle}">
+            <h3 class="project-item__title">
+                {project.projectTitle}
+            </h3>
+        </f:if>
+        <f:if condition="{project.shortDescription}">
+            <div class="project-item__description">
+                <f:format.html>{project.shortDescription}</f:format.html>
+            </div>
+        </f:if>
+        <f:if condition="{project.attributes}">
+            <f:for as="attributes" key="category" each="{project.attributes.allAttributesByType}">
+                <div class="row">
+                    <p class="col-md-4">
+                        <strong>
+                            {f:translate(key: 'sys_category.type.{category}', extensionName: 'academic_projects')}
+                        </strong>
+                    </p>
+                    <f:if condition="{attributes -> f:count()} > 0">
+                        <f:then>
+                            <ul class="col-md-8">
+                                <f:for each="{attributes}" as="attribute">
+                                    <li>{attribute.title}</li>
+                                </f:for>
+                            </ul>
+                        </f:then>
+                        <f:else>
+                            <p class="col-md-8">{f:translate(extensionName: 'fgtclb_educational', key: 'sys_category.not_set')}</p>
+                        </f:else>
+                    </f:if>
+                </div>
+            </f:for>
+        </f:if>
+        <f:link.page pageUid="{project.uid}" class="project-item__link">
+            <f:translate key="fe.button.project.details.text" />
         </f:link.page>
     </div>
 </html>

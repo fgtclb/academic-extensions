@@ -4,8 +4,17 @@
     xmlns:fap="http://typo3.org/ns/FGTCLB/AcademicProjects/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-    <div class="sorting">
-        <label for="sorting">{f:translate(extensionName: 'academic_projects', key: 'filter.sorting')}</label>
-        <fap:form.sorting property="sorting" />
+    <div class="col">
+        <label
+            class="form-label visually-hidden"
+            for="sorting"
+        >
+            {f:translate(extensionName: 'academic_projects', key: 'filter.sorting')}
+        </label>
+        <fap:form.sorting
+            class="form-select"
+            id="sorting"
+            property="sorting"
+        />
     </div>
 </html>

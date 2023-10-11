@@ -1,61 +1,58 @@
 <html
     lang="en"
     xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:fap="http://typo3.org/ns/FGTCLB/AcademicProjects/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
     <f:if condition="{categories.systemCategory}">
-        <div class="category">
-            <label for="systemCategory">{f:translate(extensionName: 'academic_projects', key: 'sys_category.type.system_category')}</label>
-            <f:form.select
+        <div class="col">
+            <label class="form-label visually-hidden" for="systemCategory">
+                {f:translate(extensionName: 'academic_projects', key: 'sys_category.type.system_category')}
+            </label>
+            <fap:form.filter
+                class="form-select"
                 id="systemCategory"
                 name="filter[filterCategories][]"
                 options="{categories.systemCategory}"
-                optionLabelField="title"
-                optionValueField="uid"
-                prependOptionLabel="{f:translate(extensionName: 'academic_projects', key: 'sys_category.type.system_category')}"
-                prependOptionValue="0"
             />
         </div>
     </f:if>
     <f:if condition="{categories.researchTopic}">
-        <div class="category">
-            <label for="researchTopic">{f:translate(extensionName: 'academic_projects', key: 'sys_category.type.research_topic')}</label>
-            <f:form.select
+        <div class="col">
+            <label class="form-label visually-hidden" for="researchTopic">
+                {f:translate(extensionName: 'academic_projects', key: 'sys_category.type.research_topic')}
+            </label>
+            <fap:form.filter
+                class="form-select"
                 id="researchTopic"
                 name="filter[filterCategories][]"
                 options="{categories.researchTopic}"
-                optionLabelField="title"
-                optionValueField="uid"
-                prependOptionLabel="{f:translate(extensionName: 'academic_projects', key: 'sys_category.type.research_topic')}"
-                prependOptionValue="0"
             />
         </div>
     </f:if>
     <f:if condition="{categories.department}">
-        <div class="category">
-            <label for="department">{f:translate(extensionName: 'academic_projects', key: 'sys_category.type.department')}</label>
-            <f:form.select
+        <div class="col">
+            <label class="form-label visually-hidden" for="department">
+                {f:translate(extensionName: 'academic_projects', key: 'sys_category.type.department')}
+            </label>
+            <fap:form.filter
+                class="form-select"
                 id="department"
                 name="filter[filterCategories][]"
                 options="{categories.department}"
-                optionLabelField="title"
-                optionValueField="uid"
-                prependOptionLabel="{f:translate(extensionName: 'academic_projects', key: 'sys_category.type.department')}"
-                prependOptionValue="0"
             />
         </div>
     </f:if>
     <f:if condition="{categories.institute}">
-        <div class="category">
-            <label for="institute">{f:translate(extensionName: 'academic_projects', key: 'sys_category.type.institute')}</label>
-            <f:form.select
+        <div class="col">
+            <label class="form-label visually-hidden" for="institute">
+                {f:translate(extensionName: 'academic_projects', key: 'sys_category.type.institute')}
+            </label>
+            <fap:form.filter
+                class="form-select"
                 id="institute"
                 name="filter[filterCategories][]"
                 options="{categories.institute}"
-                optionLabelField="title"
-                optionValueField="uid"
-                prependOptionLabel="{f:translate(extensionName: 'academic_projects', key: 'sys_category.type.institute')}"
-                prependOptionValue="0"
             />
         </div>
     </f:if>
