@@ -137,24 +137,37 @@ if (!defined('TYPO3')) {
 
     ExtensionManagementUtility::addTCAcolumns('pages', $columns);
 
-    ExtensionManagementUtility::addFieldsToPalette('pages', 'project_info', implode(',', [
-        'tx_academicprojects_project_title',
-        '--linebreak--',
-        'tx_academicprojects_short_description',
-        '--linebreak--',
-        'tx_academicprojects_budget',
-        '--linebreak--',
-        'tx_academicprojects_funders',
-    ]));
+    ExtensionManagementUtility::addFieldsToPalette(
+        'pages',
+        'project_info',
+        implode(',', [
+            'tx_academicprojects_project_title',
+            '--linebreak--',
+            'tx_academicprojects_short_description',
+            '--linebreak--',
+            'tx_academicprojects_budget',
+            '--linebreak--',
+            'tx_academicprojects_funders',
+        ])
+    );
 
-    ExtensionManagementUtility::addFieldsToPalette('pages', 'project_date', implode(',', [
-        'tx_academicprojects_start_date',
-        'tx_academicprojects_end_date',
-    ]));
+    ExtensionManagementUtility::addFieldsToPalette(
+        'pages',
+        'project_date',
+        implode(',', [
+            'tx_academicprojects_start_date',
+            'tx_academicprojects_end_date',
+        ])
+    );
 
-    ExtensionManagementUtility::addToAllTCAtypes('pages', implode(',', [
-        '--div--;Project',
-        '--palette--;;project_info',
-        '--palette--;;project_date',
-    ]), (string)$doktype, 'after:title');
+    ExtensionManagementUtility::addToAllTCAtypes(
+        'pages',
+        implode(',', [
+            '--div--;Project',
+            '--palette--;;project_info',
+            '--palette--;;project_date',
+        ]),
+        (string)$doktype,
+        'after:title'
+    );
 })();
