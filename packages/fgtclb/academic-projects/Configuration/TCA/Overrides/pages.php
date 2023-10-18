@@ -1,6 +1,8 @@
 <?php
 
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 if (!defined('TYPO3')) {
     die(__CLASS__);
@@ -11,14 +13,23 @@ if (!defined('TYPO3')) {
         return 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
     };
 
+    // Create new academic item group for academic doktype items
+    ExtensionManagementUtility::addTcaSelectItemGroup(
+        'pages',
+        'doktype',
+        'academic',
+        $ll('pages.doktype.item_group.academic'),
+        'after:default'
+    );
+
     $doktype = \FGTCLB\AcademicProjects\Domain\Enumeration\Page::TYPE_ACEDEMIC_PROJECT;
 
-    // Add new page type as possible select item:
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTcaSelectItem(
+    // Add new doktype item
+    ExtensionManagementUtility::addTcaSelectItem(
         'pages',
         'doktype',
         [
-            $ll('pages.doktype.projects'),
+            $ll('pages.doktype.item.academic_projects'),
             $doktype,
             'actions-code-merge',
         ],
@@ -26,7 +37,7 @@ if (!defined('TYPO3')) {
         'before'
     );
 
-    \TYPO3\CMS\Core\Utility\ArrayUtility::mergeRecursiveWithOverrule(
+    ArrayUtility::mergeRecursiveWithOverrule(
         $GLOBALS['TCA']['pages'],
         [
             'ctrl' => [
@@ -124,9 +135,9 @@ if (!defined('TYPO3')) {
         ],
     ];
 
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('pages', $columns);
+    ExtensionManagementUtility::addTCAcolumns('pages', $columns);
 
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addFieldsToPalette('pages', 'project_info', implode(',', [
+    ExtensionManagementUtility::addFieldsToPalette('pages', 'project_info', implode(',', [
         'tx_academicprojects_project_title',
         '--linebreak--',
         'tx_academicprojects_short_description',
@@ -136,12 +147,12 @@ if (!defined('TYPO3')) {
         'tx_academicprojects_funders',
     ]));
 
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addFieldsToPalette('pages', 'project_date', implode(',', [
+    ExtensionManagementUtility::addFieldsToPalette('pages', 'project_date', implode(',', [
         'tx_academicprojects_start_date',
         'tx_academicprojects_end_date',
     ]));
 
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('pages', implode(',', [
+    ExtensionManagementUtility::addToAllTCAtypes('pages', implode(',', [
         '--div--;Project',
         '--palette--;;project_info',
         '--palette--;;project_date',

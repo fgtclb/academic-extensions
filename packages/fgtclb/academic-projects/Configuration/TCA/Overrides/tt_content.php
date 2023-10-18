@@ -3,10 +3,15 @@
 declare(strict_types=1);
 
 (static function (): void {
+    $ll = function (string $langKey): string {
+        return 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
+    };
+
     \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
         'AcademicProjects',
         'ProjectList',
-        'Academic Projects'
+        $ll('tx_academic_projects_p1.name'),
+        'actions-code-merge'
     );
 
     $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist']['academicprojects_projectlist'] = 'layout,recursive';
