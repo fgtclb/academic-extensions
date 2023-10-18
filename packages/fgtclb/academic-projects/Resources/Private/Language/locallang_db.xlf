@@ -30,10 +30,16 @@
 				<source>Academic Projects</source>
 			</trans-unit>
 			<trans-unit id="tx_academic_projects_p1.description" resname="tx_academic_projects_p1.description">
-				<source>Manage Academic Projects</source>
+				<source>List of academic projects with sorting and filtering</source>
 			</trans-unit>
-			<trans-unit id="pages.doktype.projects">
-				<source>Projects</source>
+			<trans-unit id="wizard_items.academic">
+				<source>Academic</source>
+			</trans-unit>
+			<trans-unit id="pages.doktype.item_group.academic">
+				<source>Academic Pages</source>
+			</trans-unit>
+			<trans-unit id="pages.doktype.item.academic_projects">
+				<source>Academic Projects</source>
 			</trans-unit>
 		</body>
 	</file>

@@ -35,15 +35,23 @@
 
 			<trans-unit id="tx_academic_projects_p1.name" resname="tx_academic_projects_p1.name">
 				<source>Academic Projects</source>
-				<target></target>
+				<target>Akademische Projekte</target>
 			</trans-unit>
 			<trans-unit id="tx_academic_projects_p1.description" resname="tx_academic_projects_p1.description">
-				<source>Manage Academic Projects</source>
-				<target></target>
+				<source>List of academic projects with sorting and filtering</source>
+				<target>Liste akademischer Projekte mit Sortierung und Filterung</target>
 			</trans-unit>
-			<trans-unit id="pages.doktype.projects">
-				<source>Projects</source>
-				<target>Projekte</target>
+			<trans-unit id="wizard_items.academic">
+				<source>Academic</source>
+				<target>Akademisch</target>
+			</trans-unit>
+			<trans-unit id="pages.doktype.item_group.academic">
+				<source>Academic Pages</source>
+				<source>Akademische Seiten</source>
+			</trans-unit>
+			<trans-unit id="pages.doktype.item.academic_projects">
+				<source>Academic Projects</source>
+				<target>Akademische Projekte</target>
 			</trans-unit>
 		</body>
 	</file>
