@@ -33,12 +33,13 @@
         <tbody class="table-group-divider table-secondary" >
             <f:for each="{jobs}" as="job">
                 <tr class="overlay-link">
+										<td>
+											<a href="{job.url}" target="_blank" class="card-link">{job.title}</a>
+										</td>
                     <td>
                         {job.custom.bereich}
                     </td>
-                    <td>
-                        <a href="{job.url}" target="_blank" class="card-link">{job.title}</a>
-                    </td>
+
                     <td>
                         <f:for each="{job.umfang}" as="scope" key="key" iteration="i">
                             <f:if condition="{key} == {job.custom.umfang}">
