@@ -23,6 +23,8 @@ class AcademicCategory
 
     protected string $title;
 
+    protected bool $active = false;
+
     protected ?CategoryCollection $children = null;
 
     /**
@@ -60,5 +62,15 @@ class AcademicCategory
     public function getChildren(): ?CategoryCollection
     {
         return $this->children;
+    }
+
+    public function setActive(bool $active): void
+    {
+        $this->active = $active;
+    }
+
+    public function getActive(): bool
+    {
+        return $this->active;
     }
 }

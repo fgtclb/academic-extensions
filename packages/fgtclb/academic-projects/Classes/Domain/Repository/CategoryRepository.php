@@ -13,6 +13,7 @@ use FGTCLB\AcademicProjects\Exception\Domain\CategoryExistException;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Persistence\Generic\QueryResult;
 
 class CategoryRepository
 {
@@ -185,6 +186,57 @@ class CategoryRepository
             }
         }
         return $attributes;
+    }
+
+    /**
+     * @param QueryResult $projects
+     * @throws CategoryExistException
+     * @throws DBALException
+     * @throws Exception
+     */
+    public function findAllApplicable(QueryResult $projects): CategoryCollection
+    {
+        $db = $this->connection
+            ->getQueryBuilderForTable('sys_category');
+        $statement = $db
+            ->select(
+                'sys_category.uid',
+                'sys_category.type',
+                'sys_category.title'
+            )
+            ->from('sys_category')
+            ->where(
+                $db->expr()->neq(
+                    'sys_category.type',
+                    $db->createNamedParameter('')
+                )
+            );
+
+        $categories = new CategoryCollection();
+
+        $applicableCategories = [];
+        foreach($projects as $project) {
+            foreach($project->getAttributes() as $attribute) {
+                $applicableCategories[] = $attribute->getUid();
+            }
+        }
+
+        foreach ($statement->executeQuery()->fetchAllAssociative() as $attribute) {
+            if (in_array($attribute['type'], CategoryTypes::getConstants())) {
+                $category = new AcademicCategory(
+                    $attribute['uid'],
+                    CategoryTypes::cast($attribute['type']),
+                    $attribute['title'],
+                );
+
+                if (in_array($attribute['uid'], $applicableCategories)) {
+                    $category->setActive(true);
+                }
+
+                $categories->attach($category);
+            }
+        }
+        return $categories;
     }
 
     public function getByDatabaseFields(

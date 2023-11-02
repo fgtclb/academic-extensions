@@ -39,10 +39,12 @@ class ProjectController extends ActionController
             )
         );
 
+        $categories =$this->categoryRepository->findAllApplicable($projects);
+
         $assignedValues = [
             'projects' => $projects,
             'filter' => $filter,
-            'categories' => $this->categoryRepository->findAll(),
+            'categories' => $categories,
         ];
 
         $this->view->assignMultiple($assignedValues);
