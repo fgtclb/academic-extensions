@@ -59,7 +59,10 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
 
                 $option = '<option value="' . htmlspecialchars((string)$value) . '"';
                 if ($isSelected) {
-                    $option .= ' selected="selected"';
+                    $option .= ' selected';
+                }
+                if ($category->getActive() === false) {
+                    $option .= ' disabled';
                 }
                 $option .= '>' . htmlspecialchars((string)$label) . '</option>';
 
