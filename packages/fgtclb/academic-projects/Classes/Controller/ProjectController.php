@@ -14,8 +14,8 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 class ProjectController extends ActionController
 {
     public function __construct(
-        protected readonly ProjectRepository $projectRepository,
-        protected readonly CategoryRepository $categoryRepository
+        protected ProjectRepository $projectRepository,
+        protected CategoryRepository $categoryRepository
     ) {
     }
 
