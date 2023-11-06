@@ -9,9 +9,9 @@ use FGTCLB\AcademicProjects\Domain\Enumeration\SortingOptions;
 class SortingItemsProcFunc
 {
     /**
-     * @param array $params
+     * @param array<string, mixed> $params
      */
-    public function itemsProcFunc(&$params): void
+    public function itemsProcFunc(array &$params): void
     {
         foreach (SortingOptions::getConstants() as $value) {
             $label = 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.sorting.' . str_replace(' ', '.', $value);

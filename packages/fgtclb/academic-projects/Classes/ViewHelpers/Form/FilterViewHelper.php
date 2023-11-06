@@ -2,6 +2,7 @@
 
 namespace FGTCLB\AcademicProjects\ViewHelpers\Form;
 
+use FGTCLB\AcademicProjects\Domain\Model\AcademicCategory;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Form\AbstractFormFieldViewHelper;
 
@@ -17,10 +18,7 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
      */
     protected $selectedValue;
 
-    /**
-     * Initialize arguments.
-     */
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         parent::initializeArguments();
         $this->registerUniversalTagAttributes();
@@ -35,7 +33,6 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
      */
     public function render()
     {
-
         $name = $this->getName();
         $this->tag->addAttribute('name', $name);
 
@@ -51,7 +48,10 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
         $selectedCategories = $filter->getFilterCategories();
 
         if ($this->arguments['options'] instanceof \Traversable) {
-            foreach ($this->arguments['options'] as $category) {
+            /** @var AcademicCategory[] $categoriesOption */
+            $categoriesOption = $this->arguments['options'];
+
+            foreach ($categoriesOption as $category) {
                 $value = $category->getUid();
                 $label = $category->getTitle();
 
@@ -66,15 +66,16 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
                 $options .= $option . LF;
             }
 
-            $prepend .= '<option value="0">';
-            $prepend .= LocalizationUtility::translate('sys_category.type.' . $category->getType()->__toString(), 'academic_projects');
-            $prepend .= '</option>' . LF;
+            if (count($categoriesOption) > 0) {
+                $prepend .= '<option value="0">';
+                $prepend .= LocalizationUtility::translate('sys_category.type.' . $categoriesOption[0]->getType()->__toString(), 'academic_projects');
+                $prepend .= '</option>' . LF;
+            }
         }
 
         $this->tag->setContent($prepend . $options);
         $this->tag->forceClosingTag(true);
 
-        $content .= $this->tag->render();
-        return $content;
+        return $this->tag->render();
     }
 }

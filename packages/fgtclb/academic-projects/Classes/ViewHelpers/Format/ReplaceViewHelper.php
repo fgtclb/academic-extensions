@@ -19,32 +19,35 @@ class ReplaceViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @return array|string|int
+     * @param array<string, mixed> $arguments
+     * @return mixed
      */
     public static function renderStatic(
         array $arguments,
         \Closure $renderChildrenClosure,
         RenderingContextInterface $renderingContext
-    ) {
+    ): mixed {
         $content = $renderChildrenClosure();
-        /** @var string|array $content */
+        /** @var string|array<string, mixed> $content */
         $content = is_scalar($content) || $content === null ? (string)$content : (array)$content;
 
         $substring = $arguments['substring'];
-        /** @var string|array $substring */
+        /** @var string|array<string, mixed> $substring */
         $substring = is_scalar($substring) ? (string)$substring : (array)$substring;
 
         $replacement = $arguments['replacement'];
-        /** @var string|array $replacement */
+        /** @var string|array<string, mixed> $replacement */
         $replacement = is_scalar($replacement) ? (string)$replacement : (array)$replacement;
 
         $count = 0;
         $caseSensitive = (bool)$arguments['caseSensitive'];
         $function = $caseSensitive ? 'str_replace' : 'str_ireplace';
         $replaced = $function($substring, $replacement, $content, $count);
+
         if ($arguments['returnCount'] ?? false) {
             return $count;
         }
+
         return $replaced;
     }
 }
