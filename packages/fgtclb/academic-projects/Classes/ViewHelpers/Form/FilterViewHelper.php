@@ -56,13 +56,13 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
                 $label = $category->getTitle();
 
                 $isSelected = in_array((string)$value, $selectedCategories);
-    
+
                 $option = '<option value="' . htmlspecialchars((string)$value) . '"';
                 if ($isSelected) {
                     $option .= ' selected="selected"';
                 }
                 $option .= '>' . htmlspecialchars((string)$label) . '</option>';
-    
+
                 $options .= $option . LF;
             }
 

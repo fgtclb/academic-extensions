@@ -102,9 +102,7 @@ class CategoryCollection implements Countable, Iterator, ArrayAccess
                 1683633304209
             );
         }
-        return new class (
-            $this->typeSortedContainer[(string)$type]
-        ) implements Iterator, Countable, \JsonSerializable {
+        return new class($this->typeSortedContainer[(string)$type]) implements Iterator, Countable, \JsonSerializable {
             /**
              * @var AcademicCategory[]
              */

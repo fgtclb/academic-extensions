@@ -2,7 +2,6 @@
 
 namespace FGTCLB\AcademicProjects\ViewHelpers\Format;
 
-
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithContentArgumentAndRenderStatic;
@@ -29,18 +28,18 @@ class ReplaceViewHelper extends AbstractViewHelper
     ) {
         $content = $renderChildrenClosure();
         /** @var string|array $content */
-        $content = is_scalar($content) || $content === null ? (string) $content : (array) $content;
+        $content = is_scalar($content) || $content === null ? (string)$content : (array)$content;
 
         $substring = $arguments['substring'];
         /** @var string|array $substring */
-        $substring = is_scalar($substring) ? (string) $substring : (array) $substring;
+        $substring = is_scalar($substring) ? (string)$substring : (array)$substring;
 
         $replacement = $arguments['replacement'];
         /** @var string|array $replacement */
-        $replacement = is_scalar($replacement) ? (string) $replacement : (array) $replacement;
+        $replacement = is_scalar($replacement) ? (string)$replacement : (array)$replacement;
 
         $count = 0;
-        $caseSensitive = (boolean) $arguments['caseSensitive'];
+        $caseSensitive = (bool)$arguments['caseSensitive'];
         $function = $caseSensitive ? 'str_replace' : 'str_ireplace';
         $replaced = $function($substring, $replacement, $content, $count);
         if ($arguments['returnCount'] ?? false) {

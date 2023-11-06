@@ -45,7 +45,7 @@ class SortingViewHelper extends AbstractFormFieldViewHelper
 
         $options = '';
         foreach (SortingOptions::getConstants() as $value) {
-            
+
             $label = LocalizationUtility::translate(
                 'filter.sorting.' . str_replace(' ', '.', $value),
                 'academic_projects'

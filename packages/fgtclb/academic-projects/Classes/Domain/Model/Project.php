@@ -7,8 +7,8 @@ namespace FGTCLB\AcademicProjects\Domain\Model;
 use FGTCLB\AcademicProjects\Domain\Collection\CategoryCollection;
 use FGTCLB\AcademicProjects\Domain\Repository\CategoryRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 
 /**
