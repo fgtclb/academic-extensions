@@ -170,4 +170,10 @@ if (!defined('TYPO3')) {
         (string)$doktype,
         'after:title'
     );
+
+    if (!isset($GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides'])) {
+        $GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides'] = [];
+    }
+
+    $GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides']['title']['config']['max'] = 60;
 })();

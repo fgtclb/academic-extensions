@@ -1,3 +1,0 @@
-[traverse(page, "doktype") == 30]
-  TCEFORM.pages.title.config.max = 60
-[END]
