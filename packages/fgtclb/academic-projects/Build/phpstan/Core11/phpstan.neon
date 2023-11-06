@@ -9,9 +9,9 @@ parameters:
   level: 8
 
   paths:
-    - ../../../
-
-  excludePaths:
-    - ../../../.Build
-    - ../../../.cache
-    - ../../../Build
+    - ../../../Classes
+    - ../../../Configuration
+    - ../../../Resources
+    - ../../../ext_emconf.php
+    - ../../../ext_localconf.php
+    - ../../../ext_tables.php
