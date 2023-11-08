@@ -2,6 +2,7 @@
 
 namespace FGTCLB\AcademicProjects\ViewHelpers\Form;
 
+use FGTCLB\AcademicProjects\Domain\Collection\CategoryCollection;
 use FGTCLB\AcademicProjects\Domain\Model\AcademicCategory;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Fluid\ViewHelpers\Form\AbstractFormFieldViewHelper;
@@ -48,7 +49,7 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
         $selectedCategories = $filter->getFilterCategories();
 
         if ($this->arguments['options'] instanceof \Traversable) {
-            /** @var AcademicCategory[] $categoryOptions */
+            /** @var CategoryCollection<AcademicCategory> $categoryOptions */
             $categoryOptions = $this->arguments['options'];
 
             foreach ($categoryOptions as $category) {
