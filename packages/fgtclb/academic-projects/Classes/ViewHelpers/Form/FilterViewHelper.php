@@ -48,10 +48,10 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
         $selectedCategories = $filter->getFilterCategories();
 
         if ($this->arguments['options'] instanceof \Traversable) {
-            /** @var AcademicCategory[] $categoriesOption */
-            $categoriesOption = $this->arguments['options'];
+            /** @var AcademicCategory[] $categoryOptions */
+            $categoryOptions = $this->arguments['options'];
 
-            foreach ($categoriesOption as $category) {
+            foreach ($categoryOptions as $category) {
                 $value = $category->getUid();
                 $label = $category->getTitle();
 
@@ -69,9 +69,10 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
                 $options .= $option . LF;
             }
 
-            if (count($categoriesOption) > 0) {
+            if (count($categoryOptions) > 0) {
+                $categoryOptions->rewind();
                 $prepend .= '<option value="0">';
-                $prepend .= LocalizationUtility::translate('sys_category.type.' . $categoriesOption[0]->getType()->__toString(), 'academic_projects');
+                $prepend .= LocalizationUtility::translate('sys_category.type.' . $categoryOptions->current()->getType()->__toString(), 'academic_projects');
                 $prepend .= '</option>' . LF;
             }
         }
