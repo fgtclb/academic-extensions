@@ -70,10 +70,10 @@ class FilterViewHelper extends AbstractFormFieldViewHelper
                 $options .= $option . LF;
             }
 
-            if (count($categoryOptions) > 0) {
-                $categoryOptions->rewind();
+            $categoryOptions->rewind();
+            if ($currentCategory = $categoryOptions->current()) {
                 $prepend .= '<option value="0">';
-                $prepend .= LocalizationUtility::translate('sys_category.type.' . $categoryOptions->current()->getType()->__toString(), 'academic_projects');
+                $prepend .= LocalizationUtility::translate('sys_category.type.' . $currentCategory->getType()->__toString(), 'academic_projects');
                 $prepend .= '</option>' . LF;
             }
         }
