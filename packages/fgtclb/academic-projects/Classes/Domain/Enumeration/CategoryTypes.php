@@ -12,7 +12,7 @@ final class CategoryTypes extends Enumeration
 
     public const TYPE_COOPERATION = 'cooperation';
 
-    public const TYPE_DEPARTMENT = 'department';
-
     public const TYPE_FUNDING_PARTNER = 'funding_partner';
+
+    public const TYPE_DEPARTMENT = 'department';
 }
