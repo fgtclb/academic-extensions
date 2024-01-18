@@ -11,21 +11,21 @@
 				<target>Academic Projekte</target>
 			</trans-unit>
 
-			<trans-unit id="sys_category.type.system_category">
-				<source>System Category (17 targets)</source>
-				<target>Systemkategorie (17 Ziele)</target>
-			</trans-unit>
-			<trans-unit id="sys_category.type.research_topic">
-				<source>Research Topic</source>
-				<target>Forschungsschwerpunkt</target>
-			</trans-unit>
 			<trans-unit id="sys_category.type.department">
 				<source>Department</source>
-				<target>Abteilung</target>
+				<target>Organisationseinheit</target>
 			</trans-unit>
-			<trans-unit id="sys_category.type.institute">
-				<source>Institute</source>
-				<target>Institut</target>
+			<trans-unit id="sys_category.type.competence_field">
+				<source>Competence field</source>
+				<target>Kompetenzfeld</target>
+			</trans-unit>
+			<trans-unit id="sys_category.type.cooperation">
+				<source>Cooperation</source>
+				<target>Kooperation</target>
+			</trans-unit>
+			<trans-unit id="sys_category.type.funding_partner">
+				<source>Funding partner</source>
+				<target>Mittelgebender</target>
 			</trans-unit>
 		</body>
 	</file>

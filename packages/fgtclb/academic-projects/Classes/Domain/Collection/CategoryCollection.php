@@ -27,10 +27,10 @@ class CategoryCollection implements Countable, Iterator, ArrayAccess
      * @var array<string, AcademicCategory[]>
      */
     protected array $typeSortedContainer = [
-        CategoryTypes::TYPE_SYSTEM_CATEGORY => [],
-        CategoryTypes::TYPE_RESEARCH_TOPIC => [],
+        CategoryTypes::TYPE_COMPETENCE_FIELD => [],
+        CategoryTypes::TYPE_COOPERATION => [],
         CategoryTypes::TYPE_DEPARTMENT => [],
-        CategoryTypes::TYPE_INSTITUTE => [],
+        CategoryTypes::TYPE_FUNDING_PARTNER => [],
     ];
 
     public function current(): AcademicCategory|false

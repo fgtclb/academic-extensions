@@ -17,28 +17,28 @@ declare(strict_types=1);
     $sysCategoryTypesTcaTypeIconOverrides = [
         'ctrl' => [
             'typeicon_classes' => [
-                \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_SYSTEM_CATEGORY
-                => $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_SYSTEM_CATEGORY),
-                \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_RESEARCH_TOPIC
-                => $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_RESEARCH_TOPIC),
+                \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COMPETENCE_FIELD
+                => $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COMPETENCE_FIELD),
+                \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COOPERATION
+                => $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COOPERATION),
                 \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_DEPARTMENT
                 => $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_DEPARTMENT),
-                \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_INSTITUTE
-                => $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_INSTITUTE),
+                \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_FUNDING_PARTNER
+                => $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_FUNDING_PARTNER),
             ],
         ],
     ];
     $addItems = [
         [
-            $llBackendType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_SYSTEM_CATEGORY),
-            \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_SYSTEM_CATEGORY,
-            $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_SYSTEM_CATEGORY),
+            $llBackendType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COMPETENCE_FIELD),
+            \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COMPETENCE_FIELD,
+            $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COMPETENCE_FIELD),
             'projects',
         ],
         [
-            $llBackendType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_RESEARCH_TOPIC),
-            \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_RESEARCH_TOPIC,
-            $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_RESEARCH_TOPIC),
+            $llBackendType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COOPERATION),
+            \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COOPERATION,
+            $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_COOPERATION),
             'projects',
         ],
         [
@@ -48,9 +48,9 @@ declare(strict_types=1);
             'projects',
         ],
         [
-            $llBackendType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_INSTITUTE),
-            \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_INSTITUTE,
-            $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_INSTITUTE),
+            $llBackendType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_FUNDING_PARTNER),
+            \FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_FUNDING_PARTNER,
+            $iconType(\FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes::TYPE_FUNDING_PARTNER),
             'projects',
         ],
     ];

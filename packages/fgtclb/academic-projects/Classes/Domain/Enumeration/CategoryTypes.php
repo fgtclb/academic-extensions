@@ -8,11 +8,11 @@ use TYPO3\CMS\Core\Type\Enumeration;
 
 final class CategoryTypes extends Enumeration
 {
-    public const TYPE_SYSTEM_CATEGORY = 'system_category';
+    public const TYPE_COMPETENCE_FIELD = 'competence_field';
 
-    public const TYPE_RESEARCH_TOPIC = 'research_topic';
+    public const TYPE_COOPERATION = 'cooperation';
 
     public const TYPE_DEPARTMENT = 'department';
 
-    public const TYPE_INSTITUTE = 'institute';
+    public const TYPE_FUNDING_PARTNER = 'funding_partner';
 }

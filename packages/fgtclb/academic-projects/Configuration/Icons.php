@@ -19,20 +19,20 @@ $identifierString = function (string $identifier) {
 };
 
 return [
-    $identifierString(CategoryTypes::TYPE_SYSTEM_CATEGORY) => [
+    $identifierString(CategoryTypes::TYPE_COMPETENCE_FIELD) => [
         'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        'source' => $sourceString(CategoryTypes::TYPE_SYSTEM_CATEGORY),
+        'source' => $sourceString(CategoryTypes::TYPE_COMPETENCE_FIELD),
     ],
-    $identifierString(CategoryTypes::TYPE_RESEARCH_TOPIC) => [
+    $identifierString(CategoryTypes::TYPE_COOPERATION) => [
         'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        'source' => $sourceString(CategoryTypes::TYPE_RESEARCH_TOPIC),
+        'source' => $sourceString(CategoryTypes::TYPE_COOPERATION),
     ],
     $identifierString(CategoryTypes::TYPE_DEPARTMENT) => [
         'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
         'source' => $sourceString(CategoryTypes::TYPE_DEPARTMENT),
     ],
-    $identifierString(CategoryTypes::TYPE_INSTITUTE) => [
+    $identifierString(CategoryTypes::TYPE_FUNDING_PARTNER) => [
         'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        'source' => $sourceString(CategoryTypes::TYPE_INSTITUTE),
+        'source' => $sourceString(CategoryTypes::TYPE_FUNDING_PARTNER),
     ],
 ];

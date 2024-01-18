@@ -10,17 +10,17 @@
 				<source>Academic Projects</source>
 			</trans-unit>
 
-			<trans-unit id="sys_category.type.system_category">
-				<source>System Category (17 targets)</source>
-			</trans-unit>
-			<trans-unit id="sys_category.type.research_topic">
-				<source>Research Topic</source>
-			</trans-unit>
 			<trans-unit id="sys_category.type.department">
 				<source>Department</source>
 			</trans-unit>
-			<trans-unit id="sys_category.type.institute">
-				<source>Institute</source>
+			<trans-unit id="sys_category.type.competence_field">
+				<source>Competence field</source>
+			</trans-unit>
+			<trans-unit id="sys_category.type.cooperation">
+				<source>Cooperation</source>
+			</trans-unit>
+			<trans-unit id="sys_category.type.funding_partner">
+				<source>Funding partner</source>
 			</trans-unit>
 
 			<trans-unit id="filter.sorting.lastUpdated.asc">
