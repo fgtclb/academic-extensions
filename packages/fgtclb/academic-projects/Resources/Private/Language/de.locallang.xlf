@@ -16,16 +16,16 @@
 				<target>Organisationseinheit</target>
 			</trans-unit>
 			<trans-unit id="sys_category.type.competence_field">
-				<source>Competence field</source>
-				<target>Kompetenzfeld</target>
+				<source>Competence fields</source>
+				<target>Kompetenzfelder</target>
 			</trans-unit>
 			<trans-unit id="sys_category.type.cooperation">
-				<source>Cooperation</source>
-				<target>Kooperation</target>
+				<source>Cooperations</source>
+				<target>Kooperationen</target>
 			</trans-unit>
 			<trans-unit id="sys_category.type.funding_partner">
 				<source>Funding partner</source>
-				<target>Mittelgebender</target>
+				<target>Mittelgebende</target>
 			</trans-unit>
 		</body>
 	</file>
