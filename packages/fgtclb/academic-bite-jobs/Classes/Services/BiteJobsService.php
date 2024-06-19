@@ -28,9 +28,11 @@ final class BiteJobsService implements LoggerAwareInterface
 
     protected string $url;
 
-    public function __construct(
-        private readonly RequestFactory $requestFactory
-    ) {
+    protected RequestFactory $requestFactory;
+
+    public function __construct(RequestFactory $requestFactory) {
+        $this->requestFactory = $requestFactory ?? GeneralUtility::makeInstance(RequestFactory::class);
+
         $this->url = 'https://jobs.b-ite.com/api/v1/';
         $this->headers = ['Content-Type' => 'application/json'];
     }
