@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicBiteJobs\Controller;
 
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use FGTCLB\AcademicBiteJobs\Services\BiteJobsService;
 
 class BiteJobsController extends ActionController
 {
-    public function __construct(
-        protected readonly BiteJobsService $biteJobsService
-    ) {
+    protected BiteJobsService $biteJobsService;
+    public function __construct(BiteJobsService $biteJobsService) {
+        $this->biteJobsService = $biteJobsService ?? GeneralUtility::makeInstance(BiteJobsService::class);
     }
     public function listAction(): ResponseInterface
     {
