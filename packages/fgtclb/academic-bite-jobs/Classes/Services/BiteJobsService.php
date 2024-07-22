@@ -91,7 +91,7 @@ final class BiteJobsService implements LoggerAwareInterface
 
             $this->responseBody = json_decode($response->getBody()->getContents(), true);
         } catch (\Exception $e) {
-            $this->logger?->error(sprintf(
+            $this->logger->error(sprintf(
                 'Error while fetching jobs from Bite API: %s',
                 $e->getMessage()
             ));
