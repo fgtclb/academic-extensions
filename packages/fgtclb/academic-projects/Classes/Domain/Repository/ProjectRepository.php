@@ -20,7 +20,8 @@ class ProjectRepository extends Repository
     public function findByFilter(
         bool $hideCompletedProjects,
         ?ProjectFilter $filter = null,
-        array $pages = []
+        array $pages = [],
+        bool $selected = false
     ): QueryResult {
         $query = $this->createQuery();
 
@@ -35,6 +36,9 @@ class ProjectRepository extends Repository
                     }
                 }
             }
+        }
+        if ($selected && !empty($pages)) {
+            $constraints[] = $query->in('uid', $pages);
         }
 
         if ($hideCompletedProjects) {

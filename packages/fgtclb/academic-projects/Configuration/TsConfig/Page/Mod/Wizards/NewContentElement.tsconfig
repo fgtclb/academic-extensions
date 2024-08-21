@@ -12,7 +12,16 @@ mod.wizards {
                     list_type = academicprojects_projectlist
                 }
             }
+            academicprojects_projectlistsingle {
+                iconIdentifier = actions-code-merge
+                title = LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academic_projects_p2.name
+                description = LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academic_projects_p2.description
+                tt_content_defValues {
+                    CType = list
+                    list_type = academicprojects_projectlistsingle
+                }
+            }
         }
-        show := addToList(academicprojects_projectlist)
+        show := addToList(academicprojects_projectlist, academicprojects_projectlistsingle)
     }
 }

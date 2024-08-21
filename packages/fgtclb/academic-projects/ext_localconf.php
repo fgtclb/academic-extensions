@@ -25,4 +25,14 @@
             \FGTCLB\AcademicProjects\Controller\ProjectController::class => 'list',
         ]
     );
+    \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+        'AcademicProjects',
+        'ProjectListSingle',
+        [
+            \FGTCLB\AcademicProjects\Controller\ProjectController::class => 'list',
+        ],
+        [
+            \FGTCLB\AcademicProjects\Controller\ProjectController::class => 'list',
+        ]
+    );
 })();

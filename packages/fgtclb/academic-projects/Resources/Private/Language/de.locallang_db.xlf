@@ -41,6 +41,14 @@
 				<source>List of academic projects with sorting and filtering</source>
 				<target>Liste akademischer Projekte mit Sortierung und Filterung</target>
 			</trans-unit>
+            <trans-unit id="tx_academic_projects_p2.name" resname="tx_academic_projects_p2.name">
+				<source>Academic Projects (selected)</source>
+				<target>Akademische Projekte (ausgewählte)</target>
+			</trans-unit>
+			<trans-unit id="tx_academic_projects_p2.description" resname="tx_academic_projects_p2.description">
+				<source>List of selected academic projects with sorting and filtering</source>
+				<target>Liste ausgewählter akademischer Projekte mit Sortierung und Filterung</target>
+			</trans-unit>
 			<trans-unit id="wizard_items.academic">
 				<source>Academic</source>
 				<target>Akademisch</target>

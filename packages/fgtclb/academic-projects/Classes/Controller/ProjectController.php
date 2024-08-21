@@ -38,12 +38,10 @@ class ProjectController extends ActionController
         $projects = $this->projectRepository->findByFilter(
             $hideCompletedProjects,
             $filter,
-            GeneralUtility::intExplode(
-                ',',
-                $this->configurationManager->getContentObject()
-                    ? $this->configurationManager->getContentObject()->data['pages']
-                    : []
-            )
+            $this->configurationManager->getContentObject()->data['pages'] !== ''
+                ? GeneralUtility::intExplode(',', $this->configurationManager->getContentObject()->data['pages'])
+                : [],
+            $this->configurationManager->getContentObject()->data['list_type'] === 'academicprojects_projectlistsingle' ? true : false
         );
 
         $categories = $this->categoryRepository->findAllApplicable($projects);

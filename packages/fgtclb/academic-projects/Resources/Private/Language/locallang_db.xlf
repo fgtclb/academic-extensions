@@ -32,6 +32,12 @@
 			<trans-unit id="tx_academic_projects_p1.description" resname="tx_academic_projects_p1.description">
 				<source>List of academic projects with sorting and filtering</source>
 			</trans-unit>
+            <trans-unit id="tx_academic_projects_p2.name" resname="tx_academic_projects_p2.name">
+				<source>Academic Projects (selected)</source>
+			</trans-unit>
+            <trans-unit id="tx_academic_projects_p2.description" resname="tx_academic_projects_p2.description">
+				<source>List of selected academic projects with sorting and filtering</source>
+			</trans-unit>
 			<trans-unit id="wizard_items.academic">
 				<source>Academic</source>
 			</trans-unit>
