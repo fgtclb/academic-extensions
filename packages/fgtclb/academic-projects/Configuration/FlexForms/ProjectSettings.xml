@@ -14,6 +14,16 @@
                     </config>
                 </TCEforms>
             </settings.filter.options>
+            <settings.hide_completed_projects>
+                <TCEforms>
+                    <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.filter.options.hide_completed_projects</label>
+                    <description>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.filter.options.hide_completed_projects.description</description>
+                    <config>
+                        <type>check</type>
+                        <default>1</default>
+                    </config>
+                </TCEforms>
+            </settings.hide_completed_projects>
             <settings.sorting>
                 <TCEforms>
                     <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.sorting</label>

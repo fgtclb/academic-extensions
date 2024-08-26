@@ -12,7 +12,12 @@
 			<trans-unit id="flexform.filter.options.description">
 				<source>If the option is enabled, options with filters will not be visible in the frontend</source>
 			</trans-unit>
-
+			<trans-unit id="flexform.filter.options.hide_completed_projects">
+				<source>Hide completed projects</source>
+			</trans-unit>
+			<trans-unit id="flexform.filter.options.hide_completed_projects.description">
+				<source>Hide projects that have passed their end date from the overview.</source>
+			</trans-unit>
 			<trans-unit id="flexform.sorting">
 				<source>Sorting</source>
 			</trans-unit>
@@ -50,7 +55,6 @@
 			<trans-unit id="flexform.sorting.tx_academicprojects_start_date.desc">
 				<source>Start date (newest first)</source>
 			</trans-unit>
-
 			<trans-unit id="flexform.category.description">
 				<source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
 			</trans-unit>

@@ -21,6 +21,8 @@ class ProjectController extends ActionController
 
     public function listAction(?ProjectFilter $filter = null): ResponseInterface
     {
+        $hideCompletedProjects = true;
+
         if (!$filter) {
             $filter = new ProjectFilter();
 
@@ -29,7 +31,12 @@ class ProjectController extends ActionController
             }
         }
 
+        if (isset($this->settings['hide_completed_projects'])) {
+            $hideCompletedProjects = (bool)$this->settings['hide_completed_projects'];
+        }
+
         $projects = $this->projectRepository->findByFilter(
+            $hideCompletedProjects,
             $filter,
             GeneralUtility::intExplode(
                 ',',
@@ -39,7 +46,7 @@ class ProjectController extends ActionController
             )
         );
 
-        $categories =$this->categoryRepository->findAllApplicable($projects);
+        $categories = $this->categoryRepository->findAllApplicable($projects);
 
         $assignedValues = [
             'projects' => $projects,

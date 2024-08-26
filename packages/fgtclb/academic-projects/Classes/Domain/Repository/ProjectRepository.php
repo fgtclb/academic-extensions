@@ -18,6 +18,7 @@ class ProjectRepository extends Repository
      * @throws InvalidEnumerationValueException
      */
     public function findByFilter(
+        bool $hideCompletedProjects,
         ?ProjectFilter $filter = null,
         array $pages = []
     ): QueryResult {
@@ -36,9 +37,20 @@ class ProjectRepository extends Repository
             }
         }
 
-        $query->matching(
-            $query->logicalAnd($constraints)
-        );
+        if ($hideCompletedProjects) {
+            $constraints[] = $query->logicalOr(
+                $query->greaterThanOrEqual('tx_academicprojects_end_date', new \DateTime()),
+                $query->equals('tx_academicprojects_end_date', 0)
+            );
+        } else {
+            $query->getQuerySettings()->setIgnoreEnableFields(true);
+        }
+
+        if (!empty($constraints)) {
+            $query->matching(
+                $query->logicalAnd($constraints)
+            );
+        }
 
         [$sortingField, $sortingDirection] = explode(' ', SortingOptions::__default);
         if ($filter && $filter->getSorting()) {
