@@ -92,9 +92,6 @@
             <trans-unit id="flexform.el.jobs.limit.description">
                 <source>Maximum number of job offers (0 = no limit)</source>
             </trans-unit>
-            <trans-unit key="fe.b-ite.no-jobs">
-                <source>There are currently no job vacancies.</source>
-            </trans-unit>
         </body>
     </file>
 </xliff>

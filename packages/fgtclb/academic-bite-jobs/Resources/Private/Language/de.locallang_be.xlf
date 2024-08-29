@@ -96,10 +96,6 @@
                 <source>All</source>
                 <target>Alle</target>
             </trans-unit>
-            <trans-unit key="fe.b-ite.no-jobs">
-                <source>There are currently no job vacancies.</source>
-                <target>Zur Zeit gibt es keine aktuellen Ausschreibungen.</target>
-            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" target-language="de" datatype="plaintext"
+          original="messages" date="2023-09-15T08:53:00Z">
+        <header/>
+        <body>
+            <trans-unit id="fe.b-ite.no-jobs">
+                <source>There are currently no job vacancies.</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
