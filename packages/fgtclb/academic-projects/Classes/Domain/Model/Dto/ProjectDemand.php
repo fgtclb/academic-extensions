@@ -23,7 +23,8 @@ class ProjectDemand
 
     protected string $sortingDirection = '';
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->setSorting(SortingOptions::__default);
     }
 

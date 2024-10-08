@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicProjects\Domain\Repository;
 
 use FGTCLB\AcademicProjects\Collection\CategoryCollection;
-use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 use FGTCLB\AcademicProjects\Domain\Model\Category;
 use FGTCLB\AcademicProjects\Domain\Model\Project;
+use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -19,7 +19,8 @@ class CategoryRepository
     public function __construct(
         protected ConnectionPool $connectionPool,
         protected PageRepository $pageRepository
-    ) {}
+    ) {
+    }
 
     public function findByType(
         int $pageId,
@@ -176,8 +177,8 @@ class CategoryRepository
 
         // Generate aa list of all categories which are assigned to the given projects
         $applicableCategories = [];
-        foreach($projects as $project) {
-            foreach($project->getAttributes() as $attribute) {
+        foreach ($projects as $project) {
+            foreach ($project->getAttributes() as $attribute) {
                 $applicableCategories[] = $attribute->getUid();
             }
         }

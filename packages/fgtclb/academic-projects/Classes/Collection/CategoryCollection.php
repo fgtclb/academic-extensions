@@ -6,8 +6,8 @@ namespace FGTCLB\AcademicProjects\Collection;
 
 use ArrayAccess;
 use Countable;
-use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 use FGTCLB\AcademicProjects\Domain\Model\Category;
+use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 use FGTCLB\AcademicProjects\Exception\Domain\CategoryExistException;
 use Iterator;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;

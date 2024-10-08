@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\ViewHelpers\Form;
 
-use FGTCLB\AcademicProjects\ViewHelpers\Form\AbstractSelectViewHelper;
-
 class DemandSelectViewHelper extends AbstractSelectViewHelper
 {
     public function initializeArguments(): void
