@@ -9,6 +9,7 @@ use FGTCLB\AcademicProjects\Enumeration\SortingOptions;
 
 class ProjectDemand
 {
+    /** @var int[] */
     protected array $pages = [];
 
     protected bool $showSelected = false;
@@ -28,11 +29,17 @@ class ProjectDemand
         $this->setSorting(SortingOptions::__default);
     }
 
+    /**
+     * @param int[] $pages
+     */
     public function setPages(array $pages): void
     {
         $this->pages = $pages;
     }
 
+    /**
+     * @return int[]
+     */
     public function getPages(): array
     {
         return $this->pages;

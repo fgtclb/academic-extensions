@@ -9,6 +9,7 @@ use FGTCLB\AcademicProjects\Domain\Repository\ProjectRepository;
 use FGTCLB\AcademicProjects\Factory\DemandFactory;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class ProjectController extends ActionController
 {
@@ -25,7 +26,9 @@ class ProjectController extends ActionController
      */
     public function listAction(?array $demand = null): ResponseInterface
     {
-        $contentElementData = $this->configurationManager->getContentObject()->data;
+        /** @var ContentObjectRenderer $contentObjectRenderer */
+        $contentObjectRenderer = $this->configurationManager->getContentObject();
+        $contentElementData = $contentObjectRenderer->data;
 
         $demandObject = $this->demandFactory->createDemandObject(
             $demand,

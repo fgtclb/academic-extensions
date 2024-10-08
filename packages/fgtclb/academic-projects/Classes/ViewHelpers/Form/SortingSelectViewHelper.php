@@ -16,11 +16,9 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
     }
 
     /**
-     * Render the option tags.
-     *
-     * @return array an associative array of options, key will be the value of the option tag
+     * @return array<int, mixed>
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         $optionsArgument = [];
 
@@ -38,11 +36,7 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
             }
         } else {
             $optionsArgument = $this->arguments['options'];
-
-            if (isset($this->arguments['l10n']) && $this->arguments['l10n']) {
-                $request = $this->getRequest();
-                $extensionName = $this->arguments['extensionName'] === null ? $request->getControllerExtensionName() : $this->arguments['extensionName'];
-            }
+            $extensionName = $this->arguments['extensionName'] === null ? 'academic_projects' : $this->arguments['extensionName'];
 
             foreach ($optionsArgument as $value => $label) {
                 if (isset($this->arguments['l10n']) && $this->arguments['l10n']) {
@@ -78,10 +72,8 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
     }
 
     /**
-     * Render the option tags.
-     *
-     * @param array<string|mixed> $options the options for the form.
-     * @return string rendered tags.
+     * @param array<int, mixed> $options
+     * @return string
      */
     protected function renderOptionTags($options)
     {

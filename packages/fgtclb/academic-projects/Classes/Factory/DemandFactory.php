@@ -29,6 +29,7 @@ class DemandFactory
         array $contentElementData
     ): ProjectDemand {
         $demand = GeneralUtility::makeInstance(ProjectDemand::class);
+        $filterCollection = GeneralUtility::makeInstance(FilterCollection::class);
 
         // Init demand properties with plugin settings, which can be overwritten by the form
         if ($demandFromForm === null) {
@@ -40,7 +41,7 @@ class DemandFactory
                 && (int)$settings['categories'] > 0
             ) {
                 $categoryCollection = $this->categoryRepository->getByDatabaseFields($contentElementData['uid']);
-                $demandCollection = FilterCollection::createByCategoryCollection($categoryCollection);
+                $filterCollection = FilterCollection::createByCategoryCollection($categoryCollection);
             }
         } else {
             // Set demand properties, if form data is available
@@ -68,20 +69,16 @@ class DemandFactory
                         CategoryTypes::cast($formatType)
                     );
 
-                    if ($categoryFilterObject === null) {
-                        continue;
-                    }
-
                     foreach ($categoryFilterObject as $category) {
                         $categoryCollection->attach($category);
                     }
                 }
 
-                $demandCollection = FilterCollection::createByCategoryCollection($categoryCollection);
+                $filterCollection = FilterCollection::createByCategoryCollection($categoryCollection);
             }
         }
 
-        $demand->setFilterCollection($demandCollection);
+        $demand->setFilterCollection($filterCollection);
 
         // Set demand properties, which are always defined by plugin settings
 
@@ -92,7 +89,7 @@ class DemandFactory
         );
 
         $demand->setShowSelected(
-            $contentElementData === 'academicprojects_projectlistsingle' ? true : false
+            $contentElementData['list_type'] === 'academicprojects_projectlistsingle' ? true : false
         );
 
         if (isset($settings['hide_completed_projects'])) {

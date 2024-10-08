@@ -14,11 +14,9 @@ class DemandSelectViewHelper extends AbstractSelectViewHelper
     }
 
     /**
-     * Render the option tags.
-     *
-     * @return array an associative array of options, key will be the value of the option tag
+     * @return array<int, mixed>
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         if (!is_array($this->arguments['options'])
             && !$this->arguments['options'] instanceof \Traversable
@@ -51,10 +49,10 @@ class DemandSelectViewHelper extends AbstractSelectViewHelper
 
         if ($this->arguments['groupByParent'] !== false) {
             $optionsTree = [];
-            foreach ($options as $key => $option) {
+            foreach ($options as $option) {
                 if ($option['isRoot'] === true) {
                     $option['children'] = $this->createOptionsTree($options, $option);
-                    $optionsTree[$key] = $option;
+                    $optionsTree[] = $option;
                 }
             }
 
@@ -68,16 +66,16 @@ class DemandSelectViewHelper extends AbstractSelectViewHelper
     /**
      * Create the options tree
      *
-     * @param array<string, mixed> $options
-     * @param array<string, mixed> $optionsTree
-     * @return array<string, mixed>
+     * @param array<int, mixed> $options
+     * @param array<string, mixed> $parent
+     * @return array<int, mixed>
      */
     private function createOptionsTree(&$options, $parent): array
     {
         $tree = [];
-        foreach ($options as $key => $option) {
-            if ($options[$key]['parentId'] == $parent['uid']) {
-                $child = $options[$key];
+        foreach ($options as $option) {
+            if ($option['parentId'] == $parent['uid']) {
+                $child = $option;
                 $child['level'] = $parent['level'] + 1;
                 array_push($tree, $child);
 
@@ -95,9 +93,9 @@ class DemandSelectViewHelper extends AbstractSelectViewHelper
     /**
      * Linearize the options tree
      *
-     * @param array<string, mixed> $options
-     * @param array<string, mixed> $optionsTree
-     * @return array<string, mixed>
+     * @param array<int, mixed> $options
+     * @param array<int, mixed> $optionsTree
+     * @return array<int, mixed>
      */
     private function linearizeOptionsTree(array &$options, array $optionsTree): array
     {
@@ -111,10 +109,8 @@ class DemandSelectViewHelper extends AbstractSelectViewHelper
     }
 
     /**
-     * Render the option tags.
-     *
-     * @param array<string|mixed> $options the options for the form.
-     * @return string rendered tags.
+     * @param array<int, mixed> $options
+     * @return string
      */
     protected function renderOptionTags($options)
     {

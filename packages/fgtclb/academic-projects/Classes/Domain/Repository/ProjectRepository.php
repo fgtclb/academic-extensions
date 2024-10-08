@@ -45,11 +45,9 @@ class ProjectRepository extends Repository
             $constraints[] = $query->lessThan('txAcademicprojectsEndDate', new DateTime());
         }
 
-        if (!empty($constraints)) {
-            $query->matching(
-                $query->logicalAnd($constraints)
-            );
-        }
+        $query->matching(
+            $query->logicalAnd($constraints)
+        );
 
         $query->setOrderings(
             [
