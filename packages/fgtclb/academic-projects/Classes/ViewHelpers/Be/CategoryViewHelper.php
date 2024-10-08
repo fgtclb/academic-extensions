@@ -12,28 +12,28 @@ use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
 
 class CategoryViewHelper extends AbstractViewHelper
 {
-    use CompileWithRenderStatic;
-
     protected $escapeOutput = false;
 
     public function initializeArguments(): void
     {
         parent::initializeArguments();
+
         $this->registerArgument(
             'page',
             'int',
             'Page ID',
             true
         );
+
         $this->registerArgument(
             'type',
             'string',
             'The type, none given returns all in associative array'
         );
+
         $this->registerArgument(
             'as',
             'string',

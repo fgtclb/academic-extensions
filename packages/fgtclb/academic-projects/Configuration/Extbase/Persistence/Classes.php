@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use FGTCLB\AcademicProjects\Domain\Model\Project;
+
 return [
-    \FGTCLB\AcademicProjects\Domain\Model\Project::class => [
+    Project::class => [
         'tableName' => 'pages',
         'properties' => [
             'doktype' => [

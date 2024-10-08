@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Model;
 
-use FGTCLB\AcademicProjects\Domain\Collection\CategoryCollection;
+use DateTime;
+use FGTCLB\AcademicProjects\Collection\CategoryCollection;
 use FGTCLB\AcademicProjects\Domain\Repository\CategoryRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 
-/**
- * Model class for the page type "project"
- */
 class Project extends AbstractEntity
 {
     protected int $doktype;
@@ -27,9 +25,9 @@ class Project extends AbstractEntity
 
     protected string $shortDescription = '';
 
-    protected ?\DateTime $startDate = null;
+    protected ?DateTime $startDate = null;
 
-    protected ?\DateTime $endDate = null;
+    protected ?DateTime $endDate = null;
 
     protected float $budget = 0;
 
@@ -72,12 +70,12 @@ class Project extends AbstractEntity
         return $this->shortDescription;
     }
 
-    public function getStartDate(): ?\DateTime
+    public function getStartDate(): ?DateTime
     {
         return $this->startDate;
     }
 
-    public function getEndDate(): ?\DateTime
+    public function getEndDate(): ?DateTime
     {
         return $this->endDate;
     }

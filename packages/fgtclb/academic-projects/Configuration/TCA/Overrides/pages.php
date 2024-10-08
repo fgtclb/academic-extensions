@@ -13,7 +13,8 @@ if (!defined('TYPO3')) {
         return 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
     };
 
-    // Create new academic item group for academic doktype items
+    // Create new item group for academic doktype items
+    // TODO: Harmonize this with all academic extensions
     ExtensionManagementUtility::addTcaSelectItemGroup(
         'pages',
         'doktype',
@@ -24,7 +25,6 @@ if (!defined('TYPO3')) {
 
     $doktype = \FGTCLB\AcademicProjects\Domain\Enumeration\Page::TYPE_ACEDEMIC_PROJECT;
 
-    // Add new doktype item
     ExtensionManagementUtility::addTcaSelectItem(
         'pages',
         'doktype',

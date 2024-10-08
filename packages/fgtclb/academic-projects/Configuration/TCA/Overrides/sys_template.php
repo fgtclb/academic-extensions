@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 (static function (): void {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
+    ExtensionManagementUtility::addStaticFile(
         'academic_projects',
         'Configuration/TypoScript/',
-        'Academic Project Pages'
+        'Academic Projects'
     );
 })();
