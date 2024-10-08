@@ -1,0 +1,79 @@
+<html
+    lang="en"
+    xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:fap="http://typo3.org/ns/FGTCLB/AcademicProjects/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+    <f:if condition="{categories.competenceField}">
+        <label for="competenceField">
+            {f:translate(
+                key: 'sys_category.type.competence_field',
+                extensionName: 'academic_projects'
+            )}
+        </label>
+        <fap:form.demandSelect
+            id="competenceField"
+            property="demandCategories.competenceField"
+            value="{demand.demandCollection.demandCategories.competenceField}"
+            options="{categories.competenceField}"
+            prependOptionLabel="{f:translate(key: 'sys_category.type.competence_field', extensionName: 'academic_projects')}"
+            prependOptionValue=""
+            sortByOptionLabel="true"
+            additionalAttributes="{'onchange': 'this.form.submit()'}"
+        />
+    </f:if>
+    <f:if condition="{categories.cooperation}">
+        <label for="cooperation">
+            {f:translate(
+                key: 'sys_category.type.cooperation',
+                extensionName: 'academic_projects'
+            )}
+        </label>
+        <fap:form.demandSelect
+            id="cooperation"
+            property="demandCategories.cooperation"
+            value="{demand.demandCollection.demandCategories.cooperation}"
+            options="{categories.cooperation}"
+            prependOptionLabel="{f:translate(key: 'sys_category.type.cooperation', extensionName: 'academic_projects')}"
+            prependOptionValue=""
+            sortByOptionLabel="true"
+            additionalAttributes="{'onchange': 'this.form.submit()'}"
+        />
+    </f:if>
+    <f:if condition="{categories.fundingPartner}">
+        <label for="fundingPartner">
+            {f:translate(
+                key: 'sys_category.type.funding_partner',
+                extensionName: 'academic_projects'
+            )}
+        </label>
+        <fap:form.demandSelect
+            id="fundingPartner"
+            property="demandCategories.fundingPartner"
+            value="{demand.demandCollection.demandCategories.fundingPartner}"
+            options="{categories.fundingPartner}"
+            prependOptionLabel="{f:translate(key: 'sys_category.type.funding_partner', extensionName: 'academic_projects')}"
+            prependOptionValue=""
+            sortByOptionLabel="true"
+            additionalAttributes="{'onchange': 'this.form.submit()'}"
+        />
+    </f:if>
+    <f:if condition="{categories.department}">
+        <label for="department">
+            {f:translate(
+                key: 'sys_category.type.department',
+                extensionName: 'academic_projects'
+            )}
+        </label>
+        <fap:form.demandSelect
+            id="department"
+            property="demandCategories.department"
+            value="{demand.demandCollection.demandCategories.department}"
+            options="{categories.department}"
+            prependOptionLabel="{f:translate(key: 'sys_category.type.department', extensionName: 'academic_projects')}"
+            prependOptionValue=""
+            sortByOptionLabel="true"
+            additionalAttributes="{'onchange': 'this.form.submit()'}"
+        />
+    </f:if>
+</html>

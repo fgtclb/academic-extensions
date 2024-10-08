@@ -6,8 +6,8 @@ namespace FGTCLB\AcademicProjects\ViewHelpers\Be;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
-use FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes;
 use FGTCLB\AcademicProjects\Domain\Repository\CategoryRepository;
+use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
