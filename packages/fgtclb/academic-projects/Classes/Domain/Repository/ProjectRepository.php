@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Repository;
 
-use FGTCLB\AcademicProjects\Domain\Enumeration\Page;
-use FGTCLB\AcademicProjects\Domain\Enumeration\SortingOptions;
-use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectFilter;
+use DateTime;
+use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
+use FGTCLB\AcademicProjects\Domain\Model\Project;
+use FGTCLB\AcademicProjects\Enumeration\PageTypes;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Extbase\Persistence\Generic\QueryResult;
 use TYPO3\CMS\Extbase\Persistence\Repository;
@@ -14,40 +15,34 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
 class ProjectRepository extends Repository
 {
     /**
-     * @param int[] $pages
+     * @return QueryResult<Project>
      * @throws InvalidEnumerationValueException
      */
-    public function findByFilter(
-        bool $hideCompletedProjects,
-        ?ProjectFilter $filter = null,
-        array $pages = [],
-        bool $selected = false
-    ): QueryResult {
+    public function findByDemand(ProjectDemand $demand): QueryResult
+    {
         $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
 
         $constraints = [];
-        $constraints[] = $query->equals('doktype', Page::TYPE_ACEDEMIC_PROJECT);
+        $constraints[] = $query->equals('doktype', PageTypes::TYPE_ACEDEMIC_PROJECT);
 
-        if ($filter) {
-            if (!empty($filter->getFilterCategories())) {
-                foreach ($filter->getFilterCategories() as $category) {
-                    if (is_numeric($category) && (int)$category) {
-                        $constraints[] = $query->contains('categories', $category);
-                    }
-                }
+        if (!empty($demand->getPages())) {
+            if ($demand->getShowSelected() === true) {
+                $constraints[] = $query->in('uid', $demand->getPages());
+            } else {
+                $constraints[] = $query->in('pid', $demand->getPages());
+                $query->getQuerySettings()->setRespectStoragePage(true);
             }
         }
-        if ($selected && !empty($pages)) {
-            $constraints[] = $query->in('uid', $pages);
+
+        if ($demand->getFilterCollection() !== null) {
+            foreach ($demand->getFilterCollection()->getFilterCategories() as $category) {
+                $constraints[] = $query->contains('categories', $category->getUid());
+            }
         }
 
-        if ($hideCompletedProjects) {
-            $constraints[] = $query->logicalOr(
-                $query->greaterThanOrEqual('tx_academicprojects_end_date', new \DateTime()),
-                $query->equals('tx_academicprojects_end_date', 0)
-            );
-        } else {
-            $query->getQuerySettings()->setIgnoreEnableFields(true);
+        if ($demand->getHideCompletedProjects() === true) {
+            $constraints[] = $query->lessThan('txAcademicprojectsEndDate', new DateTime());
         }
 
         if (!empty($constraints)) {
@@ -56,16 +51,9 @@ class ProjectRepository extends Repository
             );
         }
 
-        [$sortingField, $sortingDirection] = explode(' ', SortingOptions::__default);
-        if ($filter && $filter->getSorting()) {
-            if (in_array($filter->getSorting(), SortingOptions::getConstants())) {
-                [$sortingField, $sortingDirection] = explode(' ', $filter->getSorting());
-            }
-        }
-
         $query->setOrderings(
             [
-                $sortingField => strtoupper($sortingDirection),
+                $demand->getSortingField() => strtoupper($demand->getSortingDirection()),
             ]
         );
 

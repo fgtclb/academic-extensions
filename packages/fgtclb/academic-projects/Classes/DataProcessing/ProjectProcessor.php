@@ -2,7 +2,7 @@
 
 namespace FGTCLB\AcademicProjects\DataProcessing;
 
-use FGTCLB\AcademicProjects\Domain\Factory\ProjectFactory;
+use FGTCLB\AcademicProjects\Factory\ProjectFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\ContentObject\DataProcessorInterface;
