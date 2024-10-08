@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use FGTCLB\AcademicProjects\Domain\Enumeration\CategoryTypes;
+use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 
 $sourceString = function (string $icon) {
     return sprintf(

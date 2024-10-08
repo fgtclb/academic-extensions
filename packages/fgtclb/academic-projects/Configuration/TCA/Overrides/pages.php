@@ -1,5 +1,6 @@
 <?php
 
+use FGTCLB\AcademicProjects\Enumeration\PageTypes;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -23,7 +24,9 @@ if (!defined('TYPO3')) {
         'after:default'
     );
 
-    $doktype = \FGTCLB\AcademicProjects\Domain\Enumeration\Page::TYPE_ACEDEMIC_PROJECT;
+    // Add and configure new doktype
+
+    $doktype = PageTypes::TYPE_ACEDEMIC_PROJECT;
 
     ExtensionManagementUtility::addTcaSelectItem(
         'pages',
@@ -176,4 +179,5 @@ if (!defined('TYPO3')) {
     }
 
     $GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides']['title']['config']['max'] = 60;
+    //$GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides']['categories']['l10n_mode'] = 'exclude';
 })();
