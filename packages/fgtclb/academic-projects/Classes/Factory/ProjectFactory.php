@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicProjects\Domain\Factory;
+namespace FGTCLB\AcademicProjects\Factory;
 
 use FGTCLB\AcademicProjects\Domain\Model\Project as ProjectModel;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\Mapper\DataMapper;
 
 /**
@@ -20,8 +19,7 @@ class ProjectFactory
      */
     public function get(array $properties): ProjectModel
     {
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $dataMapper = $objectManager->get(DataMapper::class);
+        $dataMapper = GeneralUtility::makeInstance(DataMapper::class);
         $projectModels = $dataMapper->map(ProjectModel::class, [$properties]);
         return $projectModels[0];
     }
