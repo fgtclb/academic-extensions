@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Backend\FormEngine;
 
-use FGTCLB\AcademicProjects\Domain\Enumeration\SortingOptions;
+use FGTCLB\AcademicProjects\Enumeration\SortingOptions;
 
 class SortingItemsProcFunc
 {
