@@ -82,9 +82,6 @@ if (!defined('TYPO3')) {
                 'rows' => 15,
                 'eval' => 'trim',
                 'default' => '',
-                'behaviour' => [
-                    'allowLanguageSynchronization' => true,
-                ],
             ],
         ],
         'tx_academicprojects_start_date' => [
@@ -95,6 +92,9 @@ if (!defined('TYPO3')) {
                 'renderType' => 'inputDateTime',
                 'eval' => 'date',
                 'size' => 7,
+                'behaviour' => [
+                    'allowLanguageSynchronization' => true,
+                ],
             ],
         ],
         'tx_academicprojects_end_date' => [
@@ -105,6 +105,9 @@ if (!defined('TYPO3')) {
                 'renderType' => 'inputDateTime',
                 'eval' => 'date',
                 'size' => 7,
+                'behaviour' => [
+                    'allowLanguageSynchronization' => true,
+                ],
             ],
         ],
         'tx_academicprojects_budget' => [
