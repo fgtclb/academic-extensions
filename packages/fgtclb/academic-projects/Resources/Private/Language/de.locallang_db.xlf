@@ -26,7 +26,7 @@
 			</trans-unit>
 			<trans-unit id="tx_academicprojects_domain_model_project.short_description">
 				<source>Project short description</source>
-				<target>Kurzbescrheibung des Projektes</target>
+				<target>Kurzbeschreibung des Projektes</target>
 			</trans-unit>
 			<trans-unit id="tx_academicprojects_domain_model_project.start_date">
 				<source>Project start</source>

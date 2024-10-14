@@ -16,14 +16,14 @@
 			<trans-unit id="tx_academicprojects_domain_model_project.funders">
 				<source>Project funders</source>
 			</trans-unit>
+			<trans-unit id="tx_academicprojects_domain_model_project.project_title">
+				<source>Project title</source>
+			</trans-unit>
 			<trans-unit id="tx_academicprojects_domain_model_project.short_description">
 				<source>Project short description</source>
 			</trans-unit>
 			<trans-unit id="tx_academicprojects_domain_model_project.start_date">
 				<source>Project start</source>
-			</trans-unit>
-			<trans-unit id="tx_academicprojects_domain_model_project.project_title">
-				<source>Project title</source>
 			</trans-unit>
 
 			<trans-unit id="tx_academic_projects_p1.name" resname="tx_academic_projects_p1.name">
