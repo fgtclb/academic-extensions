@@ -42,10 +42,10 @@ class ProjectRepository extends Repository
         }
 
         if ($demand->getHideCompletedProjects() === true) {
-            $constraints[] = $query->logicalOr(
+            $constraints[] = $query->logicalOr([
                 $query->equals('txAcademicprojectsEndDate', 0),
                 $query->greaterThan('txAcademicprojectsEndDate', new DateTime())
-            );
+            ]);
         }
 
         $query->matching(
