@@ -6,8 +6,8 @@ use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 
 $sourceString = function (string $icon) {
     return sprintf(
-        'EXT:academic_projects/Resources/Public/Icons/%s.svg',
-        \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToLowerCamelCase($icon)
+        'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/%s.svg',
+        \TYPO3\CMS\Core\Utility\GeneralUtility::underscoredToUpperCamelCase($icon)
     );
 };
 
