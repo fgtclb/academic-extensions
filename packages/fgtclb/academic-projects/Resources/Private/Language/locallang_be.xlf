@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" target-language="" datatype="plaintext"
-		  original="messages" date="2023-04-24T15:52:42Z">
-		<header>
-			<generator>PhpStorm</generator>
-		</header>
+	<file source-language="en" target-language="" datatype="plaintext" original="messages" date="2023-04-24T15:52:42Z">
+		<header />
 		<body>
+			<!-- Backend Layouts -->
+
+			<trans-unit id="backend_layout.academic_project">
+				<source>Academic Project</source>
+			</trans-unit>
+			<trans-unit id="backend_layout.academic_project.column.content">
+				<source>Content</source>
+			</trans-unit>
+
+			<!-- Flexforms -->
+
+			<trans-unit id="flexform.category.description">
+				<source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
+			</trans-unit>
 			<trans-unit id="flexform.filter.options.title">
 				<source>Deactivate filtering</source>
 			</trans-unit>
@@ -24,7 +35,6 @@
 			<trans-unit id="flexform.sorting.description">
 				<source>Define sorting in frontend. Sort by page sorting doesn't respect multiple mounts as sort</source>
 			</trans-unit>
-
 			<trans-unit id="flexform.sorting.lastUpdated.asc">
 				<source>Last updated (latest first)</source>
 			</trans-unit>
@@ -54,9 +64,6 @@
 			</trans-unit>
 			<trans-unit id="flexform.sorting.tx_academicprojects_start_date.desc">
 				<source>Start date (newest first)</source>
-			</trans-unit>
-			<trans-unit id="flexform.category.description">
-				<source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
 			</trans-unit>
 		</body>
 	</file>

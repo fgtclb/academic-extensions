@@ -1,0 +1,2 @@
+@import 'EXT:academic_projects/Configuration/TsConfig/Mod/Wizards/*.tsconfig'
+@import 'EXT:academic_projects/Configuration/TsConfig/Page/BackendLayouts/*.tsconfig'
