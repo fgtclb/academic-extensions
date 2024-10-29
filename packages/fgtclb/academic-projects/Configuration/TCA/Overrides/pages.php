@@ -90,8 +90,7 @@ if (!defined('TYPO3')) {
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'eval' => 'date',
-                'size' => 7,
+                'eval' => 'date,int',
                 'behaviour' => [
                     'allowLanguageSynchronization' => true,
                 ],
@@ -103,8 +102,7 @@ if (!defined('TYPO3')) {
             'config' => [
                 'type' => 'input',
                 'renderType' => 'inputDateTime',
-                'eval' => 'date',
-                'size' => 7,
+                'eval' => 'date,int',
                 'behaviour' => [
                     'allowLanguageSynchronization' => true,
                 ],
