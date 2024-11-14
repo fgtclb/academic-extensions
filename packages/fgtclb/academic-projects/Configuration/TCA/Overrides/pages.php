@@ -68,6 +68,7 @@ if (!defined('TYPO3')) {
         ],
         'tx_academicprojects_short_description' => [
             'exclude' => true,
+            'l10n_mode' => 'prefixLangTitle',
             'label' => $ll('tx_academicprojects_domain_model_project.short_description'),
             'config' => [
                 'type' => 'text',
@@ -121,6 +122,7 @@ if (!defined('TYPO3')) {
         ],
         'tx_academicprojects_funders' => [
             'exclude' => true,
+            'l10n_mode' => 'prefixLangTitle',
             'label' => $ll('tx_academicprojects_domain_model_project.funders'),
             'config' => [
                 'type' => 'text',
