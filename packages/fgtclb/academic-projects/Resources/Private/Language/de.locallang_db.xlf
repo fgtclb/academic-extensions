@@ -58,8 +58,8 @@
 				<source>Akademische Seiten</source>
 			</trans-unit>
 			<trans-unit id="pages.doktype.item.academic_projects">
-				<source>Academic Projects</source>
-				<target>Akademische Projekte</target>
+				<source>Academic Project</source>
+				<target>Akademisches Projekt</target>
 			</trans-unit>
 		</body>
 	</file>
