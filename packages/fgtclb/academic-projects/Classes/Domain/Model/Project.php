@@ -55,6 +55,9 @@ class Project extends AbstractEntity
         return $this->title;
     }
 
+    /**
+     * @return ObjectStorage<FileReference>
+     */
     public function getMedia(): ObjectStorage
     {
         return $this->media;

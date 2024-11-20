@@ -12,6 +12,9 @@ use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Extbase\Persistence\Generic\QueryResult;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
+/**
+ * @extends Repository<Project>
+ */
 class ProjectRepository extends Repository
 {
     /**
@@ -44,7 +47,7 @@ class ProjectRepository extends Repository
         if ($demand->getHideCompletedProjects() === true) {
             $constraints[] = $query->logicalOr([
                 $query->equals('txAcademicprojectsEndDate', 0),
-                $query->greaterThan('txAcademicprojectsEndDate', new DateTime())
+                $query->greaterThan('txAcademicprojectsEndDate', new DateTime()),
             ]);
         }
 
