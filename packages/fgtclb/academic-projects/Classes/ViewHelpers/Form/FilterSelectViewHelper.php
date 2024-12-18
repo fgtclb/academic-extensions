@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\ViewHelpers\Form;
 
-class DemandSelectViewHelper extends AbstractSelectViewHelper
+class FilterSelectViewHelper extends AbstractSelectViewHelper
 {
     public function initializeArguments(): void
     {
@@ -112,7 +112,7 @@ class DemandSelectViewHelper extends AbstractSelectViewHelper
      * @param array<int, mixed> $options
      * @return string
      */
-    protected function renderOptionTags($options)
+    protected function renderOptionTags($options): string
     {
         $output = '';
         foreach ($options as $value => $option) {
