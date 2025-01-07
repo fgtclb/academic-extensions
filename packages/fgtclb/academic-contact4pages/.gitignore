@@ -1,11 +1,12 @@
-.php-cs-fixer.cache
+.Build
 .DS_Store
 .idea
 .vscode/
-.Build
-!.Build/Web/.gitkeep
-composer.lock
 *.cache
 
 /tailor-version-artefact/
 /tailor-version-upload/
+
+/composer.lock
+/public
+/vendor
