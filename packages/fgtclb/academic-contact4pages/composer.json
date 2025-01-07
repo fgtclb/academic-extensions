@@ -1,0 +1,22 @@
+{
+	"name": "fgtclb/academic-contacts4pages",
+	"description": "Role based relations between profiles and pages",
+	"type": "typo3-cms-extension",
+	"license": [
+		"GPL-2.0-or-later"
+	],
+	"require": {
+		"typo3/cms-core": "^11.5",
+		"fgtclb/academic-persons": "^0.2.0 | dev-main"
+	},
+	"autoload": {
+		"psr-4": {
+			"FGTCLB\\AcademicContacts4pages\\": "Classes/"
+		}
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "academic_contacts4pages"
+		}
+	}
+}

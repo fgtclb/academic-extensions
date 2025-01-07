@@ -1,0 +1,7 @@
+page {
+  10 {
+    dataProcessing {
+      400 = FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor
+    }
+  }
+}

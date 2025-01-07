@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf" date="2022-08-26T11:27:17Z" product-name="contacts4pages">
+		<header/>
+		<body>
+			<trans-unit id="pages.tx_academiccontacts4pages_contacts">
+				<source>Contacts</source>
+			</trans-unit>
+			<trans-unit id="tx_academicpersons_domain_model_contract.tx_academiccontacts4pages_contacts">
+				<source>Linked pages</source>
+			</trans-unit>
+
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact">
+				<source>Contact</source>
+			</trans-unit>
+			<trans-unit id="tx_academicpersons_domain_model_contract.tx_academiccontacts4pages_domain_model_contact.button">
+				<source>Create new Linked page</source>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.page">
+				<source>Page</source>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.contract">
+				<source>Contract</source>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.role">
+				<source>Role</source>
+			</trans-unit>
+
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role">
+				<source>Role</source>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role.name">
+				<source>Name</source>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role.description">
+				<source>Description</source>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role.doktypes">
+				<source>Page types</source>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role.contacts">
+				<source>Contacts</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

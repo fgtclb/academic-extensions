@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" target-language="de" datatype="plaintext" original="EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf" date="2022-08-26T11:27:17Z" product-name="academic_contacts4pages">
+		<header/>
+		<body>
+			<trans-unit id="pages.tx_academiccontacts4pages_contacts">
+				<source>Contacts</source>
+				<target>Kontakte</target>
+			</trans-unit>
+			<trans-unit id="tx_academicpersons_domain_model_contract.tx_academiccontacts4pages_contacts">
+				<source>Linked pages</source>
+				<target>Verknüpfte Seiten</target>
+			</trans-unit>
+
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact">
+				<source>Contact</source>
+				<target>Kontakt</target>
+			</trans-unit>
+			<trans-unit id="tx_academicpersons_domain_model_contract.tx_academiccontacts4pages_domain_model_contact.button">
+				<source>Create new Linked page</source>
+				<target>Neue Verknüpfte Seite</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.page">
+				<source>Page</source>
+				<target>Seite</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.contract">
+				<source>Contract</source>
+				<target>Vertrag</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.role">
+				<source>Role</source>
+				<target>Rolle</target>
+			</trans-unit>
+
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role">
+				<source>Role</source>
+				<target>Rolle</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role.name">
+				<source>Name</source>
+				<target>Name</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role.description">
+				<source>Description</source>
+				<target>Beschreibung</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role.doktypes">
+				<source>Page types</source>
+				<target>Seitentypen</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_role.contacts">
+				<source>Contacts</source>
+				<target>Kontakte</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
