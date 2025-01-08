@@ -7,7 +7,7 @@ $ll = 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.x
 return [
     'ctrl' => [
         'title' => $ll . 'tx_academiccontacts4pages_domain_model_contact',
-        'label' => 'name',
+        'label' => 'uid',
         'label_userFunc' => \FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContactLabels::class . '->getTitle',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -16,15 +16,16 @@ return [
         'origUid' => 't3_origuid',
         'sortby' => 'sorting',
         'delete' => 'deleted',
-        'languageField' => 'sys_language_uid',
-        'transOrigPointerField' => 'l10n_parent',
-        'transOrigDiffSourceField' => 'l10n_diffsource',
-        'translationSource' => 'l10n_source',
         'enablecolumns' => [
             'disabled' => 'hidden',
         ],
         'typeicon_classes' => [
             'default' => 'tx_academiccontacts4pages_domain_model_contact_pages',
+        ],
+        // The usage of method allowTableOnStandardPages() is deprecated with v12.0 and replaced with TCA setting.
+        // @see https://docs.typo3.org/m/typo3/reference-coreapi/12.4/en-us/ExtensionArchitecture/FileStructure/ExtTables.html#extension-configuration-files-allow-table-standard
+        'security' => [
+            'ignorePageTypeRestriction' => true,
         ],
     ],
     'types' => [
