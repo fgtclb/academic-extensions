@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf" date="2022-08-26T11:27:17Z" product-name="contacts4pages">
+		<header/>
+		<body>
+			<trans-unit id="plugin.contacts_list.title">
+				<source>Contacts for this page</source>
+			</trans-unit>
+			<trans-unit id="plugin.contacts_list.description">
+				<source>List the contacts assigned to the page</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
