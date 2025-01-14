@@ -20,7 +20,7 @@ return [
             'disabled' => 'hidden',
         ],
         'typeicon_classes' => [
-            'default' => 'tx_academiccontacts4pages_domain_model_contact_pages',
+            'default' => 'tx_academiccontacts4pages_domain_model_contact',
         ],
         // The usage of method allowTableOnStandardPages() is deprecated with v12.0 and replaced with TCA setting.
         // @see https://docs.typo3.org/m/typo3/reference-coreapi/12.4/en-us/ExtensionArchitecture/FileStructure/ExtTables.html#extension-configuration-files-allow-table-standard
