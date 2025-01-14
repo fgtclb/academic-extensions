@@ -17,6 +17,8 @@ class ContractItemsProcFunc
     {
         $querySettings = GeneralUtility::makeInstance(Typo3QuerySettings::class);
         $querySettings->setRespectStoragePage(false);
+        // TODO: Check how to handle hidden and deleted records in selection and existing relations
+        // TODO: Check how to handle publish property of contracts in selection existing relations
 
         $contractRepository = GeneralUtility::makeInstance(ContractRepository::class);
         $contractRepository->setDefaultQuerySettings($querySettings);
@@ -24,28 +26,19 @@ class ContractItemsProcFunc
 
         $items = [];
         foreach ($contracts as $contract) {
-            $item = [];
-            $item['lastName'] = '';
-            $item['firstName'] = '';
-            if ($contract->getProfile()) {
-                $item['lastName'] = $contract->getProfile()->getLastName();
-                $item['firstName'] = $contract->getProfile()->getFirstName();
-            }
-
-            $item['employeeType'] = '';
-            if ($contract->getEmployeeType()) {
-                $item['employeeType'] = $contract->getEmployeeType()->getTitle();
-            }
-            $item['label'] = $contract->getLabel();
-            $items[$contract->getUid()] = $item;
+            $items[$contract->getUid()] = [
+                'lastName' => $contract->getProfile()?->getLastName(),
+                'firstName' => $contract->getProfile()?->getFirstName(),
+                'label' => $contract->getLabel(),
+            ];
         }
 
         uasort(
             $items,
             fn ($a, $b): int =>
-                [$a['lastName'], $a['firstName'], $a['employeeType']]
+                [$a['lastName'], $a['firstName']]
                 <=>
-                [$b['lastName'], $b['firstName'], $b['employeeType']]
+                [$b['lastName'], $b['firstName']]
         );
 
         foreach ($items as $key => $properties) {
