@@ -32,13 +32,13 @@ class Contact extends AbstractEntity
 
     public function getLabel(): string
     {
-        $label = '';
-        if ($this->contract) {
-            $label .= $this->contract->getLabel();
-        }
+        $labelParts = [];
         if ($this->role) {
-            $label .= ' / ' . $this->role->getName();
+            $labelParts[] = $this->role->getName();
         }
-        return $label;
+        if ($this->contract) {
+            $labelParts[] = $this->contract->getLabel();
+        }
+        return implode(' - ', $labelParts);
     }
 }
