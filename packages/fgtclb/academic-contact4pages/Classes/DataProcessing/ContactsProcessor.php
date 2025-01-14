@@ -25,20 +25,13 @@ class ContactsProcessor implements DataProcessorInterface
         array $processorConfiguration,
         array $processedData
     ) {
-        $contactRepository = GeneralUtility::makeInstance(ContactRepository::class);
-
-        // With the introduction of the new PageViewContentObject in version TYPO3 v13.1 the structure of the processedData array has changed.
-        // @see https://docs.typo3.org/c/typo3/cms-core/main/en-us//Changelog/13.1/Feature-103504-NewContentObjectPageView.html
-        // @see https://github.com/TYPO3/typo3/blob/12.4/typo3/sysext/frontend/Classes/ContentObject/FluidTemplateContentObject.php#L283
-        // @see https://github.com/TYPO3/typo3/blob/13.1/typo3/sysext/frontend/Classes/ContentObject/PageViewContentObject.php#L158
-        $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
-        if ($versionInformation->getMajorVersion() >= 13) {
-            $pageUid = $processedData['page']->getId();
-        } else {
-            $pageUid = $processedData['data']['uid'];
+        list($currentRecordTable, $currentRecordUid) = explode(':', $cObj->currentRecord);
+        if ($currentRecordTable !== 'pages') {
+            return $processedData;
         }
 
-        $contacts = $contactRepository->findByPid($pageUid);
+        $contactRepository = GeneralUtility::makeInstance(ContactRepository::class);
+        $contacts = $contactRepository->findByPid($currentRecordUid);
 
         $roles = [];
         foreach ($contacts as $contact) {
