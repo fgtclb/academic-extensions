@@ -1,0 +1,21 @@
+groups:
+  - identifier: projects
+    title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:category_group.projects'
+    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryGroups/Projects.svg'
+types:
+  - identifier: competence_field
+    title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:category_type.competence_field'
+    group: projects
+    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/CompetenceField.svg'
+  - identifier: cooperation
+    title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:category_type.cooperation'
+    group: projects
+    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Cooperation.svg'
+  - identifier: funding_partner
+    title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:category_type.funding_partner'
+    group: projects
+    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/FundingPartner.svg'
+  - identifier: department
+    title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:category_type.department'
+    group: projects
+    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Department.svg'
