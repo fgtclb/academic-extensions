@@ -3,36 +3,37 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-    <div>
-        <f:if condition="{roles}">
-            <f:then>
-                <f:for each="{roles}" as="role">
-                    <f:if condition="{role.description}">
-                        <f:then>
-                            <p class="text-primary mb-0">{role.description}</p>
-                        </f:then>
-                        <f:else>
-                            <p class="text-primary mb-0">{role.name}</p>
-                        </f:else>
-                    </f:if>
-                    <f:for each="{contacts}" as="contact">
-                        <f:if condition="{contact.role} == {role}">
-                            <f:render
-                                partial="Contacts/ContactWidgetAddress"
-                                arguments="{address: '{contact.contract}'}"
-                            />
-                        </f:if>
-                    </f:for>
-                </f:for>
-            </f:then>
-            <f:else>
+<div class="academic-contacts4pages">
+    <f:if condition="{roles}">
+        <f:then>
+            <f:for each="{roles}" as="role">
+                <f:if condition="{role.description}">
+                    <f:then>
+                        <p class="text-primary mb-0">{role.description}</p>
+                    </f:then>
+                    <f:else>
+                        <p class="text-primary mb-0">{role.name}</p>
+                    </f:else>
+                </f:if>
+
                 <f:for each="{contacts}" as="contact">
-                    <f:render
-                        partial="Contacts/ContactWidgetAddress"
-                        arguments="{address: '{contact.contract}'}"
-                    />
+                    <f:if condition="{contact.role} == {role}">
+                        <f:render
+                            partial="Contacts/ContactWidgetAddress"
+                            arguments="{address: '{contact.contract}'}"
+                        />
+                    </f:if>
                 </f:for>
-            </f:else>
-        </f:if>
-    </div>
+            </f:for>
+        </f:then>
+        <f:else>
+            <f:for each="{contacts}" as="contact">
+                <f:render
+                    partial="Contacts/ContactWidgetAddress"
+                    arguments="{address: '{contact.contract}'}"
+                />
+            </f:for>
+        </f:else>
+    </f:if>
+</div>
 </html>

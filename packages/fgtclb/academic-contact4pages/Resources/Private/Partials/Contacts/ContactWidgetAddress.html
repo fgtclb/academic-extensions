@@ -3,50 +3,54 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-    <address class="project-details-address profile-contact">
-        <f:if condition="{address.profile.firstName} || {address.profile.middleName} || {address.profile.lastName}">
-            <f:link.action
-                action="detail"
-                pageUid="{settings.detailPid}"
-                extensionName="AcademicPersons"
-                controller="Profile"
-                pluginName="Detail"
-                arguments="{profile: address.profile}"
-                class="profile-list-item-name internal-link-primary"
-            >
-                {address.profile.firstName} {address.profile.middleName} {address.profile.lastName}
-            </f:link.action>
-        </f:if>
-        <f:if condition="{address.position}">
-            <div class="profile-contract-item-wrapper">
-                <p class="profile-list-item-position">
-                    {address.position}
-                </p>
-            </div>
-        </f:if>
+<address>
+    <f:if condition="{address.profile.firstName} || {address.profile.middleName} || {address.profile.lastName}">
+        <f:link.action
+            action="detail"
+            pageUid="{settings.detailPid}"
+            extensionName="AcademicPersons"
+            controller="Profile"
+            pluginName="Detail"
+            arguments="{profile: address.profile}"
+        >
+            {address.profile.title} {address.profile.firstName} {address.profile.middleName} {address.profile.lastName}
+        </f:link.action>
+    </f:if>
 
-        <f:if condition="{address.emailAddresses}">
-            <f:for each="{address.emailAddresses}" as="emailAddress">
-                <f:if condition="{emailAddress.email}">
-                    <div class="profile-contract-item-wrapper">
-                        <f:variable name="emailAddressTitle">{f:if(condition: '{address.profile.firstName}', then: '{address.profile.firstName}')}{f:if(condition: ' {address.profile.middleName}', then: '{address.profile.middleName}')}{f:if(condition: '{address.profile.lastName}', then: ' {address.profile.lastName}')}</f:variable>
-                        <f:link.email class="profile-list-item-email" email="{emailAddress.email}" title="{f:translate(key: 'tx_academicpersons.fe.text.emailAddressAlt', extensionName: 'academic_persons_hnee', arguments: {0: '{emailAddressTitle}'})}" />
-                    </div>
-                </f:if>
-            </f:for>
-        </f:if>
+    <f:if condition="{address.position}">
+        <p>{address.position}</p>
+    </f:if>
 
-        <f:if condition="{address.phoneNumbers}">
-            <f:for each="{address.phoneNumbers}" as="phoneNumber">
-                <f:if condition="{phoneNumber.phoneNumber}">
-                    <div class="profile-contract-item-wrapper">
-                        <f:variable name="phoneAddressTitle">{f:if(condition: '{address.profile.firstName}', then: '{address.profile.firstName}')}{f:if(condition: ' {address.profile.middleName}', then: '{address.profile.middleName}')}{f:if(condition: '{address.profile.lastName}', then: ' {address.profile.lastName}')}</f:variable>
-                        <a href="tel:{phoneNumber.phoneNumber}" class="profile-list-item-phone" title="{f:translate(key: 'tx_academicpersons.fe.text.phoneNumberAlt', extensionName: 'academic_persons_hnee', arguments: {0: '{phoneAddressTitle}'})}" class="d-block">
-                            {phoneNumber.phoneNumber}
-                        </a>
-                    </div>
-                </f:if>
-            </f:for>
+    <f:for each="{address.emailAddresses}" as="emailAddress" iteration="emailAddressesIterator">
+        <f:if condition="{emailAddress.email}">
+            <f:link.email email="{emailAddress.email}">
+                {emailAddress.email}
+
+                {f:if(
+                    condition: '{emailAddress.type}',
+                    then: '({emailAddress.type})'
+                )}{f:if(
+                    condition: '!{emailAddressesIterator.isLast}',
+                    then: ', '
+                )}
+            </f:link.email>
         </f:if>
-    </address>
+    </f:for>
+
+    <f:for each="{address.phoneNumbers}" as="phoneNumber" iteration="phoneNumbersIterator">
+        <f:if condition="{phoneNumber.phoneNumber}">
+            <a href="tel:{phoneNumber.phoneNumber}">
+                {phoneNumber.phoneNumber}
+
+                {f:if(
+                    condition: '{phoneNumber.type}',
+                    then: '({phoneNumber.type})'
+                )}{f:if(
+                    condition: '!{phoneNumbersIterator.isLast}',
+                    then: ', '
+                )}
+            </a>
+        </f:if>
+    </f:for>
+</address>
 </html>
