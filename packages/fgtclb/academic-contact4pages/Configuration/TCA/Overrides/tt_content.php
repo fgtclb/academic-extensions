@@ -14,7 +14,7 @@ defined('TYPO3') or die;
         'ContactsList',
         $ll('plugin.contacts_list.title'),
         'EXT:academic_contacts4pages/Resources/Public/Icons/Extension.svg',
-        'academicpersons',
+        'academic',
         $ll('plugin.contacts_list.description'),
     );
 })();
