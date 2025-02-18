@@ -3,7 +3,6 @@
 namespace FGTCLB\AcademicContacts4pages\DataProcessing;
 
 use FGTCLB\AcademicContacts4pages\Domain\Repository\ContactRepository;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\ContentObject\DataProcessorInterface;
@@ -25,7 +24,7 @@ class ContactsProcessor implements DataProcessorInterface
         array $processorConfiguration,
         array $processedData
     ) {
-        list($currentRecordTable, $currentRecordUid) = explode(':', $cObj->currentRecord);
+        [$currentRecordTable, $currentRecordUid] = explode(':', $cObj->currentRecord);
         if ($currentRecordTable !== 'pages') {
             return $processedData;
         }

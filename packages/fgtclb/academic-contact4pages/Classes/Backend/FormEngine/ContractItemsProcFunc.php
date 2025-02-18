@@ -45,7 +45,7 @@ class ContractItemsProcFunc
             $parameters['items'][] = [
                 $properties['label'],
                 $key,
-                'tx_academiccontacts4pages_domain_model_contract'
+                'tx_academiccontacts4pages_domain_model_contract',
             ];
         }
     }
