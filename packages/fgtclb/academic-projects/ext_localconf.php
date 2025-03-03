@@ -12,7 +12,7 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
     // @see https://docs.typo3.org/m/typo3/reference-tsconfig/12.4/en-us/UsingSetting/PageTSconfig.html#pagesettingdefaultpagetsconfig
     if ($versionInformation->getMajorVersion() < 12) {
         \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('
-            @import \'EXT:academic_programs/Configuration/page.tsconfig\'
+            @import \'EXT:academic_projects/Configuration/page.tsconfig\'
         ');
     }
 
