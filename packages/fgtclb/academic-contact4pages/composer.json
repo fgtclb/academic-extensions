@@ -6,8 +6,8 @@
 		"GPL-2.0-or-later"
 	],
 	"require": {
-		"typo3/cms-core": "^11.5",
-		"fgtclb/academic-persons": "^0.2.0 | dev-main"
+		"typo3/cms-core": "^11.5 || ^12.4",
+		"fgtclb/academic-persons": "^0.2.0 || ^1.1.0 || 0.*.*@dev || 1.*.*@dev || dev-*@dev"
 	},
 	"autoload": {
 		"psr-4": {
