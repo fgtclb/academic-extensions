@@ -4,15 +4,15 @@ plugin.tx_academiccontacts4pages {
   }
   view {
     templateRootPaths {
-      10 = EXT:academic_contacts4pages_thb/Resources/Private/Templates/
+      10 = EXT:academic_contacts4pages/Resources/Private/Templates/
     }
 
     partialRootPaths {
-      10 = EXT:academic_contacts4pages_thb/Resources/Private/Partials/
+      10 = EXT:academic_contacts4pages/Resources/Private/Partials/
     }
 
     layoutRootPaths {
-      10 = EXT:academic_contacts4pages_thb/Resources/Private/Layouts/
+      10 = EXT:academic_contacts4pages/Resources/Private/Layouts/
     }
   }
 }

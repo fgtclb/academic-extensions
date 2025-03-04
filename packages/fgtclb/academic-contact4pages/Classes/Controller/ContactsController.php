@@ -25,7 +25,7 @@ final class ContactsController extends ActionController
 
         // With version TYPO3 v12 the access to the content object renderer has changed
         // @see https://docs.typo3.org/m/typo3/reference-coreapi/12.4/en-us/ApiOverview/RequestLifeCycle/RequestAttributes/CurrentContentObject.html
-        if (version_compare($versionInformation->getVersion(), '12.0.0', '>=')) {
+        if ($versionInformation->getMajorVersion() >= 12) {
             $contentObject = $this->request->getAttribute('currentContentObject');
         } else {
             $contentObject = $this->configurationManager->getContentObject();

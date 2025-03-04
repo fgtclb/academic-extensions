@@ -28,7 +28,7 @@ class ContactRepository extends Repository
 
         // With version TYPO3 v12.0 some the method setLanguageOverlayMode() is removed.
         // @see https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Breaking-97926-ExtbaseQuerySettingsMethodsRemoved.html
-        if (version_compare($versionInformation->getVersion(), '12.0.0', '>=')) {
+        if ($versionInformation->getMajorVersion() >= 12) {
             $currentLanguageAspect = $query->getQuerySettings()->getLanguageAspect();
             $changedLanguageAspect = new LanguageAspect(
                 $currentLanguageAspect->getId(),

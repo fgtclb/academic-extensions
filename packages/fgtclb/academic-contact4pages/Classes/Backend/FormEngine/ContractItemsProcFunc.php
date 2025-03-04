@@ -17,8 +17,8 @@ class ContractItemsProcFunc
     {
         $querySettings = GeneralUtility::makeInstance(Typo3QuerySettings::class);
         $querySettings->setRespectStoragePage(false);
-        // TODO: Check how to handle hidden and deleted records in selection and existing relations
-        // TODO: Check how to handle publish property of contracts in selection existing relations
+        // @todo: Check how to handle hidden and deleted records in selection and existing relations
+        // @todo: Check how to handle publish property of contracts in selection existing relations
 
         $contractRepository = GeneralUtility::makeInstance(ContractRepository::class);
         $contractRepository->setDefaultQuerySettings($querySettings);

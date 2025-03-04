@@ -13,7 +13,7 @@ defined('TYPO3') or die;
 (static function (): void {
     $versionInformation = GeneralUtility::makeInstance(Typo3Version::class);
 
-    if ($versionInformation->getMajorVersion() < 12.0) {
+    if ($versionInformation->getMajorVersion() < 12) {
         // Starting with TYPO3 v12.0 Configuration/page.tsconfig in an Extension is automatically loaded during build time
         // @see https://docs.typo3.org/m/typo3/reference-tsconfig/12.4/en-us/UsingSetting/PageTSconfig.html#pagesettingdefaultpagetsconfig
         ExtensionManagementUtility::addPageTSConfig('
