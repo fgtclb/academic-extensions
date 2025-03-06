@@ -14,20 +14,6 @@
         "issues": "https://github.com/fgtclb/academic-persons-edit/issues",
         "source": "https://github.com/fgtclb/academic-persons-edit"
     },
-    "repositories": {
-        "academic-persons": {
-            "type": "git",
-            "url": "https://github.com/fgtclb/academic-persons.git"
-        },
-        "academic-persons-edit": {
-            "type": "git",
-            "url": "https://github.com/fgtclb/academic-persons-edit.git"
-        },
-        "typo3-ext-migrations": {
-            "type": "git",
-            "url": "https://github.com/andreaswolf/typo3-ext-migrations.git"
-        }
-    },
     "require": {
         "php": "^8.0 || ^8.1 || ^8.2 || ^8.3",
         "typo3/cms-core": "^11.5",
