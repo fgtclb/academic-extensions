@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $EM_CONF[$_EXTKEY] = [
     'title' => '(FGTCLB) Academic Projects',
     'description' => 'Academic project pages for TYPO3 with specific structured data and typed sys_categories',
@@ -11,7 +9,11 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'typo3' => '11.5.0-11.5.99',
-            'fgtclb_educational' => '*',
+            'backend' => '11.5.0-11.5.99',
+            'extbase' => '11.5.0-11.5.99',
+            'fluid' => '11.5.0-11.5.99',
+            'install' => '11.5.0-11.5.99',
+            'category_types' => '1.0.0-1.99.99',
         ],
         'conflicts' => [],
         'suggests' => [],
