@@ -19,7 +19,10 @@
 		"typo3/cms": {
 			"extension-key": "academic_contacts4pages"
 		},
-		"branch-alias": "dev-compatibility"
+		"branch-alias": {
+			"dev-main": "1.x.x-dev",
+			"dev-compatibility": "2.x.x-dev"
+		}
 	},
 	"config": {
 		"allow-plugins": {
