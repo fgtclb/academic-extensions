@@ -6,6 +6,9 @@
 /.php-cs-fixer.cache
 /auth.json
 /composer.lock
+/composer.json.testing
+/composer.json.original
+
 
 /Documentation-GENERATED-temp
 
