@@ -1,2 +1,6 @@
 /.idea/
 /vendor/
+/.Build/
+/composer.json.original
+/composer.json.testing
+/composer.lock
