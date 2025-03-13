@@ -9,7 +9,10 @@
             "email": "stefan@buerk.tech"
         }
     ],
-    "require": {},
+    "require": {
+        "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+        "typo3/cms-core": "^11.5 || ^12.4"
+    },
     "config": {
         "allow-plugins": {
             "typo3/class-alias-loader": true,
@@ -25,5 +28,28 @@
             "web-dir": ".Build/Web",
             "app-dir": ".Build"
         }
+    },
+    "require-dev": {
+        "typo3/cms-backend": "^11.5 || ^12.4",
+        "typo3/cms-belog": "^11.5 || ^12.4",
+        "typo3/cms-beuser": "^11.5 || ^12.4",
+        "typo3/cms-composer-installers": "v4.0.0-RC2 || ^5",
+        "typo3/cms-extbase": "^11.5 || ^12.4",
+        "typo3/cms-extensionmanager": "^11.5 || ^12.4",
+        "typo3/cms-felogin": "^11.5 || ^12.4",
+        "typo3/cms-filelist": "^11.5 || ^12.4",
+        "typo3/cms-fluid": "^11.5 || ^12.4",
+        "typo3/cms-fluid-styled-content": "^11.5 || ^12.4",
+        "typo3/cms-frontend": "^11.5 || ^12.4",
+        "typo3/cms-info": "^11.5 || ^12.4",
+        "typo3/cms-install": "^11.5 || ^12.4",
+        "typo3/cms-recycler": "^11.5 || ^12.4",
+        "typo3/cms-redirects": "^11.5 || ^12.4",
+        "typo3/cms-reports": "^11.5 || ^12.4",
+        "typo3/cms-rte-ckeditor": "^11.5 || ^12.4",
+        "typo3/cms-setup": "^11.5 || ^12.4",
+        "typo3/cms-sys-note": "^11.5 || ^12.4",
+        "typo3/cms-tstemplate": "^11.5 || ^12.4",
+        "typo3/cms-workspaces": "^11.5 || ^12.4"
     }
 }
