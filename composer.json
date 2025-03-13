@@ -1,0 +1,13 @@
+{
+    "name": "fgtclb/academic-extensions",
+    "description": "Centralized mono repository for academic extension development",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Stefan Bürk",
+            "email": "stefan@buerk.tech"
+        }
+    ],
+    "require": {}
+}
