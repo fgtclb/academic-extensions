@@ -9,5 +9,21 @@
             "email": "stefan@buerk.tech"
         }
     ],
-    "require": {}
+    "require": {},
+    "config": {
+        "allow-plugins": {
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true,
+            "php-http/discovery": true
+        },
+        "sort-packages": true,
+        "bin-dir": ".Build/bin",
+        "vendor-dir": ".Build/vendor"
+    },
+    "extra": {
+        "typo3/cms": {
+            "web-dir": ".Build/Web",
+            "app-dir": ".Build"
+        }
+    }
 }
