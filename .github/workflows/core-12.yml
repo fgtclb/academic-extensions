@@ -1,4 +1,4 @@
-name: "TYPO3 v11"
+name: "TYPO3 v12"
 
 on:
   pull_request:
@@ -45,8 +45,8 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v4
 
-      - name: "Prepare dependencies for TYPO3 v11"
-        run: "Build/Scripts/runTests.sh -t 11 -p ${{ matrix.php-version }} -s composerUpdate"
+      - name: "Prepare dependencies for TYPO3 v12"
+        run: "Build/Scripts/runTests.sh -t 12 -p ${{ matrix.php-version }} -s composerUpdate"
 
       - name: "Run PHP lint"
-        run: "Build/Scripts/runTests.sh -t 11 -p ${{ matrix.php-version }} -s lintPhp"
+        run: "Build/Scripts/runTests.sh -t 12 -p ${{ matrix.php-version }} -s lintPhp"
