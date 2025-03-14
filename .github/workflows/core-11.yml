@@ -50,3 +50,10 @@ jobs:
 
       - name: "Run PHP lint"
         run: "Build/Scripts/runTests.sh -t 11 -p ${{ matrix.php-version }} -s lintPhp"
+
+      - name: "CGL"
+        run: "Build/Scripts/runTests.sh -t 11 -p ${{ matrix.php-version }} -s cgl"
+
+# @todo Disable until correct file header has been determined for extensions.
+#      - name: "CGL (header comments)"
+#        run: "Build/Scripts/runTests.sh -t 11 -p ${{ matrix.php-version }} -s cglHeader"

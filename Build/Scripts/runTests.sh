@@ -144,6 +144,8 @@ Usage: $0 [options] [file]
 Options:
     -s <...>
         Specifies which test suite to run
+            - cgl: test and fix all core php files
+            - cglHeader: test and fix file header for all core php files
             - composer: "composer" with all remaining arguments dispatched.
             - composerUpdate: "composer update", handy if host has no PHP
             - lintPhp: PHP linting
@@ -388,6 +390,26 @@ fi
 
 # Suite execution
 case ${TEST_SUITE} in
+    cgl)
+        # Active dry-run for cgl needs not "-n" but specific options
+        CSFIXER_DRYRUN=""""
+        if [ "${CGLCHECK_DRY_RUN}" -eq 1 ]; then
+            CSFIXER_DRYRUN="--dry-run --diff"
+        fi
+        COMMAND="php -dxdebug.mode=off .Build/bin/php-cs-fixer fix -v ${CSFIXER_DRYRUN} --config=Build/php-cs-fixer/config.php"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name cgl-${SUFFIX} ${IMAGE_PHP} ${COMMAND}
+        SUITE_EXIT_CODE=$?
+        ;;
+    cglHeader)
+        # Active dry-run for cgl needs not "-n" but specific options
+        CSFIXER_DRYRUN=""""
+        if [ "${CGLCHECK_DRY_RUN}" -eq 1 ]; then
+            CSFIXER_DRYRUN="--dry-run --diff"
+        fi
+        COMMAND="php -dxdebug.mode=off .Build/bin/php-cs-fixer fix -v ${CSFIXER_DRYRUN} --config=Build/php-cs-fixer/header-comment.php"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name cgl-header-${SUFFIX} ${IMAGE_PHP} ${COMMAND}
+        SUITE_EXIT_CODE=$?
+        ;;
     composer)
         COMMAND=(composer "$@")
         ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.Build/.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} "${COMMAND[@]}"
