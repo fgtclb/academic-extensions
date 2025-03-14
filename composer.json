@@ -30,6 +30,16 @@
         }
     },
     "require-dev": {
+        "fgtclb/academic-bite-jobs": "@dev",
+        "fgtclb/academic-contacts4pages": "@dev",
+        "fgtclb/academic-jobs": "@dev",
+        "fgtclb/academic-partners": "@dev",
+        "fgtclb/academic-persons": "@dev",
+        "fgtclb/academic-persons-edit": "@dev",
+        "fgtclb/academic-persons-sync": "@dev",
+        "fgtclb/academic-programs": "@dev",
+        "fgtclb/academic-projects": "@dev",
+        "fgtclb/category-types": "@dev",
         "typo3/cms-backend": "^11.5 || ^12.4",
         "typo3/cms-belog": "^11.5 || ^12.4",
         "typo3/cms-beuser": "^11.5 || ^12.4",
@@ -51,5 +61,11 @@
         "typo3/cms-sys-note": "^11.5 || ^12.4",
         "typo3/cms-tstemplate": "^11.5 || ^12.4",
         "typo3/cms-workspaces": "^11.5 || ^12.4"
+    },
+    "repositories": {
+        "packages": {
+            "type": "path",
+            "url": "packages/*/*"
+        }
     }
 }
