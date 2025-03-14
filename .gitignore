@@ -4,3 +4,4 @@
 /composer.json.orig
 /composer.json.testing
 /composer.lock
+/.php-cs-fixer.cache
