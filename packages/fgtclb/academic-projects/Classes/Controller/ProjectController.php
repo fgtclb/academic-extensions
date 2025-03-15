@@ -17,8 +17,7 @@ class ProjectController extends ActionController
         protected readonly ProjectRepository $projectRepository,
         protected readonly CategoryRepository $categoryRepository,
         protected readonly DemandFactory $demandFactory
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<string, mixed>|null $demand

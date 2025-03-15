@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Model;
 
-use DateTime;
 use FGTCLB\AcademicProjects\Collection\CategoryCollection;
 use FGTCLB\AcademicProjects\Domain\Repository\CategoryRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -25,9 +24,9 @@ class Project extends AbstractEntity
 
     protected string $shortDescription = '';
 
-    protected ?DateTime $startDate = null;
+    protected ?\DateTime $startDate = null;
 
-    protected ?DateTime $endDate = null;
+    protected ?\DateTime $endDate = null;
 
     protected float $budget = 0;
 
@@ -73,12 +72,12 @@ class Project extends AbstractEntity
         return $this->shortDescription;
     }
 
-    public function getStartDate(): ?DateTime
+    public function getStartDate(): ?\DateTime
     {
         return $this->startDate;
     }
 
-    public function getEndDate(): ?DateTime
+    public function getEndDate(): ?\DateTime
     {
         return $this->endDate;
     }

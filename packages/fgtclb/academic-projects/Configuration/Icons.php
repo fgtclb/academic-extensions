@@ -6,7 +6,7 @@ use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-$sourceString = static fn (string $icon): string => sprintf(
+$sourceString = static fn(string $icon): string => sprintf(
     'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/%s.svg',
     GeneralUtility::underscoredToUpperCamelCase($icon)
 );
