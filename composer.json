@@ -30,6 +30,7 @@
         }
     },
     "require-dev": {
+        "bnf/phpstan-psr-container": "^1.0.1",
         "fgtclb/academic-bite-jobs": "@dev",
         "fgtclb/academic-contacts4pages": "@dev",
         "fgtclb/academic-jobs": "@dev",
@@ -41,6 +42,10 @@
         "fgtclb/academic-projects": "@dev",
         "fgtclb/category-types": "@dev",
         "friendsofphp/php-cs-fixer": "^3.57.1",
+        "friendsoftypo3/phpstan-typo3": "^0.9.0",
+        "phpstan/phpdoc-parser": "^1.29.0",
+        "phpstan/phpstan": "^1.12.21",
+        "phpstan/phpstan-phpunit": "^1.4.0",
         "phpunit/phpunit": "^10.5.45",
         "typo3/cms-backend": "^11.5 || ^12.4",
         "typo3/cms-belog": "^11.5 || ^12.4",
