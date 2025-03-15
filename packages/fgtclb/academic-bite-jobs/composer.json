@@ -21,8 +21,8 @@
         { "type": "git", "url": "https://github.com/andreaswolf/typo3-ext-migrations.git" }
     ],
 	"require": {
-		"typo3/cms-core": "^11.5 || ^12.4",
-		"php": "^8.1 || ^8.2 || ^8.3 || ^8.4"
+		"php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+		"typo3/cms-core": "^11.5 || ^12.4"
 	},
 	"require-dev": {
 		"typo3/cms-adminpanel": "^11.5 || ^12.4",
@@ -71,7 +71,8 @@
 	"config": {
         "vendor-dir": ".Build/vendor",
         "bin-dir": ".Build/bin",
-        "allow-plugins": true
+        "allow-plugins": true,
+		"sort-packages": true
     },
     "extra": {
         "typo3/cms": {
