@@ -30,7 +30,8 @@ final class BiteJobsService implements LoggerAwareInterface
 
     protected RequestFactory $requestFactory;
 
-    public function __construct(RequestFactory $requestFactory) {
+    public function __construct(RequestFactory $requestFactory)
+    {
         $this->requestFactory = $requestFactory ?? GeneralUtility::makeInstance(RequestFactory::class);
 
         $this->url = 'https://jobs.b-ite.com/api/v1/';
@@ -96,11 +97,11 @@ final class BiteJobsService implements LoggerAwareInterface
                 $e->getMessage()
             ));
         }
-           if (!empty($this->responseBody['jobPostings'])) {
-               // We need to map the custom fields to the jobs so we have the labels instead of the values in the frontend
-               $jobs = $this->mapFieldsToJobs($this->responseBody['jobPostings'], 'umfang');
-               $jobs = $this->groupByRelations($jobs);
-           }
+        if (!empty($this->responseBody['jobPostings'])) {
+            // We need to map the custom fields to the jobs so we have the labels instead of the values in the frontend
+            $jobs = $this->mapFieldsToJobs($this->responseBody['jobPostings'], 'umfang');
+            $jobs = $this->groupByRelations($jobs);
+        }
 
         // Set Job Limit if setting is not empty
         if (!empty($jobsSettings['limit'])) {

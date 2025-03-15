@@ -19,8 +19,7 @@ class CategoryRepository
     public function __construct(
         protected ConnectionPool $connectionPool,
         protected PageRepository $pageRepository
-    ) {
-    }
+    ) {}
 
     public function findByType(
         int $pageId,

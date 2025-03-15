@@ -13,6 +13,4 @@ namespace Fgtclb\AcademicPersonsSync\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
-class FrontendUser extends AbstractEntity
-{
-}
+class FrontendUser extends AbstractEntity {}

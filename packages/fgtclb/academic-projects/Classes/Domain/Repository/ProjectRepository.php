@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Repository;
 
-use DateTime;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
 use FGTCLB\AcademicProjects\Domain\Model\Project;
 use FGTCLB\AcademicProjects\Enumeration\PageTypes;
@@ -47,7 +46,7 @@ class ProjectRepository extends Repository
         if ($demand->getHideCompletedProjects() === true) {
             $constraints[] = $query->logicalOr([
                 $query->equals('txAcademicprojectsEndDate', 0),
-                $query->greaterThan('txAcademicprojectsEndDate', new DateTime()),
+                $query->greaterThan('txAcademicprojectsEndDate', new \DateTime()),
             ]);
         }
 

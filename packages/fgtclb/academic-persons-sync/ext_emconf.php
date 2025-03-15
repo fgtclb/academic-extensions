@@ -1,6 +1,5 @@
 <?php
 
-
 $EM_CONF[$_EXTKEY] = [
     'title' => 'FGTCLB: Academic Persons Sync',
     'description' => 'Adds some configuration for external users providers like Active Directory.',
