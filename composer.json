@@ -50,5 +50,15 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "autoload-dev": {
+        "psr-4": {
+            "FGTCLB\\AcademicBiteJobs\\Tests\\": "packages/academic-bite-jobs/Tests",
+            "FGTCLB\\AcademicJobs\\Tests\\": "packages/academic-jobs/Tests",
+            "FGTCLB\\AcademicPartners\\Tests\\": "packages/academic-partners/Tests",
+            "FGTCLB\\AcademicPersons\\Tests\\": "packages/academic-persons/Tests",
+            "FGTCLB\\AcademicPersonsEdit\\Tests\\": "packages/academic-persons-edit/Tests",
+            "FGTCLB\\AcademicProjects\\Tests\\": "packages/academic-programs/Tests"
+        }
+    }
 }
