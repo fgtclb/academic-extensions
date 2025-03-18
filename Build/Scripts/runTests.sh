@@ -427,10 +427,8 @@ case ${TEST_SUITE} in
         [[ -f composer.json.orig ]] && \cp -f composer.json.orig composer.json
         ;;
 #    functional)
-#        PHPUNIT_CONFIG_FILE="Build/phpunit/FunctionalTests-10.xml"
-#        # @todo Remove version switch after TYPO3 v11 / phpunit 9 support has been dropped.
-#        [[ "${CORE_VERSION}" -eq 11 ]] && PHPUNIT_CONFIG_FILE="Build/phpunit/FunctionalTests.xml"
-#        COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-${DBMS} "$@")
+#        PHPUNIT_CONFIG_FILE="Build/phpunit/FunctionalTests.xml"
+#        COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-${DBMS} --exclude-group not-core-${CORE_VERSION} "$@")
 #        case ${DBMS} in
 #            mariadb)
 #                echo "Using driver: ${DATABASE_DRIVER}"
@@ -481,22 +479,18 @@ case ${TEST_SUITE} in
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name phpstan-baseline-${SUFFIX} -e COMPOSER_CACHE_DIR=.Build/.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} "${COMMAND[@]}"
         SUITE_EXIT_CODE=$?
         ;;
-#    unit)
-#        PHPUNIT_CONFIG_FILE="Build/phpunit/UnitTests-10.xml"
-#        # @todo Remove version switch after TYPO3 v11 / phpunit 9 support has been dropped.
-#        [[ "${CORE_VERSION}" -eq 11 ]] && PHPUNIT_CONFIG_FILE="Build/phpunit/UnitTests.xml"
-#        COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} "$@")
-#        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name unit-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${IMAGE_PHP} "${COMMAND[@]}"
-#        SUITE_EXIT_CODE=$?
-#        ;;
-#    unitRandom)
-#        PHPUNIT_CONFIG_FILE="Build/phpunit/UnitTests-10.xml"
-#        # @todo Remove version switch after TYPO3 v11 / phpunit 9 support has been dropped.
-#        [[ "${CORE_VERSION}" -eq 11 ]] && PHPUNIT_CONFIG_FILE="Build/phpunit/UnitTests.xml"
-#        COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --order-by=random ${PHPUNIT_RANDOM} "$@")
-#        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name unit-random-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${IMAGE_PHP} "${COMMAND[@]}"
-#        SUITE_EXIT_CODE=$?
-#        ;;
+    unit)
+        PHPUNIT_CONFIG_FILE="Build/phpunit/UnitTests.xml"
+        COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-core-${CORE_VERSION} "$@")
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name unit-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${IMAGE_PHP} "${COMMAND[@]}"
+        SUITE_EXIT_CODE=$?
+        ;;
+    unitRandom)
+        PHPUNIT_CONFIG_FILE="Build/phpunit/UnitTests.xml"
+        COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-core-${CORE_VERSION} --order-by=random ${PHPUNIT_RANDOM} "$@")
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name unit-random-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${IMAGE_PHP} "${COMMAND[@]}"
+        SUITE_EXIT_CODE=$?
+        ;;
     update)
         # pull typo3/core-testing-* versions of those ones that exist locally
         echo "> pull ghcr.io/typo3/core-testing-* versions of those ones that exist locally"
