@@ -17,7 +17,8 @@
         "allow-plugins": {
             "typo3/class-alias-loader": true,
             "typo3/cms-composer-installers": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "sbuerk/fixture-packages": true
         },
         "sort-packages": true,
         "bin-dir": ".Build/bin",
@@ -27,7 +28,10 @@
         "typo3/cms": {
             "web-dir": ".Build/Web",
             "app-dir": ".Build"
-        }
+        },
+        "sbuerk/fixture-packages": [
+            "packages/*/Tests/Functional/Fixtures/Extensions/*"
+        ]
     },
     "require-dev": {
         "bnf/phpstan-psr-container": "^1.0.1",
@@ -37,6 +41,7 @@
         "phpstan/phpstan": "^1.12.21",
         "phpstan/phpstan-phpunit": "^1.4.0",
         "phpunit/phpunit": "^10.5.45",
+        "sbuerk/fixture-packages": "^0.0.2 <0.1",
         "typo3/testing-framework": "^7.1.1"
     },
     "repositories": {
