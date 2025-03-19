@@ -1,50 +1,51 @@
 {
-  "name": "fgtclb/academic-bite-jobs",
-  "type": "typo3-cms-extension",
-  "description": "",
-  "minimum-stability": "beta",
-  "license": [
-    "GPL-2.0-or-later"
-  ],
-  "authors": [
-    {
-      "name": "FGTCLB GmbH",
-      "email": "hello@fgtclb.com"
-    }
-  ],
-  "support": {
-    "issues": "https://github.com/fgtclb/academic-bite-jobs/issues",
-    "source": "https://github.com/fgtclb/academic-bite-jobs"
-  },
-  "homepage": "https://github.com/fgtclb/academic-bite-jobs",
-  "require": {
-    "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
-    "typo3/cms-core": "^11.5 || ^12.4"
-  },
-  "autoload": {
-    "psr-4": {
-      "FGTCLB\\AcademicBiteJobs\\": "Classes/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "FGTCLB\\AcademicBiteJobs\\Tests\\": "Tests/"
-    }
-  },
-  "config": {
-    "vendor-dir": ".Build/vendor",
-    "bin-dir": ".Build/bin",
-    "allow-plugins": true,
-    "sort-packages": true
-  },
-  "extra": {
-    "typo3/cms": {
-      "web-dir": ".Build/Web",
-      "app-dir": ".Build",
-      "extension-key": "academic_bite_jobs"
+    "name": "fgtclb/academic-bite-jobs",
+    "type": "typo3-cms-extension",
+    "description": "",
+    "minimum-stability": "beta",
+    "license": [
+        "GPL-2.0-or-later"
+    ],
+    "authors": [
+        {
+            "name": "FGTCLB GmbH",
+            "email": "hello@fgtclb.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/fgtclb/academic-extensions/issues",
+        "source": "https://github.com/fgtclb/academic-extensions",
+        "email": "hello@fgtclb.com"
     },
-    "branch-alias": {
-      "dev-main": "1.2.x-dev"
+    "homepage": "https://www.fgtclb.com/",
+    "require": {
+        "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+        "typo3/cms-core": "^11.5 || ^12.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "FGTCLB\\AcademicBiteJobs\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FGTCLB\\AcademicBiteJobs\\Tests\\": "Tests/"
+        }
+    },
+    "config": {
+        "vendor-dir": ".Build/vendor",
+        "bin-dir": ".Build/bin",
+        "allow-plugins": true,
+        "sort-packages": true
+    },
+    "extra": {
+        "typo3/cms": {
+            "web-dir": ".Build/Web",
+            "app-dir": ".Build",
+            "extension-key": "academic_bite_jobs"
+        },
+        "branch-alias": {
+            "dev-main": "1.2.x-dev"
+        }
     }
-  }
 }

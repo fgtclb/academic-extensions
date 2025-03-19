@@ -5,8 +5,8 @@
     "license": "GPL-2.0-or-later",
     "authors": [
         {
-            "name": "Stefan Bürk",
-            "email": "stefan@buerk.tech"
+            "name": "FGTCLB GmbH",
+            "email": "hello@fgtclb.com"
         }
     ],
     "require": {
@@ -46,5 +46,11 @@
     },
     "config": {
         "sort-packages": true
-    }
+    },
+    "support": {
+        "issues": "https://github.com/fgtclb/academic-extensions/issues",
+        "source": "https://github.com/fgtclb/academic-extensions",
+        "email": "hello@fgtclb.com"
+    },
+    "homepage": "https://www.fgtclb.com/"
 }
