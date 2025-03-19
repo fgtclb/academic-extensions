@@ -1,31 +1,43 @@
-# Academic Bite Jobs
+# TYPO3 Extension `Academic Bite Jobs` (READ-ONLY)
+
+|                  | URL                                                                     |
+|------------------|-------------------------------------------------------------------------|
+| **Repository:**  | https://github.com/fgtclb/academic-bite-jobs                            |
+| **Read online:** | https://docs.typo3.org/p/fgtclb/academic/academic-bite-jobs/main/en-us/ |
+| **TER:**         | https://extensions.typo3.org/extension/academic_bite_jobs/              |
+
+## Description
 
 This extension provides a basic structure for academic B-ite jobs.
 
-German:
+As part of the bundling of requirements for the FGTCLB Academic Extensions, the TYPO3 extension "Academic Jobs b-ite"
+was created, which only requires the b-ite key to seamlessly display job adverts from the b-ite platform on a TYPO3
+website. The developed plug-in currently supports different categorisations, which are read from b-ite, e.g. appointment
+procedures, academic staff, non-scientific staff, training positions. List view, tile view and table view are currently
+available as display modes. There are also options for grouping and sorting as well as a limit for the number of job
+adverts to be displayed.
 
+> [!NOTE]
+> This extension is currently in beta state - please notice that there might be changes to the structure
 
-Im Rahmen der Bedarfsbündelung für die FGTCLB Academic Extensions ist die TYPO3 Extension “Academic Jobs b-ite” entstanden, welche lediglich den b-ite Schlüssel benötigt, um Stellenanzeigen der b-ite Plattform nahtlos in einer TYPO3 Website anzuzeigen.
-Das entwickelte Plug-in unterstützt derzeit unterschiedliche Zuordnungen, welche aus b-ite ausgelesen werden, z.B. Berufungsverfahren, Wissenschaftliches Personal, Nicht-wissenschaftliches Personal, Ausbildungsstellen.
-Als Darstellungsmodi sind derzeit Listenansicht, Kachelansicht und Tabellensicht verfügbar.
-Weiterhin stehen Optionen zur Gruppierung und Sortierung sowie ein Limit für die Anzahl der darzustellenden Stellenanzeigen zur Verfügung.
+## Compatibility
 
+| Branch | Version   | TYPO3      | PHP                |
+|--------|-----------|------------|--------------------|
+| main   | 1.2.x-dev | v11 + ~v12 | 8.1, 8.2, 8.3, 8.4 |
 
-English:
-
-
-As part of the bundling of requirements for the FGTCLB Academic Extensions, the TYPO3 extension "Academic Jobs b-ite" was created, which only requires the b-ite key to seamlessly display job adverts from the b-ite platform on a TYPO3 website.
-The developed plug-in currently supports different categorisations, which are read from b-ite, e.g. appointment procedures, academic staff, non-scientific staff, training positions.
-List view, tile view and table view are currently available as display modes.
-There are also options for grouping and sorting as well as a limit for the number of job adverts to be displayed.
-
-
-**This extension is currently in beta state - please notice that there might be changes to the structure**
 
 ## Installation
 
-```shell
-composer require fgtclb/academic-bite-jobs
+Install with your flavour:
+
+* [TER](https://extensions.typo3.org/extension/academic_bite_jobs/)
+* Extension Manager
+* composer
+
+We prefer composer installation:
+```bash
+composer req fgtclbfgtclb/academic-bite-jobs
 ```
 
 ## Credits
