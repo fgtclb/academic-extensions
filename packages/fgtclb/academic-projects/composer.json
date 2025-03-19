@@ -37,7 +37,7 @@
             "extension-key": "academic_projects"
         },
         "branch-alias": {
-            "dev-main": "1.x.x-dev"
+            "dev-main": "1.2.x-dev"
         }
     },
     "conflict": {

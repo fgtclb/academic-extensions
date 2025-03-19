@@ -33,6 +33,9 @@
             "paths": [
                 "packages/*/*/Tests/Functional/Fixtures/Extensions/*"
             ]
+        },
+        "branch-alias": {
+            "dev-main": "1.2.x-dev"
         }
     },
     "require-dev": {
