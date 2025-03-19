@@ -22,10 +22,6 @@
         "typo3/cms-extbase": "^11.5 || ^12.4"
     },
     "require-dev": {
-        "bk2k/bootstrap-package": "^14.0",
-        "friendsofphp/php-cs-fixer": "^3.14",
-        "helhum/typo3-console": "^7.1 || ^8.0",
-        "saschaegerer/phpstan-typo3": "^1.8",
         "typo3/cms-backend": "^11.5 || ^12.4",
         "typo3/cms-composer-installers": "v4.0.0-RC2 || ^5",
         "typo3/cms-felogin": "^11.5 || ^12.4",
