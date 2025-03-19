@@ -48,6 +48,7 @@
         "phpstan/phpstan-phpunit": "^1.4.0",
         "phpunit/phpunit": "^10.5.45",
         "sbuerk/fixture-packages": "^0.0.2 <0.1",
+        "typo3/tailor": "^1.6",
         "typo3/testing-framework": "^7.1.1"
     },
     "repositories": {
