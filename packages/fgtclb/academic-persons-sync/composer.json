@@ -5,14 +5,14 @@
     "license": "GPL-2.0-or-later",
     "authors": [
         {
-            "name": "Tim Schreiner",
-            "email": "tim.schreiner@km2.de",
-            "role": "Developer"
+            "name": "FGTCLB GmbH",
+            "email": "hello@fgtclb.com"
         }
     ],
     "support": {
-        "issues": "https://github.com/fgtclb/academic-persons-edit/issues",
-        "source": "https://github.com/fgtclb/academic-persons-edit"
+        "issues": "https://github.com/fgtclb/academic-extensions/issues",
+        "source": "https://github.com/fgtclb/academic-extensions",
+        "email": "hello@fgtclb.com"
     },
     "require": {
         "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
@@ -41,5 +41,6 @@
         "branch-alias": {
             "dev-main": "1.2.x-dev"
         }
-    }
+    },
+    "homepage": "https://www.fgtclb.com/"
 }

@@ -42,5 +42,17 @@
     },
     "conflict": {
         "fgtclb/category-types": "<1.0.0 || >=2.0.0"
-    }
+    },
+    "authors": [
+        {
+            "name": "FGTCLB GmbH",
+            "email": "hello@fgtclb.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/fgtclb/academic-extensions/issues",
+        "source": "https://github.com/fgtclb/academic-extensions",
+        "email": "hello@fgtclb.com"
+    },
+    "homepage": "https://www.fgtclb.com/"
 }
