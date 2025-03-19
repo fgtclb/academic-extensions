@@ -10,11 +10,21 @@
         }
     ],
     "require": {
+        "fgtclb/academic-bite-jobs": "1.2.x-dev",
+        "fgtclb/academic-contacts4pages": "1.2.x-dev",
+        "fgtclb/academic-jobs": "1.2.x-dev",
+        "fgtclb/academic-partners": "1.2.x-dev",
+        "fgtclb/academic-persons": "1.2.x-dev",
+        "fgtclb/academic-persons-edit": "1.2.x-dev",
+        "fgtclb/academic-persons-sync": "1.2.x-dev",
+        "fgtclb/academic-programs": "1.2.x-dev",
+        "fgtclb/academic-projects": "1.2.x-dev",
+        "fgtclb/category-types": "1.2.x-dev",
         "typo3/cms-backend": "^11.5 || ^12.4",
         "typo3/cms-belog": "^11.5 || ^12.4",
         "typo3/cms-beuser": "^11.5 || ^12.4",
-        "typo3/cms-core": "^11.5 || ^12.4",
         "typo3/cms-composer-installers": "v4.0.0-RC2 || ^5",
+        "typo3/cms-core": "^11.5 || ^12.4",
         "typo3/cms-extbase": "^11.5 || ^12.4",
         "typo3/cms-extensionmanager": "^11.5 || ^12.4",
         "typo3/cms-felogin": "^11.5 || ^12.4",
@@ -28,19 +38,13 @@
         "typo3/cms-redirects": "^11.5 || ^12.4",
         "typo3/cms-reports": "^11.5 || ^12.4",
         "typo3/cms-rte-ckeditor": "^11.5 || ^12.4",
+        "typo3/cms-scheduler": "^11.5 || ^12.4",
         "typo3/cms-setup": "^11.5 || ^12.4",
         "typo3/cms-sys-note": "^11.5 || ^12.4",
         "typo3/cms-tstemplate": "^11.5 || ^12.4",
-        "typo3/cms-workspaces": "^11.5 || ^12.4",
-        "fgtclb/academic-bite-jobs": "1.2.x-dev",
-        "fgtclb/academic-contacts4pages": "1.2.x-dev",
-        "fgtclb/academic-jobs": "1.2.x-dev",
-        "fgtclb/academic-partners": "1.2.x-dev",
-        "fgtclb/academic-persons": "1.2.x-dev",
-        "fgtclb/academic-persons-edit": "1.2.x-dev",
-        "fgtclb/academic-persons-sync": "1.2.x-dev",
-        "fgtclb/academic-programs": "1.2.x-dev",
-        "fgtclb/academic-projects": "1.2.x-dev",
-        "fgtclb/category-types": "1.2.x-dev"
+        "typo3/cms-workspaces": "^11.5 || ^12.4"
+    },
+    "config": {
+        "sort-packages": true
     }
 }
