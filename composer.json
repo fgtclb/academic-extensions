@@ -30,7 +30,7 @@
             "app-dir": ".Build"
         },
         "sbuerk/fixture-packages": [
-            "packages/*/Tests/Functional/Fixtures/Extensions/*"
+            "packages/*/*/Tests/Functional/Fixtures/Extensions/*"
         ]
     },
     "require-dev": {
@@ -58,13 +58,13 @@
     "prefer-stable": true,
     "autoload-dev": {
         "psr-4": {
-            "FGTCLB\\AcademicBiteJobs\\Tests\\": "packages/academic-bite-jobs/Tests",
-            "FGTCLB\\AcademicJobs\\Tests\\": "packages/academic-jobs/Tests",
-            "FGTCLB\\AcademicPartners\\Tests\\": "packages/academic-partners/Tests",
-            "FGTCLB\\AcademicPersonsEdit\\Tests\\": "packages/academic-persons-edit/Tests",
-            "FGTCLB\\AcademicProjects\\Tests\\": "packages/academic-programs/Tests",
-            "Fgtclb\\AcademicPersons\\Tests\\": "packages/academic-persons/Tests",
-            "Fgtclb\\AcademicPersonsEdit\\Tests\\": "packages/academic-persons-edit/Tests"
+            "FGTCLB\\AcademicBiteJobs\\Tests\\": "packages/fgtclb/academic-bite-jobs/Tests",
+            "FGTCLB\\AcademicJobs\\Tests\\": "packages/fgtclb/academic-jobs/Tests",
+            "FGTCLB\\AcademicPartners\\Tests\\": "packages/fgtclb/academic-partners/Tests",
+            "Fgtclb\\AcademicPersons\\Tests\\": "packages/fgtclb/academic-persons/Tests",
+            "Fgtclb\\AcademicPersonsEdit\\Tests\\": "packages/fgtclb/academic-persons-edit/Tests",
+            "FGTCLB\\AcademicPrograms\\Tests\\": "packages/fgtclb/academic-programs/Tests",
+            "FGTCLB\\AcademicProjects\\Tests\\": "packages/fgtclb/academic-programs/Tests"
         }
     }
 }
