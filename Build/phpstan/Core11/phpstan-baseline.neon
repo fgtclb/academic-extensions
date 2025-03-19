@@ -1,2 +1,376 @@
 parameters:
 	ignoreErrors:
+		-
+			message: "#^Variable \\$biteJobsService on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Controller/BiteJobsController.php
+
+		-
+			message: "#^Cannot call method error\\(\\) on Psr\\\\Log\\\\LoggerInterface\\|null\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
+
+		-
+			message: "#^Variable \\$requestFactory on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:getLabel\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Backend/FormEngine/ContactLabels.php
+
+		-
+			message: "#^Parameter \\#1 \\$pid of method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) expects int, string given\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QuerySettingsInterface\\:\\:getLanguageAspect\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QuerySettingsInterface\\:\\:setLanguageAspect\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Model\\\\Contact\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
+
+		-
+			message: "#^Static method TYPO3\\\\CMS\\\\Extbase\\\\Utility\\\\ExtensionUtility\\:\\:registerPlugin\\(\\) invoked with 6 parameters, 3\\-5 required\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Configuration/TCA/Overrides/tt_content.php
+
+		-
+			message: "#^Access to constant ERROR on an unknown class TYPO3\\\\CMS\\\\Core\\\\Type\\\\ContextualFeedbackSeverity\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
+
+		-
+			message: "#^Access to constant OK on an unknown class TYPO3\\\\CMS\\\\Core\\\\Type\\\\ContextualFeedbackSeverity\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
+
+		-
+			message: "#^Access to constant WARNING on an unknown class TYPO3\\\\CMS\\\\Core\\\\Type\\\\ContextualFeedbackSeverity\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
+
+		-
+			message: "#^Binary operation \"\\.\" between array\\<string, bool\\|string\\|null\\>\\|bool\\|string\\|null and TYPO3\\\\CMS\\\\Core\\\\Http\\\\Uri results in an error\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicJobs\\\\Controller\\\\JobController\\:\\:addFlashMessageToQueue\\(\\) has parameter \\$severity with no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<FGTCLB\\\\AcademicJobs\\\\Domain\\\\Model\\\\Contact\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Domain/Repository/ContactRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<FGTCLB\\\\AcademicJobs\\\\Domain\\\\Model\\\\Job\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Domain/Repository/JobRepository.php
+
+		-
+			message: "#^Call to method findAllApplicable\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Controller/PartnerController.php
+
+		-
+			message: "#^Parameter \\$categoryRepository of method FGTCLB\\\\AcademicPartners\\\\Controller\\\\PartnerController\\:\\:__construct\\(\\) has invalid type FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Controller/PartnerController.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicPartners\\\\Controller\\\\PartnerController\\:\\:\\$categoryRepository has unknown class FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository as its type\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Controller/PartnerController.php
+
+		-
+			message: "#^Call to method get\\(\\) on an unknown class FGTCLB\\\\AcademicPartners\\\\Factory\\\\PartnerDataFactory\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/DataProcessing/PartnerDataProcessor.php
+
+		-
+			message: "#^Class FGTCLB\\\\AcademicPartners\\\\Factory\\\\PartnerDataFactory not found\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/DataProcessing/PartnerDataProcessor.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Dto\\\\PartnerDemand\\:\\:getFilterCollection\\(\\) has invalid return type FGTCLB\\\\CategoryTypes\\\\Collection\\\\FilterCollection\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Dto/PartnerDemand.php
+
+		-
+			message: "#^Parameter \\$filterCollection of method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Dto\\\\PartnerDemand\\:\\:setFilterCollection\\(\\) has invalid type FGTCLB\\\\CategoryTypes\\\\Collection\\\\FilterCollection\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Dto/PartnerDemand.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Dto\\\\PartnerDemand\\:\\:\\$filterCollection has unknown class FGTCLB\\\\CategoryTypes\\\\Collection\\\\FilterCollection as its type\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Dto/PartnerDemand.php
+
+		-
+			message: "#^Call to method findByGroupAndPageId\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
+
+		-
+			message: "#^Class FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository not found\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\:\\:getAttributes\\(\\) has invalid return type FGTCLB\\\\CategoryTypes\\\\Collection\\\\CategoryCollection\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\:\\:getPid\\(\\) should return int\\<0, max\\>\\|null but returns int\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
+
+		-
+			message: "#^PHPDoc tag @return with type int\\<0, max\\>\\|null is not subtype of native type int\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\:\\:\\$attributes has unknown class FGTCLB\\\\CategoryTypes\\\\Collection\\\\CategoryCollection as its type\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
+
+		-
+			message: "#^Call to method getFilterCategories\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Collection\\\\FilterCollection\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findByDemand\\(\\) should return iterable\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\>&TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findGeoLocated\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findNextForGeolocation\\(\\) should return FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\|null but returns object\\|null\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
+
+		-
+			message: "#^PHPDoc tag @throws with type FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\InvalidEnumerationValueException is not subtype of Throwable$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
+
+		-
+			message: "#^Call to method attach\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Collection\\\\CategoryCollection\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Call to method findByTypeAndUidList\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Call to method getByDatabaseFields\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Call to method getCategoryTypeIdentifierByGroup\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Registry\\\\CategoryTypeRegistry\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Call to method setTypeIdentifiers\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Collection\\\\CategoryCollection\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Call to static method createByCategoryCollection\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Collection\\\\FilterCollection\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Class FGTCLB\\\\CategoryTypes\\\\Collection\\\\FilterCollection not found\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Instantiated class FGTCLB\\\\CategoryTypes\\\\Collection\\\\CategoryCollection not found\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Parameter \\$categoryRepository of method FGTCLB\\\\AcademicPartners\\\\Factory\\\\DemandFactory\\:\\:__construct\\(\\) has invalid type FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Parameter \\$categoryTypeRegistry of method FGTCLB\\\\AcademicPartners\\\\Factory\\\\DemandFactory\\:\\:__construct\\(\\) has invalid type FGTCLB\\\\CategoryTypes\\\\Registry\\\\CategoryTypeRegistry\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicPartners\\\\Factory\\\\DemandFactory\\:\\:\\$categoryRepository has unknown class FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository as its type\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicPartners\\\\Factory\\\\DemandFactory\\:\\:\\$categoryTypeRegistry has unknown class FGTCLB\\\\CategoryTypes\\\\Registry\\\\CategoryTypeRegistry as its type\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Model\\\\Address\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Repository/AddressRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Model\\\\Location\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Repository/LocationRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<Fgtclb\\\\AcademicPersons\\\\Domain\\\\Model\\\\Profile\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Repository/ProfileRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\$userUid of method Fgtclb\\\\AcademicPersonsEdit\\\\Provider\\\\ProfileProvider\\:\\:getProfileUidsFromUserUid\\(\\) expects int, array\\|bool\\|int\\|string given\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Middleware/ProfileLoader.php
+
+		-
+			message: "#^Parameter \\#1 \\$userUid of method Fgtclb\\\\AcademicPersonsEdit\\\\Provider\\\\ProfileProvider\\:\\:userHasProfile\\(\\) expects int, array\\|bool\\|int\\|string given\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Middleware/ProfileLoader.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<Fgtclb\\\\AcademicPersons\\\\Domain\\\\Model\\\\Contract\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ContractRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<Fgtclb\\\\AcademicPersons\\\\Domain\\\\Model\\\\FunctionType\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/FunctionTypeRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<Fgtclb\\\\AcademicPersons\\\\Domain\\\\Model\\\\OrganisationalUnit\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/OrganisationalUnitRepository.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:getDemand\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<Fgtclb\\\\AcademicPersons\\\\Domain\\\\Model\\\\Profile\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$query contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryInterface\\<Fgtclb\\\\AcademicPersons\\\\Domain\\\\Model\\\\Profile\\> but interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryInterface is not generic\\.$#"
+			count: 3
+			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
+
+		-
+			message: "#^Call to an undefined method object\\:\\:getLabel\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Tca/ContractLabels.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\:\\:getPid\\(\\) should return int\\<0, max\\>\\|null but returns int\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/Domain/Model/Program.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\:\\:getUid\\(\\) should return int\\<0, max\\>\\|null but returns int\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/Domain/Model/Program.php
+
+		-
+			message: "#^Argument of an invalid type FGTCLB\\\\AcademicPrograms\\\\Collection\\\\CategoryCollection\\|null supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/Domain/Repository/CategoryRepository.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Repository\\\\ProgramRepository\\:\\:findByDemand\\(\\) should return iterable\\<FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\>&TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/Domain/Repository/ProgramRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/Domain/Repository/ProgramRepository.php
+
+		-
+			message: "#^Cannot cast object to string\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/ViewHelpers/Form/AbstractSelectViewHelper.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\ViewHelpers\\\\Form\\\\AbstractSelectViewHelper\\:\\:getOptions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/ViewHelpers/Form/AbstractSelectViewHelper.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\ViewHelpers\\\\Form\\\\AbstractSelectViewHelper\\:\\:renderOptionTags\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/ViewHelpers/Form/AbstractSelectViewHelper.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'FGTCLB\\\\\\\\AcademicPrograms\\\\\\\\Enumeration\\\\\\\\CategoryTypes' and \\*NEVER\\* will always evaluate to false\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Tests/BrokenFunctional/Domain/Model/CategoryTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'FGTCLB\\\\\\\\AcademicPrograms\\\\\\\\Enumeration\\\\\\\\CategoryTypes' and FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Category\\|null will always evaluate to false\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Tests/BrokenFunctional/Domain/Model/CategoryTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertCount\\(\\) with 2 and array\\{\\} will always evaluate to false\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Tests/BrokenFunctional/Domain/Repository/CategoryRepositoryTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'FGTCLB\\\\\\\\AcademicPrograms\\\\\\\\Enumeration\\\\\\\\CategoryTypes' and FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Category\\|null will always evaluate to false\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Tests/BrokenFunctional/Domain/Repository/CategoryRepositoryTest.php
+
+		-
+			message: "#^Argument of an invalid type FGTCLB\\\\AcademicProjects\\\\Collection\\\\CategoryCollection\\|null supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Repository/CategoryRepository.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Repository\\\\ProjectRepository\\:\\:findByDemand\\(\\) should return iterable\\<FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\>&TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Repository/ProjectRepository.php
+
+		-
+			message: "#^PHPDoc tag @extends contains generic type TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository\\<FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\> but class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository is not generic\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Repository/ProjectRepository.php
