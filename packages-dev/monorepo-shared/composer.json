@@ -52,5 +52,10 @@
         "source": "https://github.com/fgtclb/academic-extensions",
         "email": "hello@fgtclb.com"
     },
-    "homepage": "https://www.fgtclb.com/"
+    "homepage": "https://www.fgtclb.com/",
+    "extra": {
+        "branch-alias": {
+            "dev-1": "1.2.x-dev"
+        }
+    }
 }
