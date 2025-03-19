@@ -29,9 +29,11 @@
             "web-dir": ".Build/Web",
             "app-dir": ".Build"
         },
-        "sbuerk/fixture-packages": [
-            "packages/*/*/Tests/Functional/Fixtures/Extensions/*"
-        ]
+        "sbuerk/fixture-packages": {
+            "paths": [
+                "packages/*/*/Tests/Functional/Fixtures/Extensions/*"
+            ]
+        }
     },
     "require-dev": {
         "bnf/phpstan-psr-container": "^1.0.1",
