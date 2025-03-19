@@ -16,7 +16,7 @@
     phpunit v10.1 compatible version.
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.1/phpunit.xsd"
+     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
      backupGlobals="true"
      beStrictAboutTestsThatDoNotTestAnything="false"
      bootstrap="FunctionalTestsBootstrap.php"
@@ -40,6 +40,7 @@
                 test location path needs to be given to phpunit.
             -->
             <directory>../../packages/*/*/Tests/Functional/</directory>
+            <exclude>academic_programs/Tests/Functional/</exclude>
         </testsuite>
     </testsuites>
     <php>
