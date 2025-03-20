@@ -1,4 +1,4 @@
-# TYPO3 academic extension collection (mono repository)
+# TYPO3 Academic Extensions (development)
 
 ## Description
 
