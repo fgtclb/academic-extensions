@@ -6,6 +6,11 @@ parameters:
 			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Controller/BiteJobsController.php
 
 		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManager\\:\\:getContentObject\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
+
+		-
 			message: "#^Cannot call method error\\(\\) on Psr\\\\Log\\\\LoggerInterface\\|null\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
@@ -14,6 +19,11 @@ parameters:
 			message: "#^Variable \\$requestFactory on left side of \\?\\? always exists and is not nullable\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Controller/ContactsController.php
 
 		-
 			message: "#^Parameter \\#1 \\$pid of method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) expects int, string given\\.$#"
@@ -29,6 +39,26 @@ parameters:
 			message: "#^Method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
+
+		-
+			message: "#^Call to an undefined static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:allowTableOnStandardPages\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/ext_tables.php
+
+		-
+			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessage\\:\\:ERROR\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
+
+		-
+			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessage\\:\\:OK\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
+
+		-
+			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessage\\:\\:WARNING\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
 
 		-
 			message: "#^Binary operation \"\\.\" between array\\<string, bool\\|string\\|null\\>\\|bool\\|string\\|null and Psr\\\\Http\\\\Message\\\\UriInterface results in an error\\.$#"
@@ -49,6 +79,41 @@ parameters:
 			message: "#^Method FGTCLB\\\\AcademicJobs\\\\Domain\\\\Repository\\\\JobRepository\\:\\:findByJobType\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Domain/Repository/JobRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\$file of method FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\JobAvatarImageUploadConverter\\:\\:createFileReferenceFromFalFileObject\\(\\) expects TYPO3\\\\CMS\\\\Core\\\\Resource\\\\File, TYPO3\\\\CMS\\\\Core\\\\Resource\\\\FileInterface given\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/JobAvatarImageUploadConverter.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\JobAvatarImageUploadConverter\\:\\:\\$priority has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/JobAvatarImageUploadConverter.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\JobAvatarImageUploadConverter\\:\\:\\$sourceTypes has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/JobAvatarImageUploadConverter.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\JobAvatarImageUploadConverter\\:\\:\\$targetType has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/JobAvatarImageUploadConverter.php
+
+		-
+			message: "#^Call to an undefined static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:getFileFieldTCAConfig\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Configuration/TCA/tx_academicjobs_domain_model_job.php
+
+		-
+			message: "#^Call to an undefined static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:allowTableOnStandardPages\\(\\)\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-jobs/ext_tables.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Controller/PartnerController.php
 
 		-
 			message: "#^Call to method findAllApplicable\\(\\) on an unknown class FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository\\.$#"
@@ -216,6 +281,11 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Factory/DemandFactory.php
 
 		-
+			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\AbstractMessage\\:\\:OK\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Controller/ProfileController.php
+
+		-
 			message: "#^Method Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Model\\\\Profile\\:\\:getLanguageUid\\(\\) should return int but returns int\\<\\-1, max\\>\\|null\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Model/Profile.php
@@ -246,9 +316,44 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Middleware/ProfileLoader.php
 
 		-
+			message: "#^Parameter \\#1 \\$identifier of method TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\PersistenceManagerInterface\\:\\:getObjectByIdentifier\\(\\) expects int\\|string, int\\|string\\|null given\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Profile/AbstractProfileFactory.php
+
+		-
 			message: "#^Parameter \\#1 \\$pid of method TYPO3\\\\CMS\\\\Extbase\\\\DomainObject\\\\AbstractDomainObject\\:\\:setPid\\(\\) expects int\\<0, max\\>, int given\\.$#"
 			count: 6
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Profile/ProfileFactory.php
+
+		-
+			message: "#^Property Fgtclb\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$priority has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
+
+		-
+			message: "#^Property Fgtclb\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$sourceTypes has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
+
+		-
+			message: "#^Property Fgtclb\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$targetType has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
+
+		-
+			message: "#^Parameter \\#2 \\$view of class Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent constructor expects TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface, TYPO3\\\\CMS\\\\Core\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface given\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
+
+		-
+			message: "#^Parameter \\#2 \\$view of class Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent constructor expects TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface, TYPO3\\\\CMS\\\\Core\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface given\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
 
 		-
 			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Domain\\\\Repository\\\\ContractRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
@@ -321,6 +426,21 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
+			message: "#^Call to an undefined static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:getFileFieldTCAConfig\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Configuration/TCA/Overrides/tx_academicpersons_domain_model_profile.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration\\:\\:write\\(\\)\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsDetailPluginTest.php
+
+		-
+			message: "#^Class TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration constructor invoked with 2 parameters, 7 required\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsDetailPluginTest.php
+
+		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsDetailPluginTest.php
@@ -334,6 +454,16 @@ parameters:
 			message: "#^Parameter \\#1 \\$instructions of method TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\InternalRequest\\:\\:withInstructions\\(\\) expects array\\<TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface\\>, array\\<string, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\> given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsDetailPluginTest.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration\\:\\:write\\(\\)\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php
+
+		-
+			message: "#^Class TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration constructor invoked with 2 parameters, 7 required\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php
 
 		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
@@ -351,6 +481,16 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php
 
 		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration\\:\\:write\\(\\)\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php
+
+		-
+			message: "#^Class TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration constructor invoked with 2 parameters, 7 required\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php
+
+		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php
@@ -364,6 +504,16 @@ parameters:
 			message: "#^Parameter \\#1 \\$instructions of method TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\InternalRequest\\:\\:withInstructions\\(\\) expects array\\<TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface\\>, array\\<string, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\> given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration\\:\\:write\\(\\)\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedContractsPluginTest.php
+
+		-
+			message: "#^Class TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration constructor invoked with 2 parameters, 7 required\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedContractsPluginTest.php
 
 		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
@@ -381,6 +531,16 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedContractsPluginTest.php
 
 		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration\\:\\:write\\(\\)\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedProfilesPluginTest.php
+
+		-
+			message: "#^Class TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\SiteConfiguration constructor invoked with 2 parameters, 7 required\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedProfilesPluginTest.php
+
+		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedProfilesPluginTest.php
@@ -394,6 +554,16 @@ parameters:
 			message: "#^Parameter \\#1 \\$instructions of method TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\InternalRequest\\:\\:withInstructions\\(\\) expects array\\<TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface\\>, array\\<string, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\> given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedProfilesPluginTest.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/Controller/DetailsController.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Classes/Controller/ProgramController.php
 
 		-
 			message: "#^Argument of an invalid type FGTCLB\\\\AcademicPrograms\\\\Collection\\\\CategoryCollection\\|null supplied for foreach, only iterables are supported\\.$#"
@@ -454,6 +624,11 @@ parameters:
 			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'FGTCLB\\\\\\\\AcademicPrograms\\\\\\\\Enumeration\\\\\\\\CategoryTypes' and FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Category\\|null will always evaluate to false\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-programs/Tests/BrokenFunctional/Domain/Repository/CategoryRepositoryTest.php
+
+		-
+			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-projects/Classes/Controller/ProjectController.php
 
 		-
 			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\:\\:getPid\\(\\) should return int but returns int\\<0, max\\>\\|null\\.$#"
