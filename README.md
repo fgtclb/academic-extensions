@@ -20,6 +20,29 @@ increasing the cross-over development and testing experience.
 > repository.
 > Support in work and at least planned to be archived when releasing `2.0.0`.
 
+### Extension Version Support Matrix
+
+| Extension               | v11  | v12     | v13     | Comment                                                                      |
+|-------------------------|------|---------|---------|------------------------------------------------------------------------------|
+| academic_bite_jobs      | -1-  | -1- -2- | -1- -2- | Broken - API key required but not configurable, not checked/adopted for v12+ |
+| academic_contacts4pages | <1>  | -1- -2- | -1- -2- | 1 in use for v11, may work for v12 but not tested. Same with 2 for v12/v13   |
+| academic_jobs           | <1>  | -1- -2- | -1- -2- |                                                                              |
+| academic_partners       | -1-  | -1- {2} | -1- {2} | Breaking for 2 pending/needs to be adopted into mono-repo                    |
+| academic_persons        | <1>  | {1} {2} | -1- {2} |                                                                              |
+| academic_persons_edit   | <1>  | {1} {2} | -1- {2} |                                                                              |
+| academic_persons_sync   | <1>  | {1} {2} | -1- {2} |                                                                              |
+| academic_programs       | <1>  | {1} {2} | -1- {2} | Breaking for 2 pending/needs to be adopted into mono-repo                    |
+| academic_projects       | <1>  | {1} {2} | -1- {2} |                                                                              |
+| category_types          | <1>  | {1} {2} | -1- {2} | Breaking for 2 pending/needs to be adopted into mono-repo                    |
+
+Legend:
+
+```
+  <X>   Allowed and used with X.y.z
+  {X}   Allowd but not tested/verified with X.y.z, but may/could work
+  -X-   Allowed but absolutly not tested and most likely not working (yet)
+```
+
 ## List of TYPO3 extension and the split repositories (READ ONLY)
 
 | Composer                       | TYPO3                   | Path                                                                                       | Split Repository                                                                  |
