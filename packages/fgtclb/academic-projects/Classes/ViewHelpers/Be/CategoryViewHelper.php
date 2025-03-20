@@ -63,7 +63,7 @@ class CategoryViewHelper extends AbstractViewHelper
         try {
             $categoryType = CategoryTypes::cast($arguments['type']);
             $attributes = $repository->findByType($arguments['page'], $categoryType);
-        } catch (InvalidEnumerationValueException $e) {
+        } catch (InvalidEnumerationValueException) {
             $attributes = $repository->findAllByPageId($arguments['page']);
         }
 

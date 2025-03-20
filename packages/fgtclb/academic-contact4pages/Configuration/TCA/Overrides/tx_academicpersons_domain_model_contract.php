@@ -5,9 +5,7 @@ if (!defined('TYPO3')) {
 }
 
 (static function (): void {
-    $ll = function (string $langKey): string {
-        return 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:' . $langKey;
-    };
+    $ll = fn(string $langKey): string => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:' . $langKey;
 
     $columns = [
         'tx_academiccontacts4pages_contacts' => [

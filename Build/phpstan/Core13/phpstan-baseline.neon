@@ -406,11 +406,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Property Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:\\$profiles with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
 			message: "#^Property Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:\\$view has unknown class TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface as its type\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php

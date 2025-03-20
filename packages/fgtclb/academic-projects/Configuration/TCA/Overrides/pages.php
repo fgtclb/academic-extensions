@@ -10,9 +10,7 @@ if (!defined('TYPO3')) {
 }
 
 (static function (): void {
-    $ll = function (string $langKey): string {
-        return 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
-    };
+    $ll = fn(string $langKey): string => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
 
     // Create new item group for academic doktype items
     // TODO: Harmonize this with all academic extensions
