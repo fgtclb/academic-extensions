@@ -3,9 +3,7 @@
 declare(strict_types=1);
 
 (static function (): void {
-    $ll = function (string $langKey): string {
-        return 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
-    };
+    $ll = fn(string $langKey): string => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
 
     // Configure list plugin
 

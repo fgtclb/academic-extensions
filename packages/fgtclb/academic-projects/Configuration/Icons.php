@@ -11,12 +11,10 @@ $sourceString = static fn(string $icon): string => sprintf(
     GeneralUtility::underscoredToUpperCamelCase($icon)
 );
 
-$identifierString = static function (string $identifier) {
-    return sprintf(
-        'academic-project-%s',
-        $identifier
-    );
-};
+$identifierString = static fn(string $identifier) => sprintf(
+    'academic-project-%s',
+    $identifier
+);
 
 return [
     $identifierString(CategoryTypes::TYPE_COMPETENCE_FIELD) => [

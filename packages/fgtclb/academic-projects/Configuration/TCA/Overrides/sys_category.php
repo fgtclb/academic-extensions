@@ -5,19 +5,15 @@ declare(strict_types=1);
 use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
 
 (static function (): void {
-    $ll = static function (string $label) {
-        return sprintf(
-            'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.type.%s',
-            $label
-        );
-    };
+    $ll = static fn(string $label) => sprintf(
+        'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.type.%s',
+        $label
+    );
 
-    $iconType = static function (string $iconType) {
-        return sprintf(
-            'academic-project-%s',
-            $iconType
-        );
-    };
+    $iconType = static fn(string $iconType) => sprintf(
+        'academic-project-%s',
+        $iconType
+    );
 
     // Create new select item group for category types
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTcaSelectItemGroup(

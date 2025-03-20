@@ -80,9 +80,7 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
         }
 
         if ($this->arguments['sortByOptionLabel'] !== false) {
-            usort($options, function ($a, $b) {
-                return strcoll($a['label'], $b['label']);
-            });
+            usort($options, fn($a, $b) => strcoll((string)$a['label'], (string)$b['label']));
         }
 
         return $options;
@@ -115,7 +113,7 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
             $labelKey
         );
 
-        $extensionName = $this->arguments['extensionName'] === null ? 'academic_programs' : $this->arguments['extensionName'];
+        $extensionName = $this->arguments['extensionName'] ?? 'academic_programs';
 
         $translatedLabel = LocalizationUtility::translate(
             $key,
