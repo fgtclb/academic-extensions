@@ -106,11 +106,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-jobs/Configuration/TCA/tx_academicjobs_domain_model_job.php
 
 		-
-			message: "#^Call to an undefined static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:allowTableOnStandardPages\\(\\)\\.$#"
-			count: 2
-			path: ../../../packages/fgtclb/academic-jobs/ext_tables.php
-
-		-
 			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Controller/PartnerController.php
@@ -341,11 +336,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
 
 		-
-			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
-
-		-
 			message: "#^Parameter \\#2 \\$view of class Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent constructor expects TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface, TYPO3\\\\CMS\\\\Core\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
@@ -424,11 +414,6 @@ parameters:
 			message: "#^Property Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:\\$view has unknown class TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface as its type\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
-			message: "#^Call to an undefined static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:getFileFieldTCAConfig\\(\\)\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Configuration/TCA/Overrides/tx_academicpersons_domain_model_profile.php
 
 		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"

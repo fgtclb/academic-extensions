@@ -251,6 +251,11 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Profile/ProfileFactory.php
 
 		-
+			message: "#^Instantiated class TYPO3\\\\CMS\\\\Core\\\\Cache\\\\CacheTag not found\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
+
+		-
 			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Domain\\\\Repository\\\\ContractRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ContractRepository.php
