@@ -96,7 +96,8 @@
             "Fgtclb\\AcademicPersons\\Tests\\": "packages/fgtclb/academic-persons/Tests",
             "Fgtclb\\AcademicPersonsEdit\\Tests\\": "packages/fgtclb/academic-persons-edit/Tests",
             "FGTCLB\\AcademicPrograms\\Tests\\": "packages/fgtclb/academic-programs/Tests",
-            "FGTCLB\\AcademicProjects\\Tests\\": "packages/fgtclb/academic-programs/Tests"
+            "FGTCLB\\AcademicProjects\\Tests\\": "packages/fgtclb/academic-programs/Tests",
+            "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms-core/Tests"
         }
     },
     "support": {

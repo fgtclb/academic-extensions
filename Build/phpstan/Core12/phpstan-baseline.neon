@@ -326,27 +326,7 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsDetailPluginTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$current of method Fgtclb\\\\AcademicPersons\\\\Tests\\\\Functional\\\\Plugins\\\\AcademicPersonsDetailPluginTest\\:\\:mergeInstruction\\(\\) expects TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\|TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsDetailPluginTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$instructions of method TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\InternalRequest\\:\\:withInstructions\\(\\) expects array\\<TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface\\>, array\\<string, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\> given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsDetailPluginTest.php
-
-		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$current of method Fgtclb\\\\AcademicPersons\\\\Tests\\\\Functional\\\\Plugins\\\\AcademicPersonsListAndDetailPluginTest\\:\\:mergeInstruction\\(\\) expects TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\|TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$instructions of method TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\InternalRequest\\:\\:withInstructions\\(\\) expects array\\<TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface\\>, array\\<string, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\> given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php
 
@@ -356,42 +336,12 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$current of method Fgtclb\\\\AcademicPersons\\\\Tests\\\\Functional\\\\Plugins\\\\AcademicPersonsListPluginTest\\:\\:mergeInstruction\\(\\) expects TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\|TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$instructions of method TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\InternalRequest\\:\\:withInstructions\\(\\) expects array\\<TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface\\>, array\\<string, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\> given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php
-
-		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedContractsPluginTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$current of method Fgtclb\\\\AcademicPersons\\\\Tests\\\\Functional\\\\Plugins\\\\AcademicPersonsSelectedContractsPluginTest\\:\\:mergeInstruction\\(\\) expects TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\|TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedContractsPluginTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$instructions of method TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\InternalRequest\\:\\:withInstructions\\(\\) expects array\\<TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface\\>, array\\<string, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\> given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedContractsPluginTest.php
-
-		-
 			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedProfilesPluginTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$current of method Fgtclb\\\\AcademicPersons\\\\Tests\\\\Functional\\\\Plugins\\\\AcademicPersonsSelectedProfilesPluginTest\\:\\:mergeInstruction\\(\\) expects TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\|TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedProfilesPluginTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$instructions of method TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\InternalRequest\\:\\:withInstructions\\(\\) expects array\\<TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\InstructionInterface\\>, array\\<string, TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Internal\\\\AbstractInstruction\\> given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedProfilesPluginTest.php
 
