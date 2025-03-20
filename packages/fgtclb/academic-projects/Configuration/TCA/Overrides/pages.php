@@ -6,7 +6,7 @@ use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 if (!defined('TYPO3')) {
-    die(__CLASS__);
+    die('Not authorized');
 }
 
 (static function (): void {
