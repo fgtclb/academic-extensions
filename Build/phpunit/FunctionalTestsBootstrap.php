@@ -49,6 +49,7 @@
         // ^^ END-OF-WORKAROUND
         $adopter->adoptFixtureExtensions();
     }
+
     $testbase = new \TYPO3\TestingFramework\Core\Testbase();
     $testbase->defineOriginalRootPath();
     //var_dump(getenv('TYPO3_PATH_ROOT'));var_dump(getenv('TYPO3_PATH_WEB'));var_dump(ORIGINAL_ROOT);die();

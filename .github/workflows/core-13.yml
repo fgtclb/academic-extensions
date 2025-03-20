@@ -153,70 +153,65 @@ jobs:
       - name: "Execute unit tests"
         run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s unit"
 
-# @todo Functional tests disabled in pipeline due to a lot of errors with TYPO3 v13. After resolving them, enable
-# @todo the pipeline again. Notable errors are:
-# @todo - Update SiteBasedTestTrait to TYPO3 v12 + v13 compatible version (once),
-#         move it to a central/global place and remove duplicate implementations
-#         from academic extensions.
+
 # @todo - Mitigate automatic TCA migrations within all extensions properly and avoid deprecation messages,
 #         which breaks functional test executions
-#
-#  functional:
-#    name: "functional"
-#    runs-on: ubuntu-22.04
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        php-version: [ "8.2", "8.3", "8.4" ]
-#        typo3: ["13"]
-#    needs: ["code-quality", "linting", "unit"]
-#    permissions:
-#      # actions: read|write|none
-#      actions: none
-#      # checks: read|write|none
-#      checks: none
-#      # contents: read|write|none
-#      contents: read
-#      # deployments: read|write|none
-#      deployments: none
-#      # id-token: read|write|none
-#      id-token: none
-#      # issues: read|write|none
-#      issues: none
-#      # discussions: read|write|none
-#      discussions: none
-#      # packages: read|write|none
-#      packages: read
-#      # pages: read|write|none
-#      pages: none
-#      # pull-requests: read|write|none
-#      pull-requests: none
-#      # repository-projects: read|write|none
-#      repository-projects: read
-#      # security-events: read|write|none
-#      security-events: none
-#      # statuses: read|write|none
-#      statuses: none
-#
-#    steps:
-#
-#      - name: "Checkout"
-#        uses: actions/checkout@v4
-#
-#      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
-#        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
-#
-#      - name: "functional with SQLite"
-#        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -s functional"
-#
-#      - name: "functional with MySQL 8.0"
-#        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d mysql -i 8.0 -s functional"
-#
-#      - name: "functional with MariaDB 10.4"
-#        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d mariadb -i 10.4 -s functional"
-#
-#      - name: "functional with MariaDB 10.6"
-#        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d mariadb -i 10.6 -s functional"
-#
-#      - name: "functional with Postgres 10"
-#        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d postgres -i 10 -s functional"
+  functional:
+    name: "functional"
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2", "8.3", "8.4" ]
+        typo3: ["13"]
+    needs: ["code-quality", "linting", "unit"]
+    permissions:
+      # actions: read|write|none
+      actions: none
+      # checks: read|write|none
+      checks: none
+      # contents: read|write|none
+      contents: read
+      # deployments: read|write|none
+      deployments: none
+      # id-token: read|write|none
+      id-token: none
+      # issues: read|write|none
+      issues: none
+      # discussions: read|write|none
+      discussions: none
+      # packages: read|write|none
+      packages: read
+      # pages: read|write|none
+      pages: none
+      # pull-requests: read|write|none
+      pull-requests: none
+      # repository-projects: read|write|none
+      repository-projects: read
+      # security-events: read|write|none
+      security-events: none
+      # statuses: read|write|none
+      statuses: none
+
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "functional with SQLite"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -s functional"
+
+      - name: "functional with MySQL 8.0"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d mysql -i 8.0 -s functional"
+
+      - name: "functional with MariaDB 10.4"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d mariadb -i 10.4 -s functional"
+
+      - name: "functional with MariaDB 10.6"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d mariadb -i 10.6 -s functional"
+
+      - name: "functional with Postgres 10"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d postgres -i 10 -s functional"
