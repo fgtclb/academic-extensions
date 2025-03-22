@@ -1,109 +1,110 @@
 {
-    "name": "fgtclb/academic-extensions",
-    "description": "Centralized mono repository for academic extension development",
-    "type": "project",
-    "license": "GPL-2.0-or-later",
-    "authors": [
-        {
-            "name": "FGTCLB GmbH",
-            "email": "hello@fgtclb.com"
+  "name": "fgtclb/academic-extensions",
+  "description": "Centralized mono repository for academic extension development",
+  "type": "project",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "FGTCLB GmbH",
+      "email": "hello@fgtclb.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+    "fgtclb/academics-monorepo-shared": "2.0.*@dev"
+  },
+  "config": {
+    "allow-plugins": {
+      "typo3/class-alias-loader": true,
+      "typo3/cms-composer-installers": true,
+      "php-http/discovery": true,
+      "sbuerk/fixture-packages": true
+    },
+    "sort-packages": true,
+    "bin-dir": ".Build/bin",
+    "vendor-dir": ".Build/vendor",
+    "preferred-install": {
+      "typo3/cms-extbase": "source",
+      "typo3/cms-core": "source",
+      "typo3/cms-frontend": "source",
+      "*": "dist"
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "web-dir": ".Build/Web",
+      "app-dir": ".Build"
+    },
+    "sbuerk/fixture-packages": {
+      "paths": {
+        "packages/*/*/Tests/Functional/Fixtures/Extensions/*": [
+          "autoload",
+          "autoload-dev"
+        ],
+        "packages/*/*": [
+          "autoload-dev"
+        ]
+      }
+    },
+    "branch-alias": {
+      "dev-main": "2.0.x-dev"
+    }
+  },
+  "require-dev": {
+    "bnf/phpstan-psr-container": "^1.0.1",
+    "friendsofphp/php-cs-fixer": "^3.57.1",
+    "friendsoftypo3/phpstan-typo3": "^0.9.0",
+    "georgringer/numbered-pagination": "^2.1",
+    "phpstan/phpdoc-parser": "^1.29.0",
+    "phpstan/phpstan": "^1.12.21",
+    "phpstan/phpstan-phpunit": "^1.4.0",
+    "phpunit/phpunit": "^10.5.45",
+    "sbuerk/fixture-packages": ">=0.1.1 < 2.0.0",
+    "typo3/tailor": "^1.6",
+    "typo3/testing-framework": "^8.2.7"
+  },
+  "repositories": {
+    "packages-dev": {
+      "type": "path",
+      "url": "packages-dev/*",
+      "options": {
+        "versions": {
+          "fgtclb/academics-monorepo-shared": "2.0.0-dev"
         }
-    ],
-    "require": {
-        "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
-        "fgtclb/academics-monorepo-shared": "2.0.*@dev"
+      }
     },
-    "config": {
-        "allow-plugins": {
-            "typo3/class-alias-loader": true,
-            "typo3/cms-composer-installers": true,
-            "php-http/discovery": true,
-            "sbuerk/fixture-packages": true
-        },
-        "sort-packages": true,
-        "bin-dir": ".Build/bin",
-        "vendor-dir": ".Build/vendor",
-        "preferred-install": {
-            "typo3/cms-extbase": "source",
-            "typo3/cms-core": "source",
-            "typo3/cms-frontend": "source",
-            "*": "dist"
+    "packages": {
+      "type": "path",
+      "url": "packages/*/*",
+      "options": {
+        "versions": {
+          "fgtclb/academic-bite-jobs": "2.0.0-dev",
+          "fgtclb/academic-contacts4pages": "2.0.0-dev",
+          "fgtclb/academic-jobs": "2.0.0-dev",
+          "fgtclb/academic-partners": "2.0.0-dev",
+          "fgtclb/academic-persons": "2.0.0-dev",
+          "fgtclb/academic-persons-edit": "2.0.0-dev",
+          "fgtclb/academic-persons-sync": "2.0.0-dev",
+          "fgtclb/academic-programs": "2.0.0-dev",
+          "fgtclb/academic-projects": "2.0.0-dev",
+          "fgtclb/category-types": "2.0.0-dev"
         }
-    },
-    "extra": {
-        "typo3/cms": {
-            "web-dir": ".Build/Web",
-            "app-dir": ".Build"
-        },
-        "sbuerk/fixture-packages": {
-            "paths": [
-                "packages/*/*/Tests/Functional/Fixtures/Extensions/*"
-            ]
-        },
-        "branch-alias": {
-            "dev-main": "2.0.x-dev"
-        }
-    },
-    "require-dev": {
-        "bnf/phpstan-psr-container": "^1.0.1",
-        "friendsofphp/php-cs-fixer": "^3.57.1",
-        "friendsoftypo3/phpstan-typo3": "^0.9.0",
-        "georgringer/numbered-pagination": "^2.1",
-        "phpstan/phpdoc-parser": "^1.29.0",
-        "phpstan/phpstan": "^1.12.21",
-        "phpstan/phpstan-phpunit": "^1.4.0",
-        "phpunit/phpunit": "^10.5.45",
-        "sbuerk/fixture-packages": "^0.0.2 <0.1",
-        "typo3/tailor": "^1.6",
-        "typo3/testing-framework": "^8.2.7"
-    },
-    "repositories": {
-        "packages-dev": {
-            "type": "path",
-            "url": "packages-dev/*",
-            "options": {
-                "versions": {
-                    "fgtclb/academics-monorepo-shared": "2.0.0-dev"
-                }
-            }
-        },
-        "packages": {
-            "type": "path",
-            "url": "packages/*/*",
-            "options": {
-                "versions": {
-                    "fgtclb/academic-bite-jobs": "2.0.0-dev",
-                    "fgtclb/academic-contacts4pages": "2.0.0-dev",
-                    "fgtclb/academic-jobs": "2.0.0-dev",
-                    "fgtclb/academic-partners": "2.0.0-dev",
-                    "fgtclb/academic-persons": "2.0.0-dev",
-                    "fgtclb/academic-persons-edit": "2.0.0-dev",
-                    "fgtclb/academic-persons-sync": "2.0.0-dev",
-                    "fgtclb/academic-programs": "2.0.0-dev",
-                    "fgtclb/academic-projects": "2.0.0-dev",
-                    "fgtclb/category-types": "2.0.0-dev"
-                }
-            }
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "autoload-dev": {
-        "psr-4": {
-            "FGTCLB\\AcademicBiteJobs\\Tests\\": "packages/fgtclb/academic-bite-jobs/Tests",
-            "FGTCLB\\AcademicJobs\\Tests\\": "packages/fgtclb/academic-jobs/Tests",
-            "FGTCLB\\AcademicPartners\\Tests\\": "packages/fgtclb/academic-partners/Tests",
-            "Fgtclb\\AcademicPersons\\Tests\\": "packages/fgtclb/academic-persons/Tests",
-            "Fgtclb\\AcademicPersonsEdit\\Tests\\": "packages/fgtclb/academic-persons-edit/Tests",
-            "FGTCLB\\AcademicPrograms\\Tests\\": "packages/fgtclb/academic-programs/Tests",
-            "FGTCLB\\AcademicProjects\\Tests\\": "packages/fgtclb/academic-programs/Tests",
-            "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms-core/Tests"
-        }
-    },
-    "support": {
-        "issues": "https://github.com/fgtclb/academic-extensions/issues",
-        "source": "https://github.com/fgtclb/academic-extensions",
-        "email": "hello@fgtclb.com"
-    },
-    "homepage": "https://www.fgtclb.com/"
+      }
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "support": {
+    "issues": "https://github.com/fgtclb/academic-extensions/issues",
+    "source": "https://github.com/fgtclb/academic-extensions",
+    "email": "hello@fgtclb.com"
+  },
+  "homepage": "https://www.fgtclb.com/",
+  "autoload": {
+    "psr-4": {
+      "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms-core/Tests/",
+      "TYPO3\\CMS\\Extbase\\Tests\\": ".Build/vendor/typo3/cms-extbase/Tests/",
+      "TYPO3\\CMS\\Frontend\\Tests\\": ".Build/vendor/typo3/cms-frontend/Tests/"
+    }
+  }
 }
