@@ -1,58 +1,80 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" target-language="" datatype="plaintext"
-		  original="messages" date="2023-03-15T11:39:25Z">
-		<header>
-			<generator>OwnScript</generator>
-		</header>
-		<body>
-			<trans-unit id="backend_layout.academic_projects">
-				<source>Academic Projects</source>
-			</trans-unit>
+    <file source-language="en" target-language="" datatype="plaintext" original="messages" date="2023-03-15T11:39:25Z">
+        <header/>
+        <body>
+            <trans-unit id="backend_layout.academic_projects">
+                <source>Academic Projects</source>
+            </trans-unit>
 
-			<trans-unit id="sys_category.type.department">
-				<source>Department</source>
-			</trans-unit>
-			<trans-unit id="sys_category.type.competence_field">
-				<source>Competence field</source>
-			</trans-unit>
-			<trans-unit id="sys_category.type.cooperation">
-				<source>Cooperation</source>
-			</trans-unit>
-			<trans-unit id="sys_category.type.funding_partner">
-				<source>Funding partner</source>
-			</trans-unit>
+            <!-- Labels for SysCategories -->
 
-			<trans-unit id="filter.sorting.lastUpdated.asc">
-				<source>Last updated (latest first)</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.lastUpdated.desc">
-				<source>Last updated (latest last)</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.sorting.asc">
-				<source>Page sorting (Result may be unexpected)</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.sorting.desc">
-				<source>Page sorting (Result may be unexpected)</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.title.asc">
-				<source>Title A-Z</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.title.desc">
-				<source>Title Z-A</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.tx_academicprojects_budget.asc">
-				<source>Budget (low to high)</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.tx_academicprojects_budget.desc">
-				<source>Budget (high to low)</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.tx_academicprojects_start_date.asc">
-				<source>Start date (oldest first)</source>
-			</trans-unit>
-			<trans-unit id="filter.sorting.tx_academicprojects_start_date.desc">
-				<source>Start date (newest first)</source>
-			</trans-unit>
-		</body>
-	</file>
+            <trans-unit id="sys_category.academic_projects.group">
+                <source>Academic Projects</source>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.allOptions">
+                <source>All options</source>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.department">
+                <source>Department</source>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.competence_field">
+                <source>Competence field</source>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.cooperation">
+                <source>Cooperation</source>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.funding_partner">
+                <source>Funding partner</source>
+            </trans-unit>
+
+            <!-- Sorting direction options -->
+
+            <trans-unit id="sorting.direction.asc">
+                <source>ascending</source>
+            </trans-unit>
+            <trans-unit id="sorting.direction.desc">
+                <source>descending</source>
+            </trans-unit>
+
+            <!-- Sorting field options -->
+
+            <trans-unit id="sorting.field.lastUpdated">
+                <source>Last updated</source>
+            </trans-unit>
+            <trans-unit id="sorting.field.sorting">
+                <source>Sorting</source>
+            </trans-unit>
+            <trans-unit id="sorting.field.title">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="sorting.field.tx_academicprojects_budget">
+                <source>Budget</source>
+            </trans-unit>
+            <trans-unit id="sorting.field.tx_academicprojects_start_date">
+                <source>Start date</source>
+            </trans-unit>
+
+            <!-- Combined sorting options -->
+
+            <trans-unit id="sorting.title.asc">
+                <source>Title A-Z</source>
+            </trans-unit>
+            <trans-unit id="sorting.title.desc">
+                <source>Title Z-A</source>
+            </trans-unit>
+            <trans-unit id="sorting.tx_academicprojects_budget.asc">
+                <source>Budget (low to high)</source>
+            </trans-unit>
+            <trans-unit id="sorting.tx_academicprojects_budget.desc">
+                <source>Budget (high to low)</source>
+            </trans-unit>
+            <trans-unit id="sorting.tx_academicprojects_start_date.asc">
+                <source>Start date (oldest first)</source>
+            </trans-unit>
+            <trans-unit id="sorting.tx_academicprojects_start_date.desc">
+                <source>Start date (newest first)</source>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>

@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Model;
 
-use FGTCLB\AcademicProjects\Collection\CategoryCollection;
-use FGTCLB\AcademicProjects\Domain\Repository\CategoryRepository;
+use FGTCLB\CategoryTypes\Collection\CategoryCollection;
+use FGTCLB\CategoryTypes\Collection\GetCategoryCollectionInterface;
+use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 
-class Project extends AbstractEntity
+class Project extends AbstractEntity implements GetCategoryCollectionInterface
 {
-    protected int $doktype;
+    protected int $doktype = 0;
 
     protected string $title = '';
 
     /** @var ObjectStorage<FileReference> */
-    protected $media;
+    protected ObjectStorage $media;
 
     protected string $projectTitle = '';
 
@@ -33,6 +34,16 @@ class Project extends AbstractEntity
     protected string $funders = '';
 
     protected ?CategoryCollection $attributes = null;
+
+    public function __construct()
+    {
+        $this->initializeObject();
+    }
+
+    public function initializeObject(): void
+    {
+        $this->media = new ObjectStorage();
+    }
 
     public function getPid(): int
     {
@@ -92,8 +103,14 @@ class Project extends AbstractEntity
         return $this->funders;
     }
 
-    public function getAttributes(): ?CategoryCollection
+    public function getAttributes(): CategoryCollection
     {
-        return GeneralUtility::makeInstance(CategoryRepository::class)->findAllByPageId($this->uid);
+        return $this->attributes ??= GeneralUtility::makeInstance(CategoryRepository::class)
+            ->findByGroupAndPageId('projects', (int)$this->uid);
+    }
+
+    public function getCategoryCollection(): CategoryCollection
+    {
+        return $this->getAttributes();
     }
 }

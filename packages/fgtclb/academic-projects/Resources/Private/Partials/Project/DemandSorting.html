@@ -1,20 +1,24 @@
 <html
-    lang="en"
-    xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-    xmlns:fap="http://typo3.org/ns/FGTCLB/AcademicProjects/ViewHelpers"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:ace="http://typo3.org/ns/FGTCLB/AcademicProjects/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-    <label for="sorting">
-        {f:translate(
-            key: 'demand.sorting',
-            extensionName: 'academic_projects'
-        )}
-    </label>
-    <fap:form.sortingSelect
-        class="form-select"
-        id="sorting"
-        property="sorting"
-        sortByOptionLabel="true"
+    <label for="sortingField">Sortierfeld</label>
+    <ace:form.sortingSelect
+        id="sortingField"
+        property="sortingField"
+        value="{demand.sortingField}"
+        type="fields"
         additionalAttributes="{'onchange': 'this.form.submit()'}"
+        l10n="filter.sortingField" 
+    />
+    <label for="sortingDirection">Sortierreihenfolge</label>
+    <ace:form.sortingSelect
+        id="sortingDirection"
+        property="sortingDirection"
+        value="{demand.sortingDirection}"
+        type="directions"
+        additionalAttributes="{'onchange': 'this.form.submit()'}"
+        l10n="filter.sortingDirection" 
     />
 </html>

@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Factory;
 
-use FGTCLB\AcademicProjects\Collection\CategoryCollection;
-use FGTCLB\AcademicProjects\Collection\FilterCollection;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
-use FGTCLB\AcademicProjects\Domain\Repository\CategoryRepository;
-use FGTCLB\AcademicProjects\Enumeration\CategoryTypes;
+use FGTCLB\CategoryTypes\Collection\FilterCollection;
+use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DemandFactory
@@ -28,23 +26,20 @@ class DemandFactory
         array $contentElementData
     ): ProjectDemand {
         $demand = GeneralUtility::makeInstance(ProjectDemand::class);
-        $filterCollection = GeneralUtility::makeInstance(FilterCollection::class);
+        $categoryCollection = null;
 
         // Init demand properties with plugin settings, which can be overwritten by the form
         if ($demandFromForm === null) {
             if (isset($settings['sorting'])) {
                 $demand->setSorting($settings['sorting']);
             }
-
             if (isset($settings['categories'])
                 && (int)$settings['categories'] > 0
             ) {
-                $categoryCollection = $this->categoryRepository->getByDatabaseFields($contentElementData['uid']);
-                $filterCollection = FilterCollection::createByCategoryCollection($categoryCollection);
+                $categoryCollection = $this->categoryRepository->getByDatabaseFields('projects', (int)$contentElementData['uid']);
             }
         } else {
             // Set demand properties, if form data is available
-
             if (isset($demandFromForm['sorting'])) {
                 $demand->setSorting($demandFromForm['sorting']);
             }
@@ -58,43 +53,34 @@ class DemandFactory
             }
 
             if (isset($demandFromForm['filterCollection'])) {
-                $categoryCollection = new CategoryCollection();
-
-                foreach ($demandFromForm['filterCollection'] as $type => $categoriesIds) {
-                    $formatType = GeneralUtility::camelCaseToLowerCaseUnderscored($type);
-                    $categoriesIdList = GeneralUtility::intExplode(',', $categoriesIds);
-                    $categoryFilterObject = $this->categoryRepository->findByUidListAndType(
-                        $categoriesIdList,
-                        CategoryTypes::cast($formatType)
-                    );
-
-                    foreach ($categoryFilterObject as $category) {
-                        $categoryCollection->attach($category);
-                    }
+                $categoryUids = [];
+                foreach ($demandFromForm['filterCollection'] as $uids) {
+                    $categoryUids = array_merge($categoryUids, GeneralUtility::intExplode(',', $uids));
                 }
 
-                $filterCollection = FilterCollection::createByCategoryCollection($categoryCollection);
+                $categoryCollection = $this->categoryRepository->findByGroupAndUidList(
+                    'projects',
+                    $categoryUids,
+                );
             }
         }
 
-        $demand->setFilterCollection($filterCollection);
+        if ($categoryCollection !== null) {
+            $demand->setFilterCollection(new FilterCollection($categoryCollection));
+        }
 
         // Set demand properties, which are always defined by plugin settings
-
         $demand->setPages(
             $contentElementData['pages'] !== ''
                 ? GeneralUtility::intExplode(',', $contentElementData['pages'])
                 : []
         );
-
         $demand->setShowSelected(
-            $contentElementData['list_type'] === 'academicprojects_projectlistsingle' ? true : false
+            $contentElementData['list_type'] === 'academicprojects_projectlistsingle'
         );
-
         if (isset($settings['hide_completed_projects'])) {
             $demand->setHideCompletedProjects((bool)$settings['hide_completed_projects']);
         }
-
         return $demand;
     }
 }

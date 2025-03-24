@@ -10,29 +10,24 @@ if (!defined('TYPO3')) {
 }
 
 (static function (): void {
-    $ll = fn(string $langKey): string => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:' . $langKey;
-
     // Create new item group for academic doktype items
     // TODO: Harmonize this with all academic extensions
     ExtensionManagementUtility::addTcaSelectItemGroup(
         'pages',
         'doktype',
         'academic',
-        $ll('pages.doktype.item_group.academic'),
+        'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:pages.doktype.item_group.academic',
         'after:default'
     );
 
     // Add and configure new doktype
-
-    $doktype = PageTypes::TYPE_ACEDEMIC_PROJECT;
-
     ExtensionManagementUtility::addTcaSelectItem(
         'pages',
         'doktype',
         [
-            $ll('pages.doktype.item.academic_projects'),
-            $doktype,
-            'actions-code-merge',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:pages.doktype.item.academic_projects',
+            'value' => PageTypes::TYPE_ACEDEMIC_PROJECT,
+            'icon' => 'actions-code-merge',
         ],
         '254',
         'before'
@@ -43,11 +38,11 @@ if (!defined('TYPO3')) {
         [
             'ctrl' => [
                 'typeicon_classes' => [
-                    $doktype => 'actions-code-merge',
+                    PageTypes::TYPE_ACEDEMIC_PROJECT => 'actions-code-merge',
                 ],
             ],
             'types' => [
-                $doktype => $GLOBALS['TCA']['pages']['types'][(string)PageRepository::DOKTYPE_DEFAULT],
+                PageTypes::TYPE_ACEDEMIC_PROJECT => $GLOBALS['TCA']['pages']['types'][(string)PageRepository::DOKTYPE_DEFAULT],
             ],
         ]
     );
@@ -55,7 +50,7 @@ if (!defined('TYPO3')) {
     $columns = [
         'tx_academicprojects_project_title' => [
             'exclude' => true,
-            'label' => $ll('tx_academicprojects_domain_model_project.project_title'),
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.project_title',
             'config' => [
                 'type' => 'input',
                 'eval' => 'trim',
@@ -67,7 +62,7 @@ if (!defined('TYPO3')) {
         'tx_academicprojects_short_description' => [
             'exclude' => true,
             'l10n_mode' => 'prefixLangTitle',
-            'label' => $ll('tx_academicprojects_domain_model_project.short_description'),
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.short_description',
             'config' => [
                 'type' => 'text',
                 'enableRichtext' => true,
@@ -85,10 +80,9 @@ if (!defined('TYPO3')) {
         ],
         'tx_academicprojects_start_date' => [
             'exclude' => true,
-            'label' => $ll('tx_academicprojects_domain_model_project.start_date'),
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.start_date',
             'config' => [
-                'type' => 'input',
-                'renderType' => 'inputDateTime',
+                'type' => 'datetime',
                 'eval' => implode(',', [
                     'date',
                     'int',
@@ -100,14 +94,10 @@ if (!defined('TYPO3')) {
         ],
         'tx_academicprojects_end_date' => [
             'exclude' => true,
-            'label' => $ll('tx_academicprojects_domain_model_project.end_date'),
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.end_date',
             'config' => [
-                'type' => 'input',
-                'renderType' => 'inputDateTime',
-                'eval' => implode(',', [
-                    'date',
-                    'int',
-                ]),
+                'type' => 'datetime',
+                'format' => 'date',
                 'behaviour' => [
                     'allowLanguageSynchronization' => true,
                 ],
@@ -115,10 +105,10 @@ if (!defined('TYPO3')) {
         ],
         'tx_academicprojects_budget' => [
             'exclude' => true,
-            'label' => $ll('tx_academicprojects_domain_model_project.budget'),
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.budget',
             'config' => [
-                'type' => 'input',
-                'eval' => 'double2',
+                'type' => 'number',
+                'format' => 'decimal',
                 'behaviour' => [
                     'allowLanguageSynchronization' => true,
                 ],
@@ -127,7 +117,7 @@ if (!defined('TYPO3')) {
         'tx_academicprojects_funders' => [
             'exclude' => true,
             'l10n_mode' => 'prefixLangTitle',
-            'label' => $ll('tx_academicprojects_domain_model_project.funders'),
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.funders',
             'config' => [
                 'type' => 'text',
                 'enableRichtext' => true,
@@ -146,7 +136,6 @@ if (!defined('TYPO3')) {
     ];
 
     ExtensionManagementUtility::addTCAcolumns('pages', $columns);
-
     ExtensionManagementUtility::addFieldsToPalette(
         'pages',
         'project_info',
@@ -177,14 +166,14 @@ if (!defined('TYPO3')) {
             '--palette--;;project_info',
             '--palette--;;project_date',
         ]),
-        (string)$doktype,
+        (string)PageTypes::TYPE_ACEDEMIC_PROJECT,
         'after:title'
     );
 
-    if (!isset($GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides'])) {
-        $GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides'] = [];
+    if (!isset($GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['columnsOverrides'])) {
+        $GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['columnsOverrides'] = [];
     }
 
-    $GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides']['title']['config']['max'] = 60;
-    //$GLOBALS['TCA']['pages']['types'][$doktype]['columnsOverrides']['categories']['l10n_mode'] = 'exclude';
+    $GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['columnsOverrides']['title']['config']['max'] = 60;
+    //$GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['columnsOverrides']['categories']['l10n_mode'] = 'exclude';
 })();

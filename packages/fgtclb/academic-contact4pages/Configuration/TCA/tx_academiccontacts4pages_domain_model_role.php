@@ -1,12 +1,12 @@
 <?php
 
-defined('TYPO3') or die;
-
-$ll = 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:';
+if (!defined('TYPO3')) {
+    die('Not authorized');
+}
 
 return [
     'ctrl' => [
-        'title' => $ll . 'tx_academiccontacts4pages_domain_model_role',
+        'title' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_role',
         'label' => 'name',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
@@ -61,7 +61,11 @@ return [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
                 'items' => [
-                    ['label' => '', 'value' => 0],
+                    [
+                        // @todo empty labels does not make sense, they are not really selectable. Consider to a defaultlike `-n/a-` or `- please choose -`
+                        'label' => '',
+                        'value' => 0,
+                    ],
                 ],
                 'foreign_table' => 'tx_academiccontacts4pages_domain_model_role',
                 'foreign_table_where' => 'AND tx_academiccontacts4pages_domain_model_role.pid=###CURRENT_PID### AND tx_academiccontacts4pages_domain_model_role.sys_language_uid IN (-1,0)',
@@ -89,16 +93,17 @@ return [
         ],
         'name' => [
             'exclude' => false,
-            'label' => $ll . 'tx_academiccontacts4pages_domain_model_role.name',
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_role.name',
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'eval' => 'trim,required',
+                'eval' => 'trim',
+                'required' => true,
             ],
         ],
         'description' => [
             'exclude' => true,
-            'label' => $ll . 'tx_academiccontacts4pages_domain_model_role.description',
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_role.description',
             'config' => [
                 'type' => 'text',
                 'cols' => 30,
@@ -108,7 +113,7 @@ return [
         'contacts' => [
             'exclude' => true,
             'l10n_mode' => 'exclude',
-            'label' => $ll . 'tx_academiccontacts4pages_domain_model_role.contacts',
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_role.contacts',
             'config' => [
                 'type' => 'inline',
                 'foreign_table' => 'tx_academiccontacts4pages_domain_model_contact',

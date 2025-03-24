@@ -1,0 +1,5 @@
+
+# @todo check if we can safely remove this or if some sets default make sense here
+#
+# Note that system global PageTsConfig should be added in `Configuration/page.tsconfig`
+# and not within a set loaded file.

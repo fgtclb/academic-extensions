@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" target-language="" datatype="plaintext"
-		  original="messages" date="2023-03-20T13:05:33Z">
-		<header>
-			<generator>OwnScript</generator>
-		</header>
+	<file
+		source-language="en"
+		datatype="plaintext"
+		original="messages"
+		date="2023-03-20T13:05:33Z"
+	>
+		<header/>
 		<body>
 			<trans-unit id="sys_category.type">
 				<source>Type</source>

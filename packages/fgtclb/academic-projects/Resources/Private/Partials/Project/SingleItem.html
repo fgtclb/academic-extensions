@@ -1,6 +1,6 @@
 <html
     lang="en"
-    xmlns:f="https://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
     <div class="project-item">
@@ -15,11 +15,18 @@
             </div>
         </f:if>
         <f:if condition="{project.attributes}">
-            <f:for as="attributes" key="category" each="{project.attributes.allCategoriesByType}">
+            <f:for
+                as="attributes"
+                key="category"
+                each="{project.attributes.allCategoriesByType}"
+            >
                 <div class="row">
                     <p class="col-md-4">
                         <strong>
-                            {f:translate(key: 'sys_category.type.{category}', extensionName: 'academic_projects')}
+                            {f:translate(
+                                key: 'sys_category.type.{category}',
+                                extensionName: 'academic_projects'
+                            )}
                         </strong>
                     </p>
                     <f:if condition="{attributes -> f:count()} > 0">
@@ -31,14 +38,19 @@
                             </ul>
                         </f:then>
                         <f:else>
-                            <p class="col-md-8">{f:translate(extensionName: 'fgtclb_educational', key: 'sys_category.not_set')}</p>
+                            <p class="col-md-8">
+                                {f:translate(
+                                    extensionName: 'fgtclb_educational',
+                                    key: 'sys_category.not_set'
+                                )}
+                            </p>
                         </f:else>
                     </f:if>
                 </div>
             </f:for>
         </f:if>
         <f:link.page pageUid="{project.uid}" class="project-item__link">
-            <f:translate key="fe.button.project.details.text" />
+            {f:translate(key: 'fe.button.project.details.text')}
         </f:link.page>
     </div>
 </html>
