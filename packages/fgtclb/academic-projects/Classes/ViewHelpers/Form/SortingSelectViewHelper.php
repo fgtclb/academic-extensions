@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicProjects\ViewHelpers\Form;
 
 use FGTCLB\AcademicProjects\Enumeration\SortingOptions;
+use FGTCLB\CategoryTypes\ViewHelpers\Form\AbstractSelectViewHelper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
@@ -15,19 +16,19 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
         parent::initializeArguments();
 
         $arguments = [
-            'fieldsOnly' => [
-                'type' => 'boolean',
-                'defaultValue' => false,
-                'description' => 'If true, the select only lists the sorting field options.',
-            ],
-            'directionsOnly' => [
-                'type' => 'boolean',
-                'defaultValue' => false,
-                'description' => 'If ture, the select only lists the sorting direction options.',
+            'type' => [
+                'type' => 'string',
+                'defaultValue' => 'combined',
+                'description' => 'Allowed values are combined, fields or directions.',
             ],
             'l10n' => [
                 'type' => 'string',
                 'description' => 'If specified, will call the correct label specified in locallang file.',
+            ],
+            'extensionName' => [
+                'type' => 'string',
+                'defaultValue' => 'academic_projects',
+                'description' => 'If set, the translation function will use the language labels from the given extension.',
             ],
         ];
 
@@ -42,18 +43,18 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
         $options = [];
 
         if (!is_array($this->arguments['options'])
-            && !$this->arguments['options'] instanceof \Traversable
+            || empty($this->arguments['options'])
         ) {
             foreach (SortingOptions::getConstants() as $sortingValue) {
                 $value = $sortingValue;
                 $labelKey = str_replace(' ', '.', $sortingValue);
 
-                if ($this->arguments['fieldsOnly'] || $this->arguments['directionsOnly']) {
+                if ($this->arguments['type'] !== 'combined') {
                     [$sortingField, $sortingDirection] = GeneralUtility::trimExplode(' ', $sortingValue);
-                    if ($this->arguments['fieldsOnly']) {
+                    if ($this->arguments['type'] === 'fields') {
                         $value = $sortingField;
                         $labelKey = 'field.' . $sortingField;
-                    } elseif ($this->arguments['directionsOnly']) {
+                    } elseif ($this->arguments['type'] === 'directions') {
                         $value = $sortingDirection;
                         $labelKey = 'direction.' . $sortingDirection;
                     }
@@ -80,7 +81,9 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
         }
 
         if ($this->arguments['sortByOptionLabel'] !== false) {
-            usort($options, fn($a, $b) => strcoll((string)$a['label'], (string)$b['label']));
+            usort($options, function ($a, $b) {
+                return strcoll($a['label'], $b['label']);
+            });
         }
 
         return $options;
@@ -108,16 +111,14 @@ class SortingSelectViewHelper extends AbstractSelectViewHelper
         ?string $l10nPrefix = 'sorting'
     ): string {
         $key = sprintf(
-            'LLL:EXT:academic_programs/Resources/Private/Language/locallang.xlf:%s.%s',
+            'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:%s.%s',
             $l10nPrefix,
             $labelKey
         );
 
-        $extensionName = $this->arguments['extensionName'] ?? 'academic_programs';
-
         $translatedLabel = LocalizationUtility::translate(
             $key,
-            $extensionName
+            $this->arguments['extensionName']
         );
 
         if ($translatedLabel === null) {

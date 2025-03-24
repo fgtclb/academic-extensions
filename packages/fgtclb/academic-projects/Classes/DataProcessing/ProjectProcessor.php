@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FGTCLB\AcademicProjects\DataProcessing;
 
 use FGTCLB\AcademicProjects\Factory\ProjectFactory;
@@ -28,7 +30,7 @@ class ProjectProcessor implements DataProcessorInterface
         array $processedData
     ) {
         $projectFactory = GeneralUtility::makeInstance(ProjectFactory::class);
-        $processedData['project'] = $projectFactory->get($processedData['data']);
+        $processedData['project'] = $projectFactory->get($processedData['page']->getPageRecord());
         return $processedData;
     }
 }

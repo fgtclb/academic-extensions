@@ -1,14 +1,26 @@
 [traverse(page, "doktype") == 30]
   page {
     10 {
+      paths {
+        10 = EXT:academic_projects/Resources/Private/
+      }
       dataProcessing {
-        300 = FGTCLB\AcademicProjects\DataProcessing\ProjectProcessor
-        310 = TYPO3\CMS\Frontend\DataProcessing\FilesProcessor
-        310 {
+        100 = project-data
+        110 = files
+        110 {
           references.fieldName = media
           as = images
         }
       }
+    }
+  }
+
+  lib.contentElement {
+    templateRootPaths {
+      10 = EXT:academic_projects/Resources/Private/Content/Templates/
+    }
+    layoutRootPaths {
+      10 = EXT:academic_projects/Resources/Private/Content/Layouts/
     }
   }
 [END]

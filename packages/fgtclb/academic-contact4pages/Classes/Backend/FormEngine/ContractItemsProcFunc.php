@@ -43,9 +43,9 @@ class ContractItemsProcFunc
 
         foreach ($items as $key => $properties) {
             $parameters['items'][] = [
-                $properties['label'],
-                $key,
-                'tx_academiccontacts4pages_domain_model_contract',
+                'label' => $properties['label'],
+                'value' => $key,
+                'icon' => 'tx_academiccontacts4pages_domain_model_contract',
             ];
         }
     }

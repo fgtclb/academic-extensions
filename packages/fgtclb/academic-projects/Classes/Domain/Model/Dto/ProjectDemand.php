@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Model\Dto;
 
-use FGTCLB\AcademicProjects\Collection\FilterCollection;
 use FGTCLB\AcademicProjects\Enumeration\SortingOptions;
+use FGTCLB\CategoryTypes\Collection\FilterCollection;
 
 class ProjectDemand
 {

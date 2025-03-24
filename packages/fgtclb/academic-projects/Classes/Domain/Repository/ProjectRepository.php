@@ -44,14 +44,17 @@ class ProjectRepository extends Repository
         }
 
         if ($demand->getHideCompletedProjects() === true) {
-            $constraints[] = $query->logicalOr([
-                $query->equals('txAcademicprojectsEndDate', 0),
-                $query->greaterThan('txAcademicprojectsEndDate', new \DateTime()),
-            ]);
+            $constraints[] = $query->logicalOr(
+                ...array_values(
+                    [
+                        $query->equals('txAcademicprojectsEndDate', 0),
+                        $query->greaterThan('txAcademicprojectsEndDate', new \DateTime()),
+                    ]
+                )
+            );
         }
-
         $query->matching(
-            $query->logicalAnd($constraints)
+            $query->logicalAnd(...array_values($constraints))
         );
 
         $query->setOrderings(

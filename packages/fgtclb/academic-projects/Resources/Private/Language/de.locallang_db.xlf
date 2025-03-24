@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" target-language="de" datatype="plaintext" original="EXT:educational_events/Resources/Private/Language/locallang_db.xlf" date="2022-08-26T11:27:17Z" product-name="educational_events">
-		<header/>
-		<body>
-			<trans-unit id="tx_academicprojects_domain_model_project">
-				<source>Project</source>
-				<target>Projekt</target>
-			</trans-unit>
+    <file source-language="en" target-language="de" datatype="plaintext" original="EXT:educational_events/Resources/Private/Language/locallang_db.xlf" date="2022-08-26T11:27:17Z" product-name="educational_events">
+        <header/>
+        <body>
+            <trans-unit id="tx_academicprojects_domain_model_project">
+                <source>Project</source>
+                <target>Projekt</target>
+            </trans-unit>
 
-			<trans-unit id="tx_academicprojects_domain_model_project.budget">
-				<source>Project budget</source>
-				<target>Projektbudget</target>
-			</trans-unit>
-			<trans-unit id="tx_academicprojects_domain_model_project.end_date">
-				<source>Project end</source>
-				<target>Projektende</target>
-			</trans-unit>
-			<trans-unit id="tx_academicprojects_domain_model_project.funders">
-				<source>Project funders</source>
-				<target>Mittelgebende</target>
-			</trans-unit>
-			<trans-unit id="tx_academicprojects_domain_model_project.project_title">
-				<source>Project title</source>
-				<target>Projekttitel</target>
-			</trans-unit>
-			<trans-unit id="tx_academicprojects_domain_model_project.short_description">
-				<source>Project short description</source>
-				<target>Kurzbeschreibung des Projektes</target>
-			</trans-unit>
-			<trans-unit id="tx_academicprojects_domain_model_project.start_date">
-				<source>Project start</source>
-				<target>Projektbeginn</target>
-			</trans-unit>
+            <trans-unit id="tx_academicprojects_domain_model_project.budget">
+                <source>Project budget</source>
+                <target>Projektbudget</target>
+            </trans-unit>
+            <trans-unit id="tx_academicprojects_domain_model_project.end_date">
+                <source>Project end</source>
+                <target>Projektende</target>
+            </trans-unit>
+            <trans-unit id="tx_academicprojects_domain_model_project.funders">
+                <source>Project funders</source>
+                <target>Mittelgebende</target>
+            </trans-unit>
+            <trans-unit id="tx_academicprojects_domain_model_project.project_title">
+                <source>Project title</source>
+                <target>Projekttitel</target>
+            </trans-unit>
+            <trans-unit id="tx_academicprojects_domain_model_project.short_description">
+                <source>Project short description</source>
+                <target>Kurzbeschreibung des Projektes</target>
+            </trans-unit>
+            <trans-unit id="tx_academicprojects_domain_model_project.start_date">
+                <source>Project start</source>
+                <target>Projektbeginn</target>
+            </trans-unit>
 
-			<trans-unit id="tx_academic_projects_p1.name" resname="tx_academic_projects_p1.name">
-				<source>Academic Projects</source>
-				<target>Akademische Projekte</target>
-			</trans-unit>
-			<trans-unit id="tx_academic_projects_p1.description" resname="tx_academic_projects_p1.description">
-				<source>List of academic projects with sorting and filtering</source>
-				<target>Liste akademischer Projekte mit Sortierung und Filterung</target>
-			</trans-unit>
+            <trans-unit id="tx_academic_projects_p1.name" resname="tx_academic_projects_p1.name">
+                <source>Academic Projects</source>
+                <target>Akademische Projekte</target>
+            </trans-unit>
+            <trans-unit id="tx_academic_projects_p1.description" resname="tx_academic_projects_p1.description">
+                <source>List of academic projects with sorting and filtering</source>
+                <target>Liste akademischer Projekte mit Sortierung und Filterung</target>
+            </trans-unit>
             <trans-unit id="tx_academic_projects_p2.name" resname="tx_academic_projects_p2.name">
-				<source>Academic Projects (selected)</source>
-				<target>Akademische Projekte (ausgewählte)</target>
-			</trans-unit>
-			<trans-unit id="tx_academic_projects_p2.description" resname="tx_academic_projects_p2.description">
-				<source>List of selected academic projects with sorting and filtering</source>
-				<target>Liste ausgewählter akademischer Projekte mit Sortierung und Filterung</target>
-			</trans-unit>
-			<trans-unit id="wizard_items.academic">
-				<source>Academic</source>
-				<target>Akademisch</target>
-			</trans-unit>
-			<trans-unit id="pages.doktype.item_group.academic">
-				<source>Academic Pages</source>
-				<source>Akademische Seiten</source>
-			</trans-unit>
-			<trans-unit id="pages.doktype.item.academic_projects">
-				<source>Academic Project</source>
-				<target>Akademisches Projekt</target>
-			</trans-unit>
-		</body>
-	</file>
+                <source>Academic Projects (selected)</source>
+                <target>Akademische Projekte (ausgewählte)</target>
+            </trans-unit>
+            <trans-unit id="tx_academic_projects_p2.description" resname="tx_academic_projects_p2.description">
+                <source>List of selected academic projects with sorting and filtering</source>
+                <target>Liste ausgewählter akademischer Projekte mit Sortierung und Filterung</target>
+            </trans-unit>
+            <trans-unit id="wizard_items.academic">
+                <source>Academic</source>
+                <target>Akademisch</target>
+            </trans-unit>
+            <trans-unit id="pages.doktype.item_group.academic">
+                <source>Academic Pages</source>
+                <source>Akademische Seiten</source>
+            </trans-unit>
+            <trans-unit id="pages.doktype.item.academic_projects">
+                <source>Academic Project</source>
+                <target>Akademisches Projekt</target>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>

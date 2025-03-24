@@ -1,32 +1,116 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" target-language="" datatype="plaintext"
-		  original="messages" date="2023-03-15T11:39:25Z">
-		<header>
-			<generator>OwnScript</generator>
-		</header>
-		<body>
-			<trans-unit id="backend_layout.academic_projects">
-				<source>Academic Projects</source>
-				<target>Academic Projekte</target>
-			</trans-unit>
+    <file source-language="en" target-language="" datatype="plaintext" original="messages" date="2023-03-15T11:39:25Z">
+        <header/>
+        <body>
+            <trans-unit id="backend_layout.academic_projects">
+                <source>Academic Projects</source>
+                <target>Academic Projekte</target>
+            </trans-unit>
 
-			<trans-unit id="sys_category.type.department">
-				<source>Department</source>
-				<target>Organisationseinheit</target>
-			</trans-unit>
-			<trans-unit id="sys_category.type.competence_field">
-				<source>Competence fields</source>
-				<target>Kompetenzfelder</target>
-			</trans-unit>
-			<trans-unit id="sys_category.type.cooperation">
-				<source>Cooperations</source>
-				<target>Kooperationen</target>
-			</trans-unit>
-			<trans-unit id="sys_category.type.funding_partner">
-				<source>Funding partner</source>
-				<target>Mittelgebende</target>
-			</trans-unit>
-		</body>
-	</file>
+            <!-- Labels for SysCategories -->
+
+            <trans-unit id="sys_category.academic_projects.group">
+                <source>Academic Projects</source>
+                <target>Akademische Projekte</target>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.allOptions">
+                <source>All options</source>
+                <target>Alle Optionen</target>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.department">
+                <source>Department</source>
+                <target>Organisationseinheit</target>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.competence_field">
+                <source>Competence field</source>
+                <target>Kompetenzfeld</target>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.cooperation">
+                <source>Cooperation</source>
+                <target>Kooperation</target>
+            </trans-unit>
+            <trans-unit id="sys_category.academic_projects.funding_partner">
+                <source>Funding partner</source>
+                <target>Mittelgebende</target>
+            </trans-unit>
+
+            <!-- Sorting direction options -->
+
+            <trans-unit id="sorting.direction.asc">
+                <source>ascending</source>
+                <target>aufsteigend</target>
+            </trans-unit>
+            <trans-unit id="sorting.direction.desc">
+                <source>descending</source>
+                <target>absteigend</target>
+            </trans-unit>
+
+            <!-- Sorting field options -->
+
+            <trans-unit id="sorting.field.lastUpdated">
+                <source>Last updated</source>
+                <target>Zuletzt aktualisiert</target>
+            </trans-unit>
+            <trans-unit id="sorting.field.sorting">
+                <source>Sorting</source>
+                <target>Sortierung</target>
+            </trans-unit>
+            <trans-unit id="sorting.field.title">
+                <source>Title</source>
+                <target>Titel</target>
+            </trans-unit>
+            <trans-unit id="sorting.field.tx_academicprojects_budget">
+                <source>Budget</source>
+                <target>Budget</target>
+            </trans-unit>
+            <trans-unit id="sorting.field.tx_academicprojects_start_date">
+                <source>Start date</source>
+                <target>Startdatum</target>
+            </trans-unit>
+
+            <!-- Combined sorting options -->
+
+            <trans-unit id="filter.sorting.lastUpdated.asc">
+                <source>Last updated (latest first)</source>
+                <target>Zuletzt aktualisiert (neueste zuerst)</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.lastUpdated.desc">
+                <source>Last updated (latest last)</source>
+                <target>Zuletzt aktualisiert (neueste zuletzt)</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.sorting.asc">
+                <source>Page sorting (Result may be unexpected)</source>
+                <target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.sorting.desc">
+                <source>Page sorting (Result may be unexpected)</source>
+                <target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.title.asc">
+                <source>Title A-Z</source>
+                <target>Titel A-Z</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.title.desc">
+                <source>Title Z-A</source>
+                <target>Titel Z-A</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.tx_academicprojects_budget.asc">
+                <source>Budget (low to high)</source>
+                <target>Budget (niedrig bis hoch)</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.tx_academicprojects_budget.desc">
+                <source>Budget (high to low)</source>
+                <target>Budget (hoch bis niedrig)</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.tx_academicprojects_start_date.asc">
+                <source>Start date (oldest first)</source>
+                <target>Startdatum (älteste zuerst)</target>
+            </trans-unit>
+            <trans-unit id="filter.sorting.tx_academicprojects_start_date.desc">
+                <source>Start date (newest first)</source>
+                <target>Startdatum (neueste zuerst)</target>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>

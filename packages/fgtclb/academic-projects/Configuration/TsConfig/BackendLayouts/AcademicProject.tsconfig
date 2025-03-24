@@ -1,0 +1,26 @@
+mod {
+  web_layout {
+    BackendLayouts {
+      AcademicProject {
+        title = LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:backend_layout.academic_project
+        icon = EXT:academic_projects/Resources/Public/Icons/BackendLayout.png
+        config {
+          backend_layout {
+            colCount = 1
+            rowCount = 1
+            rows {
+              1 {
+                columns {
+                  1 {
+                    name = LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:backend_layout.academic_project.column.content
+                    colPos = 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
