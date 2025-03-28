@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use PhpCsFixer\Config;
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
+use PhpCsFixer\Finder;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -40,10 +44,10 @@ if (PHP_SAPI !== 'cli') {
 //  - Remove unused use statements in the PHP source code
 //  - Ensure Concatenation to have at least one whitespace around
 //  - Remove trailing whitespace at the end of blank lines.
-return (new \PhpCsFixer\Config())
-    ->setParallelConfig(\PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
+return (new Config())
+    ->setParallelConfig(ParallelConfigFactory::detect())
     ->setFinder(
-        (new PhpCsFixer\Finder())
+        (new Finder())
             ->ignoreVCSIgnored(true)
             ->in([
                 __DIR__ . '/../../packages/fgtclb/',

@@ -1,5 +1,8 @@
 <?php
 
+use SBUERK\AvailableFixturePackages;
+use TYPO3\TestingFramework\Core\Testbase;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -12,7 +15,6 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 /**
  * Boilerplate for a functional test phpunit boostrap file.
  *
@@ -30,8 +32,8 @@
      * allow composer package name or extension keys of fixture extension in
      * {@see \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase::$testExtensionToLoad}.
      */
-    if (class_exists(\SBUERK\AvailableFixturePackages::class)) {
-        $adopter = (new \SBUERK\AvailableFixturePackages());
+    if (class_exists(AvailableFixturePackages::class)) {
+        $adopter = (new AvailableFixturePackages());
         /**
          * Property {@see \SBUERK\AvailableFixturePackages::$dataFile} contains an invalid path,
          * missing one slash to separate vendor name from the data file and failing to read the
@@ -51,7 +53,7 @@
         $adopter->adoptFixtureExtensions();
     }
 
-    $testbase = new \TYPO3\TestingFramework\Core\Testbase();
+    $testbase = new Testbase();
     $testbase->defineOriginalRootPath();
     //var_dump(getenv('TYPO3_PATH_ROOT'));var_dump(getenv('TYPO3_PATH_WEB'));var_dump(ORIGINAL_ROOT);die();
     $testbase->createDirectory(ORIGINAL_ROOT . 'typo3temp/var/tests');

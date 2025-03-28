@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use PhpCsFixer\Finder;
+use PhpCsFixer\Config;
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -19,7 +23,7 @@ if (PHP_SAPI !== 'cli') {
     die('This script supports command line usage only. Please check your command.');
 }
 
-$finder = PhpCsFixer\Finder::create()
+$finder = Finder::create()
     ->name('*.php')
     ->in([
         __DIR__ . '/../../packages/fgtclb/',
@@ -52,8 +56,8 @@ LICENSE.txt file that was distributed with this source code.
 The TYPO3 project - inspiring people to share!
 COMMENT;
 
-return (new \PhpCsFixer\Config())
-    ->setParallelConfig(\PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
+return (new Config())
+    ->setParallelConfig(ParallelConfigFactory::detect())
     ->setRiskyAllowed(false)
     ->setRules([
         'no_extra_blank_lines' => true,
