@@ -23,7 +23,7 @@
  * This file is defined in FunctionalTests.xml and called by phpunit
  * before instantiating the test suites.
  */
-(static function () {
+(static function (): void {
     /**
      * Automatically add fixture extensions to the `typo3/testing-framework`
      * {@see \TYPO3\TestingFramework\Composer\ComposerPackageManager} to
