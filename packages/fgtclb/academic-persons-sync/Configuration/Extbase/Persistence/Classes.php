@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Fgtclb\AcademicPersonsSync\Domain\Model\FrontendUser;
+
 /*
  * This file is part of the "academic_persons_sync" Extension for TYPO3 CMS.
  *
@@ -10,7 +12,7 @@ declare(strict_types=1);
  */
 
 return [
-    \Fgtclb\AcademicPersonsSync\Domain\Model\FrontendUser::class => [
+    FrontendUser::class => [
         'tableName' => 'fe_users',
     ],
 ];

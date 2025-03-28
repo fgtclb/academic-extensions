@@ -1,5 +1,8 @@
 <?php
 
+use FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContactLabels;
+use FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContractItemsProcFunc;
+
 if (!defined('TYPO3')) {
     die('Not authorized');
 }
@@ -8,7 +11,7 @@ return [
     'ctrl' => [
         'title' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact',
         'label' => 'uid',
-        'label_userFunc' => \FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContactLabels::class . '->getTitle',
+        'label_userFunc' => ContactLabels::class . '->getTitle',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
@@ -69,7 +72,7 @@ return [
                         'value' => 0,
                     ],
                 ],
-                'itemsProcFunc' => FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContractItemsProcFunc::class . '->itemsProcFunc',
+                'itemsProcFunc' => ContractItemsProcFunc::class . '->itemsProcFunc',
                 'minitems' => 1,
                 'default' => 0,
             ],
