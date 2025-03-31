@@ -38,8 +38,6 @@ if (!defined('TYPO3')) {
                             'localize' => true,
                         ],
                         'showPossibleRecordsSelector' => false,
-                        'fileUploadAllowed' => false,
-                        'fileByUrlAllowed' => false,
                         'elementBrowserEnabled' => false,
                     ],
                     'enableCascadingDelete' => true,
