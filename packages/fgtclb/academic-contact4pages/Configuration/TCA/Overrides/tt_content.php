@@ -21,7 +21,7 @@ if (!defined('TYPO3')) {
     ExtensionManagementUtility::addPlugin(
         [
             'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.title',
-            'value' => 'academicontacts4pages_list',
+            'value' => 'academiccontacts4pages_list',
             'icon' => 'academic_contacts4pages',
             'group' => 'academic',
             'description' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.description',
