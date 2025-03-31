@@ -21,11 +21,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
 
 		-
-			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManagerInterface\\:\\:getContentObject\\(\\)\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Controller/ContactsController.php
-
-		-
 			message: "#^Parameter \\#1 \\$pid of method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) expects int, string given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php
