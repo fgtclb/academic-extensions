@@ -7,3 +7,15 @@
 /.php-cs-fixer.cache
 /rector.php
 *.diff
+
+/ddev-instances/core-12/config
+/ddev-instances/core-12/public
+/ddev-instances/core-12/vendor
+/ddev-instances/core-12/var
+/ddev-instances/core-12/composer.lock
+
+/ddev-instances/core-13/config
+/ddev-instances/core-13/public
+/ddev-instances/core-13/vendor
+/ddev-instances/core-13/var
+/ddev-instances/core-13/composer.lock
