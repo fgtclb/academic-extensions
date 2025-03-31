@@ -10,7 +10,7 @@ defined('TYPO3') or die;
 (static function (): void {
     ExtensionUtility::configurePlugin(
         'AcademicContacts4pages',
-        'ContactsList',
+        'List',
         [
             ContactsController::class => 'list',
         ],
