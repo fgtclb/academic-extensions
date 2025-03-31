@@ -1,13 +1,13 @@
 mod.wizards.newContentElement.wizardItems.academic {
   elements {
-    academiccontacts4pages_contactslist {
+    academiccontacts4pages_list {
       iconIdentifier = actions-user
       title = LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.title
       description = LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.description
       tt_content_defValues {
-        CType = academiccontacts4pages_contactslist
+        CType = academiccontacts4pages_list
       }
     }
   }
-  show := addToList(academiccontacts4pages_contactslist)
+  show := addToList(academiccontacts4pages_list)
 }
