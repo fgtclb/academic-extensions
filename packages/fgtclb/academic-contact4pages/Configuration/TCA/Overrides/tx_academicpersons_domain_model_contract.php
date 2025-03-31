@@ -37,8 +37,6 @@ if (!defined('TYPO3')) {
                             'localize' => true,
                         ],
                         'showPossibleRecordsSelector' => false,
-                        'fileUploadAllowed' => false,
-                        'fileByUrlAllowed' => false,
                         'elementBrowserEnabled' => false,
                         'newRecordLinkTitle' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academicpersons_domain_model_contract.tx_academiccontacts4pages_domain_model_contact.button',
                     ],
