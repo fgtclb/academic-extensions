@@ -32,6 +32,8 @@ class ContactsProcessor implements DataProcessorInterface
         $contactRepository = GeneralUtility::makeInstance(ContactRepository::class);
         $contacts = $contactRepository->findByPid($currentRecordUid);
 
+        $processedData['contacts'] = $contacts;
+
         $roles = [];
         foreach ($contacts as $contact) {
             $role = $contact->getRole();
