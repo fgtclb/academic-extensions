@@ -1,0 +1,5 @@
+services:
+  web:
+    volumes:
+      - "../../packages:/var/www/packages"
+      - "../../packages-dev:/var/www/packages-dev"
