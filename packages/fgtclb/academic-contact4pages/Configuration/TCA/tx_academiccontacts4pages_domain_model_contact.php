@@ -14,7 +14,6 @@ return [
         'label_userFunc' => ContactLabels::class . '->getTitle',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
-        'cruser_id' => 'cruser_id',
         'versioningWS' => true,
         'origUid' => 't3_origuid',
         'sortby' => 'sorting',
