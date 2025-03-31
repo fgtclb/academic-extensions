@@ -109,6 +109,7 @@ if (!defined('TYPO3')) {
             'config' => [
                 'type' => 'number',
                 'format' => 'decimal',
+                'nullable' => true,
                 'behaviour' => [
                     'allowLanguageSynchronization' => true,
                 ],
