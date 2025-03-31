@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use PhpCsFixer\Config;
-use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 use PhpCsFixer\Finder;
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 
 /*
  * This file is part of the TYPO3 CMS project.
