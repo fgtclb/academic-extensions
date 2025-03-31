@@ -16,11 +16,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
 
 		-
-			message: "#^Call to an undefined static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:allowTableOnStandardPages\\(\\)\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-contact4pages/ext_tables.php
-
-		-
 			message: "#^Binary operation \"\\.\" between array\\<string, bool\\|string\\|null\\>\\|bool\\|string\\|null and Psr\\\\Http\\\\Message\\\\UriInterface results in an error\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
