@@ -1,26 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Variable \\$biteJobsService on left side of \\?\\? always exists and is not nullable\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Controller/BiteJobsController.php
-
-		-
-			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Configuration\\\\ConfigurationManager\\:\\:getContentObject\\(\\)\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
-
-		-
-			message: "#^Cannot call method error\\(\\) on Psr\\\\Log\\\\LoggerInterface\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
-
-		-
-			message: "#^Variable \\$requestFactory on left side of \\?\\? always exists and is not nullable\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php
-
-		-
 			message: "#^Parameter \\#1 \\$pid of method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) expects int, string given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php

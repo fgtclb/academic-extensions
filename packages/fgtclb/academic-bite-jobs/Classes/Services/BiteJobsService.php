@@ -4,39 +4,26 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBiteJobs\Services;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Http\RequestFactory;
+use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Service\FlexFormService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
-final class BiteJobsService implements LoggerAwareInterface
+final class BiteJobsService
 {
-    use LoggerAwareTrait;
-
     /**
      * @var array<string|array<string, mixed>, mixed>|null $responseBody
+     * @todo Response state on a service class ? A really really bad idea.
      */
     protected $responseBody;
 
-    /**
-     * @var array<string, string>
-     */
-    protected array $headers;
-
-    protected string $url;
-
-    protected RequestFactory $requestFactory;
-
-    public function __construct(RequestFactory $requestFactory)
-    {
-        $this->requestFactory = $requestFactory ?? GeneralUtility::makeInstance(RequestFactory::class);
-
-        $this->url = 'https://jobs.b-ite.com/api/v1/';
-        $this->headers = ['Content-Type' => 'application/json'];
-    }
+    public function __construct(
+        private readonly RequestFactory $requestFactory,
+        private readonly LoggerInterface $logger,
+    ) {}
 
     /**
      * custom.zuordnung is a custom Field set by select type (@05.09.2023) custom fields are:
@@ -46,14 +33,13 @@ final class BiteJobsService implements LoggerAwareInterface
      * 04: Ausbildungsstellen
      * @return string[]
      */
-    public function fetchBiteJobs(): array
+    public function fetchBiteJobs(?ServerRequestInterface $request = null): array
     {
         $flexformTool = GeneralUtility::makeInstance(FlexFormService::class);
-        $configurationManager = GeneralUtility::makeInstance(ConfigurationManager::class);
 
-        /** @var ContentObjectRenderer $cObj */
-        $cObj = $configurationManager->getContentObject();
-        $settings = $flexformTool->convertFlexFormContentToArray($cObj->data['pi_flexform']);
+        /** @var array<string, mixed> $contentElementData */
+        $contentElementData = $this->getCurrentContentObjectRenderer($request ?? $GLOBALS['TYPO3_REQUEST'] ?? new ServerRequest())?->data ?? [];
+        $settings = $flexformTool->convertFlexFormContentToArray((string)($contentElementData['pi_flexform'] ?? ''));
 
         $jobsSettings = $settings['settings']['jobs'];
 
@@ -82,11 +68,11 @@ final class BiteJobsService implements LoggerAwareInterface
             ],
         ]);
 
-        $searchUrl = $this->url . 'postings/search';
+        $searchUrl = 'https://jobs.b-ite.com/api/v1/postings/search';
 
         try {
             $response = $this->requestFactory->request($searchUrl, 'POST', [
-                'headers' => $this->headers,
+                'headers' => ['Content-Type' => 'application/json'],
                 'body' => $additionalOptions,
             ]);
 
@@ -179,5 +165,10 @@ final class BiteJobsService implements LoggerAwareInterface
         }
 
         return $grouped;
+    }
+
+    private function getCurrentContentObjectRenderer(ServerRequestInterface $request): ?ContentObjectRenderer
+    {
+        return $request->getAttribute('currentContentObject');
     }
 }
