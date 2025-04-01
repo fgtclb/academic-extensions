@@ -41,27 +41,7 @@ parameters:
 			path: ../../../packages/fgtclb/academic-contact4pages/ext_tables.php
 
 		-
-			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessage\\:\\:ERROR\\.$#"
-			count: 2
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
-
-		-
-			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessage\\:\\:OK\\.$#"
-			count: 2
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
-
-		-
-			message: "#^Access to undefined constant TYPO3\\\\CMS\\\\Core\\\\Messaging\\\\FlashMessage\\:\\:WARNING\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
-
-		-
 			message: "#^Binary operation \"\\.\" between array\\<string, bool\\|string\\|null\\>\\|bool\\|string\\|null and Psr\\\\Http\\\\Message\\\\UriInterface results in an error\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
-
-		-
-			message: "#^Method FGTCLB\\\\AcademicJobs\\\\Controller\\\\JobController\\:\\:addFlashMessageToQueue\\(\\) has parameter \\$severity with no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
 

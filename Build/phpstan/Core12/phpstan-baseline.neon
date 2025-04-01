@@ -36,11 +36,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicJobs\\\\Controller\\\\JobController\\:\\:addFlashMessageToQueue\\(\\) has parameter \\$severity with no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
-
-		-
 			message: "#^Parameter \\#1 \\$recordId of method FGTCLB\\\\AcademicJobs\\\\Controller\\\\JobController\\:\\:sendEmail\\(\\) expects int, int\\<1, max\\>\\|null given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
