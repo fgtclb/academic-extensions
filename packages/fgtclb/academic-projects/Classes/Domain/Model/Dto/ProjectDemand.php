@@ -11,18 +11,12 @@ class ProjectDemand
 {
     /** @var int[] */
     protected array $pages = [];
-
     protected bool $showSelected = false;
-
-    protected bool $hideCompletedProjects = false;
-
-    protected ?FilterCollection $filterCollection = null;
-
     protected string $sorting = '';
-
     protected string $sortingField = '';
-
     protected string $sortingDirection = '';
+    protected string $activeState = 'all';
+    protected ?FilterCollection $filterCollection = null;
 
     public function __construct()
     {
@@ -55,14 +49,32 @@ class ProjectDemand
         return $this->showSelected;
     }
 
-    public function setHideCompletedProjects(bool $hideCompletedProjects): void
+    public function setActiveState(string $activeState): void
     {
-        $this->hideCompletedProjects = $hideCompletedProjects;
+        if (ActiveState::tryFrom($activeState) === null) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Invalid $activeState value given, possible vales are "%s". Provided: %s',
+                    implode(', ', ActiveState::values()),
+                    $activeState,
+                ),
+                1743627158
+            );
+        }
+        $this->activeState = $activeState;
     }
 
-    public function getHideCompletedProjects(): bool
+    public function getActiveState(): string
     {
-        return $this->hideCompletedProjects;
+        return $this->activeState;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPossibleActiveStates(): array
+    {
+        return ActiveState::values();
     }
 
     public function setFilterCollection(?FilterCollection $filterCollection): void
@@ -77,9 +89,12 @@ class ProjectDemand
 
     public function setSorting(string $sorting): void
     {
-        if (in_array($sorting, SortingOptions::getConstants())) {
+        if (in_array($sorting, SortingOptions::getConstants(), true)) {
             $this->sorting = $sorting;
-            [$this->sortingField, $this->sortingDirection] = explode(' ', $sorting);
+            [
+                $this->sortingField,
+                $this->sortingDirection,
+            ] = array_pad(explode(' ', $sorting, 2), 2, '');
         }
     }
 
@@ -90,8 +105,7 @@ class ProjectDemand
 
     public function setSortingField(string $sortingField): void
     {
-        $newSorting = $sortingField . ' ' . $this->sortingDirection;
-        $this->setSorting($newSorting);
+        $this->setSorting($sortingField . ' ' . $this->sortingDirection);
     }
 
     public function getSortingField(): string
@@ -101,8 +115,7 @@ class ProjectDemand
 
     public function setSortingDirection(string $sortingDirection): void
     {
-        $newSorting = $this->sortingField . ' ' . $sortingDirection;
-        $this->setSorting($newSorting);
+        $this->setSorting($this->sortingField . ' ' . $sortingDirection);
     }
 
     public function getSortingDirection(): string

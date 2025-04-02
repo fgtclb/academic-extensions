@@ -33,18 +33,15 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
 
     public function executeUpdate(): bool
     {
-        $connection = $this->connectionPool->getConnectionForTable('tt_content');
         foreach (self::MIGRATE_CONTENT_TYPES_LIST as $contentType) {
-            $connection->update(
-                'tt_content',
-                [ // set
-                    'CType' => $contentType,
-                ],
-                [ // where
-                    'CType' => 'list',
-                    'list_type' => $contentType,
-                ]
-            );
+            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
+            $queryBuilder->getRestrictions()->removeAll();
+            $queryBuilder->update('tt_content')
+                ->set('CType', $contentType)
+                ->where(
+                    $queryBuilder->expr()->eq('CType', 'list'),
+                    $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter($contentType))
+                )->executeStatement();
         }
 
         return true;

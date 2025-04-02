@@ -3,14 +3,14 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-    <div class="project-item">
+    <div class="ace-item">
         <f:if condition="{project.projectTitle}">
-            <h3 class="project-item__title">
+            <h3 class="ace-item__title">
                 {project.projectTitle}
             </h3>
         </f:if>
         <f:if condition="{project.shortDescription}">
-            <div class="project-item__description">
+            <div class="ace-item__description">
                 <f:format.html>{project.shortDescription}</f:format.html>
             </div>
         </f:if>
@@ -49,8 +49,10 @@
                 </div>
             </f:for>
         </f:if>
-        <f:link.page pageUid="{project.uid}" class="project-item__link">
-            {f:translate(key: 'fe.button.project.details.text')}
+        <f:link.page pageUid="{project.uid}" class="ace-item__button">
+            <button>
+                Details
+            </button>
         </f:link.page>
     </div>
 </html>
