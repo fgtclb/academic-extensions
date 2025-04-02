@@ -3,8 +3,8 @@
         <sheetTitle>Filter</sheetTitle>
         <type>array</type>
         <el>
-            <settings.hide_completed_projects>
-                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.filter.options.hide_completed_projects</label>
+            <settings.hideActiveState>
+                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.hideActiveState.label</label>
                 <config>
                     <type>check</type>
                     <renderType>checkboxToggle</renderType>
@@ -17,9 +17,30 @@
                         </numIndex>
                     </items>
                 </config>
-            </settings.hide_completed_projects>
-            <settings.filter.options>
-                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.filter.options.title</label>
+            </settings.hideActiveState>
+            <settings.activeState>
+                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.activeState.label</label>
+                <config>
+                    <type>select</type>
+                    <renderType>selectSingle</renderType>
+                    <items>
+                        <numIndex index="0">
+                            <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.activeState.all</label>
+                            <value>all</value>
+                        </numIndex>
+                        <numIndex index="1">
+                            <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.activeState.active</label>
+                            <value>active</value>
+                        </numIndex>
+                        <numIndex index="2">
+                            <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.activeState.completed</label>
+                            <value>completed</value>
+                        </numIndex>
+                    </items>
+                </config>
+            </settings.activeState>
+            <settings.hideFilter>
+                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.hideFilter.label</label>
                 <config>
                     <type>check</type>
                     <renderType>checkboxToggle</renderType>
@@ -32,9 +53,9 @@
                         </numIndex>
                     </items>
                 </config>
-            </settings.filter.options>
-            <settings.sorting.options>
-                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.sorting.options.title</label>
+            </settings.hideFilter>
+            <settings.hideSorting>
+                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.hideSorting.label</label>
                 <config>
                     <type>check</type>
                     <renderType>checkboxToggle</renderType>
@@ -47,9 +68,9 @@
                         </numIndex>
                     </items>
                 </config>
-            </settings.sorting.options>
+            </settings.hideSorting>
             <settings.sorting>
-                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.sorting</label>
+                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.sorting.label</label>
                 <config>
                     <type>select</type>
                     <renderType>selectSingle</renderType>
@@ -57,8 +78,8 @@
                 </config>
             </settings.sorting>
             <settings.categories>
-                <label>LLL:EXT:core/Resources/Private/Language/locallang_tca.xlf:sys_category.categories</label>
-                <description>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.category.description</description>
+                <label>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.categories.label</label>
+                <description>LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:flexform.categories.description</description>
                 <config>
                     <type>category</type>
                     <default>0</default>

@@ -35,8 +35,31 @@
                 <target>Mittelgebende</target>
             </trans-unit>
 
+            <!-- Active state -->
+
+            <trans-unit id="activeState.label">
+                <source>Active state</source>
+                <target>Aktivitätsstatus</target>
+            </trans-unit>
+            <trans-unit id="activeState.all">
+                <source>all</source>
+                <target>alle</target>
+            </trans-unit>
+            <trans-unit id="activeState.active">
+                <source>active</source>
+                <target>aktiv</target>
+            </trans-unit>
+            <trans-unit id="activeState.completed">
+                <source>completed</source>
+                <target>abgeschlossen</target>
+            </trans-unit>
+
             <!-- Sorting direction options -->
 
+            <trans-unit id="sorting.sortingDirection.label">
+                <source>Sorting field</source>
+                <target>Sortierungsfeld</target>
+            </trans-unit>
             <trans-unit id="sorting.direction.asc">
                 <source>ascending</source>
                 <target>aufsteigend</target>
@@ -48,6 +71,10 @@
 
             <!-- Sorting field options -->
 
+            <trans-unit id="sorting.sortingField.label">
+                <source>Sorting direction</source>
+                <target>Sortierungsrichtung</target>
+            </trans-unit>
             <trans-unit id="sorting.field.lastUpdated">
                 <source>Last updated</source>
                 <target>Zuletzt aktualisiert</target>

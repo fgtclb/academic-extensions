@@ -10,7 +10,7 @@
         </header>
     </f:section>
     <f:section name="Main">
-        <f:if condition="{settings.sorting.options}==false || {settings.filter.options}==false">
+        <f:if condition="{settings.hideSorting}==false || {settings.hideActiveState}==false || {settings.hideFilter}==false">
             <div class="project-filter">
                 <f:form
                     action="list"
@@ -19,13 +19,19 @@
                     object="{demand}"
                 >
                     <div class="row">
-                        <f:if condition="{settings.sorting.options}==false">
+                        <f:if condition="{settings.hideSorting}==false">
                             <f:render
                                 partial="Project/DemandSorting"
                                 arguments="{_all}"
                             />
                         </f:if>
-                        <f:if condition="{settings.filter.options}==false">
+                        <f:if condition="{settings.hideActiveState}==false">
+                            <f:render
+                                partial="Project/DemandActiveState"
+                                arguments="{_all}"
+                            />
+                        </f:if>
+                        <f:if condition="{settings.hideFilter}==false">
                             <f:render
                                 partial="Project/DemandCategories"
                                 arguments="{_all}"
