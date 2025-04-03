@@ -20,20 +20,55 @@ increasing the cross-over development and testing experience.
 > repository.
 > Support in work and at least planned to be archived when releasing `2.0.0`.
 
+> [!NOTE]
+> We are still working on the `2.x.x (2.0.0)` version of the extensions and
+> the `v12/v13` support, testing them and fixing remaining issues. Additionally,
+> we still plan to add the one or other BREAKING change like migrating remaining
+> plugins from `list_type` to `CType` with upgrade wizards. This still needs some
+> time, but it is actively worked on having a 2.0.0 release soon.
+
+**Testing 2.x.x extension version in projects (composer mode)**
+
+It is already possible to use and test the `2.x` version in composer based instances,
+which is encouraged and feedback of issues not detected by us (or pull-requests).
+
+Your project should configure `minimum-stabilty: dev` and `prefer-stable` to allow
+requiring each extension but still use stable versions over development versions:
+
+```shell
+composer config minimum-stability "dev" \
+&& composer config "prefer-stable" true
+```
+
+and than for example:
+
+```shell
+composer require 'fgtclb/academic-persons':'2.*.*@dev'
+```
+
+That way, current main branch will be included and updated and as soon as 2.0.0 is released switcht to the release on
+update.
+
+## Upgrade from `1.x`
+
+Upgrading from `1.x` to `2.x` includes breaking changes, which needs to be
+addressed manualy in case not automatic upgrade path is available. See the
+`UPGRADE.md` file of each extension for details. 
+
 ### Extension Version Support Matrix
 
-| Extension               | v11  | v12     | v13     | Comment                                                                      |
-|-------------------------|------|---------|---------|------------------------------------------------------------------------------|
-| academic_bite_jobs      | -1-  | -1- -2- | -1- -2- | Broken - API key required but not configurable, not checked/adopted for v12+ |
-| academic_contacts4pages | <1>  | -1- -2- | -1- -2- | 1 in use for v11, may work for v12 but not tested. Same with 2 for v12/v13   |
-| academic_jobs           | <1>  | -1- -2- | -1- -2- |                                                                              |
-| academic_partners       | -1-  | -1- {2} | -1- {2} | Breaking for 2 pending/needs to be adopted into mono-repo                    |
-| academic_persons        | <1>  | {1} {2} | -1- {2} |                                                                              |
-| academic_persons_edit   | <1>  | {1} {2} | -1- {2} |                                                                              |
-| academic_persons_sync   | <1>  | {1} {2} | -1- {2} |                                                                              |
-| academic_programs       | <1>  | {1} {2} | -1- {2} | Breaking for 2 pending/needs to be adopted into mono-repo                    |
-| academic_projects       | <1>  | {1} {2} | -1- {2} |                                                                              |
-| category_types          | <1>  | {1} {2} | -1- {2} | Breaking for 2 pending/needs to be adopted into mono-repo                    |
+| Extension               | v11  | v12     | v13     | Comment                                                                                         |
+|-------------------------|------|---------|---------|-------------------------------------------------------------------------------------------------|
+| academic_bite_jobs      | -1-  | -1- -2- | -1- -2- | Broken - API key required but not configurable, not checked/adopted for v12+                    |
+| academic_contacts4pages | <1>  | -1- -2- | -1- -2- | 1 in use for v11, may work for v12 but not tested. 2 for v12/v13 currently tested and evaluated |
+| academic_jobs           | <1>  | -1- -2- | -1- -2- | not tested/verified yet for 2 (v12/v13) and 1 (v12)                                             |
+| academic_partners       | -1-  | -1- {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| academic_persons        | <1>  | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| academic_persons_edit   | <1>  | {1} {2} | -1- {2} | Breaking for 2, not tested yet for 2 (v12/v13) and 1 (v12)                                      |
+| academic_persons_sync   | <1>  | {1} {2} | -1- {2} | Breaking for 2, not tested yet for 2 (v12/v13) and 1 (v12)                                      |
+| academic_programs       | <1>  | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| academic_projects       | <1>  | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| category_types          | <1>  | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
 
 Legend:
 
