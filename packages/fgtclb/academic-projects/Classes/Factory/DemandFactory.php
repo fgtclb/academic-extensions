@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Factory;
 
+use FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
 use FGTCLB\CategoryTypes\Collection\FilterCollection;
 use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
@@ -30,6 +31,9 @@ class DemandFactory
 
         // Init demand properties with plugin settings, which can be overwritten by the form
         if ($demandFromForm === null) {
+            if (isset($settings['activeState'])) {
+                $demand->setActiveState(ActiveState::tryFromDefault((string)($settings['activeState']))->value);
+            }
             if (isset($settings['sorting'])) {
                 $demand->setSorting($settings['sorting']);
             }
@@ -40,19 +44,20 @@ class DemandFactory
             }
         } else {
             // Set demand properties, if form data is available
+            if (isset($demandFromForm['activeState'])) {
+                $demand->setActiveState(ActiveState::tryFromDefault($demandFromForm['activeState'])->value);
+            }
             if (isset($demandFromForm['sorting'])) {
                 $demand->setSorting($demandFromForm['sorting']);
             }
-
             if (isset($demandFromForm['sortingField'])) {
                 $demand->setSortingField($demandFromForm['sortingField']);
             }
-
             if (isset($demandFromForm['sortingDirection'])) {
                 $demand->setSortingDirection($demandFromForm['sortingDirection']);
             }
-
             if (isset($demandFromForm['filterCollection'])) {
+                // @todo Does this really make sense combined with the intExplode() ?
                 $categoryUids = [];
                 foreach ($demandFromForm['filterCollection'] as $uids) {
                     $categoryUids = array_merge($categoryUids, GeneralUtility::intExplode(',', $uids));
@@ -78,9 +83,7 @@ class DemandFactory
         $demand->setShowSelected(
             $contentElementData['list_type'] === 'academicprojects_projectlistsingle'
         );
-        if (isset($settings['hide_completed_projects'])) {
-            $demand->setHideCompletedProjects((bool)$settings['hide_completed_projects']);
-        }
+
         return $demand;
     }
 }

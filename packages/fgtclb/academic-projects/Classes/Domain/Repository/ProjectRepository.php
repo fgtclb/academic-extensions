@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Repository;
 
+use FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
 use FGTCLB\AcademicProjects\Domain\Model\Project;
 use FGTCLB\AcademicProjects\Enumeration\PageTypes;
@@ -43,7 +44,8 @@ class ProjectRepository extends Repository
             }
         }
 
-        if ($demand->getHideCompletedProjects() === true) {
+        $activeState = ActiveState::tryFromDefault($demand->getActiveState());
+        if ($activeState === ActiveState::ACTIVE) {
             $constraints[] = $query->logicalOr(
                 ...array_values(
                     [
@@ -53,6 +55,18 @@ class ProjectRepository extends Repository
                 )
             );
         }
+
+        if ($activeState === ActiveState::COMPLETED) {
+            $constraints[] = $query->logicalAnd(
+                ...array_values(
+                    [
+                        $query->greaterThan('txAcademicprojectsEndDate', 0),
+                        $query->lessThan('txAcademicprojectsEndDate', new \DateTime()),
+                    ]
+                )
+            );
+        }
+
         $query->matching(
             $query->logicalAnd(...array_values($constraints))
         );

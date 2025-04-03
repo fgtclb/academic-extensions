@@ -24,19 +24,43 @@
                 <source>Configuration</source>
                 <target>Konfiguration</target>
             </trans-unit>
-            <trans-unit id="flexform.category.description">
+            <trans-unit id="flexform.hideActiveState.label">
+                <source>Show active state options</source>
+                <target>Aktivstatus-Optionen anzeigen</target>
+            </trans-unit>
+            <trans-unit id="flexform.activeState.label">
+                <source>Active state</source>
+                <target>Aktivstatus</target>
+            </trans-unit>
+            <trans-unit id="flexform.activeState.all">
+                <source>All</source>
+                <target>Alle</target>
+            </trans-unit>
+            <trans-unit id="flexform.activeState.active">
+                <source>Active</source>
+                <target>Aktiv</target>
+            </trans-unit>
+            <trans-unit id="flexform.activeState.completed">
+                <source>Completed</source>
+                <target>Abgeschlossen</target>
+            </trans-unit>
+            <trans-unit id="flexform.categories.label">
+                <source>Categories</source>
+                <target>Kategorien</target>
+            </trans-unit>
+            <trans-unit id="flexform.categories.description">
                 <source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
                 <target>Wählen Sie Kategorien aus. Hauptkategorien wählen alle Unterkategorien durch ODER aus, mehrere Kategorien wählen durch UND aus</target>
             </trans-unit>
-            <trans-unit id="flexform.filter.options.title">
+            <trans-unit id="flexform.hideFilter.label">
                 <source>Show filter options</source>
                 <target>Filteroptionen anzeigen</target>
             </trans-unit>
-            <trans-unit id="flexform.filter.options.hide_completed_projects">
-                <source>Show completed projects</source>
-                <target>Abgeschlossene Projekte anzeigen</target>
+            <trans-unit id="flexform.hideSorting.label">
+                <source>Show sorting options</source>
+                <target>Sortieroptionen anzeigen</target>
             </trans-unit>
-            <trans-unit id="flexform.sorting">
+            <trans-unit id="flexform.sorting.label">
                 <source>Sorting</source>
                 <target>Sortierung</target>
             </trans-unit>

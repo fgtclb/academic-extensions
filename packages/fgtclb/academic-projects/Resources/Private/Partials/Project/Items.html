@@ -5,18 +5,16 @@
 >
     <f:if condition="{projects}">
         <f:then>
-            <div class="project-list">
+            <div class="ace-list">
                 <f:for
                     each="{projects}"
                     as="project"
                     iteration="iterator"
                 >
-                    <div class="project-item">
-                        <f:render
-                            partial="Project/SingleItem"
-                            arguments="{_all}"
-                        />
-                    </div>
+                    <f:render
+                        partial="Project/SingleItem"
+                        arguments="{_all}"
+                    />
                 </f:for>
             </div>
         </f:then>

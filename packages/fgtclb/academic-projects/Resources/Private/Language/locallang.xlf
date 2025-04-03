@@ -28,8 +28,26 @@
                 <source>Funding partner</source>
             </trans-unit>
 
+            <!-- Active state -->
+
+            <trans-unit id="activeState.label">
+                <source>Active state</source>
+            </trans-unit>
+            <trans-unit id="activeState.all">
+                <source>all</source>
+            </trans-unit>
+            <trans-unit id="activeState.active">
+                <source>active</source>
+            </trans-unit>
+            <trans-unit id="activeState.completed">
+                <source>completed</source>
+            </trans-unit>
+
             <!-- Sorting direction options -->
 
+            <trans-unit id="sorting.sortingDirection.label">
+                <source>Sorting field</source>
+            </trans-unit>
             <trans-unit id="sorting.direction.asc">
                 <source>ascending</source>
             </trans-unit>
@@ -39,6 +57,9 @@
 
             <!-- Sorting field options -->
 
+            <trans-unit id="sorting.sortingField.label">
+                <source>Sorting direction</source>
+            </trans-unit>
             <trans-unit id="sorting.field.lastUpdated">
                 <source>Last updated</source>
             </trans-unit>

@@ -20,16 +20,34 @@
             <trans-unit id="element.tab.configuration">
                 <source>Configuration</source>
             </trans-unit>
-            <trans-unit id="flexform.category.description">
+            <trans-unit id="flexform.hideActiveState.label">
+                <source>Show active state options</source>
+            </trans-unit>
+            <trans-unit id="flexform.activeState.label">
+                <source>Active state</source>
+            </trans-unit>
+            <trans-unit id="flexform.activeState.all">
+                <source>All</source>
+            </trans-unit>
+            <trans-unit id="flexform.activeState.active">
+                <source>Active</source>
+            </trans-unit>
+            <trans-unit id="flexform.activeState.completed">
+                <source>Completed</source>
+            </trans-unit>
+            <trans-unit id="flexform.categories.label">
+                <source>Categories</source>
+            </trans-unit>
+            <trans-unit id="flexform.categories.description">
                 <source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
             </trans-unit>
-            <trans-unit id="flexform.filter.options.title">
+            <trans-unit id="flexform.hideFilter.label">
                 <source>Show filter options</source>
             </trans-unit>
-            <trans-unit id="flexform.filter.options.hide_completed_projects">
-                <source>Show completed projects</source>
+            <trans-unit id="flexform.hideSorting.label">
+                <source>Show sorting options</source>
             </trans-unit>
-            <trans-unit id="flexform.sorting">
+            <trans-unit id="flexform.sorting.label">
                 <source>Sorting</source>
             </trans-unit>
             <trans-unit id="flexform.sorting.lastUpdated.asc">
