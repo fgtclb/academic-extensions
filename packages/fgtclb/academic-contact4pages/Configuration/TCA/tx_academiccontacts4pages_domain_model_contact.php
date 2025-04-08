@@ -9,6 +9,7 @@ return [
         'title' => $ll . 'tx_academiccontacts4pages_domain_model_contact',
         'label' => 'uid',
         'label_userFunc' => \FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContactLabels::class . '->getTitle',
+        'hideTable' => true,
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
@@ -19,6 +20,10 @@ return [
         'enablecolumns' => [
             'disabled' => 'hidden',
         ],
+        'transOrigPointerField' => 'l10n_parent',
+        'transOrigDiffSourceField' => 'l10n_diffsource',
+        'languageField' => 'sys_language_uid',
+        'translationSource' => 'l10n_source',
         'typeicon_classes' => [
             'default' => 'tx_academiccontacts4pages_domain_model_contact',
         ],
@@ -34,12 +39,17 @@ return [
                 'page',
                 'contract',
                 'role',
+                'hidden',
+                '--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:language',
+                'sys_language_uid',
+                'l10n_parent',
             ]),
         ],
     ],
     'columns' => [
         'hidden' => [
             'exclude' => true,
+            'l10n_mode' => 'exclude',
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.hidden',
             'config' => [
                 'type' => 'check',
@@ -60,21 +70,23 @@ return [
         ],
         'contract' => [
             'exclude' => true,
-            'label' => $ll . 'tx_academiccontacts4pages_domain_model_contact.contract',
+            'l10n_mode' => 'exclude',
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.contract',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
                 'items' => [
                     ['', 0],
                 ],
-                'itemsProcFunc' => FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContractItemsProcFunc::class . '->itemsProcFunc',
+                'itemsProcFunc' => \FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContractItemsProcFunc::class . '->itemsProcFunc',
                 'minitems' => 1,
                 'default' => 0,
             ],
         ],
         'role' => [
             'exclude' => false,
-            'label' => $ll . 'tx_academiccontacts4pages_domain_model_contact.role',
+            'l10n_mode' => 'exclude',
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.role',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
@@ -82,7 +94,7 @@ return [
                     ['', 0],
                 ],
                 'foreign_table' => 'tx_academiccontacts4pages_domain_model_role',
-                'foreign_table_where' => 'AND {#tx_academiccontacts4pages_domain_model_role}.{#sys_language_uid} = ###REC_FIELD_sys_language_uid### ORDER BY tx_academiccontacts4pages_domain_model_role.name ASC',
+                'foreign_table_where' => 'AND {#tx_academiccontacts4pages_domain_model_role}.{#sys_language_uid} = 0 ORDER BY tx_academiccontacts4pages_domain_model_role.name ASC',
                 'minitems' => 1,
                 'default' => 0,
             ],
