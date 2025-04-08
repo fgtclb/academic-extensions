@@ -40,7 +40,9 @@ if (!defined('TYPO3')) {
                         'elementBrowserEnabled' => false,
                         'newRecordLinkTitle' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academicpersons_domain_model_contract.tx_academiccontacts4pages_domain_model_contact.button',
                     ],
-                    'enableCascadingDelete' => true,
+                    'behavior' => [
+                        'enableCascadingDelete' => true,
+                    ],
                     'foreign_field' =>  'contract',
                     'foreign_sortby' => 'sorting',
                     'foreign_table' => 'tx_academiccontacts4pages_domain_model_contact',
