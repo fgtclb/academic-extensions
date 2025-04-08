@@ -40,7 +40,9 @@ if (!defined('TYPO3')) {
                         'showPossibleRecordsSelector' => false,
                         'elementBrowserEnabled' => false,
                     ],
-                    'enableCascadingDelete' => true,
+                    'behavior' => [
+                        'enableCascadingDelete' => true,
+                    ],
                     'foreign_field' =>  'page',
                     'foreign_sortby' => 'sorting',
                     'foreign_table' => 'tx_academiccontacts4pages_domain_model_contact',
