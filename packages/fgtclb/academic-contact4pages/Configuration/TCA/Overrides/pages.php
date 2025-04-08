@@ -42,6 +42,9 @@ if (!defined('TYPO3')) {
                     'fileByUrlAllowed' => false,
                     'elementBrowserEnabled' => false,
                 ],
+                'behavior' => [
+                    'enableCascadingDelete' => true,
+                ],
                 'enableCascadingDelete' => true,
                 'foreign_field' =>  'page',
                 'foreign_sortby' => 'sorting',
