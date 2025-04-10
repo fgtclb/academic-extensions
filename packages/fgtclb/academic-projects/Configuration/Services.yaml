@@ -11,7 +11,7 @@ services:
   FGTCLB\AcademicProjects\Domain\Repository\ProjectRepository:
     public: true
 
-  FGTCLB\AcademicPrograms\DataProcessing\ProjectProcessor:
+  FGTCLB\AcademicProjects\DataProcessing\ProjectProcessor:
     tags:
       - {
           name: 'data.processor',
