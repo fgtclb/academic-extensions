@@ -6,20 +6,76 @@
     <f:layout name="Default"/>
     <f:section name="Main">
         <section>
-            <h1>{project.title}</h1>
-            <h2>{project.projectTitle}</h2>
-            <h2>Project runtime</h2>
-            <p>{project.startDate -> f:format.date(format: '%m/%Y')}-{project.endDate -> f:format.date(format: '%m/%Y')}</p>
-            <h2>Project budget</h2>
-            <p>{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</p>
-            <h2>Project description</h2>
-            <f:format.raw>
-                {project.shortDescription}
-            </f:format.raw>
-            <h2>Project funders</h2>
-            <f:format.raw>
-                {project.funders}
-            </f:format.raw>
+            <f:comment><!-- The page title --></f:comment>
+            <h1>[PAGE TITLE] {project.title}</h1>
+        </section>
+        <hr />
+        <section>
+            <f:comment><!-- The project title --></f:comment>
+            <h2>[PROJECT TITLE] {project.projectTitle}</h2>
+        </section>
+        <hr />
+        <section>
+            <h2>[IMAGES]</h2>
+            <f:comment><!-- Provide images referenced in the media field by standard files data processor --></f:comment>
+            <f:if condition="{images}">
+                <f:then>
+                    <div class="row">
+                        <f:for
+                            each="{images}"
+                            as="image"
+                        >
+                            <f:image
+                                image="{image}"
+                                alt="{image.alternative}"
+                                title="{image.title}"
+                                style="width: 100%; height: auto;"
+                            />
+                        </f:for>
+                    </div>
+                </f:then>
+                <f:else>
+                    <p>No images found.</p>
+                </f:else>
+            </f:if>
+        </section>
+        <hr />
+        <section>
+            <f:comment><!-- The assigned categories grouped by type --></f:comment>
+            <h2>[CATEGORIES]</h2>
+            <aside>
+                <f:render
+                    partial="Categories"
+                    arguments="{_all}"
+                />
+            </aside>
+        </section>
+        <hr />
+        <section>
+            <f:comment><!-- Information from text fields added by the academic partners extension --></f:comment>
+            <h2>[INFO FROM PAGE PROPERTIES]</h2>
+            <div>
+                <h3>Project Runtime</h3>
+                {project.startDate -> f:format.date(format: '%m/%Y')}-{project.endDate -> f:format.date(format: '%m/%Y')}
+            </div>
+            <div>
+                <h3>Project Budget</h3>
+                {project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}
+            </div>
+            <div>
+                <h3>Project Description</h3>
+                {project.shortDescription -> f:format.raw()}
+            </div>
+            <div>
+                <h3>Project Funders</h3>
+                {project.funders -> f:format.raw()}
+            </div>
+        </section>
+        <hr />
+        <section>
+            <f:comment><!-- Render the content of colPos 0 --></f:comment>
+            <h2>[CONTENT]</h2>
+            <f:cObject typoscriptObjectPath="styles.content.getContent"/>
         </section>
     </f:section>
 </html>
