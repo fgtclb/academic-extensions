@@ -1,10 +1,5 @@
+@import 'EXT:academic_projects/Configuration/TypoScript/Content/'
 @import 'EXT:academic_projects/Configuration/TypoScript/Page/'
-
-plugin.tx_academicprojects {
-  features {
-    skipDefaultArguments = 1
-  }
-}
 
 plugin.tx_academicprojects {
   view {
