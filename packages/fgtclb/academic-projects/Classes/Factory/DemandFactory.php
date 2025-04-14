@@ -75,13 +75,15 @@ class DemandFactory
         }
 
         // Set demand properties, which are always defined by plugin settings
-        $demand->setPages(
-            $contentElementData['pages'] !== ''
-                ? GeneralUtility::intExplode(',', $contentElementData['pages'])
-                : []
-        );
+        $demand->setPages([]);
+        if (isset($contentElementData['pages'])
+            && is_string($contentElementData['pages'])
+            && $contentElementData['pages'] !== ''
+        ) {
+            $demand->setPages(GeneralUtility::intExplode(',', $contentElementData['pages']));
+        }
         $demand->setShowSelected(
-            $contentElementData['list_type'] === 'academicprojects_projectlistsingle'
+            ($contentElementData['list_type'] ?? '') === 'academicprojects_projectlistsingle'
         );
 
         return $demand;

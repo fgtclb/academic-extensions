@@ -44,6 +44,7 @@ defined('TYPO3') or die;
         implode(',', [
             '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.tab.configuration',
             'pi_flexform',
+            'pages',
         ]),
         'academicprojects_projectlist',
         'after:header'
