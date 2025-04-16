@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Parameter \\#1 \\$pid of method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) expects int, string given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php
-
-		-
 			message: "#^Method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
@@ -36,7 +31,7 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
 
 		-
-			message: "#^Class FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository extends generic class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Repository but does not specify its types\\: T$#"
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findAll\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\>|null but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
@@ -46,17 +41,12 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findGeoLocated\\(\\) return type with generic class TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult does not specify its types\\: TValue$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
-
-		-
-			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findGeoLocated\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
-
-		-
 			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findNextForGeolocation\\(\\) should return FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\|null but returns object\\|null\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findGeoLocated\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
@@ -64,6 +54,11 @@ parameters:
 			message: "#^PHPDoc tag @throws with type FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\InvalidEnumerationValueException is not subtype of Throwable$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
+
+		-
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnershipRepository\\:\\:findByPid\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partnership\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php
 
 		-
 			message: "#^Method Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Model\\\\Profile\\:\\:getLanguageUid\\(\\) should return int but returns int\\<\\-1, max\\>\\|null\\.$#"

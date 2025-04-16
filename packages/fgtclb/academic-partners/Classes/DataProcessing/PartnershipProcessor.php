@@ -1,13 +1,13 @@
 <?php
 
-namespace FGTCLB\AcademicContacts4pages\DataProcessing;
+namespace FGTCLB\AcademicPartners\DataProcessing;
 
-use FGTCLB\AcademicContacts4pages\Domain\Repository\ContactRepository;
+use FGTCLB\AcademicPartners\Domain\Repository\PartnershipRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\ContentObject\DataProcessorInterface;
 
-class ContactsProcessor implements DataProcessorInterface
+class PartnershipProcessor implements DataProcessorInterface
 {
     /**
      * Make project data accessable in Fluid
@@ -29,19 +29,19 @@ class ContactsProcessor implements DataProcessorInterface
             return $processedData;
         }
 
-        $contactRepository = GeneralUtility::makeInstance(ContactRepository::class);
-        $contacts = $contactRepository->findByPid((int)$currentRecordUid);
+        $partnershipRepository = GeneralUtility::makeInstance(PartnershipRepository::class);
+        $partnerships = $partnershipRepository->findByPid((int)$currentRecordUid);
 
-        $processedData['contacts'] = $contacts;
+        $processedData['partnerships'] = $partnerships;
 
         $roles = [];
-        foreach ($contacts as $contact) {
-            $role = $contact->getRole();
+        foreach ($partnerships as $partnership) {
+            $role = $partnership->getRole();
             if ($role !== null) {
                 $roles[$role->getUid()] = $role;
             }
         }
-        $processedData['roles'] = $roles;
+        $processedData['partnershipRoles'] = $roles;
 
         return $processedData;
     }
