@@ -1,4 +1,5 @@
 /.idea/
+/var/
 /vendor/
 /.Build/
 /composer.json.orig
