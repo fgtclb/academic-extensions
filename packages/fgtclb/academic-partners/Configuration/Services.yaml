@@ -18,3 +18,9 @@ services:
           identifier: 'partner-data',
           label: 'Partner Processor'
         }
+
+  FGTCLB\AcademicPartners\Command\GeocodeCommand:
+    tags:
+      - name: console.command
+        command: 'academic:geocodepartners'
+        description: 'Geocode partner addresses using the Nominatim API'
