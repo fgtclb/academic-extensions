@@ -39,4 +39,20 @@ class ProfileRepository extends Repository
             ])
             ->execute();
     }
+
+    /**
+     * @param int $frontendUserUid
+     * @return QueryResultInterface<Profile>
+     */
+    public function findByFrontendUser(int $frontendUserUid): QueryResultInterface
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+
+        return $query
+            ->matching(
+                $query->contains('frontendUsers', $frontendUserUid)
+            )
+            ->execute();
+    }
 }

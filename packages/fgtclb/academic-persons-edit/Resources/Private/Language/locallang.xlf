@@ -3,6 +3,90 @@
     <file source-language="en" datatype="plaintext" product-name="academic_persons_edit">
         <header/>
         <body>
+            <trans-unit id="form.profile.coreCompetences.label">
+                <source>Core competences</source>
+            </trans-unit>
+            <trans-unit id="form.profile.coreCompetences.placeholder">
+                <source>Core competences</source>
+            </trans-unit>
+            <trans-unit id="form.profile.firstName.label">
+                <source>First name</source>
+            </trans-unit>
+            <trans-unit id="form.profile.firstName.placeholder">
+                <source>First name</source>
+            </trans-unit>
+            <trans-unit id="form.profile.firstName.error.1221560718">
+                <source>The field first name is required.</source>
+            </trans-unit>
+            <trans-unit id="form.profile.gender.label">
+                <source>Gender</source>
+            </trans-unit>
+          <trans-unit id="form.profile.gender.placeholder">
+                <source>Gender</source>
+            </trans-unit>
+            <trans-unit id="form.profile.lastName.label">
+                <source>Last name</source>
+            </trans-unit>
+            <trans-unit id="form.profile.lastName.placeholder">
+                <source>Last name</source>
+            </trans-unit>
+            <trans-unit id="form.profile.lastName.error.1221560718">
+                <source>The field last name is required.</source>
+            </trans-unit>
+            <trans-unit id="form.profile.middleName.label">
+                <source>Middle name</source>
+            </trans-unit>
+            <trans-unit id="form.profile.middleName.placeholder">
+                <source>Middle name</source>
+            </trans-unit>
+            <trans-unit id="form.profile.miscellaneous.label">
+                <source>Miscellaneous</source>
+            </trans-unit>
+            <trans-unit id="form.profile.miscellaneous.placeholder">
+                <source>Miscellaneous</source>
+            </trans-unit>
+            <trans-unit id="form.profile.publicationsLink.label">
+                <source>Publications link</source>
+            </trans-unit>
+            <trans-unit id="form.profile.publicationsLink.placeholder">
+                <source>Publications link</source>
+            </trans-unit>
+            <trans-unit id="form.profile.supervisedDoctoralThesis.label">
+                <source>Supervised doctoral thesis</source>
+            </trans-unit>
+            <trans-unit id="form.profile.supervisedDoctoralThesis.placeholder">
+                <source>Supervised doctoral thesis</source>
+            </trans-unit>
+            <trans-unit id="form.profile.supervisedThesis.label">
+                <source>Supervised thesis</source>
+            </trans-unit>
+            <trans-unit id="form.profile.supervisedThesis.placeholder">
+                <source>Supervised thesis</source>
+            </trans-unit>
+            <trans-unit id="form.profile.teachingArea.label">
+                <source>Teaching area</source>
+            </trans-unit>
+            <trans-unit id="form.profile.teachingArea.placeholder">
+                <source>Teaching area</source>
+            </trans-unit>
+            <trans-unit id="form.profile.title.label">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="form.profile.title.placeholder">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="form.profile.website.label">
+                <source>Website</source>
+            </trans-unit>
+            <trans-unit id="form.profile.website.placeholder">
+                <source>Website</source>
+            </trans-unit>
+            <trans-unit id="form.profile.websiteTitle.label">
+                <source>Website title</source>
+            </trans-unit>
+            <trans-unit id="form.profile.websiteTitle.placeholder">
+                <source>Website title</source>
+            </trans-unit>
             <trans-unit id="flash_message.profile_updated.title">
                 <source>Success</source>
             </trans-unit>
@@ -24,26 +108,6 @@
             <trans-unit id="tx_academicpersonsedit.fe.switch.btn.switch">
                 <source>Switch Profile</source>
             </trans-unit>
-
-            <trans-unit id="tx_academicpersonsedit.fe.title.profileData">
-                <source>Profile data</source>
-            </trans-unit>
-            <trans-unit id="tx_academicpersonsedit.fe.title.additionalProfileData">
-                <source>Additional profile data</source>
-            </trans-unit>
-            <trans-unit id="tx_academicpersonsedit.fe.label.title">
-                <source>Title</source>
-            </trans-unit>
-            <trans-unit id="tx_academicpersonsedit.fe.label.firstName">
-                <source>First name</source>
-            </trans-unit>
-            <trans-unit id="tx_academicpersonsedit.fe.label.middleName">
-                <source>Middle name</source>
-            </trans-unit>
-            <trans-unit id="tx_academicpersonsedit.fe.label.lastName">
-                <source>Last name</source>
-            </trans-unit>
-
             <trans-unit id="tx_academicpersonsedit.fe.legend.image">
                 <source>Profile Image</source>
             </trans-unit>

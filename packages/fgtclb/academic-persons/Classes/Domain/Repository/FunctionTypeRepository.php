@@ -12,9 +12,21 @@ declare(strict_types=1);
 namespace Fgtclb\AcademicPersons\Domain\Repository;
 
 use Fgtclb\AcademicPersons\Domain\Model\FunctionType;
+use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
  * @extends Repository<FunctionType>
  */
-class FunctionTypeRepository extends Repository {}
+class FunctionTypeRepository extends Repository
+{
+    /**
+     * @return QueryResultInterface<FunctionType>
+     */
+    public function findAll(): QueryResultInterface
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+        return $query->execute();
+    }
+}

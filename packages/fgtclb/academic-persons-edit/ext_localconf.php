@@ -9,57 +9,67 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
+use Fgtclb\AcademicPersonsEdit\Controller\ContractController;
 use Fgtclb\AcademicPersonsEdit\Controller\ProfileController;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 (static function (): void {
-
-    ExtensionUtility::configurePlugin(
-        'AcademicPersonsEdit',
-        'ProfileSwitcher',
-        [
-            ProfileController::class => 'showProfileSwitch,executeProfileSwitch',
-        ],
-        [
-            ProfileController::class => 'showProfileSwitch,executeProfileSwitch',
-        ],
-    );
-
     ExtensionUtility::configurePlugin(
         'AcademicPersonsEdit',
         'ProfileEditing',
         [
             ProfileController::class => implode(',', [
-                'showProfileEditingForm',
-                'saveProfile',
-                'removeImage',
-                'addPhysicalAddress',
-                'removePhysicalAddress',
-                'addEmailAddress',
-                'removeEmailAddress',
-                'addPhoneNumber',
-                'removePhoneNumber',
-                'translate',
+                'list',
+                'show',
+                'edit',
+                'update',
+                'addProfileImage',
+                'removeProfileImage',
                 'addProfileInformation',
-                'removeProfileInformation',
+                'createProfileInformation',
+                'editProfileInformation',
+                'updateProfileInformation',
+                'confirmDeleteProfileInformation',
+                'deleteProfileInformation',
+            ]),
+            ContractController::class => implode(',', [
+                'list',
+                'show',
+                'new',
+                'create',
+                'edit',
+                'update',
+                'confirmDelete',
+                'delete',
+                'sortContracts',
             ]),
         ],
         [
             ProfileController::class => implode(',', [
-                'showProfileEditingForm',
-                'saveProfile',
-                'removeImage',
-                'addPhysicalAddress',
-                'removePhysicalAddress',
-                'addEmailAddress',
-                'removeEmailAddress',
-                'addPhoneNumber',
-                'removePhoneNumber',
-                'translate',
+                'list',
+                'show',
+                'edit',
+                'update',
+                'addProfileImage',
+                'removeProfileImage',
                 'addProfileInformation',
-                'removeProfileInformation',
+                'createProfileInformation',
+                'editProfileInformation',
+                'updateProfileInformation',
+                'confirmDeleteProfileInformation',
+                'deleteProfileInformation',
+            ]),
+            ContractController::class => implode(',', [
+                'list',
+                'show',
+                'new',
+                'create',
+                'edit',
+                'update',
+                'confirmDelete',
+                'delete',
+                'sortContracts',
             ]),
         ],
     );
-
 })();

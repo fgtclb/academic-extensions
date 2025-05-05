@@ -30,6 +30,7 @@ class Contract extends AbstractEntity
     protected string $room = '';
     protected string $officeHours = '';
     protected bool $publish = false;
+    protected int $sorting = 0;
 
     /**
      * @var ObjectStorage<Address>
@@ -175,6 +176,16 @@ class Contract extends AbstractEntity
     public function isPublish(): bool
     {
         return $this->publish;
+    }
+
+    public function setSorting(int $sorting): void
+    {
+        $this->sorting = $sorting;
+    }
+
+    public function getSorting(): int
+    {
+        return $this->sorting;
     }
 
     /**

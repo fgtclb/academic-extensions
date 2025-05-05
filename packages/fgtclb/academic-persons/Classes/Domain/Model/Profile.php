@@ -13,7 +13,6 @@ namespace Fgtclb\AcademicPersons\Domain\Model;
 
 use TYPO3\CMS\Extbase\Annotation\ORM\Cascade;
 use TYPO3\CMS\Extbase\Annotation\ORM\Lazy;
-use TYPO3\CMS\Extbase\Annotation\Validate;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
@@ -22,15 +21,9 @@ class Profile extends AbstractEntity
 {
     protected string $gender = '';
     protected string $title = '';
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     */
     protected string $firstName = '';
     protected string $firstNameAlpha = '';
     protected string $middleName = '';
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     */
     protected string $lastName = '';
     protected string $lastNameAlpha = '';
     /**
