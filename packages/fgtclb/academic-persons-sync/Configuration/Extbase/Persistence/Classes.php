@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Fgtclb\AcademicPersonsSync\Domain\Model\FrontendUser;
+use FGTCLB\AcademicPersonsSync\Domain\Model\FrontendUser;
 
 /*
  * This file is part of the "academic_persons_sync" Extension for TYPO3 CMS.
