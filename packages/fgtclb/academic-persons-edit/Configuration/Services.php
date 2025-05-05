@@ -9,9 +9,9 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Fgtclb\AcademicPersonsEdit;
+namespace FGTCLB\AcademicPersonsEdit;
 
-use Fgtclb\AcademicPersonsEdit\Profile\ProfileFactoryInterface;
+use FGTCLB\AcademicPersonsEdit\Profile\ProfileFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 

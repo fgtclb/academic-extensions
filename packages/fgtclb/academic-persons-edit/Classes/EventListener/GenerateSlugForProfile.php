@@ -9,9 +9,9 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Fgtclb\AcademicPersonsEdit\EventListener;
+namespace FGTCLB\AcademicPersonsEdit\EventListener;
 
-use Fgtclb\AcademicPersonsEdit\Event\AfterProfileUpdateEvent;
+use FGTCLB\AcademicPersonsEdit\Event\AfterProfileUpdateEvent;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\SlugHelper;
 use TYPO3\CMS\Core\Utility\GeneralUtility;

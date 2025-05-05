@@ -81,67 +81,37 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Model\\\\Profile\\:\\:getLanguageUid\\(\\) should return int but returns int\\<\\-1, max\\>\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Model/Profile.php
-
-		-
-			message: "#^Method Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Repository\\\\AddressRepository\\:\\:getAddressFromOrganisation\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Repository/AddressRepository.php
-
-		-
-			message: "#^Method Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Repository\\\\ProfileRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
+			message: "#^Method FGTCLB\\\\AcademicPersonsEdit\\\\Domain\\\\Repository\\\\ProfileRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Repository/ProfileRepository.php
 
 		-
-			message: "#^Parameter \\#1 \\$userUid of method Fgtclb\\\\AcademicPersonsEdit\\\\Provider\\\\ProfileProvider\\:\\:getProfileUidsFromUserUid\\(\\) expects int, array\\|bool\\|int\\|string given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Middleware/ProfileLoader.php
-
-		-
-			message: "#^Parameter \\#1 \\$userUid of method Fgtclb\\\\AcademicPersonsEdit\\\\Provider\\\\ProfileProvider\\:\\:userHasProfile\\(\\) expects int, array\\|bool\\|int\\|string given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Middleware/ProfileLoader.php
-
-		-
-			message: "#^Parameter \\#1 \\$identifier of method TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\PersistenceManagerInterface\\:\\:getObjectByIdentifier\\(\\) expects int\\|string, int\\|string\\|null given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Profile/AbstractProfileFactory.php
-
-		-
-			message: "#^Parameter \\#1 \\$pid of method TYPO3\\\\CMS\\\\Extbase\\\\DomainObject\\\\AbstractDomainObject\\:\\:setPid\\(\\) expects int\\<0, max\\>, int given\\.$#"
-			count: 6
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Profile/ProfileFactory.php
-
-		-
-			message: "#^Property Fgtclb\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$priority has no type specified\\.$#"
+			message: "#^Property FGTCLB\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$priority has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
 
 		-
-			message: "#^Property Fgtclb\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$sourceTypes has no type specified\\.$#"
+			message: "#^Property FGTCLB\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$sourceTypes has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
 
 		-
-			message: "#^Property Fgtclb\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$targetType has no type specified\\.$#"
+			message: "#^Property FGTCLB\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$targetType has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
 
 		-
-			message: "#^Parameter \\#2 \\$view of class Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent constructor expects TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface, TYPO3\\\\CMS\\\\Core\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface given\\.$#"
+			message: "#^Parameter \\#2 \\$view of class FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent constructor expects TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface, TYPO3\\\\CMS\\\\Core\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
 
 		-
-			message: "#^Parameter \\#2 \\$view of class Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent constructor expects TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface, TYPO3\\\\CMS\\\\Core\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface given\\.$#"
+			message: "#^Parameter \\#2 \\$view of class FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent constructor expects TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface, TYPO3\\\\CMS\\\\Core\\\\View\\\\ViewInterface\\|TYPO3Fluid\\\\Fluid\\\\View\\\\ViewInterface given\\.$#"
 			count: 2
 			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Domain\\\\Repository\\\\ContractRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
+			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Domain\\\\Repository\\\\ContractRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ContractRepository.php
 
@@ -151,57 +121,57 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Domain\\\\Repository\\\\ProfileRepository\\:\\:findByDemand\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
+			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Domain\\\\Repository\\\\ProfileRepository\\:\\:findByDemand\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Domain\\\\Repository\\\\ProfileRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
+			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Domain\\\\Repository\\\\ProfileRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent\\:\\:getView\\(\\) has invalid return type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
+			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent\\:\\:getView\\(\\) has invalid return type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyDetailProfileEvent.php
 
 		-
-			message: "#^Parameter \\$view of method Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent\\:\\:__construct\\(\\) has invalid type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
+			message: "#^Parameter \\$view of method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent\\:\\:__construct\\(\\) has invalid type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyDetailProfileEvent.php
 
 		-
-			message: "#^Property Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent\\:\\:\\$view has unknown class TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface as its type\\.$#"
+			message: "#^Property FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyDetailProfileEvent\\:\\:\\$view has unknown class TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface as its type\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyDetailProfileEvent.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:__construct\\(\\) has parameter \\$profiles with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface but does not specify its types\\: TKey, TValue$#"
+			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:__construct\\(\\) has parameter \\$profiles with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface but does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:getProfiles\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
+			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:getProfiles\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:getView\\(\\) has invalid return type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
+			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:getView\\(\\) has invalid return type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Method Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:setProfiles\\(\\) has parameter \\$profiles with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface but does not specify its types\\: TKey, TValue$#"
+			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:setProfiles\\(\\) has parameter \\$profiles with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface but does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Parameter \\$view of method Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:__construct\\(\\) has invalid type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
+			message: "#^Parameter \\$view of method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:__construct\\(\\) has invalid type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Property Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:\\$view has unknown class TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface as its type\\.$#"
+			message: "#^Property FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:\\$view has unknown class TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface as its type\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
