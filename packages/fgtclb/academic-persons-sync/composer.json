@@ -24,7 +24,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Fgtclb\\AcademicPersonsSync\\": "Classes/"
+            "FGTCLB\\AcademicPersonsSync\\": "Classes/"
         }
     },
     "autoload-dev": {

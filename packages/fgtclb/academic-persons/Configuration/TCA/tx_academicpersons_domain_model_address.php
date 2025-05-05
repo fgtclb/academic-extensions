@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-use Fgtclb\AcademicPersons\Tca\RecordTypes;
+use FGTCLB\AcademicPersons\Registry\AcademicPersonsSettingsRegistry;
+use FGTCLB\AcademicPersons\Tca\RecordTypes;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the "academic_persons" Extension for TYPO3 CMS.
@@ -10,7 +12,8 @@ use Fgtclb\AcademicPersons\Tca\RecordTypes;
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  */
-return [
+
+$tcaConfiguration = [
     'ctrl' => [
         'label' => 'type',
         'label_alt' => implode(',', [
@@ -90,6 +93,11 @@ return [
                 'type' => 'passthrough',
             ],
         ],
+        'sorting' => [
+            'config' => [
+                'type' => 'none',
+            ],
+        ],
         'contract' => [
             'config' => [
                 'type' => 'select',
@@ -104,7 +112,6 @@ return [
                 'type' => 'input',
                 'size' => 50,
                 'max' => 255,
-                'required' => true,
             ],
         ],
         'street_number' => [
@@ -138,7 +145,6 @@ return [
                 'type' => 'input',
                 'size' => 50,
                 'max' => 255,
-                'required' => true,
             ],
         ],
         'state' => [
@@ -155,7 +161,6 @@ return [
                 'type' => 'input',
                 'size' => 50,
                 'max' => 255,
-                'required' => true,
             ],
         ],
         'type' => [
@@ -211,3 +216,9 @@ return [
         ],
     ],
 ];
+
+$settingsRegistry = GeneralUtility::makeInstance(AcademicPersonsSettingsRegistry::class);
+$validations = $settingsRegistry->getValidationsForTca('physicalAddress');
+$tcaConfiguration = array_replace_recursive($tcaConfiguration, $validations);
+
+return $tcaConfiguration;
