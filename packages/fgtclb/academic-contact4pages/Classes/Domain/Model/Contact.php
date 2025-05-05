@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicContacts4pages\Domain\Model;
 
-use Fgtclb\AcademicPersons\Domain\Model\Contract;
+use FGTCLB\AcademicPersons\Domain\Model\Contract;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 class Contact extends AbstractEntity
