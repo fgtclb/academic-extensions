@@ -9,23 +9,16 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Fgtclb\AcademicPersons\Domain\Model;
+namespace FGTCLB\AcademicPersons\Domain\Model;
 
-use TYPO3\CMS\Extbase\Annotation\Validate;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 class Email extends AbstractEntity
 {
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\EmailAddressValidator")
-     */
+    protected ?Contract $contract = null;
     protected string $email = '';
-
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     */
     protected string $type = '';
+    protected int $sorting = 0;
 
     public function __construct()
     {
@@ -37,9 +30,14 @@ class Email extends AbstractEntity
      */
     public function initializeObject(): void {}
 
-    public function getEmail(): string
+    public function setContract(?Contract $contract): void
     {
-        return $this->email;
+        $this->contract = $contract;
+    }
+
+    public function getContract(): ?Contract
+    {
+        return $this->contract;
     }
 
     public function setEmail(string $email): void
@@ -47,13 +45,28 @@ class Email extends AbstractEntity
         $this->email = $email;
     }
 
-    public function getType(): string
+    public function getEmail(): string
     {
-        return $this->type;
+        return $this->email;
     }
 
     public function setType(string $type): void
     {
         $this->type = $type;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setSorting(int $sorting): void
+    {
+        $this->sorting = $sorting;
+    }
+
+    public function getSorting(): int
+    {
+        return $this->sorting;
     }
 }

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Fgtclb\AcademicPersonsEdit\EventListener;
+namespace FGTCLB\AcademicPersonsEdit\EventListener;
 
 use Doctrine\DBAL\Result;
-use Fgtclb\AcademicPersonsEdit\Event\AfterProfileUpdateEvent;
-use Fgtclb\AcademicPersonsEdit\Profile\ProfileTranslator;
+use FGTCLB\AcademicPersonsEdit\Event\AfterProfileUpdateEvent;
+use FGTCLB\AcademicPersonsEdit\Profile\ProfileTranslator;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;

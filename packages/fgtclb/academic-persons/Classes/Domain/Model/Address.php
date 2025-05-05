@@ -9,46 +9,22 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Fgtclb\AcademicPersons\Domain\Model;
+namespace FGTCLB\AcademicPersons\Domain\Model;
 
-use TYPO3\CMS\Extbase\Annotation\Validate;
-use TYPO3\CMS\Extbase\Domain\Model\Category;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 class Address extends AbstractEntity
 {
-    protected ?Category $employeeType = null;
-    protected ?OrganisationalUnit $organisationalUnit = null;
-    protected ?FunctionType $functionType = null;
-
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     */
+    protected ?Contract $contract = null;
     protected string $street = '';
-
     protected string $streetNumber = '';
     protected string $additional = '';
-
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     */
     protected string $zip = '';
-
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     */
     protected string $city = '';
     protected string $state = '';
-
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     */
     protected string $country = '';
-
-    /**
-     * @Validate("TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator")
-     */
     protected string $type = '';
+    protected int $sorting = 0;
 
     public function __construct()
     {
@@ -60,39 +36,14 @@ class Address extends AbstractEntity
      */
     public function initializeObject(): void {}
 
-    public function getEmployeeType(): ?Category
+    public function setContract(?Contract $contract): void
     {
-        return $this->employeeType;
+        $this->contract = $contract;
     }
 
-    public function setEmployeeType(?Category $employeeType): void
+    public function getContract(): ?Contract
     {
-        $this->employeeType = $employeeType;
-    }
-
-    public function setOrganisationalUnit(?OrganisationalUnit $organisationalUnit): void
-    {
-        $this->organisationalUnit = $organisationalUnit;
-    }
-
-    public function getOrganisationalUnit(): ?OrganisationalUnit
-    {
-        return $this->organisationalUnit;
-    }
-
-    public function setFunctionType(?FunctionType $functionType): void
-    {
-        $this->functionType = $functionType;
-    }
-
-    public function getFunctionType(): ?FunctionType
-    {
-        return $this->functionType;
-    }
-
-    public function getStreet(): string
-    {
-        return $this->street;
+        return $this->contract;
     }
 
     public function setStreet(string $street): void
@@ -100,9 +51,9 @@ class Address extends AbstractEntity
         $this->street = $street;
     }
 
-    public function getStreetNumber(): string
+    public function getStreet(): string
     {
-        return $this->streetNumber;
+        return $this->street;
     }
 
     public function setStreetNumber(string $streetNumber): void
@@ -110,9 +61,9 @@ class Address extends AbstractEntity
         $this->streetNumber = $streetNumber;
     }
 
-    public function getAdditional(): string
+    public function getStreetNumber(): string
     {
-        return $this->additional;
+        return $this->streetNumber;
     }
 
     public function setAdditional(string $additional): void
@@ -120,9 +71,9 @@ class Address extends AbstractEntity
         $this->additional = $additional;
     }
 
-    public function getZip(): string
+    public function getAdditional(): string
     {
-        return $this->zip;
+        return $this->additional;
     }
 
     public function setZip(string $zip): void
@@ -130,9 +81,9 @@ class Address extends AbstractEntity
         $this->zip = $zip;
     }
 
-    public function getCity(): string
+    public function getZip(): string
     {
-        return $this->city;
+        return $this->zip;
     }
 
     public function setCity(string $city): void
@@ -140,9 +91,9 @@ class Address extends AbstractEntity
         $this->city = $city;
     }
 
-    public function getState(): string
+    public function getCity(): string
     {
-        return $this->state;
+        return $this->city;
     }
 
     public function setState(string $state): void
@@ -150,9 +101,9 @@ class Address extends AbstractEntity
         $this->state = $state;
     }
 
-    public function getCountry(): string
+    public function getState(): string
     {
-        return $this->country;
+        return $this->state;
     }
 
     public function setCountry(string $country): void
@@ -160,13 +111,28 @@ class Address extends AbstractEntity
         $this->country = $country;
     }
 
-    public function getType(): string
+    public function getCountry(): string
     {
-        return $this->type;
+        return $this->country;
     }
 
     public function setType(string $type): void
     {
         $this->type = $type;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setSorting(int $sorting): void
+    {
+        $this->sorting = $sorting;
+    }
+
+    public function getSorting(): int
+    {
+        return $this->sorting;
     }
 }

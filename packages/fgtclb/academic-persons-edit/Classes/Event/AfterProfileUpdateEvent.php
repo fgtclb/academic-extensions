@@ -9,9 +9,9 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Fgtclb\AcademicPersonsEdit\Event;
+namespace FGTCLB\AcademicPersonsEdit\Event;
 
-use Fgtclb\AcademicPersonsEdit\Domain\Model\Profile;
+use FGTCLB\AcademicPersons\Domain\Model\Profile;
 
 final class AfterProfileUpdateEvent
 {
