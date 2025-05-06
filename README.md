@@ -8,24 +8,11 @@ increasing the cross-over development and testing experience.
 
 ## Repository version support
 
-| Branch | Version   | TYPO3       | PHP                                     |
-|--------|-----------|-------------|-----------------------------------------|
-| main   | 2.0.x-dev | ~v12 + ~v13 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3) |
-| 1      | 1.2.x-dev | v11 + ~v12  | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3) |
-
-> [!IMPORTANT]
-> The 2.x TYPO3 v12 and v13 support is not guaranteed over all extensions
-> yet and will most likely not get it. It has only been allowed to install
-> all of them with 1.x also in a TYPO3 v12 to combining them in the mono
-> repository.
-> Support in work and at least planned to be archived when releasing `2.0.0`.
-
-> [!NOTE]
-> We are still working on the `2.x.x (2.0.0)` version of the extensions and
-> the `v12/v13` support, testing them and fixing remaining issues. Additionally,
-> we still plan to add the one or other BREAKING change like migrating remaining
-> plugins from `list_type` to `CType` with upgrade wizards. This still needs some
-> time, but it is actively worked on having a 2.0.0 release soon.
+| Branch | Version       | TYPO3       | PHP                                     |
+|--------|---------------|-------------|-----------------------------------------|
+| main   | 2.0.x-dev     | ~v12 + ~v13 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3) |
+| 2      | ^2, 2.0.x-dev | ~v12 + ~v13 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3) |
+| 1      | ^1, 1.2.x-dev | v11 + ~v12  | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3) |
 
 **Testing 2.x.x extension version in projects (composer mode)**
 

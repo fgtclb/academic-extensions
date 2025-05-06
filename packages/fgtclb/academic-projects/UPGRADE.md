@@ -1,6 +1,8 @@
 # Upgrade 2.0
 
-## BREAKING: Removed methods from `\FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand`
+## 2.0.0
+
+### BREAKING: Removed methods from `\FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand`
 
 Following class methods has been removed:
 
@@ -18,7 +20,7 @@ can be used to adopt for corresponding code places. Take care of changed value t
 setter expects string of valid PHP Enum `\FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState`
 cases and the getter returns a string.
 
-## BREAKING: Changed plugin FlexForm option and values
+### BREAKING: Changed plugin FlexForm option and values
 
 FlexForm options of following plugins has changed:
 
@@ -68,7 +70,7 @@ overrides requiring to use the correct CType.
 > An TYPO3 UpgradeWizard `academicProjects_pluginUpgradeWizard` is provided to migrate
 > plugins from `CType=list` to dedicated `CTypes` matching the new registration.
 
-## BREAKING: Switch to `EXT:category_types 2.0`
+### BREAKING: Switch to `EXT:category_types 2.0`
 
 Category type based handling has been streamlined and centralized within the `EXT:category_types` extension
 and the known implementation based on deprecated TYPO3 Enumeration has been replaced with a modern PHP API
