@@ -11,7 +11,7 @@
   ],
   "require": {
     "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
-    "fgtclb/academics-monorepo-shared": "2.0.*@dev"
+    "fgtclb/academics-monorepo-shared": "2.0.1"
   },
   "config": {
     "allow-plugins": {
@@ -59,7 +59,7 @@
     "phpstan/phpstan": "^1.12.21",
     "phpstan/phpstan-phpunit": "^1.4.0",
     "phpunit/phpunit": "^10.5.45",
-    "sbuerk/fixture-packages": ">=0.1.1 < 2.0.0",
+    "sbuerk/fixture-packages": ">=0.1.1 <2.0.0",
     "typo3/tailor": "^1.6",
     "typo3/testing-framework": "^8.2.7"
   },
@@ -69,7 +69,7 @@
       "url": "packages-dev/*",
       "options": {
         "versions": {
-          "fgtclb/academics-monorepo-shared": "2.0.0"
+          "fgtclb/academics-monorepo-shared": "2.0.1"
         }
       }
     },
@@ -78,16 +78,16 @@
       "url": "packages/*/*",
       "options": {
         "versions": {
-          "fgtclb/academic-bite-jobs": "2.0.0",
-          "fgtclb/academic-contacts4pages": "2.0.0",
-          "fgtclb/academic-jobs": "2.0.0",
-          "fgtclb/academic-partners": "2.0.0",
-          "fgtclb/academic-persons": "2.0.0",
-          "fgtclb/academic-persons-edit": "2.0.0",
-          "fgtclb/academic-persons-sync": "2.0.0",
-          "fgtclb/academic-programs": "2.0.0",
-          "fgtclb/academic-projects": "2.0.0",
-          "fgtclb/category-types": "2.0.0"
+          "fgtclb/academic-bite-jobs": "2.0.1",
+          "fgtclb/academic-contacts4pages": "2.0.1",
+          "fgtclb/academic-jobs": "2.0.1",
+          "fgtclb/academic-partners": "2.0.1",
+          "fgtclb/academic-persons": "2.0.1",
+          "fgtclb/academic-persons-edit": "2.0.1",
+          "fgtclb/academic-persons-sync": "2.0.1",
+          "fgtclb/academic-programs": "2.0.1",
+          "fgtclb/academic-projects": "2.0.1",
+          "fgtclb/category-types": "2.0.1"
         }
       }
     }

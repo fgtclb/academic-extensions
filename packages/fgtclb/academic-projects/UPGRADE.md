@@ -1,5 +1,7 @@
 # Upgrade 2.0
 
+## 2.0.1
+
 ## 2.0.0
 
 ### BREAKING: Removed methods from `\FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand`
