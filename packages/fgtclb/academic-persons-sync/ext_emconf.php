@@ -8,14 +8,14 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'tim.schreiner@km2.de',
     'author_company' => 'FGTCLB',
     'state' => 'beta',
-    'version' => '1.1.5',
+    'version' => '2.0.0',
     'clearCacheOnLoad' => true,
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.0-13.4.99',
             'extbase' => '12.4.0-13.4.99',
-            'academic_persons' => '1.1.5',
-            'academic_persons_edit' => '1.1.5',
+            'academic_persons' => '2.0.0',
+            'academic_persons_edit' => '2.0.0',
         ],
         'conflicts' => [
         ],
