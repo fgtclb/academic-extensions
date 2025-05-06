@@ -51,7 +51,7 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findAll\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\>|null but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findAll\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\>\\|null but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
@@ -61,12 +61,12 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findNextForGeolocation\\(\\) should return FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\|null but returns object\\|null\\.$#"
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findGeoLocated\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findGeoLocated\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findNextForGeolocation\\(\\) should return FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\|null but returns object\\|null\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
@@ -204,31 +204,6 @@ parameters:
 			message: "#^Property Fgtclb\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:\\$view has unknown class TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface as its type\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
-			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsDetailPluginTest.php
-
-		-
-			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListAndDetailPluginTest.php
-
-		-
-			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php
-
-		-
-			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedContractsPluginTest.php
-
-		-
-			message: "#^Class TYPO3\\\\TestingFramework\\\\Core\\\\Functional\\\\Framework\\\\Frontend\\\\Hook\\\\TypoScriptInstructionModifier not found\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsSelectedProfilesPluginTest.php
 
 		-
 			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Repository\\\\ProgramRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
