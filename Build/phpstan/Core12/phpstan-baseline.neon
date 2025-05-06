@@ -71,11 +71,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Repository/AddressRepository.php
 
 		-
-			message: "#^Parameter \\#1 \\.\\.\\.\\$constraints of method TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryInterface\\<Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Model\\\\Address\\>\\:\\:logicalAnd\\(\\) expects TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\Qom\\\\ConstraintInterface, array\\<int, TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\Qom\\\\ComparisonInterface\\> given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Repository/AddressRepository.php
-
-		-
 			message: "#^Method Fgtclb\\\\AcademicPersonsEdit\\\\Domain\\\\Repository\\\\ProfileRepository\\:\\:findByUids\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Repository/ProfileRepository.php
