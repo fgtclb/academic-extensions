@@ -13,8 +13,8 @@ use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 final class PluginUpgradeWizard implements UpgradeWizardInterface
 {
     private const MIGRATE_CONTENT_TYPES_LIST = [
-        'academicprojects_projectlist',
-        'academicprojects_projectlistsingle',
+        'academicprojects_projectlist' => 'academicprojects_projectlist',
+        'academicprojects_projectlistsingle' => 'academicprojects_projectlistsingle',
     ];
 
     public function __construct(
@@ -33,18 +33,18 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
 
     public function executeUpdate(): bool
     {
-        foreach (self::MIGRATE_CONTENT_TYPES_LIST as $contentType) {
+        foreach (self::MIGRATE_CONTENT_TYPES_LIST as $oldName => $newName) {
             $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
             $queryBuilder->getRestrictions()->removeAll();
-            $queryBuilder->update('tt_content')
-                ->set('CType', $contentType)
+            $queryBuilder
+                ->update('tt_content')
+                ->set('CType', $newName)
                 ->set('list_type', '')
                 ->where(
                     $queryBuilder->expr()->eq('CType', $queryBuilder->createNamedParameter('list')),
-                    $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter($contentType))
+                    $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter($oldName)),
                 )->executeStatement();
         }
-
         return true;
     }
 
@@ -52,17 +52,18 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
         $queryBuilder->getRestrictions()->removeAll();
-        return (bool)$queryBuilder
-            ->count('uid')
-            ->from('tt_content')
-            ->where(
-                $queryBuilder->expr()->in(
-                    'list_type',
-                    $queryBuilder->quoteArrayBasedValueListToStringList(self::MIGRATE_CONTENT_TYPES_LIST)
-                ),
-            )
-            ->executeQuery()
-            ->fetchOne();
+        return (int)($queryBuilder
+                ->count('*')
+                ->from('tt_content')
+                ->where(
+                    $queryBuilder->expr()->eq('CType', $queryBuilder->createNamedParameter('list')),
+                    $queryBuilder->expr()->in(
+                        'list_type',
+                        $queryBuilder->quoteArrayBasedValueListToStringList(array_keys(self::MIGRATE_CONTENT_TYPES_LIST))
+                    ),
+                )
+                ->executeQuery()
+                ->fetchOne()) > 0;
     }
 
     /**
