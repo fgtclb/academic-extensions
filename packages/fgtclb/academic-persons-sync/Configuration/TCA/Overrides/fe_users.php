@@ -15,9 +15,9 @@ ExtensionManagementUtility::addTcaSelectItem(
     'fe_users',
     'tx_extbase_type',
     [
-        'LLL:EXT:academic_persons_sync/Resources/Private/Language/locallang_tca.xlf:fe_users.columns.tx_extbase_type.items.Tx_Academicpersonssync_Domain_Model_FrontendUser',
-        'Tx_Academicpersonssync_Domain_Model_FrontendUser',
-    ]
+        'label' => 'LLL:EXT:academic_persons_sync/Resources/Private/Language/locallang_tca.xlf:fe_users.columns.tx_extbase_type.items.Tx_Academicpersonssync_Domain_Model_FrontendUser',
+        'value' => 'Tx_Academicpersonssync_Domain_Model_FrontendUser',
+    ],
 );
 
 $GLOBALS['TCA']['fe_users']['types']['Tx_Academicpersonssync_Domain_Model_FrontendUser'] = [
