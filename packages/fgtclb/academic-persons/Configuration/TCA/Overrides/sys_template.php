@@ -25,4 +25,9 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
         'Academic Persons Standalone'
     );
 
+    ExtensionManagementUtility::addStaticFile(
+        'academic_persons',
+        'Configuration/TypoScript/StylingExample/',
+        'Academic Persons Styling Example'
+    );
 })();
