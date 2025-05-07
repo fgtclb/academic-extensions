@@ -38,8 +38,9 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
             $queryBuilder->getRestrictions()->removeAll();
             $queryBuilder->update('tt_content')
                 ->set('CType', $contentType)
+                ->set('list_tyype', '')
                 ->where(
-                    $queryBuilder->expr()->eq('CType', 'list'),
+                    $queryBuilder->expr()->eq('CType', $queryBuilder->createNamedParameter('list')),
                     $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter($contentType))
                 )->executeStatement();
         }
