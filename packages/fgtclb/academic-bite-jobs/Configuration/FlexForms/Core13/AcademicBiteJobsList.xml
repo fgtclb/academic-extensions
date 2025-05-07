@@ -119,8 +119,7 @@
                 <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.jobs.limit.label</label>
                 <description>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.jobs.limit.description</description>
                 <config>
-                    <type>input</type>
-                    <eval>int</eval>
+                    <type>number</type>
                 </config>
             </settings.jobs.limit>
         </el>
