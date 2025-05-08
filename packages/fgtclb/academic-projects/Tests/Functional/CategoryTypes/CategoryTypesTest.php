@@ -4,21 +4,12 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Tests\Functional\CategoryTypes;
 
+use FGTCLB\AcademicProjects\Tests\Functional\AbstractAcademicProjectsTestCase;
 use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
 use PHPUnit\Framework\Attributes\Test;
-use SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase;
 
-final class CategoryTypesTest extends FunctionalTestCase
+final class CategoryTypesTest extends AbstractAcademicProjectsTestCase
 {
-    protected array $coreExtensionsToLoad = [
-        'typo3/cms-install',
-    ];
-
-    protected array $testExtensionsToLoad = [
-        'fgtclb/category-types',
-        'fgtclb/academic-projects',
-    ];
-
     #[Test]
     public function extensionCategoryTypesYamlIsLoaded(): void
     {
