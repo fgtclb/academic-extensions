@@ -26,6 +26,11 @@
             "Fgtclb\\AcademicPersonsSync\\": "Classes/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Fgtclb\\AcademicPersonsSync\\Tests\\": "Tests/"
+        }
+    },
     "config": {
         "vendor-dir": ".Build/vendor",
         "bin-dir": ".Build/bin",

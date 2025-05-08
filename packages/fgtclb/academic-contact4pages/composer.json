@@ -13,6 +13,11 @@
             "FGTCLB\\AcademicContacts4pages\\": "Classes/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "FGTCLB\\AcademicContacts4pages\\Tests\\": "Tests/"
+        }
+    },
     "extra": {
         "typo3/cms": {
             "extension-key": "academic_contacts4pages"
