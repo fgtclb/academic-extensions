@@ -3,6 +3,18 @@
     "description": "Role based relations between profiles and pages",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "FGTCLB GmbH",
+            "email": "hello@fgtclb.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/fgtclb/academic-extensions/issues",
+        "source": "https://github.com/fgtclb/academic-extensions",
+        "email": "hello@fgtclb.com"
+    },
+    "homepage": "https://www.fgtclb.com/",
     "require": {
         "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
         "fgtclb/academic-persons": "2.0.*@dev",
@@ -32,17 +44,5 @@
             "typo3/class-alias-loader": true
         },
         "sort-packages": true
-    },
-    "authors": [
-        {
-            "name": "FGTCLB GmbH",
-            "email": "hello@fgtclb.com"
-        }
-    ],
-    "support": {
-        "issues": "https://github.com/fgtclb/academic-extensions/issues",
-        "source": "https://github.com/fgtclb/academic-extensions",
-        "email": "hello@fgtclb.com"
-    },
-    "homepage": "https://www.fgtclb.com/"
+    }
 }
