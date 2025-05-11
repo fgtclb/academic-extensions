@@ -1,11 +1,10 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => '(FGTCLB) Academic Projects',
-    'description' => 'Academic project pages for TYPO3 with specific structured data and typed sys_categories',
+    'author' => 'FGTCLB',
+    'author_company' => 'FGTCLB GmbH',
+    'author_email' => 'hello@fgtclb.com',
     'category' => 'fe',
-    'state' => 'beta',
-    'version' => '2.0.2',
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.0-13.4.99',
@@ -18,4 +17,8 @@ $EM_CONF[$_EXTKEY] = [
         'conflicts' => [],
         'suggests' => [],
     ],
+    'description' => 'Academic project pages for TYPO3 with specific structured data and typed sys_categories',
+    'state' => 'beta',
+    'title' => 'FGTCLB: Academic Projects',
+    'version' => '2.0.2',
 ];
