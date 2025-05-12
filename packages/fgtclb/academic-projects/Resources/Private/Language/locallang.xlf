@@ -28,6 +28,18 @@
                 <source>Funding partner</source>
             </trans-unit>
 
+			<!-- Detail page labels -->
+
+			<trans-unit id="academic_projects.runtime">
+                <source>Runtime</source>
+            </trans-unit>
+            <trans-unit id="academic_projects.budget">
+                <source>Budget</source>
+            </trans-unit>
+            <trans-unit id="academic_projects.funders">
+                <source>Funders</source>
+            </trans-unit>
+
             <!-- Active state -->
 
             <trans-unit id="activeState.label">
@@ -95,6 +107,12 @@
             </trans-unit>
             <trans-unit id="sorting.tx_academicprojects_start_date.desc">
                 <source>Start date (newest first)</source>
+            </trans-unit>
+
+			<!-- List -->
+
+            <trans-unit id="list.noProjectsFound">
+                <source>No projects found.</source>
             </trans-unit>
         </body>
     </file>

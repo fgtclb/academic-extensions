@@ -35,6 +35,21 @@
                 <target>Mittelgebende</target>
             </trans-unit>
 
+			<!-- Detail page labels -->
+
+			<trans-unit id="academic_projects.runtime">
+                <source>Runtime</source>
+                <target>Laufzeit</target>
+            </trans-unit>
+            <trans-unit id="academic_projects.budget">
+                <source>Budget</source>
+                <target>Budget</target>
+            </trans-unit>
+            <trans-unit id="academic_projects.funders">
+                <source>Funders</source>
+                <target>Förderer</target>
+            </trans-unit>
+
             <!-- Active state -->
 
             <trans-unit id="activeState.label">
@@ -137,6 +152,13 @@
             <trans-unit id="filter.sorting.tx_academicprojects_start_date.desc">
                 <source>Start date (newest first)</source>
                 <target>Startdatum (neueste zuerst)</target>
+            </trans-unit>
+
+			<!-- List -->
+
+            <trans-unit id="list.noProjectsFound">
+                <source>No projects found.</source>
+                <target>Keine Projekte gefunden.</target>
             </trans-unit>
         </body>
     </file>
