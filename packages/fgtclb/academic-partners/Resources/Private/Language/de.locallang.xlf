@@ -28,7 +28,18 @@
                 <source>SDG</source>
                 <target>SDG</target>
             </trans-unit>
-            
+			<trans-unit id="sys_category.academic_programs.allOptions">
+				<source>All options</source>
+				<target>Alle Optionen</target>
+			</trans-unit>
+
+			<!-- Detail page labels -->
+
+			<trans-unit id="academic_partners.address">
+                <source>Address</source>
+                <target>Adresse</target>
+            </trans-unit>
+
             <!-- Sorting direction options -->
 
             <trans-unit id="sorting.sortingDirection.label">

@@ -1,0 +1,52 @@
+<html
+    lang="en"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:alias map="{partner: partnership.partner}">
+    <div class="card flex-column-reverse academic-partnerships-list-item">
+        <div>
+            <div class="card-body">
+                <f:render
+                    partial="Partner/Header"
+                    arguments="{
+                        header: '{f:if(condition: partner.partnerTitle, then: partner.partnerTitle, else: partner.title)}',
+                        layout: '{data.header_layout}',
+                        positionClass: 'card-title',
+                        link: '{f:uri.page(pageUid: partner.uid)}',
+                        role: '{partnership.role}',
+                        subheader: '{data.subheader}'
+                    }"
+                />
+            </div>
+
+            <f:if condition="{partner.attributes}">
+                <ul class="list-group-flush list-group">
+                    <f:for each="{partner.attributes.allCategoriesByType}" as="categories" key="type">
+                        <f:if condition="{categories -> f:count()} > 0">
+                            <li class="list-group-item">
+                                <core:icon identifier="category_types.partners.{type}"/>
+
+                                <b>{f:translate(key: 'sys_category.academic_partners.{type}', extensionName: 'academic_partners')}:</b>
+
+                                <f:for each="{categories}" as="category" iteration="i">
+                                    <span>{category.title}{f:if(condition: '!{i.isLast}', then: ', ')}</span>
+                                </f:for>
+                            </li>
+                        </f:if>
+                    </f:for>
+                </ul>
+            </f:if>
+        </div>
+
+        <f:for each="{partner.media}" as="image" iteration="i">
+            <f:if condition="{i.isFirst}">
+                <f:image image="{image}" class="card-img-top img-fluid" alt="{image.alternative}"/>
+            </f:if>
+        </f:for>
+    </div>
+</f:alias>
+
+</html>

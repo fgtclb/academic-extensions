@@ -23,7 +23,16 @@
             <trans-unit id="sys_category.academic_partners.sdg">
                 <source>SDG</source>
             </trans-unit>
-            
+			<trans-unit id="sys_category.academic_programs.allOptions">
+				<source>All options</source>
+			</trans-unit>
+
+			<!-- Detail page labels -->
+
+			<trans-unit id="academic_partners.address">
+                <source>Address</source>
+            </trans-unit>
+
             <!-- Sorting direction options -->
 
             <trans-unit id="sorting.sortingDirection.label">
