@@ -14,15 +14,15 @@
                 <source>Office Hours</source>
                 <target>Bürozeiten</target>
             </trans-unit>
-            <trans-unit id="contracts.email">
+            <trans-unit id="contracts.emailAddresses">
                 <source>E-Mail</source>
                 <target>E-Mail</target>
             </trans-unit>
-            <trans-unit id="contracts.phone">
+            <trans-unit id="contracts.phoneNumbers">
                 <source>Phone</source>
                 <target>Telefon</target>
             </trans-unit>
-            <trans-unit id="contracts.zip">
+            <trans-unit id="contracts.physicalAddresses">
                 <source>Addresses</source>
                 <target>Adressen</target>
             </trans-unit>
@@ -32,6 +32,10 @@
             <trans-unit id="list.noProfilesFound" resname="list.noProfilesFound">
                 <source>No profiles found.</source>
                 <target>Keine Profile gefunden.</target>
+            </trans-unit>
+            <trans-unit id="list.noContractsFound" resname="list.noContractsFound">
+                <source>No contracts found.</source>
+                <target>Keine Verträge gefunden.</target>
             </trans-unit>
 
             <!-- Detail -->
@@ -127,13 +131,6 @@
             <trans-unit id="detail.till" resname="detail.till">
                 <source>Till</source>
                 <target>Bis</target>
-            </trans-unit>
-
-            <!-- Card -->
-
-            <trans-unit id="card.noProfileSelected" resname="card.noProfileSelected">
-                <source>No profile was selected.</source>
-                <target>Es wurde kein Profil ausgewählt.</target>
             </trans-unit>
         </body>
     </file>
