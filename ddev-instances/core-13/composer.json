@@ -11,6 +11,7 @@
   ],
   "require": {
     "php": "^8.2 || ^8.3 || ^8.4",
+    "bk2k/bootstrap-package": "^15.0@dev",
     "fgtclb/academics-monorepo-shared": "2.0.*@dev",
     "typo3/minimal": "^13"
   },
