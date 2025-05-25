@@ -144,7 +144,13 @@ class PartnerController extends ActionController
             $pageUid = $partnership->getPage();
             $page = $pageRepository->getPage($pageUid);
             if ($page !== null) {
-                $pages[$page['title']] = $page;
+                if (!empty($this->settings['doktype'])) {
+                    if ($page['doktype'] === (int)$this->settings['doktype']) {
+                        $pages[strtolower($page['title'])] = $page;
+                    }
+                } else {
+                    $pages[strtolower($page['title'])] = $page;
+                }
             }
         }
         ksort($pages);

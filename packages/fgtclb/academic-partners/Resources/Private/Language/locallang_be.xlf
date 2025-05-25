@@ -116,6 +116,21 @@
             <trans-unit id="flexform.sorting.sorting.asc">
                 <source>Page sorting (result may be unexpected)</source>
             </trans-unit>
+            <trans-unit id="flexform.doktype.label">
+                <source>Filter</source>
+            </trans-unit>
+            <trans-unit id="flexform.doktype.description">
+                <source>Select whether all partnerships or only project or only program partnerships should be displayed</source>
+            </trans-unit>
+            <trans-unit id="flexform.doktype.0">
+                <source>All</source>
+            </trans-unit>
+            <trans-unit id="flexform.doktype.1">
+                <source>Only project pages</source>
+            </trans-unit>
+            <trans-unit id="flexform.doktype.2">
+                <source>Only program pages</source>
+            </trans-unit>
 
             <!-- Pages table: TCA tabs and palettes -->
 
