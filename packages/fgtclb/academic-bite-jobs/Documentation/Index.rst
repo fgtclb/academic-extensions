@@ -31,9 +31,19 @@ Academic Bite Jobs
 
 ----
 
-This extension adds an academic jobs database to TYPO3.
-Records can be created, edit and displayed in the frontend.
-There is a list and a detail view for the frontend .
+The TYPO3 extension Academic Jobs with b-ite displays jobs from the b-Ite
+eRecruiting platform embedded in the TYPO3 website. All you need to use it
+is the b-ite key, which can usually be read from existing b-Ite job
+advertisements in the browser.
+
+The job offers are displayed as tiles, lists and tables. The detailed display
+of individual job advertisements is automatically linked to the b-ite platform.
+The b-ite key can be entered in the extension plugin. Custom assignment allows
+groupings such as appointment procedures, academic staff, non-scientific staff
+or training positions to be selected.
+
+Further settings for grouping, sorting, display mode and limiting the job
+advertisements are also available in the plugin.
 
 ----
 
