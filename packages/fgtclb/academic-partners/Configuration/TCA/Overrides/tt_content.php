@@ -90,4 +90,16 @@ defined('TYPO3') or die;
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
         'academic_partners'
     );
+
+    // Plugin: academicpartners_pageslist
+    ExtensionManagementUtility::addPlugin(
+        [
+            'label' => 'LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:plugin.partner_pageslist.title',
+            'value' => 'academicpartners_pageslist',
+            'icon' => 'academic-partners',
+            'group' => 'academic',
+        ],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
+        'academic_partners'
+    );
 })();

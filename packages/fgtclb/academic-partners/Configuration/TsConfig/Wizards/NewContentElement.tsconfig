@@ -34,7 +34,15 @@ mod.wizards.newContentElement.wizardItems.academic {
         CType = academicpartners_partnershipsteaser
       }
     }
+    academicpartners_pageslist {
+      iconIdentifier = academic-partners
+      title = LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:plugin.partner_pageslist.title
+      description = LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:plugin.partner_pageslist.description
+      tt_content_defValues {
+        CType = academicpartners_pageslist
+      }
+    }
   }
 
-  show := addToList(academicpartners_list,academicpartners_map,academicpartners_partnershipslist,academicpartners_partnershipsteaser)
+  show := addToList(academicpartners_list,academicpartners_map,academicpartners_partnershipslist,academicpartners_partnershipsteaser,academicpartners_pageslist)
 }

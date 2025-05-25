@@ -1,3 +1,4 @@
 
-
-
+[traverse(page, "doktype") != 40]
+  TCEFORM.tt_content.CType.removeItems = academicpartners_pageslist
+[END]

@@ -68,6 +68,12 @@
             <trans-unit id="plugin.partner_partnershipsteaser.description">
                 <source>Display teasers for partners assigned to this page.</source>
             </trans-unit>
+            <trans-unit id="plugin.partner_pageslist.title">
+                <source>[Academic] Pages list</source>
+            </trans-unit>
+            <trans-unit id="plugin.partner_pageslist.description">
+                <source>Display a list of pages assigned to current partner page.</source>
+            </trans-unit>
 
             <!-- Flexform -->
 
