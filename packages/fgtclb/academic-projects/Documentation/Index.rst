@@ -31,12 +31,16 @@ Academic Projects
 
 ----
 
-This extension adds a new page type for research projects to your TYPO3 CMS.
-Projects can be created like any normal page, but provide additional structured
-data for research projects as well as suitable typed categories.
+TYPO3 extension for the presentation of projects and research projects of universities
+with specifically structured data and typified system categories. List view in the form
+of a tile display with filtering, which only provides positive filter results based on
+system categories, prevents impossible filter combinations and thus always ensures a
+positive user experience.
 
-In addition, this extension provides a list view that can be used to sort and
-filter research projects.
+Examples of structured data: start and end year, areas of expertise, type of
+cooperation, funding bodies, duration. In conjunction with the `Contact for Pages`
+extension, the extension enables an active user journey and thus shows, for example,
+project managers, research participants or cooperation partners.
 
 ----
 
