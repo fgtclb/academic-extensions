@@ -62,4 +62,14 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
         [],
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
     );
+
+    ExtensionUtility::configurePlugin(
+        'AcademicPartners',
+        'PagesList',
+        [
+            PartnerController::class => 'pagesList',
+        ],
+        [],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
+    );
 })();
