@@ -1,19 +1,20 @@
 <html
-    data-namespace-typo3-fluid="true"
+    lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
 >
 
-<f:if condition="{settings.hideFilter} || {settings.hideSorting}">
-    <f:form action="list" object="{demand}" name="demand" objectName="demand">
+<f:if condition="!{settings.hideSorting} || !{settings.hideFilter}">
+    <f:form action="list" name="demand" object="{demand}" class="academic-programs-filtersorting">
         <div class="row">
-            <f:if condition="{settings.hideSorting}">
+            <f:if condition="!{settings.hideSorting}">
                 <f:render
                     partial="Program/DemandSorting"
                     arguments="{_all}"
                 />
             </f:if>
 
-            <f:if condition="{settings.hideFilter}">
+            <f:if condition="!{settings.hideFilter}">
                 <f:render
                     partial="Program/DemandCategories"
                     arguments="{_all}"

@@ -1,0 +1,52 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<div class="academic-programs-detail">
+    <div class="d-flex flex-column-reverse">
+        <h1>{program.title}</h1>
+
+        <f:for each="{images}" as="image" iteration="i">
+            <f:if condition="{i.isFirst}">
+                <f:image image="{image}" class="img-fluid"/>
+            </f:if>
+        </f:for>
+    </div>
+
+    <f:render
+        partial="Program/Categories"
+        arguments="{_all}"
+    />
+
+    <ul>
+        <li>
+            <b>{f:translate(key: 'program.credit_points', extensionName: 'academic_programs')}</b>
+
+            <span>{program.creditPoints}</span>
+        </li>
+
+        <li>
+            <b>{f:translate(key: 'program.job_profile', extensionName: 'academic_programs')}</b>
+
+            <f:format.raw>{program.jobProfile}</f:format.raw>
+        </li>
+
+        <li>
+            <b>{f:translate(key: 'program.performance_scope', extensionName: 'academic_programs')}</b>
+
+            <f:format.raw>{program.performanceScope}</f:format.raw>
+        </li>
+
+        <li>
+            <b>{f:translate(key: 'program.prerequisites', extensionName: 'academic_programs')}</b>
+
+            <f:format.raw>{program.prerequisites}</f:format.raw>
+        </li>
+    </ul>
+
+    <f:cObject typoscriptObjectPath="styles.content.getContent"/>
+</div>
+
+</html>

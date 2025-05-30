@@ -6,27 +6,29 @@
 >
 
 <f:for each="{categories.allCategoriesByType}" as="category" key="categoryKey">
-    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-        <label for="{categoryKey}" class="form-label">
-            {f:translate(key: 'sys_category.academic_programs.{categoryKey}', extensionName: 'academic_programs')}
-        </label>
+    <f:if condition="{category}">
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+            <label for="{categoryKey}" class="form-label">
+                {f:translate(key: 'sys_category.programs.{categoryKey}', extensionName: 'academic_programs')}
+            </label>
 
-        <ct:form.filterSelect
-            id="{categoryKey}"
-            property="filterCollection.{categoryKey}"
-            value="{demand.filterCollection.filterCategories.{categoryKey}}"
-            options="{categories.{categoryKey}}"
-            optionValueField="uid"
-            optionLabelField="title"
-            prependOptionLabel="{f:translate(
-                key: 'sys_category.academic_programs.allOptions',
-                extensionName: 'academic_programs'
-            )}"
-            prependOptionValue=""
-            additionalAttributes="{'onchange': 'this.form.submit()'}"
-            class="form-select"
-        />
-    </div>
+            <ct:form.filterSelect
+                id="{categoryKey}"
+                property="filterCollection.{categoryKey}"
+                value="{demand.filterCollection.filterCategories.{categoryKey}}"
+                options="{categories.{categoryKey}}"
+                optionValueField="uid"
+                optionLabelField="title"
+                prependOptionLabel="{f:translate(
+                    key: 'sys_category.programs.allOptions',
+                    extensionName: 'academic_programs'
+                )}"
+                prependOptionValue=""
+                additionalAttributes="{'onchange': 'this.form.submit()'}"
+                class="form-select"
+            />
+        </div>
+    </f:if>
 </f:for>
 
 </html>

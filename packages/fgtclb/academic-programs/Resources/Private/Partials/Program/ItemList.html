@@ -1,6 +1,7 @@
 <html
-    data-namespace-typo3-fluid="true"
+    lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
 >
 
 <f:if condition="{programs}">
@@ -17,7 +18,7 @@
         </div>
     </f:then>
     <f:else>
-        <p>{f:translate(key: 'list.noProgramsFound', extensionName: 'academic_programs')}</p>
+        <span>{f:translate(key: 'list.noProgramsFound', extensionName: 'academic_programs')}</span>
     </f:else>
 </f:if>
 

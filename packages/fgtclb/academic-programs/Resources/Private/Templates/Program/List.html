@@ -1,16 +1,23 @@
 <html
-    data-namespace-typo3-fluid="true"
+    lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
 >
 
-<f:render
-    partial="Program/SortingAndFilters"
-    arguments="{_all}"
-/>
+<f:layout name="Default"/>
 
-<f:render
-    partial="Program/ItemList"
-    arguments="{_all}"
-/>
+<f:section name="Main">
+    <div class="academic-programs-list">
+        <f:render
+            partial="Program/SortingAndFilters"
+            arguments="{_all}"
+        />
+
+        <f:render
+            partial="Program/ItemList"
+            arguments="{_all}"
+        />
+    </div>
+</f:section>
 
 </html>
