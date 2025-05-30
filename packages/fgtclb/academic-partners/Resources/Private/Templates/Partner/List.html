@@ -4,16 +4,20 @@
     data-namespace-typo3-fluid="true"
 >
 
-<div class="academic-partners-list">
-    <f:render
-        partial="Partner/SortingAndFilters"
-        arguments="{_all}"
-    />
+<f:layout name="Default"/>
 
-    <f:render
-        partial="Partner/ItemList"
-        arguments="{_all}"
-    />
-</div>
+<f:section name="Main">
+    <div class="academic-partners-list">
+        <f:render
+            partial="Partner/SortingAndFilters"
+            arguments="{_all}"
+        />
+
+        <f:render
+            partial="Partner/ItemList"
+            arguments="{_all}"
+        />
+    </div>
+</f:section>
 
 </html>

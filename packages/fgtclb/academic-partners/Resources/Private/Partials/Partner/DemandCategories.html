@@ -9,7 +9,7 @@
     <f:if condition="{category}">
         <div class="col-12 col-md-6 col-lg-4 col-xl-3">
             <label for="{categoryKey}" class="form-label">
-                {f:translate(key: 'sys_category.academic_partners.{categoryKey}', extensionName: 'academic_partners')}
+                {f:translate(key: 'sys_category.partners.{categoryKey}', extensionName: 'academic_partners')}
             </label>
 
             <ct:form.filterSelect
@@ -20,7 +20,7 @@
                 optionValueField="uid"
                 optionLabelField="title"
                 prependOptionLabel="{f:translate(
-                    key: 'sys_category.academic_partners.allOptions',
+                    key: 'sys_category.partners.allOptions',
                     extensionName: 'academic_partners'
                 )}"
                 prependOptionValue=""
