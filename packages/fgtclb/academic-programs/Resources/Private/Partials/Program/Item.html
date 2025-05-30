@@ -1,0 +1,37 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<div class="card flex-column-reverse academic-programs-item">
+    <div class="card-content">
+        <div class="card-body">
+            <f:render
+                partial="Project/Header"
+                arguments="{
+                    header: '{program.title}',
+                    layout: '{data.header_layout}',
+                    positionClass: 'card-title',
+                    link: '{f:uri.page(pageUid: program.uid)}',
+                    subheader: '{data.subheader}'
+                }"
+            />
+        </div>
+
+        <f:if condition="{program.attributes.allCategoriesByType.degree}">
+            <div class="list-group list-group-flush">
+                <f:for each="{program.attributes.allCategoriesByType.degree}" as="degree">
+                    <div class="list-group-item">{degree.title}</div>
+                </f:for>
+            </div>
+        </f:if>
+    </div>
+
+    <f:for each="{project.media}" as="image" iteration="i">
+        <f:if condition="{i.isFirst}">
+            <f:image image="{image}" class="card-img-top img-fluid" />
+        </f:if>
+    </f:for>
+</div>
+
+</html>
