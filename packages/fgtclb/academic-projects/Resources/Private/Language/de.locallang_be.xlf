@@ -3,7 +3,7 @@
     <file source-language="en, de" target-language="de" datatype="plaintext" original="messages" date="2023-04-24T15:52:42Z">
         <header/>
         <body>
-            <!-- Backend Layouts -->
+            <!-- Backend Layout -->
 
             <trans-unit id="backend_layout.academic_project">
                 <source>Academic Project</source>
@@ -103,6 +103,94 @@
             <trans-unit id="flexform.sorting.tx_academicprojects_start_date.desc">
                 <source>Start date (newest first)</source>
                 <target>Startdatum (neueste zuerst)</target>
+            </trans-unit>
+
+			<!-- Wizard -->
+
+			<trans-unit id="wizard_items.academic">
+                <source>Academic</source>
+                <target>Akademisch</target>
+            </trans-unit>
+            <trans-unit id="plugin.project_list.name">
+                <source>Projects</source>
+                <target>Projekte</target>
+            </trans-unit>
+            <trans-unit id="plugin.project_list.description">
+                <source>List of academic projects with sorting and filtering</source>
+                <target>Liste akademischer Projekte mit Sortierung und Filterung</target>
+            </trans-unit>
+            <trans-unit id="plugin.project_selected.name">
+                <source>Projects (selected)</source>
+                <target>Projekte (ausgewählte)</target>
+            </trans-unit>
+            <trans-unit id="plugin.project_selected.description">
+                <source>List of selected academic projects with sorting and filtering</source>
+                <target>Liste ausgewählter akademischer Projekte mit Sortierung und Filterung</target>
+            </trans-unit>
+
+			<!-- Doktype -->
+
+            <trans-unit id="pages.doktype.item_group.academic">
+                <source>Academic Pages</source>
+                <target>Akademische Seiten</target>
+            </trans-unit>
+            <trans-unit id="pages.doktype.item.academic_project">
+                <source>Project</source>
+                <target>Projekt</target>
+            </trans-unit>
+
+			<!-- Labels for SysCategories -->
+
+            <trans-unit id="sys_category.projects.group">
+                <source>Academic Projects</source>
+                <target>Akademische Projekte</target>
+            </trans-unit>
+            <trans-unit id="sys_category.projects.department">
+                <source>Department</source>
+                <target>Organisationseinheit</target>
+            </trans-unit>
+            <trans-unit id="sys_category.projects.competence_field">
+                <source>Competence field</source>
+                <target>Kompetenzfeld</target>
+            </trans-unit>
+            <trans-unit id="sys_category.projects.cooperation">
+                <source>Cooperation</source>
+                <target>Kooperation</target>
+            </trans-unit>
+            <trans-unit id="sys_category.projects.funding_partner">
+                <source>Funding partner</source>
+                <target>Mittelgebende</target>
+            </trans-unit>
+
+			<!-- TCA -->
+
+            <trans-unit id="pages.div.project">
+                <source>Project</source>
+                <target>Projekt</target>
+            </trans-unit>
+            <trans-unit id="pages.budget">
+                <source>Project budget</source>
+                <target>Projektbudget</target>
+            </trans-unit>
+            <trans-unit id="pages.end_date">
+                <source>Project end</source>
+                <target>Projektende</target>
+            </trans-unit>
+            <trans-unit id="pages.funders">
+                <source>Project funders</source>
+                <target>Mittelgebende</target>
+            </trans-unit>
+            <trans-unit id="pages.project_title">
+                <source>Project title</source>
+                <target>Projekttitel</target>
+            </trans-unit>
+            <trans-unit id="pages.short_description">
+                <source>Project short description</source>
+                <target>Kurzbeschreibung des Projektes</target>
+            </trans-unit>
+            <trans-unit id="pages.start_date">
+                <source>Project start</source>
+                <target>Projektbeginn</target>
             </trans-unit>
         </body>
     </file>

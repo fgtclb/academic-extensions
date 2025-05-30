@@ -1,5 +1,7 @@
 <html
+    lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
 
@@ -13,27 +15,46 @@
 
         <f:for each="{images}" as="image" iteration="i">
             <f:if condition="{i.isFirst}">
-                <f:image image="{image}" alt="{image.alternative}" title="{image.title}" class="img-fluid"/>
+                <f:image image="{image}" class="img-fluid"/>
             </f:if>
         </f:for>
     </div>
 
-    <f:render
-        partial="Project/Categories"
-        arguments="{_all}"
-    />
+    <f:if condition="{project.categories.allCategoriesByType}">
+        <ul>
+            <f:for each="{project.categories.allCategoriesByType}" as="categories" key="type">
+                <f:if condition="{categories}">
+                    <li>
+                        <core:icon identifier="category_types.projects.{type}"/>
+
+                        <b>{f:translate(key: 'sys_category.projects.{type}', extensionName: 'academic_projects')}:</b>
+
+                        <span>
+                            <f:for each="{categories}" as="category" iteration="i">
+                                {category.title}{f:if(condition: '!{i.isLast}', then: ', ')}
+                            </f:for>
+                        </span>
+                    </li>
+                </f:if>
+            </f:for>
+        </ul>
+    </f:if>
 
     <ul>
         <li>
             <b>{f:translate(key: 'project.runtime', extensionName: 'academic_projects')}:</b>
 
-            <span>{project.startDate -> f:format.date(format: '%m.%Y')} - {project.endDate -> f:format.date(format: '%m.%Y')}</span>
+            <span>
+                {project.startDate -> f:format.date(format: '%m.%Y')} - {project.endDate -> f:format.date(format: '%m.%Y')}
+            </span>
         </li>
+
         <li>
             <b>{f:translate(key: 'project.budget', extensionName: 'academic_projects')}:</b>
 
             <span>{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</span>
         </li>
+
         <li>
             <b>{f:translate(key: 'project.funders', extensionName: 'academic_projects')}:</b>
 

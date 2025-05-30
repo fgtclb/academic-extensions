@@ -3,16 +3,21 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-<div class="academic-projects-list">
-    <f:render
-        partial="Project/SortingAndFilters"
-        arguments="{_all}"
-    />
 
-    <f:render
-        partial="Project/ItemList"
-        arguments="{_all}"
-    />
-</div>
+<f:layout name="Default"/>
+
+<f:section name="Main">
+    <div class="academic-projects-list">
+        <f:render
+            partial="Project/SortingAndFilters"
+            arguments="{_all}"
+        />
+
+        <f:render
+            partial="Project/ItemList"
+            arguments="{_all}"
+        />
+    </div>
+</f:section>
 
 </html>

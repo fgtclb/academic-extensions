@@ -1,6 +1,7 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
 
@@ -28,19 +29,24 @@
         <f:if condition="{project.attributes}">
             <ul class="list-group list-group-flush">
                 <f:for each="{project.attributes.allCategoriesByType}" as="attributes" key="category">
-                    <li class="list-group-item">
-                        <core:icon identifier="category_types.partners.{category}"/>
+                    <f:if condition="{attributes}">
+                        <li class="list-group-item">
+                            <core:icon identifier="category_types.projects.{category}"/>
 
-                        <b>{f:translate(key: 'sys_category.academic_projects.{category}', extensionName: 'academic_projects')}:</b>
+                            <b>
+                                {f:translate(
+                                    key: 'sys_category.projects.{category}',
+                                    extensionName: 'academic_projects'
+                                )}:
+                            </b>
 
-                        <f:if condition="{attributes -> f:count()} > 0">
                             <span>
                                 <f:for each="{attributes}" as="attribute" iteration="i">
                                     {attribute.title}{f:if(condition: '!{i.isLast}', then: ', ')}
                                 </f:for>
                             </span>
-                        </f:if>
-                    </li>
+                        </li>
+                    </f:if>
                 </f:for>
             </ul>
         </f:if>
@@ -48,7 +54,7 @@
 
     <f:for each="{project.media}" as="image" iteration="i">
         <f:if condition="{i.isFirst}">
-            <f:image image="{image}" class="card-img-top img-fluid" alt="{image.alternative}"/>
+            <f:image image="{image}" class="card-img-top img-fluid"/>
         </f:if>
     </f:for>
 </div>

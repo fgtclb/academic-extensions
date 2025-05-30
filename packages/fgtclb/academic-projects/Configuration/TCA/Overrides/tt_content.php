@@ -29,7 +29,7 @@ defined('TYPO3') or die;
     // Add plugin to the CType selection
     ExtensionManagementUtility::addPlugin(
         [
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academic_projects_p1.name',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_list.name',
             'value' => 'academicprojects_projectlist',
             'icon' => 'actions-code-merge',
             'group' => 'academic',
@@ -68,7 +68,7 @@ defined('TYPO3') or die;
     // Add plugin to the CType selection
     ExtensionManagementUtility::addPlugin(
         [
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academic_projects_p2.name',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_selected.name',
             'value' => 'academicprojects_projectlistsingle',
             'icon' => 'actions-code-merge',
             'group' => 'academic',
