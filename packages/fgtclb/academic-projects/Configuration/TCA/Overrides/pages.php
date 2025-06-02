@@ -16,7 +16,7 @@ if (!defined('TYPO3')) {
         'pages',
         'doktype',
         'academic',
-        'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:pages.doktype.item_group.academic',
+        'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.doktype.item_group.academic',
         'after:default'
     );
 
@@ -25,9 +25,10 @@ if (!defined('TYPO3')) {
         'pages',
         'doktype',
         [
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:pages.doktype.item.academic_projects',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.doktype.item.academic_project',
             'value' => PageTypes::TYPE_ACEDEMIC_PROJECT,
             'icon' => 'actions-code-merge',
+            'group' => 'academic',
         ],
         '254',
         'before'
@@ -50,7 +51,7 @@ if (!defined('TYPO3')) {
     $columns = [
         'tx_academicprojects_project_title' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.project_title',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.project_title',
             'config' => [
                 'type' => 'input',
                 'eval' => 'trim',
@@ -62,7 +63,7 @@ if (!defined('TYPO3')) {
         'tx_academicprojects_short_description' => [
             'exclude' => true,
             'l10n_mode' => 'prefixLangTitle',
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.short_description',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.short_description',
             'config' => [
                 'type' => 'text',
                 'enableRichtext' => true,
@@ -80,7 +81,7 @@ if (!defined('TYPO3')) {
         ],
         'tx_academicprojects_start_date' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.start_date',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.start_date',
             'config' => [
                 'type' => 'datetime',
                 'eval' => implode(',', [
@@ -94,7 +95,7 @@ if (!defined('TYPO3')) {
         ],
         'tx_academicprojects_end_date' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.end_date',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.end_date',
             'config' => [
                 'type' => 'datetime',
                 'format' => 'date',
@@ -105,7 +106,7 @@ if (!defined('TYPO3')) {
         ],
         'tx_academicprojects_budget' => [
             'exclude' => true,
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.budget',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.budget',
             'config' => [
                 'type' => 'number',
                 'format' => 'decimal',
@@ -118,7 +119,7 @@ if (!defined('TYPO3')) {
         'tx_academicprojects_funders' => [
             'exclude' => true,
             'l10n_mode' => 'prefixLangTitle',
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academicprojects_domain_model_project.funders',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.funders',
             'config' => [
                 'type' => 'text',
                 'enableRichtext' => true,
@@ -163,7 +164,7 @@ if (!defined('TYPO3')) {
     ExtensionManagementUtility::addToAllTCAtypes(
         'pages',
         implode(',', [
-            '--div--;Project',
+            '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.div.project',
             '--palette--;;project_info',
             '--palette--;;project_date',
         ]),

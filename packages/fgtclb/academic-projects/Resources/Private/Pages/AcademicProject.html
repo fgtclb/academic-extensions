@@ -1,81 +1,90 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-    <f:layout name="Default"/>
-    <f:section name="Main">
-        <section>
-            <f:comment><!-- The page title --></f:comment>
-            <h1>[PAGE TITLE] {project.title}</h1>
-        </section>
-        <hr />
-        <section>
-            <f:comment><!-- The project title --></f:comment>
-            <h2>[PROJECT TITLE] {project.projectTitle}</h2>
-        </section>
-        <hr />
-        <section>
-            <h2>[IMAGES]</h2>
-            <f:comment><!-- Provide images referenced in the media field by standard files data processor --></f:comment>
-            <f:if condition="{images}">
-                <f:then>
-                    <div class="row">
-                        <f:for
-                            each="{images}"
-                            as="image"
-                        >
-                            <f:image
-                                image="{image}"
-                                alt="{image.alternative}"
-                                title="{image.title}"
-                                style="width: 100%; height: auto;"
-                            />
-                        </f:for>
-                    </div>
-                </f:then>
-                <f:else>
-                    <p>No images found.</p>
-                </f:else>
+
+<div class="academic-projects-detail container">
+    <div class="d-flex flex-column-reverse">
+        <div>
+            <h1>{f:if(condition: '{project.projectTitle}', then: '{project.projectTitle}', else: '{data.title}')}</h1>
+
+            <f:format.raw>{project.shortDescription}</f:format.raw>
+        </div>
+
+        <f:for each="{images}" as="image" iteration="i">
+            <f:if condition="{i.isFirst}">
+                <f:image image="{image}" class="img-fluid"/>
             </f:if>
-        </section>
-        <hr />
-        <section>
-            <f:comment><!-- The assigned categories grouped by type --></f:comment>
-            <h2>[CATEGORIES]</h2>
-            <aside>
-                <f:render
-                    partial="Categories"
-                    arguments="{_all}"
-                />
-            </aside>
-        </section>
-        <hr />
-        <section>
-            <f:comment><!-- Information from text fields added by the academic partners extension --></f:comment>
-            <h2>[INFO FROM PAGE PROPERTIES]</h2>
-            <div>
-                <h3>Project Runtime</h3>
-                {project.startDate -> f:format.date(format: '%m/%Y')}-{project.endDate -> f:format.date(format: '%m/%Y')}
-            </div>
-            <div>
-                <h3>Project Budget</h3>
-                {project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}
-            </div>
-            <div>
-                <h3>Project Description</h3>
-                {project.shortDescription -> f:format.raw()}
-            </div>
-            <div>
-                <h3>Project Funders</h3>
-                {project.funders -> f:format.raw()}
-            </div>
-        </section>
-        <hr />
-        <section>
-            <f:comment><!-- Render the content of colPos 0 --></f:comment>
-            <h2>[CONTENT]</h2>
-            <f:cObject typoscriptObjectPath="styles.content.getContent"/>
-        </section>
-    </f:section>
+        </f:for>
+    </div>
+
+    <f:if condition="{project.categories.allCategoriesByType}">
+        <ul>
+            <f:for each="{project.categories.allCategoriesByType}" as="categories" key="type">
+                <f:if condition="{categories}">
+                    <li>
+                        <core:icon identifier="category_types.projects.{type}"/>
+
+                        <b>{f:translate(key: 'sys_category.projects.{type}', extensionName: 'academic_projects')}:</b>
+
+                        <span>
+                            <f:for each="{categories}" as="category" iteration="i">
+                                {category.title}{f:if(condition: '!{i.isLast}', then: ', ')}
+                            </f:for>
+                        </span>
+                    </li>
+                </f:if>
+            </f:for>
+        </ul>
+    </f:if>
+
+    <ul>
+        <f:if condition="{project.startDate} || {project.endDate}">
+            <li>
+                <b>{f:translate(key: 'project.runtime', extensionName: 'academic_projects')}:</b>
+
+                <span>
+                    <f:if condition="{project.startDate}">
+                        <f:if condition="!{project.endDate}">
+                            {f:translate(key: 'project.since', extensionName: 'academic_projects')}
+                        </f:if>
+
+                        <f:format.date date="{project.startDate}" format="%m.%Y"/>
+                    </f:if>
+
+                    <f:if condition="{project.startDate} && {project.endDate}">-</f:if>
+
+                    <f:if condition="{project.endDate}">
+                        <f:if condition="!{project.startDate}">
+                            {f:translate(key: 'project.until', extensionName: 'academic_projects')}
+                        </f:if>
+
+                        <f:format.date date="{project.endDate}" format="%m.%Y"/>
+                    </f:if>
+                </span>
+            </li>
+        </f:if>
+
+        <f:if condition="{project.budget}">
+            <li>
+                <b>{f:translate(key: 'project.budget', extensionName: 'academic_projects')}:</b>
+
+                <span>{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</span>
+            </li>
+        </f:if>
+
+        <f:if condition="{project.funders}">
+            <li>
+                <b>{f:translate(key: 'project.funders', extensionName: 'academic_projects')}:</b>
+
+                <f:format.raw>{project.funders}</f:format.raw>
+            </li>
+        </f:if>
+    </ul>
+
+    <f:cObject typoscriptObjectPath="styles.content.getContent"/>
+</div>
+
 </html>

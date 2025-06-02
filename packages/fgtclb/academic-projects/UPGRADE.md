@@ -2,6 +2,27 @@
 
 ## X.Y.Z
 
+### BREAKING: Removed partials
+
+Some partials got removed as the templating structure has changed. Those partials include:
+
+`Resources/Private/Layouts/Default.html`
+`Resources/Private/Partials/Categories.html`
+`Resources/Private/Partials/Project/Items.html`
+`Resources/Private/Partials/Project/SingleItem.html`
+
+### BREAKING: Remove translation files
+
+To unify the academic extensions the usage of `locallang_db` files was removed and the labels were
+moved to the `locallang_be` files.
+
+> [!IMPORTANT]
+> Furthermore many label ids have changed to unify the naming in the academic extensions.
+
+> [!NOTE]
+> The default templating now supports basic bootstrap styling and is semantically optimized
+> to also not lack any major accessibility.
+
 ## 2.0.1
 
 ## 2.0.0
