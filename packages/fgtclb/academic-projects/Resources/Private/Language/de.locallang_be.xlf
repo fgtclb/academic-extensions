@@ -1,109 +1,205 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-    <file source-language="en, de" target-language="de" datatype="plaintext" original="messages" date="2023-04-24T15:52:42Z">
-        <header/>
-        <body>
-            <!-- Backend Layouts -->
+	<file source-language="en, de" target-language="de" datatype="plaintext" original="messages" date="2023-04-24T15:52:42Z">
+		<header/>
+		<body>
+			<!-- Backend Layout -->
 
-            <trans-unit id="backend_layout.academic_project">
-                <source>Academic Project</source>
-                <target>Akademisches Projekt</target>
-            </trans-unit>
-            <trans-unit id="backend_layout.academic_project.column.content">
-                <source>Content</source>
-                <target>Inhalt</target>
-            </trans-unit>
+			<trans-unit id="backend_layout.academic_project">
+				<source>Academic Project</source>
+				<target>Akademisches Projekt</target>
+			</trans-unit>
+			<trans-unit id="backend_layout.academic_project.column.content">
+				<source>Content</source>
+				<target>Inhalt</target>
+			</trans-unit>
 
-            <!-- Plugin configuration -->
+			<!-- Plugin configuration -->
 
-            <trans-unit id="content.ctype.group.label">
-                <source>Academic</source>
-                <target>Academic</target>
-            </trans-unit>
-            <trans-unit id="element.tab.configuration">
-                <source>Configuration</source>
-                <target>Konfiguration</target>
-            </trans-unit>
-            <trans-unit id="flexform.hideActiveState.label">
-                <source>Show active state options</source>
-                <target>Aktivstatus-Optionen anzeigen</target>
-            </trans-unit>
-            <trans-unit id="flexform.activeState.label">
-                <source>Active state</source>
-                <target>Aktivstatus</target>
-            </trans-unit>
-            <trans-unit id="flexform.activeState.all">
-                <source>All</source>
-                <target>Alle</target>
-            </trans-unit>
-            <trans-unit id="flexform.activeState.active">
-                <source>Active</source>
-                <target>Aktiv</target>
-            </trans-unit>
-            <trans-unit id="flexform.activeState.completed">
-                <source>Completed</source>
-                <target>Abgeschlossen</target>
-            </trans-unit>
-            <trans-unit id="flexform.categories.label">
-                <source>Categories</source>
-                <target>Kategorien</target>
-            </trans-unit>
-            <trans-unit id="flexform.categories.description">
-                <source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
-                <target>Wählen Sie Kategorien aus. Hauptkategorien wählen alle Unterkategorien durch ODER aus, mehrere Kategorien wählen durch UND aus</target>
-            </trans-unit>
-            <trans-unit id="flexform.hideFilter.label">
-                <source>Show filter options</source>
-                <target>Filteroptionen anzeigen</target>
-            </trans-unit>
-            <trans-unit id="flexform.hideSorting.label">
-                <source>Show sorting options</source>
-                <target>Sortieroptionen anzeigen</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.label">
-                <source>Sorting</source>
-                <target>Sortierung</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.lastUpdated.asc">
-                <source>Last updated (latest first)</source>
-                <target>Zuletzt aktualisiert (neueste zuerst)</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.lastUpdated.desc">
-                <source>Last updated (latest last)</source>
-                <target>Zuletzt aktualisiert (neueste zuletzt)</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.sorting.asc">
-                <source>Page sorting (Result may be unexpected)</source>
-                <target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.sorting.desc">
-                <source>Page sorting (Result may be unexpected)</source>
-                <target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.title.asc">
-                <source>Title A-Z</source>
-                <target>Titel A-Z</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.title.desc">
-                <source>Title Z-A</source>
-                <target>Titel Z-A</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.tx_academicprojects_budget.asc">
-                <source>Budget (low to high)</source>
-                <target>Budget (niedrig bis hoch)</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.tx_academicprojects_budget.desc">
-                <source>Budget (high to low)</source>
-                <target>Budget (hoch bis niedrig)</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.tx_academicprojects_start_date.asc">
-                <source>Start date (oldest first)</source>
-                <target>Startdatum (älteste zuerst)</target>
-            </trans-unit>
-            <trans-unit id="flexform.sorting.tx_academicprojects_start_date.desc">
-                <source>Start date (newest first)</source>
-                <target>Startdatum (neueste zuerst)</target>
-            </trans-unit>
-        </body>
-    </file>
+			<trans-unit id="content.ctype.group.label">
+				<source>Academic</source>
+				<target>Academic</target>
+			</trans-unit>
+			<trans-unit id="element.tab.configuration">
+				<source>Configuration</source>
+				<target>Konfiguration</target>
+			</trans-unit>
+			<trans-unit id="element.field.pages">
+				<source>Selected pages for startingpoints</source>
+				<target>Ausgewählte Seiten für Startpunkte</target>
+			</trans-unit>
+			<trans-unit id="element.field.pages.selected">
+				<source>Selected projects to display</source>
+				<target>Ausgewählte Projekte zum anzeigen</target>
+			</trans-unit>
+			<trans-unit id="flexform.hideActiveState.label">
+				<source>Show active state options</source>
+				<target>Aktivstatus-Optionen anzeigen</target>
+			</trans-unit>
+			<trans-unit id="flexform.activeState.label">
+				<source>Active state</source>
+				<target>Aktivstatus</target>
+			</trans-unit>
+			<trans-unit id="flexform.activeState.all">
+				<source>All</source>
+				<target>Alle</target>
+			</trans-unit>
+			<trans-unit id="flexform.activeState.active">
+				<source>Active</source>
+				<target>Aktiv</target>
+			</trans-unit>
+			<trans-unit id="flexform.activeState.completed">
+				<source>Completed</source>
+				<target>Abgeschlossen</target>
+			</trans-unit>
+			<trans-unit id="flexform.categories.label">
+				<source>Categories</source>
+				<target>Kategorien</target>
+			</trans-unit>
+			<trans-unit id="flexform.categories.description">
+				<source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
+				<target>Wählen Sie Kategorien aus. Hauptkategorien wählen alle Unterkategorien durch ODER aus, mehrere Kategorien wählen durch UND aus</target>
+			</trans-unit>
+			<trans-unit id="flexform.hideFilter.label">
+				<source>Show filter options</source>
+				<target>Filteroptionen anzeigen</target>
+			</trans-unit>
+			<trans-unit id="flexform.hideSorting.label">
+				<source>Show sorting options</source>
+				<target>Sortieroptionen anzeigen</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.label">
+				<source>Sorting</source>
+				<target>Sortierung</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.lastUpdated.asc">
+				<source>Last updated (latest first)</source>
+				<target>Zuletzt aktualisiert (neueste zuerst)</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.lastUpdated.desc">
+				<source>Last updated (latest last)</source>
+				<target>Zuletzt aktualisiert (neueste zuletzt)</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.sorting.asc">
+				<source>Page sorting (Result may be unexpected)</source>
+				<target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.sorting.desc">
+				<source>Page sorting (Result may be unexpected)</source>
+				<target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.title.asc">
+				<source>Title A-Z</source>
+				<target>Titel A-Z</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.title.desc">
+				<source>Title Z-A</source>
+				<target>Titel Z-A</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.tx_academicprojects_budget.asc">
+				<source>Budget (low to high)</source>
+				<target>Budget (niedrig bis hoch)</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.tx_academicprojects_budget.desc">
+				<source>Budget (high to low)</source>
+				<target>Budget (hoch bis niedrig)</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.tx_academicprojects_start_date.asc">
+				<source>Start date (oldest first)</source>
+				<target>Startdatum (älteste zuerst)</target>
+			</trans-unit>
+			<trans-unit id="flexform.sorting.tx_academicprojects_start_date.desc">
+				<source>Start date (newest first)</source>
+				<target>Startdatum (neueste zuerst)</target>
+			</trans-unit>
+
+			<!-- Wizard -->
+
+			<trans-unit id="wizard_items.academic">
+				<source>Academic</source>
+				<target>Akademisch</target>
+			</trans-unit>
+			<trans-unit id="plugin.project_list.name">
+				<source>Projects</source>
+				<target>Projekte</target>
+			</trans-unit>
+			<trans-unit id="plugin.project_list.description">
+				<source>List of academic projects with sorting and filtering</source>
+				<target>Liste akademischer Projekte mit Sortierung und Filterung</target>
+			</trans-unit>
+			<trans-unit id="plugin.project_selected.name">
+				<source>Projects (selected)</source>
+				<target>Projekte (ausgewählte)</target>
+			</trans-unit>
+			<trans-unit id="plugin.project_selected.description">
+				<source>List of selected academic projects with sorting and filtering</source>
+				<target>Liste ausgewählter akademischer Projekte mit Sortierung und Filterung</target>
+			</trans-unit>
+
+			<!-- Doktype -->
+
+			<trans-unit id="pages.doktype.item_group.academic">
+				<source>Academic Pages</source>
+				<target>Akademische Seiten</target>
+			</trans-unit>
+			<trans-unit id="pages.doktype.item.academic_project">
+				<source>Project</source>
+				<target>Projekt</target>
+			</trans-unit>
+
+			<!-- Labels for SysCategories -->
+
+			<trans-unit id="sys_category.projects.group">
+				<source>Academic Projects</source>
+				<target>Akademische Projekte</target>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.department">
+				<source>Department</source>
+				<target>Organisationseinheit</target>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.competence_field">
+				<source>Competence field</source>
+				<target>Kompetenzfeld</target>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.cooperation">
+				<source>Cooperation</source>
+				<target>Kooperation</target>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.funding_partner">
+				<source>Funding partner</source>
+				<target>Mittelgebende</target>
+			</trans-unit>
+
+			<!-- TCA -->
+
+			<trans-unit id="pages.div.project">
+				<source>Project</source>
+				<target>Projekt</target>
+			</trans-unit>
+			<trans-unit id="pages.budget">
+				<source>Project budget</source>
+				<target>Projektbudget</target>
+			</trans-unit>
+			<trans-unit id="pages.end_date">
+				<source>Project end</source>
+				<target>Projektende</target>
+			</trans-unit>
+			<trans-unit id="pages.funders">
+				<source>Project funders</source>
+				<target>Mittelgebende</target>
+			</trans-unit>
+			<trans-unit id="pages.project_title">
+				<source>Project title</source>
+				<target>Projekttitel</target>
+			</trans-unit>
+			<trans-unit id="pages.short_description">
+				<source>Project short description</source>
+				<target>Kurzbeschreibung des Projektes</target>
+			</trans-unit>
+			<trans-unit id="pages.start_date">
+				<source>Project start</source>
+				<target>Projektbeginn</target>
+			</trans-unit>
+		</body>
+	</file>
 </xliff>
