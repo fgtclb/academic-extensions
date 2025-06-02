@@ -30,3 +30,30 @@ types:
     group: partners
     icon: '<icon-file-using-EXT-syntax-needs-to-be-an-as-svg>'
 ```
+
+## 2.1.0
+
+### BREAKING: Removed partials
+
+Some partials got removed as the templating structure has changed. Those partials include:
+
+`Resources/Private/Layouts/Default.html`
+`Resources/Private/Pages/AcademicPartners.html`
+`Resources/Private/Partials/Categories.html`
+`Resources/Private/Partials/Partner/Items.html`
+`Resources/Private/Partials/Partner/SingleItem.html`
+`Resources/Private/Partials/Partnerships/ListItem.html`
+`Resources/Private/Partials/Partnerships/TeaserItem.html`
+
+### BREAKING: Move translations to their belonging locallang files
+
+As some labels used for the backend were maintained in the locallang files for frontend usage,
+these labels were organized accordingly.
+
+### BREAKING: Changed identifier of backend layout
+
+The identifier of the backend layout was changed to unfiy the naming in the academic extensions
+
+> [!NOTE]
+> The default templating now supports basic bootstrap styling and is semantically optimized
+> to also not lack any major accessibility.
