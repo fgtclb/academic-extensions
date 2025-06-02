@@ -1,101 +1,121 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-    <file source-language="en" target-language="" datatype="plaintext" original="messages" date="2023-03-15T11:39:25Z">
-        <header/>
-        <body>
-            <trans-unit id="backend_layout.academic_projects">
-                <source>Academic Projects</source>
-            </trans-unit>
+	<file source-language="en" target-language="" datatype="plaintext" original="messages" date="2023-03-15T11:39:25Z">
+		<header/>
+		<body>
+			<!-- Labels for SysCategories -->
 
-            <!-- Labels for SysCategories -->
+			<trans-unit id="sys_category.projects.group">
+				<source>Academic Projects</source>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.allOptions">
+				<source>All options</source>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.department">
+				<source>Department</source>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.competence_field">
+				<source>Competence field</source>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.cooperation">
+				<source>Cooperation</source>
+			</trans-unit>
+			<trans-unit id="sys_category.projects.funding_partner">
+				<source>Funding partner</source>
+			</trans-unit>
 
-            <trans-unit id="sys_category.academic_projects.group">
-                <source>Academic Projects</source>
-            </trans-unit>
-            <trans-unit id="sys_category.academic_projects.allOptions">
-                <source>All options</source>
-            </trans-unit>
-            <trans-unit id="sys_category.academic_projects.department">
-                <source>Department</source>
-            </trans-unit>
-            <trans-unit id="sys_category.academic_projects.competence_field">
-                <source>Competence field</source>
-            </trans-unit>
-            <trans-unit id="sys_category.academic_projects.cooperation">
-                <source>Cooperation</source>
-            </trans-unit>
-            <trans-unit id="sys_category.academic_projects.funding_partner">
-                <source>Funding partner</source>
-            </trans-unit>
+			<!-- Detail page labels -->
 
-            <!-- Active state -->
+			<trans-unit id="project.runtime">
+				<source>Runtime</source>
+			</trans-unit>
+			<trans-unit id="project.until">
+				<source>Until</source>
+			</trans-unit>
+			<trans-unit id="project.since">
+				<source>Since</source>
+			</trans-unit>
+			<trans-unit id="project.budget">
+				<source>Budget</source>
+			</trans-unit>
+			<trans-unit id="project.funders">
+				<source>Funders</source>
+			</trans-unit>
 
-            <trans-unit id="activeState.label">
-                <source>Active state</source>
-            </trans-unit>
-            <trans-unit id="activeState.all">
-                <source>all</source>
-            </trans-unit>
-            <trans-unit id="activeState.active">
-                <source>active</source>
-            </trans-unit>
-            <trans-unit id="activeState.completed">
-                <source>completed</source>
-            </trans-unit>
+			<!-- Active state -->
 
-            <!-- Sorting direction options -->
+			<trans-unit id="activeState.label">
+				<source>Active state</source>
+			</trans-unit>
+			<trans-unit id="activeState.all">
+				<source>All</source>
+			</trans-unit>
+			<trans-unit id="activeState.active">
+				<source>Active</source>
+			</trans-unit>
+			<trans-unit id="activeState.completed">
+				<source>Completed</source>
+			</trans-unit>
 
-            <trans-unit id="sorting.sortingDirection.label">
-                <source>Sorting field</source>
-            </trans-unit>
-            <trans-unit id="sorting.direction.asc">
-                <source>ascending</source>
-            </trans-unit>
-            <trans-unit id="sorting.direction.desc">
-                <source>descending</source>
-            </trans-unit>
+			<!-- Sorting direction options -->
 
-            <!-- Sorting field options -->
+			<trans-unit id="sorting.direction.label">
+				<source>Sorting direction</source>
+			</trans-unit>
+			<trans-unit id="sorting.direction.asc">
+				<source>Ascending</source>
+			</trans-unit>
+			<trans-unit id="sorting.direction.desc">
+				<source>Descending</source>
+			</trans-unit>
 
-            <trans-unit id="sorting.sortingField.label">
-                <source>Sorting direction</source>
-            </trans-unit>
-            <trans-unit id="sorting.field.lastUpdated">
-                <source>Last updated</source>
-            </trans-unit>
-            <trans-unit id="sorting.field.sorting">
-                <source>Sorting</source>
-            </trans-unit>
-            <trans-unit id="sorting.field.title">
-                <source>Title</source>
-            </trans-unit>
-            <trans-unit id="sorting.field.tx_academicprojects_budget">
-                <source>Budget</source>
-            </trans-unit>
-            <trans-unit id="sorting.field.tx_academicprojects_start_date">
-                <source>Start date</source>
-            </trans-unit>
+			<!-- Sorting field options -->
 
-            <!-- Combined sorting options -->
+			<trans-unit id="sorting.field.label">
+				<source>Sorting field</source>
+			</trans-unit>
+			<trans-unit id="sorting.field.lastUpdated">
+				<source>Last updated</source>
+			</trans-unit>
+			<trans-unit id="sorting.field.sorting">
+				<source>Sorting</source>
+			</trans-unit>
+			<trans-unit id="sorting.field.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="sorting.field.tx_academicprojects_budget">
+				<source>Budget</source>
+			</trans-unit>
+			<trans-unit id="sorting.field.tx_academicprojects_start_date">
+				<source>Start date</source>
+			</trans-unit>
 
-            <trans-unit id="sorting.title.asc">
-                <source>Title A-Z</source>
-            </trans-unit>
-            <trans-unit id="sorting.title.desc">
-                <source>Title Z-A</source>
-            </trans-unit>
-            <trans-unit id="sorting.tx_academicprojects_budget.asc">
-                <source>Budget (low to high)</source>
-            </trans-unit>
-            <trans-unit id="sorting.tx_academicprojects_budget.desc">
-                <source>Budget (high to low)</source>
-            </trans-unit>
-            <trans-unit id="sorting.tx_academicprojects_start_date.asc">
-                <source>Start date (oldest first)</source>
-            </trans-unit>
-            <trans-unit id="sorting.tx_academicprojects_start_date.desc">
-                <source>Start date (newest first)</source>
-            </trans-unit>
-        </body>
-    </file>
+			<!-- Combined sorting options -->
+
+			<trans-unit id="sorting.title.asc">
+				<source>Title A-Z</source>
+			</trans-unit>
+			<trans-unit id="sorting.title.desc">
+				<source>Title Z-A</source>
+			</trans-unit>
+			<trans-unit id="sorting.tx_academicprojects_budget.asc">
+				<source>Budget (low to high)</source>
+			</trans-unit>
+			<trans-unit id="sorting.tx_academicprojects_budget.desc">
+				<source>Budget (high to low)</source>
+			</trans-unit>
+			<trans-unit id="sorting.tx_academicprojects_start_date.asc">
+				<source>Start date (oldest first)</source>
+			</trans-unit>
+			<trans-unit id="sorting.tx_academicprojects_start_date.desc">
+				<source>Start date (newest first)</source>
+			</trans-unit>
+
+			<!-- List -->
+
+			<trans-unit id="list.noProjectsFound">
+				<source>No projects found.</source>
+			</trans-unit>
+		</body>
+	</file>
 </xliff>

@@ -29,7 +29,7 @@ defined('TYPO3') or die;
     // Add plugin to the CType selection
     ExtensionManagementUtility::addPlugin(
         [
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academic_projects_p1.name',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_list.name',
             'value' => 'academicprojects_projectlist',
             'icon' => 'actions-code-merge',
             'group' => 'academic',
@@ -44,7 +44,7 @@ defined('TYPO3') or die;
         implode(',', [
             '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.tab.configuration',
             'pi_flexform',
-            'pages',
+            'pages;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.field.pages',
         ]),
         'academicprojects_projectlist',
         'after:header'
@@ -64,7 +64,7 @@ defined('TYPO3') or die;
     // Add plugin to the CType selection
     ExtensionManagementUtility::addPlugin(
         [
-            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_db.xlf:tx_academic_projects_p2.name',
+            'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_selected.name',
             'value' => 'academicprojects_projectlistsingle',
             'icon' => 'actions-code-merge',
             'group' => 'academic',
@@ -90,5 +90,16 @@ defined('TYPO3') or die;
         '*',
         'FILE:EXT:academic_projects/Configuration/FlexForms/ProjectSettings.xml',
         'academicprojects_projectlistsingle',
+    );
+
+    ExtensionManagementUtility::addToAllTCAtypes(
+        'tt_content',
+        implode(',', [
+            '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.tab.configuration',
+            'pi_flexform',
+            'pages;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.field.pages.selected',
+        ]),
+        'academicprojects_projectlistsingle',
+        'after:header'
     );
 })();
