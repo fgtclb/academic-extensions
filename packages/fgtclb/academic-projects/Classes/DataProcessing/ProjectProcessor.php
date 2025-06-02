@@ -29,8 +29,16 @@ class ProjectProcessor implements DataProcessorInterface
         array $processorConfiguration,
         array $processedData
     ) {
-        $projectFactory = GeneralUtility::makeInstance(ProjectFactory::class);
-        $processedData['project'] = $projectFactory->get($processedData['page']->getPageRecord());
+        // Try to fetch page data for FLUIDTEMPLATE
+        $pageData = $processedData['data'] ?? [];
+        if ($pageData === []) {
+            // If no page data is available in FLUIDTEMPLATE, try to fetch page data from PAGEVIEW
+            $pageData = $processedData['page']->getPageRecord() ?? [];
+        }
+        if ($pageData !== []) {
+            $programDataFactory = GeneralUtility::makeInstance(ProjectFactory::class);
+            $processedData['project'] = $programDataFactory->get($pageData);
+        }
         return $processedData;
     }
 }
