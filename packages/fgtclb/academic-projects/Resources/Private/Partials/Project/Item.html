@@ -1,0 +1,62 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<div class="card flex-column-reverse academic-projects-item mt-4">
+    <div class="card-content">
+        <div class="card-body">
+            <f:render
+                partial="Project/Header"
+                arguments="{
+                    header: '{f:if(condition: project.projectTitle, then: project.projectTitle, else: project.title)}',
+                    layout: '{data.header_layout}',
+                    positionClass: 'card-title',
+                    link: '{f:uri.page(pageUid: project.uid)}',
+                    subheader: '{data.subheader}'
+                }"
+            />
+
+            <f:if condition="{project.shortDescription}">
+                <div class="card-text">
+                    <f:format.raw>{project.shortDescription}</f:format.raw>
+                </div>
+            </f:if>
+        </div>
+
+        <f:if condition="{project.attributes}">
+            <ul class="list-group list-group-flush">
+                <f:for each="{project.attributes.allCategoriesByType}" as="attributes" key="category">
+                    <f:if condition="{attributes}">
+                        <li class="list-group-item">
+                            <core:icon identifier="category_types.projects.{category}"/>
+
+                            <b>
+                                {f:translate(
+                                    key: 'sys_category.projects.{category}',
+                                    extensionName: 'academic_projects'
+                                )}:
+                            </b>
+
+                            <span>
+                                <f:for each="{attributes}" as="attribute" iteration="i">
+                                    {attribute.title}{f:if(condition: '!{i.isLast}', then: ', ')}
+                                </f:for>
+                            </span>
+                        </li>
+                    </f:if>
+                </f:for>
+            </ul>
+        </f:if>
+    </div>
+
+    <f:for each="{project.media}" as="image" iteration="i">
+        <f:if condition="{i.isFirst}">
+            <f:image image="{image}" class="card-img-top img-fluid"/>
+        </f:if>
+    </f:for>
+</div>
+
+</html>
