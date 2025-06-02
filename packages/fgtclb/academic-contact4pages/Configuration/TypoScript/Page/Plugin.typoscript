@@ -8,6 +8,7 @@ plugin.tx_academiccontacts4pages {
     }
 
     partialRootPaths {
+      5 = EXT:academic_persons/Resources/Private/Partials/
       10 = EXT:academic_contacts4pages/Resources/Private/Partials/
     }
 
