@@ -27,13 +27,4 @@
       }
     }
   }
-
-  lib.contentElement {
-    templateRootPaths {
-      10 = EXT:academic_projects/Resources/Private/Content/Templates/
-    }
-    layoutRootPaths {
-      10 = EXT:academic_projects/Resources/Private/Content/Layouts/
-    }
-  }
 [END]
