@@ -24,6 +24,7 @@ use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Service\ImageService;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 class JobController extends ActionController
@@ -78,7 +79,11 @@ class JobController extends ActionController
 
         $this->setMetaTags($metaTags);
 
-        $this->view->assign('job', $job);
+        $this->view->assignMultiple([
+            'job' => $job,
+            'data' => $this->getCurrentContentObjectRenderer()?->data,
+        ]);
+
         return $this->htmlResponse();
     }
 
@@ -124,7 +129,11 @@ class JobController extends ActionController
             $jobs = $this->jobRepository->findAll();
         }
 
-        $this->view->assign('jobs', $jobs);
+        $this->view->assignMultiple([
+            'jobs' => $jobs,
+            'data' => $this->getCurrentContentObjectRenderer()?->data,
+        ]);
+
         return $this->htmlResponse();
     }
 
@@ -422,5 +431,10 @@ class JobController extends ActionController
         );
 
         $this->getFlashMessageQueue($queueIdentifier)->enqueue($flashMessage);
+    }
+
+    private function getCurrentContentObjectRenderer(): ?ContentObjectRenderer
+    {
+        return $this->request->getAttribute('currentContentObject');
     }
 }
