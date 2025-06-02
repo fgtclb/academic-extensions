@@ -4,6 +4,7 @@
       paths {
         10 = EXT:academic_programs/Resources/Private/
       }
+
       dataProcessing {
         100 = program-data
         110 = files
@@ -14,16 +15,4 @@
       }
     }
   }
-
-  lib.contentElement {
-    templateRootPaths {
-      10 = EXT:academic_programs/Resources/Private/Content/Templates/
-    }
-    layoutRootPaths {
-      10 = EXT:academic_programs/Resources/Private/Content/Layouts/
-    }
-  }
 [END]
-
-
-
