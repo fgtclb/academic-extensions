@@ -83,7 +83,7 @@ class DemandFactory
             $demand->setPages(GeneralUtility::intExplode(',', $contentElementData['pages']));
         }
         $demand->setShowSelected(
-            ($contentElementData['list_type'] ?? '') === 'academicprojects_projectlistsingle'
+            ($contentElementData['CType'] ?? '') === 'academicprojects_projectlistsingle'
         );
 
         return $demand;

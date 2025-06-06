@@ -1,0 +1,34 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:if condition="!{settings.hideSorting} || !{settings.hideFilter} || !{settings.hideActiveState}">
+    <f:form action="list" name="demand" object="{demand}" class="academic-projects-filtersorting">
+        <div class="row">
+            <f:if condition="!{settings.hideSorting}">
+                <f:render
+                    partial="Project/DemandSorting"
+                    arguments="{_all}"
+                />
+            </f:if>
+
+            <f:if condition="!{settings.hideFilter}">
+                <f:render
+                    partial="Project/DemandCategories"
+                    arguments="{_all}"
+                />
+            </f:if>
+
+            <f:if condition="!{settings.hideActiveState}">
+                <f:render
+                    partial="Project/DemandActiveState"
+                    arguments="{_all}"
+                />
+            </f:if>
+        </div>
+    </f:form>
+</f:if>
+
+</html>
