@@ -9,6 +9,8 @@ use FGTCLB\AcademicPartners\Domain\Repository\PartnershipRepository;
 use FGTCLB\AcademicPartners\Factory\DemandFactory;
 use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -122,6 +124,40 @@ class PartnerController extends ActionController
             'data' => $contentElementData,
             'partnerships' => $partnerships,
             'partnershipRoles' => $roles,
+        ]);
+
+        return $this->htmlResponse();
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public function pagesListAction(): ResponseInterface
+    {
+        /** @var array<string, mixed> */
+        $contentElementData = $this->getCurrentContentObjectRenderer()?->data ?? [];
+        $partnerships = $this->partnershipRepository->findByPartner((int)($contentElementData['pid'] ?? 0));
+
+        $pages = [];
+        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
+        foreach ($partnerships as $partnership) {
+            $pageUid = $partnership->getPage();
+            $page = $pageRepository->getPage($pageUid);
+            if ($page !== null) {
+                if (!empty($this->settings['doktype'])) {
+                    if ($page['doktype'] === (int)$this->settings['doktype']) {
+                        $pages[strtolower($page['title'])] = $page;
+                    }
+                } else {
+                    $pages[strtolower($page['title'])] = $page;
+                }
+            }
+        }
+        ksort($pages);
+
+        $this->view->assignMultiple([
+            'data' => $contentElementData,
+            'pages' => $pages,
         ]);
 
         return $this->htmlResponse();

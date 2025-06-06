@@ -52,21 +52,6 @@ defined('TYPO3') or die;
         'academicpartners_map',
     );
 
-    // Add configuration tab for list and map plugins
-    ExtensionManagementUtility::addToAllTCAtypes(
-        'tt_content',
-        implode(',', [
-            '--div--;LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:plugin.partner_list.configuration',
-            'pi_flexform',
-            'pages',
-        ]),
-        implode(',', [
-            'academicpartners_list',
-            'academicpartners_map',
-        ]),
-        'after:subheader',
-    );
-
     // Plugin: academicpartners_partnershipslist
     ExtensionManagementUtility::addPlugin(
         [
@@ -89,5 +74,38 @@ defined('TYPO3') or die;
         ],
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
         'academic_partners'
+    );
+
+    // Plugin: academicpartners_pageslist
+    ExtensionManagementUtility::addPlugin(
+        [
+            'label' => 'LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:plugin.partner_pageslist.title',
+            'value' => 'academicpartners_pageslist',
+            'icon' => 'academic-partners',
+            'group' => 'academic',
+        ],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
+        'academic_partners'
+    );
+    ExtensionManagementUtility::addPiFlexFormValue(
+        '*',
+        sprintf('FILE:EXT:academic_partners/Configuration/FlexForms/Core%s/PagesListSettings.xml', $typo3MajorVersion),
+        'academicpartners_pageslist',
+    );
+
+    // Add configuration tab for list, map and pages list plugins
+    ExtensionManagementUtility::addToAllTCAtypes(
+        'tt_content',
+        implode(',', [
+            '--div--;LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:plugin.partner_list.configuration',
+            'pi_flexform',
+            'pages',
+        ]),
+        implode(',', [
+            'academicpartners_list',
+            'academicpartners_map',
+            'academicpartners_pageslist',
+        ]),
+        'after:subheader',
     );
 })();
