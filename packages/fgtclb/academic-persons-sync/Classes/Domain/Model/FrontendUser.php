@@ -9,7 +9,7 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Fgtclb\AcademicPersonsSync\Domain\Model;
+namespace FGTCLB\AcademicPersonsSync\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
