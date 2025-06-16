@@ -50,10 +50,6 @@ defined('TYPO3') or die;
         'after:header'
     );
 
-    // Exclude/add fields for the plugin
-    $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist']['academicprojects_projectlist'] = 'layout,recursive';
-    $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist']['academicprojects_projectlist'] = 'pi_flexform';
-
     // Link the FlexForm configuration to the pi_flexform field
     ExtensionManagementUtility::addPiFlexFormValue(
         '*',
@@ -77,9 +73,16 @@ defined('TYPO3') or die;
         'academicprojects_projectlistsingle'
     );
 
-    // Exclude/add fields for the plugin
-    $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist']['academicprojects_projectlistsingle'] = 'layout,recursive';
-    $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist']['academicprojects_projectlistsingle'] = 'pi_flexform';
+    ExtensionManagementUtility::addToAllTCAtypes(
+        'tt_content',
+        implode(',', [
+            '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.tab.configuration',
+            'pi_flexform',
+            'pages',
+        ]),
+        'academicprojects_projectlistsingle',
+        'after:header'
+    );
 
     // Link the FlexForm configuration to the pi_flexform field
     // @todo Add FlexForm options to select a list of projects
