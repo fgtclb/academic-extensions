@@ -1,0 +1,30 @@
+<html
+    lang="en"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+    <div class="ace-item">
+        <f:if condition="{page.media.0}">
+            <div class="ace-item__image">
+                <f:image
+                    image="{page.media.0}"
+                    class="ace-item__image"
+                    alt="{page.media.0.alternative}"
+                    title="{page.media.0.title}"
+                />
+            </div>
+        </f:if>
+        <f:if condition="{page.title}">
+            <h3 class="ace-item__title">
+                {page.title}
+            </h3>
+        </f:if>
+        <f:link.page pageUid="{page.uid}" class="ace-item__button">
+            <button>
+                Details
+            </button>
+        </f:link.page>
+        <hr />
+    </div>
+</html>
