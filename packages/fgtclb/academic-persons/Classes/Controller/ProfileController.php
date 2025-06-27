@@ -17,6 +17,7 @@ use FGTCLB\AcademicPersons\Domain\Repository\ContractRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
 use FGTCLB\AcademicPersons\Event\ModifyDetailProfileEvent;
 use FGTCLB\AcademicPersons\Event\ModifyListProfilesEvent;
+use FGTCLB\AcademicPersons\PageTitle\ProfileTitleProvider;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheDataCollector;
@@ -33,18 +34,23 @@ use TYPO3\CMS\Frontend\Page\PageAccessFailureReasons;
 
 final class ProfileController extends ActionController
 {
+    private ContractRepository $contractRepository;
     private ProfileRepository $profileRepository;
+    private ProfileTitleProvider $profileTitleProvider;
+
+    public function injectContractRepository(ContractRepository $contractRepository): void
+    {
+        $this->contractRepository = $contractRepository;
+    }
 
     public function injectProfileRepository(ProfileRepository $profileRepository): void
     {
         $this->profileRepository = $profileRepository;
     }
 
-    private ContractRepository $contractRepository;
-
-    public function injectContractRepository(ContractRepository $contractRepository): void
+    public function injectProfileTitleProvider(ProfileTitleProvider $profileTitleProvider): void
     {
-        $this->contractRepository = $contractRepository;
+        $this->profileTitleProvider = $profileTitleProvider;
     }
 
     public function initializeListAction(): void
@@ -180,16 +186,22 @@ final class ProfileController extends ActionController
         $event = $this->eventDispatcher->dispatch(new ModifyDetailProfileEvent($profile, $this->view));
         $profile = $event->getProfile();
 
-        $this->view->assignMultiple([
-            'data' => $this->getCurrentContentObjectRenderer()?->data,
-            'profile' => $profile,
-        ]);
+        // Add page title based on profile name
+        // @todo Consider to make format somehow configurable, either within flexform, TypoScript,
+        //       ModifyDetailProfileEvent or new dedicated PSR-14 event along with current page
+        //       context (multi site installations).
+        $this->profileTitleProvider->setFromProfile($profile, ProfileTitleProvider::DETAIL_PAGE_TITLE_FORMAT);
 
+        // Set additional detail page cache tags
         $this->addCacheTags(
             'profile_detail_view',
             sprintf('profile_detail_view_%d', $profile->getUid()),
         );
 
+        $this->view->assignMultiple([
+            'data' => $this->getCurrentContentObjectRenderer()?->data,
+            'profile' => $profile,
+        ]);
         return $this->htmlResponse();
     }
 
