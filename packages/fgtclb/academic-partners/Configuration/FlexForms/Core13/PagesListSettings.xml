@@ -1,0 +1,30 @@
+<T3DataStructure>
+    <ROOT>
+        <sheetTitle>Filter</sheetTitle>
+        <type>array</type>
+        <el>
+            <settings.doktype>
+                <label>LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:flexform.doktype.label</label>
+                <description>LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:flexform.doktype.description</description>
+                <config>
+                    <type>select</type>
+                    <renderType>selectSingle</renderType>
+                    <items>
+                        <numIndex index="0" type="array">
+                            <label>LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:flexform.doktype.0</label>
+                            <value></value>
+                        </numIndex>
+                        <numIndex index="1" type="array">
+                            <label>LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:flexform.doktype.1</label>
+                            <value>30</value>
+                        </numIndex>
+                        <numIndex index="2" type="array">
+                            <label>LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:flexform.doktype.2</label>
+                            <value>20</value>
+                        </numIndex>
+                    </items>
+                </config>
+            </settings.doktype>
+        </el>
+    </ROOT>
+</T3DataStructure>

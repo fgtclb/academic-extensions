@@ -38,4 +38,29 @@ class PartnershipRepository extends Repository
 
         return $query->execute();
     }
+
+    /**
+     * @return QueryResult<Partnership>
+     */
+    public function findByPartner(int $pid): QueryResult
+    {
+        $query = $this->createQuery();
+
+        $currentLanguageAspect = $query->getQuerySettings()->getLanguageAspect();
+        $changedLanguageAspect = new LanguageAspect(
+            $currentLanguageAspect->getId(),
+            $currentLanguageAspect->getContentId(),
+            LanguageAspect::OVERLAYS_ON,
+            $currentLanguageAspect->getFallbackChain()
+        );
+        $query->getQuerySettings()->setLanguageAspect($changedLanguageAspect);
+        $query->getQuerySettings()->setRespectSysLanguage(false);
+        $query->getQuerySettings()->setRespectStoragePage(false);
+
+        $query->matching(
+            $query->equals('partner', $pid)
+        );
+
+        return $query->execute();
+    }
 }
