@@ -35,3 +35,31 @@ types:
 > TYPO3 Enumeration based classes has been removed from the extension codebase
 > and is considerable breaking, allowed to be done for a major version upgrade.
 > Please adopt accordingly to the new handling.
+
+## 2.1.0
+
+### BREAKING: Removed partials
+
+Some partials got removed as the templating structure has changed. Those partials include:
+
+`Resources/Private/Layouts/Default.html`
+`Resources/Private/Pages/AcademicPrograms.html`
+`Resources/Private/Partials/Categories.html`
+`Resources/Private/Partials/Program/FilterCategories.html`
+`Resources/Private/Partials/Program/FilterSorting.html`
+
+### BREAKING: Move translations to their belonging locallang files
+
+As some labels used for the backend were maintained in the locallang files for frontend usage,
+these labels were organized accordingly.
+
+> [!IMPORTANT]
+> Furthermore many label ids have changed to unify the naming in the academic extensions.
+
+### BREAKING: Changed identifier of backend layout
+
+The identifier of the backend layout was changed to unfiy the naming in the academic extensions
+
+> [!NOTE]
+> The default templating now supports basic bootstrap styling and is semantically optimized
+> to also not lack any major accessibility.

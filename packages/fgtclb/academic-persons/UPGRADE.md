@@ -28,3 +28,18 @@ Relates to following plugins:
 > [!NOTE]
 > An TYPO3 UpgradeWizard `academicPersons_pluginUpgradeWizard` is provided to migrate
 > plugins from `CType=list` to dedicated `CTypes` matching the new registration.
+
+## 2.1.0
+
+### BREAKING: Removed partials
+
+Some partials got removed as the templating structure has changed. Those partials include:
+
+`Resources/Private/Partials/List/AlphabetPagination.html`
+`Resources/Private/Partials/List/ListItem.html`
+`Resources/Private/Partials/List/Pagination.html`
+`Resources/Private/Partials/SelectedContracts/ListItem.html`
+
+> [!NOTE]
+> The default templating now supports basic bootstrap styling and is semantically optimized
+> to also not lack any major accessibility.

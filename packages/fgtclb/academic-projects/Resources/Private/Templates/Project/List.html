@@ -3,47 +3,17 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-    <f:layout name="Default" />
-    <f:section name="Header">
-        <header>
-            <h1>{data.title}</h1>
-        </header>
-    </f:section>
-    <f:section name="Main">
-        <f:if condition="{settings.hideSorting}==false || {settings.hideActiveState}==false || {settings.hideFilter}==false">
-            <div class="project-filter">
-                <f:form
-                    action="list"
-                    id="project-filter"
-                    name="demand"
-                    object="{demand}"
-                >
-                    <div class="row">
-                        <f:if condition="{settings.hideSorting}==false">
-                            <f:render
-                                partial="Project/DemandSorting"
-                                arguments="{_all}"
-                            />
-                        </f:if>
-                        <f:if condition="{settings.hideActiveState}==false">
-                            <f:render
-                                partial="Project/DemandActiveState"
-                                arguments="{_all}"
-                            />
-                        </f:if>
-                        <f:if condition="{settings.hideFilter}==false">
-                            <f:render
-                                partial="Project/DemandCategories"
-                                arguments="{_all}"
-                            />
-                        </f:if>
-                    </div>
-                </f:form>
-            </div>
-        </f:if>
-        <f:render
-            partial="Project/Items"
-            arguments="{_all}"
-        />
-    </f:section>
+
+<div class="academic-projects-list">
+    <f:render
+        partial="Project/SortingAndFilters"
+        arguments="{_all}"
+    />
+
+    <f:render
+        partial="Project/ItemList"
+        arguments="{_all}"
+    />
+</div>
+
 </html>

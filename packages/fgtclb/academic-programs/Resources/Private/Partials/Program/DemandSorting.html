@@ -1,0 +1,40 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:ace="http://typo3.org/ns/FGTCLB/AcademicPrograms/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<div class="col-12 col-md-6 col-lg-4 col-xl-3">
+    <label for="sortingField" class="form-label">
+        {f:translate(key: 'sorting.field.label', extensionName: 'academic_programs')}
+    </label>
+
+    <ace:form.sortingSelect
+        id="sortingField"
+        property="sortingField"
+        value="{demand.sortingField}"
+        type="fields"
+        additionalAttributes="{'onchange': 'this.form.submit()'}"
+        l10n="filter.sortingField"
+        class="form-select"
+    />
+</div>
+
+<div class="col-12 col-md-6 col-lg-4 col-xl-3">
+    <label for="sortingDirection" class="form-label">
+        {f:translate(key: 'sorting.direction.label', extensionName: 'academic_programs')}
+    </label>
+
+    <ace:form.sortingSelect
+        id="sortingDirection"
+        property="sortingDirection"
+        value="{demand.sortingDirection}"
+        type="directions"
+        additionalAttributes="{'onchange': 'this.form.submit()'}"
+        l10n="filter.sortingDirection"
+        class="form-select"
+    />
+</div>
+
+</html>
