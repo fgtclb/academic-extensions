@@ -10,6 +10,7 @@ declare(strict_types=1);
  */
 use FGTCLB\AcademicPersons\Controller\ProfileController;
 use FGTCLB\AcademicPersons\Hook\DataHandlerHooks;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 defined('TYPO3') or die;
@@ -81,6 +82,15 @@ defined('TYPO3') or die;
         [],
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
+
+    ExtensionManagementUtility::addTypoScriptSetup(trim('
+        config.pageTitleProviders {
+            profile  {
+                provider = FGTCLB\AcademicPersons\PageTitle\ProfileTitleProvider
+                before = calendarize,altPageTitle,record,seo
+            }
+        }
+    '));
 
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass']['academicPersons']
         = DataHandlerHooks::class;
