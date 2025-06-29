@@ -17,6 +17,7 @@ use FGTCLB\AcademicPersons\Domain\Repository\ContractRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
 use FGTCLB\AcademicPersons\Event\ModifyDetailProfileEvent;
 use FGTCLB\AcademicPersons\Event\ModifyListProfilesEvent;
+use FGTCLB\AcademicPersons\PageTitle\ProfileTitleProvider;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheDataCollector;
@@ -179,6 +180,18 @@ final class ProfileController extends ActionController
         /** @var ModifyDetailProfileEvent $event */
         $event = $this->eventDispatcher->dispatch(new ModifyDetailProfileEvent($profile, $this->view));
         $profile = $event->getProfile();
+
+        // Add page title based on profile name
+        $titleParts = array_filter([
+            $profile->getTitle(),
+            $profile->getFirstName(),
+            $profile->getMiddleName(),
+            $profile->getLastName(),
+        ]);
+        $pageTitle = implode(' ', $titleParts);
+
+        $titleProvider = GeneralUtility::makeInstance(ProfileTitleProvider::class);
+        $titleProvider->setTitle($pageTitle);
 
         $this->view->assign('profile', $profile);
         $this->addCacheTags(
