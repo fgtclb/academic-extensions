@@ -10,6 +10,14 @@ mod.wizards.newContentElement.wizardItems.academic {
                 CType = academicpersonsedit_profileediting
             }
         }
+        academicpersonsedit_profileswitcher {
+            iconIdentifier = persons_edit_icon
+            title = LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_be.xlf:newContentElement.wizardItems.academic.profileSwitcher.title
+            description = LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_be.xlf:newContentElement.wizardItems.academic.profileSwitcher.description
+            tt_content_defValues {
+                CType = academicpersonsedit_profileswitcher
+            }
+        }
     }
-    show := addToList(academicpersonsedit_profileediting)
+    show := addToList(academicpersonsedit_profileediting, academicpersonsedit_profileswitcher)
 }
