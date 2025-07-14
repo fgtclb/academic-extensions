@@ -86,22 +86,7 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:getView\\(\\) has invalid return type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
 			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:setProfiles\\(\\) has parameter \\$profiles with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface but does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
-			message: "#^Parameter \\$view of method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:__construct\\(\\) has invalid type TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
-			message: "#^Property FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:\\$view has unknown class TYPO3\\\\CMS\\\\Extbase\\\\Mvc\\\\View\\\\ViewInterface as its type\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
