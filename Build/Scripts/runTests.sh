@@ -160,15 +160,16 @@ Options:
     -t <11|12>
         Only with -s composerInstall|composerInstallMin|composerInstallMax
         Specifies the TYPO3 CORE Version to be used
-            - 11: (default) use TYPO3 v11
-            - 12: use TYPO3 v12
+            - 12: (default) use TYPO3 v12
+            - 13: use TYPO3 v13
 
-    -p <8.1|8.2|8.3|8.4>
+    -p <8.1|8.2|8.3|8.4|8.5>
         Specifies the PHP minor version to be used
             - 8.1: use PHP 8.1 (default)
             - 8.2: use PHP 8.2
             - 8.3: use PHP 8.3
             - 8.4: use PHP 8.4
+            - 8.5: use PHP 8.5
 
     -u
         Update existing typo3/core-testing-*:latest container images and remove dangling local volumes.
@@ -254,7 +255,7 @@ while getopts "a:b:s:d:i:p:t:xy:o:nhu" OPT; do
             ;;
         p)
             PHP_VERSION=${OPTARG}
-            if ! [[ ${PHP_VERSION} =~ ^(8.1|8.2|8.3|8.4)$ ]]; then
+            if ! [[ ${PHP_VERSION} =~ ^(8.1|8.2|8.3|8.4|8.5)$ ]]; then
                 INVALID_OPTIONS+=("p ${OPTARG}")
             fi
             ;;
