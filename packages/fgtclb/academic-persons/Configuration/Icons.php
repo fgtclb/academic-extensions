@@ -49,4 +49,8 @@ return [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:academic_persons/Resources/Public/Icons/persons_icon.svg',
     ],
+    'extension_icon' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons/Resources/Public/Icons/Extension.svg',
+    ],
 ];
