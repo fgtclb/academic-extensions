@@ -1,0 +1,82 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:layout name="ProfileEdit" />
+
+<f:section name="Main">
+    <div class="academic-persons-edit-form">
+        <f:render
+            partial="Profile/Header"
+            arguments="{
+                header: '{profile.title} {profile.firstName} {profile.middleName} {profile.lastName}',
+                layout: '{data.header_layout}',
+                subheader: '{data.subheader}',
+                detail: 'true'
+            }"
+        />
+
+        <f:if condition="{profile.languageUid}=={currentLanguageUid}">
+            <f:then>
+                <f:asset.script
+                    identifier="ckeditor"
+                    src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"
+                    async="1"
+                    defer="1"
+                />
+
+                <f:asset.script
+                    identifier="ckeditor-config"
+                    src="EXT:academic_persons_edit/Resources/Public/JavaScript/CKEditor.js"
+                    async="1"
+                    defer="1"
+                />
+
+                <f:render
+                    partial="Profile/Forms/Errors"
+                    arguments="{object:ProfileFormData}"
+                />
+
+                <f:form
+                    action="update"
+                    name="profileFormData"
+                    object="{profileFormData}"
+                    arguments="{profile: profile}"
+                >
+                    <f:render
+                        partial="Profile/Buttons/SaveExitCancel"
+                        arguments="{cancelUrl: cancelUrl}"
+                    />
+
+                    <f:render
+                        partial="Profile/Properties/Profile"
+                        arguments="{profile: profileFormData}"
+                    />
+
+                    <f:render
+                        partial="Profile/Buttons/SaveExitCancel"
+                        arguments="{cancelUrl: cancelUrl}"
+                    />
+                </f:form>
+            </f:then>
+            <f:else>
+                <p>
+                    No translation.
+                </p>
+                <f:if condition="{translationAllowed}">
+                    <f:link.action
+                        action="translate"
+                        arguments="{profileUid: profile.uid, languageUid: currentLanguageUid}"
+                        class="btn btn-primary"
+                    >
+                        Translate
+                    </f:link.action>
+                </f:if>
+            </f:else>
+        </f:if>
+    </div>
+</f:section>
+
+</html>

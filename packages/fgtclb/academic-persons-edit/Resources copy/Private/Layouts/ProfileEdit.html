@@ -1,0 +1,48 @@
+<html
+    lang="en"
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<div class="academic-persons-edit">
+
+    <f:render partial="Header/All" arguments="{_all}" />
+
+    <f:if condition="
+        {cancelUrl} && {cancelUrl} != {f:uri.page(absolute: true)}
+        || {profileInformation}
+        || !{physicalAddress} && {profile} && {contract}"
+    >
+        <f:then>
+            <f:link.action
+                controller="Profile"
+                action="show"
+                arguments="{profile: profile}"
+                class="back-link"
+            >
+                {f:translate(key: 'back', extensionName: 'academic_persons_edit')}
+            </f:link.action>
+        </f:then>
+        <f:else if="{contract}">
+            <f:link.action
+                controller="Contract"
+                action="show"
+                arguments="{contract: contract}"
+                class="back-link"
+            >
+                {f:translate(key: 'back', extensionName: 'academic_persons_edit')}
+            </f:link.action>
+        </f:else>
+        <f:else if="{profile}">
+            <f:link.page class="back-link">
+                {f:translate(key: 'back', extensionName: 'academic_persons_edit')}
+            </f:link.page>
+        </f:else>
+    </f:if>
+
+    <f:flashMessages />
+
+    <f:render section="Main" />
+</div>
+
+</html>
