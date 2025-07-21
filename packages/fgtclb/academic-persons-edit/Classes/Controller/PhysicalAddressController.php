@@ -144,9 +144,9 @@ final class PhysicalAddressController extends AbstractActionController
         return (new ForwardResponse('edit'))->withArguments(['physicalAddress' => $physicalAddress]);
     }
 
-    public function sortAction(Address $physicalAddressFromForm, string $sortDirection): ResponseInterface
+    public function sortAction(Address $physicalAddress, string $sortDirection): ResponseInterface
     {
-        $contract = $physicalAddressFromForm->getContract();
+        $contract = $physicalAddress->getContract();
         if ($contract === null) {
             // @todo Needs to be handled properly.
             throw new \RuntimeException(
@@ -176,7 +176,7 @@ final class PhysicalAddressController extends AbstractActionController
         // Switch sorting values
         $prevAddress = null;
         foreach ($addressArray as $currentAddress) {
-            if ($physicalAddressFromForm != $currentAddress) {
+            if ($physicalAddress != $currentAddress) {
                 $prevAddress = $currentAddress;
             } else {
                 // Only switch sorting if the selected contract is not the first one in the array

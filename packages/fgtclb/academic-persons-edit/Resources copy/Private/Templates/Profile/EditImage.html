@@ -1,0 +1,48 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<f:layout name="ProfileEdit" />
+
+<f:section name="Main">
+    <f:form action="addImage" name="profile" object="{profile}">
+        <f:form.validationResults for="profile.image">
+            <f:if condition="{validationResults.flattenedErrors}">
+                <ul class="errors">
+                    <f:for each="{validationResults.flattenedErrors}" as="errors" key="propertyPath">
+                        <f:for each="{errors}" as="error">
+                            <li>{error}</li>
+                        </f:for>
+                    </f:for>
+                </ul>
+            </f:if>
+        </f:form.validationResults>
+
+        <f:form.upload property="image" class="form-control" id="profile-image"/>
+
+        <f:if condition="{maxFileUploadsInBytes}">
+            <small>
+                {f:translate(key: 'maxFileUploadSize', extensionName: 'academic_persons_edit')}: <f:format.bytes value="{maxFileUploadsInBytes}" />
+            </small>
+        </f:if>
+
+        <a href="{cancelUrl}" class="btn btn-danger">
+            {f:translate(key: 'actions.cancel', extensionName: 'academic_persons_edit')}
+
+            <core:icon identifier="academic-persons-edit-cancel" alternativeMarkupIdentifier="inline"/>
+        </a>
+
+        <f:form.button
+            name="submit"
+            value="save-and-edit"
+            class="btn btn-outline-primary"
+        >
+            {f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}
+
+            <core:icon identifier="academic-persons-edit-save" alternativeMarkupIdentifier="inline"/>
+        </f:form.button>
+    </f:form>
+</f:section>
+
+</html>

@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file
+		source-language="en"
+		datatype="plaintext"
+		original="messages" date="2024-10-07T12:41:15Z"
+	>
+		<header>
+			<generator>OwnScript</generator>
+		</header>
+		<body>
+			<trans-unit id="list.profile.assigned">
+				<source>Assigned profiles</source>
+			</trans-unit>
+			<trans-unit id="list.profile">
+				<source>Profile</source>
+			</trans-unit>
+			<trans-unit id="list.profileInformations.year">
+				<source>Year</source>
+			</trans-unit>
+			<trans-unit id="list.profileInformations.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="list.contract.position">
+				<source>Position</source>
+			</trans-unit>
+			<trans-unit id="list.actions">
+				<source>Actions</source>
+			</trans-unit>
+			<trans-unit id="actions.view">
+				<source>View</source>
+			</trans-unit>
+			<trans-unit id="actions.edit">
+				<source>Edit</source>
+			</trans-unit>
+			<trans-unit id="actions.add">
+				<source>Add</source>
+			</trans-unit>
+			<trans-unit id="actions.sortUp">
+				<source>Sort up</source>
+			</trans-unit>
+			<trans-unit id="actions.sortDown">
+				<source>Sort down</source>
+			</trans-unit>
+			<trans-unit id="actions.delete">
+				<source>Delete</source>
+			</trans-unit>
+			<trans-unit id="actions.cancel">
+				<source>Cancel</source>
+			</trans-unit>
+			<trans-unit id="actions.save">
+				<source>Save</source>
+			</trans-unit>
+			<trans-unit id="actions.saveAndExit">
+				<source>Save and exit</source>
+			</trans-unit>
+			<trans-unit id="list.noProfilesFound">
+				<source>No profiles found.</source>
+			</trans-unit>
+			<trans-unit id="list.noContractsFound">
+				<source>No contracts found.</source>
+			</trans-unit>
+			<trans-unit id="list.nolecturesFound">
+				<source>No lectures found.</source>
+			</trans-unit>
+			<trans-unit id="list.nomembershipsFound">
+				<source>No memberships found.</source>
+			</trans-unit>
+			<trans-unit id="list.nopressMediaFound">
+				<source>No press media found.</source>
+			</trans-unit>
+			<trans-unit id="list.nopublicationsFound">
+				<source>No publications found.</source>
+			</trans-unit>
+			<trans-unit id="list.noscientificResearchFound">
+				<source>No scientific research found.</source>
+			</trans-unit>
+			<trans-unit id="list.novitaFound">
+				<source>No vita found.</source>
+			</trans-unit>
+			<trans-unit id="list.noPhysicalAddressesFound">
+				<source>No physical addresses found.</source>
+			</trans-unit>
+			<trans-unit id="list.noEmailAddressesFound">
+				<source>No email addresses found.</source>
+			</trans-unit>
+			<trans-unit id="list.noPhoneNumbersFound">
+				<source>No phone numbers found.</source>
+			</trans-unit>
+			<trans-unit id="back">
+				<source>back</source>
+			</trans-unit>
+			<trans-unit id="maxFileUploadSize">
+				<source>Max file upload size</source>
+			<trans-unit id="profile.image">
+				<source>Image</source>
+			</trans-unit>
+			<trans-unit id="profile.personal">
+				<source>Personal data</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.gender">
+				<source>Gender</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.name">
+				<source>Name</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.publicationsLink">
+				<source>Publications link</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.website">
+				<source>Website</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.coreCompetences">
+				<source>Core competences</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.miscellaneous">
+				<source>Miscellaneous</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.supervisedThesis">
+				<source>Supervises thesis</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.supervisedDoctoralThesis">
+				<source>Supervises doctoral thesis</source>
+			</trans-unit>
+			<trans-unit id="profile.personal.teachingArea">
+				<source>Teaching area</source>
+			</trans-unit>
+			<trans-unit id="profile.contracts">
+				<source>Contracts</source>
+			</trans-unit>
+			<trans-unit id="profile.cooperation">
+				<source>Cooperations</source>
+			</trans-unit>
+			<trans-unit id="profile.lectures">
+				<source>Lectures</source>
+			</trans-unit>
+			<trans-unit id="profile.memberships">
+				<source>Memberships</source>
+			</trans-unit>
+			<trans-unit id="profile.pressMedia">
+				<source>Press media</source>
+			</trans-unit>
+			<trans-unit id="profile.publications">
+				<source>Publications</source>
+			</trans-unit>
+			<trans-unit id="profile.scientificResearch">
+				<source>Scientific research</source>
+			</trans-unit>
+			<trans-unit id="profile.vita">
+				<source>Vita</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.cooperation">
+				<source>Cooperation</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.lectures">
+				<source>Lecture</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.memberships">
+				<source>Membership</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.pressMedia">
+				<source>Press media</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.publications">
+				<source>Publication</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.scientificResearch">
+				<source>Scientific research</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.vita">
+				<source>Vita</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.year">
+				<source>Year</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.yearStart">
+				<source>Start year</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.yearEnd">
+				<source>End year</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.link">
+				<source>Link</source>
+			</trans-unit>
+			<trans-unit id="profile.profileInformations.text">
+				<source>Text</source>
+			</trans-unit>
+			<trans-unit id="contract.data">
+				<source>Contract data</source>
+			</trans-unit>
+			<trans-unit id="contract.data.position">
+				<source>Position</source>
+			</trans-unit>
+			<trans-unit id="contract.data.organisationalUnit">
+				<source>Organisational unit</source>
+			</trans-unit>
+			<trans-unit id="contract.data.functionType">
+				<source>Function type</source>
+			</trans-unit>
+			<trans-unit id="contract.data.validFrom">
+				<source>Valid from</source>
+			</trans-unit>
+			<trans-unit id="contract.data.validTo">
+				<source>Valid to</source>
+			</trans-unit>
+			<trans-unit id="contract.data.location">
+				<source>Location</source>
+			</trans-unit>
+			<trans-unit id="contract.data.room">
+				<source>Room</source>
+			</trans-unit>
+			<trans-unit id="contract.data.officeHours">
+				<source>Office hours</source>
+			</trans-unit>
+			<trans-unit id="contract.data.published">
+				<source>Published</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddress">
+				<source>Physical address</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddresses">
+				<source>Physical addresses</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddresses.street">
+				<source>Street</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddresses.city">
+				<source>City</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddresses.country">
+				<source>Country</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddresses.streetNumber">
+				<source>Street number</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddresses.additional">
+				<source>Additional</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddresses.zip">
+				<source>Zip</source>
+			</trans-unit>
+			<trans-unit id="contract.physicalAddresses.state">
+				<source>State</source>
+			</trans-unit>
+			<trans-unit id="contract.emailAddresses.email">
+				<source>Email</source>
+			</trans-unit>
+			<trans-unit id="contract.emailAddresses.type">
+				<source>Type</source>
+			</trans-unit>
+			<trans-unit id="contract.phoneNumbers">
+				<source>Phone numbers</source>
+			</trans-unit>
+			<trans-unit id="contract.phoneNumbers.phoneNumber">
+				<source>Phone number</source>
+			</trans-unit>
+			<trans-unit id="contract.phoneNumbers.type">
+				<source>Type</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
