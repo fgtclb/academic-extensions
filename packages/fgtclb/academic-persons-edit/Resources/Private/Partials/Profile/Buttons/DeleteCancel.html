@@ -1,0 +1,20 @@
+<html
+    lang="en"
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+>
+<dialog class="modal-buttons">
+    <a href="{cancelUrl}" class="btn btn-outline-danger">
+        {f:translate(key: 'actions.cancel', extensionName: 'academic_persons_edit')}
+
+        <core:icon identifier="academic-persons-edit-cancel" alternativeMarkupIdentifier="inline"/>
+    </a>
+
+    <a href="{deleteUrl}" class="btn btn-danger">
+        {f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}
+
+        <core:icon identifier="academic-persons-edit-delete" alternativeMarkupIdentifier="inline"/>
+    </a>
+</dialog>
+</html>
