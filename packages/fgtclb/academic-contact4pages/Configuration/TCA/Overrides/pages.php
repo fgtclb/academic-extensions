@@ -1,6 +1,8 @@
 <?php
 
+use FGTCLB\AcademicBase\TcaManipulator;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 if (!defined('TYPO3')) {
     die('Not authorized');
@@ -50,13 +52,14 @@ if (!defined('TYPO3')) {
             ],
         ]
     );
-    ExtensionManagementUtility::addToAllTCAtypes(
-        'pages',
+
+    $GLOBALS['TCA'] = GeneralUtility::makeInstance(TcaManipulator::class)->addToPageTypesGeneralTab(
+        $GLOBALS['TCA'],
         implode(',', [
             '--div--;LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:pages.tx_academiccontacts4pages_contacts',
             'tx_academiccontacts4pages_contacts',
         ]),
-        '',
-        'after:title'
+        [],
+        [254, 255]
     );
 })();
