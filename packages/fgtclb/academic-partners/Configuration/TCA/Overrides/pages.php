@@ -7,6 +7,7 @@ use FGTCLB\AcademicPartners\Enumeration\PageTypes;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 defined('TYPO3') or die;
 
@@ -274,26 +275,44 @@ defined('TYPO3') or die;
         $additionalTCAcolumns
     );
 
-    // Add the partnerships tab and column to all page types
-    ExtensionManagementUtility::addToAllTCAtypes(
-        'pages',
-        implode(',', [
-            '--div--;LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:tx_academicpartners_domain_model_partnership',
-            'tx_academicpartners_partnerships',
-        ]),
-        '',
-        'after:title'
-    );
+    // @todo make configurable via extension configuration
+    $excludeTypes = [
+        254,
+        255,
+    ];
 
-    // Add all other columns only to academic partners page type
-    ExtensionManagementUtility::addToAllTCAtypes(
-        'pages',
-        implode(',', [
-            '--div--;LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:pages.div.partner_information',
-            '--palette--;;address',
-            '--palette--;;geocode',
-        ]),
-        (string)PageTypes::ACADEMIC_PARTNERS,
-        'after:title'
-    );
+    foreach ($GLOBALS['TCA']['pages']['types'] ?? [] as $type => $typeConfig) {
+        if (in_array($type, $excludeTypes, true)) {
+            continue;
+        }
+
+        $tabs = GeneralUtility::trimExplode(
+            '--div--',
+            $typeConfig['showitem'],
+            true
+        );
+
+        $generalTab = array_shift($tabs);
+
+        if ($type === PageTypes::ACADEMIC_PARTNERS) {
+            array_unshift(
+                $tabs,
+                ';LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:pages.div.partner_information, --palette--;;address, --palette--;;geocode,'
+            );
+        }
+
+        array_unshift(
+            $tabs,
+            ';LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:tx_academicpartners_domain_model_partnership, tx_academicpartners_partnerships,'
+        );
+
+        array_unshift(
+            $tabs,
+            $generalTab
+        );
+
+        $typeConfig['showitem'] = sprintf('--div--%s', implode('--div--', $tabs));
+
+        $GLOBALS['TCA']['pages']['types'][$type] = $typeConfig;
+    }
 })();

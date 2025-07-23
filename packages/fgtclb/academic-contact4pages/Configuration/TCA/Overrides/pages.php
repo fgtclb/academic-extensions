@@ -1,6 +1,7 @@
 <?php
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 if (!defined('TYPO3')) {
     die('Not authorized');
@@ -50,13 +51,38 @@ if (!defined('TYPO3')) {
             ],
         ]
     );
-    ExtensionManagementUtility::addToAllTCAtypes(
-        'pages',
-        implode(',', [
-            '--div--;LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:pages.tx_academiccontacts4pages_contacts',
-            'tx_academiccontacts4pages_contacts',
-        ]),
-        '',
-        'after:title'
-    );
+
+    // @todo make configurable via extension configuration
+    $excludeTypes = [
+        254,
+        255,
+    ];
+
+    foreach ($GLOBALS['TCA']['pages']['types'] ?? [] as $type => $typeConfig) {
+        if (in_array($type, $excludeTypes, true)) {
+            continue;
+        }
+
+        $tabs = GeneralUtility::trimExplode(
+            '--div--',
+            $typeConfig['showitem'],
+            true
+        );
+
+        $generalTab = array_shift($tabs);
+
+        array_unshift(
+            $tabs,
+            ';LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:pages.tx_academiccontacts4pages_contacts, tx_academiccontacts4pages_contacts,'
+        );
+
+        array_unshift(
+            $tabs,
+            $generalTab
+        );
+
+        $typeConfig['showitem'] = sprintf('--div--%s', implode('--div--', $tabs));
+
+        $GLOBALS['TCA']['pages']['types'][$type] = $typeConfig;
+    }
 })();

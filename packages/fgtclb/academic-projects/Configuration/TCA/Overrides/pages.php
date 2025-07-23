@@ -4,6 +4,7 @@ use FGTCLB\AcademicProjects\Enumeration\PageTypes;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 if (!defined('TYPO3')) {
     die('Not authorized');
@@ -161,21 +162,30 @@ if (!defined('TYPO3')) {
         ])
     );
 
-    ExtensionManagementUtility::addToAllTCAtypes(
-        'pages',
-        implode(',', [
-            '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.div.project',
-            '--palette--;;project_info',
-            '--palette--;;project_date',
-        ]),
-        (string)PageTypes::TYPE_ACEDEMIC_PROJECT,
-        'after:title'
-    );
-
     if (!isset($GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['columnsOverrides'])) {
         $GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['columnsOverrides'] = [];
     }
 
     $GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['columnsOverrides']['title']['config']['max'] = 60;
     //$GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['columnsOverrides']['categories']['l10n_mode'] = 'exclude';
+
+    $tabs = GeneralUtility::trimExplode(
+        '--div--',
+        $GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['showitem'],
+        true
+    );
+
+    $generalTab = array_shift($tabs);
+
+    array_unshift(
+        $tabs,
+        ';LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.div.project, project_info, project_date,'
+    );
+
+    array_unshift(
+        $tabs,
+        $generalTab
+    );
+
+    $GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['showitem'] = sprintf('--div--%s', implode('--div--', $tabs));
 })();
