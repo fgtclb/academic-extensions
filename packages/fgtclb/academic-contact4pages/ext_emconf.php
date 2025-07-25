@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Contacts for Pages',
     'description' => 'Role based relations between profiles and pages',
