@@ -5,3 +5,5 @@
 /composer.json.testing
 /composer.lock
 /.php-cs-fixer.cache
+/tailor-version-artefact/
+/tailor-version-upload/
