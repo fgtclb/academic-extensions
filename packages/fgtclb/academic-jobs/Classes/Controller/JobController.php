@@ -110,13 +110,13 @@ class JobController extends ActionController
         if ($this->request->hasArgument('job')) {
             $jobArgumentConfiguration = $this->arguments->getArgument('job')->getPropertyMappingConfiguration();
 
-            $propertiesToCpnvert = [
+            $propertiesToConvert = [
                 'employmentStartDate',
                 'starttime',
                 'endtime',
             ];
 
-            foreach ($propertiesToCpnvert as $propertyToConvert) {
+            foreach ($propertiesToConvert as $propertyToConvert) {
                 $jobArgumentConfiguration->forProperty($propertyToConvert)
                     ->setTypeConverterOptions(
                         DateTimeConverter::class,
@@ -180,7 +180,9 @@ class JobController extends ActionController
         $redirectPageId = $afterSaveJobEvent->getRedirectPageId();
         $flashMessageCreationMode = $afterSaveJobEvent->getFlashMessageCreationMode();
         $listPid = $this->settings['listPid'] ? (int)$this->settings['listPid'] : null;
-        $mailWasSent = $this->sendEmail($uid);
+        // @todo Reenable
+        // $mailWasSent = $this->sendEmail($uid);
+        $mailWasSent = true; // For now, assume email was sent successfully.
 
         $useRedirectPageId = $redirectPageId;
         if ($useRedirectPageId === null && $listPid !== null && $listPid > 0) {
