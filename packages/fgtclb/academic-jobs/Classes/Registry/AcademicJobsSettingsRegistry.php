@@ -7,6 +7,7 @@ namespace FGTCLB\AcademicJobs\Registry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\EmailAddressValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator;
+use TYPO3\CMS\Extbase\Validation\Validator\UrlValidator;
 
 class AcademicJobsSettingsRegistry
 {
@@ -63,6 +64,9 @@ class AcademicJobsSettingsRegistry
                             break;
                         case 'required':
                             $validatorClass = NotEmptyValidator::class;
+                            break;
+                        case 'url':
+                            $validatorClass = UrlValidator::class;
                             break;
                     }
                     if ($validatorClass !== null) {
