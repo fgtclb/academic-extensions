@@ -30,10 +30,18 @@ defined('TYPO3') or die;
         'academic_bite_jobs'
     );
     ExtensionManagementUtility::addPiFlexFormValue(
-        'academicbitejobs_list',
-        sprintf('FILE:EXT:academic_bite_jobs/Configuration/FlexForms/Core%s/AcademicBiteJobsList.xml', $typo3MajorVersion)
+        '*',
+        sprintf('FILE:EXT:academic_bite_jobs/Configuration/FlexForms/Core%s/AcademicBiteJobsList.xml', $typo3MajorVersion),
+        'academicbitejobs_list'
     );
-    $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist']['academicbitejobs_list'] = 'recursive,select_key';
-    $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist']['academicbitejobs_list'] = 'pi_flexform';
-
+    ExtensionManagementUtility::addToAllTCAtypes(
+        'tt_content',
+        implode(',', [
+            '--div--;LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.configuration',
+            'pi_flexform',
+            'pages',
+        ]),
+        'academicbitejobs_list',
+        'after:subheader',
+    );
 })();
