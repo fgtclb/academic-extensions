@@ -1,0 +1,53 @@
+<html
+    lang="en"
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+>
+
+<f:asset.script
+    identifier="ckeditor"
+    src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"
+    defer="1"
+/>
+<f:asset.script
+    identifier="frontend-editor"
+    src="EXT:academic_jobs/Resources/Public/JavaScript/CKEditor.js"
+    defer="1"
+/>
+
+<div class="academic-jobs-new">
+    <f:render
+        partial="Job/Header"
+        arguments="{
+            header: '{data.header}',
+            layout: '{data.header_layout}',
+            subheader: '{data.subheader}',
+        }"
+    />
+
+    <f:render
+        partial="Job/Forms/Errors"
+        arguments="{
+            object: job,
+            validationResults: validationResults
+        }"
+    />
+
+    <f:form
+        action="create"
+        name="job"
+        object="{job}"
+        enctype="multipart/form-data"
+    >
+        <f:render
+            partial="Job/Properties/Job"
+            arguments="{_all}"
+        />
+
+        <button class="btn btn-primary" type="submit">
+            {f:translate(key: 'jobs.submit', extensionName: 'academic_jobs')}
+        </button>
+    </f:form>
+</div>
+
+</html>
