@@ -17,6 +17,11 @@
                 <target>Bite: Jobliste</target>
             </trans-unit>
 
+			<trans-unit id="plugin.bite.list.configuration">
+				<source>Configuration</source>
+				<target>Konfiguration</target>
+			</trans-unit>
+
             <trans-unit id="flexform.tab.settings">
                 <source>Settings</source>
                 <target>Einstellungen</target>
