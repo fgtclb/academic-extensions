@@ -21,7 +21,7 @@ defined('TYPO3') or die;
 
     ExtensionManagementUtility::addPlugin(
         [
-            'label' => 'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.list.label',
+            'label' => 'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label',
             'value' => 'academicbitejobs_list',
             'icon' => 'bitejobs_list',
             'group' => 'academic',
