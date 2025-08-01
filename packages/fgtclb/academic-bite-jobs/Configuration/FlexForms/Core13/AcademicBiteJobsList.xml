@@ -18,7 +18,7 @@
                     <renderType>selectSingle</renderType>
                     <items>
                         <numIndex index="0" type="array">
-                            <label><numIndex index="0"></numIndex></label>
+                            <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.all</label>
                             <value>all</value>
                         </numIndex>
                         <numIndex index="1" type="array">
