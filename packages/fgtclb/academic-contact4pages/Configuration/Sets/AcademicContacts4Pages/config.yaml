@@ -1,2 +1,4 @@
 name: fgtclb/academic-contacts4pages
 label: Academic Contacts4Pages
+dependencies:
+  - fgtclb/academic-base-ctype-group

@@ -14,6 +14,7 @@ abstract class AbstractAcademicPersonsSyncTestCase extends FunctionalTestCase
     ];
 
     protected array $testExtensionsToLoad = [
+        'fgtclb/academic-base',
         'fgtclb/academic-persons',
         'fgtclb/academic-persons-edit',
         'fgtclb/academic-persons-sync',

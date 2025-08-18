@@ -11,10 +11,6 @@
 				<source>List the contacts assigned to this page</source>
 				<target>Liste der Kontakte, die dieser Seite zugeordnet sind</target>
 			</trans-unit>
-			<trans-unit id="content.ctype.group.label">
-				<source>Academic</source>
-				<target>Academic</target>
-			</trans-unit>
 		</body>
 	</file>
 </xliff>

@@ -11,13 +11,6 @@ if (!defined('TYPO3')) {
 
 (static function (): void {
 
-    ExtensionManagementUtility::addTcaSelectItemGroup(
-        'tt_content',
-        'CType',
-        'academic',
-        'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:content.ctype.group.label',
-    );
-
     ExtensionManagementUtility::addPlugin(
         [
             'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.title',

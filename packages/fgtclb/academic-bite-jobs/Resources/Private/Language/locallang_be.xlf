@@ -4,10 +4,6 @@
           original="messages" date="2023-09-15T08:53:00Z">
         <header />
         <body>
-            <trans-unit id="content.ctype.group.label">
-                <source>Academic</source>
-            </trans-unit>
-
             <!-- BITE Plugin -->
 
             <trans-unit id="plugin.bite.list.label">

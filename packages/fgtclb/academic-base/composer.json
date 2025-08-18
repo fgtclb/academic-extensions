@@ -1,0 +1,29 @@
+{
+    "name": "fgtclb/academic-base",
+    "description": "Base functionality accross academic extensions",
+    "type": "typo3-cms-extension",
+    "homepage": "https://www.fgtclb.com/",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+        "typo3/cms-core": "^12.4.22 || ^13.4"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "FGTCLB\\AcademicBase\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FGTCLB\\AcademicBase\\Tests\\": "Tests/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "academic_base"
+        }
+    }
+}
