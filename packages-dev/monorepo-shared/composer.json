@@ -10,6 +10,7 @@
         }
     ],
     "require": {
+        "fgtclb/academic-base": "2.0.*@dev",
         "fgtclb/academic-bite-jobs": "2.*.*@dev",
         "fgtclb/academic-contacts4pages": "2.*.*@dev",
         "fgtclb/academic-jobs": "2.*.*@dev",

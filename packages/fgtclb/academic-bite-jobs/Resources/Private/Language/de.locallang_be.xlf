@@ -5,11 +5,6 @@
         <header/>
         <body>
 
-            <trans-unit id="content.ctype.group.label">
-                <source>Academic</source>
-                <target>Academic</target>
-            </trans-unit>
-
             <!-- BITE Plugin -->
 
             <trans-unit id="plugin.bite.list.label">

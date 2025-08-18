@@ -13,6 +13,7 @@ abstract class AbstractAcademicBiteJobsTestCase extends FunctionalTestCase
     ];
 
     protected array $testExtensionsToLoad = [
+        'fgtclb/academic-base',
         'fgtclb/academic-bite-jobs',
     ];
 }

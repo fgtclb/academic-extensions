@@ -44,18 +44,19 @@ addressed manualy in case not automatic upgrade path is available. See the
 
 ### Extension Version Support Matrix
 
-| Extension               | v11  | v12     | v13     | Comment                                                                                         |
-|-------------------------|------|---------|---------|-------------------------------------------------------------------------------------------------|
-| academic_bite_jobs      | -1-  | -1- -2- | -1- -2- | Broken - API key required but not configurable, not checked/adopted for v12+                    |
-| academic_contacts4pages | <1>  | -1- -2- | -1- -2- | 1 in use for v11, may work for v12 but not tested. 2 for v12/v13 currently tested and evaluated |
-| academic_jobs           | <1>  | -1- -2- | -1- -2- | not tested/verified yet for 2 (v12/v13) and 1 (v12)                                             |
-| academic_partners       | -1-  | -1- {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
-| academic_persons        | <1>  | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
-| academic_persons_edit   | <1>  | {1} {2} | -1- {2} | Breaking for 2, not tested yet for 2 (v12/v13) and 1 (v12)                                      |
-| academic_persons_sync   | <1>  | {1} {2} | -1- {2} | Breaking for 2, not tested yet for 2 (v12/v13) and 1 (v12)                                      |
-| academic_programs       | <1>  | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
-| academic_projects       | <1>  | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
-| category_types          | <1>  | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| Extension               | v11 | v12     | v13     | Comment                                                                                         |
+|-------------------------|-----|---------|---------|-------------------------------------------------------------------------------------------------|
+| academic_base           | -   | -2-     | -2-     | Shared base functionalities, introduced in 2.x                                                  |
+| academic_bite_jobs      | -1- | -1- -2- | -1- -2- | Broken - API key required but not configurable, not checked/adopted for v12+                    |
+| academic_contacts4pages | <1> | -1- -2- | -1- -2- | 1 in use for v11, may work for v12 but not tested. 2 for v12/v13 currently tested and evaluated |
+| academic_jobs           | <1> | -1- -2- | -1- -2- | not tested/verified yet for 2 (v12/v13) and 1 (v12)                                             |
+| academic_partners       | -1- | -1- {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| academic_persons        | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| academic_persons_edit   | <1> | {1} {2} | -1- {2} | Breaking for 2, not tested yet for 2 (v12/v13) and 1 (v12)                                      |
+| academic_persons_sync   | <1> | {1} {2} | -1- {2} | Breaking for 2, not tested yet for 2 (v12/v13) and 1 (v12)                                      |
+| academic_programs       | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| academic_projects       | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| category_types          | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
 
 Legend:
 
@@ -67,15 +68,16 @@ Legend:
 
 ## List of TYPO3 extension and the split repositories (READ ONLY)
 
-| Composer                       | TYPO3                   | Path                                                                                       | Split Repository                                                                   |
-|--------------------------------|-------------------------|--------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
-| fgtclb/academic-bite-jobs      | academic_bite_jobs      | [packages/fgtclb/academic-bite-jobs](packages/fgtclb/academic-bite-jobs/README.md)         | [fgtclb/academic-bite-jobs](https://github.com/fgtclb/academic-bite-jobs)          |
-| fgtclb/academic-contacts4pages | academic_contacts4pages | [packages/fgtclb/academic-contact4pages](packages/fgtclb/academic-contact4pages/README.md) | [fgtclb/academic-contact4pages](https://github.com/fgtclb/academic-contact4pages) |
-| fgtclb/academic-jobs           | academic_jobs           | [packages/fgtclb/academic-jobs](packages/fgtclb/academic-jobs/README.md)                   | [fgtclb/academic-jobs](https://github.com/fgtclb/academic-jobs)                    |
-| fgtclb/academic-partners       | academic_partners       | [packages/fgtclb/academic-partners](packages/fgtclb/academic-partners/README.md)           | [fgtclb/academic-partners](https://github.com/fgtclb/academic-partners)            |
-| fgtclb/academic-persons        | academic_persons        | [packages/fgtclb/academic-persons](packages/fgtclb/academic-persons/README.md)             | [fgtclb/academic-persons](https://github.com/fgtclb/academic-persons)              |
-| fgtclb/academic-persons-edit   | academic_persons_edit   | [packages/fgtclb/academic-persons-edit](packages/fgtclb/academic-persons-edit/README.md)   | [fgtclb/academic-persons-edit](https://github.com/fgtclb/academic-persons-edit)    |
-| fgtclb/academic-persons-sync   | academic_persons_sync   | [packages/fgtclb/academic-persons-sync](packages/fgtclb/academic-persons-sync/README.md)   | [fgtclb/academic-persons-sync](https://github.com/fgtclb/academic-persons-sync)    |
-| fgtclb/academic-programs       | academic_programs       | [packages/fgtclb/academic-programs](packages/fgtclb/academic-programs/README.md)           | [fgtclb/academic-programs](https://github.com/fgtclb/academic-programs)            |
-| fgtclb/academic-projects       | academic_projects       | [packages/fgtclb/academic-projects](packages/fgtclb/academic-projects/README.md)           | [fgtclb/academic-projects](https://github.com/fgtclb/academic-projects)            |
-| fgtclb/category-types          | category_types          | [packages/fgtclb/typo3-category-types](packages/fgtclb/typo3-category-types/README.md)     | [fgtclb/fgtclb/typo3-category-types](https://github.com/fgtclb/typo3-category-types)        |
+| Composer                       | TYPO3                   | Path                                                                                       | Split Repository                                                                     |
+|--------------------------------|-------------------------|--------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| fgtclb/academic-base           | academic_base           | [packages/fgtclb/academic-base](packages/fgtclb/academic-base/README.md)                   | [fgtclb/academic-base](https://github.com/fgtclb/academic-base)                      |
+| fgtclb/academic-bite-jobs      | academic_bite_jobs      | [packages/fgtclb/academic-bite-jobs](packages/fgtclb/academic-bite-jobs/README.md)         | [fgtclb/academic-bite-jobs](https://github.com/fgtclb/academic-bite-jobs)            |
+| fgtclb/academic-contacts4pages | academic_contacts4pages | [packages/fgtclb/academic-contact4pages](packages/fgtclb/academic-contact4pages/README.md) | [fgtclb/academic-contact4pages](https://github.com/fgtclb/academic-contact4pages)    |
+| fgtclb/academic-jobs           | academic_jobs           | [packages/fgtclb/academic-jobs](packages/fgtclb/academic-jobs/README.md)                   | [fgtclb/academic-jobs](https://github.com/fgtclb/academic-jobs)                      |
+| fgtclb/academic-partners       | academic_partners       | [packages/fgtclb/academic-partners](packages/fgtclb/academic-partners/README.md)           | [fgtclb/academic-partners](https://github.com/fgtclb/academic-partners)              |
+| fgtclb/academic-persons        | academic_persons        | [packages/fgtclb/academic-persons](packages/fgtclb/academic-persons/README.md)             | [fgtclb/academic-persons](https://github.com/fgtclb/academic-persons)                |
+| fgtclb/academic-persons-edit   | academic_persons_edit   | [packages/fgtclb/academic-persons-edit](packages/fgtclb/academic-persons-edit/README.md)   | [fgtclb/academic-persons-edit](https://github.com/fgtclb/academic-persons-edit)      |
+| fgtclb/academic-persons-sync   | academic_persons_sync   | [packages/fgtclb/academic-persons-sync](packages/fgtclb/academic-persons-sync/README.md)   | [fgtclb/academic-persons-sync](https://github.com/fgtclb/academic-persons-sync)      |
+| fgtclb/academic-programs       | academic_programs       | [packages/fgtclb/academic-programs](packages/fgtclb/academic-programs/README.md)           | [fgtclb/academic-programs](https://github.com/fgtclb/academic-programs)              |
+| fgtclb/academic-projects       | academic_projects       | [packages/fgtclb/academic-projects](packages/fgtclb/academic-projects/README.md)           | [fgtclb/academic-projects](https://github.com/fgtclb/academic-projects)              |
+| fgtclb/category-types          | category_types          | [packages/fgtclb/typo3-category-types](packages/fgtclb/typo3-category-types/README.md)     | [fgtclb/fgtclb/typo3-category-types](https://github.com/fgtclb/typo3-category-types) |

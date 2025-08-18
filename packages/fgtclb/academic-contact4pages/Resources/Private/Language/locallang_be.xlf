@@ -9,9 +9,6 @@
 			<trans-unit id="plugin.contacts_list.description">
 				<source>List the contacts assigned to the page</source>
 			</trans-unit>
-			<trans-unit id="content.ctype.group.label">
-				<source>Academic</source>
-			</trans-unit>
 		</body>
 	</file>
 </xliff>

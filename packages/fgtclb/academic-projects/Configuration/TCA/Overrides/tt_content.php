@@ -15,13 +15,6 @@ defined('TYPO3') or die;
     // Add custom content element group for acadmic plugins
     // ------------------------------------------------------------------------
 
-    ExtensionManagementUtility::addTcaSelectItemGroup(
-        'tt_content',
-        'CType',
-        'academic',
-        'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:content.ctype.group.label',
-    );
-
     // ------------------------------------------------------------------------
     // Add the academicprojects_projectlist plugin
     // ------------------------------------------------------------------------

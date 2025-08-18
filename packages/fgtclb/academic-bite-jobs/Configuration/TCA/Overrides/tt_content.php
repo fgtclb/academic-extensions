@@ -12,13 +12,6 @@ defined('TYPO3') or die;
 
     $typo3MajorVersion = (new Typo3Version())->getMajorVersion();
 
-    ExtensionManagementUtility::addTcaSelectItemGroup(
-        'tt_content',
-        'CType',
-        'academic',
-        'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:content.ctype.group.label',
-    );
-
     ExtensionManagementUtility::addPlugin(
         [
             'label' => 'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label',
