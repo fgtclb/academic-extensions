@@ -2,6 +2,7 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
 	<file
 		source-language="en"
+		target-language="de"
 		datatype="plaintext"
 		original="EXT:academic_persons_sync/Resources/Private/Language/locallang.xlf"
 		date="2015-11-10T06:53:10Z"
@@ -11,6 +12,7 @@
 		<body>
 			<trans-unit id="fe_users.columns.tx_extbase_type.items.Tx_Academicpersonssync_Domain_Model_FrontendUser">
 				<source>Academic Persons: External User</source>
+				<target>Academic Persons: Externer Benutzer</target>
 			</trans-unit>
 		</body>
 	</file>

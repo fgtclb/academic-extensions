@@ -1,101 +1,106 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<xliff version="1.0">
-    <file source-language="en" target-language="" datatype="plaintext"
-          original="messages" date="2023-09-15T08:53:00Z">
-        <header />
-        <body>
-            <!-- BITE Plugin -->
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file
+		source-language="en"
+		datatype="plaintext"
+		original="EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf"
+		date="2023-09-15T08:53:00Z"
+		product-name="academic_bite_jobs"
+	>
+		<header/>
+		<body>
+			<!-- BITE Plugin -->
 
-            <trans-unit id="plugin.bite.list.label">
-                <source>Bite: List of Jobs</source>
-            </trans-unit>
+			<trans-unit id="plugin.bite.list.label">
+				<source>Bite: List of Jobs</source>
+			</trans-unit>
 
 			<trans-unit id="plugin.bite.list.configuration">
 				<source>Configuration</source>
 			</trans-unit>
 
-            <trans-unit id="flexform.tab.settings">
-                <source>Settings</source>
-            </trans-unit>
+			<trans-unit id="flexform.tab.settings">
+				<source>Settings</source>
+			</trans-unit>
 
-            <trans-unit id="flexform.el.jobs.key.label">
-                <source>Job Listing Key</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.jobs.key.description">
-                <source>Unique key from B-Ite Application</source>
-            </trans-unit>
+			<trans-unit id="flexform.el.jobs.key.label">
+				<source>Job Listing Key</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.jobs.key.description">
+				<source>Unique key from B-Ite Application</source>
+			</trans-unit>
 
-            <trans-unit id="flexform.el.view.label">
-                <source>Select view</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.view.items.list">
-                <source>List view</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.view.items.card">
-                <source>Card view</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.view.items.table">
-                <source>Table view</source>
-            </trans-unit>
+			<trans-unit id="flexform.el.view.label">
+				<source>Select view</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.view.items.list">
+				<source>List view</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.view.items.card">
+				<source>Card view</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.view.items.table">
+				<source>Table view</source>
+			</trans-unit>
 
-            <trans-unit id="flexform.el.groupBy.label">
-                <source>Group By</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.groupBy.items.none">
-                <source>No grouping</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.groupBy.items.thema">
-                <source>Thema</source>
-            </trans-unit>
+			<trans-unit id="flexform.el.groupBy.label">
+				<source>Group By</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.groupBy.items.none">
+				<source>No grouping</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.groupBy.items.thema">
+				<source>Thema</source>
+			</trans-unit>
 
-            <trans-unit id="flexform.el.sortBy.label">
-                <source>Sort By</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.sortBy.items.none">
-                <source>No sorting</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.sortBy.items.ends_on">
-                <source>Ends On</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.sortBy.items.title">
-                <source>Title</source>
-            </trans-unit>
+			<trans-unit id="flexform.el.sortBy.label">
+				<source>Sort By</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortBy.items.none">
+				<source>No sorting</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortBy.items.ends_on">
+				<source>Ends On</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortBy.items.title">
+				<source>Title</source>
+			</trans-unit>
 
-            <trans-unit id="flexform.el.sortByDirection.label">
-                <source>Sort By Direction</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.sortByDirection.items.asc">
-                <source>Ascending</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.sortByDirection.items.desc">
-                <source>Descending</source>
-            </trans-unit>
+			<trans-unit id="flexform.el.sortByDirection.label">
+				<source>Sort By Direction</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortByDirection.items.asc">
+				<source>Ascending</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.sortByDirection.items.desc">
+				<source>Descending</source>
+			</trans-unit>
 
-            <trans-unit id="flexform.el.custom.zuordnung.label">
-                <source>Custom Zuordnung</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.all">
-                <source>All</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.custom.zurodnung.items.01">
-                <source>Berufungsverfahren</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.custom.zurodnung.items.02">
-                <source>Wissenschaftliches Personal</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.custom.zurodnung.items.03">
-                <source>Nicht-wissenschaftliches Personal</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.custom.zurodnung.items.04">
-                <source>Ausbildungsstellen</source>
-            </trans-unit>
+			<trans-unit id="flexform.el.custom.zuordnung.label">
+				<source>Custom Zuordnung</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.all">
+				<source>All</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.custom.zurodnung.items.01">
+				<source>Berufungsverfahren</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.custom.zurodnung.items.02">
+				<source>Wissenschaftliches Personal</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.custom.zurodnung.items.03">
+				<source>Nicht-wissenschaftliches Personal</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.custom.zurodnung.items.04">
+				<source>Ausbildungsstellen</source>
+			</trans-unit>
 
-            <trans-unit id="flexform.el.jobs.limit.label">
-                <source>Job Listing Limit</source>
-            </trans-unit>
-            <trans-unit id="flexform.el.jobs.limit.description">
-                <source>Maximum number of job offers (0 = no limit)</source>
-            </trans-unit>
-        </body>
-    </file>
+			<trans-unit id="flexform.el.jobs.limit.label">
+				<source>Job Listing Limit</source>
+			</trans-unit>
+			<trans-unit id="flexform.el.jobs.limit.description">
+				<source>Maximum number of job offers (0 = no limit)</source>
+			</trans-unit>
+		</body>
+	</file>
 </xliff>
