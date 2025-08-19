@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff version="1.2"
-	   xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file source-language="en" datatype="plaintext" product-name="academic_base">
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file
+		source-language="en"
+		datatype="plaintext"
+		original="EXT:academic_base/Resources/Private/Language/locallang_be.xlf"
+		product-name="academic_base"
+	>
 		<header/>
 		<body>
 			<trans-unit id="content.ctype.group.label">
