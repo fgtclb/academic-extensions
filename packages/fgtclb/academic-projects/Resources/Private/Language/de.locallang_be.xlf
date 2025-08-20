@@ -118,10 +118,6 @@
 
 			<!-- Wizard -->
 
-			<trans-unit id="wizard_items.academic">
-				<source>Academic</source>
-				<target>Akademisch</target>
-			</trans-unit>
 			<trans-unit id="plugin.project_list.name">
 				<source>Projects</source>
 				<target>Projekte</target>
