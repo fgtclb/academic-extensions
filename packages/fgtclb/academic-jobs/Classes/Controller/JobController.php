@@ -10,7 +10,6 @@ use FGTCLB\AcademicJobs\Domain\Model\Job;
 use FGTCLB\AcademicJobs\Domain\Repository\JobRepository;
 use FGTCLB\AcademicJobs\Domain\Validator\JobValidator;
 use FGTCLB\AcademicJobs\Event\AfterSaveJobEvent;
-use FGTCLB\AcademicJobs\Property\TypeConverter\ImageUploadConverter;
 use FGTCLB\AcademicJobs\Registry\AcademicJobsSettingsRegistry;
 use FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode;
 use Psr\Http\Message\ResponseInterface;
@@ -24,10 +23,14 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Extbase\Annotation\Validate;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\Controller\FileUploadConfiguration;
 use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Service\ImageService;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
+use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
+
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -137,26 +140,33 @@ final class JobController extends ActionController
                         $format
                     );
             }
+
+            $fileUploadConfiguration = new FileUploadConfiguration('image');
+            $fileUploadConfiguration
+                ->resetValidators()
+                ->setMaxFiles(1)
+                ->setUploadFolder($this->settings['saveForm']['jobLogo']['uploadFolder'] ?? '');
+
+            if ($this->settings['saveForm']['jobLogo']['validation']['mimeType']) {
+                $mimeTypeValidator = GeneralUtility::makeInstance(MimeTypeValidator::class);
+                if ($this->settings['saveForm']['jobLogo']['validation']['mimeType']['allowedMimeTypes']) {
+                    $mimeTypeValidator->setOptions(['allowedMimeTypes' => GeneralUtility::trimExplode(',', $this->settings['saveForm']['jobLogo']['validation']['mimeType']['allowedMimeTypes'], true)]);
+                    $fileUploadConfiguration->addValidator($mimeTypeValidator);
+                }
+            }
+            if ($this->settings['saveForm']['jobLogo']['validation']['fileSize']) {
+                $fileSizeValidator = GeneralUtility::makeInstance(FileSizeValidator::class);
+                if ($this->settings['saveForm']['jobLogo']['validation']['fileSize']['maximum']) {
+                    $fileSizeValidator->setOptions(['maximum' => $this->settings['saveForm']['jobLogo']['validation']['fileSize']['maximum']]);
+                    $fileUploadConfiguration->addValidator($fileSizeValidator);
+                }
+            }
+
+            $fileHandlingServiceConfiguration = $this->arguments->getArgument('job')->getFileHandlingServiceConfiguration();
+            $fileHandlingServiceConfiguration->addFileUploadConfiguration($fileUploadConfiguration);
+
+            $this->arguments->getArgument('job')->getPropertyMappingConfiguration()->skipProperties('image');
         }
-
-        $targetFolderIdentifier = $this->settings['saveForm']['jobLogo']['targetFolder'] ?? null;
-        $maxFilesize = $this->settings['saveForm']['jobLogo']['validation']['maxFileSize'] ?? '0kb';
-        $allowedImeTypes = $this->settings['saveForm']['jobLogo']['validation']['allowedMimeTypes'] ?? '';
-        $jobAvatarImageUploadConverter = GeneralUtility::makeInstance(ImageUploadConverter::class);
-
-        $this->arguments
-            ->getArgument('job')
-            ->getPropertyMappingConfiguration()
-            ->forProperty('image')
-            ->setTypeConverter($jobAvatarImageUploadConverter)
-            ->setTypeConverterOptions(
-                ImageUploadConverter::class,
-                [
-                    ImageUploadConverter::CONFIGURATION_TARGET_DIRECTORY_COMBINED_IDENTIFIER => $targetFolderIdentifier,
-                    ImageUploadConverter::CONFIGURATION_MAX_UPLOAD_SIZE => $maxFilesize,
-                    ImageUploadConverter::CONFIGURATION_ALLOWED_MIME_TYPES => $allowedImeTypes,
-                ]
-            );
     }
 
     #[Validate([
