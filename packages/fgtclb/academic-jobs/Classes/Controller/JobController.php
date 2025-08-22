@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicJobs\Controller;
 
-use FGTCLB\AcademicJobs\DateTime\IsoDateTime;
+use FGTCLB\AcademicJobs\Backend\FormEngine\EmploymentTypeItems;
+use FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems;
 use FGTCLB\AcademicJobs\Domain\Model\Job;
 use FGTCLB\AcademicJobs\Domain\Repository\JobRepository;
+use FGTCLB\AcademicJobs\Domain\Validator\JobValidator;
 use FGTCLB\AcademicJobs\Event\AfterSaveJobEvent;
-use FGTCLB\AcademicJobs\Property\TypeConverter\JobAvatarImageUploadConverter;
+use FGTCLB\AcademicJobs\Property\TypeConverter\ImageUploadConverter;
+use FGTCLB\AcademicJobs\Registry\AcademicJobsSettingsRegistry;
 use FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder as BackendUriBuilder;
@@ -18,15 +21,17 @@ use TYPO3\CMS\Core\MetaTag\MetaTagManagerRegistry;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
+use TYPO3\CMS\Extbase\Annotation\Validate;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Service\ImageService;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-class JobController extends ActionController
+final class JobController extends ActionController
 {
     private const JOB_HIDDEN = true;
 
@@ -34,11 +39,27 @@ class JobController extends ActionController
         private readonly JobRepository $jobRepository,
         private readonly PersistenceManagerInterface $persistenceManager,
         private readonly ImageService $imageService,
+        private readonly EmploymentTypeItems $employmentTypeItems,
+        private readonly TypeItems $typeItems,
         protected readonly BackendUriBuilder $backendUriBuilder,
+        protected AcademicJobsSettingsRegistry $settingsRegistry,
     ) {}
 
-    public function indexAction(): ResponseInterface
+    public function listAction(): ResponseInterface
     {
+        $jobType = $this->settings['job']['type'] ?? 0;
+
+        if ($jobType > 0) {
+            $jobs = $this->jobRepository->findByJobType((int)$jobType);
+        } else {
+            $jobs = $this->jobRepository->findAll();
+        }
+
+        $this->view->assignMultiple([
+            'jobs' => $jobs,
+            'data' => $this->getCurrentContentObjectRenderer()?->data,
+        ]);
+
         return $this->htmlResponse();
     }
 
@@ -70,82 +91,50 @@ class JobController extends ActionController
         ];
 
         if ($image !== null) {
-            $metaTags['og:image'] = $title;
-            $metaTags['og:image:alt'] = $image;
+            $metaTags['og:image'] = $image;
+            $metaTags['og:image:alt'] = $title;
             $metaTags['twitter:image'] = $image;
             $metaTags['twitter:image:alt'] = $title;
         }
 
         $this->setMetaTags($metaTags);
 
-        $this->view->assign('job', $job);
+        $this->view->assignMultiple([
+            'job' => $job,
+            'data' => $this->getCurrentContentObjectRenderer()?->data,
+        ]);
+
         return $this->htmlResponse();
     }
 
-    /**
-     * @param FileReference|null $imageObject
-     */
-    public function getImageUri($imageObject): ?string
+    public function newAction(?Job $job = null): ResponseInterface
     {
-        if ($imageObject === null) {
-            return null;
-        }
-        $originalResource = $imageObject->getOriginalResource();
-
-        return $this->imageService->getImageUri($originalResource, true);
-    }
-
-    /**
-     * @param array<string, string> $metaTags
-     */
-    private function setMetaTags(array $metaTags): void
-    {
-        $metaTagManager = GeneralUtility::makeInstance(MetaTagManagerRegistry::class);
-
-        foreach ($metaTags as $property => $content) {
-            $metaTagManagerForProperty = $metaTagManager->getManagerForProperty($property);
-            $metaTagManagerForProperty->addProperty($property, $content);
-        }
-    }
-
-    public function newJobFormAction(?Job $job = null): ResponseInterface
-    {
+        $this->view->assignMultiple([
+            'validations' => $this->settingsRegistry->getValidationsForFrontend('job'),
+            'employmentTypeOptions' => $this->employmentTypeItems->getEmploymentTypes(),
+            'typeOptions' => $this->typeItems->getTypes(),
+            'data' => $this->getCurrentContentObjectRenderer()?->data,
+        ]);
         return $this->htmlResponse();
     }
 
-    public function listAction(): ResponseInterface
-    {
-        $jobs = [];
-        $jobType = $this->settings['job']['type'] ?? 0;
-
-        if ($jobType > 0) {
-            $jobs = $this->jobRepository->findByJobType((int)$jobType);
-        } else {
-            $jobs = $this->jobRepository->findAll();
-        }
-
-        $this->view->assign('jobs', $jobs);
-        return $this->htmlResponse();
-    }
-
-    public function initializeSaveJobAction(): void
+    public function initializeCreateAction(): void
     {
         if ($this->request->hasArgument('job')) {
             $jobArgumentConfiguration = $this->arguments->getArgument('job')->getPropertyMappingConfiguration();
 
-            $propertiesToCpnvert = [
-                'employmentStartDate',
-                'starttime',
-                'endtime',
+            $propertiesToConvert = [
+                'employmentStartDate' => 'Y-m-d',
+                'starttime' => 'Y-m-d',
+                'endtime' => 'Y-m-d',
             ];
 
-            foreach ($propertiesToCpnvert as $propertyToConvert) {
+            foreach ($propertiesToConvert as $propertyToConvert => $format) {
                 $jobArgumentConfiguration->forProperty($propertyToConvert)
-                    ->setTypeConverterOptions(
+                    ->setTypeConverterOption(
                         DateTimeConverter::class,
-                        [
-                            DateTimeConverter::CONFIGURATION_DATE_FORMAT => IsoDateTime::FORMAT,
-                        ]
+                        DateTimeConverter::CONFIGURATION_DATE_FORMAT,
+                        $format
                     );
             }
         }
@@ -153,7 +142,7 @@ class JobController extends ActionController
         $targetFolderIdentifier = $this->settings['saveForm']['jobLogo']['targetFolder'] ?? null;
         $maxFilesize = $this->settings['saveForm']['jobLogo']['validation']['maxFileSize'] ?? '0kb';
         $allowedImeTypes = $this->settings['saveForm']['jobLogo']['validation']['allowedMimeTypes'] ?? '';
-        $jobAvatarImageUploadConverter = GeneralUtility::makeInstance(JobAvatarImageUploadConverter::class);
+        $jobAvatarImageUploadConverter = GeneralUtility::makeInstance(ImageUploadConverter::class);
 
         $this->arguments
             ->getArgument('job')
@@ -161,17 +150,25 @@ class JobController extends ActionController
             ->forProperty('image')
             ->setTypeConverter($jobAvatarImageUploadConverter)
             ->setTypeConverterOptions(
-                JobAvatarImageUploadConverter::class,
+                ImageUploadConverter::class,
                 [
-                    JobAvatarImageUploadConverter::CONFIGURATION_TARGET_DIRECTORY_COMBINED_IDENTIFIER => $targetFolderIdentifier,
-                    JobAvatarImageUploadConverter::CONFIGURATION_MAX_UPLOAD_SIZE => $maxFilesize,
-                    JobAvatarImageUploadConverter::CONFIGURATION_ALLOWED_MIME_TYPES => $allowedImeTypes,
+                    ImageUploadConverter::CONFIGURATION_TARGET_DIRECTORY_COMBINED_IDENTIFIER => $targetFolderIdentifier,
+                    ImageUploadConverter::CONFIGURATION_MAX_UPLOAD_SIZE => $maxFilesize,
+                    ImageUploadConverter::CONFIGURATION_ALLOWED_MIME_TYPES => $allowedImeTypes,
                 ]
             );
     }
 
-    public function saveJobAction(Job $job): ResponseInterface
+    #[Validate([
+        'param' => 'job',
+        'validator' => JobValidator::class,
+    ])]
+    public function createAction(?Job $job = null): ResponseInterface
     {
+        if ($job === null) {
+            return $this->redirect('new');
+        }
+
         $job->setHidden((int)self::JOB_HIDDEN);
         $this->jobRepository->add($job);
         $this->persistenceManager->persistAll();
@@ -184,12 +181,13 @@ class JobController extends ActionController
                 ContextualFeedbackSeverity::ERROR,
                 true
             );
-            $this->redirect('newJobForm');
+            $this->redirect('new');
         }
 
         $currentPageId = $this->determineCurrentPageId();
         $redirectPageId = $this->resolveRedirectPageId();
         $flashMessageCreationMode = $this->resolveFlashMessageCreationMode();
+
         $afterSaveJobEvent = new AfterSaveJobEvent(
             request: $this->request,
             job: $job,
@@ -200,6 +198,7 @@ class JobController extends ActionController
         );
         /** @var AfterSaveJobEvent $afterSaveJobEvent */
         $afterSaveJobEvent = $this->eventDispatcher->dispatch($afterSaveJobEvent);
+
         $redirectPageId = $afterSaveJobEvent->getRedirectPageId();
         $flashMessageCreationMode = $afterSaveJobEvent->getFlashMessageCreationMode();
         $listPid = $this->settings['listPid'] ? (int)$this->settings['listPid'] : null;
@@ -263,7 +262,38 @@ class JobController extends ActionController
         }
         // Since TYPO3v12 redirect method returns a response object. Return it directly.
         return $this->redirect('list');
+    }
 
+    /**
+     * ------------------------------------------------------------------------
+     * Helper functions
+     * ------------------------------------------------------------------------
+     */
+
+    /**
+     * @param FileReference|null $imageObject
+     */
+    public function getImageUri($imageObject): ?string
+    {
+        if ($imageObject === null) {
+            return null;
+        }
+        $originalResource = $imageObject->getOriginalResource();
+
+        return $this->imageService->getImageUri($originalResource, true);
+    }
+
+    /**
+     * @param array<string, string> $metaTags
+     */
+    private function setMetaTags(array $metaTags): void
+    {
+        $metaTagManager = GeneralUtility::makeInstance(MetaTagManagerRegistry::class);
+
+        foreach ($metaTags as $property => $content) {
+            $metaTagManagerForProperty = $metaTagManager->getManagerForProperty($property);
+            $metaTagManagerForProperty->addProperty($property, $content);
+        }
     }
 
     public function sendEmail(int $recordId): bool
@@ -422,5 +452,10 @@ class JobController extends ActionController
         );
 
         $this->getFlashMessageQueue($queueIdentifier)->enqueue($flashMessage);
+    }
+
+    private function getCurrentContentObjectRenderer(): ?ContentObjectRenderer
+    {
+        return $this->request->getAttribute('currentContentObject');
     }
 }
