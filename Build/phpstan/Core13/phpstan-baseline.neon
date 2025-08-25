@@ -1,6 +1,21 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Property FGTCLB\\\\AcademicBase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$priority has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-base/Classes/Property/TypeConverter/FileUploadConverter.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicBase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$sourceTypes has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-base/Classes/Property/TypeConverter/FileUploadConverter.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicBase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$targetType has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-base/Classes/Property/TypeConverter/FileUploadConverter.php
+
+		-
 			message: "#^Method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
@@ -19,21 +34,6 @@ parameters:
 			message: "#^Method FGTCLB\\\\AcademicJobs\\\\Domain\\\\Repository\\\\JobRepository\\:\\:findByJobType\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Domain/Repository/JobRepository.php
-
-		-
-			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\ImageUploadConverter\\:\\:\\$priority has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/ImageUploadConverter.php
-
-		-
-			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\ImageUploadConverter\\:\\:\\$sourceTypes has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/ImageUploadConverter.php
-
-		-
-			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\ImageUploadConverter\\:\\:\\$targetType has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/ImageUploadConverter.php
 
 		-
 			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\:\\:getUid\\(\\) should return int but returns int\\<1, max\\>\\|null\\.$#"
