@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicJobs\Controller;
 
+use FGTCLB\AcademicBase\Service\FileUploadService;
 use FGTCLB\AcademicJobs\Backend\FormEngine\EmploymentTypeItems;
 use FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems;
 use FGTCLB\AcademicJobs\Domain\Model\Job;
@@ -23,14 +24,10 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Extbase\Annotation\Validate;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Extbase\Mvc\Controller\FileUploadConfiguration;
 use TYPO3\CMS\Extbase\Persistence\PersistenceManagerInterface;
 use TYPO3\CMS\Extbase\Property\TypeConverter\DateTimeConverter;
 use TYPO3\CMS\Extbase\Service\ImageService;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
-use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
-
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -46,6 +43,7 @@ final class JobController extends ActionController
         private readonly TypeItems $typeItems,
         protected readonly BackendUriBuilder $backendUriBuilder,
         protected AcademicJobsSettingsRegistry $settingsRegistry,
+        protected FileUploadService $fileUploadService
     ) {}
 
     public function listAction(): ResponseInterface
@@ -141,26 +139,10 @@ final class JobController extends ActionController
                     );
             }
 
-            $fileUploadConfiguration = new FileUploadConfiguration('image');
-            $fileUploadConfiguration
-                ->resetValidators()
-                ->setMaxFiles(1)
-                ->setUploadFolder($this->settings['saveForm']['jobLogo']['uploadFolder'] ?? '');
-
-            if ($this->settings['saveForm']['jobLogo']['validation']['mimeType']) {
-                $mimeTypeValidator = GeneralUtility::makeInstance(MimeTypeValidator::class);
-                if ($this->settings['saveForm']['jobLogo']['validation']['mimeType']['allowedMimeTypes']) {
-                    $mimeTypeValidator->setOptions(['allowedMimeTypes' => GeneralUtility::trimExplode(',', $this->settings['saveForm']['jobLogo']['validation']['mimeType']['allowedMimeTypes'], true)]);
-                    $fileUploadConfiguration->addValidator($mimeTypeValidator);
-                }
-            }
-            if ($this->settings['saveForm']['jobLogo']['validation']['fileSize']) {
-                $fileSizeValidator = GeneralUtility::makeInstance(FileSizeValidator::class);
-                if ($this->settings['saveForm']['jobLogo']['validation']['fileSize']['maximum']) {
-                    $fileSizeValidator->setOptions(['maximum' => $this->settings['saveForm']['jobLogo']['validation']['fileSize']['maximum']]);
-                    $fileUploadConfiguration->addValidator($fileSizeValidator);
-                }
-            }
+            $fileUploadConfiguration = $this->fileUploadService->configureFileUpload(
+                'image',
+                $this->settings['fileUpload']
+            );
 
             $fileHandlingServiceConfiguration = $this->arguments->getArgument('job')->getFileHandlingServiceConfiguration();
             $fileHandlingServiceConfiguration->addFileUploadConfiguration($fileUploadConfiguration);
