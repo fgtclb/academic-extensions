@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicJobs\Controller;
 
+use FGTCLB\AcademicBase\Service\FileUploadService;
 use FGTCLB\AcademicJobs\Backend\FormEngine\EmploymentTypeItems;
 use FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems;
 use FGTCLB\AcademicJobs\Domain\Model\Job;
 use FGTCLB\AcademicJobs\Domain\Repository\JobRepository;
 use FGTCLB\AcademicJobs\Domain\Validator\JobValidator;
 use FGTCLB\AcademicJobs\Event\AfterSaveJobEvent;
-use FGTCLB\AcademicJobs\Property\TypeConverter\ImageUploadConverter;
 use FGTCLB\AcademicJobs\Registry\AcademicJobsSettingsRegistry;
 use FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode;
 use Psr\Http\Message\ResponseInterface;
@@ -43,6 +43,7 @@ final class JobController extends ActionController
         private readonly TypeItems $typeItems,
         protected readonly BackendUriBuilder $backendUriBuilder,
         protected AcademicJobsSettingsRegistry $settingsRegistry,
+        protected FileUploadService $fileUploadService
     ) {}
 
     public function listAction(): ResponseInterface
@@ -137,26 +138,17 @@ final class JobController extends ActionController
                         $format
                     );
             }
-        }
 
-        $targetFolderIdentifier = $this->settings['saveForm']['jobLogo']['targetFolder'] ?? null;
-        $maxFilesize = $this->settings['saveForm']['jobLogo']['validation']['maxFileSize'] ?? '0kb';
-        $allowedImeTypes = $this->settings['saveForm']['jobLogo']['validation']['allowedMimeTypes'] ?? '';
-        $jobAvatarImageUploadConverter = GeneralUtility::makeInstance(ImageUploadConverter::class);
-
-        $this->arguments
-            ->getArgument('job')
-            ->getPropertyMappingConfiguration()
-            ->forProperty('image')
-            ->setTypeConverter($jobAvatarImageUploadConverter)
-            ->setTypeConverterOptions(
-                ImageUploadConverter::class,
-                [
-                    ImageUploadConverter::CONFIGURATION_TARGET_DIRECTORY_COMBINED_IDENTIFIER => $targetFolderIdentifier,
-                    ImageUploadConverter::CONFIGURATION_MAX_UPLOAD_SIZE => $maxFilesize,
-                    ImageUploadConverter::CONFIGURATION_ALLOWED_MIME_TYPES => $allowedImeTypes,
-                ]
+            $fileUploadConfiguration = $this->fileUploadService->configureFileUpload(
+                'image',
+                $this->settings['fileUpload']
             );
+
+            $fileHandlingServiceConfiguration = $this->arguments->getArgument('job')->getFileHandlingServiceConfiguration();
+            $fileHandlingServiceConfiguration->addFileUploadConfiguration($fileUploadConfiguration);
+
+            $this->arguments->getArgument('job')->getPropertyMappingConfiguration()->skipProperties('image');
+        }
     }
 
     #[Validate([

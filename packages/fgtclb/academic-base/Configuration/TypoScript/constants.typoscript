@@ -1,0 +1,18 @@
+plugin.tx_academicbase {
+  fileUpload {
+    # cat=plugin.tx_academicbase//a; type=string; label=Maximum of files
+    maxFiles = 1
+    # cat=plugin.tx_academicbase//a; type=string; label=An upload folder
+    uploadFolder = 1:/global-content/jobs/logos/
+    validation {
+      fileSize {
+        # cat=plugin.tx_academicbase//a; type=string; label=The maximum file size to accept
+        maximum = 2M
+      }
+      mimeType {
+        # cat=plugin.academicbase//a; type=string; label=Allowed mime types (using */* IANA media types)
+        allowedMimeTypes = image/jpeg,image/png,image/webp,image/svg+xml
+      }
+    }
+  }
+}

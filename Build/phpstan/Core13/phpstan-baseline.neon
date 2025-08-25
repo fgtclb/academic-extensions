@@ -21,21 +21,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Domain/Repository/JobRepository.php
 
 		-
-			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\ImageUploadConverter\\:\\:\\$priority has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/ImageUploadConverter.php
-
-		-
-			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\ImageUploadConverter\\:\\:\\$sourceTypes has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/ImageUploadConverter.php
-
-		-
-			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Property\\\\TypeConverter\\\\ImageUploadConverter\\:\\:\\$targetType has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Property/TypeConverter/ImageUploadConverter.php
-
-		-
 			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\:\\:getUid\\(\\) should return int but returns int\\<1, max\\>\\|null\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Model/Partner.php
