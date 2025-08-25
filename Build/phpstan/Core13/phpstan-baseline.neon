@@ -1,6 +1,21 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Access to an undefined property FGTCLB\\\\AcademicBase\\\\Extbase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$priority\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
+
+		-
+			message: "#^Access to an undefined property FGTCLB\\\\AcademicBase\\\\Extbase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$sourceTypes\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
+
+		-
+			message: "#^Access to an undefined property FGTCLB\\\\AcademicBase\\\\Extbase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$targetType\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
+
+		-
 			message: "#^Method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
