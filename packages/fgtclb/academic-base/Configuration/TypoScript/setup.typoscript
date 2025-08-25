@@ -1,0 +1,8 @@
+plugin.tx_academicbase.settings.fileUpload {
+  maxFiles = {$plugin.tx_academicbase.fileUpload.maxFiles}
+  uploadFolder = {$plugin.tx_academicbase.fileUpload.uploadFolder}
+  validation {
+    fileSize.maximum = {$plugin.tx_academicbase.fileUpload.validation.fileSize.maximum}
+    mimeType.allowedMimeTypes = {$plugin.tx_academicbase.fileUpload.validation.mimeType.allowedMimeTypes}
+  }
+}

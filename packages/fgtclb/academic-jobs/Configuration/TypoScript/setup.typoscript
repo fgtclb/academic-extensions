@@ -31,15 +31,17 @@ plugin.tx_academicjobs {
     }
 
     saveForm {
-      jobLogo {
-        uploadFolder = {$plugin.tx_academicjobs.saveForm.jobLogo.uploadFolder}
-        validation {
-          fileSize.maximum = {$plugin.tx_academicjobs.saveForm.jobLogo.validation.fileSize.maximum}
-          mimeType.allowedMimeTypes = {$plugin.tx_academicjobs.saveForm.jobLogo.validation.mimeType.allowedMimeTypes}
-        }
-      }
       fallbackRedirectPageId = {$plugin.tx_academicjobs.saveForm.fallbackRedirectPageId}
       fallbackFlashMessageCreationMode = {$plugin.tx_academicjobs.saveForm.fallbackFlashMessageCreationMode}
+    }
+
+    fileUpload {
+      maxFiles = {$plugin.tx_academicbase.fileUpload.maxFiles}
+      uploadFolder = {$plugin.tx_academicbase.fileUpload.uploadFolder}
+      validation {
+        fileSize.maximum = {$plugin.tx_academicbase.fileUpload.validation.fileSize.maximum}
+        mimeType.allowedMimeTypes = {$plugin.tx_academicbase.fileUpload.validation.mimeType.allowedMimeTypes}
+      }
     }
   }
   view {
