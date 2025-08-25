@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicJobs\Property\TypeConverter;
+namespace FGTCLB\AcademicBase\Property\TypeConverter;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -24,11 +24,11 @@ use TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface;
 use TYPO3\CMS\Extbase\Property\TypeConverter\AbstractTypeConverter;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
-final class ImageUploadConverter extends AbstractTypeConverter
+final class FileUploadConverter extends AbstractTypeConverter
 {
-    public const CONFIGURATION_TARGET_DIRECTORY_COMBINED_IDENTIFIER = 'targetFolderCombinedIdentifier';
-    public const CONFIGURATION_MAX_UPLOAD_SIZE = 'maxUploadSize';
-    public const CONFIGURATION_ALLOWED_MIME_TYPES = 'allowedMimeTypes';
+    public const CONFIGURATION_UPLOAD_FOLDER = 'uploadFolder';
+    public const CONFIGURATION_VALIDATION_FILESIZE_MAXIMUM = 'validationFileSizeMaximum';
+    public const CONFIGURATION_VALIDATION_MIME_TYPE_ALLOWED_MIME_TYPES = 'validationMimeTypeAllowedMimeTypes';
 
     protected $sourceTypes = ['array'];
 
@@ -57,21 +57,21 @@ final class ImageUploadConverter extends AbstractTypeConverter
     ): Error|ExtbaseFileReference|null {
         $uploadedFileInformation = $source;
 
-        $targetFolderIdentifier = null;
-        $maxFileSize = '0k';
+        $targetFolderIdentifier = '1:user_upload/';
+        $maxFileSize = PHP_INT_MAX . 'B';
         $allowedMimeTypes = '';
         if ($configuration !== null) {
             $targetFolderIdentifier = $configuration->getConfigurationValue(
                 self::class,
-                self::CONFIGURATION_TARGET_DIRECTORY_COMBINED_IDENTIFIER
+                self::CONFIGURATION_UPLOAD_FOLDER
             );
             $maxFileSize = $configuration->getConfigurationValue(
                 self::class,
-                self::CONFIGURATION_MAX_UPLOAD_SIZE
+                self::CONFIGURATION_VALIDATION_FILESIZE_MAXIMUM
             );
             $allowedMimeTypes = $configuration->getConfigurationValue(
                 self::class,
-                self::CONFIGURATION_ALLOWED_MIME_TYPES
+                self::CONFIGURATION_VALIDATION_MIME_TYPE_ALLOWED_MIME_TYPES
             );
         }
 

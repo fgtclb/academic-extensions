@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicJobs\Controller;
 
+use FGTCLB\AcademicBase\Property\TypeConverter\FileUploadConverter;
 use FGTCLB\AcademicJobs\Backend\FormEngine\EmploymentTypeItems;
 use FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems;
 use FGTCLB\AcademicJobs\Domain\Model\Job;
 use FGTCLB\AcademicJobs\Domain\Repository\JobRepository;
 use FGTCLB\AcademicJobs\Domain\Validator\JobValidator;
 use FGTCLB\AcademicJobs\Event\AfterSaveJobEvent;
-use FGTCLB\AcademicJobs\Property\TypeConverter\ImageUploadConverter;
 use FGTCLB\AcademicJobs\Registry\AcademicJobsSettingsRegistry;
 use FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode;
 use Psr\Http\Message\ResponseInterface;
@@ -137,26 +137,23 @@ final class JobController extends ActionController
                         $format
                     );
             }
+
+            $fileUploadConverter = GeneralUtility::makeInstance(FileUploadConverter::class);
+
+            $this->arguments
+                ->getArgument('job')
+                ->getPropertyMappingConfiguration()
+                ->forProperty('image')
+                ->setTypeConverter($fileUploadConverter)
+                ->setTypeConverterOptions(
+                    FileUploadConverter::class,
+                    [
+                        FileUploadConverter::CONFIGURATION_UPLOAD_FOLDER => $this->settings['fileUpload']['uploadFolder'] ?? '1:user_upload/',
+                        FileUploadConverter::CONFIGURATION_VALIDATION_FILESIZE_MAXIMUM => $this->settings['fileUpload']['validation']['fileSize']['maximum'] ?? PHP_INT_MAX . 'B',
+                        FileUploadConverter::CONFIGURATION_VALIDATION_MIME_TYPE_ALLOWED_MIME_TYPES => $this->settings['fileUpload']['validation']['mimeType']['allowedMimeTypes'] ?? null,
+                    ]
+                );
         }
-
-        $targetFolderIdentifier = $this->settings['saveForm']['jobLogo']['targetFolder'] ?? null;
-        $maxFilesize = $this->settings['saveForm']['jobLogo']['validation']['maxFileSize'] ?? '0kb';
-        $allowedImeTypes = $this->settings['saveForm']['jobLogo']['validation']['allowedMimeTypes'] ?? '';
-        $jobAvatarImageUploadConverter = GeneralUtility::makeInstance(ImageUploadConverter::class);
-
-        $this->arguments
-            ->getArgument('job')
-            ->getPropertyMappingConfiguration()
-            ->forProperty('image')
-            ->setTypeConverter($jobAvatarImageUploadConverter)
-            ->setTypeConverterOptions(
-                ImageUploadConverter::class,
-                [
-                    ImageUploadConverter::CONFIGURATION_TARGET_DIRECTORY_COMBINED_IDENTIFIER => $targetFolderIdentifier,
-                    ImageUploadConverter::CONFIGURATION_MAX_UPLOAD_SIZE => $maxFilesize,
-                    ImageUploadConverter::CONFIGURATION_ALLOWED_MIME_TYPES => $allowedImeTypes,
-                ]
-            );
     }
 
     #[Validate([
