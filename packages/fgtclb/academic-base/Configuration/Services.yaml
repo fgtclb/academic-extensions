@@ -4,7 +4,16 @@ services:
     autoconfigure: true
     public: false
 
-#  FGTCLB\AcademicBase\:
-#    resource: '../Classes/*'
-#    exclude:
-#      - '../Classes/Domain/Model/*'
+  FGTCLB\AcademicBase\:
+    resource: '../Classes/*'
+    exclude:
+      - '../Classes/Domain/Model/*'
+
+  # @internal not part of public API
+  FGTCLB\AcademicBase\Extbase\Property\TypeConverter\FileUploadConverter:
+    tags:
+      - name: extbase.type_converter
+        priority: 10
+        target: TYPO3\CMS\Extbase\Domain\Model\FileReference
+        sources: TYPO3\CMS\Core\Http\UploadedFile
+
