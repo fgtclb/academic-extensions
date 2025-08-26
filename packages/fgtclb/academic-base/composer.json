@@ -24,6 +24,9 @@
     "extra": {
         "typo3/cms": {
             "extension-key": "academic_base"
+        },
+        "branch-alias": {
+            "dev-main": "2.0.x-dev"
         }
     }
 }
