@@ -4,9 +4,6 @@ services:
     autoconfigure: true
     public: false
 
-  FGTCLB\AcademicJobs\Property\TypeConverter:
-    public: true
-
   FGTCLB\AcademicJobs\:
     resource: '../Classes/*'
     exclude: '../Classes/Domain/Model/*'
@@ -16,3 +13,9 @@ services:
       - name: event.listener
         identifier: generateJobSlug
         event: FGTCLB\AcademicJobs\Event\AfterSaveJobEvent
+
+  FGTCLB\AcademicJobs\Registry\AcademicJobsSettingsRegistry:
+    public: true
+    factory:
+      - '@FGTCLB\AcademicJobs\Loader\AcademicJobsSettingsLoader'
+      - 'load'

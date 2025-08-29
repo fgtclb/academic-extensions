@@ -1,0 +1,26 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:j="http://typo3.org/ns/FGTCLB/AcademicJobs/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:variable name="elementId" value="job.{element.identifier}"/>
+
+<f:render
+    partial="Job/Forms/FieldWrapper"
+    arguments="{element: element, elementId: elementId, class: 'form-textfield-wrap'}"
+    contentAs="elementContent"
+>
+    <f:form.textfield
+        type="{j:validation.fieldTypeFromValidation(validations: element.validations, identifier: element.identifier)}"
+        property="{element.identifier}"
+        id="{elementId}"
+        placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: 'academic_jobs')}"
+        class="form-control"
+        disabled="{element.disabled}"
+        autocomplete="{element.autocomplete}"
+    />
+</f:render>
+
+</html>

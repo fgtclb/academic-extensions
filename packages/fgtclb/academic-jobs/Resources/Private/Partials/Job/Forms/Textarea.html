@@ -1,0 +1,24 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:variable name="elementId" value="job.{element.identifier}"/>
+
+<f:render
+    partial="Job/Forms/FieldWrapper"
+    arguments="{element: element, elementId: elementId, class: 'form-textarea-wrap'}"
+    contentAs="elementContent"
+>
+    <f:form.textarea
+        property="{element.identifier}"
+        id="{elementId}"
+        class="form-control {f:if(condition: element.richtext, then: 'rich-text')}"
+        disabled="{element.disabled}"
+        placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: 'academic_jobs')}"
+        rows="5"
+    />
+</f:render>
+
+</html>

@@ -1,0 +1,234 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Upload"
+                arguments="{
+                    element: {
+                        identifier: 'image',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-8">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'title',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Select"
+                arguments="{
+                    element: {
+                        identifier: 'employmentType',
+                        validations: validations,
+                        options: employmentTypeOptions,
+                        optionValueField: 'value',
+                        optionLabelField: 'label',
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Select"
+                arguments="{
+                    element: {
+                        identifier: 'type',
+                        validations: validations,
+                        options: typeOptions,
+                        optionValueField: 'value',
+                        optionLabelField: 'label',
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'contractualRelationship',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'companyName',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'sector',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'workLocation',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-6">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'link',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-6">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'requiredDegree',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/DateTime"
+                arguments="{
+                    element: {
+                        identifier: 'employmentStartDate',
+                        value: job.employmentStartDate,
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/DateTime"
+                arguments="{
+                    element: {
+                        identifier: 'starttime',
+                        value: job.starttime,
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/DateTime"
+                arguments="{
+                    element: {
+                        identifier: 'endtime',
+                        value: job.endtime,
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12">
+            <f:render
+                partial="Job/Forms/Textarea"
+                arguments="{
+                    element: {
+                        identifier: 'description',
+                        validations: validations,
+                        richtext: true,
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'contactName',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'contactEmail',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12 col-md-4">
+            <f:render
+                partial="Job/Forms/Textfield"
+                arguments="{
+                    element: {
+                        identifier: 'contactPhone',
+                        validations: validations
+                    }
+                }"
+            />
+        </div>
+
+        <div class="col-12">
+            <f:render
+                partial="Job/Forms/Textarea"
+                arguments="{
+                    element: {
+                        identifier: 'contactAdditionalInformation',
+                        validations: validations,
+                        richtext: true
+                    }
+                }"
+            />
+        </div>
+    </div>
+</html>

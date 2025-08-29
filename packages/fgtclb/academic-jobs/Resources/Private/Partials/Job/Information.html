@@ -1,0 +1,50 @@
+<html
+    lang="en"
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+>
+
+<ul>
+    <f:for
+        each="{
+            0: 'employmentStartDate',
+            1: 'companyName',
+            2: 'sector',
+            3: 'type',
+            4: 'requiredDegree',
+            5: 'contractualRelationship',
+            6: 'employmentType',
+            7: 'workLocation',
+            8: 'internationalsWelcome',
+            9: 'alumniRecommend',
+            10: 'link',
+            11: 'endtime',
+        }"
+        as="item"
+    >
+        <f:if condition="{job.{item}}">
+            <li>
+                <core:icon identifier="academic_jobs-{item}"/>
+
+                <b>{f:translate(key: 'jobs.{item}', extensionName: 'academic_jobs')}:</b>
+
+                <span>
+                    <f:if condition="{item} == 'employmentStartDate' || {item} == 'endtime'">
+                        <f:then>
+                            <f:format.date format="d.m.Y">{job.{item}}</f:format.date>
+                        </f:then>
+                        <f:else if="{item} == 'employmentType' || {item} == 'type'">
+                            <f:translate key="jobs.{item}.{job.{item}}" />
+                        </f:else>
+                        <f:else>
+                            {job.{item}}
+                        </f:else>
+                    </f:if>
+                </span>
+            </li>
+        </f:if>
+    </f:for>
+</ul>
+
+</html>
