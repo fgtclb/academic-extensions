@@ -9,6 +9,7 @@ use FGTCLB\AcademicPartners\Domain\Repository\PartnershipRepository;
 use FGTCLB\AcademicPartners\Factory\DemandFactory;
 use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -18,7 +19,8 @@ class PartnerController extends ActionController
         protected PartnerRepository $partnerRepository,
         protected PartnershipRepository $partnershipRepository,
         protected CategoryRepository $categoryRepository,
-        protected DemandFactory $partnerDemandFactory
+        protected DemandFactory $partnerDemandFactory,
+        protected PageRepository $pageRepository
     ) {}
 
     /**
@@ -82,20 +84,17 @@ class PartnerController extends ActionController
     {
         /** @var array<string, mixed> */
         $contentElementData = $this->getCurrentContentObjectRenderer()?->data ?? [];
-        $partnerships = $this->partnershipRepository->findByPid((int)($contentElementData['pid'] ?? 0));
+        $partnerships = $this->partnershipRepository->findByPartnerUid((int)($contentElementData['pid'] ?? 0));
 
-        $roles = [];
+        $partnershipPages = [];
         foreach ($partnerships as $partnership) {
-            $role = $partnership->getRole();
-            if ($role !== null) {
-                $roles[$role->getUid()] = $role;
-            }
+            $partnershipPages[] = $this->pageRepository->getPage($partnership->getPage());
         }
 
         $this->view->assignMultiple([
             'data' => $contentElementData,
             'partnerships' => $partnerships,
-            'partnershipRoles' => $roles,
+            'partnershipPages' => $partnershipPages,
         ]);
 
         return $this->htmlResponse();

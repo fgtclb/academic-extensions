@@ -1,0 +1,17 @@
+<T3DataStructure>
+    <ROOT>
+        <sheetTitle>Filter</sheetTitle>
+        <type>array</type>
+        <el>
+            <settings.partnerships>
+                <label>LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:flexform.partnerships.label</label>
+                <description>LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:flexform.partnerships.description</description>
+                <config>
+                    <type>select</type>
+                    <renderType>selectMultipleSideBySide</renderType>
+                    <itemsProcFunc>FGTCLB\AcademicPartners\Backend\FormEngine\PartnershipItems->itemsProcFunc</itemsProcFunc>
+                </config>
+            </settings.partnerships>
+        </el>
+    </ROOT>
+</T3DataStructure>

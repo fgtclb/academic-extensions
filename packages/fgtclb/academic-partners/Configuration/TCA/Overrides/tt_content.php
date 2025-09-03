@@ -72,6 +72,24 @@ defined('TYPO3') or die;
         'academic_partners'
     );
 
+    ExtensionManagementUtility::addPiFlexFormValue(
+        '*',
+        sprintf('FILE:EXT:academic_partners/Configuration/FlexForms/Core%s/PartnershipsListSettings.xml', $typo3MajorVersion),
+        'academicpartners_partnershipslist',
+    );
+
+    ExtensionManagementUtility::addToAllTCAtypes(
+        'tt_content',
+        implode(',', [
+            '--div--;LLL:EXT:academic_partners/Resources/Private/Language/locallang_be.xlf:plugin.partner_list.configuration',
+            'pi_flexform',
+        ]),
+        implode(',', [
+            'academicpartners_partnershipslist',
+        ]),
+        'after:subheader',
+    );
+
     // Plugin: academicpartners_partnershipsteaser
     ExtensionManagementUtility::addPlugin(
         [
