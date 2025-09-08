@@ -241,6 +241,12 @@
 			<trans-unit id="tx_academicpersons_domain_model_profile.columns.image.label">
 				<source>Image</source>
 			</trans-unit>
+			<trans-unit id="tx_academicpersons_domain_model_profile.columns.image.title">
+				<source>Image of %s</source>
+			</trans-unit>
+			<trans-unit id="tx_academicpersons_domain_model_profile.columns.image.alternative">
+				<source>Image of %s</source>
+			</trans-unit>
 			<trans-unit id="tx_academicpersons_domain_model_profile.columns.last_name.label">
 				<source>Last Name</source>
 			</trans-unit>

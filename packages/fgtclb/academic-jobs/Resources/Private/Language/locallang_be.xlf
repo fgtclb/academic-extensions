@@ -138,6 +138,12 @@
 			<trans-unit id="tx_academicjobs_domain_model_job.jobtype.thesis">
 				<source>Thesis</source>
 			</trans-unit>
+			<trans-unit id="tx_academicjobs_domain_model_job.image.title">
+				<source>Logo of %s</source>
+			</trans-unit>
+			<trans-unit id="tx_academicjobs_domain_model_job.image.alternative">
+				<source>Logo of %s</source>
+			</trans-unit>
 
 			<!-- Domain Model: Contact -->
 
