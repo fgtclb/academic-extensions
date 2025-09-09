@@ -81,21 +81,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php
 
 		-
-			message: "#^Property FGTCLB\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$priority has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
-
-		-
-			message: "#^Property FGTCLB\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$sourceTypes has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
-
-		-
-			message: "#^Property FGTCLB\\\\AcademicPersonsEdit\\\\Property\\\\TypeConverter\\\\ProfileImageUploadConverter\\:\\:\\$targetType has no type specified\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Property/TypeConverter/ProfileImageUploadConverter.php
-
-		-
 			message: "#^Call to an undefined method object\\:\\:getDemand\\(\\)\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
