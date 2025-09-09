@@ -76,11 +76,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php
 
 		-
-			message: "#^Unable to resolve the template type T in call to method static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\GeneralUtility\\:\\:makeInstance\\(\\)$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php
-
-		-
 			message: "#^Call to an undefined method object\\:\\:getDemand\\(\\)\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
