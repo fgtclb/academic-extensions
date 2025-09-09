@@ -61,11 +61,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php
 
 		-
-			message: "#^Unable to resolve the template type T in call to method static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\GeneralUtility\\:\\:makeInstance\\(\\)$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php
-
-		-
 			message: "#^Instantiated class TYPO3\\\\CMS\\\\Core\\\\Cache\\\\CacheTag not found\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
