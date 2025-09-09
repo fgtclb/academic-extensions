@@ -43,6 +43,7 @@ final class FileUploadConverter extends AbstractTypeConverter
     public const CONFIGURATION_UPLOAD_FOLDER = 'uploadFolder';
     public const CONFIGURATION_VALIDATION_FILESIZE_MAXIMUM = 'validationFileSizeMaximum';
     public const CONFIGURATION_VALIDATION_MIME_TYPE_ALLOWED_MIME_TYPES = 'validationMimeTypeAllowedMimeTypes';
+    public const CONFIGURATION_TARGET_FILE_NAME_WITHOUT_EXTENSION = 'targetFileNameWithoutExtension';
 
     public function __construct(
         private readonly ResourceFactory $resourceFactory,
@@ -80,6 +81,7 @@ final class FileUploadConverter extends AbstractTypeConverter
         $targetFolderIdentifier = '1:user_upload/';
         $maxFileSize = PHP_INT_MAX . 'B';
         $allowedMimeTypes = '';
+        $targetFileNameWithoutExtension = null;
         if ($configuration !== null) {
             $targetFolderIdentifier = $configuration->getConfigurationValue(
                 self::class,
@@ -92,6 +94,10 @@ final class FileUploadConverter extends AbstractTypeConverter
             $allowedMimeTypes = $configuration->getConfigurationValue(
                 self::class,
                 self::CONFIGURATION_VALIDATION_MIME_TYPE_ALLOWED_MIME_TYPES,
+            );
+            $targetFileNameWithoutExtension = $configuration->getConfigurationValue(
+                self::class,
+                self::CONFIGURATION_TARGET_FILE_NAME_WITHOUT_EXTENSION
             );
         }
 
@@ -106,10 +112,18 @@ final class FileUploadConverter extends AbstractTypeConverter
         if ($uploadedFileInformation->getClientFilename() === null) {
             return null;
         }
+        $targetFileName = $uploadedFileInformation->getClientFilename();
+        if (is_string($targetFileNameWithoutExtension) && $targetFileNameWithoutExtension !== '') {
+            $targetFileName = strtolower(sprintf(
+                '%s.%s',
+                $targetFileNameWithoutExtension,
+                pathinfo($uploadedFileInformation->getClientFilename(), PATHINFO_EXTENSION),
+            ));
+        }
 
         try {
             $this->validateUploadedFile($uploadedFileInformation, $maxFileSize, $allowedMimeTypes);
-            return $this->importUploadedResource($uploadedFileInformation, $targetFolderIdentifier, $uploadedFileInformation->getClientFilename());
+            return $this->importUploadedResource($uploadedFileInformation, $targetFolderIdentifier, $targetFileName);
         } catch (TypeConverterException $e) {
             return GeneralUtility::makeInstance(
                 Error::class,
