@@ -23,6 +23,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference as ExtbaseFileReference;
 use TYPO3\CMS\Extbase\Error\Error;
+use TYPO3\CMS\Extbase\Mvc\Controller\Arguments;
 use TYPO3\CMS\Extbase\Property\Exception\TypeConverterException;
 use TYPO3\CMS\Extbase\Property\PropertyMappingConfigurationInterface;
 use TYPO3\CMS\Extbase\Property\TypeConverter\AbstractTypeConverter;
@@ -56,10 +57,35 @@ final class FileUploadConverter extends AbstractTypeConverter
     }
 
     /**
+     * @param array<string, mixed>|null $options
+     */
+    public function setArgumentTypeConverterConfiguration(
+        Arguments $arguments,
+        string $argumentName,
+        string $propertyName,
+        ?array $options = null,
+    ): self {
+        $arguments
+            ->getArgument($argumentName)
+            ->getPropertyMappingConfiguration()
+            ->forProperty($propertyName)
+            ->setTypeConverter($this)
+            ->setTypeConverterOptions(
+                self::class,
+                $options ?? [
+                    FileUploadConverter::CONFIGURATION_UPLOAD_FOLDER => '1:user_upload/',
+                    FileUploadConverter::CONFIGURATION_VALIDATION_FILESIZE_MAXIMUM =>  PHP_INT_MAX . 'B',
+                    FileUploadConverter::CONFIGURATION_VALIDATION_MIME_TYPE_ALLOWED_MIME_TYPES => '',
+                ],
+            );
+        return $this;
+    }
+
+    /**
      * Actually convert from $source to $targetType, taking into account the fully
      * built $convertedChildProperties and $configuration.
      *
-     * @param UploadedFile $source
+     * @param array<string, mixed>|UploadedFile $source
      * @param array<string, mixed> $convertedChildProperties
      */
     public function convertFrom(
@@ -68,16 +94,16 @@ final class FileUploadConverter extends AbstractTypeConverter
         array $convertedChildProperties = [],
         ?PropertyMappingConfigurationInterface $configuration = null
     ): Error|ExtbaseFileReference|null {
-        if (! $source instanceof UploadedFile) {
-            throw new \RuntimeException(
-                sprintf(
-                    '$source must be instance of "%s"',
-                    UploadedFile::class,
-                ),
-                1756381290,
-            );
-        }
-        $uploadedFileInformation = $source;
+        $source = $this->convertUploadedFileToUploadInfoArray($source);
+        /**
+         * @var array{
+         *      name: string|null,
+         *      tmp_name: string|null,
+         *      size: int|null,
+         *      error: int|null,
+         *      type: string|null,
+         *  } $source
+         */
         $targetFolderIdentifier = '1:user_upload/';
         $maxFileSize = PHP_INT_MAX . 'B';
         $allowedMimeTypes = '';
@@ -91,7 +117,7 @@ final class FileUploadConverter extends AbstractTypeConverter
                 self::class,
                 self::CONFIGURATION_VALIDATION_FILESIZE_MAXIMUM,
             );
-            $allowedMimeTypes = $configuration->getConfigurationValue(
+            $allowedMimeTypes = (string)$configuration->getConfigurationValue(
                 self::class,
                 self::CONFIGURATION_VALIDATION_MIME_TYPE_ALLOWED_MIME_TYPES,
             );
@@ -100,30 +126,28 @@ final class FileUploadConverter extends AbstractTypeConverter
                 self::CONFIGURATION_TARGET_FILE_NAME_WITHOUT_EXTENSION
             );
         }
-
-        if ($uploadedFileInformation->getError() !== \UPLOAD_ERR_OK) {
+        if ($source['error'] !== \UPLOAD_ERR_OK) {
             return GeneralUtility::makeInstance(
                 Error::class,
-                $this->getUploadErrorMessage($uploadedFileInformation->getError()),
+                $this->getUploadErrorMessage($source['error'] ?? \UPLOAD_ERR_NO_FILE),
                 1756373245,
             );
         }
-
-        if ($uploadedFileInformation->getClientFilename() === null) {
+        if (($source['name'] ?? null) === null) {
             return null;
         }
-        $targetFileName = $uploadedFileInformation->getClientFilename();
+        $targetFileName = $source['name'];
         if (is_string($targetFileNameWithoutExtension) && $targetFileNameWithoutExtension !== '') {
             $targetFileName = strtolower(sprintf(
                 '%s.%s',
                 $targetFileNameWithoutExtension,
-                pathinfo($uploadedFileInformation->getClientFilename(), PATHINFO_EXTENSION),
+                pathinfo($source['name'], PATHINFO_EXTENSION),
             ));
         }
 
         try {
-            $this->validateUploadedFile($uploadedFileInformation, $maxFileSize, $allowedMimeTypes);
-            return $this->importUploadedResource($uploadedFileInformation, $targetFolderIdentifier, $targetFileName);
+            $this->validateUploadedFile($source, $maxFileSize, $allowedMimeTypes);
+            return $this->importUploadedResource($source, $targetFolderIdentifier, $targetFileName);
         } catch (TypeConverterException $e) {
             return GeneralUtility::makeInstance(
                 Error::class,
@@ -134,14 +158,21 @@ final class FileUploadConverter extends AbstractTypeConverter
     }
 
     /**
+     * @param array{
+     *      name: string|null,
+     *      tmp_name: string|null,
+     *      size: int|null,
+     *      error: int|null,
+     *      type: string|null,
+     *  } $uploadedFileInformation
      * @throws TypeConverterException
      */
     private function importUploadedResource(
-        UploadedFile $uploadedFileInformation,
+        array $uploadedFileInformation,
         string $targetFolderIdentifier,
         ?string $targetFileName
     ): ExtbaseFileReference {
-        if (!GeneralUtility::makeInstance(FileNameValidator::class)->isValid((string)$uploadedFileInformation->getClientFilename())) {
+        if (!GeneralUtility::makeInstance(FileNameValidator::class)->isValid((string)$uploadedFileInformation['name'])) {
             throw new TypeConverterException('Uploading files with PHP file extensions is not allowed!', 1753712929);
         }
 
@@ -158,15 +189,22 @@ final class FileUploadConverter extends AbstractTypeConverter
     }
 
     /**
+     * @param array{
+     *      name: string|null,
+     *      tmp_name: string|null,
+     *      size: int|null,
+     *      error: int|null,
+     *      type: string|null,
+     *  } $uploadedFileInformation
      * @throws TypeConverterException
      */
-    private function validateUploadedFile(UploadedFile $uploadedFileInformation, string $maxFileSize, string $allowedMimeTypes): void
+    private function validateUploadedFile(array $uploadedFileInformation, string $maxFileSize, string $allowedMimeTypes): void
     {
         $languageService = $this->getLanguageService();
         $maxFileSizeInBytes = GeneralUtility::getBytesFromSizeMeasurement($maxFileSize);
         $allowedMimeTypesArray = GeneralUtility::trimExplode(',', $allowedMimeTypes);
 
-        if ($uploadedFileInformation->getSize() > $maxFileSizeInBytes) {
+        if ($uploadedFileInformation['size'] > $maxFileSizeInBytes) {
             throw new TypeConverterException(
                 $languageService->sL(
                     'LLL:EXT:academic_base/Resources/Private/Language/locallang.xlf:upload.error.150530345'
@@ -175,13 +213,13 @@ final class FileUploadConverter extends AbstractTypeConverter
             );
         }
 
-        if (!in_array($uploadedFileInformation->getClientMediaType(), $allowedMimeTypesArray, true)) {
+        if (!in_array($uploadedFileInformation['type'], $allowedMimeTypesArray, true)) {
             throw new TypeConverterException(
                 sprintf(
                     $languageService->sL(
                         'LLL:EXT:academic_base/Resources/Private/Language/locallang.xlf:validation.error.1471708998'
                     ),
-                    $uploadedFileInformation->getClientMediaType()
+                    $uploadedFileInformation['type']
                 ),
                 1756373500,
             );
@@ -311,5 +349,35 @@ final class FileUploadConverter extends AbstractTypeConverter
             $this->targetType = ExtbaseFileReference::class;
             $this->priority = 10;
         }
+    }
+
+    /**
+     * @param array<string, mixed>|UploadedFile $uploadedFile
+     * @return array{
+     *     name: string|null,
+     *     tmp_name: string|null,
+     *     size: int|null,
+     *     error: int|null,
+     *     type: string|null,
+     * }
+     */
+    private function convertUploadedFileToUploadInfoArray(array|UploadedFile $uploadedFile): array
+    {
+        if (is_array($uploadedFile)) {
+            return [
+                'name' => $uploadedFile['name'] ?? null,
+                'tmp_name' => $uploadedFile['tmp_name'] ?? null,
+                'size' => $uploadedFile['size'] ?? null,
+                'error' => $uploadedFile['error'] ?? null,
+                'type' => $uploadedFile['type'],
+            ];
+        }
+        return [
+            'name' => $uploadedFile->getClientFilename(),
+            'tmp_name' => $uploadedFile->getTemporaryFileName(),
+            'size' => $uploadedFile->getSize(),
+            'error' => $uploadedFile->getError(),
+            'type' => $uploadedFile->getClientMediaType(),
+        ];
     }
 }

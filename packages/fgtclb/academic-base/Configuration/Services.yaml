@@ -15,5 +15,5 @@ services:
       - name: extbase.type_converter
         priority: 10
         target: TYPO3\CMS\Extbase\Domain\Model\FileReference
-        sources: TYPO3\CMS\Core\Http\UploadedFile
+        sources: array
 
