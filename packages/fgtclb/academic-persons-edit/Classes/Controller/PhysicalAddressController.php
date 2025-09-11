@@ -97,7 +97,7 @@ final class PhysicalAddressController extends AbstractActionController
         $this->addressRepository->add($physicalAddress);
         $this->persistenceManager->persistAll();
 
-        $this->addTranslatedSuccessMessage('physicalAddresses.success.create.done');
+        $this->addTranslatedSuccessMessage('physicalAddress.create.success');
 
         if ($this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
@@ -142,7 +142,7 @@ final class PhysicalAddressController extends AbstractActionController
             ),
         );
 
-        $this->addTranslatedSuccessMessage('physicalAddress.success.update.done');
+        $this->addTranslatedSuccessMessage('physicalAddress.update.success');
 
         if ($this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
@@ -198,7 +198,7 @@ final class PhysicalAddressController extends AbstractActionController
                     $this->addressRepository->update($currentAddress);
 
                     $this->persistenceManager->persistAll();
-                    $this->addTranslatedSuccessMessage('contracts.sort.success.done');
+                    $this->addTranslatedSuccessMessage('physicalAddress.sort.success');
                 }
                 break;
             }
@@ -225,7 +225,7 @@ final class PhysicalAddressController extends AbstractActionController
     public function deleteAction(Address $physicalAddress): ResponseInterface
     {
         $this->addressRepository->remove($physicalAddress);
-        $this->addTranslatedSuccessMessage('physicalAddress.success.delete.done');
+        $this->addTranslatedSuccessMessage('physicalAddress.delete.success');
         return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
     }
 
