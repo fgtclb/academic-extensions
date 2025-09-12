@@ -95,7 +95,7 @@ final class PhoneNumberController extends AbstractActionController
         $this->phoneNumberRepository->add($phoneNumber);
         $this->persistenceManager->persistAll();
 
-        $this->addTranslatedSuccessMessage('phoneNumber.success.create.done');
+        $this->addTranslatedSuccessMessage('phoneNumber.create.success');
 
         if ($this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
@@ -136,7 +136,7 @@ final class PhoneNumberController extends AbstractActionController
             ),
         );
 
-        $this->addTranslatedSuccessMessage('phoneNumber.success.update.done');
+        $this->addTranslatedSuccessMessage('phoneNumber.update.success');
 
         if ($this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
@@ -192,7 +192,7 @@ final class PhoneNumberController extends AbstractActionController
                     $this->phoneNumberRepository->update($currentPhoneNumber);
 
                     $this->persistenceManager->persistAll();
-                    $this->addTranslatedSuccessMessage('phoneNumber.sort.success.done');
+                    $this->addTranslatedSuccessMessage('phoneNumber.sort.success');
                 }
                 break;
             }
@@ -219,7 +219,7 @@ final class PhoneNumberController extends AbstractActionController
     public function deleteAction(PhoneNumber $phoneNumber): ResponseInterface
     {
         $this->phoneNumberRepository->remove($phoneNumber);
-        $this->addTranslatedSuccessMessage('phoneNumber.success.delete.done');
+        $this->addTranslatedSuccessMessage('phoneNumber.delete.success');
         return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
     }
 

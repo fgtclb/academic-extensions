@@ -105,7 +105,7 @@ final class ProfileInformationController extends AbstractActionController
         $this->profileInformationRepository->add($profileInformation);
         $this->persistenceManager->persistAll();
 
-        $this->addTranslatedSuccessMessage('profileInformation.success.create.done');
+        $this->addTranslatedSuccessMessage($profileInformation->getType() . '.create.success');
 
         if ($this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
@@ -144,7 +144,7 @@ final class ProfileInformationController extends AbstractActionController
             ),
         );
 
-        $this->addTranslatedSuccessMessage('profileInformation.success.update.done');
+        $this->addTranslatedSuccessMessage($profileInformation->getType() . '.update.success');
 
         if ($this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
@@ -207,7 +207,7 @@ final class ProfileInformationController extends AbstractActionController
                     $this->profileInformationRepository->update($currentItem);
 
                     $this->persistenceManager->persistAll();
-                    $this->addTranslatedSuccessMessage('contracts.sort.success.done');
+                    $this->addTranslatedSuccessMessage($profileInformation->getType() . '.sort.success');
                 }
                 break;
             }
@@ -233,7 +233,7 @@ final class ProfileInformationController extends AbstractActionController
     public function deleteAction(ProfileInformation $profileInformation): ResponseInterface
     {
         $this->profileInformationRepository->remove($profileInformation);
-        $this->addTranslatedSuccessMessage('profileInformation.success.delete.done');
+        $this->addTranslatedSuccessMessage($profileInformation->getType() . '.delete.success');
         return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
     }
 }

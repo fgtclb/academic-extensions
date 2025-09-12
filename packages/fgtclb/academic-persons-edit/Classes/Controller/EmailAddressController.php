@@ -97,7 +97,7 @@ final class EmailAddressController extends AbstractActionController
         $this->emailAddressRepository->add($emailAddress);
         $this->persistenceManager->persistAll();
 
-        $this->addTranslatedSuccessMessage('emailAddress.success.create.done');
+        $this->addTranslatedSuccessMessage('emailAddress.create.success');
 
         if ($this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
@@ -142,7 +142,7 @@ final class EmailAddressController extends AbstractActionController
             ),
         );
 
-        $this->addTranslatedSuccessMessage('emailAddress.success.update.done');
+        $this->addTranslatedSuccessMessage('emailAddress.update.success');
 
         if ($this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
@@ -198,7 +198,7 @@ final class EmailAddressController extends AbstractActionController
                     $this->emailAddressRepository->update($currentEmailAddress);
 
                     $this->persistenceManager->persistAll();
-                    $this->addTranslatedSuccessMessage('emailAddress.sort.success.done');
+                    $this->addTranslatedSuccessMessage('emailAddress.sort.success');
                 }
                 break;
             }
@@ -226,7 +226,7 @@ final class EmailAddressController extends AbstractActionController
     public function deleteAction(Email $emailAddress): ResponseInterface
     {
         $this->emailAddressRepository->remove($emailAddress);
-        $this->addTranslatedSuccessMessage('emailAddress.success.delete.done');
+        $this->addTranslatedSuccessMessage('emailAddress.delete.success');
         return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
     }
 
