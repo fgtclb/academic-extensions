@@ -19,8 +19,8 @@ class Job extends AbstractEntity
     protected string $sector = '';
     protected string $requiredDegree = '';
     protected string $contractualRelationship = '';
-    protected int $alumniRecommend = 0;
-    protected int $internationalsWelcome = 0;
+    protected bool $alumniRecommend = false;
+    protected bool $internationalsWelcome = false;
     protected int $employmentType = 0;
     protected string $workLocation = '';
     protected string $link = '';
@@ -114,22 +114,22 @@ class Job extends AbstractEntity
         return $this->contractualRelationship;
     }
 
-    public function setAlumniRecommend(int $alumniRecommend): void
+    public function setAlumniRecommend(bool $alumniRecommend): void
     {
         $this->alumniRecommend = $alumniRecommend;
     }
 
-    public function getAlumniRecommend(): int
+    public function getAlumniRecommend(): bool
     {
         return $this->alumniRecommend;
     }
 
-    public function setInternationalsWelcome(int $internationalsWelcome): void
+    public function setInternationalsWelcome(bool $internationalsWelcome): void
     {
         $this->internationalsWelcome = $internationalsWelcome;
     }
 
-    public function getInternationalsWelcome(): int
+    public function getInternationalsWelcome(): bool
     {
         return $this->internationalsWelcome;
     }
