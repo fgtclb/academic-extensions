@@ -180,6 +180,14 @@
 				<source>Thesis</source>
 				<target>Abschlussarbeit</target>
 			</trans-unit>
+			<trans-unit id="tx_academicjobs_domain_model_job.image.title">
+				<source>Logo of %s</source>
+				<target>Logo von %s</target>
+			</trans-unit>
+			<trans-unit id="tx_academicjobs_domain_model_job.image.alternative">
+				<source>Logo of %s</source>
+				<target>Logo von %s</target>
+			</trans-unit>
 
 			<!-- Domain Model: Contact -->
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicJobs\Controller;
 
 use FGTCLB\AcademicBase\Extbase\Property\TypeConverter\FileUploadConverter;
+use FGTCLB\AcademicBase\Service\ImageMetadataService;
 use FGTCLB\AcademicJobs\Backend\FormEngine\EmploymentTypeItems;
 use FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems;
 use FGTCLB\AcademicJobs\Domain\Model\Job;
@@ -41,6 +42,7 @@ final class JobController extends ActionController
         private readonly ImageService $imageService,
         private readonly EmploymentTypeItems $employmentTypeItems,
         private readonly TypeItems $typeItems,
+        private readonly ImageMetadataService $imageMetadataService,
         protected readonly BackendUriBuilder $backendUriBuilder,
         protected AcademicJobsSettingsRegistry $settingsRegistry,
     ) {}
@@ -165,6 +167,10 @@ final class JobController extends ActionController
         $job->setHidden((int)self::JOB_HIDDEN);
         $this->jobRepository->add($job);
         $this->persistenceManager->persistAll();
+
+        if ($job->getImage() !== null) {
+            $this->imageMetadataService->setMetadata($job, $job->getImage());
+        }
 
         $uid = $job->getUid();
         if ($uid === null) {

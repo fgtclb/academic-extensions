@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicJobs\Domain\Model;
 
+use FGTCLB\AcademicBase\Provider\FileMetadataProviderInterface;
 use TYPO3\CMS\Extbase\Annotation as Extbase;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
-class Job extends AbstractEntity
+class Job extends AbstractEntity implements FileMetadataProviderInterface
 {
     protected string $title = '';
     protected ?\DateTime $employmentStartDate = null;
@@ -262,5 +264,32 @@ class Job extends AbstractEntity
     public function getContactAdditionalInformation(): string
     {
         return $this->contactAdditionalInformation;
+    }
+
+    public function getCopyrightForImage(): string
+    {
+        return $this->companyName;
+    }
+
+    public function getAltTextForImage(): string
+    {
+        return LocalizationUtility::translate(
+            'LLL:EXT:academic_jobs/Resources/Private/Language/locallang_be.xlf:tx_academicjobs_domain_model_job.image.alternative',
+            null,
+            [
+                $this->companyName
+            ]
+        );
+    }
+
+    public function getTitleForImage(): string
+    {
+        return LocalizationUtility::translate(
+            'LLL:EXT:academic_jobs/Resources/Private/Language/locallang_be.xlf:tx_academicjobs_domain_model_job.image.title',
+            null,
+            [
+                $this->companyName
+            ]
+        );
     }
 }
