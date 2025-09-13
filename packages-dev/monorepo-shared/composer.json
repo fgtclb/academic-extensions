@@ -34,6 +34,7 @@
         "typo3/cms-frontend": "^12.4.22 || ^13.4",
         "typo3/cms-info": "^12.4.22 || ^13.4",
         "typo3/cms-install": "^12.4.22 || ^13.4",
+        "typo3/cms-lowlevel": "12.4.22 || ^13.4",
         "typo3/cms-recycler": "^12.4.22 || ^13.4",
         "typo3/cms-redirects": "^12.4.22 || ^13.4",
         "typo3/cms-reports": "^12.4.22 || ^13.4",
@@ -56,6 +57,27 @@
     "extra": {
         "branch-alias": {
             "dev-main": "2.0.x-dev"
+        }
+    },
+    "repositories": {
+        "packages": {
+            "type": "path",
+            "url": "../../packages/*/*",
+            "options": {
+                "versions": {
+                    "fgtclb/academic-bite-jobs": "2.0.2-dev",
+                    "fgtclb/academic-contacts4pages": "2.0.2-dev",
+                    "fgtclb/academic-jobs": "2.0.2-dev",
+                    "fgtclb/academic-partners": "2.0.2-dev",
+                    "fgtclb/academic-persons": "2.0.2-dev",
+                    "fgtclb/academic-persons-edit": "2.0.2-dev",
+                    "fgtclb/academic-persons-sync": "2.0.2-dev",
+                    "fgtclb/academic-programs": "2.0.2-dev",
+                    "fgtclb/academic-projects": "2.0.2-dev",
+                    "fgtclb/category-types": "2.0.2-dev",
+                    "fgtclb/academic-base": "2.0.2-dev"
+                }
+            }
         }
     }
 }
