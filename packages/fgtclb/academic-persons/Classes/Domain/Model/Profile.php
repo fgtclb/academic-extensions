@@ -11,16 +11,18 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersons\Domain\Model;
 
+use FGTCLB\AcademicBase\Provider\FileMetadataProviderInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Annotation\ORM\Cascade;
 use TYPO3\CMS\Extbase\Annotation\ORM\Lazy;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\HtmlSanitizer\Builder\CommonBuilder;
 use TYPO3\HtmlSanitizer\Sanitizer;
 
-class Profile extends AbstractEntity
+class Profile extends AbstractEntity implements FileMetadataProviderInterface
 {
     protected string $gender = '';
     protected string $title = '';
@@ -500,6 +502,33 @@ class Profile extends AbstractEntity
     public function getVita(): ObjectStorage
     {
         return $this->vita;
+    }
+
+    public function getCopyrightForImage(): string
+    {
+        return (string)$this->firstName . ' ' . $this->middleName . ' ' . $this->lastName;
+    }
+
+    public function getAltTextForImage(): string
+    {
+        return LocalizationUtility::translate(
+            'LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:tx_academicjobs_domain_model_job.image.alternative',
+            null,
+            [
+                (string)$this->firstName . ' ' . $this->middleName . ' ' . $this->lastName
+            ]
+        );
+    }
+
+    public function getTitleForImage(): string
+    {
+        return LocalizationUtility::translate(
+            'LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:tx_academicjobs_domain_model_job.image.title',
+            null,
+            [
+                (string)$this->firstName . ' ' . $this->middleName . ' ' . $this->lastName
+            ]
+        );
     }
 
     /**
