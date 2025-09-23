@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicBase\Controller;
 
 use FGTCLB\AcademicJobs\Controller\JobController;
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
@@ -36,12 +38,14 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
      * @todo Use TcaSchema for TYPO3 v13, either as dual version OR when dropping TYPO3 v12 support.
      */
     protected function getSelectItemsForTcaManagedTableField(
+        ServerRequestInterface $request,
         LocalizationUtility $localizationUtility,
         string $extensionKey,
         string $tableName,
         string $fieldName,
         array $removeItemByValue = [''],
     ): array {
+        $currentPageId = $request->getAttribute('frontend.controller')?->id ?? $request->getAttribute('site')?->getRootPageId() ?? 0;
         $items = $GLOBALS['TCA'][$tableName]['columns'][$fieldName]['config']['items'] ?? [];
         $itemProcFunc = (string)($GLOBALS['TCA'][$tableName]['columns'][$fieldName]['config']['itemsProcFunc'] ?? '');
         if ($itemProcFunc !== '') {
@@ -49,8 +53,11 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
             $processorParameters = [
                 'items' => &$items,
                 'config' => $GLOBALS['TCA'][$tableName]['columns'][$fieldName]['config'],
+                'TSconfig' => BackendUtility::getPagesTSconfig($currentPageId),
                 'table' => $tableName,
                 'field' => $fieldName,
+                'effectivePid' => $currentPageId,
+                'site' => $request->getAttribute('site'),
             ];
             GeneralUtility::callUserFunction($itemProcFunc, $processorParameters, $this);
             $items = $processorParameters['items'];
