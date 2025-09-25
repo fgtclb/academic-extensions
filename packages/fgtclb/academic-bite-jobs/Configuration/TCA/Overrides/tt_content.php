@@ -22,11 +22,13 @@ defined('TYPO3') or die;
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
         'academic_bite_jobs'
     );
+
     ExtensionManagementUtility::addPiFlexFormValue(
         '*',
         sprintf('FILE:EXT:academic_bite_jobs/Configuration/FlexForms/Core%s/AcademicBiteJobsList.xml', $typo3MajorVersion),
         'academicbitejobs_list'
     );
+
     ExtensionManagementUtility::addToAllTCAtypes(
         'tt_content',
         implode(',', [

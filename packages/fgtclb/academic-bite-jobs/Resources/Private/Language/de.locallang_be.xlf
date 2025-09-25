@@ -10,12 +10,9 @@
 	>
 		<header/>
 		<body>
-
-			<!-- BITE Plugin -->
-
 			<trans-unit id="plugin.bite.list.label">
-				<source>Bite: List of Jobs</source>
-				<target>Bite: Jobliste</target>
+				<source>Bite Jobs List</source>
+				<target>Bite Jobs Liste</target>
 			</trans-unit>
 
 			<trans-unit id="plugin.bite.list.configuration">
@@ -27,48 +24,32 @@
 				<source>Settings</source>
 				<target>Einstellungen</target>
 			</trans-unit>
-
 			<trans-unit id="flexform.el.jobs.key.label">
-				<source>Job Listing Key</source>
+				<source>Job listing key</source>
 				<target>Stellenangebotsschlüssel</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.jobs.key.description">
 				<source>Unique key from B-Ite Application</source>
-				<target>Eindeutiger Schlüssel von B-Ite Application</target>
+				<target>Eindeutiger Schlüssel aus der B-Ite Anwendung</target>
 			</trans-unit>
-
 			<trans-unit id="flexform.el.view.label">
 				<source>Select view</source>
 				<target>Ansicht auswählen</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.view.items.list">
-				<source>List view</source>
-				<target>Listenansicht</target>
+				<source>List</source>
+				<target>Liste</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.view.items.card">
-				<source>Card view</source>
-				<target>Kartenansicht</target>
+				<source>Card</source>
+				<target>Karten</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.view.items.table">
-				<source>Table view</source>
-				<target>Tabellenansicht</target>
+				<source>Table</source>
+				<target>Tabelle</target>
 			</trans-unit>
-
-			<trans-unit id="flexform.el.groupBy.label">
-				<source>Group By</source>
-				<target>Gruppiere nach</target>
-			</trans-unit>
-			<trans-unit id="flexform.el.groupBy.items.none">
-				<source>No grouping</source>
-				<target>Keine Gruppierung</target>
-			</trans-unit>
-			<trans-unit id="flexform.el.groupBy.items.thema">
-				<source>Thema</source>
-				<target>Thema</target>
-			</trans-unit>
-
 			<trans-unit id="flexform.el.sortBy.label">
-				<source>Sort By</source>
+				<source>Sort by</source>
 				<target>Sortiere nach</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.sortBy.items.none">
@@ -76,17 +57,16 @@
 				<target>Keine Sortierung</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.sortBy.items.ends_on">
-				<source>Ends On</source>
+				<source>Ends on</source>
 				<target>Endet am</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.sortBy.items.title">
 				<source>Title</source>
-				<target>Title</target>
+				<target>Titel</target>
 			</trans-unit>
-
 			<trans-unit id="flexform.el.sortByDirection.label">
-				<source>Sort By Direction</source>
-				<target>Nach Richtung sortieren</target>
+				<source>Sort direction</source>
+				<target>Sortierreihenfolge</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.sortByDirection.items.asc">
 				<source>Ascending</source>
@@ -96,14 +76,14 @@
 				<source>Descending</source>
 				<target>Absteigend</target>
 			</trans-unit>
-
 			<trans-unit id="flexform.el.jobs.limit.label">
-				<target>Limit für Stellenanzeigen</target>
+				<source>Maximum number of job offers</source>
+				<target>Maximale Anzahl an Stellenangeboten</target>
 			</trans-unit>
 			<trans-unit id="flexform.el.jobs.limit.description">
-				<target>Maximale Anzahl an Stellenangeboten (0 = kein Limit)</target>
+				<source>(0 = show all)</source>
+				<target>(0 = Alle anzeigen)</target>
 			</trans-unit>
-
 			<trans-unit id="flexform.el.all">
 				<source>All</source>
 				<target>Alle</target>

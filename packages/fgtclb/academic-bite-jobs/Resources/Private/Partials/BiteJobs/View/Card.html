@@ -1,0 +1,36 @@
+<html
+    lang="en"
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+>
+
+<div class="academic-bite-jobs-itemcards">
+    <f:for each="{jobs}" as="job">
+        <div class="academic-bite-jobs-item card">
+            <div class="card-body">
+                <f:render
+                    partial="BiteJobs/Header"
+                    arguments="{
+                        header: job.title,
+                        layout: data.header_layout,
+                        subheader: data.subheader,
+                        link: job.url,
+                        grouped: grouped
+                    }"
+                />
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <b>{f:translate(key: 'jobs.bite.endsOn', extensionName: 'academic_bite_jobs')}:</b>
+
+                        <span>{job.endsOn -> f:format.date(format: 'd.m.Y')}</span>
+                    </li>
+
+                    <!-- Add custom fields here -->
+                </ul>
+            </div>
+        </div>
+    </f:for>
+</div>
+
+</html>

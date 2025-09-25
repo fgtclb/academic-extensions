@@ -4,15 +4,23 @@
 		source-language="en"
 		target-language="de"
 		datatype="plaintext"
-		original="EXT:academic_bite_jobs/Resources/Private/Language/locallang_fe.xlf"
+		original="EXT:academic_bite_jobs/Resources/Private/Language/locallang.xlf"
 		date="2023-09-15T08:53:00Z"
 		product-name="academic_bite_jobs"
 	>
 		<header/>
 		<body>
-			<trans-unit id="fe.b-ite.no-jobs">
+			<trans-unit id="no-jobs">
 				<source>There are currently no job vacancies.</source>
 				<target>Zur Zeit gibt es keine aktuellen Ausschreibungen.</target>
+			</trans-unit>
+			<trans-unit id="jobs.bite.title">
+				<source>Title</source>
+				<target>Titel</target>
+			</trans-unit>
+			<trans-unit id="jobs.bite.endsOn">
+				<source>Ends on</source>
+				<target>Endet am</target>
 			</trans-unit>
 		</body>
 	</file>
