@@ -22,7 +22,6 @@ class BiteJobsController extends ActionController
         $this->view->assignMultiple([
             'data' => $contentElementData,
             'jobs' => $this->biteJobsService->fetchBiteJobs($this->request),
-            'jobRelations' => $this->biteJobsService->findCustomjobRelations(),
         ]);
 
         return $this->htmlResponse();

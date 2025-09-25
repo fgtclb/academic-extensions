@@ -1,0 +1,40 @@
+<html
+    lang="en"
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+>
+
+<table class="table table-striped academic-bite-jobs-itemtable">
+    <thead class="table-primary">
+        <tr>
+            <f:for
+                each="{
+                    0: 'title',
+                    1: 'endsOn',
+                }"
+                as="column"
+            >
+                <th>
+                    {f:translate(key: 'jobs.bite.{column}', extensionName: 'academic_bite_jobs')}
+                </th>
+            </f:for>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider table-secondary">
+        <f:for each="{jobs}" as="job">
+            <tr class="academic-bite-jobs-item">
+                <td>
+                    <a href="{job.url}" target="_blank" class="card-link">{job.title}</a>
+                </td>
+
+                <td>
+                    {job.endsOn -> f:format.date(format: 'd.m.Y')}
+                </td>
+
+                <!-- Add custom fields here -->
+            </tr>
+        </f:for>
+    </tbody>
+</table>
+
+</html>

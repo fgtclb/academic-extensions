@@ -1,22 +1,54 @@
 <html
     lang="en"
-    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
 >
 
-<section class="bite-jobs">
-	<f:if condition="{jobs}">
-			<f:then>
-					<f:render partial="BiteJobs/{settings.jobs.view}" arguments="{_all}" />
-					<style>
-							.bite-jobs th {
-									hyphens: none !important;
-							}
-					</style>
-			</f:then>
-			<f:else>
-				<f:translate key="LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_fe.xlf:fe.b-ite.no-jobs" />
-			</f:else>
-	</f:if>
-</section>
+<div class="academic-bite-jobs-list">
+
+    <f:render partial="Header/All" arguments="{_all}" />
+
+    <f:if condition="{jobs}">
+        <f:then>
+            <f:if condition="{settings.jobs.groupBy} !== 'none'">
+                <f:then>
+                    <f:groupedFor as="groupedJobs" groupBy="relationName" each="{jobs}">
+                        <f:render
+                            partial="BiteJobs/Header"
+                            arguments="{
+                                header: groupKey,
+                                layout: data.header_layout,
+                                subheader: data.subheader,
+                            }"
+                        />
+
+                        <f:render
+                            partial="BiteJobs/View/{settings.jobs.view}"
+                            arguments="{
+                                data: data,
+                                jobs: groupedJobs,
+                                grouped: 'true'
+                            }"
+                        />
+                    </f:groupedFor>
+                </f:then>
+                <f:else>
+                    <f:render
+                        partial="BiteJobs/View/{settings.jobs.view}"
+                        arguments="{
+                            data: data,
+                            jobs: jobs,
+                        }"
+                    />
+                </f:else>
+            </f:if>
+        </f:then>
+        <f:else>
+            <span>
+                {f:translate(key: 'no-jobs', extensionName: 'academic_bite_jobs')}
+            </span>
+        </f:else>
+    </f:if>
+</div>
+
 </html>
