@@ -1,0 +1,29 @@
+{
+    "name": "fgtclb/academics-monorepo-testing-helper",
+    "description": "Shared dependencies for root and ddev installations to reduce maintenance burden",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "keywords": [
+        "testing"
+    ],
+    "authors": [
+        {
+            "name": "FGTCLB GmbH",
+            "email": "hello@fgtclb.com"
+        }
+    ],
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "FGTCLB\\TestingHelper\\": "Classes/"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/fgtclb/academic-extensions/issues",
+        "source": "https://github.com/fgtclb/academic-extensions",
+        "email": "hello@fgtclb.com"
+    },
+    "homepage": "https://www.fgtclb.com/"
+}
