@@ -35,12 +35,21 @@ class ContactsProcessor implements DataProcessorInterface
         $processedData['contacts'] = $contacts;
 
         $roles = [];
+        $availableContacts = [];
         foreach ($contacts as $contact) {
+            if ($contact->getContract() === null || $contact->getContract()->getProfile() === null) {
+                continue;
+            }
+
+            $availableContacts[] = $contact;
             $role = $contact->getRole();
+
             if ($role !== null) {
                 $roles[$role->getUid()] = $role;
             }
         }
+
+        $processedData['contacts'] = $availableContacts;
         $processedData['roles'] = $roles;
 
         return $processedData;
