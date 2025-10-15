@@ -16,7 +16,7 @@
     phpunit v10.1 compatible version.
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+     xsi:noNamespaceSchemaLocation="../../.Build/vendor/phpunit/phpunit/phpunit.xsd"
      backupGlobals="true"
      beStrictAboutTestsThatDoNotTestAnything="false"
      bootstrap="FunctionalTestsBootstrap.php"
