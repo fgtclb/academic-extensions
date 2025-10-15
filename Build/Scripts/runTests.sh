@@ -48,7 +48,7 @@ handleDbmsOptions() {
                 exit 1
             fi
             [ -z "${DBMS_VERSION}" ] && DBMS_VERSION="10.4"
-            if ! [[ ${DBMS_VERSION} =~ ^(10.4|10.5|10.6|10.7|10.8|10.9|10.10|10.11|11.0|11.1)$ ]]; then
+            if ! [[ ${DBMS_VERSION} =~ ^(10.4|10.5|10.6|10.7|10.8|10.9|10.10|10.11|11.0|11.1|11.2|11.2|11.3|11.4)$ ]]; then
                 echo "Invalid combination -d ${DBMS} -i ${DBMS_VERSION}" >&2
                 echo >&2
                 echo "Use \".Build/Scripts/runTests.sh -h\" to display help and valid options" >&2
@@ -149,6 +149,10 @@ Options:
             - composer: "composer" with all remaining arguments dispatched.
             - composerUpdate: "composer update", handy if host has no PHP
             - lintPhp: PHP linting
+            - phpstan: phpstan tests
+            - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
+            - unit (default): PHP unit tests
+            - unitRandom: PHP unit tests in random order, "-- --random-order-seed=<number>" to use specific seed
 
     -b <docker|podman>
         Container environment:
@@ -157,7 +161,56 @@ Options:
 
         If not specified, podman will be used if available. Otherwise, docker is used.
 
-    -t <11|12>
+    -a <mysqli|pdo_mysql>
+        Only with -s functional|functionalDeprecated
+        Specifies to use another driver, following combinations are available:
+            - mysql
+                - mysqli (default)
+                - pdo_mysql
+            - mariadb
+                - mysqli (default)
+                - pdo_mysql
+
+    -d <sqlite|mariadb|mysql|postgres>
+        Only with -s functional|functionalDeprecated|acceptance|acceptanceInstall
+        Specifies on which DBMS tests are performed
+            - sqlite: (default): use sqlite
+            - mariadb: use mariadb
+            - mysql: use MySQL
+            - postgres: use postgres
+
+    -i version
+        Specify a specific database version
+        With "-d mariadb":
+            - 10.4   short-term, maintained until 2024-06-18 (default)
+            - 10.5   short-term, maintained until 2025-06-24
+            - 10.6   long-term, maintained until 2026-06
+            - 10.7   short-term, no longer maintained
+            - 10.8   short-term, maintained until 2023-05
+            - 10.9   short-term, maintained until 2023-08
+            - 10.10  short-term, maintained until 2023-11
+            - 10.11  long-term, maintained until 2028-02
+            - 11.0   development series
+            - 11.1   short-term development series
+            - 11.2   short-term development series, maintained until 2024-11
+            - 11.3   short-term development series, rolling release
+            - 11.4   long-term, maintained until 2029-05
+        With "-d mysql":
+            - 8.0   maintained until 2026-04 (default) LTS
+            - 8.1   unmaintained since 2023-10
+            - 8.2   unmaintained since 2024-01
+            - 8.3   maintained until 2024-04
+            - 8.4   maintained until 2032-04 LTS
+        With "-d postgres":
+            - 10    unmaintained since 2022-11-10 (default)
+            - 11    maintained until 2023-11-09
+            - 12    maintained until 2024-11-14
+            - 13    maintained until 2025-11-13
+            - 14    maintained until 2026-11-12
+            - 15    maintained until 2027-11-11
+            - 16    maintained until 2028-11-09
+
+    -t <12|13>
         Only with -s composerInstall|composerInstallMin|composerInstallMax
         Specifies the TYPO3 CORE Version to be used
             - 12: (default) use TYPO3 v12
@@ -171,6 +224,20 @@ Options:
             - 8.4: use PHP 8.4
             - 8.5: use PHP 8.5
 
+    -x
+        Only with -s functional|unit|unitRandom
+        Send information to host instance for test or system under test break points. This is especially
+        useful if a local PhpStorm instance is listening on default xdebug port 9003. A different port
+        can be selected with -y
+
+    -y <port>
+        Send xdebug information to a different port than default 9003 if an IDE like PhpStorm
+        is not listening on default port.
+
+    -n
+        Only with -s cgl|cglGit|cglHeader|cglHeaderGit
+        Activate dry-run in CGL check that does not actively change files and only prints broken ones.
+
     -u
         Update existing typo3/core-testing-*:latest container images and remove dangling local volumes.
         New images are published once in a while and only the latest ones are supported by core testing.
@@ -180,8 +247,12 @@ Options:
         Show this help.
 
 Examples:
-    # Run all core unit tests using PHP 8.1
+    # Run all core unit tests using PHP 8.2
     ./Build/Scripts/runTests.sh -s unit
+    ./Build/Scripts/runTests.sh -s unit -p 8.2
+
+    # Run all core unit tests using PHP 8.1
+    ./Build/Scripts/runTests.sh -s unit -p 8.1
 
     # Run all core units tests and enable xdebug (have a PhpStorm listening on port 9003!)
     ./Build/Scripts/runTests.sh -x
@@ -198,12 +269,6 @@ Examples:
 
     # Run functional tests on postgres 11
     ./Build/Scripts/runTests.sh -s functional -d postgres -k 11
-
-    # Run restricted set of application acceptance tests
-    ./Build/Scripts/runTests.sh -s acceptance typo3/sysext/core/Tests/Acceptance/Application/Login/BackendLoginCest.php:loginButtonMouseOver
-
-    # Run installer tests of a new instance on sqlite
-    ./Build/Scripts/runTests.sh -s acceptanceInstall -d sqlite
 EOF
 }
 
@@ -359,7 +424,7 @@ ARCH=$(uname -m)
 if [ ${ARCH} = "arm64" ]; then
     IMAGE_SELENIUM="docker.io/seleniarm/standalone-chromium:4.1.2-20220227"
 fi
-echo "Architecture" ${ARCH} "requires" ${IMAGE_SELENIUM} "to run acceptance tests."
+# echo "Architecture" ${ARCH} "requires" ${IMAGE_SELENIUM} "to run acceptance tests."
 
 # Set $1 to first mass argument, this is the optional test file or test directory to execute
 shift $((OPTIND - 1))
@@ -376,9 +441,15 @@ if [ "${CONTAINER_BIN}" == "docker" ]; then
 else
     # podman
     CONTAINER_HOST="host.containers.internal"
-    CONTAINER_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm --network ${NETWORK} -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
-    CONTAINER_SIMPLE_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
-    DOCUMENTATION_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR} -v ${ROOT_DIR}:/project"
+    if [ $( uname ) = "Linux" ]; then
+        CONTAINER_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm --network ${NETWORK} -v ${ROOT_DIR}:${ROOT_DIR}:Z -w ${ROOT_DIR}"
+        CONTAINER_SIMPLE_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR}:Z -w ${ROOT_DIR}"
+        DOCUMENTATION_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR}:Z -v ${ROOT_DIR}:/project"
+    else
+        CONTAINER_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm --network ${NETWORK} -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
+        CONTAINER_SIMPLE_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
+        DOCUMENTATION_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR} -v ${ROOT_DIR}:/project"
+    fi
 fi
 
 if [ ${PHP_XDEBUG_ON} -eq 0 ]; then
