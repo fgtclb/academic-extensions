@@ -10,10 +10,26 @@ services:
       - '../Classes/Domain/Model/*'
 
   # @internal not part of public API
+  cache.academic_settings:
+    class: TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+    factory: ['@TYPO3\CMS\Core\Cache\CacheManager', 'getCache']
+    arguments: ['academic_settings']
+
+  # @internal not part of public API
+  FGTCLB\AcademicBase\Extbase\Property\TypeConverter\AcademicSettingsConverter:
+    tags:
+      - name: extbase.type_converter
+        priority: 20
+        target: FGTCLB\AcademicBase\Settings\AcademicSettingsInterface
+        sources: array
+
+  # @internal not part of public API
   FGTCLB\AcademicBase\Extbase\Property\TypeConverter\FileUploadConverter:
     tags:
       - name: extbase.type_converter
         priority: 10
         target: TYPO3\CMS\Extbase\Domain\Model\FileReference
         sources: array
+
+
 
