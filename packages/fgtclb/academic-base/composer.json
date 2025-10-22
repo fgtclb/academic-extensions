@@ -6,6 +6,8 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+        "symfony/config": "^6.4.26 || ^7.3.4",
+        "symfony/serializer": "^6.4.26 || ^7.3.4",
         "typo3/cms-core": "^12.4.22 || ^13.4"
     },
     "config": {
@@ -27,6 +29,14 @@
         },
         "branch-alias": {
             "dev-main": "2.0.x-dev"
+        },
+        "sbuerk/release": {
+            "tailor": {
+                "require": {
+                    "symfony/config": "^6.4.26",
+                    "symfony/serializer": "^6.4.26"
+                }
+            }
         }
     }
 }
