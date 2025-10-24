@@ -45,3 +45,4 @@ Ldap Imports.
 
     Installation/Index
     KnownProblems/Index
+    Changelog/Changelog-2
