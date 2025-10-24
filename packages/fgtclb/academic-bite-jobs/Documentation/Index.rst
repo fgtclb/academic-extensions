@@ -2,9 +2,9 @@
 
 .. _start:
 
-================
+==================
 Academic Bite Jobs
-================
+==================
 
 :Extension key:
     academic_bite_jobs
@@ -59,3 +59,4 @@ advertisements are also available in the plugin.
     Configuration/Index
     Templates/Index
     KnownProblems/Index
+    Changelog/Changelog-2
