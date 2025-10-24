@@ -1,17 +1,20 @@
-# Upgrade 2.0
+.. include:: /Includes.rst.txt
 
-## X.Y.Z
+.. _breaking-1758798000:
 
-### BREAKING
+===============================================
+Breaking: Remove project specific custom fields
+===============================================
 
-#### BREAKING: Remove project specific custom fields
+Description
+===========
 
-`EXT:academic_bite_jobs` provided flexform options
-and filters based on custom project specific field
+`EXT:academic_bite_jobs` provides flexform options
+and filters based on custom project specific fields
 and options not interchangeable with other projects
 and not making sense being provided by default.
 
-These custom fields needs to be setup the samy way
+These custom fields needs to be setup the same way
 on the external bite-job system and is mosts likely
 not the way to go.
 
@@ -41,10 +44,14 @@ Additionally, fluid template structure is streamlined
 in the same step to follow the restructure epic for
 all academic extensions.
 
-Following removals are include:
 
-* `flexform` options `settings.jobs.custom.zuordnung`
-  and `settings.jobs.groupBy` are removed.
+Impact
+======
+
+Following removals are included:
+
+* `flexform` options `settings.jobs.custom.zuordnung` and
+ `settings.jobs.groupBy` are removed.
 * `BiteFieldsHelper` is removed being unused and an empty class anyway.
 * `BiteJobsService->fetchBiteJobs()` handling code for removed flexform
   setting options is removed from method.
@@ -53,6 +60,15 @@ Following removals are include:
 * `public BiteJobsService->groupByRelations()` is removed.
 * `public BiteJobsService->mapFieldsToJobs()` is removed.
 
-## 2.0.1
+Affected Installations
+======================
 
-## 2.0.0
+EXT:academic_bite_jobs before v2.1 installations using custom project specific
+fields and options
+
+Migration
+=========
+
+[TODO] How to migrate the breaking change?
+
+.. index:: FlexForm, Fluid, Frontend
