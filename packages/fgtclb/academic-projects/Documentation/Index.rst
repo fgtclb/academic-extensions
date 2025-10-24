@@ -56,3 +56,4 @@ project managers, research participants or cooperation partners.
     Configuration/Index
     Templates/Index
     KnownProblems/Index
+    Changelog/Changelog-2
