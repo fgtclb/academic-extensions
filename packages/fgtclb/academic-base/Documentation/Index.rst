@@ -45,3 +45,4 @@ TYPO3 extension base containing functionality across academic extensions.
     Introduction/Index
     Installation/Index
     KnownProblems/Index
+    Changelog/Changelog-2
