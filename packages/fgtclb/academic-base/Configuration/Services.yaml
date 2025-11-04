@@ -8,6 +8,8 @@ services:
     resource: '../Classes/*'
     exclude:
       - '../Classes/Domain/Model/*'
+#      - '../Classes/Core12/*'
+#      - '../Classes/Core13/*'
 
   # @internal not part of public API
   academic-base.serializer:
