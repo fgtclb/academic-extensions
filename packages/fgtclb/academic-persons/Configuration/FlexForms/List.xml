@@ -147,7 +147,7 @@
                             <numIndex index="1">table</numIndex>
                         </numIndex>
                     </items>
-                    <default>asc</default>
+                    <default>list</default>
                 </config>
             </settings.viewMode.default>
             <settings.fallbackForNonTranslated>
@@ -201,6 +201,15 @@
                     <size>3</size>
                 </config>
             </settings.functionTypes>
+            <settings.showPublic>
+                <label>LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.showPublic.label</label>
+                <description>LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.showPublic.description</description>
+                <config>
+                    <type>check</type>
+                    <renderType>checkboxToggle</renderType>
+                    <default>1</default>
+                </config>
+            </settings.showPublic>
         </el>
     </ROOT>
 </T3DataStructure>

@@ -39,8 +39,6 @@ class Contract extends AbstractEntity
 
     protected string $officeHours = '';
 
-    protected bool $publish = false;
-
     /**
      * @var ObjectStorage<Address>
      * @Lazy
@@ -167,16 +165,6 @@ class Contract extends AbstractEntity
     public function getOfficeHours(): string
     {
         return $this->officeHours;
-    }
-
-    public function setPublish(bool $publish): void
-    {
-        $this->publish = $publish;
-    }
-
-    public function isPublish(): bool
-    {
-        return $this->publish;
     }
 
     /**

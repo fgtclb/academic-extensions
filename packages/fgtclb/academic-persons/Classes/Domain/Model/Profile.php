@@ -119,6 +119,8 @@ class Profile extends AbstractEntity
      */
     protected ObjectStorage $lectures;
 
+    protected bool $allowedShowPublic = false;
+
     public function __construct()
     {
         $this->contracts = new ObjectStorage();
@@ -427,5 +429,15 @@ class Profile extends AbstractEntity
     public function setLectures(ObjectStorage $lectures): void
     {
         $this->lectures = $lectures;
+    }
+
+    public function getAllowedShowPublic(): bool
+    {
+        return $this->allowedShowPublic;
+    }
+
+    public function setAllowedShowPublic(bool $allowedShowPublic): void
+    {
+        $this->allowedShowPublic = $allowedShowPublic;
     }
 }

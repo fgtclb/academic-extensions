@@ -48,6 +48,17 @@
                             </config>
                         </TCEforms>
                     </settings.showFields>
+                    <settings.showPublic>
+                        <TCEforms>
+                            <label>LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.showPublic.label</label>
+                            <description>LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.showPublic.description</description>
+                            <config>
+                                <type>check</type>
+                                <renderType>checkboxToggle</renderType>
+                                <default>1</default>
+                            </config>
+                        </TCEforms>
+                    </settings.showPublic>
                     <settings.viewMode.enabled>
                         <TCEforms>
                             <label>LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.viewMode.enabled.label</label>
@@ -80,7 +91,7 @@
                                         <numIndex index="1">table</numIndex>
                                     </numIndex>
                                 </items>
-                                <default>asc</default>
+                                <default>list</default>
                             </config>
                         </TCEforms>
                     </settings.viewMode.default>

@@ -17,6 +17,8 @@ use Fgtclb\AcademicPersons\Domain\Repository\ContractRepository;
 use Fgtclb\AcademicPersons\Domain\Repository\ProfileRepository;
 use Fgtclb\AcademicPersons\Event\ModifyDetailProfileEvent;
 use Fgtclb\AcademicPersons\Event\ModifyListProfilesEvent;
+use Fgtclb\AcademicPersons\Services\DemandGenerator;
+use Fgtclb\AcademicPersons\Utility\SortUtility;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheTag;
@@ -35,16 +37,22 @@ final class ProfileController extends ActionController
 {
     private ProfileRepository $profileRepository;
 
+    private ContractRepository $contractRepository;
+
+    private DemandGenerator $demandGenerator;
+
     public function injectProfileRepository(ProfileRepository $profileRepository): void
     {
         $this->profileRepository = $profileRepository;
     }
 
-    private ContractRepository $contractRepository;
-
     public function injectContractRepository(ContractRepository $contractRepository): void
     {
         $this->contractRepository = $contractRepository;
+    }
+    public function injectDemandGenerator(DemandGenerator $demandGenerator): void
+    {
+        $this->demandGenerator = $demandGenerator;
     }
 
     public function initializeListAction(): void
@@ -68,9 +76,26 @@ final class ProfileController extends ActionController
         $this->settings['showFields'] = !empty($this->settings['showFields']) ? GeneralUtility::trimExplode(',', $this->settings['showFields']) : null;
     }
 
-    public function listAction(ProfileDemand $demand): ResponseInterface
+    public function listAction(?ProfileDemand $demand = null): ResponseInterface
     {
-        $this->adoptSettings($demand);
+        $settings = $this->settings;
+
+        $contentObjectData = $this->getContentObject()?->data;
+        $hasStoragePids = (
+            is_array($contentObjectData)
+            && !empty($contentObjectData['pages'])
+            && is_string($contentObjectData['pages'])
+        );
+        if ($hasStoragePids) {
+            $settings['pages'] = $contentObjectData['pages'];
+        }
+
+        if ($demand === null) {
+            $demand = $this->demandGenerator->createProfileDemand($settings);
+        } else {
+            $demand = $this->demandGenerator->overrideProfileDemand($demand, $settings);
+        }
+
         $profiles = $this->profileRepository->findByDemand($demand);
 
         /** @var ModifyListProfilesEvent $event */
@@ -92,6 +117,7 @@ final class ProfileController extends ActionController
             } else {
                 $pagination = new SimplePagination($paginator);
             }
+
             $this->view->assignMultiple([
                 'paginator' => $paginator,
                 'pagination' => $pagination,
@@ -100,16 +126,8 @@ final class ProfileController extends ActionController
 
         // If profiles were selected manually, sort them by order in selection
         if (!empty($demand->getProfileList())) {
-            $selectedProfiles = [];
             $profileUidArray = GeneralUtility::intExplode(',', $demand->getProfileList(), true);
-            foreach ($profileUidArray as $uid) {
-                foreach ($profiles as $profile) {
-                    if ($profile->getUid() === $uid) {
-                        $selectedProfiles[] = $profile;
-                    }
-                }
-            }
-            $profiles = $selectedProfiles;
+            $profiles = SortUtility::sortArrayByIdList($profiles->toArray(), $profileUidArray);
         }
 
         $this->view->assignMultiple([
@@ -192,6 +210,7 @@ final class ProfileController extends ActionController
     public function initializeSelectedProfilesAction(): void
     {
         $this->settings['showFields'] = !empty($this->settings['showFields']) ? GeneralUtility::trimExplode(',', $this->settings['showFields']) : null;
+        $this->settings['pages'] = $this->getContentObject()?->data['pages'] ?? '';
     }
 
     public function selectedProfilesAction(): ResponseInterface
@@ -200,22 +219,19 @@ final class ProfileController extends ActionController
             return $this->htmlResponse();
         }
 
-        $profileUids = GeneralUtility::intExplode(',', $this->settings['selectedProfiles'], true);
-        $profiles = $this->profileRepository->findByUids($profileUids);
+        $demandGenerator = GeneralUtility::makeInstance(DemandGenerator::class);
+        $demand = $demandGenerator->createProfileDemand($this->settings);
+        $demand->setProfileList($this->settings['selectedProfiles']);
+
+        $profiles = $this->profileRepository->findByDemand($demand);
 
         /** @var ModifyListProfilesEvent $event */
         $event = $this->eventDispatcher->dispatch(new ModifyListProfilesEvent($profiles, $this->view));
         $profiles = $event->getProfiles();
 
         // Sort profiles by order in selection
-        $sortedProfiles = [];
-        foreach ($profileUids as $uid) {
-            foreach ($profiles as $profile) {
-                if ($profile->getUid() === $uid) {
-                    $sortedProfiles[] = $profile;
-                }
-            }
-        }
+        $profileUids = GeneralUtility::intExplode(',', $demand->getProfileList(), true);
+        $sortedProfiles = SortUtility::sortArrayByIdList($profiles->toArray(), $profileUids);
 
         $this->view->assignMultiple([
             'data' => $this->getContentObject()?->data,
@@ -236,18 +252,10 @@ final class ProfileController extends ActionController
             return $this->htmlResponse();
         }
 
-        $contractUids = GeneralUtility::intExplode(',', $this->settings['selectedContracts'], true);
-        $contracts = $this->contractRepository->findByUids($contractUids);
+        $demand = $this->demandGenerator->createContractDemand($this->settings);
+        $contracts = $this->contractRepository->findByDemand($demand);
 
-        // Sort profiles by order in selection
-        $sortedContracts = [];
-        foreach ($contractUids as $uid) {
-            foreach ($contracts as $contract) {
-                if ($contract->getUid() === $uid) {
-                    $sortedContracts[] = $contract;
-                }
-            }
-        }
+        $sortedContracts = SortUtility::sortArrayByIdList($contracts->toArray(), $demand->getContractList());
 
         $this->view->assignMultiple([
             'data' => $this->getContentObject()?->data,
@@ -255,54 +263,6 @@ final class ProfileController extends ActionController
         ]);
 
         return $this->htmlResponse();
-    }
-
-    /**
-     * Adopt plugin settings and `tt_content.pages`.
-     */
-    private function adoptSettings(ProfileDemand $demand): void
-    {
-        if (isset($this->settings['functionTypes'])
-            && is_string($this->settings['functionTypes'])
-            && $this->settings['functionTypes'] !== ''
-        ) {
-            $functionTypeUids = GeneralUtility::intExplode(',', $this->settings['functionTypes'], true);
-            if (!empty($functionTypeUids)) {
-                $demand->setFunctionTypes($functionTypeUids);
-            }
-        }
-
-        if (isset($this->settings['organisationalUnits'])
-            && is_string($this->settings['organisationalUnits'])
-            && $this->settings['organisationalUnits'] !== ''
-        ) {
-            $organisationalUnitUids = GeneralUtility::intExplode(',', $this->settings['organisationalUnits'], true);
-            if (!empty($organisationalUnitUids)) {
-                $demand->setOrganisationalUnits($organisationalUnitUids);
-            }
-        }
-
-        $contentObjectData = $this->getContentObject()?->data;
-        $hasStoragePids = (
-            is_array($contentObjectData)
-            && !empty($contentObjectData['pages'])
-            && is_string($contentObjectData['pages'])
-        );
-        if ($hasStoragePids) {
-            $demand->setStoragePages($contentObjectData['pages']);
-        }
-
-        /**
-         * Introduced with https://github.com/fgtclb/academic-persons/pull/30 to have the option to display profiles in
-         * fallback mode even when site language (non-default) is configured to be in strict mode.
-         *
-         * {@see AcademicPersonsListAndDetailPluginTest::fullyLocalizedListDisplaysLocalizedSelectedProfilesForRequestedLanguageInSelectedOrder()}
-         * {@see AcademicPersonsListPluginTest::fullyLocalizedListDisplaysLocalizedSelectedProfilesForRequestedLanguageInSelectedOrder()}
-         */
-        $fallbackForNonTranslated = (int)($this->settings['fallbackForNonTranslated'] ?? 0);
-        if ($fallbackForNonTranslated === 1) {
-            $demand->setFallbackForNonTranslated($fallbackForNonTranslated);
-        }
     }
 
     /**

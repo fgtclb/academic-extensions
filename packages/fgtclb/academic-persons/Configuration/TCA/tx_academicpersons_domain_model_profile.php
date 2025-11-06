@@ -708,6 +708,24 @@ return [
                 ],
             ],
         ],
+        'allowed_show_public' => [
+            'exclude' => true,
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.allowed_show_public.label',
+            'description' => '',
+            'config' => [
+                'type' => 'check',
+                'renderType' => 'checkboxToggle',
+                'default' => 0,
+                'items' => [
+                    [
+                        $selectLabelKey => '',
+                        'labelChecked' => 'Enabled',
+                        'labelUnchecked' => 'Disabled',
+                        'invertStateDisplay' => false,
+                    ],
+                ],
+            ],
+        ],
     ],
     'palettes' => [
         'name' => [
@@ -759,6 +777,7 @@ return [
                 'endtime;LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:endtime_formlabel',
                 '--linebreak--',
                 'fe_group;LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:fe_group_formlabel',
+                '--linebreak--',
             ]),
         ],
     ],
@@ -792,6 +811,7 @@ return [
                 '--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:access',
                 '--palette--;;hidden',
                 '--palette--;;access',
+                'allowed_show_public',
                 '--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:extended',
             ]),
         ],

@@ -226,6 +226,14 @@
                 <source>Table</source>
                 <target>Tabelle</target>
             </trans-unit>
+            <trans-unit id="flexform.el.showPublic.label">
+                <source>show public profile only</source>
+                <target>Nur öffentliches Profil anzeigen</target>
+            </trans-unit>
+            <trans-unit id="flexform.el.showPublic.description">
+                <source>show only public Profile allowed by user self</source>
+                <target>Nur vom Benutzer selbst zugelassenes öffentliches Profil anzeigen</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

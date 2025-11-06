@@ -11,23 +11,23 @@ declare(strict_types=1);
 
 namespace Fgtclb\AcademicPersons\Event;
 
-use Fgtclb\AcademicPersons\Domain\Model\Dto\DemandInterface;
+use Fgtclb\AcademicPersons\Domain\Model\Dto\ProfileDemandInterface;
 
 final class ModifyProfileDemandEvent
 {
-    private DemandInterface $demand;
+    private ProfileDemandInterface $demand;
 
-    public function __construct(DemandInterface $demand)
+    public function __construct(ProfileDemandInterface $demand)
     {
         $this->demand = $demand;
     }
 
-    public function setDemand(DemandInterface $demand): void
+    public function setDemand(ProfileDemandInterface $demand): void
     {
         $this->demand = $demand;
     }
 
-    public function getDemand(): DemandInterface
+    public function getDemand(): ProfileDemandInterface
     {
         return $this->demand;
     }

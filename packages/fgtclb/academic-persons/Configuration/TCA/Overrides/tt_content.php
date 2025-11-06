@@ -9,7 +9,6 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-// <<<<<<< HEAD
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
