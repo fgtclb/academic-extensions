@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicContacts4pages\Domain\Repository;
 
 use FGTCLB\AcademicContacts4pages\Domain\Model\Contact;
 use TYPO3\CMS\Core\Context\LanguageAspect;
+use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
@@ -31,6 +32,9 @@ class ContactRepository extends Repository
         $query->getQuerySettings()->setLanguageAspect($changedLanguageAspect);
         $query->getQuerySettings()->setRespectSysLanguage(false);
         $query->getQuerySettings()->setRespectStoragePage(false);
+        $query->setOrderings([
+            'sorting' => QueryInterface::ORDER_ASCENDING,
+        ]);
 
         $query->matching(
             $query->equals('page', $pid)
