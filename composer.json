@@ -22,7 +22,10 @@
         },
         "sort-packages": true,
         "bin-dir": ".Build/bin",
-        "vendor-dir": ".Build/vendor"
+        "vendor-dir": ".Build/vendor",
+        "audit": {
+            "block-insecure": false
+        }
     },
     "extra": {
         "typo3/cms": {
