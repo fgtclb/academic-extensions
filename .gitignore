@@ -10,6 +10,7 @@
 /rector.php
 *.diff
 
+/ddev-instances/*/.Build
 /ddev-instances/core-12/config
 /ddev-instances/core-12/public
 /ddev-instances/core-12/vendor

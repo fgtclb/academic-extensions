@@ -22,7 +22,10 @@
             "php-http/discovery": true,
             "sbuerk/fixture-packages": true
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "audit": {
+            "block-insecure": false
+        }
     },
     "extra": {
         "typo3/cms": {
