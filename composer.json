@@ -25,6 +25,9 @@
         "vendor-dir": ".Build/vendor",
         "preferred-install": {
             "*": "dist"
+        },
+        "audit": {
+            "block-insecure": false
         }
     },
     "extra": {
