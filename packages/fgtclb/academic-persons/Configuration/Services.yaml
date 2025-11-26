@@ -8,6 +8,13 @@ services:
     resource: '../Classes/*'
     exclude: '../Classes/Domain/Model/*.php'
 
-  Fgtclb\AcademicPersons\Domain\Model\Dto\DemandInterface:
+  Fgtclb\AcademicPersons\Domain\Model\Dto\ContractDemandInterface:
+    alias: Fgtclb\AcademicPersons\Domain\Model\Dto\ContractDemand
+    public: true
+
+  Fgtclb\AcademicPersons\Domain\Model\Dto\ProfileDemandInterface:
     alias: Fgtclb\AcademicPersons\Domain\Model\Dto\ProfileDemand
+    public: true
+
+  Fgtclb\AcademicPersons\Controller\PersonController:
     public: true

@@ -174,6 +174,12 @@
             <trans-unit id="flexform.el.viewMode.default.I.table">
                 <source>Table</source>
             </trans-unit>
+            <trans-unit id="flexform.el.showPublic.label">
+                <source>Show public profile only</source>
+            </trans-unit>
+            <trans-unit id="flexform.el.showPublic.description">
+                <source>Show only public Profile allowed by user self</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

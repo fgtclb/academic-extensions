@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Fgtclb\AcademicPersons\Domain\Model\Dto;
 
-class ProfileDemand implements DemandInterface
+class ProfileDemand implements ProfileDemandInterface
 {
     protected string $groupBy = '';
     protected string $sortBy = 'lastName';
@@ -31,6 +31,8 @@ class ProfileDemand implements DemandInterface
      * @var int[]
      */
     protected array $organisationalUnits = [];
+
+    private bool $showPublicOnly = false;
 
     /**
      * Does not have any effect when {@see self::getProfileList()} is not empty.
@@ -127,6 +129,7 @@ class ProfileDemand implements DemandInterface
 
     /**
      * @param int[] $functionTypes
+     *
      * @return ProfileDemand
      */
     public function setFunctionTypes(array $functionTypes): ProfileDemand
@@ -145,6 +148,7 @@ class ProfileDemand implements DemandInterface
 
     /**
      * @param int[] $organisationalUnits
+     *
      * @return ProfileDemand
      */
     public function setOrganisationalUnits(array $organisationalUnits): ProfileDemand
@@ -218,5 +222,16 @@ class ProfileDemand implements DemandInterface
     {
         $this->fallbackForNonTranslated = $fallbackForNonTranslated;
         return $this;
+    }
+
+    public function setShowPublicOnly(bool $showPublicOnly): ProfileDemandInterface
+    {
+        $this->showPublicOnly = $showPublicOnly;
+        return $this;
+    }
+
+    public function getShowPublicOnly(): bool
+    {
+        return $this->showPublicOnly;
     }
 }

@@ -13,7 +13,7 @@ namespace Fgtclb\AcademicPersons\Domain\Repository;
 
 use Fgtclb\AcademicPersons\DemandValues\GroupByValues;
 use Fgtclb\AcademicPersons\DemandValues\SortByValues;
-use Fgtclb\AcademicPersons\Domain\Model\Dto\DemandInterface;
+use Fgtclb\AcademicPersons\Domain\Model\Dto\ProfileDemandInterface;
 use Fgtclb\AcademicPersons\Domain\Model\Profile;
 use Fgtclb\AcademicPersons\Event\ModifyProfileDemandEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -39,7 +39,7 @@ class ProfileRepository extends Repository
     /**
      * @return QueryResultInterface<Profile>
      */
-    public function findByDemand(DemandInterface $demand): QueryResultInterface
+    public function findByDemand(ProfileDemandInterface $demand): QueryResultInterface
     {
         $query = $this->createQuery();
         $demand = $this->eventDispatcher->dispatch(new ModifyProfileDemandEvent($demand))->getDemand();
@@ -51,7 +51,7 @@ class ProfileRepository extends Repository
     /**
      * @param QueryInterface<Profile> $query
      */
-    private function applyDemandSettings(QueryInterface $query, DemandInterface $demand): void
+    private function applyDemandSettings(QueryInterface $query, ProfileDemandInterface $demand): void
     {
         // @todo Remove method_exists() level (unnesting block) with next major, when added breaking to DemandInterface
         //       and deprecation layer in ProfileController::adoptSettings().
@@ -71,7 +71,7 @@ class ProfileRepository extends Repository
                     $demand::class,
                     'setStoragePages',
                     'getStoragePages',
-                    DemandInterface::class,
+                    ProfileDemandInterface::class,
                 ),
                 E_USER_DEPRECATED
             );
@@ -115,7 +115,7 @@ class ProfileRepository extends Repository
                     $demand::class,
                     'setFallbackForNonTranslated',
                     'getFallbackForNonTranslated',
-                    DemandInterface::class,
+                    ProfileDemandInterface::class,
                 ),
                 E_USER_DEPRECATED
             );
@@ -125,13 +125,22 @@ class ProfileRepository extends Repository
     /**
      * @param QueryInterface<Profile> $query
      */
-    private function applyDemandForQuery(QueryInterface $query, DemandInterface $demand): void
+    private function applyDemandForQuery(QueryInterface $query, ProfileDemandInterface $demand): void
     {
         // Direct selected profiles make all other filters and orderings obsolete and is handled first.
         if ($demand->getProfileList() !== '') {
             $profileUidArray = GeneralUtility::intExplode(',', $demand->getProfileList(), true);
             $query->getQuerySettings()->setRespectSysLanguage(false);
-            $query->matching($query->in('uid', $profileUidArray));
+
+            $filters = [
+                $query->in('uid', $profileUidArray)
+            ];
+
+            if ($demand->getShowPublicOnly() === true) {
+                $filters[] = $query->equals('allowedShowPublic', 1);
+            }
+
+            $query->matching($query->logicalAnd(...$filters));
             return;
         }
 
@@ -145,22 +154,31 @@ class ProfileRepository extends Repository
     /**
      * @param QueryInterface<Profile> $query
      */
-    private function setFilters(QueryInterface $query, DemandInterface $demand): ?ConstraintInterface
+    private function setFilters(QueryInterface $query, ProfileDemandInterface $demand): ?ConstraintInterface
     {
         $filters = [];
 
-        if (method_exists($demand, 'getFunctionTypes')
-            && $demand->getFunctionTypes() !== []) {
+        if ($demand->getFunctionTypes() !== []) {
             $filters[] = $query->in('contracts.functionType', $demand->getFunctionTypes());
         }
 
-        if (method_exists($demand, 'getOrganisationalUnits')
-            && $demand->getOrganisationalUnits() !== []) {
+        if ($demand->getOrganisationalUnits() !== []) {
             $filters[] = $query->in('contracts.organisationalUnit', $demand->getOrganisationalUnits());
         }
 
         if ($demand->getAlphabetFilter() != '') {
             $filters[] = $query->like('last_name', $demand->getAlphabetFilter() . '%');
+        }
+
+        if ($demand->getShowPublicOnly() === true) {
+            $filters[] = $query->equals('allowedShowPublic', 1);
+        }
+
+        if ($demand->getProfileList() !== '') {
+            $filters[] = $query->in(
+                'uid',
+                GeneralUtility::intExplode(',', $demand->getProfileList(), true)
+            );
         }
 
         return ($filters === [])
@@ -171,7 +189,7 @@ class ProfileRepository extends Repository
     /**
      * @return array<string, string>
      */
-    private function getOrderingsFromDemand(DemandInterface $demand): array
+    private function getOrderingsFromDemand(ProfileDemandInterface $demand): array
     {
         $orderings = [];
         $allowedGroupingValues = array_keys(GeneralUtility::makeInstance(GroupByValues::class)->getAll());

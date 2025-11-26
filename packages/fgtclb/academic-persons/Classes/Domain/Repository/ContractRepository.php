@@ -12,7 +12,11 @@ declare(strict_types=1);
 namespace Fgtclb\AcademicPersons\Domain\Repository;
 
 use Fgtclb\AcademicPersons\Domain\Model\Contract;
+use Fgtclb\AcademicPersons\Domain\Model\Dto\ContractDemand;
+use Fgtclb\AcademicPersons\Domain\Model\Dto\ContractDemandInterface;
 use TYPO3\CMS\Core\Context\LanguageAspect;
+use TYPO3\CMS\Extbase\Persistence\Generic\Qom\ConstraintInterface;
+use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
@@ -21,13 +25,16 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
  */
 class ContractRepository extends Repository
 {
-    /**
-     * @param int[] $uids
-     * @return QueryResultInterface<Contract>
-     */
-    public function findByUids(array $uids): QueryResultInterface
+    public function findByDemand(ContractDemandInterface $demand): QueryResultInterface
     {
         $query = $this->createQuery();
+        $this->applyDemandSettings($query, $demand);
+        $this->applyDemandForQuery($query, $demand);
+        return $query->execute();
+    }
+
+    private function applyDemandSettings(QueryInterface $query, ContractDemandInterface $demand)
+    {
         // Selected uid's are default language and we need to configure extbase in away to
         // properly handle the overlay. This is adopted from the generic extbase backend
         // implementation.
@@ -47,10 +54,23 @@ class ContractRepository extends Repository
                 $query->getQuerySettings()->setLanguageOverlayMode(true);
             }
         }
+
         $query->getQuerySettings()->setRespectStoragePage(false);
         $query->getQuerySettings()->setRespectSysLanguage(false);
-        $query->matching($query->in('uid', $uids));
+    }
 
-        return $query->execute();
+    private function applyDemandForQuery(QueryInterface $query, ContractDemandInterface $demand): void
+    {
+        $filters = [];
+
+        if ($demand->getContractList() !== []) {
+            $filters[] = $query->in('uid', $demand->getContractList());
+        }
+
+        if ($demand->getShowPublicOnly() === true) {
+            $filters[] = $query->equals('profile.allowedShowPublic', 1);
+        }
+
+        $query->matching($query->logicalAnd(...$filters));
     }
 }
