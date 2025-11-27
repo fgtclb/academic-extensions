@@ -8,6 +8,44 @@ if [ "${CI}" != "true" ]; then
     trap 'echo "runTests.sh SIGINT signal emitted";cleanUp;exit 2' SIGINT
 fi
 
+printSummary() {
+    cleanUp
+
+    # Print summary
+    echo "" >&2
+    echo "###########################################################################" >&2
+    echo "Result of ${TEST_SUITE}" >&2
+    echo "Container runtime: ${CONTAINER_BIN}" >&2
+    echo "Container suffix: ${SUFFIX}"
+    if [[ ${IS_CORE_CI} -eq 1 ]]; then
+        echo "Environment: CI" >&2
+    else
+        echo "Environment: local" >&2
+    fi
+    echo "PHP: ${PHP_VERSION}" >&2
+    echo "TYPO3: ${CORE_VERSION}" >&2
+    if [[ ${TEST_SUITE} =~ ^(functional|functionalDeprecated|acceptance|acceptanceInstall)$ ]]; then
+        case "${DBMS}" in
+            mariadb|mysql|postgres)
+                echo "DBMS: ${DBMS}  version ${DBMS_VERSION}  driver ${DATABASE_DRIVER}" >&2
+                ;;
+            sqlite)
+                echo "DBMS: ${DBMS}" >&2
+                ;;
+        esac
+    fi
+    if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+        echo "SUCCESS" >&2
+    else
+        echo "FAILURE" >&2
+    fi
+    echo "###########################################################################" >&2
+    echo "" >&2
+
+    # Exit with code of test suite - This script return non-zero if the executed test failed.
+    exit $SUITE_EXIT_CODE
+}
+
 waitFor() {
     local HOST=${1}
     local PORT=${2}
@@ -505,6 +543,7 @@ case ${TEST_SUITE} in
             mariadb)
                 echo "Using driver: ${DATABASE_DRIVER}"
                 ${CONTAINER_BIN} run --name mariadb-func-${SUFFIX} --network ${NETWORK} -d -e MYSQL_ROOT_PASSWORD=funcp --tmpfs /var/lib/mysql/:rw,noexec,nosuid ${IMAGE_MARIADB} >/dev/null
+                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 waitFor mariadb-func-${SUFFIX} 3306
                 CONTAINERPARAMS="-e typo3DatabaseDriver=${DATABASE_DRIVER} -e typo3DatabaseName=func_test -e typo3DatabaseUsername=root -e typo3DatabaseHost=mariadb-func-${SUFFIX} -e typo3DatabasePassword=funcp"
                 ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${CONTAINERPARAMS} ${IMAGE_PHP} "${COMMAND[@]}"
@@ -515,6 +554,7 @@ case ${TEST_SUITE} in
             mysql)
                 echo "Using driver: ${DATABASE_DRIVER}"
                 ${CONTAINER_BIN} run --name mysql-func-${SUFFIX} --network ${NETWORK} -d -e MYSQL_ROOT_PASSWORD=funcp --tmpfs /var/lib/mysql/:rw,noexec,nosuid ${IMAGE_MYSQL} >/dev/null
+                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 waitFor mysql-func-${SUFFIX} 3306
                 CONTAINERPARAMS="-e typo3DatabaseDriver=${DATABASE_DRIVER} -e typo3DatabaseName=func_test -e typo3DatabaseUsername=root -e typo3DatabaseHost=mysql-func-${SUFFIX} -e typo3DatabasePassword=funcp "
                 ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${CONTAINERPARAMS} ${IMAGE_PHP} "${COMMAND[@]}"
@@ -522,6 +562,7 @@ case ${TEST_SUITE} in
                 ;;
             postgres)
                 ${CONTAINER_BIN} run --name postgres-func-${SUFFIX} --network ${NETWORK} -d -e POSTGRES_PASSWORD=funcp -e POSTGRES_USER=funcu --tmpfs /var/lib/postgresql/data:rw,noexec,nosuid ${IMAGE_POSTGRES} >/dev/null
+                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 waitFor postgres-func-${SUFFIX} 5432
                 CONTAINERPARAMS="-e typo3DatabaseDriver=pdo_pgsql -e typo3DatabaseName=bamboo -e typo3DatabaseUsername=funcu -e typo3DatabaseHost=postgres-func-${SUFFIX} -e typo3DatabasePassword=funcp "
                 ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${CONTAINERPARAMS} ${IMAGE_PHP} "${COMMAND[@]}"
@@ -529,7 +570,10 @@ case ${TEST_SUITE} in
                 ;;
             sqlite)
                 # create sqlite tmpfs mount typo3temp/var/tests/functional-sqlite-dbs/ to avoid permission issues
+                rm -rf "${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/"
+                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 mkdir -p "${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/"
+                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 CONTAINERPARAMS="-e typo3DatabaseDriver=pdo_sqlite --tmpfs ${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/:rw,noexec,nosuid "
                 ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${CONTAINERPARAMS} ${IMAGE_PHP} "${COMMAND[@]}"
                 SUITE_EXIT_CODE=$?
@@ -589,38 +633,5 @@ case ${TEST_SUITE} in
         ;;
 esac
 
-cleanUp
-
-# Print summary
-echo "" >&2
-echo "###########################################################################" >&2
-echo "Result of ${TEST_SUITE}" >&2
-echo "Container runtime: ${CONTAINER_BIN}" >&2
-echo "Container suffix: ${SUFFIX}"
-if [[ ${IS_CORE_CI} -eq 1 ]]; then
-    echo "Environment: CI" >&2
-else
-    echo "Environment: local" >&2
-fi
-echo "PHP: ${PHP_VERSION}" >&2
-echo "TYPO3: ${CORE_VERSION}" >&2
-if [[ ${TEST_SUITE} =~ ^(functional|functionalDeprecated|acceptance|acceptanceInstall)$ ]]; then
-    case "${DBMS}" in
-        mariadb|mysql|postgres)
-            echo "DBMS: ${DBMS}  version ${DBMS_VERSION}  driver ${DATABASE_DRIVER}" >&2
-            ;;
-        sqlite)
-            echo "DBMS: ${DBMS}" >&2
-            ;;
-    esac
-fi
-if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
-    echo "SUCCESS" >&2
-else
-    echo "FAILURE" >&2
-fi
-echo "###########################################################################" >&2
-echo "" >&2
-
-# Exit with code of test suite - This script return non-zero if the executed test failed.
-exit $SUITE_EXIT_CODE
+# Cleanup, print summary && exit with exitcode
+printSummary
