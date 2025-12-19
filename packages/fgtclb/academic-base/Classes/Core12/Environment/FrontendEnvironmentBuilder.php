@@ -13,13 +13,18 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\TypoScriptAspect;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
+use TYPO3\CMS\Core\Exception\Page\RootLineException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Routing\PageArguments;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\RootlineUtility;
+use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -55,10 +60,31 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
 
     private function createRequest(StateBuildContext $stateBuildContext, State $state, Site $site, SiteLanguage $siteLanguage): State
     {
-        $request = (new ServerRequest())
-            ->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE)
+        $uriLanguage = $siteLanguage->getBase();
+        $uriSite = $site->getBase();
+        $uri = (new Uri())
+            ->withScheme($uriLanguage->getScheme() ?: $uriSite->getScheme() ?: 'http')
+            ->withHost($uriLanguage->getHost() ?: $uriSite->getHost() ?: '')
+            ->withPort($uriLanguage->getPort() ?? $uriSite->getPort() ?? null)
+            ->withPath($uriLanguage->getPath() ?: $uriSite->getPath() ?: '/');
+        $request = (new ServerRequest(
+            $uri,
+            'GET',
+            null,
+            [],
+            [
+                'HTTP_HOST' => $uri->getHost(),
+                'SERVER_NAME' => $uri->getHost(),
+                'HTTPS' => $uri->getScheme() === 'https',
+                'SCRIPT_FILENAME' => __FILE__,
+                'SCRIPT_NAME' => rtrim($uri->getPath(), '/') . '/',
+            ],
+        ))->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE);
+        $request = $request
             ->withAttribute('site', $site)
-            ->withAttribute('siteLanguage', $siteLanguage);
+            ->withAttribute('siteLanguage', $siteLanguage)
+            ->withAttribute('normalizedParams', NormalizedParams::createFromRequest($request))
+            ->withAttribute('extbase', new ExtbaseRequestParameters());
         return $state->withRequest($request);
     }
 
@@ -66,6 +92,8 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     {
         $request = $state->request() ?? new ServerRequest();
         $context = GeneralUtility::makeInstance(Context::class);
+        $pageId = $this->getNearestAccessiblePage($stateBuildContext->pageId ?? $site->getRootPageId(), $context)
+            ?: $site->getRootPageId();
         // Ensure frontend user authentication in request
         // @todo Consider if frontend user authentication data may be set through StateBuildContext.
         $frontendUser = GeneralUtility::makeInstance(FrontendUserAuthentication::class);
@@ -82,10 +110,11 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             $site,
             $siteLanguage,
             new PageArguments(
-                pageId: $stateBuildContext->pageId ?? $site->getRootPageId(),
+                pageId: $pageId,
                 pageType: '0',
                 routeArguments: [],
             ),
+            $frontendUser,
         );
         $request = $request->withAttribute('frontend.controller', $controller);
         $controller->determineId($request);
@@ -165,5 +194,23 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             return;
         }
         $frontendUserAuthentication->uc = $userConfiguration;
+    }
+
+    private function getNearestAccessiblePage(int $pageId, ?Context $context = null): int
+    {
+        try {
+            $rootline = GeneralUtility::makeInstance(RootlineUtility::class, $pageId, '', $context)->get();
+            foreach ($rootline as $pageRecord) {
+                $uid = (int)($pageRecord['uid'] ?? 0);
+                $pageDoktype = (int)($pageRecord['doktype'] ?? 0);
+                $hidden = (bool)($pageRecord['hidden'] ?? true);
+                $isSpacerOrSysfolder = $pageDoktype === PageRepository::DOKTYPE_SPACER || $pageDoktype === PageRepository::DOKTYPE_SYSFOLDER;
+                if (!$isSpacerOrSysfolder && !$hidden) {
+                    return $uid;
+                }
+            }
+        } catch (RootLineException) {
+        }
+        return 0;
     }
 }
