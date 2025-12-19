@@ -14,7 +14,10 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
+use TYPO3\CMS\Core\Exception\Page\RootLineException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Routing\PageArguments;
@@ -24,6 +27,7 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\TypoScript\FrontendTypoScriptFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\RootlineUtility;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
@@ -60,12 +64,12 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         $state = new State();
         $site = $this->determineSiteConfig($stateBuildContext);
         $siteLanguage = $this->determineSiteLanguage($stateBuildContext, $site);
-        $state = $this->createRequest($state, $site, $siteLanguage);
-        $state = $this->createTypoScriptFrontendController($state, $site, $siteLanguage);
+        $state = $this->createRequest($stateBuildContext, $state, $site, $siteLanguage);
+        $state = $this->createTypoScriptFrontendController($stateBuildContext, $state, $site, $siteLanguage);
         return $state;
     }
 
-    private function createRequest(State $state, Site $site, SiteLanguage $siteLanguage): State
+    private function createRequest(StateBuildContext $stateBuildContext, State $state, Site $site, SiteLanguage $siteLanguage): State
     {
         $uriLanguage = $siteLanguage->getBase();
         $uriSite = $site->getBase();
@@ -74,10 +78,10 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             ->withHost($uriLanguage->getHost() ?: $uriSite->getHost() ?: '')
             ->withPort($uriLanguage->getPort() ?? $uriSite->getPort() ?? null)
             ->withPath($uriLanguage->getPath() ?: $uriSite->getPath() ?: '/');
-        $request = new ServerRequest(
+        $request = (new ServerRequest(
             $uri,
             'GET',
-            'php:://input',
+            null,
             [],
             [
                 'HTTP_HOST' => $uri->getHost(),
@@ -86,21 +90,23 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
                 'SCRIPT_FILENAME' => __FILE__,
                 'SCRIPT_NAME' => rtrim($uri->getPath(), '/') . '/',
             ],
-        );
+        ))->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE);
         $request = $request
-            ->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE)
+            ->withAttribute('normalizedParams', NormalizedParams::createFromRequest($request))
             ->withAttribute('site', $site)
             ->withAttribute('language', $siteLanguage)
             ->withAttribute('extbase', new ExtbaseRequestParameters());
         return $state->withRequest($request);
     }
 
-    private function createTypoScriptFrontendController(State $state, Site $site, SiteLanguage $siteLanguage): State
+    private function createTypoScriptFrontendController(StateBuildContext $stateBuildContext, State $state, Site $site, SiteLanguage $siteLanguage): State
     {
         $request = $state->request() ?? new ServerRequest();
         $context = GeneralUtility::makeInstance(Context::class);
         // Ensure to have a preview aspect set to the context
         $context->setAspect('frontend.preview', new PreviewAspect());
+        $pageId = $this->getNearestAccessiblePage($stateBuildContext->pageId ?? $site->getRootPageId(), $context)
+            ?: $site->getRootPageId();
         // Ensure frontend user authentication in request
         // @todo Consider if frontend user authentication data may be set through StateBuildContext.
         $frontendUser = GeneralUtility::makeInstance(FrontendUserAuthentication::class);
@@ -110,7 +116,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         // Prepare other request attributes
         $cacheInstruction = new CacheInstruction();
         $request = $request->withAttribute('frontend.cache.instruction', $cacheInstruction);
-        $pageArguments = new PageArguments($site->getRootPageId(), '0', []);
+        $pageArguments = new PageArguments($pageId, '0', []);
         $request = $request->withAttribute('routing', $pageArguments);
         $pageInformation = $this->pageInformationFactory->create($request);
         $request = $request->withAttribute('frontend.page.information', $pageInformation);
@@ -238,5 +244,23 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             return;
         }
         $frontendUserAuthentication->uc = $userConfiguration;
+    }
+
+    private function getNearestAccessiblePage(int $pageId, ?Context $context = null): int
+    {
+        try {
+            $rootline = GeneralUtility::makeInstance(RootlineUtility::class, $pageId, '', $context)->get();
+            foreach ($rootline as $pageRecord) {
+                $uid = (int)($pageRecord['uid'] ?? 0);
+                $pageDoktype = (int)($pageRecord['doktype'] ?? 0);
+                $hidden = (bool)($pageRecord['hidden'] ?? true);
+                $isSpacerOrSysfolder = $pageDoktype === PageRepository::DOKTYPE_SPACER || $pageDoktype === PageRepository::DOKTYPE_SYSFOLDER;
+                if (!$isSpacerOrSysfolder && !$hidden) {
+                    return $uid;
+                }
+            }
+        } catch (RootLineException) {
+        }
+        return 0;
     }
 }
