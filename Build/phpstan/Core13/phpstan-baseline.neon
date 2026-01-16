@@ -76,6 +76,11 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php
 
 		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Model/Dto/ProfileInformationFormData.php
+
+		-
 			message: "#^Call to an undefined method object\\:\\:getDemand\\(\\)\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
