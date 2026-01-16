@@ -61,6 +61,11 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php
 
 		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Model/Dto/ProfileInformationFormData.php
+
+		-
 			message: "#^Instantiated class TYPO3\\\\CMS\\\\Core\\\\Cache\\\\CacheTag not found\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php
