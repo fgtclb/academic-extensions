@@ -4,6 +4,13 @@
 
 ### BREAKING CHANGES
 
+#### BREAKING: Changed namespace and class names of `ContractItemsProcFunc` and `ProfileShowFieldsItemProcFunc`
+
+While introducing the `ModifyTcaSelectFieldItemsEvent`, to be able to modify the select items
+of fields which are populated by an itemsProcFunc, the classes received a proper namespace
+and class names suitable for classes providing itemsProcFuncs. Naturally this meant adjusting
+the references to this classes in the plugin FlexForms.
+
 #### BREAKING: `ProfilesController::selectedProfilesAction()` no longer dispatches `ModifyListProfilesEvent`
 
 `ProfilesController::selectedProfilesAction()` dispatched the `ModifyListProfilesEvent`
@@ -49,6 +56,72 @@ to be called and are mandatory - beside having a visually glue for developers.
 See [Autowiring other Methods (e.g. Setters and Public Typed Properties)](https://symfony.com/doc/current/service_container/autowiring.html#autowiring-other-methods-e-g-setters-and-public-typed-properties)
 
 ### FEATURES
+
+#### FEATURE: Dispatch `ModifyTcaSelectFieldItemsEvent` in `ContractItems` and `ProfileShowFieldsItems`
+
+Following provided `itemsProcFunc` handlers now dispatches the new
+PSR-14 `\FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent`:
+
+* `\FGTCLB\AcademicPersons\Backend\FormEngine\ContractItems`
+* `\FGTCLB\AcademicPersons\Backend\FormEngine\ProfileShowFieldsItems`
+
+This allows projects to modify the available select items for the
+backend (FormEngine) and also for the frontend using a PSR-14 event
+listener:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace MyVendor\MyExt\EventListener;
+
+use FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Attribute\AsEventListener;
+
+#[AsEventListener(identifier: 'project/modify-academic-persons-tca-select-items')]
+final public ModifyTcaSelectFieldItemsEventListener
+{
+    public function __invoke(ModifyTcaSelectFieldItemsEvent $event): void
+    {
+        $tableName = $event->getParameters()['table'];
+        $fieldName = $event->getParameters()['field'];
+        if ($tableName !== 'tt_content') {
+            // Not the table we want to handle. Skip
+            return;
+        }
+        if ($fieldName === 'settings.showFields') {
+            $this->modifyPersonsShowFieldsSelectItems($event);
+        }
+        if ($fieldName === 'settings.selectedContracts') {
+            $this->modifyPersonsContractSelectItems($event);
+        }
+    }
+
+    private function modifyPersonsShowFieldsSelectItems(
+        ModifyTcaSelectFieldItemsEvent $event,
+    ): void {
+        $parameters = $event->getParameters();
+        $parameters['items'][] = [
+            'label' => BackendUtility::getItemLabel('tx_academicpersons_domain_model_contract', 'position'),
+            'value' => 10
+        ];
+        $event->setParameters($parameters);
+    }
+
+    private function modifyPersonsContractSelectItems(
+        ModifyTcaSelectFieldItemsEvent $event,
+    ): void {
+        $parameters = $event->getParameters();
+        $parameters['items'][] = [
+            'label' => 'LLL:EXT:my_ext/Resources/Private/Language/locallang_be.xlf:tx_academicpersons_domain_model_contract.custom_type',
+            'value' => 10
+        ];
+        $event->setParameters($parameters);
+    }
+}
+```
 
 #### FEATURE: Add `academic:createprofiles` options `--include-pids` and `--exclude-pids`
 
