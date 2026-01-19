@@ -1,7 +1,7 @@
 <?php
 
 use FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContactLabels;
-use FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContractItemsProcFunc;
+use FGTCLB\AcademicPersons\Backend\FormEngine\ContractItems;
 
 if (!defined('TYPO3')) {
     die('Not authorized');
@@ -82,7 +82,7 @@ return [
                         'value' => 0,
                     ],
                 ],
-                'itemsProcFunc' => ContractItemsProcFunc::class . '->itemsProcFunc',
+                'itemsProcFunc' => ContractItems::class . '->itemsProcFunc',
                 'minitems' => 1,
                 'default' => 0,
             ],
