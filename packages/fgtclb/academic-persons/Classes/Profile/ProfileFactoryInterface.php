@@ -21,4 +21,14 @@ interface ProfileFactoryInterface
      * @return int The new profile uid. Null if profile could not be created.
      */
     public function createProfileForUser(FrontendUserAuthentication $frontendUserAuthentication): ?int;
+
+    /**
+     * Determines whether the profile should be updated for the given frontend user.
+     */
+    public function shouldUpdateProfileForUser(FrontendUserAuthentication $frontendUserAuthentication): bool;
+
+    /**
+     * Updates the profile for the given frontend user.
+     */
+    public function updateProfileForUser(FrontendUserAuthentication $frontendUserAuthentication): void;
 }

@@ -13,6 +13,7 @@ namespace FGTCLB\AcademicPersons\Profile;
 
 use FGTCLB\AcademicPersons\Domain\Model\FrontendUser;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
+use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
 use FGTCLB\AcademicPersons\Event\AfterProfileUpdateEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -29,6 +30,7 @@ abstract class AbstractProfileFactory implements ProfileFactoryInterface
     protected PersistenceManagerInterface $persistenceManager;
     protected ExtensionConfiguration $extensionConfiguration;
     protected EventDispatcherInterface $eventDispatcher;
+    protected ProfileRepository $profileRepository;
     protected bool $autoCreateProfiles = false;
     /**
      * @var int[]
@@ -51,6 +53,12 @@ abstract class AbstractProfileFactory implements ProfileFactoryInterface
     public function injectPersistenceManagerInterface(PersistenceManagerInterface $persistenceManager): void
     {
         $this->persistenceManager = $persistenceManager;
+    }
+
+    #[Required]
+    public function injectProfileRepository(ProfileRepository $profileRepository): void
+    {
+        $this->profileRepository = $profileRepository;
     }
 
     public function initializeObject(): void
@@ -102,9 +110,55 @@ abstract class AbstractProfileFactory implements ProfileFactoryInterface
     }
 
     /**
+     * Determines whether the profile should be updated for the given frontend user.
+     * Default implementation returns true.
+     */
+    public function shouldUpdateProfileForUser(FrontendUserAuthentication $frontendUserAuthentication): bool
+    {
+        return true;
+    }
+
+    /**
+     * Updates the profile for the given frontend user.
+     * Orchestrates the update process by retrieving the profile and delegating to updateProfileFromFrontendUser.
+     */
+    public function updateProfileForUser(FrontendUserAuthentication $frontendUserAuthentication): void
+    {
+        /** @var array<string, int|string|null>|null $userData */
+        $userData = $frontendUserAuthentication->user;
+        if ($userData === null) {
+            return;
+        }
+
+        $frontendUserUid = (int)$userData['uid'];
+        $profiles = $this->profileRepository->findByFrontendUser($frontendUserUid);
+        if ($profiles->count() === 0) {
+            return;
+        }
+
+        foreach ($profiles as $profile) {
+            $this->updateProfileFromFrontendUser($userData, $profile);
+            $this->persistenceManager->update($profile);
+        }
+
+        $this->persistenceManager->persistAll();
+    }
+
+    /**
      * @param array<string, int|string|null> $frontendUserData
      */
     abstract protected function createProfileFromFrontendUser(array $frontendUserData): Profile;
+
+    /**
+     * Updates the profile based on frontend user data.
+     * Default implementation does nothing (empty method body).
+     *
+     * @param array<string, int|string|null> $frontendUserData
+     */
+    protected function updateProfileFromFrontendUser(array $frontendUserData, Profile $profile): void
+    {
+        // Default implementation does nothing
+    }
 
     private function initializeExtensionConfigurationOptions(ExtensionConfiguration $extensionConfiguration): void
     {
