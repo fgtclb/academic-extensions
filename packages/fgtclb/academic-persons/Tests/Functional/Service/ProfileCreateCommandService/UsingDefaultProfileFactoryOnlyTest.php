@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersons\Tests\Functional\Service\ProfileCreateCommandService;
 
 use FGTCLB\AcademicPersons\Profile\ProfileFactory;
-use FGTCLB\AcademicPersons\Service\Event\ModifyProfileCreateEnvironmentStateBuildContextForFrontendUserEvent;
+use FGTCLB\AcademicPersons\Service\Event\ModifyProfileCommandEnvironmentStateBuildContextForFrontendUserEvent;
 use FGTCLB\AcademicPersons\Service\ProfileCreateCommandService;
 use FGTCLB\AcademicPersons\Tests\Functional\AbstractAcademicPersonsTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -645,14 +645,14 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
         $container->set(
             'modify-profile-create-environment-state-build-context-for-frontend-user-listener',
             static function (
-                ModifyProfileCreateEnvironmentStateBuildContextForFrontendUserEvent $event
+                ModifyProfileCommandEnvironmentStateBuildContextForFrontendUserEvent $event
             ) use (&$dispatchedModifyEvents): void {
                 $dispatchedModifyEvents[] = $dispatchedModifyEvents;
             }
         );
         $listenerProvider = $container->get(ListenerProvider::class);
         $listenerProvider->addListener(
-            ModifyProfileCreateEnvironmentStateBuildContextForFrontendUserEvent::class,
+            ModifyProfileCommandEnvironmentStateBuildContextForFrontendUserEvent::class,
             'modify-profile-create-environment-state-build-context-for-frontend-user-listener',
         );
         $this->assertFileExists(__DIR__ . '/Fixtures/Asserts/' . $assertCsvFileName);

@@ -13,6 +13,7 @@ namespace FGTCLB\AcademicPersons\Profile;
 
 use FGTCLB\AcademicPersons\Domain\Model\FrontendUser;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
+use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
 use FGTCLB\AcademicPersons\Event\AfterProfileUpdateEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -29,6 +30,7 @@ abstract class AbstractProfileFactory implements ProfileFactoryInterface
     protected PersistenceManagerInterface $persistenceManager;
     protected ExtensionConfiguration $extensionConfiguration;
     protected EventDispatcherInterface $eventDispatcher;
+    protected ProfileRepository $profileRepository;
     protected bool $autoCreateProfiles = false;
     /**
      * @var int[]
@@ -51,6 +53,12 @@ abstract class AbstractProfileFactory implements ProfileFactoryInterface
     public function injectPersistenceManagerInterface(PersistenceManagerInterface $persistenceManager): void
     {
         $this->persistenceManager = $persistenceManager;
+    }
+
+    #[Required]
+    public function injectProfileRepository(ProfileRepository $profileRepository): void
+    {
+        $this->profileRepository = $profileRepository;
     }
 
     public function initializeObject(): void
@@ -101,10 +109,42 @@ abstract class AbstractProfileFactory implements ProfileFactoryInterface
         return $profileForDefaultLanguage->getUid();
     }
 
+    public function shouldUpdateProfileForUser(FrontendUserAuthentication $frontendUserAuthentication): bool
+    {
+        return true;
+    }
+
+    public function updateProfileForUser(FrontendUserAuthentication $frontendUserAuthentication): void
+    {
+        /** @var array<string, int|string|null>|null $userData */
+        $userData = $frontendUserAuthentication->user;
+        if ($userData === null) {
+            return;
+        }
+
+        $frontendUserUid = (int)$userData['uid'];
+        $profiles = $this->profileRepository->findByFrontendUser($frontendUserUid);
+        if ($profiles->count() === 0) {
+            return;
+        }
+
+        foreach ($profiles as $profile) {
+            $this->updateProfileFromFrontendUser($userData, $profile);
+            $this->persistenceManager->update($profile);
+        }
+
+        $this->persistenceManager->persistAll();
+    }
+
     /**
      * @param array<string, int|string|null> $frontendUserData
      */
     abstract protected function createProfileFromFrontendUser(array $frontendUserData): Profile;
+
+    /**
+     * @param array<string, int|string|null> $frontendUserData
+     */
+    protected function updateProfileFromFrontendUser(array $frontendUserData, Profile $profile): void {}
 
     private function initializeExtensionConfigurationOptions(ExtensionConfiguration $extensionConfiguration): void
     {
