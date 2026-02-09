@@ -1,0 +1,4 @@
+TCEFORM.tt_content {
+  # restore extension specific elements and fields
+  CType.removeItems := removeFromList(academic_study_plan)
+}
