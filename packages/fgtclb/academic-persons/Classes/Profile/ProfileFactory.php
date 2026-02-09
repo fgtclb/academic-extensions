@@ -34,49 +34,153 @@ final class ProfileFactory extends AbstractProfileFactory
                 1627471234
             );
         }
-
+        /** @var int<0, max> $pid */
         $profile = new Profile();
         $profile->setPid($pid);
-        $profile->setTitle((string)($frontendUserData['title'] ?? ''));
-        $profile->setFirstName((string)($frontendUserData['first_name'] ?? ''));
-        $profile->setMiddleName((string)($frontendUserData['middle_name'] ?? ''));
-        $profile->setLastName((string)($frontendUserData['last_name'] ?? ''));
-        $profile->setWebsite((string)($frontendUserData['www'] ?? ''));
+        $this->applyProfileData($frontendUserData, $profile);
 
         $contract = new Contract();
         $contract->setPid($pid);
         $profile->getContracts()->attach($contract);
 
-        $address = new Address();
-        $address->setPid($pid);
+        $this->applyContractData($frontendUserData, $contract, $pid);
+
+        return $profile;
+    }
+
+    /**
+     * @param array<string, int|string|null> $frontendUserData
+     */
+    protected function updateProfileFromFrontendUser(array $frontendUserData, Profile $profile): void
+    {
+        /** @var int<0, max> $pid */
+        $pid = (int)$frontendUserData['pid'];
+        $this->applyProfileData($frontendUserData, $profile);
+
+        $contracts = $profile->getContracts();
+        if ($contracts->count() === 0) {
+            return;
+        }
+
+        $contracts->rewind();
+        $contract = $contracts->current();
+
+        if (!$contract instanceof Contract) {
+            return;
+        }
+
+        $this->applyContractData($frontendUserData, $contract, $pid);
+    }
+
+    /**
+     * @param array<string, int|string|null> $frontendUserData
+     */
+    private function applyProfileData(array $frontendUserData, Profile $profile): void
+    {
+        $profile->setTitle((string)($frontendUserData['title'] ?? ''));
+        $profile->setFirstName((string)($frontendUserData['first_name'] ?? ''));
+        $profile->setMiddleName((string)($frontendUserData['middle_name'] ?? ''));
+        $profile->setLastName((string)($frontendUserData['last_name'] ?? ''));
+        $profile->setWebsite((string)($frontendUserData['www'] ?? ''));
+    }
+
+    /**
+     * @param array<string, int|string|null> $frontendUserData
+     * @param int<0, max> $pid
+     */
+    private function applyContractData(array $frontendUserData, Contract $contract, int $pid): void
+    {
+        $this->applyPhysicalAddress($frontendUserData, $contract, $pid);
+        $this->applyEmailAddress($frontendUserData, $contract, $pid);
+        $this->applyPhoneNumber($frontendUserData, $contract, $pid, 'phone', 'telephone');
+        $this->applyPhoneNumber($frontendUserData, $contract, $pid, 'fax', 'fax');
+    }
+
+    /**
+     * @param array<string, int|string|null> $frontendUserData
+     * @param int<0, max> $pid
+     */
+    private function applyPhysicalAddress(array $frontendUserData, Contract $contract, int $pid): void
+    {
+        $addresses = $contract->getPhysicalAddresses();
+        if ($addresses->count() > 0) {
+            $addresses->rewind();
+            $address = $addresses->current();
+        } else {
+            $address = new Address();
+            $address->setPid($pid);
+            $contract->getPhysicalAddresses()->attach($address);
+        }
+
+        if (!$address instanceof Address) {
+            return;
+        }
+
         $address->setStreet((string)($frontendUserData['address'] ?? ''));
         $address->setZip((string)($frontendUserData['zip'] ?? ''));
         $address->setCity((string)($frontendUserData['city'] ?? ''));
         $address->setCountry((string)($frontendUserData['country'] ?? ''));
-        $contract->getPhysicalAddresses()->attach($address);
+    }
 
-        if (!empty($frontendUserData['email'])) {
+    /**
+     * @param array<string, int|string|null> $frontendUserData
+     * @param int<0, max> $pid
+     */
+    private function applyEmailAddress(array $frontendUserData, Contract $contract, int $pid): void
+    {
+        if (empty($frontendUserData['email'])) {
+            return;
+        }
+
+        $emails = $contract->getEmailAddresses();
+        if ($emails->count() > 0) {
+            $emails->rewind();
+            $email = $emails->current();
+        } else {
             $email = new Email();
             $email->setPid($pid);
-            $email->setEmail((string)($frontendUserData['email']));
             $contract->getEmailAddresses()->attach($email);
         }
 
-        if (!empty($frontendUserData['telephone'])) {
-            $phoneNumber = new PhoneNumber();
-            $phoneNumber->setPid($pid);
-            $phoneNumber->setPhoneNumber((string)($frontendUserData['telephone']));
-            $phoneNumber->setType('phone');
-            $contract->getPhoneNumbers()->attach($phoneNumber);
-        }
-        if (!empty($frontendUserData['fax'])) {
-            $phoneNumber = new PhoneNumber();
-            $phoneNumber->setPid($pid);
-            $phoneNumber->setPhoneNumber((string)($frontendUserData['fax']));
-            $phoneNumber->setType('fax');
-            $contract->getPhoneNumbers()->attach($phoneNumber);
+        if (!$email instanceof Email) {
+            return;
         }
 
-        return $profile;
+        $email->setEmail((string)($frontendUserData['email']));
+    }
+
+    /**
+     * @param array<string, int|string|null> $frontendUserData
+     * @param int<0, max> $pid
+     */
+    private function applyPhoneNumber(
+        array $frontendUserData,
+        Contract $contract,
+        int $pid,
+        string $type,
+        string $dataKey
+    ): void {
+        if (empty($frontendUserData[$dataKey])) {
+            return;
+        }
+
+        $phoneNumbers = $contract->getPhoneNumbers();
+        $existingPhoneNumber = null;
+
+        foreach ($phoneNumbers as $phoneNumber) {
+            if ($phoneNumber->getType() === $type) {
+                $existingPhoneNumber = $phoneNumber;
+                break;
+            }
+        }
+
+        if ($existingPhoneNumber === null) {
+            $existingPhoneNumber = new PhoneNumber();
+            $existingPhoneNumber->setPid($pid);
+            $existingPhoneNumber->setType($type);
+            $contract->getPhoneNumbers()->attach($existingPhoneNumber);
+        }
+
+        $existingPhoneNumber->setPhoneNumber((string)($frontendUserData[$dataKey]));
     }
 }
