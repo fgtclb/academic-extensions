@@ -49,6 +49,7 @@ addressed manualy in case not automatic upgrade path is available. See the
 | academic_base           | -   | -2-     | -2-     | Shared base functionalities, introduced in 2.x                                                  |
 | academic_bite_jobs      | -1- | -1- -2- | -1- -2- | Broken - API key required but not configurable, not checked/adopted for v12+                    |
 | academic_contacts4pages | <1> | -1- -2- | -1- -2- | 1 in use for v11, may work for v12 but not tested. 2 for v12/v13 currently tested and evaluated |
+| academic_study_plan     | -   | -2-     | -2-     | Introduced in 2.x                                                                               |
 | academic_jobs           | <1> | -1- -2- | -1- -2- | not tested/verified yet for 2 (v12/v13) and 1 (v12)                                             |
 | academic_partners       | -1- | -1- {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
 | academic_persons        | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
@@ -73,6 +74,7 @@ Legend:
 | fgtclb/academic-base           | academic_base           | [packages/fgtclb/academic-base](packages/fgtclb/academic-base/README.md)                   | [fgtclb/academic-base](https://github.com/fgtclb/academic-base)                      |
 | fgtclb/academic-bite-jobs      | academic_bite_jobs      | [packages/fgtclb/academic-bite-jobs](packages/fgtclb/academic-bite-jobs/README.md)         | [fgtclb/academic-bite-jobs](https://github.com/fgtclb/academic-bite-jobs)            |
 | fgtclb/academic-contacts4pages | academic_contacts4pages | [packages/fgtclb/academic-contact4pages](packages/fgtclb/academic-contact4pages/README.md) | [fgtclb/academic-contact4pages](https://github.com/fgtclb/academic-contact4pages)    |
+| fgtclb/academic-study-plan     | academic_study_plan     | [fgtclb/academic-study-plan](https://github.com/fgtclb/academic-study-plan)                |
 | fgtclb/academic-jobs           | academic_jobs           | [packages/fgtclb/academic-jobs](packages/fgtclb/academic-jobs/README.md)                   | [fgtclb/academic-jobs](https://github.com/fgtclb/academic-jobs)                      |
 | fgtclb/academic-partners       | academic_partners       | [packages/fgtclb/academic-partners](packages/fgtclb/academic-partners/README.md)           | [fgtclb/academic-partners](https://github.com/fgtclb/academic-partners)              |
 | fgtclb/academic-persons        | academic_persons        | [packages/fgtclb/academic-persons](packages/fgtclb/academic-persons/README.md)             | [fgtclb/academic-persons](https://github.com/fgtclb/academic-persons)                |

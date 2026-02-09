@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2"
+	xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" datatype="plaintext" original="messages" date="2024-01-01T00:00:00Z" product-name="academic_study_plan">
+		<header/>
+		<body>
+			<!-- Content Element Group -->
+			<trans-unit id="newContentElement.group.academic">
+				<source>Academic</source>
+			</trans-unit>
+
+			<!-- Content Element -->
+			<trans-unit id="tt_content.CType.academic_study_plan.title">
+				<source>Academic Study Plan</source>
+			</trans-unit>
+			<trans-unit id="tt_content.CType.academic_study_plan.description">
+				<source>Display academic study plans with semesters and modules</source>
+			</trans-unit>
+			<trans-unit id="tt_content.footer_note">
+				<source>Footer Note</source>
+			</trans-unit>
+			<trans-unit id="tt_content.semesters">
+				<source>Semesters</source>
+			</trans-unit>
+
+			<!-- Category -->
+			<trans-unit id="tx_academicstudyplan_domain_model_category">
+				<source>Study Plan Category</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_category.label">
+				<source>Label</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_category.colour">
+				<source>Colour</source>
+			</trans-unit>
+
+			<!-- Semester -->
+			<trans-unit id="tx_academicstudyplan_domain_model_semester">
+				<source>Semester</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_semester.label">
+				<source>Label</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_semester.note">
+				<source>Note</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_semester.credit_points">
+				<source>Credit Points</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_semester.modules">
+				<source>Modules</source>
+			</trans-unit>
+
+			<!-- Module -->
+			<trans-unit id="tx_academicstudyplan_domain_model_module">
+				<source>Module</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_module.label">
+				<source>Label</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_module.note">
+				<source>Note</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_module.credit_points">
+				<source>Credit Points</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_module.description">
+				<source>Description</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_module.audio_file">
+				<source>Audio File</source>
+			</trans-unit>
+			<trans-unit id="tx_academicstudyplan_domain_model_module.categories">
+				<source>Categories</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

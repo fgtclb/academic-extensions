@@ -72,6 +72,7 @@
                     "fgtclb/academic-persons-sync": "2.0.2-dev",
                     "fgtclb/academic-programs": "2.0.2-dev",
                     "fgtclb/academic-projects": "2.0.2-dev",
+                    "fgtclb/academic-study-plan": "2.0.2-dev",
                     "fgtclb/category-types": "2.0.2-dev",
                     "fgtclb/academic-base": "2.0.2-dev"
                 }
