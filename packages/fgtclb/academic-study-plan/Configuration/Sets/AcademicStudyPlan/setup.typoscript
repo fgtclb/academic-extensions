@@ -1,0 +1,2 @@
+@import 'EXT:academic_study_plan/Configuration/TypoScript/Includes/ContentElement.typoscript'
+@import 'EXT:academic_study_plan/Configuration/TypoScript/Includes/Page.typoscript'

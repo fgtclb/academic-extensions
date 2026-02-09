@@ -1,0 +1,21 @@
+# ======================================================================================================================
+# EXT:academic_study_plan/Configuration/TypoScript/Includes/ContentElement.typoscript
+# ======================================================================================================================
+tt_content {
+    academic_study_plan =< lib.contentElement
+    academic_study_plan {
+        templateName = AcademicStudyPlan
+        templateRootPaths {
+            100 = EXT:academic_study_plan/Resources/Private/Frontend/Default/Templates/
+        }
+        partialRootPaths {
+            100 = EXT:academic_study_plan/Resources/Private/Frontend/Default/Partials/
+        }
+        layoutRootPaths {
+            100 = EXT:academic_study_plan/Resources/Private/Frontend/Default/Layouts/
+        }
+        dataProcessing {
+            10 = FGTCLB\AcademicStudyPlan\DataProcessing\StudyPlanProcessor
+        }
+    }
+}

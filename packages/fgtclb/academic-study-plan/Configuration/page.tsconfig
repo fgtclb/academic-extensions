@@ -1,0 +1,29 @@
+
+# Disable/hide everything globally for new fields and plugins/content-elements,
+# so they are only visible if the config has been loaded in the site config (v13)
+# or static includes (v12/v13-non-site-sets).
+TCEFORM.tt_content {
+  CType.removeItems := addToList(academic_study_plan)
+}
+
+# @todo typo3/cms > 12.4 Remove when TYPO3 12.4 support is removed from extension.
+[typo3.branch == "12.4"]
+# Restricted to TYPO3 v12 only, not needed for TYPO3 v13 or newer as it is populated
+# based on TCA: https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/13.0/Feature-102834-Auto-registrationOfNewContentElementWizardViaTCA.html
+mod.wizards.newContentElement.wizardItems {
+    academic {
+        header = LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:newContentElement.group.academic
+        elements {
+            academic_study_plan {
+                iconIdentifier = academic-study-plan
+                title = LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:tt_content.CType.academic_study_plan.title
+                description = LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:tt_content.CType.academic_study_plan.description
+                tt_content_defValues {
+                    CType = academic_study_plan
+                }
+            }
+        }
+        show := addToList(academic_study_plan)
+    }
+}
+[END]
