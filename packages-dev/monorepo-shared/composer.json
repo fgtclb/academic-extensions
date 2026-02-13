@@ -20,6 +20,7 @@
         "fgtclb/academic-persons-sync": "2.*.*@dev",
         "fgtclb/academic-programs": "2.*.*@dev",
         "fgtclb/academic-projects": "2.*.*@dev",
+        "fgtclb/academic-study-plan": "2.*.*@dev",
         "fgtclb/category-types": "2.*.*@dev",
         "typo3/cms-backend": "^12.4.22 || ^13.4",
         "typo3/cms-belog": "^12.4.22 || ^13.4",
@@ -74,6 +75,7 @@
                     "fgtclb/academic-persons-sync": "2.0.2-dev",
                     "fgtclb/academic-programs": "2.0.2-dev",
                     "fgtclb/academic-projects": "2.0.2-dev",
+                    "fgtclb/academic-study-plan": "2.0.2-dev",
                     "fgtclb/category-types": "2.0.2-dev",
                     "fgtclb/academic-base": "2.0.2-dev"
                 }

@@ -1,0 +1,19 @@
+tt_content {
+    academic_study_plan =< lib.contentElement
+    academic_study_plan {
+        templateName = AcademicStudyPlan
+        templateRootPaths {
+            100 = EXT:academic_study_plan/Resources/Private/Templates/
+        }
+        partialRootPaths {
+            100 = EXT:academic_study_plan/Resources/Private/Partials/
+        }
+        layoutRootPaths {
+            100 = EXT:academic_study_plan/Resources/Private/Layouts/
+        }
+
+        dataProcessing {
+            10 = FGTCLB\AcademicStudyPlan\DataProcessing\StudyPlanProcessor
+        }
+    }
+}

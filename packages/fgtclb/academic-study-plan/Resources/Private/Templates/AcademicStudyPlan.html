@@ -1,0 +1,129 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<div
+    class="academic-study-plan container"
+    data-study-plan="{data.uid}"
+    data-filter-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}"
+>
+    <f:render partial="Header/All" arguments="{_all}" />
+
+    <nav role="navigation" aria-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}">
+        <ul class="filter">
+            <li>
+                <button
+                    data-category-id="category-id-placeholder"
+                    data-category-color="category-color-placeholder"
+                    aria-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}: category-label-placeholder"
+                    style="--category-color: category-color-placeholder;"
+                >
+                    category-label-placeholder
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <f:if condition="{semesters}">
+        <ul class="semesters row">
+            <f:for each="{semesters}" as="semester">
+                <li class="col">
+                    <div class="header" aria-hidden="true" inert>
+                        <div class="wrapper">
+                            <div>
+                                <h3 class="h6"><b>{semester.label}</b></h3>
+
+                                <f:if condition="{semester.credit_points}">
+                                    <span class="credits small">
+                                        {semester.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+                                    </span>
+                                </f:if>
+                            </div>
+
+                            <core:icon identifier="plus" alternativeMarkupIdentifier="inline"/>
+                            <core:icon identifier="minus" alternativeMarkupIdentifier="inline"/>
+                        </div>
+
+                        <f:if condition="{semester.note}">
+                            <span class="note small text-muted">{semester.note}</span>
+                        </f:if>
+                    </div>
+
+                    <ul>
+                        <f:for each="{semester.modules}" as="module">
+                            <f:variable
+                                name="hasContent"
+                                value="{f:if(condition: '{module.description} || {module.audioFiles}', then: '1', else: '0')}"
+                            />
+
+                            <li class="module {f:if(condition: hasContent, then: 'clickable')}" data-categories="{f:format.json(value: module.categories) -> f:format.htmlspecialchars()}">
+                                <h4 class="h6">{module.label}</h4>
+
+                                <f:if condition="{module.credit_points}">
+                                    <span class="credits small">
+                                        {module.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+                                    </span>
+                                </f:if>
+
+                                <f:if condition="{module.note}">
+                                    <span class="note small text-muted">{module.note}</span>
+                                </f:if>
+
+                                <f:if condition="{hasContent}">
+                                    <button class="modal-trigger" data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
+                                        <span class="visually-hidden">
+                                            {semester.label}, {semester.note}, {semester.credit_points}
+                                            {f:translate(key: 'credits', extensionName: 'academic_study_plan')}.
+                                            {f:translate(key: 'modal.open', extensionName: 'academic_study_plan')}: {module.label}
+                                        </span>
+                                    </button>
+
+                                    <dialog id="popup-{module.uid}">
+                                        <div class="wrapper">
+                                            <div>
+                                                <span class="h6" aria-hidden="true"><b>{module.label}</b></span>
+
+                                                <f:if condition="{module.credit_points}">
+                                                    <span class="credits small" aria-hidden="true">
+                                                        {module.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+                                                    </span>
+                                                </f:if>
+                                            </div>
+
+                                            <button aria-label="{f:translate(key: 'modal.close', extensionName: 'academic_study_plan')}">
+                                                <core:icon identifier="close-button" alternativeMarkupIdentifier="inline" />
+                                            </button>
+                                        </div>
+
+                                        <f:if condition="{module.note}">
+                                            <span class="note small text-muted" aria-hidden="true">{module.note}</span>
+                                        </f:if>
+
+                                        <f:if condition="{module.description}">
+                                            <p><f:format.nl2br>{module.description}</f:format.nl2br></p>
+                                        </f:if>
+
+                                        <f:if condition="{module.audioFiles}">
+                                            <f:for each="{module.audioFiles}" as="audioFile">
+                                                <audio controls aria-label="{f:translate(key: 'modal.audio', extensionName: 'academic_study_plan')}: {module.label}">
+                                                    <source src="{audioFile.publicUrl}" type="{audioFile.mimeType}">
+                                                </audio>
+                                            </f:for>
+                                        </f:if>
+                                    </dialog>
+                                </f:if>
+                            </li>
+                        </f:for>
+                    </ul>
+                </li>
+            </f:for>
+        </ul>
+    </f:if>
+
+    <f:if condition="{data.tx_academicstudyplan_footer_note}">
+        <f:format.html>{data.tx_academicstudyplan_footer_note}</f:format.html>
+    </f:if>
+</div>
+
+</html>

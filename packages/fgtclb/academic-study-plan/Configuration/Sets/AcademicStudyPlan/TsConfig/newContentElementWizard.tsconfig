@@ -1,0 +1,16 @@
+mod.wizards.newContentElement.wizardItems {
+    academic {
+        header = LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:newContentElement.group.academic
+        elements {
+            academic_study_plan {
+                iconIdentifier = academic-study-plan
+                title = LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:tt_content.CType.academic_study_plan.title
+                description = LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:tt_content.CType.academic_study_plan.description
+                tt_content_defValues {
+                    CType = academic_study_plan
+                }
+            }
+        }
+        show := addToList(academic_study_plan)
+    }
+}
