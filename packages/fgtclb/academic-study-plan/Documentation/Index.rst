@@ -4,19 +4,49 @@
 Academic StudyPlan
 ==================
 
+:Extension key:
+    academic_study_plan
+
+:Package name:
+    fgtclb/academic-study-plan
+
+:Version:
+    |release|
+
+:Language:
+    en
+
+:Author:
+    FGTCLB
+
+:License:
+    This document is published under the
+    `Creative Commons BY 4.0 <https://creativecommons.org/licenses/by/4.0/>`__
+    license.
+
+:Rendered:
+    |today|
+
+----
+
 TYPO3 extension for building and displaying academic study plans with semesters,
 modules, and categorization features.
+
+----
 
 ..  toctree::
     :glob:
     :titlesonly:
     :hidden:
 
-    */Index
-    Installation
-    Configuration
-    GetHelp
-    *
+    Introduction/Index
+    Installation/Index
+    Configuration/Index
+    Faq/Index
+    GetHelp/Index
+    KnownProblems/Index
+    Changelog/Changelog-2
+
 
 ..  card-grid::
     :columns: 1

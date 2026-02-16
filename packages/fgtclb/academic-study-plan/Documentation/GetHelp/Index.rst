@@ -15,4 +15,4 @@ or contact the extension author.
 Report Issues
 =============
 
-You can report issues at `https://github.com/fgtclb/academic-study-plan/issues <https://github.com/fgtclb/academic-study-plan/issues>`_.
+You can report issues at `https://github.com/fgtclb/academic-extensions/issues <https://github.com/fgtclb/academic-extensions/issues>`_.
