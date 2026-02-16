@@ -1,0 +1,53 @@
+..  include:: /Includes.rst.txt
+:navigation-title: Installation
+..  _installation:
+
+============
+Installation
+============
+
+..  _installation-composer:
+
+Install Academic StudyPlan with Composer
+========================================
+
+This extension can be installed using the TYPO3 `extension manager
+<https://extensions.typo3.org/extension/academic_persons>`__ or by `composer
+<https://packagist.org/packages/fgtclb/academic-persons>`__.
+
+..  code-block:: shell
+
+    composer install \
+        'fgtclb/academic-persons':'^2'
+
+Testing 2.x.x extension version in projects (composer mode)
+-----------------------------------------------------------
+
+It is already possible to use and test the `2.x` version in composer based instances,
+which is encouraged and feedback of issues not detected by us (or pull-requests).
+
+Your project should configure `minimum-stabilty: dev` and `prefer-stable` to allow
+requiring each extension but still use stable versions over development versions:
+
+..  code-block:: shell
+
+    composer config minimum-stability "dev" \
+    && composer config "prefer-stable" true
+
+and installed with:
+
+..  code-block:: shell
+
+    composer require \
+        'fgtclb/academic-persons':'2.*.*@dev'
+
+Install Academic StudyPlan in Classic Mode
+==========================================
+
+Or download the extension from
+
+* GitHub release artifact `https://github.com/fgtclb/academic-study-plan/releases>`_
+* TYPO3 Extension Repository `https://extensions.typo3.org/extension/academic_study_plan/`_
+* Use the Extension Manager and retrieve the extension from the TYPO3 Extension Repository.
+
+and install it in the Extension Manager.
