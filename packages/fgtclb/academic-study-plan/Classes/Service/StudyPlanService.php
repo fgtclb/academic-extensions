@@ -178,7 +178,7 @@ final class StudyPlanService
             && is_string($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['disabled'])
             && trim((string)$GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['disabled']) !== ''
         ) {
-            return trim((string)($GLOBALS['TCA'][$tableName]['ctrl']['disabled'])) ?: null;
+            return trim((string)($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['disabled'])) ?: null;
         }
         return null;
     }
@@ -194,7 +194,7 @@ final class StudyPlanService
             && is_string($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['deleted'])
             && trim((string)$GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['deleted']) !== ''
         ) {
-            return trim((string)($GLOBALS['TCA'][$tableName]['ctrl']['deleted'])) ?: null;
+            return trim((string)($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['deleted'])) ?: null;
         }
         return null;
     }
