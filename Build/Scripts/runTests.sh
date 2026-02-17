@@ -170,6 +170,39 @@ cleanRenderedDocumentationFiles() {
     echo "done"
 }
 
+executeRstRendering() {
+    local extensionFolderName="$1"
+    local extensionFolder="packages/fgtclb/${extensionFolderName}"
+    if [[ ! -d "${extensionFolder}/Documentation" ]]; then
+        return 1
+    fi
+    echo "Processing RST directory: ${extensionFolder}/Documentation"
+    ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name check-rst-rendering-${extensionFolderName}-${SUFFIX}  -w /project -v "${ROOT_DIR}/${extensionFolder}:/project" ${IMAGE_RSTRENDERING} --fail-on-log --fail-on-error --no-progress --config=Documentation Documentation
+    local exitCode=$?
+    echo "Render result for ${extensionFolder}: ${exitCode}"
+    rm -rf "documentation-rendered/${extensionFolderName}/Documentation-GENERATED-temp" && \
+      mkdir -p "documentation-rendered/${extensionFolderName}/Documentation-GENERATED-temp" && \
+      cp -Rf "${extensionFolder}/Documentation-GENERATED-temp" "documentation-rendered/${extensionFolderName}/" || exitCode=1
+    return ${exitCode}
+}
+
+openDocumentation() {
+    local extensionFolderName="$1"
+    local documentationFolder="documentation-rendered/${extensionFolderName}/Documentation-GENERATED-temp"
+    if [[ ! -d "${documentationFolder}" ]]; then
+        echo "ERROR: No rendered documentation found for ${extensionFolderName}"
+        echo ""
+        echo "       Run ./Build/Scripts/runtests.sh -s checkRstRenderingAll"
+        echo "        or  ./Build/Scripts/runtests.sh -s checkRstRenderingSingle <extension-folder-key>"
+        echo ""
+        echo "       first to have a rendered documentation in place."
+        echo ""
+        return 1
+    fi
+    # @todo Make this OS aware, currently only linux supported.
+    xdg-open "${documentationFolder}/Index.html"
+}
+
 loadHelp() {
     # Load help text into $HELP
     read -r -d '' HELP <<EOF
@@ -184,9 +217,12 @@ Options:
         Specifies which test suite to run
             - cgl: test and fix all core php files
             - cglHeader: test and fix file header for all core php files
+            - checkRstRenderingAll: Test all extension .rst files for rendering errors
+            - checkRstRenderingSingle: Test specified system extension .rst files for rendering errors
             - composer: "composer" with all remaining arguments dispatched.
             - composerUpdate: "composer update", handy if host has no PHP
             - lintPhp: PHP linting
+            - openDocumentation: Open a rendered extension documentation in the browser (only linux for now)
             - phpstan: phpstan tests
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
             - unit (default): PHP unit tests
@@ -454,6 +490,7 @@ IMAGE_SELENIUM="docker.io/selenium/standalone-chrome:4.0.0-20211102"
 IMAGE_MARIADB="docker.io/mariadb:${DBMS_VERSION}"
 IMAGE_MYSQL="docker.io/mysql:${DBMS_VERSION}"
 IMAGE_POSTGRES="docker.io/postgres:${DBMS_VERSION}-alpine"
+IMAGE_RSTRENDERING="ghcr.io/typo3-documentation/render-guides:latest"
 
 # Detect arm64 and use a seleniarm image.
 # In a perfect world selenium would have a arm64 integrated, but that is not on the horizon.
@@ -520,6 +557,37 @@ case ${TEST_SUITE} in
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name cgl-header-${SUFFIX} ${IMAGE_PHP} ${COMMAND}
         SUITE_EXIT_CODE=$?
         ;;
+    checkRstRenderingAll)
+        SUITE_EXIT_CODE=0
+        echo "Scanning packages/fgtclb/ for directories with Documentation..."
+        for extensionFolder in packages/fgtclb//*/Documentation; do
+            extensionFolderName="${extensionFolder%/Documentation}"
+            extensionFolderName=$(basename "${extensionFolderName}")
+            executeRstRendering "${extensionFolderName}"
+            TMP_SUITE_EXIT_CODE=$?
+            if [ ${TMP_SUITE_EXIT_CODE} -ne 0 ]; then
+                SUITE_EXIT_CODE=${TMP_SUITE_EXIT_CODE}
+            fi
+        done
+        ;;
+    checkRstRenderingSingle)
+        extensionKey="${1}"
+        if [ -n "${extensionKey}" ]; then
+            if [[ ! -d "packages/fgtclb/${extensionKey}" ]]; then
+                echo "Error: Invalid extension key provided: \"${systemExtensionKey}\""
+                SUITE_EXIT_CODE=1
+            elif [[ ! -d "packages/fgtclb/${extensionKey}/Documentation" ]]; then
+                echo "Error: Valid extension \"${extensionKey}\" does not contain a \"Documentation\" folder"
+                SUITE_EXIT_CODE=1
+            else
+                executeRstRendering "${extensionKey}"
+                SUITE_EXIT_CODE=$?
+            fi
+        else
+            echo "Error: No system extension key provided as first argument"
+            SUITE_EXIT_CODE=1
+        fi
+        ;;
     composer)
         COMMAND=(composer "$@")
         ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.Build/.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} "${COMMAND[@]}"
@@ -584,6 +652,21 @@ case ${TEST_SUITE} in
         COMMAND="find . -name \\*.php ! -path "./.Build/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} -e COMPOSER_CACHE_DIR=.Build/.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
+        ;;
+    openDocumentation)
+        extensionKey="${1}"
+        if [ -n "${extensionKey}" ]; then
+            if [[ ! -d "documentation-rendered/${extensionKey}/Documentation-GENERATED-temp" ]]; then
+                echo "Error: Valid extension \"${extensionKey}\" does not contain a rendered \"Documentation\" folder"
+                SUITE_EXIT_CODE=1
+            else
+                openDocumentation "${extensionKey}"
+                SUITE_EXIT_CODE=$?
+            fi
+        else
+            echo "Error: No extension key provided as first argument"
+            SUITE_EXIT_CODE=1
+        fi
         ;;
     phpstan)
         PHPSTAN_CONFIG_FILE="Build/phpstan/Core${CORE_VERSION}/phpstan.neon"
