@@ -18,12 +18,12 @@ Extension specific category types are now grouped and are now defined by
 newly introduced yaml file format, following a concrete convention to look
 and auto-register these files.
 
-`EXT:academic_programs` now ships a default set of partner related category
+`EXT:academic_projects` now ships a default set of partner related category
 types, which can be found in `./Configuration/CategoryTypes.yaml`
 
-`EXT:academic_programs` related category types can be extended by any other
+`EXT:academic_projects` related category types can be extended by any other
 TYPO3 extension providing a `Configuration/CategoryTypes.yaml` file containing
-category-types using the group-identifier `programs`.
+category-types using the group-identifier `projects`.
 
 `Configuration/CategoryTypes.yaml` format uses following syntax:
 
@@ -33,7 +33,7 @@ category-types using the group-identifier `programs`.
     types:
         - identifier: <unique_identifier>
           title: '<type-translation-lable-using-full-LLL-syntax'
-          group: programs
+          group: projects
           icon: '<icon-file-using-EXT-syntax-needs-to-be-an-as-svg>'
 
 ..  important::
