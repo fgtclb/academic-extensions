@@ -8,14 +8,4 @@ page {
     includeJSFooter {
         academicStudyPlan = EXT:academic_study_plan/Resources/Public/JavaScript/academic-study-plan.js
     }
-    includeJSLibs {
-      topwire = EXT:topwire/Resources/Public/JavaScript/topwire.js
-      topwire {
-        type = module
-        async = 1
-        defer = 1
-        disableCompression = 1
-        excludeFromConcatenation = 1
-      }
-    }
 }
