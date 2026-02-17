@@ -52,6 +52,14 @@ jobs:
             fi
           done
 
+      - name: Render documentation of all academic extensions
+        shell: bash
+        # We enforce successfull state here
+        run: |
+          Build/Scripts/runTests.sh -b docker -s checkRstRenderingAll | true
+          cd documentation-rendered
+          find . -type d -maxdepth 1 -exec zip -r {}_documentation-${{ env.version }}.zip {} \
+
       # Note that when release already exists for tag, only files will be uploaded and lets this acting as a
       # fallback to ensure that a real GitHub release is created for the tag along with extension artifacts.
       - name: Create release and upload artifacts in the same step
@@ -62,6 +70,7 @@ jobs:
           generate_release_notes: true
           files: |
             tailor-version-artefact/*_${{ env.version }}.zip
+            documentation-rendered/*_documentation-${{ env.version }}.zip
             LICENSE
           fail_on_unmatched_files: true
 
