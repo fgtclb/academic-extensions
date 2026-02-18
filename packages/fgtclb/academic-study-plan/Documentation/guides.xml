@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- See  https://docs.typo3.org/permalink/h2document:guides-xml for documentation on this file-->
 <guides
     xmlns="https://www.phpdoc.org/guides"
@@ -9,7 +9,7 @@
     default-code-language="php">
     <project
         title="Academic StudyPlan"
-        release="2.1.0"
+        release="2.1.1"
         copyright="since 2025 by FGTCLB GmbH"
     />
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
