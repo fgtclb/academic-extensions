@@ -24,6 +24,7 @@ class ProfileInformation extends AbstractEntity
     protected ?int $yearStart = null;
     protected ?int $yearEnd = null;
     protected int $sorting = 0;
+    protected string $importIdentifier = '';
 
     public function __construct()
     {
