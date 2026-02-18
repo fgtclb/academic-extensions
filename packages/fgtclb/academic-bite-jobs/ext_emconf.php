@@ -8,11 +8,11 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.22-13.4.99',
-            'academic_base' => '2.0.2',
+            'academic_base' => '2.1.0',
         ],
     ],
     'description' => 'The Academic Bite Jobs extension shows jobs from the B-Ite Job Board.',
     'state' => 'beta',
     'title' => 'FGTCLB: Academic Bite Jobs',
-    'version' => '2.0.2',
+    'version' => '2.1.0',
 ];

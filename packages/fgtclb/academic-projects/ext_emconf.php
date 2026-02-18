@@ -12,8 +12,8 @@ $EM_CONF[$_EXTKEY] = [
             'extbase' => '12.4.22-13.4.99',
             'fluid' => '12.4.22-13.4.99',
             'install' => '12.4.22-13.4.99',
-            'academic_base' => '2.0.2',
-            'category_types' => '2.0.2',
+            'academic_base' => '2.1.0',
+            'category_types' => '2.1.0',
         ],
         'conflicts' => [],
         'suggests' => [],
@@ -21,5 +21,5 @@ $EM_CONF[$_EXTKEY] = [
     'description' => 'Academic project pages for TYPO3 with specific structured data and typed sys_categories',
     'state' => 'beta',
     'title' => 'FGTCLB: Academic Projects',
-    'version' => '2.0.2',
+    'version' => '2.1.0',
 ];
