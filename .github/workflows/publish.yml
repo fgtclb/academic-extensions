@@ -62,6 +62,7 @@ jobs:
 
       # Note that when release already exists for tag, only files will be uploaded and lets this acting as a
       # fallback to ensure that a real GitHub release is created for the tag along with extension artifacts.
+      #             documentation-rendered/*_documentation-${{ env.version }}.zip
       - name: Create release and upload artifacts in the same step
         uses: softprops/action-gh-release@v2
         if: ${{startsWith(github.ref, 'refs/tags/') }}
@@ -70,7 +71,6 @@ jobs:
           generate_release_notes: true
           files: |
             tailor-version-artefact/*_${{ env.version }}.zip
-            # documentation-rendered/*_documentation-${{ env.version }}.zip
             LICENSE
           fail_on_unmatched_files: true
 

@@ -71,8 +71,8 @@
             "url": "packages-dev/*",
             "options": {
                 "versions": {
-                    "fgtclb/academics-monorepo-shared": "2.1.0",
-                    "fgtclb/academics-monorepo-testing-helper": "2.1.0"
+                    "fgtclb/academics-monorepo-shared": "2.1.2",
+                    "fgtclb/academics-monorepo-testing-helper": "2.1.2"
                 }
             }
         },
@@ -81,18 +81,18 @@
             "url": "packages/*/*",
             "options": {
                 "versions": {
-                    "fgtclb/academic-bite-jobs": "2.1.1",
-                    "fgtclb/academic-contacts4pages": "2.1.1",
-                    "fgtclb/academic-jobs": "2.1.1",
-                    "fgtclb/academic-partners": "2.1.1",
-                    "fgtclb/academic-persons": "2.1.1",
-                    "fgtclb/academic-persons-edit": "2.1.1",
-                    "fgtclb/academic-persons-sync": "2.1.1",
-                    "fgtclb/academic-programs": "2.1.1",
-                    "fgtclb/academic-projects": "2.1.1",
-                    "fgtclb/category-types": "2.1.1",
-                    "fgtclb/academic-base": "2.1.1",
-                    "fgtclb/academic-study-plan": "2.1.1"
+                    "fgtclb/academic-bite-jobs": "2.1.2",
+                    "fgtclb/academic-contacts4pages": "2.1.2",
+                    "fgtclb/academic-jobs": "2.1.2",
+                    "fgtclb/academic-partners": "2.1.2",
+                    "fgtclb/academic-persons": "2.1.2",
+                    "fgtclb/academic-persons-edit": "2.1.2",
+                    "fgtclb/academic-persons-sync": "2.1.2",
+                    "fgtclb/academic-programs": "2.1.2",
+                    "fgtclb/academic-projects": "2.1.2",
+                    "fgtclb/category-types": "2.1.2",
+                    "fgtclb/academic-base": "2.1.2",
+                    "fgtclb/academic-study-plan": "2.1.2"
                 }
             }
         }

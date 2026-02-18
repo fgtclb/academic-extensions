@@ -14,5 +14,5 @@ $EM_CONF[$_EXTKEY] = [
     'description' => 'Base functionality accross academic extensions.',
     'state' => 'beta',
     'title' => 'FGTCLB: Academic Base',
-    'version' => '2.1.1',
+    'version' => '2.1.2',
 ];
