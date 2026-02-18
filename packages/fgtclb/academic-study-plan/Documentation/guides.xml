@@ -9,7 +9,7 @@
     default-code-language="php">
     <project
         title="Academic StudyPlan"
-        release="2.1.1"
+        release="2.1.2"
         copyright="since 2025 by FGTCLB GmbH"
     />
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
