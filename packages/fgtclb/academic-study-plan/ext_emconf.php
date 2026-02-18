@@ -8,12 +8,12 @@ $EM_CONF[$_EXTKEY] = [
     'author_company' => 'FGTCLB GmbH',
     'author_email' => 'hello@fgtclb.com',
     'state' => 'beta',
-    'version' => '1.0.0',
+    'version' => '2.1.0',
     'constraints' => [
         'depends' => [
             'typo3' => '12.0.0-13.4.99',
             'backend' => '12.0.0-13.4.99',
-            'academic_base' => '2.0.2',
+            'academic_base' => '2.1.0',
         ],
         'conflicts' => [],
         'suggests' => [],
