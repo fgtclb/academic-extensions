@@ -55,18 +55,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         );
         $listenerProvider = $container->get(ListenerProvider::class);
         $listenerProvider->addListener(StateBackupEvent::class, 'state-backup-event-interceptor');
-        $typoScriptAspectMock = $this->createMock(TypoScriptAspect::class);
-        $contextMock = $this->createMock(Context::class);
-        $contextMock
-            ->expects($this->exactly(1))
-            ->method('hasAspect')
-            ->with('typoscript')
-            ->willReturn(true);
-        $contextMock
-            ->expects($this->exactly(1))
-            ->method('getAspect')
-            ->with('typoscript')
-            ->willReturn($typoScriptAspectMock);
         $requestMock = $this->createMock(ServerRequestInterface::class);
         $typoScriptFrontendControllerMock = $this->createMock(TypoScriptFrontendController::class);
         $backendUserAuthenticationMock = $this->createMock(BackendUserAuthentication::class);
@@ -75,7 +63,7 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $GLOBALS['BE_USER'] = $backendUserAuthenticationMock;
         $environmentBuilderMock = $this->createEnvironmentBuilderMock();
         $environmentBuilderFactoryMock = $this->createEnvironmentBuilderFactoryMock($environmentBuilderMock);
-        $stateManager = $this->createStateManager($contextMock, $environmentBuilderFactoryMock);
+        $stateManager = $this->createStateManager($environmentBuilderFactoryMock);
         $stateManagerReflection = new \ReflectionObject($stateManager);
         $stackPropertyReflection = $stateManagerReflection->getProperty('stack');
         // before
@@ -99,11 +87,11 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertInstanceOf(State::class, $firstState);
         $this->assertIsObject($firstState->request());
         $this->assertIsObject($firstState->typoScriptFrontendController());
-        $this->assertIsObject($firstState->typoScriptAspect());
+        $this->assertIsObject($firstState->context());
+        $this->assertTrue($firstState->context()->hasAspect('typoscript'));
         $this->assertIsObject($firstState->backendUserAuthentication());
         $this->assertSame($requestMock, $firstState->request());
         $this->assertSame($typoScriptFrontendControllerMock, $firstState->typoScriptFrontendController());
-        $this->assertSame($typoScriptAspectMock, $firstState->typoScriptAspect());
         $this->assertSame($backendUserAuthenticationMock, $firstState->backendUserAuthentication());
         // assert event count
         $this->assertCount(1, $dispatchedBackupEvents);
@@ -124,24 +112,12 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         );
         $listenerProvider = $container->get(ListenerProvider::class);
         $listenerProvider->addListener(StateBackupEvent::class, 'state-backup-event-interceptor');
-        $typoScriptAspectMock = $this->createMock(TypoScriptAspect::class);
-        $contextMock = $this->createMock(Context::class);
-        $contextMock
-            ->expects($this->exactly(2))
-            ->method('hasAspect')
-            ->with('typoscript')
-            ->willReturn(false, true, false);
-        $contextMock
-            ->expects($this->exactly(1))
-            ->method('getAspect')
-            ->with('typoscript')
-            ->willReturn($typoScriptAspectMock);
         $requestMock = $this->createMock(ServerRequestInterface::class);
         $typoScriptFrontendControllerMock = $this->createMock(TypoScriptFrontendController::class);
         $environmentBuilderMock = $this->createEnvironmentBuilderMock();
         $environmentBuilderFactoryMock = $this->createEnvironmentBuilderFactoryMock($environmentBuilderMock);
         $backendUserAuthenticationMock = $this->createMock(BackendUserAuthentication::class);
-        $stateManager = $this->createStateManager($contextMock, $environmentBuilderFactoryMock);
+        $stateManager = $this->createStateManager($environmentBuilderFactoryMock);
         $stateManagerReflection = new \ReflectionObject($stateManager);
         $stackPropertyReflection = $stateManagerReflection->getProperty('stack');
         // before
@@ -172,7 +148,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertInstanceOf(State::class, $firstState);
         $this->assertNull($firstState->request());
         $this->assertNull($firstState->typoScriptFrontendController());
-        $this->assertNull($firstState->typoScriptAspect());
         $this->assertNull($firstState->backendUserAuthentication());
         $secondState = $stack[1] ?? null;
         $this->assertInstanceOf(StateInterface::class, $secondState);
@@ -180,7 +155,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertInstanceOf(State::class, $secondState);
         $this->assertSame($requestMock, $secondState->request());
         $this->assertSame($typoScriptFrontendControllerMock, $secondState->typoScriptFrontendController());
-        $this->assertSame($typoScriptAspectMock, $secondState->typoScriptAspect());
         $this->assertSame($backendUserAuthenticationMock, $secondState->backendUserAuthentication());
         // assert event count
         $this->assertCount(2, $dispatchedBackupEvents);
@@ -213,7 +187,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $expectedState = new State(
             request: $request,
             typoScriptFrontendController: $typoScriptFrontendControllerMock,
-            typoScriptAspect: $typoScriptAspectMock,
             backendUserAuthentication: $backendUserAuthenticationMock,
         );
         $stateManager = $this->createStateManager(environmentBuilderFactory: $environmentBuilderFactoryMock);
@@ -236,17 +209,12 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertSame($typoScriptFrontendControllerMock, $GLOBALS['TSFE'] ?? null);
         // @phpstan-ignore-next-line Make PHPStan happy
         $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER'] ?? null);
-        $this->assertSame($typoScriptAspectMock, $context->getAspect('typoscript'));
         $this->assertCount(0, $stackPropertyReflection->getValue($stateManager));
         // restore on empty stack resets environment to empty state - expected !
         $stateManager->restore();
         $this->assertNull($GLOBALS['TYPO3_REQUEST'] ?? null);
         $this->assertNull($GLOBALS['TSFE'] ?? null);
         $this->assertNull($GLOBALS['BE_USER'] ?? null);
-        // should be false due to unsetAspect() call, but the context class creates empty TypoScriptAspect
-        // in case it is not set already in case of getAspect() and hardcoded returns true for `hasAspect()`.
-        $this->assertTrue($context->hasAspect('typoscript'));
-        $this->assertNotSame($typoScriptAspectMock, $context->getAspect('typoscript'));
         // assert event count
         $this->assertCount(2, $dispatchedApplyEvents);
     }
@@ -276,14 +244,11 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
     }
 
     private function createStateManager(
-        ?Context $context = null,
         ?EnvironmentBuilderFactoryInterface $environmentBuilderFactory = null,
     ): StateManager {
-        $context ??= $this->get(Context::class);
         $environmentBuilderFactory ??= $this->get(EnvironmentBuilderFactoryInterface::class);
         return new StateManager(
             environmentBuilderFactory: $environmentBuilderFactory,
-            context: $context,
         );
     }
 }

@@ -68,7 +68,7 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $GLOBALS['BE_USER'] = $backendUserAuthenticationMock;
         $environmentBuilderMock = $this->createEnvironmentBuilderMock();
         $environmentBuilderFactoryMock = $this->createEnvironmentBuilderFactoryMock($environmentBuilderMock);
-        $stateManager = $this->createStateManager($context, $environmentBuilderFactoryMock);
+        $stateManager = $this->createStateManager($environmentBuilderFactoryMock);
         $stateManagerReflection = new \ReflectionObject($stateManager);
         $stackPropertyReflection = $stateManagerReflection->getProperty('stack');
         // before
@@ -94,11 +94,9 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertInstanceOf(State::class, $firstState);
         $this->assertIsObject($firstState->request());
         $this->assertIsObject($firstState->typoScriptFrontendController());
-        $this->assertIsObject($firstState->previewAspect());
         $this->assertIsObject($firstState->backendUserAuthentication());
         $this->assertSame($requestMock, $firstState->request());
         $this->assertSame($typoScriptFrontendControllerMock, $firstState->typoScriptFrontendController());
-        $this->assertSame($previewAspectSplObjectHash, spl_object_hash($firstState->previewAspect()));
         $this->assertSame($backendUserAuthenticationMock, $firstState->backendUserAuthentication());
         // assert event count
         $this->assertCount(1, $dispatchedBackupEvents);
@@ -128,7 +126,7 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $backendUserAuthenticationMock = $this->createMock(BackendUserAuthentication::class);
         $environmentBuilderMock = $this->createEnvironmentBuilderMock();
         $environmentBuilderFactoryMock = $this->createEnvironmentBuilderFactoryMock($environmentBuilderMock);
-        $stateManager = $this->createStateManager($context, $environmentBuilderFactoryMock);
+        $stateManager = $this->createStateManager($environmentBuilderFactoryMock);
         $stateManagerReflection = new \ReflectionObject($stateManager);
         $stackPropertyReflection = $stateManagerReflection->getProperty('stack');
         // before
@@ -167,7 +165,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertInstanceOf(State::class, $firstState);
         $this->assertNull($firstState->request());
         $this->assertNull($firstState->typoScriptFrontendController());
-        $this->assertNull($firstState->previewAspect());
         $this->assertNull($firstState->backendUserAuthentication());
         $secondState = $stack[1] ?? null;
         $this->assertInstanceOf(StateInterface::class, $secondState);
@@ -175,11 +172,9 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertInstanceOf(State::class, $secondState);
         $this->assertIsObject($secondState->request());
         $this->assertIsObject($secondState->typoScriptFrontendController());
-        $this->assertIsObject($secondState->previewAspect());
         $this->assertIsObject($secondState->backendUserAuthentication());
         $this->assertSame($requestMock, $secondState->request());
         $this->assertSame($typoScriptFrontendControllerMock, $secondState->typoScriptFrontendController());
-        $this->assertSame($previewAspectSplObjectHash, spl_object_hash($secondState->previewAspect()));
         $this->assertSame($backendUserAuthenticationMock, $secondState->backendUserAuthentication());
         // assert event count
         $this->assertCount(2, $dispatchedBackupEvents);
@@ -200,9 +195,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         );
         $listenerProvider = $container->get(ListenerProvider::class);
         $listenerProvider->addListener(StateApplyEvent::class, 'state-apply-event-interceptor');
-        $previewAspectMock = new PreviewAspect();
-        $previewAspectSplObjectHash = spl_object_hash($previewAspectMock);
-        $context = GeneralUtility::makeInstance(Context::class);
         $request = new ServerRequest();
         $request = $request->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE);
         $typoScriptFrontendControllerMock = $this->createMock(TypoScriptFrontendController::class);
@@ -215,10 +207,9 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $expectedState = new State(
             request: $request,
             typoScriptFrontendController: $typoScriptFrontendControllerMock,
-            previewAspect: $previewAspectMock,
             backendUserAuthentication: $backendUserAuthenticationMock,
         );
-        $stateManager = $this->createStateManager($context, $environmentBuilderFactoryMock);
+        $stateManager = $this->createStateManager($environmentBuilderFactoryMock);
         $stateManagerReflection = new \ReflectionObject($stateManager);
         $stackPropertyReflection = $stateManagerReflection->getProperty('stack');
         $stackPropertyReflection->setValue($stateManager, [0 => $expectedState]);
@@ -239,7 +230,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         // @phpstan-ignore-next-line Make PHPStan happy
         $this->assertSame($backendUserAuthenticationMock, $GLOBALS['BE_USER'] ?? null);
         $this->assertTrue($context->hasAspect('frontend.preview'));
-        $this->assertSame($previewAspectSplObjectHash, spl_object_hash($context->getAspect('frontend.preview')));
         $this->assertCount(0, $stackPropertyReflection->getValue($stateManager));
         // restore on empty stack resets environment to empty state - expected !
         $stateManager->restore();
@@ -275,14 +265,11 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
     }
 
     public function createStateManager(
-        ?Context $context = null,
         ?EnvironmentBuilderFactoryInterface $environmentBuilderFactory = null,
     ): StateManager {
-        $context ??= $this->get(Context::class);
         $environmentBuilderFactory ??= $this->get(EnvironmentBuilderFactoryInterface::class);
         return new StateManager(
             environmentBuilderFactory: $environmentBuilderFactory,
-            context: $context,
         );
     }
 }

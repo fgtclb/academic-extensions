@@ -13,7 +13,14 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use TYPO3\CMS\Core\Cache\Frontend\PhpFrontend;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\DateTimeAspect;
+use TYPO3\CMS\Core\Context\LanguageAspect;
+use TYPO3\CMS\Core\Context\LanguageAspectFactory;
+use TYPO3\CMS\Core\Context\UserAspect;
+use TYPO3\CMS\Core\Context\VisibilityAspect;
+use TYPO3\CMS\Core\Context\WorkspaceAspect;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Domain\DateTimeFactory;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Exception\Page\RootLineException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
@@ -102,9 +109,12 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     private function createTypoScriptFrontendController(StateBuildContext $stateBuildContext, State $state, Site $site, SiteLanguage $siteLanguage): State
     {
         $request = $state->request() ?? new ServerRequest();
-        $context = GeneralUtility::makeInstance(Context::class);
+        // Note creating with new here on purpose to have a clean new instance.
+        $context = new Context();
         // Ensure to have a preview aspect set to the context
         $context->setAspect('frontend.preview', new PreviewAspect());
+        $context->setAspect('language', LanguageAspectFactory::createFromSiteLanguage($siteLanguage));
+        $this->overrideContextData(GeneralUtility::makeInstance(Context::class), $context);
         $pageId = $this->getNearestAccessiblePage($stateBuildContext->pageId ?? $site->getRootPageId(), $context)
             ?: $site->getRootPageId();
         // Ensure frontend user authentication in request
@@ -148,7 +158,8 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         $controller->newCObj($request);
         return $state
             ->withRequest($request)
-            ->withTypoScriptFrontendController($controller);
+            ->withTypoScriptFrontendController($controller)
+            ->withContext($context);
     }
 
     /**
@@ -262,5 +273,24 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         } catch (RootLineException) {
         }
         return 0;
+    }
+
+    final protected function overrideContextData(Context $context, Context $overrideContext): void
+    {
+        $propertyAccessor = new \ReflectionProperty(Context::class, 'aspects');
+        $propertyAccessor->setValue($context, $propertyAccessor->getValue($overrideContext));
+    }
+
+    final protected function resetContextData(Context $context): void
+    {
+        $propertyAccessor = new \ReflectionProperty(Context::class, 'aspects');
+        $propertyAccessor->setValue($context, [
+            'date' => new DateTimeAspect(DateTimeFactory::createFromTimestamp($GLOBALS['EXEC_TIME'])),
+            'visibility' => new VisibilityAspect(),
+            'backend.user' => new UserAspect(),
+            'frontend.user' => new UserAspect(),
+            'workspace' => new WorkspaceAspect(),
+            'language' => new LanguageAspect(),
+        ]);
     }
 }

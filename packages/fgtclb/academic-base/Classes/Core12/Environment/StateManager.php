@@ -12,8 +12,6 @@ use FGTCLB\AcademicBase\Environment\StateManagerExecuteMethodTrait;
 use FGTCLB\AcademicBase\Environment\StateManagerInterface;
 use FGTCLB\AcademicBase\Environment\StateManagerRootStateInterfaceHelperMethodsTrait;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
-use TYPO3\CMS\Core\Context\Context;
-use TYPO3\CMS\Core\Context\TypoScriptAspect;
 
 /**
  * Default implementation of {@see StateManagerInterface} for  TYPO3 v12.
@@ -38,7 +36,6 @@ final class StateManager implements StateManagerInterface
 
     public function __construct(
         private readonly EnvironmentBuilderFactoryInterface $environmentBuilderFactory,
-        private readonly Context $context,
     ) {}
 
     /**
@@ -46,11 +43,9 @@ final class StateManager implements StateManagerInterface
      */
     public function backup(): void
     {
-        /** @var TypoScriptAspect|null $typoScriptAspect */
-        $typoScriptAspect = $this->context->hasAspect('typoscript') ? $this->context->getAspect('typoscript') : null;
         $state = $this->backupStateInterface(new State());
         if ($state instanceof ExtendedStateInterface) {
-            $state = $state->withTypoScriptAspect($typoScriptAspect);
+            // no special handling right now required based on extended interface
         }
         $state = $this->dispatchStateBackupEvent($state);
         /** @var State $state */
@@ -118,12 +113,7 @@ final class StateManager implements StateManagerInterface
     {
         $this->applyStateInterface($state);
         if ($state instanceof ExtendedStateInterface) {
-            // Handle state for extended interface.
-            if ($state->typoScriptAspect() !== null) {
-                $this->context->setAspect('typoscript', $state->typoScriptAspect());
-            } else {
-                $this->context->unsetAspect('typoscript');
-            }
+            // no special handling right now required based on extended interface
         }
         $this->dispatchStateApplyEvent($state);
     }

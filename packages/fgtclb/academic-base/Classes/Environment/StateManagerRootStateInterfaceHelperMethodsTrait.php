@@ -8,10 +8,13 @@ use FGTCLB\AcademicBase\Environment\Event\StateApplyEvent;
 use FGTCLB\AcademicBase\Environment\Event\StateBackupEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -36,6 +39,18 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
                 1762340764,
             );
         }
+        $contextToSet = $state->context();
+        if ($contextToSet === null) {
+            $contextToSet = new Context();
+            if ($state->request() !== null && ApplicationType::fromRequest($state->request())->isFrontend()) {
+                $contextToSet->setAspect('frontend.preview', new PreviewAspect());
+            }
+        }
+        $this->overrideContextData(
+            // Operate on real singleton instance.
+            GeneralUtility::makeInstance(Context::class),
+            $contextToSet,
+        );
         if ($state->request() !== null) {
             $GLOBALS['TYPO3_REQUEST'] = $state->request();
         } else {
@@ -80,6 +95,7 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
 
     final protected function backupStateInterface(StateInterface $state): StateInterface
     {
+        $context = clone GeneralUtility::makeInstance(Context::class);
         /** @var ServerRequestInterface|null $request */
         $request = $GLOBALS['TYPO3_REQUEST'] ?? null;
         /** @var TypoScriptFrontendController|null $typoScriptFrontendController */
@@ -87,6 +103,7 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         $applicationType = $request !== null && $request->getAttribute('applicationType') ?: null;
         $pageRenderer = $request !== null && $applicationType !== null ? GeneralUtility::makeInstance(PageRenderer::class) : null;
         return $state
+            ->withContext($context)
             ->withRequest($request)
             ->withTypoScriptFrontendController($typoScriptFrontendController)
             ->withBackendUserAuthentication($GLOBALS['BE_USER'] ?? null)
@@ -108,5 +125,11 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         $event = GeneralUtility::makeInstance(EventDispatcherInterface::class)->dispatch($event);
         /** @var StateBackupEvent $event */
         return $event->getState();
+    }
+
+    final protected function overrideContextData(Context $context, Context $overrideContext): void
+    {
+        $propertyAccessor = new \ReflectionProperty(Context::class, 'aspects');
+        $propertyAccessor->setValue($context, $propertyAccessor->getValue($overrideContext));
     }
 }
