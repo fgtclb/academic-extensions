@@ -8,8 +8,8 @@ use FGTCLB\AcademicBase\Environment\StateInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -33,11 +33,16 @@ final class State implements StateInterface, ExtendedStateInterface
     public function __construct(
         private readonly ?ServerRequestInterface $request = null,
         private readonly ?TypoScriptFrontendController $typoScriptFrontendController = null,
-        private readonly ?PreviewAspect $previewAspect = null,
         private readonly ?PageRenderer $pageRenderer = null,
+        private readonly ?Context $context = null,
         private readonly ?BackendUserAuthentication $backendUserAuthentication = null,
         private readonly array $additionalData = [],
     ) {}
+
+    public function context(): ?Context
+    {
+        return $this->context;
+    }
 
     public function request(): ?ServerRequestInterface
     {
@@ -47,11 +52,6 @@ final class State implements StateInterface, ExtendedStateInterface
     public function typoScriptFrontendController(): ?TypoScriptFrontendController
     {
         return $this->typoScriptFrontendController;
-    }
-
-    public function previewAspect(): ?PreviewAspect
-    {
-        return $this->previewAspect;
     }
 
     public function pageRenderer(): ?PageRenderer
@@ -82,13 +82,25 @@ final class State implements StateInterface, ExtendedStateInterface
         return $this->additionalData;
     }
 
+    public function withContext(?Context $context): self
+    {
+        return new self(
+            request: $this->request,
+            typoScriptFrontendController: $this->typoScriptFrontendController,
+            pageRenderer: $this->pageRenderer,
+            context: $context,
+            backendUserAuthentication: $this->backendUserAuthentication,
+            additionalData: $this->additionalData,
+        );
+    }
+
     public function withRequest(?ServerRequestInterface $request = null): self
     {
         return new self(
             request: $request,
             typoScriptFrontendController: $this->typoScriptFrontendController,
-            previewAspect: $this->previewAspect,
             pageRenderer: $this->pageRenderer,
+            context: $this->context,
             backendUserAuthentication: $this->backendUserAuthentication,
             additionalData: $this->additionalData,
         );
@@ -99,20 +111,8 @@ final class State implements StateInterface, ExtendedStateInterface
         return new self(
             request: $this->request,
             typoScriptFrontendController: $typoScriptFrontendController,
-            previewAspect: $this->previewAspect,
             pageRenderer: $this->pageRenderer,
-            backendUserAuthentication: $this->backendUserAuthentication,
-            additionalData: $this->additionalData,
-        );
-    }
-
-    public function withPreviewAspect(?PreviewAspect $previewAspect = null): self
-    {
-        return new self(
-            request: $this->request,
-            typoScriptFrontendController: $this->typoScriptFrontendController,
-            previewAspect: $previewAspect,
-            pageRenderer: $this->pageRenderer,
+            context: $this->context,
             backendUserAuthentication: $this->backendUserAuthentication,
             additionalData: $this->additionalData,
         );
@@ -123,8 +123,8 @@ final class State implements StateInterface, ExtendedStateInterface
         return new self(
             request: $this->request,
             typoScriptFrontendController: $this->typoScriptFrontendController,
-            previewAspect: $this->previewAspect,
             pageRenderer: $pageRenderer,
+            context: $this->context,
             backendUserAuthentication: $this->backendUserAuthentication,
             additionalData: $this->additionalData,
         );
@@ -135,8 +135,8 @@ final class State implements StateInterface, ExtendedStateInterface
         return new self(
             request: $this->request,
             typoScriptFrontendController: $this->typoScriptFrontendController,
-            previewAspect: $this->previewAspect,
             pageRenderer: $this->pageRenderer,
+            context: $this->context,
             backendUserAuthentication: $backendUserAuthentication,
             additionalData: $this->additionalData,
         );
@@ -152,8 +152,8 @@ final class State implements StateInterface, ExtendedStateInterface
         return new self(
             request: $this->request,
             typoScriptFrontendController: $this->typoScriptFrontendController,
-            previewAspect: $this->previewAspect,
             pageRenderer: $this->pageRenderer,
+            context: $this->context,
             backendUserAuthentication: $this->backendUserAuthentication,
             additionalData: $additionalData,
         );

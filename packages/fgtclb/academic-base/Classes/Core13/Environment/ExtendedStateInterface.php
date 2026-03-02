@@ -6,7 +6,6 @@ namespace FGTCLB\AcademicBase\Core13\Environment;
 
 use FGTCLB\AcademicBase\Environment\StateInterface;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
-use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 
 /**
  * Extended state interface for TYPO3 v13 specific methods.
@@ -19,8 +18,4 @@ use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
  * @internal only to be used within `EXT:academic_*` extensions and not part of public API.
  */
 #[Exclude]
-interface ExtendedStateInterface extends StateInterface
-{
-    public function withPreviewAspect(?PreviewAspect $previewAspect = null): self;
-    public function previewAspect(): ?PreviewAspect;
-}
+interface ExtendedStateInterface extends StateInterface {}

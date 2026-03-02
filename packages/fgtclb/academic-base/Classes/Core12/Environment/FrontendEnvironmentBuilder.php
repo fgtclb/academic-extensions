@@ -10,6 +10,7 @@ use FGTCLB\AcademicBase\Environment\StateBuildContext;
 use FGTCLB\AcademicBase\Environment\StateInterface;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\LanguageAspectFactory;
 use TYPO3\CMS\Core\Context\TypoScriptAspect;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
@@ -91,7 +92,9 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
     private function createTypoScriptFrontendController(StateBuildContext $stateBuildContext, State $state, Site $site, SiteLanguage $siteLanguage): State
     {
         $request = $state->request() ?? new ServerRequest();
-        $context = GeneralUtility::makeInstance(Context::class);
+        // Note creating with new here on purpose to have a clean new instance.
+        $context = new Context();
+        $context->setAspect('language', LanguageAspectFactory::createFromSiteLanguage($siteLanguage));
         $pageId = $this->getNearestAccessiblePage($stateBuildContext->pageId ?? $site->getRootPageId(), $context)
             ?: $site->getRootPageId();
         // Ensure frontend user authentication in request
@@ -128,7 +131,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         return $state
             ->withRequest($request)
             ->withTypoScriptFrontendController($controller)
-            ->withTypoScriptAspect($typoScriptAspect);
+            ->withContext($context);
     }
 
     /**

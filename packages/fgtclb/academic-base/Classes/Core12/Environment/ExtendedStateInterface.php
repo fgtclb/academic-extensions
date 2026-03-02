@@ -6,7 +6,6 @@ namespace FGTCLB\AcademicBase\Core12\Environment;
 
 use FGTCLB\AcademicBase\Environment\StateInterface;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
-use TYPO3\CMS\Core\Context\TypoScriptAspect;
 
 /**
  * Extended state interface for TYPO3 v12 specific methods.
@@ -19,8 +18,4 @@ use TYPO3\CMS\Core\Context\TypoScriptAspect;
  * @internal only to be used within `EXT:academic_*` extensions and not part of public API.
  */
 #[Exclude]
-interface ExtendedStateInterface extends StateInterface
-{
-    public function withTypoScriptAspect(?TypoScriptAspect $typoScriptAspect = null): self;
-    public function typoScriptAspect(): ?TypoScriptAspect;
-}
+interface ExtendedStateInterface extends StateInterface {}

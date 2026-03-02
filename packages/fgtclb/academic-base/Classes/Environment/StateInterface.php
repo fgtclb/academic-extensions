@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicBase\Environment;
 
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
@@ -25,6 +26,8 @@ interface StateInterface
     public function pageRenderer(): ?PageRenderer;
     public function withBackendUserAuthentication(?BackendUserAuthentication $backendUserAuthentication = null): self;
     public function backendUserAuthentication(): ?BackendUserAuthentication;
+    public function withContext(?Context $context): self;
+    public function context(): ?Context;
 
     /**
      * @param array<int|string, mixed> $data

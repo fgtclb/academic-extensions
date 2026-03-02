@@ -12,8 +12,6 @@ use FGTCLB\AcademicBase\Environment\StateManagerExecuteMethodTrait;
 use FGTCLB\AcademicBase\Environment\StateManagerInterface;
 use FGTCLB\AcademicBase\Environment\StateManagerRootStateInterfaceHelperMethodsTrait;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
-use TYPO3\CMS\Core\Context\Context;
-use TYPO3\CMS\Frontend\Aspect\PreviewAspect;
 
 /**
  * Default implementation of {@see StateManagerInterface} for TYPO3 v13.
@@ -38,7 +36,6 @@ final class StateManager implements StateManagerInterface
 
     public function __construct(
         private readonly EnvironmentBuilderFactoryInterface $environmentBuilderFactory,
-        private readonly Context $context,
     ) {}
 
     /**
@@ -46,11 +43,9 @@ final class StateManager implements StateManagerInterface
      */
     public function backup(): void
     {
-        /** @var PreviewAspect|null $previewAspect */
-        $previewAspect = $this->context->hasAspect('frontend.preview') ? $this->context->getAspect('frontend.preview') : null;
         $state = $this->backupStateInterface(new State());
         if ($state instanceof ExtendedStateInterface) {
-            $state = $state->withPreviewAspect($previewAspect);
+            // no special handling right now required based on extended interface
         }
         $state = $this->dispatchStateBackupEvent($state);
         /** @var State $state */
@@ -119,12 +114,7 @@ final class StateManager implements StateManagerInterface
     {
         $this->applyStateInterface($state);
         if ($state instanceof ExtendedStateInterface) {
-            // Handle state for extended interface.
-            if ($state->previewAspect() !== null) {
-                $this->context->setAspect('frontend.preview', $state->previewAspect());
-            } else {
-                $this->context->unsetAspect('frontend.preview');
-            }
+            // no special handling right now required based on extended interface
         }
         $this->dispatchStateApplyEvent($state);
     }
