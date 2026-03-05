@@ -26,6 +26,17 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  */
 trait StateManagerRootStateInterfaceHelperMethodsTrait
 {
+    /** @var string[] */
+    private $SERVER_SUPERGLOBAL_VARS = [
+        'HTTP_HOST',
+        'SERVER_NAME',
+        'HTTPS',
+        'SCRIPT_FILENAME',
+        'SCRIPT_NAME',
+        'REMOTE_ADDR',
+        'REQUEST_URI',
+    ];
+
     final protected function applyStateInterface(StateInterface $state): void
     {
         if (!$this instanceof StateManagerInterface) {
@@ -73,6 +84,30 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         } else {
             unset($GLOBALS['BE_USER']);
         }
+        // apply super globals
+        $superGlobals = $state->additionalData('_SERVER');
+        foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
+            if (!is_array($superGlobals)) {
+                if (!is_array($_SERVER)) {
+                    // No superglobals wanted for environment and super global does not exist, simply skip it.
+                    continue;
+                }
+                // No superglobals wanted for environment but super global exists, ensure to remove not set variable.
+                unset($_SERVER[$var]);
+                continue;
+            }
+            if (array_key_exists($var, $superGlobals)) {
+                // Wanted for environment, apply it to $_SERVER.
+                $_SERVER[$var] = $superGlobals[$var];
+                continue;
+            }
+            // not set in for environment, remove it from $_SERVER.
+            unset($_SERVER[$var]);
+        }
+        // This is required to ensure that the IndpEnv cache is cleared properly to ensure
+        // that extension or core calls to `GeneralUtility::getIndpEnv()` retrieves values
+        // based on the applied/prepared environment. Ignoring `@internal` is done intentionally.
+        GeneralUtility::flushInternalRuntimeCaches();
         // Restore safed PageRender or clean it up at least.
         $instances = GeneralUtility::getSingletonInstances();
         unset($instances[PageRenderer::class]);
@@ -102,12 +137,22 @@ trait StateManagerRootStateInterfaceHelperMethodsTrait
         $typoScriptFrontendController = $GLOBALS['TSFE'] ?? null;
         $applicationType = $request !== null && $request->getAttribute('applicationType') ?: null;
         $pageRenderer = $request !== null && $applicationType !== null ? GeneralUtility::makeInstance(PageRenderer::class) : null;
+        $superGlobals = [];
+        if (is_array($_SERVER)) {
+            foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
+                if (array_key_exists($var, $_SERVER)) {
+                    $superGlobals['_SERVER'] ??= [];
+                    $superGlobals['_SERVER'][$var] = $_SERVER[$var];
+                }
+            }
+        }
         return $state
             ->withContext($context)
             ->withRequest($request)
             ->withTypoScriptFrontendController($typoScriptFrontendController)
             ->withBackendUserAuthentication($GLOBALS['BE_USER'] ?? null)
-            ->withPageRenderer($pageRenderer);
+            ->withPageRenderer($pageRenderer)
+            ->withAdditionalData('_SERVER', $superGlobals);
     }
 
     final protected function dispatchStateApplyEvent(StateInterface $state): void

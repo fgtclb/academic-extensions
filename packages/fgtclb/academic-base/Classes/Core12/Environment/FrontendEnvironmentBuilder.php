@@ -42,6 +42,17 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 #[Exclude]
 final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
 {
+    /** @var string[] */
+    private $SERVER_SUPERGLOBAL_VARS = [
+        'HTTP_HOST',
+        'SERVER_NAME',
+        'HTTPS',
+        'SCRIPT_FILENAME',
+        'SCRIPT_NAME',
+        'REMOTE_ADDR',
+        'REQUEST_URI',
+    ];
+
     public function __construct(
         private readonly SiteFinder $siteFinder,
     ) {}
@@ -68,25 +79,43 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
             ->withHost($uriLanguage->getHost() ?: $uriSite->getHost() ?: '')
             ->withPort($uriLanguage->getPort() ?? $uriSite->getPort() ?? null)
             ->withPath($uriLanguage->getPath() ?: $uriSite->getPath() ?: '/');
+        $serverParams = [
+            'HTTP_HOST' => $uri->getHost(),
+            'SERVER_NAME' => $uri->getHost(),
+            'HTTPS' => $uri->getScheme() === 'https',
+            'SCRIPT_FILENAME' => __FILE__,
+            'SCRIPT_NAME' => rtrim($uri->getPath(), '/') . '/',
+            'REMOTE_ADDR' => '127.0.1',
+            'REQUEST_URI' => '/' . ltrim($uri->getPath(), '/'),
+        ];
+        foreach ($this->SERVER_SUPERGLOBAL_VARS as $var) {
+            if (array_key_exists($var, $serverParams)) {
+                // Wanted for environment, apply it to $_SERVER.
+                $_SERVER[$var] = $serverParams[$var];
+                continue;
+            }
+            // not set in for environment, remove it from $_SERVER.
+            unset($_SERVER[$var]);
+        }
+        // This is required to ensure that the IndpEnv cache is cleared properly to ensure
+        // that extension or core calls to `GeneralUtility::getIndpEnv()` retrieves values
+        // based on the applied/prepared environment. Ignoring `@internal` is done intentionally.
+        GeneralUtility::flushInternalRuntimeCaches();
         $request = (new ServerRequest(
             $uri,
             'GET',
             null,
             [],
-            [
-                'HTTP_HOST' => $uri->getHost(),
-                'SERVER_NAME' => $uri->getHost(),
-                'HTTPS' => $uri->getScheme() === 'https',
-                'SCRIPT_FILENAME' => __FILE__,
-                'SCRIPT_NAME' => rtrim($uri->getPath(), '/') . '/',
-            ],
+            $serverParams,
         ))->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_FE);
         $request = $request
             ->withAttribute('site', $site)
             ->withAttribute('siteLanguage', $siteLanguage)
             ->withAttribute('normalizedParams', NormalizedParams::createFromRequest($request))
             ->withAttribute('extbase', new ExtbaseRequestParameters());
-        return $state->withRequest($request);
+        return $state
+            ->withRequest($request)
+            ->withAdditionalData('_SERVER', $serverParams);
     }
 
     private function createTypoScriptFrontendController(StateBuildContext $stateBuildContext, State $state, Site $site, SiteLanguage $siteLanguage): State
