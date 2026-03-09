@@ -429,6 +429,12 @@
 			<trans-unit id="actions.sortDown">
 				<source>Sort down</source>
 			</trans-unit>
+			<trans-unit id="actions.setToTop">
+				<source>Set to top</source>
+			</trans-unit>
+			<trans-unit id="actions.setToBottom">
+				<source>Set to bottom</source>
+			</trans-unit>
 			<trans-unit id="actions.delete">
 				<source>Delete</source>
 			</trans-unit>
