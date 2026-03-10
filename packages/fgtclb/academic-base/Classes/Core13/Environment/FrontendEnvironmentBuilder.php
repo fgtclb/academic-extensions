@@ -99,7 +99,7 @@ final class FrontendEnvironmentBuilder implements EnvironmentBuilderInterface
         $serverParams = [
             'HTTP_HOST' => $uri->getHost(),
             'SERVER_NAME' => $uri->getHost(),
-            'HTTPS' => $uri->getScheme() === 'https',
+            'HTTPS' => ($uri->getScheme() === 'https' ? 'on' : 'off'),
             'SCRIPT_FILENAME' => __FILE__,
             'SCRIPT_NAME' => rtrim($uri->getPath(), '/') . '/',
             'REMOTE_ADDR' => '127.0.0.1',
