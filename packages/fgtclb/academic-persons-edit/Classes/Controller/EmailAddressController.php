@@ -167,44 +167,70 @@ final class EmailAddressController extends AbstractActionController
             );
         }
 
-        if (!in_array($sortDirection, ['up', 'down'])
+        if (!in_array($sortDirection, ['up', 'down', 'top', 'bottom'])
             || $contract->getEmailAddresses()->count() <= 1
         ) {
             $this->addTranslatedErrorMessage('emailAddress.sort.error.notPossible');
             return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
         }
 
-        // Convert contracts to array
-        $emailAddressArray = [];
+        // Convert email addresses to array
+        $sortingItemsArray = [];
+        $targetItemIndex = null;
+
+        $index = 0;
         foreach ($contract->getEmailAddresses() as $contractEmailAddress) {
-            $emailAddressArray[] = $contractEmailAddress;
+            $sortingItemsArray[] = $contractEmailAddress;
+            if ($emailAddress->getUid() === $contractEmailAddress->getUid()) {
+                $targetItemIndex = $index;
+            }
+            $index++;
         }
 
-        // Revert array, if sort direction is down
-        if ($sortDirection === 'down') {
-            $emailAddressArray = array_reverse($emailAddressArray);
-        }
+        $changed = false;
 
-        // Switch sorting values
-        $prevEmailAddress = null;
-        foreach ($emailAddressArray as $currentEmailAddress) {
-            if ($emailAddress != $currentEmailAddress) {
-                $prevEmailAddress = $currentEmailAddress;
-            } else {
-                // Only switch sorting if the selected contract is not the first one in the array
-                // (normally the sorting options for this case should be hidden in the Fluid template)
-                if ($prevEmailAddress !== null) {
-                    $prevSorting = $prevEmailAddress->getSorting();
-                    $prevEmailAddress->setSorting($currentEmailAddress->getSorting());
-                    $currentEmailAddress->setSorting($prevSorting);
+        if ($targetItemIndex !== null) {
+            $targetItem = $sortingItemsArray[$targetItemIndex];
 
-                    $this->emailAddressRepository->update($prevEmailAddress);
-                    $this->emailAddressRepository->update($currentEmailAddress);
+            // if sort direction is top and target not the first item, remove item from array then prepend it to the array
+            if ($sortDirection === 'top' && $targetItemIndex > 0) {
+                array_splice($sortingItemsArray, $targetItemIndex, 1);
+                array_unshift($sortingItemsArray, $targetItem);
+                $changed = true;
+            }
+            // if sort direction is bottom and target not the last item, remove item from array then append it to the array
+            elseif ($sortDirection === 'bottom' && $targetItemIndex < count($sortingItemsArray) - 1) {
+                array_splice($sortingItemsArray, $targetItemIndex, 1);
+                array_push($sortingItemsArray, $targetItem);
+                $changed = true;
+            }
+            // if sort direction is up and target not the first item, swap the target with the previous item
+            elseif ($sortDirection === 'up' && $targetItemIndex > 0) {
+                $sortingItemsArray[$targetItemIndex] = $sortingItemsArray[$targetItemIndex - 1];
+                $sortingItemsArray[$targetItemIndex - 1] = $targetItem;
+                $changed = true;
+            }
+            // if sort direction is down and target not the last item, swap the target with the next item
+            elseif ($sortDirection === 'down' && $targetItemIndex < count($sortingItemsArray) - 1) {
+                $sortingItemsArray[$targetItemIndex] = $sortingItemsArray[$targetItemIndex + 1];
+                $sortingItemsArray[$targetItemIndex + 1] = $targetItem;
+                $changed = true;
+            }
 
-                    $this->persistenceManager->persistAll();
-                    $this->addTranslatedSuccessMessage('emailAddress.sort.success');
+            foreach ($sortingItemsArray as $idx => $item) {
+                // Use strictly increasing sorting values (standard TYPO3 behavior)
+                $expectedSorting = ($idx + 1) * 10;
+
+                if ($item->getSorting() !== $expectedSorting) {
+                    $item->setSorting($expectedSorting);
+                    $this->emailAddressRepository->update($item);
+                    $changed = true;
                 }
-                break;
+            }
+
+            if ($changed) {
+                $this->persistenceManager->persistAll();
+                $this->addTranslatedSuccessMessage('emailAddress.sort.success');
             }
         }
 
