@@ -183,7 +183,7 @@ final class ProfileInformationController extends AbstractActionController
             $profileInformation->getType()
         );
 
-        if (!in_array($sortDirection, ['up', 'down'])
+        if (!in_array($sortDirection, ['up', 'down', 'top', 'bottom'])
             || $sortingItems->count() <= 1
         ) {
             $this->addTranslatedErrorMessage('profileInformations.sort.error.notPossible');
@@ -192,35 +192,53 @@ final class ProfileInformationController extends AbstractActionController
 
         // Convert profile informations to array
         $sortingItemsArray = [];
-        foreach ($sortingItems as $item) {
+        $targetItemIndex = null;
+
+        foreach ($sortingItems as $index => $item) {
             $sortingItemsArray[] = $item;
+            if ($profileInformation === $item) {
+                $targetItemIndex = $index;
+            }
         }
 
-        // Revert array, if sort direction is down
-        if ($sortDirection === 'down') {
-            $sortingItemsArray = array_reverse($sortingItemsArray);
-        }
+        $changed = false;
 
-        // Switch sorting values
-        $prevItem = null;
-        foreach ($sortingItemsArray as $currentItem) {
-            if ($profileInformation != $currentItem) {
-                $prevItem = $currentItem;
-            } else {
-                // Only switch sorting if the selected contract is not the first one in the array
-                // (normally the sorting options for this case should be hidden in the Fluid template)
-                if ($prevItem !== null) {
-                    $prevSorting = $prevItem->getSorting();
-                    $prevItem->setSorting($currentItem->getSorting());
-                    $currentItem->setSorting($prevSorting);
+        if ($targetItemIndex !== null) {
+            $targetItem = $sortingItemsArray[$targetItemIndex];
 
-                    $this->profileInformationRepository->update($prevItem);
-                    $this->profileInformationRepository->update($currentItem);
+            // if sort direction is top and target not the first item, remove item from array then prepend it to the array
+            if ($sortDirection === 'top' && $targetItemIndex > 0) {
+                array_splice($sortingItemsArray, $targetItemIndex, 1);
+                array_unshift($sortingItemsArray, $targetItem);
+            }
+            // if sort direction is bottom and target not the last item, remove item from array then append it to the array
+            elseif ($sortDirection === 'bottom' && $targetItemIndex < count($sortingItemsArray) - 1) {
+                array_splice($sortingItemsArray, $targetItemIndex, 1);
+                array_push($sortingItemsArray, $targetItem);
+            }
+            // if sort direction is up and target not the first item, swap the target with the previous item
+            elseif ($sortDirection === 'up' && $targetItemIndex > 0) {
+                $sortingItemsArray[$targetItemIndex] = $sortingItemsArray[$targetItemIndex - 1];
+                $sortingItemsArray[$targetItemIndex - 1] = $targetItem;
+            }
+            // if sort direction is down and target not the last item, swap the target with the next item
+            elseif ($sortDirection === 'down' && $targetItemIndex < count($sortingItemsArray) - 1) {
+                $sortingItemsArray[$targetItemIndex] = $sortingItemsArray[$targetItemIndex + 1];
+                $sortingItemsArray[$targetItemIndex + 1] = $targetItem;
+            }
 
-                    $this->persistenceManager->persistAll();
-                    $this->addTranslatedSuccessMessage($profileInformation->getType() . '.sort.success');
+            foreach ($sortingItemsArray as $index => $item) {
+                $expectedSorting = ($index + 1) * 10;
+                if ($item->getSorting() !== $expectedSorting) {
+                    $item->setSorting($expectedSorting);
+                    $this->profileInformationRepository->update($item);
+                    $changed = true;
                 }
-                break;
+            }
+
+            if ($changed) {
+                $this->persistenceManager->persistAll();
+                $this->addTranslatedSuccessMessage($profileInformation->getType() . '.sort.success');
             }
         }
         return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);

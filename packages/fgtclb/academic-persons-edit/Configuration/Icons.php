@@ -50,4 +50,8 @@ return [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/sort-icon.svg',
     ],
+    'academic-persons-edit-to-top' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/to-top-icon.svg',
+    ],
 ];

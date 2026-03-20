@@ -558,6 +558,14 @@
 				<source>Sort down</source>
 				<target>Nach unten sortieren</target>
 			</trans-unit>
+			<trans-unit id="actions.setToTop">
+				<source>Set to top</source>
+				<target>An erste Stelle setzen</target>
+			</trans-unit>
+			<trans-unit id="actions.setToBottom">
+				<source>Set to bottom</source>
+				<target>An letzte Stelle setzen</target>
+			</trans-unit>
 			<trans-unit id="actions.delete">
 				<source>Delete</source>
 				<target>Löschen</target>
