@@ -81,7 +81,7 @@ defined('TYPO3') or die();
                 --palette--;;headers,
                 tx_academicstudyplan_semesters,
                 tx_academicstudyplan_footer_note,
-            --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:appearance,
+            --div--;LLL:EXT:frontend/Resources/Private/Language/locallang_ttc.xlf:tabs.appearance,
                 --palette--;;frames,
                 --palette--;;appearanceLinks,
             --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:language,
