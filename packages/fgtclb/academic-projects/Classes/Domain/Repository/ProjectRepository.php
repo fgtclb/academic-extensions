@@ -32,6 +32,11 @@ class ProjectRepository extends Repository
         if (!empty($demand->getPages())) {
             if ($demand->getShowSelected() === true) {
                 $constraints[] = $query->in('uid', $demand->getPages());
+                // Selecting record ids in the backend (FormEngine) are always persisted using the default language
+                // uid of the records unrelated to the language and leads to missing translated contend depending on
+                // the site configuration and frontend context. In these cases we need to disable respecting the
+                // system langauge to tell Extbase ORM to do proper overlay handling in this case.
+                $query->getQuerySettings()->setRespectSysLanguage(false);
             } else {
                 $constraints[] = $query->in('pid', $demand->getPages());
                 $query->getQuerySettings()->setRespectStoragePage(true);
