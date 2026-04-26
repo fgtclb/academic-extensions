@@ -153,6 +153,7 @@ final class StudyPlanService
 
     private function getTableLanguageFieldName(string $tableName): ?string
     {
+        // See: https://docs.typo3.org/permalink/t3tca:confval-ctrl-languagefield
         if (isset($GLOBALS['TCA'][$tableName])
             && is_array($GLOBALS['TCA'][$tableName])
             && isset($GLOBALS['TCA'][$tableName]['ctrl'])
@@ -168,6 +169,7 @@ final class StudyPlanService
 
     private function getTableHiddenFieldName(string $tableName): ?string
     {
+        // See: https://docs.typo3.org/permalink/t3tca:confval-ctrl-enablecolumns -> `disabled`
         if (isset($GLOBALS['TCA'][$tableName])
             && is_array($GLOBALS['TCA'][$tableName])
             && isset($GLOBALS['TCA'][$tableName]['ctrl'])
@@ -184,17 +186,16 @@ final class StudyPlanService
     }
     private function getTableDeletedFieldName(string $tableName): ?string
     {
+        // See: https://docs.typo3.org/permalink/t3tca:confval-ctrl-delete
         if (isset($GLOBALS['TCA'][$tableName])
             && is_array($GLOBALS['TCA'][$tableName])
             && isset($GLOBALS['TCA'][$tableName]['ctrl'])
             && is_array($GLOBALS['TCA'][$tableName]['ctrl'])
-            && isset($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns'])
-            && is_array($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns'])
-            && isset($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['deleted'])
-            && is_string($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['deleted'])
-            && trim((string)$GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['deleted']) !== ''
+            && isset($GLOBALS['TCA'][$tableName]['ctrl']['delete'])
+            && is_string($GLOBALS['TCA'][$tableName]['ctrl']['delete'])
+            && trim((string)$GLOBALS['TCA'][$tableName]['ctrl']['delete']) !== ''
         ) {
-            return trim((string)($GLOBALS['TCA'][$tableName]['ctrl']['enablecolumns']['deleted'])) ?: null;
+            return trim((string)($GLOBALS['TCA'][$tableName]['ctrl']['delete'])) ?: null;
         }
         return null;
     }
