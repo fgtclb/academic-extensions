@@ -1,9 +1,39 @@
 parameters:
 	ignoreErrors:
 		-
+			message: "#^Property FGTCLB\\\\AcademicBase\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicBase\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicBiteJobs\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-bite-jobs/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicBiteJobs\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-bite-jobs/Tests/Functional/ExtensionLoadedTest.php
+
+		-
 			message: "#^Method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicContacts4pages\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicContacts4pages\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-contact4pages/Tests/Functional/ExtensionLoadedTest.php
 
 		-
 			message: "#^Binary operation \"\\.\" between array\\<string, bool\\|string\\|null\\>\\|bool\\|string\\|null and Psr\\\\Http\\\\Message\\\\UriInterface results in an error\\.$#"
@@ -19,6 +49,16 @@ parameters:
 			message: "#^Method FGTCLB\\\\AcademicJobs\\\\Domain\\\\Repository\\\\JobRepository\\:\\:findByJobType\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Domain/Repository/JobRepository.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicJobs\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-jobs/Tests/Functional/ExtensionLoadedTest.php
 
 		-
 			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\:\\:getUid\\(\\) should return int but returns int\\<1, max\\>\\|null\\.$#"
@@ -61,9 +101,39 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php
 
 		-
+			message: "#^Property FGTCLB\\\\AcademicPartners\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicPartners\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-partners/Tests/Functional/ExtensionLoadedTest.php
+
+		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 2
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Model/Dto/ProfileInformationFormData.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicPersonsEdit\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicPersonsEdit\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-edit/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicPersonsSync\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-sync/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicPersonsSync\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons-sync/Tests/Functional/ExtensionLoadedTest.php
 
 		-
 			message: "#^Instantiated class TYPO3\\\\CMS\\\\Core\\\\Cache\\\\CacheTag not found\\.$#"
@@ -91,9 +161,29 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
+			message: "#^Property FGTCLB\\\\AcademicPersons\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicPersons\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/ExtensionLoadedTest.php
+
+		-
 			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Repository\\\\ProgramRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-programs/Classes/Domain/Repository/ProgramRepository.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicPrograms\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicPrograms\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-programs/Tests/Functional/ExtensionLoadedTest.php
 
 		-
 			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\:\\:getPid\\(\\) should return int but returns int\\<0, max\\>\\|null\\.$#"
@@ -109,3 +199,33 @@ parameters:
 			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Repository\\\\ProjectRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Repository/ProjectRepository.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicProjects\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-projects/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicProjects\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-projects/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Property FGTCLB\\\\AcademicStudyPlan\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-study-plan/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\AcademicStudyPlan\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/academic-study-plan/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Property FGTCLB\\\\CategoryTypes\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/typo3-category-types/Tests/Functional/ExtensionLoadedTest.php
+
+		-
+			message: "#^Static property FGTCLB\\\\CategoryTypes\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
+			count: 1
+			path: ../../../packages/fgtclb/typo3-category-types/Tests/Functional/ExtensionLoadedTest.php
