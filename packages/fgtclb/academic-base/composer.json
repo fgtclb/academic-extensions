@@ -28,7 +28,7 @@
             "extension-key": "academic_base"
         },
         "branch-alias": {
-            "dev-main": "2.3.3-dev"
+            "dev-main": "2.3.x-dev"
         },
         "sbuerk/release": {
             "tailor": {
