@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsSync\Tests\Functional;
 
-use PHPUnit\Framework\Attributes\Test;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use FGTCLB\TestingHelper\FunctionalTestCase\ExtensionsLoadedTestsTrait;
 
 final class ExtensionLoadedTest extends AbstractAcademicPersonsSyncTestCase
 {
-    #[Test]
-    public function testCaseLoadsExtension(): void
-    {
-        $this->assertContains('fgtclb/academic-persons-sync', $this->testExtensionsToLoad);
-    }
+    use ExtensionsLoadedTestsTrait;
 
-    #[Test]
-    public function extensionIsLoaded(): void
-    {
-        $this->assertTrue(ExtensionManagementUtility::isLoaded('academic_persons_sync'));
-    }
+    private static $expectedLoadedExtensions = [
+        // composer package names
+        'fgtclb/academic-base',
+        'fgtclb/academic-persons',
+        'fgtclb/academic-persons-edit',
+        'fgtclb/academic-persons-sync',
+        // extension keys
+        'academic_base',
+        'academic_persons',
+        'academic_persons_edit',
+        'academic_persons_sync',
+    ];
 }
