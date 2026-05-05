@@ -446,7 +446,7 @@ fi
 
 handleDbmsOptions
 
-COMPOSER_ROOT_VERSION="2.3.4"
+COMPOSER_ROOT_VERSION="2.3.5-dev"
 CONTAINER_INTERACTIVE="-it --init"
 HOST_UID=$(id -u)
 USERSET=""
