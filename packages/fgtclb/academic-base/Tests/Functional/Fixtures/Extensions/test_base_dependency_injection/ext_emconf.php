@@ -3,21 +3,16 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'TESTS: Academic Base Dependency Injection Tests',
     'description' => 'Provide classes to test dependency injection',
-    'category' => 'plugin',
-    'author' => 'Stefan Bürk',
-    'author_email' => 'stefan@buerk.tech',
-    'author_company' => 'web-vision GmbH',
-    'state' => 'beta',
     'version' => '2.3.2',
-    'clearCacheOnLoad' => true,
+    'category' => 'plugin',
+    'state' => 'beta',
+    'author' => 'Stefan Bürk',
+    'author_email' => 'hello@fgtclb.com',
+    'author_company' => 'FGTCLB GmbH',
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.22-13.4.99',
             'academic_base' => '2.3.2',
-        ],
-        'conflicts' => [
-        ],
-        'suggests' => [
         ],
     ],
 ];
