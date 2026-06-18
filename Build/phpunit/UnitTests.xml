@@ -16,7 +16,7 @@
     phpunit v10.1 compatible version.
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="../../.Build/vendor/phpunit/phpunit/phpunit.xsd"
+     xsi:noNamespaceSchemaLocation="../../.Build/vendor/phpunit/phpunit/phpunit.xsd"
      backupGlobals="true"
      beStrictAboutTestsThatDoNotTestAnything="false"
      bootstrap="UnitTestsBootstrap.php"
@@ -27,6 +27,7 @@
      displayDetailsOnTestsThatTriggerErrors="true"
      displayDetailsOnTestsThatTriggerNotices="true"
      displayDetailsOnTestsThatTriggerWarnings="true"
+     displayDetailsOnPhpunitDeprecations="true"
      failOnDeprecation="true"
      failOnNotice="true"
      failOnRisky="true"
