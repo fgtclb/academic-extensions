@@ -166,11 +166,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Parameter \\#1 \\$identifier of method TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\PersistenceManagerInterface\\:\\:getObjectByIdentifier\\(\\) expects int\\|string, int\\|string\\|null given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Profile/AbstractProfileFactory.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicPersons\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/ExtensionLoadedTest.php
