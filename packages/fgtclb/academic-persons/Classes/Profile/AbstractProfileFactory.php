@@ -127,7 +127,9 @@ abstract class AbstractProfileFactory implements ProfileFactoryInterface
         }
 
         $frontendUserUid = (int)$userData['uid'];
-        $profiles = $this->profileRepository->findByFrontendUser($frontendUserUid);
+        // Include hidden profiles so they keep being synchronized. The visibility (`hidden` enable
+        // field) is never changed here, therefore a manually hidden profile stays hidden.
+        $profiles = $this->profileRepository->findByFrontendUserIncludingHidden($frontendUserUid);
         if ($profiles->count() === 0) {
             return;
         }

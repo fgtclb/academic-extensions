@@ -678,6 +678,18 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
             'assertCsvFileName' => 'updated-secondary-relations-hidden.csv',
             'dispatchedEventCount' => 5,
         ];
+        yield '#9 exclude pids - keeps hidden profile hidden but still synchronizes its data' => [
+            'additionalImportDataSets' => [
+                __DIR__ . '/Fixtures/DataSets/secondary-relations-profile-hidden.csv',
+            ],
+            'includePids' => [],
+            'excludePids' => [
+                1100,
+                1110,
+            ],
+            'assertCsvFileName' => 'updated-secondary-relations-profile-hidden.csv',
+            'dispatchedEventCount' => 5,
+        ];
     }
 
     /**
