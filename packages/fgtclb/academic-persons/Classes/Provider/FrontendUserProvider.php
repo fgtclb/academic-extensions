@@ -14,6 +14,7 @@ namespace FGTCLB\AcademicPersons\Provider;
 use Doctrine\DBAL\Result;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 
 final class FrontendUserProvider
 {
@@ -103,6 +104,13 @@ final class FrontendUserProvider
     public function getUsersWithProfileResult(array $includePids, array $excludePids = []): Result
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('fe_users');
+        // The synchronization must keep already hidden profiles up to date as well, without ever
+        // changing their visibility (that is the responsibility of the ProfileFactory). The
+        // automatically applied hidden restriction would otherwise exclude frontend users whose
+        // profile is hidden, so it is removed here. Deleted records stay excluded through the
+        // default deleted restriction and the frontend user visibility is still respected
+        // explicitly through the `fe_users.disable` constraint below.
+        $queryBuilder->getRestrictions()->removeByType(HiddenRestriction::class);
         $queryBuilder
             ->select('fe_users.*')
             ->distinct()
@@ -131,6 +139,8 @@ final class FrontendUserProvider
                     'fe_users.tx_extbase_type',
                     $queryBuilder->createNamedParameter('Tx_Academicpersonsedit_Domain_Model_FrontendUser', Connection::PARAM_STR)
                 ),
+                // Keep respecting the frontend user visibility, only the profile visibility is ignored.
+                $queryBuilder->expr()->eq('fe_users.disable', 0),
                 $queryBuilder->expr()->eq('tx_academicpersons_domain_model_profile.skip_sync', 0)
             );
 

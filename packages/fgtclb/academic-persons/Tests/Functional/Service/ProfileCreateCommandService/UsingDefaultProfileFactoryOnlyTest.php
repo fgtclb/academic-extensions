@@ -665,4 +665,76 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
         $this->assertCSVDataSet(__DIR__ . '/Fixtures/Asserts/' . $assertCsvFileName);
         $this->assertCount($dispatchedEventCount, $dispatchedModifyEvents);
     }
+
+    /**
+     * A frontend user that already has a profile - even a hidden one - must not get a second
+     * profile created. The hidden profile keeps its visibility and is left to the update command
+     * for data synchronization.
+     *
+     * The first create run sets up the real profile (and the M:N relation) for the frontend users
+     * of pid 100. One of them is hidden afterwards, then a second create run must neither duplicate
+     * the hidden profile nor change its visibility.
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    #[Test]
+    public function executeDoesNotCreateAdditionalProfileForUserWithExistingHiddenProfile(): void
+    {
+        $profileCreateCommandService = GeneralUtility::makeInstance(ProfileCreateCommandService::class);
+
+        // First run: creates the profiles for the frontend users of pid 100 (uids 10 and 14).
+        $profileCreateCommandService->execute(new ProfileCreateCommandDto(includePids: [100], excludePids: []));
+        $this->assertSame(
+            2,
+            $this->countProfiles(),
+            'The first create run must create the two profiles for pid 100.',
+        );
+
+        // Hide the profile of fe_user 10.
+        $connection = $this->getConnectionPool()->getConnectionForTable('tx_academicpersons_domain_model_profile');
+        $connection->update(
+            'tx_academicpersons_domain_model_profile',
+            ['hidden' => 1],
+            ['import_identifier' => 'fe_users:10'],
+        );
+
+        // Second run: must not create a second profile for the now hidden one.
+        $profileCreateCommandService->execute(new ProfileCreateCommandDto(includePids: [100], excludePids: []));
+
+        $this->assertSame(
+            1,
+            $this->countProfiles(['import_identifier' => 'fe_users:10']),
+            'The hidden profile of fe_user 10 must not be duplicated by a second create run.',
+        );
+        $this->assertSame(
+            1,
+            $this->countProfiles(['import_identifier' => 'fe_users:10', 'hidden' => 1]),
+            'The hidden profile must keep its visibility.',
+        );
+        $this->assertSame(
+            2,
+            $this->countProfiles(),
+            'No additional profile must be created on the second run.',
+        );
+    }
+
+    /**
+     * Counts profile records ignoring all enable field restrictions, so hidden profiles are
+     * counted as well.
+     *
+     * @param array<string, int|string> $identifiers
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function countProfiles(array $identifiers = []): int
+    {
+        $queryBuilder = $this->getConnectionPool()->getQueryBuilderForTable('tx_academicpersons_domain_model_profile');
+        $queryBuilder->getRestrictions()->removeAll();
+        $queryBuilder->count('uid')->from('tx_academicpersons_domain_model_profile');
+        foreach ($identifiers as $field => $value) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->eq($field, $queryBuilder->createNamedParameter($value))
+            );
+        }
+        return (int)$queryBuilder->executeQuery()->fetchOne();
+    }
 }

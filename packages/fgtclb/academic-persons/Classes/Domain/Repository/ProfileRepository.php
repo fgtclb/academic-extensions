@@ -230,4 +230,27 @@ class ProfileRepository extends Repository
             )
             ->execute();
     }
+
+    /**
+     * Find profiles for a frontend user including hidden ones. This is required by the
+     * synchronization, which must keep updating the data of a hidden profile without ever
+     * changing its visibility. The frontend display must keep using {@see self::findByFrontendUser()}
+     * so that hidden profiles stay hidden there.
+     *
+     * @param int $frontendUserUid
+     * @return QueryResultInterface<int, Profile>
+     */
+    public function findByFrontendUserIncludingHidden(int $frontendUserUid): QueryResultInterface
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+        $query->getQuerySettings()->setIgnoreEnableFields(true);
+        $query->getQuerySettings()->setEnableFieldsToBeIgnored(['disabled']);
+
+        return $query
+            ->matching(
+                $query->contains('frontendUsers', $frontendUserUid)
+            )
+            ->execute();
+    }
 }
