@@ -61,11 +61,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicJobs\\\\Domain\\\\Repository\\\\JobRepository\\:\\:findByJobType\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-jobs/Classes/Domain/Repository/JobRepository.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-jobs/Tests/Functional/ExtensionLoadedTest.php
