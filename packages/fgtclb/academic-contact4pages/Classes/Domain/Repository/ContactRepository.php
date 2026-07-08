@@ -18,9 +18,16 @@ class ContactRepository extends Repository
     /**
      * @return QueryResultInterface<Contact>
      */
-    public function findByPid(int $pid): QueryResultInterface
+    public function findByPid(int $pid, bool $showHidden = false): QueryResultInterface
     {
         $query = $this->createQuery();
+
+        if ($showHidden === true) {
+            // Include hidden (disabled) records; other enable fields
+            // (deleted, start-/endtime, fe_group) stay in effect.
+            $query->getQuerySettings()->setIgnoreEnableFields(true);
+            $query->getQuerySettings()->setEnableFieldsToBeIgnored(['disabled']);
+        }
 
         $currentLanguageAspect = $query->getQuerySettings()->getLanguageAspect();
         $changedLanguageAspect = new LanguageAspect(

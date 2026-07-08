@@ -22,7 +22,11 @@ final class ContactsController extends ActionController
     {
         /** @var array<string, mixed> */
         $contentElementData = $this->getCurrentContentObjectRenderer()?->data ?? [];
-        $contacts = $this->contactRepository->findByPid((int)($contentElementData['pid'] ?? 0));
+        $showHiddenRecords = (bool)($this->settings['showHiddenRecords'] ?? false);
+        $contacts = $this->contactRepository->findByPid(
+            (int)($contentElementData['pid'] ?? 0),
+            $showHiddenRecords
+        );
 
         $roles = [];
         foreach ($contacts as $contact) {

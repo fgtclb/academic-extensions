@@ -15,6 +15,15 @@
 			<trans-unit id="plugin.contacts_list.description">
 				<source>List the contacts assigned to the page</source>
 			</trans-unit>
+			<trans-unit id="element.tab.configuration">
+				<source>Configuration</source>
+			</trans-unit>
+			<trans-unit id="flexform.showHiddenRecords.label">
+				<source>Show hidden records</source>
+			</trans-unit>
+			<trans-unit id="flexform.showHiddenRecords.description">
+				<source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
