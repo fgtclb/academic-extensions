@@ -43,7 +43,7 @@ jobs:
     steps:
 
       - name: "Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
         run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
