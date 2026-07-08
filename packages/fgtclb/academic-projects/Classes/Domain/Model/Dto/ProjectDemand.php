@@ -16,6 +16,7 @@ class ProjectDemand
     protected string $sortingField = '';
     protected string $sortingDirection = '';
     protected string $activeState = 'all';
+    protected bool $showHiddenRecords = false;
     protected ?FilterCollection $filterCollection = null;
 
     public function __construct()
@@ -83,6 +84,16 @@ class ProjectDemand
     public function getPossibleActiveStates(): array
     {
         return ActiveState::values();
+    }
+
+    public function setShowHiddenRecords(bool $showHiddenRecords): void
+    {
+        $this->showHiddenRecords = $showHiddenRecords;
+    }
+
+    public function getShowHiddenRecords(): bool
+    {
+        return $this->showHiddenRecords;
     }
 
     public function setFilterCollection(?FilterCollection $filterCollection): void

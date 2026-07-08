@@ -63,6 +63,14 @@
 				<source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
 				<target>Wählen Sie Kategorien aus. Hauptkategorien wählen alle Unterkategorien durch ODER aus, mehrere Kategorien wählen durch UND aus</target>
 			</trans-unit>
+			<trans-unit id="flexform.showHiddenRecords.label">
+				<source>Show hidden records</source>
+				<target>Versteckte Datensätze anzeigen</target>
+			</trans-unit>
+			<trans-unit id="flexform.showHiddenRecords.description">
+				<source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
+				<target>Wenn aktiviert, werden versteckte (deaktivierte) Datensätze unabhängig von den Backend-Vorschaueinstellungen im Frontend ausgegeben.</target>
+			</trans-unit>
 			<trans-unit id="flexform.hideFilter.label">
 				<source>Show filter options</source>
 				<target>Filteroptionen anzeigen</target>
