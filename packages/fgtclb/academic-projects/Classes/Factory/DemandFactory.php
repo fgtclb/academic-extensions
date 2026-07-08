@@ -85,6 +85,7 @@ class DemandFactory
         $demand->setShowSelected(
             ($contentElementData['CType'] ?? '') === 'academicprojects_projectlistsingle'
         );
+        $demand->setShowHiddenRecords((bool)($settings['showHiddenRecords'] ?? false));
 
         return $demand;
     }

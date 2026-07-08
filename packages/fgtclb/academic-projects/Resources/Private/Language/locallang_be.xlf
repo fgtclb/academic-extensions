@@ -50,6 +50,12 @@
 			<trans-unit id="flexform.categories.description">
 				<source>Select categories. Main categories will select all subcategories by OR, multiple categories selects by AND</source>
 			</trans-unit>
+			<trans-unit id="flexform.showHiddenRecords.label">
+				<source>Show hidden records</source>
+			</trans-unit>
+			<trans-unit id="flexform.showHiddenRecords.description">
+				<source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
+			</trans-unit>
 			<trans-unit id="flexform.hideFilter.label">
 				<source>Show filter options</source>
 			</trans-unit>
