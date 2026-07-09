@@ -1,0 +1,398 @@
+#!/usr/bin/env bash
+
+#
+# set-version — apply a version across the academic-extensions mono repository.
+#
+# Applies a version (and its derived variants) to every relevant file: the
+# runTests.sh COMPOSER_ROOT_VERSION, each split extension (composer.json,
+# ext_emconf.php, VERSION, tailor, branch-alias), the functional-test fixture
+# extensions, the monorepo-shared meta package, the ddev instances and the root
+# composer.json (path-repository version maps + monorepo-shared requirement).
+#
+# The set of academic packages, their extension keys and their inter-package
+# dependencies are discovered dynamically from the repository — nothing about the
+# package list is hardcoded here.
+#
+# Usage:
+#   bin/set-version <version> <type> [options]
+#
+#   <version>   MAJOR.MINOR.PATCH, e.g. 2.4.0
+#   <type>      release | post-release | dev
+#                 release      : tag/release version  (X.Y.Z, deps X.Y.Z@dev)
+#                 post-release : next dev version      (X.Y.W-dev, deps ~X.Y.W@dev,
+#                                branch-alias X.Y.x-dev) — the version passed is
+#                                already the next version; no +1 happens here.
+#                 dev          : force a plain dev version everywhere (X.Y.Z-dev),
+#                                thin variant of post-release (branching / forced
+#                                minor/major bumps).
+#
+# Options:
+#   --source-branch=<name>   git branch the branch-alias is keyed to (default: main)
+#   --dry-run                print every change without touching a file
+#   -h, --help               show this help
+#
+# This script only edits working-tree files. It performs no git or network
+# operations — orchestration (branch/commit/PR/tag) lives in bin/release.
+#
+
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# Locate the repository root (this script lives in <root>/bin) and cd into it so
+# every relative path below resolves against the mono-repo root.
+# ---------------------------------------------------------------------------
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+cd "${ROOT_DIR}"
+
+# ---------------------------------------------------------------------------
+# Output helpers
+# ---------------------------------------------------------------------------
+DRY_RUN=0
+
+info()  { printf '>> %s\n' "$*"; }
+step()  { printf '   [%s] %s\n' "$1" "$2"; }
+die()   { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
+
+usage() {
+    sed -n '3,44p' "${BASH_SOURCE[0]}" | sed 's/^#\{0,1\} \{0,1\}//'
+}
+
+# Execute a command, or in dry-run mode only print it.
+run() {
+    if [ "${DRY_RUN}" -eq 1 ]; then
+        printf '   [dry-run] %s\n' "$*"
+        return 0
+    fi
+    "$@"
+}
+
+# ---------------------------------------------------------------------------
+# Argument parsing
+# ---------------------------------------------------------------------------
+PASSED_VERSION=""
+TYPE=""
+SOURCE_BRANCH="main"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --dry-run)            DRY_RUN=1 ;;
+        --source-branch=*)    SOURCE_BRANCH="${1#*=}" ;;
+        --source-branch)      shift; SOURCE_BRANCH="${1:-}" ;;
+        -h|--help)            usage; exit 0 ;;
+        -*)                   die "Unknown option: $1 (see --help)" ;;
+        *)
+            if [ -z "${PASSED_VERSION}" ]; then
+                PASSED_VERSION="$1"
+            elif [ -z "${TYPE}" ]; then
+                TYPE="$1"
+            else
+                die "Unexpected extra argument: $1 (see --help)"
+            fi
+            ;;
+    esac
+    shift
+done
+
+[ -n "${PASSED_VERSION}" ] || die "Missing <version> argument (see --help)"
+[ -n "${TYPE}" ]           || die "Missing <type> argument (see --help)"
+
+# ---------------------------------------------------------------------------
+# Validate version + type
+# ---------------------------------------------------------------------------
+if ! [[ "${PASSED_VERSION}" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+    die "Invalid version '${PASSED_VERSION}': expected MAJOR.MINOR.PATCH (e.g. 2.4.0)"
+fi
+MAJOR="${BASH_REMATCH[1]}"
+MINOR="${BASH_REMATCH[2]}"
+PATCH="${BASH_REMATCH[3]}"
+
+case "${TYPE}" in
+    release|post-release|dev) : ;;
+    *) die "Invalid type '${TYPE}': expected release | post-release | dev" ;;
+esac
+
+# ---------------------------------------------------------------------------
+# Resolve + verify binaries (fail early with a clear message). External override
+# is intentionally not offered yet.
+# ---------------------------------------------------------------------------
+resolve_bin() {
+    local var="$1" name="$2" path
+    path="$(command -v "${name}" 2>/dev/null || true)"
+    [ -n "${path}" ] || die "Required tool '${name}' not found on PATH."
+    printf -v "${var}" '%s' "${path}"
+    step "tool" "${name} -> ${path}"
+}
+
+info "Resolving tools"
+resolve_bin COMPOSER composer
+resolve_bin PHP      php
+resolve_bin TAILOR   tailor
+resolve_bin PKW      pkw
+resolve_bin JQ       jq
+resolve_bin SED      sed
+
+# tailor and pkw are PHP applications and are invoked through php (matches the
+# manual release workflow and is robust regardless of the bin proxy's shebang).
+TAILOR_CMD=("${PHP}" "${TAILOR}")
+PKW_CMD=("${PHP}" "${PKW}")
+
+# ---------------------------------------------------------------------------
+# Derive the per-type version variants.
+#
+#   RUNTESTS_VERSION      -> Build/Scripts/runTests.sh COMPOSER_ROOT_VERSION
+#   MAP_VERSION           -> jq path-repository version maps (packages[-dev])
+#   VERSION_FILE_VALUE    -> split extension VERSION file
+#   EMCONF_VERSION        -> ext_emconf.php 'version' (pkw extemconf:set)
+#   EMCONF_CONSTRAINT     -> ext_emconf.php depends/suggests (pkw constraints:set)
+#   TAILOR_VERSION        -> tailor set-version
+#   ACADEMIC_CONSTRAINT   -> composer require constraint for academic package deps
+#   DDEV_SHARED_CONSTRAINT-> composer require academics-monorepo-shared in ddev
+#   ROOT_SHARED_CONSTRAINT-> composer require academics-monorepo-shared in root
+#   SET_BRANCH_ALIAS/ALIAS-> extra.branch-alias.dev-<source-branch>
+# ---------------------------------------------------------------------------
+BRANCH_ALIAS="${MAJOR}.${MINOR}.x-dev"
+
+if [ "${TYPE}" = "release" ]; then
+    RELEASE_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+    RUNTESTS_VERSION="${RELEASE_VERSION}"
+    MAP_VERSION="${RELEASE_VERSION}"
+    VERSION_FILE_VALUE="${RELEASE_VERSION}"
+    EMCONF_VERSION="${RELEASE_VERSION}"
+    EMCONF_CONSTRAINT="${RELEASE_VERSION}"
+    TAILOR_VERSION="${RELEASE_VERSION}"
+    ACADEMIC_CONSTRAINT="${RELEASE_VERSION}@dev"
+    DDEV_SHARED_CONSTRAINT="${RELEASE_VERSION}@dev"
+    ROOT_SHARED_CONSTRAINT="~${RELEASE_VERSION}@dev"
+    SET_BRANCH_ALIAS=0
+else
+    # post-release and dev share the -dev derivation; the passed version is the
+    # dev version to apply directly (no +1 here).
+    DEV_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+    RUNTESTS_VERSION="${DEV_VERSION}-dev"
+    MAP_VERSION="${DEV_VERSION}-dev"
+    VERSION_FILE_VALUE="${DEV_VERSION}-dev"
+    EMCONF_VERSION="${DEV_VERSION}"
+    EMCONF_CONSTRAINT="${DEV_VERSION}"
+    TAILOR_VERSION="${DEV_VERSION}"
+    ACADEMIC_CONSTRAINT="~${DEV_VERSION}@dev"
+    DDEV_SHARED_CONSTRAINT="~${DEV_VERSION}@dev"
+    ROOT_SHARED_CONSTRAINT="~${DEV_VERSION}@dev"
+    SET_BRANCH_ALIAS=1
+fi
+
+info "set-version ${PASSED_VERSION} (${TYPE})$([ "${DRY_RUN}" -eq 1 ] && echo '  [DRY-RUN]')"
+step "info" "runTests COMPOSER_ROOT_VERSION = ${RUNTESTS_VERSION}"
+step "info" "version maps                   = ${MAP_VERSION}"
+step "info" "ext_emconf version             = ${EMCONF_VERSION}"
+step "info" "academic dep constraint        = ${ACADEMIC_CONSTRAINT}"
+[ "${SET_BRANCH_ALIAS}" -eq 1 ] && step "info" "branch-alias dev-${SOURCE_BRANCH}      = ${BRANCH_ALIAS}"
+
+# ---------------------------------------------------------------------------
+# Discover the academic package set: composer name <-> extension key <-> path.
+# Split extensions are packages/fgtclb/*/ carrying both composer.json and
+# ext_emconf.php.
+# ---------------------------------------------------------------------------
+declare -a SPLIT_DIRS=()
+declare -a ACADEMIC_NAMES=()     # composer package names, e.g. fgtclb/academic-base
+declare -a ACADEMIC_EXTKEYS=()   # extension keys, e.g. academic_base
+
+for dir in packages/fgtclb/*/; do
+    dir="${dir%/}"
+    [ -f "${dir}/composer.json" ] || continue
+    [ -f "${dir}/ext_emconf.php" ] || continue
+    name="$("${JQ}" -r '.name // empty' "${dir}/composer.json")"
+    extkey="$("${JQ}" -r '.extra."typo3/cms"."extension-key" // empty' "${dir}/composer.json")"
+    [ -n "${name}" ]   || die "No composer name in ${dir}/composer.json"
+    [ -n "${extkey}" ] || die "No typo3/cms.extension-key in ${dir}/composer.json"
+    SPLIT_DIRS+=("${dir}")
+    ACADEMIC_NAMES+=("${name}")
+    ACADEMIC_EXTKEYS+=("${extkey}")
+done
+
+[ "${#SPLIT_DIRS[@]}" -gt 0 ] || die "No split packages discovered under packages/fgtclb/*"
+info "Discovered ${#SPLIT_DIRS[@]} split extensions"
+
+# Fixture extensions live below each package's Tests/Functional/Fixtures/Extensions.
+declare -a FIXTURE_DIRS=()
+while IFS= read -r fdir; do
+    FIXTURE_DIRS+=("${fdir}")
+done < <(find packages/fgtclb/*/Tests/Functional/Fixtures/Extensions -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+info "Discovered ${#FIXTURE_DIRS[@]} fixture extensions"
+
+# Collect every ext_emconf.php (splits + fixtures) for the bulk pkw operations.
+declare -a EMCONF_FILES=()
+for dir in "${SPLIT_DIRS[@]}" "${FIXTURE_DIRS[@]}"; do
+    [ -f "${dir}/ext_emconf.php" ] && EMCONF_FILES+=("${dir}/ext_emconf.php")
+done
+
+# ---------------------------------------------------------------------------
+# Helper: is $1 one of the academic composer names?
+# ---------------------------------------------------------------------------
+is_academic_name() {
+    local candidate="$1" n
+    for n in "${ACADEMIC_NAMES[@]}"; do
+        [ "${n}" = "${candidate}" ] && return 0
+    done
+    return 1
+}
+
+# Helper: rewrite the academic composer dependencies of one package to $2, keeping
+# each dependency in its existing section (require / require-dev). Only academic
+# packages actually declared by the target are touched (dynamic).
+apply_academic_composer_deps() {
+    local dir="$1" constraint="$2"
+    local f="${dir}/composer.json"
+    [ -f "${f}" ] || return 0
+
+    local -a hard=() soft=()
+    local key
+    while IFS= read -r key; do
+        is_academic_name "${key}" && hard+=("${key}:${constraint}")
+    done < <("${JQ}" -r '(.require // {}) | keys[]' "${f}")
+    while IFS= read -r key; do
+        is_academic_name "${key}" && soft+=("${key}:${constraint}")
+    done < <("${JQ}" -r '(."require-dev" // {}) | keys[]' "${f}")
+
+    if [ "${#hard[@]}" -gt 0 ]; then
+        step "${dir}" "composer require ${hard[*]}"
+        run "${COMPOSER}" require -d "${dir}" --no-update "${hard[@]}"
+    fi
+    if [ "${#soft[@]}" -gt 0 ]; then
+        step "${dir}" "composer require --dev ${soft[*]}"
+        run "${COMPOSER}" require -d "${dir}" --no-update --dev "${soft[@]}"
+    fi
+    if [ "${#hard[@]}" -eq 0 ] && [ "${#soft[@]}" -eq 0 ]; then
+        step "${dir}" "no academic composer dependencies"
+    fi
+}
+
+# Helper: set a composer require constraint for a single package name in a dir.
+apply_single_composer_require() {
+    local dir="$1" name="$2" constraint="$3"
+    step "${dir}" "composer require ${name}:${constraint}"
+    run "${COMPOSER}" require -d "${dir}" --no-update "${name}:${constraint}"
+}
+
+# Helper: set the branch-alias for a package (or the root when dir is '.').
+apply_branch_alias() {
+    local dir="$1"
+    step "${dir}" "config extra.branch-alias.dev-${SOURCE_BRANCH} = ${BRANCH_ALIAS}"
+    run "${COMPOSER}" config -d "${dir}" \
+        "extra.branch-alias.dev-${SOURCE_BRANCH}" "${BRANCH_ALIAS}"
+}
+
+# Helper: rewrite a jq version map in place (temp file + mv; never self-redirect).
+apply_version_map() {
+    local file="$1" map="$2"   # map: packages | packages-dev
+    # shellcheck disable=SC2016  # $M/$SV are jq variables, must stay unexpanded
+    "${JQ}" -e --arg M "${map}" '.repositories[$M].options.versions' "${file}" >/dev/null 2>&1 || return 0
+    step "${file}" "repositories.${map}.options.versions[] = ${MAP_VERSION}"
+    if [ "${DRY_RUN}" -eq 1 ]; then
+        printf '   [dry-run] jq set repositories.%s.options.versions[] = %s in %s\n' \
+            "${map}" "${MAP_VERSION}" "${file}"
+        return 0
+    fi
+    local tmp
+    tmp="$(mktemp)"
+    # shellcheck disable=SC2016  # $M/$SV are jq variables, must stay unexpanded
+    "${JQ}" --arg SV "${MAP_VERSION}" --arg M "${map}" --indent 4 \
+        '.repositories[$M].options.versions[] |= $SV' "${file}" > "${tmp}"
+    mv "${tmp}" "${file}"
+}
+
+# Helper: write a VERSION file.
+apply_version_file() {
+    local dir="$1"
+    step "${dir}" "VERSION = ${VERSION_FILE_VALUE}"
+    if [ "${DRY_RUN}" -eq 1 ]; then
+        printf '   [dry-run] echo %s > %s/VERSION\n' "${VERSION_FILE_VALUE}" "${dir}"
+        return 0
+    fi
+    printf '%s\n' "${VERSION_FILE_VALUE}" > "${dir}/VERSION"
+}
+
+# ---------------------------------------------------------------------------
+# 1. Build/Scripts/runTests.sh COMPOSER_ROOT_VERSION
+# ---------------------------------------------------------------------------
+info "Build/Scripts/runTests.sh"
+step "Build/Scripts/runTests.sh" "COMPOSER_ROOT_VERSION = ${RUNTESTS_VERSION}"
+run "${SED}" -i \
+    "s/^COMPOSER_ROOT_VERSION.*/COMPOSER_ROOT_VERSION=\"${RUNTESTS_VERSION}\"/" \
+    Build/Scripts/runTests.sh
+
+# ---------------------------------------------------------------------------
+# 2. Split extensions: composer deps, branch-alias, tailor, VERSION file
+# ---------------------------------------------------------------------------
+info "Split extensions"
+for dir in "${SPLIT_DIRS[@]}"; do
+    apply_academic_composer_deps "${dir}" "${ACADEMIC_CONSTRAINT}"
+    [ "${SET_BRANCH_ALIAS}" -eq 1 ] && apply_branch_alias "${dir}"
+    # docs-presence decides the --no-docs flag; all current splits ship docs.
+    if [ -d "${dir}/Documentation" ]; then
+        step "${dir}" "tailor set-version ${TAILOR_VERSION}"
+        run "${TAILOR_CMD[@]}" --path="${dir}" set-version -- "${TAILOR_VERSION}"
+    else
+        step "${dir}" "tailor set-version --no-docs ${TAILOR_VERSION}"
+        run "${TAILOR_CMD[@]}" --path="${dir}" set-version --no-docs -- "${TAILOR_VERSION}"
+    fi
+    apply_version_file "${dir}"
+done
+
+# ---------------------------------------------------------------------------
+# 3. Fixture extensions: composer deps only (no tailor, no VERSION, no alias).
+#    ext_emconf version + constraints are handled by the bulk pkw pass below.
+# ---------------------------------------------------------------------------
+info "Fixture extensions"
+for dir in "${FIXTURE_DIRS[@]}"; do
+    apply_academic_composer_deps "${dir}" "${ACADEMIC_CONSTRAINT}"
+done
+
+# ---------------------------------------------------------------------------
+# 4. ext_emconf.php: version + depends/suggests constraints (splits + fixtures).
+# ---------------------------------------------------------------------------
+info "ext_emconf.php version + constraints"
+step "ext_emconf" "version = ${EMCONF_VERSION} (${#EMCONF_FILES[@]} files)"
+run "${PKW_CMD[@]}" extemconf:set --ext-version="${EMCONF_VERSION}" -- "${EMCONF_FILES[@]}"
+
+for extkey in "${ACADEMIC_EXTKEYS[@]}"; do
+    step "ext_emconf" "depends/suggests ${extkey} = ${EMCONF_CONSTRAINT}"
+    run "${PKW_CMD[@]}" extemconf:constraints:set \
+        --constraint="${EMCONF_CONSTRAINT}" --update-only \
+        -- depends "${extkey}" "${EMCONF_FILES[@]}"
+    run "${PKW_CMD[@]}" extemconf:constraints:set \
+        --constraint="${EMCONF_CONSTRAINT}" --update-only \
+        -- suggests "${extkey}" "${EMCONF_FILES[@]}"
+done
+
+# ---------------------------------------------------------------------------
+# 5. monorepo-shared: academic deps + packages version map.
+# ---------------------------------------------------------------------------
+info "packages-dev/monorepo-shared"
+apply_academic_composer_deps "packages-dev/monorepo-shared" "${ACADEMIC_CONSTRAINT}"
+apply_version_map "packages-dev/monorepo-shared/composer.json" "packages"
+
+# ---------------------------------------------------------------------------
+# 6. ddev instances: both version maps + academics-monorepo-shared require.
+# ---------------------------------------------------------------------------
+for dir in ddev-instances/core-12 ddev-instances/core-13; do
+    [ -f "${dir}/composer.json" ] || continue
+    info "${dir}"
+    apply_version_map "${dir}/composer.json" "packages"
+    apply_version_map "${dir}/composer.json" "packages-dev"
+    apply_single_composer_require "${dir}" \
+        "fgtclb/academics-monorepo-shared" "${DDEV_SHARED_CONSTRAINT}"
+done
+
+# ---------------------------------------------------------------------------
+# 7. root composer.json: both version maps + monorepo-shared require + alias.
+# ---------------------------------------------------------------------------
+info "root composer.json"
+apply_version_map "composer.json" "packages"
+apply_version_map "composer.json" "packages-dev"
+step "." "composer require fgtclb/academics-monorepo-shared:${ROOT_SHARED_CONSTRAINT}"
+run "${COMPOSER}" require --no-update \
+    "fgtclb/academics-monorepo-shared:${ROOT_SHARED_CONSTRAINT}"
+[ "${SET_BRANCH_ALIAS}" -eq 1 ] && apply_branch_alias "."
+
+info "Finished set-version ${PASSED_VERSION} (${TYPE})"
