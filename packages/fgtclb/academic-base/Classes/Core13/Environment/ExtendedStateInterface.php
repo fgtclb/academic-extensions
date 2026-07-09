@@ -15,6 +15,9 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  * TYPO3 version. TYPO3 version aware configuration is handled and re_enabled within the
  * `EXT:academic_base/Configuration/Services.php` file.
  *
+ * @deprecated since academic_base 2.4.0, will be removed in academic_base 3.0.0.
+ *             Use the fgtclb/environment-state-manager extension instead
+ *             (namespace FGTCLB\EnvironmentStateManager).
  * @internal only to be used within `EXT:academic_*` extensions and not part of public API.
  */
 #[Exclude]

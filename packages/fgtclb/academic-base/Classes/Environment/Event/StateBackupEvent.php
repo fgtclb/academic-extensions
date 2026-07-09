@@ -12,6 +12,9 @@ use FGTCLB\AcademicBase\Environment\StateInterface;
  * provided with {@see StateInterface::additionalData()}, {@see StateInterface::completeAdditionalData()} and
  * {@see StateInterface::withAdditionalData()}.
  *
+ * @deprecated since academic_base 2.4.0, will be removed in academic_base 3.0.0.
+ *             Use the fgtclb/environment-state-manager extension instead
+ *             (namespace FGTCLB\EnvironmentStateManager).
  * @internal for internal usage only and not part of public API.
  */
 final class StateBackupEvent

@@ -6,11 +6,11 @@ namespace FGTCLB\AcademicBase\Core13\Environment;
 
 use FGTCLB\AcademicBase\Environment\EnvironmentBuilderFactoryInterface;
 use FGTCLB\AcademicBase\Environment\Exception\NoTypo3VersionCompatibleEnvironmentBuilderFound;
-use FGTCLB\AcademicBase\Environment\StateBuildContext;
 use FGTCLB\AcademicBase\Environment\StateInterface;
 use FGTCLB\AcademicBase\Environment\StateManagerExecuteMethodTrait;
 use FGTCLB\AcademicBase\Environment\StateManagerInterface;
 use FGTCLB\AcademicBase\Environment\StateManagerRootStateInterfaceHelperMethodsTrait;
+use FGTCLB\EnvironmentStateManager\StateBuildContext;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 
 /**
@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
  * TYPO3 version. TYPO3 version aware configuration is handled and re_enabled within the
  * `EXT:academic_base/Configuration/Services.php` file.
  *
+ * @deprecated since academic_base 2.4.0, will be removed in academic_base 3.0.0.
+ *             Use the fgtclb/environment-state-manager extension instead
+ *             (namespace FGTCLB\EnvironmentStateManager).
  * @internal only to be used within `EXT:academic_*` extensions and not part of public API.
  */
 #[Exclude]

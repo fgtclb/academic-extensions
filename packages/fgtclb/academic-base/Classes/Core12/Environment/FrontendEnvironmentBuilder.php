@@ -6,8 +6,8 @@ namespace FGTCLB\AcademicBase\Core12\Environment;
 
 use FGTCLB\AcademicBase\Environment\EnvironmentBuilderInterface;
 use FGTCLB\AcademicBase\Environment\Exception\SiteConfigCouldNotBeDetermined;
-use FGTCLB\AcademicBase\Environment\StateBuildContext;
 use FGTCLB\AcademicBase\Environment\StateInterface;
+use FGTCLB\EnvironmentStateManager\StateBuildContext;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\LanguageAspectFactory;
@@ -37,6 +37,9 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * TYPO3 version. TYPO3 version aware configuration is handled and re_enabled within the
  * `EXT:academic_base/Configuration/Services.php` file.
  *
+ * @deprecated since academic_base 2.4.0, will be removed in academic_base 3.0.0.
+ *             Use the fgtclb/environment-state-manager extension instead
+ *             (namespace FGTCLB\EnvironmentStateManager).
  * @internal only to be used within `EXT:academic_*` extensions and not part of public API.
  */
 #[Exclude]

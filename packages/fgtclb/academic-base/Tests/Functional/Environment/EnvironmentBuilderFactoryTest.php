@@ -8,8 +8,8 @@ use FGTCLB\AcademicBase\Core12\Environment\FrontendEnvironmentBuilder as Core12F
 use FGTCLB\AcademicBase\Core13\Environment\FrontendEnvironmentBuilder as Core13FrontendEnvironmentBuilder;
 use FGTCLB\AcademicBase\Environment\EnvironmentBuilderFactory;
 use FGTCLB\AcademicBase\Environment\EnvironmentBuilderFactoryInterface;
-use FGTCLB\AcademicBase\Environment\StateBuildContext;
 use FGTCLB\AcademicBase\Tests\Functional\AbstractAcademicBaseTestCase;
+use FGTCLB\EnvironmentStateManager\StateBuildContext;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Http\ApplicationType;
