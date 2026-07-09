@@ -1,53 +1,53 @@
-..  include:: /Includes.rst.txt
-:navigation-title: Installation
 ..  _installation:
 
 ============
 Installation
 ============
 
-..  _installation-composer:
+The extension has to be installed like any other TYPO3 CMS extension. You can
+download and install it using one of the following methods.
 
-Install Academic StudyPlan with Composer
-========================================
+..  tabs::
 
-This extension can be installed using the TYPO3 `extension manager
-<https://extensions.typo3.org/extension/academic_persons>`__ or by `composer
-<https://packagist.org/packages/fgtclb/academic-persons>`__.
+    ..  group-tab:: Composer
 
-..  code-block:: shell
+        ..  code-block:: bash
+            :caption: Install the stable release
 
-    composer install \
-        'fgtclb/academic-persons':'^2'
+            composer require 'fgtclb/academic-study-plan':'^2'
 
-Testing 2.x.x extension version in projects (composer mode)
------------------------------------------------------------
+        ..  tip::
 
-It is already possible to use and test the `2.x` version in composer based instances,
-which is encouraged and feedback of issues not detected by us (or pull-requests).
+            The ``2.x`` version can already be used and tested in Composer based
+            instances. Configure ``minimum-stability: dev`` and ``prefer-stable``
+            in your root :file:`composer.json` so requiring the extension still
+            prefers stable releases over development versions:
 
-Your project should configure `minimum-stabilty: dev` and `prefer-stable` to allow
-requiring each extension but still use stable versions over development versions:
+            ..  code-block:: bash
 
-..  code-block:: shell
+                composer config minimum-stability "dev" \
+                    && composer config "prefer-stable" true
 
-    composer config minimum-stability "dev" \
-    && composer config "prefer-stable" true
+            and install the development version with:
 
-and installed with:
+            ..  code-block:: bash
 
-..  code-block:: shell
+                composer require 'fgtclb/academic-study-plan':'2.*.*@dev'
 
-    composer require \
-        'fgtclb/academic-persons':'2.*.*@dev'
+    ..  group-tab:: Extension Manager
 
-Install Academic StudyPlan in Classic Mode
-==========================================
+        #.  Switch to the module :guilabel:`Admin Tools > Extensions`.
+        #.  Switch to :guilabel:`Get Extensions`.
+        #.  Search for the extension key :guilabel:`academic_study_plan`.
+        #.  Import the extension from the repository.
 
-Or download the extension from
+    ..  group-tab:: Upload ZIP (TER)
 
-* GitHub release artifact `https://github.com/fgtclb/academic-study-plan/releases>`_
-* TYPO3 Extension Repository `https://extensions.typo3.org/extension/academic_study_plan/`_
-* Use the Extension Manager and retrieve the extension from the TYPO3 Extension Repository.
+        #.  Get the current version from `TER`_ by downloading the ZIP version.
+            Alternatively, get the ZIP from the `GitHub Releases`_ page.
+        #.  Switch to the module :guilabel:`Admin Tools > Extensions`.
+        #.  Enable :guilabel:`Upload Extension`.
+        #.  Select or drag the extension ZIP archive and upload the file.
 
-and install it in the Extension Manager.
+..  _TER: https://extensions.typo3.org/extension/academic_study_plan
+..  _GitHub Releases: https://github.com/fgtclb/academic-study-plan/releases
