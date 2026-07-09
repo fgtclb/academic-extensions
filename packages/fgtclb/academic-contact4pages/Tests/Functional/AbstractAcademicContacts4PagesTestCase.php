@@ -14,6 +14,7 @@ abstract class AbstractAcademicContacts4PagesTestCase extends FunctionalTestCase
     ];
 
     protected array $testExtensionsToLoad = [
+        'fgtclb/environment-state-manager',
         'fgtclb/academic-base',
         'fgtclb/academic-persons',
         'fgtclb/academic-contacts4pages',
