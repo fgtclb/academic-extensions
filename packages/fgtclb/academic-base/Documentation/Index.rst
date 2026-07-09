@@ -1,10 +1,8 @@
-..  include:: /Includes.rst.txt
+..  _start:
 
-.. _start:
-
-================
+=============
 Academic Base
-================
+=============
 
 :Extension key:
     academic_base
@@ -31,18 +29,49 @@ Academic Base
 
 ----
 
-TYPO3 extension base containing functionality across academic extensions.
+TYPO3 extension base containing shared functionality used across the academic
+extensions.
 
 ----
 
-**Table of Contents:**
+..  card-grid::
+    :columns: 1
+    :columns-md: 2
+    :gap: 4
+    :class: pb-4
+    :card-height: 100
+
+    ..  card:: :ref:`Introduction <introduction>`
+
+        What the extension does and the main concepts behind it.
+
+    ..  card:: :ref:`Installation <installation>`
+
+        Install :guilabel:`academic_base` via Composer, the Extension
+        Manager or a TER upload.
+
+    ..  card:: :ref:`Known problems <known-problems>`
+
+        Known issues and information about them.
+
+    ..  card:: :ref:`Changelog <changelog-v2>`
+
+        Learn about what has changed and which actions are required to
+        upgrade.
 
 ..  toctree::
-    :maxdepth: 5
+    :maxdepth: 2
     :titlesonly:
-    :glob:
+    :hidden:
 
     Introduction/Index
     Installation/Index
     KnownProblems/Index
     Changelog/Changelog-2
+
+..  Meta Menu
+
+..  toctree::
+    :hidden:
+
+    Sitemap
