@@ -22,6 +22,9 @@ use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
  * This trait provides internal methods for {@see StateInterface} provided getter methods to use them
  * in {@see StateManagerInterface} implementation for the base interface and reduce code duplication.
  *
+ * @deprecated since academic_base 2.4.0, will be removed in academic_base 3.0.0.
+ *             Use the fgtclb/environment-state-manager extension instead
+ *             (namespace FGTCLB\EnvironmentStateManager).
  * @internal only to be used within `EXT:academic_*` extensions and not part of public API.
  */
 trait StateManagerRootStateInterfaceHelperMethodsTrait

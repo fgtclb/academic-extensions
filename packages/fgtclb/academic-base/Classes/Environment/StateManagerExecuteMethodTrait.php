@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Environment;
 
+use FGTCLB\EnvironmentStateManager\StateBuildContext;
+
 /**
  * Provides shared {@see StateManagerInterface::execute()} implementation to be used in
  * {@see StateManagerInterface} implementations depending on to reduce code duplication.
  *
+ * @deprecated since academic_base 2.4.0, will be removed in academic_base 3.0.0.
+ *             Use the fgtclb/environment-state-manager extension instead
+ *             (namespace FGTCLB\EnvironmentStateManager).
  * @internal only to be used within `EXT:academic_*` extensions and not part of public API.
  */
 trait StateManagerExecuteMethodTrait

@@ -15,5 +15,6 @@ parameters:
 
   excludePaths:
     - ../../../packages/fgtclb/*/ext_emconf.php
+    - ../../../packages/fgtclb/*/Migrations/*
     - ../../../packages/fgtclb/*/Classes/Core13/*
     - ../../../packages/fgtclb/*/Tests/*/Core13/*
