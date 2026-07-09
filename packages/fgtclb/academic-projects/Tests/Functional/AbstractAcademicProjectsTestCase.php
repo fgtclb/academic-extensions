@@ -13,6 +13,7 @@ abstract class AbstractAcademicProjectsTestCase extends FunctionalTestCase
     ];
 
     protected array $testExtensionsToLoad = [
+        'fgtclb/environment-state-manager',
         'fgtclb/academic-base',
         'fgtclb/category-types',
         'fgtclb/academic-projects',
