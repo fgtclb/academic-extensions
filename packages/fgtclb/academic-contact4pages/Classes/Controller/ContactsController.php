@@ -29,8 +29,15 @@ final class ContactsController extends ActionController
         );
 
         $roles = [];
+        $availableContacts = [];
         foreach ($contacts as $contact) {
+            if ($contact->getContract() === null || $contact->getContract()->getProfile() === null) {
+                continue;
+            }
+
+            $availableContacts[] = $contact;
             $role = $contact->getRole();
+
             if ($role !== null) {
                 $roles[$role->getUid()] = $role;
             }
@@ -38,7 +45,7 @@ final class ContactsController extends ActionController
 
         $this->view->assignMultiple([
             'data' => $contentElementData,
-            'contacts' => $contacts,
+            'contacts' => $availableContacts,
             'roles' => $roles,
         ]);
 
