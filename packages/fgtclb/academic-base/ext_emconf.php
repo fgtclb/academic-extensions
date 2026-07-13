@@ -13,7 +13,6 @@ $EM_CONF[$_EXTKEY] = [
         'depends' => [
             'typo3' => '13.4.0-13.4.99',
             'backend' => '13.4.0-13.4.99',
-            'environment_state_manager' => '1.0.0-1.99.99',
         ],
     ],
 ];
