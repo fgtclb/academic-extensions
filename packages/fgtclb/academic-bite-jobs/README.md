@@ -53,10 +53,10 @@ composer require \
 ```
 
 > [!IMPORTANT]
-> `2.x.x` is still in development and not all academics extension are fully tested in v12 and v13,
+> `3.x.x` is still in development and not all academics extension are fully tested in v13,
 > but can be installed in composer instances to use, test them. Testing and reporting are welcome.
 
-**Testing 2.x.x extension version in projects (composer mode)**
+**Testing 3.x.x extension version in projects (composer mode)**
 
 It is already possible to use and test the `2.x` version in composer based instances,
 which is encouraged and feedback of issues not detected by us (or pull-requests).
@@ -72,10 +72,10 @@ composer config minimum-stability "dev" \
 and installed with:
 
 ```shell
-composer require 'fgtclb/academic-bite-jobs':'2.*.*@dev'
+composer require 'fgtclb/academic-bite-jobs':'3.*.*@dev'
 ```
 
-That way, current main branch will be included and updated and as soon as 2.0.0 is released switcht to the release on
+That way, current main branch will be included and updated and as soon as 3.0.0 is released switcht to the release on
 update.
 
 ## Upgrade from `1.x`

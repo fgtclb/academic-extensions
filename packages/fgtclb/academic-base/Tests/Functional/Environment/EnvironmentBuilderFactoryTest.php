@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Tests\Functional\Environment;
 
-use FGTCLB\AcademicBase\Core12\Environment\FrontendEnvironmentBuilder as Core12FrontendEnvironmentBuilder;
 use FGTCLB\AcademicBase\Core13\Environment\FrontendEnvironmentBuilder as Core13FrontendEnvironmentBuilder;
 use FGTCLB\AcademicBase\Environment\EnvironmentBuilderFactory;
 use FGTCLB\AcademicBase\Environment\EnvironmentBuilderFactoryInterface;
 use FGTCLB\AcademicBase\Tests\Functional\AbstractAcademicBaseTestCase;
 use FGTCLB\EnvironmentStateManager\StateBuildContext;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -33,20 +31,6 @@ final class EnvironmentBuilderFactoryTest extends AbstractAcademicBaseTestCase
         $this->assertInstanceOf(EnvironmentBuilderFactory::class, $factory);
     }
 
-    #[Group('not-core-13')]
-    #[Test]
-    public function createReturnsTypoV12FrontendEnvironmentBuilderInstance(): void
-    {
-        $stateBuildContext = new StateBuildContext(
-            applicationType: ApplicationType::FRONTEND,
-            pageId: null,
-            languageId: null,
-        );
-        $builder = GeneralUtility::makeInstance(EnvironmentBuilderFactory::class)->create($stateBuildContext);
-        $this->assertInstanceOf(Core12FrontendEnvironmentBuilder::class, $builder);
-    }
-
-    #[Group('not-core-12')]
     #[Test]
     public function createReturnsTypoV13FrontendEnvironmentBuilderInstance(): void
     {
