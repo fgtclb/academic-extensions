@@ -6,16 +6,10 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "php": "^8.2 || ^8.3 || ^8.4",
-        "fgtclb/environment-state-manager": "^1.0",
-        "symfony/config": "^6.4.26 || ^7.3.4",
         "symfony/serializer": "^6.4.26 || ^7.3.4",
-        "typo3/class-alias-loader": "^1.2",
         "typo3/cms-core": "^13.4"
     },
     "config": {
-        "allow-plugins": {
-            "typo3/class-alias-loader": true
-        },
         "sort-packages": true
     },
     "autoload": {
@@ -32,18 +26,12 @@
         "typo3/cms": {
             "extension-key": "academic_base"
         },
-        "typo3/class-alias-loader": {
-            "class-alias-maps": [
-                "Migrations/Code/ClassAliasMap.php"
-            ]
-        },
         "branch-alias": {
             "dev-main": "3.0.x-dev"
         },
         "sbuerk/release": {
             "tailor": {
                 "require": {
-                    "symfony/config": "^6.4.26",
                     "symfony/serializer": "^6.4.26"
                 }
             }
