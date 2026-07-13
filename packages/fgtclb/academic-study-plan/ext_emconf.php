@@ -3,7 +3,7 @@
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Academic Study Plan',
     'description' => 'TYPO3 extension for building and displaying academic study plans with semesters, modules, and categorization features.',
-    'version' => '2.4.0',
+    'version' => '3.0.0',
     'category' => 'fe',
     'state' => 'beta',
     'author' => 'FGTCLB',
@@ -13,7 +13,7 @@ $EM_CONF[$_EXTKEY] = [
         'depends' => [
             'typo3' => '12.0.0-13.4.99',
             'backend' => '12.0.0-13.4.99',
-            'academic_base' => '2.4.0',
+            'academic_base' => '3.0.0',
         ],
     ],
 ];
