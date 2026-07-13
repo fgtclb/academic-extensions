@@ -27,6 +27,7 @@
      displayDetailsOnTestsThatTriggerErrors="true"
      displayDetailsOnTestsThatTriggerNotices="true"
      displayDetailsOnTestsThatTriggerWarnings="true"
+     displayDetailsOnPhpunitDeprecations="true"
      failOnDeprecation="true"
      failOnNotice="true"
      failOnRisky="true"

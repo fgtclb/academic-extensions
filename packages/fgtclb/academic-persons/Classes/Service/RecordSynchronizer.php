@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersons\Service;
 
 use Doctrine\DBAL\Result;
+use FGTCLB\AcademicBase\Tca\TableConfiguration;
 use FGTCLB\AcademicPersons\Domain\Model\Dto\Syncronizer\SynchronizerContext;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -45,7 +46,6 @@ class RecordSynchronizer implements RecordSynchronizerInterface
         if ($defaultRecord === null) {
             return;
         }
-        $tcaColumns = $GLOBALS['TCA'][$context->tableName]['columns'];
         foreach ($context->allowedSiteLanguages as $allowedSiteLanguage) {
             $translatedRecord = $this->getTranslatedRecord(
                 $context->tableName,
@@ -61,7 +61,7 @@ class RecordSynchronizer implements RecordSynchronizerInterface
                 continue;
             }
             $translatedRecord = $this->createTranslation(
-                $context->tableName,
+                $context,
                 $defaultRecord,
                 $allowedSiteLanguage->getLanguageId(),
                 $values,
@@ -70,35 +70,24 @@ class RecordSynchronizer implements RecordSynchronizerInterface
                 // Failed to create translation record, skip relation synchronization.
                 continue;
             }
-            foreach ($tcaColumns as $columnName => $columnDefinition) {
+            foreach ($context->tableConfiguration->columns() as $columnName => $columnDefinition) {
                 $columnType = $columnDefinition['type'] ?? 'unknown';
-                if (!($columnType === 'inline' && $columnName !== 'sys_file_reference')) {
-                    // Non inline fields or column `sys_file_reference` should be skipped.
-                    // @todo Column name `sys_file_reference` exclude does not make sense and should be most likely
-                    //       `foreign_table` and will investigated at a later point, kept for now during moving code
-                    //       around to prepare for better testability and avoiding a side task for now.
-                    continue;
-                }
-                $inlineTable = $columnDefinition['config']['foreign_table'];
-                $inlineField = $columnDefinition['config']['foreign_field'];
-                $inlineChilds = $this->getInlineChilds(
-                    $inlineTable,
-                    $inlineField,
-                    $defaultRecord['uid'],
-                    $context->defaultLanguage->getLanguageId(),
-                );
-                if ($inlineChilds === null) {
-                    // No inline children. Skip to next loop iteration.
-                    continue;
-                }
-                while ($inlineChild = $inlineChilds->fetchAssociative()) {
-                    $this->synchronizeRecord(
-                        $context->withRecord($inlineTable, $inlineChild['uid']),
-                        [
-                            (string)$inlineField => $translatedRecord['uid'],
-                        ],
+
+                // @todo Column name `sys_file_reference` exclude does not make sense and should be most likely
+                //       `foreign_table` and will investigated at a later point, kept for now during moving code
+                //       around to prepare for better testability and avoiding a side task for now.
+                if ($columnType === 'inline' && $columnName !== 'sys_file_reference') {
+                    $this->synchronizeInlineField(
+                        $context,
+                        $defaultRecord,
+                        $translatedRecord,
+                        $columnName,
+                        $columnDefinition,
                     );
+                    continue;
                 }
+
+                // @todo Handle other relation types ?!
             }
         }
     }
@@ -167,58 +156,31 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     }
 
     /**
-     * @param string $tableName
      * @param array<string, mixed> $defaultRecord
-     * @param int $languageUid
      * @param array<string, mixed> $values
      * @return array<string, mixed>|null
      */
     private function createTranslation(
-        string $tableName,
+        SynchronizerContext $context,
         array $defaultRecord,
-        int $languageUid,
+        int $languageId,
         array $values = []
     ): ?array {
-        $defaultRecoredUid = $defaultRecord['uid'];
-        $tcaColumns = $GLOBALS['TCA'][$tableName]['columns'];
-        $tcaCtrl = $GLOBALS['TCA'][$tableName]['ctrl'];
-
-        // Exclude inline columns from the default record
-        $excludeColumns = array_merge(
-            ['uid', 'l10n_diffsource', 't3ver_oid', 't3ver_wsid', 't3ver_state', 't3ver_stage'],
-            array_keys($values)
+        $values = $this->getValuesForNewRecordTranslation(
+            $context,
+            $defaultRecord,
+            $languageId,
+            $values,
         );
-        foreach ($tcaColumns as $columnName => $columnDefinition) {
-            if ($columnDefinition['config']['type'] === 'inline') {
-                $excludeColumns[] = $columnName;
-            }
-        }
-
-        // Merge default record values with the given values
-        foreach ($defaultRecord as $columnName => $value) {
-            if (!in_array($columnName, $excludeColumns)) {
-                $values[$columnName] = $value;
-            }
-        }
-
-        // Override language specific values
-        $values['sys_language_uid'] = $languageUid;
-        if (isset($tcaCtrl['transOrigPointerField'])) {
-            $values[$tcaCtrl['transOrigPointerField']] = $defaultRecoredUid;
-        }
-        if (isset($tcaCtrl['translationSource'])) {
-            $values[$tcaCtrl['translationSource']] = $defaultRecoredUid;
-        }
-        $values['crdate'] = $GLOBALS['EXEC_TIME'];
-        $values['tstamp'] = $GLOBALS['EXEC_TIME'];
-
-        $queryBuilder = $this->getQueryBuilder($tableName);
-        $queryBuilder->insert($tableName);
-        $queryBuilder->values($values);
-
-        $queryBuilder->executeStatement();
-
-        return $this->getTranslatedRecord($tableName, $defaultRecoredUid, $languageUid);
+        $this->getQueryBuilder($context->tableName)
+            ->insert($context->tableName)
+            ->values($values)
+            ->executeStatement();
+        return $this->getTranslatedRecord(
+            $context->tableName,
+            $defaultRecord['uid'],
+            $languageId,
+        );
     }
 
     /**
@@ -228,26 +190,13 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     private function updateTranslation(
         SynchronizerContext $context,
         array $defaultRecord,
-        array $translatedRecord
+        array $translatedRecord,
     ): void {
-        $tcaColumns = $GLOBALS['TCA'][$context->tableName]['columns'];
-        $updateColumns = [];
-        foreach ($tcaColumns as $columnName => $columnDefinition) {
-            if (isset($columnDefinition['config']['type'])
-                && is_string($columnDefinition['config']['type'])
-                && $columnDefinition['config']['type'] !== 'inline'
-                && isset($columnDefinition['l10n_mode'])
-                && $columnDefinition['l10n_mode'] === 'exclude'
-            ) {
-                $updateColumns[] = $columnName;
-            }
-        }
-
-        // Skip if there are no columns to update
-        if (empty($updateColumns)) {
+        $updateColumns = $this->getColumnNamedForTranslatedRecordUpdate($context);
+        if ($updateColumns === null) {
+            // Skip if there are no columns to update
             return;
         }
-
         $queryBuilder = $this->getQueryBuilder($context->tableName);
         $queryBuilder->update($context->tableName)
             ->where(
@@ -256,12 +205,44 @@ class RecordSynchronizer implements RecordSynchronizerInterface
                     $queryBuilder->createNamedParameter($translatedRecord['uid'], Connection::PARAM_INT)
                 ),
             );
-
         foreach ($updateColumns as $columnName) {
             $queryBuilder->set($columnName, $defaultRecord[$columnName]);
         }
-
         $queryBuilder->executeStatement();
+    }
+
+    /**
+     * @param array<string, mixed> $defaultRecord
+     * @param array<string, mixed> $translatedRecord
+     * @param array<string, mixed> $columnDefinition
+     */
+    private function synchronizeInlineField(
+        SynchronizerContext $context,
+        array $defaultRecord,
+        array $translatedRecord,
+        string $columnName,
+        array $columnDefinition,
+    ): void {
+        $inlineTable = $columnDefinition['config']['foreign_table'];
+        $inlineField = $columnDefinition['config']['foreign_field'];
+        $inlineChilds = $this->getInlineChilds(
+            $inlineTable,
+            $inlineField,
+            $defaultRecord['uid'],
+            $context->defaultLanguage->getLanguageId(),
+        );
+        if ($inlineChilds === null) {
+            // No inline children. Skip to next loop iteration.
+            return;
+        }
+        while ($inlineChild = $inlineChilds->fetchAssociative()) {
+            $this->synchronizeRecord(
+                $context->withRecord($inlineTable, $inlineChild['uid']),
+                [
+                    (string)$inlineField => $translatedRecord['uid'],
+                ],
+            );
+        }
     }
 
     /**
@@ -307,5 +288,107 @@ class RecordSynchronizer implements RecordSynchronizerInterface
             ->removeAll()
             ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
         return $queryBuilder;
+    }
+
+    /**
+     * @param array<string, mixed> $defaultRecord
+     * @param array<string, mixed> $values
+     * @return array<string, mixed>
+     */
+    private function getValuesForNewRecordTranslation(
+        SynchronizerContext $context,
+        array $defaultRecord,
+        int $languageId,
+        array $values = [],
+    ): array {
+        $tableConfiguration = $context->tableConfiguration;
+        $excludeColumns = $this->enrichExcludesColumnsForNewRecordTranslation($tableConfiguration, array_keys($values));
+        foreach ($defaultRecord as $columnName => $value) {
+            if (in_array($columnName, $excludeColumns, true)) {
+                continue;
+            }
+            $values[$columnName] = $value;
+        }
+        if ($tableConfiguration->languageFieldName) {
+            $values[$tableConfiguration->languageFieldName] = $languageId;
+        }
+        if ($tableConfiguration->createdAtFieldName) {
+            $values[$tableConfiguration->createdAtFieldName] = $GLOBALS['EXEC_TIME'];
+        }
+        if ($tableConfiguration->updatedAtFieldName) {
+            $values[$tableConfiguration->updatedAtFieldName] = $GLOBALS['EXEC_TIME'];
+        }
+        if ($tableConfiguration->transOrigPointerFieldName) {
+            $values[$tableConfiguration->transOrigPointerFieldName] = $defaultRecord['uid'];
+        }
+        if ($tableConfiguration->translationSourceFieldName) {
+            $values[$tableConfiguration->translationSourceFieldName] = $defaultRecord['uid'];
+        }
+        return $values;
+    }
+
+    /**
+     * @param TableConfiguration $tableConfiguration
+     * @param string[] $excludedColumns
+     * @return string[]
+     */
+    private function enrichExcludesColumnsForNewRecordTranslation(
+        TableConfiguration $tableConfiguration,
+        array $excludedColumns,
+    ): array {
+        $defaultExcludedColumns = [
+            'uid',
+            't3ver_oid',
+            't3ver_wsid',
+            't3ver_state',
+            't3ver_stage',
+        ];
+        if ($tableConfiguration->translationSourceFieldName) {
+            $defaultExcludedColumns[] = $tableConfiguration->translationSourceFieldName;
+        }
+        $excludedColumns = array_unique(
+            [
+                ...array_values($defaultExcludedColumns),
+                ...array_values($excludedColumns),
+            ],
+        );
+        foreach ($tableConfiguration->columns() as $columnName => $columnDefinition) {
+            $type = $columnDefinition['type'] ?? null;
+            if ($type === 'inline') {
+                // @todo Simply skipping inline fields is really the way to go ?
+                $excludedColumns[] = $columnName;
+                continue;
+            }
+        }
+        return $excludedColumns;
+    }
+
+    /**
+     * @return string[]|null
+     */
+    private function getColumnNamedForTranslatedRecordUpdate(SynchronizerContext $context): ?array
+    {
+        $updateColumns = [];
+        foreach ($context->tableConfiguration->columns() as $columnName => $columnDefinition) {
+            if (!$this->columnIsUsableForUpdate($columnDefinition)) {
+                continue;
+            }
+            $updateColumns[] = $columnName;
+        }
+        return $updateColumns ?: null;
+    }
+
+    /**
+     * @param array<string, mixed> $columnDefinition
+     * @return bool
+     */
+    private function columnIsUsableForUpdate(array $columnDefinition): bool
+    {
+        return isset($columnDefinition['config']['type'])
+            && is_string($columnDefinition['config']['type'])
+            && $columnDefinition['config']['type'] !== 'inline'
+            && isset($columnDefinition['l10n_mode'])
+            && $columnDefinition['l10n_mode'] === 'exclude'
+        ;
     }
 }
