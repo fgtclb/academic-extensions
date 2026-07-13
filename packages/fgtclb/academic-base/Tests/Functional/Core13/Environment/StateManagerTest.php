@@ -13,7 +13,6 @@ use FGTCLB\AcademicBase\Environment\Event\StateApplyEvent;
 use FGTCLB\AcademicBase\Environment\Event\StateBackupEvent;
 use FGTCLB\AcademicBase\Environment\StateInterface;
 use FGTCLB\AcademicBase\Tests\Functional\AbstractAcademicBaseTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ServerRequestInterface;
@@ -40,7 +39,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         parent::tearDown();
     }
 
-    #[Group('not-core-12')]
     #[Test]
     public function backupAddsExpectedStateOnInternalStack(): void
     {
@@ -102,7 +100,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertCount(1, $dispatchedBackupEvents);
     }
 
-    #[Group('not-core-12')]
     #[Test]
     public function backupAddsExpectedStateAsSecondItemOnInternalStack(): void
     {
@@ -180,7 +177,6 @@ final class StateManagerTest extends AbstractAcademicBaseTestCase
         $this->assertCount(2, $dispatchedBackupEvents);
     }
 
-    #[Group('not-core-12')]
     #[Test]
     public function restoreSetsExpectedStateToEnvironment(): void
     {

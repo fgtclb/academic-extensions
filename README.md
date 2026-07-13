@@ -14,7 +14,7 @@ increasing the cross-over development and testing experience.
 | 2, 2.x | ^2, 2.x-dev   | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
 | 1      | ^1, 1.x-dev   | v11 + v12 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
 
-**Testing 2.x.x extension version in projects (composer mode)**
+**Testing 3.x.x extension version in projects (composer mode)**
 
 It is already possible to use and test the `2.x` version in composer based instances,
 which is encouraged and feedback of issues not detected by us (or pull-requests).
@@ -30,10 +30,10 @@ composer config minimum-stability "dev" \
 and than for example:
 
 ```shell
-composer require 'fgtclb/academic-persons':'2.*.*@dev'
+composer require 'fgtclb/academic-persons':'3.*.*@dev'
 ```
 
-That way, current main branch will be included and updated and as soon as 2.0.0 is released switcht to the release on
+That way, current main branch will be included and updated and as soon as 3.0.0 is released switcht to the release on
 update.
 
 ## Upgrade from `1.x`

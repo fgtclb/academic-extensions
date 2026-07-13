@@ -5,12 +5,12 @@
     "homepage": "https://www.fgtclb.com/",
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+        "php": "^8.2 || ^8.3 || ^8.4",
         "fgtclb/environment-state-manager": "^1.0",
         "symfony/config": "^6.4.26 || ^7.3.4",
         "symfony/serializer": "^6.4.26 || ^7.3.4",
         "typo3/class-alias-loader": "^1.2",
-        "typo3/cms-core": "^12.4.22 || ^13.4"
+        "typo3/cms-core": "^13.4"
     },
     "config": {
         "allow-plugins": {

@@ -11,8 +11,8 @@ $EM_CONF[$_EXTKEY] = [
     'author_company' => 'FGTCLB GmbH',
     'constraints' => [
         'depends' => [
-            'typo3' => '12.0.0-13.4.99',
-            'backend' => '12.0.0-13.4.99',
+            'typo3' => '13.4.0-13.4.99',
+            'backend' => '13.4.0-13.4.99',
             'academic_base' => '3.0.0',
         ],
     ],

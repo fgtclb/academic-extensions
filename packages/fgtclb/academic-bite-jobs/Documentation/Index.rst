@@ -73,7 +73,7 @@ advertisements are also available in the plugin.
 
         Known issues and information about them.
 
-    ..  card:: :ref:`Changelog <changelog-v2>`
+    ..  card:: :ref:`Changelog <changelog-v3>`
 
         Learn about what has changed and which actions are required to
         upgrade.
@@ -88,6 +88,7 @@ advertisements are also available in the plugin.
     Configuration/Index
     Templates/Index
     KnownProblems/Index
+    Changelog/Changelog-3
     Changelog/Changelog-2
 
 ..  Meta Menu
