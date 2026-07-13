@@ -31,7 +31,7 @@ The extension directory name does not always equal the extension key: e.g.
 
 ## Version support
 
-- Branch `main` = version `2.3.x-dev`, supporting **TYPO3 v12 + v13**, PHP 8.1–8.4.
+- Branch `main` = version `2.4.x-dev`, supporting **TYPO3 v12 + v13**, PHP 8.1–8.5.
 - Branch `2` = `^2`, v12+v13. Branch `1` = `^1`, v11+v12 (legacy).
 - The per-extension support/test status matrix is in `README.md` — consult it before assuming an extension works on a given core/PHP combination; many `2.x` combinations are explicitly "not tested yet".
 

@@ -68,6 +68,15 @@ Legend:
   (X)   Planned for the upcoming X.y.z line, not yet available/tested
 ```
 
+**Roadmap: the planned `3.x` line**
+
+The `(3)` marker documents the upcoming major `3.x` line, which will target
+TYPO3 **v13 + v14** (see the branch support matrix above). It is a roadmap
+signal only: `3.x` is not released yet and the extensions are not tested against
+TYPO3 v14, so every `(3)` cell means *planned, not yet available or verified*.
+As v14 support is actually implemented and tested, the state of the affected
+cells will be promoted from `(3)` to `{3}` and finally to `<3>` per extension.
+
 ## List of TYPO3 extension and the split repositories (READ ONLY)
 
 | Composer                       | TYPO3                   | Path                                                                                       | Split Repository                                                                     |
