@@ -44,27 +44,28 @@ addressed manualy in case not automatic upgrade path is available. See the
 
 ### Extension Version Support Matrix
 
-| Extension               | v11 | v12     | v13     | Comment                                                                                         |
-|-------------------------|-----|---------|---------|-------------------------------------------------------------------------------------------------|
-| academic_base           | -   | -2-     | -2-     | Shared base functionalities, introduced in 2.x                                                  |
-| academic_bite_jobs      | -1- | -1- -2- | -1- -2- | Broken - API key required but not configurable, not checked/adopted for v12+                    |
-| academic_contacts4pages | <1> | -1- -2- | -1- -2- | 1 in use for v11, may work for v12 but not tested. 2 for v12/v13 currently tested and evaluated |
-| academic_study_plan     | -   | -2-     | -2-     | Introduced in 2.x                                                                               |
-| academic_jobs           | <1> | -1- -2- | -1- -2- | not tested/verified yet for 2 (v12/v13) and 1 (v12)                                             |
-| academic_partners       | -1- | -1- {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
-| academic_persons        | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
-| academic_persons_edit   | <1> | {1} {2} | -1- {2} | Breaking for 2, not tested yet for 2 (v12/v13) and 1 (v12)                                      |
-| academic_persons_sync   | <1> | {1} {2} | -1- {2} | Breaking for 2, not tested yet for 2 (v12/v13) and 1 (v12)                                      |
-| academic_programs       | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
-| academic_projects       | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
-| category_types          | <1> | {1} {2} | -1- {2} | Breaking for 2, in test for v13 (2), not tested yet for 2 (v12) and 1 (v12)                     |
+| Extension               | v11 | v12     | v13     | v14 |
+|-------------------------|-----|---------|---------|-----|
+| academic_base           | -   | <2>     | <2> (3) | (3) |
+| academic_bite_jobs      | <1> | <1> <2> | <2> (3) | (3) |
+| academic_contacts4pages | <1> | <1> <2> | <2> (3) | (3) |
+| academic_study_plan     | -   | <2>     | <2> (3) | (3) |
+| academic_jobs           | <1> | <1> <2> | <2> (3) | (3) |
+| academic_partners       | <1> | <1> <2> | <2> (3) | (3) |
+| academic_persons        | <1> | <1> <2> | <2> (3) | (3) |
+| academic_persons_edit   | <1> | <1> <2> | <2> (3) | (3) |
+| academic_persons_sync   | <1> | <1> <2> | <2> (3) | (3) |
+| academic_programs       | <1> | <1> <2> | <2> (3) | (3) |
+| academic_projects       | <1> | <1> <2> | <2> (3) | (3) |
+| category_types          | <1> | <1> <2> | <2> (3) | (3) |
 
 Legend:
 
 ```
   <X>   Allowed and used with X.y.z
-  {X}   Allowd but not tested/verified with X.y.z, but may/could work
-  -X-   Allowed but absolutly not tested and most likely not working (yet)
+  {X}   Allowed but not tested/verified with X.y.z, but may/could work
+  -X-   Allowed but absolutely not tested and most likely not working (yet)
+  (X)   Planned for the upcoming X.y.z line, not yet available/tested
 ```
 
 ## List of TYPO3 extension and the split repositories (READ ONLY)
