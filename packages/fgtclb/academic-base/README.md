@@ -19,11 +19,11 @@ in projects and mitigates oversights in project dependency management.
 
 ## Compatibility
 
-| Branch | Version       | TYPO3       | PHP                                     |
-|--------|---------------|-------------|-----------------------------------------|
-| main   | 2.0.x-dev     | ~v12 + ~v13 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3) |
-| 2      | ^2, 2.0.x-dev | ~v12 + ~v13 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3) |
-| 1      | -             | v11 + ~v12  | not availbe for 1.x                     |
+| Branch | Version       | TYPO3     | PHP                                          |
+|--------|---------------|-----------|----------------------------------------------|
+| main   | ^3, 3.x-dev   | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
+| 2, 2.x | ^2, 2.x-dev   | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
+| 1      | -             | v11 + v12 | not available for 1.x                        |
 
 ## Installation
 
