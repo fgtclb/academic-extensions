@@ -45,7 +45,7 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
         string $fieldName,
         array $removeItemByValue = [''],
     ): array {
-        $currentPageId = $request->getAttribute('frontend.controller')?->id ?? $request->getAttribute('site')?->getRootPageId() ?? 0;
+        $currentPageId = $request->getAttribute('frontend.page.information')?->getId() ?? $request->getAttribute('site')?->getRootPageId() ?? 0;
         $items = $GLOBALS['TCA'][$tableName]['columns'][$fieldName]['config']['items'] ?? [];
         $itemProcFunc = (string)($GLOBALS['TCA'][$tableName]['columns'][$fieldName]['config']['itemsProcFunc'] ?? '');
         if ($itemProcFunc !== '') {
