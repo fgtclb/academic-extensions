@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 defined('TYPO3') or die;
 
 (static function (): void {
-
-    $typo3MajorVersion = (new Typo3Version())->getMajorVersion();
 
     ExtensionManagementUtility::addPlugin(
         [
@@ -25,7 +22,7 @@ defined('TYPO3') or die;
 
     ExtensionManagementUtility::addPiFlexFormValue(
         '*',
-        sprintf('FILE:EXT:academic_bite_jobs/Configuration/FlexForms/Core%s/AcademicBiteJobsList.xml', $typo3MajorVersion),
+        'FILE:EXT:academic_bite_jobs/Configuration/FlexForms/AcademicBiteJobsList.xml',
         'academicbitejobs_list'
     );
 
