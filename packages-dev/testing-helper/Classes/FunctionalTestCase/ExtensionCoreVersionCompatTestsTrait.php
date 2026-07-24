@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Information\Typo3Version;
 
 const TYPO3_LOWEST_SUPPORTED_MAJOR_VERSION = 13;
-const TYPO3_HIGHEST_SUPPORTED_MAJOR_VERSION = 13;
+const TYPO3_HIGHEST_SUPPORTED_MAJOR_VERSION = 14;
 
 trait ExtensionCoreVersionCompatTestsTrait
 {
