@@ -7,7 +7,6 @@ namespace FGTCLB\AcademicBase\Extbase\Property\TypeConverter;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Http\UploadedFile;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
@@ -50,11 +49,7 @@ final class FileUploadConverter extends AbstractTypeConverter
         private readonly ResourceFactory $resourceFactory,
         private readonly LanguageServiceFactory $languageServiceFactory,
         private readonly LoggerInterface $logger,
-    ) {
-        // @todo Remove method call and method when TYPO3 v12 support is dropped.
-        //       https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Deprecation-94117-RegisterExtbaseTypeConvertersAsServices.html
-        $this->configureProperties();
-    }
+    ) {}
 
     /**
      * @param array<string, mixed>|null $options
@@ -333,22 +328,6 @@ final class FileUploadConverter extends AbstractTypeConverter
             return $this->languageServiceFactory->createFromSiteLanguage($request->getAttribute('site')->getDefaultLanguage());
         }
         return $this->languageServiceFactory->create('default');
-    }
-
-    /**
-     * Set deprecated properties for TYPO3 v12 in cases some code will request deprecated methods to retrieve the
-     * information. Properties are now configured within `EXT:academic_base/Configuration/Services.yaml`.
-     *
-     * @todo Remove method together with call in {@see self::__construct()} when TYPO3 v12 support is dropped.
-     *       https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/12.0/Deprecation-94117-RegisterExtbaseTypeConvertersAsServices.html
-     */
-    private function configureProperties(): void
-    {
-        if ((new Typo3Version())->getMajorVersion() < 13) {
-            $this->sourceTypes = ['array'];
-            $this->targetType = ExtbaseFileReference::class;
-            $this->priority = 10;
-        }
     }
 
     /**

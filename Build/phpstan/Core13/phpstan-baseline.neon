@@ -1,21 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Access to an undefined property FGTCLB\\\\AcademicBase\\\\Extbase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$priority\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
-
-		-
-			message: "#^Access to an undefined property FGTCLB\\\\AcademicBase\\\\Extbase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$sourceTypes\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
-
-		-
-			message: "#^Access to an undefined property FGTCLB\\\\AcademicBase\\\\Extbase\\\\Property\\\\TypeConverter\\\\FileUploadConverter\\:\\:\\$targetType\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicBase\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php
