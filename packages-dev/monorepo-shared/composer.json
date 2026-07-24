@@ -22,7 +22,7 @@
         "fgtclb/academic-projects": "~3.0.0@dev",
         "fgtclb/academic-study-plan": "~3.0.0@dev",
         "fgtclb/category-types": "~3.0.0@dev",
-        "fgtclb/environment-state-manager": "^1.0",
+        "fgtclb/environment-state-manager": "^2.0.1@dev",
         "typo3/cms-backend": "^13.4",
         "typo3/cms-belog": "^13.4",
         "typo3/cms-beuser": "^13.4",
