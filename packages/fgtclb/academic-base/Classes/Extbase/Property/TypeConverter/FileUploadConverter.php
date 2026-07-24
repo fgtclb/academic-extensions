@@ -9,13 +9,14 @@ use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
-use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference as CoreFileReference;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileNameValidator;
+use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -47,6 +48,7 @@ final class FileUploadConverter extends AbstractTypeConverter
 
     public function __construct(
         private readonly ResourceFactory $resourceFactory,
+        private readonly StorageRepository $storageRepository,
         private readonly LanguageServiceFactory $languageServiceFactory,
         private readonly LoggerInterface $logger,
     ) {}
@@ -238,9 +240,13 @@ final class FileUploadConverter extends AbstractTypeConverter
         } catch (ResourceDoesNotExistException) {
             $parts = GeneralUtility::trimExplode(':', $targetFolderIdentifier);
             if (count($parts) === 2) {
-                $storageUid = (int)$parts[0];
+                // Storage UIDs are always non-negative; the max(0, ...) keeps the
+                // value within StorageRepository::getStorageObject()'s int<0, max>.
+                $storageUid = max(0, (int)$parts[0]);
                 $folderIdentifier = $parts[1];
-                $uploadFolder = $this->resourceFactory->getStorageObject($storageUid)->createFolder($folderIdentifier);
+                // ResourceFactory::getStorageObject() was removed in TYPO3 v14;
+                // StorageRepository provides the same lookup in v13 and v14.
+                $uploadFolder = $this->storageRepository->getStorageObject($storageUid)->createFolder($folderIdentifier);
             } else {
                 throw new TypeConverterException(
                     sprintf(
