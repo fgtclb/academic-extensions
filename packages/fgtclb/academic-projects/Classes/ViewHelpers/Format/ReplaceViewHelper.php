@@ -2,14 +2,10 @@
 
 namespace FGTCLB\AcademicProjects\ViewHelpers\Format;
 
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
-use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithContentArgumentAndRenderStatic;
 
 class ReplaceViewHelper extends AbstractViewHelper
 {
-    use CompileWithContentArgumentAndRenderStatic;
-
     public function initializeArguments(): void
     {
         $this->registerArgument('content', 'string', 'Content in which to perform replacement. Array supported.');
@@ -19,32 +15,28 @@ class ReplaceViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param array<string, mixed> $arguments
      * @return mixed
      */
-    public static function renderStatic(
-        array $arguments,
-        \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
-    ): mixed {
-        $content = $renderChildrenClosure();
+    public function render(): mixed
+    {
+        $content = $this->arguments['content'] ?? $this->renderChildren();
         /** @var string|array<string, mixed> $content */
         $content = is_scalar($content) || $content === null ? (string)$content : (array)$content;
 
-        $substring = $arguments['substring'];
+        $substring = $this->arguments['substring'];
         /** @var string|array<string, mixed> $substring */
         $substring = is_scalar($substring) ? (string)$substring : (array)$substring;
 
-        $replacement = $arguments['replacement'];
+        $replacement = $this->arguments['replacement'];
         /** @var string|array<string, mixed> $replacement */
         $replacement = is_scalar($replacement) ? (string)$replacement : (array)$replacement;
 
         $count = 0;
-        $caseSensitive = (bool)$arguments['caseSensitive'];
+        $caseSensitive = (bool)$this->arguments['caseSensitive'];
         $function = $caseSensitive ? 'str_replace' : 'str_ireplace';
         $replaced = $function($substring, $replacement, $content, $count);
 
-        if ($arguments['returnCount'] ?? false) {
+        if ($this->arguments['returnCount'] ?? false) {
             return $count;
         }
 
