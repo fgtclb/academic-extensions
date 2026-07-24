@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
+use FGTCLB\AcademicBase\TcaManipulator;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 defined('TYPO3') or die;
 
 (static function (): void {
 
-    ExtensionManagementUtility::addPlugin(
+    (new TcaManipulator())->addContentElementPlugin(
         [
             'label' => 'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label',
             'value' => 'academicbitejobs_list',
             'icon' => 'bitejobs_list',
             'group' => 'academic',
         ],
-        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
         'academic_bite_jobs'
     );
 
