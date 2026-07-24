@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use FGTCLB\AcademicBase\TcaManipulator;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 defined('TYPO3') or die;
 
@@ -17,15 +17,14 @@ defined('TYPO3') or die;
     // ------------------------------------------------------------------------
 
     // Add plugin to the CType selection
-    ExtensionManagementUtility::addPlugin(
+    (new TcaManipulator())->addContentElementPlugin(
         [
             'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_list.name',
             'value' => 'academicprojects_projectlist',
             'icon' => 'actions-code-merge',
             'group' => 'academic',
         ],
-        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
-        'academicprojects_projectlist'
+        'academic_projects'
     );
 
     // Add a configuration tab and the FlexForm configuration to plugin
@@ -52,15 +51,14 @@ defined('TYPO3') or die;
     // ------------------------------------------------------------------------
 
     // Add plugin to the CType selection
-    ExtensionManagementUtility::addPlugin(
+    (new TcaManipulator())->addContentElementPlugin(
         [
             'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_selected.name',
             'value' => 'academicprojects_projectlistsingle',
             'icon' => 'actions-code-merge',
             'group' => 'academic',
         ],
-        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
-        'academicprojects_projectlistsingle'
+        'academic_projects'
     );
 
     ExtensionManagementUtility::addToAllTCAtypes(

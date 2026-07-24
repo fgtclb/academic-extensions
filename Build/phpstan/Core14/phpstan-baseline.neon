@@ -11,11 +11,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
 
 		-
-			message: "#^Parameter \\#1 \\$uid of method TYPO3\\\\CMS\\\\Core\\\\Resource\\\\StorageRepository\\:\\:getStorageObject\\(\\) expects int\\<0, max\\>\\|string, int given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicBase\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php
@@ -24,11 +19,6 @@ parameters:
 			message: "#^Static property FGTCLB\\\\AcademicBase\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php
-
-		-
-			message: "#^Static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:addPlugin\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-bite-jobs/Configuration/TCA/Overrides/tt_content.php
 
 		-
 			message: "#^Property FGTCLB\\\\AcademicBiteJobs\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
@@ -44,11 +34,6 @@ parameters:
 			message: "#^Method FGTCLB\\\\AcademicContacts4pages\\\\Domain\\\\Repository\\\\ContactRepository\\:\\:findByPid\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-contact4pages/Classes/Domain/Repository/ContactRepository.php
-
-		-
-			message: "#^Static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:addPlugin\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-contact4pages/Configuration/TCA/Overrides/tt_content.php
 
 		-
 			message: "#^Property FGTCLB\\\\AcademicContacts4pages\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
@@ -69,11 +54,6 @@ parameters:
 			message: "#^Parameter \\#1 \\$recordId of method FGTCLB\\\\AcademicJobs\\\\Controller\\\\JobController\\:\\:sendEmail\\(\\) expects int, int\\<1, max\\>\\|null given\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php
-
-		-
-			message: "#^Static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:addPlugin\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#"
-			count: 3
-			path: ../../../packages/fgtclb/academic-jobs/Configuration/TCA/Overrides/tt_content.php
 
 		-
 			message: "#^Property FGTCLB\\\\AcademicJobs\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
@@ -126,11 +106,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnershipRepository.php
 
 		-
-			message: "#^Static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:addPlugin\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#"
-			count: 4
-			path: ../../../packages/fgtclb/academic-partners/Configuration/TCA/Overrides/tt_content.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicPartners\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Tests/Functional/ExtensionLoadedTest.php
@@ -144,16 +119,6 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 2
 			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Domain/Model/Dto/ProfileInformationFormData.php
-
-		-
-			message: "#^Access to an undefined property TYPO3\\\\CMS\\\\Core\\\\DataHandling\\\\DataHandler\\:\\:\\$neverHideAtCopy\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons-edit/Classes/Profile/ProfileTranslator.php
-
-		-
-			message: "#^Static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:addPlugin\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#"
-			count: 2
-			path: ../../../packages/fgtclb/academic-persons-edit/Configuration/TCA/Overrides/tt_content.php
 
 		-
 			message: "#^Property FGTCLB\\\\AcademicPersonsEdit\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
@@ -196,11 +161,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
 
 		-
-			message: "#^Static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:addPlugin\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#"
-			count: 6
-			path: ../../../packages/fgtclb/academic-persons/Configuration/TCA/Overrides/tt_content.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicPersons\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/ExtensionLoadedTest.php
@@ -214,11 +174,6 @@ parameters:
 			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Repository\\\\ProgramRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-programs/Classes/Domain/Repository/ProgramRepository.php
-
-		-
-			message: "#^Static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:addPlugin\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#"
-			count: 2
-			path: ../../../packages/fgtclb/academic-programs/Configuration/TCA/Overrides/tt_content.php
 
 		-
 			message: "#^Property FGTCLB\\\\AcademicPrograms\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
@@ -244,11 +199,6 @@ parameters:
 			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Repository\\\\ProjectRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Repository/ProjectRepository.php
-
-		-
-			message: "#^Static method TYPO3\\\\CMS\\\\Core\\\\Utility\\\\ExtensionManagementUtility\\:\\:addPlugin\\(\\) invoked with 3 parameters, 1\\-2 required\\.$#"
-			count: 2
-			path: ../../../packages/fgtclb/academic-projects/Configuration/TCA/Overrides/tt_content.php
 
 		-
 			message: "#^Property FGTCLB\\\\AcademicProjects\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"

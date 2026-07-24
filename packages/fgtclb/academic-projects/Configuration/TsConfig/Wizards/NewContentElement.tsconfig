@@ -6,8 +6,7 @@ mod.wizards {
                 title = LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_list.name
                 description = LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_list.description
                 tt_content_defValues {
-                    CType = list
-                    list_type = academicprojects_projectlist
+                    CType = academicprojects_projectlist
                 }
             }
             academicprojects_projectlistsingle {
@@ -15,8 +14,7 @@ mod.wizards {
                 title = LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_selected.name
                 description = LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_selected.description
                 tt_content_defValues {
-                    CType = list
-                    list_type = academicprojects_projectlistsingle
+                    CType = academicprojects_projectlistsingle
                 }
             }
         }

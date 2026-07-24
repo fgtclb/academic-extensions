@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase;
 
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Schema\Struct\SelectItem;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
 /**
  * Provides additional methods to manipulate TCA not possible with TYPO3 Core utilities.
@@ -71,6 +73,34 @@ final class TcaManipulator
         }
         $additionalTypeInformation['showitem'] = $showItemList;
         $GLOBALS['TCA'][$table]['types'][$selectItem->getValue()] = $additionalTypeInformation;
+    }
+
+    /**
+     * Register an Extbase plugin as a content element (CType) in a way that works
+     * on both TYPO3 v13 and v14.
+     *
+     * TYPO3 v13 `ExtensionManagementUtility::addPlugin()` takes
+     * `($item, $type, $extensionKey)` and only registers a CType when
+     * `$type === ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT`. TYPO3 v14 removed
+     * the `list_type` sub-type concept: `addPlugin()` now takes `($item, $flexForm)`
+     * and always registers the plugin value as a first-class CType, so passing the
+     * old `$type`/`$extensionKey` arguments is both wrong and a signature error.
+     *
+     * The arguments are collected in an array and spread so the version-specific
+     * argument count is resolved at runtime (and not flagged by static analysis).
+     *
+     * FOR USE IN files in `Configuration/TCA/Overrides/*.php`.
+     *
+     * @param array{label: string, value: int|string|null, description?: string|string[]|null, icon?: string|null, group?: string|null}|SelectItem $item
+     */
+    public function addContentElementPlugin(array|SelectItem $item, string $extensionKey): void
+    {
+        $arguments = [$item];
+        if ((new Typo3Version())->getMajorVersion() < 14) {
+            $arguments[] = ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT;
+            $arguments[] = $extensionKey;
+        }
+        ExtensionManagementUtility::addPlugin(...$arguments);
     }
 
     /**
