@@ -46,7 +46,11 @@
         "typo3/cms": {
             "web-dir": ".Build/public",
             "app-dir": ".Build",
-            "extension-key": "academic_persons_sync"
+            "extension-key": "academic_persons_sync",
+            "version": "3.0.0-dev",
+            "Package": {
+                "providesPackages": {}
+            }
         },
         "branch-alias": {
             "dev-main": "3.0.x-dev"
