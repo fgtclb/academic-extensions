@@ -5,6 +5,8 @@ includes:
   - ../../../.Build/vendor/phpstan/phpstan-phpunit/extension.neon
 
 parameters:
+  bootstrapFiles:
+    - phpstan-constants.php
   # Use local .cache dir instead of /tmp
   tmpDir: ../../../.Build/.cache/phpstan
 
@@ -15,4 +17,5 @@ parameters:
 
   excludePaths:
     - ../../../packages/fgtclb/*/ext_emconf.php
+    - ../../../packages/fgtclb/*/EXT_CONSTANTS.php
     - ../../../packages/fgtclb/*/Migrations/*
