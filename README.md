@@ -46,18 +46,18 @@ addressed manualy in case not automatic upgrade path is available. See the
 
 | Extension               | v11 | v12     | v13     | v14 |
 |-------------------------|-----|---------|---------|-----|
-| academic_base           | -   | <2>     | <2> (3) | (3) |
-| academic_bite_jobs      | <1> | <1> <2> | <2> (3) | (3) |
-| academic_contacts4pages | <1> | <1> <2> | <2> (3) | (3) |
-| academic_study_plan     | -   | <2>     | <2> (3) | (3) |
-| academic_jobs           | <1> | <1> <2> | <2> (3) | (3) |
-| academic_partners       | <1> | <1> <2> | <2> (3) | (3) |
-| academic_persons        | <1> | <1> <2> | <2> (3) | (3) |
-| academic_persons_edit   | <1> | <1> <2> | <2> (3) | (3) |
-| academic_persons_sync   | <1> | <1> <2> | <2> (3) | (3) |
-| academic_programs       | <1> | <1> <2> | <2> (3) | (3) |
-| academic_projects       | <1> | <1> <2> | <2> (3) | (3) |
-| category_types          | <1> | <1> <2> | <2> (3) | (3) |
+| academic_base           | -   | <2>     | <2> <3> | <3> |
+| academic_bite_jobs      | <1> | <1> <2> | <2> <3> | <3> |
+| academic_contacts4pages | <1> | <1> <2> | <2> <3> | <3> |
+| academic_study_plan     | -   | <2>     | <2> <3> | <3> |
+| academic_jobs           | <1> | <1> <2> | <2> <3> | <3> |
+| academic_partners       | <1> | <1> <2> | <2> <3> | <3> |
+| academic_persons        | <1> | <1> <2> | <2> <3> | <3> |
+| academic_persons_edit   | <1> | <1> <2> | <2> <3> | <3> |
+| academic_persons_sync   | <1> | <1> <2> | <2> <3> | <3> |
+| academic_programs       | <1> | <1> <2> | <2> <3> | <3> |
+| academic_projects       | <1> | <1> <2> | <2> <3> | <3> |
+| category_types          | <1> | <1> <2> | <2> <3> | <3> |
 
 Legend:
 
@@ -68,14 +68,13 @@ Legend:
   (X)   Planned for the upcoming X.y.z line, not yet available/tested
 ```
 
-**Roadmap: the planned `3.x` line**
+**The `3.x` line (in development)**
 
-The `(3)` marker documents the upcoming major `3.x` line, which will target
-TYPO3 **v13 + v14** (see the branch support matrix above). It is a roadmap
-signal only: `3.x` is not released yet and the extensions are not tested against
-TYPO3 v14, so every `(3)` cell means *planned, not yet available or verified*.
-As v14 support is actually implemented and tested, the state of the affected
-cells will be promoted from `(3)` to `{3}` and finally to `<3>` per extension.
+The `<3>` marker documents the upcoming major `3.x` line, which targets TYPO3
+**v13 + v14** (see the branch support matrix above). Both core versions are
+implemented and verified for every extension above by the `TYPO3 v13` and
+`TYPO3 v14` CI workflows. The `3.x` line itself is still in development
+(`3.0.0-dev`) and not released yet.
 
 ## List of TYPO3 extension and the split repositories (READ ONLY)
 
