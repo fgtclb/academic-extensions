@@ -2,7 +2,9 @@
 
 use FGTCLB\AcademicBase\TcaManipulator;
 use FGTCLB\AcademicProjects\Enumeration\PageTypes;
+use TYPO3\CMS\Core\DataHandling\PageDoktypeRegistry;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -49,6 +51,21 @@ if (!defined('TYPO3')) {
             ],
         ]
     );
+
+    // TYPO3 v14+ resolves the tables allowed on a page type from this TCA option
+    // (superseding the PageDoktypeRegistry below).
+    $GLOBALS['TCA']['pages']['types'][PageTypes::TYPE_ACEDEMIC_PROJECT]['allowedRecordTypes'] = ['*'];
+
+    // TYPO3 v13 has no "allowedRecordTypes" TCA option yet and still resolves the
+    // allowed tables through the PageDoktypeRegistry. Registering it in
+    // ext_tables.php was deprecated in TYPO3 v14.3, hence the version-guarded call.
+    // @todo Remove once TYPO3 v13 support is dropped; keep only "allowedRecordTypes".
+    if ((new Typo3Version())->getMajorVersion() < 14) {
+        GeneralUtility::makeInstance(PageDoktypeRegistry::class)->add(
+            PageTypes::TYPE_ACEDEMIC_PROJECT,
+            ['allowedTables' => '*']
+        );
+    }
 
     $columns = [
         'tx_academicprojects_project_title' => [
