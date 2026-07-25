@@ -1,16 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Property\\\\PropertyMappingConfigurationInterface\\:\\:setTypeConverter\\(\\)\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
-
-		-
-			message: "#^Parameter \\#1 \\$propertyPath of method TYPO3\\\\CMS\\\\Extbase\\\\Property\\\\PropertyMappingConfiguration\\:\\:forProperty\\(\\) expects non\\-empty\\-string, string given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicBase\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php
@@ -219,31 +209,6 @@ parameters:
 			message: "#^Static property FGTCLB\\\\AcademicStudyPlan\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions is never read, only written\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-study-plan/Tests/Functional/ExtensionLoadedTest.php
-
-		-
-			message: "#^Cannot access offset 'l10n_parent' on array\\|false\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php
-
-		-
-			message: "#^Method FGTCLB\\\\CategoryTypes\\\\Domain\\\\Repository\\\\CategoryRepository\\:\\:getCategoryArray\\(\\) should return array\\<string, mixed\\> but returns array\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php
-
-		-
-			message: "#^Cannot call method getVariableProvider\\(\\) on TYPO3Fluid\\\\Fluid\\\\Core\\\\Rendering\\\\RenderingContextInterface\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/typo3-category-types/Classes/ViewHelpers/Be/CategoryViewHelper.php
-
-		-
-			message: "#^Cannot call method getVariableProvider\\(\\) on TYPO3Fluid\\\\Fluid\\\\Core\\\\Rendering\\\\RenderingContextInterface\\|null\\.$#"
-			count: 2
-			path: ../../../packages/fgtclb/typo3-category-types/Classes/ViewHelpers/Form/AbstractSelectViewHelper.php
-
-		-
-			message: "#^Cannot call method getViewHelperVariableContainer\\(\\) on TYPO3Fluid\\\\Fluid\\\\Core\\\\Rendering\\\\RenderingContextInterface\\|null\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/typo3-category-types/Classes/ViewHelpers/Form/AbstractSelectViewHelper.php
 
 		-
 			message: "#^Property FGTCLB\\\\CategoryTypes\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"

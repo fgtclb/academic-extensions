@@ -47,6 +47,10 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
 
     public function updateNecessary(): bool
     {
+        // This wizard renames a CType (not a list_type sub-type), so it matches
+        // on CType exactly like executeUpdate(). The previous `list_type` query
+        // never matched and additionally broke on TYPO3 v14, which removed that
+        // column. See https://docs.typo3.org/permalink/changelog:important-105538-1730752784
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
         $queryBuilder->getRestrictions()->removeAll();
         return (bool)$queryBuilder
@@ -54,7 +58,7 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
             ->from('tt_content')
             ->where(
                 $queryBuilder->expr()->in(
-                    'list_type',
+                    'CType',
                     $queryBuilder->quoteArrayBasedValueListToStringList(array_keys(self::MIGRATE_CONTENT_TYPES_LIST))
                 ),
             )
