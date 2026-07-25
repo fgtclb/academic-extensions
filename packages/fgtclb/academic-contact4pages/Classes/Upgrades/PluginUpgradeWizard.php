@@ -47,6 +47,9 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
 
     public function updateNecessary(): bool
     {
+        // This wizard renames a CType (not a list_type sub-type), so it must
+        // detect records by CType exactly like executeUpdate() migrates them.
+        // The previous `list_type` query never matched, so the wizard never ran.
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
         $queryBuilder->getRestrictions()->removeAll();
         return (bool)$queryBuilder
@@ -54,7 +57,7 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
             ->from('tt_content')
             ->where(
                 $queryBuilder->expr()->in(
-                    'list_type',
+                    'CType',
                     $queryBuilder->quoteArrayBasedValueListToStringList(array_keys(self::MIGRATE_CONTENT_TYPES_LIST))
                 ),
             )
