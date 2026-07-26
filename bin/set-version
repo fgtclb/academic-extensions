@@ -16,7 +16,7 @@
 # Usage:
 #   bin/set-version <version> <type> [options]
 #
-#   <version>   MAJOR.MINOR.PATCH, e.g. 2.4.0
+#   <version>   MAJOR.MINOR.PATCH, e.g. 2.2.2
 #   <type>      release | post-release | dev
 #                 release      : tag/release version  (X.Y.Z, deps X.Y.Z@dev)
 #                 post-release : next dev version      (X.Y.W-dev, deps ~X.Y.W@dev,
@@ -101,7 +101,7 @@ done
 # Validate version + type
 # ---------------------------------------------------------------------------
 if ! [[ "${PASSED_VERSION}" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-    die "Invalid version '${PASSED_VERSION}': expected MAJOR.MINOR.PATCH (e.g. 2.4.0)"
+    die "Invalid version '${PASSED_VERSION}': expected MAJOR.MINOR.PATCH (e.g. 2.2.2)"
 fi
 MAJOR="${BASH_REMATCH[1]}"
 MINOR="${BASH_REMATCH[2]}"
@@ -282,6 +282,17 @@ apply_branch_alias() {
         "extra.branch-alias.dev-${SOURCE_BRANCH}" "${BRANCH_ALIAS}"
 }
 
+# Helper: set extra.typo3/cms.version for a split extension composer.json. TYPO3
+# v14 reads the extension version from composer.json (ext_emconf.php is
+# deprecated), so it must track the path-repository version. Only applied when
+# the key already exists (composer config preserves the file formatting).
+apply_extension_composer_version() {
+    local dir="$1"
+    "${JQ}" -e '.extra."typo3/cms".version' "${dir}/composer.json" >/dev/null 2>&1 || return 0
+    step "${dir}" "config extra.typo3/cms.version = ${MAP_VERSION}"
+    run "${COMPOSER}" config -d "${dir}" "extra.typo3/cms.version" "${MAP_VERSION}"
+}
+
 # Helper: rewrite a jq version map in place (temp file + mv; never self-redirect).
 apply_version_map() {
     local file="$1" map="$2"   # map: packages | packages-dev
@@ -327,6 +338,7 @@ run "${SED}" -i \
 info "Split extensions"
 for dir in "${SPLIT_DIRS[@]}"; do
     apply_academic_composer_deps "${dir}" "${ACADEMIC_CONSTRAINT}"
+    apply_extension_composer_version "${dir}"
     [ "${SET_BRANCH_ALIAS}" -eq 1 ] && apply_branch_alias "${dir}"
     # docs-presence decides the --no-docs flag; all current splits ship docs.
     if [ -d "${dir}/Documentation" ]; then

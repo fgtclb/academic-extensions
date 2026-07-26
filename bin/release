@@ -4,7 +4,7 @@
 # release — orchestrate the two-phase GitHub release of the academic-extensions
 # mono repository.
 #
-# Given a single release version (e.g. 2.4.0) this drives the full workflow:
+# Given a single release version (e.g. 2.2.2) this drives the full workflow:
 #
 #   PHASE 1 (release)
 #     - branch release-X.Y.Z off the source branch
@@ -31,7 +31,7 @@
 # Usage:
 #   bin/release <release-version> [options]
 #
-#   <release-version>        MAJOR.MINOR.PATCH, e.g. 2.4.0
+#   <release-version>        MAJOR.MINOR.PATCH, e.g. 2.2.2
 #
 # Options:
 #   --source-branch=<name>   base/source branch (default: 2.2)
@@ -134,7 +134,7 @@ fi
 # Validate version and derive the next dev (post-release) version (patch + 1).
 # ---------------------------------------------------------------------------
 if ! [[ "${PASSED_VERSION}" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-    die "Invalid version '${PASSED_VERSION}': expected MAJOR.MINOR.PATCH (e.g. 2.4.0)"
+    die "Invalid version '${PASSED_VERSION}': expected MAJOR.MINOR.PATCH (e.g. 2.2.2)"
 fi
 MAJOR="${BASH_REMATCH[1]}"
 MINOR="${BASH_REMATCH[2]}"
