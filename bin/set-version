@@ -16,7 +16,7 @@
 # Usage:
 #   bin/set-version <version> <type> [options]
 #
-#   <version>   MAJOR.MINOR.PATCH, e.g. 2.4.0
+#   <version>   MAJOR.MINOR.PATCH, e.g. 3.0.0
 #   <type>      release | post-release | dev
 #                 release      : tag/release version  (X.Y.Z, deps X.Y.Z@dev)
 #                 post-release : next dev version      (X.Y.W-dev, deps ~X.Y.W@dev,
@@ -101,7 +101,7 @@ done
 # Validate version + type
 # ---------------------------------------------------------------------------
 if ! [[ "${PASSED_VERSION}" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-    die "Invalid version '${PASSED_VERSION}': expected MAJOR.MINOR.PATCH (e.g. 2.4.0)"
+    die "Invalid version '${PASSED_VERSION}': expected MAJOR.MINOR.PATCH (e.g. 3.0.0)"
 fi
 MAJOR="${BASH_REMATCH[1]}"
 MINOR="${BASH_REMATCH[2]}"
