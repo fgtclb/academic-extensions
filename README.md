@@ -92,3 +92,118 @@ implemented and verified for every extension above by the `TYPO3 v13` and
 | fgtclb/academic-programs       | academic_programs       | [packages/fgtclb/academic-programs](packages/fgtclb/academic-programs/README.md)           | [fgtclb/academic-programs](https://github.com/fgtclb/academic-programs)              |
 | fgtclb/academic-projects       | academic_projects       | [packages/fgtclb/academic-projects](packages/fgtclb/academic-projects/README.md)           | [fgtclb/academic-projects](https://github.com/fgtclb/academic-projects)              |
 | fgtclb/category-types          | category_types          | [packages/fgtclb/typo3-category-types](packages/fgtclb/typo3-category-types/README.md)     | [fgtclb/fgtclb/typo3-category-types](https://github.com/fgtclb/typo3-category-types) |
+
+## Releasing (maintainers)
+
+A release is always cut from the branch owning that version line (see the
+[branch support matrix](#repository-version-support)) using the two scripts in
+`bin/`. All extensions of the mono repository are released together, sharing one
+version number.
+
+| Branch | Release line | Example version | Release tooling                             |
+|--------|--------------|-----------------|---------------------------------------------|
+| main   | `3.x`        | `3.0.0`         | `bin/release`, `bin/set-version`            |
+| 2      | `2.x`        | `2.4.0`         | `bin/release`, `bin/set-version`            |
+| 2.2    | `2.2.x`      | `2.2.2`         | `bin/release`, `bin/set-version`            |
+| 1      | `1.x`        | -               | none — that branch has no `bin/` scripts    |
+
+Both scripts are kept as the *same* implementation on every branch. Only two
+things legitimately differ per branch: the `--source-branch` default (which
+equals the branch itself) and the version examples in the help output (which
+must lie inside that branch's version range).
+
+### Required tooling
+
+`bin/set-version` resolves `composer`, `php`, `tailor`, `pkw`, `jq` and `sed`
+from `PATH`; `bin/release` additionally needs `git` and an authenticated `gh`.
+Both abort with an explicit error if a tool is missing, before changing
+anything.
+
+### `bin/set-version` — apply a version across the mono repository
+
+```shell
+bin/set-version <version> <type> [--source-branch=<name>] [--dry-run]
+```
+
+`<type>` selects how the version is written:
+
+| Type           | Result                                                                   |
+|----------------|--------------------------------------------------------------------------|
+| `release`      | tag/release version — `X.Y.Z`, academic deps `X.Y.Z@dev`                  |
+| `post-release` | next dev version — `X.Y.W-dev`, deps `~X.Y.W@dev`, branch-alias `X.Y.x-dev`; the version passed is *already* the next one, no `+1` happens here |
+| `dev`          | force a plain dev version everywhere (`X.Y.Z-dev`); thin variant of `post-release`, used for branching and forced minor/major bumps |
+
+It rewrites, in one pass:
+
+1. `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION`
+2. split extensions → academic composer deps, `extra.typo3/cms.version`,
+   branch-alias, `tailor set-version`, `VERSION` file
+3. functional-test fixture extensions → composer deps only
+4. `ext_emconf.php` → `version` plus `depends`/`suggests` constraints
+5. `packages-dev/monorepo-shared` → academic deps + packages version map
+6. `ddev-instances/*` → both version maps + `academics-monorepo-shared` require
+7. root `composer.json` → both version maps, `monorepo-shared` require, alias
+
+The script only edits working-tree files — it performs no git and no network
+operations. `--dry-run` prints every single change without touching a file and
+is the safe way to rehearse a bump.
+
+### `bin/release` — orchestrate the full release
+
+```shell
+bin/release <release-version> [--source-branch=<name>] [--dry-run|--execute]
+```
+
+It runs two phases, delegating all version rewriting to `bin/set-version`:
+
+* **Phase 1 (release)** — branch `release-X.Y.Z`, `set-version X.Y.Z release`,
+  commit `[RELEASE] X.Y.Z`, push, open a PR, wait for the checks, admin
+  rebase-merge, then tag `X.Y.Z` on the refreshed source branch and push the tag.
+* **Phase 2 (post-release)** — branch `set-version-X.Y.W` (`W = Z+1`),
+  `set-version X.Y.W post-release`, commit `[TASK] Set version X.Y.W`, push,
+  PR, checks, admin rebase-merge.
+
+Two independent safety gates control how far a run goes:
+
+| Invocation  | Local steps | Remote/irreversible steps (push, PR, merge, tag) |
+|-------------|-------------|--------------------------------------------------|
+| *(bare)*    | executed    | **only printed** — a bare run can never mutate the remote or create a tag |
+| `--dry-run` | printed     | printed                                          |
+| `--execute` | executed    | executed                                         |
+
+`--dry-run` and `--execute` are mutually exclusive. Pre-flight checks refuse to
+run outside a git work tree or when the target tag already exists; a dirty
+working tree is fatal for `--execute` and only a warning otherwise, so the flow
+stays rehearsable.
+
+### What the pushed tag triggers
+
+Pushing the tag starts the `publish` workflow
+([`.github/workflows/publish.yml`](.github/workflows/publish.yml)), which:
+
+1. verifies the tag matches `MAJOR.MINOR.PATCH`,
+2. builds one TER upload artifact per extension via
+   `tailor create-artefact` — **this step fails when the tag does not match an
+   extension's `ext_emconf.php` version**, which is exactly what
+   `bin/set-version` keeps in sync, and
+3. creates the GitHub release `[RELEASE] <version>` with generated release notes
+   and attaches the artifacts plus `LICENSE`.
+
+The mono repository itself is **not** published to the TER — it is a composer
+`project`, not an extension. TER publishing happens per extension, one step
+later in the chain:
+
+1. the tag is pushed here and the workflow above creates the GitHub release,
+2. the (external) splitter mirrors the tagged state into the read-only split
+   repositories listed above,
+3. each split repository carries its **own** `publish` workflow, which reacts to
+   the tag arriving there and runs `tailor ter:publish` for that single
+   extension.
+
+That per-extension workflow is maintained in this repository as
+`packages/fgtclb/<package>/.github/workflows/publish.yml` (all 12 packages ship
+one) and is split out together with the package — so TER publishing is changed
+here, never in a split repository.
+
+Note that the documentation-rendering step of the root workflow is currently
+commented out.
