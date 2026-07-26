@@ -80,11 +80,23 @@ Test discovery: phpunit globs `packages/*/*/Tests/Unit/` and
 
 ## CI (`.github/workflows/`)
 
-`core-12.yml` / `core-13.yml` run the same `runTests.sh` suites (CGL `-n`,
-phpstan, lintPhp, unit, functional) across the PHP matrix. `core-11.yml` is
-disabled. `publish.yml` triggers on a version tag matching `X.Y.Z`: it builds a
-TER artifact per extension with `typo3/tailor` and publishes. **The tag version
-must match each extension's `ext_emconf.php` version or publish fails.**
+`core-13.yml` / `core-14.yml` run the same `runTests.sh` suites (CGL `-n`,
+phpstan, lintPhp, unit, functional) across the PHP matrix on every pull request.
+`core-11.yml` and `core-12.yml` are disabled (`workflow_dispatch` only) and kept
+solely for their status badges — do not delete them.
+
+`publish.yml` triggers on a version tag matching `X.Y.Z`: it builds a TER
+artifact per extension with `typo3/tailor` and creates the GitHub release. It
+does **not** publish to the TER — the mono repository is a composer `project`,
+not an extension. **The tag version must match each extension's
+`ext_emconf.php` version or the artifact step fails.**
+
+TER publishing happens one step later, per extension: the external splitter
+mirrors the tagged state into the read-only split repositories, where each
+package's own `publish` workflow runs `tailor ter:publish`. That workflow is
+maintained here as `packages/fgtclb/<package>/.github/workflows/publish.yml` and
+is split out with the package, so it is changed in this repository, never
+downstream. See the "Releasing (maintainers)" section of `README.md`.
 
 ## Quality gates
 
