@@ -199,7 +199,10 @@ final class FileUploadConverter extends AbstractTypeConverter
     {
         $languageService = $this->getLanguageService();
         $maxFileSizeInBytes = GeneralUtility::getBytesFromSizeMeasurement($maxFileSize);
-        $allowedMimeTypesArray = GeneralUtility::trimExplode(',', $allowedMimeTypes);
+        // Empty values must be dropped: `trimExplode(',', '')` returns `['']`, which would
+        // never match a real mime type and thus reject every upload. An empty allow-list
+        // means "no mime type restriction", matching the unrestricted file size default.
+        $allowedMimeTypesArray = GeneralUtility::trimExplode(',', $allowedMimeTypes, true);
 
         if ($uploadedFileInformation['size'] > $maxFileSizeInBytes) {
             throw new TypeConverterException(
@@ -210,7 +213,7 @@ final class FileUploadConverter extends AbstractTypeConverter
             );
         }
 
-        if (!in_array($uploadedFileInformation['type'], $allowedMimeTypesArray, true)) {
+        if ($allowedMimeTypesArray !== [] && !in_array($uploadedFileInformation['type'], $allowedMimeTypesArray, true)) {
             throw new TypeConverterException(
                 sprintf(
                     $languageService->sL(
