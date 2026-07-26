@@ -329,18 +329,14 @@ Examples:
     # Run all core units tests and enable xdebug (have a PhpStorm listening on port 9003!)
     ./Build/Scripts/runTests.sh -x
 
-    # Run unit tests in phpunit verbose mode with xdebug on PHP 8.3 and filter for test canRetrieveValueWithGP
-    ./Build/Scripts/runTests.sh -x -p 8.3 -e "-v --filter canRetrieveValueWithGP"
-
-    # Run functional tests in phpunit with a filtered test method name in a specified file
-    # example will currently execute two tests, both of which start with the search term
-    ./Build/Scripts/runTests.sh -s functional -e "--filter deleteContent" typo3/sysext/core/Tests/Functional/DataHandling/Regular/Modify/ActionTest.php
+    # Run the unit tests of a single test file with xdebug on PHP 8.3
+    ./Build/Scripts/runTests.sh -x -p 8.3 -s unit packages/fgtclb/academic-persons/Tests/Unit/Domain/Model/ProfileInformationTest.php
 
     # Run functional tests on postgres with xdebug, php 8.3 and execute a restricted set of tests
-    ./Build/Scripts/runTests.sh -x -p 8.3 -s functional -d postgres typo3/sysext/core/Tests/Functional/Authentication
+    ./Build/Scripts/runTests.sh -x -p 8.3 -s functional -d postgres packages/fgtclb/academic-persons/Tests/Functional/Domain
 
-    # Run functional tests on postgres 11
-    ./Build/Scripts/runTests.sh -s functional -d postgres -k 11
+    # Run functional tests on postgres 16
+    ./Build/Scripts/runTests.sh -s functional -d postgres -i 16
 EOF
 }
 

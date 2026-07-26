@@ -22,7 +22,7 @@ together.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits (`ExtensionsLoadedTestsTrait`, `TcaHelperMethodsTrait`, `ExtensionCoreVersionCompatTestsTrait`).
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
-- `ddev-instances/core-12`, `ddev-instances/core-13` — DDEV setups per core version.
+- `ddev-instances/core-13`, `ddev-instances/core-14` — DDEV setups per core version.
 
 The extension directory name does not always equal the extension key: e.g.
 `packages/fgtclb/academic-contact4pages/` ships extension key
@@ -51,13 +51,19 @@ All checks run through the containerized harness (docker or podman, auto-selecte
 override with `-b docker|podman`). It mirrors the TYPO3 Core `runTests.sh`. Key flags:
 
 - `-s <suite>` — suite to run.
-- `-t <13|14>` — TYPO3 core version (default 13). Drives `composerUpdate`/install and which `Build/phpstan/Core12|Core13` config is used.
+- `-t <13|14>` — TYPO3 core version (default 13). Drives `composerUpdate`/install and which `Build/phpstan/Core13|Core14` config is used.
 - `-p <8.2|8.3|8.4|8.5>` — PHP version (default 8.2).
 - `-d <sqlite|mariadb|mysql|postgres>` — DBMS for functional tests (default sqlite).
+- `-i <version>` — DBMS version, when the default of the selected `-d` does not fit.
+- `-a <driver>` — database driver, e.g. `pdo_mysql` or `mysqli` (default: driver of `-d`).
 - `-n` — dry-run for `cgl` (report only, don't modify).
 - `-x` / `-y <port>` — enable xdebug to a host IDE (default port 9003).
-- `-e "<args>"` — pass extra args through to phpunit (e.g. `--filter`).
+- `-o <seed>` — random order seed for `unitRandom`.
+- `-u` — update the `typo3/core-testing-*` container images.
 - Trailing `[file]` — restrict phpunit to a path.
+
+There is **no option to pass extra arguments through to phpunit** — no `-e`, and
+no `--` passthrough. Restrict a run with the trailing path only.
 
 Typical workflow — **always prepare deps first** for the target core version:
 
@@ -73,12 +79,17 @@ Build/Scripts/runTests.sh -t 13 -p 8.3 -s unit       # unit tests
 Build/Scripts/runTests.sh -t 13 -p 8.3 -s functional # functional tests (sqlite)
 ```
 
-Run a single test / filter:
+Restrict a run to a directory or a single test file:
 
 ```bash
-Build/Scripts/runTests.sh -t 13 -s unit -e "--filter someTestMethod"
 Build/Scripts/runTests.sh -t 13 -s functional packages/fgtclb/academic-persons/Tests/Functional/Domain
+Build/Scripts/runTests.sh -t 13 -s unit packages/fgtclb/academic-persons/Tests/Unit/Domain/Model/ProfileInformationTest.php
 ```
+
+`-t` selects configuration only, it does **not** reinstall dependencies. After a
+`composerUpdate` for one core version, a run for the other one silently uses the
+wrong vendor tree and fails in confusing ways — always `composerUpdate` for the
+version you are about to test.
 
 Other suites: `composer` (dispatch arbitrary composer command), `composerUpdate`,
 `unitRandom`, `phpstanGenerateBaseline`, `checkRstRenderingAll`,
