@@ -14,11 +14,3 @@ services:
     class: Symfony\Component\Serializer\SerializerInterface
     factory: '@FGTCLB\AcademicBase\Factory\SerializerFactory'
 
-  # @internal not part of public API
-  FGTCLB\AcademicBase\Extbase\Property\TypeConverter\FileUploadConverter:
-    tags:
-      - name: extbase.type_converter
-        priority: 10
-        target: TYPO3\CMS\Extbase\Domain\Model\FileReference
-        sources: array
-

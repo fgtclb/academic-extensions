@@ -1,16 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to an undefined method TYPO3\\\\CMS\\\\Extbase\\\\Property\\\\PropertyMappingConfigurationInterface\\:\\:setTypeConverter\\(\\)\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
-
-		-
-			message: "#^Parameter \\#1 \\$propertyPath of method TYPO3\\\\CMS\\\\Extbase\\\\Property\\\\PropertyMappingConfiguration\\:\\:forProperty\\(\\) expects non\\-empty\\-string, string given\\.$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicBase\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php
