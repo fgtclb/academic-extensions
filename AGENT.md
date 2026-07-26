@@ -32,8 +32,18 @@ The extension directory name does not always equal the extension key: e.g.
 ## Version support
 
 - Branch `main` = version `3.0.0-dev`, supporting **TYPO3 v13 + v14**, PHP 8.2–8.5.
-- Branch `2` = `^2` (`2.4.x-dev), v12+v13. Branch `1` = `^1`, v11+v12 (legacy).
+- Branch `2` = `^2` (`2.4.x-dev`), v12+v13. Branch `1` = `^1`, v11+v12 (legacy).
 - The per-extension support/test status matrix is in `README.md` — consult it before assuming an extension works on a given core/PHP combination; many `2.x` combinations are explicitly "not tested yet".
+
+### Backport targets
+
+**The only maintained backport targets are `main` and `2`.**
+
+**Branch `2.2` is no longer maintained.** Never backport to it, and do not
+propose it as a target — not even when it demonstrably carries the same defect —
+unless it is explicitly requested for that specific change. Branch `1` is legacy
+and is treated the same way. Stating factually which branches contain a defect is
+fine; proposing work on `2.2` is not.
 
 ## Build / test / lint — `Build/Scripts/runTests.sh`
 
