@@ -40,8 +40,10 @@ defined('TYPO3') or die;
     );
 
     // Link the FlexForm configuration to the pi_flexform field
-    $GLOBALS['TCA']['tt_content']['types']['academicprojects_projectlist']['columnsOverrides']['pi_flexform']['config']['ds']
-        = 'FILE:EXT:academic_projects/Configuration/FlexForms/ProjectSettings.xml';
+    (new TcaManipulator())->addContentElementPluginFlexForm(
+        'academicprojects_projectlist',
+        'FILE:EXT:academic_projects/Configuration/FlexForms/ProjectSettings.xml',
+    );
 
     // ------------------------------------------------------------------------
     // Add the academicprojects_projectlistsingle plugin
@@ -71,8 +73,10 @@ defined('TYPO3') or die;
 
     // Link the FlexForm configuration to the pi_flexform field
     // @todo Add FlexForm options to select a list of projects
-    $GLOBALS['TCA']['tt_content']['types']['academicprojects_projectlistsingle']['columnsOverrides']['pi_flexform']['config']['ds']
-        = 'FILE:EXT:academic_projects/Configuration/FlexForms/ProjectSettings.xml';
+    (new TcaManipulator())->addContentElementPluginFlexForm(
+        'academicprojects_projectlistsingle',
+        'FILE:EXT:academic_projects/Configuration/FlexForms/ProjectSettings.xml',
+    );
 
     ExtensionManagementUtility::addToAllTCAtypes(
         'tt_content',

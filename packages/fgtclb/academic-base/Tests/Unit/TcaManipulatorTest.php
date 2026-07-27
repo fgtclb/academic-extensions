@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicBase\Tests\Unit;
 
 use FGTCLB\AcademicBase\TcaManipulator;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
@@ -555,5 +556,43 @@ final class TcaManipulatorTest extends UnitTestCase
         array $expected,
     ): void {
         $this->assertSame($expected, (new TcaManipulator())->addToPageTypesGeneralTab($tca, $definitionToAdd, $types, $excludeTypes));
+    }
+
+    /**
+     * TYPO3 v13 resolves `ds` through `ds_pointerField` and requires an array;
+     * a string makes the content element unopenable in the backend.
+     */
+    #[Group('not-core-14')]
+    #[Test]
+    public function pluginFlexFormIsAssignedAsArrayOnCoreV13(): void
+    {
+        unset($GLOBALS['TCA']['tt_content']);
+        (new TcaManipulator())->addContentElementPluginFlexForm(
+            'academicexample_list',
+            'FILE:EXT:academic_example/Configuration/FlexForms/List.xml',
+        );
+        $this->assertSame(
+            ['default' => 'FILE:EXT:academic_example/Configuration/FlexForms/List.xml'],
+            $GLOBALS['TCA']['tt_content']['types']['academicexample_list']['columnsOverrides']['pi_flexform']['config']['ds'],
+        );
+    }
+
+    /**
+     * TYPO3 v14 resolves the data structure through the record type of the TCA
+     * schema and requires the string; an array leaves the FlexForm tab empty.
+     */
+    #[Group('not-core-13')]
+    #[Test]
+    public function pluginFlexFormIsAssignedAsStringOnCoreV14(): void
+    {
+        unset($GLOBALS['TCA']['tt_content']);
+        (new TcaManipulator())->addContentElementPluginFlexForm(
+            'academicexample_list',
+            'FILE:EXT:academic_example/Configuration/FlexForms/List.xml',
+        );
+        $this->assertSame(
+            'FILE:EXT:academic_example/Configuration/FlexForms/List.xml',
+            $GLOBALS['TCA']['tt_content']['types']['academicexample_list']['columnsOverrides']['pi_flexform']['config']['ds'],
+        );
     }
 }
