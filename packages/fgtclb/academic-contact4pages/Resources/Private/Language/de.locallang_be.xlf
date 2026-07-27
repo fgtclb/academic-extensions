@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file
-		source-language="en"
-		target-language="de"
-		datatype="plaintext"
-		original="EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf"
-		date="2022-08-26T11:27:17Z"
-		product-name="academic_contacts4pages"
-	>
-		<header/>
-		<body>
-			<trans-unit id="plugin.contacts_list.title">
-				<source>Contacts for this Page</source>
-				<target>Kontakte für diese Seite</target>
-			</trans-unit>
-			<trans-unit id="plugin.contacts_list.description">
-				<source>List the contacts assigned to this page</source>
-				<target>Liste der Kontakte, die dieser Seite zugeordnet sind</target>
-			</trans-unit>
-			<trans-unit id="element.tab.configuration">
-				<source>Configuration</source>
-				<target>Konfiguration</target>
-			</trans-unit>
-			<trans-unit id="flexform.showHiddenRecords.label">
-				<source>Show hidden records</source>
-				<target>Versteckte Datensätze anzeigen</target>
-			</trans-unit>
-			<trans-unit id="flexform.showHiddenRecords.description">
-				<source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
-				<target>Wenn aktiviert, werden versteckte (deaktivierte) Datensätze unabhängig von den Backend-Vorschaueinstellungen im Frontend ausgegeben.</target>
-			</trans-unit>
-		</body>
-	</file>
+  <file
+    source-language="en"
+    target-language="de"
+    datatype="plaintext"
+    original="EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf"
+    date="2022-08-26T11:27:17Z"
+    product-name="academic_contacts4pages"
+  >
+    <header/>
+    <body>
+      <trans-unit id="plugin.contacts_list.title">
+        <source>Contacts for this Page</source>
+        <target>Kontakte für diese Seite</target>
+      </trans-unit>
+      <trans-unit id="plugin.contacts_list.description">
+        <source>List the contacts assigned to this page</source>
+        <target>Liste der Kontakte, die dieser Seite zugeordnet sind</target>
+      </trans-unit>
+      <trans-unit id="element.tab.configuration">
+        <source>Configuration</source>
+        <target>Konfiguration</target>
+      </trans-unit>
+      <trans-unit id="flexform.showHiddenRecords.label">
+        <source>Show hidden records</source>
+        <target>Versteckte Datensätze anzeigen</target>
+      </trans-unit>
+      <trans-unit id="flexform.showHiddenRecords.description">
+        <source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
+        <target>Wenn aktiviert, werden versteckte (deaktivierte) Datensätze unabhängig von den Backend-Vorschaueinstellungen im Frontend ausgegeben.</target>
+      </trans-unit>
+    </body>
+  </file>
 </xliff>

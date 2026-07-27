@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-	<file
-		source-language="en"
-		datatype="plaintext"
-		original="EXT:academic_bite_jobs/Resources/Private/Language/locallang.xlf"
-		date="2023-09-15T08:53:00Z"
-		product-name="academic_bite_jobs"
-	>
-		<header/>
-		<body>
-			<trans-unit id="no-jobs">
-				<source>There are currently no job vacancies.</source>
-			</trans-unit>
-		</body>
-	</file>
+  <file
+    source-language="en"
+    datatype="plaintext"
+    original="EXT:academic_bite_jobs/Resources/Private/Language/locallang.xlf"
+    date="2023-09-15T08:53:00Z"
+    product-name="academic_bite_jobs"
+  >
+    <header/>
+    <body>
+      <trans-unit id="no-jobs">
+        <source>There are currently no job vacancies.</source>
+      </trans-unit>
+    </body>
+  </file>
 </xliff>
