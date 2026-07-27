@@ -454,6 +454,88 @@ final class TcaManipulatorTest extends UnitTestCase
                 ],
             ],
         ];
+
+        // The three data sets above use the TYPO3 v13 spelling of the core tab
+        // labels and place the extended tab last, where extracting it and
+        // appending it again cannot be told apart from doing nothing.
+        //
+        // The two below put a further tab *after* the extended tab, so the
+        // extraction is observable, and cover both spellings: TYPO3 v14 moved
+        // the core `showitem` definitions to short form label references
+        // (breaking #107789), and matching only the long form silently stopped
+        // detecting the tab there.
+
+        yield 'extended tab is moved to the end, TYPO3 v14 short form label' => [
+            'tca' => [
+                'pages' => [
+                    'types' => [
+                        1 => [
+                            'showitem' => '
+                                --div--;core.form.tabs:general,
+                                    --palette--;;standard,
+                                --div--;core.form.tabs:extended,
+                                    extendedFieldA,
+                                --div--;core.form.tabs:notes,
+                                    rowDescription,
+                            ',
+                        ],
+                    ],
+                ],
+            ],
+            'definitionToAdd' => '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.div.project, project_info, project_date,',
+            'types' => [],
+            'excludeTypes' => [],
+            'expected' => [
+                'pages' => [
+                    'types' => [
+                        1 => [
+                            'showitem' => '
+--div--;core.form.tabs:general,
+--palette--;;standard,
+--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.div.project, project_info, project_date,
+--div--;core.form.tabs:notes,rowDescription,
+--div--;core.form.tabs:extended,extendedFieldA,',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        yield 'extended tab is moved to the end, TYPO3 v13 long form label' => [
+            'tca' => [
+                'pages' => [
+                    'types' => [
+                        1 => [
+                            'showitem' => '
+                                --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:general,
+                                    --palette--;;standard,
+                                --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:extended,
+                                    extendedFieldA,
+                                --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:notes,
+                                    rowDescription,
+                            ',
+                        ],
+                    ],
+                ],
+            ],
+            'definitionToAdd' => '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.div.project, project_info, project_date,',
+            'types' => [],
+            'excludeTypes' => [],
+            'expected' => [
+                'pages' => [
+                    'types' => [
+                        1 => [
+                            'showitem' => '
+--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:general,
+--palette--;;standard,
+--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.div.project, project_info, project_date,
+--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:notes,rowDescription,
+--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:extended,extendedFieldA,',
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
