@@ -111,9 +111,18 @@ artifact as a single, updated-in-place pull-request comment. It is a **separate*
 workflow on the `workflow_run` event on purpose: a pull request from a fork gets
 a read-only token, so a comment step inside `ci.yml` would work for branches here
 and silently fail for external contributors. `pull_request_target` is
-deliberately not used. Consequence: changes to `pr-comment.yml` only take effect
-once they are on the target branch, never within the pull request that changes
-them.
+deliberately not used.
+
+Two consequences of `workflow_run`, both observed in practice:
+
+* It always runs the workflow file from the repository's **default branch**
+  (`main`), never from the pull request's base or head branch. **The copy on this
+  branch therefore never executes** — pull requests against `2` are commented on
+  by `main`'s `pr-comment.yml`. It is kept here only so the branches do not
+  diverge; edit it on `main`.
+* Changes to it take effect only once they are on the default branch, never
+  within the pull request that changes them. That is why PR #350 — the one that
+  introduced the file — got no comment, while #351 against this branch did.
 
 Composer downloads and the phpstan result cache live in `.cache/` at the
 repository root, **not** under `.Build/` — `composerUpdate` starts with
