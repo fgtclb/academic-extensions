@@ -19,8 +19,10 @@ defined('TYPO3') or die;
         'academic_bite_jobs'
     );
 
-    $GLOBALS['TCA']['tt_content']['types']['academicbitejobs_list']['columnsOverrides']['pi_flexform']['config']['ds']
-        = 'FILE:EXT:academic_bite_jobs/Configuration/FlexForms/AcademicBiteJobsList.xml';
+    (new TcaManipulator())->addContentElementPluginFlexForm(
+        'academicbitejobs_list',
+        'FILE:EXT:academic_bite_jobs/Configuration/FlexForms/AcademicBiteJobsList.xml',
+    );
 
     ExtensionManagementUtility::addToAllTCAtypes(
         'tt_content',

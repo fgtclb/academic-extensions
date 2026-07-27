@@ -142,6 +142,35 @@ final class TcaManipulator
     }
 
     /**
+     * Assign the FlexForm data structure of a plugin content element in a way
+     * that works on both TYPO3 v13 and v14.
+     *
+     * The two core versions want a different shape and neither tolerates the
+     * other, which makes this the one place a version switch is unavoidable:
+     *
+     * * TYPO3 v13 resolves `ds` through `ds_pointerField` and requires an array.
+     *   Given a string it throws, and the whole content element can no longer be
+     *   opened in the backend (`FlexFormTools`, code 1463826960).
+     * * TYPO3 v14 resolves the data structure through the record type of the TCA
+     *   schema and requires the string. Given an array it throws
+     *   `InvalidTcaException` (code 1751796940) — which `TcaFlexPrepare` catches,
+     *   so the backend silently renders an **empty** FlexForm tab instead of
+     *   failing visibly.
+     *
+     * FOR USE IN files in `Configuration/TCA/Overrides/*.php`.
+     *
+     * @param string $cType Content element type the data structure belongs to
+     * @param string $dataStructure Data structure reference, e.g. `FILE:EXT:my_ext/Configuration/FlexForms/List.xml`
+     */
+    public function addContentElementPluginFlexForm(string $cType, string $dataStructure): void
+    {
+        $GLOBALS['TCA']['tt_content']['types'][$cType]['columnsOverrides']['pi_flexform']['config']['ds']
+            = (new Typo3Version())->getMajorVersion() >= 14
+                ? $dataStructure
+                : ['default' => $dataStructure];
+    }
+
+    /**
      * Add `$definitionToAdd` as last item to the general tab for page types.
      *
      * FOR USE IN files in `Configuration/TCA/Overrides/*.php`.

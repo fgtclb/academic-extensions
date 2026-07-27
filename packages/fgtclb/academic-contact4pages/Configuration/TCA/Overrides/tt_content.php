@@ -34,6 +34,8 @@ if (!defined('TYPO3')) {
     );
 
     // Link the FlexForm configuration to the pi_flexform field
-    $GLOBALS['TCA']['tt_content']['types']['academiccontacts4pages_list']['columnsOverrides']['pi_flexform']['config']['ds']
-        = 'FILE:EXT:academic_contacts4pages/Configuration/FlexForms/ContactsList.xml';
+    (new TcaManipulator())->addContentElementPluginFlexForm(
+        'academiccontacts4pages_list',
+        'FILE:EXT:academic_contacts4pages/Configuration/FlexForms/ContactsList.xml',
+    );
 })();
