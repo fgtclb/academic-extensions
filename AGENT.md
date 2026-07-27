@@ -101,10 +101,48 @@ Test discovery: phpunit globs `packages/*/*/Tests/Unit/` and
 
 ## CI (`.github/workflows/`)
 
-`core-13.yml` / `core-14.yml` run the same `runTests.sh` suites (CGL `-n`,
-phpstan, lintPhp, unit, functional) across the PHP matrix on every pull request.
-`core-11.yml` and `core-12.yml` are disabled (`workflow_dispatch` only) and kept
-solely for their status badges — do not delete them.
+`ci.yml` is the single pull-request workflow. The TYPO3 core version is a matrix
+dimension, not a separate file, which is what makes the staging below possible —
+job dependencies cannot cross workflows:
+
+```
+cgl     ─┐
+phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
+lint    ─┘
+documentation   (independent)
+```
+
+The DBMS matrix (16 jobs) only starts once the same functional tests passed on
+SQLite for both core versions and both edge PHP versions, so a defect that is
+not DBMS specific is reported by 4 jobs instead of 20.
+
+Three PHP sets, to be changed together: `lint` uses all of 8.2–8.5, `unit` and
+`functional` use the edges 8.2 + 8.5, `cgl` and `phpstan` use 8.2 only.
+`phpstan` is the only source gate that runs per core version (it analyses
+against the installed core via `Build/phpstan/Core13|Core14`). `lint` needs
+neither `-t` nor `composerUpdate` — `lintPhp` runs `php -l` over the sources and
+excludes `.Build/`.
+
+The `documentation` job runs `checkRstRenderingAll` (a real gate — the renderer
+uses `--fail-on-log --fail-on-error`) and uploads `documentation-rendered/`,
+which holds one folder per extension.
+
+`pr-comment.yml` posts the link to that artifact as a single, updated-in-place
+pull-request comment. It is a **separate** workflow on the `workflow_run` event
+on purpose: a pull request from a fork gets a read-only token, so a comment step
+inside `ci.yml` would work for branches here and silently fail for external
+contributors. `pull_request_target` is deliberately not used. Consequence:
+changes to `pr-comment.yml` only take effect once they are on the default
+branch, never within the pull request that changes them.
+
+Composer downloads and the phpstan result cache live in `.cache/` at the
+repository root, **not** under `.Build/` — `composerUpdate` starts with
+`rm -rf .Build`, so a cache inside it would be discarded on every dependency
+install (locally and in CI). `ci.yml` caches `.cache/composer` per PHP and core
+version.
+
+There are no `core-*.yml` workflows any more; `core-11.yml` … `core-14.yml` were
+consolidated into `ci.yml`. No badge in this repository referenced them.
 
 `publish.yml` triggers on a version tag matching `X.Y.Z`: it builds a TER
 artifact per extension with `typo3/tailor` and creates the GitHub release. It
