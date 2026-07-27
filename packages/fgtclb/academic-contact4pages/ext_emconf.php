@@ -12,6 +12,7 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.22-13.4.99',
+            'install' => '12.4.22-13.4.99',
             'academic_base' => '2.4.0',
             'academic_persons' => '2.4.0',
         ],
