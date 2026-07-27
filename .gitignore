@@ -3,6 +3,10 @@
 /var/
 /vendor/
 /.Build/
+# Composer download and phpstan result cache. Deliberately outside ".Build/",
+# because "runTests.sh -s composerUpdate" starts with "rm -rf .Build" and would
+# otherwise throw the cache away on every dependency install.
+/.cache/
 /composer.json.orig
 /composer.json.testing
 /composer.lock
