@@ -1,0 +1,289 @@
+name: "CI"
+
+# Everything that runs for a pull request: quality gates, linting, unit tests,
+# functional tests against every supported DBMS, and the rendered documentation
+# of all extensions in this mono repository.
+#
+# One workflow rather than one per core version. The core version is a matrix
+# dimension, which keeps a single place to add v15 later and makes the
+# dependencies between the stages expressible — they cannot cross workflows,
+# which is why the previous "core-13.yml" / "core-14.yml" pair could not stage
+# its functional tests.
+#
+# Staging, cheapest and most likely to fail first:
+#
+#   cgl     ─┐
+#   phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
+#   lint    ─┘
+#
+#   documentation  (independent, for fast feedback on documentation changes)
+#
+# The DBMS matrix is the expensive part — 16 jobs, each starting a database
+# container — so it only runs once the same tests have passed on SQLite for both
+# core versions and both edge PHP versions. A failure that is not DBMS specific
+# is then reported by 4 jobs instead of 20.
+#
+# Supported versions are declared in the matrices below. There are three PHP
+# sets, and they have to be changed together:
+#
+#   set     PHP versions      Used by
+#   ------  ----------------  ---------------------------------------------
+#   all     8.2 8.3 8.4 8.5   lint
+#   edges   8.2 8.5           unit, functional
+#   lowest  8.2               cgl, phpstan
+#
+# Only the lowest PHP version is used for the gates that do not depend on it,
+# because running them once per PHP version inspects the same files again.
+#
+# Every step goes through "Build/Scripts/runTests.sh", so a gate behaves
+# identically here and on a developer machine. Note that "-t" selects the
+# configuration only and does *not* reinstall dependencies, which is why every
+# job that needs a vendor tree runs "composerUpdate" for its own core version
+# first.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege. Nothing in this workflow writes, and it must stay that way:
+# a pull request from a fork gets a read-only token anyway, so a write step here
+# would work for branches and silently fail for external contributors.
+# Commenting on the pull request happens in "pr-comment.yml" instead.
+permissions:
+  contents: read
+
+# Superseded runs of the same pull request are pointless, and this workflow is
+# not cheap. Pushing twice in a minute cancels the first run.
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+
+  cgl:
+    name: "cgl"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # php-cs-fixer inspects source files, not the installed core, so one
+        # dependency set is enough. The lowest supported one is used.
+        php-version: [ "8.2" ]
+        typo3: [ "13" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "CGL"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cgl -n"
+
+# @todo Disabled until the correct file header has been determined for extensions.
+#      - name: "CGL (header comments)"
+#        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cglHeader"
+
+  phpstan:
+    name: "phpstan (v${{ matrix.typo3 }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The only source gate configured per core version: each configuration
+        # in "Build/phpstan/Core13|Core14" analyses against the core installed
+        # for it, so running it for one version would miss half the findings.
+        php-version: [ "8.2" ]
+        typo3: [ "13", "14" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "Static code analyzer"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s phpstan"
+
+  lint:
+    name: "lint (PHP ${{ matrix.php-version }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2", "8.3", "8.4", "8.5" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      # No "composerUpdate" and no core version: the suite runs "php -l" over
+      # the sources and excludes ".Build/", so it needs neither a vendor tree
+      # nor a TYPO3 version. The previous workflows installed dependencies here
+      # for nothing, once per PHP version.
+      - name: "Run PHP lint"
+        run: "Build/Scripts/runTests.sh -p ${{ matrix.php-version }} -s lintPhp"
+
+  unit:
+    name: "unit (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
+    runs-on: ubuntu-latest
+    needs: [ "cgl", "phpstan", "lint" ]
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2", "8.5" ]
+        typo3: [ "13", "14" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "Execute unit tests"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s unit"
+
+      - name: "Execute unit tests in random order"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s unitRandom"
+
+  functional-sqlite:
+    name: "functional sqlite (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
+    runs-on: ubuntu-22.04
+    needs: [ "unit" ]
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2", "8.5" ]
+        typo3: [ "13", "14" ]
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "Execute functional tests with SQLite"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -s functional"
+
+  functional-dbms:
+    name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
+    runs-on: ubuntu-22.04
+    # Only after the same tests passed on SQLite for every core and edge PHP
+    # version. A defect that is not DBMS specific never reaches these 16 jobs.
+    needs: [ "functional-sqlite" ]
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [ "8.2", "8.5" ]
+        typo3: [ "13", "14" ]
+        dbms:
+          - { name: "mysql", version: "8.0" }
+          - { name: "mariadb", version: "10.4" }
+          - { name: "mariadb", version: "10.6" }
+          - { name: "postgres", version: "10" }
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache composer downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/composer"
+          key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
+          restore-keys: |
+            composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
+            composer-${{ matrix.php-version }}-
+
+      - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+
+      - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
+        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
+
+  documentation:
+    name: "documentation"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      # Recorded and uploaded *before* the rendering, so the comment workflow can
+      # report on the right pull request even when the rendering fails.
+      # "github.event.workflow_run.pull_requests" is empty for a fork, which is
+      # why the number travels in an artifact rather than being read from the
+      # event.
+      - name: "Record the pull request number"
+        if: "github.event_name == 'pull_request'"
+        run: |
+          mkdir -p .Build/pull-request-context
+          echo "${{ github.event.pull_request.number }}" > .Build/pull-request-context/number
+
+      - name: "Upload the pull request context"
+        if: "github.event_name == 'pull_request'"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "pull-request-context"
+          path: ".Build/pull-request-context/"
+          if-no-files-found: "error"
+          retention-days: 5
+
+      # Renders the documentation of all 12 extensions in one pass and collects
+      # the results in "documentation-rendered/<extension>/". This is a real
+      # gate, not just an artifact producer: the renderer runs with
+      # "--fail-on-log --fail-on-error", so a warning fails the job.
+      # "checkRstRenderingSingle <extension>" renders a single one locally.
+      - name: "Render documentation of all extensions"
+        run: "Build/Scripts/runTests.sh -s checkRstRenderingAll"
+
+      - name: "Upload rendered documentation"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "documentation"
+          path: "documentation-rendered/"
+          compression-level: 9
+          if-no-files-found: "error"
+          retention-days: 5
+          include-hidden-files: true
+          overwrite: true

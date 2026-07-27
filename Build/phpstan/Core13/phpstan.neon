@@ -8,7 +8,7 @@ parameters:
   bootstrapFiles:
     - phpstan-constants.php
   # Use local .cache dir instead of /tmp
-  tmpDir: ../../../.Build/.cache/phpstan
+  tmpDir: ../../../.cache/phpstan
 
   level: 8
 
