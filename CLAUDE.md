@@ -80,11 +80,52 @@ Test discovery: phpunit globs `packages/*/*/Tests/Unit/` and
 
 ## CI (`.github/workflows/`)
 
-`core-12.yml` / `core-13.yml` run the same `runTests.sh` suites (CGL `-n`,
-phpstan, lintPhp, unit, functional) across the PHP matrix. `core-11.yml` is
-disabled. `publish.yml` triggers on a version tag matching `X.Y.Z`: it builds a
-TER artifact per extension with `typo3/tailor` and publishes. **The tag version
-must match each extension's `ext_emconf.php` version or publish fails.**
+`ci.yml` is the single pull-request workflow. The TYPO3 core version is a matrix
+dimension, not a separate file, which is what makes the staging below possible —
+job dependencies cannot cross workflows:
+
+```
+cgl     ─┐
+phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
+lint    ─┘
+documentation   (independent)
+```
+
+The DBMS matrix (16 jobs) only starts once the same functional tests passed on
+SQLite for both core versions and both edge PHP versions.
+
+Supported PHP versions differ **per core version** on this branch, so the
+core/PHP pairs are listed explicitly as a `combo` axis rather than formed by a
+cross product — a plain `php-version × typo3` matrix would generate unsupported
+combinations such as v13 on PHP 8.1. `unit` and `functional` run v12 on 8.1/8.4
+and v13 on 8.2/8.5; `cgl` runs on v12 + 8.1; `phpstan` runs per core version
+(v12 + 8.1 and v13 + 8.2) because it analyses against the installed core via
+`Build/phpstan/Core12|Core13`. `lint` needs neither `-t` nor `composerUpdate` —
+`lintPhp` runs `php -l` over the sources and excludes `.Build/` — so it covers
+all of PHP 8.1–8.5 with no core dimension.
+
+The `documentation` job runs `checkRstRenderingAll` (a real gate — the renderer
+uses `--fail-on-log --fail-on-error`) and uploads `documentation-rendered/`,
+which holds one folder per extension. `pr-comment.yml` posts the link to that
+artifact as a single, updated-in-place pull-request comment. It is a **separate**
+workflow on the `workflow_run` event on purpose: a pull request from a fork gets
+a read-only token, so a comment step inside `ci.yml` would work for branches here
+and silently fail for external contributors. `pull_request_target` is
+deliberately not used. Consequence: changes to `pr-comment.yml` only take effect
+once they are on the target branch, never within the pull request that changes
+them.
+
+Composer downloads and the phpstan result cache live in `.cache/` at the
+repository root, **not** under `.Build/` — `composerUpdate` starts with
+`rm -rf .Build`, so a cache inside it would be discarded on every dependency
+install (locally and in CI).
+
+There are no `core-*.yml` workflows any more; `core-11.yml` … `core-13.yml` were
+consolidated into `ci.yml`.
+
+`publish.yml` triggers on a version tag matching `X.Y.Z`: it builds a TER
+artifact per extension with `typo3/tailor`. **The tag version must match each
+extension's `ext_emconf.php` version or the artifact step fails.**
 
 ## Core-version-aware code (v12 vs v13)
 

@@ -1,4 +1,31 @@
 name: publish
+
+# Turns a version tag into a GitHub release with one TER upload artifact per
+# extension attached.
+#
+# This workflow deliberately does **not** publish to the TER. The repository
+# root is a composer "project", not an extension, so there is nothing here to
+# publish. TER publishing happens one step later and per extension: the external
+# splitter mirrors the tagged state into the read-only split repositories, where
+# each package's own workflow runs "tailor ter:publish". That workflow is
+# maintained here as "packages/fgtclb/<package>/.github/workflows/publish.yml"
+# and is split out with the package, so it is changed in this repository and
+# never downstream.
+#
+# Triggered by pushing a tag. The tag has to be a bare "MAJOR.MINOR.PATCH"
+# without a "v" prefix — which is what "bin/release" creates — and it has to
+# match the "version" in every "ext_emconf.php". "tailor create-artefact" fails
+# otherwise, on purpose, so a release cannot disagree with the extension
+# metadata.
+#
+# The extension keys are read from each "composer.json" at runtime
+# ("extra.typo3/cms.extension-key"), because the directory name is not always
+# the extension key — "academic-contact4pages" ships "academic_contacts4pages".
+#
+# Kept as a dedicated workflow rather than folded into "ci.yml": it has a
+# different trigger, needs "contents: write", and must stay reviewable on its
+# own.
+
 on:
   push:
     tags:
