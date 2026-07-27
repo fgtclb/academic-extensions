@@ -18,6 +18,35 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 final class TcaManipulator
 {
     /**
+     * The "extended" tab, in both spellings that can occur in a `showitem` string.
+     *
+     * TYPO3 v14 moved the core TCA `showitem` definitions to short form label
+     * references (breaking #107789): `core.form.tabs:extended` instead of the
+     * full `LLL:EXT:core/...` path. TYPO3 v14.3 core `pages` TCA contains no
+     * occurrence of the long form at all, so matching only that form silently
+     * stops detecting the tab there.
+     *
+     * Both forms have to be *recognised*. Only `EXTENDED_TAB` is ever *written*:
+     * `EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf` still exists
+     * in TYPO3 v14 and still carries the `extended` label, so the long form
+     * resolves on both supported core versions, while the short form does not
+     * resolve on TYPO3 v13.
+     *
+     * @todo typo3/cms-core >=14 Emit `EXTENDED_TAB_SHORT` and drop the long form
+     *       once TYPO3 v13 support is removed.
+     */
+    private const EXTENDED_TAB = '--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:extended';
+    private const EXTENDED_TAB_SHORT = '--div--;core.form.tabs:extended';
+
+    /**
+     * @return string[]
+     */
+    private function extendedTabVariants(): array
+    {
+        return [self::EXTENDED_TAB, self::EXTENDED_TAB_SHORT];
+    }
+
+    /**
      * Convenience method so you don't have to deal with strings and arrays and $GLOBALS[TCA] directly that much.
      *
      * Adds a new entry to an existing TCA DB table that has a type field configured (via $TCA[$table][ctrl][type])
@@ -65,8 +94,17 @@ final class TcaManipulator
         ExtensionManagementUtility::addTcaSelectItem($table, $typeField, $selectItem->toArray(), $relativeInformation[0] ?? '', $relativeInformation[1] ?? '');
         $showItemList = trim($showItemList, ', ');
         // Add the extended tab if not already added manually at the very end.
-        if ($showItemList !== '' && !str_contains($showItemList, '--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:extended')) {
-            $showItemList .= ',--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:extended';
+        // Both spellings count as "already added", otherwise a caller using the
+        // TYPO3 v14 short form would end up with two extended tabs.
+        $hasExtendedTab = false;
+        foreach ($this->extendedTabVariants() as $extendedTab) {
+            if (str_contains($showItemList, $extendedTab)) {
+                $hasExtendedTab = true;
+                break;
+            }
+        }
+        if ($showItemList !== '' && !$hasExtendedTab) {
+            $showItemList .= ',' . self::EXTENDED_TAB;
         }
         if ($showItemList !== '') {
             $showItemList .= ',';
@@ -198,7 +236,7 @@ final class TcaManipulator
         $extendedParts = [];
         $addFields = false;
         foreach ($showItemFiltered as $key => $part) {
-            if ($part === '--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:extended') {
+            if (in_array($part, $this->extendedTabVariants(), true)) {
                 $extendedParts[] = $part;
                 $addFields = true;
                 unset($showItemFiltered[$key]);
