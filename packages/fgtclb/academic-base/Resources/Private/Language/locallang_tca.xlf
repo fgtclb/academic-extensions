@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file
+    source-language="en"
+    datatype="plaintext"
+    original="EXT:academic_base/Resources/Private/Language/locallang_tca.xlf"
+    product-name="academic_base"
+  >
+    <header/>
+    <body>
+      <!--
+        Labels for TCA fields that every academic extension declares itself.
+
+        They used to point at core labels that TYPO3 v14 marks
+        x-unused-since="14.0" (#107938, #108086). Those still resolve on v14,
+        but the v14 language packs no longer ship translations for them, so a
+        German backend rendered them in English. The replacements core offers
+        instead live in v14-only XLIFF 2.0 files and cannot be referenced while
+        TYPO3 v13 is supported.
+
+        Source and translations are taken from the upstream core language packs
+        so the wording stays the one editors know. The ids match the core keys
+        they replace, to keep the mapping obvious.
+      -->
+      <trans-unit id="l18n_parent">
+        <source>Transl.Orig</source>
+      </trans-unit>
+      <trans-unit id="fe_group.hide_at_login">
+        <source>Hide at login</source>
+      </trans-unit>
+      <trans-unit id="fe_group.any_login">
+        <source>Show at any login</source>
+      </trans-unit>
+      <trans-unit id="fe_group.usergroups">
+        <source>__Usergroups:__</source>
+      </trans-unit>
+      <trans-unit id="palette.general">
+        <source>Content Element</source>
+      </trans-unit>
+      <trans-unit id="palette.access">
+        <source>Publish Dates and Access Rights</source>
+      </trans-unit>
+      <trans-unit id="field.hidden">
+        <source>Visibility of content element</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

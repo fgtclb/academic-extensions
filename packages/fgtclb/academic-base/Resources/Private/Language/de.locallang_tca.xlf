@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file
+    source-language="en"
+    target-language="de"
+    datatype="plaintext"
+    original="EXT:academic_base/Resources/Private/Language/locallang_tca.xlf"
+    product-name="academic_base"
+  >
+    <header/>
+    <body>
+      <!--
+        Translations taken verbatim from the upstream TYPO3 core language packs,
+        so the German wording stays identical to what editors saw before.
+        See the source file for why these labels are ours now.
+      -->
+      <trans-unit id="l18n_parent">
+        <source>Transl.Orig</source>
+        <target>Ursprungstext</target>
+      </trans-unit>
+      <trans-unit id="fe_group.hide_at_login">
+        <source>Hide at login</source>
+        <target>Nach Anmeldung verbergen</target>
+      </trans-unit>
+      <trans-unit id="fe_group.any_login">
+        <source>Show at any login</source>
+        <target>Anzeigen, wenn angemeldet</target>
+      </trans-unit>
+      <trans-unit id="fe_group.usergroups">
+        <source>__Usergroups:__</source>
+        <target>__Benutzergruppen:__</target>
+      </trans-unit>
+      <trans-unit id="palette.general">
+        <source>Content Element</source>
+        <target>Inhaltselement</target>
+      </trans-unit>
+      <trans-unit id="palette.access">
+        <source>Publish Dates and Access Rights</source>
+        <target>Veröffentlichungsdaten und Zugriffsrechte</target>
+      </trans-unit>
+      <trans-unit id="field.hidden">
+        <source>Visibility of content element</source>
+        <target>Sichtbarkeit des Inhaltselements</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
