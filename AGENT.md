@@ -205,13 +205,40 @@ the `#[AsEventListener]` attribute from `symfony.
 `phpstan` core-version aware configurations requires to add the related core version
 folder to the `paths` configuration; note that core-version aware functional tests
 should be handled in related subfolders (`Tests/Unit/Core13/`) and using phpunit
-phpattribute for the group using the `not-core14` as execute only for not that group
+phpattribute for the group using the `not-core-14` as execute only for not that group
 selection (there should be examples). If it is only about database fixuters or simpler
 stuff keep the tests in the shared folder using only the attributes.
 
 Note: extensions here still use `Configuration/Services.php` (PHP-form) for DI
 rather than Symfony attributes. Match the surrounding extension's existing DI
 style when editing it.
+
+## TYPO3 v15 blockers — do not migrate these yet
+
+Three APIs on `main` are deprecated in TYPO3 v14 and removed in v15. **None of
+them can be migrated while the branch still supports TYPO3 v13**, because the
+replacement does not exist there. Verified against both vendor trees:
+
+| API | Replacement | Present on v13.4.33? | Call sites |
+|---|---|---|---|
+| `Extbase\Annotation\*` | `Extbase\Attribute\*` | no — `cms-extbase/Classes/Attribute/` absent | 10 in 6 files |
+| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent | 8 wizards in 5 extensions |
+| `Core\Service\FlexFormService` | `Core\Configuration\FlexForm\FlexFormTools` | class exists on v13, but without `convertFlexFormContentToArray()` on `FlexFormTools` | 1 file |
+
+They are tracked as **ACE-294** (epic) with ACE-295, ACE-296 and ACE-297.
+Static analysis and IDE inspections will keep suggesting the replacements —
+ignore them here. A "helpful" import rewrite is a fatal error on v13.
+
+Two ways out, and the choice belongs to the epic, not to an individual change:
+drop v13 support first (expected), or introduce the `Core13/Core14` split
+described above — disproportionate for ~19 call sites.
+
+**Not on this list:** references to core labels marked `x-unused-since="14.0"`.
+They look the same — the replacements are v14-only XLIFF 2.0 files — but they
+are labels on *our own* TCA, so shipping our own text resolves them today on
+both core versions (**ACE-298**). It also has to happen before backend-form
+tests are added, because the suite runs with `failOnDeprecation` and those
+labels emit `E_USER_DEPRECATED` on every form render on v14.
 
 ## Releasing / versions
 
