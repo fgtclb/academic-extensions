@@ -1,6 +1,7 @@
-# CLAUDE.md
+# AGENT.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for coding agents working in this repository. `CLAUDE.md` is a symlink
+to this file — edit `AGENT.md`.
 
 ## What this repository is
 
@@ -19,7 +20,7 @@ together.
 
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable.
-- `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits (`ExtensionsLoadedTestsTrait`, `TcaHelperMethodsTrait`, `ExtensionCoreVersionCompatTestsTrait`).
+- `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits (`ExtensionsLoadedTestsTrait`, `TcaHelperMethodsTrait`, `ExtensionCoreVersionCompatTestsTrait`, `EnsureTtContentListTypeColumnTrait`, `PluginFlexFormDataStructureTrait`).
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
 - `ddev-instances/core-13`, `ddev-instances/core-14` — DDEV setups per core version.
@@ -91,9 +92,10 @@ Build/Scripts/runTests.sh -t 13 -s unit packages/fgtclb/academic-persons/Tests/U
 wrong vendor tree and fails in confusing ways — always `composerUpdate` for the
 version you are about to test.
 
-Other suites: `composer` (dispatch arbitrary composer command), `composerUpdate`,
-`unitRandom`, `phpstanGenerateBaseline`, `checkRstRenderingAll`,
-`checkRstRenderingSingle`, `openDocumentation`, `cglHeader`.
+The complete suite list is `cgl`, `cglHeader`, `checkRstRenderingAll`,
+`checkRstRenderingSingle`, `composer` (dispatch an arbitrary composer command),
+`composerUpdate`, `functional`, `lintPhp`, `openDocumentation`, `phpstan`,
+`phpstanGenerateBaseline`, `unit`, `unitRandom`; plus `help` and `update`.
 
 Test discovery: phpunit globs `packages/*/*/Tests/Unit/` and
 `packages/*/*/Tests/Functional/` across **all** extensions at once
@@ -121,7 +123,9 @@ Three PHP sets, to be changed together: `lint` uses all of 8.2–8.5, `unit` and
 `phpstan` is the only source gate that runs per core version (it analyses
 against the installed core via `Build/phpstan/Core13|Core14`). `lint` needs
 neither `-t` nor `composerUpdate` — `lintPhp` runs `php -l` over the sources and
-excludes `.Build/`.
+excludes `.Build/` and `ddev-instances/`. Both exclusions are load-bearing:
+those are git-ignored vendor trees, and `typo3/class-alias-loader` ships a
+template file that is deliberately not valid PHP.
 
 The `documentation` job runs `checkRstRenderingAll` (a real gate — the renderer
 uses `--fail-on-log --fail-on-error`) and uploads `documentation-rendered/`,
@@ -171,14 +175,23 @@ error analysis, but always a full run in the end.
 
 In any-case watch pull-request pipelines for pipeline errors when pushing pull-requests.
 
-## Core-version-aware code (v12 vs v13)
+## Core-version-aware code (v13 vs v14)
 
-Currently we do not have core-version aware code pattern in one of the academic
-extension packages, but the technique can be looked up in `web-vision/deepltranslate-core`
-or `fgtclb/environment-state-manager` packages and extension. The generic principal is
-to have two additional class folders (for each supported core version of the branch):
+There is no `Core13/`/`Core14/` split in any academic extension yet. The two
+places that currently differ per core version are single switches on
+`(new Typo3Version())->getMajorVersion()`, both in
+`academic-base/Classes/TcaManipulator.php`:
+`addContentElementPlugin()` (the `addPlugin()` signature changed) and
+`addContentElementPluginFlexForm()` (the FlexForm `ds` shape differs and
+**neither version tolerates the other's**, see ACE-293).
 
-* `Core13/`: For TYPO3 v13 only implementation or core-version aware implementation
+Keep it that way while the difference is a line or two. Reach for the folder
+split below only when a whole class has to differ — the technique can be looked
+up in `web-vision/deepltranslate-core` or `fgtclb/environment-state-manager`.
+The generic principle is two additional class folders, one per supported core
+version of the branch:
+
+* `Core13/`, `Core14/`: For TYPO3 v13 or v14 only implementation, or core-version aware implementation
    of shared interfaces (`Classes/`) adding the core-version as third level to the
    PHP namespace, which is registered for all supported versions as composer autoload
   (`PSR-4`) and using `Configuration/Services.php` with a code-snippet to only autowire,
@@ -196,18 +209,25 @@ to have two additional class folders (for each supported core version of the bra
   ```
 
 If nothing else is required keep only a `Services.php` file and prefer PHP attribute
-usage for symfony dependency injection configuration over `Services.yaml` entries;
-For TYPO3 v12 or older support respect that not all TYPO3 attributes may be exist in
-both versions, for example the `#[AsEventListener]` and requires the registration as
-tag in `Services.yaml` (if not doable using other symfony php attributes) - never use
-the `#[AsEventListener]` attribute from `symfony.
+usage for symfony dependency injection configuration over `Services.yaml` entries.
+Not every TYPO3 attribute exists in every supported version, so check before using
+one — and never use Symfony's own `#[AsEventListener]`, always TYPO3's.
 
-`phpstan` core-version aware configurations requires to add the related core version
-folder to the `paths` configuration; note that core-version aware functional tests
-should be handled in related subfolders (`Tests/Unit/Core13/`) and using phpunit
-phpattribute for the group using the `not-core-14` as execute only for not that group
-selection (there should be examples). If it is only about database fixuters or simpler
-stuff keep the tests in the shared folder using only the attributes.
+`phpstan` core-version aware configurations require the related core version folder
+in the `paths` of `Build/phpstan/Core13|Core14`.
+
+Core-version aware **tests** come in two shapes:
+
+* A whole test class that only applies to one version goes in a `Core13/`/`Core14/`
+  subfolder of `Tests/Unit` or `Tests/Functional`.
+* A single test method, or a class that only differs in fixtures, stays in the
+  shared folder and carries a phpunit group attribute instead.
+
+The group names are **`not-core-13`** and **`not-core-14`**: `runTests.sh` always
+runs `--exclude-group not-core-${CORE_VERSION}`, so a test tagged `not-core-13`
+runs on v14 only. Examples:
+`academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormUploadTest.php`
+(class level) and `academic-base/Tests/Unit/TcaManipulatorTest.php` (method level).
 
 Note: extensions here still use `Configuration/Services.php` (PHP-form) for DI
 rather than Symfony attributes. Match the surrounding extension's existing DI
@@ -242,8 +262,9 @@ labels emit `E_USER_DEPRECATED` on every form render on v14.
 
 ## Releasing / versions
 
-Every package is pinned to the same dev version (currently `2.3.5-dev`) in the
-root and shared `composer.json` path-repository `versions` maps. A release bumps
+Every package is pinned to the same dev version (on this branch `3.0.0-dev`) in
+the root, the shared meta-package and both DDEV instance `composer.json`
+path-repository `versions` maps — all four have to move together. A release bumps
 each extension's `ext_emconf.php` `version` and `VERSION` file. Commit subjects
 use TYPO3 Core conventions (see recent history: `[RELEASE]`, `[TASK]`,
 `[BUGFIX]`, and `ACE-NNN` issue refs in the subject/footer). The public issue/PR
