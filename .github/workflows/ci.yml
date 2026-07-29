@@ -43,6 +43,16 @@ name: "CI"
 # configuration only and does *not* reinstall dependencies, which is why every
 # job that needs a vendor tree runs "composerUpdate" for its own core version
 # first.
+#
+# Every step also passes "-b docker" (ACE-313). The script prefers podman
+# whenever it is present and only falls back to docker, which is the right
+# default for it -- but GitHub hosted runners ship both, and since 2026-07-29
+# their podman/crun combination aborts the first container start of a job with
+# "OCI runtime error: crun: unknown version specified" (exit 126). It is
+# intermittent, hits any job, and was traced to neither the runner image nor the
+# testing image changing. Selecting docker here avoids crun entirely and leaves
+# the script default and local runs untouched. Drop the flag once GitHub stops
+# producing the mismatch.
 
 on:
   pull_request:
@@ -88,14 +98,14 @@ jobs:
             composer-${{ matrix.php-version }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
 
       - name: "CGL"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cgl -n"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cgl -n"
 
 # @todo Disabled until the correct file header has been determined for extensions.
 #      - name: "CGL (header comments)"
-#        run: "Build/Scripts/runTests.sh -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cglHeader"
+#        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cglHeader"
 
   phpstan:
     name: "phpstan (v${{ matrix.combo.typo3 }})"
@@ -124,10 +134,10 @@ jobs:
             composer-${{ matrix.combo.php }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.combo.typo3 }}"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
 
       - name: "Static code analyzer"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s phpstan"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s phpstan"
 
   lint:
     name: "lint (PHP ${{ matrix.php-version }})"
@@ -146,7 +156,7 @@ jobs:
       # nor a TYPO3 version. The previous workflows installed dependencies here
       # for nothing, once per PHP version.
       - name: "Run PHP lint"
-        run: "Build/Scripts/runTests.sh -p ${{ matrix.php-version }} -s lintPhp"
+        run: "Build/Scripts/runTests.sh -b docker -p ${{ matrix.php-version }} -s lintPhp"
 
   unit:
     name: "unit (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
@@ -175,13 +185,13 @@ jobs:
             composer-${{ matrix.combo.php }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.combo.typo3 }}"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
 
       - name: "Execute unit tests"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s unit"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s unit"
 
       - name: "Execute unit tests in random order"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s unitRandom"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s unitRandom"
 
   functional-sqlite:
     name: "functional sqlite (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
@@ -210,10 +220,10 @@ jobs:
             composer-${{ matrix.combo.php }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.combo.typo3 }}"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
 
       - name: "Execute functional tests with SQLite"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d sqlite -s functional"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d sqlite -s functional"
 
   functional-dbms:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
@@ -249,10 +259,10 @@ jobs:
             composer-${{ matrix.combo.php }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.combo.typo3 }}"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
 
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
-        run: "Build/Scripts/runTests.sh -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
 
   documentation:
     name: "documentation"
@@ -288,7 +298,7 @@ jobs:
       # "--fail-on-log --fail-on-error", so a warning fails the job.
       # "checkRstRenderingSingle <extension>" renders a single one locally.
       - name: "Render documentation of all extensions"
-        run: "Build/Scripts/runTests.sh -s checkRstRenderingAll"
+        run: "Build/Scripts/runTests.sh -b docker -s checkRstRenderingAll"
 
       - name: "Upload rendered documentation"
         uses: actions/upload-artifact@v6
