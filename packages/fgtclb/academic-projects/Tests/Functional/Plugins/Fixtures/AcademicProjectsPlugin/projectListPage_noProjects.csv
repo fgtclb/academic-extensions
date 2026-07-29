@@ -1,0 +1,7 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title"
+,1,0,1,0,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/home","Home (EN)"
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header","pages","pi_flexform"
+,1,2,0,0,0,0,"academicprojects_projectlist","","","<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms><data><sheet index=""sDEF""><language index=""lDEF""><field index=""settings.hideActiveState""><value index=""vDEF"">0</value></field><field index=""settings.activeState""><value index=""vDEF"">all</value></field><field index=""settings.hideFilter""><value index=""vDEF"">0</value></field><field index=""settings.hideSorting""><value index=""vDEF"">0</value></field><field index=""settings.sorting""><value index=""vDEF"">title asc</value></field><field index=""settings.showHiddenRecords""><value index=""vDEF"">0</value></field></language></sheet></data></T3FlexForms>"
