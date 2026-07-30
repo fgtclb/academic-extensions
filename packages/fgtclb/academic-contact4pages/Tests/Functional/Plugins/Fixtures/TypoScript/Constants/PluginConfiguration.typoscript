@@ -1,0 +1,5 @@
+# The item partial of `EXT:academic_persons` builds its detail link against this
+# page, and this plugin inherits the setting from there.
+plugin.tx_academicpersons {
+    detailPid = 3
+}
