@@ -1,0 +1,32 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title"
+,1,0,1,0,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/home","Home (EN)"
+,3,1,1,0,0,0,0,0,"/profiles","Profiles"
+,4,1,1,0,0,0,0,0,"/other-page","Other page"
+,100,1,254,0,0,0,0,0,"/sysfolder-records","Recordcollection"
+"tx_academicpersons_domain_model_profile",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","first_name","last_name","slug"
+,1,100,0,0,0,0,"Max","Müllermann","max-muellermann"
+,2,100,0,0,0,0,"Horst","Huber","horst-huber"
+,3,100,0,0,0,0,"Erika","Beispiel","erika-beispiel"
+,4,100,0,0,0,0,"Nina","Nebenan","nina-nebenan"
+"tx_academicpersons_domain_model_location",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","title"
+,1,100,0,0,0,0,"Main Campus"
+"tx_academicpersons_domain_model_contract",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","profile","position","location","room"
+,1,100,0,0,0,0,1,"Professor",1,"A 101"
+,2,100,0,0,0,0,2,"Lecturer",0,"B 202"
+,3,100,0,0,0,0,3,"Assistant",0,"C 303"
+,4,100,0,0,0,0,4,"Coordinator",0,"D 404"
+"tx_academiccontacts4pages_domain_model_role",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","name","description"
+,1,100,0,0,0,0,"Dean's Office",""
+,2,100,0,0,0,0,"Student Advisors",""
+"tx_academiccontacts4pages_domain_model_contact",
+,"uid","pid","deleted","hidden","sys_language_uid","sorting","page","contract","role"
+,4,100,0,0,0,4,4,4,1
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header","pi_flexform"
+,1,2,0,0,0,0,"academiccontacts4pages_list","","<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms><data><sheet index=""sDEF""><language index=""lDEF""><field index=""settings.showHiddenRecords""><value index=""vDEF"">0</value></field></language></sheet></data></T3FlexForms>"
