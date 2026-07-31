@@ -1,0 +1,13 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title"
+,1,0,1,0,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/home","Home (EN)"
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header","tx_academicstudyplan_semesters","tx_academicstudyplan_footer_note"
+,1,2,0,0,0,0,"academic_study_plan","",1,""
+"tx_academicstudyplan_domain_model_semester",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","content_element","label","note","credit_points","modules"
+,1,2,0,0,0,0,1,1,"First Semester","",30,1
+"tx_academicstudyplan_domain_model_module",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","semester","label","note","credit_points","description","categories"
+,1,2,0,0,0,0,1,1,"Mathematics I","",10,"",0
