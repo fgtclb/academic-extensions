@@ -53,16 +53,16 @@
         .col {
             padding: 0;
 
-            .icon-minus {
+            .icon-academic-study-plan-minus {
                 display: none;
             }
 
             &.open {
-                .icon-plus {
+                .icon-academic-study-plan-plus {
                     display: none;
                 }
 
-                .icon-minus {
+                .icon-academic-study-plan-minus {
                     display: block;
                 }
 
