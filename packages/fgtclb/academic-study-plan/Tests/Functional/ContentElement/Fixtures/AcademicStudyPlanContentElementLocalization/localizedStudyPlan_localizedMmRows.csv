@@ -1,0 +1,35 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title"
+,1,0,1,0,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/home","Home (EN)"
+,3,1,1,0,0,1,2,0,"/home","Home (DE)"
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header","tx_academicstudyplan_semesters","tx_academicstudyplan_footer_note"
+,1,2,0,0,0,0,"academic_study_plan","Study plan",2,"<p>All modules are subject to change.</p>"
+,2,2,0,0,1,1,"academic_study_plan","[DE] Studienplan",2,"<p>[DE] Aenderungen vorbehalten.</p>"
+"tx_academicstudyplan_domain_model_semester",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","content_element","label","note","credit_points","modules"
+,1,2,0,0,0,0,1,1,"First Semester","Foundation courses",30,2
+,2,2,0,0,0,0,2,1,"Second Semester","",30,1
+,3,2,0,0,1,1,1,2,"[DE] Erstes Semester","[DE] Grundlagenkurse",30,2
+,4,2,0,0,1,2,2,2,"[DE] Zweites Semester","",30,1
+"tx_academicstudyplan_domain_model_module",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","semester","label","note","credit_points","description","categories"
+,1,2,0,0,0,0,1,1,"Mathematics I","Mandatory attendance",10,"Linear algebra and analysis.",2
+,2,2,0,0,0,0,2,1,"Programming Basics","",5,"",0
+,3,2,0,0,0,0,1,2,"Statistics","",8,"Descriptive and inductive.",0
+,4,2,0,0,1,1,1,3,"[DE] Mathematik I","[DE] Anwesenheitspflicht",10,"[DE] Lineare Algebra und Analysis.",2
+,5,2,0,0,1,2,2,3,"[DE] Programmiergrundlagen","",5,"",0
+,6,2,0,0,1,3,1,4,"[DE] Statistik","",8,"[DE] Deskriptiv und induktiv.",0
+"tx_academicstudyplan_domain_model_category",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","label","colour"
+,1,2,0,0,0,0,1,"Mandatory","#cc0000"
+,2,2,0,0,0,0,2,"Elective","#0066cc"
+,3,2,0,0,1,1,1,"[DE] Pflicht","#cc0000"
+,4,2,0,0,1,2,2,"[DE] Wahlfach","#0066cc"
+"tx_academicstudyplan_module_category_mm",
+,"uid_local","uid_foreign","sorting","sorting_foreign"
+,1,1,0,1
+,1,2,0,2
+,4,3,0,1
+,4,4,0,2

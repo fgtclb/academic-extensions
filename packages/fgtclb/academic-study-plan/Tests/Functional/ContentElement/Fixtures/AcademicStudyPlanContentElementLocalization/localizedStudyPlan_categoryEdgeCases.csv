@@ -1,0 +1,36 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title"
+,1,0,1,0,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/home","Home (EN)"
+,3,1,1,0,0,1,2,0,"/home","Home (DE)"
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header","tx_academicstudyplan_semesters","tx_academicstudyplan_footer_note"
+,1,2,0,0,0,0,"academic_study_plan","Study plan",1,""
+,2,2,0,0,1,1,"academic_study_plan","[DE] Studienplan",1,""
+"tx_academicstudyplan_domain_model_semester",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","content_element","label","note","credit_points","modules"
+,1,2,0,0,0,0,1,1,"First Semester","",30,2
+,2,2,0,0,1,1,1,2,"[DE] Erstes Semester","",30,2
+"tx_academicstudyplan_domain_model_module",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","semester","label","note","credit_points","description","categories"
+,1,2,0,0,0,0,1,1,"Mathematics I","",10,"",4
+,2,2,0,1,0,0,2,1,"Hidden Module","",5,"",1
+,3,2,0,0,1,1,1,2,"[DE] Mathematik I","",10,"",4
+"tx_academicstudyplan_domain_model_category",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","label","colour"
+,1,2,0,0,0,0,1,"Mandatory","#cc0000"
+,2,2,0,0,0,0,2,"Elective","#0066cc"
+,3,2,0,1,0,0,3,"Hidden Category","#00cc00"
+,4,2,1,0,0,0,4,"Deleted Category","#cccc00"
+,5,2,0,0,1,1,1,"[DE] Pflicht","#cc0000"
+,6,2,0,1,1,2,2,"[DE] Wahlfach hidden","#0066cc"
+,7,2,0,0,1,0,5,"[DE] Nur uebersetzt","#333333"
+,8,2,0,0,0,0,6,"Only On Hidden Module","#999999"
+"tx_academicstudyplan_module_category_mm",
+,"uid_local","uid_foreign","sorting","sorting_foreign"
+,1,1,0,1
+,1,2,0,2
+,1,3,0,3
+,1,4,0,4
+,1,7,0,5
+,2,8,0,1
