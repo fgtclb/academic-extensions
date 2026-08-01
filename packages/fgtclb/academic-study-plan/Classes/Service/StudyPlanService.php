@@ -96,13 +96,17 @@ final class StudyPlanService
             ->select('c.*')
             ->from('tx_academicstudyplan_domain_model_category', 'c')
             ->join('c', 'tx_academicstudyplan_module_category_mm', 'mm', $queryBuilder->expr()->eq('mm.uid_foreign', 'c.uid'))
-            // @todo Consider to add additional join to `*_module` along with language/hidden/deleted constraints below
+            // Deliberately no join to `*_module`: this query is keyed by a single module
+            // uid that `fetchModules()` has already selected under the language, hidden
+            // and deleted constraints, so a join could only re-check that same row. The
+            // relations of a module that did not pass those constraints are unreachable
+            // for the same reason - it is never fetched, so its uid is never passed in.
+            // Verified by AcademicStudyPlanContentElementLocalizationTest.
             ->where(
                 $queryBuilder->expr()->eq('mm.uid_local', $queryBuilder->createNamedParameter($moduleUid, Connection::PARAM_INT)),
                 $this->getLanguageFieldRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_category', 'c'),
                 $this->getHiddenRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_category', 'c'),
                 $this->getDeletedRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_category', 'c'),
-                // @todo Consider to add `*_module` constraints for language/hidden/deleted if join is added above
             )
             ->orderBy('c.label', 'ASC')
             // Ensuring deterministic sorting behaviour
