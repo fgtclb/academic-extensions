@@ -19,4 +19,18 @@ return [
         'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
         'source' => 'EXT:academic_study_plan/Resources/Public/Icons/module.svg',
     ],
+    // Frontend controls of the study plan element, unlike the record icons above:
+    // drawn in `currentColor` so they take the colour of the surrounding text.
+    'academic-study-plan-plus' => [
+        'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/plus.svg',
+    ],
+    'academic-study-plan-minus' => [
+        'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/minus.svg',
+    ],
+    'academic-study-plan-close' => [
+        'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/close.svg',
+    ],
 ];
