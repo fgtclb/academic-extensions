@@ -8,8 +8,10 @@ use FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
 use FGTCLB\AcademicProjects\Domain\Model\Project;
 use FGTCLB\AcademicProjects\Enumeration\PageTypes;
+use TYPO3\CMS\Core\Context\LanguageAspect;
 use TYPO3\CMS\Core\Type\Exception\InvalidEnumerationValueException;
 use TYPO3\CMS\Extbase\Persistence\Generic\QueryResult;
+use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
@@ -39,11 +41,7 @@ class ProjectRepository extends Repository
         if (!empty($demand->getPages())) {
             if ($demand->getShowSelected() === true) {
                 $constraints[] = $query->in('uid', $demand->getPages());
-                // Selecting record ids in the backend (FormEngine) are always persisted using the default language
-                // uid of the records unrelated to the language and leads to missing translated contend depending on
-                // the site configuration and frontend context. In these cases we need to disable respecting the
-                // system langauge to tell Extbase ORM to do proper overlay handling in this case.
-                $query->getQuerySettings()->setRespectSysLanguage(false);
+                $this->matchSelectedUidsAcrossLanguages($query);
             } else {
                 $constraints[] = $query->in('pid', $demand->getPages());
                 $query->getQuerySettings()->setRespectStoragePage(true);
@@ -90,5 +88,33 @@ class ProjectRepository extends Repository
         );
 
         return $query->execute();
+    }
+
+    /**
+     * Prepare a query that matches records by uid taken from a manual selection.
+     *
+     * FormEngine persists such a selection as **default language** uids, so the language
+     * restriction has to come off - otherwise nothing matches in a translation. That
+     * alone is not enough: with `fallbackType: free` the aspect carries `OVERLAYS_OFF`,
+     * and the default language rows are then handed to the frontend unoverlaid, which is
+     * how a German page ended up listing English projects (ACE-341). So the aspect is
+     * lifted to `OVERLAYS_ON_WITH_FLOATING` first, and only then is the restriction
+     * dropped.
+     *
+     * Adopted from the generic Extbase backend implementation, and the same shape as
+     * `EXT:academic_persons` `ProfileRepository::matchSelectedUidsAcrossLanguages()`.
+     *
+     * @param QueryInterface<Project> $query
+     */
+    private function matchSelectedUidsAcrossLanguages(QueryInterface $query): void
+    {
+        $currentLanguageAspect = $query->getQuerySettings()->getLanguageAspect();
+        $changedLanguageAspect = new LanguageAspect(
+            $currentLanguageAspect->getId(),
+            $currentLanguageAspect->getContentId(),
+            $currentLanguageAspect->getOverlayType() === LanguageAspect::OVERLAYS_OFF ? LanguageAspect::OVERLAYS_ON_WITH_FLOATING : $currentLanguageAspect->getOverlayType()
+        );
+        $query->getQuerySettings()->setLanguageAspect($changedLanguageAspect);
+        $query->getQuerySettings()->setRespectSysLanguage(false);
     }
 }
