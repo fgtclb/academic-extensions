@@ -162,6 +162,23 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     }
 
     #[Test]
+    public function contentElementRendersOnlyResolvableIcons(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $content = $this->renderHomePage();
+        // `core:icon` never fails on an unknown identifier: it renders the
+        // `default-not-found` placeholder, the small red "broken" icon, and the
+        // identifier that was asked for is gone from the markup.
+        $this->assertStringNotContainsString('default-not-found', $content);
+        // The three identifiers the element actually asks for, so a rename in
+        // `Configuration/Icons.php` without one in the template is caught here too.
+        $this->assertStringContainsString('data-identifier="academic-study-plan-plus"', $content);
+        $this->assertStringContainsString('data-identifier="academic-study-plan-minus"', $content);
+        $this->assertStringContainsString('data-identifier="academic-study-plan-close"', $content);
+    }
+
+    #[Test]
     public function contentElementRendersNoDialogForModuleWithoutContent(): void
     {
         $this->setUpTestCase('studyPlanPage');
