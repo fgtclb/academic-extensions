@@ -145,6 +145,23 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     }
 
     #[Test]
+    public function contentElementLabelsTheModalTriggerForScreenReaders(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $content = $this->renderHomePage();
+        // The trigger carries no visible text, so its visually hidden span is the only
+        // thing announcing what the control does. A missing `modal.open` label does not
+        // fail loudly: `f:translate` resolves it to an empty string and the span
+        // degrades to a bare ": Mathematics I".
+        $this->assertMatchesRegularExpression(
+            '#First Semester,\s+Foundation courses,\s+30\s+CP\.\s+Show module details: Mathematics I#',
+            $content,
+        );
+        $this->assertDoesNotMatchRegularExpression('#CP\.\s+: Mathematics I#', $content);
+    }
+
+    #[Test]
     public function contentElementRendersNoDialogForModuleWithoutContent(): void
     {
         $this->setUpTestCase('studyPlanPage');
