@@ -34,7 +34,7 @@ final class StudyPlanService
             ->from('tx_academicstudyplan_domain_model_semester')
             ->where(
                 $queryBuilder->expr()->eq('content_element', $queryBuilder->createNamedParameter($contentElementUid, Connection::PARAM_INT)),
-                $this->getLanguageFieldRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_semester'),
+                $this->getLanguageFieldRestrictionForTable($queryBuilder, 'tx_academicstudyplan_domain_model_semester'),
                 $this->getHiddenRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_semester'),
                 $this->getDeletedRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_semester'),
             )
@@ -65,7 +65,7 @@ final class StudyPlanService
             ->from('tx_academicstudyplan_domain_model_module')
             ->where(
                 $queryBuilder->expr()->eq('semester', $queryBuilder->createNamedParameter($semesterUid, Connection::PARAM_INT)),
-                $this->getLanguageFieldRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_module'),
+                $this->getLanguageFieldRestrictionForTable($queryBuilder, 'tx_academicstudyplan_domain_model_module'),
                 $this->getHiddenRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_module'),
                 $this->getDeletedRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_module'),
             )
@@ -99,7 +99,7 @@ final class StudyPlanService
             // @todo Consider to add additional join to `*_module` along with language/hidden/deleted constraints below
             ->where(
                 $queryBuilder->expr()->eq('mm.uid_local', $queryBuilder->createNamedParameter($moduleUid, Connection::PARAM_INT)),
-                $this->getLanguageFieldRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_category', 'c'),
+                $this->getLanguageFieldRestrictionForTable($queryBuilder, 'tx_academicstudyplan_domain_model_category', 'c'),
                 $this->getHiddenRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_category', 'c'),
                 $this->getDeletedRestrictionForTable($queryBuilder, $context, 'tx_academicstudyplan_domain_model_category', 'c'),
                 // @todo Consider to add `*_module` constraints for language/hidden/deleted if join is added above
@@ -200,13 +200,16 @@ final class StudyPlanService
         return null;
     }
 
+    /**
+     * No `Context` argument, unlike the two restrictions below: which language a record
+     * belongs to is a property of the row, so there is no visibility aspect to consult.
+     */
     private function getLanguageFieldRestrictionForTable(
         QueryBuilder $queryBuilder,
-        Context $context,
         string $tableName,
         ?string $alias = null,
     ): string {
-        $languageFieldName = $this->getTableLanguageFieldName('tx_academicstudyplan_domain_model_semester');
+        $languageFieldName = $this->getTableLanguageFieldName($tableName);
         if ($languageFieldName === null || $languageFieldName === '') {
             // return empty string to omit condition
             return '';
