@@ -450,6 +450,7 @@ handleDbmsOptions
 COMPOSER_ROOT_VERSION="3.0.0-dev"
 CONTAINER_INTERACTIVE="-it --init"
 HOST_UID=$(id -u)
+HOST_GID=$(id -g)
 USERSET=""
 if [ $(uname) != "Darwin" ]; then
     USERSET="--user $HOST_UID"
@@ -514,9 +515,24 @@ if [ "${CONTAINER_BIN}" == "docker" ]; then
     CONTAINER_COMMON_PARAMS="${CONTAINER_INTERACTIVE} --rm --network ${NETWORK} --add-host ${CONTAINER_HOST}:host-gateway ${USERSET} -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
     CONTAINER_SIMPLE_PARAMS="${CONTAINER_INTERACTIVE} --rm --network ${NETWORK} --add-host ${CONTAINER_HOST}:host-gateway ${USERSET} -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
     DOCUMENTATION_COMMON_PARAMS="${CONTAINER_INTERACTIVE} --rm ${USERSET} -v ${ROOT_DIR}:/project"
+    # docker creates the tmpfs owned by "root:root", while "${USERSET}" above passes a uid
+    # but no group, so the container runs as "uid=${HOST_UID} gid=0" and does not own the
+    # mount it has to write the test databases into. Whether that still works then depends
+    # on the mode docker happens to give the tmpfs: 1777 by default on docker 29, but 0755
+    # where it follows the umask, and then no test database can be created and every test
+    # fails with "unable to open database file".
+    #
+    # "uid"/"gid" remove that dependency at the source - the mount is owned by the user the
+    # container runs as. "mode=1777" is the workaround the docker adoption introduced
+    # instead, and is kept next to them: it is what has been proven on a GitHub hosted
+    # runner, and it costs nothing to leave in place.
+    TMPFS_MOUNT_OPTIONS="rw,noexec,nosuid,uid=${HOST_UID},gid=${HOST_GID},mode=1777"
 else
     # podman
     CONTAINER_HOST="host.containers.internal"
+    # Rootless podman maps the container root to the host user, so the tmpfs is writable
+    # without an explicit owner. "mode=1777" is kept for the rootful case.
+    TMPFS_MOUNT_OPTIONS="rw,noexec,nosuid,mode=1777"
     if [ $( uname ) = "Linux" ]; then
         CONTAINER_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm --network ${NETWORK} -v ${ROOT_DIR}:${ROOT_DIR}:Z -w ${ROOT_DIR}"
         CONTAINER_SIMPLE_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR}:Z -w ${ROOT_DIR}"
@@ -641,13 +657,11 @@ case ${TEST_SUITE} in
                 SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 mkdir -p "${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/"
                 SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
-                # "mode=1777" is required for docker and harmless for podman: docker runs the
-                # container as "--user $(id -u)" with group 0, while the tmpfs comes up owned by
-                # root with mode 0755, so the test databases cannot be created and every test
-                # fails with "unable to open database file". Rootless podman needs no "--user"
-                # (it is root inside the user namespace), which is why this only shows with
-                # docker.
-                CONTAINERPARAMS="-e typo3DatabaseDriver=pdo_sqlite --tmpfs ${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/:rw,noexec,nosuid,mode=1777 "
+                # "${TMPFS_MOUNT_OPTIONS}" carries the owner and mode the mount needs, which
+                # differ per container binary - see where it is assigned. Without them the
+                # test databases cannot be created and every test fails with "unable to open
+                # database file".
+                CONTAINERPARAMS="-e typo3DatabaseDriver=pdo_sqlite --tmpfs ${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/:${TMPFS_MOUNT_OPTIONS} "
                 ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${CONTAINERPARAMS} ${IMAGE_PHP} "${COMMAND[@]}"
                 SUITE_EXIT_CODE=$?
                 ;;
