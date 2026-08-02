@@ -144,6 +144,63 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
     }
 
     #[Test]
+    public function listPluginRendersContactsWithoutRoleBesideGroupedOnes(): void
+    {
+        // The mixed case: some contacts of the page carry a role, one does not. Before
+        // ACE-322 the grouped branch was taken for all of them and the role-less contact
+        // was dropped from the markup entirely - no notice, no placeholder.
+        $this->setUpTestCase('contactsListPage_mixedRoles');
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('Dean&#039;s Office', $content);
+        $this->assertRendersProfileName($content, 'Max', 'Müllermann');
+        $this->assertRendersProfileName($content, 'Horst', 'Huber');
+        $this->assertRendersProfileName($content, 'Erika', 'Beispiel');
+        // The role she used to hold is no longer held by anyone, so its group is gone.
+        $this->assertStringNotContainsString('Student Advisors', $content);
+    }
+
+    #[Test]
+    public function listPluginRendersUngroupedContactsAfterTheRoleGroups(): void
+    {
+        $this->setUpTestCase('contactsListPage_mixedRoles');
+
+        $content = $this->renderHomePage();
+        $roleHeading = strpos($content, 'Dean&#039;s Office');
+        $grouped = strpos($content, 'Müllermann');
+        $ungrouped = strpos($content, 'Beispiel');
+        $this->assertIsInt($roleHeading);
+        $this->assertIsInt($grouped);
+        $this->assertIsInt($ungrouped);
+        $this->assertLessThan($ungrouped, $roleHeading, 'The role groups come first.');
+        $this->assertLessThan($ungrouped, $grouped, 'A role-less contact renders after the grouped ones.');
+    }
+
+    #[Test]
+    public function listPluginRendersUngroupedContactsOneHeadingLevelUp(): void
+    {
+        $this->setUpTestCase('contactsListPage_mixedRoles');
+
+        // The ungrouped block renders through `Profile/Header` rather than
+        // `Profile/SectionHeader`, so a role-less contact keeps the higher heading level
+        // it has on a page with no roles at all - the two branches stay consistent.
+        $this->assertMatchesRegularExpression(
+            '#<h2 class="card-title">\s*<a href="[^"]*">Erika\s+Beispiel</a>\s*</h2>#',
+            $this->renderHomePage(),
+        );
+    }
+
+    #[Test]
+    public function listPluginEmitsNoEmptyRowWhenEveryContactHasARole(): void
+    {
+        // The ungrouped block is conditional, so the fully grouped page must render
+        // exactly the rows of its two role groups and nothing extra.
+        $this->setUpTestCase('contactsListPage');
+
+        $this->assertSame(2, substr_count($this->renderHomePage(), '<div class="row">'));
+    }
+
+    #[Test]
     public function listPluginRendersContentElementHeader(): void
     {
         $this->setUpTestCase('contactsListPage');

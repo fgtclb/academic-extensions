@@ -18,7 +18,7 @@
                     />
 
                     <f:for each="{contacts}" as="contact">
-                        <f:if condition="{contact.role} == {role}">
+                        <f:if condition="{contact.role.uid} == {role.uid}">
                             <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                                 <f:render
                                     partial="Profile/Item"
@@ -35,6 +35,24 @@
                     </f:for>
                 </div>
             </f:for>
+
+            <f:if condition="{contactsWithoutRole}">
+                <div class="row">
+                    <f:for each="{contactsWithoutRole}" as="contact">
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                            <f:render
+                                partial="Profile/Item"
+                                arguments="{
+                                    profile: contact.contract.profile,
+                                    contract: contact.contract,
+                                    settings: settings,
+                                    data: data
+                                }"
+                            />
+                        </div>
+                    </f:for>
+                </div>
+            </f:if>
         </f:then>
         <f:else>
             <div class="row">
