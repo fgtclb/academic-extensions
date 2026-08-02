@@ -46,6 +46,38 @@ printSummary() {
     exit $SUITE_EXIT_CODE
 }
 
+# Make sure an image is available locally, retrying a failed pull.
+#
+# `run` pulls implicitly on a cache miss, and a single failed pull ends the whole
+# job with exit 125 before a test has run - twice within three hours on GitHub
+# Actions, both times on a docker.io image (ACE-342). Anonymous Docker Hub pulls
+# are rate limited per source IP and hosted runners share address space, which
+# also explains why no ghcr.io pull has failed; only the docker.io images are
+# guarded here.
+#
+# The local check comes first so a warm cache still works offline and a pinned
+# image is not re-fetched on every local run.
+ensureImage() {
+    local IMAGE=${1}
+    local MAX_ATTEMPTS=3
+    local ATTEMPT=1
+    if ${CONTAINER_BIN} image inspect "${IMAGE}" >/dev/null 2>&1; then
+        return 0
+    fi
+    while [ ${ATTEMPT} -le ${MAX_ATTEMPTS} ]; do
+        if ${CONTAINER_BIN} pull "${IMAGE}"; then
+            return 0
+        fi
+        if [ ${ATTEMPT} -lt ${MAX_ATTEMPTS} ]; then
+            echo "Pulling ${IMAGE} failed (attempt ${ATTEMPT} of ${MAX_ATTEMPTS}), retrying in $((ATTEMPT * 5))s." >&2
+            sleep $((ATTEMPT * 5))
+        fi
+        ATTEMPT=$((ATTEMPT + 1))
+    done
+    echo "Could not pull ${IMAGE} after ${MAX_ATTEMPTS} attempts. Aborting." >&2
+    return 1
+}
+
 waitFor() {
     local HOST=${1}
     local PORT=${2}
@@ -63,6 +95,7 @@ waitFor() {
             COUNT=\$((COUNT + 1));
         done;
     "
+    ensureImage "${IMAGE_ALPINE}" || { cleanUp; exit 1; }
     ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name wait-for-${SUFFIX} ${XDEBUG_MODE} -e XDEBUG_CONFIG="${XDEBUG_CONFIG}" ${IMAGE_ALPINE} /bin/sh -c "${TESTCOMMAND}"
     if [[ $? -gt 0 ]]; then
         # Not "kill -SIGINT -$$": the SIGINT trap is only installed when CI is not "true",
@@ -633,6 +666,8 @@ case ${TEST_SUITE} in
         case ${DBMS} in
             mariadb)
                 echo "Using driver: ${DATABASE_DRIVER}"
+                ensureImage "${IMAGE_MARIADB}"
+                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 ${CONTAINER_BIN} run --name mariadb-func-${SUFFIX} --network ${NETWORK} -d -e MYSQL_ROOT_PASSWORD=funcp --tmpfs /var/lib/mysql/:rw,noexec,nosuid ${IMAGE_MARIADB} >/dev/null
                 SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 waitFor mariadb-func-${SUFFIX} 3306
@@ -642,6 +677,8 @@ case ${TEST_SUITE} in
                 ;;
             mysql)
                 echo "Using driver: ${DATABASE_DRIVER}"
+                ensureImage "${IMAGE_MYSQL}"
+                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 ${CONTAINER_BIN} run --name mysql-func-${SUFFIX} --network ${NETWORK} -d -e MYSQL_ROOT_PASSWORD=funcp --tmpfs /var/lib/mysql/:rw,noexec,nosuid ${IMAGE_MYSQL} >/dev/null
                 SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 waitFor mysql-func-${SUFFIX} 3306
@@ -650,6 +687,8 @@ case ${TEST_SUITE} in
                 SUITE_EXIT_CODE=$?
                 ;;
             postgres)
+                ensureImage "${IMAGE_POSTGRES}"
+                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 ${CONTAINER_BIN} run --name postgres-func-${SUFFIX} --network ${NETWORK} -d -e POSTGRES_PASSWORD=funcp -e POSTGRES_USER=funcu --tmpfs /var/lib/postgresql/data:rw,noexec,nosuid ${IMAGE_POSTGRES} >/dev/null
                 SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 waitFor postgres-func-${SUFFIX} 5432
