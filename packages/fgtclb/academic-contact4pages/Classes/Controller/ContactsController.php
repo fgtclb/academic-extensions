@@ -28,18 +28,28 @@ final class ContactsController extends ActionController
             $showHiddenRecords
         );
 
+        // Contacts without a role are collected here rather than filtered in the
+        // template: the grouped branch can only render a contact that belongs to one of
+        // the roles, so without this list they were dropped from the output entirely as
+        // soon as any other contact on the page had a role (ACE-322). Keeping the split
+        // in the controller also lets the template ask whether the ungrouped block is
+        // needed at all, instead of emitting an empty row.
         $roles = [];
+        $contactsWithoutRole = [];
         foreach ($contacts as $contact) {
             $role = $contact->getRole();
             if ($role !== null) {
                 $roles[$role->getUid()] = $role;
+                continue;
             }
+            $contactsWithoutRole[] = $contact;
         }
 
         $this->view->assignMultiple([
             'data' => $contentElementData,
             'contacts' => $contacts,
             'roles' => $roles,
+            'contactsWithoutRole' => $contactsWithoutRole,
         ]);
 
         return $this->htmlResponse();
