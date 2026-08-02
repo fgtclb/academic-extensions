@@ -81,9 +81,11 @@ final class FlexFormUpgradeWizard implements UpgradeWizardInterface
             $updateQueryBuilder->update('tt_content')
                 ->set('pi_flexform', $this->array2xml($flexFormData))
                 ->where(
-                    $queryBuilder->expr()->in(
+                    // The constraint must be built on the builder that executes it: a named
+                    // parameter is bound to the query builder that created it.
+                    $updateQueryBuilder->expr()->eq(
                         'uid',
-                        $queryBuilder->createNamedParameter($record['uid'], Connection::PARAM_INT)
+                        $updateQueryBuilder->createNamedParameter($record['uid'], Connection::PARAM_INT)
                     )
                 )
                 ->executeStatement();
