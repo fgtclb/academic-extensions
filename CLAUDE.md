@@ -136,6 +136,40 @@ consolidated into `ci.yml`.
 artifact per extension with `typo3/tailor`. **The tag version must match each
 extension's `ext_emconf.php` version or the artifact step fails.**
 
+## Database queries
+
+Two rules, both learned from defects that reached a release (ACE-349, ACE-356).
+
+**Never hand a raw array to `in()` or `notIn()`.** Quote it with the query
+builder helper meant for it:
+
+```php
+$queryBuilder->expr()->in('uid', $queryBuilder->quoteArrayBasedValueListToIntegerList($uids));
+$queryBuilder->expr()->in('CType', $queryBuilder->quoteArrayBasedValueListToStringList($types));
+```
+
+Both return the string `NULL` for an empty array, so the condition becomes
+`field IN (NULL)`: valid on every DBMS and matching no row. They exist since
+TYPO3 v11.5 and are therefore available on both core versions of this branch.
+A raw `[]` instead reaches the database as `IN ()` on TYPO3 v12 — MariaDB, MySQL
+and PostgreSQL reject it, **SQLite accepts it**, so the default `-d sqlite` run
+does not show the defect — while TYPO3 v13 raises `\InvalidArgumentException`
+1701857902 before the query is built. A
+`createNamedParameter($values, PARAM_*_ARRAY)` is equally safe; Doctrine renders
+an empty array as `NULL` too. Do not write a caller-side `if ($values === [])`
+guard instead.
+
+**Build a constraint on the query builder that executes it.** A named parameter
+is bound to the builder that created it, so a `WHERE` assembled on one builder
+and passed to another references a placeholder that was never bound — and may
+collide with a placeholder the target builder created itself, e.g. through
+`set()`. That silently updated nothing on MySQL, MariaDB and SQLite and threw on
+PostgreSQL. When a loop builds one statement per record, keep expression and
+execution on the same object.
+
+This is the **decorated TYPO3 `QueryBuilder`** (`TYPO3\CMS\Core\Database\Query`),
+not the Extbase one.
+
 ## Core-version-aware code (v12 vs v13)
 
 The reference pattern lives in `academic-base`. Where v12 and v13 APIs diverge,
