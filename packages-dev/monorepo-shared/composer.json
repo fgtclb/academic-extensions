@@ -31,6 +31,7 @@
         "typo3/cms-extensionmanager": "^12.4.22 || ^13.4",
         "typo3/cms-felogin": "^12.4.22 || ^13.4",
         "typo3/cms-filelist": "^12.4.22 || ^13.4",
+        "typo3/cms-filemetadata": "^12.4.22 || ^13.4",
         "typo3/cms-fluid": "^12.4.22 || ^13.4",
         "typo3/cms-fluid-styled-content": "^12.4.22 || ^13.4",
         "typo3/cms-frontend": "^12.4.22 || ^13.4",
