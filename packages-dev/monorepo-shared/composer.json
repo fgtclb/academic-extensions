@@ -31,6 +31,7 @@
         "typo3/cms-extensionmanager": "~13.4.0@dev || ~14.3.0@dev",
         "typo3/cms-felogin": "~13.4.0@dev || ~14.3.0@dev",
         "typo3/cms-filelist": "~13.4.0@dev || ~14.3.0@dev",
+        "typo3/cms-filemetadata": "~13.4.0@dev || ~14.3.0@dev",
         "typo3/cms-fluid": "~13.4.0@dev || ~14.3.0@dev",
         "typo3/cms-fluid-styled-content": "~13.4.0@dev || ~14.3.0@dev",
         "typo3/cms-frontend": "~13.4.0@dev || ~14.3.0@dev",
