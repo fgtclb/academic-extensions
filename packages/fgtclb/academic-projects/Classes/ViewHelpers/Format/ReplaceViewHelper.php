@@ -8,9 +8,9 @@ class ReplaceViewHelper extends AbstractViewHelper
 {
     public function initializeArguments(): void
     {
-        $this->registerArgument('content', 'string', 'Content in which to perform replacement. Array supported.');
-        $this->registerArgument('substring', 'string', 'Substring to replace. Array supported.', true);
-        $this->registerArgument('replacement', 'string', 'Replacement to insert. Array supported.', false, '');
+        $this->registerArgument('content', 'mixed', 'Content in which to perform replacement. Array supported.');
+        $this->registerArgument('substring', 'mixed', 'Substring to replace. Array supported.', true);
+        $this->registerArgument('replacement', 'mixed', 'Replacement to insert. Array supported.', false, '');
         $this->registerArgument('caseSensitive', 'boolean', 'If true, perform case-sensitive replacement', false, true);
         $this->registerArgument('returnCount', 'boolean', 'If true, return the number of replacements instead of the replaced content.', false, false);
     }
