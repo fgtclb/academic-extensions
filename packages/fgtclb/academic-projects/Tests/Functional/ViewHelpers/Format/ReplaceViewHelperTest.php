@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicProjects\Tests\Functional\ViewHelpers\Format;
 
 use FGTCLB\AcademicProjects\Tests\Functional\ViewHelpers\AbstractViewHelperTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
@@ -83,16 +82,10 @@ final class ReplaceViewHelperTest extends AbstractViewHelperTestCase
     }
 
     /**
-     * TYPO3 v14 rejects the list. `content`, `substring` and `replacement` are registered
-     * as `string` while the class documents and implements array support, and Fluid 5
-     * validates the registered type with `StrictArgumentProcessor`, where Fluid 4 was
-     * lenient:
-     *
-     * `The argument "substring" was registered with type "string", but is of type "array"`
-     *
-     * Tracked as ACE-359 - the registered types have to widen before this can run there.
+     * The three value arguments are registered as `mixed`, because TYPO3 v14 rejected the
+     * list while they were registered as `string`: Fluid 5 validates a registered type with
+     * `StrictArgumentProcessor`, where Fluid 4 is lenient and lets anything through.
      */
-    #[Group('not-core-14')]
     #[Test]
     public function substringAndReplacementCanBeLists(): void
     {
@@ -103,6 +96,24 @@ final class ReplaceViewHelperTest extends AbstractViewHelperTestCase
         ]);
 
         $this->assertSame('One teaching project', $output);
+    }
+
+    /**
+     * `mixed` rather than a `string|array` union, and this is the case that decides it.
+     * Fluid 5 matches its scalar coercion on the whole registered type string, so a union
+     * falls through uncoerced and is then validated against both members - an integer is
+     * neither, and `string` used to cast it. The view helper casts it itself.
+     */
+    #[Test]
+    public function nonStringScalarsAreAccepted(): void
+    {
+        $output = $this->render('Replace', [
+            'content' => 'Project 2025 report',
+            'substring' => 2025,
+            'replacement' => 2026,
+        ]);
+
+        $this->assertSame('Project 2026 report', $output);
     }
 
     #[Test]
