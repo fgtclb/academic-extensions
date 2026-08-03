@@ -90,7 +90,13 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
     {
         $this->setUpTestCase('projectListPage');
 
-        $this->assertStringContainsString('academic-projects-filtersorting', $this->renderHomePage());
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('academic-projects-filtersorting', $content);
+        // The options are written by `CategoryTypes\ViewHelpers\Form\AbstractSelectViewHelper`,
+        // which `ViewHelpers\Form\SortingSelectViewHelper` no longer overrides - this is what
+        // covers that here, the class has no test of its own.
+        $this->assertStringContainsString('<option value="title" selected="selected">Title</option>', $content);
+        $this->assertStringContainsString('<option value="asc" selected="selected">Ascending</option>', $content);
     }
 
     #[Test]
