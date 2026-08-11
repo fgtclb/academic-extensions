@@ -1,0 +1,95 @@
+{
+    "name": "fgtclb/academic-extensions-core-13",
+    "description": "TYPO3 v13 development instance for the academic extension mono repository",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "FGTCLB GmbH",
+            "email": "hello@fgtclb.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2 || ^8.3 || ^8.4",
+        "bk2k/bootstrap-package": "^15.0@dev",
+        "fgtclb/academics-monorepo-shared": "~3.0.0@dev",
+        "sbuerk/extended-path-repository": "^1.0.1",
+        "typo3/cms-adminpanel": "~13.4.0@dev",
+        "typo3/cms-dashboard": "~13.4.0@dev",
+        "typo3/cms-form": "~13.4.0@dev",
+        "typo3/cms-impexp": "~13.4.0@dev",
+        "typo3/cms-indexed-search": "~13.4.0@dev",
+        "typo3/cms-linkvalidator": "~13.4.0@dev",
+        "typo3/cms-opendocs": "~13.4.0@dev",
+        "typo3/cms-reactions": "~13.4.0@dev",
+        "typo3/cms-seo": "~13.4.0@dev",
+        "typo3/cms-styleguide": "~13.4.0@dev",
+        "typo3/cms-viewpage": "~13.4.0@dev",
+        "typo3/cms-webhooks": "~13.4.0@dev",
+        "typo3/minimal": "^13"
+    },
+    "require-dev": {
+        "vaimo/composer-patches": "^6.0.1"
+    },
+    "config": {
+        "allow-plugins": {
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true,
+            "php-http/discovery": true,
+            "sbuerk/fixture-packages": true,
+            "vaimo/composer-patches": true,
+            "sbuerk/extended-path-repository": true
+        },
+        "sort-packages": true,
+        "audit": {
+            "block-insecure": false
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "web-dir": "public"
+        },
+        "patches-search": "patches/"
+    },
+    "repositories": {
+        "packages-dev": {
+            "type": "path",
+            "url": "../packages-dev/*"
+        },
+        "packages": {
+            "type": "path",
+            "url": "../packages/*/*"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/fgtclb/academic-extensions/issues",
+        "source": "https://github.com/fgtclb/academic-extensions",
+        "email": "hello@fgtclb.com"
+    },
+    "homepage": "https://www.fgtclb.com/",
+    "scripts": {
+        "sqlite:apply": [
+            "\\cp -Rvf ../sqlite-databases/core-13.sqlite var/sqlite/core-13.sqlite",
+            "@php vendor/bin/typo3 cache:flush",
+            "@php vendor/bin/typo3 cache:warmup"
+        ],
+        "sqlite:backup": [
+            "@php vendor/bin/typo3 cache:flush",
+            "\\cp -Rvf var/sqlite/core-13.sqlite ../sqlite-databases/core-13.sqlite",
+            "@php vendor/bin/typo3 cache:warmup"
+        ],
+        "system:refresh": [
+            "@php vendor/bin/typo3 cache:flush",
+            "@php vendor/bin/typo3 cache:warmup",
+            "@php vendor/bin/typo3 language:update",
+            "@php vendor/bin/typo3 extension:setup"
+        ]
+    },
+    "scripts-descriptions": {
+        "sqlite:apply": "Restore this instance from \"../sqlite-databases/core-13.sqlite\", discarding its current database.",
+        "sqlite:backup": "Copy this instance's database to \"../sqlite-databases/core-13.sqlite\" so it can be committed.",
+        "system:refresh": "Refresh the system after changes: flush and warm up caches (DI), update languages, run extension setup."
+    }
+}

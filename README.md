@@ -93,6 +93,62 @@ implemented and verified for every extension above by the `TYPO3 v13` and
 | fgtclb/academic-projects       | academic_projects       | [packages/fgtclb/academic-projects](packages/fgtclb/academic-projects/README.md)           | [fgtclb/academic-projects](https://github.com/fgtclb/academic-projects)              |
 | fgtclb/category-types          | category_types          | [packages/fgtclb/typo3-category-types](packages/fgtclb/typo3-category-types/README.md)     | [fgtclb/fgtclb/typo3-category-types](https://github.com/fgtclb/typo3-category-types) |
 
+## Development instances
+
+Two ready-to-start TYPO3 instances live at the repository root, one per supported
+core version:
+
+| Folder     | TYPO3 | DDEV project           | Seeded demo content |
+|------------|-------|------------------------|---------------------|
+| `core-13/` | v13   | `core13-academics-v3`  | styleguide          |
+| `core-14/` | v14   | `core14-academics-v3`  | camino              |
+
+Both run on **SQLite** — no database container is started (`omit_containers: [db]`).
+Each instance is seeded on first start from the committed template in
+`sqlite-databases/`, by `config/system/additional.php`. So there is no setup step:
+check out, start, log in.
+
+```shell
+cd core-13 && ddev start && ddev launch /typo3/
+```
+
+The backend account shipped in both databases:
+
+```
+USERNAME: john-doe
+PASSWORD: John-Doe-1701D.
+```
+
+### Database backup and restore
+
+The instance database is git-ignored (`core-*/var/`); the template next to it is
+committed. Two composer scripts move state between them:
+
+```shell
+cd core-13
+ddev composer sqlite:backup    # instance -> sqlite-databases/core-13.sqlite (commit this)
+ddev composer sqlite:apply     # sqlite-databases/core-13.sqlite -> instance (discards changes)
+ddev composer system:refresh   # flush + warm caches, update languages, extension:setup
+```
+
+`sqlite:backup` rewrites a multi-megabyte binary that git cannot delta-compress,
+so commit it when the demo content genuinely changed, not on every run.
+
+### Teardown
+
+```shell
+cd core-13 && ddev stop -ROU && git clean -xdf -e '.idea'
+```
+
+### Without DDEV
+
+The instances do not depend on DDEV. `config/system/additional.php` recomputes the
+database path from `__DIR__` and the site configurations use host-less, relative
+`base` values, so a host stack only needs PHP with `pdo_sqlite` and a vhost
+pointing at `core-13/public`. Local-only overrides — different binary paths, a
+different mail transport — go into `core-*/config/system/additional/*.php`, which
+is git-ignored and included automatically.
+
 ## Releasing (maintainers)
 
 A release is always cut from the branch owning that version line (see the
@@ -140,9 +196,14 @@ It rewrites, in one pass:
    branch-alias, `tailor set-version`, `VERSION` file
 3. functional-test fixture extensions → composer deps only
 4. `ext_emconf.php` → `version` plus `depends`/`suggests` constraints
-5. `packages-dev/monorepo-shared` → academic deps + packages version map
-6. `ddev-instances/*` → both version maps + `academics-monorepo-shared` require
-7. root `composer.json` → both version maps, `monorepo-shared` require, alias
+5. `packages-dev/*` → academic deps, `extra.typo3/cms.version`, `VERSION` file
+6. `core-*/` development instances → `academics-monorepo-shared` require
+7. root `composer.json` → `monorepo-shared` require, branch alias
+
+There are no path-repository version maps to keep in sync any more. The composer
+plugin `sbuerk/extended-path-repository` derives a path package's version from
+the package itself, so steps 2 and 5 — which write `extra.typo3/cms.version` and
+the `VERSION` file — are what sets the version everywhere it is consumed.
 
 The script only edits working-tree files — it performs no git and no network
 operations. `--dry-run` prints every single change without touching a file and

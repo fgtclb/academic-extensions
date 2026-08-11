@@ -23,7 +23,8 @@ together.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits (`ExtensionsLoadedTestsTrait`, `TcaHelperMethodsTrait`, `ExtensionCoreVersionCompatTestsTrait`, `EnsureTtContentListTypeColumnTrait`, `PluginFlexFormDataStructureTrait`).
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
-- `ddev-instances/core-13`, `ddev-instances/core-14` — DDEV setups per core version.
+- `core-13/`, `core-14/` — ready-to-start development instances, one per core version. SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
+- `sqlite-databases/` — committed database templates for those instances. `core-*/patches` symlinks into the shared `patches/` pool consumed by `vaimo/composer-patches`.
 
 The extension directory name does not always equal the extension key: e.g.
 `packages/fgtclb/academic-contact4pages/` ships extension key
@@ -123,9 +124,11 @@ Three PHP sets, to be changed together: `lint` uses all of 8.2–8.5, `unit` and
 `phpstan` is the only source gate that runs per core version (it analyses
 against the installed core via `Build/phpstan/Core13|Core14`). `lint` needs
 neither `-t` nor `composerUpdate` — `lintPhp` runs `php -l` over the sources and
-excludes `.Build/` and `ddev-instances/`. Both exclusions are load-bearing:
-those are git-ignored vendor trees, and `typo3/class-alias-loader` ships a
-template file that is deliberately not valid PHP.
+excludes `.Build/` plus the `vendor/`, `public/` and `var/` trees of the
+`core-*` instances. Those exclusions are load-bearing: they are git-ignored
+vendor trees, and `typo3/class-alias-loader` ships a template file that is
+deliberately not valid PHP. The instances' *tracked* `config/system/*.php` is
+deliberately still linted.
 
 The `documentation` job runs `checkRstRenderingAll` (a real gate — the renderer
 uses `--fail-on-log --fail-on-error`) and uploads `documentation-rendered/`,
@@ -295,9 +298,13 @@ labels emit `E_USER_DEPRECATED` on every form render on v14.
 
 ## Releasing / versions
 
-Every package is pinned to the same dev version (on this branch `3.0.0-dev`) in
-the root, the shared meta-package and both DDEV instance `composer.json`
-path-repository `versions` maps — all four have to move together. A release bumps
+Every package carries its own version (on this branch `3.0.0-dev`) in
+`extra.typo3/cms.version` and its `VERSION` file — including the two
+`packages-dev/*` meta packages. The composer plugin
+`sbuerk/extended-path-repository`, required by every composer.json that declares
+a `path` repository, derives the path package version from exactly those, so
+there are **no** `repositories.*.options.versions` maps to keep in sync any more.
+Write the version on the package and it is right everywhere. A release bumps
 each extension's `ext_emconf.php` `version` and `VERSION` file. Commit subjects
 use TYPO3 Core conventions (see recent history: `[RELEASE]`, `[TASK]`,
 `[BUGFIX]`, and `ACE-NNN` issue refs in the subject/footer). The public issue/PR
