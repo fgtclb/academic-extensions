@@ -37,7 +37,8 @@
     },
     "extra": {
         "typo3/cms": {
-            "extension-key": "academic_contacts4pages"
+            "extension-key": "academic_contacts4pages",
+            "version": "2.4.0-dev"
         },
         "branch-alias": {
             "dev-2": "2.4.x-dev"

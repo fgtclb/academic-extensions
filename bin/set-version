@@ -6,12 +6,18 @@
 # Applies a version (and its derived variants) to every relevant file: the
 # runTests.sh COMPOSER_ROOT_VERSION, each split extension (composer.json,
 # ext_emconf.php, VERSION, tailor, branch-alias), the functional-test fixture
-# extensions, the monorepo-shared meta package, the ddev instances and the root
-# composer.json (path-repository version maps + monorepo-shared requirement).
+# extensions, the packages-dev meta packages, the ddev instances and the root
+# composer.json (monorepo-shared requirement + branch-alias).
 #
 # The set of academic packages, their extension keys and their inter-package
 # dependencies are discovered dynamically from the repository — nothing about the
-# package list is hardcoded here.
+# package list is hardcoded here. The same holds for the packages-dev meta
+# packages and the ddev instances, which are discovered by path.
+#
+# There are no path-repository version maps to maintain any more: the composer
+# plugin "sbuerk/extended-path-repository" derives a path package's version from
+# the package itself (extra.typo3/cms.version, version, VERSION file), so writing
+# those three per package is what sets the version everywhere it is consumed.
 #
 # Usage:
 #   bin/set-version <version> <type> [options]
@@ -141,13 +147,13 @@ PKW_CMD=("${PHP}" "${PKW}")
 # Derive the per-type version variants.
 #
 #   RUNTESTS_VERSION      -> Build/Scripts/runTests.sh COMPOSER_ROOT_VERSION
-#   MAP_VERSION           -> jq path-repository version maps (packages[-dev])
+#   PACKAGE_VERSION       -> extra.typo3/cms.version of every path package
 #   VERSION_FILE_VALUE    -> split extension VERSION file
 #   EMCONF_VERSION        -> ext_emconf.php 'version' (pkw extemconf:set)
 #   EMCONF_CONSTRAINT     -> ext_emconf.php depends/suggests (pkw constraints:set)
 #   TAILOR_VERSION        -> tailor set-version
 #   ACADEMIC_CONSTRAINT   -> composer require constraint for academic package deps
-#   DDEV_SHARED_CONSTRAINT-> composer require academics-monorepo-shared in ddev
+#                            and for academics-monorepo-shared in the ddev instances
 #   ROOT_SHARED_CONSTRAINT-> composer require academics-monorepo-shared in root
 #   SET_BRANCH_ALIAS/ALIAS-> extra.branch-alias.dev-<source-branch>
 # ---------------------------------------------------------------------------
@@ -156,13 +162,12 @@ BRANCH_ALIAS="${MAJOR}.${MINOR}.x-dev"
 if [ "${TYPE}" = "release" ]; then
     RELEASE_VERSION="${MAJOR}.${MINOR}.${PATCH}"
     RUNTESTS_VERSION="${RELEASE_VERSION}"
-    MAP_VERSION="${RELEASE_VERSION}"
+    PACKAGE_VERSION="${RELEASE_VERSION}"
     VERSION_FILE_VALUE="${RELEASE_VERSION}"
     EMCONF_VERSION="${RELEASE_VERSION}"
     EMCONF_CONSTRAINT="${RELEASE_VERSION}"
     TAILOR_VERSION="${RELEASE_VERSION}"
     ACADEMIC_CONSTRAINT="${RELEASE_VERSION}@dev"
-    DDEV_SHARED_CONSTRAINT="${RELEASE_VERSION}@dev"
     ROOT_SHARED_CONSTRAINT="~${RELEASE_VERSION}@dev"
     SET_BRANCH_ALIAS=0
 else
@@ -170,20 +175,19 @@ else
     # dev version to apply directly (no +1 here).
     DEV_VERSION="${MAJOR}.${MINOR}.${PATCH}"
     RUNTESTS_VERSION="${DEV_VERSION}-dev"
-    MAP_VERSION="${DEV_VERSION}-dev"
+    PACKAGE_VERSION="${DEV_VERSION}-dev"
     VERSION_FILE_VALUE="${DEV_VERSION}-dev"
     EMCONF_VERSION="${DEV_VERSION}"
     EMCONF_CONSTRAINT="${DEV_VERSION}"
     TAILOR_VERSION="${DEV_VERSION}"
     ACADEMIC_CONSTRAINT="~${DEV_VERSION}@dev"
-    DDEV_SHARED_CONSTRAINT="~${DEV_VERSION}@dev"
     ROOT_SHARED_CONSTRAINT="~${DEV_VERSION}@dev"
     SET_BRANCH_ALIAS=1
 fi
 
 info "set-version ${PASSED_VERSION} (${TYPE})$([ "${DRY_RUN}" -eq 1 ] && echo '  [DRY-RUN]')"
 step "info" "runTests COMPOSER_ROOT_VERSION = ${RUNTESTS_VERSION}"
-step "info" "version maps                   = ${MAP_VERSION}"
+step "info" "package version                = ${PACKAGE_VERSION}"
 step "info" "ext_emconf version             = ${EMCONF_VERSION}"
 step "info" "academic dep constraint        = ${ACADEMIC_CONSTRAINT}"
 [ "${SET_BRANCH_ALIAS}" -eq 1 ] && step "info" "branch-alias dev-${SOURCE_BRANCH}      = ${BRANCH_ALIAS}"
@@ -289,27 +293,8 @@ apply_branch_alias() {
 apply_extension_composer_version() {
     local dir="$1"
     "${JQ}" -e '.extra."typo3/cms".version' "${dir}/composer.json" >/dev/null 2>&1 || return 0
-    step "${dir}" "config extra.typo3/cms.version = ${MAP_VERSION}"
-    run "${COMPOSER}" config -d "${dir}" "extra.typo3/cms.version" "${MAP_VERSION}"
-}
-
-# Helper: rewrite a jq version map in place (temp file + mv; never self-redirect).
-apply_version_map() {
-    local file="$1" map="$2"   # map: packages | packages-dev
-    # shellcheck disable=SC2016  # $M/$SV are jq variables, must stay unexpanded
-    "${JQ}" -e --arg M "${map}" '.repositories[$M].options.versions' "${file}" >/dev/null 2>&1 || return 0
-    step "${file}" "repositories.${map}.options.versions[] = ${MAP_VERSION}"
-    if [ "${DRY_RUN}" -eq 1 ]; then
-        printf '   [dry-run] jq set repositories.%s.options.versions[] = %s in %s\n' \
-            "${map}" "${MAP_VERSION}" "${file}"
-        return 0
-    fi
-    local tmp
-    tmp="$(mktemp)"
-    # shellcheck disable=SC2016  # $M/$SV are jq variables, must stay unexpanded
-    "${JQ}" --arg SV "${MAP_VERSION}" --arg M "${map}" --indent 4 \
-        '.repositories[$M].options.versions[] |= $SV' "${file}" > "${tmp}"
-    mv "${tmp}" "${file}"
+    step "${dir}" "config extra.typo3/cms.version = ${PACKAGE_VERSION}"
+    run "${COMPOSER}" config -d "${dir}" "extra.typo3/cms.version" "${PACKAGE_VERSION}"
 }
 
 # Helper: write a VERSION file.
@@ -378,30 +363,40 @@ for extkey in "${ACADEMIC_EXTKEYS[@]}"; do
 done
 
 # ---------------------------------------------------------------------------
-# 5. monorepo-shared: academic deps + packages version map.
+# 5. packages-dev meta packages: academic deps, extra.typo3/cms.version, VERSION.
+#
+#    These are path packages too, so the extended-path-repository plugin reads
+#    their version from exactly the same three places as a split extension. They
+#    carry no ext_emconf.php and are not published, hence no tailor and no alias.
 # ---------------------------------------------------------------------------
-info "packages-dev/monorepo-shared"
-apply_academic_composer_deps "packages-dev/monorepo-shared" "${ACADEMIC_CONSTRAINT}"
-apply_version_map "packages-dev/monorepo-shared/composer.json" "packages"
-
-# ---------------------------------------------------------------------------
-# 6. ddev instances: both version maps + academics-monorepo-shared require.
-# ---------------------------------------------------------------------------
-for dir in ddev-instances/core-12 ddev-instances/core-13; do
+info "packages-dev meta packages"
+for dir in packages-dev/*/; do
+    dir="${dir%/}"
     [ -f "${dir}/composer.json" ] || continue
-    info "${dir}"
-    apply_version_map "${dir}/composer.json" "packages"
-    apply_version_map "${dir}/composer.json" "packages-dev"
-    apply_single_composer_require "${dir}" \
-        "fgtclb/academics-monorepo-shared" "${DDEV_SHARED_CONSTRAINT}"
+    apply_academic_composer_deps "${dir}" "${ACADEMIC_CONSTRAINT}"
+    apply_extension_composer_version "${dir}"
+    apply_version_file "${dir}"
 done
 
 # ---------------------------------------------------------------------------
-# 7. root composer.json: both version maps + monorepo-shared require + alias.
+# 6. ddev instances: academics-monorepo-shared require.
+#
+#    Discovered by path so a new core version is picked up by adding its folder,
+#    which is what the previously hardcoded list failed to do.
+# ---------------------------------------------------------------------------
+info "ddev instances"
+for dir in core-*/; do
+    dir="${dir%/}"
+    [ -f "${dir}/composer.json" ] || continue
+    info "${dir}"
+    apply_single_composer_require "${dir}" \
+        "fgtclb/academics-monorepo-shared" "${ACADEMIC_CONSTRAINT}"
+done
+
+# ---------------------------------------------------------------------------
+# 7. root composer.json: monorepo-shared require + branch alias.
 # ---------------------------------------------------------------------------
 info "root composer.json"
-apply_version_map "composer.json" "packages"
-apply_version_map "composer.json" "packages-dev"
 step "." "composer require fgtclb/academics-monorepo-shared:${ROOT_SHARED_CONSTRAINT}"
 run "${COMPOSER}" require --no-update \
     "fgtclb/academics-monorepo-shared:${ROOT_SHARED_CONSTRAINT}"
