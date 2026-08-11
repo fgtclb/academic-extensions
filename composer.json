@@ -11,14 +11,16 @@
     ],
     "require": {
         "php": "^8.2 || ^8.3 || ^8.4",
-        "fgtclb/academics-monorepo-shared": "~3.0.0@dev"
+        "fgtclb/academics-monorepo-shared": "~3.0.0@dev",
+        "sbuerk/extended-path-repository": "^1.0.1"
     },
     "config": {
         "allow-plugins": {
             "typo3/class-alias-loader": true,
             "typo3/cms-composer-installers": true,
             "php-http/discovery": true,
-            "sbuerk/fixture-packages": true
+            "sbuerk/fixture-packages": true,
+            "sbuerk/extended-path-repository": true
         },
         "sort-packages": true,
         "bin-dir": ".Build/bin",
@@ -68,33 +70,11 @@
     "repositories": {
         "packages-dev": {
             "type": "path",
-            "url": "packages-dev/*",
-            "options": {
-                "versions": {
-                    "fgtclb/academics-monorepo-shared": "3.0.0-dev",
-                    "fgtclb/academics-monorepo-testing-helper": "3.0.0-dev"
-                }
-            }
+            "url": "packages-dev/*"
         },
         "packages": {
             "type": "path",
-            "url": "packages/*/*",
-            "options": {
-                "versions": {
-                    "fgtclb/academic-bite-jobs": "3.0.0-dev",
-                    "fgtclb/academic-contacts4pages": "3.0.0-dev",
-                    "fgtclb/academic-jobs": "3.0.0-dev",
-                    "fgtclb/academic-partners": "3.0.0-dev",
-                    "fgtclb/academic-persons": "3.0.0-dev",
-                    "fgtclb/academic-persons-edit": "3.0.0-dev",
-                    "fgtclb/academic-persons-sync": "3.0.0-dev",
-                    "fgtclb/academic-programs": "3.0.0-dev",
-                    "fgtclb/academic-projects": "3.0.0-dev",
-                    "fgtclb/category-types": "3.0.0-dev",
-                    "fgtclb/academic-base": "3.0.0-dev",
-                    "fgtclb/academic-study-plan": "3.0.0-dev"
-                }
-            }
+            "url": "packages/*/*"
         },
         "numbered-pagination-fork": {
             "type": "vcs",

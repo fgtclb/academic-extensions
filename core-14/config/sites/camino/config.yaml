@@ -1,0 +1,52 @@
+base: /camino/
+dependencies:
+  - typo3/theme-camino
+languages:
+  -
+    title: English
+    enabled: true
+    locale: en-US
+    hreflang: en-US
+    base: /
+    websiteTitle: '[EN] Camino'
+    navigationTitle: English
+    flag: global
+    languageId: 0
+  -
+    title: German
+    enabled: true
+    locale: de_DE
+    hreflang: ''
+    base: /de/
+    websiteTitle: '[DE] Camino'
+    navigationTitle: Deutsch
+    fallbackType: strict
+    fallbacks: ''
+    flag: de
+    languageId: 1
+  -
+    title: Italian
+    enabled: true
+    locale: it_IT
+    hreflang: ''
+    base: /it/
+    websiteTitle: '[IT] Camino'
+    navigationTitle: Italiano
+    fallbackType: strict
+    fallbacks: ''
+    flag: it
+    languageId: 2
+  -
+    title: French
+    enabled: true
+    locale: fr_FR
+    hreflang: ''
+    base: /fr/
+    websiteTitle: '[FR] Camino'
+    navigationTitle: Français
+    fallbackType: strict
+    fallbacks: ''
+    flag: fr
+    languageId: 3
+rootPageId: 1
+websiteTitle: Camino

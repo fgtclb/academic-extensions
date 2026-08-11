@@ -1,0 +1,7 @@
+services:
+  web:
+    volumes:
+      - "../../packages:/var/www/packages"
+      - "../../packages-dev:/var/www/packages-dev"
+      - "../../sqlite-databases:/var/www/sqlite-databases"
+      - "../../patches:/var/www/patches"
