@@ -22,7 +22,9 @@ together.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits (`ExtensionsLoadedTestsTrait`, `TcaHelperMethodsTrait`, `ExtensionCoreVersionCompatTestsTrait`).
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
-- `ddev-instances/core-12`, `ddev-instances/core-13` — DDEV setups per core version.
+- `core-12/`, `core-13/` — ready-to-start development instances, one per core version. SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
+- `sqlite-databases/` — committed database templates for those instances. `core-*/patches` symlinks into the shared `patches/` pool consumed by `vaimo/composer-patches`.
+- Switching branches in one checkout collides in DDEV: the instance folders have the same path on every branch but the project names differ per version line (`core13-academics-v2` on `2`, `core13-academics-v3` on `main`), and DDEV refuses a second name for a known path. `ddev stop --unlist <other-name>` clears it; it removes only the registration. The instance database in the git-ignored `core-*/var/` survives the switch, so reset it with `ddev composer sqlite:apply`.
 
 The extension directory name does not always equal the extension key: e.g.
 `packages/fgtclb/academic-contact4pages/` ships extension key
@@ -101,8 +103,10 @@ combinations such as v13 on PHP 8.1. `unit` and `functional` run v12 on 8.1/8.4
 and v13 on 8.2/8.5; `cgl` runs on v12 + 8.1; `phpstan` runs per core version
 (v12 + 8.1 and v13 + 8.2) because it analyses against the installed core via
 `Build/phpstan/Core12|Core13`. `lint` needs neither `-t` nor `composerUpdate` —
-`lintPhp` runs `php -l` over the sources and excludes `.Build/` — so it covers
-all of PHP 8.1–8.5 with no core dimension.
+`lintPhp` runs `php -l` over the sources and excludes `.Build/` plus the
+`vendor/`, `public/` and `var/` trees of the `core-*` instances — so it covers
+all of PHP 8.1–8.5 with no core dimension. The instances' *tracked*
+`config/system/*.php` is deliberately still linted.
 
 The `documentation` job runs `checkRstRenderingAll` (a real gate — the renderer
 uses `--fail-on-log --fail-on-error`) and uploads `documentation-rendered/`,
@@ -187,8 +191,13 @@ style when editing it.
 
 ## Releasing / versions
 
-Every package is pinned to the same dev version (currently `2.3.5-dev`) in the
-root and shared `composer.json` path-repository `versions` maps. A release bumps
+Every package carries its own version (on this branch `2.4.0-dev`) in
+`extra.typo3/cms.version` and its `VERSION` file — including the two
+`packages-dev/*` meta packages. The composer plugin
+`sbuerk/extended-path-repository`, required by every composer.json that declares
+a `path` repository, derives the path package version from exactly those, so
+there are **no** `repositories.*.options.versions` maps to keep in sync any more.
+Write the version on the package and it is right everywhere. A release bumps
 each extension's `ext_emconf.php` `version` and `VERSION` file. Commit subjects
 use TYPO3 Core conventions (see recent history: `[RELEASE]`, `[TASK]`,
 `[BUGFIX]`, and `ACE-NNN` issue refs in the subject/footer). The public issue/PR

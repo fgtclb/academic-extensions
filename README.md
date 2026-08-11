@@ -93,3 +93,85 @@ cells will be promoted from `(3)` to `{3}` and finally to `<3>` per extension.
 | fgtclb/academic-programs       | academic_programs       | [packages/fgtclb/academic-programs](packages/fgtclb/academic-programs/README.md)           | [fgtclb/academic-programs](https://github.com/fgtclb/academic-programs)              |
 | fgtclb/academic-projects       | academic_projects       | [packages/fgtclb/academic-projects](packages/fgtclb/academic-projects/README.md)           | [fgtclb/academic-projects](https://github.com/fgtclb/academic-projects)              |
 | fgtclb/category-types          | category_types          | [packages/fgtclb/typo3-category-types](packages/fgtclb/typo3-category-types/README.md)     | [fgtclb/fgtclb/typo3-category-types](https://github.com/fgtclb/typo3-category-types) |
+
+## Development instances
+
+Two ready-to-start TYPO3 instances live at the repository root, one per supported
+core version:
+
+| Folder     | TYPO3 | DDEV project           |
+|------------|-------|------------------------|
+| `core-12/` | v12   | `core12-academics-v2`  |
+| `core-13/` | v13   | `core13-academics-v2`  |
+
+Both run on **SQLite** — no database container is started (`omit_containers: [db]`).
+Each instance is seeded on first start from the committed template in
+`sqlite-databases/`, by `config/system/additional.php`. So there is no setup step:
+check out, start, log in.
+
+```shell
+cd core-12 && ddev start && ddev launch /typo3/
+```
+
+The backend account shipped in both databases:
+
+```
+USERNAME: john-doe
+PASSWORD: John-Doe-1701D.
+```
+
+### Database backup and restore
+
+The instance database is git-ignored (`core-*/var/`); the template next to it is
+committed. Two composer scripts move state between them:
+
+```shell
+cd core-12
+ddev composer sqlite:backup    # instance -> sqlite-databases/core-12.sqlite (commit this)
+ddev composer sqlite:apply     # sqlite-databases/core-12.sqlite -> instance (discards changes)
+ddev composer system:refresh   # flush + warm caches, update languages, extension:setup
+```
+
+`sqlite:backup` rewrites a multi-megabyte binary that git cannot delta-compress,
+so commit it when the demo content genuinely changed, not on every run.
+
+### Teardown
+
+```shell
+cd core-12 && ddev stop -ROU && git clean -xdf -e '.idea'
+```
+
+### Switching branches in the same checkout
+
+The instance folders sit at the repository root on every branch, but each branch
+names its DDEV projects after the version line it carries — `core13-academics-v2`
+here on `2`, `core13-academics-v3` on `main`. Two different project names for the
+same directory is a state DDEV refuses:
+
+```
+Failed to start app core13-academics-v2: this project root '…/core-13'
+already contains a project named 'core13-academics-v3'.
+```
+
+That is not a broken checkout. DDEV remembers the project by path, and the name
+changed underneath it. Unregister the one belonging to the other branch and start
+again:
+
+```shell
+ddev stop --unlist core13-academics-v3
+ddev start
+```
+
+`--unlist` only removes the registration; it touches neither the containers nor
+any data. The instance database lives in the git-ignored `core-*/var/`, so it
+survives the switch and keeps whatever the *other* branch left there — run
+`ddev composer sqlite:apply` to reset it to this branch's committed template.
+
+### Without DDEV
+
+The instances do not depend on DDEV. `config/system/additional.php` recomputes the
+database path from `__DIR__` and the site configurations use host-less, relative
+`base` values, so a host stack only needs PHP with `pdo_sqlite` and a vhost
+pointing at `core-12/public`. Local-only overrides — different binary paths, a
+different mail transport — go into `core-*/config/system/additional/*.php`, which
+is git-ignored and included automatically.
