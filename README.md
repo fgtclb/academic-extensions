@@ -140,6 +140,32 @@ so commit it when the demo content genuinely changed, not on every run.
 cd core-13 && ddev stop -ROU && git clean -xdf -e '.idea'
 ```
 
+### Switching branches in the same checkout
+
+The instance folders sit at the repository root on every branch, but each branch
+names its DDEV projects after the version line it carries — `core13-academics-v3`
+here on `main`, `core13-academics-v2` on `2`. Two different project names for the
+same directory is a state DDEV refuses:
+
+```
+Failed to start app core13-academics-v2: this project root '…/core-13'
+already contains a project named 'core13-academics-v3'.
+```
+
+That is not a broken checkout. DDEV remembers the project by path, and the name
+changed underneath it. Unregister the one belonging to the other branch and start
+again:
+
+```shell
+ddev stop --unlist core13-academics-v2
+ddev start
+```
+
+`--unlist` only removes the registration; it touches neither the containers nor
+any data. The instance database lives in the git-ignored `core-*/var/`, so it
+survives the switch and keeps whatever the *other* branch left there — run
+`ddev composer sqlite:apply` to reset it to this branch's committed template.
+
 ### Without DDEV
 
 The instances do not depend on DDEV. `config/system/additional.php` recomputes the

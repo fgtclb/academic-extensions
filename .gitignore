@@ -14,6 +14,11 @@
 /rector.php
 *.diff
 
+# Composer writes its cache relative to the directory given with "-d", so
+# "bin/set-version" and any manual "composer -d <package>" leaves one behind.
+/packages-dev/*/.cache/
+/packages/*/*/.cache/
+
 # Development instances. "config/" and "composer.lock" are tracked now: the
 # instance ships its own system configuration and a locked dependency set, and
 # is seeded from "sqlite-databases/". Only generated trees are ignored, plus the
