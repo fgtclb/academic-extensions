@@ -88,7 +88,15 @@ jobs:
       - name: "Cache composer downloads"
         uses: actions/cache@v6
         with:
-          path: ".cache/composer"
+          # Only "files/", never the whole composer cache. That subdirectory holds
+          # dist archives at "files/<vendor>/<package>/<sha>.zip" - content
+          # addressed, so a restored entry can never be wrong, and it is where the
+          # entire benefit sits (~150 packages per job). Its sibling "repo/" holds
+          # packagist metadata, which is stale the moment anything is published;
+          # caching that lets the "restore-keys" fallback below resolve against a
+          # package list from whenever the cache was written. Composer refetches
+          # the small provider files every run instead, which costs seconds.
+          path: ".cache/composer/files"
           key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
           restore-keys: |
             composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
@@ -123,7 +131,15 @@ jobs:
       - name: "Cache composer downloads"
         uses: actions/cache@v6
         with:
-          path: ".cache/composer"
+          # Only "files/", never the whole composer cache. That subdirectory holds
+          # dist archives at "files/<vendor>/<package>/<sha>.zip" - content
+          # addressed, so a restored entry can never be wrong, and it is where the
+          # entire benefit sits (~150 packages per job). Its sibling "repo/" holds
+          # packagist metadata, which is stale the moment anything is published;
+          # caching that lets the "restore-keys" fallback below resolve against a
+          # package list from whenever the cache was written. Composer refetches
+          # the small provider files every run instead, which costs seconds.
+          path: ".cache/composer/files"
           key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
           restore-keys: |
             composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
@@ -171,7 +187,15 @@ jobs:
       - name: "Cache composer downloads"
         uses: actions/cache@v6
         with:
-          path: ".cache/composer"
+          # Only "files/", never the whole composer cache. That subdirectory holds
+          # dist archives at "files/<vendor>/<package>/<sha>.zip" - content
+          # addressed, so a restored entry can never be wrong, and it is where the
+          # entire benefit sits (~150 packages per job). Its sibling "repo/" holds
+          # packagist metadata, which is stale the moment anything is published;
+          # caching that lets the "restore-keys" fallback below resolve against a
+          # package list from whenever the cache was written. Composer refetches
+          # the small provider files every run instead, which costs seconds.
+          path: ".cache/composer/files"
           key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
           restore-keys: |
             composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
@@ -203,7 +227,15 @@ jobs:
       - name: "Cache composer downloads"
         uses: actions/cache@v6
         with:
-          path: ".cache/composer"
+          # Only "files/", never the whole composer cache. That subdirectory holds
+          # dist archives at "files/<vendor>/<package>/<sha>.zip" - content
+          # addressed, so a restored entry can never be wrong, and it is where the
+          # entire benefit sits (~150 packages per job). Its sibling "repo/" holds
+          # packagist metadata, which is stale the moment anything is published;
+          # caching that lets the "restore-keys" fallback below resolve against a
+          # package list from whenever the cache was written. Composer refetches
+          # the small provider files every run instead, which costs seconds.
+          path: ".cache/composer/files"
           key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
           restore-keys: |
             composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
@@ -239,7 +271,15 @@ jobs:
       - name: "Cache composer downloads"
         uses: actions/cache@v6
         with:
-          path: ".cache/composer"
+          # Only "files/", never the whole composer cache. That subdirectory holds
+          # dist archives at "files/<vendor>/<package>/<sha>.zip" - content
+          # addressed, so a restored entry can never be wrong, and it is where the
+          # entire benefit sits (~150 packages per job). Its sibling "repo/" holds
+          # packagist metadata, which is stale the moment anything is published;
+          # caching that lets the "restore-keys" fallback below resolve against a
+          # package list from whenever the cache was written. Composer refetches
+          # the small provider files every run instead, which costs seconds.
+          path: ".cache/composer/files"
           key: "composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-${{ hashFiles('composer.json', 'packages-dev/*/composer.json', 'packages/fgtclb/*/composer.json') }}"
           restore-keys: |
             composer-${{ matrix.php-version }}-v${{ matrix.typo3 }}-
