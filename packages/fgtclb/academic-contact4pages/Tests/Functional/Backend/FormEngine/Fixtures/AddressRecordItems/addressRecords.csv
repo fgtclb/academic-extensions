@@ -1,0 +1,29 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","slug","title"
+,1,0,1,0,0,0,0,"/","Site Root"
+,100,1,254,0,0,0,0,"/sysfolder-records","Recordcollection"
+"tx_academicpersons_domain_model_profile",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","first_name","last_name","slug"
+,1,100,0,0,0,0,"Max","Müllermann","max-muellermann"
+"tx_academicpersons_domain_model_contract",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","profile","position"
+,1,100,0,0,0,0,1,"Professor"
+,2,100,0,0,0,0,1,"Lecturer"
+"tx_academicpersons_domain_model_email",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","contract","email","type"
+,1,100,0,0,0,0,2,1,"office@example.org","business"
+,2,100,0,0,0,0,1,1,"plain@example.org",""
+,3,100,0,1,0,0,3,1,"hidden@example.org","private"
+,4,100,1,0,0,0,4,1,"deleted@example.org","private"
+,5,100,0,0,1,1,2,1,"translated@example.org","business"
+,6,100,0,0,0,0,1,2,"other-contract@example.org","business"
+"tx_academicpersons_domain_model_phone_number",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","contract","phone_number","type"
+,1,100,0,0,0,0,1,1,"+49 170 1234567","mobile"
+,2,100,0,0,0,0,2,1,"+49 30 1234567",""
+,3,100,0,0,0,0,1,2,"+49 40 7654321","business"
+"tx_academicpersons_domain_model_address",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","contract","street","street_number","additional","zip","city","country","type"
+,1,100,0,0,0,0,1,1,"Musterstraße","1","Building A","10115","Berlin","Germany","business"
+,2,100,0,0,0,0,2,1,"","","","","","",""
+,3,100,0,0,0,0,1,2,"Anderstraße","2","","20095","Hamburg","Germany","private"

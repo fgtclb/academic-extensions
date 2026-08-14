@@ -31,6 +31,30 @@
       <trans-unit id="tx_academiccontacts4pages_domain_model_contact.role">
         <source>Role</source>
       </trans-unit>
+      <trans-unit id="tx_academiccontacts4pages_domain_model_contact.palette.addressRecords">
+        <source>Displayed address records</source>
+      </trans-unit>
+      <trans-unit id="tx_academiccontacts4pages_domain_model_contact.palette.addressRecords.description">
+        <source>Without a dedicated selection all address records of the contract are displayed.</source>
+      </trans-unit>
+      <trans-unit id="tx_academiccontacts4pages_domain_model_contact.email_address">
+        <source>E-mail address</source>
+      </trans-unit>
+      <trans-unit id="tx_academiccontacts4pages_domain_model_contact.phone_number">
+        <source>Phone number</source>
+      </trans-unit>
+      <trans-unit id="tx_academiccontacts4pages_domain_model_contact.physical_address">
+        <source>Physical address</source>
+      </trans-unit>
+      <trans-unit id="tx_academiccontacts4pages_domain_model_contact.addressRecord.all">
+        <source>Display all</source>
+      </trans-unit>
+      <trans-unit id="tx_academiccontacts4pages_domain_model_contact.addressRecord.none">
+        <source>Do not display</source>
+      </trans-unit>
+      <trans-unit id="tx_academiccontacts4pages_domain_model_contact.addressRecord.hidden">
+        <source>[Hidden] %s</source>
+      </trans-unit>
 
       <trans-unit id="tx_academiccontacts4pages_domain_model_role">
         <source>Role</source>

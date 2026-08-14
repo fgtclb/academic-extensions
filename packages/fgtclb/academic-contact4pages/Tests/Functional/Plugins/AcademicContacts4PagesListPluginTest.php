@@ -264,6 +264,135 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertRendersProfileName($content, 'Horst', 'Huber');
     }
 
+    /**
+     * The `contactsListPage_addressRecords` fixture gives each of its four contacts an own
+     * contract with two email addresses, two phone numbers and two physical addresses, and
+     * a different dedicated address record selection. Every profile of the fixture carries
+     * its own values, so an assertion on a value proves which contact rendered it.
+     */
+    #[Test]
+    public function listPluginRendersAllAddressRecordsWithoutDedicatedSelection(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecords');
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('anna-first@example.org', $content);
+        $this->assertStringContainsString('anna-second@example.org', $content);
+        $this->assertStringContainsString('+4900011', $content);
+        $this->assertStringContainsString('+4900012', $content);
+        $this->assertStringContainsString('Annafirst', $content);
+        $this->assertStringContainsString('Annasecond', $content);
+    }
+
+    #[Test]
+    public function listPluginRendersOnlyTheSelectedAddressRecords(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecords');
+
+        $content = $this->renderHomePage();
+        $this->assertStringNotContainsString('bruno-first@example.org', $content);
+        $this->assertStringContainsString('bruno-second@example.org', $content);
+        $this->assertStringNotContainsString('Brunofirst', $content);
+        $this->assertStringContainsString('Brunosecond', $content);
+    }
+
+    #[Test]
+    public function listPluginSuppressesAnAddressRecordKindEntirely(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecords');
+
+        $content = $this->renderHomePage();
+        // Bruno has no phone number at all, Clara no email address ...
+        $this->assertStringNotContainsString('+4900021', $content);
+        $this->assertStringNotContainsString('+4900022', $content);
+        $this->assertStringNotContainsString('clara-first@example.org', $content);
+        $this->assertStringNotContainsString('clara-second@example.org', $content);
+        // ... while the record kinds they did not restrict stay untouched.
+        $this->assertStringContainsString('+4900031', $content);
+        $this->assertStringContainsString('+4900032', $content);
+        $this->assertStringContainsString('Clarafirst', $content);
+    }
+
+    /**
+     * Dora points at an email address that is not part of her contract, which is what a
+     * contact looks like after its contract was switched. Nothing is rendered for a
+     * selection that cannot be resolved, exactly like "Do not display".
+     */
+    #[Test]
+    public function listPluginRendersNoAddressRecordForAnUnresolvableSelection(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecords');
+
+        $content = $this->renderHomePage();
+        $this->assertStringNotContainsString('dora-first@example.org', $content);
+        $this->assertStringNotContainsString('dora-second@example.org', $content);
+    }
+
+    /**
+     * Emil points at a hidden email address. Hidden address records are selectable in the
+     * backend, but reach the frontend only where hidden records are asked for.
+     */
+    #[Test]
+    public function listPluginRendersNoAddressRecordForASelectedHiddenOne(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecords');
+
+        $content = $this->renderHomePage();
+        $this->assertStringNotContainsString('emil-hidden@example.org', $content);
+        // The selection stays a selection: the visible record of the same contract is not
+        // rendered as a replacement.
+        $this->assertStringNotContainsString('emil-visible@example.org', $content);
+    }
+
+    #[Test]
+    public function listPluginRendersASelectedHiddenAddressRecordWhenConfigured(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecordsShowHidden');
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('emil-hidden@example.org', $content);
+        $this->assertStringNotContainsString('emil-visible@example.org', $content);
+    }
+
+    /**
+     * Frida displays all of her email addresses, one of which is hidden. The hidden one is
+     * part of "all" wherever hidden records are asked for - the contract relation itself
+     * never carries it.
+     */
+    #[Test]
+    public function listPluginRendersHiddenAddressRecordsWithoutDedicatedSelectionWhenConfigured(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecordsShowHidden');
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('frida-visible@example.org', $content);
+        $this->assertStringContainsString('frida-hidden@example.org', $content);
+    }
+
+    #[Test]
+    public function listPluginKeepsHiddenAddressRecordsOutOfTheCompleteListByDefault(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecords');
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('frida-visible@example.org', $content);
+        $this->assertStringNotContainsString('frida-hidden@example.org', $content);
+    }
+
+    /**
+     * "Show hidden records" widens what a selection may resolve to, it does not turn an
+     * unresolvable one into the full list.
+     */
+    #[Test]
+    public function listPluginRendersNoAddressRecordForAnUnresolvableSelectionWithHiddenRecords(): void
+    {
+        $this->setUpTestCase('contactsListPage_addressRecordsShowHidden');
+
+        $content = $this->renderHomePage();
+        $this->assertStringNotContainsString('dora-first@example.org', $content);
+        $this->assertStringNotContainsString('dora-second@example.org', $content);
+    }
+
     #[Test]
     public function listPluginRendersWrapperWithoutContacts(): void
     {
