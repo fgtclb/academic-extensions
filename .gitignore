@@ -1,5 +1,15 @@
 .DS_Store
 /.idea/
+
+# Working tree of AI coding agents: plans, reports, commit drafts and scratch
+# files. See AGENTS.md — nothing below it is ever committed.
+/.agent
+
+# Agent tool configuration and personal, machine-local instructions.
+/.claude
+/AGENTS.local.md
+/CLAUDE.local.md
+/GEMINI.local.md
 /var/
 /vendor/
 /.Build/
