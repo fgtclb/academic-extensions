@@ -559,22 +559,30 @@ final class TcaManipulatorTest extends UnitTestCase
     }
 
     /**
-     * TYPO3 v13 resolves `ds` through `ds_pointerField` and requires an array;
-     * a string makes the content element unopenable in the backend.
+     * TYPO3 v13 resolves the data structure through `ds_pointerField`, which is
+     * `list_type,CType`, and reads it back from the global column configuration.
+     * A plugin content element has no `list_type`, so `*,<CType>` is the key.
+     * Assigning it to the record type instead is what left the backend showing
+     * core's own default data structure.
      */
     #[Group('not-core-14')]
     #[Test]
-    public function pluginFlexFormIsAssignedAsArrayOnCoreV13(): void
+    public function pluginFlexFormIsAssignedToTheGlobalColumnOnCoreV13(): void
     {
-        unset($GLOBALS['TCA']['tt_content']);
+        $GLOBALS['TCA']['tt_content']['columns']['pi_flexform']['config']['ds'] = ['default' => 'core default'];
+        unset($GLOBALS['TCA']['tt_content']['types']);
         (new TcaManipulator())->addContentElementPluginFlexForm(
             'academicexample_list',
             'FILE:EXT:academic_example/Configuration/FlexForms/List.xml',
         );
         $this->assertSame(
-            ['default' => 'FILE:EXT:academic_example/Configuration/FlexForms/List.xml'],
-            $GLOBALS['TCA']['tt_content']['types']['academicexample_list']['columnsOverrides']['pi_flexform']['config']['ds'],
+            [
+                'default' => 'core default',
+                '*,academicexample_list' => 'FILE:EXT:academic_example/Configuration/FlexForms/List.xml',
+            ],
+            $GLOBALS['TCA']['tt_content']['columns']['pi_flexform']['config']['ds'],
         );
+        $this->assertArrayNotHasKey('types', $GLOBALS['TCA']['tt_content']);
     }
 
     /**
@@ -586,6 +594,7 @@ final class TcaManipulatorTest extends UnitTestCase
     public function pluginFlexFormIsAssignedAsStringOnCoreV14(): void
     {
         unset($GLOBALS['TCA']['tt_content']);
+        $GLOBALS['TCA']['tt_content']['columns']['pi_flexform']['config']['ds'] = [];
         (new TcaManipulator())->addContentElementPluginFlexForm(
             'academicexample_list',
             'FILE:EXT:academic_example/Configuration/FlexForms/List.xml',
@@ -594,5 +603,6 @@ final class TcaManipulatorTest extends UnitTestCase
             'FILE:EXT:academic_example/Configuration/FlexForms/List.xml',
             $GLOBALS['TCA']['tt_content']['types']['academicexample_list']['columnsOverrides']['pi_flexform']['config']['ds'],
         );
+        $this->assertSame([], $GLOBALS['TCA']['tt_content']['columns']['pi_flexform']['config']['ds']);
     }
 }

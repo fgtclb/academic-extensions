@@ -145,17 +145,29 @@ final class TcaManipulator
      * Assign the FlexForm data structure of a plugin content element in a way
      * that works on both TYPO3 v13 and v14.
      *
-     * The two core versions want a different shape and neither tolerates the
-     * other, which makes this the one place a version switch is unavoidable:
+     * The two core versions want it in a different place and neither tolerates
+     * the other, which makes this the one place a version switch is unavoidable:
      *
-     * * TYPO3 v13 resolves `ds` through `ds_pointerField` and requires an array.
-     *   Given a string it throws, and the whole content element can no longer be
-     *   opened in the backend (`FlexFormTools`, code 1463826960).
      * * TYPO3 v14 resolves the data structure through the record type of the TCA
-     *   schema and requires the string. Given an array it throws
-     *   `InvalidTcaException` (code 1751796940) — which `TcaFlexPrepare` catches,
-     *   so the backend silently renders an **empty** FlexForm tab instead of
-     *   failing visibly.
+     *   schema, so it belongs to the record type as a plain string. Given an
+     *   array it throws `InvalidTcaException` (code 1751796940) — which
+     *   `TcaFlexPrepare` catches, so the backend silently renders an **empty**
+     *   FlexForm tab instead of failing visibly.
+     * * TYPO3 v13 resolves it through `ds_pointerField`, which is
+     *   `list_type,CType` for `pi_flexform`, and it must live in the **global**
+     *   column configuration. Putting it on the record type does not work:
+     *   `FlexFormTools::getDataStructureIdentifier()` does see the merged
+     *   `columnsOverrides` and picks a key from it, but the identifier carries
+     *   only that key, and `parseDataStructureByIdentifier()` then reads the
+     *   structure back from `$GLOBALS['TCA']` — where the override never was.
+     *   Core states this in its own docblock: "The TCA for data structure
+     *   definitions MUST NOT be overridden by 'columnsOverrides'". The record
+     *   would silently render core's default data structure, a single field
+     *   named `xmlTitle`, instead of the one the extension ships.
+     *
+     * A plugin registered through {@see self::addContentElementPlugin()} is a
+     * CType with an empty `list_type`, so `*,<CType>` is the key that matches —
+     * which is exactly what `addPiFlexFormValue()` writes.
      *
      * FOR USE IN files in `Configuration/TCA/Overrides/*.php`.
      *
@@ -164,10 +176,12 @@ final class TcaManipulator
      */
     public function addContentElementPluginFlexForm(string $cType, string $dataStructure): void
     {
-        $GLOBALS['TCA']['tt_content']['types'][$cType]['columnsOverrides']['pi_flexform']['config']['ds']
-            = (new Typo3Version())->getMajorVersion() >= 14
-                ? $dataStructure
-                : ['default' => $dataStructure];
+        if ((new Typo3Version())->getMajorVersion() >= 14) {
+            $GLOBALS['TCA']['tt_content']['types'][$cType]['columnsOverrides']['pi_flexform']['config']['ds']
+                = $dataStructure;
+            return;
+        }
+        ExtensionManagementUtility::addPiFlexFormValue('*', $dataStructure, $cType);
     }
 
     /**
