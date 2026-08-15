@@ -4,6 +4,29 @@ This file is the entry point for AI coding agents working in this repository.
 `CLAUDE.md`, `GEMINI.md` and `.github/copilot-instructions.md` are symlinks to
 it — there is one set of instructions, not four. Edit `AGENTS.md`.
 
+It does **not** repeat the developer documentation. Everything about how this
+repository is built lives in [`docs/`](docs/Index.md) and
+[`CONTRIBUTING.md`](CONTRIBUTING.md), and is linked from here. What this file
+adds are the rules that apply *specifically* to working as an agent, and the
+handful of things that are easy to get wrong and expensive to discover later.
+
+## Read this before changing code
+
+| Topic                                                | Page                                                                    |
+|------------------------------------------------------|-------------------------------------------------------------------------|
+| Container based tooling, every suite and option      | [Development environment](docs/development/environment.md)              |
+| What lives where, extension keys, split repositories | [Monorepo layout](docs/development/monorepo-layout.md)                  |
+| **Dual core setup — read this first**                | [Dual core setup](docs/development/dual-core-setup.md)                  |
+| The gates and what they check                        | [Quality gates](docs/development/quality-gates.md)                      |
+| Version differences, and the v15 blockers            | [Core version aware code](docs/architecture/core-version-aware-code.md) |
+| Service configuration and stateless services         | [Dependency injection](docs/architecture/dependency-injection.md)       |
+| `final`, `readonly`, injection, data objects         | [Class design](docs/architecture/class-design.md)                       |
+| **Quoting value lists and binding parameters**       | [Database queries](docs/architecture/database-queries.md)               |
+| Both suites, their strictness and their conventions  | [Testing](docs/testing/Index.md)                                        |
+| The shared functional test traits                    | [Testing helper](docs/testing/testing-helper.md)                        |
+| Commit message conventions                           | [Commit messages](docs/workflow/commit-messages.md)                     |
+| Analysing a backport instead of cherry-picking it    | [Backporting](docs/workflow/backporting.md)                             |
+
 ## Local additions and overrides
 
 A machine-local `AGENTS.local.md` may sit next to this file. It is git-ignored
@@ -80,7 +103,7 @@ together.
 
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable.
-- `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits (`ExtensionsLoadedTestsTrait`, `TcaHelperMethodsTrait`, `ExtensionCoreVersionCompatTestsTrait`, `EnsureTtContentListTypeColumnTrait`, `PluginFlexFormDataStructureTrait`).
+- `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Seven of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
 - `core-13/`, `core-14/` — ready-to-start development instances, one per core version. SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
@@ -125,8 +148,10 @@ override with `-b docker|podman`). It mirrors the TYPO3 Core `runTests.sh`. Key 
 - `-u` — update the `typo3/core-testing-*` container images.
 - Trailing `[file]` — restrict phpunit to a path.
 
-There is **no option to pass extra arguments through to phpunit** — no `-e`, and
-no `--` passthrough. Restrict a run with the trailing path only.
+There is **no `-e` option**. Everything after a `--` separator is appended to the
+suite's command, so `-s unit -- --filter Foo` does reach phpunit — but that is
+undocumented in the script's own help, so prefer restricting a run with the
+trailing path.
 
 Typical workflow — **always prepare deps first** for the target core version:
 
@@ -339,8 +364,12 @@ usage for symfony dependency injection configuration over `Services.yaml` entrie
 Not every TYPO3 attribute exists in every supported version, so check before using
 one — and never use Symfony's own `#[AsEventListener]`, always TYPO3's.
 
-`phpstan` core-version aware configurations require the related core version folder
-in the `paths` of `Build/phpstan/Core13|Core14`.
+`Build/phpstan/Core13/phpstan.neon` and `Core14/phpstan.neon` are byte-identical
+and their `paths` is `../../../packages` wholesale, so a new `Core13/`/`Core14/`
+folder is analysed without any change — what such a split would need instead is
+an `excludePaths` entry for the folder that does not match the analysed version.
+The real per-version difference is `phpstan-constants.php` and the two baselines.
+Note that `packages-dev/` is not analysed at all.
 
 Core-version aware **tests** come in two shapes:
 
@@ -355,9 +384,14 @@ runs on v14 only. Examples:
 `academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormUploadTest.php`
 (class level) and `academic-base/Tests/Unit/TcaManipulatorTest.php` (method level).
 
-Note: extensions here still use `Configuration/Services.php` (PHP-form) for DI
-rather than Symfony attributes. Match the surrounding extension's existing DI
-style when editing it.
+Note: the DI style here is **not** what a fresh extension would use. Eleven of
+the twelve extensions configure services in `Configuration/Services.yaml`; only
+`academic-persons` also has a `Configuration/Services.php`, and that file holds
+nothing but `registerForAutoconfiguration()` calls. TYPO3's DI attributes are
+already in use in production code — `#[Autoconfigure]`, `#[Autowire]`,
+`#[AsAlias]`, `#[Exclude]` — so the two styles coexist. Match the surrounding
+extension when editing it, and see
+[Dependency injection](docs/architecture/dependency-injection.md).
 
 ## TYPO3 v15 blockers — do not migrate these yet
 
@@ -365,11 +399,11 @@ Three APIs on `main` are deprecated in TYPO3 v14 and removed in v15. **None of
 them can be migrated while the branch still supports TYPO3 v13**, because the
 replacement does not exist there. Verified against both vendor trees:
 
-| API | Replacement | Present on v13.4.33? | Call sites |
-|---|---|---|---|
-| `Extbase\Annotation\*` | `Extbase\Attribute\*` | no — `cms-extbase/Classes/Attribute/` absent | 10 in 6 files |
-| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent | 8 wizards in 5 extensions |
-| `Core\Service\FlexFormService` | `Core\Configuration\FlexForm\FlexFormTools` | class exists on v13, but without `convertFlexFormContentToArray()` on `FlexFormTools` | 1 file |
+| API                                                    | Replacement                                       | Present on v13.4.33?                                                                  | Call sites                |
+|--------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------|
+| `Extbase\Annotation\*`                                 | `Extbase\Attribute\*`                             | no — `cms-extbase/Classes/Attribute/` absent                                          | 10 in 6 files             |
+| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent                                              | 8 wizards in 5 extensions |
+| `Core\Service\FlexFormService`                         | `Core\Configuration\FlexForm\FlexFormTools`       | class exists on v13, but without `convertFlexFormContentToArray()` on `FlexFormTools` | 1 file                    |
 
 They are tracked as **ACE-294** (epic) with ACE-295, ACE-296 and ACE-297.
 Static analysis and IDE inspections will keep suggesting the replacements —
@@ -411,6 +445,8 @@ Before reporting a change as complete:
       runtime behaviour.
 - [ ] New behaviour has a test, and the test was shown to fail without the
       change.
+- [ ] [`docs/`](docs/Index.md) updated in the same change — a new concept gets a
+      page or a section, and it is linked from the section `Index.md`.
 - [ ] The affected extension's `Documentation/` updated when the change is user
       or integrator facing, with a `Documentation/Changelog/<version>/` entry —
       `Breaking-*.rst`, `Deprecation-*.rst`, `Feature-*.rst` or
