@@ -1,3 +1,10 @@
+// The interactive study plan.
+//
+// Written with native nesting, which SCSS understands unchanged — this file was
+// a plain stylesheet before it moved into the build and needed no rewriting.
+// The colours a category filter applies come in as custom properties set by the
+// script ("--category-color", "--highlight-color").
+
 .academic-study-plan {
     @media screen and (max-width: 767px) {
         &.highlighted {
@@ -140,7 +147,7 @@
                         &:hover,
                         &:focus {
                             background: rgba(218, 165, 32, 0.25);
-    
+
                             &.highlighted {
                                 background: var(--highlight-color);
                             }

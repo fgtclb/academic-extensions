@@ -1,0 +1,157 @@
+/* Generated from Resources/Private/Scss — do not edit. */
+/* packages/fgtclb/academic-study-plan/Resources/Private/Scss/frontend/academic-study-plan.scss */
+@media screen and (max-width: 767px) {
+  .academic-study-plan.highlighted .col:not(.highlighted) {
+    display: none;
+  }
+}
+.academic-study-plan .filter {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  width: 100%;
+  padding-left: 0;
+  list-style-type: none;
+}
+.academic-study-plan .filter button {
+  background: #fff;
+  border: 1px solid black;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.academic-study-plan .filter button:hover {
+  border-color: var(--category-color);
+  transform: scale(1.05);
+}
+.academic-study-plan .filter button.highlighted {
+  background: var(--highlight-color);
+  border-color: var(--category-color);
+}
+.academic-study-plan .semesters {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: hidden;
+  list-style: none;
+  padding-left: 0;
+}
+@media screen and (max-width: 767px) {
+  .academic-study-plan .semesters {
+    flex-direction: column;
+  }
+}
+.academic-study-plan .semesters .col {
+  padding: 0;
+}
+.academic-study-plan .semesters .col .icon-academic-study-plan-minus {
+  display: none;
+}
+.academic-study-plan .semesters .col.open .icon-academic-study-plan-plus {
+  display: none;
+}
+.academic-study-plan .semesters .col.open .icon-academic-study-plan-minus {
+  display: block;
+}
+.academic-study-plan .semesters .col.open ul {
+  display: block;
+}
+@media screen and (max-width: 767px) {
+  .academic-study-plan .semesters .col.highlighted .module:not(.highlighted) {
+    display: none;
+  }
+}
+.academic-study-plan .semesters .col .note {
+  display: block;
+}
+.academic-study-plan .semesters .col .h6 {
+  margin-bottom: 0;
+}
+.academic-study-plan .semesters .col .modal-trigger {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-top: none;
+}
+.academic-study-plan .semesters .col .header {
+  text-align: left;
+  border-bottom: 3px solid goldenrod;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column-reverse;
+}
+@media screen and (min-width: 768px) {
+  .academic-study-plan .semesters .col .header {
+    text-align: center;
+  }
+}
+.academic-study-plan .semesters .col .header .wrapper {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+@media screen and (min-width: 768px) {
+  .academic-study-plan .semesters .col .header .wrapper {
+    display: block;
+  }
+  .academic-study-plan .semesters .col .header .wrapper .icon {
+    display: none;
+  }
+}
+.academic-study-plan .semesters .col ul {
+  padding-left: 0;
+  list-style-type: none;
+}
+@media screen and (max-width: 767px) {
+  .academic-study-plan .semesters .col ul {
+    display: none;
+  }
+}
+.academic-study-plan .semesters .col ul .module {
+  padding: 0.5rem;
+  position: relative;
+}
+.academic-study-plan .semesters .col ul .module:has(.modal-trigger):hover,
+.academic-study-plan .semesters .col ul .module:has(.modal-trigger):focus {
+  background: rgba(218, 165, 32, 0.25);
+}
+.academic-study-plan .semesters .col ul .module:has(.modal-trigger):hover.highlighted,
+.academic-study-plan .semesters .col ul .module:has(.modal-trigger):focus.highlighted {
+  background: var(--highlight-color);
+}
+.academic-study-plan .semesters .col ul .module:not(:has(.modal-trigger)) {
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-top: none;
+}
+.academic-study-plan .semesters .col ul .module.highlighted {
+  background: var(--highlight-color);
+}
+.academic-study-plan .semesters .col ul .module .credits {
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.academic-study-plan .semesters .col ul .module dialog {
+  border: none;
+  max-width: 50rem;
+}
+.academic-study-plan .semesters .col ul .module dialog .wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.academic-study-plan .semesters .col ul .module dialog .wrapper button {
+  background: none;
+  border: none;
+}
+.academic-study-plan .semesters .col ul .module dialog p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
