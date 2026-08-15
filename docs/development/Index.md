@@ -39,6 +39,7 @@ with the same `-p 8.1`.
 | [Monorepo layout](monorepo-layout.md)     | What each directory is for, the twelve extensions and their split repositories, extension keys, how a path package gets its version. |
 | [Dual core setup](dual-core-setup.md)     | Why the installed dependency set must match `-t`, how to check which core is installed, and how tests are scoped per version.        |
 | [Quality gates](quality-gates.md)         | Each gate and what it actually runs, PHPStan per core version, and how continuous integration stages them.                           |
+| [Frontend assets](frontend-assets.md)     | The TypeScript and SCSS build, where sources live, how the result is loaded, and why the committed artifacts need a gate.            |
 
 ## See also
 

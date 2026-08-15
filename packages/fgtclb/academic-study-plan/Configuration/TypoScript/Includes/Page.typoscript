@@ -3,9 +3,9 @@
 # ======================================================================================================================
 page {
     includeCSS {
-        academicStudyPlan = EXT:academic_study_plan/Resources/Public/Css/academic-study-plan.css
+        academicStudyPlan = EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css
     }
     includeJSFooter {
-        academicStudyPlan = EXT:academic_study_plan/Resources/Public/JavaScript/academic-study-plan.js
+        academicStudyPlan = EXT:academic_study_plan/Resources/Public/JavaScript/frontend/academic-study-plan.js
     }
 }
