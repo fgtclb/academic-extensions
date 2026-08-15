@@ -161,11 +161,10 @@ override with `-b docker|podman`). It mirrors the TYPO3 Core `runTests.sh`. Key 
 - Trailing `[file]` — restrict phpunit to a path.
 
 There is **no `-e` option** — the getopts string is `a:b:s:d:i:p:t:xy:o:nhu`, and
-`-e` is rejected as an invalid option. The Examples block of the script's own
-help still advertises one; that is a leftover from the TYPO3 Core script this was
-adopted from, and following it fails immediately. The help text is stale in two
-further places: it calls PHP 8.1 the `-p` default, which is 8.2, and it scopes
-`-t` to suites that do not exist here. The list above is the verified one.
+`-e` is rejected as an invalid option. Everything after a `--` separator is
+appended to the suite's command, so `-s unit -- --filter Foo` reaches phpunit.
+Prefer restricting a run with the trailing path, and `-o` for the random order
+seed.
 
 Everything after a `--` separator is appended to the suite's command instead, so
 `-s unit -- --filter Foo` does reach phpunit. `unit`, `unitRandom`, `functional`,

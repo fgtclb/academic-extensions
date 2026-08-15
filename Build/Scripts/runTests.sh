@@ -256,18 +256,25 @@ openDocumentation() {
 loadHelp() {
     # Load help text into $HELP
     read -r -d '' HELP <<EOF
-TYPO3 core test runner. Execute acceptance, unit, functional and other test suites in
-a container based test environment. Handles execution of single test files, sending
-xdebug information to a local IDE and more.
+Test runner of fgtclb/academic-extensions. Executes the unit, functional, linting,
+static analysis, documentation and frontend suites in a container based environment,
+so nothing but docker or podman has to be installed on the host. Handles execution of
+single test files, sending xdebug information to a local IDE and more.
 
-Usage: $0 [options] [file]
+Usage: $0 [options] [file] [-- <arguments>]
+
+A trailing file or directory restricts the phpunit based suites to it. Everything
+after a "--" separator is appended to the command the suite runs, which is how
+options are handed to phpunit, composer and npm:
+
+    ./Build/Scripts/runTests.sh -s unit -- --filter SomeTest
 
 Options:
     -s <...>
         Specifies which test suite to run
             - buildJs: compile the frontend sources of every extension into its Resources/Public/
-            - cgl: test and fix all core php files
-            - cglHeader: test and fix file header for all core php files
+            - cgl: test and fix all php files, "-n" to only check
+            - cglHeader: test and fix the file header of all php files, "-n" to only check
             - checkJsBuildClean: check the committed frontend artifacts match their sources
             - checkRstRenderingAll: Test all extension .rst files for rendering errors
             - checkRstRenderingSingle: Test specified system extension .rst files for rendering errors
@@ -282,8 +289,10 @@ Options:
             - phpstan: phpstan tests
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
             - typecheckJs: "tsc --noEmit" over the TypeScript sources, which the build does not do
-            - unit (default): PHP unit tests
-            - unitRandom: PHP unit tests in random order, "-- --random-order-seed=<number>" to use specific seed
+            - unit: PHP unit tests
+            - unitRandom: PHP unit tests in random order, "-o <number>" to use a specific seed
+            - update: update the typo3/core-testing-* images, same as "-u"
+            - help: show this help, the default when "-s" is not given
 
         The frontend suites - buildJs, checkJsBuildClean, lintTypescript, npm and
         typecheckJs - run in a node container, and cleanJs runs on the host. All six are
@@ -300,7 +309,7 @@ Options:
         If not specified, podman will be used if available. Otherwise, docker is used.
 
     -a <mysqli|pdo_mysql>
-        Only with -s functional|functionalDeprecated
+        Only with -s functional
         Specifies to use another driver, following combinations are available:
             - mysql
                 - mysqli (default)
@@ -310,7 +319,7 @@ Options:
                 - pdo_mysql
 
     -d <sqlite|mariadb|mysql|postgres>
-        Only with -s functional|functionalDeprecated|acceptance|acceptanceInstall
+        Only with -s functional
         Specifies on which DBMS tests are performed
             - sqlite: (default): use sqlite
             - mariadb: use mariadb
@@ -349,15 +358,21 @@ Options:
             - 16    maintained until 2028-11-09
 
     -t <12|13>
-        Only with -s composerInstall|composerInstallMin|composerInstallMax
-        Specifies the TYPO3 CORE Version to be used
+        Only with -s composerUpdate|functional|phpstan|phpstanGenerateBaseline|unit|unitRandom
+        Specifies the TYPO3 core version to be used
             - 12: (default) use TYPO3 v12
             - 13: use TYPO3 v13
 
+        It selects configuration only and does not install anything: composerUpdate
+        resolves against it, phpstan picks Build/phpstan/Core<version>/phpstan.neon,
+        and the test suites exclude the group "not-core-<version>". Running a suite
+        for one version while the other one's dependencies are installed fails in
+        confusing ways, so run composerUpdate for the version to be tested first.
+
     -p <8.1|8.2|8.3|8.4|8.5>
         Specifies the PHP minor version to be used
-            - 8.1: use PHP 8.1 (default)
-            - 8.2: use PHP 8.2
+            - 8.1: use PHP 8.1, TYPO3 v12 only
+            - 8.2: (default) use PHP 8.2
             - 8.3: use PHP 8.3
             - 8.4: use PHP 8.4
             - 8.5: use PHP 8.5
@@ -372,9 +387,14 @@ Options:
         Send xdebug information to a different port than default 9003 if an IDE like PhpStorm
         is not listening on default port.
 
+    -o <number>
+        Only with -s unitRandom
+        Set the random order seed, so a failing random order run can be repeated:
+        "--random-order-seed=<number>" is passed on to phpunit.
+
     -n
-        Only with -s cgl|cglGit|cglHeader|cglHeaderGit
-        Activate dry-run in CGL check that does not actively change files and only prints broken ones.
+        Only with -s cgl|cglHeader|lintTypescript
+        Activate dry-run, which does not change files and only reports the broken ones.
 
     -u
         Update existing typo3/core-testing-*:latest container images and remove dangling local volumes.
@@ -385,28 +405,30 @@ Options:
         Show this help.
 
 Examples:
-    # Run all core unit tests using PHP 8.2
+    # Install the dependencies of a core version, which every PHP suite needs first
+    ./Build/Scripts/runTests.sh -s composerUpdate -t 13 -p 8.3
+
+    # Run all unit tests using PHP 8.2
     ./Build/Scripts/runTests.sh -s unit
     ./Build/Scripts/runTests.sh -s unit -p 8.2
 
-    # Run all core unit tests using PHP 8.1
-    ./Build/Scripts/runTests.sh -s unit -p 8.1
+    # Run all unit tests against TYPO3 v13 using PHP 8.3
+    ./Build/Scripts/runTests.sh -s unit -t 13 -p 8.3
 
-    # Run all core units tests and enable xdebug (have a PhpStorm listening on port 9003!)
+    # Repeat a failing random order unit run with the seed it reported
+    ./Build/Scripts/runTests.sh -s unitRandom -o 1234
+
+    # Run all unit tests and enable xdebug (have a PhpStorm listening on port 9003!)
     ./Build/Scripts/runTests.sh -x
 
-    # Run unit tests in phpunit verbose mode with xdebug on PHP 8.1 and filter for test canRetrieveValueWithGP
-    ./Build/Scripts/runTests.sh -x -p 8.1 -e "-v --filter canRetrieveValueWithGP"
+    # Run the unit tests of a single test file with xdebug on PHP 8.3
+    ./Build/Scripts/runTests.sh -x -p 8.3 -s unit packages/fgtclb/academic-persons/Tests/Unit/Domain/Model/ProfileInformationTest.php
 
-    # Run functional tests in phpunit with a filtered test method name in a specified file
-    # example will currently execute two tests, both of which start with the search term
-    ./Build/Scripts/runTests.sh -s functional -e "--filter deleteContent" typo3/sysext/core/Tests/Functional/DataHandling/Regular/Modify/ActionTest.php
+    # Run functional tests on postgres with xdebug, php 8.3 and execute a restricted set of tests
+    ./Build/Scripts/runTests.sh -x -p 8.3 -s functional -d postgres packages/fgtclb/academic-persons/Tests/Functional/Domain
 
-    # Run functional tests on postgres with xdebug, php 8.1 and execute a restricted set of tests
-    ./Build/Scripts/runTests.sh -x -p 8.1 -s functional -d postgres typo3/sysext/core/Tests/Functional/Authentication
-
-    # Run functional tests on postgres 11
-    ./Build/Scripts/runTests.sh -s functional -d postgres -k 11
+    # Run functional tests on postgres 16
+    ./Build/Scripts/runTests.sh -s functional -d postgres -i 16
 
     # Compile the frontend assets after a change below an extension's Resources/Private/
     ./Build/Scripts/runTests.sh -s buildJs
