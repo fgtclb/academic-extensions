@@ -14,6 +14,8 @@
         "outputs": "node esbuild.mjs --list-outputs",
         "lint": "cd .. && eslint --no-error-on-unmatched-pattern --config Build/eslint.config.mjs .",
         "lint:fix": "npm run lint -- --fix",
+        "lint:markdown": "node markdown.mjs",
+        "lint:markdown:fix": "node markdown.mjs --fix",
         "typecheck": "node typecheck.mjs"
     },
     "devDependencies": {
