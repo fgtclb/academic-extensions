@@ -405,10 +405,18 @@ frontend assets, markdown, documentation   (independent)
 | `frontend-assets`   | —                  | none                                  |
 | `markdown`          | —                  | none                                  |
 | `documentation`     | —                  | none                                  |
+| `all checks`        | all of the above   | none                                  |
 
-The last three carry no matrix because none of them reads the installed core:
-they look at sources and committed artifacts, so repeating them per core and
-PHP version would check the same files four times.
+`frontend-assets`, `markdown` and `documentation` carry no matrix because none
+of them reads the installed core: they look at sources and committed artifacts,
+so repeating them per core and PHP version would check the same files four
+times.
+
+`all checks` runs no gate of its own. It exists so that a branch ruleset has one
+check to require whose name does not move with the matrix — see
+[Pull requests](../workflow/pull-requests.md). It needs every other job, runs
+with `if: always()` so that it reports rather than being skipped, and treats a
+skipped dependency as a failure.
 
 The DBMS matrix is the expensive part — sixteen jobs, each starting a database
 container. It runs only after the same tests passed on SQLite for both core

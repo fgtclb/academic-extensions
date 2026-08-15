@@ -129,6 +129,36 @@ pipeline be merged by someone with the approval. Reading the pipeline result
 before merging is a discipline here, not a guard rail, which is exactly why the
 next two sections exist.
 
+### The check to require, once that is wanted
+
+Requiring the leaf jobs by name does not work here: nearly all of them carry
+their matrix values in the name — `unit (v12, PHP 8.1)`,
+`functional mysql 8.0 (v13, PHP 8.5)` — so the ruleset would pin the matrix of
+a branch in a repository setting that lives outside that branch, and the two
+maintained branches do not have the same matrix.
+
+`ci.yml` therefore ends in an aggregating job named **`all checks`** (ACE-398).
+It needs every other job, runs with `if: always()` and fails when any of them
+reported `failure`, `cancelled` or `skipped`. Its name never changes, so it is
+the one check a ruleset should require:
+
+```bash
+gh api repos/fgtclb/academic-extensions/rulesets/4151166   # inspect first
+```
+
+The `always()` is the load-bearing part. Without it the job would be *skipped*
+as soon as anything it needs fails, and a skipped required check blocks a pull
+request indefinitely rather than reporting a failure. Treating a skipped
+dependency as a failure follows from the same reasoning: a gate that did not
+run has not passed.
+
+`version-branches` is **one** ruleset covering the default branch, `1`, `1.*`,
+`2` and `2.*`, so the required context has to exist on every branch it covers
+before the rule is added — otherwise a pull request against a branch without
+that job waits for a status that is never reported. That is why this job is
+maintained on both `main` and `2`, and why the rule itself is a separate,
+repository-wide decision rather than part of the change that added the job.
+
 ## Pre-flight, before pushing
 
 Run the gates locally first. The harness is containerized, so a local run and a
