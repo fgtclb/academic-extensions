@@ -290,7 +290,7 @@ Options:
             - phpstan: phpstan tests
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
             - typecheckJs: "tsc --noEmit" over the TypeScript sources, which the build does not do
-            - unit (default): PHP unit tests
+            - unit: PHP unit tests
             - unitRandom: PHP unit tests in random order, "-o <number>" to use a specific seed
             - update: update the typo3/core-testing-* images, same as "-u"
             - help: show this help, the default when "-s" is not given
