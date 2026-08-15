@@ -99,11 +99,10 @@ the per-DBMS defaults and the accepted version lists:
 
 ### Restricting a run
 
-**There is no option for handing extra arguments to PHPUnit.** No `-e`, and no
-suite that takes a filter — the `getopts` string is `a:b:s:d:i:p:t:xy:o:nhu`.
-The help text still advertises `-e "..."` in two of its examples, which is a
-leftover from TYPO3 Core's script: the option is not parsed, so a run using it
-aborts with "Invalid option(s)". A run is restricted with the trailing path:
+**There is no `-e` option.** The `getopts` string is `a:b:s:d:i:p:t:xy:o:nhu`,
+so a run using `-e "..."` — which the help text advertised until ACE-396, a
+leftover from TYPO3 Core's script — aborts with "Invalid option(s)". A run is
+restricted with the trailing path:
 
 ```bash
 # One directory.
@@ -123,14 +122,19 @@ the **extension folder name** below `packages/fgtclb/`
 (`Build/Scripts/runTests.sh:630`, `725`). For `composer` it is the composer
 command with its arguments (`Build/Scripts/runTests.sh:648`).
 
-> [!NOTE]
-> A `--` separator does technically end the wrapper's own option parsing, and
-> the remainder then reaches the dispatched tool, because every one of those
-> suites appends `"$@"`. It is neither documented in `-h` nor used by the
-> workflows, and the single mention of a separator in the help text — under
-> `unitRandom`, `Build/Scripts/runTests.sh:269` — points at what `-o` already
-> does. Use `-o` for the seed and the trailing path for everything else; do not
-> build tooling on the separator.
+A `--` separator ends the wrapper's own option parsing, and the remainder
+reaches the dispatched tool, because every one of those suites appends `"$@"`.
+It is the supported way to hand an option to phpunit, composer or npm, and it
+is documented in `-h` since ACE-396:
+
+```bash
+Build/Scripts/runTests.sh -s unit -- --filter SomeTest
+Build/Scripts/runTests.sh -s npm -- install --save-dev sass@latest
+```
+
+For the two cases that have a dedicated option, prefer it: `-o` for the random
+order seed and the trailing path for restricting a phpunit run. Neither
+workflow in `.github/workflows/` uses the separator.
 
 ## Suites
 
@@ -158,34 +162,30 @@ is the authority — the help text is not complete, see below.
 Anything else prints the help and exits non-zero
 (`Build/Scripts/runTests.sh:778-784`).
 
-### Where the help text and the script disagree
+### The help text
 
-`-h` renders a text block maintained by hand in `loadHelp()`
-(`Build/Scripts/runTests.sh:246-386`), and it has drifted from the `case`
-statement. Read the script when in doubt:
+`-h` renders a text block maintained by hand in `loadHelp()`. It had drifted
+badly from the `case` statement, because the wrapper started as a copy of the
+TYPO3 Core runner and inherited its help: `-t` was documented for
+`composerInstall|composerInstallMin|composerInstallMax`, `-n` for
+`cglGit|cglHeaderGit`, `-a` and `-d` for `functionalDeprecated` and the
+acceptance suites, `-o` was not documented at all, `unit` was marked as the
+default although the default suite is `help`, `-p` claimed a default of 8.1
+where it is 8.2, and three examples used `-e "..."` for a PHPUnit filter and
+`-k` for a database version — neither is parsed here, so both abort the run.
+All of that was corrected in ACE-396.
 
-* **`functional` is missing from the help text entirely**, although it is a
-  suite (`Build/Scripts/runTests.sh:663`), is described under `-d` and `-a`,
-  and appears in the examples. `update` and `help` are missing as well, and
-  `unit` is marked as the default although the default suite is `help`.
-* `-o` is not listed as an option at all, even though it is parsed
-  (`Build/Scripts/runTests.sh:453-455`).
-* `-t` is documented as being usable only with the suites `composerInstall`,
-  `composerInstallMin` and `composerInstallMax`. None of those three exists
-  here, and `-t` in fact also selects the PHPStan configuration and the
-  excluded PHPUnit group.
-* `-p` is documented with `8.1` as its default; the default is `8.2`
-  (`Build/Scripts/runTests.sh:399`).
-* `-n` is documented for `cgl|cglGit|cglHeader|cglHeaderGit`; the `*Git`
-  variants do not exist.
-* The examples use two options that are not parsed at all: `-e "..."` for a
-  PHPUnit filter and `-k` for a database version, which is `-i` here. Both are
-  leftovers from TYPO3 Core's script and abort the run.
-* The `-i` lists carry TYPO3 Core's maintenance annotations, which are dated
-  and say nothing about this repository.
+Two things are deliberately not derived from the script and can therefore still
+go stale, so read the `case` statement and the `getopts` string when a claim
+matters:
 
-Correcting the help text is worthwhile; until then, the `case` statement and
-the `getopts` string are the specification.
+* The suite list and the option descriptions are prose. A new suite has to be
+  added to both the `case` statement and `loadHelp()`.
+* The `-i` lists carry TYPO3 Core's maintenance annotations for the DBMS
+  versions. They describe the products, not this repository, and are as dated
+  as the day they were copied. The values themselves are checked against the
+  regular expressions in `handleDbmsOptions()`, so an unsupported one is
+  rejected rather than silently used.
 
 ## Quick start
 
