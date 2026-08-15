@@ -415,8 +415,8 @@ route from "this does nothing" to "this is comparing the wrong two things".
 Both rules fail in the direction the default test run cannot see: rule 1 hides
 behind SQLite's tolerance of `IN ()` on v12, rule 2 hides behind three
 databases silently updating nothing. The functional suite defaults to SQLite
-(`Build/Scripts/runTests.sh:398`, `DBMS="sqlite"`) and to core version 12
-(line 397), so a green local run proves less than it appears to — and on this
+and to core version 12 — `DBMS="sqlite"` and `CORE_VERSION="12"` in
+`runTests.sh` — so a green local run proves less than it appears to, and on this
 branch the default core version is the one *without* the empty-array guard.
 
 Three habits follow.
@@ -429,9 +429,9 @@ Build/Scripts/runTests.sh -t 12 -p 8.1 -s functional -d postgres \
     packages/fgtclb/academic-projects/Tests/Functional/Upgrades
 ```
 
-CI reaches the same coverage eventually — `functional-dbms` in
-`.github/workflows/ci.yml:260-278` runs MySQL 8.0, MariaDB 10.4, MariaDB 10.6
-and PostgreSQL 10 against four core/PHP combinations — but only after the
+CI reaches the same coverage eventually — the `functional-dbms` job runs MySQL
+8.0, MariaDB 10.4, MariaDB 10.6 and PostgreSQL 10 against four core/PHP
+combinations — but only after the
 SQLite jobs pass, so a defect of this kind is reported one stage late unless it
 was reproduced locally first.
 

@@ -11,12 +11,10 @@ of every other tool:
 | [`Build/phpunit/FunctionalTests.xml`](../../Build/phpunit/FunctionalTests.xml)                   | 49    | PHPUnit configuration of the functional suite. |
 | [`Build/phpunit/FunctionalTestsBootstrap.php`](../../Build/phpunit/FunctionalTestsBootstrap.php) | 60    | Bootstrap referenced by `FunctionalTests.xml`. |
 
-Nothing selects them implicitly. `Build/Scripts/runTests.sh` passes the matching
-file with `-c` for every suite it starts — see
-[`Build/Scripts/runTests.sh:664`](../../Build/Scripts/runTests.sh#L664) for the
-functional suite and
-[`Build/Scripts/runTests.sh:752`](../../Build/Scripts/runTests.sh#L752) and
-[`:758`](../../Build/Scripts/runTests.sh#L758) for `unit` and `unitRandom`.
+Nothing selects them implicitly.
+[`Build/Scripts/runTests.sh`](../../Build/Scripts/runTests.sh) sets
+`PHPUNIT_CONFIG_FILE` and passes it with `-c` in each of the `functional`,
+`unit` and `unitRandom` arms.
 
 The root [`composer.json`](../../composer.json) requires
 `phpunit/phpunit` `^10.5.45` and `typo3/testing-framework` `^8.2.7` as

@@ -35,10 +35,10 @@ supported one in each case, which is also what continuous integration uses.
 
 ## Coding guidelines — `cgl`
 
-`Build/Scripts/runTests.sh:596-605` runs php-cs-fixer with
+The `cgl` arm of `runTests.sh` runs php-cs-fixer with
 [`Build/php-cs-fixer/config.php`](../../Build/php-cs-fixer/config.php). Without
 `-n` it **rewrites files in place**; with `-n` it adds `--dry-run --diff` and
-only reports, which is the form CI uses (`.github/workflows/ci.yml:111-112`).
+only reports, which is the form CI uses in its `cgl` job.
 
 The rule set is `@PER-CS1.0` plus `@DoctrineAnnotation` and some fifty
 individual rules (`Build/php-cs-fixer/config.php:64-133`), risky rules allowed.
@@ -82,15 +82,16 @@ carry a header: `*locallang*.php`, `ext_localconf.php`, `ext_tables.php`,
 > [!IMPORTANT]
 > **This gate is currently not enforced.** Its CI step is commented out with a
 > `@todo` — "Disabled until the correct file header has been determined for
-> extensions" (`.github/workflows/ci.yml:114-116`). Running it locally without
+> extensions" — the commented-out *CGL (header comments)* step of the `cgl`
+> job. Running it locally without
 > `-n` therefore rewrites headers across the code base and produces a diff
 > nobody asked for. Run it with `-n` if at all, until the header is settled.
 
 ## PHP linting — `lintPhp`
 
 `php -l` over every `*.php` in the repository, four processes in parallel, with
-Xdebug off (`Build/Scripts/runTests.sh:715-723`). It has no configuration file;
-the specification is the `find` invocation, and its exclusions are load-bearing:
+Xdebug off. It has no configuration file; the specification is the `find`
+invocation in its `case` arm, and its exclusions are load-bearing:
 
 * `./.Build/*` — the installed vendor tree.
 * `./.agent/*` — the git-ignored working tree for drafts and partial snippets;
@@ -103,7 +104,7 @@ The instances' **tracked** `config/system/*.php` is deliberately still linted.
 
 This is the only gate that needs neither a vendor tree nor a core version,
 which is why CI runs it without `composerUpdate` and across all five PHP
-versions (`.github/workflows/ci.yml:158-175`). It is also the cheapest way to
+versions — the `lint` job. It is also the cheapest way to
 find a syntax error that is specific to one PHP version.
 
 ## Static analysis — `phpstan`
@@ -117,12 +118,12 @@ included from the installed vendor tree: `bnf/phpstan-psr-container`,
 ### Why it is configured per core version
 
 `-t` selects `Build/phpstan/Core${CORE_VERSION}/phpstan.neon`
-(`Build/Scripts/runTests.sh:739-744`). PHPStan analyses the sources **against
+in the `phpstan` arm. PHPStan analyses the sources **against
 the core that is installed in `.Build/`**, so the same code produces different
 findings on v12 and on v13: a method that exists only in one of them, a
 signature that changed, a return type that was narrowed. Running the gate for
 one version would miss half of them. It is the only source gate CI runs per
-core version (`.github/workflows/ci.yml:118-156`).
+core version — its `phpstan` job has the core version as a matrix axis.
 
 The two configurations differ in exactly one place, and it is the reason they
 have to be a pair:
@@ -159,7 +160,7 @@ Build/Scripts/runTests.sh -t 13 -s phpstanGenerateBaseline
 ```
 
 which writes `Build/phpstan/Core<version>/phpstan-baseline.neon` with
-`--allow-empty-baseline` (`Build/Scripts/runTests.sh:745-750`).
+`--allow-empty-baseline`, in the `phpstanGenerateBaseline` arm.
 
 **A growing baseline is a defect, not a configuration change.** Regenerating it
 to make a new finding disappear removes exactly the signal the gate exists for,
@@ -192,7 +193,7 @@ one slower run and never loses anything.
 [`Build/phpunit/UnitTests.xml`](../../Build/phpunit/UnitTests.xml),
 `functional` uses
 [`Build/phpunit/FunctionalTests.xml`](../../Build/phpunit/FunctionalTests.xml)
-(`Build/Scripts/runTests.sh:751-762`, `663-714`). `unitRandom` adds
+, each named in its own `case` arm. `unitRandom` adds
 `--order-by=random` and the seed from `-o`, which is how an order dependency
 between tests is found and then replayed.
 
@@ -256,7 +257,7 @@ Build/Scripts/runTests.sh -t 12 -s functional \
 
 `functional` starts the database in its own container, waits for the port,
 hands the connection parameters to PHPUnit as environment variables and removes
-the container afterwards (`Build/Scripts/runTests.sh:663-714`). With the
+the container afterwards — all of it in the `functional` arm. With the
 default `-d sqlite` no container is started; the databases are created in a
 tmpfs below `.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/`.
 
@@ -269,7 +270,7 @@ Build/Scripts/runTests.sh -t 12 -s functional -d postgres -i 16
 ```
 
 `functional` also excludes the group `not-${DBMS}`
-(`Build/Scripts/runTests.sh:665`), so a test that cannot work on one DBMS can
+, so a test that cannot work on one DBMS can
 be tagged `#[Group('not-postgres')]` instead of being skipped at runtime. No
 test uses this at the moment; a DBMS difference has so far always been a defect
 in the query, not a property of the test.
@@ -277,7 +278,7 @@ in the query, not a property of the test.
 ## Core version aware tests: `not-core-12` and `not-core-13`
 
 Every PHPUnit suite is started with `--exclude-group not-core-${CORE_VERSION}`
-(`Build/Scripts/runTests.sh:665`, `753`, `759`). The name reads as an
+— the `functional`, `unit` and `unitRandom` arms. The name reads as an
 exclusion, so the effect is inverted from what it looks like:
 
 | Group attribute           | Runs on |
@@ -318,8 +319,7 @@ The user-facing manuals live per package in
 `checkRstRenderingAll` iterates over every extension folder that has a
 `Documentation/` directory — twelve today — and renders each one with the
 `ghcr.io/typo3-documentation/render-guides` image
-(`Build/Scripts/runTests.sh:616-628`, rendering in `executeRstRendering()` at
-`Build/Scripts/runTests.sh:213-227`).
+; the rendering itself is in `executeRstRendering()`.
 
 **This is a real gate, not an artifact producer.** The renderer is invoked with
 `--fail-on-log --fail-on-error`, so a warning fails the job. The results are
@@ -422,8 +422,8 @@ anybody. See [Pull requests](../workflow/pull-requests.md).
 The DBMS matrix is the expensive part — sixteen jobs, each starting a database
 container. It runs only after the same tests passed on SQLite for both core
 versions and both edge PHP versions, so a defect that is not DBMS specific is
-reported by four jobs instead of twenty
-(`.github/workflows/ci.yml:260-265`).
+reported by four jobs instead of twenty — `functional-dbms` needs
+`functional-sqlite`.
 
 ### The core/PHP pairs are listed, not multiplied
 
@@ -431,7 +431,7 @@ The supported PHP versions differ per core version on this branch, so the jobs
 that need a vendor tree carry a `combo` axis of explicit `{typo3, php}` pairs
 instead of a `php-version × typo3` cross product, which would generate
 unsupported combinations such as TYPO3 v13 on PHP 8.1. The reasoning is written
-out in the workflow header (`.github/workflows/ci.yml:25-39`).
+out in the workflow header of `ci.yml`.
 
 Four sets result, and they have to be changed together:
 
@@ -450,7 +450,7 @@ A gate therefore cannot behave differently in CI than locally, and reproducing
 a red pipeline is a matter of copying the command from the log.
 
 The two deviations from a plain local run are both explained in the workflow
-itself: `-b docker` on every step (`.github/workflows/ci.yml:47-55`) and the
+itself: `-b docker` on every step, explained in its header comment, and the
 `composerUpdate` that precedes every job needing a vendor tree.
 
 ### Why the pull-request comment is a separate workflow
@@ -463,8 +463,7 @@ A pull request **from a fork** gets a read-only `GITHUB_TOKEN` and no secrets.
 Commenting needs `pull-requests: write`, so a comment step inside `ci.yml`
 would work for branches in this repository and silently fail for exactly the
 contributors it is meant to serve. `ci.yml` therefore declares
-`permissions: contents: read` and writes nothing at all
-(`.github/workflows/ci.yml:65-66`).
+`permissions: contents: read` and writes nothing at all.
 
 `workflow_run` fires when `ci.yml` finishes, runs in the context of the default
 branch rather than the fork, and its token can write. No code from the pull
@@ -481,7 +480,8 @@ Two consequences follow, and both have cost time before:
    request number cannot be read from the event. `ci.yml` writes it into the
    `pull-request-context` artifact before rendering, so the comment lands on
    the right pull request even when the rendering fails
-   (`.github/workflows/ci.yml:315-333`).
+   — the *Record the pull request number* and *Upload the pull request context*
+   steps of its `documentation` job.
 
 ## Before pushing
 
