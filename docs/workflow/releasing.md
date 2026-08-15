@@ -156,8 +156,8 @@ authenticated `gh` (`bin/release:154-162`).
 ## The tag has to match `ext_emconf.php`
 
 The root `publish` workflow builds the TER artifacts with
-`tailor create-artefact <version> <extension-key>`
-(`.github/workflows/publish.yml:69-80`), and **that command fails when the
+`tailor create-artefact <version> <extension-key>` in its *Create local TER
+package upload artifact* step, and **that command fails when the
 version does not match the extension's `ext_emconf.php`**. This is a feature, not
 an obstacle: it makes it impossible for a release to disagree with the extension
 metadata that TYPO3 and the TER read.
@@ -168,8 +168,8 @@ extensions currently declare `'version' => '3.0.0'`, so the tag for the next
 release is `3.0.0`.
 
 The workflow additionally rejects a tag that is not a bare
-`MAJOR.MINOR.PATCH` before doing any work
-(`.github/workflows/publish.yml:47-52`). There is no `v` prefix — `bin/release`
+`MAJOR.MINOR.PATCH` before doing any work, in its *Verify tag* step. There is
+no `v` prefix — `bin/release`
 creates `3.0.0`, not `v3.0.0`.
 
 ## The three-step publishing chain
@@ -196,18 +196,17 @@ verifies its shape, installs `typo3/tailor`, then loops over
 `packages/fgtclb/*`, reads each extension key from that package's
 `composer.json` at runtime, and builds one artifact per extension. The keys are
 read rather than derived from the directory name because they differ:
-`academic-contact4pages` ships `academic_contacts4pages`
-(`.github/workflows/publish.yml:21-23`). Finally
+`academic-contact4pages` ships `academic_contacts4pages`. Finally
 `softprops/action-gh-release` creates the release `[RELEASE] <version>` with
 generated notes and attaches all artifacts plus `LICENSE`, failing on an
 unmatched file.
 
-This workflow contains **no** `ter:publish` step, and that is deliberate
-(`.github/workflows/publish.yml:3-13`). There is no `academic_extensions`
+This workflow contains **no** `ter:publish` step, and that is deliberate; the
+header comment of the file says why. There is no `academic_extensions`
 extension to publish.
 
-A documentation-rendering step exists in the file but is commented out
-(`.github/workflows/publish.yml:82-88`); the rendered manual is currently
+A *Render documentation of all academic extensions* step exists in the file but
+is commented out; the rendered manual is currently
 produced only by the CI workflow on pull requests, see
 [Changelog and documentation](changelog-and-documentation.md).
 
