@@ -39,6 +39,38 @@
 				<source>Role</source>
 				<target>Rolle</target>
 			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.palette.addressRecords">
+				<source>Displayed address records</source>
+				<target>Angezeigte Adress-Datensätze</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.palette.addressRecords.description">
+				<source>Without a dedicated selection all address records of the contract are displayed.</source>
+				<target>Ohne dedizierte Auswahl werden alle Adress-Datensätze des Vertrags angezeigt.</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.email_address">
+				<source>E-mail address</source>
+				<target>E-Mail-Adresse</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.phone_number">
+				<source>Phone number</source>
+				<target>Telefonnummer</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.physical_address">
+				<source>Physical address</source>
+				<target>Physikalische Adresse</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.addressRecord.all">
+				<source>Display all</source>
+				<target>Alle anzeigen</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.addressRecord.none">
+				<source>Do not display</source>
+				<target>Nicht anzeigen</target>
+			</trans-unit>
+			<trans-unit id="tx_academiccontacts4pages_domain_model_contact.addressRecord.hidden">
+				<source>[Hidden] %s</source>
+				<target>[Verborgen] %s</target>
+			</trans-unit>
 
 			<trans-unit id="tx_academiccontacts4pages_domain_model_role">
 				<source>Role</source>
