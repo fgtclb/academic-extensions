@@ -7,6 +7,7 @@ namespace FGTCLB\TestingHelper\FunctionalTestCase;
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides;
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaFlexPrepare;
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Resolves the FlexForm data structure of a plugin content type the way
@@ -65,12 +66,19 @@ trait PluginFlexFormDataStructureTrait
     }
 
     /**
-     * Asserts that the plugin's FlexForm is resolved to actual fields.
+     * Asserts that the plugin's own FlexForm is resolved to actual fields.
      *
-     * An empty sheet is the failure mode to watch on TYPO3 v14: `TcaFlexPrepare`
-     * swallows an unresolvable data structure there and leaves the caller with
-     * `['sheets' => ['sDEF' => []]]`, so the backend renders an empty tab
-     * instead of raising anything.
+     * Two failure modes, one per core version, and the assertion has to cover
+     * both because each one is silent in the backend:
+     *
+     * * TYPO3 v14 leaves an unresolvable data structure as
+     *   `['sheets' => ['sDEF' => []]]` — `TcaFlexPrepare` swallows the exception
+     *   and the backend renders an empty tab.
+     * * TYPO3 v13 falls back to **core's own default** data structure when the
+     *   extension's one is registered where core does not look for it. The
+     *   backend then shows a foreign field instead of the plugin options, which
+     *   a "did anything resolve at all" assertion happily accepts — that is how
+     *   the defect behind ACE-387 passed CI for seven extensions.
      */
     private function assertPluginFlexFormIsResolved(string $cType, string $sheetName = 'sDEF'): void
     {
@@ -81,13 +89,48 @@ trait PluginFlexFormDataStructureTrait
             $dataStructure['sheets'] ?? [],
             sprintf('FlexForm of content type "%s" has no sheet "%s".', $cType, $sheetName),
         );
+        $resolvedFields = array_keys($dataStructure['sheets'][$sheetName]['ROOT']['el'] ?? []);
         self::assertNotEmpty(
-            $dataStructure['sheets'][$sheetName]['ROOT']['el'] ?? [],
+            $resolvedFields,
             sprintf(
                 'FlexForm sheet "%s" of content type "%s" resolved to no fields at all.',
                 $sheetName,
                 $cType,
             ),
         );
+
+        $coreDefaultFields = $this->getCoreDefaultFlexFormFields();
+        if ($coreDefaultFields !== []) {
+            self::assertNotSame(
+                $coreDefaultFields,
+                $resolvedFields,
+                sprintf(
+                    'FlexForm of content type "%s" resolved to the TYPO3 core default data structure'
+                    . ' instead of the one the extension registers.',
+                    $cType,
+                ),
+            );
+        }
+    }
+
+    /**
+     * The field names of the data structure core ships in
+     * `tt_content.pi_flexform`, which is what a plugin falls back to when its
+     * own one is not found. Read from the TCA rather than hard coded, so a
+     * changed core default cannot turn this guard into a no-op.
+     *
+     * @return list<string>
+     */
+    private function getCoreDefaultFlexFormFields(): array
+    {
+        $coreDefault = $GLOBALS['TCA']['tt_content']['columns']['pi_flexform']['config']['ds']['default'] ?? null;
+        if (!is_string($coreDefault) || $coreDefault === '') {
+            // TYPO3 v14 has no such fallback.
+            return [];
+        }
+
+        $parsed = GeneralUtility::xml2array($coreDefault);
+
+        return is_array($parsed) ? array_keys($parsed['ROOT']['el'] ?? []) : [];
     }
 }
