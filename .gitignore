@@ -18,6 +18,13 @@
 # because "runTests.sh -s composerUpdate" starts with "rm -rf .Build" and would
 # otherwise throw the cache away on every dependency install.
 /.cache/
+
+# Dependency tree of the frontend asset build. The compiled artifacts below the
+# packages' "Resources/Public/" are committed, this is not: neither composer nor
+# a TER upload runs a node build, so the result has to ship while its sources and
+# tooling do not. The npm cache lands in "/.cache/npm", ignored above.
+/Build/node_modules
+
 /composer.json.orig
 /composer.json.testing
 /composer.lock

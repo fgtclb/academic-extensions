@@ -62,6 +62,29 @@ growing baseline is a defect — prefer fixing the finding.
 
 → [Quality gates](docs/development/quality-gates.md)
 
+## Frontend assets
+
+TypeScript and SCSS sources live in the extension they belong to, below
+`Resources/Private/TypeScript/` and `Resources/Private/Scss/`, and compile into
+its `Resources/Public/`. Neither directory has to exist; adding one is picked up
+without any configuration change.
+
+```bash
+Build/Scripts/runTests.sh -s buildJs             # compile, then commit the result
+Build/Scripts/runTests.sh -s checkJsBuildClean   # prove the artifacts match, as CI does
+Build/Scripts/runTests.sh -s lintTypescript -n   # eslint, omit "-n" to fix
+Build/Scripts/runTests.sh -s typecheckJs         # tsc --noEmit
+```
+
+The compiled files are **committed**, because neither composer nor a TER upload
+runs a node build. That makes it possible to change a source and forget to
+rebuild, which nothing else would notice — so `checkJsBuildClean` is a required
+gate rather than a convenience.
+
+These suites are core version independent: no `-t`, no `composerUpdate`.
+
+→ [Frontend assets](docs/development/frontend-assets.md)
+
 ## Running tests
 
 ```bash

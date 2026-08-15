@@ -1,0 +1,54 @@
+// TypeScript is installed for "tsc --noEmit" only: esbuild performs the emit and
+// does not type check, which is why "typecheckJs" is a suite of its own — a build
+// that is green and a type check that is red have to be distinguishable.
+//
+// One project covers every extension. The sources of the extensions do not
+// import each other, so there is nothing a per-extension project would isolate
+// that this one does not.
+//
+// tsconfig.json is JSONC, and both TypeScript and esbuild read the comments.
+{
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "lib": [
+            "es2022",
+            "dom",
+            "dom.iterable"
+        ],
+        // No ambient @types packages. These sources run in a browser, not in node.
+        "types": [],
+
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "skipLibCheck": true,
+
+        "noEmit": true,
+
+        // A module that imports another module of the same extension does so by
+        // the bare specifier the TYPO3 import map resolves in the browser, never
+        // relatively — only a specifier that goes through the map receives the
+        // "?bust=" cache key, and a relative one could pair a fresh module with
+        // a stale cached dependency.
+        //
+        // TypeScript has to be told where those specifiers live. Add an entry
+        // here when an extension gains a module that is imported by another;
+        // an extension whose modules are standalone needs none.
+        //
+        // No "baseUrl": with "moduleResolution": "bundler" the targets resolve
+        // relative to this file, and a "baseUrl" would additionally make every
+        // directory below it importable as a bare specifier.
+        "paths": {}
+    },
+    "include": [
+        "../packages/*/*/Resources/Private/TypeScript/**/*.ts",
+        "../packages-dev/*/Resources/Private/TypeScript/**/*.ts"
+    ]
+}
