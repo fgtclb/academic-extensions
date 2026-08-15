@@ -66,7 +66,7 @@ optional trailing argument.
 | `-d <dbms>`       | DBMS for functional tests: `sqlite`, `mariadb`, `mysql`, `postgres`.                | `sqlite`            |
 | `-i <version>`    | DBMS version, only with `-d mariadb\|mysql\|postgres`.                              | per DBMS, see below |
 | `-a <driver>`     | Database driver, only with `-d mariadb\|mysql`: `mysqli` or `pdo_mysql`.            | `mysqli`            |
-| `-n`              | Dry run for `cgl` and `cglHeader`: report offending files, change nothing.          | off                 |
+| `-n`              | Dry run for `cgl`, `cglHeader`, `lintMarkdown` and `lintTypescript`.                | off                 |
 | `-x`              | Enable Xdebug and send debugging information to the host IDE.                       | off                 |
 | `-y <port>`       | Xdebug client port on the host, when the IDE does not listen on the default.        | `9003`              |
 | `-o <seed>`       | Random order seed for `unitRandom`, to replay a specific order.                     | none                |
@@ -150,6 +150,7 @@ is the authority — the help text is not complete, see below.
 | `composer`                | `composer` with all remaining arguments dispatched into the container.                              |
 | `composerUpdate`          | Installs the dependency set for `-t`, see below.                                                    |
 | `functional`              | PHPUnit with `Build/phpunit/FunctionalTests.xml` against the DBMS from `-d`.                        |
+| `lintMarkdown`            | `Build/markdown.mjs` over every Markdown file. Fixes in place, `-n` only reports.                   |
 | `lintPhp`                 | `php -l` over every `*.php` outside the excluded trees.                                             |
 | `openDocumentation`       | Opens a previously rendered documentation in the browser (Linux only, `xdg-open`).                  |
 | `phpstan`                 | PHPStan with `Build/phpstan/Core<12\|13>/phpstan.neon`.                                             |

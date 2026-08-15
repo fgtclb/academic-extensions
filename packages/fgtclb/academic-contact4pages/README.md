@@ -9,11 +9,11 @@ Provides selection of contacts on page level.
 
 ## Compatibility
 
-| Branch | Version       | TYPO3     | PHP                                          |
-|--------|---------------|-----------|----------------------------------------------|
-| main   | ^3, 3.x-dev   | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
-| 2, 2.x | ^2, 2.x-dev   | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
-| 1      | ^1, 1.x-dev   | v11 + v12 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
+| Branch | Version     | TYPO3     | PHP                                          |
+|--------|-------------|-----------|----------------------------------------------|
+| main   | ^3, 3.x-dev | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
+| 2, 2.x | ^2, 2.x-dev | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
+| 1      | ^1, 1.x-dev | v11 + v12 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
 
 ## Installation
 
@@ -68,4 +68,3 @@ documented per version in [Documentation/Changelog](./Documentation/Changelog).
 This extension was created by [FGTCLB GmbH](https://www.fgtclb.com/).
 
 [Find more TYPO3 extensions we have developed](https://github.com/fgtclb/).
-
