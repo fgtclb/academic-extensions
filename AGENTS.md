@@ -161,9 +161,8 @@ override with `-b docker|podman`). It mirrors the TYPO3 Core `runTests.sh`. Key 
 - Trailing `[file]` — restrict phpunit to a path.
 
 There is **no `-e` option**. Everything after a `--` separator is appended to the
-suite's command, so `-s unit -- --filter Foo` does reach phpunit — but that is
-undocumented in the script's own help, so prefer restricting a run with the
-trailing path.
+suite's command, so `-s unit -- --filter Foo` reaches phpunit. Prefer restricting
+a run with the trailing path, and `-o` for the random order seed.
 
 Typical workflow — **always prepare deps first** for the target core version:
 
