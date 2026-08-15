@@ -132,6 +132,17 @@ unless it is explicitly requested for that specific change. Branch `1` is legacy
 and is treated the same way. Stating factually which branches contain a defect is
 fine; proposing work on `2.2` is not.
 
+**A backport starts by reading the target branch's own `AGENTS.md` and `docs/`.**
+They are not copies of these: each branch supports a different pair of TYPO3
+versions, so the instructions differ, and several of them differ by being
+*inverted* rather than merely absent. `not-core-13` means v12-only here and
+excludes a test from v13 on `main`. The phpstan configurations differ here and
+are byte-identical there. `Core\Attribute\AsEventListener` does not exist on v12
+and does exist there. Applying a rule from the other branch's file without
+checking this one first is how a change lands that is confidently wrong.
+
+→ [Backporting](docs/workflow/backporting.md) for the file-level diff recipe.
+
 ## Build / test / lint — `Build/Scripts/runTests.sh`
 
 All checks run through the containerized harness (docker or podman, auto-selected;
@@ -407,8 +418,15 @@ Configuration files split the same way when the format differs:
 capitalisation. They are selected with
 `sprintf('FILE:EXT:<key>/Configuration/FlexForms/Core%s/…', $typo3MajorVersion)`.
 
-Never use Symfony's own `#[AsEventListener]`, always TYPO3's, and check that an
-attribute exists on **v12** before using it.
+**Check that an attribute exists on v12 before using it.** `#[AsEventListener]`
+is the case that catches people: TYPO3 ships its own on v13, and on `main` the
+rule is to use it and never Symfony's. It cannot be followed here —
+`TYPO3\CMS\Core\Attribute\AsEventListener` does not exist on v12 at all, where
+`Core\Attribute\` holds only `AsAllowedCallable` and `WebhookMessage`. Register
+event listeners with the `event.listener` tag in `Services.yaml` instead, which
+is what the three listeners in this repository already do. Symfony's attribute
+is not the fallback: it registers nothing in TYPO3, so the listener silently
+never fires.
 
 `Build/phpstan/Core12/phpstan.neon` and `Core13/phpstan.neon` are identical apart
 from their `excludePaths`, which drop the other version's
