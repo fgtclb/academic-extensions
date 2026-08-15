@@ -180,6 +180,9 @@ Build/Scripts/runTests.sh -s checkRstRenderingAll
 # Render one, then open it.
 Build/Scripts/runTests.sh -s checkRstRenderingSingle academic-persons
 Build/Scripts/runTests.sh -s openDocumentation academic-persons
+
+# Check every Markdown file, as CI does. Omit "-n" to fix what can be fixed.
+Build/Scripts/runTests.sh -s lintMarkdown -n
 ```
 
 User facing changes need a changelog entry below the extension's
@@ -187,9 +190,10 @@ User facing changes need a changelog entry below the extension's
 `Feature-*.rst` or `Important-*.rst`. Templates are in
 `Build/Documentation/Templates/`.
 
-Two formatting rules that are easy to get wrong and are not caught by a gate:
-a reST section over- or underline must match its title length **exactly**, and
-Markdown tables are always padded so the pipes line up.
+One formatting rule that is easy to get wrong and is not caught by a gate: a
+reST section over- or underline must match its title length **exactly**. The
+Markdown side is caught — `lintMarkdown` pads the tables, strips trailing
+whitespace and reports links that do not resolve.
 
 → [Changelog and documentation](docs/workflow/changelog-and-documentation.md)
 

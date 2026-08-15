@@ -208,16 +208,23 @@ version you are about to test.
 The complete suite list is `buildJs`, `cgl`, `cglHeader`, `checkJsBuildClean`,
 `checkRstRenderingAll`, `checkRstRenderingSingle`, `cleanJs`, `composer`
 (dispatch an arbitrary composer command), `composerUpdate`, `functional`,
-`lintPhp`, `lintTypescript`, `npm` (dispatch an arbitrary npm command),
+`lintMarkdown`, `lintPhp`, `lintTypescript`, `npm` (dispatch an arbitrary npm
+command),
 `openDocumentation`, `phpstan`, `phpstanGenerateBaseline`, `typecheckJs`,
 `unit`, `unitRandom`; plus `help` and `update`.
 
-The six frontend suites — `buildJs`, `checkJsBuildClean`, `cleanJs`,
-`lintTypescript`, `npm` and `typecheckJs` — are **core version independent**.
-They look at the sources and the committed artifacts, never at the installed
-core, so `-t` changes nothing for them and they need no `composerUpdate`. Note
-that they emit classic scripts here, not ES modules: see
-[Frontend assets](docs/development/frontend-assets.md).
+The seven node suites — `buildJs`, `checkJsBuildClean`, `cleanJs`,
+`lintMarkdown`, `lintTypescript`, `npm` and `typecheckJs` — are **core version
+independent**. They look at the sources and the committed artifacts, never at
+the installed core, so `-t` changes nothing for them and they need no
+`composerUpdate`. Note that the frontend ones emit classic scripts here, not ES
+modules: see [Frontend assets](docs/development/frontend-assets.md).
+
+`lintMarkdown` checks `docs/`, the root Markdown files and every package's
+`README.md` and `CONTRIBUTING.md` — links that resolve, padded tables, no
+trailing whitespace, a `## See also` on every `docs/` page. Like `cgl` it fixes
+by default and only reports with `-n`. It needs no node dependency, so it is
+the one node suite that runs without an `npm ci`.
 
 Test discovery: phpunit globs `packages/*/*/Tests/Unit/` and
 `packages/*/*/Tests/Functional/` across **all** extensions at once
