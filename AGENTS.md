@@ -132,6 +132,17 @@ unless it is explicitly requested for that specific change. Branch `1` is legacy
 and is treated the same way. Stating factually which branches contain a defect is
 fine; proposing work on `2.2` is not.
 
+**A backport starts by reading the target branch's own `AGENTS.md` and `docs/`.**
+They are not copies of these: each branch supports a different pair of TYPO3
+versions, so the instructions differ, and several of them differ by being
+*inverted* rather than merely absent. `not-core-13` excludes a test from v13
+here and means v12-only on `2`. The phpstan configurations are byte-identical
+here and differ there. `TYPO3\CMS\Core\Attribute\AsEventListener` exists here and
+does not exist on v12 at all. Applying a rule from this file to branch `2`
+without checking its copy first is how a change lands that is confidently wrong.
+
+→ [Backporting](docs/workflow/backporting.md) for the file-level diff recipe.
+
 ## Build / test / lint — `Build/Scripts/runTests.sh`
 
 All checks run through the containerized harness (docker or podman, auto-selected;
@@ -397,11 +408,20 @@ runs on v14 only. Examples:
 Note: the DI style here is **not** what a fresh extension would use. Eleven of
 the twelve extensions configure services in `Configuration/Services.yaml`; only
 `academic-persons` also has a `Configuration/Services.php`, and that file holds
-nothing but `registerForAutoconfiguration()` calls. TYPO3's DI attributes are
-already in use in production code — `#[Autoconfigure]`, `#[Autowire]`,
-`#[AsAlias]`, `#[Exclude]` — so the two styles coexist. Match the surrounding
-extension when editing it, and see
-[Dependency injection](docs/architecture/dependency-injection.md).
+nothing but `registerForAutoconfiguration()` calls. Attributes are already in use
+in production code alongside it, so the two styles coexist.
+
+Keep the two vendors apart when you use them. `#[Autoconfigure]`, `#[Autowire]`,
+`#[AsAlias]` and `#[Exclude]` are **Symfony's**, from
+`Symfony\Component\DependencyInjection\Attribute`. The only **TYPO3** attribute
+in use here is `Install\Attribute\UpgradeWizard`. That distinction is what the
+`#[AsEventListener]` rule above turns on — TYPO3 ships its own, Symfony's must
+never stand in for it, and Symfony's fails silently rather than loudly: it
+registers nothing, so the listener simply never fires.
+
+Match the surrounding extension when editing it, and see
+[Dependency injection](docs/architecture/dependency-injection.md) for the counts
+— they are measured there, and are deliberately not repeated here.
 
 ## TYPO3 v15 blockers — do not migrate these yet
 
