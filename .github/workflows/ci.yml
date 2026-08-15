@@ -386,3 +386,43 @@ jobs:
           retention-days: 5
           include-hidden-files: true
           overwrite: true
+
+  # One job whose name never changes, so a branch ruleset can require it without
+  # pinning the matrix. Every leaf job here carries its core, PHP and DBMS values
+  # in its name — "unit (v13, PHP 8.2)", "functional mysql 8.0 (v14, PHP 8.5)" —
+  # and requiring those by name would move the matrix into a repository setting
+  # that lives outside the branch, where the two maintained branches do not have
+  # the same one.
+  #
+  # "always()" is what makes it work: without it the job would be skipped as soon
+  # as anything it needs fails, and a skipped required check blocks a pull request
+  # forever instead of reporting a failure. With it the job always runs and decides
+  # for itself. A skipped dependency counts as a failure too, because a gate that
+  # did not run has not passed.
+  all-checks:
+    name: "all checks"
+    runs-on: ubuntu-latest
+    if: "always()"
+    needs:
+      - "cgl"
+      - "phpstan"
+      - "lint"
+      - "unit"
+      - "functional-sqlite"
+      - "functional-dbms"
+      - "frontend-assets"
+      - "markdown"
+      - "documentation"
+    steps:
+
+      # Through an environment variable, not interpolated into the command:
+      # the JSON is multi-line and quoted, and a "run" that inlines it is not
+      # valid shell.
+      - name: "Report the result of every job"
+        env:
+          NEEDS: "${{ toJSON(needs) }}"
+        run: 'echo "$NEEDS"'
+
+      - name: "Fail unless all of them succeeded"
+        if: "contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')"
+        run: "exit 1"
