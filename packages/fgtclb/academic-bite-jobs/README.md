@@ -78,11 +78,11 @@ composer require 'fgtclb/academic-bite-jobs':'2.*.*@dev'
 That way, current main branch will be included and updated and as soon as 2.0.0 is released switcht to the release on
 update.
 
-## Upgrade from `1.x`
+## Upgrade
 
-Upgrading from `1.x` to `2.x` includes breaking changes, which needs to be
-addressed manualy in case not automatic upgrade path is available. See the
-[UPGRADE.md](./UPGRADE.md) file for details.
+Upgrading between major versions can include breaking changes, which have to be
+addressed manually where no automatic upgrade path is available. They are
+documented per version in [Documentation/Changelog](./Documentation/Changelog).
 
 ## Credits
 
