@@ -1,7 +1,67 @@
-# AGENT.md
+# Agent instructions
 
-Guidance for coding agents working in this repository. `CLAUDE.md` is a symlink
-to this file — edit `AGENT.md`.
+This file is the entry point for AI coding agents working in this repository.
+`CLAUDE.md`, `GEMINI.md` and `.github/copilot-instructions.md` are symlinks to
+it — there is one set of instructions, not four. Edit `AGENTS.md`.
+
+## Local additions and overrides
+
+A machine-local `AGENTS.local.md` may sit next to this file. It is git-ignored
+and never committed, so a fresh clone starts without it. `CLAUDE.local.md` and
+`GEMINI.local.md` are symlinks to it.
+
+**Read it if it is present.** It belongs to whoever works on this checkout, it
+may add to or override anything in this file, and where the two differ it takes
+precedence.
+
+## Who you are working for
+
+The maintainer of this repository is an **experienced senior developer with a
+maintainer background** — TYPO3 Core Team, and maintainer of a number of public
+extensions and packages. Work is held to TYPO3 Core review standards.
+
+What follows from that:
+
+- **Explain decisions, not concepts.** No introductions to what dependency
+  injection or a functional test is. Say what you chose and why you rejected the
+  alternative.
+- **Correctness before volume.** A small change that is verified beats a large
+  one that is plausible.
+- **Say what you did not do.** A gap that is named is a decision; a gap that is
+  hidden is a defect.
+- **Disagreement is useful.** If the requested approach has a real problem, say
+  so in a sentence or two, then deliver what was asked under stated assumptions.
+
+## AI-assisted contributions
+
+1. **Responsibility is indivisible, and AI is not an author.** Whoever submits a
+   change is responsible for it in full, exactly as if every line had been typed
+   by hand. A model is a tool. It is therefore never credited as an author: no
+   `Co-authored-by:` trailer for a model or a tool, no `AI-assisted:` trailer,
+   and no "Generated with …" notice — not in a commit, a pull request, an issue
+   or a file.
+2. **The quality bar does not move.** Every gate in this file applies unchanged.
+   Never submit code that has only been reasoned about; run it.
+3. **Be deliberate about security.** Use the TYPO3 `QueryBuilder` rather than
+   string concatenation, TYPO3 request handling rather than `$_GET`/`$_POST`,
+   and never hardcode credentials.
+4. **Write in the maintainer's voice.** Commit messages, pull request texts and
+   documentation are written as a human author would write them.
+
+## Working files belong in `.agent/`
+
+Never write scratch files, notes, plans, downloads or drafts into the repository
+tree, and **never into `/tmp/`** — it is a ramdisk, it is lost on restart and it
+costs RAM. Use `.agent/` in the repository root, which is git-ignored:
+
+| Path              | For                                                                                          |
+|-------------------|----------------------------------------------------------------------------------------------|
+| `.agent/plans/`   | Plans and step tracking, **one subdirectory per plan** so all files of a plan stay together. |
+| `.agent/reports/` | Analyses, investigations and hand-off documents.                                             |
+| `.agent/commits/` | Commit messages to draft, review or edit before committing.                                  |
+| `.agent/tmp/`     | Everything else: scripts, downloads, scratch checkouts, tool output.                         |
+
+Nothing below `.agent/` is ever committed.
 
 ## What this repository is
 
@@ -179,6 +239,35 @@ error analysis, but always a full run in the end.
 
 In any-case watch pull-request pipelines for pipeline errors when pushing pull-requests.
 
+## The test suites are deliberately hard breaking
+
+`Build/phpunit/UnitTests.xml` and `FunctionalTests.xml` both set
+`failOnDeprecation`, `failOnNotice`, `failOnRisky` and `failOnWarning` to
+`true`. A deprecation raised anywhere in a test run is a failing test, not a
+line of output to scroll past.
+
+Never silence one, never add a group to skip it, never lower a flag to get a run
+green. Fix the cause. A deprecation that cannot be fixed on the older supported
+core version is a version split — see below — not a suppression.
+
+The one flag that is *not* strict is `beStrictAboutTestsThatDoNotTestAnything`,
+which is `false`: a test without an assertion passes here. That makes proving a
+new test can fail more important, not less.
+
+## Verify, do not assume
+
+The most common failure mode of an agent in this repository is a confident,
+plausible, wrong statement. Two habits prevent it:
+
+- **Read the source rather than recalling it.** The installed core is right
+  there under `.Build/vendor/typo3/`, and the changelogs ship with it in
+  `.Build/vendor/typo3/cms-core/Documentation/Changelog/`. An API that "should"
+  exist on a core version either does or does not, and checking costs seconds.
+  This matters most for anything claimed about the *older* supported version.
+- **Prove a new test can fail.** A test that passes may be passing for the wrong
+  reason. Break the thing it covers on purpose, watch the test go red, restore.
+  This is cheap and it is the difference between a test and a decoration.
+
 ## Database queries
 
 Two rules, both learned from defects that reached a release (ACE-349, ACE-356).
@@ -311,3 +400,23 @@ use TYPO3 Core conventions (see recent history: `[RELEASE]`, `[TASK]`,
 `[BUGFIX]`, and `ACE-NNN` issue refs in the subject/footer). The public issue/PR
 tracker is GitHub (`fgtclb/academic-extensions`); the `ACE-NNN` references are
 YouTrack keys — verify them against YouTrack before writing them into a commit.
+
+## Definition of done
+
+Before reporting a change as complete:
+
+- [ ] `lintPhp`, `cgl -n`, `phpstan` and `unit` green for **every** core version
+      the branch supports, each after its own `composerUpdate`.
+- [ ] `functional` green for the same versions when the change can affect
+      runtime behaviour.
+- [ ] New behaviour has a test, and the test was shown to fail without the
+      change.
+- [ ] The affected extension's `Documentation/` updated when the change is user
+      or integrator facing, with a `Documentation/Changelog/<version>/` entry —
+      `Breaking-*.rst`, `Deprecation-*.rst`, `Feature-*.rst` or
+      `Important-*.rst`. Templates are in `Build/Documentation/Templates/`.
+- [ ] `README.md` and `CONTRIBUTING.md` still only summarize and link — no
+      duplicated content.
+- [ ] Commit message follows the TYPO3 Core conventions, with a verified
+      `ACE-NNN` reference and no AI attribution of any kind.
+- [ ] Anything left out is stated explicitly, with the reason.

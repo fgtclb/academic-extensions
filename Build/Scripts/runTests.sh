@@ -710,7 +710,12 @@ case ${TEST_SUITE} in
         # The DDEV instances install their own vendor tree next to the sources.
         # It is git ignored and holds third party files that are not ours to
         # lint - class-alias-loader ships a template that is not valid PHP.
-        COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./core-1\\*/vendor/\\*" ! -path "./core-1\\*/public/\\*" ! -path "./core-1\\*/var/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
+        #
+        # ".agent/" is the git ignored working tree of AI coding agents (see
+        # AGENTS.md). It holds drafts and partial snippets that are none of this
+        # repository's business, and a snippet that does not parse would turn
+        # this gate red for a file that is not part of the code base.
+        COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./.agent/\\*" ! -path "./core-1\\*/vendor/\\*" ! -path "./core-1\\*/public/\\*" ! -path "./core-1\\*/var/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
         ;;
