@@ -1,0 +1,44 @@
+# Development
+
+Everything about getting a working copy running, what the repository is made of,
+and what has to pass before a change is done.
+
+## Quick start
+
+The only requirement on the host is a container runtime — **podman** (preferred)
+or **docker**. Everything else runs inside images.
+
+```bash
+# Install dependencies for the core version and PHP version you will test.
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
+
+# Gates.
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s cgl -n
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s phpstan
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s lintPhp
+
+# Tests.
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s unit
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s functional
+
+# All options.
+Build/Scripts/runTests.sh -h
+```
+
+Everything has to pass for **both** supported core versions, each after its own
+`composerUpdate` — see [Dual core setup](dual-core-setup.md).
+
+## Pages
+
+| Page                                      | Contents                                                                                                                             |
+|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| [Development environment](environment.md) | The `runTests.sh` wrapper, container runtimes, every suite and every option.                                                         |
+| [Monorepo layout](monorepo-layout.md)     | What each directory is for, the twelve extensions and their split repositories, extension keys, how a path package gets its version. |
+| [Dual core setup](dual-core-setup.md)     | Why the installed dependency set must match `-t`, how to check which core is installed, and how tests are scoped per version.        |
+| [Quality gates](quality-gates.md)         | Each gate and what it actually runs, PHPStan per core version, and how continuous integration stages them.                           |
+
+## See also
+
+- [Architecture](../architecture/Index.md) — the rules the code itself follows.
+- [Testing](../testing/Index.md) — both test suites and their conventions.
+- [Workflow](../workflow/Index.md) — commits, pull requests, releases.
