@@ -1,11 +1,24 @@
 <?php
 
+use FGTCLB\AcademicContacts4pages\Backend\FormEngine\AddressRecordItems;
 use FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContactLabels;
+use FGTCLB\AcademicContacts4pages\Domain\Model\Contact;
 use FGTCLB\AcademicPersons\Backend\FormEngine\ContractItems;
 
 if (!defined('TYPO3')) {
     die('Not authorized');
 }
+
+$defaultAddressRecordItems = [
+    [
+        'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.addressRecord.all',
+        'value' => Contact::DISPLAY_ALL,
+    ],
+    [
+        'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.addressRecord.none',
+        'value' => Contact::DISPLAY_NONE,
+    ],
+];
 
 return [
     'ctrl' => [
@@ -33,12 +46,25 @@ return [
             'ignorePageTypeRestriction' => true,
         ],
     ],
+    'palettes' => [
+        'addressRecords' => [
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.palette.addressRecords',
+            'description' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.palette.addressRecords.description',
+            'showitem' => implode(',', [
+                'email_address',
+                'phone_number',
+                '--linebreak--',
+                'physical_address',
+            ]),
+        ],
+    ],
     'types' => [
         0 => [
             'showitem' => implode(',', [
                 'page',
                 'contract',
                 'role',
+                '--palette--;;addressRecords',
                 'hidden',
                 '--div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:language',
                 'sys_language_uid',
@@ -72,6 +98,7 @@ return [
             'exclude' => true,
             'l10n_mode' => 'exclude',
             'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.contract',
+            'onChange' => 'reload',
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectSingle',
@@ -105,6 +132,45 @@ return [
                 'foreign_table_where' => 'AND {#tx_academiccontacts4pages_domain_model_role}.{#sys_language_uid} = 0 ORDER BY tx_academiccontacts4pages_domain_model_role.name ASC',
                 'minitems' => 1,
                 'default' => 0,
+            ],
+        ],
+        'email_address' => [
+            'exclude' => true,
+            'l10n_mode' => 'exclude',
+            'displayCond' => 'FIELD:contract:>:0',
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.email_address',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'items' => $defaultAddressRecordItems,
+                'itemsProcFunc' => AddressRecordItems::class . '->emailAddressItems',
+                'default' => Contact::DISPLAY_ALL,
+            ],
+        ],
+        'phone_number' => [
+            'exclude' => true,
+            'l10n_mode' => 'exclude',
+            'displayCond' => 'FIELD:contract:>:0',
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.phone_number',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'items' => $defaultAddressRecordItems,
+                'itemsProcFunc' => AddressRecordItems::class . '->phoneNumberItems',
+                'default' => Contact::DISPLAY_ALL,
+            ],
+        ],
+        'physical_address' => [
+            'exclude' => true,
+            'l10n_mode' => 'exclude',
+            'displayCond' => 'FIELD:contract:>:0',
+            'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_contact.physical_address',
+            'config' => [
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'items' => $defaultAddressRecordItems,
+                'itemsProcFunc' => AddressRecordItems::class . '->physicalAddressItems',
+                'default' => Contact::DISPLAY_ALL,
             ],
         ],
     ],
