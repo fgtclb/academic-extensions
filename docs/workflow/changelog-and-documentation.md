@@ -59,21 +59,20 @@ Build/Scripts/runTests.sh -s openDocumentation academic-jobs         # open the 
 ```
 
 The image is `ghcr.io/typo3-documentation/render-guides:latest`
-(`Build/Scripts/runTests.sh:537`). Neither `-t` nor `-p` matters here: the
+(`IMAGE_RSTRENDERING`). Neither `-t` nor `-p` matters here: the
 renderer is a self-contained container and needs no vendor tree, which is why
 `composerUpdate` is not a precondition for a documentation change.
 
 The argument to `checkRstRenderingSingle` and `openDocumentation` is the
 **directory** below `packages/fgtclb/`, not the extension key — the script
 checks `packages/fgtclb/${extensionKey}` for existence
-(`Build/Scripts/runTests.sh:629-641`) despite the variable's name. For
+, in the `checkRstRenderingSingle` arm, despite the variable's name. For
 `academic_contacts4pages` the argument is therefore `academic-contact4pages`.
 
 ### Where the output lands
 
-`executeRstRendering()` (`Build/Scripts/runTests.sh:213-227`) mounts one package
-into the container and runs the renderer with the package as both configuration
-and input directory:
+`executeRstRendering()` mounts one package into the container and runs the
+renderer with the package as both configuration and input directory:
 
 ```
 --fail-on-log --fail-on-error --no-progress --config=Documentation Documentation
@@ -84,8 +83,7 @@ The renderer writes into the package itself, at
 `.gitignore` excludes (`packages/fgtclb/academic-base/.gitignore:9`). The script
 then copies that tree to
 `documentation-rendered/<ext>/Documentation-GENERATED-temp/`
-(`Build/Scripts/runTests.sh:223-225`), which is ignored at the root
-(`.gitignore:55`).
+, which is ignored at the root.
 
 Two locations for one result is deliberate. The per-package one is where the
 renderer has to write, because it renders one package at a time with that
@@ -96,7 +94,7 @@ per extension, and that single directory is what CI uploads as an artifact.
 `openDocumentation` reads only the collected copy and opens
 `documentation-rendered/<ext>/Documentation-GENERATED-temp/Index.html` with
 `xdg-open`. It renders nothing itself: without a preceding render it prints the
-two commands to run first (`Build/Scripts/runTests.sh:229-244`). It is
+two commands to run first, in `openDocumentation()`. It is
 Linux-only, which the script marks with a `@todo`.
 
 There is no watch mode in this repository. The loop is edit, render the single
@@ -104,8 +102,7 @@ package, reopen.
 
 ## The render is a gate, not an artifact producer
 
-The `documentation` job of the CI workflow
-(`.github/workflows/ci.yml:307-352`) runs exactly the command above:
+The `documentation` job of the CI workflow runs exactly the command above:
 
 ```yaml
 - name: "Render documentation of all extensions"
@@ -116,7 +113,7 @@ Because `executeRstRendering()` passes **`--fail-on-log --fail-on-error`**, the
 renderer exits non-zero on a warning, not only on a hard error, and the job
 fails. A broken cross-reference, an unknown directive or a malformed table is
 therefore a red pull request, not a cosmetic remark. The comment above the step
-says so in the workflow itself (`.github/workflows/ci.yml:335-339`).
+says so in the workflow itself.
 
 The job is independent of the source gates — it has no `needs:` — so a
 documentation-only change gets its answer without waiting for `cgl`, `phpstan`,
@@ -128,7 +125,7 @@ consistent with the renderer needing no vendor tree.
 `.github/workflows/pr-comment.yml` posts one comment per pull request linking
 the `documentation` artifact of the run, and updates that same comment on every
 push instead of adding a new one (it finds its own comment by the marker
-`<!-- rendered-documentation -->`, `.github/workflows/pr-comment.yml:84`).
+`<!-- rendered-documentation -->`).
 
 It is a **separate workflow on the `workflow_run` event**, and that is not an
 accident:
@@ -141,7 +138,7 @@ accident:
   **default branch** of this repository, not the fork. Its token can write even
   though the token of the run that triggered it could not, and no code from the
   pull request is checked out — which is what makes granting write permission
-  safe (`.github/workflows/pr-comment.yml:6-22`, `39-43`).
+  safe — see its `on:` block and its `permissions:`.
 * `pull_request_target` is deliberately **not** used. It also carries a write
   token, but running the pull request's own code under it is a documented way to
   leak write access and secrets.
@@ -154,9 +151,9 @@ Two consequences follow, and both surprise people:
    comments is always the one on `main`. Edit it there.
 2. `github.event.workflow_run.pull_requests` is empty for a fork, so the pull
    request number cannot be read from the event. `ci.yml` writes it into a
-   `pull-request-context` artifact *before* rendering
-   (`.github/workflows/ci.yml:315-334`), so the comment lands on the right pull
-   request even when the rendering failed.
+   `pull-request-context` artifact *before* rendering, in the *Record the pull
+   request number* and *Upload the pull request context* steps, so the comment
+   lands on the right pull request even when the rendering failed.
 
 ## Changelog entries
 

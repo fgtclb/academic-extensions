@@ -29,24 +29,23 @@ Build/Scripts/runTests.sh -t 12 -p 8.1 -s unit
 | `runTests.sh -s unit packages/fgtclb/academic-persons/Tests/Unit`                            | Restricted to one extension.                                            |
 | `runTests.sh -s unit packages/fgtclb/academic-persons/Tests/Unit/Domain/Model/EmailTest.php` | Restricted to one file.                                                 |
 
-The trailing path is the **only** way to narrow a run. `runTests.sh` has no
-argument passthrough to PHPUnit — no `-e`, no `--`. Anything else (a
-`--filter`, a `--group`) has to be added to the `COMMAND` array in the script
-itself, which is not how a normal run works.
+The trailing path is the usual way to narrow a run, and there is no `-e`
+option. Anything else — a `--filter`, a `--group` — goes after a `--`
+separator, which every phpunit suite appends to its command:
 
-`-o` is parsed at
-[`Build/Scripts/runTests.sh:453-455`](../../Build/Scripts/runTests.sh#L453-L455)
-and turns into `--random-order-seed=<seed>`. It only has an effect together with
-`-s unitRandom`; the `unit` suite does not pass `PHPUNIT_RANDOM` on. Note that
-the built-in help text still documents the TYPO3 Core spelling
-`-- --random-order-seed=<number>`
-([`runTests.sh:269`](../../Build/Scripts/runTests.sh#L269)) — that form does not
-work here, use `-o`.
+```bash
+Build/Scripts/runTests.sh -s unit -- --filter EmailTest
+```
 
-`unitRandom` is not decoration. CI runs it right after `unit` in the same job
-([`.github/workflows/ci.yml:214-218`](../../.github/workflows/ci.yml#L214-L218)),
-because ordering dependencies between tests are exactly the kind of defect a
-fixed order hides.
+`-o` is parsed in its own `getopts` arm and turns into
+`--random-order-seed=<seed>`. It only has an effect together with
+`-s unitRandom`; the `unit` suite does not pass `PHPUNIT_RANDOM` on. Prefer it
+over `-- --random-order-seed=<number>`, which reaches phpunit as well but says
+the same thing twice as long.
+
+`unitRandom` is not decoration. CI runs it right after `unit` in the same job —
+the *Execute unit tests in random order* step — because ordering dependencies
+between tests are exactly the kind of defect a fixed order hides.
 
 ## Discovery
 
@@ -163,10 +162,8 @@ will not catch one for you.
 ## Core-version-aware unit tests
 
 `runTests.sh` always appends `--exclude-group not-core-${CORE_VERSION}` to the
-PHPUnit call — for `unit` at
-[`runTests.sh:753`](../../Build/Scripts/runTests.sh#L753) and for `unitRandom`
-at [`:759`](../../Build/Scripts/runTests.sh#L759). The group names read as what
-they exclude, **not** as the version they run on:
+PHPUnit call, in both the `unit` and the `unitRandom` arm. The group names read
+as what they exclude, **not** as the version they run on:
 
 | Group         | Runs on | Meaning                      |
 |---------------|---------|------------------------------|

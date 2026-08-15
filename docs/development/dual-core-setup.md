@@ -14,13 +14,11 @@ repository.
 > command is run with.
 
 `-t <12|13>` selects **configuration only**. It picks the phpstan config
-(`Build/phpstan/Core${CORE_VERSION}/phpstan.neon`,
-`Build/Scripts/runTests.sh:740`) and the phpunit exclude group
-(`--exclude-group not-core-${CORE_VERSION}`, `Build/Scripts/runTests.sh:665`
-and `:753`). It installs nothing.
+(`Build/phpstan/Core${CORE_VERSION}/phpstan.neon`, in the `phpstan` arm) and
+the phpunit exclude group (`--exclude-group not-core-${CORE_VERSION}`, in the
+`functional`, `unit` and `unitRandom` arms). It installs nothing.
 
-The only suite that changes what is in `.Build/` is `composerUpdate`
-(`Build/Scripts/runTests.sh:653-661`):
+The only suite that changes what is in `.Build/` is `composerUpdate`:
 
 ```bash
 rm -rf .Build composer.lock composer.json.orig
@@ -50,8 +48,8 @@ Running `-t 12` while the v13 set is installed does not fail with a useful
 message. It produces wrong answers: phpstan reports unknown classes for APIs
 that only exist in the other major and misses the errors it was supposed to
 find, and tests pass or fail for reasons that have nothing to do with the
-change under test. The default is `-t 12` (`Build/Scripts/runTests.sh:397`),
-so the trap is easiest to fall into right after finishing a v13 round and
+change under test. The default is `-t 12` — `CORE_VERSION="12"` — so the trap
+is easiest to fall into right after finishing a v13 round and
 omitting `-t` on the next command.
 
 Both `.Build/` and `composer.lock` are git-ignored, so nothing is lost by
@@ -62,13 +60,12 @@ reinstalling. The composer download cache lives in `.cache/composer`, outside
 
 `-p <8.1|8.2|8.3|8.4|8.5>` has exactly the same property, and it is easier to
 overlook because a PHP version does not feel like a dependency. The default is
-`8.2` (`Build/Scripts/runTests.sh:399`) — the inline help still names `8.1` as
-the default (`:335`), which it no longer is.
+`8.2` — `PHP_VERSION="8.2"`.
 
 `composerUpdate` runs `composer` inside the container image selected by `-p`
-(`IMAGE_PHP`, `Build/Scripts/runTests.sh:530`, which builds the image name
-`ghcr.io/typo3/core-testing-php<version without dot>:latest` and is used for
-the composer calls at `Build/Scripts/runTests.sh:655` and `:658`). The root
+(`IMAGE_PHP`, which builds the name
+`ghcr.io/typo3/core-testing-php<version without dot>:latest` and is what both
+composer calls of that arm run in). The root
 `composer.json` sets no `config.platform`, so composer resolves against the PHP
 version it is actually running on. A tree resolved on 8.1 can therefore hold
 different package versions than one resolved on 8.4, and running the 8.4 image
@@ -77,10 +74,10 @@ integration will test.
 
 `.github/workflows/ci.yml` follows this without exception: every job that runs
 a suite runs `composerUpdate` first with the same `-t` **and** `-p` values it
-then uses (`ci.yml:109/112`, `:153/156`, `:212/215`, `:255/258`, `:302/305`).
-The one job that does not is `lint`, which passes neither `-t` nor
-`composerUpdate` (`ci.yml:175`) because `lintPhp` only runs `php -l` over the
-sources and needs no vendor tree at all.
+then uses — its *Prepare dependencies for TYPO3 v…* step, present in `cgl`,
+`phpstan`, `unit`, `functional-sqlite` and `functional-dbms`. The one job that
+does not is `lint`, which passes neither `-t` nor `composerUpdate` because
+`lintPhp` only runs `php -l` over the sources and needs no vendor tree at all.
 
 Treat `-t` and `-p` together as the identity of the installed tree: change
 either, reinstall.
@@ -157,10 +154,10 @@ Not every test can run on both core versions. Two mechanisms exist and they are
 picked by scope, not by taste.
 
 `runTests.sh` always passes `--exclude-group not-core-${CORE_VERSION}` to
-phpunit — for `functional` (`Build/Scripts/runTests.sh:665`, where it is
-combined with the DBMS exclusion into
-`--exclude-group not-${DBMS},not-core-${CORE_VERSION}`), `unit` (`:753`) and
-`unitRandom` (`:759`). The group therefore names the version the test must
+phpunit, in the `functional`, `unit` and `unitRandom` arms — the `functional`
+one combines it with the DBMS exclusion into
+`--exclude-group not-${DBMS},not-core-${CORE_VERSION}`. The group therefore
+names the version the test must
 **not** run on:
 
 | Group         | Runs on     | Meaning                                     |
@@ -257,14 +254,14 @@ Notes on that loop:
 - `-p 8.2` is chosen because both majors accept it — v13 does not run on 8.1,
   v12 does not require it — which is what lets one loop cover both. The matrix
   edges differ per core version: v12 on 8.1 and 8.4, v13 on 8.2 and 8.5
-  (`ci.yml:185-188`). A change that touches language-level behaviour deserves a
+  — the `combo` axis of `ci.yml`. A change that touches language-level behaviour deserves a
   second pass on the other edge of each major, and every such pass needs its
   own `composerUpdate`.
 - Restrict a run while iterating by appending a path, for example
   `-s unit packages/fgtclb/academic-base/Tests/Unit/TcaManipulatorTest.php`.
   The trailing path is the restriction mechanism; there is no dedicated flag
   for handing extra options to phpunit, apart from `-o <seed>` for
-  `unitRandom` (`Build/Scripts/runTests.sh:453-455`).
+  `unitRandom`.
 
 Run the unrestricted sequence once before pushing, no matter how narrow the
 change looked.
