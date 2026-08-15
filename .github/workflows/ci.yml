@@ -325,6 +325,21 @@ jobs:
       - name: "Ensure the committed assets match their sources"
         run: "Build/Scripts/runTests.sh -b docker -s checkJsBuildClean"
 
+  markdown:
+    name: "markdown"
+    runs-on: ubuntu-latest
+    # Its own job rather than a step of "documentation": that one uploads the
+    # pull request context before it renders, and a Markdown defect must not be
+    # able to stop it from doing so. No matrix and no cache — the gate reads the
+    # sources with the node standard library and installs nothing.
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Check the Markdown documentation"
+        run: "Build/Scripts/runTests.sh -b docker -s lintMarkdown -n"
+
   documentation:
     name: "documentation"
     runs-on: ubuntu-latest

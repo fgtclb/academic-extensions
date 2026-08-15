@@ -282,6 +282,7 @@ Options:
             - composer: "composer" with all remaining arguments dispatched.
             - composerUpdate: "composer update", handy if host has no PHP
             - functional: PHP functional tests
+            - lintMarkdown: check docs/ and the README/CONTRIBUTING files, fixes by default, "-n" to only check
             - lintPhp: PHP linting
             - lintTypescript: eslint over the TypeScript sources, fixes by default, "-n" to only check
             - npm: "npm" with all remaining arguments dispatched, run in Build/
@@ -294,12 +295,13 @@ Options:
             - update: update the typo3/core-testing-* images, same as "-u"
             - help: show this help, the default when "-s" is not given
 
-        The frontend suites - buildJs, checkJsBuildClean, lintTypescript, npm and
-        typecheckJs - run in a node container, and cleanJs runs on the host. All six are
-        core version independent: they look at the sources and the committed artifacts and
-        never at the installed core, so "-t" does not change what they do. They also need
-        no composerUpdate, which makes them the only suites that are safe to run while the
-        other core version's dependency set is installed.
+        The node suites - buildJs, checkJsBuildClean, lintMarkdown, lintTypescript, npm
+        and typecheckJs - run in a node container, and cleanJs runs on the host. All seven
+        are core version independent: they look at the sources and the committed artifacts
+        and never at the installed core, so "-t" does not change what they do. They also
+        need no composerUpdate, which makes them the only suites that are safe to run while
+        the other core version's dependency set is installed. lintMarkdown needs no node
+        dependency either, so it runs without an "npm ci" first.
 
     -b <docker|podman>
         Container environment:
@@ -392,7 +394,7 @@ Options:
         "--random-order-seed=<number>" is passed on to phpunit.
 
     -n
-        Only with -s cgl|cglHeader|lintTypescript
+        Only with -s cgl|cglHeader|lintMarkdown|lintTypescript
         Activate dry-run, which does not change files and only reports the broken ones.
 
     -u
@@ -832,6 +834,20 @@ case ${TEST_SUITE} in
         # packages do ship PHP - "flatted" carries a PHP port of itself.
         COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./.agent/\\*" ! -path "./Build/node_modules/\\*" ! -path "./core-1\\*/vendor/\\*" ! -path "./core-1\\*/public/\\*" ! -path "./core-1\\*/var/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
+        SUITE_EXIT_CODE=$?
+        ;;
+    lintMarkdown)
+        # Mirrors "cgl": it fixes in place, and only checks when "-n" is given.
+        #
+        # No "npm ci" first, unlike its node siblings: Build/markdown.mjs uses
+        # nothing but the node standard library, so installing the frontend
+        # dependency tree would only make the gate slower.
+        MARKDOWN_ARGUMENTS="--fix"
+        if [ "${CGLCHECK_DRY_RUN}" -eq 1 ]; then
+            MARKDOWN_ARGUMENTS=""
+        fi
+        COMMAND="node Build/markdown.mjs ${MARKDOWN_ARGUMENTS}"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-markdown-${SUFFIX} ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
         ;;
     lintTypescript)

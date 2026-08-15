@@ -18,15 +18,16 @@ Build/Scripts/runTests.sh -t 14 -p 8.2 -s composerUpdate
 # ... the same list again
 ```
 
-| Gate                                              | Tool             | Configuration                                    | Depends on the core version |
-|---------------------------------------------------|------------------|--------------------------------------------------|-----------------------------|
-| `cgl`                                             | php-cs-fixer     | `Build/php-cs-fixer/config.php`                  | no                          |
-| `cglHeader`                                       | php-cs-fixer     | `Build/php-cs-fixer/header-comment.php`          | no                          |
-| `lintPhp`                                         | `php -l`         | none, a `find` in the suite itself               | no                          |
-| `phpstan`                                         | PHPStan, level 8 | `Build/phpstan/Core13/`, `Build/phpstan/Core14/` | **yes**                     |
-| `unit`, `unitRandom`                              | PHPUnit          | `Build/phpunit/UnitTests.xml`                    | through the excluded group  |
-| `functional`                                      | PHPUnit          | `Build/phpunit/FunctionalTests.xml`              | through the excluded group  |
-| `checkRstRenderingAll`, `checkRstRenderingSingle` | render-guides    | each extension's own `Documentation/`            | no                          |
+| Gate                                              | Tool                 | Configuration                                    | Depends on the core version |
+|---------------------------------------------------|----------------------|--------------------------------------------------|-----------------------------|
+| `cgl`                                             | php-cs-fixer         | `Build/php-cs-fixer/config.php`                  | no                          |
+| `cglHeader`                                       | php-cs-fixer         | `Build/php-cs-fixer/header-comment.php`          | no                          |
+| `lintPhp`                                         | `php -l`             | none, a `find` in the suite itself               | no                          |
+| `phpstan`                                         | PHPStan, level 8     | `Build/phpstan/Core13/`, `Build/phpstan/Core14/` | **yes**                     |
+| `unit`, `unitRandom`                              | PHPUnit              | `Build/phpunit/UnitTests.xml`                    | through the excluded group  |
+| `functional`                                      | PHPUnit              | `Build/phpunit/FunctionalTests.xml`              | through the excluded group  |
+| `checkRstRenderingAll`, `checkRstRenderingSingle` | render-guides        | each extension's own `Documentation/`            | no                          |
+| `lintMarkdown`                                    | `Build/markdown.mjs` | none, the conventions are the specification      | no                          |
 
 ## Coding guidelines — `cgl`
 
@@ -322,6 +323,43 @@ Build/Scripts/runTests.sh -s openDocumentation academic-persons
 Note the argument is the **folder** name, which is not always the extension
 key — `academic-contact4pages` ships `academic_contacts4pages`.
 
+## Markdown documentation — `lintMarkdown`
+
+The counterpart for the Markdown half: `docs/`, the files at the repository
+root, and the per-package `README.md` and `CONTRIBUTING.md`. `Build/markdown.mjs`
+checks four conventions:
+
+| Convention                                                   | Fixable |
+|--------------------------------------------------------------|---------|
+| Relative links resolve to a file that exists                 | no      |
+| Table rows are padded so the pipes line up                   | yes     |
+| No trailing whitespace, and one newline at the end of file   | yes     |
+| Every `docs/` page but an `Index.md` ends in a `## See also` | no      |
+
+It mirrors `cgl`: it repairs in place by default and only reports with `-n`,
+which is the form CI uses. What it will not do is invent a decision — a link
+that points nowhere and a page without a *See also* are reported, never
+rewritten.
+
+```bash
+# Report, change nothing. This is what CI runs.
+Build/Scripts/runTests.sh -s lintMarkdown -n
+
+# Repair the padding and the whitespace, then report what is left.
+Build/Scripts/runTests.sh -s lintMarkdown
+```
+
+Two properties are worth knowing. It **skips symlinks**, so `AGENTS.md` is
+checked once rather than four times through `CLAUDE.md`, `GEMINI.md` and
+`.github/copilot-instructions.md`. And it uses nothing but the node standard
+library, which is why it is the one node suite that runs without an `npm ci`
+first.
+
+The per-package files are in scope on purpose: they are the front page of the
+split repository each package is mirrored into, so a dead link there is seen by
+someone who is not us. That is how the missing `UPGRADE.md` of ten packages was
+found (ACE-399).
+
 ## Continuous integration
 
 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) is the single
@@ -336,18 +374,24 @@ cgl     ─┐
 phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
 lint    ─┘
 
-documentation   (independent)
+frontend assets, markdown, documentation   (independent)
 ```
 
-| Job                 | Line | Needs              | Matrix                     |
-|---------------------|------|--------------------|----------------------------|
-| `cgl`               | 73   | —                  | PHP 8.2, v13               |
-| `phpstan`           | 115  | —                  | PHP 8.2 × v13, v14         |
-| `lint`              | 154  | —                  | PHP 8.2, 8.3, 8.4, 8.5     |
-| `unit`              | 173  | cgl, phpstan, lint | PHP 8.2, 8.5 × v13, v14    |
-| `functional-sqlite` | 213  | unit               | PHP 8.2, 8.5 × v13, v14    |
-| `functional-dbms`   | 250  | functional-sqlite  | the same × 4 DBMS, 16 jobs |
-| `documentation`     | 294  | —                  | none                       |
+| Job                 | Needs              | Matrix                     |
+|---------------------|--------------------|----------------------------|
+| `cgl`               | —                  | PHP 8.2, v13               |
+| `phpstan`           | —                  | PHP 8.2 × v13, v14         |
+| `lint`              | —                  | PHP 8.2, 8.3, 8.4, 8.5     |
+| `unit`              | cgl, phpstan, lint | PHP 8.2, 8.5 × v13, v14    |
+| `functional-sqlite` | unit               | PHP 8.2, 8.5 × v13, v14    |
+| `functional-dbms`   | functional-sqlite  | the same × 4 DBMS, 16 jobs |
+| `frontend-assets`   | —                  | none                       |
+| `markdown`          | —                  | none                       |
+| `documentation`     | —                  | none                       |
+
+The last three carry no matrix because none of them reads the installed core:
+they look at sources and committed artifacts, so repeating them per core and
+PHP version would check the same files four times.
 
 The DBMS matrix is the expensive part — sixteen jobs, each starting a database
 container. It runs only after the same tests passed on SQLite for both core
