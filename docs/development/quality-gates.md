@@ -395,11 +395,12 @@ of them reads the installed core: they look at sources and committed artifacts,
 so repeating them per core and PHP version would check the same files four
 times.
 
-`all checks` runs no gate of its own. It exists so that a branch ruleset has one
-check to require whose name does not move with the matrix — see
-[Pull requests](../workflow/pull-requests.md). It needs every other job, runs
-with `if: always()` so that it reports rather than being skipped, and treats a
-skipped dependency as a failure.
+`all checks` runs no gate of its own. It needs every other job, runs with
+`if: always()` so that it reports rather than being skipped, and treats a
+skipped dependency as a failure. It is the **required status check** of the
+`required_status_checks` ruleset — the one check whose name does not move with
+the matrix — so a pull request whose pipeline is not green cannot be merged, by
+anybody. See [Pull requests](../workflow/pull-requests.md).
 
 The DBMS matrix is the expensive part — sixteen jobs, each starting a database
 container. It runs only after the same tests passed on SQLite for both core

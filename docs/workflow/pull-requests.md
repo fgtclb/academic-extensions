@@ -87,15 +87,45 @@ The remote branch is gone already — `delete_branch_on_merge` removes it when t
 pull request is merged — so this is local cleanup only. Use the target the pull
 request actually went to, `origin/2` for a backport.
 
-## Rules on the maintained branches
+## Rules on the branches
 
-Verified through `gh api repos/fgtclb/academic-extensions/rulesets`. Note that
+The repository uses **rulesets**, not classic branch protection.
 `gh api repos/fgtclb/academic-extensions/branches/main/protection` answers
-`404 Branch not protected`: the repository uses **rulesets**, not classic branch
-protection, so the classic endpoint being empty says nothing.
+`404 Branch not protected`, and that says nothing at all — it is the wrong
+endpoint. Two that are right:
 
-The ruleset `version-branches` is active and applies to the default branch plus
-`refs/heads/1`, `refs/heads/1.*`, `refs/heads/2` and `refs/heads/2.*`:
+```bash
+# What exists.
+gh api "repos/fgtclb/academic-extensions/rulesets?includes_parents=true"
+
+# What actually applies to one branch, across all rulesets. Use this one.
+gh api repos/fgtclb/academic-extensions/rules/branches/main
+```
+
+Prefer the second when a question is "is this branch protected against X". The
+conditions are `fnmatch` patterns including bracket expressions, several
+rulesets overlap, and reading four condition lists and intersecting them by eye
+is how a wrong answer is produced.
+
+Four rulesets, all repository level and all active:
+
+| Ruleset                   | Applies to                                          | Rules                                                                                 |
+|---------------------------|-----------------------------------------------------|---------------------------------------------------------------------------------------|
+| `linear-history`          | `~ALL`                                              | `required_linear_history`                                                             |
+| `version-branches`        | default branch, `2`, `2.[3-9]`, `2.[1-9][0-9]`, …   | `pull_request`, `creation`, `deletion`, `non_fast_forward`, `required_linear_history` |
+| `required_status_checks`  | default branch and every version-shaped branch name | `required_status_checks`                                                              |
+| `End Of Live (read-only)` | `1`, `1.[0-9]`, …, and `2.[0-2]`                    | `update`, `creation`, `deletion`, `non_fast_forward`                                  |
+
+Which produces two distinct shapes:
+
+| Branch | Effective rules                                                                                                 |
+|--------|-----------------------------------------------------------------------------------------------------------------|
+| `main` | `creation`, `deletion`, `non_fast_forward`, `pull_request`, `required_linear_history`, `required_status_checks` |
+| `2`    | the same                                                                                                        |
+| `1`    | `creation`, `deletion`, `non_fast_forward`, `required_linear_history`, `required_status_checks`, `update`       |
+| `2.2`  | the same as `1`                                                                                                 |
+
+### The maintained branches — `version-branches`
 
 | Rule                                       | Effect                                                  |
 |--------------------------------------------|---------------------------------------------------------|
@@ -111,13 +141,21 @@ The ruleset `version-branches` is active and applies to the default branch plus
 Bypass is granted to organization admins and to one repository role, in
 `always` mode. That is an escape hatch for a maintainer, not a workflow.
 
-**There is no required status checks rule in either ruleset.** CI is therefore
-not a mechanical merge blocker — GitHub will let a pull request with a red
-pipeline be merged by someone with the approval. Reading the pipeline result
-before merging is a discipline here, not a guard rail, which is exactly why the
-next two sections exist.
+Its conditions name the *live* `2.x` line explicitly — `2.[3-9]` and upwards —
+rather than a blanket `2.*`, so that the frozen `2.0`, `2.1` and `2.2` fall to
+the read-only ruleset instead. A future `2.3` is covered without touching
+anything.
 
-### The check to require, once that is wanted
+### The pipeline is a merge blocker — `required_status_checks`
+
+One required check, and it is not a leaf job:
+
+| Parameter                              | Value                                                                     |
+|----------------------------------------|---------------------------------------------------------------------------|
+| `context`                              | `all checks`                                                              |
+| `integration_id`                       | `15368` — GitHub Actions, so no other app can satisfy it                  |
+| `strict_required_status_checks_policy` | `false` — a pull request need not be rebased onto the newest target first |
+| `do_not_enforce_on_create`             | `true`                                                                    |
 
 Requiring the leaf jobs by name does not work here: nearly all of them carry
 their matrix values in the name — `unit (v13, PHP 8.2)`,
@@ -125,14 +163,10 @@ their matrix values in the name — `unit (v13, PHP 8.2)`,
 a branch in a repository setting that lives outside that branch, and the two
 maintained branches do not have the same matrix.
 
-`ci.yml` therefore ends in an aggregating job named **`all checks`** (ACE-398).
-It needs every other job, runs with `if: always()` and fails when any of them
-reported `failure`, `cancelled` or `skipped`. Its name never changes, so it is
-the one check a ruleset should require:
-
-```bash
-gh api repos/fgtclb/academic-extensions/rulesets/4151166   # inspect first
-```
+`ci.yml` therefore ends in an aggregating job named **`all checks`**. It needs
+every other job, runs with `if: always()` and fails when any of them reported
+`failure`, `cancelled` or `skipped`. Its name never changes, so it is the one
+check the ruleset requires.
 
 The `always()` is the load-bearing part. Without it the job would be *skipped*
 as soon as anything it needs fails, and a skipped required check blocks a pull
@@ -140,8 +174,28 @@ request indefinitely rather than reporting a failure. Treating a skipped
 dependency as a failure follows from the same reasoning: a gate that did not
 run has not passed.
 
-Adding the rule itself is a repository setting and affects every contributor,
-so it is deliberately not part of that change.
+Two consequences worth knowing before they are met in the middle of a merge:
+
+* **This ruleset grants no bypass** — not to organization admins, not to
+  anybody. `gh pr merge --admin` is refused while `all checks` is not green,
+  unlike every rule in `version-branches`. A degraded GitHub Actions blocks
+  merging entirely, and that is intended.
+* **A pull request older than the job cannot merge on approval alone.** The
+  check is matched on the head commit, so a branch that was last pushed before
+  `all checks` existed has no such check run and stays blocked until it is
+  rebased or pushed again.
+
+### The frozen branches — `End Of Live (read-only)`
+
+`1` and the `2.0`–`2.2` line are end of life. `update` is the rule that does the
+work: it rejects every push to the branch, which blocks merging a pull request
+into it as well, so no `pull_request` rule is needed there. `deletion`,
+`creation` and `non_fast_forward` close the remaining routes — the branches
+cannot be removed, re-created or rewritten.
+
+It grants no bypass either, so working on those branches again means disabling
+the ruleset first. That is the intended amount of friction. See
+[Backporting](backporting.md): the maintained targets are `main` and `2`.
 
 ## Pre-flight, before pushing
 
@@ -209,9 +263,9 @@ The `ci.yml` workflow is staged so that a defect is reported cheaply:
 
 ```
 cgl     ─┐
-phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
-lint    ─┘
-documentation   (independent)
+phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres) ─┐
+lint    ─┘                                                                         ├─> all checks
+frontend assets, markdown, documentation   (independent) ──────────────────────────┘
 ```
 
 The 16-job DBMS matrix only starts once the same functional tests passed on
@@ -238,9 +292,11 @@ defect. Stating factually which branches contain a defect is useful; opening a
 pull request against `2.2` or `1`, or suggesting one, is not, unless it has been
 explicitly requested for that specific change.
 
-Note that the `version-branches` ruleset covers `refs/heads/1`, `refs/heads/1.*`
-and `refs/heads/2.*` as well. Those branches being protected is a leftover of
-when they were maintained; it is not an invitation.
+That is enforced rather than merely agreed: the `End Of Live (read-only)`
+ruleset carries an `update` rule for `1`, its `1.x` line and `2.0`–`2.2`, which
+rejects every push to them — merging a pull request included. A backport to one
+of those branches cannot land without an administrator disabling the ruleset
+first.
 
 ## See also
 
