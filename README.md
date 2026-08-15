@@ -6,13 +6,27 @@
 which may depend on others. To keep the maintenance burden across the set of extension small while
 increasing the cross-over development and testing experience.
 
+## Documentation
+
+| For                        | Where                                                                     |
+|----------------------------|---------------------------------------------------------------------------|
+| Users and integrators      | The `Documentation/` folder of each extension, rendered to docs.typo3.org |
+| Developers and maintainers | [`docs/`](docs/Index.md)                                                  |
+| Contributors, entry point  | [`CONTRIBUTING.md`](CONTRIBUTING.md)                                      |
+| AI coding agents           | [`AGENTS.md`](AGENTS.md)                                                  |
+
+Each extension ships its own manual — there is no repository-wide one, because
+each extension is released and published on its own. [`docs/`](docs/Index.md) is
+the counterpart for the repository itself: the harness, the rules the code
+follows, and how a release is cut.
+
 ## Repository version support
 
-| Branch | Version       | TYPO3     | PHP                                          |
-|--------|---------------|-----------|----------------------------------------------|
-| main   | ^3, 3.x-dev   | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
-| 2, 2.x | ^2, 2.x-dev   | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
-| 1      | ^1, 1.x-dev   | v11 + v12 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
+| Branch | Version     | TYPO3     | PHP                                          |
+|--------|-------------|-----------|----------------------------------------------|
+| main   | ^3, 3.x-dev | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
+| 2, 2.x | ^2, 2.x-dev | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
+| 1      | ^1, 1.x-dev | v11 + v12 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
 
 **Testing 3.x.x extension version in projects (composer mode)**
 
@@ -78,30 +92,62 @@ implemented and verified for every extension above by the `TYPO3 v13` and
 
 ## List of TYPO3 extension and the split repositories (READ ONLY)
 
-| Composer                       | TYPO3                   | Path                                                                                       | Split Repository                                                                     |
-|--------------------------------|-------------------------|--------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| fgtclb/academic-base           | academic_base           | [packages/fgtclb/academic-base](packages/fgtclb/academic-base/README.md)                   | [fgtclb/academic-base](https://github.com/fgtclb/academic-base)                      |
-| fgtclb/academic-bite-jobs      | academic_bite_jobs      | [packages/fgtclb/academic-bite-jobs](packages/fgtclb/academic-bite-jobs/README.md)         | [fgtclb/academic-bite-jobs](https://github.com/fgtclb/academic-bite-jobs)            |
-| fgtclb/academic-contacts4pages | academic_contacts4pages | [packages/fgtclb/academic-contact4pages](packages/fgtclb/academic-contact4pages/README.md) | [fgtclb/academic-contact4pages](https://github.com/fgtclb/academic-contact4pages)    |
-| fgtclb/academic-study-plan     | academic_study_plan     | [packages/fgtclb/academic-study-plan](packages/fgtclb/academic-study-plan/README.md)       | [fgtclb/academic-study-plan](https://github.com/fgtclb/academic-study-plan)          |
-| fgtclb/academic-jobs           | academic_jobs           | [packages/fgtclb/academic-jobs](packages/fgtclb/academic-jobs/README.md)                   | [fgtclb/academic-jobs](https://github.com/fgtclb/academic-jobs)                      |
-| fgtclb/academic-partners       | academic_partners       | [packages/fgtclb/academic-partners](packages/fgtclb/academic-partners/README.md)           | [fgtclb/academic-partners](https://github.com/fgtclb/academic-partners)              |
-| fgtclb/academic-persons        | academic_persons        | [packages/fgtclb/academic-persons](packages/fgtclb/academic-persons/README.md)             | [fgtclb/academic-persons](https://github.com/fgtclb/academic-persons)                |
-| fgtclb/academic-persons-edit   | academic_persons_edit   | [packages/fgtclb/academic-persons-edit](packages/fgtclb/academic-persons-edit/README.md)   | [fgtclb/academic-persons-edit](https://github.com/fgtclb/academic-persons-edit)      |
-| fgtclb/academic-persons-sync   | academic_persons_sync   | [packages/fgtclb/academic-persons-sync](packages/fgtclb/academic-persons-sync/README.md)   | [fgtclb/academic-persons-sync](https://github.com/fgtclb/academic-persons-sync)      |
-| fgtclb/academic-programs       | academic_programs       | [packages/fgtclb/academic-programs](packages/fgtclb/academic-programs/README.md)           | [fgtclb/academic-programs](https://github.com/fgtclb/academic-programs)              |
-| fgtclb/academic-projects       | academic_projects       | [packages/fgtclb/academic-projects](packages/fgtclb/academic-projects/README.md)           | [fgtclb/academic-projects](https://github.com/fgtclb/academic-projects)              |
-| fgtclb/category-types          | category_types          | [packages/fgtclb/typo3-category-types](packages/fgtclb/typo3-category-types/README.md)     | [fgtclb/fgtclb/typo3-category-types](https://github.com/fgtclb/typo3-category-types) |
+| Composer                       | TYPO3                   | Path                                                                                       | Split Repository                                                                  |
+|--------------------------------|-------------------------|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| fgtclb/academic-base           | academic_base           | [packages/fgtclb/academic-base](packages/fgtclb/academic-base/README.md)                   | [fgtclb/academic-base](https://github.com/fgtclb/academic-base)                   |
+| fgtclb/academic-bite-jobs      | academic_bite_jobs      | [packages/fgtclb/academic-bite-jobs](packages/fgtclb/academic-bite-jobs/README.md)         | [fgtclb/academic-bite-jobs](https://github.com/fgtclb/academic-bite-jobs)         |
+| fgtclb/academic-contacts4pages | academic_contacts4pages | [packages/fgtclb/academic-contact4pages](packages/fgtclb/academic-contact4pages/README.md) | [fgtclb/academic-contact4pages](https://github.com/fgtclb/academic-contact4pages) |
+| fgtclb/academic-study-plan     | academic_study_plan     | [packages/fgtclb/academic-study-plan](packages/fgtclb/academic-study-plan/README.md)       | [fgtclb/academic-study-plan](https://github.com/fgtclb/academic-study-plan)       |
+| fgtclb/academic-jobs           | academic_jobs           | [packages/fgtclb/academic-jobs](packages/fgtclb/academic-jobs/README.md)                   | [fgtclb/academic-jobs](https://github.com/fgtclb/academic-jobs)                   |
+| fgtclb/academic-partners       | academic_partners       | [packages/fgtclb/academic-partners](packages/fgtclb/academic-partners/README.md)           | [fgtclb/academic-partners](https://github.com/fgtclb/academic-partners)           |
+| fgtclb/academic-persons        | academic_persons        | [packages/fgtclb/academic-persons](packages/fgtclb/academic-persons/README.md)             | [fgtclb/academic-persons](https://github.com/fgtclb/academic-persons)             |
+| fgtclb/academic-persons-edit   | academic_persons_edit   | [packages/fgtclb/academic-persons-edit](packages/fgtclb/academic-persons-edit/README.md)   | [fgtclb/academic-persons-edit](https://github.com/fgtclb/academic-persons-edit)   |
+| fgtclb/academic-persons-sync   | academic_persons_sync   | [packages/fgtclb/academic-persons-sync](packages/fgtclb/academic-persons-sync/README.md)   | [fgtclb/academic-persons-sync](https://github.com/fgtclb/academic-persons-sync)   |
+| fgtclb/academic-programs       | academic_programs       | [packages/fgtclb/academic-programs](packages/fgtclb/academic-programs/README.md)           | [fgtclb/academic-programs](https://github.com/fgtclb/academic-programs)           |
+| fgtclb/academic-projects       | academic_projects       | [packages/fgtclb/academic-projects](packages/fgtclb/academic-projects/README.md)           | [fgtclb/academic-projects](https://github.com/fgtclb/academic-projects)           |
+| fgtclb/category-types          | category_types          | [packages/fgtclb/typo3-category-types](packages/fgtclb/typo3-category-types/README.md)     | [fgtclb/typo3-category-types](https://github.com/fgtclb/typo3-category-types)     |
+
+## Development
+
+Every test and quality tool runs in a container through the
+[`Build/Scripts/runTests.sh`](Build/Scripts/runTests.sh) wrapper. The only
+requirement on the host is a container runtime — **podman** (preferred) or
+**docker**.
+
+```bash
+# Install dependencies for the core version and PHP version you will test.
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
+
+# Quality gates.
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s cgl -n
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s phpstan
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s lintPhp
+
+# Tests.
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s unit
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s functional
+
+# All available options.
+Build/Scripts/runTests.sh -h
+```
+
+`-t` selects configuration only, it does **not** reinstall dependencies.
+Everything has to pass for **both** TYPO3 versions this branch supports, each
+after its own `composerUpdate` — see
+[Dual core setup](docs/development/dual-core-setup.md).
+
+→ [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution workflow ·
+[`docs/`](docs/Index.md) for the full developer documentation
 
 ## Development instances
 
 Two ready-to-start TYPO3 instances live at the repository root, one per supported
 core version:
 
-| Folder     | TYPO3 | DDEV project           | Seeded demo content |
-|------------|-------|------------------------|---------------------|
-| `core-13/` | v13   | `core13-academics-v3`  | styleguide          |
-| `core-14/` | v14   | `core14-academics-v3`  | camino              |
+| Folder     | TYPO3 | DDEV project          | Seeded demo content |
+|------------|-------|-----------------------|---------------------|
+| `core-13/` | v13   | `core13-academics-v3` | styleguide          |
+| `core-14/` | v14   | `core14-academics-v3` | camino              |
 
 Both run on **SQLite** — no database container is started (`omit_containers: [db]`).
 Each instance is seeded on first start from the committed template in
@@ -182,12 +228,12 @@ A release is always cut from the branch owning that version line (see the
 `bin/`. All extensions of the mono repository are released together, sharing one
 version number.
 
-| Branch | Release line | Example version | Release tooling                             |
-|--------|--------------|-----------------|---------------------------------------------|
-| main   | `3.x`        | `3.0.0`         | `bin/release`, `bin/set-version`            |
-| 2      | `2.x`        | `2.4.0`         | `bin/release`, `bin/set-version`            |
-| 2.2    | `2.2.x`      | `2.2.2`         | `bin/release`, `bin/set-version`            |
-| 1      | `1.x`        | -               | none — that branch has no `bin/` scripts    |
+| Branch | Release line | Example version | Release tooling                          |
+|--------|--------------|-----------------|------------------------------------------|
+| main   | `3.x`        | `3.0.0`         | `bin/release`, `bin/set-version`         |
+| 2      | `2.x`        | `2.4.0`         | `bin/release`, `bin/set-version`         |
+| 2.2    | `2.2.x`      | `2.2.2`         | `bin/release`, `bin/set-version`         |
+| 1      | `1.x`        | -               | none — that branch has no `bin/` scripts |
 
 Both scripts are kept as the *same* implementation on every branch. Only two
 things legitimately differ per branch: the `--source-branch` default (which
@@ -209,11 +255,11 @@ bin/set-version <version> <type> [--source-branch=<name>] [--dry-run]
 
 `<type>` selects how the version is written:
 
-| Type           | Result                                                                   |
-|----------------|--------------------------------------------------------------------------|
-| `release`      | tag/release version — `X.Y.Z`, academic deps `X.Y.Z@dev`                  |
+| Type           | Result                                                                                                                                          |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `release`      | tag/release version — `X.Y.Z`, academic deps `X.Y.Z@dev`                                                                                        |
 | `post-release` | next dev version — `X.Y.W-dev`, deps `~X.Y.W@dev`, branch-alias `X.Y.x-dev`; the version passed is *already* the next one, no `+1` happens here |
-| `dev`          | force a plain dev version everywhere (`X.Y.Z-dev`); thin variant of `post-release`, used for branching and forced minor/major bumps |
+| `dev`          | force a plain dev version everywhere (`X.Y.Z-dev`); thin variant of `post-release`, used for branching and forced minor/major bumps             |
 
 It rewrites, in one pass:
 
@@ -252,11 +298,11 @@ It runs two phases, delegating all version rewriting to `bin/set-version`:
 
 Two independent safety gates control how far a run goes:
 
-| Invocation  | Local steps | Remote/irreversible steps (push, PR, merge, tag) |
-|-------------|-------------|--------------------------------------------------|
+| Invocation  | Local steps | Remote/irreversible steps (push, PR, merge, tag)                          |
+|-------------|-------------|---------------------------------------------------------------------------|
 | *(bare)*    | executed    | **only printed** — a bare run can never mutate the remote or create a tag |
-| `--dry-run` | printed     | printed                                          |
-| `--execute` | executed    | executed                                         |
+| `--dry-run` | printed     | printed                                                                   |
+| `--execute` | executed    | executed                                                                  |
 
 `--dry-run` and `--execute` are mutually exclusive. Pre-flight checks refuse to
 run outside a git work tree or when the target tag already exists; a dirty
