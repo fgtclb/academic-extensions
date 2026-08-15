@@ -1,0 +1,228 @@
+# Unit tests
+
+Unit tests run against a bootstrapped TYPO3 class loader and nothing else — no
+database, no site, no request. Everything the subject needs is passed to it or
+stubbed. That makes the suite fast enough to run on every save, and it makes a
+failure point at one class instead of at a stack.
+
+There are 31 unit test classes across the twelve extensions, 12 of which are the
+one-line version compatibility test every extension carries (see
+[below](#the-version-compatibility-test)).
+
+## Running them
+
+Dependencies come first, always. `-t` selects configuration, it does **not**
+install anything, so a run for a core version whose dependencies are not
+installed silently uses the wrong vendor tree:
+
+```bash
+Build/Scripts/runTests.sh -t 12 -p 8.1 -s composerUpdate
+Build/Scripts/runTests.sh -t 12 -p 8.1 -s unit
+```
+
+| Command                                                                                      | What it does                                                            |
+|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| `runTests.sh -s unit`                                                                        | The whole suite, TYPO3 v12 and PHP 8.2 by default.                      |
+| `runTests.sh -t 13 -p 8.5 -s unit`                                                           | The same suite on the other end of the support matrix.                  |
+| `runTests.sh -s unitRandom`                                                                  | The suite with `--order-by=random` and a fresh seed.                    |
+| `runTests.sh -s unitRandom -o 1234`                                                          | The same, with a fixed seed — how a random-order failure is reproduced. |
+| `runTests.sh -s unit packages/fgtclb/academic-persons/Tests/Unit`                            | Restricted to one extension.                                            |
+| `runTests.sh -s unit packages/fgtclb/academic-persons/Tests/Unit/Domain/Model/EmailTest.php` | Restricted to one file.                                                 |
+
+The trailing path is the **only** way to narrow a run. `runTests.sh` has no
+argument passthrough to PHPUnit — no `-e`, no `--`. Anything else (a
+`--filter`, a `--group`) has to be added to the `COMMAND` array in the script
+itself, which is not how a normal run works.
+
+`-o` is parsed at
+[`Build/Scripts/runTests.sh:453-455`](../../Build/Scripts/runTests.sh#L453-L455)
+and turns into `--random-order-seed=<seed>`. It only has an effect together with
+`-s unitRandom`; the `unit` suite does not pass `PHPUNIT_RANDOM` on. Note that
+the built-in help text still documents the TYPO3 Core spelling
+`-- --random-order-seed=<number>`
+([`runTests.sh:269`](../../Build/Scripts/runTests.sh#L269)) — that form does not
+work here, use `-o`.
+
+`unitRandom` is not decoration. CI runs it right after `unit` in the same job
+([`.github/workflows/ci.yml:214-218`](../../.github/workflows/ci.yml#L214-L218)),
+because ordering dependencies between tests are exactly the kind of defect a
+fixed order hides.
+
+## Discovery
+
+There is no per-extension PHPUnit configuration. One glob in
+[`Build/phpunit/UnitTests.xml:36-44`](../../Build/phpunit/UnitTests.xml#L36-L44)
+collects every extension's unit tests into a single suite:
+
+```xml
+<testsuites>
+    <testsuite name="Unit tests">
+        <!--
+            This path either needs an adaption in extensions, or an extension's
+            test location path needs to be given to phpunit.
+        -->
+        <directory>../../packages/*/*/Tests/Unit/</directory>
+    </testsuite>
+</testsuites>
+```
+
+Three things follow from that single line.
+
+**A new extension needs no configuration change.** Drop it under
+`packages/<vendor>/<dir>/` with a `Tests/Unit/` folder and it is in the suite.
+
+**`packages-dev/` is not covered.** The glob starts at `packages/`, so the two
+meta packages — including
+[`packages-dev/testing-helper/`](../../packages-dev/testing-helper) — have no
+tests of their own. Their traits are exercised only through the extensions that
+use them.
+
+**Test classes are autoloaded, not included.** Each extension registers its own
+`Tests/` namespace as `autoload-dev`, for example
+`FGTCLB\AcademicPersons\Tests\` → `Tests/` in
+[`academic-persons/composer.json`](../../packages/fgtclb/academic-persons/composer.json).
+A test class in the wrong namespace for its path is not found, and PHPUnit
+reports nothing rather than an error.
+
+## Conventions
+
+These are read off the existing classes, not prescribed from outside. All 31 of
+them follow the shape below.
+
+**Every test class is `final`, declares `strict_types`, and extends
+`TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
+unit test case, and no unit test extends another test class.
+
+**The namespace mirrors the path, which mirrors `Classes/`.**
+`FGTCLB\AcademicPersons\Tests\Unit\Domain\Model\EmailTest` tests
+`FGTCLB\AcademicPersons\Domain\Model\Email`. Finding the test of a class is a
+path transformation, never a search.
+
+**Test methods carry `#[Test]`, never a `test` prefix.** There is not a single
+`public function test…()` in the repository. Method names are readable
+statements about the subject, which is what turns the PHPUnit output into a
+specification:
+
+```php
+#[Test]
+public function getSortingReturnsIntegerZeroForNewModel(): void
+{
+    $this->assertSame(0, (new Email())->getSorting());
+}
+```
+
+— [`EmailTest.php:37-41`](../../packages/fgtclb/academic-persons/Tests/Unit/Domain/Model/EmailTest.php#L37-L41)
+
+**Data providers are `public static` and return a `\Generator` with named data
+sets.** The name is what a failure report shows, so it describes the case rather
+than numbering it:
+
+```php
+public static function returnsExpectedTcaArrayDataSet(): \Generator
+{
+    yield 'custom tab is added after the general tab not moving palettes to wrong tab for all types' => [
+        // …
+    ];
+}
+```
+
+— [`TcaManipulatorTest.php:14-16`](../../packages/fgtclb/academic-base/Tests/Unit/TcaManipulatorTest.php#L14-L16)
+
+**Non-obvious tests carry a docblock that says why, not what.** The assertion
+already says what. The docblock records the defect the test descends from, so
+that a later reader does not "simplify" it away:
+
+```php
+/**
+ * A registry nobody attached anything to is a real state: only three extensions of
+ * this repository ship a `Configuration/CategoryTypes.yaml`, so an installation
+ * using `EXT:category_types` alone never fills it. `attach()` also returns early for
+ * an empty argument list, which is what the loader passes in that case.
+ */
+#[Test]
+public function freshRegistryReportsNoTypes(): void
+```
+
+— [`CategoryTypeRegistryTest.php:31-38`](../../packages/fgtclb/typo3-category-types/Tests/Unit/Registry/CategoryTypeRegistryTest.php#L31-L38)
+
+**Fixtures are built by a private helper on the test class, not by a data
+provider full of literals.** `CategoryTypeRegistryTest` has a `categoryType()`
+factory with named defaults
+([lines 15-29](../../packages/fgtclb/typo3-category-types/Tests/Unit/Registry/CategoryTypeRegistryTest.php#L15-L29)),
+so each test names only the property it is about.
+
+**Expected exceptions are pinned by code, not only by class.**
+`$this->expectExceptionCode(1683633304209)` next to
+`$this->expectException(\InvalidArgumentException::class)` keeps the test from
+passing on a different `\InvalidArgumentException` thrown three frames earlier.
+
+**No assertion-free test without a reason.** `beStrictAboutTestsThatDoNotTestAnything`
+is relaxed (see [PHPUnit configuration](phpunit-configuration.md)), so PHPUnit
+will not catch one for you.
+
+## Core-version-aware unit tests
+
+`runTests.sh` always appends `--exclude-group not-core-${CORE_VERSION}` to the
+PHPUnit call — for `unit` at
+[`runTests.sh:753`](../../Build/Scripts/runTests.sh#L753) and for `unitRandom`
+at [`:759`](../../Build/Scripts/runTests.sh#L759). The group names read as what
+they exclude, **not** as the version they run on:
+
+| Group         | Runs on | Meaning                      |
+|---------------|---------|------------------------------|
+| `not-core-12` | v13     | Excluded from a `-t 12` run. |
+| `not-core-13` | v12     | Excluded from a `-t 13` run. |
+| *(none)*      | both    | The normal case.             |
+
+That inversion is the thing to get right: `not-core-13` marks a test that runs
+on TYPO3 v12 only. On the `main` branch the same two-group scheme is spelled
+`not-core-13` / `not-core-14`, so a test moved between branches needs its group
+renamed, not copied.
+
+Use them for a single method or for a class that differs only in expectations. A
+whole class that only exists for one version belongs in a `Core12/` or `Core13/`
+subfolder instead.
+
+**No unit test in this repository currently uses either group.** The only
+core-version-gated unit tests are the two inside
+`ExtensionCoreVersionCompatTestsTrait`, which build their group names from the
+supported-version constants — see
+[Testing helper](testing-helper.md#extensioncoreversioncompatteststrait). The
+worked examples of both mechanisms are all in the functional suite; see
+[Functional tests](functional-tests.md#version-gated-tests).
+
+When a gated unit test does become necessary, note that `backupGlobals="true"`
+restores `$GLOBALS` after each test, so a test may `unset($GLOBALS['TCA'][…])`
+in its body without cleaning up after itself.
+
+## The version compatibility test
+
+Every extension ships a `Tests/Unit/VersionCompatTest.php` that is nothing but a
+`use` statement:
+
+```php
+final class VersionCompatTest extends UnitTestCase
+{
+    use ExtensionCoreVersionCompatTestsTrait;
+}
+```
+
+— [`academic-persons/Tests/Unit/VersionCompatTest.php`](../../packages/fgtclb/academic-persons/Tests/Unit/VersionCompatTest.php)
+
+The trait asserts that the running TYPO3 major version is one of the two the
+branch supports, and — via `not-core-*` groups — that the v12 leg really runs on
+12 and the v13 leg really runs on 13. It is the tripwire for "the harness
+installed a different core than the run asked for", which is otherwise a
+confusing pile of unrelated failures. See
+[Testing helper](testing-helper.md#extensioncoreversioncompatteststrait).
+
+`EXT:category_types` names its copy `VersionCompareTest.php`
+([`typo3-category-types/Tests/Unit/VersionCompareTest.php`](../../packages/fgtclb/typo3-category-types/Tests/Unit/VersionCompareTest.php));
+the content is identical. Every extension also carries the same test in its
+functional suite.
+
+## See also
+
+- [PHPUnit configuration](phpunit-configuration.md)
+- [Functional tests](functional-tests.md)
+- [Testing helper](testing-helper.md)
