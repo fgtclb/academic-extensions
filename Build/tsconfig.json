@@ -1,0 +1,53 @@
+// TypeScript is installed for "tsc --noEmit" only: esbuild performs the emit and
+// does not type check, which is why "typecheckJs" is a suite of its own — a build
+// that is green and a type check that is red have to be distinguishable.
+//
+// One project covers every extension. The sources of the extensions do not
+// import each other, so there is nothing a per-extension project would isolate
+// that this one does not.
+//
+// tsconfig.json is JSONC, and both TypeScript and esbuild read the comments.
+{
+    "compilerOptions": {
+        "target": "es2022",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "lib": [
+            "es2022",
+            "dom",
+            "dom.iterable"
+        ],
+        // No ambient @types packages. These sources run in a browser, not in node.
+        "types": [],
+
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "skipLibCheck": true,
+
+        "noEmit": true,
+
+        // A module that imports another module of the same extension does so
+        // relatively. This branch bundles, so every import is resolved at build
+        // time and nothing has to be addressable from the browser.
+        //
+        // That is the opposite of "main", which emits unbundled ES modules and
+        // therefore requires bare specifiers resolved through the TYPO3 import
+        // map. Import maps reach the frontend since TYPO3 v12, but the Fluid
+        // view helper that loads a module does not exist there — see the note
+        // in "esbuild.mjs".
+        //
+        // No mapping is needed, and none should be added while the build
+        // bundles.
+        "paths": {}
+    },
+    "include": [
+        "../packages/*/*/Resources/Private/TypeScript/**/*.ts",
+        "../packages-dev/*/Resources/Private/TypeScript/**/*.ts"
+    ]
+}

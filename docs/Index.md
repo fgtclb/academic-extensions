@@ -25,6 +25,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | [Monorepo layout](development/monorepo-layout.md)     | What each directory is, the packages and their split repositories, extension keys, path package versions. |
 | [Dual core setup](development/dual-core-setup.md)     | Running against TYPO3 v12 and v13, and the rule that avoids false positives.                              |
 | [Quality gates](development/quality-gates.md)         | Every gate and its configuration, PHPStan per core version, continuous integration.                       |
+| [Frontend assets](development/frontend-assets.md)     | The TypeScript and SCSS build, and why the compiled result is committed.                                  |
 
 ## [Architecture](architecture/Index.md)
 

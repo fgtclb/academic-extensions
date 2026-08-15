@@ -12,20 +12,21 @@ handful of things that are easy to get wrong and expensive to discover later.
 
 ## Read this before changing code
 
-| Topic                                                | Page                                                                    |
-|------------------------------------------------------|-------------------------------------------------------------------------|
-| Container based tooling, every suite and option      | [Development environment](docs/development/environment.md)              |
-| What lives where, extension keys, split repositories | [Monorepo layout](docs/development/monorepo-layout.md)                  |
-| **Dual core setup — read this first**                | [Dual core setup](docs/development/dual-core-setup.md)                  |
-| The gates and what they check                        | [Quality gates](docs/development/quality-gates.md)                      |
-| Version differences, and the split per core version  | [Core version aware code](docs/architecture/core-version-aware-code.md) |
-| Service configuration and stateless services         | [Dependency injection](docs/architecture/dependency-injection.md)       |
-| `final`, `readonly`, injection, data objects         | [Class design](docs/architecture/class-design.md)                       |
-| **Quoting value lists and binding parameters**       | [Database queries](docs/architecture/database-queries.md)               |
-| Both suites, their strictness and their conventions  | [Testing](docs/testing/Index.md)                                        |
-| The shared functional test traits                    | [Testing helper](docs/testing/testing-helper.md)                        |
-| Commit message conventions                           | [Commit messages](docs/workflow/commit-messages.md)                     |
-| Analysing a backport instead of cherry-picking it    | [Backporting](docs/workflow/backporting.md)                             |
+| Topic                                                   | Page                                                                    |
+|---------------------------------------------------------|-------------------------------------------------------------------------|
+| Container based tooling, every suite and option         | [Development environment](docs/development/environment.md)              |
+| What lives where, extension keys, split repositories    | [Monorepo layout](docs/development/monorepo-layout.md)                  |
+| **Dual core setup — read this first**                   | [Dual core setup](docs/development/dual-core-setup.md)                  |
+| The gates and what they check                           | [Quality gates](docs/development/quality-gates.md)                      |
+| The TypeScript and SCSS build, and its committed output | [Frontend assets](docs/development/frontend-assets.md)                  |
+| Version differences, and the split per core version     | [Core version aware code](docs/architecture/core-version-aware-code.md) |
+| Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)       |
+| `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                       |
+| **Quoting value lists and binding parameters**          | [Database queries](docs/architecture/database-queries.md)               |
+| Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                        |
+| The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                        |
+| Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                     |
+| Analysing a backport instead of cherry-picking it       | [Backporting](docs/workflow/backporting.md)                             |
 
 ## Local additions and overrides
 
@@ -194,12 +195,19 @@ Build/Scripts/runTests.sh -t 12 -s unit packages/fgtclb/academic-persons/Tests/U
 wrong vendor tree and fails in confusing ways — always `composerUpdate` for the
 version you are about to test.
 
-The complete suite list is `cgl`, `cglHeader`, `checkRstRenderingAll`,
-`checkRstRenderingSingle`, `composer` (dispatch an arbitrary composer command),
-`composerUpdate`, `functional`, `lintPhp`, `openDocumentation`, `phpstan`,
-`phpstanGenerateBaseline`, `unit`, `unitRandom`; plus `help` and `update`. The
-script's own `-s` help text omits `functional` from its list — the suite exists
-regardless.
+The complete suite list is `buildJs`, `cgl`, `cglHeader`, `checkJsBuildClean`,
+`checkRstRenderingAll`, `checkRstRenderingSingle`, `cleanJs`, `composer`
+(dispatch an arbitrary composer command), `composerUpdate`, `functional`,
+`lintPhp`, `lintTypescript`, `npm` (dispatch an arbitrary npm command),
+`openDocumentation`, `phpstan`, `phpstanGenerateBaseline`, `typecheckJs`,
+`unit`, `unitRandom`; plus `help` and `update`.
+
+The six frontend suites — `buildJs`, `checkJsBuildClean`, `cleanJs`,
+`lintTypescript`, `npm` and `typecheckJs` — are **core version independent**.
+They look at the sources and the committed artifacts, never at the installed
+core, so `-t` changes nothing for them and they need no `composerUpdate`. Note
+that they emit classic scripts here, not ES modules: see
+[Frontend assets](docs/development/frontend-assets.md).
 
 Test discovery: phpunit globs `packages/*/*/Tests/Unit/` and
 `packages/*/*/Tests/Functional/` across **all** extensions at once

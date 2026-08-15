@@ -15,7 +15,8 @@ name: "CI"
 #   phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
 #   lint    ─┘
 #
-#   documentation  (independent, for fast feedback on documentation changes)
+#   documentation     (independent, for fast feedback on documentation changes)
+#   frontend assets   (independent, core version agnostic, no composerUpdate)
 #
 # The DBMS matrix is the expensive part — 16 jobs, each starting a database
 # container — so it only runs once the same tests have passed on SQLite for both
@@ -303,6 +304,39 @@ jobs:
 
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
+
+  frontend-assets:
+    name: "frontend assets"
+    runs-on: ubuntu-latest
+    # No matrix. These suites run in a node container and never touch PHP or the
+    # installed core, so repeating them per PHP and core version would check the
+    # same sources four times. They also need no "composerUpdate" — nothing here
+    # reads ".Build/".
+    steps:
+
+      - name: "Checkout"
+        uses: actions/checkout@v6
+
+      - name: "Cache npm downloads"
+        uses: actions/cache@v6
+        with:
+          path: ".cache/npm"
+          key: "npm-${{ hashFiles('Build/package-lock.json') }}"
+          restore-keys: "npm-"
+
+      - name: "Lint TypeScript"
+        run: "Build/Scripts/runTests.sh -b docker -s lintTypescript -n"
+
+      - name: "Type check"
+        run: "Build/Scripts/runTests.sh -b docker -s typecheckJs"
+
+      # Last, and the one that matters most: the compiled assets are committed,
+      # because neither composer nor a TER upload runs a node build. That makes
+      # it possible to change a source and forget to rebuild, which nothing else
+      # would notice — the artifact would simply go on serving the previous
+      # behaviour.
+      - name: "Ensure the committed assets match their sources"
+        run: "Build/Scripts/runTests.sh -b docker -s checkJsBuildClean"
 
   documentation:
     name: "documentation"
