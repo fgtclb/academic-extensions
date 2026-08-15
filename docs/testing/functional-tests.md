@@ -56,14 +56,14 @@ As with the unit suite, the trailing path is the only way to narrow a run;
 | `-i`   | a version of the selected DBMS           | see below | Rejected for `-d sqlite`.                                                 |
 | `-a`   | `mysqli`, `pdo_mysql`                    | `mysqli`  | Only for `-d mysql` and `-d mariadb`; rejected for SQLite and PostgreSQL. |
 
-Defaults and accepted versions are validated in `handleDbmsOptions()`,
-[`Build/Scripts/runTests.sh:117`](../../Build/Scripts/runTests.sh#L117) onwards:
+Defaults and accepted versions are validated in `handleDbmsOptions()` of
+[`Build/Scripts/runTests.sh`](../../Build/Scripts/runTests.sh):
 MariaDB `10.4`, MySQL `8.0`, PostgreSQL `10`. An invalid combination is refused
 before a container starts, with the offending pair echoed.
 
 SQLite needs no container: the script creates
-`.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/` and mounts it as tmpfs
-([`runTests.sh:693-706`](../../Build/Scripts/runTests.sh#L693-L706)). The other
+`.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/` and mounts it as tmpfs,
+in the `sqlite)` branch of the `functional` arm. The other
 three start a database container, wait for its port, and pass the connection
 through `typo3Database*` environment variables. That is the whole reason SQLite
 is the default — it is the fastest loop, and it needs the least of the host.
@@ -131,8 +131,7 @@ DBMS specific is therefore reported by 4 jobs instead of 20.
 
 ## The `not-<dbms>` group
 
-`runTests.sh` always appends **two** exclusions to the functional PHPUnit call
-([`runTests.sh:659`](../../Build/Scripts/runTests.sh#L659)):
+`runTests.sh` always appends **two** exclusions to the functional PHPUnit call:
 
 ```bash
 COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-${DBMS} --exclude-group not-core-${CORE_VERSION} "$@")

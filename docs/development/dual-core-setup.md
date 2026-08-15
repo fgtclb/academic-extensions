@@ -12,13 +12,11 @@ repository.
 > command is run with.
 
 `-t <13|14>` selects **configuration only**. It picks the phpstan config
-(`Build/phpstan/Core${CORE_VERSION}/phpstan.neon`,
-`Build/Scripts/runTests.sh:738`) and the phpunit exclude group
-(`--exclude-group not-core-${CORE_VERSION}`, `Build/Scripts/runTests.sh:659`
-and `:751`). It installs nothing.
+(`Build/phpstan/Core${CORE_VERSION}/phpstan.neon`, in the `phpstan` arm) and
+the phpunit exclude group (`--exclude-group not-core-${CORE_VERSION}`, in the
+`functional`, `unit` and `unitRandom` arms). It installs nothing.
 
-The only suite that changes what is in `.Build/` is `composerUpdate`
-(`Build/Scripts/runTests.sh:646-655`):
+The only suite that changes what is in `.Build/` is `composerUpdate`:
 
 ```bash
 rm -rf .Build composer.lock composer.json.orig
@@ -48,8 +46,8 @@ Running `-t 14` while the v13 set is installed does not fail with a useful
 message. It produces wrong answers: phpstan reports unknown classes for APIs
 that only exist in the other major and misses the errors it was supposed to
 find, and tests pass or fail for reasons that have nothing to do with the
-change under test. The default is `-t 13` (`Build/Scripts/runTests.sh:391`),
-so the trap is easiest to fall into right after finishing a v14 round and
+change under test. The default is `-t 13` — `CORE_VERSION="13"` — so the trap
+is easiest to fall into right after finishing a v14 round and
 omitting `-t` on the next command.
 
 Both `.Build/` and `composer.lock` are git-ignored, so nothing is lost by
@@ -62,9 +60,8 @@ reinstalling. The composer download cache lives in `.cache/composer`, outside
 overlook because a PHP version does not feel like a dependency.
 
 `composerUpdate` runs `composer` inside the container image selected by `-p`
-(`IMAGE_PHP="ghcr.io/typo3/core-testing-php${PHP_VERSION}"`,
-`Build/Scripts/runTests.sh:524`, used for the composer calls at
-`Build/Scripts/runTests.sh:649` and `:652`). The root `composer.json` sets no
+(`IMAGE_PHP="ghcr.io/typo3/core-testing-php${PHP_VERSION}"`, which is what both
+composer calls of that arm run in). The root `composer.json` sets no
 `config.platform`, so composer resolves against the PHP version it is actually
 running on. A tree resolved on 8.2 can therefore hold different package
 versions than one resolved on 8.5, and running the 8.5 image against a tree
@@ -73,10 +70,10 @@ test.
 
 `.github/workflows/ci.yml` follows this without exception: every job that runs
 a suite runs `composerUpdate` first with the same `-t` **and** `-p` values it
-then uses (`ci.yml:106/109`, `:149/152`, `:205/208`, `:245/248`, `:289/292`).
-The one job that does not is `lint`, which passes neither `-t` nor
-`composerUpdate` (`ci.yml:171`) because `lintPhp` only runs `php -l` over the
-sources and needs no vendor tree at all.
+then uses — its *Prepare dependencies for TYPO3 v…* step, present in `cgl`,
+`phpstan`, `unit`, `functional-sqlite` and `functional-dbms`. The one job that
+does not is `lint`, which passes neither `-t` nor `composerUpdate` because
+`lintPhp` only runs `php -l` over the sources and needs no vendor tree at all.
 
 Treat `-t` and `-p` together as the identity of the installed tree: change
 either, reinstall.
@@ -146,9 +143,8 @@ Not every test can run on both core versions. Two mechanisms exist and they are
 picked by scope, not by taste.
 
 `runTests.sh` always passes `--exclude-group not-core-${CORE_VERSION}` to
-phpunit — for `functional` (`Build/Scripts/runTests.sh:659`), `unit` (`:751`)
-and `unitRandom` (`:757`). The group therefore names the version the test must
-**not** run on:
+phpunit, in the `functional`, `unit` and `unitRandom` arms. The group therefore
+names the version the test must **not** run on:
 
 | Group         | Runs on     | Meaning                                     |
 |---------------|-------------|---------------------------------------------|
@@ -240,7 +236,7 @@ Notes on that loop:
   `-s unit packages/fgtclb/academic-base/Tests/Unit/TcaManipulatorTest.php`.
   The trailing path is the restriction mechanism; there is no dedicated flag
   for handing extra options to phpunit, apart from `-o <seed>` for
-  `unitRandom` (`Build/Scripts/runTests.sh:447-448`).
+  `unitRandom`.
 
 Run the unrestricted sequence once before pushing, no matter how narrow the
 change looked.

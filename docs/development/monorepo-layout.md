@@ -79,7 +79,7 @@ Both are covered in their own sections below.
 repository: every extension's `composer.json`, `ext_emconf.php`, `VERSION` file
 and tailor metadata, the functional-test fixture extensions, the `packages-dev`
 meta packages, the development instances, the root `composer.json` and the
-`COMPOSER_ROOT_VERSION` in `runTests.sh` (`Build/Scripts/runTests.sh:483`). It
+`COMPOSER_ROOT_VERSION` assignment in `runTests.sh`. It
 discovers the package list from the repository rather than carrying one, so a
 new extension needs no change there. It only edits files; it runs no git and no
 network operation.
@@ -123,7 +123,7 @@ at the moment and holds only a `.gitkeep` so git keeps the directory.
 is `.Build/vendor` (`composer.json:26-27`), and the TYPO3 web and app
 directories are `.Build/Web` and `.Build` (`composer.json:37-38`). It is
 git-ignored and disposable — `runTests.sh -s composerUpdate` starts by removing
-it (`Build/Scripts/runTests.sh:647`).
+it.
 
 `.cache/` holds the composer download cache and the phpstan result cache. It
 sits next to `.Build/` rather than inside it precisely because
@@ -133,8 +133,8 @@ phpstan configuration points its `tmpDir` at `../../../.cache/phpstan`
 (`Build/phpstan/Core13/phpstan.neon:11`).
 
 `documentation-rendered/` receives the output of `checkRstRenderingAll` and
-`checkRstRenderingSingle`, one folder per extension
-(`Build/Scripts/runTests.sh:223-225`). It is git-ignored and uploaded as a
+`checkRstRenderingSingle`, one folder per extension — the output directory is
+built in `executeRstRendering()`. It is git-ignored and uploaded as a
 continuous integration artifact.
 
 ## The extensions and their split repositories
@@ -180,7 +180,7 @@ turned into hyphens, which makes the two that are not easy to miss:
 The authoritative source is always `extra.typo3/cms.extension-key` in the
 package's `composer.json`. Anything that needs the key derives it from there
 rather than from the path — the release workflow reads it with `jq` at runtime
-for exactly this reason (`.github/workflows/publish.yml:76`), and
+for exactly this reason, in its TER artifact step, and
 `bin/set-version` discovers the mapping the same way.
 
 Note also that the split repository name follows the directory, not the package

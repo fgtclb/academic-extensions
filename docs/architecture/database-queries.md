@@ -360,9 +360,9 @@ route from "this does nothing" to "this is comparing the wrong two things".
 
 Both rules fail in the direction the default test run cannot see: rule 1 hides
 behind SQLite's tolerance of `IN ()` on v12, rule 2 hides behind three
-databases silently updating nothing. The functional suite defaults to SQLite
-(`Build/Scripts/runTests.sh:392`, `DBMS="sqlite"`), so a green local run proves
-less than it appears to.
+databases silently updating nothing. The functional suite defaults to SQLite —
+`DBMS="sqlite"` in `runTests.sh` — so a green local run proves less than it
+appears to.
 
 Three habits follow.
 
@@ -374,9 +374,9 @@ Build/Scripts/runTests.sh -t 13 -p 8.3 -s functional -d postgres \
     packages/fgtclb/academic-projects/Tests/Functional/Upgrades
 ```
 
-CI reaches the same coverage eventually — `functional-dbms` in
-`.github/workflows/ci.yml:250-265` runs MySQL 8.0, MariaDB 10.4, MariaDB 10.6
-and PostgreSQL 10 — but only after the SQLite jobs pass, so a defect of this
+CI reaches the same coverage eventually — the `functional-dbms` job runs MySQL
+8.0, MariaDB 10.4, MariaDB 10.6 and PostgreSQL 10 — but only after the SQLite
+jobs pass, so a defect of this
 kind is reported one stage late unless it was reproduced locally first.
 
 **Assert the effect, not the return value.** `executeStatement()` returning

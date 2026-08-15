@@ -14,8 +14,7 @@ of problem that exists in this repository.
 ## Host requirements
 
 One container runtime, and nothing else. No PHP, no Composer, no PHPUnit on the
-host. The script refuses to start when neither runtime is installed
-(`Build/Scripts/runTests.sh:384-387`):
+host. The script refuses to start when neither runtime is installed:
 
 ```bash
 if ! type "docker" >/dev/null 2>&1 && ! type "podman" >/dev/null 2>&1; then
@@ -24,14 +23,14 @@ if ! type "docker" >/dev/null 2>&1 && ! type "podman" >/dev/null 2>&1; then
 fi
 ```
 
-**podman is preferred.** When `-b` is not given, the runtime is picked at
-`Build/Scripts/runTests.sh:516-522`: podman if it is on the `PATH`, docker
-otherwise. `-b docker|podman` overrides the choice, and an argument that is
-neither is rejected as an invalid option
-(`Build/Scripts/runTests.sh:414-419`).
+**podman is preferred.** When `-b` is not given, `CONTAINER_BIN` is resolved
+from the `PATH`: podman if it is there, docker otherwise. `-b docker|podman`
+overrides the choice, and the `b)` arm of the option parsing rejects anything
+else as an invalid option.
 
 The two runtimes are not interchangeable in their details, which is why the
-script branches on the selected one (`Build/Scripts/runTests.sh:549-578`):
+script branches on `CONTAINER_BIN` where it assembles
+`CONTAINER_COMMON_PARAMS`:
 
 * docker needs `--add-host host.docker.internal:host-gateway` for Xdebug to
   reach an IDE on the host; podman has `host.containers.internal` built in.
@@ -44,19 +43,18 @@ script branches on the selected one (`Build/Scripts/runTests.sh:549-578`):
 
 The GitHub workflows pass `-b docker` on every step. That is not a statement
 about which runtime is better — it works around a crun failure on hosted
-runners and is documented in `.github/workflows/ci.yml:44-52`. There is no
-reason to pass it locally.
+runners and is documented in the header comment of
+[`ci.yml`](../../.github/workflows/ci.yml). There is no reason to pass it
+locally.
 
-Each run creates its own container network named `academic-extensions-<random>`
-(`Build/Scripts/runTests.sh:545-547`) and removes it together with every
-attached container in `cleanUp()` (`Build/Scripts/runTests.sh:109-115`), so
-parallel runs on one machine do not collide.
+Each run creates its own container network — `NETWORK` is
+`academic-extensions-${SUFFIX}` — and `cleanUp()` removes it together with
+every attached container, so parallel runs on one machine do not collide.
 
 ## Options
 
-The wrapper parses exactly these options
-(`Build/Scripts/runTests.sh:409-468`); everything left over after them is the
-optional trailing argument.
+The wrapper parses exactly these options in its `while getopts` loop;
+everything left over after them is the optional trailing argument.
 
 | Option            | Meaning                                                                             | Default             |
 |-------------------|-------------------------------------------------------------------------------------|---------------------|
@@ -75,16 +73,15 @@ optional trailing argument.
 | `-h`              | Print the help text and exit.                                                       | —                   |
 | trailing `[file]` | Path passed on to the tool of the suite — for PHPUnit a test file or directory.     | none                |
 
-`-u` is not a modifier: it sets the suite to `update`
-(`Build/Scripts/runTests.sh:458-460`), so it cannot be combined with `-s`.
+`-u` is not a modifier: its `u)` arm sets `TEST_SUITE=update`, so it cannot be
+combined with `-s`.
 
-`-t` and `-p` are validated against a fixed list
-(`Build/Scripts/runTests.sh:431-440`); anything else aborts the run before a
-container is started.
+`-t` and `-p` are validated against a fixed list in their own `getopts` arms;
+anything else aborts the run before a container is started.
 
 The `-a`, `-d` and `-i` combinations are validated together in
-`handleDbmsOptions()` (`Build/Scripts/runTests.sh:117-188`), which also holds
-the per-DBMS defaults and the accepted version lists:
+`handleDbmsOptions()`, which also holds the per-DBMS defaults and the accepted
+version lists:
 
 | `-d`       | Default `-i` | Accepted `-i`                     | `-a`                              |
 |------------|--------------|-----------------------------------|-----------------------------------|
@@ -110,11 +107,10 @@ Build/Scripts/runTests.sh -t 13 -s unit \
 
 The trailing argument means different things per suite. For `unit`,
 `unitRandom`, `functional` and `phpstan` it is appended to the tool's command
-line (`Build/Scripts/runTests.sh:659`, `739`, `751`, `757`). For
-`checkRstRenderingSingle` and `openDocumentation` it is not a path at all but
-the **extension folder name** below `packages/fgtclb/`
-(`Build/Scripts/runTests.sh:624`, `723`). For `composer` it is the composer
-command with its arguments (`Build/Scripts/runTests.sh:642`).
+line, in each of those four `case` arms. For `checkRstRenderingSingle` and
+`openDocumentation` it is not a path at all but the **extension folder name**
+below `packages/fgtclb/`. For `composer` it is the composer command with its
+arguments.
 
 A `--` separator ends the wrapper's own option parsing, and the remainder
 reaches the dispatched tool, because every one of those suites appends `"$@"`.
@@ -132,8 +128,8 @@ workflow in `.github/workflows/` uses the separator.
 
 ## Suites
 
-Taken from the `case` statement at `Build/Scripts/runTests.sh:589-783`, which
-is the authority — the help text is not complete, see below.
+Taken from the `case ${TEST_SUITE} in` statement, which is the authority — the
+help text is prose and can drift, see below.
 
 | Suite                     | What it runs                                                                                        |
 |---------------------------|-----------------------------------------------------------------------------------------------------|
@@ -154,8 +150,7 @@ is the authority — the help text is not complete, see below.
 | `update`                  | Pulls newer `ghcr.io/typo3/core-testing-*` images and removes dangling ones. Also reached via `-u`. |
 | `help`                    | Prints the help text. This is the default when `-s` is omitted.                                     |
 
-Anything else prints the help and exits non-zero
-(`Build/Scripts/runTests.sh:776-782`).
+Anything else falls to the `*)` arm, which prints the help and exits non-zero.
 
 ### The help text
 
@@ -200,7 +195,7 @@ Build/Scripts/runTests.sh -t 14 -p 8.2 -s phpstan
 
 ## Dependencies: one tree, one core version, one PHP version
 
-`composerUpdate` (`Build/Scripts/runTests.sh:646-656`) does four things:
+The `composerUpdate` arm does four things:
 
 1. `rm -rf .Build composer.lock composer.json.orig` — the vendor tree is
    rebuilt from scratch, never patched.
@@ -230,15 +225,15 @@ Two consequences that cause most of the confusing local failures:
 
 The workflows follow this rule literally: every job that needs a vendor tree
 runs `composerUpdate` for its own `-t`/`-p` pair first, and the `lint` job,
-which needs no vendor tree, does not run it at all
-(`.github/workflows/ci.yml:154-171`).
+which needs no vendor tree, does not run it at all — see its `lint` job.
 
 ## Caches: `.cache/` at the repository root
 
 Composer downloads land in `.cache/composer` and the PHPStan result cache in
 `.cache/phpstan`. The directory is created before any container starts
-(`Build/Scripts/runTests.sh:502-503`), passed in as `COMPOSER_CACHE_DIR` on
-every composer-facing suite, and configured as PHPStan's `tmpDir`
+by an explicit `mkdir -p .cache/composer` before any container starts, passed
+in as `COMPOSER_CACHE_DIR` on every composer-facing suite, and configured as
+PHPStan's `tmpDir`
 (`Build/phpstan/Core13/phpstan.neon:11`).
 
 It sits **next to** `.Build/`, not inside it, and that placement is deliberate.
@@ -249,10 +244,9 @@ CI. The reasoning is recorded in `.gitignore:17-20`.
 The workflows cache only `.cache/composer/files` — the content-addressed dist
 archives — and never the `repo/` metadata next to it, because restoring stale
 packagist metadata makes the `restore-keys` fallback resolve against an old
-package list (`.github/workflows/ci.yml:88-103`).
+package list — see the *Cache composer downloads* step in `ci.yml`.
 
-`.cache` and `.php-cs-fixer.cache` are what `cleanCacheFiles()` removes
-(`Build/Scripts/runTests.sh:190-196`).
+`.cache` and `.php-cs-fixer.cache` are what `cleanCacheFiles()` removes.
 
 ## Container images
 
@@ -265,8 +259,8 @@ package list (`.github/workflows/ci.yml:88-103`).
 | PostgreSQL       | `docker.io/postgres:<-i>-alpine`                   |
 | Port wait helper | `docker.io/alpine:3.8`                             |
 
-Defined at `Build/Scripts/runTests.sh:524-531`. The `docker.io` images are
-pulled through `ensureImage()` (`Build/Scripts/runTests.sh:60-79`), which
+Defined in the `IMAGE_*` variables. The `docker.io` images are pulled through
+`ensureImage()`, which
 checks the local image first and retries a failed pull up to three times: an
 anonymous Docker Hub pull is rate limited per source IP, hosted runners share
 address space, and a single failed pull otherwise ends a job with exit 125
@@ -274,13 +268,14 @@ before a test has run. The `ghcr.io` images have never needed it, which is why
 only the Docker Hub ones are guarded.
 
 `-u` refreshes the PHP images that already exist locally and removes the
-dangling ones (`Build/Scripts/runTests.sh:761-770`). Run it when tests start
+dangling ones, in the `update` arm. Run it when tests start
 failing in ways that do not match the code.
 
 ## Xdebug
 
 `-x` switches the PHP container from `XDEBUG_MODE=off` to `debug` and points
-the client at the host (`Build/Scripts/runTests.sh:580-586`). The host address
+the client at the host through `XDEBUG_MODE` and `XDEBUG_CONFIG`. The host
+address
 differs per runtime — `host.docker.internal` for docker,
 `host.containers.internal` for podman — and the wrapper sets the right one.
 `-y <port>` changes the client port when the IDE does not listen on 9003.
@@ -301,8 +296,8 @@ extensions in a running backend and frontend.
 their own `composer.lock`, their own git-ignored `vendor/`, `public/` and
 `var/` trees, and they play no part in any suite. The single point of contact
 is negative: `lintPhp` explicitly excludes `./core-1*/vendor/`,
-`./core-1*/public/` and `./core-1*/var/` from the `find`
-(`Build/Scripts/runTests.sh:709-718`), because those are third-party trees —
+`./core-1*/public/` and `./core-1*/var/` from the `find` in its `case` arm, because those are
+third-party trees —
 `typo3/class-alias-loader` ships a template file that is deliberately not valid
 PHP. The instances' tracked `config/system/*.php` is still linted, on purpose.
 
