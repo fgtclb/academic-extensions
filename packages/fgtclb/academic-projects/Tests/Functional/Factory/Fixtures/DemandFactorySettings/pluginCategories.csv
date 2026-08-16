@@ -1,0 +1,14 @@
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header","pages","categories"
+,1,1,0,0,0,0,"academicprojects_projectlist","Projects with a category selection","",3
+,2,1,0,0,0,0,"academicprojects_projectlist","Projects without a category selection","",0
+"sys_category",
+,"uid","pid","deleted","hidden","parent","type","title","sys_language_uid","l10n_parent"
+,1,1,0,0,0,"competence_field","Quantum Physics",0,0
+,2,1,0,0,0,"cooperation","Industry Partner",0,0
+,3,1,0,0,0,"program_type","Full-time",0,0
+"sys_category_record_mm",
+,"uid_local","uid_foreign","tablenames","fieldname","sorting","sorting_foreign"
+,1,1,"tt_content","pi_flexform",0,1
+,2,1,"tt_content","pi_flexform",0,2
+,3,1,"tt_content","pi_flexform",0,3
