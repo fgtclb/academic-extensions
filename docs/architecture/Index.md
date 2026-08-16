@@ -13,15 +13,23 @@ describing an intention as if it were the state.
 - Never hand a raw array to `in()` or `notIn()`, and build a constraint on the
   query builder that executes it. Both rules come from defects that reached a
   release.
+- One YAML in `academic_persons` drives field validation for **both** the backend
+  FormEngine and the frontend edit form. It ships there, not in
+  `academic_persons_edit`, because the TCA needs it.
+- In the frontend edit forms, a `disabled` or `readOnly` property is **never**
+  written, whatever the request carries. The shipped `profile` set locks the
+  three name fields that way, which is intended and regularly misread.
 
 ## Pages
 
-| Page                                                  | Contents                                                                                                                                              |
-|-------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Core version aware code](core-version-aware-code.md) | The version switches that exist today, what a `Core13/`/`Core14/` split would look like, and the APIs that cannot be migrated while v13 is supported. |
-| [Dependency injection](dependency-injection.md)       | How services are configured across the extensions, why they must be stateless, and which TYPO3 attributes are safe on both core versions.             |
-| [Class design](class-design.md)                       | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                              |
-| [Database queries](database-queries.md)               | Quoting value lists, and keeping a constraint on the builder that executes it.                                                                        |
+| Page                                                    | Contents                                                                                                                                              |
+|---------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Core version aware code](core-version-aware-code.md)   | The version switches that exist today, what a `Core13/`/`Core14/` split would look like, and the APIs that cannot be migrated while v13 is supported. |
+| [Dependency injection](dependency-injection.md)         | How services are configured across the extensions, why they must be stateless, and which TYPO3 attributes are safe on both core versions.             |
+| [Class design](class-design.md)                         | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                              |
+| [Database queries](database-queries.md)                 | Quoting value lists, and keeping a constraint on the builder that executes it.                                                                        |
+| [Validation settings](validation-settings.md)           | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                     |
+| [Form data transformation](form-data-transformation.md) | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                          |
 
 ## See also
 
