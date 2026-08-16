@@ -109,7 +109,10 @@ no test run depends on them.
 `sqlite-databases/core-13.sqlite` and `sqlite-databases/core-14.sqlite` are the
 committed database templates. Each instance restores from and backs up to its
 own file through the composer scripts `sqlite:apply` and `sqlite:backup`
-declared in `core-13/composer.json` and `core-14/composer.json`.
+declared in `core-13/composer.json` and `core-14/composer.json`. Both call
+`Build/Scripts/sqliteSnapshot.php` rather than copying the file — see
+[Development environment](environment.md#snapshotting-an-instance-database-is-not-a-copy)
+for why a copy is wrong.
 
 `patches/` is the shared pool for `vaimo/composer-patches`. Both instances
 require that plugin and declare `"patches-search": "patches/"`

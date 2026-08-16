@@ -1,6 +1,17 @@
+# Makes the parts of the repository the instance refers to reachable under the
+# same relative paths inside the container as on the host.
+#
+# The instance itself is mounted at "/var/www/html", so ".." inside the
+# container is "/var/www". Each mount below recreates one directory the
+# instance sees one level up on the host, which is what lets a single
+# "composer.json" serve DDEV and a plain host stack.
+#
+# The sources are resolved by DDEV relative to this ".ddev" directory, hence
+# "../..".
 services:
   web:
     volumes:
+      - "../../Build:/var/www/Build"
       - "../../packages:/var/www/packages"
       - "../../packages-dev:/var/www/packages-dev"
       - "../../sqlite-databases:/var/www/sqlite-databases"
