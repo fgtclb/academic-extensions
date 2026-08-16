@@ -358,6 +358,110 @@ the same relative path on both sides, because each instance bind-mounts the
 repository's `Build/` into its container
 (`core-*/.ddev/docker-compose.mounts.yaml`).
 
+### Rebuilding an instance from nothing
+
+`config/system/additional.php` copies the committed template into `var/sqlite/`
+whenever the instance database is missing. That is what makes a fresh clone work
+with no setup step — check out, `ddev start`, log in — and it is also why
+**deleting the database does not give you an empty instance**. The next request
+puts the template straight back. So does the documented teardown: `git clean
+-xdf` removes the database, and the auto seed restores it on the next start.
+
+That matters as soon as the content is meant to be reproducible. The committed
+templates are the accumulated result of manual backend work; a content generator
+run on top of one of them produces a database in which nobody can tell generated
+content from hand-made content any more. To get a clean, generator-only
+snapshot, the instance has to be buildable from nothing first.
+
+Two switches suppress the seed. Either is enough, both are git-ignored, and both
+belong to **one** instance, so one core version can be rebuilt while the other
+keeps working:
+
+| Switch                                          | Set by                    | Use it for                          |
+|-------------------------------------------------|---------------------------|-------------------------------------|
+| `core-NN/.no-database-seed`                     | `composer instance:fresh` | working on it by hand               |
+| `ACADEMICS_NO_DATABASE_SEED`, any value but `0` | the environment           | scripts, `web_environment`, a vhost |
+
+Neither is ever committed. With one of them in place a missing database stays
+missing: nothing at boot recreates it, and TYPO3 is still told where the database
+belongs, so it creates an empty one and reports that it is not installed.
+
+**Order matters if you also wipe the checkout.** `git clean -xdf` deletes the
+marker file along with everything else that is git-ignored, so the sequence is
+teardown first, marker second, start third — never the other way round.
+
+#### The walk-through
+
+The sequence below was run against `main`'s `core-13/`, which is the same TYPO3
+v13 instance this branch carries; the output quoted is what it produced. It was
+not executed on this branch, because a checkout that has been on `main` leaves
+`core-13/vendor/` autoloading path packages that resolve differently here — see
+*Switching branches in the same checkout* in
+[`README.md`](../../README.md#switching-branches-in-the-same-checkout).
+
+```shell
+cd core-13
+ddev composer instance:fresh      # drops var/sqlite/*.sqlite and writes the marker
+```
+
+Then install TYPO3 into the empty instance. **`extension:setup` cannot do this**
+— it authenticates a backend user before it does anything else, so against a
+database with no tables at all it stops at `no such table: be_users`. The
+command that can is `typo3 setup`:
+
+```shell
+ddev exec 'TYPO3_DB_DRIVER=sqlite \
+  TYPO3_SETUP_ADMIN_USERNAME=john-doe \
+  TYPO3_SETUP_ADMIN_PASSWORD="John-Doe-1701D." \
+  TYPO3_SETUP_ADMIN_EMAIL=john-doe@example.com \
+  TYPO3_PROJECT_NAME="Academic extensions (TYPO3 v13)" \
+  TYPO3_SERVER_TYPE=other \
+  vendor/bin/typo3 setup --force --no-interaction'
+```
+
+`setup` is an installer, not a repair tool, and it leaves two things behind that
+have to be undone. Both are expected, neither is a defect:
+
+1. **It rewrites `config/system/settings.php`**, which is *tracked* here. It
+   replaces the install tool password, turns `BE/debug` and `FE/debug` off,
+   rewrites the `GFX` processor and hard-codes an absolute database path. Restore
+   the committed file — `git checkout core-13/config/system/settings.php`.
+2. **It ignores the database name for SQLite** and always creates its own
+   `var/sqlite/cms-<hash>.sqlite`, leaving the instance's own file empty. Adopt
+   it:
+
+   ```shell
+   rm var/sqlite/core-13.sqlite
+   mv var/sqlite/cms-*.sqlite var/sqlite/core-13.sqlite
+   ```
+
+   The rename is enough because `additional.php` recomputes the database path on
+   every request anyway — the path in `settings.php` is advisory, and says so.
+
+From here the instance is a normal one and the usual commands work:
+
+```shell
+ddev composer system:refresh                       # extension:setup, languages, caches
+ddev exec vendor/bin/typo3 styleguide:generate     # or whatever generator applies
+ddev composer sqlite:backup                        # commit the result
+ddev composer sqlite:apply                         # back to normal, clears the marker
+```
+
+`sqlite:apply` clearing the marker is deliberate: restoring the committed
+template *is* the end of a rebuild, and a marker that outlives one is a trap —
+the instance would come up empty after some later teardown, long after anybody
+remembers why.
+
+A `core-13` rebuilt this way came out at **170 tables** with every extension of
+the repository set up.
+
+`core-12` behaves the same, and the two sharp edges above are the same there —
+checked against the TYPO3 12.4 sources rather than run, because a fresh checkout
+has no dependency tree in `core-12/`. `extension:setup` comes from
+`EXT:extensionmanager` on v12 instead of `EXT:core`, but calls
+`Bootstrap::initializeBackendAuthentication()` just the same, and the `setup`
+command has the identical `pdo_sqlite` branch that ignores the database name.
+
 ## See also
 
 - [Quality gates](quality-gates.md) — what each suite asserts, and the CI
