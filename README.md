@@ -181,6 +181,11 @@ ddev composer system:refresh   # flush + warm caches, update languages, extensio
 `sqlite:backup` rewrites a multi-megabyte binary that git cannot delta-compress,
 so commit it when the demo content genuinely changed, not on every run.
 
+Both directions go through `Build/Scripts/sqliteSnapshot.php` rather than `cp`,
+because a running instance keeps its newest writes in a SQLite write ahead log
+that a plain copy leaves behind — see
+[Development environment](docs/development/environment.md#snapshotting-an-instance-database-is-not-a-copy).
+
 ### Teardown
 
 ```shell

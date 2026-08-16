@@ -313,9 +313,50 @@ PHP. The instances' tracked `config/system/*.php` is still linted, on purpose.
 Do not run a gate expecting an instance to be updated, and do not fix a failing
 instance by running `composerUpdate` — that installs the root project's
 dependency tree into `.Build/`, which is a different thing entirely. Instance
-handling, DDEV project names, the SQLite backup/restore scripts and the branch
-switching collision are described in
+handling, DDEV project names and the branch switching collision are described in
 [`README.md`](../../README.md#development-instances).
+
+### Snapshotting an instance database is not a copy
+
+Both directions of the snapshot — `ddev composer sqlite:backup` and
+`ddev composer sqlite:apply` — go through
+[`Build/Scripts/sqliteSnapshot.php`](../../Build/Scripts/sqliteSnapshot.php)
+rather than `cp`. That is not a refinement. A plain copy is **wrong** here, and
+it fails silently.
+
+SQLite in write ahead logging mode keeps the newest transactions in a `-wal`
+sidecar until a checkpoint folds them back into the main file. The checkpoint
+happens when the *last* connection closes — and a backup is taken while the
+instance is running, so php-fpm is holding one. Until it closes, the main file
+can be almost empty.
+
+Measured on PHP 8.1 and 8.2 with `pdo_sqlite`, 500 rows written in WAL mode with
+the writer deliberately kept open:
+
+| File              | Size    |
+|-------------------|---------|
+| `live.sqlite`     | 4 kB    |
+| `live.sqlite-wal` | 2076 kB |
+
+The plain copy of the main file opened, and then reported `no such table` for
+every table the database had. That is the shape of the defect: not an error at
+backup time, but a committed template that turns out to be empty the next time
+somebody restores from it. The `cache:flush` that `sqlite:backup` runs first
+does not help — it flushes TYPO3 caches, not the write ahead log.
+
+The helper therefore checkpoints the source with `PRAGMA wal_checkpoint(TRUNCATE)`
+before copying, removes the `-wal` and `-shm` sidecars of the file it replaces
+— they belong to the database being overwritten, never to its replacement — and
+verifies the result by opening it and counting its tables. It exits non-zero
+with a readable message when the source is missing or the copy cannot be opened.
+
+The checkpoint is harmless in any other journal mode; the pragma then reports
+that there was nothing to do, which is why the helper needs no journal mode
+detection. It uses nothing but PHP with `pdo_sqlite`, because it is called from
+an instance whose dependencies may not be installed yet — and it is reachable at
+the same relative path on both sides, because each instance bind-mounts the
+repository's `Build/` into its container
+(`core-*/.ddev/docker-compose.mounts.yaml`).
 
 ## See also
 
