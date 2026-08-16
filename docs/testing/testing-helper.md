@@ -220,28 +220,47 @@ registration.
 
 ### The defect
 
-A plugin's FlexForm data structure is attached to the content type as
-`$GLOBALS['TCA']['tt_content']['types'][<CType>]['columnsOverrides']['pi_flexform']['config']['ds']`.
-**TYPO3 v13 and v14 want different shapes there, and neither tolerates the
-other's:**
+The two core versions do not disagree about the *shape* of a plugin's FlexForm
+registration. They disagree about **where it has to live**, and getting that
+wrong failed twice, in two different ways, before it was understood.
 
-| Core version | Required shape                            | What the other shape does                                                                                                        |
-|--------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| v13          | array, e.g. `['default' => 'FILE:EXT:…']` | A string throws in `FlexFormTools` (code 1463826960). **The record cannot be opened.**                                           |
-| v14          | plain string, `'FILE:EXT:…'`              | An array throws `InvalidTcaException`, which `TcaFlexPrepare` catches — the backend renders an **empty FlexForm tab**, silently. |
+| Core version | Where the data structure belongs                                                                              | How it is written                                                                       |
+|--------------|---------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| v14          | on the record type — `…['types'][<CType>]['columnsOverrides']['pi_flexform']['config']['ds']`, a plain string | assigned directly                                                                       |
+| v13          | in the **global** column configuration, under the key `ds_pointerField` matches                               | `ExtensionManagementUtility::addPiFlexFormValue('*', $ds, $cType)`, writing `*,<CType>` |
 
-The v14-shaped registration was introduced when `addPiFlexFormValue()` was
-dropped for its v14 deprecation, and it made all fifteen academic plugin content
-elements unopenable in the TYPO3 v13 backend. Every gate stayed green on both
-core versions, because nothing in the suite compiled a backend form. The commit
-message of `c2e8f84de` states the lesson plainly:
+**ACE-293, the visible failure.** The v14-shaped registration was introduced
+when `addPiFlexFormValue()` was dropped for its v14 deprecation. A plain string
+in `columnsOverrides` throws in `FlexFormTools` on v13 (code 1463826960), which
+made all fifteen academic plugin content elements unopenable in the v13 backend.
+Every gate stayed green, because nothing in the suite compiled a backend form.
+The commit message of `c2e8f84de` states the lesson plainly:
 
 > That no test caught this is the point worth keeping: nothing in the suite
 > renders or compiles a backend form, so TCA that is fatal in the v13 backend
 > passes every gate on both core versions.
 
-The production side of the fix is the single version switch in
-[`academic-base/Classes/TcaManipulator.php:165-168`](../../packages/fgtclb/academic-base/Classes/TcaManipulator.php#L165-L168);
+**ACE-387, the silent one.** Putting an *array* in `columnsOverrides` stopped the
+throw, so v13 records opened again — and still showed the wrong form. Core
+resolves a data structure there in two steps:
+`getDataStructureIdentifier()` is handed the field TCA with `columnsOverrides`
+already merged in and does pick the key from it, but the identifier it builds
+carries nothing but that key, and `parseDataStructureByIdentifier()` then reads
+the structure back from `$GLOBALS['TCA']` — where the override never was. The
+lookup landed on core's own `default` entry, a single field `xmlTitle` labelled
+"The Title:", and the plugin options were unreachable. `FlexFormTools` says so
+in its own docblock: the TCA for data structure definitions must not be
+overridden by `columnsOverrides`.
+
+So `columnsOverrides` is a v14 mechanism, not a shared one with two spellings.
+On v13 the registration goes into the global column configuration, under the key
+the `ds_pointerField` `list_type,CType` matches. A plugin registered as a
+content element has an empty `list_type`, so that key is `*,<CType>` — exactly
+what `addPiFlexFormValue()` writes.
+
+The production side of both fixes is the version switch in
+`addContentElementPluginFlexForm()` of
+[`academic-base/Classes/TcaManipulator.php`](../../packages/fgtclb/academic-base/Classes/TcaManipulator.php);
 its unit-level counterpart is the `not-core-13`/`not-core-14` pair described in
 [Unit tests](unit-tests.md#core-version-aware-unit-tests).
 
@@ -289,11 +308,12 @@ construct as a v14 gate and do not reuse it as one.** A genuine gate is
 ### The assertion
 
 `assertPluginFlexFormIsResolved(string $cType, string $sheetName = 'sDEF')` makes
-**two** assertions, and the second one is the load-bearing one:
+**three** assertions, one per way this has already gone wrong:
 
 ```php
 self::assertArrayHasKey($sheetName, $dataStructure['sheets'] ?? [], …);
-self::assertNotEmpty($dataStructure['sheets'][$sheetName]['ROOT']['el'] ?? [], …);
+self::assertNotEmpty($resolvedFields, …);
+self::assertNotSame($coreDefaultFields, $resolvedFields, …);
 ```
 
 Asserting the sheet alone would pass on v14 against the empty fallback: when
@@ -302,10 +322,29 @@ left with `['sheets' => ['sDEF' => []]]` — a sheet that exists and contains
 nothing. Only the assertion on `ROOT.el` distinguishes "resolved" from
 "silently empty".
 
+The third one exists because the first two are not enough. On v13 an
+unresolvable structure does not come back empty, it comes back as **core's
+default** — and core's default has a field, so "resolved to something" is
+satisfied. Seven extensions carried this test and all seven were green while
+every one of them rendered the wrong form. The field names it compares against
+are parsed out of
+`$GLOBALS['TCA']['tt_content']['columns']['pi_flexform']['config']['ds']['default']`
+rather than hard coded, so a changed core default cannot quietly turn the guard
+into a no-op. TYPO3 v14 has no such fallback entry, so on v14 the third
+assertion returns early and the first two carry the check.
+
 **When to use it.** One `Tests/Functional/Tca/PluginFlexFormTest.php` per
 extension that registers plugins, listing every CType in a data provider. Seven
 extensions have one. Add the CType to the provider in the same change that
 registers the plugin.
+
+**Prove it can fail.** A test of this kind is worth exactly as much as its last
+failed run, and both defects above passed a test that existed. Break the
+registration on purpose — put the v14 assignment back on both branches of
+`addContentElementPluginFlexForm()` — watch the suite go red on v13, and
+restore. Done while writing this: **15 data sets across the seven extensions**
+fail with *"resolved to the TYPO3 core default data structure instead of the one
+the extension registers"*.
 
 ---
 
