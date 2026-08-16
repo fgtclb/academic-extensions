@@ -114,6 +114,12 @@ declared in `core-13/composer.json` and `core-14/composer.json`. Both call
 [Development environment](environment.md#snapshotting-an-instance-database-is-not-a-copy)
 for why a copy is wrong.
 
+`instance:fresh` is the third script and the only one that does not go through a
+template: it drops the database and writes the git-ignored marker
+`core-NN/.no-database-seed`, which stops `config/system/additional.php` from
+seeding the instance again. See
+[Rebuilding an instance from nothing](environment.md#rebuilding-an-instance-from-nothing).
+
 `patches/` is the shared pool for `vaimo/composer-patches`. Both instances
 require that plugin and declare `"patches-search": "patches/"`
 (`core-14/composer.json:53`), and each has a `patches` symlink pointing at
