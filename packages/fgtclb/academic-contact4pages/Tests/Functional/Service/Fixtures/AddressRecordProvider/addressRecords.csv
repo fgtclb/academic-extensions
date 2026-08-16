@@ -1,0 +1,36 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","slug","title"
+,1,0,1,0,0,0,0,"/","Site Root"
+,100,1,254,0,0,0,0,"/sysfolder-records","Recordcollection"
+,101,1,254,0,0,0,0,"/sysfolder-other","Second Recordcollection"
+"tx_academicpersons_domain_model_profile",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","first_name","last_name","slug"
+,1,100,0,0,0,0,"Max","Müllermann","max-muellermann"
+"tx_academicpersons_domain_model_contract",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","profile","position"
+,1,100,0,0,0,0,1,"Professor"
+,2,100,0,0,0,0,1,"Lecturer"
+,3,100,0,0,0,0,1,"Assistant"
+"tx_academicpersons_domain_model_email",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","contract","email","type"
+,1,101,0,0,0,0,30,1,"third@example.org","business"
+,2,100,0,0,0,0,10,1,"first@example.org","business"
+,3,100,0,1,0,0,20,1,"hidden@example.org","private"
+,4,100,1,0,0,0,5,1,"deleted@example.org","private"
+,5,100,0,0,1,2,15,1,"translated@example.org","business"
+,6,100,0,0,0,0,10,2,"other-contract@example.org","business"
+,7,100,0,0,0,0,1,0,"without-contract@example.org","business"
+"tx_academicpersons_domain_model_phone_number",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","contract","phone_number","type"
+,1,100,0,0,0,0,20,1,"+49 30 111","business"
+,2,100,0,1,0,0,10,1,"+49 30 222","private"
+,3,100,1,0,0,0,30,1,"+49 30 333","private"
+,4,100,0,0,0,0,10,2,"+49 40 444","business"
+,5,100,0,0,0,0,1,0,"+49 50 555","business"
+"tx_academicpersons_domain_model_address",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","contract","street","street_number","zip","city","country","type"
+,1,100,0,0,0,0,20,1,"Musterstraße","1","10115","Berlin","Germany","business"
+,2,100,0,1,0,0,10,1,"Nebenstraße","2","20095","Hamburg","Germany","private"
+,3,100,1,0,0,0,30,1,"Löschweg","3","50667","Köln","Germany","private"
+,4,100,0,0,0,0,10,2,"Anderstraße","4","80331","München","Germany","business"
+,5,100,0,0,0,0,1,0,"Waisenweg","5","70173","Stuttgart","Germany","business"
