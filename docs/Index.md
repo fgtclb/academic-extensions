@@ -29,12 +29,14 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 
 ## [Architecture](architecture/Index.md)
 
-| Page                                                               | Contents                                                                                             |
-|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| [Core version aware code](architecture/core-version-aware-code.md) | Version switches, and when to split classes and configuration per core version.                      |
-| [Dependency injection](architecture/dependency-injection.md)       | Service configuration, stateless services, the TYPO3 attributes that are safe on both core versions. |
-| [Class design](architecture/class-design.md)                       | What the code base actually does with `final`, `readonly`, injection and data objects.               |
-| [Database queries](architecture/database-queries.md)               | The two query builder rules that were learned from released defects.                                 |
+| Page                                                                 | Contents                                                                                                      |
+|----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| [Core version aware code](architecture/core-version-aware-code.md)   | Version switches, and when to split classes and configuration per core version.                               |
+| [Dependency injection](architecture/dependency-injection.md)         | Service configuration, stateless services, the TYPO3 attributes that are safe on both core versions.          |
+| [Class design](architecture/class-design.md)                         | What the code base actually does with `final`, `readonly`, injection and data objects.                        |
+| [Database queries](architecture/database-queries.md)                 | The two query builder rules that were learned from released defects.                                          |
+| [Validation settings](architecture/validation-settings.md)           | The one YAML driving both the backend FormEngine and the frontend edit form, and how it is overridden.        |
+| [Form data transformation](architecture/form-data-transformation.md) | When a submitted value reaches the domain model, and why the shipped `profile` defaults lock the name fields. |
 
 ## [Testing](testing/Index.md)
 
