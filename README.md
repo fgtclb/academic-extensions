@@ -186,6 +186,27 @@ because a running instance keeps its newest writes in a SQLite write ahead log
 that a plain copy leaves behind — see
 [Development environment](docs/development/environment.md#snapshotting-an-instance-database-is-not-a-copy).
 
+### Rebuilding an instance from nothing
+
+Deleting the database does not empty an instance: `config/system/additional.php`
+copies the committed template back on the next request. That is what makes a
+fresh clone work without a setup step, and it is in the way when the point is to
+build the content again from scratch.
+
+```shell
+cd core-12
+ddev composer instance:fresh   # drop the database and stop the automatic seeding
+```
+
+This writes the git-ignored marker `core-12/.no-database-seed`; the environment
+variable `ACADEMICS_NO_DATABASE_SEED` does the same for scripted use. Neither is
+ever committed, and `ddev composer sqlite:apply` clears the marker again.
+
+Installing TYPO3 into the empty instance afterwards has two sharp edges — TYPO3's
+own `setup` command rewrites the *tracked* `settings.php` and picks its own
+database file name. The walk-through, with both fix-ups, is in
+[Development environment](docs/development/environment.md#rebuilding-an-instance-from-nothing).
+
 ### Teardown
 
 ```shell
@@ -217,6 +238,14 @@ ddev start
 any data. The instance database lives in the git-ignored `core-*/var/`, so it
 survives the switch and keeps whatever the *other* branch left there — run
 `ddev composer sqlite:apply` to reset it to this branch's committed template.
+
+`core-*/vendor/` survives the switch the same way, and unlike the database it is
+then **wrong**: it is git-ignored, so it is not per branch, and its autoloader
+still points at the path packages of the branch it was installed from. Running
+`vendor/bin/typo3` after a switch fails with a `Failed opening required …
+EXT_CONSTANTS.php`. `ddev start` fixes it — its post-start hook runs
+`composer install` — and `ddev composer install` does the same without a
+restart.
 
 ### Without DDEV
 

@@ -70,8 +70,12 @@
     },
     "homepage": "https://www.fgtclb.com/",
     "scripts": {
+        "instance:fresh": [
+            "@php ../Build/Scripts/instanceDatabase.php fresh"
+        ],
         "sqlite:apply": [
             "@php ../Build/Scripts/sqliteSnapshot.php restore ../sqlite-databases/core-12.sqlite var/sqlite/core-12.sqlite",
+            "@php ../Build/Scripts/instanceDatabase.php seeded",
             "@php vendor/bin/typo3 cache:flush",
             "@php vendor/bin/typo3 cache:warmup"
         ],
@@ -88,6 +92,7 @@
         ]
     },
     "scripts-descriptions": {
+        "instance:fresh": "Drop this instance's database and stop the automatic seeding, so it can be rebuilt from nothing.",
         "sqlite:apply": "Restore this instance from \"../sqlite-databases/core-12.sqlite\", discarding its current database.",
         "sqlite:backup": "Copy this instance's database to \"../sqlite-databases/core-12.sqlite\" so it can be committed.",
         "system:refresh": "Refresh the system after changes: flush and warm up caches (DI), update languages, run extension setup."
