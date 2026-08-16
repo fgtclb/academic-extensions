@@ -41,14 +41,18 @@
 # instance ships its own system configuration and a locked dependency set, and
 # is seeded from "sqlite-databases/". Only generated trees are ignored, plus the
 # "config/system/additional/" drop-in folder for local-only overrides (for
-# example when the instance is served by a host stack instead of DDEV).
+# example when the instance is served by a host stack instead of DDEV) and the
+# ".no-database-seed" marker that suppresses the seeding while an instance is
+# being rebuilt from nothing.
 /core-13/.cache/
+/core-13/.no-database-seed
 /core-13/config/system/additional/*.php
 /core-13/public/
 /core-13/var/
 /core-13/vendor/
 
 /core-14/.cache/
+/core-14/.no-database-seed
 /core-14/config/system/additional/*.php
 /core-14/public/
 /core-14/var/

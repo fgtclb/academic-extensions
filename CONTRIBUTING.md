@@ -46,6 +46,24 @@ Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
 [Monorepo layout](docs/development/monorepo-layout.md) ·
 [Dual core setup](docs/development/dual-core-setup.md)
 
+### Looking at the extensions in a browser
+
+The test harness has no web server. For that there are two ready-to-start TYPO3
+instances at the repository root, one per supported core version, on SQLite and
+seeded from a committed database template — so they need no setup either:
+
+```bash
+cd core-13 && ddev start && ddev launch /typo3/
+```
+
+They are development aids and no test run depends on them. Their databases move
+in and out of `sqlite-databases/` with `ddev composer sqlite:backup` and
+`sqlite:apply`, and `ddev composer instance:fresh` drops the database and stops
+the automatic seeding so an instance can be rebuilt from nothing.
+
+→ [`README.md`](README.md#development-instances) ·
+[Development instances](docs/development/environment.md#development-instances-are-not-part-of-the-harness)
+
 ## Quality gates
 
 The same gates run locally and in the GitHub Actions workflow, for every TYPO3
