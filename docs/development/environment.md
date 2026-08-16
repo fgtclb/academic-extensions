@@ -51,6 +51,45 @@ Each run creates its own container network — `NETWORK` is
 `academic-extensions-${SUFFIX}` — and `cleanUp()` removes it together with
 every attached container, so parallel runs on one machine do not collide.
 
+### A pseudo TTY only when there is a terminal
+
+`CONTAINER_INTERACTIVE` is `-it --init` by default, and drops to `--init` when
+stdin **or** stdout is not a terminal — a script runner, a pipe, a redirect, a
+non-interactive shell. `CI=true` clears it entirely, as before. That distinction
+is load-bearing rather than cosmetic.
+
+`-t` makes the runtime allocate a pseudo TTY inside the container, and every tool
+started there then believes it may ask a question. Composer does. When a plugin
+is missing from `config.allow-plugins` it asks whether the plugin is trusted —
+and in a scripted run nobody answers, so the whole invocation **hangs with no
+output at all**. Measured: a root `-s composer` command with one `allow-plugins`
+entry removed was still waiting when it was killed at 45 seconds; with the entry
+restored the same command returns in seconds.
+
+Nothing about it points at composer. It looks exactly like a stuck image pull or
+a broken container runtime, which is why it cost the time it did (ACE-383).
+
+Without the TTY the same run fails immediately and says what is wrong:
+
+```
+In PluginManager.php line 821:
+  sbuerk/extended-path-repository contains a Composer plugin which is blocked
+  by your allow-plugins config. You may add it to the list if you consider it safe.
+  You can run "composer config --no-plugins allow-plugins.… [true|false]" to enable it
+```
+
+An interactive run keeps `-t`, so colours and progress bars are unchanged when a
+person is watching. The `input device is not a TTY` warning that used to prefix
+every scripted run is gone with it.
+
+Checking stdout as well as stdin is not redundancy: `runTests.sh -s unit > log`
+from a real terminal has a terminal on stdin and a file on stdout, and with `-t`
+the container writes TTY control characters into that file.
+
+The condition and its comment are taken verbatim from
+`web-vision/a11y-by-default`, the one harness in the portfolio that already had
+them, so the two do not drift apart.
+
 ## Options
 
 The wrapper parses exactly these options in its `while getopts` loop;
