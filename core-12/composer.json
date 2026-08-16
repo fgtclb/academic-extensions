@@ -71,13 +71,13 @@
     "homepage": "https://www.fgtclb.com/",
     "scripts": {
         "sqlite:apply": [
-            "\\cp -Rvf ../sqlite-databases/core-12.sqlite var/sqlite/core-12.sqlite",
+            "@php ../Build/Scripts/sqliteSnapshot.php restore ../sqlite-databases/core-12.sqlite var/sqlite/core-12.sqlite",
             "@php vendor/bin/typo3 cache:flush",
             "@php vendor/bin/typo3 cache:warmup"
         ],
         "sqlite:backup": [
             "@php vendor/bin/typo3 cache:flush",
-            "\\cp -Rvf var/sqlite/core-12.sqlite ../sqlite-databases/core-12.sqlite",
+            "@php ../Build/Scripts/sqliteSnapshot.php backup var/sqlite/core-12.sqlite ../sqlite-databases/core-12.sqlite",
             "@php vendor/bin/typo3 cache:warmup"
         ],
         "system:refresh": [
