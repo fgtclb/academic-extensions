@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicContacts4pages\Tests\Unit\Domain\Model;
 
 use FGTCLB\AcademicContacts4pages\Domain\Model\Contact;
+use FGTCLB\AcademicContacts4pages\Domain\Model\Role;
+use FGTCLB\AcademicContacts4pages\Service\AddressRecordProvider;
 use FGTCLB\AcademicPersons\Domain\Model\Address;
 use FGTCLB\AcademicPersons\Domain\Model\Contract;
 use FGTCLB\AcademicPersons\Domain\Model\Email;
@@ -184,6 +186,104 @@ final class ContactTest extends UnitTestCase
         $contact->setAddressRecordProvider(null);
 
         $this->assertNotSame($narrowedContract, $contact->getContract());
+    }
+
+    /**
+     * @return \Generator<string, array{0: non-empty-string, 1: int}>
+     */
+    public static function addressRecordSelectionFlagDataProvider(): \Generator
+    {
+        yield 'a selected email address' => ['emailAddress', 12];
+        yield 'no email address' => ['emailAddress', Contact::DISPLAY_NONE];
+        yield 'a selected phone number' => ['phoneNumber', 21];
+        yield 'no phone number' => ['phoneNumber', Contact::DISPLAY_NONE];
+        yield 'a selected physical address' => ['physicalAddress', 31];
+        yield 'no physical address' => ['physicalAddress', Contact::DISPLAY_NONE];
+    }
+
+    /**
+     * The flag decides whether the contract is handed out as it is or copied, so each of the
+     * three fields has to raise it on its own - including the "display none" end of the range,
+     * which is a selection too although nothing is picked.
+     *
+     * @param non-empty-string $propertyName
+     */
+    #[DataProvider('addressRecordSelectionFlagDataProvider')]
+    #[Test]
+    public function eachAddressRecordKindRaisesTheSelectionFlagOnItsOwn(string $propertyName, int $selectedUid): void
+    {
+        $contact = $this->createContact($this->createContract());
+        $contact->_setProperty($propertyName, $selectedUid);
+
+        $this->assertTrue($contact->hasAddressRecordSelection());
+    }
+
+    /**
+     * The label is what the backend shows for a contact record, and both parts are optional:
+     * the role is a free relation and the contract is only set once a person was picked.
+     */
+    #[Test]
+    public function theLabelIsEmptyWithoutARoleAndWithoutAContract(): void
+    {
+        $this->assertSame('', (new Contact())->getLabel());
+    }
+
+    #[Test]
+    public function theLabelIsTheRoleNameAloneWithoutAContract(): void
+    {
+        $contact = new Contact();
+        $contact->_setProperty('role', $this->createRole('Head of department'));
+
+        $this->assertSame('Head of department', $contact->getLabel());
+    }
+
+    #[Test]
+    public function theLabelIsTheContractLabelAloneWithoutARole(): void
+    {
+        $contract = $this->createContract();
+        $contact = $this->createContact($contract);
+
+        $this->assertSame($contract->getLabel(), $contact->getLabel());
+    }
+
+    #[Test]
+    public function theLabelJoinsTheRoleNameAndTheContractLabel(): void
+    {
+        $contract = $this->createContract();
+        $contact = $this->createContact($contract);
+        $contact->_setProperty('role', $this->createRole('Head of department'));
+
+        $this->assertSame('Head of department - ' . $contract->getLabel(), $contact->getLabel());
+    }
+
+    /**
+     * Once the plugin hands over a provider, the provider is what the records come from - the
+     * relation is only the fallback for a contact that has none. A contract that was never
+     * persisted therefore ends up empty, because the provider cannot look anything up for it.
+     */
+    #[Test]
+    public function aProviderReplacesTheRelationRecordsEvenWithoutASelection(): void
+    {
+        $contract = $this->createContract();
+        $contract->_setProperty('uid', null);
+        $contact = $this->createContact($contract);
+        $contact->setAddressRecordProvider(new AddressRecordProvider());
+
+        $displayContract = $contact->getContract();
+        $this->assertInstanceOf(Contract::class, $displayContract);
+        $this->assertNotSame($contract, $displayContract);
+        $this->assertSame([], $this->getUids($displayContract->getEmailAddresses()));
+        $this->assertSame([], $this->getUids($displayContract->getPhoneNumbers()));
+        $this->assertSame([], $this->getUids($displayContract->getPhysicalAddresses()));
+        $this->assertSame([11, 12], $this->getUids($contract->getEmailAddresses()));
+    }
+
+    private function createRole(string $name): Role
+    {
+        $role = new Role();
+        $role->_setProperty('uid', 1);
+        $role->_setProperty('name', $name);
+        return $role;
     }
 
     private function createContact(Contract $contract): Contact
