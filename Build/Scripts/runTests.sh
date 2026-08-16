@@ -625,6 +625,10 @@ SUFFIX=$(echo $RANDOM)
 NETWORK="academic-extensions-${SUFFIX}"
 ${CONTAINER_BIN} network create ${NETWORK} >/dev/null
 
+# Suffix every bind mount needs, kept next to the mounts that use it. Empty except for
+# podman on Linux, which relabels the mount for SELinux - see the assignments below.
+CONTAINER_MOUNT_SUFFIX=""
+
 if [ "${CONTAINER_BIN}" == "docker" ]; then
     # docker needs the add-host for xdebug remote debugging. podman has host.container.internal built in
     CONTAINER_COMMON_PARAMS="${CONTAINER_INTERACTIVE} --rm --network ${NETWORK} --add-host ${CONTAINER_HOST}:host-gateway ${USERSET} -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
@@ -648,6 +652,7 @@ else
     # without an explicit owner. "mode=1777" is kept for the rootful case.
     TMPFS_MOUNT_OPTIONS="rw,noexec,nosuid,mode=1777"
     if [ $( uname ) = "Linux" ]; then
+        CONTAINER_MOUNT_SUFFIX=":Z"
         CONTAINER_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm --network ${NETWORK} -v ${ROOT_DIR}:${ROOT_DIR}:Z -w ${ROOT_DIR}"
         CONTAINER_SIMPLE_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR}:Z -w ${ROOT_DIR}"
     else
@@ -782,6 +787,25 @@ case ${TEST_SUITE} in
     functional)
         PHPUNIT_CONFIG_FILE="Build/phpunit/FunctionalTests.xml"
         COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-${DBMS},not-core-${CORE_VERSION} "$@")
+        # Each functional test case gets its own TYPO3 instance below
+        # "typo3temp/var/tests/functional-<identifier>". The testing framework derives that
+        # identifier itself, as "substr(sha1(<test class>), 0, 7)", so it is the same in every
+        # run of the same test class - see FunctionalTestCase::getInstanceIdentifier().
+        #
+        # Two runs in one checkout therefore work in the *same* instance directories, and
+        # "removeOldInstanceIfExists()" of the one deletes the instance the other is currently
+        # using. It surfaces as "No such file or directory", "no such table" and "UNIQUE
+        # constraint failed" in tests that have nothing to do with each other, and it cost
+        # roughly one run in three during the ACE-403 .. ACE-422 round.
+        #
+        # Give every run its own directory on the host and mount it where the testing framework
+        # expects to find it, so concurrent runs cannot see each other's instances. A bind mount
+        # rather than a tmpfs on purpose: 125 test classes at some 5 MB each would put the better
+        # part of a gigabyte into RAM, and a failed run stays inspectable this way.
+        FUNCTIONAL_INSTANCE_DIR="${ROOT_DIR}/.Build/Web/typo3temp/var/tests-${SUFFIX}"
+        mkdir -p "${FUNCTIONAL_INSTANCE_DIR}"
+        SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
+        CONTAINER_COMMON_PARAMS="${CONTAINER_COMMON_PARAMS} -v ${FUNCTIONAL_INSTANCE_DIR}:${ROOT_DIR}/.Build/Web/typo3temp/var/tests${CONTAINER_MOUNT_SUFFIX}"
         case ${DBMS} in
             mariadb)
                 echo "Using driver: ${DATABASE_DRIVER}"
@@ -817,9 +841,11 @@ case ${TEST_SUITE} in
                 ;;
             sqlite)
                 # create sqlite tmpfs mount typo3temp/var/tests/functional-sqlite-dbs/ to avoid permission issues
-                rm -rf "${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/"
-                SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
-                mkdir -p "${ROOT_DIR}/.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/"
+                #
+                # The directory is created inside this run's own instance directory, which is
+                # mounted over "typo3temp/var/tests" above. It is therefore empty already and
+                # is not shared with any other run, so nothing has to be removed first.
+                mkdir -p "${FUNCTIONAL_INSTANCE_DIR}/functional-sqlite-dbs"
                 SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
                 # "${TMPFS_MOUNT_OPTIONS}" carries the owner and mode the mount needs, which
                 # differ per container binary - see where it is assigned. Without them the
@@ -830,6 +856,14 @@ case ${TEST_SUITE} in
                 SUITE_EXIT_CODE=$?
                 ;;
         esac
+        # A green run has nothing left to look at, and the instances are some 5 MB each. A red
+        # one is kept, because the instance of a failing test - its configuration, its
+        # typo3temp, the files a test wrote - is usually where the answer is.
+        if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+            rm -rf "${FUNCTIONAL_INSTANCE_DIR}"
+        else
+            echo "Test instances of this run kept for inspection: ${FUNCTIONAL_INSTANCE_DIR}"
+        fi
         ;;
     lintPhp)
         # ".agent/" is the git ignored working tree of AI coding agents (see
