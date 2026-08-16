@@ -51,6 +51,31 @@ Each run creates its own container network — `NETWORK` is
 `academic-extensions-${SUFFIX}` — and `cleanUp()` removes it together with
 every attached container, so parallel runs on one machine do not collide.
 
+Functional runs need one thing more, because the collision there is not in the
+containers but in the files they share. The testing framework puts each test
+case's TYPO3 instance in `typo3temp/var/tests/functional-<identifier>`, and
+derives that identifier as `substr(sha1(<test class>), 0, 7)` — the same value in
+every run. Two runs in one checkout would therefore work in the same instance
+directories, and `removeOldInstanceIfExists()` of the one would delete the
+instance the other is using. It surfaced as `No such file or directory`, `no such
+table` and `UNIQUE constraint failed` in tests that had nothing to do with each
+other, and it cost roughly one functional run in three (ACE-440).
+
+`runTests.sh` therefore gives every functional run its own
+`typo3temp/var/tests-${SUFFIX}` on the host and bind mounts it where the testing
+framework looks. A bind mount rather than a tmpfs deliberately: 150 test classes
+at some 5 MB each would put the better part of a gigabyte into RAM.
+
+**A green run removes its directory; a red one keeps it and prints the path.**
+The instance of a failing test — its configuration, its `typo3temp`, the files
+the test wrote — is usually where the answer is, so it is worth looking at before
+running anything else. They are not cleaned up automatically, so delete them when
+you are done:
+
+```bash
+rm -rf .Build/Web/typo3temp/var/tests-*
+```
+
 ### A pseudo TTY only when there is a terminal
 
 `CONTAINER_INTERACTIVE` is `-it --init` by default, and drops to `--init` when
