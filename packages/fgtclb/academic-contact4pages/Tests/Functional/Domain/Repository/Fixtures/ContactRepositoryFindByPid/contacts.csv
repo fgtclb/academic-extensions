@@ -1,0 +1,28 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","slug","title"
+,1,0,1,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,"/contacts","Contacts Page"
+,3,1,1,0,0,0,0,"/other","Other Page"
+,4,1,1,0,0,0,0,"/empty","Page Without Contacts"
+,100,1,254,0,0,0,0,"/sysfolder-records","Recordcollection"
+,101,1,254,0,0,0,0,"/sysfolder-other","Second Recordcollection"
+"tx_academiccontacts4pages_domain_model_role",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","name","description"
+,1,100,0,0,0,0,"Dean's Office",""
+,2,100,0,0,0,0,"Student Advisors",""
+"tx_academicpersons_domain_model_profile",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","first_name","last_name","slug"
+,1,100,0,0,0,0,"Max","Müllermann","max-muellermann"
+"tx_academicpersons_domain_model_contract",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","profile","position"
+,1,100,0,0,0,0,1,"Professor"
+"tx_academiccontacts4pages_domain_model_contact",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","page","contract","role"
+,1,100,0,0,0,0,30,2,1,1
+,2,100,0,0,0,0,10,2,1,2
+,3,101,0,0,0,0,20,2,1,0
+,4,100,0,0,0,0,5,3,1,1
+,5,100,0,1,0,0,1,2,1,1
+,6,100,1,0,0,0,2,2,1,1
+,7,100,0,0,0,0,40,0,1,0
+,8,100,0,0,0,0,50,500,1,0
