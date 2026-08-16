@@ -1,0 +1,9 @@
+"pages",
+,"uid","pid","doktype","sys_language_uid","hidden","deleted","starttime","endtime","title","slug","tx_academicprojects_end_date"
+,1,0,1,0,0,0,0,0,"Site Root","/",\NULL
+,100,1,1,0,0,0,0,0,"Storage A","/storage-a",\NULL
+,101,1,1,0,0,0,0,0,"Storage B","/storage-b",\NULL
+,10,100,30,0,0,0,0,0,"Open ended project","/open-ended",0
+,11,100,30,0,0,0,0,0,"Running project","/running",2145916800
+,12,100,30,0,0,0,0,0,"Finished project","/finished",946684800
+,13,101,30,0,0,0,0,0,"Project without an end date column value","/no-end-date",\NULL
