@@ -238,7 +238,7 @@ the other version's folder: analysing v14-only sources against an installed v13
 reports API that legitimately does not exist there.
 
 Note that `paths` also means **`packages-dev/` is not analysed by PHPStan at
-all** — the two shared meta packages, including the functional test traits in
+all** — all three packages there, including the functional test traits in
 `packages-dev/testing-helper/`, sit outside the gate on both core versions. A
 core version aware helper added there would get no static analysis; only
 `lintPhp` and the tests themselves would cover it.

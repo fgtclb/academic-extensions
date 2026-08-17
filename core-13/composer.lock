@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ce14dca673be78a1c197b6f278ddcfa",
+    "content-hash": "eff917092c1afa3395c2937366d6f519",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1652,6 +1652,49 @@
             ],
             "description": "TYPO3 extension for building and displaying academic study plans with semesters, modules, and categorization features.",
             "homepage": "https://www.fgtclb.com/",
+            "support": {
+                "issues": "https://github.com/fgtclb/academic-extensions/issues",
+                "source": "https://github.com/fgtclb/academic-extensions",
+                "email": "hello@fgtclb.com"
+            },
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "fgtclb/academics-monorepo-dev-site",
+            "version": "3.0.0-dev",
+            "dist": {
+                "type": "path",
+                "url": "../packages-dev/dev-site",
+                "reference": "0611f97f2e8e314954e6c36013a889288b38faf9"
+            },
+            "require": {
+                "php": "^8.2 || ^8.3 || ^8.4",
+                "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev"
+            },
+            "type": "typo3-cms-extension",
+            "extra": {
+                "typo3/cms": {
+                    "extension-key": "academics_dev_site",
+                    "version": "3.0.0-dev"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "FGTCLB GmbH",
+                    "email": "hello@fgtclb.com"
+                }
+            ],
+            "description": "Seed definitions for the development instances of the academic extensions mono repository. Development aid only - never released and never shipped to a customer",
+            "homepage": "https://www.fgtclb.com/",
+            "keywords": [
+                "development",
+                "seed"
+            ],
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
                 "source": "https://github.com/fgtclb/academic-extensions",
@@ -3318,6 +3361,92 @@
                 "source": "https://github.com/sbuerk/extended-path-repository/tree/1.1.0"
             },
             "time": "2026-08-11T13:31:18+00:00"
+        },
+        {
+            "name": "sbuerk/theme-extension-development",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sbuerk/theme-extension-development.git",
+                "reference": "df202c7a4376052292901dc8e404f4d5b818a81a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sbuerk/theme-extension-development/zipball/df202c7a4376052292901dc8e404f4d5b818a81a",
+                "reference": "df202c7a4376052292901dc8e404f4d5b818a81a",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2 || ^8.3 || ^8.4 || ^8.5",
+                "typo3/cms-core": "^13.4 || ^14.3"
+            },
+            "require-dev": {
+                "fgtclb/environment-state-manager": "^2.0.1",
+                "friendsofphp/php-cs-fixer": "^3.95.15",
+                "nikic/php-parser": "^5.4.0",
+                "phpstan/phpstan": "^2.2.5",
+                "phpstan/phpstan-phpunit": "^2.0.18",
+                "phpunit/phpunit": "^11.5.56",
+                "saschaegerer/phpstan-typo3": "^2.1.1 || ^3.0.1",
+                "sbuerk/fixture-packages": "^1.1.3",
+                "sbuerk/typo3-site-based-test-trait": "^2.0.1 || ^3.0.0",
+                "typo3/testing-framework": "^9.6.1"
+            },
+            "default-branch": true,
+            "type": "typo3-cms-extension",
+            "extra": {
+                "typo3/cms": {
+                    "Package": {
+                        "providesPackages": []
+                    },
+                    "version": "2.0.0-dev",
+                    "web-dir": ".Build/Web",
+                    "extension-key": "theme_extension_development"
+                },
+                "branch-alias": {
+                    "dev-main": "2.0.x-dev"
+                },
+                "sbuerk/fixture-packages": {
+                    "paths": {
+                        "Tests/Functional/Fixtures/Extensions/*": [
+                            "autoload"
+                        ]
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SBUERK\\ThemeExtensionDevelopment\\": "Classes/",
+                    "SBUERK\\ThemeExtensionDevelopment\\Core13\\": "Core13/",
+                    "SBUERK\\ThemeExtensionDevelopment\\Core14\\": "Core14/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "sbuerk"
+                }
+            ],
+            "description": "TYPO3 frontend theme for development purposes: extension development, DDEV based test instances and acceptance tests.",
+            "homepage": "https://github.com/sbuerk/theme-extension-development",
+            "keywords": [
+                "acceptance-tests",
+                "ddev",
+                "development",
+                "frontend",
+                "testing",
+                "theme",
+                "typo3",
+                "typo3-cms-extension"
+            ],
+            "support": {
+                "issues": "https://github.com/sbuerk/theme-extension-development/issues",
+                "source": "https://github.com/sbuerk/theme-extension-development"
+            },
+            "time": "2026-08-17T09:07:57+00:00"
         },
         {
             "name": "scssphp/scssphp",
@@ -9674,7 +9803,9 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "bk2k/bootstrap-package": 20,
+        "fgtclb/academics-monorepo-dev-site": 20,
         "fgtclb/academics-monorepo-shared": 20,
+        "sbuerk/theme-extension-development": 20,
         "typo3/cms-adminpanel": 20,
         "typo3/cms-dashboard": 20,
         "typo3/cms-form": 20,

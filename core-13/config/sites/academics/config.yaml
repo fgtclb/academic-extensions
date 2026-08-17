@@ -1,0 +1,43 @@
+# Site of the seeded page tree.
+#
+# "rootPageId" is 1 because the seed definition declares that uid - see
+# "packages-dev/dev-site/Configuration/Seeds/Instance.yaml". Declaring uids is
+# the whole reason a seed may do so: without it this file could not be
+# committed, because the root page would get whatever the database assigned.
+#
+# The base carries no host name, so the instance is reachable under its DDEV
+# host name and under whatever a host stack serves it as.
+rootPageId: 1
+base: /
+websiteTitle: 'Academic extensions (TYPO3 v13)'
+dependencies:
+  # The frontend theme. "full" pulls in the backend layouts, the content
+  # elements, Bootstrap 5, the RTE preset and the rest - the seed's
+  # "backend_layout" values are its identifiers.
+  - bootstrap-package/full
+  # The TypoScript of the academic extensions: view paths for their plugins and
+  # the plugin settings. Without it a plugin has no template root path and every
+  # action fails. Deliberately "academic-persons-default" and not
+  # "-standalone": the standalone set defines its own "page" object and would
+  # replace the theme. Each of these depends on
+  # "fgtclb/academic-base-ctype-group", which is therefore not listed here.
+  - fgtclb/academic-persons-default
+  - fgtclb/academic-persons-edit
+  - fgtclb/academic-programs
+  - fgtclb/academic-partners
+  # EXT:felogin registers its TypoScript with "includeInSiteSets = false", so
+  # in a site set driven installation it arrives only through this dependency.
+  - typo3/felogin
+  # The instance's own glue: the page templates of the custom page types the
+  # academic extensions add. See the set for why it is needed.
+  - fgtclb/academics-dev-site
+languages:
+  -
+    title: English
+    enabled: true
+    languageId: 0
+    base: /
+    locale: en_US.UTF-8
+    navigationTitle: English
+    flag: us
+    websiteTitle: ''

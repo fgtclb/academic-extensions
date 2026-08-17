@@ -12,8 +12,10 @@
     "require": {
         "php": "^8.2 || ^8.3 || ^8.4",
         "bk2k/bootstrap-package": "^16.0@dev",
+        "fgtclb/academics-monorepo-dev-site": "~3.0.0@dev",
         "fgtclb/academics-monorepo-shared": "~3.0.0@dev",
         "sbuerk/extended-path-repository": "^1.1.0",
+        "sbuerk/theme-extension-development": "^2.0.0@dev",
         "typo3/cms-adminpanel": "~14.3.6@dev",
         "typo3/cms-dashboard": "~14.3.6@dev",
         "typo3/cms-form": "~14.3.6@dev",
@@ -26,8 +28,7 @@
         "typo3/cms-styleguide": "~14.3.6@dev",
         "typo3/cms-viewpage": "~14.3.6@dev",
         "typo3/cms-webhooks": "~14.3.6@dev",
-        "typo3/minimal": "^14",
-        "typo3/theme-camino": "~14.3.6@dev"
+        "typo3/minimal": "^14"
     },
     "require-dev": {
         "vaimo/composer-patches": "^6.0.1"
@@ -74,6 +75,9 @@
         "instance:fresh": [
             "@php ../Build/Scripts/instanceDatabase.php fresh"
         ],
+        "instance:seed": [
+            "@php vendor/bin/typo3 theme:seed EXT:academics_dev_site/Configuration/Seeds/Instance.yaml"
+        ],
         "sqlite:apply": [
             "@php ../Build/Scripts/sqliteSnapshot.php restore ../sqlite-databases/core-14.sqlite var/sqlite/core-14.sqlite",
             "@php ../Build/Scripts/instanceDatabase.php seeded",
@@ -94,6 +98,7 @@
     },
     "scripts-descriptions": {
         "instance:fresh": "Drop this instance's database and stop the automatic seeding, so it can be rebuilt from nothing.",
+        "instance:seed": "Write the page tree, content and records of \"packages-dev/dev-site\" into this instance. Needs an empty page tree.",
         "sqlite:apply": "Restore this instance from \"../sqlite-databases/core-14.sqlite\", discarding its current database.",
         "sqlite:backup": "Copy this instance's database to \"../sqlite-databases/core-14.sqlite\" so it can be committed.",
         "system:refresh": "Refresh the system after changes: flush and warm up caches (DI), update languages, run extension setup."

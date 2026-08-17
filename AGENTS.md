@@ -105,9 +105,10 @@ together.
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Seven of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
+- `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed definitions the DDEV instances are built from. Content, not code. Written into an empty instance with `ddev composer instance:seed`, which runs the `theme:seed` command of `sbuerk/theme-extension-development` — that package is required for its **seeder only**, its theme is not used.
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
-- `core-13/`, `core-14/` — ready-to-start development instances, one per core version. SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
+- `core-13/`, `core-14/` — ready-to-start development instances, one per core version, both themed with `bk2k/bootstrap-package`. SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`, and those templates are themselves produced by seeding an empty instance from `packages-dev/dev-site`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
 - `sqlite-databases/` — committed database templates for those instances. `core-*/patches` symlinks into the shared `patches/` pool consumed by `vaimo/composer-patches`.
 - Deleting an instance database does **not** empty the instance: `config/system/additional.php` seeds it from the template again on the next request. `ddev composer instance:fresh` drops it and writes the git-ignored marker `core-NN/.no-database-seed` that suppresses the seeding, so an instance can be rebuilt from nothing; `sqlite:apply` clears the marker. See [Rebuilding an instance from nothing](docs/development/environment.md#rebuilding-an-instance-from-nothing).
 - Switching branches in one checkout collides in DDEV: the instance folders have the same path on every branch but the project names differ per version line (`core13-academics-v3` on `main`, `core13-academics-v2` on `2`), and DDEV refuses a second name for a known path. `ddev stop --unlist <other-name>` clears it; it removes only the registration. The instance database in the git-ignored `core-*/var/` survives the switch, so reset it with `ddev composer sqlite:apply`. So does `core-*/vendor/`, and that one is then wrong — its autoloader points at the other branch's path packages and `vendor/bin/typo3` dies on a missing `EXT_CONSTANTS.php`; `ddev composer install` rebuilds it.
@@ -460,8 +461,9 @@ labels emit `E_USER_DEPRECATED` on every form render on v14.
 ## Releasing / versions
 
 Every package carries its own version (on this branch `3.0.0-dev`) in
-`extra.typo3/cms.version` and its `VERSION` file — including the two
-`packages-dev/*` meta packages. The composer plugin
+`extra.typo3/cms.version` and its `VERSION` file — including all three
+`packages-dev/*` packages, which are versioned but never released and carry no
+`ext_emconf.php`. The composer plugin
 `sbuerk/extended-path-repository`, required by every composer.json that declares
 a `path` repository, derives the path package version from exactly those, so
 there are **no** `repositories.*.options.versions` maps to keep in sync any more.
