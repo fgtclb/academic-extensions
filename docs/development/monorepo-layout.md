@@ -433,6 +433,8 @@ in passing while editing an extension.
   to match `-t` and `-p`
 - [Development environment](environment.md) — host requirements and the
   `runTests.sh` options
+- [Development instances](instances.md) — the two DDEV instances and the seed
+  they are built from
 - [Quality gates](quality-gates.md) — what each suite checks and how continuous
   integration stages them
 - [Core version aware code](../architecture/core-version-aware-code.md)

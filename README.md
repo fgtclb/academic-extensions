@@ -145,10 +145,10 @@ after its own `composerUpdate` — see
 Two ready-to-start TYPO3 instances live at the repository root, one per supported
 core version:
 
-| Folder     | TYPO3 | DDEV project          |
-|------------|-------|-----------------------|
-| `core-12/` | v12   | `core12-academics-v2` |
-| `core-13/` | v13   | `core13-academics-v2` |
+| Folder     | TYPO3 | DDEV project          | Theme               |
+|------------|-------|-----------------------|---------------------|
+| `core-12/` | v12   | `core12-academics-v2` | `bootstrap_package` |
+| `core-13/` | v13   | `core13-academics-v2` | `bootstrap_package` |
 
 Both run on **SQLite** — no database container is started (`omit_containers: [db]`).
 Each instance is seeded on first start from the committed template in
@@ -159,27 +159,33 @@ check out, start, log in.
 cd core-12 && ddev start && ddev launch /typo3/
 ```
 
-The backend account shipped in both databases:
+What is in those templates is **described rather than clicked together**:
+`packages-dev/dev-site/Configuration/Seeds/Instance.yaml` holds the page tree,
+the content and the records, and `ddev composer instance:seed` writes it into an
+empty instance. That is how a template is rebuilt once it has gone stale — see
+[Rebuilding an instance from nothing](#rebuilding-an-instance-from-nothing).
 
-```
-USERNAME: john-doe
-PASSWORD: John-Doe-1701D.
-```
+The backend admin account is `john-doe`, and the seed also creates the frontend
+user needed to look at `EXT:academic_persons_edit`. Both, and what is on which
+page, are documented in
+[Development instances](docs/development/instances.md#accounts).
 
 ### Database backup and restore
 
 The instance database is git-ignored (`core-*/var/`); the template next to it is
-committed. Two composer scripts move state between them:
+committed. Five composer scripts move state around:
 
 ```shell
 cd core-12
 ddev composer sqlite:backup    # instance -> sqlite-databases/core-12.sqlite (commit this)
 ddev composer sqlite:apply     # sqlite-databases/core-12.sqlite -> instance (discards changes)
+ddev composer instance:fresh   # drop the database and suppress the automatic seeding
+ddev composer instance:seed    # write the seed definition into an empty page tree
 ddev composer system:refresh   # flush + warm caches, update languages, extension:setup
 ```
 
 `sqlite:backup` rewrites a multi-megabyte binary that git cannot delta-compress,
-so commit it when the demo content genuinely changed, not on every run.
+so commit it when the content genuinely changed, not on every run.
 
 Both directions go through `Build/Scripts/sqliteSnapshot.php` rather than `cp`,
 because a running instance keeps its newest writes in a SQLite write ahead log
@@ -246,6 +252,13 @@ still points at the path packages of the branch it was installed from. Running
 EXT_CONSTANTS.php`. `ddev start` fixes it — its post-start hook runs
 `composer install` — and `ddev composer install` does the same without a
 restart.
+
+Two more things survive the switch and are merely in the way, so the repository
+ignores both: `core-*/.ddev/traefik/`, which holds the router certificate and its
+private key — DDEV ignores them itself, but under the *current* project name
+only, so the other name's certificate is left visible — and the instance folder
+of the other version line, `core-14/` here and `core-12/` on `main`, whose
+ignored trees stay behind when its tracked files go.
 
 ### Without DDEV
 

@@ -55,20 +55,26 @@ to `12`, `-p` to `8.2`.
 ### Looking at the extensions in a browser
 
 The test harness has no web server. For that there are two ready-to-start TYPO3
-instances at the repository root, one per supported core version, on SQLite and
-seeded from a committed database template — so they need no setup either:
+instances at the repository root, one per supported core version, themed with
+`bk2k/bootstrap-package`, on SQLite and seeded from a committed database
+template — so they need no setup either:
 
 ```bash
 cd core-12 && ddev start && ddev launch /typo3/
 ```
 
-They are development aids and no test run depends on them. Their databases move
-in and out of `sqlite-databases/` with `ddev composer sqlite:backup` and
-`sqlite:apply`, and `ddev composer instance:fresh` drops the database and stops
-the automatic seeding so an instance can be rebuilt from nothing.
+They are development aids and no test run depends on them. What is in that
+template is not clicked together but described, in the seed definition of
+`packages-dev/dev-site/`, and written into an empty instance with
+`ddev composer instance:seed` — so adding a page or a plugin is a reviewable
+diff. Their databases move in and out of `sqlite-databases/` with
+`ddev composer sqlite:backup` and `sqlite:apply`, and
+`ddev composer instance:fresh` drops the database and stops the automatic
+seeding so an instance can be rebuilt from nothing.
 
-→ [`README.md`](README.md#development-instances) ·
-[Development instances](docs/development/environment.md#development-instances-are-not-part-of-the-harness)
+→ [Development instances](docs/development/instances.md) ·
+[Seeding an instance](docs/development/environment.md#seeding-an-instance) ·
+[`README.md`](README.md#development-instances)
 
 ## Quality gates
 
