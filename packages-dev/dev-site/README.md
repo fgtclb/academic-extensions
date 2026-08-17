@@ -52,19 +52,11 @@ works unchanged on both versions — and every set the academic extensions ship 
 a plain `@import` of exactly the files that record includes, so nothing is lost
 by taking the older road.
 
-What this package adds on top of those includes is the glue a real installation
-would put in its site package:
-
-- `Configuration/TypoScript/` — the page template name for the two custom page
-  types of `EXT:academic_programs` and `EXT:academic_partners`. Bootstrap
-  package derives that name from the backend layout through
-  `case = uppercamelcase`, which lowercases the string first, so
-  `pagets__AcademicProgram` resolves to `Academicprogram.html` and the page dies
-  with an `InvalidTemplateResourceException`. Registered as a static template in
-  `Configuration/TCA/Overrides/sys_template.php`.
-- `Configuration/page.tsconfig` — the backend layout of the
-  `EXT:academic_partners` page type, which that extension imports only from its
-  site set and therefore not at all on TYPO3 v12.
+This package carried two pieces of glue for a while — the page template name of
+the custom page types, and the backend layout of the `EXT:academic_partners`
+page type. Both were workarounds for defects of those extensions rather than
+instance configuration, both are fixed at the source now (ACE-450, ACE-451), and
+both are gone. The package holds nothing but the seed definition again.
 
 ## What this is not
 

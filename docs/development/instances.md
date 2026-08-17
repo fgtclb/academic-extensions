@@ -164,13 +164,11 @@ site's settings are inserted at the position the record clears, that is *before*
 its static includes, so every static template would overwrite them. The record's
 own `constants` field is applied after its children and therefore wins.
 
-What `packages-dev/dev-site` adds on top of the extensions' own TypoScript is
-the glue a real installation would put in its site package: the page template
-name for the two custom page types (`Configuration/TypoScript/`, registered as a
-static template in `Configuration/TCA/Overrides/sys_template.php`) and the
-backend layout of the `EXT:academic_partners` page type
-(`Configuration/page.tsconfig`), which that extension imports only from its site
-set and therefore not at all on TYPO3 v12.
+`packages-dev/dev-site` adds nothing on top of the extensions' own TypoScript.
+It carried two pieces of glue for a while — the page template name of the custom
+page types and the backend layout of the `EXT:academic_partners` page type — and
+both were workarounds for defects of those extensions rather than instance
+configuration. Both are fixed at the source now (ACE-450, ACE-451).
 
 ## Database backup and restore
 

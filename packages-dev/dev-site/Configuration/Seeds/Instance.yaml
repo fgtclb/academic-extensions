@@ -87,24 +87,14 @@ pages:
         title: 'Academic extensions'
         root: 1
         clear: 3
-        # Order matters: bootstrap package defines the "page" object, the
-        # extensions add their plugin configuration on top of it, and the
-        # instance's own static has the last word on the page templates.
+        # Order matters: bootstrap package defines the "page" object and the
+        # extensions add their page types and their plugin configuration on
+        # top of it.
         #
         # Deliberately the "Default" static of EXT:academic_persons and not
         # its "Standalone" one: standalone defines its own "page" object and
         # would replace the theme.
-        #
-        # The partners entry is the one path here that is not a registered
-        # static template. EXT:academic_partners registers its own under the
-        # extension key "academic_programs" - see
-        # "academic-partners/Configuration/TCA/Overrides/sys_template.php" -
-        # so the backend selector offers the programs TypoScript twice and the
-        # partners TypoScript not at all. The core resolves the path off disk
-        # regardless of what is registered, so writing it here is correct and
-        # the registration defect stays visible instead of being worked around
-        # in the extension.
-        include_static_file: 'EXT:bootstrap_package/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Default,EXT:academic_persons_edit/Configuration/TypoScript,EXT:academic_programs/Configuration/TypoScript/,EXT:academic_partners/Configuration/TypoScript/,EXT:academics_dev_site/Configuration/TypoScript'
+        include_static_file: 'EXT:bootstrap_package/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Default,EXT:academic_persons_edit/Configuration/TypoScript,EXT:academic_programs/Configuration/TypoScript/,EXT:academic_partners/Configuration/TypoScript/'
         # What a development instance has to correct, and nothing else. These
         # are constants of the includes above, not site settings: a site's
         # "settings.yaml" is inserted at the position the record clears, which
