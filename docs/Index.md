@@ -22,6 +22,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | Page                                                  | Contents                                                                                                  |
 |-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | [Development environment](development/environment.md) | `runTests.sh`, container runtimes, every suite and option.                                                |
+| [Development instances](development/instances.md)     | The two DDEV instances, their accounts, and what the seed puts on which page.                             |
 | [Monorepo layout](development/monorepo-layout.md)     | What each directory is, the packages and their split repositories, extension keys, path package versions. |
 | [Dual core setup](development/dual-core-setup.md)     | Running against TYPO3 v12 and v13, and the rule that avoids false positives.                              |
 | [Quality gates](development/quality-gates.md)         | Every gate and its configuration, PHPStan per core version, continuous integration.                       |
@@ -56,7 +57,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | [Pull requests](workflow/pull-requests.md)                             | Branch naming, the rebase merge model, the pre-flight checklist.               |
 | [Backporting](workflow/backporting.md)                                 | The maintained targets, and analysing a backport instead of cherry-picking it. |
 | [Changelog and documentation](workflow/changelog-and-documentation.md) | The two audiences, rendering the manual, changelog entries per extension.      |
-| [Releasing](workflow/releasing.md)                                     | Versions across twelve packages, the release scripts, the publishing chain.    |
+| [Releasing](workflow/releasing.md)                                     | Versions across fifteen packages, the release scripts, the publishing chain.   |
 
 ## Conventions of this documentation
 
