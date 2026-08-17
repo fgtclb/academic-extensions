@@ -40,6 +40,21 @@ only. Two things survive the switch and are then wrong: the database in
 whose autoloader points at the other branch's path packages — `ddev composer
 install` rebuilds it.
 
+Two more things survive it and are merely in the way, so the repository ignores
+both:
+
+- **`core-*/.ddev/traefik/`** — the router certificate, its private key and the
+  router configuration. DDEV generates them per project and ignores them itself,
+  by rewriting `.ddev/.gitignore` on every start — but it lists them under the
+  *current* project name only. After a switch and a `ddev stop --unlist`, the
+  other name's certificate is left outside that list and shows up in
+  `git status`. Nothing under that directory is ever committed, a private key
+  least of all. Deleting a stale one is safe; DDEV regenerates what it needs on
+  the next `ddev start`.
+- **The instance folder of the other version line** — `core-12/` here,
+  `core-14/` on branch `2`. Switching removes its tracked files and leaves its
+  ignored trees, so the folder stays behind as untracked noise.
+
 ## Accounts
 
 ### Backend
