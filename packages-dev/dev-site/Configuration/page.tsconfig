@@ -1,0 +1,18 @@
+# The backend layout of the EXT:academic_partners page type.
+#
+# "Configuration/TsConfig/BackendLayouts/AcademicPartner.tsconfig" registers
+# "pagets__AcademicPartner", the value the seed writes into the two partner
+# pages - but the only file importing it is
+# "Configuration/Sets/AcademicPartners/page.tsconfig", i.e. the site set. On
+# TYPO3 v12 there are no site sets, and these instances do not use them on v13
+# either, so without this import the backend layout is not registered and the
+# selector on those pages shows a value it does not know.
+#
+# EXT:academic_programs does not need the same line: its own
+# "Configuration/page.tsconfig" imports its backend layouts, and that file is
+# auto-included on v12 and v13 alike (Feature: #96614, TYPO3 v12.0).
+#
+# @todo Remove this once EXT:academic_partners imports its backend layouts from
+#       its own "Configuration/page.tsconfig", the way EXT:academic_programs
+#       already does.
+@import 'EXT:academic_partners/Configuration/TsConfig/BackendLayouts/*.tsconfig'

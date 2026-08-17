@@ -70,8 +70,8 @@ Three things follow from that single line.
 **A new extension needs no configuration change.** Drop it under
 `packages/<vendor>/<dir>/` with a `Tests/Unit/` folder and it is in the suite.
 
-**`packages-dev/` is not covered.** The glob starts at `packages/`, so the two
-meta packages — including
+**`packages-dev/` is not covered.** The glob starts at `packages/`, so all three
+packages there — including
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) — have no
 tests of their own. Their traits are exercised only through the extensions that
 use them.

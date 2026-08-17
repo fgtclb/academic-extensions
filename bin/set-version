@@ -6,13 +6,13 @@
 # Applies a version (and its derived variants) to every relevant file: the
 # runTests.sh COMPOSER_ROOT_VERSION, each split extension (composer.json,
 # ext_emconf.php, VERSION, tailor, branch-alias), the functional-test fixture
-# extensions, the packages-dev meta packages, the ddev instances and the root
+# extensions, the three packages-dev packages, the ddev instances and the root
 # composer.json (monorepo-shared requirement + branch-alias).
 #
 # The set of academic packages, their extension keys and their inter-package
 # dependencies are discovered dynamically from the repository — nothing about the
-# package list is hardcoded here. The same holds for the packages-dev meta
-# packages and the ddev instances, which are discovered by path.
+# package list is hardcoded here. The same holds for the packages-dev packages
+# and the ddev instances, which are discovered by path.
 #
 # There are no path-repository version maps to maintain any more: the composer
 # plugin "sbuerk/extended-path-repository" derives a path package's version from
@@ -363,13 +363,15 @@ for extkey in "${ACADEMIC_EXTKEYS[@]}"; do
 done
 
 # ---------------------------------------------------------------------------
-# 5. packages-dev meta packages: academic deps, extra.typo3/cms.version, VERSION.
+# 5. packages-dev packages: academic deps, extra.typo3/cms.version, VERSION.
 #
-#    These are path packages too, so the extended-path-repository plugin reads
-#    their version from exactly the same three places as a split extension. They
-#    carry no ext_emconf.php and are not published, hence no tailor and no alias.
+#    Three of them today: monorepo-shared and testing-helper (type "library")
+#    and dev-site (type "typo3-cms-extension"). These are path packages too, so
+#    the extended-path-repository plugin reads their version from exactly the
+#    same three places as a split extension. None of them carries an
+#    ext_emconf.php and none is published, hence no tailor and no alias.
 # ---------------------------------------------------------------------------
-info "packages-dev meta packages"
+info "packages-dev packages"
 for dir in packages-dev/*/; do
     dir="${dir%/}"
     [ -f "${dir}/composer.json" ] || continue
