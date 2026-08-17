@@ -28,9 +28,6 @@ dependencies:
   # EXT:felogin registers its TypoScript with "includeInSiteSets = false", so
   # in a site set driven installation it arrives only through this dependency.
   - typo3/felogin
-  # The instance's own glue: the page templates of the custom page types the
-  # academic extensions add. See the set for why it is needed.
-  - fgtclb/academics-dev-site
 languages:
   -
     title: English

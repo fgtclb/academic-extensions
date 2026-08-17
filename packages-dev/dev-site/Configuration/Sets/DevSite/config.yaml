@@ -1,7 +1,0 @@
-# The site set of the development instances.
-#
-# It carries the glue between the theme and the academic extensions that a real
-# installation would put in its site package. Nothing in here belongs in an
-# extension: it is instance configuration, and this package is the instance.
-name: fgtclb/academics-dev-site
-label: 'Academics development site'
