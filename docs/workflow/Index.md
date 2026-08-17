@@ -26,7 +26,7 @@ How a change gets from a working copy into a release. This is branch `2`, the
 | [Pull requests](pull-requests.md)                             | Branch naming on `2`, the rebase merge model and what it implies, the pre-flight gates, the repository rules.      |
 | [Backporting](backporting.md)                                 | What arrives here from `main`, and why it is analysed rather than cherry-picked — starting with a file-level diff. |
 | [Changelog and documentation](changelog-and-documentation.md) | The two audiences, rendering the manual, and the changelog entry kinds.                                            |
-| [Releasing](releasing.md)                                     | Versions across fourteen packages, `bin/set-version` and `bin/release`, and the three-step publishing chain.       |
+| [Releasing](releasing.md)                                     | Versions across fifteen packages, `bin/set-version` and `bin/release`, and the three-step publishing chain.        |
 
 ## See also
 

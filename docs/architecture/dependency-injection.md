@@ -27,14 +27,16 @@ description.
 | `packages/fgtclb/academic-projects`      | –              | yes             |
 | `packages/fgtclb/academic-study-plan`    | –              | yes             |
 | `packages/fgtclb/typo3-category-types`   | –              | yes             |
+| `packages-dev/dev-site`                  | –              | –               |
 | `packages-dev/monorepo-shared`           | –              | –               |
 | `packages-dev/testing-helper`            | –              | –               |
 
 So: **11 `Services.yaml`, 2 `Services.php`**, and both packages carrying a
-`Services.php` carry a `Services.yaml` next to it. Three packages have neither —
+`Services.php` carry a `Services.yaml` next to it. Four packages have neither —
 `academic-persons-sync` ships only domain models under `Classes/Domain/`, and
-the two `packages-dev/` meta packages have no `Classes/` requiring registration
-beyond test traits.
+none of the three `packages-dev/` packages has a `Classes/` requiring
+registration: two hold constraints and test traits, and `dev-site` holds seed
+definitions and instance configuration rather than code.
 
 Three further `Services.yaml` files exist under `Tests/Functional/Fixtures/
 Extensions/` in `academic-base`, `academic-persons` and `typo3-category-types`.

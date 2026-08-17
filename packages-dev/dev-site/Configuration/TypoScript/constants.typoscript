@@ -1,0 +1,11 @@
+# No constants.
+#
+# This file exists because a static template is a pair: the core appends both
+# "constants.typoscript" and "setup.typoscript" to the included path, and a
+# static include that ships only one half is a static include whose other half
+# silently does not exist. The values a development instance has to correct are
+# not here either - they are written into the "constants" field of the root
+# "sys_template" record by the seed definition, because a record's own field
+# wins over everything it includes, which is what "correct the defaults" means.
+#
+# See "Configuration/Seeds/Instance.yaml", record "site-template".

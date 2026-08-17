@@ -1,7 +1,7 @@
 # Releasing
 
-A release of this repository is a release of **fourteen packages at once**:
-twelve TYPO3 extensions under `packages/fgtclb/` and the two meta packages under
+A release of this repository is a release of **fifteen packages at once**:
+twelve TYPO3 extensions under `packages/fgtclb/` and the three packages under
 `packages-dev/`. They share a single version number, they are tagged together,
 and twelve of them end up in the TER — but never from here. The repository root
 is a composer `project`, not an extension, and has nothing to publish.
@@ -26,12 +26,16 @@ The `-dev` suffix appears in the composer-facing files and not in the two TYPO3
 facing ones, because `ext_emconf.php` and `guides.xml` express a released
 version, not a range.
 
-The two `packages-dev/*` meta packages are **not** an exception:
-`fgtclb/academics-monorepo-shared` and
-`fgtclb/academics-monorepo-testing-helper` both carry
-`extra.typo3/cms.version` and a `VERSION` file, both at `2.4.0-dev`. They have
-no `ext_emconf.php`, are not extensions, and are never published — but they are
-path packages, so their version has to be right for the same reason.
+The three `packages-dev/*` packages are **not** an exception:
+`fgtclb/academics-monorepo-shared`,
+`fgtclb/academics-monorepo-testing-helper` and
+`fgtclb/academics-monorepo-dev-site` all carry `extra.typo3/cms.version` and a
+`VERSION` file, all at `2.4.0-dev`. None of them has an `ext_emconf.php`, none
+is released, and none is ever published — but they are path packages, so their
+version has to be right for the same reason. That `dev-site` is a
+`typo3-cms-extension` rather than a `library` changes nothing here: the type is
+what makes `EXT:academics_dev_site/…` resolvable, not a statement about
+shipping it.
 
 **Why this matters:** every `composer.json` in this repository that declares a
 `path` repository requires the composer plugin `sbuerk/extended-path-repository`,
@@ -40,7 +44,7 @@ exactly those three places. Before it, each consuming `composer.json` carried a
 `repositories.*.options.versions` map naming the version of every path package,
 and every bump had to be mirrored into every map. Those maps are gone. Write the
 version on the package and it is correct in the root project, in the sibling
-extensions, in the `packages-dev` meta packages and in the `core-12`/`core-13`
+extensions, in the `packages-dev` packages and in the `core-12`/`core-13`
 development instances.
 
 The constraint is `^1.1.0` — in the root `composer.json`, in
@@ -73,7 +77,7 @@ is the thin variant used for branching and forced minor or major bumps.
 `post-release` does **not** increment anything — the version passed is already
 the next one.
 
-What one run rewrites, in order (`bin/set-version:311-403`):
+What one run rewrites, in order (`bin/set-version:311-405`):
 
 1. `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION`
 2. every split extension → academic composer dependencies,
@@ -92,10 +96,13 @@ directories under `packages/fgtclb/*/` that carry both a `composer.json` and an
 `ext_emconf.php` (`bin/set-version:204-215`); the extension key is read from
 `extra.typo3/cms.extension-key`, never guessed from the directory name; fixture
 extensions are found under `Tests/Functional/Fixtures/Extensions`
-(`bin/set-version:220-225`); the meta packages and the development instances are
-discovered by path. A thirteenth extension or a `core-14` instance is picked up
-by existing, which is precisely what the previously hardcoded instance list
-failed to do.
+(`bin/set-version:220-225`); the `packages-dev` packages and the development
+instances are discovered by path, `for dir in packages-dev/*/`
+(`bin/set-version:375`) and `for dir in core-*/` (`bin/set-version:390`). A
+thirteenth extension, a fourth `packages-dev` package or a `core-14` instance is
+picked up by existing, which is precisely what the previously hardcoded instance
+list failed to do — and is how `packages-dev/dev-site/` was versioned correctly
+the moment it was added.
 
 `--dry-run` prints every change without touching a file and is the way to
 rehearse a bump. `--source-branch=<name>` only selects which

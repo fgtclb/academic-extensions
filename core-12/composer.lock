@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc966e43488a5e12cd487b34e604a408",
+    "content-hash": "9c20d2dccf8c52b7da4f7bab353ec8b7",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -947,7 +947,7 @@
         },
         {
             "name": "fgtclb/academic-base",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-base",
@@ -1005,7 +1005,7 @@
         },
         {
             "name": "fgtclb/academic-bite-jobs",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-bite-jobs",
@@ -1062,7 +1062,7 @@
         },
         {
             "name": "fgtclb/academic-contacts4pages",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-contact4pages",
@@ -1120,7 +1120,7 @@
         },
         {
             "name": "fgtclb/academic-jobs",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-jobs",
@@ -1181,7 +1181,7 @@
         },
         {
             "name": "fgtclb/academic-partners",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-partners",
@@ -1253,7 +1253,7 @@
         },
         {
             "name": "fgtclb/academic-persons",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons",
@@ -1320,7 +1320,7 @@
         },
         {
             "name": "fgtclb/academic-persons-edit",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons-edit",
@@ -1380,7 +1380,7 @@
         },
         {
             "name": "fgtclb/academic-persons-sync",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons-sync",
@@ -1441,7 +1441,7 @@
         },
         {
             "name": "fgtclb/academic-programs",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-programs",
@@ -1513,7 +1513,7 @@
         },
         {
             "name": "fgtclb/academic-projects",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-projects",
@@ -1579,7 +1579,7 @@
         },
         {
             "name": "fgtclb/academic-study-plan",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-study-plan",
@@ -1640,8 +1640,51 @@
             }
         },
         {
+            "name": "fgtclb/academics-monorepo-dev-site",
+            "version": "2.4.0-dev",
+            "dist": {
+                "type": "path",
+                "url": "../packages-dev/dev-site",
+                "reference": "b9693031312ac4f2d88ff819130fb957f52415a3"
+            },
+            "require": {
+                "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+                "typo3/cms-core": "^12.4.22 || ^13.4"
+            },
+            "type": "typo3-cms-extension",
+            "extra": {
+                "typo3/cms": {
+                    "extension-key": "academics_dev_site",
+                    "version": "2.4.0-dev"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "FGTCLB GmbH",
+                    "email": "hello@fgtclb.com"
+                }
+            ],
+            "description": "Seed definitions for the development instances of the academic extensions mono repository. Development aid only - never released and never shipped to a customer",
+            "homepage": "https://www.fgtclb.com/",
+            "keywords": [
+                "development",
+                "seed"
+            ],
+            "support": {
+                "issues": "https://github.com/fgtclb/academic-extensions/issues",
+                "source": "https://github.com/fgtclb/academic-extensions",
+                "email": "hello@fgtclb.com"
+            },
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "fgtclb/academics-monorepo-shared",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages-dev/monorepo-shared",
@@ -1715,7 +1758,7 @@
         },
         {
             "name": "fgtclb/category-types",
-            "version": "2.4.0.x-dev",
+            "version": "2.4.0-dev",
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/typo3-category-types",
@@ -3286,6 +3329,91 @@
                 "source": "https://github.com/sbuerk/extended-path-repository/tree/1.1.0"
             },
             "time": "2026-08-11T13:31:18+00:00"
+        },
+        {
+            "name": "sbuerk/theme-extension-development",
+            "version": "1.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sbuerk/theme-extension-development.git",
+                "reference": "5b13e41f5b7eb7d71443d0dd3052b27bfb3e6f24"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sbuerk/theme-extension-development/zipball/5b13e41f5b7eb7d71443d0dd3052b27bfb3e6f24",
+                "reference": "5b13e41f5b7eb7d71443d0dd3052b27bfb3e6f24",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1 || ^8.2 || ^8.3 || ^8.4",
+                "typo3/cms-core": "^12.4.22 || ^13.4"
+            },
+            "require-dev": {
+                "fgtclb/environment-state-manager": "^1.0.0",
+                "friendsofphp/php-cs-fixer": "^3.95.15",
+                "nikic/php-parser": "^4.15.4 || ^5.4.0",
+                "phpstan/phpstan": "^1.12.34 || ^2.2.5",
+                "phpstan/phpstan-phpunit": "^1.4.2 || ^2.0.18",
+                "phpunit/phpunit": "^10.5.64",
+                "saschaegerer/phpstan-typo3": "^1.10.2 || ^2.1.1",
+                "sbuerk/fixture-packages": "^1.1.3",
+                "sbuerk/typo3-site-based-test-trait": "^1.0.2 || ^2.0.1",
+                "typo3/testing-framework": "^8.3.3"
+            },
+            "type": "typo3-cms-extension",
+            "extra": {
+                "typo3/cms": {
+                    "Package": {
+                        "providesPackages": []
+                    },
+                    "version": "1.0.0-dev",
+                    "web-dir": ".Build/Web",
+                    "extension-key": "theme_extension_development"
+                },
+                "branch-alias": {
+                    "1.x-dev": "1.0.x-dev"
+                },
+                "sbuerk/fixture-packages": {
+                    "paths": {
+                        "Tests/Functional/Fixtures/Extensions/*": [
+                            "autoload"
+                        ]
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SBUERK\\ThemeExtensionDevelopment\\": "Classes/",
+                    "SBUERK\\ThemeExtensionDevelopment\\Core12\\": "Core12/",
+                    "SBUERK\\ThemeExtensionDevelopment\\Core13\\": "Core13/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "sbuerk"
+                }
+            ],
+            "description": "TYPO3 frontend theme for development purposes: extension development, DDEV based test instances and acceptance tests.",
+            "homepage": "https://github.com/sbuerk/theme-extension-development",
+            "keywords": [
+                "acceptance-tests",
+                "ddev",
+                "development",
+                "frontend",
+                "testing",
+                "theme",
+                "typo3",
+                "typo3-cms-extension"
+            ],
+            "support": {
+                "issues": "https://github.com/sbuerk/theme-extension-development/issues",
+                "source": "https://github.com/sbuerk/theme-extension-development"
+            },
+            "time": "2026-08-17T09:35:18+00:00"
         },
         {
             "name": "scssphp/scssphp",
@@ -9387,7 +9515,9 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "bk2k/bootstrap-package": 20,
+        "fgtclb/academics-monorepo-dev-site": 20,
         "fgtclb/academics-monorepo-shared": 20,
+        "sbuerk/theme-extension-development": 20,
         "typo3/cms-adminpanel": 20,
         "typo3/cms-dashboard": 20,
         "typo3/cms-form": 20,

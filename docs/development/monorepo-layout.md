@@ -21,18 +21,18 @@ composer resolves the whole graph from the working tree.
 
 ## Top-level directories
 
-| Path                      | Tracked | What it is                                                                                |
-|---------------------------|---------|-------------------------------------------------------------------------------------------|
-| `packages/fgtclb/`        | yes     | The twelve extensions. One composer `typo3-cms-extension` each. Source changes go here.   |
-| `packages-dev/`           | yes     | Two meta packages that exist only for development: shared constraints and test helpers.   |
-| `Build/`                  | yes     | The test harness and every tool configuration: phpunit, phpstan, php-cs-fixer, templates. |
-| `bin/`                    | yes     | Release tooling: `bin/set-version` and `bin/release`.                                     |
-| `core-12/`, `core-13/`    | partly  | Ready-to-start development instances, one per supported core version.                     |
-| `sqlite-databases/`       | yes     | Committed database templates the development instances are seeded from.                   |
-| `patches/`                | yes     | Composer patch pool shared by both development instances. Currently only a `.gitkeep`.    |
-| `.Build/`                 | no      | Generated composer install target. Removed and rebuilt by `composerUpdate`.               |
-| `.cache/`                 | no      | Composer download cache and the phpstan result cache.                                     |
-| `documentation-rendered/` | no      | Output of the reST rendering suites, one folder per extension.                            |
+| Path                      | Tracked | What it is                                                                                        |
+|---------------------------|---------|---------------------------------------------------------------------------------------------------|
+| `packages/fgtclb/`        | yes     | The twelve extensions. One composer `typo3-cms-extension` each. Source changes go here.           |
+| `packages-dev/`           | yes     | Three packages that exist only for development: shared constraints, test helpers, instance seeds. |
+| `Build/`                  | yes     | The test harness and every tool configuration: phpunit, phpstan, php-cs-fixer, templates.         |
+| `bin/`                    | yes     | Release tooling: `bin/set-version` and `bin/release`.                                             |
+| `core-12/`, `core-13/`    | partly  | Ready-to-start development instances, one per supported core version.                             |
+| `sqlite-databases/`       | yes     | Committed database templates the development instances are seeded from.                           |
+| `patches/`                | yes     | Composer patch pool shared by both development instances. Currently only a `.gitkeep`.            |
+| `.Build/`                 | no      | Generated composer install target. Removed and rebuilt by `composerUpdate`.                       |
+| `.cache/`                 | no      | Composer download cache and the phpstan result cache.                                             |
+| `documentation-rendered/` | no      | Output of the reST rendering suites, one folder per extension.                                    |
 
 ### `packages/fgtclb/`
 
@@ -43,15 +43,22 @@ version `2.4.0-dev` on branch `2`.
 
 ### `packages-dev/`
 
-Two packages that are never released as extensions and never shipped to an
+Three packages that are never released as extensions and never shipped to an
 installation:
 
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`, type
   `library`. It centralizes the TYPO3 core dependency constraints.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`,
   type `library`. Shared functional-test traits.
+- `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key
+  `academics_dev_site`. The seed definitions the development instances are built
+  from. The only one of the three that is a `typo3-cms-extension`, because its
+  seeds are addressed as `EXT:academics_dev_site/Configuration/Seeds/*.yaml` —
+  the one path form that resolves inside DDEV and on a host stack alike.
 
-Both are covered in their own sections below.
+All three are covered in their own sections below. The third holds content
+rather than code, and how that content is applied is described in
+[Seeding an instance](environment.md#seeding-an-instance).
 
 ### `Build/`
 
@@ -81,11 +88,11 @@ Both are covered in their own sections below.
 
 `bin/set-version <version> <type>` applies a version across the whole
 repository: every extension's `composer.json`, `ext_emconf.php`, `VERSION` file
-and tailor metadata, the functional-test fixture extensions, the `packages-dev`
-meta packages, the development instances, the root `composer.json` and the
-`COMPOSER_ROOT_VERSION` assignment in `runTests.sh`. It
-discovers the package list from the repository rather than carrying one, so a
-new extension needs no change there. It only edits files; it runs no git and no
+and tailor metadata, the functional-test fixture extensions, the three
+`packages-dev` packages, the development instances, the root `composer.json`
+and the `COMPOSER_ROOT_VERSION` assignment in `runTests.sh`. It discovers the
+package list from the repository rather than carrying one, so a new extension
+needs no change there. It only edits files; it runs no git and no
 network operation.
 
 `bin/release <version>` drives the two-phase GitHub release on top of it —
@@ -100,6 +107,15 @@ core version, with DDEV project names `core12-academics-v2` and
 `core-13/.ddev/config.yaml:1`). Both run on SQLite, so no database container is
 started, and both are seeded on first start from `sqlite-databases/`.
 
+Both are themed with `bk2k/bootstrap-package` and each serves exactly one site,
+identifier `academics`, `rootPageId: 1` and `base: /`
+(`core-12/config/sites/academics/config.yaml`,
+`core-13/config/sites/academics/config.yaml`). The page tree behind that root
+page is not clicked together but described, in
+`packages-dev/dev-site/Configuration/Seeds/Instance.yaml`, and written into an
+empty instance with `ddev composer instance:seed`. Both instances use the same
+seed, so a page tree found in one is the page tree of the other.
+
 Their `config/` and `composer.lock` are tracked; `public/`, `var/`, `vendor/`
 and `config/system/additional/*.php` are not (`.gitignore`). They consume the
 extensions through path repositories pointing back at `../packages/*/*`, the
@@ -111,22 +127,30 @@ no test run depends on them.
 ### `sqlite-databases/` and `patches/`
 
 `sqlite-databases/core-12.sqlite` and `sqlite-databases/core-13.sqlite` are the
-committed database templates. Each instance restores from and backs up to its
-own file through the composer scripts `sqlite:apply` and `sqlite:backup`
-declared in `core-12/composer.json` and `core-13/composer.json`. Both call
-`Build/Scripts/sqliteSnapshot.php` rather than copying the file — see
+committed database templates. Each instance declares five composer scripts
+(`core-12/composer.json:74-98`, `core-13/composer.json:74-98`):
+`instance:fresh`, `instance:seed`, `sqlite:apply`, `sqlite:backup` and
+`system:refresh`. Of those, `sqlite:apply` and `sqlite:backup` are the ones that
+touch a template — each instance restores from and backs up to its own file, and
+both call `Build/Scripts/sqliteSnapshot.php` rather than copying it, see
 [Development environment](environment.md#snapshotting-an-instance-database-is-not-a-copy)
 for why a copy is wrong.
 
-`instance:fresh` is the third script and the only one that does not go through a
-template: it drops the database and writes the git-ignored marker
+The templates are not the accumulated result of manual backend work either. They
+are produced by seeding an empty instance from `packages-dev/dev-site` with
+`instance:seed` and backing the result up, which is what makes them
+reproducible.
+
+Two of the five scripts do not go through a template at all. `instance:fresh`
+drops the database and writes the git-ignored marker
 `core-NN/.no-database-seed`, which stops `config/system/additional.php` from
-seeding the instance again. See
+seeding the instance again; `instance:seed` writes the seed definition into the
+empty instance it leaves behind. See
 [Rebuilding an instance from nothing](environment.md#rebuilding-an-instance-from-nothing).
 
 `patches/` is the shared pool for `vaimo/composer-patches`. Both instances
 require that plugin and declare `"patches-search": "patches/"`
-(`core-12/composer.json:52`, `core-13/composer.json:52`), and each has a
+(`core-12/composer.json:54`, `core-13/composer.json:54`), and each has a
 `patches` symlink pointing at `../patches`, so a patch is written once and
 applied by both. The pool is empty at the moment and holds only a `.gitkeep` so
 git keeps the directory.
@@ -219,8 +243,8 @@ each able to drift.
 Those maps are gone. Every `composer.json` that declares a path repository also
 requires the composer plugin `sbuerk/extended-path-repository`, pinned to
 `^1.1.0` on this branch (`composer.json:15`,
-`packages-dev/monorepo-shared/composer.json:26`, `core-12/composer.json:16`,
-`core-13/composer.json:16`). The plugin extends the built-in `path` repository
+`packages-dev/monorepo-shared/composer.json:26`, `core-12/composer.json:17`,
+`core-13/composer.json:17`). The plugin extends the built-in `path` repository
 with two behaviours: it derives a path package's
 version from `composer.json` `version`, from `extra."typo3/cms".version` or
 from a sibling `VERSION` file before falling back to composer's stock
@@ -233,7 +257,7 @@ kept identical:
 - `extra.typo3/cms.version` in its `composer.json`
 - its `VERSION` file
 
-Both read `2.4.0-dev` for all twelve extensions and both `packages-dev`
+Both read `2.4.0-dev` for all twelve extensions and all three `packages-dev`
 packages on branch `2`. A release additionally bumps `version` in
 `ext_emconf.php`, which currently reads `2.4.0` everywhere — the publish
 workflow fails deliberately when the release tag and an `ext_emconf.php`
@@ -247,8 +271,17 @@ no second place to remember.
 `fgtclb/academics-monorepo-shared` requires all twelve extensions,
 `fgtclb/environment-state-manager` and the TYPO3 system extensions the
 repository needs, and it is what the root and both development instances
-require in turn (`composer.json:14`, `core-12/composer.json:15`,
-`core-13/composer.json:15`).
+require in turn (`composer.json:14`, `core-12/composer.json:16`,
+`core-13/composer.json:16`).
+
+The instances require two packages on top of it:
+`fgtclb/academics-monorepo-dev-site` for the seed definitions
+(`core-12/composer.json:15`, `core-13/composer.json:15`), which the root does
+not require at all, and `sbuerk/theme-extension-development` for the
+`theme:seed` command that applies them (`core-12/composer.json:18`,
+`core-13/composer.json:18`; the root carries it as a dev dependency,
+`composer.json:66`). The latter is required for its seeder only — its theme is
+not used, both instances are themed with `bk2k/bootstrap-package`.
 
 Its point is that the TYPO3 core constraint appears once per system extension
 rather than once per consuming package. Every `typo3/cms-*` entry in
@@ -279,6 +312,36 @@ the root. It ships three functional-test traits in
 They live in a package rather than in one extension's `Tests/` folder because
 every extension needs them and no extension may depend on another extension's
 test code. The package is development-only and is never part of a release.
+
+## `packages-dev/dev-site/` — the seed the instances are built from
+
+`fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`,
+holds the description of what a development instance contains: the page tree,
+the content elements and the records, in
+`packages-dev/dev-site/Configuration/Seeds/Instance.yaml`. Both instances
+require it and write it in with `ddev composer instance:seed`.
+
+It is the only package below `packages-dev/` with type `typo3-cms-extension`
+rather than `library`, and the extension key is the whole reason: a seed is
+addressed as `EXT:academics_dev_site/Configuration/Seeds/Instance.yaml`, which
+is the one path form that resolves the same inside DDEV and on a host stack. A
+`library` is not an installed extension, so `EXT:` could not reach it.
+
+It carries no PHP beyond the TCA override registering its static template, and
+no `Classes/`. Next to the seed it ships only the instance configuration a real
+site package would hold — `Configuration/TypoScript/` for the page template name
+of the two custom page types, and `Configuration/page.tsconfig` for the backend
+layout of the `EXT:academic_partners` page type, which that extension imports
+from its site set only and therefore not at all on TYPO3 v12. Site sets are
+deliberately not used here; the TypoScript arrives through the root
+`sys_template` record the seed writes, which works on v12 and v13 alike — see
+[Seeding an instance](environment.md#seeding-an-instance).
+
+Like its two siblings it has no `ext_emconf.php`: it is never released, never
+split out to a read-only repository and never published to the TER, so
+`bin/set-version` needs no special case for it. It is versioned along with
+everything else for one reason only — it is a path package, so its version has
+to be resolvable.
 
 ## Per-package `.gitattributes`
 
@@ -347,10 +410,10 @@ Individual deviations on top of that:
 - Five of the eight shape A files end without a trailing newline:
   `academic-base`, `academic-bite-jobs`, `academic-jobs`, `academic-projects`
   and `academic-study-plan`.
-- Neither the repository root nor the two `packages-dev` packages has a
+- Neither the repository root nor any of the three `packages-dev` packages has a
   `.gitattributes` at all. The root is a `project` that is never installed as a
-  dependency and the meta packages are development-only, so nothing generates
-  an archive from them.
+  dependency and those three are development-only, so nothing generates an
+  archive from them.
 
 Most of the files also still reference tooling this repository no longer uses
 per package — `.gitlab-ci.yml`, `.gitlab/`, `docker-compose.yaml`,
