@@ -479,22 +479,12 @@ field either, because on v12 a site's settings are inserted at the position the
 record clears, before its static includes, and every static template would
 overwrite them.
 
-On top of the extensions' own TypoScript, `packages-dev/dev-site` adds what a
-real installation would put in its site package: the page template name for the
-two custom page types, registered as a static template in
-`Configuration/TCA/Overrides/sys_template.php`. `bk2k/bootstrap-package` derives
-that name from the backend layout through `case = uppercamelcase`, which
-lowercases the whole string first, so the layout `pagets__AcademicProgram` that
-EXT:academic_programs registers resolves to `Academicprogram.html` and the
-frontend dies with an `InvalidTemplateResourceException`. Setting the name
-explicitly per page type fixes the frontend and leaves the backend layout — the
-one place the registered spelling is correct — alone.
-
-Its `Configuration/page.tsconfig` is there for the same class of reason: the
-backend layout of the `EXT:academic_partners` page type is imported by that
-extension from its site set only, so without this line the selector on a partner
-page shows a value it does not know — on v12 always, and on v13 too as long as
-these instances do not use sets.
+`packages-dev/dev-site` carried two pieces of glue on top of that for a while —
+the page template name of the custom page types, and the backend layout of the
+`EXT:academic_partners` page type. Both were workarounds for defects of those
+extensions rather than instance configuration, both are fixed at the source now
+(ACE-450, ACE-451), and both are gone. The package holds nothing but the seed
+definition again.
 
 Adding a page, a plugin or a record is therefore a reviewable diff, and
 [rebuilding the instance](#rebuilding-an-instance-from-nothing) reproduces it
