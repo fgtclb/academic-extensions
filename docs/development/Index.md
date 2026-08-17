@@ -33,6 +33,7 @@ Everything has to pass for **both** supported core versions, each after its own
 | Page                                      | Contents                                                                                                                             |
 |-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | [Development environment](environment.md) | The `runTests.sh` wrapper, container runtimes, every suite and every option.                                                         |
+| [Development instances](instances.md)     | The two DDEV instances, their accounts, what the seed puts in them, backup and restore.                                              |
 | [Monorepo layout](monorepo-layout.md)     | What each directory is for, the twelve extensions and their split repositories, extension keys, how a path package gets its version. |
 | [Dual core setup](dual-core-setup.md)     | Why the installed dependency set must match `-t`, how to check which core is installed, and how tests are scoped per version.        |
 | [Quality gates](quality-gates.md)         | Each gate and what it actually runs, PHPStan per core version, and how continuous integration stages them.                           |

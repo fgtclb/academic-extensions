@@ -19,6 +19,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | Page                                                  | Contents                                                                                                  |
 |-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | [Development environment](development/environment.md) | `runTests.sh`, container runtimes, every suite and option.                                                |
+| [Development instances](development/instances.md)     | The two DDEV instances, the backend and frontend accounts, and what the seed contains.                    |
 | [Monorepo layout](development/monorepo-layout.md)     | What each directory is, the packages and their split repositories, extension keys, path package versions. |
 | [Dual core setup](development/dual-core-setup.md)     | Running against TYPO3 v13 and v14, and the rule that avoids false positives.                              |
 | [Quality gates](development/quality-gates.md)         | Every gate and its configuration, PHPStan per core version, continuous integration.                       |
