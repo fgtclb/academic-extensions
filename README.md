@@ -164,12 +164,10 @@ empty instance. That is how a template is rebuilt when it goes stale — see
 cd core-13 && ddev start && ddev launch /typo3/
 ```
 
-The backend account shipped in both databases:
-
-```
-USERNAME: john-doe
-PASSWORD: John-Doe-1701D.
-```
+The backend admin account is `john-doe`, and the seed also creates the frontend
+user needed to look at `EXT:academic_persons_edit`. Both, and what is on which
+page, are documented in
+[Development instances](docs/development/instances.md#accounts).
 
 ### Database backup and restore
 

@@ -368,8 +368,9 @@ PHP. The instances' tracked `config/system/*.php` is still linted, on purpose.
 Do not run a gate expecting an instance to be updated, and do not fix a failing
 instance by running `composerUpdate` — that installs the root project's
 dependency tree into `.Build/`, which is a different thing entirely. Instance
-handling, DDEV project names and the branch switching collision are described in
-[`README.md`](../../README.md#development-instances).
+handling, the DDEV project names, the branch switching collision, the backend
+and frontend accounts and what the seed puts on which page are described in
+[Development instances](instances.md).
 
 ### Snapshotting an instance database is not a copy
 
