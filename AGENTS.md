@@ -299,6 +299,13 @@ install (locally and in CI). `ci.yml` caches `.cache/composer/files` — the
 content addressed dist archives only, never the stale `repo/` metadata — keyed
 per PHP and core version.
 
+That cache is a speed-up, not a safety net: it is saved only when the job
+succeeds, so a failed job leaves its key cold for the next attempt. What keeps a
+cold job from failing is the token — `ci.yml` sets `COMPOSER_AUTH` from
+`github.token` and `runTests.sh` forwards it into the container, because
+unauthenticated dist downloads are limited to 60 requests per hour and per
+runner IP while a cold install pulls some 158 archives (ACE-452).
+
 There are no `core-*.yml` workflows any more; `core-11.yml` … `core-13.yml` were
 consolidated into `ci.yml`.
 

@@ -550,6 +550,25 @@ HOST_GID=$(id -g)
 # Additional container parameters, provided by the environment. Empty unless the caller
 # exports it, which is how the portfolio harnesses inject CI specific flags.
 CI_PARAMS="${CI_PARAMS:-}"
+
+# Composer authentication, forwarded into the container it runs in.
+#
+# Composer fetches every dist archive from "api.github.com" and
+# "codeload.github.com". Unauthenticated that is 60 requests per hour and per
+# IP, and an install with a cold cache pulls some 158 archives - which is why
+# runs used to die in "composerUpdate" with "HTTP/2 429" from codeload or
+# "502"/"504" from the API, in the dependency step and never in a gate. A token
+# lifts the limit to 1000 requests per hour. The workflows set the variable from
+# their own token, see ".github/workflows/ci.yml" (ACE-452).
+#
+# The value is deliberately *not* written into the "-e" argument. A bare
+# "-e COMPOSER_AUTH" tells the runtime to take the value from this process's
+# environment, so the token never lands on a command line and cannot show up in
+# the process list of the host.
+COMPOSER_AUTH_ENV=""
+if [ -n "${COMPOSER_AUTH:-}" ]; then
+    COMPOSER_AUTH_ENV="-e COMPOSER_AUTH"
+fi
 USERSET=""
 if [ $(uname) != "Darwin" ]; then
     USERSET="--user $HOST_UID"
@@ -770,16 +789,16 @@ case ${TEST_SUITE} in
         ;;
     composer)
         COMMAND=(composer "$@")
-        ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} "${COMMAND[@]}"
+        ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${COMPOSER_AUTH_ENV} ${IMAGE_PHP} "${COMMAND[@]}"
         SUITE_EXIT_CODE=$?
         ;;
     composerUpdate)
         rm -rf .Build composer.lock composer.json.orig
         \cp -f composer.json composer.json.orig
-        ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} composer require --dev --no-update "typo3/minimal":"^${CORE_VERSION}"
+        ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${COMPOSER_AUTH_ENV} ${IMAGE_PHP} composer require --dev --no-update "typo3/minimal":"^${CORE_VERSION}"
         SUITE_EXIT_CODE=$?
         if [[ "${SUITE_EXIT_CODE}" -eq 0 ]]; then
-          ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} composer install
+          ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name composer-command-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${COMPOSER_AUTH_ENV} ${IMAGE_PHP} composer install
           SUITE_EXIT_CODE=$?
         fi
         [[ -f composer.json.orig ]] && \cp -f composer.json.orig composer.json
@@ -871,7 +890,7 @@ case ${TEST_SUITE} in
         # repository's business, and a snippet that does not parse would turn
         # this gate red for a file that is not part of the code base.
         COMMAND="find . -name \\*.php ! -path "./.Build/\\*" ! -path "./.agent/\\*" ! -path "./Build/node_modules/\\*" ! -path "./core-1\\*/vendor/\\*" ! -path "./core-1\\*/public/\\*" ! -path "./core-1\\*/var/\\*" -print0 | xargs -0 -n1 -P4 php -dxdebug.mode=off -l >/dev/null"
-        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name lint-php-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${COMPOSER_AUTH_ENV} ${IMAGE_PHP} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
         ;;
     lintMarkdown)
@@ -931,13 +950,13 @@ case ${TEST_SUITE} in
     phpstan)
         PHPSTAN_CONFIG_FILE="Build/phpstan/Core${CORE_VERSION}/phpstan.neon"
         COMMAND=(php -dxdebug.mode=off .Build/bin/phpstan analyse -c ${PHPSTAN_CONFIG_FILE} --no-progress --no-interaction --memory-limit 4G "$@")
-        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name phpstan-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} "${COMMAND[@]}"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name phpstan-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${COMPOSER_AUTH_ENV} ${IMAGE_PHP} "${COMMAND[@]}"
         SUITE_EXIT_CODE=$?
         ;;
     phpstanGenerateBaseline)
         PHPSTAN_CONFIG_FILE="Build/phpstan/Core${CORE_VERSION}/phpstan.neon"
         COMMAND=(php -dxdebug.mode=off .Build/bin/phpstan analyse -c ${PHPSTAN_CONFIG_FILE} --no-progress --no-interaction --memory-limit 4G --allow-empty-baseline --generate-baseline=Build/phpstan/Core${CORE_VERSION}/phpstan-baseline.neon)
-        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name phpstan-baseline-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${IMAGE_PHP} "${COMMAND[@]}"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name phpstan-baseline-${SUFFIX} -e COMPOSER_CACHE_DIR=.cache/composer -e COMPOSER_ROOT_VERSION=${COMPOSER_ROOT_VERSION} ${COMPOSER_AUTH_ENV} ${IMAGE_PHP} "${COMMAND[@]}"
         SUITE_EXIT_CODE=$?
         ;;
     unit)

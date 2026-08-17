@@ -72,6 +72,25 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
   cancel-in-progress: true
 
+# Composer fetches every dist archive from "api.github.com" and
+# "codeload.github.com". Unauthenticated that is 60 requests per hour and per
+# runner IP, and a job whose composer cache is cold pulls some 158 archives - so
+# runs died in the "Prepare dependencies" step with "HTTP/2 429" from codeload
+# or "502"/"504" from the API, never in a gate. The jobs that install nothing
+# passed in the same run every time, which is what identified it (ACE-452).
+#
+# A token lifts the limit to 1000 requests per hour. "github.token" rather than
+# "secrets.GITHUB_TOKEN": the two are the same installation token, and the
+# "github" context is available to a workflow level "env" block. It stays read
+# only - "permissions: contents: read" above applies to it - and a pull request
+# from a fork gets one as well, so nothing here works for branches and silently
+# fails for external contributors.
+#
+# "runTests.sh" forwards the variable into the container with a bare
+# "-e COMPOSER_AUTH", so the token is never written onto a command line.
+env:
+  COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
+
 jobs:
 
   cgl:
