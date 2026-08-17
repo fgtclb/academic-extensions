@@ -104,7 +104,7 @@ together.
 
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable.
-- `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Three of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
+- `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Four of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed definitions the DDEV instances are built from. Content and instance configuration, not code. Written into an empty instance with `ddev composer instance:seed`, which runs the `theme:seed` command of `sbuerk/theme-extension-development` — that package is required for its **seeder only**, its theme is not used. The definition delivers the instance TypoScript through one root `sys_template` record rather than through site sets, because site sets arrived in TYPO3 v13.1 and this branch also supports v12.
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
