@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but three PHP traits — the parts of the test setup that were being copied
+but four PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -10,6 +10,7 @@ necessary.
 |---------------------------------------------------------------------------------|---------------------------------------------------------------------|
 | [`ExtensionCoreVersionCompatTestsTrait`](#extensioncoreversioncompatteststrait) | Asserts the run really happens on a supported core version.         |
 | [`ExtensionsLoadedTestsTrait`](#extensionsloadedteststrait)                     | Asserts an extension resolves by package name and by extension key. |
+| [`FrontendPluginRenderingTrait`](#frontendpluginrenderingtrait)                 | The scaffolding every frontend plugin rendering test needs.         |
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
 
 ## How an extension gets access
@@ -151,6 +152,67 @@ as a `LLL:EXT:…` that does not resolve or a TCA override that never applies.
 
 **Watch out.** The trait reads `self::$expectedLoadedExtensions` but does not
 declare it. Forgetting the property is a PHP error, not a failed assertion.
+
+---
+
+## `FrontendPluginRenderingTrait`
+
+[`Classes/FunctionalTestCase/FrontendPluginRenderingTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/FrontendPluginRenderingTrait.php)
+
+**What it does.** Collects everything a plugin rendering test needs around the
+assertion — roughly sixty lines per test class before this trait existed
+(ACE-305):
+
+| Member                              | Role                                                                    |
+|-------------------------------------|-------------------------------------------------------------------------|
+| `frontendPluginTestBase()`          | `https://www.acme.com/` — the base every helper here assumes.           |
+| `frontendPluginTestConfiguration()` | The instance configuration, merged recursively with what the test adds. |
+| `addCoreExtensionsToLoad()`         | Appends to `$coreExtensionsToLoad` instead of replacing it.             |
+| `addTestExtensionsToLoad()`         | The same for `$testExtensionsToLoad`.                                   |
+| `writeFrontendPluginTestSite()`     | Writes the site `acme` with the languages the test passes.              |
+| `removeWrittenSiteConfiguration()`  | Removes it again in `tearDown()`.                                       |
+| `requestFrontendPage()`             | Fires the sub request, returns the `ResponseInterface`.                 |
+| `renderFrontendPage()`              | The same, asserts `200`, returns the body as a string.                  |
+
+**When to use it.** In every test that renders a plugin. The class must also
+`use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait` and declare its own
+`LANGUAGE_PRESETS` — which languages a test needs is part of what it tests, so
+that stays with the test.
+
+```php
+protected function setUp(): void
+{
+    $this->configurationToUseInTestInstance = $this->frontendPluginTestConfiguration();
+    $this->addCoreExtensionsToLoad('typo3/cms-fluid-styled-content');
+    parent::setUp();
+}
+
+protected function tearDown(): void
+{
+    $this->removeWrittenSiteConfiguration();
+    parent::tearDown();
+}
+```
+
+**Why the base is a method and not a constant.** This branch supports PHP 8.1,
+and constants in traits arrived in PHP 8.2. A trait constant is a fatal
+`Traits cannot have constants` there — at parse time, before any test runs, so
+it takes the whole suite down rather than one test. The `main` branch, which
+starts at PHP 8.2, declares it as a constant.
+
+**The traps it exists for.** Three, all of them silent:
+
+- `subrequestPageErrors` is switched on in the configuration. Without it the
+  frontend swallows the exception of a sub request and answers a **rendered
+  error page**, so a test asserting only the status code passes while the plugin
+  is broken. `renderFrontendPage()` asserting `200` is only meaningful because
+  of that flag.
+- A written site configuration outlives the test instance, so the next test
+  finds a site it did not write. Hence the explicit `removeWrittenSiteConfiguration()`
+  in `tearDown()`.
+- The two `add…ToLoad()` helpers exist because assigning `$testExtensionsToLoad`
+  in a subclass drops everything the abstract test case declared, and the loss
+  is not reported.
 
 ---
 
