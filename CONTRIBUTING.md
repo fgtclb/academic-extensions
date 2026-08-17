@@ -49,8 +49,9 @@ Build/Scripts/runTests.sh -t 13 -p 8.2 -s composerUpdate
 ### Looking at the extensions in a browser
 
 The test harness has no web server. For that there are two ready-to-start TYPO3
-instances at the repository root, one per supported core version, on SQLite and
-seeded from a committed database template — so they need no setup either:
+instances at the repository root, one per supported core version, on SQLite,
+themed with `bk2k/bootstrap-package` and seeded from a committed database
+template — so they need no setup either:
 
 ```bash
 cd core-13 && ddev start && ddev launch /typo3/
@@ -61,8 +62,14 @@ in and out of `sqlite-databases/` with `ddev composer sqlite:backup` and
 `sqlite:apply`, and `ddev composer instance:fresh` drops the database and stops
 the automatic seeding so an instance can be rebuilt from nothing.
 
+What those templates contain is not clicked together but described, in
+`packages-dev/dev-site/Configuration/Seeds/Instance.yaml`, and
+`ddev composer instance:seed` writes it into an empty instance — that is how a
+template is refreshed once it has gone stale.
+
 → [`README.md`](README.md#development-instances) ·
-[Development instances](docs/development/environment.md#development-instances-are-not-part-of-the-harness)
+[Development instances](docs/development/environment.md#development-instances-are-not-part-of-the-harness) ·
+[Seeding an instance](docs/development/environment.md#seeding-an-instance)
 
 ## Quality gates
 

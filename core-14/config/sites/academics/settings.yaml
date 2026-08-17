@@ -1,0 +1,31 @@
+# Site settings of the seeded site.
+#
+# Only what a development instance has to correct is set here; everything else
+# keeps the defaults of the sets listed in "config.yaml".
+page:
+  theme:
+    googleFont:
+      # Bootstrap package fetches the font from fonts.googleapis.com through a
+      # PageRenderer hook that has no try/catch, so on a machine without
+      # outbound HTTPS the first frontend request ends in a 500. A development
+      # instance has no business calling out anyway.
+      enable: false
+    cookieconsent:
+      # Nothing here sets a cookie worth consenting to, and the banner covers
+      # the page while looking at a plugin.
+      enable: false
+plugin:
+  tx_academicpersons:
+    # The detail page of the seeded tree. The plugins declare it in their
+    # FlexForm as well; this is the fallback for one added by hand later.
+    detailPid: 6
+    demand:
+      # The set ships "title", which is not one of the values the extension
+      # configuration allows ("firstName", "lastName" - see
+      # "config/system/settings.php"). An unknown value is dropped silently,
+      # which means no ordering at all.
+      sortBy: lastName
+      sortByDirection: asc
+    pagination:
+      # The set ships 1.
+      resultsPerPage: 10

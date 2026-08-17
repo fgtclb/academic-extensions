@@ -29,11 +29,13 @@ description.
 | `packages/fgtclb/typo3-category-types`   | –              | yes             |
 | `packages-dev/monorepo-shared`           | –              | –               |
 | `packages-dev/testing-helper`            | –              | –               |
+| `packages-dev/dev-site`                  | –              | –               |
 
 So: **11 `Services.yaml`, 1 `Services.php`**, and `academic-persons` is the only
-package carrying both. Three packages have neither — `academic-persons-sync`
-ships only domain models under `Classes/Domain/`, and the two `packages-dev/`
-meta packages have no `Classes/` requiring registration at all.
+package carrying both. Four packages have neither — `academic-persons-sync`
+ships only domain models under `Classes/Domain/`, and none of the three
+`packages-dev/` packages has a `Classes/` folder requiring registration at all.
+`packages-dev/dev-site/` ships no PHP at all.
 
 ### What the YAML files contain
 

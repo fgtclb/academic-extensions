@@ -144,15 +144,21 @@ after its own `composerUpdate` — see
 Two ready-to-start TYPO3 instances live at the repository root, one per supported
 core version:
 
-| Folder     | TYPO3 | DDEV project          | Seeded demo content |
-|------------|-------|-----------------------|---------------------|
-| `core-13/` | v13   | `core13-academics-v3` | styleguide          |
-| `core-14/` | v14   | `core14-academics-v3` | camino              |
+| Folder     | TYPO3 | DDEV project          | Theme               | Content                      |
+|------------|-------|-----------------------|---------------------|------------------------------|
+| `core-13/` | v13   | `core13-academics-v3` | `bootstrap_package` | `packages-dev/dev-site` seed |
+| `core-14/` | v14   | `core14-academics-v3` | `bootstrap_package` | `packages-dev/dev-site` seed |
 
 Both run on **SQLite** — no database container is started (`omit_containers: [db]`).
 Each instance is seeded on first start from the committed template in
 `sqlite-databases/`, by `config/system/additional.php`. So there is no setup step:
 check out, start, log in.
+
+What is in those templates is **described rather than clicked together**:
+`packages-dev/dev-site/Configuration/Seeds/Instance.yaml` holds the page tree,
+the content and the records, and `ddev composer instance:seed` writes it into an
+empty instance. That is how a template is rebuilt when it goes stale — see
+[Rebuilding an instance from nothing](#rebuilding-an-instance-from-nothing).
 
 ```shell
 cd core-13 && ddev start && ddev launch /typo3/

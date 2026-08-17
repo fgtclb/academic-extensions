@@ -278,8 +278,8 @@ nullability of a property meaningful, so a `?Foo $foo = null` that is really
 always set has to be justified rather than assumed.
 
 Note that `paths` is `../../../packages` only: **`packages-dev/` is not analysed
-by PHPStan**. The two shared meta packages, including the functional test traits
-in `packages-dev/testing-helper/`, are outside the gate. Keep that in mind when
+by PHPStan**. All three packages there, including the functional test traits in
+`packages-dev/testing-helper/`, are outside the gate. Keep that in mind when
 changing them — lint and the tests themselves are the only checks they get.
 
 ## See also
