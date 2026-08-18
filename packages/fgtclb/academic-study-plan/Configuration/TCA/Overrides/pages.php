@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
     ExtensionManagementUtility::registerPageTSConfigFile(
         'academic_study_plan',
-        'Configuration/TsConfig/Default.tsconfig',
+        'Configuration/TSconfig/Default.tsconfig',
         'Academic StudyPlan (Default)'
     );
 
