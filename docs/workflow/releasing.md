@@ -196,9 +196,9 @@ tag X.Y.Z pushed to fgtclb/academic-extensions
 ```
 
 **Step 1 — here.** `.github/workflows/publish.yml` triggers on any pushed tag,
-verifies its shape, installs `typo3/tailor`, then loops over
-`packages/fgtclb/*`, reads each extension key from that package's
-`composer.json` at runtime, and builds one artifact per extension. The keys are
+verifies its shape, installs `typo3/tailor` with an authenticated composer (see
+below), then loops over `packages/fgtclb/*`, reads each extension key from that
+package's `composer.json` at runtime, and builds one artifact per extension. The keys are
 read rather than derived from the directory name because they differ:
 `academic-contact4pages` ships `academic_contacts4pages`. Finally
 `softprops/action-gh-release` creates the release `[RELEASE] <version>` with
@@ -239,8 +239,22 @@ copies currently differ from only in the `actions/checkout` version (`v6` in the
 packages, `v4` in the template).
 
 Both publish workflows declare the `TYPO3_API_TOKEN` secret and grant
-`contents: write`; only the per-package one actually spends the token, in
+`contents: write`; only the per-package one actually spends that secret, in
 `ter:publish`.
+
+Both also set a workflow level `COMPOSER_AUTH` from `github.token`, because
+`composer global require typo3/tailor` runs on the runner host rather than in a
+container — [`Build/Scripts/runTests.sh`](../../Build/Scripts/runTests.sh) never
+sees it, so there is nothing to forward and the workflow has to carry the token
+itself. Unauthenticated it shares the 60 requests per hour and per runner IP
+that took out the pull-request pipeline (ACE-452), and a release fails as a
+whole rather than as one job out of twenty. `shivammathur/setup-php` writes the
+same credential into composer's `auth.json` on its own, but refuses to for the
+composer versions affected by `GHSA-f9f8-rm49-7jv2` and `tools: composer:v2` is
+a floating tag — so the explicit variable is what makes it version independent,
+and its `github-token` input is left alone because it already defaults to
+`github.token`. The same block sits in the root workflow, in all twelve package
+workflows and in the template; change them together.
 
 ## Pre-release checklist
 
