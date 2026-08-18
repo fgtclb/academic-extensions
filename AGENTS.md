@@ -270,6 +270,16 @@ cold job from failing is the token — `ci.yml` sets `COMPOSER_AUTH` from
 unauthenticated dist downloads are limited to 60 requests per hour and per
 runner IP while a cold install pulls some 158 archives (ACE-452).
 
+The release workflows carry the same variable for a related reason: they install
+`typo3/tailor` on the runner host, outside any container, so `runTests.sh` has
+nothing to forward it into and each has to set it itself — `publish.yml` at the
+repository root, the twelve `packages/fgtclb/*/.github/workflows/publish.yml`
+that are split out with their package, and
+`Build/templates/extensions/.github/workflows/publish.yml`, the template a new
+extension is created from. All fourteen carry the same block; change them
+together. Do not add `github-token` to their `shivammathur/setup-php` step —
+that input already defaults to `github.token`.
+
 There are no `core-*.yml` workflows any more; `core-11.yml` … `core-14.yml` were
 consolidated into `ci.yml`. No badge in this repository referenced them.
 

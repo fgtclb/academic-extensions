@@ -85,6 +85,10 @@ concurrency:
 #
 # "runTests.sh" forwards the variable into the container with a bare
 # "-e COMPOSER_AUTH", so the token is never written onto a command line.
+#
+# "publish.yml", the twelve package publish workflows and the template in
+# "Build/templates/extensions/" set the same variable for tooling they install
+# on the runner host, where there is no container to forward it into.
 env:
   COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ github.token }}"}}'
 
