@@ -11,4 +11,4 @@
 # set, they apply on the sites that enable it and nowhere else - which on TYPO3
 # v12 means no wizard entry at all, because there the wizard is built from page
 # TSconfig alone.
-@import 'EXT:academic_bite_jobs/Configuration/TsConfig/Wizards/*.tsconfig'
+@import 'EXT:academic_bite_jobs/Configuration/TSconfig/Wizards/*.tsconfig'

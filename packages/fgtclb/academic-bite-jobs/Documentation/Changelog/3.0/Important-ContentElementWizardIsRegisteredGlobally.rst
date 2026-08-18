@@ -8,7 +8,7 @@ Description
 ===========
 
 The new content element wizard entry of this extension is defined in
-:file:`Configuration/TsConfig/Wizards/NewContentElement.tsconfig`, and that file
+:file:`Configuration/TSconfig/Wizards/NewContentElement.tsconfig`, and that file
 was imported only by :file:`Configuration/Sets/AcademicBiteJobs/page.tsconfig`.
 
 :file:`Configuration/page.tsconfig` of an extension is auto-included for the
