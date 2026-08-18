@@ -8,6 +8,4 @@ Configuration
    :maxdepth: 5
    :titlesonly:
 
-   General/Index
-   Validations/Index
    RouteEnhancers/Index
