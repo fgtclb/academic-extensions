@@ -558,8 +558,10 @@ CI_PARAMS="${CI_PARAMS:-}"
 # IP, and an install with a cold cache pulls some 158 archives - which is why
 # runs used to die in "composerUpdate" with "HTTP/2 429" from codeload or
 # "502"/"504" from the API, in the dependency step and never in a gate. A token
-# lifts the limit to 1000 requests per hour. The workflows set the variable from
-# their own token, see ".github/workflows/ci.yml" (ACE-452).
+# lifts the limit to 1000 requests per hour. "ci.yml" sets the variable from its
+# own token and this script forwards it, see ".github/workflows/ci.yml"
+# (ACE-452). The release workflows set it too, but for tooling they install on
+# the runner host - nothing there goes through this script.
 #
 # The value is deliberately *not* written into the "-e" argument. A bare
 # "-e COMPOSER_AUTH" tells the runtime to take the value from this process's
