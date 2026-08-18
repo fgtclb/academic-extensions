@@ -102,6 +102,14 @@
         <source>Display a sortable and filterable list of academic programs.</source>
         <target>Zeigt eine sortierbare und filterbare Liste von akademischen Programmen an.</target>
       </trans-unit>
+      <trans-unit id="plugin.study_finder.title">
+        <source>Program List</source>
+        <target>Programmliste</target>
+      </trans-unit>
+      <trans-unit id="plugin.study_finder.description">
+        <source>Display a sortable and filterable list of academic programs.</source>
+        <target>Zeigt eine sortierbare und filterbare Liste von akademischen Programmen an.</target>
+      </trans-unit>
       <trans-unit id="plugin.program_details.title">
         <source>Program Details</source>
         <target>Programmdetails</target>

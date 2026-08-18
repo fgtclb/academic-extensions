@@ -30,4 +30,17 @@ defined('TYPO3') or die;
         [],
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
     );
+
+    //studyFinder
+    ExtensionUtility::configurePlugin(
+        'AcademicPrograms',
+        'StudyFinder',
+        [
+            ProgramController::class => 'list',
+        ],
+        [
+            ProgramController::class => 'list',
+        ],
+        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
+    );
 })();
