@@ -1,0 +1,14 @@
+# Page TSconfig of this extension, auto-included for the whole installation.
+#
+# TYPO3 reads "Configuration/page.tsconfig" of every active extension since
+# v12.0 (Feature: #96614). A site set does not replace that file, it adds to it
+# for the sites that enable the set - so anything an installation needs
+# regardless of its site configuration belongs here, not in the set.
+#
+# The new content element wizard in particular: it configures the entry of the
+# content element this extension registers, so its icon, its title and its
+# default values have to be found on every installation. Registered only in the
+# set, they apply on the sites that enable it and nowhere else - which on TYPO3
+# v12 means no wizard entry at all, because there the wizard is built from page
+# TSconfig alone.
+@import 'EXT:academic_bite_jobs/Configuration/TsConfig/Wizards/*.tsconfig'
