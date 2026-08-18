@@ -5,17 +5,6 @@
     xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-<f:variable
-    name="types"
-    value="{
-        0: 'degree',
-        1: 'program_type',
-        2: 'begin_program',
-        3: 'topic',
-        4: 'teaching_language',
-        5: 'costs'
-    }"
-/>
 <f:asset.script identifier="filterAjaxSubmission" src="EXT:academic_programs/Resources/Public/JavaScript/filter-ajax.js" />
 
 <f:form
@@ -28,8 +17,8 @@
     objectName="demand"
 >
     <div class="row">
-        <f:for each="{types}" as="typeKey" iteration="1">
-            <f:if condition="{categories.allCategoriesByType.{typeKey}}">
+        <f:for each="{categories.allCategoriesByType}" as="categoriesForType" key="typeKey" iteration="1">
+            <f:if condition="{f:contains(subject: settings.categoryTypes, value: typeKey)}">
                 <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                     <label for="{typeKey}" class="form-label">
                         {f:translate(key: 'sys_category.programs.{typeKey}', extensionName: 'academic_programs')}
