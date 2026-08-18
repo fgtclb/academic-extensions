@@ -47,6 +47,8 @@ trait FrontendPluginRenderingTrait
      * constants in traits arrived in PHP 8.2 - a trait constant is a fatal
      * "Traits cannot have constants" there, at parse time, before any test runs.
      * Override it in a test class that needs a different host.
+     *
+     * @return non-empty-string
      */
     protected function frontendPluginTestBase(): string
     {
