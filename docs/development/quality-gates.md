@@ -449,9 +449,16 @@ invocation in the workflow — every step is a `Build/Scripts/runTests.sh` call.
 A gate therefore cannot behave differently in CI than locally, and reproducing
 a red pipeline is a matter of copying the command from the log.
 
-The two deviations from a plain local run are both explained in the workflow
-itself: `-b docker` on every step, explained in its header comment, and the
-`composerUpdate` that precedes every job needing a vendor tree.
+The three deviations from a plain local run are all explained in the workflow
+itself: `-b docker` on every step, explained in its header comment, the
+`composerUpdate` that precedes every job needing a vendor tree, and a workflow
+level `COMPOSER_AUTH` built from `github.token`, which `runTests.sh` forwards
+into the container with a bare `-e COMPOSER_AUTH` so that a job with a cold
+composer cache is not throttled to 60 dist downloads per hour (ACE-452).
+
+The release workflows set the same variable for the same reason, but for tooling
+they install on the runner host rather than in a container — see
+[Releasing](../workflow/releasing.md).
 
 ### Why the pull-request comment is a separate workflow
 
@@ -505,6 +512,8 @@ Two consequences follow, and both have cost time before:
 - [Core version aware code](../architecture/core-version-aware-code.md)
 - [Pull requests](../workflow/pull-requests.md) — what has to be green before
   pushing, and how to read a red pipeline.
+- [Releasing](../workflow/releasing.md) — the publish workflows, and the token
+  they share with continuous integration.
 - [`AGENTS.md`](../../AGENTS.md) — the short form, including the definition of
   done.
 - [`CONTRIBUTING.md`](../../CONTRIBUTING.md)
