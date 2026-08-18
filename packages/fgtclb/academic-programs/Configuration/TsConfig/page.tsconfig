@@ -18,13 +18,13 @@ mod.wizards.newContentElement.wizardItems.academic {
         CType = academicprograms_programdetails
       }
     }
-  }
-  academicprograms_studyfinder {
-    iconIdentifier = academic-programs
-    title = LLL:EXT:academic_programs/Resources/Private/Language/locallang_be.xlf:plugin.study_finder.title
-    description = LLL:EXT:academic_programs/Resources/Private/Language/locallang_be.xlf:plugin.study_finder.description
-    tt_content_defValues {
-      CType = academicprograms_studyfinder
+    academicprograms_studyfinder {
+      iconIdentifier = academic-programs
+      title = LLL:EXT:academic_programs/Resources/Private/Language/locallang_be.xlf:plugin.study_finder.title
+      description = LLL:EXT:academic_programs/Resources/Private/Language/locallang_be.xlf:plugin.study_finder.description
+      tt_content_defValues {
+        CType = academicprograms_studyfinder
+      }
     }
   }
   show := addToList(academicprograms_programlist,academicprograms_programdetails,academicprograms_studyfinder)

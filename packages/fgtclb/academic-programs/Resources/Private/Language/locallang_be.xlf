@@ -80,6 +80,12 @@
       <trans-unit id="plugin.program_list.description">
         <source>Display a sortable and filterable list of academic programs.</source>
       </trans-unit>
+      <trans-unit id="plugin.study_finder.title">
+        <source>Studyfinder</source>
+      </trans-unit>
+      <trans-unit id="plugin.study_finder.description">
+        <source>Display a filterable list of academic programs that does't reload on changed filters.</source>
+      </trans-unit>
       <trans-unit id="plugin.program_details.title">
         <source>Program Details</source>
       </trans-unit>
