@@ -103,12 +103,16 @@
         <target>Zeigt eine sortierbare und filterbare Liste von akademischen Programmen an.</target>
       </trans-unit>
       <trans-unit id="plugin.study_finder.title">
-        <source>Program List</source>
-        <target>Programmliste</target>
+        <source>Program Finder</source>
+        <target>Studiengang Finder</target>
       </trans-unit>
       <trans-unit id="plugin.study_finder.description">
-        <source>Display a sortable and filterable list of academic programs.</source>
-        <target>Zeigt eine sortierbare und filterbare Liste von akademischen Programmen an.</target>
+        <source>Shows a short filter which pre filters the results of the selected list page</source>
+        <target>Zeigt einen kurzen Filter, der die Ergebnisse der ausgewählten Listseite vorfiltert</target>
+      </trans-unit>
+      <trans-unit id="flexform.el.listPid.label">
+        <source>List page</source>
+        <target>Listseite</target>
       </trans-unit>
       <trans-unit id="plugin.program_details.title">
         <source>Program Details</source>
