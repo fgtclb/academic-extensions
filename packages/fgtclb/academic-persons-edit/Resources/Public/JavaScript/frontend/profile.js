@@ -1,7 +1,33 @@
 const formSelector = "[data-academic-persons-inline-edit]";
+const formElement = document.querySelector(formSelector);
+const statusValues = {
+  error: {
+    title: formElement.dataset.messageErrorTitle ?? "",
+    message: formElement.dataset.messageErrorMessage ?? "",
+    class: "bg-danger",
+  },
+  success: {
+    title: formElement.dataset.messageSuccessTitle ?? "",
+    message: formElement.dataset.messageSuccessMessage ?? "",
+    class: "bg-success",
+  },
+  info: {
+    title: formElement.dataset.messageInfoTitle ?? "",
+    message: formElement.dataset.messageInfoMessage ?? "",
+    class: "bg-info",
+  },
+  warning: {
+    title: formElement.dataset.messageWarningTitle ?? "",
+    message: formElement.dataset.messageWarningMessage ?? "",
+    class: "bg-warning",
+  },
+};
 const editButtonSelector = "[data-academic-persons-inline-edit-activate-btn]";
 const fieldSelector = ".academic-persons-inline-edit__field";
-
+const statusToastSelector = "[data-ie-status-toast]";
+const statusToast = document.querySelector(statusToastSelector);
+const statusToastTitleElement = statusToast.querySelector(".status-title");
+const statusToastMessageElement = statusToast.querySelector(".status-message");
 const getFieldValue = (field) => {
   if (field instanceof HTMLInputElement && field.type === "checkbox") {
     return field.checked;
@@ -9,15 +35,19 @@ const getFieldValue = (field) => {
   return field.value;
 };
 
-const showStatus = (statusElement, message, type) => {
-  statusElement.classList.remove(
+const showStatus = (type) => {
+  statusToast.classList.remove(
     "d-none",
-    "alert-info",
-    "alert-success",
-    "alert-danger",
+    "bg-info",
+    "bg-success",
+    "bg-danger",
+    "bg-warning",
   );
-  statusElement.classList.add(`alert-${type}`);
-  statusElement.textContent = message;
+  statusToast.classList.add(statusValues[type].class);
+  statusToastTitleElement.innerHTML = statusValues[type].title;
+  statusToastMessageElement.innerHTML = statusValues[type].message;
+  const toast = new bootstrap.Toast(statusToast);
+  toast.show();
 };
 
 const clearValidationErrors = (fields) => {
@@ -27,7 +57,7 @@ const clearValidationErrors = (fields) => {
       .closest(".mb-3, .form-check")
       ?.querySelector(".invalid-feedback");
     if (feedback !== null && feedback !== void 0) {
-      feedback.textContent = "";
+      feedback.innerHTML = "";
     }
   });
 };
@@ -45,12 +75,13 @@ const showValidationErrors = (fields, errors) => {
       .closest(".mb-3, .form-check")
       ?.querySelector(".invalid-feedback");
     if (feedback !== null && feedback !== void 0) {
-      feedback.textContent = Array.isArray(messages)
+      feedback.innerHTML = Array.isArray(messages)
         ? messages.join(" ")
         : String(messages);
     }
   });
 };
+
 document.querySelectorAll(editButtonSelector).forEach((button) => {
   button.addEventListener("click", (event) => {
     event.preventDefault();
@@ -83,15 +114,8 @@ document.querySelectorAll(editButtonSelector).forEach((button) => {
     });
   });
 });
-document.querySelectorAll(formSelector).forEach((form) => {
-  const statusElement = form.querySelector("[data-inline-profile-status]");
-  if (
-    !(form instanceof HTMLFormElement) ||
-    !(statusElement instanceof HTMLElement)
-  ) {
-    return;
-  }
 
+document.querySelectorAll(formSelector).forEach((form) => {
   const fields = Array.from(form.querySelectorAll(fieldSelector)).filter(
     (field) =>
       field instanceof HTMLInputElement ||
@@ -101,7 +125,6 @@ document.querySelectorAll(formSelector).forEach((form) => {
   const initialValues = new Map(
     fields.map((field) => [field.name, getFieldValue(field)]),
   );
-  const submitButton = form.querySelector('button[type="submit"]');
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -116,7 +139,7 @@ document.querySelectorAll(formSelector).forEach((form) => {
     });
 
     if (Object.keys(data).length === 0) {
-      showStatus(statusElement, form.dataset.messageUnchanged ?? "", "info");
+      showStatus("info");
       return;
     }
 
@@ -127,15 +150,12 @@ document.querySelectorAll(formSelector).forEach((form) => {
       profileUid <= 0 ||
       updateUrl === void 0
     ) {
-      showStatus(statusElement, form.dataset.messageError ?? "", "danger");
+      showStatus("danger");
       return;
     }
 
     form.setAttribute("aria-busy", "true");
-    if (submitButton instanceof HTMLButtonElement) {
-      submitButton.disabled = true;
-    }
-    showStatus(statusElement, form.dataset.messageSaving ?? "", "info");
+    showStatus("info");
 
     try {
       const response = await fetch(updateUrl, {
@@ -155,15 +175,10 @@ document.querySelectorAll(formSelector).forEach((form) => {
       if (!response.ok || result?.success !== true) {
         if (result?.errors !== void 0 && typeof result.errors === "object") {
           showValidationErrors(fields, result.errors);
-          showStatus(
-            statusElement,
-            form.dataset.messageValidation ?? "",
-            "danger",
-          );
+          showStatus("danger");
         } else {
           showStatus(
-            statusElement,
-            result?.message ?? form.dataset.messageError ?? "",
+            result?.message ?? form.dataset?.messageErrorMessage ?? "",
             "danger",
           );
         }
@@ -173,14 +188,11 @@ document.querySelectorAll(formSelector).forEach((form) => {
       Object.keys(data).forEach((propertyName) => {
         initialValues.set(propertyName, data[propertyName]);
       });
-      showStatus(statusElement, form.dataset.messageSuccess ?? "", "success");
+      showStatus("success");
     } catch {
-      showStatus(statusElement, form.dataset.messageError ?? "", "danger");
+      showStatus("danger");
     } finally {
       form.removeAttribute("aria-busy");
-      if (submitButton instanceof HTMLButtonElement) {
-        submitButton.disabled = false;
-      }
     }
   });
 });
