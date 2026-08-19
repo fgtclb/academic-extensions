@@ -78,7 +78,6 @@ final class InlineProfileController extends AbstractActionController
     {
         $frontendUserId = (int) $this->context->getPropertyFromAspect('frontend.user', 'id', 0);
         $profile = $this->profileRepository->findByIdentifier($frontendUserId);
-
         $genderOptions = [];
         foreach ($this->profileGenderOptionsService->getAllowedValues() as $genderValue) {
             $genderOptions[$genderValue] = $genderValue;
