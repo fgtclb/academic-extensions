@@ -58,6 +58,14 @@
         <source>Plugin for editing profiles in the frontend</source>
         <target>Plugin zur Bearbeitung von Profilen im Frontend</target>
       </trans-unit>
+        <trans-unit id="newContentElement.wizardItems.academic.inlineEditing.title">
+        <source>Academic Persons Inline Editing</source>
+        <target>Akademische Personen Inline Bearbeitung</target>
+      </trans-unit>
+      <trans-unit id="newContentElement.wizardItems.academic.inlineEditing.description">
+        <source>Plugin for inline editing of profiles in the frontend</source>
+        <target>Plugin zur Inline-Bearbeitung von Profilen im Frontend</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

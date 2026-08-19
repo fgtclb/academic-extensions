@@ -7,12 +7,14 @@
     date="2015-11-10T06:53:10Z"
     product-name="academic_persons_edit"
   >
-    <header/>
+    <header />
     <body>
       <trans-unit id="plugin.profile_editing.label">
         <source>Profiles: Profile Editing</source>
       </trans-unit>
-
+      <trans-unit id="plugin.profile_inlineediting.label">
+        <source>Profiles: Inline Editing</source>
+      </trans-unit>
       <trans-unit id="extension_configuration.profile.autoCreateProfiles.label">
         <source>Deprecated and no effect. See EXT:academic_persons > autoCreateProfiles</source>
       </trans-unit>
@@ -29,7 +31,8 @@
       <trans-unit id="fe_users.tabs.tx_academicpersons_profiles.label">
         <source>Profiles</source>
       </trans-unit>
-      <trans-unit id="fe_users.columns.tx_extbase_type.items.Tx_AcademicPersonsEdit_Domain_Model_FrontendUser">
+      <trans-unit
+        id="fe_users.columns.tx_extbase_type.items.Tx_AcademicPersonsEdit_Domain_Model_FrontendUser">
         <source>Academic Persons: User</source>
       </trans-unit>
 
@@ -45,6 +48,12 @@
       </trans-unit>
       <trans-unit id="newContentElement.wizardItems.academic.profileEditing.description">
         <source>Plugin for editing profiles in the frontend</source>
+      </trans-unit>
+      <trans-unit id="newContentElement.wizardItems.academic.inlineEditing.title">
+        <source>Academic Persons Inline Editing</source>
+      </trans-unit>
+      <trans-unit id="newContentElement.wizardItems.academic.inlineEditing.description">
+        <source>Plugin for inline editing of profiles in the frontend</source>
       </trans-unit>
     </body>
   </file>
