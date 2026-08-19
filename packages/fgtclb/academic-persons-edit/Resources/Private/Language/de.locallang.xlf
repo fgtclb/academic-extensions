@@ -540,6 +540,61 @@
         <target>Typ</target>
       </trans-unit>
 
+      <!-- Inline profile editing -->
+
+      <trans-unit id="inlineProfile.heading">
+        <source>Edit profile</source>
+        <target>Profil bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.introduction">
+        <source>Only changed fields are submitted. The page is not reloaded when saving.</source>
+        <target>Es werden nur geänderte Felder übertragen. Beim Speichern wird die Seite nicht neu geladen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.personal">
+        <source>Personal data</source>
+        <target>Persönliche Daten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.links">
+        <source>Links</source>
+        <target>Links</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.content">
+        <source>Profile content</source>
+        <target>Profilinhalte</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.settings">
+        <source>Settings</source>
+        <target>Einstellungen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.saving">
+        <source>Saving changes…</source>
+        <target>Änderungen werden gespeichert…</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.success">
+        <source>The profile has been updated.</source>
+        <target>Das Profil wurde aktualisiert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.error">
+        <source>The profile could not be updated. Please try again.</source>
+        <target>Das Profil konnte nicht aktualisiert werden. Bitte erneut versuchen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.validation">
+        <source>Please check the highlighted fields.</source>
+        <target>Bitte die markierten Felder überprüfen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.unchanged">
+        <source>There are no changes to save.</source>
+        <target>Es sind keine Änderungen zu speichern.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.noProfile">
+        <source>No editable profile is assigned to the current frontend user.</source>
+        <target>Dem aktuellen Frontend-Benutzer ist kein bearbeitbares Profil zugeordnet.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.contract.unnamed">
+        <source>Contract without position</source>
+        <target>Vertrag ohne Positionsangabe</target>
+      </trans-unit>
+
       <!-- Action buttons -->
 
       <trans-unit id="actions.view">

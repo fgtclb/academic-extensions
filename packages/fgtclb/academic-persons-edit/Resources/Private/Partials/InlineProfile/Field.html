@@ -1,0 +1,63 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:p="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:variable
+    name="validation"
+><p:validationEnsure
+    validations="{validations}"
+    identifier="{identifier}"
+/></f:variable>
+
+<f:variable
+    name="elementId"
+    value="inline-profile-{profile.uid}-{identifier}"
+/>
+
+<div class="{columnClass}">
+    <div class="mb-3">
+        <label class="form-label" for="{elementId}">
+            {f:translate(key: 'profile.{identifier}.label', extensionName: 'academic_persons_edit')}
+            <f:if condition="{validation.required}">
+                <abbr title="required">*</abbr>
+            </f:if>
+        </label>
+
+        <f:if condition="{textarea}">
+            <f:then>
+                <f:form.textarea
+                    name="{identifier}"
+                    id="{elementId}"
+                    value="{profile.{identifier}}"
+                    class="form-control academic-persons-inline-edit__field"
+                    rows="{rows}"
+                    placeholder="{f:translate(key: 'profile.{identifier}.placeholder', extensionName: 'academic_persons_edit')}"
+                    disabled="{validation.disabled}"
+                    readonly="{validation.readOnly}"
+                    required="{validation.required}"
+                />
+            </f:then>
+            <f:else>
+                <f:form.textfield
+                    name="{identifier}"
+                    id="{elementId}"
+                    value="{profile.{identifier}}"
+                    type="{validation.inputType ? validation.inputType : 'text'}"
+                    class="form-control academic-persons-inline-edit__field"
+                    placeholder="{f:translate(key: 'profile.{identifier}.placeholder', extensionName: 'academic_persons_edit')}"
+                    autocomplete="{autocomplete}"
+                    disabled="{validation.disabled}"
+                    readonly="{validation.readOnly}"
+                    required="{validation.required}"
+                />
+            </f:else>
+        </f:if>
+
+        <div class="invalid-feedback"></div>
+    </div>
+</div>
+
+</html>
