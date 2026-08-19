@@ -573,13 +573,33 @@
         <source>Saving changes…</source>
         <target>Änderungen werden gespeichert…</target>
       </trans-unit>
-      <trans-unit id="inlineProfile.status.success">
+      <trans-unit id="inlineProfile.status.success.message">
         <source>The profile has been updated.</source>
         <target>Das Profil wurde aktualisiert.</target>
       </trans-unit>
-      <trans-unit id="inlineProfile.status.error">
+      <trans-unit id="inlineProfile.status.error.message">
         <source>The profile could not be updated. Please try again.</source>
         <target>Das Profil konnte nicht aktualisiert werden. Bitte erneut versuchen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.info.message">
+        <source>No changes where made. Please check your changes.</source>
+        <target>Es wurden keine Änderungen vorgenommen. Bitte überprüfen Sie Ihre Änderungen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.success.title">
+        <source>Success</source>
+        <target>Erfolg</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.error.title">
+        <source>Error</source>
+        <target>Fehler</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.info.title">
+        <source>Info</source>
+        <target>Info</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.warning.title">
+        <source>Warning</source>
+        <target>Warning</target>
       </trans-unit>
       <trans-unit id="inlineProfile.status.validation">
         <source>Please check the highlighted fields.</source>

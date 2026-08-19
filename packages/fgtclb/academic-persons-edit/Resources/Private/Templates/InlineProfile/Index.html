@@ -32,8 +32,13 @@
                     data-update-url="{updateUrl}"
                     data-profile-uid="{profile.uid}"
                     data-message-saving="{f:translate(key: 'inlineProfile.status.saving', extensionName: 'academic_persons_edit')}"
-                    data-message-success="{f:translate(key: 'inlineProfile.status.success', extensionName: 'academic_persons_edit')}"
-                    data-message-error="{f:translate(key: 'inlineProfile.status.error', extensionName: 'academic_persons_edit')}"
+                    data-message-success-message="{f:translate(key: 'inlineProfile.status.success.message', extensionName: 'academic_persons_edit')}"
+                    data-message-error-message="{f:translate(key: 'inlineProfile.status.error.message', extensionName: 'academic_persons_edit')}"
+                    data-message-error-title="{f:translate(key: 'inlineProfile.status.error.title', extensionName: 'academic_persons_edit')}"
+                    data-message-success-title="{f:translate(key: 'inlineProfile.status.success.title', extensionName: 'academic_persons_edit')}"
+                    data-message-info-title="{f:translate(key: 'inlineProfile.status.info.title', extensionName: 'academic_persons_edit')}"
+                    data-message-info-message="{f:translate(key: 'inlineProfile.status.info.message', extensionName: 'academic_persons_edit')}"
+                    data-message-warning-title="{f:translate(key: 'inlineProfile.status.warning.title', extensionName: 'academic_persons_edit')}"
                     data-message-validation="{f:translate(key: 'inlineProfile.status.validation', extensionName: 'academic_persons_edit')}"
                     data-message-unchanged="{f:translate(key: 'inlineProfile.status.unchanged', extensionName: 'academic_persons_edit')}"
                 >
@@ -48,13 +53,6 @@
                         </p>
                     </header>
 
-                    <div
-                        class="alert d-none"
-                        role="status"
-                        aria-live="polite"
-                        data-inline-profile-status
-                    ></div>
-
                     <div class="row g-4">
                         <div class="col-12 col-lg-4">
                             <div class="card h-100">
@@ -67,9 +65,7 @@
                             </div>
                         </div>
 
-                        <div
-                            class="col-12 col-lg-8"
-                        >
+                        <div class="col-12 col-lg-8">
                             <fieldset class="card h-100">
                                 <div class="card-body">
                                     <legend class="h5">
@@ -315,4 +311,23 @@
             </div>
         </f:else>
     </f:if>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div data-ie-status-toast
+            class="toast"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+        >
+            <div class="toast-header">
+                <strong class="me-auto status-title">Bootstrap</strong>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="toast"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="toast-body status-message">Hello, world! This is a toast message.</div>
+        </div>
+    </div>
 </html>

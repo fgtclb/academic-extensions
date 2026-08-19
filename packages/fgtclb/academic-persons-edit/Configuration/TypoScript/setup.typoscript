@@ -38,7 +38,7 @@ academicPersonsInlineAjax {
         admPanel = 0
         debug = 0
         disablePrefixComment = 1
-
+        no_cache = 1
         additionalHeaders.10 {
             header = Content-Type: application/json
             replace = 1

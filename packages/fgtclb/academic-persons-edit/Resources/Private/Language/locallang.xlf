@@ -439,11 +439,26 @@
       <trans-unit id="inlineProfile.status.saving">
         <source>Saving changes…</source>
       </trans-unit>
-      <trans-unit id="inlineProfile.status.success">
+      <trans-unit id="inlineProfile.status.success.message">
         <source>The profile has been updated.</source>
       </trans-unit>
-      <trans-unit id="inlineProfile.status.error">
+      <trans-unit id="inlineProfile.status.error.message">
         <source>The profile could not be updated. Please try again.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.info.message">
+        <source>No changes where made. Please check your changes.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.success.title">
+        <source>Success</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.error.title">
+        <source>Error</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.info.title">
+        <source>Info</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.warning.title">
+        <source>Warning</source>
       </trans-unit>
       <trans-unit id="inlineProfile.status.validation">
         <source>Please check the highlighted fields.</source>
