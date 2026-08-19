@@ -56,26 +56,19 @@
                     ></div>
 
                     <div class="row g-4">
-                        <f:if condition="{profile.image}">
-                            <div class="col-12 col-lg-4">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h3 class="h5 card-title">
-                                            {f:translate(key: 'profile.image',
-                                            extensionName:
-                                            'academic_persons_edit')}
-                                        </h3>
-                                        <f:render
-                                            partial="Profile/Show/Image"
-                                            arguments="{profile: profile}"
-                                        />
-                                    </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <f:render
+                                        partial="Profile/Show/Image"
+                                        arguments="{profile: profile}"
+                                    />
                                 </div>
                             </div>
-                        </f:if>
+                        </div>
 
                         <div
-                            class="col-12{f:if(condition: profile.image, then: ' col-lg-8')}"
+                            class="col-12 col-lg-8"
                         >
                             <fieldset class="card h-100">
                                 <div class="card-body">
@@ -118,7 +111,7 @@
                                                         <f:form.select
                                                             name="gender"
                                                             id="inline-profile-{profile.uid}-gender"
-                                                            class="form-select academic-persons-inline-edit__field"
+                                                            class="form-select form-select-sm academic-persons-inline-edit__field"
                                                             options="{genderOptions}"
                                                             value="{profile.gender}"
                                                             prependOptionLabel="---"
@@ -130,7 +123,7 @@
                                                         <f:form.select
                                                             name="gender"
                                                             id="inline-profile-{profile.uid}-gender"
-                                                            class="form-select academic-persons-inline-edit__field"
+                                                            class="form-select form-select-sm academic-persons-inline-edit__field"
                                                             options="{genderOptions}"
                                                             value="{profile.gender}"
                                                             prependOptionLabel="---"
@@ -297,9 +290,13 @@
                     </fieldset>
 
                     <div
-                        class="d-flex flex-wrap gap-2 justify-content-end mt-4"
+                        class="d-flex flex-wrap gap-2 justify-content-end mt-4 d-none"
                     >
-                        <button class="btn btn-outline-danger disabled" disabled type="reset">
+                        <button
+                            class="btn btn-outline-danger disabled"
+                            disabled
+                            type="reset"
+                        >
                             {f:translate(key: 'actions.cancel', extensionName:
                             'academic_persons_edit')}
                         </button>

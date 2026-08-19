@@ -7,7 +7,7 @@
     date="2015-11-10T06:53:10Z"
     product-name="academic_persons_edit"
   >
-    <header/>
+    <header />
     <body>
       <trans-unit id="back">
         <source>back</source>
@@ -256,7 +256,8 @@
         <source>Disable profile sync</source>
       </trans-unit>
       <trans-unit id="profile.skipSync.description">
-        <source>Disabling the profile synchronization will prevent automatic updates from external sources.</source>
+        <source>Disabling the profile synchronization will prevent automatic updates from external
+          sources.</source>
       </trans-unit>
 
       <!-- Profile information fields -->
@@ -455,6 +456,9 @@
       </trans-unit>
       <trans-unit id="inlineProfile.contract.unnamed">
         <source>Contract without position</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.user_image_not_available">
+        <source>To edit userimage, please click here.</source>
       </trans-unit>
 
       <!-- Action buttons -->
