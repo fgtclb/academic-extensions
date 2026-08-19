@@ -28,5 +28,13 @@ use FGTCLB\AcademicBase\TcaManipulator;
         ],
         'academic_persons_edit'
     );
-
+    (new TcaManipulator())->addContentElementPlugin(
+        [
+            'label' => 'LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_be.xlf:plugin.profile_inlineediting.label',
+            'value' => 'academicpersonsedit_inlineprofile',
+            'icon' => 'persons_edit_icon',
+            'group' => 'academic',
+        ],
+        'academic_persons_edit'
+    );
 })();

@@ -11,3 +11,17 @@ mod.wizards.newContentElement.wizardItems.academic {
   }
   show := addToList(academicpersonsedit_profileediting)
 }
+
+mod.wizards.newContentElement.wizardItems.academic {
+  elements {
+    academicpersonsedit_inlineprofile {
+      iconIdentifier = persons_edit_icon
+      title = LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_be.xlf:newContentElement.wizardItems.academic.inlineEditing.title
+      description = LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_be.xlf:newContentElement.wizardItems.academic.inlineEditing.description
+      tt_content_defValues {
+        CType = academicpersonsedit_inlineprofile
+      }
+    }
+  }
+  show := addToList(academicpersonsedit_inlineprofile)
+}

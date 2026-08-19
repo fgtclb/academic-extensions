@@ -27,3 +27,21 @@ plugin.tx_academicpersonsedit {
     }
   }
 }
+academicPersonsInlineAjax = PAGE
+academicPersonsInlineAjax {
+    typeNum = 1733735
+
+    10 < tt_content.academicpersonsedit_inlineprofile.20
+
+    config {
+        disableAllHeaderCode = 1
+        admPanel = 0
+        debug = 0
+        disablePrefixComment = 1
+
+        additionalHeaders.10 {
+            header = Content-Type: application/json
+            replace = 1
+        }
+    }
+}
