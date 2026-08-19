@@ -78,16 +78,11 @@ final class InlineProfileController extends AbstractActionController
     {
         $frontendUserId = (int) $this->context->getPropertyFromAspect('frontend.user', 'id', 0);
         $profile = $this->profileRepository->findByIdentifier($frontendUserId);
-        $genderOptions = [];
-        foreach ($this->profileGenderOptionsService->getAllowedValues() as $genderValue) {
-            $genderOptions[$genderValue] = $genderValue;
-        }
-
         $this->view->assignMultiple([
             'data' => $this->getCurrentContentObjectRenderer()?->data,
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
             'profile' => $profile,
-            'genderOptions' => $genderOptions,
+            'genderOptions' => $this->profileGenderOptionsService->getAllowedValues(),
             'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('profile')->validations,
         ]);
         return $this->htmlResponse();
