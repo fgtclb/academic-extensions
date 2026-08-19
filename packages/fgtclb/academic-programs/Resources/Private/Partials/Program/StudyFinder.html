@@ -1,0 +1,63 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:ct="http://typo3.org/ns/FGTCLB/CategoryTypes/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+<f:asset.script
+    identifier="studyfinderCategoryAvailability"
+    src="EXT:academic_programs/Resources/Public/JavaScript/filter-category-availability.js"
+/>
+<f:form
+    id="studyfinder"
+    action="list"
+    controller="Program"
+    pluginName="studyfinder"
+    object="{demand}"
+    name="demand"
+    objectName="demand"
+>
+    <div class="row">
+        <f:for each="{categories.allCategoriesByType}" as="categoriesForType" key="typeKey" iteration="1">
+            <f:if condition="{f:contains(subject: settings.categoryTypes, value: typeKey)}">
+                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <label for="{typeKey}" class="form-label">
+                        {f:translate(key: 'sys_category.programs.{typeKey}', extensionName: 'academic_programs')}
+                    </label>
+                    <ct:form.filterSelect
+                        id="{typeKey}"
+                        property="filterCollection.{typeKey}"
+                        value="{demand.filterCollection.filterCategories.{typeKey}}"
+                        options="{categoriesForType}"
+                        optionValueField="uid"
+                        optionLabelField="title"
+                        prependOptionLabel="{f:translate(
+                                key: 'sys_category.programs.allOptions',
+                                extensionName: 'academic_programs'
+                            )}"
+                        prependOptionValue=""
+                        class="form-select"
+                    />
+                </div>
+            </f:if>
+        </f:for>
+    </div>
+</f:form>
+<f:form
+    action="list"
+    controller="Program"
+    pluginName="programlist"
+    pageUid="{settings.listPid}"
+    object="{demand}"
+    name="demand"
+    objectName="demand"
+    additionalAttributes="{'data-turbo': 'false'}"
+>
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <button type="submit" class="btn btn-blue">
+            find {f:translate(key: 'find.program', extensionName: 'academic_programs')}
+        </button>
+    </div>
+</f:form>
+</html>
