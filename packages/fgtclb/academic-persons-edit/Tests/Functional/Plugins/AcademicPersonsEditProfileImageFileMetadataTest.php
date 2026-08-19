@@ -46,7 +46,7 @@ final class AcademicPersonsEditProfileImageFileMetadataTest extends AbstractProf
             $this->fail('The profile detail view rendered no <figure> element for the profile image.');
         }
 
-        return $matches[0];
+        return $this->clearHtmlString($matches[0]);
     }
 
     #[Test]
@@ -82,7 +82,6 @@ final class AcademicPersonsEditProfileImageFileMetadataTest extends AbstractProf
         ]);
 
         $figure = $this->getRenderedFigure();
-
         $this->assertStringContainsString(
             'alt="Portrait of the profile owner"',
             $figure,
