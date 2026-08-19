@@ -1,4 +1,5 @@
 const formSelector = "[data-academic-persons-inline-edit]";
+const editButtonSelector = "[data-academic-persons-inline-edit-activate-btn]";
 const fieldSelector = ".academic-persons-inline-edit__field";
 
 const getFieldValue = (field) => {
@@ -13,7 +14,7 @@ const showStatus = (statusElement, message, type) => {
     "d-none",
     "alert-info",
     "alert-success",
-    "alert-danger"
+    "alert-danger",
   );
   statusElement.classList.add(`alert-${type}`);
   statusElement.textContent = message;
@@ -22,7 +23,9 @@ const showStatus = (statusElement, message, type) => {
 const clearValidationErrors = (fields) => {
   fields.forEach((field) => {
     field.classList.remove("is-invalid");
-    const feedback = field.closest(".mb-3, .form-check")?.querySelector(".invalid-feedback");
+    const feedback = field
+      .closest(".mb-3, .form-check")
+      ?.querySelector(".invalid-feedback");
     if (feedback !== null && feedback !== void 0) {
       feedback.textContent = "";
     }
@@ -38,26 +41,65 @@ const showValidationErrors = (fields, errors) => {
     }
 
     field.classList.add("is-invalid");
-    const feedback = field.closest(".mb-3, .form-check")?.querySelector(".invalid-feedback");
+    const feedback = field
+      .closest(".mb-3, .form-check")
+      ?.querySelector(".invalid-feedback");
     if (feedback !== null && feedback !== void 0) {
-      feedback.textContent = Array.isArray(messages) ? messages.join(" ") : String(messages);
+      feedback.textContent = Array.isArray(messages)
+        ? messages.join(" ")
+        : String(messages);
     }
   });
 };
+document.querySelectorAll(editButtonSelector).forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    const targetElementName = button.dataset.ieFor;
+    if (targetElementName === void 0) {
+      return;
+    }
 
+    const inputElement = document.querySelector(`[id="${targetElementName}"]`);
+    if (
+      !(
+        inputElement instanceof HTMLInputElement ||
+        inputElement instanceof HTMLSelectElement ||
+        inputElement instanceof HTMLTextAreaElement
+      )
+    ) {
+      return;
+    }
+    const dismissButtonSelector = `[data-ie-dismiss][data-ie-for="${targetElementName}"]`;
+    const saveButtonSelector = `[data-ie-save][data-ie-for="${targetElementName}"]`;
+    inputElement.classList.remove("d-none");
+    button.classList.add("d-none");
+    document
+      .querySelectorAll(dismissButtonSelector)
+      .forEach((dismissButton) => {
+        dismissButton.classList.remove("d-none");
+      });
+    document.querySelectorAll(saveButtonSelector).forEach((saveButton) => {
+      saveButton.classList.remove("d-none");
+    });
+  });
+});
 document.querySelectorAll(formSelector).forEach((form) => {
   const statusElement = form.querySelector("[data-inline-profile-status]");
-  if (!(form instanceof HTMLFormElement) || !(statusElement instanceof HTMLElement)) {
+  if (
+    !(form instanceof HTMLFormElement) ||
+    !(statusElement instanceof HTMLElement)
+  ) {
     return;
   }
 
   const fields = Array.from(form.querySelectorAll(fieldSelector)).filter(
-    (field) => field instanceof HTMLInputElement
-      || field instanceof HTMLSelectElement
-      || field instanceof HTMLTextAreaElement
+    (field) =>
+      field instanceof HTMLInputElement ||
+      field instanceof HTMLSelectElement ||
+      field instanceof HTMLTextAreaElement,
   );
   const initialValues = new Map(
-    fields.map((field) => [field.name, getFieldValue(field)])
+    fields.map((field) => [field.name, getFieldValue(field)]),
   );
   const submitButton = form.querySelector('button[type="submit"]');
 
@@ -80,7 +122,11 @@ document.querySelectorAll(formSelector).forEach((form) => {
 
     const profileUid = Number.parseInt(form.dataset.profileUid ?? "", 10);
     const updateUrl = form.dataset.updateUrl;
-    if (!Number.isInteger(profileUid) || profileUid <= 0 || updateUrl === void 0) {
+    if (
+      !Number.isInteger(profileUid) ||
+      profileUid <= 0 ||
+      updateUrl === void 0
+    ) {
       showStatus(statusElement, form.dataset.messageError ?? "", "danger");
       return;
     }
@@ -97,24 +143,28 @@ document.querySelectorAll(formSelector).forEach((form) => {
         credentials: "same-origin",
         headers: {
           Accept: "application/json",
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           profile: profileUid,
-          data
-        })
+          data,
+        }),
       });
       const result = await response.json().catch(() => null);
 
       if (!response.ok || result?.success !== true) {
         if (result?.errors !== void 0 && typeof result.errors === "object") {
           showValidationErrors(fields, result.errors);
-          showStatus(statusElement, form.dataset.messageValidation ?? "", "danger");
+          showStatus(
+            statusElement,
+            form.dataset.messageValidation ?? "",
+            "danger",
+          );
         } else {
           showStatus(
             statusElement,
             result?.message ?? form.dataset.messageError ?? "",
-            "danger"
+            "danger",
           );
         }
         return;
