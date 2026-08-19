@@ -1,51 +1,56 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('studyfinder');
+    const form = document.getElementById('academic-programs-filtersorting');
+    const results = document.getElementById('studyfinder-results');
 
-  if (!form) return;
+    if (!form || !results) {
+        return;
+    }
+    const updateResults = async () => {
+        const formData = new FormData(form);
 
-  const targetUrl = form.action;
-  const results = document.getElementById('studyfinder-results');
-  if (!results) return;
-  form.querySelectorAll('select').forEach(select => {
-    select.addEventListener('change', async() => {
-      const formData = new FormData(form);
+        form.classList.add('is-loading');
 
-      form.classList.add('is-loading');
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
 
-      try {
-        const response = await fetch(targetUrl, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        });
+            if (!response.ok) {
+                throw new Error(`Server Error: ${response.status}`);
+            }
 
-        if (!response.ok) {
-          throw new Error(`Server Error: ${response.status}`);
+            const html = await response.text();
+
+            const virtualDocument = new DOMParser().parseFromString(
+                html,
+                'text/html'
+            );
+
+            const returnedResults = virtualDocument.querySelector(
+                '#studyfinder-results'
+            );
+
+            if (returnedResults) {
+                results.replaceWith(returnedResults);
+            }
+        } catch (error) {
+            console.error(
+                'Academic programs AJAX filter failed:',
+                error
+            );
+        } finally {
+            form.classList.remove('is-loading');
         }
+    };
 
-        const htmlContent = await response.text();
+  form.querySelectorAll('select').forEach((select) => {
 
-        const parser = new DOMParser();
-        const virtualDocument = parser.parseFromString(
-          htmlContent,
-          'text/html'
-        );
-
-        const filteredResults = virtualDocument.querySelector(
-          '#studyfinder-results'
-        );
-
-        if (filteredResults) {
-          results.innerHTML = filteredResults.innerHTML;
-        }
-
-      } catch (error) {
-        console.error('Fehler beim AJAX-Filter:', error);
-      } finally {
-        form.classList.remove('is-loading');
-      }
+    select.addEventListener('change', () => {
+      updateResults();
     });
   });
-})
+});

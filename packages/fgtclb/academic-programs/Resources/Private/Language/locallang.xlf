@@ -105,6 +105,12 @@
         <source>Performance scope</source>
         <target>Leistungsumfang</target>
       </trans-unit>
+
+      <!-- Find -->
+
+      <trans-unit id="find.program">
+        <source>Find program</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

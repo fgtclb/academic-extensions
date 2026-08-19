@@ -15,9 +15,8 @@
                     <required>1</required>
                 </config>
             </settings.listPid>
-
             <settings.categoryTypes>
-                <label>Kategorie-Typen</label>
+                <label>Kategorie-Typen</label> <!-- TODO: xlf-->
                 <config>
                     <type>select</type>
                     <renderType>selectMultipleSideBySide</renderType>
