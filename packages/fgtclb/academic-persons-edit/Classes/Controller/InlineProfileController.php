@@ -113,37 +113,31 @@ final class InlineProfileController extends AbstractActionController
         $requestResult = $this->profileUpdateRequestService->validate(
             $this->request
         );
-
         if (!$requestResult->isValid()) {
             return $this->jsonError(
                 $requestResult->getError() ?? 'invalid_request',
                 $requestResult->getStatusCode(),
             );
         }
-
         $payload = $requestResult->getPayload();
         $profile = $requestResult->getProfile();
-
         if ($payload === null || $profile === null) {
             return $this->jsonError('internal_server_error', 500);
         }
-
         try {
             $pluginControllerActionContext = new PluginControllerActionContext(
                 $this->request,
                 $this->settings,
             );
-
             $profileFormData = $this->profileUpdateValidationService->createFormData(
                 $pluginControllerActionContext,
                 $profile,
                 $payload,
             );
-            //TODO: Edit validator for links
+            //@todo: Edit validator for links
             $validationResult = $this->profileUpdateValidationService->validate(
                 $profileFormData,
             );
-
             if ($validationResult->hasErrors()) {
                 $errors = [];
                 foreach ($validationResult->getFlattenedErrors() as $propertyPath => $propertyErrors) {

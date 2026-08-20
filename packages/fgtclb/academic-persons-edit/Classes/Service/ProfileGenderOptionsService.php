@@ -23,7 +23,7 @@ final class ProfileGenderOptionsService
                 continue;
             }
 
-            $values[] = $value;
+            $values[$value] = $value;
         }
 
         return $values;

@@ -41,7 +41,6 @@ final readonly class ProfileUpdateValidationService
                     sprintf('Unknown profile property "%s".', $propertyName)
                 );
             }
-
             if ($propertyName === 'gender') {
                 if (
                     !is_string($value)
