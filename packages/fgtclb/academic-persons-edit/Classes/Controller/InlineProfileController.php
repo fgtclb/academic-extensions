@@ -15,33 +15,25 @@ use Psr\Http\Message\ResponseInterface;
 use Throwable;
 use UnexpectedValueException;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
-use FGTCLB\AcademicPersons\{
-    Domain\Model\Profile,
-    Domain\Repository\ProfileRepository
-};
-use FGTCLB\AcademicPersonsEdit\{
-    Domain\Factory\ProfileFactory,
-    Service\ProfileUpdateRequestService,
-    Service\ProfileUpdateValidationService,
-    Service\ProfileGenderOptionsService
-};
-use TYPO3\CMS\Core\{
-    Utility\GeneralUtility,
-    Database\Connection,
-    Database\ConnectionPool,
-    Database\Query\Restriction\DeletedRestriction,
-    Http\RedirectResponse,
-    Http\JsonResponse,
-    Log\LogManager,
-    Resource\Exception\FileDoesNotExistException,
-    Resource\File,
-    Resource\ResourceFactory
-};
-use TYPO3\CMS\Extbase\{
-    Mvc\Controller\FileUploadConfiguration,
-    Validation\Validator\FileSizeValidator,
-    Validation\Validator\MimeTypeValidator
-};
+use FGTCLB\AcademicPersons\Domain\Model\Profile;
+use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Http\RedirectResponse;
+use TYPO3\CMS\Core\Http\JsonResponse;
+use TYPO3\CMS\Core\Log\LogManager;
+use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Extbase\Mvc\Controller\FileUploadConfiguration;
+use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
+use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
 
 /**
  * @internal to be used only in `EXT:academic_person_edit` and not part of public API.
@@ -65,7 +57,6 @@ final class InlineProfileController extends AbstractActionController
         if ($this->request->getControllerActionName() === 'update') {
             return;
         }
-
         parent::initializeAction();
     }
 
@@ -88,8 +79,9 @@ final class InlineProfileController extends AbstractActionController
     }
 
     // =================================================================================================================
-    // Update profile data
+    // Handle entity profile operations
     // =================================================================================================================
+
     /**
      * JSON
      *
@@ -145,7 +137,6 @@ final class InlineProfileController extends AbstractActionController
                         $errors[$propertyPath][] = $propertyError->getMessage();
                     }
                 }
-
                 return $this->jsonError(
                     'validation_failed',
                     422,
@@ -153,16 +144,13 @@ final class InlineProfileController extends AbstractActionController
                     $errors,
                 );
             }
-
             $updatedProfile = $this->profileFactory->updateFromFormData(
                 $this->academicPersonsSettings->getValidationSetWithFallback('profile'),
                 $profile,
                 $profileFormData,
             );
-
             $this->profileRepository->update($updatedProfile);
             $this->persistenceManager->persistAll();
-
             return new JsonResponse([
                 'success' => true,
                 'profile' => $updatedProfile->getUid(),
@@ -180,7 +168,6 @@ final class InlineProfileController extends AbstractActionController
                 ->error('Updating the inline profile failed.', [
                     'exception' => $exception,
                 ]);
-
             return $this->jsonError(
                 'internal_server_error',
                 500,
@@ -202,15 +189,12 @@ final class InlineProfileController extends AbstractActionController
             'success' => false,
             'error' => $error,
         ];
-
         if ($message !== null) {
             $body['message'] = $message;
         }
-
         if ($errors !== []) {
             $body['errors'] = $errors;
         }
-
         return new JsonResponse($body, $statusCode);
     }
 
@@ -231,6 +215,7 @@ final class InlineProfileController extends AbstractActionController
     // =================================================================================================================
     //  Handle entity image operations
     // =================================================================================================================
+    public function uploadImage(): JsonResponse {}
 
     public function editImageAction(Profile $profile): ResponseInterface
     {
