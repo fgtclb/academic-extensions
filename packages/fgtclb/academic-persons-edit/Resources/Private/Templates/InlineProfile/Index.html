@@ -9,10 +9,11 @@
             Test view not final
         </small>
     </div>
+
     <f:if condition="{profile}">
         <f:then>
             <f:asset.module
-                identifier="@fgtclb/academic-persons-edit/frontend/profile.js"
+                identifier="@fgtclb/academic-persons-edit/frontend/profile.js?t={f:format.date(format: '%s', date: 'now')}"
             />
 
             <f:variable
@@ -24,7 +25,7 @@
                 absolute: true
             )}"
             />
-
+            <input class="form-control w-100" readonly value="{updateUrl}" />
             <div class="academic-persons-inline-edit container-fluid px-0">
                 <form
                     class="academic-persons-inline-edit__form"
@@ -306,13 +307,16 @@
         </f:then>
         <f:else>
             <div class="alert alert-info" role="status">
-                {f:translate(key: 'inlineProfile.noProfile', extensionName:
-                'academic_persons_edit')}
+                <f:translate
+                    key="inlineProfile.noProfile"
+                    extensionName="academic_persons_edit"
+                />
             </div>
         </f:else>
     </f:if>
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div data-ie-status-toast
+        <div
+            data-ie-status-toast
             class="toast"
             role="alert"
             aria-live="assertive"
@@ -327,7 +331,27 @@
                     aria-label="Close"
                 ></button>
             </div>
-            <div class="toast-body status-message">Hello, world! This is a toast message.</div>
+            <div class="toast-body status-message">
+                Hello, world! This is a toast message.
+            </div>
         </div>
     </div>
+    <template id="templateInlineEditBtn">
+        <button
+            class="btn btn-outline-dark btn-sm text-truncate overflow-x-hidden mw-100"
+            data-academic-persons-inline-edit-activate-btn
+            data-ie-for=""
+            type="button"
+        ></button>
+    </template>
+    <template id="templateInlineEditNew">
+        <button
+            class="btn btn-outline-success btn-sm text-truncate overflow-x-hidden mw-100"
+            data-academic-persons-inline-edit-activate-btn
+            data-ie-for=""
+            type="button"
+        >
+            +
+        </button>
+    </template>
 </html>
