@@ -4,12 +4,6 @@
     xmlns:p="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
-    <div class="py-4">
-        <small class="alert alert-info" role="alert">
-            Test view not final
-        </small>
-    </div>
-
     <f:if condition="{profile}">
         <f:then>
             <f:asset.module
@@ -25,7 +19,7 @@
                 absolute: true
             )}"
             />
-            <input class="form-control w-100" readonly value="{updateUrl}" />
+
             <div class="academic-persons-inline-edit container-fluid px-0">
                 <form
                     class="academic-persons-inline-edit__form"
@@ -68,13 +62,22 @@
 
                         <div class="col-12 col-lg-8">
                             <fieldset class="card h-100">
-                                <div class="card-body">
+                                <div class="card-body position-relative">
+                                    <button
+                                        class="btn btn-outline-info position-absolute top-0 end-0 m-2"
+                                        type="button"
+                                        data-academic-persons-inline-edit-edit-all-btn
+                                    >
+                                        <f:translate
+                                            key="inlineProfile.btnEditAll"
+                                            extensionName="academic_persons_edit"
+                                        />
+                                    </button>
                                     <legend class="h5">
                                         {f:translate(key:
                                         'inlineProfile.section.personal',
                                         extensionName: 'academic_persons_edit')}
                                     </legend>
-
                                     <div class="row g-3">
                                         <f:variable name="genderValidation"
                                             ><p:validationEnsure
@@ -287,6 +290,7 @@
                     </fieldset>
 
                     <div
+                        data-ie-footer-button-area
                         class="d-flex flex-wrap gap-2 justify-content-end mt-4 d-none"
                     >
                         <button

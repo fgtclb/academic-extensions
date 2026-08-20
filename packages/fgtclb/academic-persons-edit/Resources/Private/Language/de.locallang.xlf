@@ -548,6 +548,10 @@
         <source>Edit profile</source>
         <target>Profil bearbeiten</target>
       </trans-unit>
+      <trans-unit id="inlineProfile.btnEditAll">
+        <source>Edit all</source>
+        <target>Alle bearbeiten</target>
+      </trans-unit>
       <trans-unit id="inlineProfile.introduction">
         <source>Only changed fields are submitted. The page is not reloaded when saving.</source>
         <target>Es werden nur geänderte Felder übertragen. Beim Speichern wird die Seite nicht neu
