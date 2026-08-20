@@ -55,8 +55,7 @@ final class InlineProfileController extends AbstractActionController
         private readonly ProfileUpdateRequestService $profileUpdateRequestService,
         private readonly ProfileUpdateValidationService $profileUpdateValidationService,
         private readonly ProfileGenderOptionsService $profileGenderOptionsService,
-    ) {
-    }
+    ) {}
 
     public function initializeAction(): void
     {
@@ -140,7 +139,7 @@ final class InlineProfileController extends AbstractActionController
                 $profile,
                 $payload,
             );
-
+            //TODO: Edit validator for links
             $validationResult = $this->profileUpdateValidationService->validate(
                 $profileFormData,
             );
@@ -475,5 +474,4 @@ final class InlineProfileController extends AbstractActionController
         }
         return $items;
     }
-
 }

@@ -1,6 +1,15 @@
 const formSelector = "[data-academic-persons-inline-edit]";
+const editButtonSelector = "[data-academic-persons-inline-edit-activate-btn]";
+const fieldSelector = ".academic-persons-inline-edit__field";
 const formElement = document.querySelector(formSelector);
+const templateInlineEditBtn = document.getElementById("templateInlineEditBtn");
+const templateInlineEditNew = document.getElementById("templateInlineEditNew");
 const statusValues = {
+  danger: {
+    title: formElement.dataset.messageErrorTitle ?? "",
+    message: formElement.dataset.messageErrorMessage ?? "",
+    class: "bg-danger",
+  },
   error: {
     title: formElement.dataset.messageErrorTitle ?? "",
     message: formElement.dataset.messageErrorMessage ?? "",
@@ -22,12 +31,7 @@ const statusValues = {
     class: "bg-warning",
   },
 };
-const editButtonSelector = "[data-academic-persons-inline-edit-activate-btn]";
-const fieldSelector = ".academic-persons-inline-edit__field";
-const statusToastSelector = "[data-ie-status-toast]";
-const statusToast = document.querySelector(statusToastSelector);
-const statusToastTitleElement = statusToast.querySelector(".status-title");
-const statusToastMessageElement = statusToast.querySelector(".status-message");
+
 const getFieldValue = (field) => {
   if (field instanceof HTMLInputElement && field.type === "checkbox") {
     return field.checked;
@@ -36,6 +40,11 @@ const getFieldValue = (field) => {
 };
 
 const showStatus = (type) => {
+  const statusToastSelector = "[data-ie-status-toast]";
+  const statusToast = document.querySelector(statusToastSelector);
+  const statusToastTitleElement = statusToast.querySelector(".status-title");
+  const statusToastMessageElement =
+    statusToast.querySelector(".status-message");
   statusToast.classList.remove(
     "d-none",
     "bg-info",
@@ -43,7 +52,7 @@ const showStatus = (type) => {
     "bg-danger",
     "bg-warning",
   );
-  statusToast.classList.add(statusValues[type].class);
+  statusToast.classList.add(statusValues[type]?.class);
   statusToastTitleElement.innerHTML = statusValues[type].title;
   statusToastMessageElement.innerHTML = statusValues[type].message;
   const toast = new bootstrap.Toast(statusToast);
@@ -85,33 +94,66 @@ const showValidationErrors = (fields, errors) => {
 document.querySelectorAll(editButtonSelector).forEach((button) => {
   button.addEventListener("click", (event) => {
     event.preventDefault();
-    const targetElementName = button.dataset.ieFor;
-    if (targetElementName === void 0) {
-      return;
-    }
+    toggleEditField(button, true);
+  });
+});
 
-    const inputElement = document.querySelector(`[id="${targetElementName}"]`);
-    if (
-      !(
-        inputElement instanceof HTMLInputElement ||
-        inputElement instanceof HTMLSelectElement ||
-        inputElement instanceof HTMLTextAreaElement
-      )
-    ) {
-      return;
-    }
-    const dismissButtonSelector = `[data-ie-dismiss][data-ie-for="${targetElementName}"]`;
-    const saveButtonSelector = `[data-ie-save][data-ie-for="${targetElementName}"]`;
+const toggleEditField = (button, state = true) => {
+  const targetElementName = button.dataset.ieFor;
+  if (targetElementName === void 0) {
+    return;
+  }
+  const activateButton = document.querySelector(
+    `[data-academic-persons-inline-edit-activate-btn][data-ie-for="${targetElementName}"]`,
+  );
+  const inputElement = document.querySelector(`[id="${targetElementName}"]`);
+  if (
+    !(
+      inputElement instanceof HTMLInputElement ||
+      inputElement instanceof HTMLSelectElement ||
+      inputElement instanceof HTMLTextAreaElement
+    )
+  ) {
+    return;
+  }
+  if (state) {
     inputElement.classList.remove("d-none");
-    button.classList.add("d-none");
+    activateButton.classList.add("d-none");
     document
-      .querySelectorAll(dismissButtonSelector)
+      .querySelectorAll(`[data-ie-dismiss][data-ie-for="${targetElementName}"]`)
       .forEach((dismissButton) => {
         dismissButton.classList.remove("d-none");
       });
-    document.querySelectorAll(saveButtonSelector).forEach((saveButton) => {
-      saveButton.classList.remove("d-none");
-    });
+    document
+      .querySelectorAll(`[data-ie-save][data-ie-for="${targetElementName}"]`)
+      .forEach((saveButton) => {
+        saveButton.classList.remove("d-none");
+      });
+  } else {
+    inputElement.classList.add("d-none");
+    activateButton.classList.remove("d-none");
+    document
+      .querySelectorAll(`[data-ie-dismiss][data-ie-for="${targetElementName}"]`)
+      .forEach((dismissButton) => {
+        dismissButton.classList.add("d-none");
+      });
+    document
+      .querySelectorAll(`[data-ie-save][data-ie-for="${targetElementName}"]`)
+      .forEach((saveButton) => {
+        saveButton.classList.add("d-none");
+      });
+  }
+};
+
+document.querySelectorAll(`[data-ie-dismiss]`).forEach((button) => {
+  button.addEventListener("click", (event) => {
+    toggleEditField(button, false);
+  });
+});
+
+document.querySelectorAll(`[data-ie-save]`).forEach((button) => {
+  button.addEventListener("click", (event) => {
+    toggleEditField(button, false);
   });
 });
 
@@ -189,6 +231,7 @@ document.querySelectorAll(formSelector).forEach((form) => {
         initialValues.set(propertyName, data[propertyName]);
       });
       showStatus("success");
+      updateView(initialValues, fields);
     } catch {
       showStatus("danger");
     } finally {
@@ -196,3 +239,34 @@ document.querySelectorAll(formSelector).forEach((form) => {
     }
   });
 });
+
+// Map initialValues, Array fields
+const updateView = (initialValues, fields) => {
+  fields.forEach((field) => {
+    if (!field.name) {
+      return;
+    }
+    const initialValue = initialValues.get(field.name) ?? "";
+    switch (true) {
+      case field instanceof HTMLSelectElement:
+        field.value = initialValue;
+        break;
+
+      case field instanceof HTMLInputElement:
+      case field instanceof HTMLTextAreaElement:
+        field.value = initialValue;
+        //check which state applies and render different buttons
+        checkButtonTemplateType(initialValue);
+        break;
+
+      default:
+        break;
+    }
+  });
+};
+
+const checkButtonTemplateType = (fieldValue) => {
+  console.log(fieldValue);
+//  console.log(templateInlineEditBtn);
+//  console.log(templateInlineEditNew);
+};

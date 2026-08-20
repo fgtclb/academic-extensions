@@ -30,7 +30,7 @@
                     <f:if condition="{validation.disabled}">
                         <f:then>
                             <button
-                                class="btn btn-outline-secondary btn-sm"
+                                class="btn btn-outline-secondary btn-sm text-truncate overflow-x-hidden mw-100"
                                 disabled
                                 type="button"
                             >
@@ -39,7 +39,7 @@
                         </f:then>
                         <f:else>
                             <button
-                                class="btn btn-outline-dark btn-sm"
+                                class="btn btn-outline-dark btn-sm text-truncate overflow-x-hidden mw-100"
                                 data-academic-persons-inline-edit-activate-btn
                                 data-ie-for="{elementId}"
                                 type="button"
@@ -51,7 +51,7 @@
                 </f:then>
                 <f:else if="!{validation.disabled} && !{validation.readOnly}">
                     <button
-                        class="btn btn-outline-success btn-sm"
+                        class="btn btn-outline-success btn-sm text-truncate overflow-x-hidden mw-100"
                         data-academic-persons-inline-edit-activate-btn
                         data-ie-for="{elementId}"
                         type="button"
