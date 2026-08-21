@@ -13,8 +13,11 @@ Profiles get connected with a frontend user and the frontend user is allow to ed
 
 The `Inline profile editing` content element provides a responsive form that
 saves only changed profile fields through a JSON endpoint without reloading the
-page. Authentication, profile ownership, configured validators and TCA gender
-options are checked server-side.
+page. The synchronization checkbox and profile image use dedicated AJAX
+endpoints. Clicking the image opens a Bootstrap 5 modal for adding, replacing
+or deleting it through AJAX, without additional CSS or inline styles.
+Authentication, profile ownership, configured validators, file validation and
+TCA gender options are checked server-side.
 
 > [!NOTE]
 > This extension is currently in beta state - please notice that there might be changes to the structure

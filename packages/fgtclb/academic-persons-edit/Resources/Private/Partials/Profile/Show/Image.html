@@ -1,8 +1,7 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-    data-namespace-typo3-fluid="true"
->
+    data-namespace-typo3-fluid="true">
     <f:if condition="{profile.image}">
         <f:then>
             <figure>
@@ -14,8 +13,7 @@
                             fileExtension: 'webp',
                         )}"
                         type="image/webp"
-                        media="(min-width: 992px)"
-                    />
+                        media="(min-width: 992px)" />
                     <source
                         srcset="{f:uri.image(
                             image: profile.image,
@@ -23,8 +21,7 @@
                             fileExtension: 'webp',
                         )}"
                         type="image/webp"
-                        media="(min-width: 768px)"
-                    />
+                        media="(min-width: 768px)" />
                     <source
                         srcset="{f:uri.image(
                             image: profile.image,
@@ -32,26 +29,23 @@
                             fileExtension: 'webp',
                         )}"
                         type="image/webp"
-                        media="(min-width: 576px)"
-                    />
+                        media="(min-width: 576px)" />
                     <source
                         srcset="{f:uri.image(
                             image: profile.image,
                             maxWidth: '535',
                             fileExtension: 'webp',
                         )}"
-                        type="image/webp"
-                    />
+                        type="image/webp" />
                     <img
                         src="{f:uri.image(
                             image: profile.image,
                             maxWidth: 690,
                         )}"
                         alt="{profile.image.originalResource.alternative}"
-                        class="w-100 h-100object-fit-contain border rounded border border-secondary"
+                        class="w-100 h-100 object-fit-contain border rounded border-secondary"
                         title="{profile.image.originalResource.title}"
-                        loading="lazy"
-                    />
+                        loading="lazy" />
                 </picture>
                 <f:if condition="{profile.image.originalResource.description}">
                     <figcaption class="visually-hidden">
@@ -66,11 +60,10 @@
                     src="EXT:academic_persons_edit/Resources/Public/Images/profile-placeholder.png"
                     alt="{f:translate(key: 'profile.image.placeholder.alt', extensionName:
                     'academic_persons_edit')}"
-                    class="w-100 h-100 object-fit-contain border rounded border border-secondary"
+                    class="w-100 h-100 object-fit-contain border rounded border-secondary"
                     title="{f:translate(key: 'inlineProfile.user_image_not_available', extensionName:
                     'academic_persons_edit')}"
-                    loading="lazy"
-                />
+                    loading="lazy" />
                 <figcaption class="visually-hidden">
                     {f:translate(key: 'inlineProfile.user_image_not_available',
                     extensionName: 'academic_persons_edit')}

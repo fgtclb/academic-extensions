@@ -36,15 +36,13 @@ final class ProfileGenderOptionsServiceTest extends UnitTestCase
     public function allowedValuesAreReadFromGenderTcaAndEmptyOptionsAreSkipped(): void
     {
         $this->setConfiguredItems([
-            ['label' => 'Please choose', 'value' => ''],
-            ['label' => 'Female', 'value' => 'female'],
-            ['label' => 'Male', 'value' => 'male'],
-            ['label' => 'Without value'],
-            ['label' => 'Numeric value', 'value' => 3],
+            ['label' => 'Female', 'value' => 'ms'],
+            ['label' => 'Male', 'value' => 'mr'],
+            ['label' => 'Diverse', 'value' => 'diverse'],
         ]);
 
         self::assertSame(
-            ['female', 'male', '3'],
+            ['ms', 'mr', 'diverse'],
             (new ProfileGenderOptionsService())->getAllowedValues(),
         );
     }

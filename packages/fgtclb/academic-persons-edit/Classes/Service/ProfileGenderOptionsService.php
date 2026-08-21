@@ -6,7 +6,6 @@ namespace FGTCLB\AcademicPersonsEdit\Service;
 
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
-
 final class ProfileGenderOptionsService
 {
     private const TABLE = 'tx_academicpersons_domain_model_profile';
@@ -15,9 +14,9 @@ final class ProfileGenderOptionsService
     /**
      * @return array<string, string>
      */
-    public function getAllowedValues(): array
+    public function getOptions(): array
     {
-        $values = [];
+        $options = [];
         foreach ($this->getConfiguredItems() as $item) {
             $value = (string) ($item['value'] ?? '');
             if ($value === '') {
@@ -30,9 +29,24 @@ final class ProfileGenderOptionsService
                 $labelIdentifier,
                 'persons_edit',
             ) ?? $labelIdentifier) ?: $labelIdentifier;
-            $values[$value] = $translatedLabel;
+            $options[$value] = $translatedLabel;
         }
-        return $values;
+        return $options;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getAllowedValues(): array
+    {
+        $values = [];
+        foreach ($this->getConfiguredItems() as $item) {
+            $value = (string)($item['value'] ?? '');
+            if ($value !== '') {
+                $values[$value] = true;
+            }
+        }
+        return array_keys($values);
     }
 
     public function isAllowed(string $value): bool
@@ -40,7 +54,7 @@ final class ProfileGenderOptionsService
         if ($value === '') {
             return true;
         }
-        return array_key_exists($value, $this->getAllowedValues());
+        return in_array($value, $this->getAllowedValues(), true);
     }
 
     /**

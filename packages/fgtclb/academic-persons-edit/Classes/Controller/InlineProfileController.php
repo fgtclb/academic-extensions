@@ -25,8 +25,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
-use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Http\JsonResponse;
+use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
@@ -54,10 +54,27 @@ final class InlineProfileController extends AbstractActionController
         // The JSON update endpoint performs its own authentication check so it
         // can return a machine-readable 401 response instead of the HTML error
         // response propagated by the shared controller initialization.
-        if ($this->request->getControllerActionName() === 'update') {
+        if (in_array(
+            $this->request->getControllerActionName(),
+            ['update', 'updateSkipSync', 'deleteImage'],
+            true,
+        )) {
             return;
         }
         parent::initializeAction();
+    }
+
+    protected function errorAction(): ResponseInterface
+    {
+        if ($this->request->getControllerActionName() === 'uploadImage') {
+            return $this->jsonError(
+                'validation_failed',
+                422,
+                $this->getFlattenedValidationErrorMessage(),
+            );
+        }
+
+        return parent::errorAction();
     }
 
     // =================================================================================================================
@@ -72,8 +89,12 @@ final class InlineProfileController extends AbstractActionController
             'data' => $this->getCurrentContentObjectRenderer()?->data,
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
             'profile' => $profile,
-            'genderOptions' => $this->profileGenderOptionsService->getAllowedValues(),
+            'genderOptions' => $this->profileGenderOptionsService->getOptions(),
             'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('profile')->validations,
+            'imageAllowedMimeTypes' => (string)(
+                $this->settings['editForm']['profileImage']['validation']['allowedMimeTypes']
+                ?? 'image/jpeg,image/png,image/webp'
+            ),
         ]);
         return $this->htmlResponse();
     }
@@ -177,6 +198,98 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
+     * Updates the synchronization flag through its own JSON endpoint.
+     *
+     * Keeping this separate from the generic field endpoint allows the
+     * checkbox to persist immediately without submitting unrelated fields.
+     */
+    public function updateSkipSyncAction(): ResponseInterface
+    {
+        $requestResult = $this->profileUpdateRequestService->validate(
+            $this->request,
+        );
+        if (!$requestResult->isValid()) {
+            return $this->jsonError(
+                $requestResult->getError() ?? 'invalid_request',
+                $requestResult->getStatusCode(),
+            );
+        }
+
+        $payload = $requestResult->getPayload();
+        $profile = $requestResult->getProfile();
+        if ($payload === null || $profile === null) {
+            return $this->jsonError('internal_server_error', 500);
+        }
+
+        $data = $payload->getData();
+        if (
+            array_keys($data) !== ['skipSync']
+            || !is_bool($data['skipSync'])
+        ) {
+            return $this->jsonError(
+                'invalid_payload',
+                400,
+                'The payload must contain exactly one boolean skipSync value.',
+            );
+        }
+
+        try {
+            $pluginControllerActionContext = new PluginControllerActionContext(
+                $this->request,
+                $this->settings,
+            );
+            $profileFormData = $this->profileUpdateValidationService->createFormData(
+                $pluginControllerActionContext,
+                $profile,
+                $payload,
+            );
+            $validationResult = $this->profileUpdateValidationService->validate(
+                $profileFormData,
+            );
+            if ($validationResult->hasErrors()) {
+                $errors = [];
+                foreach ($validationResult->getFlattenedErrors() as $propertyPath => $propertyErrors) {
+                    foreach ($propertyErrors as $propertyError) {
+                        $errors[$propertyPath][] = $propertyError->getMessage();
+                    }
+                }
+                return $this->jsonError(
+                    'validation_failed',
+                    422,
+                    'The submitted synchronization setting is invalid.',
+                    $errors,
+                );
+            }
+
+            $updatedProfile = $this->profileFactory->updateFromFormData(
+                $this->academicPersonsSettings->getValidationSetWithFallback('profile'),
+                $profile,
+                $profileFormData,
+            );
+            $this->profileRepository->update($updatedProfile);
+            $this->persistenceManager->persistAll();
+
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $updatedProfile->getUid(),
+                'skipSync' => $updatedProfile->getSkipSync(),
+            ]);
+        } catch (Throwable $exception) {
+            GeneralUtility::makeInstance(LogManager::class)
+                ->getLogger(self::class)
+                ->error('Updating the inline profile synchronization flag failed.', [
+                    'exception' => $exception,
+                ]);
+
+            return $this->jsonError(
+                'internal_server_error',
+                500,
+                'The synchronization setting could not be updated.',
+            );
+        }
+    }
+
+    /**
      * @param array<string, list<string>> $errors
      */
     private function jsonError(
@@ -215,25 +328,102 @@ final class InlineProfileController extends AbstractActionController
     // =================================================================================================================
     //  Handle entity image operations
     // =================================================================================================================
-    public function uploadImage(): JsonResponse {}
-
-    public function editImageAction(Profile $profile): ResponseInterface
+    public function initializeUploadImageAction(): void
     {
-        $this->view->assignMultiple([
-            'data' => $this->getCurrentContentObjectRenderer()?->data,
-            'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
-            'profile' => $profile,
-            'cancelUrl' => $this->userSessionService->loadRefererFromSession($this->request),
-        ]);
-        return $this->htmlResponse();
-    }
+        $profileArgument = $this->request->hasArgument('profile')
+            ? $this->request->getArgument('profile')
+            : null;
+        $profileUid = is_array($profileArgument)
+            ? (int)($profileArgument['__identity'] ?? 0)
+            : (int)$profileArgument;
 
-    public function initializeAddImageAction(): void
-    {
+        // This check happens before Extbase maps the upload. An unauthorized
+        // request therefore cannot create an unreferenced file in FAL.
+        if ($this->profileUpdateRequestService->findEditableProfile($profileUid) === null) {
+            throw new PropagateResponseException(
+                $this->jsonError('profile_not_editable', 403),
+                1776760201,
+            );
+        }
+
         $this->configureImageFileUpload();
     }
 
-    public function addImageAction(Profile $profile): ResponseInterface
+    public function uploadImageAction(Profile $profile): ResponseInterface
+    {
+        try {
+            $this->persistUploadedProfileImage($profile);
+
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'hasImage' => $profile->getImage() !== null,
+            ]);
+        } catch (Throwable $exception) {
+            GeneralUtility::makeInstance(LogManager::class)
+                ->getLogger(self::class)
+                ->error('Uploading the inline profile image failed.', [
+                    'exception' => $exception,
+                ]);
+
+            return $this->jsonError(
+                'internal_server_error',
+                500,
+                'The profile image could not be uploaded.',
+            );
+        }
+    }
+
+    public function deleteImageAction(): ResponseInterface
+    {
+        $requestResult = $this->profileUpdateRequestService->validate(
+            $this->request,
+        );
+        if (!$requestResult->isValid()) {
+            return $this->jsonError(
+                $requestResult->getError() ?? 'invalid_request',
+                $requestResult->getStatusCode(),
+            );
+        }
+
+        $payload = $requestResult->getPayload();
+        $profile = $requestResult->getProfile();
+        if ($payload === null || $profile === null) {
+            return $this->jsonError('internal_server_error', 500);
+        }
+        if ($payload->getData() !== []) {
+            return $this->jsonError(
+                'invalid_payload',
+                400,
+                'The image deletion payload must not contain profile fields.',
+            );
+        }
+
+        try {
+            $deleted = $this->deleteProfileImage($profile);
+
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'deleted' => $deleted,
+                'hasImage' => false,
+            ]);
+        } catch (Throwable $exception) {
+            GeneralUtility::makeInstance(LogManager::class)
+                ->getLogger(self::class)
+                ->error('Deleting the inline profile image failed.', [
+                    'exception' => $exception,
+                ]);
+
+            return $this->jsonError(
+                'internal_server_error',
+                500,
+                'The profile image could not be deleted.',
+            );
+        }
+    }
+
+    private function persistUploadedProfileImage(Profile $profile): void
     {
         // The file handling service already stored the uploaded file and rewired the profile
         // image property to it, so the replaced file can only be determined from the state
@@ -244,37 +434,30 @@ final class InlineProfileController extends AbstractActionController
         $this->persistenceManager->persistAll();
 
         $this->deleteReplacedProfileImageFile($replacedImageFile, $profile);
-
-        return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
     }
 
-    public function removeImageAction(Profile $profile): ResponseInterface
+    private function deleteProfileImage(Profile $profile): bool
     {
         $image = $profile->getImage();
-        if ($image !== null) {
-            $imageFile = $image->getOriginalResource()->getOriginalFile();
-            // The relation is dropped first, for two reasons: deleting the file alone leaves
-            // the reference count on the profile record pointing at a reference that no longer
-            // exists, and the file can only be checked for other usages once this profile does
-            // not reference it any more.
-            $profile->setImage(null);
-            $this->profileRepository->update($profile);
-            $this->persistenceManager->remove($image);
-            $this->persistenceManager->persistAll();
-
-            if ($this->countFileReferences($imageFile) === 0) {
-                $imageFile->getStorage()->deleteFile($imageFile);
-            }
+        if ($image === null) {
+            return false;
         }
-        return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
-    }
 
-    public function toggleSkipSyncAction(Profile $profile): ResponseInterface
-    {
-        $profile->setSkipSync(!$profile->getSkipSync());
+        $imageFile = $image->getOriginalResource()->getOriginalFile();
+        // The relation is dropped first, for two reasons: deleting the file alone leaves
+        // the reference count on the profile record pointing at a reference that no longer
+        // exists, and the file can only be checked for other usages once this profile does
+        // not reference it any more.
+        $profile->setImage(null);
         $this->profileRepository->update($profile);
+        $this->persistenceManager->remove($image);
         $this->persistenceManager->persistAll();
-        return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
+
+        if ($this->countFileReferences($imageFile) === 0) {
+            $imageFile->getStorage()->deleteFile($imageFile);
+        }
+
+        return true;
     }
 
     /**
@@ -293,7 +476,7 @@ final class InlineProfileController extends AbstractActionController
             // The profile holds a single image, but the limit is validated against the already
             // referenced file plus the upload. Allowing two therefore means "replace", which is
             // what this form does - the file handling service repoints the existing reference to
-            // the uploaded file, and `addImageAction()` cleans the replaced file up afterwards.
+            // the uploaded file, and `uploadImageAction()` cleans the replaced file up afterwards.
             // Registering a file deletion instead would delete the replaced file unconditionally,
             // even when another record still references it.
             ->setMaxFiles(2)

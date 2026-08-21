@@ -8,13 +8,10 @@ use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
 use FGTCLB\AcademicPersonsEdit\Tests\Functional\AbstractAcademicPersonsEditTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-
 final class ProfileGenderOptionsServiceTest extends AbstractAcademicPersonsEditTestCase
 {
-
     private static function createTestTcaConfiguration(): void
     {
-
         $GLOBALS['TCA'] = [
             'tx_academicpersons_domain_model_profile' => [
                 'columns' => [
@@ -32,6 +29,7 @@ final class ProfileGenderOptionsServiceTest extends AbstractAcademicPersonsEditT
             ],
         ];
     }
+
     private static function getValuesFromTca(): array
     {
         return $GLOBALS['TCA']['tx_academicpersons_domain_model_profile']['columns']['gender']['config']['items'];
@@ -48,39 +46,26 @@ final class ProfileGenderOptionsServiceTest extends AbstractAcademicPersonsEditT
         $this->createTestTcaConfiguration();
     }
 
-    /**
-     * Test to check if allowed options return the same values as it is in tca configuration
-     */
     #[Test]
-    public function getConfiguredItemsFromTcaTest(): void
+    public function getOptionsReturnsConfiguredValuesAndLabels(): void
     {
         $profileGenderOptionsService = new ProfileGenderOptionsService();
-
-        $actualAllowedValues = $profileGenderOptionsService->getAllowedValues();
-
-        $configuredValues = array_column(self::getValuesFromTca(), 'value');
-
-        $expectedAllowedValues = array_values(
-            array_filter(
-                $configuredValues,
-                static fn(mixed $value): bool => is_string($value) && $value !== ''
-            )
-        );
-
-        $this->assertEqualsCanonicalizing(
-            $expectedAllowedValues,
-            $actualAllowedValues
-        );
+        $actualOptions = $profileGenderOptionsService->getOptions();
+        $expectedOptions = [];
+        foreach (self::getValuesFromTca() as $item) {
+            if ($item['value'] !== '') {
+                $expectedOptions[$item['value']] = $item['label'];
+            }
+        }
+        $this->assertSame($expectedOptions, $actualOptions);
     }
-    /**
-     * Test to check if allowed options return the same values as it is in tca configuration
-     */
+
     #[Test]
     public function checkIfIsAllowedFunctionWorksAsExpected(): void
     {
         $profileGenderOptionsService = new ProfileGenderOptionsService();
-        $this->assertTrue($profileGenderOptionsService->isAllowed(self::getValueFromTca(1)["value"]));
-        $this->assertNotTrue($profileGenderOptionsService->isAllowed(self::generateRandomString()));
+        $this->assertTrue($profileGenderOptionsService->isAllowed(self::getValueFromTca(1)['value']));
+        $this->assertFalse($profileGenderOptionsService->isAllowed(self::generateRandomString()));
     }
 
     private function generateRandomString(int $length = 10): string
