@@ -103,6 +103,10 @@
         <source>Image</source>
         <target>Bild</target>
       </trans-unit>
+      <trans-unit id="profile.image.placeholder.alt">
+        <source>No profile image available</source>
+        <target>Kein Profilbild vorhanden</target>
+      </trans-unit>
       <trans-unit id="profile.personal">
         <source>Personal data</source>
         <target>Persönliche Daten</target>
@@ -603,7 +607,7 @@
       </trans-unit>
       <trans-unit id="inlineProfile.status.warning.title">
         <source>Warning</source>
-        <target>Warning</target>
+        <target>Warnung</target>
       </trans-unit>
       <trans-unit id="inlineProfile.status.validation">
         <source>Please check the highlighted fields.</source>
@@ -624,6 +628,42 @@
       <trans-unit id="inlineProfile.user_image_not_available">
         <source>To edit userimage, please click here.</source>
         <target>Um das Benutzerbild zu bearbeiten, klicken Sie hier.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.title">
+        <source>Edit profile image</source>
+        <target>Profilbild bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.open">
+        <source>Edit profile image</source>
+        <target>Profilbild bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.close">
+        <source>Close image modal</source>
+        <target>Bildbearbeitung schließen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.hint.add">
+        <source>Select an image to add it to the profile.</source>
+        <target>Wählen Sie ein Bild aus, um es dem Profil hinzuzufügen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.hint.replace">
+        <source>Select a new image to replace the current profile image.</source>
+        <target>Wählen Sie ein neues Bild aus, um das aktuelle Profilbild zu ersetzen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.deleteHint">
+        <source>The profile image is removed permanently unless another record still uses the file.</source>
+        <target>Das Profilbild wird dauerhaft entfernt, sofern keine andere Verwendung der Datei besteht.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.upload.label">
+        <source>Choose image</source>
+        <target>Bild auswählen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.uploaded">
+        <source>The profile image has been saved.</source>
+        <target>Das Profilbild wurde gespeichert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.deleted">
+        <source>The profile image has been deleted.</source>
+        <target>Das Profilbild wurde gelöscht.</target>
       </trans-unit>
 
       <!-- Action buttons -->

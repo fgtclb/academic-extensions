@@ -14,6 +14,13 @@
         name="elementId"
         value="inline-profile-{profile.uid}-{identifier}"
     />
+    <f:variable name="resolvedInputType" value="text" />
+    <f:if condition="{validation.inputType}">
+        <f:variable name="resolvedInputType" value="{validation.inputType}" />
+    </f:if>
+    <f:if condition="{inputType}">
+        <f:variable name="resolvedInputType" value="{inputType}" />
+    </f:if>
 
     <div class="{columnClass}">
         <div class="mb-3">
@@ -24,42 +31,43 @@
                     <abbr title="required">*</abbr>
                 </f:if>
             </label>
-            <div class="clearfix" id="buttonInjectAferElement"></div>
-            <f:if condition="{profile.{identifier}}">
-                <f:then>
-                    <f:if condition="{validation.disabled}">
-                        <f:then>
-                            <button
-                                class="btn btn-outline-secondary btn-sm text-truncate overflow-x-hidden mw-100"
-                                disabled
-                                type="button"
-                            >
-                                {profile.{identifier}}
-                            </button>
-                        </f:then>
-                        <f:else>
-                            <button
-                                class="btn btn-outline-dark btn-sm text-truncate overflow-x-hidden mw-100"
-                                data-academic-persons-inline-edit-activate-btn
-                                data-ie-for="{elementId}"
-                                type="button"
-                            >
-                                {profile.{identifier}}
-                            </button>
-                        </f:else>
-                    </f:if>
-                </f:then>
-                <f:else if="!{validation.disabled} && !{validation.readOnly}">
-                    <button
-                        class="btn btn-outline-success btn-sm text-truncate overflow-x-hidden mw-100"
-                        data-academic-persons-inline-edit-activate-btn
-                        data-ie-for="{elementId}"
-                        type="button"
-                    >
-                        +
-                    </button>
-                </f:else>
-            </f:if>
+            <div class="clearfix" data-form-field-button-area>
+                <f:if condition="{profile.{identifier}}">
+                    <f:then>
+                        <f:if condition="{validation.disabled} || {validation.readOnly}">
+                            <f:then>
+                                <button
+                                    class="btn btn-outline-secondary btn-sm text-truncate overflow-x-hidden mw-100"
+                                    disabled
+                                    type="button"
+                                >
+                                    {profile.{identifier}}
+                                </button>
+                            </f:then>
+                            <f:else>
+                                <button
+                                    class="btn btn-outline-dark btn-sm text-truncate overflow-x-hidden mw-100"
+                                    data-academic-persons-inline-edit-activate-btn
+                                    data-ie-for="{elementId}"
+                                    type="button"
+                                >
+                                    {profile.{identifier}}
+                                </button>
+                            </f:else>
+                        </f:if>
+                    </f:then>
+                    <f:else if="!{validation.disabled} && !{validation.readOnly}">
+                        <button
+                            class="btn btn-outline-success btn-sm text-truncate overflow-x-hidden mw-100"
+                            data-academic-persons-inline-edit-activate-btn
+                            data-ie-for="{elementId}"
+                            type="button"
+                        >
+                            +
+                        </button>
+                    </f:else>
+                </f:if>
+            </div>
             <div class="d-flex flex-row gap-2">
                 <f:if condition="{textarea}">
                     <f:then>
@@ -79,7 +87,7 @@
                             name="{identifier}"
                             id="{elementId}"
                             value="{profile.{identifier}}"
-                            type="{validation.inputType ? validation.inputType : 'text'}"
+                            type="{resolvedInputType}"
                             class="d-none form-control form-control-sm academic-persons-inline-edit__field"
                             disabled="{validation.disabled ? 'disabled' : ''}"
                             required="{validation.required ? 'required' : ''}"

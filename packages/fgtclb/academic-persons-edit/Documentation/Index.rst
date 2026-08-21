@@ -58,7 +58,8 @@ assigned profiles from the TYPO3 frontend.
 
     ..  card:: :ref:`Inline profile editing <inline-profile-editing>`
 
-        Render the inline editor and update profiles through its JSON endpoint.
+        Edit fields, synchronization and profile images through dedicated AJAX
+        endpoints.
 
     ..  card:: :ref:`Templates <templates>`
 
