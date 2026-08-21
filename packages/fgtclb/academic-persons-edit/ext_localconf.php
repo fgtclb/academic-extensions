@@ -171,10 +171,9 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
             InlineProfileController::class => implode(',', [
                 'index',
                 'update',
-                'editImage',
-                'addImage',
-                'removeImage',
-                'toggleSkipSync',
+                'updateSkipSync',
+                'uploadImage',
+                'deleteImage',
             ]),
             ProfileInformationController::class => implode(',', [
                 'list',
@@ -239,10 +238,9 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
             InlineProfileController::class => implode(',', [
                 'index',
                 'update',
-                'editImage',
-                'addImage',
-                'removeImage',
-                'toggleSkipSync',
+                'updateSkipSync',
+                'uploadImage',
+                'deleteImage',
             ]),
             ProfileInformationController::class => implode(',', [
                 'list',

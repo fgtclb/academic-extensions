@@ -123,6 +123,144 @@ final class InlineProfileControllerTest extends UnitTestCase
         );
     }
 
+    #[Test]
+    public function updateSkipSyncRejectsNonPostRequest(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest('GET')
+        );
+
+        $response = $subject->updateSkipSyncAction();
+
+        $this->assertJsonResponse(
+            $response,
+            405,
+            [
+                'success' => false,
+                'error' => 'method_not_allowed',
+            ],
+        );
+    }
+
+    #[Test]
+    public function updateSkipSyncReturnsJsonWhenAuthenticationIsRequired(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                json_encode(
+                    [
+                        'profile' => 123,
+                        'data' => ['skipSync' => true],
+                    ],
+                    JSON_THROW_ON_ERROR,
+                )
+            )
+        );
+
+        $response = $subject->updateSkipSyncAction();
+
+        $this->assertJsonResponse(
+            $response,
+            401,
+            [
+                'success' => false,
+                'error' => 'authentication_required',
+            ],
+        );
+    }
+
+    #[Test]
+    public function updateSkipSyncRejectsInvalidJson(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                '{"profile": 123,'
+            )
+        );
+
+        $response = $subject->updateSkipSyncAction();
+
+        $this->assertJsonResponse(
+            $response,
+            400,
+            [
+                'success' => false,
+                'error' => 'invalid_json',
+            ],
+        );
+    }
+
+    #[Test]
+    public function deleteImageRejectsNonPostRequest(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest('GET')
+        );
+
+        $response = $subject->deleteImageAction();
+
+        $this->assertJsonResponse(
+            $response,
+            405,
+            [
+                'success' => false,
+                'error' => 'method_not_allowed',
+            ],
+        );
+    }
+
+    #[Test]
+    public function deleteImageRejectsInvalidJson(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                '{"profile": 123,'
+            )
+        );
+
+        $response = $subject->deleteImageAction();
+
+        $this->assertJsonResponse(
+            $response,
+            400,
+            [
+                'success' => false,
+                'error' => 'invalid_json',
+            ],
+        );
+    }
+
+    #[Test]
+    public function deleteImageReturnsJsonWhenAuthenticationIsRequired(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                json_encode(
+                    [
+                        'profile' => 123,
+                        'data' => [],
+                    ],
+                    JSON_THROW_ON_ERROR,
+                )
+            )
+        );
+
+        $response = $subject->deleteImageAction();
+
+        $this->assertJsonResponse(
+            $response,
+            401,
+            [
+                'success' => false,
+                'error' => 'authentication_required',
+            ],
+        );
+    }
+
     private function createSubject(Request $request): InlineProfileController
     {
         $profileRepository = $this->createStub(ProfileRepository::class);

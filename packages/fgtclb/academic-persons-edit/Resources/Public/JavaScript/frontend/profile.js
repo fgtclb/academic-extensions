@@ -1,24 +1,29 @@
-const formSelector = "[data-academic-persons-inline-edit]";
-const editButtonSelector = "[data-academic-persons-inline-edit-activate-btn]";
+const rootSelector = "[data-academic-persons-inline-edit]";
+const fieldsFormSelector = "[data-ie-fields-form]";
+const editButtonSelector =
+  "[data-academic-persons-inline-edit-activate-btn]";
 const editAllButtonSelector =
   "[data-academic-persons-inline-edit-edit-all-btn]";
 const footerButtonAreaSelector = "[data-ie-footer-button-area]";
 const buttonAreaSelector = "[data-form-field-button-area]";
 const fieldSelector = ".academic-persons-inline-edit__field";
-const templateInlineEditButton = document.getElementById(
-  "templateInlineEditBtn",
-);
-const templateInlineEditNew = document.getElementById("templateInlineEditNew");
+const imageFormSelector = ".academic-persons-inline-edit__image-form";
+const imageModalSelector = "[data-ie-image-modal]";
+const syncFormSelector = "[data-ie-sync-form]";
+const syncCheckboxSelector = ".academic-persons-inline-edit__sync-checkbox";
+
 const isEditableField = (element) =>
   element instanceof HTMLInputElement ||
   element instanceof HTMLSelectElement ||
   element instanceof HTMLTextAreaElement;
+
 const getFieldValue = (field) => {
   if (field instanceof HTMLInputElement && field.type === "checkbox") {
     return field.checked;
   }
   return field.value;
 };
+
 const setFieldValue = (field, value) => {
   if (field instanceof HTMLInputElement && field.type === "checkbox") {
     field.checked = Boolean(value);
@@ -27,64 +32,68 @@ const setFieldValue = (field, value) => {
   field.value = value === null || value === undefined ? "" : String(value);
 };
 
-const getFieldById = (form, fieldId) => {
+const getFieldPropertyName = (field) => {
+  const bracketProperty = field.name.match(/\[([^\]]+)]$/)?.[1];
+  return bracketProperty ?? field.name;
+};
+
+const getProfileUid = (root) => {
+  const profileUid = Number.parseInt(root.dataset.profileUid ?? "", 10);
+  return Number.isInteger(profileUid) && profileUid > 0 ? profileUid : null;
+};
+
+const getFieldById = (root, fieldId) => {
   if (!fieldId) {
     return null;
   }
-  const field = form.querySelector(`#${CSS.escape(fieldId)}`);
+  const field = root.querySelector(`#${CSS.escape(fieldId)}`);
   return isEditableField(field) ? field : null;
 };
-const getActivateButton = (field) => {
-  if (!field.form || !field.id) {
+
+const getActivateButton = (root, field) => {
+  if (!field.id) {
     return null;
   }
   const selector = `${editButtonSelector}[data-ie-for="${CSS.escape(field.id)}"]`;
-  const button = field.form.querySelector(selector);
+  const button = root.querySelector(selector);
   return button instanceof HTMLButtonElement ? button : null;
 };
-const setFooterVisible = (form, visible) => {
-  const footer =
-    form.querySelector(footerButtonAreaSelector) ??
-    document.querySelector(footerButtonAreaSelector);
-  footer?.classList.toggle("d-none", !visible);
+
+const setFooterVisible = (root, visible) => {
+  root
+    .querySelector(footerButtonAreaSelector)
+    ?.classList.toggle("d-none", !visible);
 };
-const showStatus = (form, type) => {
+
+const showStatus = (root, type, message = null) => {
   const statusValues = {
     danger: {
-      title: form.dataset.messageErrorTitle ?? "",
-      message: form.dataset.messageErrorMessage ?? "",
-      className: "bg-danger",
-    },
-    error: {
-      title: form.dataset.messageErrorTitle ?? "",
-      message: form.dataset.messageErrorMessage ?? "",
+      title: root.dataset.messageErrorTitle ?? "",
+      message: root.dataset.messageErrorMessage ?? "",
       className: "bg-danger",
     },
     success: {
-      title: form.dataset.messageSuccessTitle ?? "",
-      message: form.dataset.messageSuccessMessage ?? "",
+      title: root.dataset.messageSuccessTitle ?? "",
+      message: root.dataset.messageSuccessMessage ?? "",
       className: "bg-success",
     },
     info: {
-      title: form.dataset.messageInfoTitle ?? "",
-      message: form.dataset.messageInfoMessage ?? "",
+      title: root.dataset.messageInfoTitle ?? "",
+      message: root.dataset.messageInfoMessage ?? "",
       className: "bg-info",
     },
     warning: {
-      title: form.dataset.messageWarningTitle ?? "",
-      message: form.dataset.messageWarningMessage ?? "",
+      title: root.dataset.messageWarningTitle ?? "",
+      message: root.dataset.messageValidation ?? "",
       className: "bg-warning",
     },
   };
-  const status = statusValues[type] ?? statusValues.error;
-  const statusToast =
-    form.querySelector("[data-ie-status-toast]") ??
-    document.querySelector("[data-ie-status-toast]");
+  const status = statusValues[type] ?? statusValues.danger;
+  const statusToast = root.querySelector("[data-ie-status-toast]");
   if (!(statusToast instanceof HTMLElement)) {
     return;
   }
-  const titleElement = statusToast.querySelector(".status-title");
-  const messageElement = statusToast.querySelector(".status-message");
+
   statusToast.classList.remove(
     "d-none",
     "bg-info",
@@ -93,16 +102,21 @@ const showStatus = (form, type) => {
     "bg-warning",
   );
   statusToast.classList.add(status.className);
+
+  const titleElement = statusToast.querySelector(".status-title");
+  const messageElement = statusToast.querySelector(".status-message");
   if (titleElement) {
     titleElement.textContent = status.title;
   }
   if (messageElement) {
-    messageElement.textContent = status.message;
+    messageElement.textContent = message ?? status.message;
   }
+
   if (globalThis.bootstrap?.Toast) {
     globalThis.bootstrap.Toast.getOrCreateInstance(statusToast).show();
   }
 };
+
 const clearValidationErrors = (fields) => {
   fields.forEach((field) => {
     field.classList.remove("is-invalid");
@@ -114,13 +128,17 @@ const clearValidationErrors = (fields) => {
     }
   });
 };
+
 const showValidationErrors = (fields, errors) => {
   Object.entries(errors).forEach(([propertyPath, messages]) => {
     const propertyName = propertyPath.split(".").pop();
-    const field = fields.find((candidate) => candidate.name === propertyName);
+    const field = fields.find(
+      (candidate) => getFieldPropertyName(candidate) === propertyName,
+    );
     if (!field) {
       return;
     }
+
     field.classList.add("is-invalid");
     const feedback = field
       .closest(".mb-3, .form-check")
@@ -132,144 +150,252 @@ const showValidationErrors = (fields, errors) => {
     }
   });
 };
+
 const getTemplateButton = (template) => {
   if (template instanceof HTMLTemplateElement) {
     return template.content.querySelector("button");
   }
-  if (template instanceof HTMLButtonElement) {
-    return template;
-  }
-  if (template instanceof HTMLElement) {
-    return template.querySelector("button");
-  }
   return null;
 };
-const createActivateButton = (template, field, fieldValue) => {
+
+const createActivateButton = (root, field, fieldValue) => {
+  const normalizedValue =
+    fieldValue === null || fieldValue === undefined ? "" : String(fieldValue);
+  const template = root.querySelector(
+    normalizedValue === ""
+      ? "[data-ie-new-button-template]"
+      : "[data-ie-edit-button-template]",
+  );
   const templateButton = getTemplateButton(template);
   if (!(templateButton instanceof HTMLButtonElement)) {
     return null;
   }
+
   const button = templateButton.cloneNode(true);
   if (!(button instanceof HTMLButtonElement)) {
     return null;
   }
-  button.removeAttribute("id");
-  button.type = "button";
-  button.setAttribute("data-academic-persons-inline-edit-activate-btn", "");
+
   button.dataset.ieFor = field.id;
-  if (fieldValue !== "") {
-    const label = button.querySelector("[data-ie-button-label]");
-    if (label) {
-      label.textContent = String(fieldValue);
-    } else {
-      button.textContent = String(fieldValue);
-    }
+  const label = button.querySelector("[data-ie-button-label]");
+  if (label) {
+    label.textContent = normalizedValue === "" ? "+" : normalizedValue;
   }
   return button;
 };
-const renderActivateButton = (fieldValue, field) => {
-  if (!field.form || !field.id) {
-    return;
-  }
-  const normalizedValue =
-    fieldValue === null || fieldValue === undefined ? "" : String(fieldValue);
-  const currentButton = getActivateButton(field);
-  const template =
-    normalizedValue === "" ? templateInlineEditNew : templateInlineEditButton;
-  const replacementButton = createActivateButton(
-    template,
-    field,
-    normalizedValue,
-  );
-  if (replacementButton) {
-    if (currentButton) {
-      replacementButton.classList.toggle(
-        "d-none",
-        currentButton.classList.contains("d-none"),
-      );
-      currentButton.replaceWith(replacementButton);
-      return;
-    }
 
-    const buttonArea = field
-      .closest(".mb-3, .form-check")
-      ?.querySelector(buttonAreaSelector);
-    buttonArea?.append(replacementButton);
+const renderActivateButton = (root, field, fieldValue) => {
+  if (!field.id || field.disabled || field.readOnly) {
     return;
   }
 
-  //fallback
+  const currentButton = getActivateButton(root, field);
+  const replacementButton = createActivateButton(root, field, fieldValue);
+  if (!replacementButton) {
+    return;
+  }
+
   if (currentButton) {
-    currentButton.textContent =
-      normalizedValue === ""
-        ? (currentButton.dataset.emptyLabel ?? "+")
-        : normalizedValue;
-  }
-};
-const toggleEditField = (form, fieldId, state = true) => {
-  const inputElement = getFieldById(form, fieldId);
-  if (!inputElement) {
+    replacementButton.classList.toggle(
+      "d-none",
+      currentButton.classList.contains("d-none"),
+    );
+    currentButton.replaceWith(replacementButton);
     return;
   }
-  const activateButton = getActivateButton(inputElement);
-  inputElement.classList.toggle("d-none", !state);
-  activateButton?.classList.toggle("d-none", state);
-  form
+
+  field
+    .closest(".mb-3, .form-check")
+    ?.querySelector(buttonAreaSelector)
+    ?.append(replacementButton);
+};
+
+const toggleEditField = (root, fieldId, state = true) => {
+  const field = getFieldById(root, fieldId);
+  if (!field || field.disabled || field.readOnly) {
+    return;
+  }
+
+  field.classList.toggle("d-none", !state);
+  getActivateButton(root, field)?.classList.toggle("d-none", state);
+  root
     .querySelectorAll(`[data-ie-dismiss][data-ie-for="${CSS.escape(fieldId)}"]`)
-    .forEach((button) => {
-      button.classList.toggle("d-none", !state);
-    });
-  form
+    .forEach((button) => button.classList.toggle("d-none", !state));
+  root
     .querySelectorAll(`[data-ie-save][data-ie-for="${CSS.escape(fieldId)}"]`)
-    .forEach((button) => {
-      button.classList.toggle("d-none", !state);
-    });
+    .forEach((button) => button.classList.toggle("d-none", !state));
+
+  if (state) {
+    field.focus();
+  }
 };
-const closeAllFields = (form, fields) => {
+
+const closeFields = (root, fields) => {
   fields.forEach((field) => {
-    if (field instanceof HTMLSelectElement) {
-      return;
-    }
-    if (field.id) {
-      toggleEditField(form, field.id, false);
-    }
-  });
-  setFooterVisible(form, false);
-};
-const updateView = (initialValues, fields) => {
-  fields.forEach((field) => {
-    if (!field.name) {
-      return;
-    }
-    const value = initialValues.get(field.name) ?? "";
-    setFieldValue(field, value);
-    if (!(field instanceof HTMLSelectElement)) {
-      renderActivateButton(value, field);
+    if (!(field instanceof HTMLSelectElement) && field.id) {
+      toggleEditField(root, field.id, false);
     }
   });
 };
-document.querySelectorAll(formSelector).forEach((form) => {
-  if (!(form instanceof HTMLFormElement)) {
+
+const closeAllFields = (root, fields) => {
+  closeFields(root, fields);
+  setFooterVisible(root, false);
+};
+
+const requestJson = async (url, options) => {
+  const { headers = {}, ...requestOptions } = options;
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    ...requestOptions,
+    headers: {
+      Accept: "application/json",
+      ...headers,
+    },
+  });
+  const result = await response.json().catch(() => null);
+
+  if (!response.ok || result?.success !== true) {
+    const error = new Error("The request failed.");
+    error.result = result;
+    throw error;
+  }
+
+  return result;
+};
+
+const initializeFieldEditing = (root) => {
+  const forms = Array.from(root.querySelectorAll(fieldsFormSelector)).filter(
+    (element) => element instanceof HTMLFormElement,
+  );
+  const primaryForm = forms[0];
+  if (!(primaryForm instanceof HTMLFormElement)) {
     return;
   }
-  const fields = Array.from(form.querySelectorAll(fieldSelector)).filter(
+
+  const fields = Array.from(root.querySelectorAll(fieldSelector)).filter(
     isEditableField,
   );
-  const initialValues = new Map(
-    fields.map((field) => [field.name, getFieldValue(field)]),
+  const persistedValues = new Map(
+    fields.map((field) => [field, getFieldValue(field)]),
   );
-  form.addEventListener("change", (event) => {
-    event.preventDefault();
-    if (!(event.target instanceof Element)) {
-      return;
+  let bulkEditing = false;
+
+  const finishBulkEditingWhenClosed = () => {
+    const hasOpenTextField = fields.some(
+      (field) =>
+        !(field instanceof HTMLSelectElement) &&
+        !field.classList.contains("d-none"),
+    );
+    if (!hasOpenTextField) {
+      bulkEditing = false;
+      setFooterVisible(root, false);
     }
-    const select = event.target.closest("select");
-    if (!(select instanceof HTMLSelectElement)) {
-      return;
+  };
+
+  const resetFields = (fieldsToReset) => {
+    fieldsToReset.forEach((field) => {
+      setFieldValue(field, persistedValues.get(field) ?? "");
+    });
+    clearValidationErrors(fieldsToReset);
+  };
+
+  const saveFields = async (fieldsToSave, closeEverything = false) => {
+    if (root.getAttribute("aria-busy") === "true") {
+      return false;
     }
-    form.requestSubmit();
+
+    clearValidationErrors(fieldsToSave);
+    const changedFields = fieldsToSave.filter(
+      (field) =>
+        getFieldPropertyName(field) &&
+        !field.disabled &&
+        !field.readOnly &&
+        persistedValues.get(field) !== getFieldValue(field),
+    );
+
+    if (changedFields.length === 0) {
+      if (closeEverything) {
+        closeAllFields(root, fields);
+        bulkEditing = false;
+      } else {
+        closeFields(root, fieldsToSave);
+        finishBulkEditingWhenClosed();
+      }
+      showStatus(root, "info", root.dataset.messageUnchanged ?? null);
+      return true;
+    }
+
+    const invalidField = changedFields.find((field) => !field.checkValidity());
+    if (invalidField) {
+      invalidField.reportValidity();
+      invalidField.classList.add("is-invalid");
+      showStatus(root, "warning", root.dataset.messageValidation ?? null);
+      return false;
+    }
+
+    const profileUid = getProfileUid(root);
+    const updateUrl = root.dataset.updateUrl;
+    if (profileUid === null || !updateUrl) {
+      showStatus(root, "danger");
+      return false;
+    }
+
+    const data = Object.fromEntries(
+      changedFields.map((field) => [
+        getFieldPropertyName(field),
+        getFieldValue(field),
+      ]),
+    );
+    root.setAttribute("aria-busy", "true");
+    showStatus(root, "info", root.dataset.messageSaving ?? null);
+
+    try {
+      await requestJson(updateUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profile: profileUid, data }),
+      });
+
+      changedFields.forEach((field) => {
+        const value = getFieldValue(field);
+        persistedValues.set(field, value);
+        renderActivateButton(root, field, value);
+      });
+
+      if (closeEverything) {
+        closeAllFields(root, fields);
+        bulkEditing = false;
+      } else {
+        closeFields(root, changedFields);
+        finishBulkEditingWhenClosed();
+      }
+      showStatus(root, "success");
+      return true;
+    } catch (error) {
+      const result = error instanceof Error ? error.result : null;
+      if (result?.errors && typeof result.errors === "object") {
+        showValidationErrors(fields, result.errors);
+        showStatus(root, "warning", root.dataset.messageValidation ?? null);
+      } else {
+        showStatus(root, "danger", result?.message ?? null);
+      }
+      return false;
+    } finally {
+      root.removeAttribute("aria-busy");
+    }
+  };
+
+  root.addEventListener("change", (event) => {
+    if (
+      event.target instanceof HTMLSelectElement &&
+      event.target.matches(fieldSelector)
+    ) {
+      void saveFields([event.target]);
+    }
   });
-  form.addEventListener("click", (event) => {
+
+  root.addEventListener("click", (event) => {
     if (!(event.target instanceof Element)) {
       return;
     }
@@ -277,23 +403,23 @@ document.querySelectorAll(formSelector).forEach((form) => {
     if (!(button instanceof HTMLButtonElement)) {
       return;
     }
+
     if (button.matches(editAllButtonSelector)) {
       event.preventDefault();
-      form.querySelectorAll(editButtonSelector).forEach((editButton) => {
-        const fieldId = editButton.dataset.ieFor;
-
-        if (fieldId) {
-          toggleEditField(form, fieldId, true);
+      root.querySelectorAll(editButtonSelector).forEach((editButton) => {
+        if (editButton.dataset.ieFor) {
+          toggleEditField(root, editButton.dataset.ieFor, true);
         }
       });
-      setFooterVisible(form, true);
+      bulkEditing = true;
+      setFooterVisible(root, true);
       return;
     }
+
     if (button.matches(editButtonSelector)) {
       event.preventDefault();
-      const fieldId = button.dataset.ieFor;
-      if (fieldId) {
-        toggleEditField(form, fieldId, true);
+      if (button.dataset.ieFor) {
+        toggleEditField(root, button.dataset.ieFor, true);
       }
       return;
     }
@@ -302,84 +428,355 @@ document.querySelectorAll(formSelector).forEach((form) => {
       event.preventDefault();
       const fieldId = button.dataset.ieFor;
       if (fieldId) {
-        const field = getFieldById(form, fieldId);
+        const field = getFieldById(root, fieldId);
         if (field) {
-          setFieldValue(field, initialValues.get(field.name) ?? "");
-          clearValidationErrors([field]);
-          toggleEditField(form, fieldId, false);
+          resetFields([field]);
+          toggleEditField(root, fieldId, false);
+          finishBulkEditingWhenClosed();
         }
       } else {
-        fields.forEach((field) => {
-          setFieldValue(field, initialValues.get(field.name) ?? "");
-        });
-        clearValidationErrors(fields);
-        closeAllFields(form, fields);
+        resetFields(fields);
+        closeAllFields(root, fields);
+        bulkEditing = false;
       }
       return;
     }
 
     if (button.matches("[data-ie-save]")) {
       event.preventDefault();
-      form.requestSubmit();
+      const field = getFieldById(root, button.dataset.ieFor);
+      if (field) {
+        void saveFields([field]);
+      }
     }
   });
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    clearValidationErrors(fields);
-    const data = {};
-    fields.forEach((field) => {
-      if (!field.name) {
-        return;
-      }
-      const value = getFieldValue(field);
-      if (initialValues.get(field.name) !== value) {
-        data[field.name] = value;
-      }
+
+  forms.forEach((form) => {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const savesAllFields = form === primaryForm;
+      const fieldsToSave = savesAllFields
+        ? fields
+        : fields.filter((field) => form.contains(field));
+      void saveFields(fieldsToSave, savesAllFields);
     });
-    if (Object.keys(data).length === 0) {
-      showStatus(form, "info");
+    form.addEventListener("reset", (event) => event.preventDefault());
+  });
+
+  // Keep the footer state coherent when a field is saved individually while
+  // the bulk editor is open.
+  root.addEventListener("input", () => {
+    if (bulkEditing) {
+      setFooterVisible(root, true);
+    }
+  });
+};
+
+const initializeSkipSync = (root) => {
+  const form = root.querySelector(syncFormSelector);
+  const checkbox = form?.querySelector(syncCheckboxSelector);
+  if (!(form instanceof HTMLFormElement) || !(checkbox instanceof HTMLInputElement)) {
+    return;
+  }
+
+  let persistedValue = checkbox.checked;
+  form.addEventListener("submit", (event) => event.preventDefault());
+  checkbox.addEventListener("change", async () => {
+    const profileUid = getProfileUid(root);
+    const updateUrl = root.dataset.skipSyncUrl;
+    if (profileUid === null || !updateUrl) {
+      checkbox.checked = persistedValue;
+      showStatus(root, "danger");
       return;
     }
-    const profileUid = Number.parseInt(form.dataset.profileUid ?? "", 10);
-    const updateUrl = form.dataset.updateUrl;
-    if (!Number.isInteger(profileUid) || profileUid <= 0 || !updateUrl) {
-      showStatus(form, "danger");
-      return;
-    }
+
+    const requestedValue = checkbox.checked;
     form.setAttribute("aria-busy", "true");
-    showStatus(form, "info");
+    checkbox.disabled = true;
+    showStatus(root, "info", root.dataset.messageSaving ?? null);
+
     try {
-      const response = await fetch(updateUrl, {
+      const result = await requestJson(updateUrl, {
         method: "POST",
-        credentials: "same-origin",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           profile: profileUid,
-          data,
+          data: { skipSync: requestedValue },
         }),
       });
-      const result = await response.json().catch(() => null);
-      if (!response.ok || result?.success !== true) {
-        if (result?.errors !== null && typeof result?.errors === "object") {
-          showValidationErrors(fields, result.errors);
-        }
-        showStatus(form, "danger");
-        return;
-      }
-      Object.entries(data).forEach(([propertyName, value]) => {
-        initialValues.set(propertyName, value);
-      });
-      updateView(initialValues, fields);
-      closeAllFields(form, fields);
-      showStatus(form, "success");
+      persistedValue = Boolean(result.skipSync);
+      checkbox.checked = persistedValue;
+      checkbox.classList.remove("is-invalid");
+      showStatus(root, "success");
     } catch (error) {
-      console.error("Inline edit request failed:", error);
-      showStatus(form, "danger");
+      const result = error instanceof Error ? error.result : null;
+      checkbox.checked = persistedValue;
+      checkbox.classList.add("is-invalid");
+      showStatus(root, "danger", result?.message ?? null);
     } finally {
+      checkbox.disabled = false;
       form.removeAttribute("aria-busy");
     }
   });
+};
+
+const getImagePreviews = (root) =>
+  Array.from(
+    root.querySelectorAll(
+      "[data-ie-image-preview], [data-ie-image-modal-preview]",
+    ),
+  );
+
+const setImagePreviewUrl = (preview, url, alt = "", title = "") => {
+  const image = preview.querySelector("img");
+  if (!(image instanceof HTMLImageElement)) {
+    return;
+  }
+
+  preview
+    .querySelectorAll("source")
+    .forEach((source) => source.setAttribute("srcset", url));
+  image.removeAttribute("srcset");
+  image.src = url;
+  image.alt = alt;
+  image.title = title;
+};
+
+const updateImagePreviewsFromFile = (root, file) => {
+  getImagePreviews(root).forEach((preview) => {
+    const objectUrl = URL.createObjectURL(file);
+    setImagePreviewUrl(preview, objectUrl, file.name, file.name);
+    const image = preview.querySelector("img");
+    image?.addEventListener("load", () => URL.revokeObjectURL(objectUrl), {
+      once: true,
+    });
+  });
+};
+
+const setImageState = (root, hasImage) => {
+  root.dataset.hasImage = hasImage ? "1" : "0";
+  root
+    .querySelector("[data-ie-delete-image]")
+    ?.classList.toggle("d-none", !hasImage);
+
+  const submitButton = root.querySelector(
+    `${imageFormSelector} button[type="submit"]`,
+  );
+  if (submitButton instanceof HTMLButtonElement) {
+    const label = hasImage
+      ? submitButton.dataset.replaceLabel
+      : submitButton.dataset.addLabel;
+    if (label) {
+      const labelElement = submitButton.querySelector("[data-ie-action-label]");
+      if (labelElement) {
+        labelElement.textContent = label;
+      }
+    }
+  }
+
+  const modalHint = root.querySelector("[data-ie-image-modal-hint]");
+  if (modalHint instanceof HTMLElement) {
+    const label = hasImage
+      ? modalHint.dataset.replaceLabel
+      : modalHint.dataset.addLabel;
+    if (label) {
+      modalHint.textContent = label;
+    }
+  }
+
+  root
+    .querySelector("[data-ie-image-delete-hint]")
+    ?.classList.toggle("d-none", !hasImage);
+};
+
+const initializeImageEditing = (root) => {
+  const form = root.querySelector(imageFormSelector);
+  const modal = root.querySelector(imageModalSelector);
+  const openButton = root.querySelector("[data-ie-open-image-modal]");
+  const fileInput = form?.querySelector('input[type="file"]');
+  const uploadButton = form?.querySelector("[data-ie-upload-image]");
+  const deleteButton = root.querySelector("[data-ie-delete-image]");
+  const Modal = globalThis.bootstrap?.Modal;
+  if (
+    !(form instanceof HTMLFormElement) ||
+    !(modal instanceof HTMLElement) ||
+    !(openButton instanceof HTMLButtonElement) ||
+    !(fileInput instanceof HTMLInputElement) ||
+    !(uploadButton instanceof HTMLButtonElement) ||
+    !Modal
+  ) {
+    return;
+  }
+
+  const modalInstance = Modal.getOrCreateInstance(modal);
+  let requestPending = false;
+
+  const clearImageError = () => {
+    fileInput.classList.remove("is-invalid");
+    const feedback = form.querySelector("[data-ie-image-error]");
+    if (feedback) {
+      feedback.textContent = "";
+    }
+  };
+
+  const showImageError = (message) => {
+    fileInput.classList.add("is-invalid");
+    const feedback = form.querySelector("[data-ie-image-error]");
+    if (feedback) {
+      feedback.textContent = message;
+    }
+  };
+
+  const updateActionAvailability = () => {
+    const hasSelectedFile = fileInput.files?.length === 1;
+    fileInput.disabled = requestPending;
+    uploadButton.disabled = requestPending || !hasSelectedFile;
+    if (deleteButton instanceof HTMLButtonElement) {
+      deleteButton.disabled =
+        requestPending || root.dataset.hasImage !== "1";
+    }
+    modal.querySelectorAll("[data-ie-close-image-modal]").forEach((button) => {
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = requestPending;
+      }
+    });
+  };
+
+  const setRequestPending = (pending, activeButton = null) => {
+    requestPending = pending;
+    modal.toggleAttribute("aria-busy", pending);
+    modal.querySelectorAll("[data-ie-action-spinner]").forEach((spinner) => {
+      spinner.classList.toggle(
+        "d-none",
+        !pending || spinner.closest("button") !== activeButton,
+      );
+    });
+    updateActionAvailability();
+  };
+
+  modal.addEventListener("show.bs.modal", () => {
+    clearImageError();
+    updateActionAvailability();
+  });
+  modal.addEventListener("hide.bs.modal", (event) => {
+    if (requestPending) {
+      event.preventDefault();
+    }
+  });
+  modal.addEventListener("hidden.bs.modal", () => {
+    form.reset();
+    clearImageError();
+    updateActionAvailability();
+    openButton.focus();
+  });
+
+  fileInput.addEventListener("change", () => {
+    clearImageError();
+    updateActionAvailability();
+  });
+
+  setImageState(root, root.dataset.hasImage === "1");
+  updateActionAvailability();
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (requestPending) {
+      return;
+    }
+    if (!form.reportValidity()) {
+      showStatus(root, "warning", root.dataset.messageValidation ?? null);
+      return;
+    }
+
+    const file = fileInput?.files?.[0];
+    if (!(file instanceof File)) {
+      showStatus(root, "warning", root.dataset.messageValidation ?? null);
+      return;
+    }
+
+    clearImageError();
+    setRequestPending(true, uploadButton);
+    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    let uploadSucceeded = false;
+
+    try {
+      await requestJson(form.action, {
+        method: "POST",
+        body: new FormData(form),
+      });
+      updateImagePreviewsFromFile(root, file);
+      setImageState(root, true);
+      uploadSucceeded = true;
+      showStatus(root, "success", root.dataset.messageImageUploaded ?? null);
+    } catch (error) {
+      const result = error instanceof Error ? error.result : null;
+      const message = result?.message ?? root.dataset.messageErrorMessage ?? "";
+      showImageError(message);
+      showStatus(root, "danger", message || null);
+    } finally {
+      setRequestPending(false);
+      if (uploadSucceeded) {
+        modalInstance.hide();
+      }
+    }
+  });
+
+  deleteButton?.addEventListener("click", async () => {
+    if (requestPending || root.dataset.hasImage !== "1") {
+      return;
+    }
+
+    const profileUid = getProfileUid(root);
+    const deleteUrl = root.dataset.deleteImageUrl;
+    if (profileUid === null || !deleteUrl) {
+      showStatus(root, "danger");
+      return;
+    }
+
+    setRequestPending(
+      true,
+      deleteButton instanceof HTMLButtonElement ? deleteButton : null,
+    );
+    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    let deletionSucceeded = false;
+
+    try {
+      await requestJson(deleteUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profile: profileUid, data: {} }),
+      });
+
+      const placeholderUrl = root.dataset.placeholderImageUrl;
+      if (placeholderUrl) {
+        getImagePreviews(root).forEach((preview) => {
+          setImagePreviewUrl(
+            preview,
+            placeholderUrl,
+            root.dataset.placeholderImageAlt ?? "",
+          );
+        });
+      }
+      setImageState(root, false);
+      deletionSucceeded = true;
+      showStatus(root, "success", root.dataset.messageImageDeleted ?? null);
+    } catch (error) {
+      const result = error instanceof Error ? error.result : null;
+      showStatus(root, "danger", result?.message ?? null);
+    } finally {
+      setRequestPending(false);
+      if (deletionSucceeded) {
+        modalInstance.hide();
+      }
+    }
+  });
+};
+
+document.querySelectorAll(rootSelector).forEach((root) => {
+  if (!(root instanceof HTMLElement)) {
+    return;
+  }
+  initializeFieldEditing(root);
+  initializeSkipSync(root);
+  initializeImageEditing(root);
 });
