@@ -17,31 +17,31 @@
 #-----------------------------------------------------------------------------------------------------------------------
 profileInformationsTypes:
   cooperation:
-    label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.cooperation.label'
+    label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.cooperation.label"
     type: cooperation
     fieldName: cooperation
   lectures:
-    label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.lectures.label'
+    label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.lectures.label"
     type: lecture
     fieldName: lectures
   memberships:
-    label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.memberships.label'
+    label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.memberships.label"
     type: membership
     fieldName: memberships
   pressMedia:
-    label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.press_media.label'
+    label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.press_media.label"
     type: press_media
     fieldName: press_media
   publications:
-    label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publications.label'
+    label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publications.label"
     type: publication
     fieldName: publications
   scientificResearch:
-    label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.scientific_research.label'
+    label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.scientific_research.label"
     type: scientific_research
     fieldName: scientific_research
   vita:
-    label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.vita.label'
+    label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.vita.label"
     type: curriculum_vitae
     fieldName: vita
 #-----------------------------------------------------------------------------------------------------------------------
@@ -55,12 +55,13 @@ validations:
   #
   # <identifier>:
   #   <propertyName>:
-  #      - required   # must not be empty; adds the "required" flag to the TCA column
-  #      - email      # must be an email address; renders an email input
-  #      - number     # renders a number input; adds no further validation
-  #      - disabled   # must not be edited; implies "readonly" and cancels "required"
-  #      - readonly   # shown but not writable; cancels "required"
-  #
+  #      - required  # Must not be empty
+  #     - email      # Valid email address and input type="email"
+  #     - url        # Valid URL and input type="url"
+  #     - number     # Renders input type="number"
+  #     - tel        # Renders input type="tel"; no additional server validation
+  #     - disabled   # Must not be edited
+  #     - readonly   # Shown but not writable
   # Flag names are matched case insensitively, anything not listed above is ignored. A "disabled" or
   # "readonly" property is never written by the frontend transformation, which is what protects
   # already stored data from being emptied by a submitted form.
@@ -76,6 +77,7 @@ validations:
   phoneNumber:
     phoneNumber:
       - required
+      - tel
     type:
       - required
   physicalAddress:
@@ -99,6 +101,10 @@ validations:
       - disabled
     lastName:
       - disabled
+    website:
+      - url
+    publicationsLink:
+      - url
   profileInformation:
     year:
       - required
