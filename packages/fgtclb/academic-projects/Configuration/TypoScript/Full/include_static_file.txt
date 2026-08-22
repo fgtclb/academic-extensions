@@ -1,0 +1,3 @@
+EXT:academic_projects/Configuration/TypoScript/ProjectList,
+EXT:academic_projects/Configuration/TypoScript/ProjectListSingle,
+EXT:academic_projects/Configuration/TypoScript/ContentLoad

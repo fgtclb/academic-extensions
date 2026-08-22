@@ -4,10 +4,53 @@ declare(strict_types=1);
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
+defined('TYPO3') or die;
+
 (static function (): void {
+
+    //==================================================================================================================
+    // Static TypoScript templates, selectable in a "sys_template" record for installations that do not use site sets.
+    //
+    // The registered folders are the same ones the sets of this extension deliver through their "typoscript" key.
+    // Use one mechanism per site, not both - see the extension documentation, chapter "Configuration". On TYPO3 v12
+    // this is the only mechanism there is: site sets arrived in TYPO3 v13.1.
+    //==================================================================================================================
+    ExtensionManagementUtility::addStaticFile(
+        'academic_projects',
+        'Configuration/TypoScript/ProjectList',
+        'Academic Projects: Projects',
+    );
+
+    ExtensionManagementUtility::addStaticFile(
+        'academic_projects',
+        'Configuration/TypoScript/ProjectListSingle',
+        'Academic Projects: Projects (selected)',
+    );
+
+    ExtensionManagementUtility::addStaticFile(
+        'academic_projects',
+        'Configuration/TypoScript/ContentLoad',
+        'Academic Projects: Content load override',
+    );
+
+    ExtensionManagementUtility::addStaticFile(
+        'academic_projects',
+        'Configuration/TypoScript/Full',
+        'Academic Projects: All components',
+    );
+
+    //==================================================================================================================
+    // The entry below keeps the value that installations already store in "sys_template.include_static_file".
+    //
+    // It is the shared "plugin.tx_academicprojects" block every component folder includes, plus the page object of the
+    // page type this extension registers. Selecting it is equivalent to what the single entry of this extension
+    // delivered before the configuration was cut per component, minus the "styles.content" override above - but it
+    // does not make any content element selectable, which the page TSconfig does.
+    //==================================================================================================================
     ExtensionManagementUtility::addStaticFile(
         'academic_projects',
         'Configuration/TypoScript/',
-        'Academic Projects'
+        'Academic Projects: Shared plugin settings and page rendering',
     );
+
 })();
