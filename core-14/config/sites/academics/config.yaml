@@ -15,16 +15,32 @@ dependencies:
   # elements, Bootstrap 5, the RTE preset and the rest - the seed's
   # "backend_layout" values are its identifiers.
   - bootstrap-package/full
-  # The TypoScript of the academic extensions: view paths for their plugins and
-  # the plugin settings. Without it a plugin has no template root path and every
-  # action fails. Deliberately "academic-persons-default" and not
-  # "-standalone": the standalone set defines its own "page" object and would
-  # replace the theme. Each of these depends on
-  # "fgtclb/academic-base-ctype-group", which is therefore not listed here.
-  - fgtclb/academic-persons-default
+  # Every academic extension that ships a site set, by its aggregate. Since
+  # ACE-458 each extension hides its own content elements for the whole
+  # installation and re-enables them per component, so an extension that is not
+  # named here can be installed and still offer nothing an editor can place.
+  # A development instance is meant to offer everything, hence all of them.
+  #
+  # Each aggregate depends on its own component sets, so naming it enables the
+  # whole extension. Do not name component sets here by hand: the three
+  # "-content-load" sets are dependencies of their aggregates and leaving one
+  # out is a fatal error, not a degraded page - nothing else defines
+  # "styles.content.getContent" and the page templates call it through
+  # "f:cObject".
+  - fgtclb/academic-base
+  - fgtclb/academic-bite-jobs
+  - fgtclb/academic-contacts4pages
+  - fgtclb/academic-jobs
+  - fgtclb/academic-partners
+  # Deliberately the aggregate and not "fgtclb/academic-persons-standalone":
+  # the standalone set defines its own "page" object and would replace the
+  # theme. "fgtclb/academic-persons-default" is kept as a compatibility alias
+  # of this aggregate and would work as well.
+  - fgtclb/academic-persons
   - fgtclb/academic-persons-edit
   - fgtclb/academic-programs
-  - fgtclb/academic-partners
+  - fgtclb/academic-projects
+  - fgtclb/academic-study-plan
   # EXT:felogin registers its TypoScript with "includeInSiteSets = false", so
   # in a site set driven installation it arrives only through this dependency.
   - typo3/felogin
