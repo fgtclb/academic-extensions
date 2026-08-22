@@ -323,8 +323,8 @@ package may `@import`. On this branch it is a backport of the work done on
 `main`, and it runs in five slices.
 
 Converted so far: `academic-base`, `academic-bite-jobs`, `academic-persons`,
-`academic-contact4pages` and `academic-persons-edit`. Still on the old shape:
-`academic-jobs`, `academic-study-plan`, `academic-partners`,
+`academic-contact4pages`, `academic-persons-edit`, `academic-jobs` and
+`academic-study-plan`. Still on the old shape: `academic-partners`,
 `academic-programs` and `academic-projects`. The remaining two,
 `academic-persons-sync` and `typo3-category-types`, ship neither a
 `Configuration/TypoScript/` nor a `Configuration/Sets/` and have nothing to

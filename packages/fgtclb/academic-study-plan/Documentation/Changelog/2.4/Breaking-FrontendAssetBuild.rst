@@ -19,11 +19,12 @@ in the repository rather than maintained as finished files. Both moved into a
     EXT:academic_study_plan/Resources/Public/JavaScript/academic-study-plan.js
     ->  EXT:academic_study_plan/Resources/Public/JavaScript/frontend/academic-study-plan.js
 
-How they are loaded does **not** change. The TypoScript include
-:file:`Configuration/TypoScript/Includes/Page.typoscript` still adds both
-through :typoscript:`page.includeCSS` and :typoscript:`page.includeJSFooter`,
-and the compiled script is still a classic script rather than an ES module —
-the Fluid view helper that loads a module does not exist on TYPO3 v12.
+How they are loaded does **not** change. The TypoScript of the content element
+still adds both through :typoscript:`page.includeCSS` and
+:typoscript:`page.includeJSFooter`, and the compiled script is still a classic
+script rather than an ES module — the Fluid view helper that loads a module does
+not exist on TYPO3 v12. The file it is assigned in moved in the same release,
+see :ref:`breaking-site-sets-and-static-templates-restructured`.
 
 Impact
 ======
