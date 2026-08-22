@@ -7,6 +7,15 @@ Installation
 The extension has to be installed like any other TYPO3 CMS extension. You can
 download and install it using one of the following methods.
 
+Requirements
+============
+
+Version 3 requires TYPO3 13.4.31 or newer in the 13.4 LTS series, or TYPO3
+14.3.6 or newer in the 14.3 series. The lower bounds include the HTML-sanitizer
+security fixes required by the inline rich-text editor. The
+``typo3/cms-rte-ckeditor`` system extension is a required dependency and must
+be active. Composer and the Extension Manager resolve it automatically.
+
 ..  tabs::
 
     ..  group-tab:: Composer

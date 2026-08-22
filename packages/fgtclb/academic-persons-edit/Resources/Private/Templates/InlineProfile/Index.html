@@ -1,7 +1,6 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-    xmlns:p="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
     data-namespace-typo3-fluid="true">
     <f:if condition="{profile}">
         <f:then>
@@ -10,28 +9,13 @@
 
             <f:variable
                 name="updateUrl"
-                value="{f:uri.action(
-                    action: 'update',
-                    controller: 'InlineProfile',
-                    pageType: 1733735,
-                    absolute: true
-                )}" />
+                value="{f:uri.action(action: 'update', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
             <f:variable
                 name="skipSyncUrl"
-                value="{f:uri.action(
-                    action: 'updateSkipSync',
-                    controller: 'InlineProfile',
-                    pageType: 1733735,
-                    absolute: true
-                )}" />
+                value="{f:uri.action(action: 'updateSkipSync', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
             <f:variable
                 name="deleteImageUrl"
-                value="{f:uri.action(
-                    action: 'deleteImage',
-                    controller: 'InlineProfile',
-                    pageType: 1733735,
-                    absolute: true
-                )}" />
+                value="{f:uri.action(action: 'deleteImage', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
             <f:variable
                 name="placeholderImageUrl"
                 value="{f:uri.resource(path: 'Images/profile-placeholder.png')}" />
@@ -55,524 +39,41 @@
                 data-message-info-message="{f:translate(key: 'inlineProfile.status.info.message', extensionName: 'academic_persons_edit')}"
                 data-message-warning-title="{f:translate(key: 'inlineProfile.status.warning.title', extensionName: 'academic_persons_edit')}"
                 data-message-validation="{f:translate(key: 'inlineProfile.status.validation', extensionName: 'academic_persons_edit')}"
+                data-message-editor-error="{f:translate(key: 'inlineProfile.status.editorError', extensionName: 'academic_persons_edit')}"
                 data-message-unchanged="{f:translate(key: 'inlineProfile.status.unchanged', extensionName: 'academic_persons_edit')}"
                 data-message-image-uploaded="{f:translate(key: 'inlineProfile.image.status.uploaded', extensionName: 'academic_persons_edit')}"
+                data-message-image-upload-missing="{f:translate(key: 'inlineProfile.image.status.missing', extensionName: 'academic_persons_edit')}"
                 data-message-image-deleted="{f:translate(key: 'inlineProfile.image.status.deleted', extensionName: 'academic_persons_edit')}">
-                <header class="mb-4">
-                    <h2 class="h3 mb-2">
-                        {f:translate(key: 'inlineProfile.heading',
-                        extensionName: 'academic_persons_edit')}
-                    </h2>
-                    <p class="text-body-secondary mb-0">
-                        {f:translate(key: 'inlineProfile.introduction',
-                        extensionName: 'academic_persons_edit')}
-                    </p>
-                </header>
+                <f:render partial="InlineProfile/Header" />
+
                 <div class="conainer-fluid">
                     <div class="row">
                         <div class="col-12 col-lg-4">
-                            <!--  Image open modal start -->
-                            <section class="card">
-                                <div class="card-body">
-                                    <h3 class="h5">
-                                        {f:translate(key: 'profile.image',
-                                        extensionName: 'academic_persons_edit')}
-                                    </h3>
-
-                                    <button
-                                        class="btn border-0 p-0 w-100 text-start"
-                                        type="button"
-                                        data-ie-open-image-modal
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#inline-profile-{profile.uid}-image-modal"
-                                        aria-controls="inline-profile-{profile.uid}-image-modal"
-                                        aria-haspopup="dialog">
-                                        <span class="visually-hidden">
-                                            {f:translate(key:
-                                            'inlineProfile.image.modal.open',
-                                            extensionName:
-                                            'academic_persons_edit')}
-                                        </span>
-                                        <div data-ie-image-preview>
-                                            <f:render
-                                                partial="Profile/Show/Image"
-                                                arguments="{profile: profile}" />
-                                        </div>
-                                    </button>
-                                    <div class="form-text text-center">
-                                        {f:translate(key:
-                                        'inlineProfile.image.modal.open',
-                                        extensionName: 'academic_persons_edit')}
-                                    </div>
-                                </div>
-                            </section>
-                            <!--  Image open modal start -->
-                            <!--  Sync checkbox start -->
-                            <section class="mt-4">
-                                <f:variable name="skipSyncValidation"
-                                    ><p:validationEnsure
-                                        validations="{validations}"
-                                        identifier="skipSync"
-                                /></f:variable>
-                                <form
-                                    class="academic-persons-inline-edit__sync-form"
-                                    data-ie-sync-form>
-                                    <fieldset class="card">
-                                        <div class="card-body">
-                                            <legend class="h5">
-                                                {f:translate(key:
-                                                'inlineProfile.section.settings',
-                                                extensionName:
-                                                'academic_persons_edit')}
-                                            </legend>
-
-                                            <div class="form-check">
-                                                <f:if
-                                                    condition="{skipSyncValidation.readOnly}">
-                                                    <f:then>
-                                                        <f:form.checkbox
-                                                            name="skipSync"
-                                                            id="inline-profile-{profile.uid}-skipSync"
-                                                            class="form-check-input academic-persons-inline-edit__sync-checkbox"
-                                                            value="1"
-                                                            checked="{profile.skipSync}"
-                                                            disabled="true" />
-                                                    </f:then>
-                                                    <f:else>
-                                                        <f:form.checkbox
-                                                            name="skipSync"
-                                                            id="inline-profile-{profile.uid}-skipSync"
-                                                            class="form-check-input academic-persons-inline-edit__sync-checkbox"
-                                                            value="1"
-                                                            checked="{profile.skipSync}"
-                                                            disabled="{skipSyncValidation.disabled}" />
-                                                    </f:else>
-                                                </f:if>
-                                                <label
-                                                    class="form-check-label"
-                                                    for="inline-profile-{profile.uid}-skipSync">
-                                                    {f:translate(key:
-                                                    'profile.skipSync.label',
-                                                    extensionName:
-                                                    'academic_persons_edit')}
-                                                </label>
-                                                <div class="form-text">
-                                                    {f:translate(key:
-                                                    'profile.skipSync.description',
-                                                    extensionName:
-                                                    'academic_persons_edit')}
-                                                </div>
-                                                <div
-                                                    class="invalid-feedback"></div>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                </form>
-                            </section>
-                            <!--  Sync checkbox end -->
+                            <f:render
+                                partial="InlineProfile/Image/Card"
+                                arguments="{profile: profile}" />
+                            <f:render
+                                partial="InlineProfile/Settings/Sync"
+                                arguments="{profile: profile, validations: validations}" />
                         </div>
                         <div class="col-12 col-lg-8">
-                            <form
-                                class="academic-persons-inline-edit__form"
-                                data-ie-fields-form>
-                                <fieldset class="card">
-                                    <div class="card-body position-relative">
-                                        <button
-                                            class="btn btn-outline-info position-absolute top-0 end-0 m-2"
-                                            type="button"
-                                            data-academic-persons-inline-edit-edit-all-btn>
-                                            <f:translate
-                                                key="inlineProfile.btnEditAll"
-                                                extensionName="academic_persons_edit" />
-                                        </button>
-                                        <legend class="h5">
-                                            {f:translate(key:
-                                            'inlineProfile.section.personal',
-                                            extensionName:
-                                            'academic_persons_edit')}
-                                        </legend>
-                                        <div class="row g-3">
-                                            <f:variable name="genderValidation"
-                                                ><p:validationEnsure
-                                                    validations="{validations}"
-                                                    identifier="gender"
-                                            /></f:variable>
-
-                                            <div class="col-12 col-sm-6">
-                                                <div class="mb-3">
-                                                    <label
-                                                        class="form-label"
-                                                        for="inline-profile-{profile.uid}-gender">
-                                                        {f:translate(key:
-                                                        'profile.gender.label',
-                                                        extensionName:
-                                                        'academic_persons_edit')}
-                                                        <f:if
-                                                            condition="{genderValidation.required}">
-                                                            <abbr
-                                                                title="required"
-                                                                >*</abbr
-                                                            >
-                                                        </f:if>
-                                                    </label>
-
-                                                    <f:if
-                                                        condition="{genderValidation.readOnly}">
-                                                        <f:then>
-                                                            <f:form.select
-                                                                name="gender"
-                                                                id="inline-profile-{profile.uid}-gender"
-                                                                class="form-select form-select-sm academic-persons-inline-edit__field"
-                                                                options="{genderOptions}"
-                                                                value="{profile.gender}"
-                                                                prependOptionLabel="---"
-                                                                prependOptionValue=""
-                                                                disabled="true" />
-                                                        </f:then>
-                                                        <f:else>
-                                                            <f:form.select
-                                                                name="gender"
-                                                                id="inline-profile-{profile.uid}-gender"
-                                                                class="form-select form-select-sm academic-persons-inline-edit__field"
-                                                                options="{genderOptions}"
-                                                                value="{profile.gender}"
-                                                                prependOptionLabel="---"
-                                                                prependOptionValue=""
-                                                                disabled="{genderValidation.disabled}"
-                                                                required="{genderValidation.required}" />
-                                                        </f:else>
-                                                    </f:if>
-
-                                                    <div
-                                                        class="invalid-feedback"></div>
-                                                </div>
-                                            </div>
-
-                                            <f:render
-                                                partial="InlineProfile/Field"
-                                                arguments="{
-                                                profile: profile,
-                                                validations: validations,
-                                                identifier: 'title',
-                                                autocomplete: 'honorific-prefix',
-                                                columnClass: 'col-12 col-sm-6'
-                                            }" />
-                                            <f:render
-                                                partial="InlineProfile/Field"
-                                                arguments="{
-                                                profile: profile,
-                                                validations: validations,
-                                                identifier: 'firstName',
-                                                autocomplete: 'given-name',
-                                                columnClass: 'col-12 col-md-4'
-                                            }" />
-                                            <f:render
-                                                partial="InlineProfile/Field"
-                                                arguments="{
-                                                profile: profile,
-                                                validations: validations,
-                                                identifier: 'middleName',
-                                                autocomplete: 'additional-name',
-                                                columnClass: 'col-12 col-md-4'
-                                            }" />
-                                            <f:render
-                                                partial="InlineProfile/Field"
-                                                arguments="{
-                                                profile: profile,
-                                                validations: validations,
-                                                identifier: 'lastName',
-                                                autocomplete: 'family-name',
-                                                columnClass: 'col-12 col-md-4'
-                                            }" />
-                                        </div>
-                                    </div>
-                                </fieldset>
-
-                                <fieldset class="card mt-4">
-                                    <div class="card-body">
-                                        <legend class="h5">
-                                            {f:translate(key:
-                                            'inlineProfile.section.links',
-                                            extensionName:
-                                            'academic_persons_edit')}
-                                        </legend>
-
-                                        <div class="row g-3">
-                                            <f:render
-                                                partial="InlineProfile/Field"
-                                                arguments="{
-                                                profile: profile,
-                                                validations: validations,
-                                                identifier: 'website',
-                                                autocomplete: 'url',
-                                                columnClass: 'col-12 col-md-6'
-                                            }" />
-                                            <f:render
-                                                partial="InlineProfile/Field"
-                                                arguments="{
-                                                profile: profile,
-                                                validations: validations,
-                                                identifier: 'websiteTitle',
-                                                columnClass: 'col-12 col-md-6'
-                                            }" />
-                                            <f:render
-                                                partial="InlineProfile/Field"
-                                                arguments="{
-                                                profile: profile,
-                                                validations: validations,
-                                                identifier: 'publicationsLink',
-                                                columnClass: 'col-12 col-md-6'
-                                            }" />
-                                            <f:render
-                                                partial="InlineProfile/Field"
-                                                arguments="{
-                                                profile: profile,
-                                                validations: validations,
-                                                identifier: 'publicationsLinkTitle',
-                                                columnClass: 'col-12 col-md-6'
-                                            }" />
-                                        </div>
-                                    </div>
-                                </fieldset>
-                                <!-- Footer button area start -->
-                                <div
-                                    data-ie-footer-button-area
-                                    class="d-flex flex-wrap gap-2 justify-content-end mt-4 d-none">
-                                    <button
-                                        class="btn btn-outline-danger"
-                                        data-ie-dismiss
-                                        type="reset">
-                                        {f:translate(key: 'actions.cancel',
-                                        extensionName: 'academic_persons_edit')}
-                                    </button>
-                                    <button
-                                        class="btn btn-primary"
-                                        type="submit">
-                                        {f:translate(key: 'actions.save',
-                                        extensionName: 'academic_persons_edit')}
-                                    </button>
-                                </div>
-                                <!-- Footer button area end -->
-                            </form>
+                            <f:render
+                                partial="InlineProfile/Forms/Profile"
+                                arguments="{profile: profile, validations: validations, genderOptions: genderOptions}" />
                         </div>
                         <div class="col-12">
-                            <form
-                                class="academic-persons-inline-edit__form"
-                                data-ie-fields-form
-                                data-ie-content-fields-form>
-                                <fieldset class="card mt-4">
-                                    <div class="card-body">
-                                        <legend class="h5">
-                                            {f:translate(key:
-                                            'inlineProfile.section.content',
-                                            extensionName: 'academic_persons_edit')}
-                                        </legend>
-
-                                        <div class="row g-3">
-                                            <f:for
-                                                each="{
-                                                0: 'coreCompetences',
-                                                1: 'teachingArea',
-                                                2: 'supervisedDoctoralThesis',
-                                                3: 'supervisedThesis',
-                                                4: 'miscellaneous'
-                                            }"
-                                                as="identifier">
-                                                <f:render
-                                                    partial="InlineProfile/Field"
-                                                    arguments="{
-                                                    profile: profile,
-                                                    validations: validations,
-                                                    identifier: identifier,
-                                                    textarea: true,
-                                                    rows: 5,
-                                                    columnClass: 'col-12'
-                                                }" />
-                                            </f:for>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </form>
+                            <f:render
+                                partial="InlineProfile/Forms/Content"
+                                arguments="{profile: profile, validations: validations}" />
                         </div>
                     </div>
                 </div>
-                <!--  Modal start -->
-                <div
-                    id="inline-profile-{profile.uid}-image-modal"
-                    class="modal fade"
-                    tabindex="-1"
-                    data-ie-image-modal
-                    aria-labelledby="inline-profile-{profile.uid}-image-modal-title"
-                    aria-hidden="true">
-                    <div
-                        class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3
-                                    class="modal-title h5"
-                                    id="inline-profile-{profile.uid}-image-modal-title">
-                                    {f:translate(key: 'inlineProfile.image.modal.title',
-                                    extensionName: 'academic_persons_edit')}
-                                </h3>
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    data-ie-close-image-modal
-                                    data-bs-dismiss="modal"
-                                    aria-label="{f:translate(key: 'inlineProfile.image.modal.close', extensionName: 'academic_persons_edit')}"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3" data-ie-image-modal-preview>
-                                    <f:render
-                                        partial="Profile/Show/Image"
-                                        arguments="{profile: profile}" />
-                                </div>
 
-                                <p
-                                    class="text-body-secondary"
-                                    data-ie-image-modal-hint
-                                    data-add-label="{f:translate(key: 'inlineProfile.image.modal.hint.add', extensionName: 'academic_persons_edit')}"
-                                    data-replace-label="{f:translate(key: 'inlineProfile.image.modal.hint.replace', extensionName: 'academic_persons_edit')}">
-                                    <f:if condition="{profile.image}">
-                                        <f:then>
-                                            {f:translate(key:
-                                            'inlineProfile.image.modal.hint.replace',
-                                            extensionName: 'academic_persons_edit')}
-                                        </f:then>
-                                        <f:else>
-                                            {f:translate(key:
-                                            'inlineProfile.image.modal.hint.add',
-                                            extensionName: 'academic_persons_edit')}
-                                        </f:else>
-                                    </f:if>
-                                </p>
-
-                                <f:form
-                                    action="uploadImage"
-                                    controller="InlineProfile"
-                                    pageType="1733735"
-                                    name="profile"
-                                    object="{profile}"
-                                    enctype="multipart/form-data"
-                                    class="academic-persons-inline-edit__image-form">
-                                    <label
-                                        class="form-label"
-                                        for="inline-profile-{profile.uid}-image">
-                                        {f:translate(key:
-                                        'inlineProfile.image.upload.label',
-                                        extensionName: 'academic_persons_edit')}
-                                    </label>
-                                    <f:form.upload
-                                        property="image"
-                                        id="inline-profile-{profile.uid}-image"
-                                        class="form-control form-control-sm"
-                                        accept="{imageAllowedMimeTypes}"
-                                        required="true" />
-                                    <div
-                                        class="invalid-feedback"
-                                        data-ie-image-error></div>
-                                    <button
-                                        class="btn btn-primary btn-sm mt-2"
-                                        type="submit"
-                                        data-ie-upload-image
-                                        data-add-label="{f:translate(key: 'actions.add', extensionName: 'academic_persons_edit')}"
-                                        data-replace-label="{f:translate(key: 'actions.replace', extensionName: 'academic_persons_edit')}"
-                                        disabled>
-                                        <span
-                                            class="spinner-border spinner-border-sm d-none"
-                                            data-ie-action-spinner
-                                            aria-hidden="true"></span>
-                                        <span data-ie-action-label>
-                                            <f:if condition="{profile.image}">
-                                                <f:then>
-                                                    {f:translate(key: 'actions.replace',
-                                                    extensionName:
-                                                    'academic_persons_edit')}
-                                                </f:then>
-                                                <f:else>
-                                                    {f:translate(key: 'actions.add',
-                                                    extensionName:
-                                                    'academic_persons_edit')}
-                                                </f:else>
-                                            </f:if>
-                                        </span>
-                                    </button>
-                                </f:form>
-                            </div>
-                            <div class="modal-footer">
-                                <span
-                                    class="small text-body-secondary me-auto"
-                                    data-ie-image-delete-hint>
-                                    {f:translate(key:
-                                    'inlineProfile.image.modal.deleteHint',
-                                    extensionName: 'academic_persons_edit')}
-                                </span>
-                                <button
-                                    class="btn btn-danger{f:if(condition: profile.image, else: ' d-none')}"
-                                    type="button"
-                                    data-ie-delete-image>
-                                    <span
-                                        class="spinner-border spinner-border-sm d-none"
-                                        data-ie-action-spinner
-                                        aria-hidden="true"></span>
-                                    <span data-ie-action-label>
-                                        {f:translate(key: 'actions.delete',
-                                        extensionName: 'academic_persons_edit')}
-                                    </span>
-                                </button>
-                                <button
-                                    class="btn btn-outline-secondary"
-                                    type="button"
-                                    data-ie-close-image-modal
-                                    data-bs-dismiss="modal">
-                                    {f:translate(key: 'actions.cancel', extensionName:
-                                    'academic_persons_edit')}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Modal end -->
-                <!-- Toast start -->
-                <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                    <div
-                        data-ie-status-toast
-                        class="toast"
-                        role="status"
-                        aria-live="polite"
-                        aria-atomic="true">
-                        <div class="toast-header">
-                            <strong class="me-auto status-title"></strong>
-                            <button
-                                type="button"
-                                class="btn-close"
-                                data-bs-dismiss="toast"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body status-message"></div>
-                    </div>
-                </div>
-                <!-- Toast end -->
-                <!-- Templates start -->
-                <template data-ie-edit-button-template>
-                    <button
-                        class="btn btn-outline-dark btn-sm text-truncate overflow-x-hidden mw-100"
-                        data-academic-persons-inline-edit-activate-btn
-                        data-ie-for=""
-                        type="button">
-                        <span data-ie-button-label></span>
-                    </button>
-                </template>
-                <template data-ie-new-button-template>
-                    <button
-                        class="btn btn-outline-success btn-sm text-truncate overflow-x-hidden mw-100"
-                        data-academic-persons-inline-edit-activate-btn
-                        data-ie-for=""
-                        type="button">
-                        <span data-ie-button-label>+</span>
-                    </button>
-                </template>
-                <!-- Templates end -->
+                <f:render
+                    partial="InlineProfile/Image/Modal"
+                    arguments="{profile: profile, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
+                <f:render partial="InlineProfile/StatusToast" />
+                <f:render partial="InlineProfile/ButtonTemplates" />
             </div>
         </f:then>
         <f:else>

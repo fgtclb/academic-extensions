@@ -1,4 +1,4 @@
-..  index:: Inline editing, AJAX, JSON, Profile image
+..  index:: Inline editing, AJAX, CKEditor, JSON, Profile image, Rich text
 ..  _inline-profile-editing:
 
 ======================
@@ -47,14 +47,48 @@ The controller assigns the following variables to the Fluid template:
     *   - ``{data}`` and ``{record}``
         - Current content element data and its record object.
 
+View structure
+==============
+
+The template is intentionally a composition root. The main partial groups are:
+
+..  list-table::
+    :header-rows: 1
+
+    *   - Partial group
+        - Responsibility
+    *   - ``Image/Card.html`` and ``Image/Modal.html``
+        - Page preview, file selection, modal preview and image actions.
+    *   - ``Settings/Sync.html``
+        - Independently persisted synchronization checkbox.
+    *   - ``Forms/*``
+        - Profile/content form boundaries and bulk footer actions.
+    *   - ``Sections/*``
+        - Personal, link and rich-text content field composition.
+    *   - ``Field.html`` and ``Field/*``
+        - Shared field orchestration, preview, textfield/textarea control,
+          gender select and per-field actions.
+    *   - ``Header.html``, ``StatusToast.html`` and
+          ``ButtonTemplates.html``
+        - Independent component-level UI elements.
+
 Supported controls
 ==================
 
-The :file:`Resources/Private/Partials/InlineProfile/Field.html` partial renders
-a text input by default. ``validation.inputType`` or the explicit
-``inputType`` partial argument can select HTML input types such as ``tel`` and
-``url``. Setting ``textarea`` renders a textarea instead. The index template
-also demonstrates a select field and a separately persisted checkbox.
+The :file:`Resources/Private/Partials/InlineProfile/Field.html` partial only
+resolves validation, element ID and input type before composing three focused
+partials:
+
+*   :file:`Field/Preview.html` renders the read preview and edit trigger,
+*   :file:`Field/Control.html` renders either ``f:form.textfield`` or
+    ``f:form.textarea``, including the CKEditor hook, and
+*   :file:`Field/Actions.html` renders delete, cancel and save.
+
+``validation.inputType`` or the explicit ``inputType`` argument can select HTML
+input types such as ``tel`` and ``url``. Setting ``textarea`` renders a
+textarea instead. The dedicated :file:`Field/Gender.html` partial handles the
+select field, while :file:`Settings/Sync.html` contains the separately
+persisted checkbox.
 
 ..  list-table::
     :header-rows: 1
@@ -77,7 +111,9 @@ also demonstrates a select field and a separately persisted checkbox.
           ``academic-persons-inline-edit__sync-checkbox`` and its dedicated
           form.
     *   - Multiline text
-        - Field partial with ``textarea: true``.
+        - Field partial with ``textarea: true``. Passing ``richText: true``
+          additionally turns the textarea into the TYPO3 CKEditor 5 when the
+          field is opened.
 
 Generic field update
 ====================
@@ -109,6 +145,85 @@ values required for strict validation. ``getOptions()`` additionally resolves
 the labels for the Fluid select. Keeping validation independent of localization
 also keeps the service usable in isolated unit tests.
 
+Rich-text content fields
+========================
+
+The five fields in the :guilabel:`Content` section are rich-text fields:
+
+*   ``coreCompetences``,
+*   ``teachingArea``,
+*   ``supervisedDoctoralThesis``,
+*   ``supervisedThesis``, and
+*   ``miscellaneous``.
+
+The editor is TYPO3's shipped CKEditor 5 from the
+``typo3/cms-rte-ckeditor`` package. The frontend module imports its CKEditor
+modules through TYPO3's JavaScript import map; it does not load an editor from
+a CDN. An editor instance is created lazily when a rich-text field is opened.
+If initialization fails, the original textarea remains available and the
+component reports an error.
+
+The toolbar intentionally exposes only undo, redo, bold, italic, bulleted
+lists, numbered lists and links. Editor changes are mirrored into the
+underlying textarea, so required-field validation, changed-value detection and
+the existing JSON request remain the single persistence path. CKEditor's
+initial HTML normalization becomes the local comparison baseline; merely
+opening an editor therefore does not submit or rewrite legacy content.
+
+Outside edit mode, each rich-text field renders its formatted content directly
+and provides a compact edit button in the upper right corner. Empty values show
+a localized placeholder. The preview is initially rendered through TYPO3's
+HTML formatting pipeline and is replaced after a successful save with the
+sanitized markup returned by the server. The frontend applies the same strict
+tag, attribute and URI-scheme allowlist without assigning markup through
+``innerHTML``.
+
+Each open field has three explicit actions:
+
+*   :guilabel:`Delete` (``data-ie-dismiss``) clears the current browser-side
+    draft. The editor stays open and no request is sent.
+*   :guilabel:`Cancel` (``data-ie-cancel``) restores the last successfully
+    persisted value and closes only that field. No request is sent.
+*   :guilabel:`Save` (``data-ie-save``) sends that field through the JSON AJAX
+    endpoint. It closes the field only after a successful response or when
+    there is no changed value to persist.
+
+The action group uses Bootstrap utility classes to remain content-sized and
+aligned to the start of the editor instead of stretching to the CKEditor
+height. No additional stylesheet or inline style is required. The bulk
+:guilabel:`Cancel` button has the separate ``data-ie-cancel-all`` hook; it
+restores all last successfully persisted values and closes the editors.
+
+The decorative content of the compact preview edit button is intentionally not
+part of the JavaScript contract and can later be replaced by an icon or image.
+Template overrides must retain the button's edit hook, ``data-ie-for`` target
+and accessible label.
+
+Server-side sanitization
+------------------------
+
+Client-side editor configuration is not treated as a security boundary.
+``ProfileUpdateValidationService`` accepts an explicit list of editable
+properties and passes the five rich-text values through
+``ProfileRichTextSanitizer`` before validation and persistence. The sanitizer
+uses TYPO3's allow-list based HTML sanitizer and permits only:
+
+*   the tags ``p``, ``br``, ``strong``, ``em``, ``ul``, ``ol``, ``li`` and
+    ``a``;
+*   the ``href`` attribute on ``a``; and
+*   local links and the URI schemes ``http``, ``https``, ``mailto`` and
+    ``tel``.
+
+Scripts, event-handler attributes, style attributes, images, unknown tags and
+unsafe URI schemes are removed. The successful JSON response contains the
+normalized, sanitized values. The frontend replaces its local editor and
+preview state with exactly those returned values rather than trusting the
+submitted markup.
+
+The extension requires at least TYPO3 13.4.31 or TYPO3 14.3.6. These constraints
+include the HTML-sanitizer fixes published with TYPO3-CORE-SA-2026-006. Projects
+must still keep TYPO3 security updates current.
+
 Synchronization checkbox
 ========================
 
@@ -133,18 +248,21 @@ state.
 Profile image modal
 ===================
 
-Clicking the current profile image or its placeholder opens a Bootstrap 5
-modal. It uses only Bootstrap utility and component classes; the shipped
-template requires neither inline styles nor additional CSS. The same modal
-supports every image state:
+Clicking the current profile image or its placeholder opens the Bootstrap 5
+modal from :file:`Partials/InlineProfile/Image/Modal.html`. It uses only
+Bootstrap utility and component classes; the shipped view requires neither
+inline styles nor additional CSS.
 
-*   without an image it offers an image upload labelled :guilabel:`Add`,
-*   with an image it offers :guilabel:`Replace` and :guilabel:`Delete`, and
-*   after an AJAX operation it updates the page preview, modal preview,
-    labels and available actions without reloading the page.
+The modal deliberately has no state-dependent :guilabel:`Add` or
+:guilabel:`Replace` action. Selecting a file immediately replaces only the
+modal preview with a local object URL. The page preview and persisted profile
+remain unchanged until :guilabel:`Save` succeeds. A successful upload replaces
+both previews, closes the modal and shows the saved image directly. Cancel or
+closing the modal discards the selected preview and restores the persisted
+image. :guilabel:`Delete` is shown only while an image is persisted.
 
-The upload button remains disabled until a file is selected. While an upload
-or deletion is pending, the image controls and modal close buttons are disabled
+The save button remains disabled until a file is selected. While an upload or
+deletion is pending, the image controls and modal close buttons are disabled
 and the active action displays a Bootstrap spinner. This prevents duplicate
 requests and closing the modal during a running operation.
 
@@ -153,6 +271,9 @@ Upload
 
 The image form is intercepted by the frontend module and sends
 ``multipart/form-data`` to ``uploadImageAction()`` through ``fetch()``.
+The ``FormData`` object is built before the file control is disabled for the
+pending state. Disabled controls are omitted by the browser and would otherwise
+produce an apparently valid request without an uploaded image.
 Extbase's file handling service validates the configured maximum file size and
 allowed MIME types, stores the file in the configured target folder and updates
 the FAL relation. Authorization is checked before Extbase maps or stores the
@@ -160,8 +281,17 @@ uploaded file. A replaced physical file is removed only when it has no other
 references.
 
 The modal does not render ``f:form.validationResults``. Upload validation
-failures are returned as JSON, displayed on the file input and announced
-through the component's status toast.
+failures are returned as JSON and displayed in an alert inside the still-open
+modal. The controller additionally compares the submitted image with the
+persisted FAL reference. It returns ``image_upload_missing`` with status
+``422`` instead of reporting success when no new file arrived.
+
+The upload action propagates non-successful JSON responses out of TYPO3's
+Extbase ``USER`` content rendering with ``PropagateResponseException``. A
+``JsonResponse`` returned by the action alone would contribute its body to the
+surrounding ``PAGE`` object while the outer frontend response retained status
+``200``. Propagation therefore preserves the documented ``422`` and ``500``
+HTTP status codes for the AJAX client.
 
 The relevant TypoScript settings are:
 
@@ -222,8 +352,13 @@ also converted to JSON by the controller's error action.
     *   - ``405``
         - ``method_not_allowed``
         - A JSON endpoint was called with a method other than ``POST``.
+    *   - ``415``
+        - ``unsupported_media_type``
+        - A JSON endpoint was called without ``Content-Type:
+          application/json``.
     *   - ``422``
-        - ``invalid_profile_data`` or ``validation_failed``
+        - ``invalid_profile_data``, ``validation_failed`` or
+          ``image_upload_missing``
         - A field value or uploaded file is invalid.
     *   - ``500``
         - ``internal_server_error``
@@ -233,9 +368,12 @@ also converted to JSON by the controller's error action.
 Customizing the view
 ====================
 
-Override :file:`InlineProfile/Index.html` and
-:file:`InlineProfile/Field.html` through the regular template and partial root
-paths. Keep the following contracts when reusing the shipped JavaScript:
+Override :file:`InlineProfile/Index.html` and the partials below
+:file:`Resources/Private/Partials/InlineProfile/` through the regular template
+and partial root paths. The index keeps only URL/data setup, the unchanged main
+grid and composition. Forms, sections, image UI, field controls, status toast
+and reusable button templates are separate partials. Keep the following
+contracts when reusing the shipped JavaScript:
 
 ..  list-table::
     :header-rows: 1
@@ -256,12 +394,33 @@ paths. Keep the following contracts when reusing the shipped JavaScript:
           ``academic-persons-inline-edit__field``
         - Generic field forms and controls. The first form owns the bulk action;
           additional forms preserve valid markup in separate grid sections.
+    *   - ``data-ie-rich-text`` and ``data-ie-editor-container``
+        - Marks a textarea for lazy CKEditor initialization and its wrapper for
+          show/hide handling.
+    *   - ``data-ie-rich-text-preview`` and
+          ``data-ie-rich-text-preview-content``
+        - Direct formatted read preview and its safely replaceable content
+          container.
+    *   - ``data-ie-field-actions``
+        - Content-sized Bootstrap group for the three per-field actions.
+    *   - ``data-ie-dismiss``
+        - Deletes the current draft value without closing or saving it.
+    *   - ``data-ie-cancel``
+        - Restores the last persisted value and closes one field without a
+          request.
+    *   - ``data-ie-save``
+        - Persists one field through the generic JSON endpoint.
+    *   - ``data-ie-cancel-all``
+        - Restores all persisted field values and closes the bulk editor.
     *   - ``data-ie-sync-form`` and
           ``academic-persons-inline-edit__sync-checkbox``
         - Synchronization control.
     *   - ``academic-persons-inline-edit__image-form`` and
           ``data-ie-image-modal``
         - AJAX-only multipart upload form and Bootstrap modal.
+    *   - ``data-ie-upload-image`` and ``data-ie-image-error``
+        - Save action and modal-local error output. The save action is enabled
+          only after selecting a file.
     *   - ``data-ie-image-preview`` and
           ``data-ie-image-modal-preview``
         - Image locations updated after upload or deletion.
@@ -277,10 +436,20 @@ Tests
 =====
 
 Controller unit tests cover method, payload and authentication errors for the
-JSON actions. Functional plugin tests render both Bootstrap modal states,
-verify the AJAX-only controls and exercise the dedicated image deletion
-endpoint through the generated action URL. Existing profile image functional
-tests continue to cover FAL upload, replacement, reference and physical-file
-cleanup behavior. Upload tests are assigned to the ``not-core-13`` PHPUnit
-group because TYPO3 v13's CLI upload permission check requires a real HTTP
-upload.
+JSON actions. Sanitizer unit tests cover the supported profile properties,
+allowed editor markup and rejection of scripts, event attributes, styles,
+unknown tags and unsafe link schemes. Validation-service unit tests verify that
+sanitization happens before a value is registered for persistence.
+
+Functional plugin tests render both Bootstrap modal states, verify the
+decomposed Fluid contracts, AJAX-only controls, direct rich-text previews and
+the separate delete, cancel and save actions. They persist malicious rich-text
+input through the real update endpoint and assert that only the sanitized
+response is stored. The inline image tests verify that a missing file can never
+return success and that a real multipart upload returns ``hasImage: true`` and
+creates the FAL relation. They also exercise the dedicated image deletion
+endpoint through the generated action URL. Form submissions reuse the complete
+rendered action URL, including the JSON page type, so the tests exercise the
+same routing contract as the browser. Upload tests are assigned to the
+``not-core-13`` PHPUnit group because TYPO3 v13's CLI upload permission check
+requires a real HTTP upload.

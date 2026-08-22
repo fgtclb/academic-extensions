@@ -50,6 +50,19 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
     }
 
     #[Test]
+    public function nonJsonContentTypeIsRejectedBeforeParsingOrAuthentication(): void
+    {
+        $context = $this->createMock(Context::class);
+        $context->expects(self::never())->method('getPropertyFromAspect');
+        $profileRepository = $this->createMock(ProfileRepository::class);
+        $profileRepository->expects(self::never())->method('findByFrontendUser');
+        $result = $this->createSubject($context, $profileRepository)->validate(
+            $this->createRequest('POST', '{"profile":123,"data":[]}', 'text/plain'),
+        );
+        $this->assertFailure($result, 'unsupported_media_type', 415);
+    }
+
+    #[Test]
     public function structurallyInvalidPayloadIsRejectedBeforeAuthentication(): void
     {
         $context = $this->createMock(Context::class);
@@ -182,6 +195,7 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
     private function createRequest(
         string $method,
         string $body,
+        string $contentType = 'application/json',
     ): ServerRequest {
         $stream = new Stream('php://temp', 'rw');
         $stream->write($body);
@@ -189,7 +203,8 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
 
         return (new ServerRequest())
             ->withMethod($method)
-            ->withBody($stream);
+            ->withBody($stream)
+            ->withHeader('Content-Type', $contentType);
     }
 
     private function createProfile(int $uid): Profile

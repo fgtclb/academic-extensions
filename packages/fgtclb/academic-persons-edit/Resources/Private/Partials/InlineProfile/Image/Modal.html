@@ -1,0 +1,105 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <div
+        id="inline-profile-{profile.uid}-image-modal"
+        class="modal fade"
+        tabindex="-1"
+        data-ie-image-modal
+        aria-labelledby="inline-profile-{profile.uid}-image-modal-title"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <f:form
+                action="uploadImage"
+                controller="InlineProfile"
+                pageType="1733735"
+                name="profile"
+                object="{profile}"
+                enctype="multipart/form-data"
+                class="modal-content academic-persons-inline-edit__image-form">
+                <div
+                    class="modal-header d-flex flex-row justify-content-between">
+                    <h3
+                        class="modal-title h5"
+                        id="inline-profile-{profile.uid}-image-modal-title">
+                        <f:translate
+                            key="inlineProfile.image.modal.title"
+                            extensionName="academic_persons_edit" />
+                    </h3>
+                    <button
+                        class="btn btn-danger{f:if(condition: profile.image, else: ' d-none')}"
+                        type="button"
+                        data-ie-delete-image
+                        title="{f:translate(key: 'inlineProfile.image.modal.deleteHint', extensionName: 'academic_persons_edit')}">
+                        <span
+                            class="spinner-border spinner-border-sm d-none"
+                            data-ie-action-spinner
+                            aria-hidden="true"></span>
+                        <span data-ie-action-label>
+                            <f:translate
+                                key="actions.delete"
+                                extensionName="academic_persons_edit" />
+                        </span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3" data-ie-image-modal-preview>
+                        <f:render
+                            partial="Profile/Show/Image"
+                            arguments="{profile: profile}" />
+                    </div>
+                    <p class="text-body-secondary">
+                        <f:translate
+                            key="inlineProfile.image.modal.hint.select"
+                            extensionName="academic_persons_edit" />
+                    </p>
+                    <label
+                        class="form-label"
+                        for="inline-profile-{profile.uid}-image">
+                        <f:translate
+                            key="inlineProfile.image.upload.label"
+                            extensionName="academic_persons_edit" />
+                    </label>
+                    <f:form.upload
+                        property="image"
+                        id="inline-profile-{profile.uid}-image"
+                        class="form-control form-control-sm"
+                        accept="{imageAllowedMimeTypes}"
+                        required="true" />
+                    <div
+                        class="alert alert-danger d-none mt-3 mb-0"
+                        role="alert"
+                        data-ie-image-error></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                        class="btn btn-outline-secondary ms-auto"
+                        type="button"
+                        data-ie-close-image-modal
+                        data-bs-dismiss="modal">
+                        <f:translate
+                            key="actions.cancel"
+                            extensionName="academic_persons_edit" />
+                    </button>
+                    <button
+                        class="btn btn-primary"
+                        type="submit"
+                        data-ie-upload-image
+                        disabled>
+                        <span
+                            class="spinner-border spinner-border-sm d-none"
+                            data-ie-action-spinner
+                            aria-hidden="true"></span>
+                        <span data-ie-action-label>
+                            <f:translate
+                                key="actions.save"
+                                extensionName="academic_persons_edit" />
+                        </span>
+                    </button>
+                </div>
+            </f:form>
+        </div>
+    </div>
+</html>

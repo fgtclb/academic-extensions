@@ -16,6 +16,7 @@ declare(strict_types=1);
 return [
     'dependencies' => [
         'core',
+        'rte_ckeditor',
     ],
     'imports' => [
         '@fgtclb/academic-persons-edit/frontend/' => 'EXT:academic_persons_edit/Resources/Public/JavaScript/frontend/',

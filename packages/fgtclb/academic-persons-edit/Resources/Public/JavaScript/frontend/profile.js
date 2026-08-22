@@ -1,3 +1,10 @@
+import { Bold, Italic } from "@ckeditor/ckeditor5-basic-styles";
+import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import { Essentials } from "@ckeditor/ckeditor5-essentials";
+import { Link } from "@ckeditor/ckeditor5-link";
+import { List } from "@ckeditor/ckeditor5-list";
+import { Paragraph } from "@ckeditor/ckeditor5-paragraph";
+
 const rootSelector = "[data-academic-persons-inline-edit]";
 const fieldsFormSelector = "[data-ie-fields-form]";
 const editButtonSelector =
@@ -11,15 +18,88 @@ const imageFormSelector = ".academic-persons-inline-edit__image-form";
 const imageModalSelector = "[data-ie-image-modal]";
 const syncFormSelector = "[data-ie-sync-form]";
 const syncCheckboxSelector = ".academic-persons-inline-edit__sync-checkbox";
+const richTextFieldSelector = "[data-ie-rich-text]";
+const richTextPreviewSelector = "[data-ie-rich-text-preview]";
+const richTextPreviewContentSelector = "[data-ie-rich-text-preview-content]";
+const fieldActionsSelector = "[data-ie-field-actions]";
+const richTextEditors = new WeakMap();
+const richTextEditorPromises = new WeakMap();
+const richTextInitialValues = new WeakMap();
+const allowedRichTextPreviewTags = new Set([
+  "a",
+  "br",
+  "em",
+  "li",
+  "ol",
+  "p",
+  "strong",
+  "ul",
+]);
+const blockedRichTextPreviewTags = new Set([
+  "iframe",
+  "math",
+  "object",
+  "script",
+  "style",
+  "svg",
+  "template",
+]);
+const allowedRichTextLinkSchemes = new Set([
+  "http",
+  "https",
+  "mailto",
+  "tel",
+]);
+const richTextEditorConfig = {
+  licenseKey: "GPL",
+  plugins: [Essentials, Paragraph, Bold, Italic, List, Link],
+  toolbar: {
+    items: [
+      "undo",
+      "redo",
+      "|",
+      "bold",
+      "italic",
+      "|",
+      "bulletedList",
+      "numberedList",
+      "|",
+      "link",
+    ],
+    shouldNotGroupWhenFull: false,
+  },
+  link: {
+    allowedProtocols: ["http", "https", "mailto", "tel"],
+    defaultProtocol: "https://",
+  },
+};
 
 const isEditableField = (element) =>
   element instanceof HTMLInputElement ||
   element instanceof HTMLSelectElement ||
   element instanceof HTMLTextAreaElement;
 
+const isRichTextField = (field) => field.matches(richTextFieldSelector);
+
+const getFieldEditElement = (field) =>
+  field.closest("[data-ie-editor-container]") ?? field;
+
+const getRichTextPreview = (root, field) => {
+  if (!isRichTextField(field) || !field.id) {
+    return null;
+  }
+  return root.querySelector(
+    `${richTextPreviewSelector}[data-ie-for="${CSS.escape(field.id)}"]`,
+  );
+};
+
 const getFieldValue = (field) => {
   if (field instanceof HTMLInputElement && field.type === "checkbox") {
     return field.checked;
+  }
+  const editor = richTextEditors.get(field);
+  if (editor) {
+    field.value = editor.getData();
   }
   return field.value;
 };
@@ -29,8 +109,87 @@ const setFieldValue = (field, value) => {
     field.checked = Boolean(value);
     return;
   }
-  field.value = value === null || value === undefined ? "" : String(value);
+  const normalizedValue =
+    value === null || value === undefined ? "" : String(value);
+  field.value = normalizedValue;
+  const editor = richTextEditors.get(field);
+  if (editor && editor.getData() !== normalizedValue) {
+    editor.setData(normalizedValue);
+  }
 };
+
+const getPlainText = (value) => {
+  const parsedDocument = new DOMParser().parseFromString(value, "text/html");
+  return (parsedDocument.body.textContent ?? "")
+    .replaceAll("\u00a0", " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const isAllowedRichTextLink = (value) => {
+  const normalizedValue = value.trim();
+  if (normalizedValue === "" || normalizedValue.startsWith("//")) {
+    return false;
+  }
+  const scheme = normalizedValue.match(/^([a-z][a-z\d+.-]*):/i)?.[1];
+  return (
+    scheme === undefined ||
+    allowedRichTextLinkSchemes.has(scheme.toLowerCase())
+  );
+};
+
+const parseRichTextPreview = (value) => {
+  const parsedDocument = new DOMParser().parseFromString(value, "text/html");
+  Array.from(parsedDocument.body.querySelectorAll("*")).forEach((element) => {
+    const tagName = element.tagName.toLowerCase();
+    if (blockedRichTextPreviewTags.has(tagName)) {
+      element.remove();
+      return;
+    }
+    if (!allowedRichTextPreviewTags.has(tagName)) {
+      element.replaceWith(...Array.from(element.childNodes));
+      return;
+    }
+    Array.from(element.attributes).forEach((attribute) => {
+      const keepsHref =
+        tagName === "a" &&
+        attribute.name === "href" &&
+        isAllowedRichTextLink(attribute.value);
+      if (!keepsHref) {
+        element.removeAttribute(attribute.name);
+      }
+    });
+  });
+  return parsedDocument;
+};
+
+const renderRichTextPreview = (root, field, value) => {
+  const preview = getRichTextPreview(root, field);
+  const content = preview?.querySelector(richTextPreviewContentSelector);
+  if (!(preview instanceof HTMLElement) || !(content instanceof HTMLElement)) {
+    return;
+  }
+  const normalizedValue =
+    value === null || value === undefined ? "" : String(value);
+  if (getPlainText(normalizedValue) === "") {
+    const emptyLabel = document.createElement("span");
+    emptyLabel.className = "text-body-secondary";
+    emptyLabel.textContent = preview.dataset.emptyLabel ?? "";
+    content.replaceChildren(emptyLabel);
+    return;
+  }
+  const parsedDocument = parseRichTextPreview(normalizedValue);
+  const fragment = document.createDocumentFragment();
+  Array.from(parsedDocument.body.childNodes).forEach((node) => {
+    fragment.append(document.importNode(node, true));
+  });
+  content.replaceChildren(fragment);
+};
+
+const getFieldDisplayValue = (field, value) =>
+  isRichTextField(field)
+    ? getPlainText(String(value ?? ""))
+    : String(value ?? "");
 
 const getFieldPropertyName = (field) => {
   const bracketProperty = field.name.match(/\[([^\]]+)]$/)?.[1];
@@ -117,9 +276,41 @@ const showStatus = (root, type, message = null) => {
   }
 };
 
+const ensureRichTextEditor = (root, field) => {
+  if (!isRichTextField(field) || field.disabled || field.readOnly) {
+    return Promise.resolve(null);
+  }
+  const editor = richTextEditors.get(field);
+  if (editor) {
+    return Promise.resolve(editor);
+  }
+  const pendingEditor = richTextEditorPromises.get(field);
+  if (pendingEditor) {
+    return pendingEditor;
+  }
+  const editorPromise = ClassicEditor.create(field, richTextEditorConfig)
+    .then((createdEditor) => {
+      richTextEditors.set(field, createdEditor);
+      richTextInitialValues.set(field, createdEditor.getData());
+      createdEditor.model.document.on("change:data", () => {
+        field.value = createdEditor.getData();
+        field.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      return createdEditor;
+    })
+    .catch((error) => {
+      showStatus(root, "danger", root.dataset.messageEditorError ?? null);
+      throw error;
+    })
+    .finally(() => richTextEditorPromises.delete(field));
+  richTextEditorPromises.set(field, editorPromise);
+  return editorPromise;
+};
+
 const clearValidationErrors = (fields) => {
   fields.forEach((field) => {
     field.classList.remove("is-invalid");
+    getFieldEditElement(field).classList.remove("is-invalid");
     const feedback = field
       .closest(".mb-3, .form-check")
       ?.querySelector(".invalid-feedback");
@@ -129,7 +320,7 @@ const clearValidationErrors = (fields) => {
   });
 };
 
-const showValidationErrors = (fields, errors) => {
+const showValidationErrors = (root, fields, errors) => {
   Object.entries(errors).forEach(([propertyPath, messages]) => {
     const propertyName = propertyPath.split(".").pop();
     const field = fields.find(
@@ -138,8 +329,11 @@ const showValidationErrors = (fields, errors) => {
     if (!field) {
       return;
     }
-
     field.classList.add("is-invalid");
+    getFieldEditElement(field).classList.add("is-invalid");
+    if (field.id) {
+      toggleEditField(root, field.id, true);
+    }
     const feedback = field
       .closest(".mb-3, .form-check")
       ?.querySelector(".invalid-feedback");
@@ -161,8 +355,9 @@ const getTemplateButton = (template) => {
 const createActivateButton = (root, field, fieldValue) => {
   const normalizedValue =
     fieldValue === null || fieldValue === undefined ? "" : String(fieldValue);
+  const displayValue = getFieldDisplayValue(field, normalizedValue);
   const template = root.querySelector(
-    normalizedValue === ""
+    displayValue === ""
       ? "[data-ie-new-button-template]"
       : "[data-ie-edit-button-template]",
   );
@@ -179,13 +374,17 @@ const createActivateButton = (root, field, fieldValue) => {
   button.dataset.ieFor = field.id;
   const label = button.querySelector("[data-ie-button-label]");
   if (label) {
-    label.textContent = normalizedValue === "" ? "+" : normalizedValue;
+    label.textContent = displayValue === "" ? "+" : displayValue;
   }
   return button;
 };
 
 const renderActivateButton = (root, field, fieldValue) => {
   if (!field.id || field.disabled || field.readOnly) {
+    return;
+  }
+  if (isRichTextField(field)) {
+    renderRichTextPreview(root, field, fieldValue);
     return;
   }
 
@@ -216,17 +415,25 @@ const toggleEditField = (root, fieldId, state = true) => {
     return;
   }
 
-  field.classList.toggle("d-none", !state);
-  getActivateButton(root, field)?.classList.toggle("d-none", state);
+  getFieldEditElement(field).classList.toggle("d-none", !state);
+  const previewElement = isRichTextField(field)
+    ? getRichTextPreview(root, field)
+    : getActivateButton(root, field);
+  previewElement?.classList.toggle("d-none", state);
   root
-    .querySelectorAll(`[data-ie-dismiss][data-ie-for="${CSS.escape(fieldId)}"]`)
-    .forEach((button) => button.classList.toggle("d-none", !state));
-  root
-    .querySelectorAll(`[data-ie-save][data-ie-for="${CSS.escape(fieldId)}"]`)
-    .forEach((button) => button.classList.toggle("d-none", !state));
+    .querySelectorAll(
+      `${fieldActionsSelector}[data-ie-for="${CSS.escape(fieldId)}"]`,
+    )
+    .forEach((actions) => actions.classList.toggle("d-none", !state));
 
   if (state) {
-    field.focus();
+    if (isRichTextField(field)) {
+      void ensureRichTextEditor(root, field)
+        .then((editor) => editor?.editing.view.focus())
+        .catch(() => field.focus());
+    } else {
+      field.focus();
+    }
   }
 };
 
@@ -279,13 +486,14 @@ const initializeFieldEditing = (root) => {
   const persistedValues = new Map(
     fields.map((field) => [field, getFieldValue(field)]),
   );
+  const normalizedRichTextBaselines = new WeakSet();
   let bulkEditing = false;
 
   const finishBulkEditingWhenClosed = () => {
     const hasOpenTextField = fields.some(
       (field) =>
         !(field instanceof HTMLSelectElement) &&
-        !field.classList.contains("d-none"),
+        !getFieldEditElement(field).classList.contains("d-none"),
     );
     if (!hasOpenTextField) {
       bulkEditing = false;
@@ -304,7 +512,24 @@ const initializeFieldEditing = (root) => {
     if (root.getAttribute("aria-busy") === "true") {
       return false;
     }
-
+    try {
+      await Promise.all(
+        fieldsToSave
+          .filter(isRichTextField)
+          .map((field) => ensureRichTextEditor(root, field)),
+      );
+    } catch {
+      return false;
+    }
+    fieldsToSave.filter(isRichTextField).forEach((field) => {
+      if (!normalizedRichTextBaselines.has(field)) {
+        const initialValue = richTextInitialValues.get(field);
+        if (initialValue !== undefined) {
+          persistedValues.set(field, initialValue);
+        }
+        normalizedRichTextBaselines.add(field);
+      }
+    });
     clearValidationErrors(fieldsToSave);
     const changedFields = fieldsToSave.filter(
       (field) =>
@@ -328,8 +553,13 @@ const initializeFieldEditing = (root) => {
 
     const invalidField = changedFields.find((field) => !field.checkValidity());
     if (invalidField) {
-      invalidField.reportValidity();
       invalidField.classList.add("is-invalid");
+      getFieldEditElement(invalidField).classList.add("is-invalid");
+      if (isRichTextField(invalidField)) {
+        toggleEditField(root, invalidField.id, true);
+      } else {
+        invalidField.reportValidity();
+      }
       showStatus(root, "warning", root.dataset.messageValidation ?? null);
       return false;
     }
@@ -351,14 +581,17 @@ const initializeFieldEditing = (root) => {
     showStatus(root, "info", root.dataset.messageSaving ?? null);
 
     try {
-      await requestJson(updateUrl, {
+      const result = await requestJson(updateUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profile: profileUid, data }),
       });
-
       changedFields.forEach((field) => {
-        const value = getFieldValue(field);
+        const propertyName = getFieldPropertyName(field);
+        const value = Object.hasOwn(result.data ?? {}, propertyName)
+          ? result.data[propertyName]
+          : getFieldValue(field);
+        setFieldValue(field, value);
         persistedValues.set(field, value);
         renderActivateButton(root, field, value);
       });
@@ -375,7 +608,7 @@ const initializeFieldEditing = (root) => {
     } catch (error) {
       const result = error instanceof Error ? error.result : null;
       if (result?.errors && typeof result.errors === "object") {
-        showValidationErrors(fields, result.errors);
+        showValidationErrors(root, fields, result.errors);
         showStatus(root, "warning", root.dataset.messageValidation ?? null);
       } else {
         showStatus(root, "danger", result?.message ?? null);
@@ -430,15 +663,31 @@ const initializeFieldEditing = (root) => {
       if (fieldId) {
         const field = getFieldById(root, fieldId);
         if (field) {
-          resetFields([field]);
-          toggleEditField(root, fieldId, false);
-          finishBulkEditingWhenClosed();
+          setFieldValue(field, "");
+          clearValidationErrors([field]);
+          toggleEditField(root, fieldId, true);
         }
-      } else {
-        resetFields(fields);
-        closeAllFields(root, fields);
-        bulkEditing = false;
       }
+      return;
+    }
+
+    if (button.matches("[data-ie-cancel]")) {
+      event.preventDefault();
+      const field = getFieldById(root, button.dataset.ieFor);
+      if (field) {
+        setFieldValue(field, persistedValues.get(field) ?? "");
+        clearValidationErrors([field]);
+        toggleEditField(root, field.id, false);
+        finishBulkEditingWhenClosed();
+      }
+      return;
+    }
+
+    if (button.matches("[data-ie-cancel-all]")) {
+      event.preventDefault();
+      resetFields(fields);
+      closeAllFields(root, fields);
+      bulkEditing = false;
       return;
     }
 
@@ -527,6 +776,11 @@ const getImagePreviews = (root) =>
     ),
   );
 
+const getImagePreview = (root, selector) => {
+  const preview = root.querySelector(selector);
+  return preview instanceof HTMLElement ? preview : null;
+};
+
 const setImagePreviewUrl = (preview, url, alt = "", title = "") => {
   const image = preview.querySelector("img");
   if (!(image instanceof HTMLImageElement)) {
@@ -535,22 +789,11 @@ const setImagePreviewUrl = (preview, url, alt = "", title = "") => {
 
   preview
     .querySelectorAll("source")
-    .forEach((source) => source.setAttribute("srcset", url));
+    .forEach((source) => source.removeAttribute("srcset"));
   image.removeAttribute("srcset");
   image.src = url;
   image.alt = alt;
   image.title = title;
-};
-
-const updateImagePreviewsFromFile = (root, file) => {
-  getImagePreviews(root).forEach((preview) => {
-    const objectUrl = URL.createObjectURL(file);
-    setImagePreviewUrl(preview, objectUrl, file.name, file.name);
-    const image = preview.querySelector("img");
-    image?.addEventListener("load", () => URL.revokeObjectURL(objectUrl), {
-      once: true,
-    });
-  });
 };
 
 const setImageState = (root, hasImage) => {
@@ -558,31 +801,6 @@ const setImageState = (root, hasImage) => {
   root
     .querySelector("[data-ie-delete-image]")
     ?.classList.toggle("d-none", !hasImage);
-
-  const submitButton = root.querySelector(
-    `${imageFormSelector} button[type="submit"]`,
-  );
-  if (submitButton instanceof HTMLButtonElement) {
-    const label = hasImage
-      ? submitButton.dataset.replaceLabel
-      : submitButton.dataset.addLabel;
-    if (label) {
-      const labelElement = submitButton.querySelector("[data-ie-action-label]");
-      if (labelElement) {
-        labelElement.textContent = label;
-      }
-    }
-  }
-
-  const modalHint = root.querySelector("[data-ie-image-modal-hint]");
-  if (modalHint instanceof HTMLElement) {
-    const label = hasImage
-      ? modalHint.dataset.replaceLabel
-      : modalHint.dataset.addLabel;
-    if (label) {
-      modalHint.textContent = label;
-    }
-  }
 
   root
     .querySelector("[data-ie-image-delete-hint]")
@@ -596,6 +814,8 @@ const initializeImageEditing = (root) => {
   const fileInput = form?.querySelector('input[type="file"]');
   const uploadButton = form?.querySelector("[data-ie-upload-image]");
   const deleteButton = root.querySelector("[data-ie-delete-image]");
+  const pagePreview = getImagePreview(root, "[data-ie-image-preview]");
+  const modalPreview = getImagePreview(root, "[data-ie-image-modal-preview]");
   const Modal = globalThis.bootstrap?.Modal;
   if (
     !(form instanceof HTMLFormElement) ||
@@ -603,6 +823,8 @@ const initializeImageEditing = (root) => {
     !(openButton instanceof HTMLButtonElement) ||
     !(fileInput instanceof HTMLInputElement) ||
     !(uploadButton instanceof HTMLButtonElement) ||
+    !(pagePreview instanceof HTMLElement) ||
+    !(modalPreview instanceof HTMLElement) ||
     !Modal
   ) {
     return;
@@ -610,12 +832,69 @@ const initializeImageEditing = (root) => {
 
   const modalInstance = Modal.getOrCreateInstance(modal);
   let requestPending = false;
+  let selectedPreviewUrl = null;
+  let persistedPreviewUrl = null;
+
+  const releaseSelectedPreviewUrl = () => {
+    if (selectedPreviewUrl) {
+      URL.revokeObjectURL(selectedPreviewUrl);
+      selectedPreviewUrl = null;
+    }
+  };
+
+  const releasePersistedPreviewUrl = () => {
+    if (persistedPreviewUrl) {
+      URL.revokeObjectURL(persistedPreviewUrl);
+      persistedPreviewUrl = null;
+    }
+  };
+
+  const copyPagePreviewToModal = () => {
+    const image = pagePreview.querySelector("img");
+    if (image instanceof HTMLImageElement) {
+      setImagePreviewUrl(
+        modalPreview,
+        image.src,
+        image.alt,
+        image.title,
+      );
+    }
+  };
+
+  const previewSelectedFile = (file) => {
+    releaseSelectedPreviewUrl();
+    selectedPreviewUrl = URL.createObjectURL(file);
+    setImagePreviewUrl(
+      modalPreview,
+      selectedPreviewUrl,
+      file.name,
+      file.name,
+    );
+  };
+
+  const commitSelectedPreview = (file) => {
+    if (!selectedPreviewUrl) {
+      return;
+    }
+    releasePersistedPreviewUrl();
+    getImagePreviews(root).forEach((preview) => {
+      setImagePreviewUrl(
+        preview,
+        selectedPreviewUrl,
+        file.name,
+        file.name,
+      );
+    });
+    persistedPreviewUrl = selectedPreviewUrl;
+    selectedPreviewUrl = null;
+  };
 
   const clearImageError = () => {
     fileInput.classList.remove("is-invalid");
     const feedback = form.querySelector("[data-ie-image-error]");
     if (feedback) {
       feedback.textContent = "";
+      feedback.classList.add("d-none");
     }
   };
 
@@ -624,6 +903,7 @@ const initializeImageEditing = (root) => {
     const feedback = form.querySelector("[data-ie-image-error]");
     if (feedback) {
       feedback.textContent = message;
+      feedback.classList.remove("d-none");
     }
   };
 
@@ -656,6 +936,7 @@ const initializeImageEditing = (root) => {
 
   modal.addEventListener("show.bs.modal", () => {
     clearImageError();
+    copyPagePreviewToModal();
     updateActionAvailability();
   });
   modal.addEventListener("hide.bs.modal", (event) => {
@@ -665,6 +946,8 @@ const initializeImageEditing = (root) => {
   });
   modal.addEventListener("hidden.bs.modal", () => {
     form.reset();
+    releaseSelectedPreviewUrl();
+    copyPagePreviewToModal();
     clearImageError();
     updateActionAvailability();
     openButton.focus();
@@ -672,6 +955,13 @@ const initializeImageEditing = (root) => {
 
   fileInput.addEventListener("change", () => {
     clearImageError();
+    const file = fileInput.files?.[0];
+    if (file instanceof File) {
+      previewSelectedFile(file);
+    } else {
+      releaseSelectedPreviewUrl();
+      copyPagePreviewToModal();
+    }
     updateActionAvailability();
   });
 
@@ -684,35 +974,46 @@ const initializeImageEditing = (root) => {
       return;
     }
     if (!form.reportValidity()) {
-      showStatus(root, "warning", root.dataset.messageValidation ?? null);
+      showImageError(root.dataset.messageValidation ?? "");
       return;
     }
 
     const file = fileInput?.files?.[0];
     if (!(file instanceof File)) {
-      showStatus(root, "warning", root.dataset.messageValidation ?? null);
+      showImageError(root.dataset.messageValidation ?? "");
       return;
     }
 
+    // Build the multipart body before `setRequestPending()` disables the file
+    // input. Disabled form controls are deliberately omitted by FormData.
+    const formData = new FormData(form);
     clearImageError();
     setRequestPending(true, uploadButton);
-    showStatus(root, "info", root.dataset.messageSaving ?? null);
     let uploadSucceeded = false;
 
     try {
-      await requestJson(form.action, {
+      const result = await requestJson(form.action, {
         method: "POST",
-        body: new FormData(form),
+        body: formData,
       });
-      updateImagePreviewsFromFile(root, file);
+      if (result.hasImage !== true) {
+        const error = new Error("The upload returned no profile image.");
+        error.result = {
+          message: root.dataset.messageImageUploadMissing ?? "",
+        };
+        throw error;
+      }
+      commitSelectedPreview(file);
       setImageState(root, true);
       uploadSucceeded = true;
       showStatus(root, "success", root.dataset.messageImageUploaded ?? null);
     } catch (error) {
       const result = error instanceof Error ? error.result : null;
-      const message = result?.message ?? root.dataset.messageErrorMessage ?? "";
+      const message =
+        result?.error === "image_upload_missing"
+          ? root.dataset.messageImageUploadMissing ?? ""
+          : result?.message ?? root.dataset.messageErrorMessage ?? "";
       showImageError(message);
-      showStatus(root, "danger", message || null);
     } finally {
       setRequestPending(false);
       if (uploadSucceeded) {
@@ -749,6 +1050,8 @@ const initializeImageEditing = (root) => {
 
       const placeholderUrl = root.dataset.placeholderImageUrl;
       if (placeholderUrl) {
+        releaseSelectedPreviewUrl();
+        releasePersistedPreviewUrl();
         getImagePreviews(root).forEach((preview) => {
           setImagePreviewUrl(
             preview,
@@ -762,13 +1065,20 @@ const initializeImageEditing = (root) => {
       showStatus(root, "success", root.dataset.messageImageDeleted ?? null);
     } catch (error) {
       const result = error instanceof Error ? error.result : null;
-      showStatus(root, "danger", result?.message ?? null);
+      showImageError(
+        result?.message ?? root.dataset.messageErrorMessage ?? "",
+      );
     } finally {
       setRequestPending(false);
       if (deletionSucceeded) {
         modalInstance.hide();
       }
     }
+  });
+
+  globalThis.addEventListener("pagehide", () => {
+    releaseSelectedPreviewUrl();
+    releasePersistedPreviewUrl();
   });
 };
 
