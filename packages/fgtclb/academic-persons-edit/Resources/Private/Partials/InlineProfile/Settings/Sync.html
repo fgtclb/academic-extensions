@@ -1,0 +1,58 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:p="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <f:variable name="skipSyncValidation"
+        ><p:validationEnsure validations="{validations}" identifier="skipSync"
+    /></f:variable>
+
+    <section class="my-4">
+        <form class="academic-persons-inline-edit__sync-form" data-ie-sync-form>
+            <fieldset class="card">
+                <div class="card-body">
+                    <legend class="h5">
+                        <f:translate
+                            key="inlineProfile.section.settings"
+                            extensionName="academic_persons_edit" />
+                    </legend>
+                    <div class="form-check">
+                        <f:if condition="{skipSyncValidation.readOnly}">
+                            <f:then>
+                                <f:form.checkbox
+                                    name="skipSync"
+                                    id="inline-profile-{profile.uid}-skipSync"
+                                    class="form-check-input academic-persons-inline-edit__sync-checkbox"
+                                    value="1"
+                                    checked="{profile.skipSync}"
+                                    disabled="true" />
+                            </f:then>
+                            <f:else>
+                                <f:form.checkbox
+                                    name="skipSync"
+                                    id="inline-profile-{profile.uid}-skipSync"
+                                    class="form-check-input academic-persons-inline-edit__sync-checkbox"
+                                    value="1"
+                                    checked="{profile.skipSync}"
+                                    disabled="{skipSyncValidation.disabled}" />
+                            </f:else>
+                        </f:if>
+                        <label
+                            class="form-check-label"
+                            for="inline-profile-{profile.uid}-skipSync">
+                            <f:translate
+                                key="profile.skipSync.label"
+                                extensionName="academic_persons_edit" />
+                        </label>
+                        <div class="form-text">
+                            <f:translate
+                                key="profile.skipSync.description"
+                                extensionName="academic_persons_edit" />
+                        </div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </section>
+</html>

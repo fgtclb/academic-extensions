@@ -45,8 +45,7 @@ final class AcademicPersonsEditProfileImageMetadataTest extends AbstractProfileE
         if (preg_match('@<figure>.*?</figure>@s', $showPage, $matches) !== 1) {
             $this->fail('The profile detail view rendered no <figure> element for the profile image.');
         }
-
-        return $matches[0];
+        return $this->clearHtmlString($matches[0]);
     }
 
     private function fileMetadataTableHasColumn(string $columnName): bool

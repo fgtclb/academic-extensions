@@ -8,7 +8,7 @@
     date="2015-11-10T06:53:10Z"
     product-name="academic_persons_edit"
   >
-    <header/>
+    <header />
     <body>
       <trans-unit id="back">
         <source>back</source>
@@ -102,6 +102,10 @@
       <trans-unit id="profile.image">
         <source>Image</source>
         <target>Bild</target>
+      </trans-unit>
+      <trans-unit id="profile.image.placeholder.alt">
+        <source>No profile image available</source>
+        <target>Kein Profilbild vorhanden</target>
       </trans-unit>
       <trans-unit id="profile.personal">
         <source>Personal data</source>
@@ -333,8 +337,10 @@
         <target>Profil-Synchronisation deaktivieren</target>
       </trans-unit>
       <trans-unit id="profile.skipSync.description">
-        <source>Disabling the profile synchronization will prevent automatic updates from external sources.</source>
-        <target>Die Deaktivierung der Profil-Synchronisation verhindert automatische Aktualisierungen aus externen Quellen.</target>
+        <source>Disabling the profile synchronization will prevent automatic updates from external
+          sources.</source>
+        <target>Die Deaktivierung der Profil-Synchronisation verhindert automatische
+          Aktualisierungen aus externen Quellen.</target>
       </trans-unit>
 
       <!-- Profile information fields -->
@@ -540,6 +546,145 @@
         <target>Typ</target>
       </trans-unit>
 
+      <!-- Inline profile editing -->
+
+      <trans-unit id="inlineProfile.heading">
+        <source>Edit profile</source>
+        <target>Profil bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.btnEditAll">
+        <source>Edit all</source>
+        <target>Alle bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.introduction">
+        <source>Only changed fields are submitted. The page is not reloaded when saving.</source>
+        <target>Es werden nur geänderte Felder übertragen. Beim Speichern wird die Seite nicht neu
+          geladen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.personal">
+        <source>Personal data</source>
+        <target>Persönliche Daten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.links">
+        <source>Links</source>
+        <target>Links</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.content">
+        <source>Profile content</source>
+        <target>Profilinhalte</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.settings">
+        <source>Settings</source>
+        <target>Einstellungen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.saving">
+        <source>Saving changes…</source>
+        <target>Änderungen werden gespeichert…</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.success.message">
+        <source>The profile has been updated.</source>
+        <target>Das Profil wurde aktualisiert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.error.message">
+        <source>The profile could not be updated. Please try again.</source>
+        <target>Das Profil konnte nicht aktualisiert werden. Bitte erneut versuchen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.info.message">
+        <source>No changes where made. Please check your changes.</source>
+        <target>Es wurden keine Änderungen vorgenommen. Bitte überprüfen Sie Ihre Änderungen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.success.title">
+        <source>Success</source>
+        <target>Erfolg</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.error.title">
+        <source>Error</source>
+        <target>Fehler</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.info.title">
+        <source>Info</source>
+        <target>Info</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.warning.title">
+        <source>Warning</source>
+        <target>Warnung</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.validation">
+        <source>Please check the highlighted fields.</source>
+        <target>Bitte die markierten Felder überprüfen.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.editorError">
+        <source>The rich text editor could not be loaded. Please reload the page and try again.</source>
+        <target>Der Rich-Text-Editor konnte nicht geladen werden. Bitte laden Sie die Seite neu und
+          versuchen Sie es erneut.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.unchanged">
+        <source>There are no changes to save.</source>
+        <target>Es sind keine Änderungen zu speichern.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.actions.clear">
+        <source>Delete content</source>
+        <target>Inhalt löschen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.actions.group">
+        <source>Field actions</source>
+        <target>Feldaktionen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.content.empty">
+        <source>No content</source>
+        <target>Kein Inhalt</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.noProfile">
+        <source>No editable profile is assigned to the current frontend user.</source>
+        <target>Dem aktuellen Frontend-Benutzer ist kein bearbeitbares Profil zugeordnet.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.contract.unnamed">
+        <source>Contract without position</source>
+        <target>Vertrag ohne Positionsangabe</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.user_image_not_available">
+        <source>To edit userimage, please click here.</source>
+        <target>Um das Benutzerbild zu bearbeiten, klicken Sie hier.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.title">
+        <source>Edit profile image</source>
+        <target>Profilbild bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.open">
+        <source>Edit profile image</source>
+        <target>Profilbild bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.close">
+        <source>Close image modal</source>
+        <target>Bildbearbeitung schließen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.hint.select">
+        <source>Select an image to preview it. The profile image changes only after you save.</source>
+        <target>Wählen Sie ein Bild für die Vorschau aus. Das Profilbild wird erst beim Speichern
+          geändert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.deleteHint">
+        <source>The profile image is removed permanently unless another record still uses the file.</source>
+        <target>Das Profilbild wird dauerhaft entfernt, sofern keine andere Verwendung der Datei
+          besteht.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.upload.label">
+        <source>Choose image</source>
+        <target>Bild auswählen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.uploaded">
+        <source>The profile image has been saved.</source>
+        <target>Das Profilbild wurde gespeichert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.missing">
+        <source>No new profile image was received. Please select the image again.</source>
+        <target>Es wurde kein neues Profilbild empfangen. Bitte wählen Sie das Bild erneut aus.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.deleted">
+        <source>The profile image has been deleted.</source>
+        <target>Das Profilbild wurde gelöscht.</target>
+      </trans-unit>
+
       <!-- Action buttons -->
 
       <trans-unit id="actions.view">
@@ -577,6 +722,10 @@
       <trans-unit id="actions.delete">
         <source>Delete</source>
         <target>Löschen</target>
+      </trans-unit>
+      <trans-unit id="actions.undo">
+        <source>Undo</source>
+        <target>Rückgängig</target>
       </trans-unit>
       <trans-unit id="actions.cancel">
         <source>Cancel</source>

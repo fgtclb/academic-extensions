@@ -1,0 +1,63 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <fieldset class="card">
+        <div class="card-body position-relative">
+            <button
+                class="btn btn-outline-info position-absolute top-0 end-0 m-2"
+                type="button"
+                data-academic-persons-inline-edit-edit-all-btn>
+                <f:translate
+                    key="inlineProfile.btnEditAll"
+                    extensionName="academic_persons_edit" />
+            </button>
+            <legend class="h5">
+                <f:translate
+                    key="inlineProfile.section.personal"
+                    extensionName="academic_persons_edit" />
+            </legend>
+            <div class="row g-3">
+                <f:render
+                    partial="InlineProfile/Field/Gender"
+                    arguments="{profile: profile, validations: validations, genderOptions: genderOptions}" />
+                <f:render
+                    partial="InlineProfile/Field"
+                    arguments="{
+                        profile: profile,
+                        validations: validations,
+                        identifier: 'title',
+                        autocomplete: 'honorific-prefix',
+                        columnClass: 'col-12 col-sm-6'
+                    }" />
+                <f:render
+                    partial="InlineProfile/Field"
+                    arguments="{
+                        profile: profile,
+                        validations: validations,
+                        identifier: 'firstName',
+                        autocomplete: 'given-name',
+                        columnClass: 'col-12 col-md-4'
+                    }" />
+                <f:render
+                    partial="InlineProfile/Field"
+                    arguments="{
+                        profile: profile,
+                        validations: validations,
+                        identifier: 'middleName',
+                        autocomplete: 'additional-name',
+                        columnClass: 'col-12 col-md-4'
+                    }" />
+                <f:render
+                    partial="InlineProfile/Field"
+                    arguments="{
+                        profile: profile,
+                        validations: validations,
+                        identifier: 'lastName',
+                        autocomplete: 'family-name',
+                        columnClass: 'col-12 col-md-4'
+                    }" />
+            </div>
+        </div>
+    </fieldset>
+</html>

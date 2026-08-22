@@ -1,0 +1,341 @@
+<?php
+
+declare(strict_types=1);
+
+namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Controller;
+
+use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
+use FGTCLB\AcademicPersonsEdit\Controller\InlineProfileController;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFormDataFactoryInterface;
+use FGTCLB\AcademicPersonsEdit\Domain\Parser\ProfileUpdatePayloadParser;
+use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
+use PHPUnit\Framework\Attributes\Test;
+use Psr\Http\Message\ResponseInterface;
+use ReflectionProperty;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Http\Stream;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\Request;
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
+use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
+
+final class InlineProfileControllerTest extends UnitTestCase
+{
+    #[Test]
+    public function updateRejectsNonPostRequest(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest('GET')
+        );
+
+        $response = $subject->updateAction();
+
+        $this->assertJsonResponse(
+            $response,
+            405,
+            [
+                'success' => false,
+                'error' => 'method_not_allowed',
+            ],
+        );
+    }
+
+    #[Test]
+    public function updateRejectsInvalidJson(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                '{"profile": 123,'
+            )
+        );
+
+        $response = $subject->updateAction();
+
+        $this->assertJsonResponse(
+            $response,
+            400,
+            [
+                'success' => false,
+                'error' => 'invalid_json',
+            ],
+        );
+    }
+
+    #[Test]
+    public function updateRejectsInvalidPayload(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                json_encode(
+                    [
+                        'profile' => 123,
+                    ],
+                    JSON_THROW_ON_ERROR,
+                )
+            )
+        );
+
+        $response = $subject->updateAction();
+
+        $this->assertJsonResponse(
+            $response,
+            400,
+            [
+                'success' => false,
+                'error' => 'invalid_payload',
+            ],
+        );
+    }
+
+    #[Test]
+    public function updateReturnsJsonWhenAuthenticationIsRequired(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                json_encode(
+                    [
+                        'profile' => 123,
+                        'data' => [],
+                    ],
+                    JSON_THROW_ON_ERROR,
+                )
+            )
+        );
+
+        $response = $subject->updateAction();
+
+        $this->assertJsonResponse(
+            $response,
+            401,
+            [
+                'success' => false,
+                'error' => 'authentication_required',
+            ],
+        );
+    }
+
+    #[Test]
+    public function updateSkipSyncRejectsNonPostRequest(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest('GET')
+        );
+
+        $response = $subject->updateSkipSyncAction();
+
+        $this->assertJsonResponse(
+            $response,
+            405,
+            [
+                'success' => false,
+                'error' => 'method_not_allowed',
+            ],
+        );
+    }
+
+    #[Test]
+    public function updateSkipSyncReturnsJsonWhenAuthenticationIsRequired(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                json_encode(
+                    [
+                        'profile' => 123,
+                        'data' => ['skipSync' => true],
+                    ],
+                    JSON_THROW_ON_ERROR,
+                )
+            )
+        );
+
+        $response = $subject->updateSkipSyncAction();
+
+        $this->assertJsonResponse(
+            $response,
+            401,
+            [
+                'success' => false,
+                'error' => 'authentication_required',
+            ],
+        );
+    }
+
+    #[Test]
+    public function updateSkipSyncRejectsInvalidJson(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                '{"profile": 123,'
+            )
+        );
+
+        $response = $subject->updateSkipSyncAction();
+
+        $this->assertJsonResponse(
+            $response,
+            400,
+            [
+                'success' => false,
+                'error' => 'invalid_json',
+            ],
+        );
+    }
+
+    #[Test]
+    public function deleteImageRejectsNonPostRequest(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest('GET')
+        );
+
+        $response = $subject->deleteImageAction();
+
+        $this->assertJsonResponse(
+            $response,
+            405,
+            [
+                'success' => false,
+                'error' => 'method_not_allowed',
+            ],
+        );
+    }
+
+    #[Test]
+    public function deleteImageRejectsInvalidJson(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                '{"profile": 123,'
+            )
+        );
+
+        $response = $subject->deleteImageAction();
+
+        $this->assertJsonResponse(
+            $response,
+            400,
+            [
+                'success' => false,
+                'error' => 'invalid_json',
+            ],
+        );
+    }
+
+    #[Test]
+    public function deleteImageReturnsJsonWhenAuthenticationIsRequired(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                json_encode(
+                    [
+                        'profile' => 123,
+                        'data' => [],
+                    ],
+                    JSON_THROW_ON_ERROR,
+                )
+            )
+        );
+
+        $response = $subject->deleteImageAction();
+
+        $this->assertJsonResponse(
+            $response,
+            401,
+            [
+                'success' => false,
+                'error' => 'authentication_required',
+            ],
+        );
+    }
+
+    private function createSubject(Request $request): InlineProfileController
+    {
+        $profileRepository = $this->createStub(ProfileRepository::class);
+        $profileFormDataFactory = $this->createStub(ProfileFormDataFactoryInterface::class);
+        $profileGenderOptionsService = new ProfileGenderOptionsService();
+
+        $subject = new InlineProfileController(
+            $this->createStub(ProfileFactory::class),
+            $profileRepository,
+            $this->createStub(ResourceFactory::class),
+            new ProfileUpdateRequestService(
+                new Context(),
+                $profileRepository,
+                new ProfileUpdatePayloadParser(),
+            ),
+            new ProfileUpdateValidationService(
+                $profileFormDataFactory,
+                new ProfileFormDataValidator(),
+                $profileGenderOptionsService,
+                $this->createStub(ProfileRichTextSanitizerInterface::class),
+            ),
+            $profileGenderOptionsService,
+        );
+
+        $requestProperty = new ReflectionProperty(
+            ActionController::class,
+            'request',
+        );
+        $requestProperty->setValue($subject, $request);
+
+        return $subject;
+    }
+
+    private function createRequest(
+        string $method,
+        string $body = '',
+    ): Request {
+        $stream = new Stream('php://temp', 'rw');
+        $stream->write($body);
+        $stream->rewind();
+
+        $serverRequest = (new ServerRequest())
+            ->withMethod($method)
+            ->withBody($stream)
+            ->withHeader('Content-Type', 'application/json')
+            ->withAttribute(
+                'extbase',
+                new ExtbaseRequestParameters(),
+            );
+
+        return new Request($serverRequest);
+    }
+
+    /**
+     * @param array<string, mixed> $expectedBody
+     */
+    private function assertJsonResponse(
+        ResponseInterface $response,
+        int $expectedStatusCode,
+        array $expectedBody,
+    ): void {
+        $this->assertSame(
+            $expectedStatusCode,
+            $response->getStatusCode(),
+        );
+
+        $this->assertSame(
+            $expectedBody,
+            json_decode(
+                (string) $response->getBody(),
+                true,
+                512,
+                JSON_THROW_ON_ERROR,
+            ),
+        );
+    }
+}

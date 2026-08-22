@@ -123,7 +123,8 @@ abstract class AbstractProfileEditingPluginTestCase extends AbstractAcademicPers
         preg_match_all('@href="([^"]+)"@', $content, $matches);
         foreach ($matches[1] as $href) {
             $href = html_entity_decode($href);
-            if (!str_contains($href, urlencode('[action]') . '=' . $action)
+            if (
+                !str_contains($href, urlencode('[action]') . '=' . $action)
                 && !str_contains($href, '[action]=' . $action)
             ) {
                 continue;
@@ -215,5 +216,15 @@ abstract class AbstractProfileEditingPluginTestCase extends AbstractAcademicPers
         }
 
         return $files;
+    }
+    /**
+     * @param string $string recive the string to clear
+     * @return string returns the cleared string
+     */
+    protected function clearHtmlString(string $string): string
+    {
+        $string = preg_replace('/>\s+/u', '>', $string);
+        $string = preg_replace('/\s+</u', '<', $string);
+        return $string;
     }
 }

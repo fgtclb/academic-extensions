@@ -7,7 +7,7 @@
     date="2015-11-10T06:53:10Z"
     product-name="academic_persons_edit"
   >
-    <header/>
+    <header />
     <body>
       <trans-unit id="back">
         <source>back</source>
@@ -80,6 +80,9 @@
 
       <trans-unit id="profile.image">
         <source>Image</source>
+      </trans-unit>
+      <trans-unit id="profile.image.placeholder.alt">
+        <source>No profile image available</source>
       </trans-unit>
       <trans-unit id="profile.personal">
         <source>Personal data</source>
@@ -256,7 +259,8 @@
         <source>Disable profile sync</source>
       </trans-unit>
       <trans-unit id="profile.skipSync.description">
-        <source>Disabling the profile synchronization will prevent automatic updates from external sources.</source>
+        <source>Disabling the profile synchronization will prevent automatic updates from external
+          sources.</source>
       </trans-unit>
 
       <!-- Profile information fields -->
@@ -415,6 +419,108 @@
         <source>Type</source>
       </trans-unit>
 
+      <!-- Inline profile editing -->
+
+      <trans-unit id="inlineProfile.heading">
+        <source>Edit profile</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.btnEditAll">
+        <source>Edit all</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.introduction">
+        <source>Only changed fields are submitted. The page is not reloaded when saving.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.personal">
+        <source>Personal data</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.links">
+        <source>Links</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.content">
+        <source>Profile content</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.section.settings">
+        <source>Settings</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.saving">
+        <source>Saving changes…</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.success.message">
+        <source>The profile has been updated.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.error.message">
+        <source>The profile could not be updated. Please try again.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.info.message">
+        <source>No changes where made. Please check your changes.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.success.title">
+        <source>Success</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.error.title">
+        <source>Error</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.info.title">
+        <source>Info</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.warning.title">
+        <source>Warning</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.validation">
+        <source>Please check the highlighted fields.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.editorError">
+        <source>The rich text editor could not be loaded. Please reload the page and try again.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.status.unchanged">
+        <source>There are no changes to save.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.actions.clear">
+        <source>Delete content</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.actions.group">
+        <source>Field actions</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.content.empty">
+        <source>No content</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.noProfile">
+        <source>No editable profile is assigned to the current frontend user.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.contract.unnamed">
+        <source>Contract without position</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.user_image_not_available">
+        <source>To edit userimage, please click here.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.title">
+        <source>Edit profile image</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.open">
+        <source>Edit profile image</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.close">
+        <source>Close image modal</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.hint.select">
+        <source>Select an image to preview it. The profile image changes only after you save.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.deleteHint">
+        <source>The profile image is removed permanently unless another record still uses the file.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.upload.label">
+        <source>Choose image</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.uploaded">
+        <source>The profile image has been saved.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.missing">
+        <source>No new profile image was received. Please select the image again.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.deleted">
+        <source>The profile image has been deleted.</source>
+      </trans-unit>
+
       <!-- Action buttons -->
 
       <trans-unit id="actions.view">
@@ -443,6 +549,9 @@
       </trans-unit>
       <trans-unit id="actions.delete">
         <source>Delete</source>
+      </trans-unit>
+      <trans-unit id="actions.undo">
+        <source>Undo</source>
       </trans-unit>
       <trans-unit id="actions.cancel">
         <source>Cancel</source>

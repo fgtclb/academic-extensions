@@ -37,3 +37,13 @@ We suggest that you use a sitepackage extension. Learn how to
             layoutRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Layouts/
         }
     }
+
+Inline profile template
+-----------------------
+
+The inline editor consists of
+:file:`Resources/Private/Templates/InlineProfile/Index.html` and
+:file:`Resources/Private/Partials/InlineProfile/Field.html`. When overriding
+either file while keeping the shipped JavaScript, preserve its form data
+attributes and field class. The complete contract is documented in
+:ref:`inline-profile-editing`.

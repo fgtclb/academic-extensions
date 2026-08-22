@@ -1,0 +1,38 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <section class="card">
+        <div class="card-body">
+            <h3 class="h5">
+                <f:translate
+                    key="profile.image"
+                    extensionName="academic_persons_edit" />
+            </h3>
+            <button
+                class="btn border-0 p-0 w-100 text-start"
+                type="button"
+                data-ie-open-image-modal
+                data-bs-toggle="modal"
+                data-bs-target="#inline-profile-{profile.uid}-image-modal"
+                aria-controls="inline-profile-{profile.uid}-image-modal"
+                aria-haspopup="dialog">
+                <span class="visually-hidden">
+                    <f:translate
+                        key="inlineProfile.image.modal.open"
+                        extensionName="academic_persons_edit" />
+                </span>
+                <div data-ie-image-preview>
+                    <f:render
+                        partial="InlineProfile/Show/Image"
+                        arguments="{profile: profile}" />
+                </div>
+            </button>
+            <div class="form-text text-center">
+                <f:translate
+                    key="inlineProfile.image.modal.open"
+                    extensionName="academic_persons_edit" />
+            </div>
+        </div>
+    </section>
+</html>

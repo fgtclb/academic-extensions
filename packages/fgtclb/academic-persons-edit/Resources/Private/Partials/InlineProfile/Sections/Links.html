@@ -1,0 +1,49 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <fieldset class="card mt-4">
+        <div class="card-body">
+            <legend class="h5">
+                <f:translate
+                    key="inlineProfile.section.links"
+                    extensionName="academic_persons_edit" />
+            </legend>
+            <div class="row g-3">
+                <f:render
+                    partial="InlineProfile/Field"
+                    arguments="{
+                        profile: profile,
+                        validations: validations,
+                        identifier: 'website',
+                        autocomplete: 'url',
+                        columnClass: 'col-12 col-md-6'
+                    }" />
+                <f:render
+                    partial="InlineProfile/Field"
+                    arguments="{
+                        profile: profile,
+                        validations: validations,
+                        identifier: 'websiteTitle',
+                        columnClass: 'col-12 col-md-6'
+                    }" />
+                <f:render
+                    partial="InlineProfile/Field"
+                    arguments="{
+                        profile: profile,
+                        validations: validations,
+                        identifier: 'publicationsLink',
+                        columnClass: 'col-12 col-md-6'
+                    }" />
+                <f:render
+                    partial="InlineProfile/Field"
+                    arguments="{
+                        profile: profile,
+                        validations: validations,
+                        identifier: 'publicationsLinkTitle',
+                        columnClass: 'col-12 col-md-6'
+                    }" />
+            </div>
+        </div>
+    </fieldset>
+</html>

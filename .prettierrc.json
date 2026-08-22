@@ -1,0 +1,10 @@
+{
+	"overrides": [
+		{
+			"files": ["**/*.html", "**/*.htm"],
+			"options": {
+				"bracketSameLine": true
+			}
+		}
+	]
+}
