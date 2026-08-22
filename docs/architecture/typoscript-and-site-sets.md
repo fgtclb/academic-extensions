@@ -200,15 +200,15 @@ impossible.
 
 ## What is not converted yet
 
-`academic-base`, `academic-bite-jobs` and `academic-persons` follow this
-layout. Seven extensions still ship a single `Configuration/TypoScript/`
-folder, a set whose `setup.typoscript` is a one-line `@import` of it, and —
-with the single exception of `academic-study-plan` — no page TSconfig
-registration and no hide-by-default: `academic-contact4pages`,
-`academic-jobs`, `academic-partners`, `academic-persons-edit`,
-`academic-programs`, `academic-projects` and `academic-study-plan`. The
-remaining two, `academic-persons-sync` and `typo3-category-types`, ship neither
-a `Configuration/TypoScript/` nor a `Configuration/Sets/` and have nothing to
+`academic-base`, `academic-bite-jobs`, `academic-persons`,
+`academic-contact4pages` and `academic-persons-edit` follow this layout. Five
+extensions still ship a single `Configuration/TypoScript/` folder, a set whose
+`setup.typoscript` is a one-line `@import` of it, and — with the single
+exception of `academic-study-plan` — no page TSconfig registration and no
+hide-by-default: `academic-jobs`, `academic-partners`, `academic-programs`,
+`academic-projects` and `academic-study-plan`. The remaining two,
+`academic-persons-sync` and `typo3-category-types`, ship neither a
+`Configuration/TypoScript/` nor a `Configuration/Sets/` and have nothing to
 convert.
 
 Converting the rest is tracked as ACE-458 and happens per extension, each with

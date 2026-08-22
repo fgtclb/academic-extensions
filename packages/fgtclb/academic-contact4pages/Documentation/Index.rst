@@ -51,6 +51,10 @@ partners alongside the page content.
         Install :guilabel:`academic_contacts4pages` via Composer, the
         Extension Manager or a TER upload.
 
+    ..  card:: :ref:`Configuration <configuration>`
+
+        Configure the extension and its plugin for your installation.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -67,6 +71,7 @@ partners alongside the page content.
 
     Introduction/Index
     Installation/Index
+    Configuration/Index
     KnownProblems/Index
     Changelog/Changelog-3
     Changelog/Changelog-2

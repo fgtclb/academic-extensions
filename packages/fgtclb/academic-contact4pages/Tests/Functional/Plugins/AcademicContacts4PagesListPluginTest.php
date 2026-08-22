@@ -53,12 +53,13 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
                 'constants' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
                     'EXT:academic_persons/Configuration/TypoScript/Default/constants.typoscript',
+                    'EXT:academic_contacts4pages/Configuration/TypoScript/List/constants.typoscript',
                     'EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/PluginConfiguration.typoscript',
                 ],
                 'setup' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
                     'EXT:academic_persons/Configuration/TypoScript/Default/setup.typoscript',
-                    'EXT:academic_contacts4pages/Configuration/TypoScript/setup.typoscript',
+                    'EXT:academic_contacts4pages/Configuration/TypoScript/List/setup.typoscript',
                     'EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/Rendering.typoscript',
                 ],
             ],
