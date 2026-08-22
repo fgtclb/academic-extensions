@@ -200,20 +200,28 @@ impossible.
 
 ## What is not converted yet
 
-Only `academic-base` and `academic-bite-jobs` follow this layout. Eight
-extensions still ship a single `Configuration/TypoScript/` folder, a set whose
-`setup.typoscript` is a one-line `@import` of it, and — with the single
-exception of `academic-study-plan` — no page TSconfig registration and no
-hide-by-default: `academic-contact4pages`, `academic-jobs`,
-`academic-partners`, `academic-persons`, `academic-persons-edit`,
+`academic-base`, `academic-bite-jobs` and `academic-persons` follow this
+layout. Seven extensions still ship a single `Configuration/TypoScript/`
+folder, a set whose `setup.typoscript` is a one-line `@import` of it, and —
+with the single exception of `academic-study-plan` — no page TSconfig
+registration and no hide-by-default: `academic-contact4pages`,
+`academic-jobs`, `academic-partners`, `academic-persons-edit`,
 `academic-programs`, `academic-projects` and `academic-study-plan`. The
 remaining two, `academic-persons-sync` and `typo3-category-types`, ship neither
 a `Configuration/TypoScript/` nor a `Configuration/Sets/` and have nothing to
 convert.
 
-Converting the eight is tracked as ACE-458 and happens per extension, each with
+Converting the rest is tracked as ACE-458 and happens per extension, each with
 its own Breaking changelog entry, because every conversion moves paths that a
 site package may `@import`.
+
+`academic-persons` is the one extension where six content elements share a
+single `plugin.tx_academicpersons` block. It keeps that block in
+`Configuration/TypoScript/Default/` and each component folder names it in an
+`include_static_file.txt`, which both delivery paths read — see its own
+integrator chapter. The folder deliberately keeps the name `Default`: it is the
+value stored in existing `sys_template` records and the path several functional
+tests load directly.
 
 ## See also
 
