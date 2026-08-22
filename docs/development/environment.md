@@ -291,6 +291,27 @@ The workflows follow this rule literally: every job that needs a vendor tree
 runs `composerUpdate` for its own `-t`/`-p` pair first, and the `lint` job,
 which needs no vendor tree, does not run it at all — see its `lint` job.
 
+### Git worktrees
+
+A `git worktree` is a supported checkout. `runTests.sh` mounts the repository's
+common git directory alongside the working tree, because a worktree's `.git` is
+a file pointing into the main checkout and everything git needs would otherwise
+be outside the mount.
+
+What that costs is a dependency set per worktree, not per branch: `.Build/`,
+`.cache/` and `composer.lock` are all git-ignored and therefore per checkout, so
+a fresh worktree starts cold and needs its own `-s composerUpdate` for each core
+version before any suite that needs dependencies will run.
+
+Without the mount the failure is misleading — composer cannot determine a
+version for the path packages without git, so the install stops on the one path
+package that carries no `branch-alias` rather than on anything git shaped:
+
+```text
+Root composer.json requires fgtclb/academics-monorepo-shared ~3.0.0@dev,
+found fgtclb/academics-monorepo-shared[dev-main] but it does not match.
+```
+
 ## Caches: `.cache/` at the repository root
 
 Composer downloads land in `.cache/composer` and the PHPStan result cache in
