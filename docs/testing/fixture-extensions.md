@@ -159,7 +159,7 @@ protected function setUp(): void
 ```php
 'setup' => [
     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
-    'EXT:academic_persons/Configuration/TypoScript/setup.typoscript',
+    'EXT:academic_persons/Configuration/TypoScript/Default/setup.typoscript',
     'EXT:test_plugin_templates/Configuration/TypoScript/setup.typoscript',
     // …
 ],
