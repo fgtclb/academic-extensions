@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicBiteJobs\Tests\Functional\SiteSet;
+namespace FGTCLB\AcademicContacts4pages\Tests\Functional\SiteSet;
 
-use FGTCLB\AcademicBiteJobs\Tests\Functional\AbstractAcademicBiteJobsTestCase;
+use FGTCLB\AcademicContacts4pages\Tests\Functional\AbstractAcademicContacts4PagesTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
@@ -23,6 +23,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * therefore produces no error anywhere, only a site that is configured differently than
  * the integrator expects - which is the whole reason this restructuring exists.
  *
+ * It matters more here than in the other academic extensions: no seeded development
+ * instance includes this set, so nothing else would notice a broken delivery.
+ *
  * The probe TypoScript renders one constant and one setup value of the component, so a
  * delivery that did not happen shows up as a wrong value rather than as an exception.
  * The `sys_template` record it is imported from carries `clear = 0` on purpose: the
@@ -30,7 +33,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * everything the site sets contributed, and so does
  * `FunctionalTestCase::setUpFrontendRootPage()`.
  */
-final class SiteSetDeliveryTest extends AbstractAcademicBiteJobsTestCase
+final class SiteSetDeliveryTest extends AbstractAcademicContacts4PagesTestCase
 {
     use FrontendPluginRenderingTrait;
     use SiteBasedTestTrait;
@@ -39,8 +42,8 @@ final class SiteSetDeliveryTest extends AbstractAcademicBiteJobsTestCase
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8', 'iso' => 'en', 'hrefLang' => 'en-US', 'direction' => ''],
     ];
 
-    private const AGGREGATE_SET = 'fgtclb/academic-bite-jobs';
-    private const COMPONENT_SET = 'fgtclb/academic-bite-jobs-list';
+    private const AGGREGATE_SET = 'fgtclb/academic-contacts4pages';
+    private const COMPONENT_SET = 'fgtclb/academic-contacts4pages-list';
 
     protected function setUp(): void
     {
@@ -62,14 +65,70 @@ final class SiteSetDeliveryTest extends AbstractAcademicBiteJobsTestCase
         $body = $this->renderFrontendPage(self::FRONTEND_PLUGIN_TEST_BASE);
 
         $this->assertStringContainsString(
-            '<div id="constant">EXT:academic_bite_jobs/Resources/Private/Templates/BiteJobs/</div>',
+            '<div id="constant">EXT:academic_contacts4pages/Resources/Private/Templates/</div>',
             $body,
             'The site set did not deliver "constants.typoscript" of the component.',
         );
         $this->assertStringContainsString(
-            '<div id="setup">EXT:academic_bite_jobs/Resources/Private/Templates/</div>',
+            '<div id="setup">EXT:academic_persons/Resources/Private/Partials/</div>',
             $body,
             'The site set did not deliver "setup.typoscript" of the component.',
+        );
+    }
+
+    /**
+     * The component reads `{$plugin.tx_academicpersons.detailPid}`, a constant of
+     * another extension.
+     *
+     * What delivers it, measured rather than assumed: the
+     * `include_static_file.txt` of this component, which BOTH mechanisms read —
+     * `SysTemplateTreeBuilder::handleSetInclude()` reads it out of the folder the
+     * set's `typoscript` key names, exactly as the static template path does.
+     * Removing it turns the static half of this pair red. A set dependency on an
+     * `academic_persons` set is deliberately NOT declared: it does not deliver the
+     * constant on either path, and it would make that extension's content element
+     * selectable wherever this one is enabled.
+     *
+     * This needs its own test because the failure is invisible: TypoScript leaves an
+     * unresolved constant as its own literal text instead of raising, so the link to a
+     * profile would be built from the string `{$plugin.tx_academicpersons.detailPid}`
+     * and nothing anywhere would report it.
+     */
+    #[Test]
+    public function theConstantOfAcademicPersonsIsResolvedOnTheSiteSetPath(): void
+    {
+        $this->setUpSite(dependencies: [self::AGGREGATE_SET]);
+
+        $body = $this->renderFrontendPage(self::FRONTEND_PLUGIN_TEST_BASE);
+
+        $this->assertStringNotContainsString(
+            '{$plugin.tx_academicpersons.detailPid}',
+            $body,
+            'The constant of "academic_persons" was not substituted, so the set dependency did not deliver its TypoScript.',
+        );
+        $this->assertStringContainsString(
+            '<div id="foreign-constant">0</div>',
+            $body,
+            'The constant of "academic_persons" did not arrive with its shipped default.',
+        );
+    }
+
+    /**
+     * The static counterpart of the test above: the same constant, reached through
+     * `Configuration/TypoScript/List/include_static_file.txt` instead of through the
+     * set dependency.
+     */
+    #[Test]
+    public function theConstantOfAcademicPersonsIsResolvedOnTheStaticPath(): void
+    {
+        $this->setUpSite(includeStaticFile: 'EXT:academic_contacts4pages/Configuration/TypoScript/Full');
+
+        $body = $this->renderFrontendPage(self::FRONTEND_PLUGIN_TEST_BASE);
+
+        $this->assertStringNotContainsString(
+            '{$plugin.tx_academicpersons.detailPid}',
+            $body,
+            'The constant of "academic_persons" was not substituted through the static template.',
         );
     }
 
@@ -81,17 +140,17 @@ final class SiteSetDeliveryTest extends AbstractAcademicBiteJobsTestCase
     #[Test]
     public function aggregateStaticTemplateDeliversTheComponentTypoScript(): void
     {
-        $this->setUpSite(includeStaticFile: 'EXT:academic_bite_jobs/Configuration/TypoScript/Full');
+        $this->setUpSite(includeStaticFile: 'EXT:academic_contacts4pages/Configuration/TypoScript/Full');
 
         $body = $this->renderFrontendPage(self::FRONTEND_PLUGIN_TEST_BASE);
 
         $this->assertStringContainsString(
-            '<div id="constant">EXT:academic_bite_jobs/Resources/Private/Templates/BiteJobs/</div>',
+            '<div id="constant">EXT:academic_contacts4pages/Resources/Private/Templates/</div>',
             $body,
             'The aggregate static template did not deliver "constants.typoscript" of the component.',
         );
         $this->assertStringContainsString(
-            '<div id="setup">EXT:academic_bite_jobs/Resources/Private/Templates/</div>',
+            '<div id="setup">EXT:academic_persons/Resources/Private/Partials/</div>',
             $body,
             'The aggregate static template did not deliver "setup.typoscript" of the component.',
         );
@@ -115,7 +174,7 @@ final class SiteSetDeliveryTest extends AbstractAcademicBiteJobsTestCase
         );
 
         $this->assertContains(
-            'academicbitejobs_list',
+            'academiccontacts4pages_list',
             $removeItems,
             'The content element is selectable although no set and no page TSconfig enable it.',
         );
@@ -140,12 +199,12 @@ final class SiteSetDeliveryTest extends AbstractAcademicBiteJobsTestCase
         );
 
         $this->assertNotContains(
-            'academicbitejobs_list',
+            'academiccontacts4pages_list',
             $removeItems,
             'The site set did not deliver the page TSconfig that re-enables the content element.',
         );
         $this->assertArrayHasKey(
-            'academicbitejobs_list.',
+            'academiccontacts4pages_list.',
             $pageTsConfig['mod.']['wizards.']['newContentElement.']['wizardItems.']['academic.']['elements.'] ?? [],
             'The site set did not deliver the new content element wizard entry.',
         );
@@ -168,8 +227,8 @@ final class SiteSetDeliveryTest extends AbstractAcademicBiteJobsTestCase
         $this->assertNotNull($component, sprintf('The set "%s" is not registered.', self::COMPONENT_SET));
         $this->assertNotNull($aggregate, sprintf('The set "%s" is not registered.', self::AGGREGATE_SET));
 
-        $this->assertSame('EXT:academic_bite_jobs/Configuration/TypoScript/List/', $component->typoscript);
-        $this->assertSame('EXT:academic_bite_jobs/Configuration/TSconfig/List/page.tsconfig', $component->pagets);
+        $this->assertSame('EXT:academic_contacts4pages/Configuration/TypoScript/List/', $component->typoscript);
+        $this->assertSame('EXT:academic_contacts4pages/Configuration/TSconfig/List/page.tsconfig', $component->pagets);
         $this->assertDirectoryExists(GeneralUtility::getFileAbsFileName((string)$component->typoscript));
         $this->assertFileExists(GeneralUtility::getFileAbsFileName((string)$component->pagets));
 
@@ -214,7 +273,7 @@ final class SiteSetDeliveryTest extends AbstractAcademicBiteJobsTestCase
                 'clear' => 0,
                 'title' => 'Probe',
                 'constants' => '',
-                'config' => '@import \'EXT:academic_bite_jobs/Tests/Functional/SiteSet/Fixtures/TypoScript/Probe.typoscript\'',
+                'config' => '@import \'EXT:academic_contacts4pages/Tests/Functional/SiteSet/Fixtures/TypoScript/Probe.typoscript\'',
                 'include_static_file' => $includeStaticFile,
             ],
         );

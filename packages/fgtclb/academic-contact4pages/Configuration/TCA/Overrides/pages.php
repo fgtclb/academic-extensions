@@ -9,6 +9,24 @@ if (!defined('TYPO3')) {
 }
 
 (static function (): void {
+
+    //==================================================================================================================
+    // Page TSconfig, selectable in the page field "Page TSconfig" for installations that do not use site sets.
+    //
+    // The files are the same ones the sets of this extension deliver. Use one mechanism per site, not both.
+    //==================================================================================================================
+    ExtensionManagementUtility::registerPageTSConfigFile(
+        'academic_contacts4pages',
+        'Configuration/TSconfig/List/page.tsconfig',
+        'Academic Contacts4Pages: Contact list',
+    );
+
+    ExtensionManagementUtility::registerPageTSConfigFile(
+        'academic_contacts4pages',
+        'Configuration/TSconfig/Full/page.tsconfig',
+        'Academic Contacts4Pages: All components',
+    );
+
     ExtensionManagementUtility::addTCAcolumns(
         'pages',
         [

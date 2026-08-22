@@ -1,0 +1,23 @@
+# Page TSconfig of the contact list content element.
+#
+# Delivered by the set "fgtclb/academic-contacts4pages-list" and registered for
+# the page field "Page TSconfig" by "Configuration/TCA/Overrides/pages.php" -
+# one physical copy, two ways to it.
+#
+# The content element is hidden for the whole installation by
+# "Configuration/page.tsconfig"; this file is what makes it selectable again,
+# so it applies where the component is actually wanted instead of everywhere.
+TCEFORM.tt_content.CType.removeItems := removeFromList(academiccontacts4pages_list)
+
+mod.wizards.newContentElement.wizardItems.academic {
+  elements {
+    academiccontacts4pages_list {
+      iconIdentifier = actions-user
+      title = LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.title
+      description = LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.description
+      tt_content_defValues {
+        CType = academiccontacts4pages_list
+      }
+    }
+  }
+}

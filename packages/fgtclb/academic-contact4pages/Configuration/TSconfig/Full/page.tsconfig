@@ -1,0 +1,6 @@
+# Aggregate page TSconfig: every component this extension ships.
+#
+# The counterpart of the set "fgtclb/academic-contacts4pages" for installations
+# that include page TSconfig through the page field "Page TSconfig" instead of
+# through a site set.
+@import 'EXT:academic_contacts4pages/Configuration/TSconfig/List/page.tsconfig'
