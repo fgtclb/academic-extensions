@@ -583,6 +583,37 @@ cd "$THIS_SCRIPT_DIR" || exit 1
 cd ../../ || exit 1
 ROOT_DIR="${PWD}"
 
+# Git worktree support. In a worktree ".git" is a *file* pointing at a directory
+# inside the main checkout - "gitdir: <main>/.git/worktrees/<name>" - and that
+# directory is outside "${ROOT_DIR}", so the mount below does not carry it and
+# git has no repository at all inside the container.
+#
+# The failure that produces is not git shaped and is worth naming: composer
+# cannot determine a version for the path packages without git, so the install
+# stops on the only path package that has no "branch-alias". The plugin that
+# would resolve it from the "VERSION" file, sbuerk/extended-path-repository,
+# cannot help either - composer activates only plugins already present in
+# ".Build/vendor", and a cold worktree has none.
+#
+# Mounting the *common* directory is enough for both: the worktree's own git
+# directory lives inside it, and so does the shared object store.
+GIT_COMMON_DIR=""
+if [ -f "${ROOT_DIR}/.git" ]; then
+    gitDirPointer="$(sed -n 's/^gitdir: //p' "${ROOT_DIR}/.git" | head -1)"
+    case "${gitDirPointer}" in
+        "") ;;
+        /*) ;;
+        *) gitDirPointer="${ROOT_DIR}/${gitDirPointer}" ;;
+    esac
+    if [ -n "${gitDirPointer}" ] && [ -d "${gitDirPointer}" ]; then
+        if [ -f "${gitDirPointer}/commondir" ]; then
+            GIT_COMMON_DIR="$(cd "${gitDirPointer}" && cd "$(cat commondir)" && pwd)"
+        else
+            GIT_COMMON_DIR="${gitDirPointer}"
+        fi
+    fi
+fi
+
 # Create .cache dir: composer need this.
 mkdir -p .cache/composer
 mkdir -p .Build/Web/typo3temp/var/tests
@@ -680,6 +711,14 @@ else
         CONTAINER_COMMON_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm --network ${NETWORK} -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
         CONTAINER_SIMPLE_PARAMS="${CONTAINER_INTERACTIVE} ${CI_PARAMS} --rm -v ${ROOT_DIR}:${ROOT_DIR} -w ${ROOT_DIR}"
     fi
+fi
+
+# Carries the git directory of a worktree into the container, see "GIT_COMMON_DIR"
+# above. Appended after the branches so it uses the same relabel suffix as the
+# "${ROOT_DIR}" mount does.
+if [ -n "${GIT_COMMON_DIR}" ]; then
+    CONTAINER_COMMON_PARAMS="${CONTAINER_COMMON_PARAMS} -v ${GIT_COMMON_DIR}:${GIT_COMMON_DIR}${CONTAINER_MOUNT_SUFFIX}"
+    CONTAINER_SIMPLE_PARAMS="${CONTAINER_SIMPLE_PARAMS} -v ${GIT_COMMON_DIR}:${GIT_COMMON_DIR}${CONTAINER_MOUNT_SUFFIX}"
 fi
 
 if [ ${PHP_XDEBUG_ON} -eq 0 ]; then
