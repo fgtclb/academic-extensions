@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ce4b7e195d5f5b742d62b031921e5dc2",
+    "content-hash": "072da8fd8680c0622647ab1abdeb612d",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3278,6 +3278,95 @@
             "time": "2019-03-08T08:55:37+00:00"
         },
         {
+            "name": "sbuerk/data-factory",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sbuerk/data-factory.git",
+                "reference": "2b446548d5bc57ca035c93669849a192655c6a30"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sbuerk/data-factory/zipball/2b446548d5bc57ca035c93669849a192655c6a30",
+                "reference": "2b446548d5bc57ca035c93669849a192655c6a30",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2 || ^8.3 || ^8.4 || ^8.5",
+                "typo3/cms-core": "^13.4 || ^14.3"
+            },
+            "require-dev": {
+                "fgtclb/environment-state-manager": "^2.0.1",
+                "friendsofphp/php-cs-fixer": "^3.95.15",
+                "nikic/php-parser": "^5.4.0",
+                "phpstan/phpstan": "^2.2.5",
+                "phpstan/phpstan-phpunit": "^2.0.18",
+                "phpunit/phpunit": "^11.5.56",
+                "saschaegerer/phpstan-typo3": "^2.1.1 || ^3.0.1",
+                "sbuerk/fixture-packages": "^1.1.3",
+                "sbuerk/typo3-site-based-test-trait": "^2.0.1 || ^3.0.0",
+                "typo3/cms-workspaces": "^13.4 || ^14.3",
+                "typo3/testing-framework": "^9.6.1"
+            },
+            "type": "typo3-cms-extension",
+            "extra": {
+                "typo3/cms": {
+                    "Package": {
+                        "providesPackages": []
+                    },
+                    "version": "2.0.0",
+                    "web-dir": ".Build/Web",
+                    "extension-key": "data_factory"
+                },
+                "branch-alias": {
+                    "dev-main": "2.0.x-dev"
+                },
+                "sbuerk/fixture-packages": {
+                    "paths": {
+                        "Tests/Functional/Fixtures/Extensions/*": [
+                            "autoload"
+                        ]
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SBUERK\\DataFactory\\": "Classes/",
+                    "SBUERK\\DataFactory\\Core13\\": "Core13/",
+                    "SBUERK\\DataFactory\\Core14\\": "Core14/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Stefan Bürk",
+                    "email": "stefan@buerk.tech"
+                }
+            ],
+            "description": "TYPO3 Data Factory - Seeds pages, records, files and site configurations into a TYPO3 installation from YAML definitions shipped by extensions.",
+            "homepage": "https://github.com/sbuerk/data-factory",
+            "keywords": [
+                "cli",
+                "data-factory",
+                "data_factory",
+                "demo-data",
+                "fixtures",
+                "seeding",
+                "typo3",
+                "typo3-cms-extension",
+                "yaml"
+            ],
+            "support": {
+                "docs": "https://docs.typo3.org/p/sbuerk/data-factory/main/en-us/",
+                "issues": "https://github.com/sbuerk/data-factory/issues",
+                "source": "https://github.com/sbuerk/data-factory"
+            },
+            "time": "2026-08-21T21:21:02+00:00"
+        },
+        {
             "name": "sbuerk/extended-path-repository",
             "version": "1.1.0",
             "source": {
@@ -3338,92 +3427,6 @@
                 "source": "https://github.com/sbuerk/extended-path-repository/tree/1.1.0"
             },
             "time": "2026-08-11T13:31:18+00:00"
-        },
-        {
-            "name": "sbuerk/theme-extension-development",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sbuerk/theme-extension-development.git",
-                "reference": "df202c7a4376052292901dc8e404f4d5b818a81a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sbuerk/theme-extension-development/zipball/df202c7a4376052292901dc8e404f4d5b818a81a",
-                "reference": "df202c7a4376052292901dc8e404f4d5b818a81a",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.2 || ^8.3 || ^8.4 || ^8.5",
-                "typo3/cms-core": "^13.4 || ^14.3"
-            },
-            "require-dev": {
-                "fgtclb/environment-state-manager": "^2.0.1",
-                "friendsofphp/php-cs-fixer": "^3.95.15",
-                "nikic/php-parser": "^5.4.0",
-                "phpstan/phpstan": "^2.2.5",
-                "phpstan/phpstan-phpunit": "^2.0.18",
-                "phpunit/phpunit": "^11.5.56",
-                "saschaegerer/phpstan-typo3": "^2.1.1 || ^3.0.1",
-                "sbuerk/fixture-packages": "^1.1.3",
-                "sbuerk/typo3-site-based-test-trait": "^2.0.1 || ^3.0.0",
-                "typo3/testing-framework": "^9.6.1"
-            },
-            "default-branch": true,
-            "type": "typo3-cms-extension",
-            "extra": {
-                "typo3/cms": {
-                    "Package": {
-                        "providesPackages": []
-                    },
-                    "version": "2.0.0-dev",
-                    "web-dir": ".Build/Web",
-                    "extension-key": "theme_extension_development"
-                },
-                "branch-alias": {
-                    "dev-main": "2.0.x-dev"
-                },
-                "sbuerk/fixture-packages": {
-                    "paths": {
-                        "Tests/Functional/Fixtures/Extensions/*": [
-                            "autoload"
-                        ]
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "SBUERK\\ThemeExtensionDevelopment\\": "Classes/",
-                    "SBUERK\\ThemeExtensionDevelopment\\Core13\\": "Core13/",
-                    "SBUERK\\ThemeExtensionDevelopment\\Core14\\": "Core14/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "sbuerk"
-                }
-            ],
-            "description": "TYPO3 frontend theme for development purposes: extension development, DDEV based test instances and acceptance tests.",
-            "homepage": "https://github.com/sbuerk/theme-extension-development",
-            "keywords": [
-                "acceptance-tests",
-                "ddev",
-                "development",
-                "frontend",
-                "testing",
-                "theme",
-                "typo3",
-                "typo3-cms-extension"
-            ],
-            "support": {
-                "issues": "https://github.com/sbuerk/theme-extension-development/issues",
-                "source": "https://github.com/sbuerk/theme-extension-development"
-            },
-            "time": "2026-08-17T09:07:57+00:00"
         },
         {
             "name": "scssphp/scssphp",
@@ -10335,7 +10338,6 @@
         "bk2k/bootstrap-package": 20,
         "fgtclb/academics-monorepo-dev-site": 20,
         "fgtclb/academics-monorepo-shared": 20,
-        "sbuerk/theme-extension-development": 20,
         "typo3/cms-adminpanel": 20,
         "typo3/cms-dashboard": 20,
         "typo3/cms-form": 20,

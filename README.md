@@ -154,17 +154,17 @@ Each instance is seeded on first start from the committed template in
 `sqlite-databases/`, by `config/system/additional.php`. So there is no setup step:
 check out, start, log in.
 
-What is in those templates is **described rather than clicked together**:
-`packages-dev/dev-site/Configuration/Seeds/Instance.yaml` holds the page tree,
-the content and the records, and `ddev composer instance:seed` writes it into an
-empty instance. That is how a template is rebuilt when it goes stale — see
+What is in those templates is **described rather than clicked together**: the
+seed set `packages-dev/dev-site/Configuration/DataFactory/academics-instance/`
+holds the page tree, the content and the records, and
+`ddev composer instance:seed` imports it into an empty instance. That is how a template is rebuilt when it goes stale — see
 [Rebuilding an instance from nothing](#rebuilding-an-instance-from-nothing).
 
 ```shell
 cd core-13 && ddev start && ddev launch /typo3/
 ```
 
-The backend admin account is `john-doe`, and the seed also creates the frontend
+The backend admin account is `john-doe`, and the set also creates the frontend
 user needed to look at `EXT:academic_persons_edit`. Both, and what is on which
 page, are documented in
 [Development instances](docs/development/instances.md#accounts).
