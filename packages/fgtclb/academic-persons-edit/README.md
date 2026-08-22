@@ -11,22 +11,35 @@
 This extension extends the `academic_persons` extension by the option to edit profiles in the frontend.
 Profiles get connected with a frontend user and the frontend user is allow to edit its assigned profiles.
 
-The `Inline profile editing` content element provides a responsive form that
-saves only changed profile fields through a JSON endpoint without reloading the
-page. The synchronization checkbox and profile image use dedicated AJAX
-endpoints. Clicking the image opens a Bootstrap 5 modal: selecting a file
-updates the local modal preview, saving uploads and replaces the page preview,
-and deleting removes the current image. Upload errors retain their non-success
-HTTP status, are shown inside the open modal and do not change the page preview.
+The `Inline profile editing` content element provides a responsive, Bootstrap
+5 based profile page that saves only changed profile fields through a JSON
+endpoint without reloading the page. On large viewports the profile image
+column remains sticky while the personal data scrolls. Its runtime top offset
+tracks the rendered border-box height of `#page-header`, including responsive
+and scroll-dependent height or padding changes. On smaller viewports the
+layout collapses to one column. Read values
+are plain text with a borderless pencil action instead of button-like value
+controls. Related name and link properties are presented as groups and edited
+together.
+
+The profile name is displayed as the main heading above the sticky image. The
+compact `Private` switch sits immediately left of the small `Edit all` button
+beside the personal-data heading and keeps using its dedicated `skipSync` AJAX
+endpoint. A small pencil button in the upper-right corner of the profile image
+opens a Bootstrap 5 modal: selecting a file updates the local modal preview,
+saving uploads and replaces the page preview, and deleting removes the current
+image. Upload errors retain their non-success HTTP status, are shown inside the
+open modal and do not change the page preview.
 No additional CSS or inline styles are required.
 Authentication, profile ownership, configured validators, file validation and
 TCA gender options are checked server-side.
 
-The five fields in the profile content section use TYPO3's bundled CKEditor 5
-and are saved through the same partial-update endpoint. Submitted rich text is
+The five rich-text properties use TYPO3's bundled CKEditor 5; four appear in
+the personal-data column and `miscellaneous` appears as the `About me`
+description. They are saved through the same partial-update endpoint. Submitted rich text is
 sanitized server-side with an explicit tag, attribute and URI-scheme allowlist
 before it is validated and persisted. Rich-text fields show their formatted
-content directly with a compact edit control. While editing, separate delete,
+content directly with a compact pencil control. While editing, separate delete,
 cancel and save actions clear the draft, restore the last persisted value or
 persist the field through AJAX. See the
 [inline-editing documentation](./Documentation/InlineEditing/Index.rst) for the

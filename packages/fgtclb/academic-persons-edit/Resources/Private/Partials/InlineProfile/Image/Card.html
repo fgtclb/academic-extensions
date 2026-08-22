@@ -1,38 +1,38 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true">
-    <section class="card">
-        <div class="card-body">
-            <h3 class="h5">
-                <f:translate
-                    key="profile.image"
-                    extensionName="academic_persons_edit" />
-            </h3>
+    <section aria-labelledby="inline-profile-{profile.uid}-name-heading">
+        <h1
+            id="inline-profile-{profile.uid}-name-heading"
+            class="h2 fw-normal text-break mb-4"
+            data-ie-profile-name
+            data-ie-profile-name-field-ids="inline-profile-{profile.uid}-title inline-profile-{profile.uid}-firstName inline-profile-{profile.uid}-middleName inline-profile-{profile.uid}-lastName">
+            {profile.title} {profile.firstName} {profile.middleName}
+            {profile.lastName}
+        </h1>
+        <div class="position-relative">
+            <div data-ie-image-preview>
+                <f:render
+                    partial="InlineProfile/Show/Image"
+                    arguments="{profile: profile}" />
+            </div>
             <button
-                class="btn border-0 p-0 w-100 text-start"
+                class="btn btn-outline-info btn-sm border shadow-sm position-absolute top-0 end-0 m-2 d-inline-flex align-items-center justify-content-center"
                 type="button"
                 data-ie-open-image-modal
                 data-bs-toggle="modal"
                 data-bs-target="#inline-profile-{profile.uid}-image-modal"
                 aria-controls="inline-profile-{profile.uid}-image-modal"
-                aria-haspopup="dialog">
-                <span class="visually-hidden">
-                    <f:translate
-                        key="inlineProfile.image.modal.open"
-                        extensionName="academic_persons_edit" />
-                </span>
-                <div data-ie-image-preview>
-                    <f:render
-                        partial="InlineProfile/Show/Image"
-                        arguments="{profile: profile}" />
-                </div>
+                aria-haspopup="dialog"
+                title="{f:translate(key: 'inlineProfile.image.edit', extensionName: 'academic_persons_edit')}"
+                aria-label="{f:translate(key: 'inlineProfile.image.edit', extensionName: 'academic_persons_edit')}">
+                <core:icon
+                    identifier="academic-persons-inline-edit-pencil"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
             </button>
-            <div class="form-text text-center">
-                <f:translate
-                    key="inlineProfile.image.modal.open"
-                    extensionName="academic_persons_edit" />
-            </div>
         </div>
     </section>
 </html>

@@ -6,43 +6,62 @@
     <f:variable name="genderValidation"
         ><p:validationEnsure validations="{validations}" identifier="gender"
     /></f:variable>
-
-    <div class="col-12 col-sm-6">
-        <div class="mb-3">
-            <label class="form-label" for="inline-profile-{profile.uid}-gender">
-                <f:translate
-                    key="profile.gender.label"
-                    extensionName="academic_persons_edit" />
-                <f:if condition="{genderValidation.required}">
-                    <abbr title="required">*</abbr>
+    <f:variable
+        name="elementId"
+        value="inline-profile-{profile.uid}-gender" />
+    <div class="{columnClass}">
+        <div
+            class="rounded-1 p-3 p-lg-4 {rowClass}"
+            data-ie-field-wrapper>
+            <f:render
+                partial="InlineProfile/Field/Preview"
+                arguments="{
+                    profile: profile,
+                    identifier: 'gender',
+                    elementId: elementId,
+                    validation: genderValidation
+                }" />
+            <div
+                id="{elementId}-editor"
+                class="d-none mt-3"
+                data-ie-field-editor
+                data-ie-for="{elementId}">
+                <label class="form-label fw-semibold" for="{elementId}">
+                    <f:translate
+                        key="profile.gender.label"
+                        extensionName="academic_persons_edit" />
+                    <f:if condition="{genderValidation.required}">
+                        <abbr title="required">*</abbr>
+                    </f:if>
+                </label>
+                <f:if condition="{genderValidation.readOnly}">
+                    <f:then>
+                        <f:form.select
+                            name="gender"
+                            id="{elementId}"
+                            class="form-select form-select-sm academic-persons-inline-edit__field"
+                            options="{genderOptions}"
+                            value="{profile.gender}"
+                            prependOptionLabel="---"
+                            prependOptionValue=""
+                            disabled="true" />
+                    </f:then>
+                    <f:else>
+                        <f:form.select
+                            name="gender"
+                            id="{elementId}"
+                            class="form-select form-select-sm academic-persons-inline-edit__field"
+                            options="{genderOptions}"
+                            value="{profile.gender}"
+                            prependOptionLabel="---"
+                            prependOptionValue=""
+                            disabled="{genderValidation.disabled}"
+                            required="{genderValidation.required}"
+                            data-ie-autosave-on-change="true" />
+                    </f:else>
                 </f:if>
-            </label>
-            <f:if condition="{genderValidation.readOnly}">
-                <f:then>
-                    <f:form.select
-                        name="gender"
-                        id="inline-profile-{profile.uid}-gender"
-                        class="form-select form-select-sm academic-persons-inline-edit__field"
-                        options="{genderOptions}"
-                        value="{profile.gender}"
-                        prependOptionLabel="---"
-                        prependOptionValue=""
-                        disabled="true" />
-                </f:then>
-                <f:else>
-                    <f:form.select
-                        name="gender"
-                        id="inline-profile-{profile.uid}-gender"
-                        class="form-select form-select-sm academic-persons-inline-edit__field"
-                        options="{genderOptions}"
-                        value="{profile.gender}"
-                        prependOptionLabel="---"
-                        prependOptionValue=""
-                        disabled="{genderValidation.disabled}"
-                        required="{genderValidation.required}" />
-                </f:else>
-            </f:if>
-            <div class="invalid-feedback"></div>
+                <div class="invalid-feedback"></div>
+            </div>
         </div>
     </div>
 </html>

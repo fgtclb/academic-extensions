@@ -7,18 +7,28 @@ import { Paragraph } from "@ckeditor/ckeditor5-paragraph";
 
 const rootSelector = "[data-academic-persons-inline-edit]";
 const fieldsFormSelector = "[data-ie-fields-form]";
-const editButtonSelector =
-  "[data-academic-persons-inline-edit-activate-btn]";
+const editButtonSelector = "[data-academic-persons-inline-edit-activate-btn]";
 const editAllButtonSelector =
   "[data-academic-persons-inline-edit-edit-all-btn]";
 const footerButtonAreaSelector = "[data-ie-footer-button-area]";
 const buttonAreaSelector = "[data-form-field-button-area]";
 const fieldSelector = ".academic-persons-inline-edit__field";
+const fieldPreviewSelector = "[data-ie-field-preview]";
+const fieldEditorSelector = "[data-ie-field-editor]";
+const fieldGroupSelector = "[data-ie-field-group]";
+const groupPreviewSelector = "[data-ie-group-preview]";
+const groupPreviewContentSelector = "[data-ie-group-preview-content]";
+const groupEditorSelector = "[data-ie-group-editor]";
+const groupEditButtonSelector = "[data-ie-group-edit]";
+const profileNameSelector = "[data-ie-profile-name]";
+const stickyImageSelector = "[data-ie-sticky-image]";
+const pageHeaderSelector = "#page-header";
 const imageFormSelector = ".academic-persons-inline-edit__image-form";
 const imageModalSelector = "[data-ie-image-modal]";
 const syncFormSelector = "[data-ie-sync-form]";
 const syncCheckboxSelector = ".academic-persons-inline-edit__sync-checkbox";
 const richTextFieldSelector = "[data-ie-rich-text]";
+const autosaveOnChangeSelector = "[data-ie-autosave-on-change]";
 const richTextPreviewSelector = "[data-ie-rich-text-preview]";
 const richTextPreviewContentSelector = "[data-ie-rich-text-preview-content]";
 const fieldActionsSelector = "[data-ie-field-actions]";
@@ -44,12 +54,7 @@ const blockedRichTextPreviewTags = new Set([
   "svg",
   "template",
 ]);
-const allowedRichTextLinkSchemes = new Set([
-  "http",
-  "https",
-  "mailto",
-  "tel",
-]);
+const allowedRichTextLinkSchemes = new Set(["http", "https", "mailto", "tel"]);
 const richTextEditorConfig = {
   licenseKey: "GPL",
   plugins: [Essentials, Paragraph, Bold, Italic, List, Link],
@@ -82,7 +87,10 @@ const isEditableField = (element) =>
 const isRichTextField = (field) => field.matches(richTextFieldSelector);
 
 const getFieldEditElement = (field) =>
-  field.closest("[data-ie-editor-container]") ?? field;
+  field.closest(fieldGroupSelector)?.querySelector(groupEditorSelector) ??
+  field.closest(fieldEditorSelector) ??
+  field.closest("[data-ie-editor-container]") ??
+  field;
 
 const getRichTextPreview = (root, field) => {
   if (!isRichTextField(field) || !field.id) {
@@ -133,8 +141,7 @@ const isAllowedRichTextLink = (value) => {
   }
   const scheme = normalizedValue.match(/^([a-z][a-z\d+.-]*):/i)?.[1];
   return (
-    scheme === undefined ||
-    allowedRichTextLinkSchemes.has(scheme.toLowerCase())
+    scheme === undefined || allowedRichTextLinkSchemes.has(scheme.toLowerCase())
   );
 };
 
@@ -186,10 +193,18 @@ const renderRichTextPreview = (root, field, value) => {
   content.replaceChildren(fragment);
 };
 
-const getFieldDisplayValue = (field, value) =>
-  isRichTextField(field)
-    ? getPlainText(String(value ?? ""))
-    : String(value ?? "");
+const getFieldDisplayValue = (field, value) => {
+  if (isRichTextField(field)) {
+    return getPlainText(String(value ?? ""));
+  }
+  if (field instanceof HTMLSelectElement) {
+    const selectedOption = field.selectedOptions[0];
+    return selectedOption?.value
+      ? (selectedOption.textContent ?? "").trim()
+      : "";
+  }
+  return String(value ?? "").trim();
+};
 
 const getFieldPropertyName = (field) => {
   const bracketProperty = field.name.match(/\[([^\]]+)]$/)?.[1];
@@ -216,6 +231,81 @@ const getActivateButton = (root, field) => {
   const selector = `${editButtonSelector}[data-ie-for="${CSS.escape(field.id)}"]`;
   const button = root.querySelector(selector);
   return button instanceof HTMLButtonElement ? button : null;
+};
+
+const getFieldPreview = (root, field) => {
+  if (!field.id) {
+    return null;
+  }
+  const selector = `${fieldPreviewSelector}[data-ie-for="${CSS.escape(field.id)}"]`;
+  const preview = root.querySelector(selector);
+  return preview instanceof HTMLElement ? preview : null;
+};
+
+const parseFieldIds = (value) =>
+  (value ?? "").split(/\s+/).filter((fieldId) => fieldId !== "");
+
+const getFieldsByIds = (root, value) =>
+  parseFieldIds(value)
+    .map((fieldId) => getFieldById(root, fieldId))
+    .filter((field) => field !== null);
+
+const getGroupFields = (root, group) =>
+  getFieldsByIds(root, group.dataset.ieFieldIds);
+
+const renderProfileName = (root) => {
+  const heading = root.querySelector(profileNameSelector);
+  if (!(heading instanceof HTMLElement)) {
+    return;
+  }
+  const value = getFieldsByIds(root, heading.dataset.ieProfileNameFieldIds)
+    .map((field) => getFieldDisplayValue(field, getFieldValue(field)))
+    .filter((fieldValue) => fieldValue !== "")
+    .join(" ");
+  heading.textContent = value;
+};
+
+const renderFieldGroupPreview = (root, group) => {
+  const content = group.querySelector(groupPreviewContentSelector);
+  if (!(content instanceof HTMLElement)) {
+    return;
+  }
+  const displayFields = getFieldsByIds(
+    root,
+    group.dataset.ieDisplayFieldIds ?? group.dataset.ieFieldIds,
+  );
+  const values = displayFields
+    .map((field) => getFieldDisplayValue(field, getFieldValue(field)))
+    .filter((value) => value !== "");
+  const value =
+    group.dataset.ieDisplayMode === "first"
+      ? (values[0] ?? "")
+      : values.join(" ");
+  if (value !== "") {
+    content.classList.remove("text-body-secondary");
+    content.textContent = value;
+    return;
+  }
+  content.classList.add("text-body-secondary");
+  content.textContent = content.dataset.emptyLabel ?? "";
+};
+
+const toggleEditGroup = (root, group, state = true) => {
+  const editor = group.querySelector(groupEditorSelector);
+  const preview = group.querySelector(groupPreviewSelector);
+  const button = group.querySelector(groupEditButtonSelector);
+  const fields = getGroupFields(root, group).filter(
+    (field) => !field.disabled && !field.readOnly,
+  );
+  if (!(editor instanceof HTMLElement) || fields.length === 0) {
+    return;
+  }
+  editor.classList.toggle("d-none", !state);
+  preview?.classList.toggle("d-none", state);
+  button?.setAttribute("aria-expanded", String(state));
+  if (state) {
+    fields[0].focus();
+  }
 };
 
 const setFooterVisible = (root, visible) => {
@@ -312,7 +402,7 @@ const clearValidationErrors = (fields) => {
     field.classList.remove("is-invalid");
     getFieldEditElement(field).classList.remove("is-invalid");
     const feedback = field
-      .closest(".mb-3, .form-check")
+      .closest("[data-ie-field-wrapper], [data-ie-group-control], .form-check")
       ?.querySelector(".invalid-feedback");
     if (feedback) {
       feedback.textContent = "";
@@ -335,7 +425,7 @@ const showValidationErrors = (root, fields, errors) => {
       toggleEditField(root, field.id, true);
     }
     const feedback = field
-      .closest(".mb-3, .form-check")
+      .closest("[data-ie-field-wrapper], [data-ie-group-control], .form-check")
       ?.querySelector(".invalid-feedback");
     if (feedback) {
       feedback.textContent = Array.isArray(messages)
@@ -380,33 +470,43 @@ const createActivateButton = (root, field, fieldValue) => {
 };
 
 const renderActivateButton = (root, field, fieldValue) => {
-  if (!field.id || field.disabled || field.readOnly) {
+  if (!field.id) {
     return;
   }
   if (isRichTextField(field)) {
     renderRichTextPreview(root, field, fieldValue);
     return;
   }
-
-  const currentButton = getActivateButton(root, field);
-  const replacementButton = createActivateButton(root, field, fieldValue);
-  if (!replacementButton) {
+  const group = field.closest(fieldGroupSelector);
+  if (group instanceof HTMLElement) {
+    renderFieldGroupPreview(root, group);
     return;
   }
-
-  if (currentButton) {
-    replacementButton.classList.toggle(
-      "d-none",
-      currentButton.classList.contains("d-none"),
-    );
-    currentButton.replaceWith(replacementButton);
+  const preview = getFieldPreview(root, field);
+  const content = preview?.querySelector("[data-ie-field-preview-content]");
+  if (!(content instanceof HTMLElement)) {
+    const currentButton = getActivateButton(root, field);
+    const replacementButton = createActivateButton(root, field, fieldValue);
+    if (!replacementButton) {
+      return;
+    }
+    if (currentButton) {
+      replacementButton.classList.toggle(
+        "d-none",
+        currentButton.classList.contains("d-none"),
+      );
+      currentButton.replaceWith(replacementButton);
+      return;
+    }
+    field
+      .closest(".mb-3, .form-check")
+      ?.querySelector(buttonAreaSelector)
+      ?.append(replacementButton);
     return;
   }
-
-  field
-    .closest(".mb-3, .form-check")
-    ?.querySelector(buttonAreaSelector)
-    ?.append(replacementButton);
+  const displayValue = getFieldDisplayValue(field, fieldValue);
+  content.classList.toggle("text-body-secondary", displayValue === "");
+  content.textContent = displayValue || preview.dataset.emptyLabel || "";
 };
 
 const toggleEditField = (root, fieldId, state = true) => {
@@ -414,12 +514,15 @@ const toggleEditField = (root, fieldId, state = true) => {
   if (!field || field.disabled || field.readOnly) {
     return;
   }
-
+  const group = field.closest(fieldGroupSelector);
+  if (group instanceof HTMLElement) {
+    toggleEditGroup(root, group, state);
+    return;
+  }
   getFieldEditElement(field).classList.toggle("d-none", !state);
-  const previewElement = isRichTextField(field)
-    ? getRichTextPreview(root, field)
-    : getActivateButton(root, field);
+  const previewElement = getFieldPreview(root, field);
   previewElement?.classList.toggle("d-none", state);
+  getActivateButton(root, field)?.setAttribute("aria-expanded", String(state));
   root
     .querySelectorAll(
       `${fieldActionsSelector}[data-ie-for="${CSS.escape(fieldId)}"]`,
@@ -438,11 +541,16 @@ const toggleEditField = (root, fieldId, state = true) => {
 };
 
 const closeFields = (root, fields) => {
+  const groups = new Set();
   fields.forEach((field) => {
-    if (!(field instanceof HTMLSelectElement) && field.id) {
+    const group = field.closest(fieldGroupSelector);
+    if (group instanceof HTMLElement) {
+      groups.add(group);
+    } else if (field.id) {
       toggleEditField(root, field.id, false);
     }
   });
+  groups.forEach((group) => toggleEditGroup(root, group, false));
 };
 
 const closeAllFields = (root, fields) => {
@@ -471,6 +579,48 @@ const requestJson = async (url, options) => {
   return result;
 };
 
+const initializeStickyImageOffset = (root) => {
+  const stickyImage = root.querySelector(stickyImageSelector);
+  const pageHeader = document.querySelector(pageHeaderSelector);
+  if (!(stickyImage instanceof HTMLElement)) {
+    return;
+  }
+  if (!(pageHeader instanceof HTMLElement)) {
+    stickyImage.style.removeProperty("top");
+    return;
+  }
+
+  const updateOffset = () => {
+    const headerOuterHeight = Math.max(
+      0,
+      Math.ceil(pageHeader.getBoundingClientRect().height),
+    );
+    stickyImage.style.setProperty(
+      "top",
+      `${headerOuterHeight + 10}px`,
+      "important",
+    );
+  };
+
+  updateOffset();
+  const HeaderResizeObserver = globalThis.ResizeObserver;
+  if (typeof HeaderResizeObserver === "function") {
+    const resizeObserver = new HeaderResizeObserver(updateOffset);
+    resizeObserver.observe(pageHeader, { box: "border-box" });
+    globalThis.addEventListener("pagehide", () => resizeObserver.disconnect(), {
+      once: true,
+    });
+    return;
+  }
+
+  globalThis.addEventListener("resize", updateOffset);
+  globalThis.addEventListener(
+    "pagehide",
+    () => globalThis.removeEventListener("resize", updateOffset),
+    { once: true },
+  );
+};
+
 const initializeFieldEditing = (root) => {
   const forms = Array.from(root.querySelectorAll(fieldsFormSelector)).filter(
     (element) => element instanceof HTMLFormElement,
@@ -486,6 +636,24 @@ const initializeFieldEditing = (root) => {
   const persistedValues = new Map(
     fields.map((field) => [field, getFieldValue(field)]),
   );
+  renderProfileName(root);
+  root.querySelectorAll(fieldGroupSelector).forEach((group) => {
+    if (!(group instanceof HTMLElement)) {
+      return;
+    }
+    renderFieldGroupPreview(root, group);
+    const hasEditableField = getGroupFields(root, group).some(
+      (field) => !field.disabled && !field.readOnly,
+    );
+    group
+      .querySelector(groupEditButtonSelector)
+      ?.classList.toggle("d-none", !hasEditableField);
+  });
+  fields
+    .filter((field) => !field.closest(fieldGroupSelector))
+    .forEach((field) =>
+      renderActivateButton(root, field, getFieldValue(field)),
+    );
   const normalizedRichTextBaselines = new WeakSet();
   let bulkEditing = false;
 
@@ -595,6 +763,7 @@ const initializeFieldEditing = (root) => {
         persistedValues.set(field, value);
         renderActivateButton(root, field, value);
       });
+      renderProfileName(root);
 
       if (closeEverything) {
         closeAllFields(root, fields);
@@ -619,15 +788,6 @@ const initializeFieldEditing = (root) => {
     }
   };
 
-  root.addEventListener("change", (event) => {
-    if (
-      event.target instanceof HTMLSelectElement &&
-      event.target.matches(fieldSelector)
-    ) {
-      void saveFields([event.target]);
-    }
-  });
-
   root.addEventListener("click", (event) => {
     if (!(event.target instanceof Element)) {
       return;
@@ -636,9 +796,53 @@ const initializeFieldEditing = (root) => {
     if (!(button instanceof HTMLButtonElement)) {
       return;
     }
-
+    if (button.matches(groupEditButtonSelector)) {
+      event.preventDefault();
+      const group = button.closest(fieldGroupSelector);
+      if (group instanceof HTMLElement) {
+        toggleEditGroup(root, group, true);
+      }
+      return;
+    }
+    if (button.matches("[data-ie-group-dismiss]")) {
+      event.preventDefault();
+      const group = button.closest(fieldGroupSelector);
+      if (group instanceof HTMLElement) {
+        const groupFields = getGroupFields(root, group).filter(
+          (field) => !field.disabled && !field.readOnly,
+        );
+        groupFields.forEach((field) => setFieldValue(field, ""));
+        clearValidationErrors(groupFields);
+        toggleEditGroup(root, group, true);
+      }
+      return;
+    }
+    if (button.matches("[data-ie-group-cancel]")) {
+      event.preventDefault();
+      const group = button.closest(fieldGroupSelector);
+      if (group instanceof HTMLElement) {
+        const groupFields = getGroupFields(root, group);
+        resetFields(groupFields);
+        renderFieldGroupPreview(root, group);
+        toggleEditGroup(root, group, false);
+      }
+      return;
+    }
+    if (button.matches("[data-ie-group-save]")) {
+      event.preventDefault();
+      const group = button.closest(fieldGroupSelector);
+      if (group instanceof HTMLElement) {
+        void saveFields(getGroupFields(root, group));
+      }
+      return;
+    }
     if (button.matches(editAllButtonSelector)) {
       event.preventDefault();
+      root.querySelectorAll(fieldGroupSelector).forEach((group) => {
+        if (group instanceof HTMLElement) {
+          toggleEditGroup(root, group, true);
+        }
+      });
       root.querySelectorAll(editButtonSelector).forEach((editButton) => {
         if (editButton.dataset.ieFor) {
           toggleEditField(root, editButton.dataset.ieFor, true);
@@ -700,6 +904,14 @@ const initializeFieldEditing = (root) => {
     }
   });
 
+  root.addEventListener("change", (event) => {
+    const field = event.target;
+    if (!isEditableField(field) || !field.matches(autosaveOnChangeSelector)) {
+      return;
+    }
+    void saveFields([field]);
+  });
+
   forms.forEach((form) => {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -724,7 +936,10 @@ const initializeFieldEditing = (root) => {
 const initializeSkipSync = (root) => {
   const form = root.querySelector(syncFormSelector);
   const checkbox = form?.querySelector(syncCheckboxSelector);
-  if (!(form instanceof HTMLFormElement) || !(checkbox instanceof HTMLInputElement)) {
+  if (
+    !(form instanceof HTMLFormElement) ||
+    !(checkbox instanceof HTMLInputElement)
+  ) {
     return;
   }
 
@@ -852,24 +1067,14 @@ const initializeImageEditing = (root) => {
   const copyPagePreviewToModal = () => {
     const image = pagePreview.querySelector("img");
     if (image instanceof HTMLImageElement) {
-      setImagePreviewUrl(
-        modalPreview,
-        image.src,
-        image.alt,
-        image.title,
-      );
+      setImagePreviewUrl(modalPreview, image.src, image.alt, image.title);
     }
   };
 
   const previewSelectedFile = (file) => {
     releaseSelectedPreviewUrl();
     selectedPreviewUrl = URL.createObjectURL(file);
-    setImagePreviewUrl(
-      modalPreview,
-      selectedPreviewUrl,
-      file.name,
-      file.name,
-    );
+    setImagePreviewUrl(modalPreview, selectedPreviewUrl, file.name, file.name);
   };
 
   const commitSelectedPreview = (file) => {
@@ -878,12 +1083,7 @@ const initializeImageEditing = (root) => {
     }
     releasePersistedPreviewUrl();
     getImagePreviews(root).forEach((preview) => {
-      setImagePreviewUrl(
-        preview,
-        selectedPreviewUrl,
-        file.name,
-        file.name,
-      );
+      setImagePreviewUrl(preview, selectedPreviewUrl, file.name, file.name);
     });
     persistedPreviewUrl = selectedPreviewUrl;
     selectedPreviewUrl = null;
@@ -912,8 +1112,7 @@ const initializeImageEditing = (root) => {
     fileInput.disabled = requestPending;
     uploadButton.disabled = requestPending || !hasSelectedFile;
     if (deleteButton instanceof HTMLButtonElement) {
-      deleteButton.disabled =
-        requestPending || root.dataset.hasImage !== "1";
+      deleteButton.disabled = requestPending || root.dataset.hasImage !== "1";
     }
     modal.querySelectorAll("[data-ie-close-image-modal]").forEach((button) => {
       if (button instanceof HTMLButtonElement) {
@@ -1011,8 +1210,8 @@ const initializeImageEditing = (root) => {
       const result = error instanceof Error ? error.result : null;
       const message =
         result?.error === "image_upload_missing"
-          ? root.dataset.messageImageUploadMissing ?? ""
-          : result?.message ?? root.dataset.messageErrorMessage ?? "";
+          ? (root.dataset.messageImageUploadMissing ?? "")
+          : (result?.message ?? root.dataset.messageErrorMessage ?? "");
       showImageError(message);
     } finally {
       setRequestPending(false);
@@ -1065,9 +1264,7 @@ const initializeImageEditing = (root) => {
       showStatus(root, "success", root.dataset.messageImageDeleted ?? null);
     } catch (error) {
       const result = error instanceof Error ? error.result : null;
-      showImageError(
-        result?.message ?? root.dataset.messageErrorMessage ?? "",
-      );
+      showImageError(result?.message ?? root.dataset.messageErrorMessage ?? "");
     } finally {
       setRequestPending(false);
       if (deletionSucceeded) {
@@ -1086,6 +1283,7 @@ document.querySelectorAll(rootSelector).forEach((root) => {
   if (!(root instanceof HTMLElement)) {
     return;
   }
+  initializeStickyImageOffset(root);
   initializeFieldEditing(root);
   initializeSkipSync(root);
   initializeImageEditing(root);

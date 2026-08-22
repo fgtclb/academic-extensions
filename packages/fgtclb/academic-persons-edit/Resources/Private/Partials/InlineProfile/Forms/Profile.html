@@ -2,13 +2,30 @@
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
-    <form class="academic-persons-inline-edit__form" data-ie-fields-form>
+    <section aria-labelledby="inline-profile-{profile.uid}-personal-heading">
         <f:render
-            partial="InlineProfile/Sections/Personal"
-            arguments="{profile: profile, validations: validations, genderOptions: genderOptions}" />
-        <f:render
-            partial="InlineProfile/Sections/Links"
+            partial="InlineProfile/Header"
             arguments="{profile: profile, validations: validations}" />
-        <f:render partial="InlineProfile/Forms/FooterActions" />
-    </form>
+        <form class="academic-persons-inline-edit__form" data-ie-fields-form>
+            <fieldset class="border-0 p-0 m-0">
+                <legend class="visually-hidden">
+                    <f:translate
+                        key="inlineProfile.section.personal"
+                        extensionName="academic_persons_edit" />
+                </legend>
+                <div class="row g-3">
+                    <f:render
+                        partial="InlineProfile/Sections/Personal"
+                        arguments="{profile: profile, validations: validations, genderOptions: genderOptions}" />
+                    <f:render
+                        partial="InlineProfile/Sections/Links"
+                        arguments="{profile: profile, validations: validations}" />
+                    <f:render
+                        partial="InlineProfile/Sections/Content"
+                        arguments="{profile: profile, validations: validations}" />
+                </div>
+            </fieldset>
+            <f:render partial="InlineProfile/Forms/FooterActions" />
+        </form>
+    </section>
 </html>

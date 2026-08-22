@@ -2,36 +2,50 @@
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
-    <fieldset class="card mt-4">
-        <div class="card-body">
-            <legend class="h5">
-                <f:translate
-                    key="inlineProfile.section.content"
-                    extensionName="academic_persons_edit" />
-            </legend>
-            <div class="row g-3">
-                <f:for
-                    each="{
-                        0: 'coreCompetences',
-                        1: 'teachingArea',
-                        2: 'supervisedDoctoralThesis',
-                        3: 'supervisedThesis',
-                        4: 'miscellaneous'
-                    }"
-                    as="identifier">
-                    <f:render
-                        partial="InlineProfile/Field"
-                        arguments="{
-                            profile: profile,
-                            validations: validations,
-                            identifier: identifier,
-                            textarea: true,
-                            richText: true,
-                            rows: 5,
-                            columnClass: 'col-12'
-                        }" />
-                </f:for>
-            </div>
-        </div>
-    </fieldset>
+    <f:render
+        partial="InlineProfile/Field"
+        arguments="{
+            profile: profile,
+            validations: validations,
+            identifier: 'coreCompetences',
+            textarea: true,
+            richText: true,
+            rows: 5,
+            columnClass: 'col-12',
+            rowClass: 'bg-body-tertiary'
+        }" />
+    <f:render
+        partial="InlineProfile/Field"
+        arguments="{
+            profile: profile,
+            validations: validations,
+            identifier: 'supervisedThesis',
+            textarea: true,
+            richText: true,
+            rows: 5,
+            columnClass: 'col-12'
+        }" />
+    <f:render
+        partial="InlineProfile/Field"
+        arguments="{
+            profile: profile,
+            validations: validations,
+            identifier: 'supervisedDoctoralThesis',
+            textarea: true,
+            richText: true,
+            rows: 5,
+            columnClass: 'col-12',
+            rowClass: 'bg-body-tertiary'
+        }" />
+    <f:render
+        partial="InlineProfile/Field"
+        arguments="{
+            profile: profile,
+            validations: validations,
+            identifier: 'teachingArea',
+            textarea: true,
+            richText: true,
+            rows: 5,
+            columnClass: 'col-12'
+        }" />
 </html>

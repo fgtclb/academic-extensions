@@ -1,0 +1,154 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:p="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <div
+        class="{columnClass}"
+        data-ie-field-group
+        data-ie-field-ids="{fieldIds}"
+        data-ie-display-field-ids="{displayFieldIds}"
+        data-ie-display-mode="{displayMode}">
+        <div class="rounded-1 p-3 p-lg-4 {rowClass}">
+            <div class="d-flex align-items-start gap-3" data-ie-group-preview>
+                <div class="flex-grow-1 overflow-hidden">
+                    <div class="fw-semibold">
+                        <f:translate
+                            key="{labelKey}"
+                            extensionName="academic_persons_edit" />
+                    </div>
+                    <div
+                        class="text-break"
+                        data-ie-group-preview-content
+                        data-empty-label="{f:translate(key: 'inlineProfile.field.empty', extensionName: 'academic_persons_edit')}">
+                        <f:if condition="{displayValue}">
+                            <f:then>{displayValue}</f:then>
+                            <f:else>
+                                <span class="text-body-secondary">
+                                    <f:translate
+                                        key="inlineProfile.field.empty"
+                                        extensionName="academic_persons_edit" />
+                                </span>
+                            </f:else>
+                        </f:if>
+                    </div>
+                </div>
+                <button
+                    class="btn btn-sm border-0 p-1 text-body flex-shrink-0"
+                    data-ie-group-edit
+                    type="button"
+                    aria-controls="inline-profile-{profile.uid}-{identifier}-group-editor"
+                    aria-expanded="false"
+                    title="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
+                    aria-label="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}">
+                    <core:icon
+                        identifier="academic-persons-inline-edit-pencil"
+                        size="small"
+                        alternativeMarkupIdentifier="inline" />
+                </button>
+            </div>
+            <div
+                id="inline-profile-{profile.uid}-{identifier}-group-editor"
+                class="d-none mt-3"
+                data-ie-group-editor>
+                <div class="row g-3">
+                    <f:for each="{fields}" as="fieldConfiguration">
+                        <f:variable name="fieldValidation"
+                            ><p:validationEnsure
+                                validations="{validations}"
+                                identifier="{fieldConfiguration.identifier}"
+                        /></f:variable>
+                        <f:variable name="resolvedInputType" value="text" />
+                        <f:if condition="{fieldValidation.inputType}">
+                            <f:variable
+                                name="resolvedInputType"
+                                value="{fieldValidation.inputType}" />
+                        </f:if>
+                        <f:if condition="{fieldConfiguration.inputType}">
+                            <f:variable
+                                name="resolvedInputType"
+                                value="{fieldConfiguration.inputType}" />
+                        </f:if>
+                        <f:variable
+                            name="elementId"
+                            value="inline-profile-{profile.uid}-{fieldConfiguration.identifier}" />
+                        <div
+                            class="{fieldConfiguration.columnClass}"
+                            data-ie-group-control>
+                            <label
+                                class="form-label"
+                                for="{elementId}">
+                                <f:translate
+                                    key="profile.{fieldConfiguration.identifier}.label"
+                                    extensionName="academic_persons_edit" />
+                                <f:if condition="{fieldValidation.required}">
+                                    <abbr title="required">*</abbr>
+                                </f:if>
+                            </label>
+                            <f:render
+                                partial="InlineProfile/Field/Control"
+                                arguments="{
+                                    profile: profile,
+                                    identifier: fieldConfiguration.identifier,
+                                    elementId: elementId,
+                                    validation: fieldValidation,
+                                    resolvedInputType: resolvedInputType,
+                                    autocomplete: fieldConfiguration.autocomplete
+                                }" />
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </f:for>
+                </div>
+                <div
+                    class="d-flex justify-content-end mt-3"
+                    data-ie-group-actions>
+                    <div
+                        class="btn-group btn-group-sm flex-shrink-0"
+                        role="group"
+                        aria-label="{f:translate(key: 'inlineProfile.actions.group', extensionName: 'academic_persons_edit')}">
+                        <button
+                            class="btn btn-outline-danger"
+                            data-ie-group-dismiss
+                            type="button"
+                            title="{f:translate(key: 'inlineProfile.actions.clear', extensionName: 'academic_persons_edit')}"
+                            aria-label="{f:translate(key: 'inlineProfile.actions.clear', extensionName: 'academic_persons_edit')}">
+                            <span aria-hidden="true" class="fs-5 lh-1">
+                                <core:icon
+                                    identifier="academic-persons-inline-edit-clear"
+                                    size="small"
+                                    alternativeMarkupIdentifier="inline" />
+                            </span>
+                        </button>
+                        <button
+                            class="btn btn-outline-secondary"
+                            data-ie-group-cancel
+                            type="button"
+                            title="{f:translate(key: 'actions.undo', extensionName: 'academic_persons_edit')}"
+                            aria-label="{f:translate(key: 'actions.undo', extensionName: 'academic_persons_edit')}">
+                            <span aria-hidden="true" class="fs-5 lh-1">
+                                <core:icon
+                                    identifier="academic-persons-inline-edit-undo"
+                                    size="small"
+                                    alternativeMarkupIdentifier="inline" />
+                            </span>
+                        </button>
+                        <button
+                            class="btn btn-success"
+                            data-ie-group-save
+                            type="button"
+                            title="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}"
+                            aria-label="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}">
+                            <span aria-hidden="true" class="fs-5 lh-1">
+                                <core:icon
+                                    identifier="academic-persons-inline-edit-save"
+                                    size="small"
+                                    alternativeMarkupIdentifier="inline" />
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
