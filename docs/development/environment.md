@@ -435,6 +435,25 @@ the same relative path on both sides, because each instance bind-mounts the
 repository's `Build/` into its container
 (`core-*/.ddev/docker-compose.mounts.yaml`).
 
+### Site sets are cached, and the cache outlives a `git pull`
+
+The set definitions an installation knows are cached. After pulling a branch
+that adds, renames or repoints a site set, an instance keeps serving the
+definitions it had — even though `core-*/vendor/fgtclb/*` are **symlinks into
+`packages/`**, so the new `Configuration/Sets/` folders are already on disk.
+
+```bash
+ddev exec vendor/bin/typo3 site:sets:list      # may still show the old sets
+ddev exec vendor/bin/typo3 cache:flush
+ddev exec vendor/bin/typo3 site:sets:list      # now the current ones
+```
+
+This is worth knowing because a stale cache looks exactly like a broken
+conversion: the sets a site depends on appear not to exist, and the frontend
+loses the configuration they deliver. Flush before concluding anything. The
+same applies to `site:show`, which reads the cached definitions to resolve
+`dependencies:`.
+
 ### Seeding an instance
 
 What an instance contains is **described**, not clicked together: the seed set
