@@ -1,0 +1,10 @@
+# The name this extension published before the configuration was cut per
+# component, kept so that a site configuration depending on it keeps working.
+#
+# It is an alias with no payload: it delivers exactly what
+# "fgtclb/academic-study-plan" delivers. New site configurations should name the
+# aggregate, or the component set it delivers.
+name: fgtclb/academic-study-plan-default
+label: Academic Study Plan (Default)
+dependencies:
+  - fgtclb/academic-study-plan

@@ -1,24 +1,81 @@
 :navigation-title: Configuration
+
 ..  _configuration:
 
 =============
 Configuration
 =============
 
+This extension ships its frontend TypoScript and its backend page TSconfig in
+two forms: as TYPO3 **site sets**, and as classic **static templates** plus
+**page TSconfig files** that are selected on a page. Both forms read the very
+same files, so they configure an installation identically.
+
+Pick one of them per site and stay with it — see
+:ref:`Do not combine both <one-mechanism-per-site>` for what happens otherwise.
+
+..  note::
+
+    Site sets arrived in TYPO3 v13.1. On TYPO3 v12 the set files this extension
+    ships are never read, and the static template plus the page TSconfig file
+    below are the only way to configure a site.
+
+..  _configuration-components:
+
+What the sets contain
+=====================
+
+The extension ships one content element, so it ships one component set and one
+aggregate set that depends on it.
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Set
+        -   Delivers
+    *   -   `fgtclb/academic-study-plan-content-element`
+        -   The :guilabel:`Academic Study Plan` content element: its TypoScript
+            (:typoscript:`tt_content.academic_study_plan`, the Fluid root paths,
+            the data processor that assigns the semesters and modules to the
+            template and the two frontend assets) and the page TSconfig that
+            makes the content element selectable in the backend.
+    *   -   `fgtclb/academic-study-plan`
+        -   Everything above. This is the set to use unless you deliberately
+            want a subset.
+    *   -   `fgtclb/academic-study-plan-default`
+        -   The name this extension published before the sets were cut per
+            component. It delivers exactly what `fgtclb/academic-study-plan`
+            delivers, and is kept so that existing site configurations keep
+            working.
+
+The component set depends on `fgtclb/academic-base-ctype-group`, the set of
+:guilabel:`EXT:academic_base` that labels the content element group all academic
+extensions sort their elements into.
+
+..  _configuration-hidden-by-default:
+
+The content element is hidden by default
+========================================
+
+:guilabel:`EXT:academic_study_plan` hides its content element for the whole
+installation and brings it back per component. Whichever of the two mechanisms
+below you use, it is what makes :guilabel:`Academic Study Plan` selectable in the
+backend again — without one of them the content element is not offered, and
+existing records keep rendering.
+
+This is not new in version 2.4: this extension always hid its content element.
+What changed is the file that brings it back and the name it is registered
+under — see
+:ref:`Breaking: Site sets and static templates have been restructured
+<breaking-site-sets-and-static-templates-restructured>`.
+
 ..  _site-set:
 
 Include the site set
 ====================
 
-..  note::
-
-    Site sets are only available when the extension is used in TYPO3 v13,
-    :ref:`Static Templates <static-templates>` need to be used in TYPO3 v12
-    and can also be used in TYPO3 v13 when still using classic :sql:`sys_template`
-    TypoScript records.
-
-This extension comes with a site set called `fgtclb/academic-persons-default`. To use it include
-this set in your site configuration via
+Add the set to the :file:`config.yaml` of the site that should offer the content
+element:
 
 ..  code-block:: diff
     :caption: config/sites/my-site/config.yaml (diff)
@@ -26,39 +83,86 @@ this set in your site configuration via
      base: 'https://example.com/'
      rootPageId: 1
     +dependencies:
-    +  - fgtclb/academic-persons-default
+    +  - fgtclb/academic-study-plan
 
-See also: `TYPO3 Explained, Using a site set as dependency in a site <https://docs.typo3.org/permalink/t3coreapi:site-sets-usage>`_.
-
+See also `TYPO3 Explained, Using a site set as dependency in a site
+<https://docs.typo3.org/permalink/t3coreapi:site-sets-usage>`__.
 
 ..  _static-templates:
 
 Include static templates
 ========================
 
-For TYPO3 v12 or when still having classic :sql:`sys_template` TypoScript record
-:ref:`Static TypoScript <static-typoscript>` and `:ref:`static-pagetsconfig` are
-still provided to allow easy adoption.
+For an installation that still configures its frontend through
+:sql:`sys_template` records — and for every installation on TYPO3 v12 — the same
+files are registered as static templates and as selectable page TSconfig files.
 
 ..  tip::
 
-    With TYPO3 v13 we recommend to use
-    `TYPO3 site set as dependency in a site <https://docs.typo3.org/permalink/t3coreapi:site-sets-usage>`_
+    On TYPO3 v13 we recommend the site set — and if you use it, do not press the
+    backend button :guilabel:`Create a root TypoScript record` on that site. The
+    :sql:`sys_template` record it creates carries the flag :guilabel:`Clear` for
+    constants and setup, and that flag discards everything the site sets
+    contributed. An installation that is already in that state gets its
+    configuration back by selecting the static templates below in that very
+    record.
 
 ..  _static-typoscript:
 
 Include static TypoScript
 -------------------------
 
-..  note::
+Edit the :sql:`sys_template` record of the site root and add the entry to
+:guilabel:`Include static (from extensions)`:
 
-    @todo
+..  list-table::
+    :header-rows: 1
+
+    *   -   Entry
+        -   Delivers
+    *   -   :guilabel:`Academic Study Plan: Content element (academic_study_plan)`
+        -   The TypoScript of the :guilabel:`Academic Study Plan` content
+            element.
+    *   -   :guilabel:`Academic Study Plan: All components (academic_study_plan)`
+        -   Every component this extension ships, in one entry.
 
 ..  _static-pagetsconfig:
 
-Include static PageTsConfig
----------------------------
+Include static page TSconfig
+----------------------------
 
-..  note::
+Edit the page record of the site root, tab :guilabel:`Resources`, field
+:guilabel:`Page TSconfig`, and add the entry:
 
-    @todo
+..  list-table::
+    :header-rows: 1
+
+    *   -   Entry
+        -   Delivers
+    *   -   :guilabel:`Academic Study Plan: Content element (academic_study_plan)`
+        -   Makes the :guilabel:`Academic Study Plan` content element selectable,
+            and configures its entry in the new content element wizard.
+    *   -   :guilabel:`Academic Study Plan: All components (academic_study_plan)`
+        -   Every component this extension ships, in one entry.
+
+The setting is inherited by every page below the one it is set on.
+
+..  _one-mechanism-per-site:
+
+Do not combine both
+===================
+
+A site that uses the site set **and** the static template reads the shipped
+files twice. The site set is applied before the :sql:`sys_template` record, so
+the second read happens after the site settings and after
+:file:`config/sites/<site>/constants.typoscript` — and it resets every constant
+the extension ships a default for back to that default. For this extension those
+are the three Fluid root paths of the content element.
+
+Nothing else is damaged: the :guilabel:`Constants` and :guilabel:`Setup` fields
+of the :sql:`sys_template` record, the page TSconfig of a page and the page
+TSconfig files selected on a page are all applied afterwards and still win. Use
+one mechanism per site and the question does not arise.
+
+The question does not arise on TYPO3 v12 either, where there is only one
+mechanism.

@@ -1,0 +1,41 @@
+# The setup of the study plan content element.
+#
+# It lives in the folder that "Configuration/TCA/Overrides/sys_template.php"
+# registers as a static template and that the set
+# "fgtclb/academic-study-plan-content-element" points its "typoscript" key at -
+# one physical copy, two ways to it. Until version 2.4 the same block lived in
+# "Configuration/TypoScript/Includes/ContentElement.typoscript" and was reached
+# through two one-line "@import" files, and the frontend assets below lived in a
+# third file, "Configuration/TypoScript/Includes/Page.typoscript". This
+# extension ships one component, so both belong to it.
+tt_content {
+    academic_study_plan =< lib.contentElement
+    academic_study_plan {
+        templateName = AcademicStudyPlan
+        templateRootPaths {
+            100 = {$plugin.tx_academicstudyplan.view.templateRootPath}
+        }
+        partialRootPaths {
+            100 = {$plugin.tx_academicstudyplan.view.partialRootPath}
+        }
+        layoutRootPaths {
+            100 = {$plugin.tx_academicstudyplan.view.layoutRootPath}
+        }
+        dataProcessing {
+            10 = FGTCLB\AcademicStudyPlan\DataProcessing\StudyPlanProcessor
+        }
+    }
+}
+
+# The compiled stylesheet and script of the content element. They are classic
+# assets rather than an ES module, because the Fluid view helper that loads a
+# module does not exist on TYPO3 v12 - see the repository documentation, page
+# "Frontend assets".
+page {
+    includeCSS {
+        academicStudyPlan = EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css
+    }
+    includeJSFooter {
+        academicStudyPlan = EXT:academic_study_plan/Resources/Public/JavaScript/frontend/academic-study-plan.js
+    }
+}

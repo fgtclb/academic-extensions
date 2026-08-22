@@ -1,0 +1,34 @@
+# Renders what the extension contributed to the TypoScript of this site, and nothing
+# else. The constant is what "constants.typoscript" of the component assigns, the copied
+# values are what its "setup.typoscript" assigns - so a delivery mechanism that did not
+# reach this site renders an empty or a literal value here.
+#
+# This extension declares no site settings at all, so the constant cannot be one that a
+# "settings.definitions.yaml" also contributes - the trap the sibling extensions have to
+# work around does not exist here.
+#
+# The stylesheet is copied into "lib." before "page" is redefined below, because the
+# probe replaces the whole PAGE object and "page.includeCSS" would be gone by then. On
+# this branch the frontend assets of the content element are still delivered through
+# TypoScript rather than through a Fluid view helper, so they are part of what the
+# component has to deliver.
+lib.studyPlanCss = TEXT
+lib.studyPlanCss.value < page.includeCSS.academicStudyPlan
+lib.studyPlanCss.wrap = <div id="css">|</div>
+
+page = PAGE
+page {
+  10 = TEXT
+  10.value = {$plugin.tx_academicstudyplan.view.templateRootPath}
+  10.wrap = <div id="constant">|</div>
+
+  20 = TEXT
+  20.value < tt_content.academic_study_plan.templateName
+  20.wrap = <div id="setup">|</div>
+
+  30 = TEXT
+  30.value < tt_content.academic_study_plan.partialRootPaths.100
+  30.wrap = <div id="substituted">|</div>
+
+  40 < lib.studyPlanCss
+}
