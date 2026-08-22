@@ -65,9 +65,7 @@ final class NewContentElementWizardRegistrationTest extends AbstractAcademicBite
 
     /**
      * The element definition carries the title, the icon and the CType the wizard
-     * preselects. The "show" list of the same file is asserted with it: TYPO3 v13 and
-     * v14 build the wizard from TCA and no longer read it, but it is what the file
-     * states about its own element, and an installation on an older core reads it.
+     * preselects.
      */
     #[Test]
     public function wizardItemIsRegisteredWithTheRegisteredPageTsConfig(): void
@@ -88,10 +86,6 @@ final class NewContentElementWizardRegistrationTest extends AbstractAcademicBite
         $this->assertSame(
             ['CType' => 'academicbitejobs_list'],
             $elements['academicbitejobs_list.']['tt_content_defValues.'] ?? null,
-        );
-        $this->assertContains(
-            'academicbitejobs_list',
-            GeneralUtility::trimExplode(',', (string)($group['show'] ?? ''), true),
         );
     }
 

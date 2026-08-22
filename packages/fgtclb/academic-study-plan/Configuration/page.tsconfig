@@ -23,7 +23,6 @@ mod.wizards.newContentElement.wizardItems {
                 }
             }
         }
-        show := addToList(academic_study_plan)
     }
 }
 [END]
