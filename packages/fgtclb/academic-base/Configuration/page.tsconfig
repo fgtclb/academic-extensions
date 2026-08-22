@@ -1,1 +1,16 @@
-@import 'EXT:academic_base/Configuration/TsConfig/Wizards/*.tsconfig'
+# Page TSconfig of this extension, auto-included for the whole installation.
+#
+# TYPO3 reads "Configuration/page.tsconfig" of every active extension since
+# v12.0 (Feature: #96614), so it is read on both core versions this extension
+# supports. This file is the place for everything an installation needs
+# regardless of its site configuration.
+#
+# The content element group header is exactly that: every academic extension
+# sorts its content elements into the group "academic", so the group has to
+# carry its label on every installation, not only on the sites that enable the
+# set "fgtclb/academic-base-ctype-group" (ACE-453) - and site sets arrived in
+# TYPO3 v13.1, so on v12 they deliver nothing at all. The very same file is
+# also reachable through that set and through the page field "Page TSconfig" -
+# one physical copy, three ways to it, and assigning the same two values again
+# changes nothing.
+@import 'EXT:academic_base/Configuration/TSconfig/CTypeGroup/page.tsconfig'

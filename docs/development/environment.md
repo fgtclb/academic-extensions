@@ -494,8 +494,8 @@ The TypoScript of the instances comes from the definition too, as one root
 `sys_template` record with `root: 1` and `clear: 3`. Site sets are deliberately
 not used: they arrived in TYPO3 v13.1 and this branch also supports v12, where a
 site configuration provides no TypoScript at all — and every set the academic
-extensions ship is a plain `@import` of exactly the files the record includes,
-so nothing is lost. Site settings could not replace the record's `constants`
+extensions ship reads exactly the files the record includes, so nothing is lost.
+See [TypoScript and site sets](../architecture/typoscript-and-site-sets.md). Site settings could not replace the record's `constants`
 field either, because on v12 a site's settings are inserted at the position the
 record clears, before its static includes, and every static template would
 overwrite them.
