@@ -42,7 +42,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             __DIR__ . '/../../../Resources/Private/Partials/InlineProfile/' . $relativePath . '.html',
         );
         $this->assertIsString($content);
-
         return $content;
     }
 
@@ -54,14 +53,12 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             ...(glob(__DIR__ . '/../../../Resources/Private/Partials/InlineProfile/*/*.html') ?: []),
         ];
         sort($paths);
-
         $sources = '';
         foreach ($paths as $path) {
             $content = file_get_contents($path);
             $this->assertIsString($content);
             $sources .= $content;
         }
-
         return $sources;
     }
 
@@ -73,7 +70,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             preg_match($pattern, $content, $match),
             sprintf('The rendered component has no "%s" URL.', $attribute),
         );
-
         $url = html_entity_decode($match[1]);
         return str_starts_with($url, '/') ? 'https://www.acme.com' . $url : $url;
     }
@@ -85,7 +81,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             preg_match('@<button\b(?=[^>]*data-ie-delete-image)[^>]*>@s', $content, $match),
             'The image modal has no delete button.',
         );
-
         return $match[0];
     }
 
@@ -108,7 +103,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         $body = new Stream('php://temp', 'rw');
         $body->write(json_encode($payload, JSON_THROW_ON_ERROR));
         $body->rewind();
-
         return $this->requestAsFrontendUser(
             (new InternalRequest($url))
                 ->withMethod('POST')
@@ -137,7 +131,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         if (str_starts_with($action, '/')) {
             $action = 'https://www.acme.com' . $action;
         }
-
         $body = [];
         preg_match_all(
             '@<input\b(?=[^>]*type="hidden")(?=[^>]*name="([^"]+)")'
@@ -153,7 +146,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
                 html_entity_decode($hiddenField[2]),
             );
         }
-
         $this->assertSame(
             1,
             preg_match(
@@ -163,7 +155,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             ),
             'The inline image form has no file input.',
         );
-
         return [
             'action' => $action,
             'body' => $body,
@@ -181,7 +172,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             $target[$name] = $value;
             return;
         }
-
         preg_match_all('@\[([^]]*)]@', $name, $matches);
         $keys = array_merge([substr($name, 0, $position)], $matches[1]);
         $current = &$target;
@@ -206,7 +196,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         $stream = new Stream('php://temp', 'rw');
         $stream->write(http_build_query($body));
         $stream->rewind();
-
         $request = (new InternalRequest($action))
             ->withMethod('POST')
             ->withAddedHeader('Content-Type', 'application/x-www-form-urlencoded')
@@ -215,7 +204,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         if ($uploadedFiles !== []) {
             $request = $request->withUploadedFiles($uploadedFiles);
         }
-
         return $this->requestAsFrontendUser($request);
     }
 
@@ -247,7 +235,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         $fluidSources = $this->getInlineProfileFluidSources();
         $this->assertIsString($module);
         $this->assertIsString($template);
-
         $this->assertStringContainsString('Array.from(root.querySelectorAll(fieldSelector))', $module);
         $this->assertStringContainsString('root.addEventListener("click"', $module);
         $this->assertStringContainsString('root.querySelector(imageModalSelector)', $module);
@@ -300,7 +287,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             5,
             preg_match_all('@\bdata-ie-rich-text-preview-content(?=[\s>])@', $content),
         );
-
         $fieldActionCount = substr_count($content, 'data-ie-field-actions');
         $this->assertGreaterThanOrEqual(5, $fieldActionCount);
         $this->assertSame($fieldActionCount, substr_count($content, 'data-ie-dismiss'));
@@ -370,7 +356,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         $this->assertIsString($configuration);
         $inlineConfiguration = strstr($configuration, "'InlineProfile',");
         $this->assertIsString($inlineConfiguration);
-
         $this->assertStringContainsString("'uploadImage'", $inlineConfiguration);
         $this->assertStringContainsString("'deleteImage'", $inlineConfiguration);
         foreach (['editImage', 'addImage', 'removeImage', 'toggleSkipSync'] as $legacyAction) {
@@ -382,10 +367,8 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
     public function profileWithoutImageRendersBootstrapModalAndDedicatedAjaxUrls(): void
     {
         $this->setUpInlineProfileTestCase();
-
         $content = $this->renderInlineProfilePage();
         $decodedContent = urldecode(html_entity_decode($content));
-
         $this->assertStringContainsString('data-academic-persons-inline-edit', $content);
         $this->assertStringContainsString('data-ie-open-image-modal', $content);
         $this->assertStringContainsString('data-bs-toggle="modal"', $content);
@@ -425,7 +408,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
     {
         $this->setUpInlineProfileTestCase();
         $this->seedProfileImage();
-
         $content = $this->renderInlineProfilePage();
         $this->assertMatchesRegularExpression(
             '@<img\b[^>]+src="[^"]*profile-image[^"]*\.png"@',
@@ -440,9 +422,8 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
     {
         $this->setUpInlineProfileTestCase();
         $submitData = $this->extractImageFormSubmissionData($this->renderInlineProfilePage());
-
+        $storedFilesBeforeRequest = $this->getStoredFiles();
         $response = $this->submitInlineImageForm($submitData['action'], $submitData['body']);
-
         $this->assertSame(422, $response->getStatusCode());
         $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
         $this->assertSame(
@@ -454,7 +435,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR),
         );
         $this->assertSame(0, $this->getPersistedProfileImageCount());
-        $this->assertSame([], $this->getStoredFiles());
+        $this->assertSame($storedFilesBeforeRequest, $this->getStoredFiles());
     }
 
     #[Test]
@@ -463,7 +444,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
     {
         $this->setUpInlineProfileTestCase();
         $submitData = $this->extractImageFormSubmissionData($this->renderInlineProfilePage());
-
         $fixture = __DIR__ . '/Fixtures/Uploads/profile-image.png';
         $temporaryFile = $this->instancePath . '/typo3temp/' . uniqid('inline-profile-image-', false) . '.upload';
         copy($fixture, $temporaryFile);
@@ -479,13 +459,11 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
                 'application/octet-stream',
             ),
         );
-
         $response = $this->submitInlineImageForm(
             $submitData['action'],
             $submitData['body'],
             $uploadedFiles,
         );
-
         $this->assertSame(200, $response->getStatusCode());
         $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
         $this->assertSame(
@@ -506,7 +484,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         $this->setUpInlineProfileTestCase();
         $content = $this->renderInlineProfilePage();
         $syncUrl = $this->extractDataUrl($content, 'data-skip-sync-url');
-
         $response = $this->postJson(
             $syncUrl,
             [
@@ -514,7 +491,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
                 'data' => ['skipSync' => true],
             ],
         );
-
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(
             [
@@ -542,7 +518,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         $imagePath = $this->instancePath . '/fileadmin' . self::IMAGE_IDENTIFIER;
         $this->assertFileExists($imagePath);
         $this->assertSame(1, $this->getPersistedProfileImageCount());
-
         $deleteUrl = $this->extractDataUrl(
             $this->renderInlineProfilePage(),
             'data-delete-image-url',
@@ -554,7 +529,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
                 'data' => [],
             ],
         );
-
         $this->assertSame(200, $response->getStatusCode());
         $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
         $this->assertSame(
@@ -579,16 +553,16 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             'inlineProfile.image.modal.open' => 'Edit profile image',
             'inlineProfile.image.modal.close' => 'Close image modal',
             'inlineProfile.image.modal.hint.select' =>
-                'Select an image to preview it. The profile image changes only after you save.',
+            'Select an image to preview it. The profile image changes only after you save.',
             'inlineProfile.image.modal.deleteHint' =>
-                'The profile image is removed permanently unless another record still uses the file.',
+            'The profile image is removed permanently unless another record still uses the file.',
             'inlineProfile.image.upload.label' => 'Choose image',
             'inlineProfile.image.status.uploaded' => 'The profile image has been saved.',
             'inlineProfile.image.status.missing' =>
-                'No new profile image was received. Please select the image again.',
+            'No new profile image was received. Please select the image again.',
             'inlineProfile.image.status.deleted' => 'The profile image has been deleted.',
             'inlineProfile.status.editorError' =>
-                'The rich text editor could not be loaded. Please reload the page and try again.',
+            'The rich text editor could not be loaded. Please reload the page and try again.',
             'inlineProfile.actions.clear' => 'Delete content',
             'inlineProfile.actions.group' => 'Field actions',
             'inlineProfile.content.empty' => 'No content',
@@ -602,7 +576,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
                 ),
             );
         }
-
         $file = __DIR__ . '/../../../Resources/Private/Language/de.locallang.xlf';
         $document = new DOMDocument();
         $this->assertTrue($document->load($file));

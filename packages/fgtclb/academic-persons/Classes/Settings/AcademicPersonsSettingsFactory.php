@@ -11,6 +11,7 @@ use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\EmailAddressValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator;
+use TYPO3\CMS\Extbase\Validation\Validator\UrlValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 /**
@@ -87,7 +88,8 @@ class AcademicPersonsSettingsFactory
     private function normalizeValidations(array $settings): array
     {
         $validations = [];
-        if (array_key_exists('validations', $settings)
+        if (
+            array_key_exists('validations', $settings)
             && is_array($settings['validations'])
             && $settings['validations'] !== []
         ) {
@@ -124,7 +126,13 @@ class AcademicPersonsSettingsFactory
                         $tcaConfig['type'] = 'number';
                         $inputType = 'number';
                     }
-                    // @todo url validation ?
+                    if (in_array('url', $validators, true)) {
+                        $validatorClassNames[] = UrlValidator::class;
+                        $inputType = 'url';
+                    }
+                    if (in_array('tel', $validators, true)) {
+                        $inputType = 'tel';
+                    }
                     $itemValidations[$fieldIdentifier] = new Validation(
                         identifier: $fieldIdentifier,
                         fieldName: GeneralUtility::camelCaseToLowerCaseUnderscored($fieldIdentifier),
@@ -152,7 +160,8 @@ class AcademicPersonsSettingsFactory
     private function normalizeProfileInformationsTypes(array $settings): array
     {
         $profileInformationTypes = [];
-        if (array_key_exists('profileInformationsTypes', $settings)
+        if (
+            array_key_exists('profileInformationsTypes', $settings)
             && is_array($settings['profileInformationsTypes'])
             && $settings['profileInformationsTypes'] !== []
         ) {
