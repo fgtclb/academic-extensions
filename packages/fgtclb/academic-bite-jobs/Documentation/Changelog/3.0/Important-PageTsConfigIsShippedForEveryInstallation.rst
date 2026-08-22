@@ -33,13 +33,13 @@ site happens to enable a set.
 Impact
 ======
 
-The wizard entry itself is unchanged in content, and on TYPO3 v13 and v14 it is
-not what makes the content element selectable: the wizard is built from TCA
-since Feature: #102834, and both versions drop an element whose value appears in
+On TYPO3 v13 and v14 the wizard entry is not what makes the content element
+selectable: the wizard is built from TCA since Feature: #102834, and both
+versions drop an element whose value appears in
 :typoscript:`TCEFORM.tt_content.CType.removeItems` before rendering. The
-:typoscript:`show := addToList()` line the file also carries has no reader left
-in :php:`NewContentElementController` on either version; it is kept because it
-still describes the intent of the file.
+:typoscript:`show := addToList()` line the file used to carry was dropped with
+this release — :php:`NewContentElementController` has no reader for it on either
+supported version.
 
 Where the content element is offered, and what an installation has to do about
 it, is described in

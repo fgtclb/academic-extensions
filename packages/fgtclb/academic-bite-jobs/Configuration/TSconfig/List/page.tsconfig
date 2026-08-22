@@ -19,6 +19,4 @@ mod.wizards.newContentElement.wizardItems.academic {
       }
     }
   }
-
-  show := addToList(academicbitejobs_list)
 }

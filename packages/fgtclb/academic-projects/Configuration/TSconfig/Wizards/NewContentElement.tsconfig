@@ -18,6 +18,5 @@ mod.wizards {
                 }
             }
         }
-        show := addToList(academicprojects_projectlist, academicprojects_projectlistsingle)
     }
 }
