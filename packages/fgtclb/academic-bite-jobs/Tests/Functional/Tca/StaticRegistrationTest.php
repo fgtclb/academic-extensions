@@ -1,0 +1,125 @@
+<?php
+
+declare(strict_types=1);
+
+namespace FGTCLB\AcademicBiteJobs\Tests\Functional\Tca;
+
+use FGTCLB\AcademicBiteJobs\Tests\Functional\AbstractAcademicBiteJobsTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+/**
+ * Pins the values an installation stores in "sys_template.include_static_file" and
+ * in "pages.tsconfig_includes".
+ *
+ * They are not implementation detail: they are written into records, so renaming a
+ * registered folder silently empties the configuration of every installation that
+ * selected it. Whenever an expectation here changes, the extension needs a Breaking
+ * changelog entry naming the old and the new value.
+ *
+ * Both registrations behave identically on TYPO3 v12 and v13 - `addStaticFile()` and
+ * `registerPageTSConfigFile()` have the same body on both - and on v12 they are the
+ * only delivery path there is, so this class covers both core versions.
+ */
+final class StaticRegistrationTest extends AbstractAcademicBiteJobsTestCase
+{
+    /**
+     * @return \Generator<string, array{0: string, 1: string}>
+     */
+    public static function staticTemplateIsRegisteredDataProvider(): \Generator
+    {
+        yield 'job list' => [
+            'EXT:academic_bite_jobs/Configuration/TypoScript/List',
+            'Academic Bite Jobs: Job list (academic_bite_jobs)',
+        ];
+        yield 'all components' => [
+            'EXT:academic_bite_jobs/Configuration/TypoScript/Full',
+            'Academic Bite Jobs: All components (academic_bite_jobs)',
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('staticTemplateIsRegisteredDataProvider')]
+    public function staticTemplateIsRegistered(string $value, string $label): void
+    {
+        $this->assertContains(
+            ['label' => $label, 'value' => $value],
+            $GLOBALS['TCA']['sys_template']['columns']['include_static_file']['config']['items'] ?? [],
+        );
+    }
+
+    /**
+     * The registration above is a string, so it stays green when the folder it names
+     * is renamed or removed - which is the failure this test class exists for. A
+     * static template that points at a folder without any of the three files the core
+     * looks for is not an error either, it simply contributes nothing, so the folder
+     * and its content have to be asserted separately.
+     */
+    #[Test]
+    #[DataProvider('staticTemplateIsRegisteredDataProvider')]
+    public function registeredStaticTemplateFolderExistsAndCarriesTypoScript(string $value, string $label): void
+    {
+        $path = GeneralUtility::getFileAbsFileName($value);
+
+        $this->assertDirectoryExists(
+            $path,
+            sprintf('The folder registered as "%s" does not exist.', $label),
+        );
+
+        $carriedFiles = array_values(array_filter(
+            ['constants.typoscript', 'setup.typoscript', 'include_static_file.txt'],
+            static fn(string $fileName): bool => file_exists($path . '/' . $fileName),
+        ));
+
+        $this->assertNotSame(
+            [],
+            $carriedFiles,
+            sprintf(
+                'The folder registered as "%s" holds none of "constants.typoscript", "setup.typoscript" or'
+                    . ' "include_static_file.txt", so the static template delivers nothing.',
+                $label,
+            ),
+        );
+    }
+
+    /**
+     * @return \Generator<string, array{0: string, 1: string}>
+     */
+    public static function pageTsConfigFileIsRegisteredDataProvider(): \Generator
+    {
+        yield 'job list' => [
+            'EXT:academic_bite_jobs/Configuration/TSconfig/List/page.tsconfig',
+            'Academic Bite Jobs: Job list (academic_bite_jobs)',
+        ];
+        yield 'all components' => [
+            'EXT:academic_bite_jobs/Configuration/TSconfig/Full/page.tsconfig',
+            'Academic Bite Jobs: All components (academic_bite_jobs)',
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('pageTsConfigFileIsRegisteredDataProvider')]
+    public function pageTsConfigFileIsRegistered(string $value, string $label): void
+    {
+        $this->assertContains(
+            ['label' => $label, 'value' => $value],
+            $GLOBALS['TCA']['pages']['columns']['tsconfig_includes']['config']['items'] ?? [],
+        );
+    }
+
+    /**
+     * As above, and worse: an unresolved page TSconfig include is silent, so a
+     * registration that names a file which is not there configures nothing and reports
+     * nothing.
+     */
+    #[Test]
+    #[DataProvider('pageTsConfigFileIsRegisteredDataProvider')]
+    public function registeredPageTsConfigFileExists(string $value, string $label): void
+    {
+        $this->assertFileExists(
+            GeneralUtility::getFileAbsFileName($value),
+            sprintf('The file registered as "%s" does not exist.', $label),
+        );
+    }
+}

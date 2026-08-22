@@ -22,6 +22,10 @@ This branch supports **TYPO3 v12 and v13**.
 - In the frontend edit forms, a `disabled` or `readOnly` property is **never**
   written, whatever the request carries. The shipped `profile` set locks the
   three name fields that way, which is intended and regularly misread.
+- TypoScript and page TSconfig exist **once** on disk and are delivered twice:
+  a site set points at the very files the static template registration points
+  at. Content elements are hidden globally and re-enabled per component. Site
+  sets do nothing on v12, so the static half is the load-bearing one here.
 
 ## Pages
 
@@ -33,6 +37,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Database queries](database-queries.md)                 | Quoting value lists, and keeping a constraint on the builder that executes it.                                                                   |
 | [Validation settings](validation-settings.md)           | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                |
 | [Form data transformation](form-data-transformation.md) | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                     |
+| [TypoScript and site sets](typoscript-and-site-sets.md) | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.       |
 
 ## See also
 

@@ -1,4 +1,0 @@
-name: fgtclb/academic-bite-jobs
-label: Academic Bite Jobs
-dependencies:
-  - fgtclb/academic-base-ctype-group

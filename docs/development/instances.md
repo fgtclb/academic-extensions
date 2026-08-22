@@ -155,9 +155,12 @@ of values a development instance has to correct.
 Site sets would be the obvious mechanism today, and they are not available here:
 they arrived in TYPO3 v13.1 and this branch also supports v12, where a site
 configuration has no `dependencies` key and provides no TypoScript at all. Every
-set the academic extensions ship is a plain `@import` of exactly the files that
-record includes, so the older mechanism delivers identical TypoScript on both
-versions — which is why neither site configuration has a `dependencies` list.
+set the academic extensions ship reads exactly the files that record includes —
+the converted extensions by pointing their `typoscript:` key at the very folder
+the static template registers, the ones not converted yet by `@import`ing it —
+so the older mechanism delivers identical TypoScript on both versions, which is
+why neither site configuration has a `dependencies` list. See
+[TypoScript and site sets](../architecture/typoscript-and-site-sets.md).
 
 A site `settings.yaml` could not stand in for the constants either. On v12 a
 site's settings are inserted at the position the record clears, that is *before*

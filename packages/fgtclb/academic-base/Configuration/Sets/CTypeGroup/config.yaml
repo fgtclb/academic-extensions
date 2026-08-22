@@ -1,0 +1,17 @@
+# The content element group all academic extensions sort their content elements
+# into. It carries no TypoScript, only the page TSconfig that labels the group
+# in the new content element wizard.
+#
+# "pagets" points at the same file that "Configuration/page.tsconfig" imports
+# and that "Configuration/TCA/Overrides/pages.php" registers - there is exactly
+# one physical copy of it.
+#
+# Site sets arrived in TYPO3 v13.1, so on TYPO3 v12 this file is never read.
+# What the group label needs on that version is "Configuration/page.tsconfig",
+# which delivers it without any site configuration.
+#
+# Do not rename the set: six other sets depend on it by name, and so may site
+# configurations outside this repository.
+name: fgtclb/academic-base-ctype-group
+label: 'Academic Base: Content element group'
+pagets: 'EXT:academic_base/Configuration/TSconfig/CTypeGroup/page.tsconfig'

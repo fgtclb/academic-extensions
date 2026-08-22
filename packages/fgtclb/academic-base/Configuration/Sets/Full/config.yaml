@@ -1,0 +1,8 @@
+# Aggregate set: everything this extension ships, in one dependency.
+#
+# It carries no payload of its own - each component is delivered by the set that
+# owns it, and listing it here would parse the same files a second time.
+name: fgtclb/academic-base
+label: Academic Base
+dependencies:
+  - fgtclb/academic-base-ctype-group
