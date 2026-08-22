@@ -577,6 +577,30 @@
         <source>Settings</source>
         <target>Einstellungen</target>
       </trans-unit>
+      <trans-unit id="inlineProfile.section.about">
+        <source>About me</source>
+        <target>Über mich</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.about.description">
+        <source>Description:</source>
+        <target>Beschreibung:</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.visibility.private">
+        <source>Private</source>
+        <target>Privat</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.field.empty">
+        <source>Not specified</source>
+        <target>Keine Angabe</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.heading">
+        <source>Profile image</source>
+        <target>Profilbild</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.edit">
+        <source>Edit</source>
+        <target>Bearbeiten</target>
+      </trans-unit>
       <trans-unit id="inlineProfile.status.saving">
         <source>Saving changes…</source>
         <target>Änderungen werden gespeichert…</target>

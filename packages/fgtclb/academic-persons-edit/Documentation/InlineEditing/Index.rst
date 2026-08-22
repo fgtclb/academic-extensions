@@ -18,9 +18,9 @@ The frontend module
 :file:`Resources/Public/JavaScript/frontend/profile.js` initializes every
 ``data-academic-persons-inline-edit`` component on the page. All changes are
 saved through AJAX without reloading the page. Editable fields are discovered
-across the complete component root, even when the preserved responsive grid
+across the complete component root, even when the responsive page layout
 places them in separate ``data-ie-fields-form`` elements. Modal, toast and
-button-template elements live in the same component scope.
+compatibility-template elements live in the same component scope.
 
 View data
 =========
@@ -58,37 +58,87 @@ The template is intentionally a composition root. The main partial groups are:
     *   - Partial group
         - Responsibility
     *   - ``Image/Card.html`` and ``Image/Modal.html``
-        - Page preview, file selection, modal preview and image actions.
+        - Profile-name heading above the sticky page preview, dedicated edit
+          overlay, file selection, modal preview and image actions.
     *   - ``Settings/Sync.html``
-        - Independently persisted synchronization checkbox.
+        - Independently persisted synchronization switch immediately left of
+          the bulk edit button.
     *   - ``Forms/*``
-        - Profile/content form boundaries and bulk footer actions.
+        - Personal-data and about-section form boundaries plus the retained
+          bulk footer actions.
     *   - ``Sections/*``
-        - Personal, link and rich-text content field composition.
-    *   - ``Field.html`` and ``Field/*``
-        - Shared field orchestration, preview, textfield/textarea control,
-          gender select and per-field actions.
-    *   - ``Header.html``, ``StatusToast.html`` and
-          ``ButtonTemplates.html``
-        - Independent component-level UI elements.
+        - Personal, link and rich-text field composition in display order.
+    *   - ``Field.html``, ``Field/Group.html`` and ``Field/*``
+        - Shared field orchestration, plain read previews, grouped fields,
+          textfield/textarea controls, gender select and per-field actions.
+    *   - ``Header.html`` and ``StatusToast.html``
+        - Personal-section heading, synchronization/edit controls and scoped
+          status output.
+          ``ButtonTemplates.html`` remains a compatibility fallback for
+          existing template overrides; the shipped read view does not use its
+          button-shaped value controls.
+
+Layout and responsive behavior
+==============================
+
+The view uses only Bootstrap 5 grid, spacing, typography, background,
+positioning and form utilities. It ships no extension-specific stylesheet and
+the Fluid templates contain no inline style declarations.
+
+On ``lg`` and larger viewports the first row uses a ``4 / 8`` column split.
+The profile image block has ``sticky-top`` so the image and its edit action
+stay visible while the profile data scrolls. Below ``lg`` both columns stack in
+document order. The about section follows the complete first row and therefore
+never overlaps the sticky column.
+
+At runtime ``initializeStickyImageOffset()`` reads the visible outer height of
+``#page-header`` through ``getBoundingClientRect().height`` and assigns that
+pixel value to the ``top`` property of ``data-ie-sticky-image``. A
+``ResizeObserver`` watches the header's ``border-box`` and keeps the offset
+synchronized whenever the navbar changes height, including height or padding
+changes caused by a scroll-dependent header state. Environments without it use
+the window ``resize`` event as a fallback. If the page header is absent,
+Bootstrap's regular ``sticky-top`` value remains in control.
+
+The two columns live in their own ``align-items-stretch`` row. The image column
+inherits the stretched cross-axis size, giving the sticky image a containing
+block as tall as the adjacent profile data. The full-width about section keeps
+its own ``col-12`` in a separate sibling row below it.
+
+The complete profile name is the page's ``h1`` above the image and replaces the
+former :guilabel:`Profile image` heading. The heading uses
+``data-ie-profile-name-field-ids`` so a successful inline name update is shown
+without reloading the page.
+
+Profile values are rendered as readable text rows with alternating
+``bg-body-tertiary`` surfaces. The only read-mode action is a borderless pencil
+button with an accessible label. Name components and the URL/title pair of
+each link share one preview row and open as one inline-edit group.
 
 Supported controls
 ==================
 
-The :file:`Resources/Private/Partials/InlineProfile/Field.html` partial only
+The :file:`Resources/Private/Partials/InlineProfile/Field.html` partial
 resolves validation, element ID and input type before composing three focused
 partials:
 
-*   :file:`Field/Preview.html` renders the read preview and edit trigger,
+*   :file:`Field/Preview.html` renders the text preview and pencil trigger,
 *   :file:`Field/Control.html` renders either ``f:form.textfield`` or
     ``f:form.textarea``, including the CKEditor hook, and
 *   :file:`Field/Actions.html` renders delete, cancel and save.
 
+:file:`Field/Group.html` composes related textfields below one preview. Its
+``data-ie-field-ids`` value defines which fields open, cancel and save together;
+``data-ie-display-field-ids`` and ``data-ie-display-mode`` control whether the
+preview joins values (the name) or uses the first non-empty value (link title
+falling back to its URL).
+
 ``validation.inputType`` or the explicit ``inputType`` argument can select HTML
 input types such as ``tel`` and ``url``. Setting ``textarea`` renders a
 textarea instead. The dedicated :file:`Field/Gender.html` partial handles the
-select field, while :file:`Settings/Sync.html` contains the separately
-persisted checkbox.
+select field without an action group. Its ``change`` event saves immediately
+through the generic update endpoint. :file:`Settings/Sync.html` contains the
+separately persisted checkbox.
 
 ..  list-table::
     :header-rows: 1
@@ -105,7 +155,8 @@ persisted checkbox.
         - Default textfield.
     *   - Select
         - ``f:form.select`` with the
-          ``academic-persons-inline-edit__field`` class.
+          ``academic-persons-inline-edit__field`` class. Gender additionally
+          uses ``data-ie-autosave-on-change``.
     *   - Checkbox
         - The synchronization control uses
           ``academic-persons-inline-edit__sync-checkbox`` and its dedicated
@@ -148,7 +199,9 @@ also keeps the service usable in isolated unit tests.
 Rich-text content fields
 ========================
 
-The five fields in the :guilabel:`Content` section are rich-text fields:
+Five profile properties are rich-text fields. Four are displayed with the
+personal data, while ``miscellaneous`` is the :guilabel:`About me`
+description:
 
 *   ``coreCompetences``,
 *   ``teachingArea``,
@@ -171,14 +224,15 @@ initial HTML normalization becomes the local comparison baseline; merely
 opening an editor therefore does not submit or rewrite legacy content.
 
 Outside edit mode, each rich-text field renders its formatted content directly
-and provides a compact edit button in the upper right corner. Empty values show
-a localized placeholder. The preview is initially rendered through TYPO3's
+and provides a borderless pencil action on the right. Empty values show a
+localized placeholder. The preview is initially rendered through TYPO3's
 HTML formatting pipeline and is replaced after a successful save with the
 sanitized markup returned by the server. The frontend applies the same strict
 tag, attribute and URI-scheme allowlist without assigning markup through
 ``innerHTML``.
 
-Each open field has three explicit actions:
+Each open text or rich-text field has three explicit actions. Gender is the
+exception and saves immediately when its select value changes.
 
 *   :guilabel:`Delete` (``data-ie-dismiss``) clears the current browser-side
     draft. The editor stays open and no request is sent.
@@ -191,13 +245,15 @@ Each open field has three explicit actions:
 The action group uses Bootstrap utility classes to remain content-sized and
 aligned to the start of the editor instead of stretching to the CKEditor
 height. No additional stylesheet or inline style is required. The bulk
-:guilabel:`Cancel` button has the separate ``data-ie-cancel-all`` hook; it
-restores all last successfully persisted values and closes the editors.
+:guilabel:`Edit all` button beside the personal-data heading opens both regular
+fields and grouped rows. The bulk :guilabel:`Cancel` button has the separate
+``data-ie-cancel-all`` hook; it restores all last successfully persisted values
+and closes the editors.
 
-The decorative content of the compact preview edit button is intentionally not
-part of the JavaScript contract and can later be replaced by an icon or image.
-Template overrides must retain the button's edit hook, ``data-ie-for`` target
-and accessible label.
+The pencil is rendered through TYPO3's ``core:icon`` ViewHelper. Template
+overrides may replace the icon but must retain the button's edit hook,
+``data-ie-for`` target and accessible label. The profile value itself must not
+be placed back inside the button.
 
 Server-side sanitization
 ------------------------
@@ -227,9 +283,13 @@ must still keep TYPO3 security updates current.
 Synchronization checkbox
 ========================
 
-The synchronization checkbox is persisted immediately through
-``updateSkipSyncAction()``. It does not submit or mutate any other field. The
-endpoint accepts exactly one boolean property:
+The synchronization checkbox appears as the compact :guilabel:`Private` switch
+immediately left of :guilabel:`Edit all` in the personal-section header and is
+persisted immediately through ``updateSkipSyncAction()``. Its form is a sibling
+of the profile form, not a nested form. The visual label follows the supplied
+profile-page design; the underlying data and endpoint semantics remain
+``skipSync``. It does not submit or mutate any other field. The endpoint accepts
+exactly one boolean property:
 
 ..  code-block:: json
     :caption: Synchronization update
@@ -248,10 +308,16 @@ state.
 Profile image modal
 ===================
 
-Clicking the current profile image or its placeholder opens the Bootstrap 5
-modal from :file:`Partials/InlineProfile/Image/Modal.html`. It uses only
-Bootstrap utility and component classes; the shipped view requires neither
-inline styles nor additional CSS.
+Clicking the compact pencil button in the upper-right corner of the current
+profile image or its placeholder opens the Bootstrap 5 modal from
+:file:`Partials/InlineProfile/Image/Modal.html`. It uses only Bootstrap utility
+and component classes; the shipped view requires neither inline styles nor
+additional CSS.
+
+The image wrapper uses ``position-relative`` and the ``btn-sm`` edit action uses
+``position-absolute top-0 end-0``. Its visible label is the registered pencil
+icon; localized ``title`` and ``aria-label`` attributes retain an accessible
+name.
 
 The modal deliberately has no state-dependent :guilabel:`Add` or
 :guilabel:`Replace` action. Selecting a file immediately replaces only the
@@ -370,10 +436,10 @@ Customizing the view
 
 Override :file:`InlineProfile/Index.html` and the partials below
 :file:`Resources/Private/Partials/InlineProfile/` through the regular template
-and partial root paths. The index keeps only URL/data setup, the unchanged main
-grid and composition. Forms, sections, image UI, field controls, status toast
-and reusable button templates are separate partials. Keep the following
-contracts when reusing the shipped JavaScript:
+and partial root paths. The index keeps URL/data setup, the responsive main
+grid and composition. Forms, sections, image UI, field controls and status
+toast are separate partials. Keep the following contracts when reusing the
+shipped JavaScript:
 
 ..  list-table::
     :header-rows: 1
@@ -401,8 +467,26 @@ contracts when reusing the shipped JavaScript:
           ``data-ie-rich-text-preview-content``
         - Direct formatted read preview and its safely replaceable content
           container.
+    *   - ``data-ie-field-preview`` and ``data-ie-field-editor``
+        - Plain read row and the inline control region for one field.
+    *   - ``data-ie-profile-name`` and
+          ``data-ie-profile-name-field-ids``
+        - Main heading and the name controls used to refresh it after saving.
+    *   - ``data-ie-sticky-image``
+        - Sticky image container receiving the measured ``#page-header`` height
+          as its runtime ``top`` offset.
+    *   - ``data-ie-field-group``, ``data-ie-field-ids`` and
+          ``data-ie-display-field-ids``
+        - Grouped preview/editor and the controls participating in it.
+    *   - ``data-ie-group-edit``, ``data-ie-group-dismiss``,
+          ``data-ie-group-cancel`` and ``data-ie-group-save``
+        - Open, clear the draft, restore and persist a grouped field row.
     *   - ``data-ie-field-actions``
         - Content-sized Bootstrap group for the three per-field actions.
+    *   - ``data-ie-autosave-on-change``
+        - Saves the gender select immediately after a changed selection.
+    *   - ``data-academic-persons-inline-edit-edit-all-btn``
+        - Opens all editable single fields and grouped rows.
     *   - ``data-ie-dismiss``
         - Deletes the current draft value without closing or saving it.
     *   - ``data-ie-cancel``
@@ -428,9 +512,10 @@ contracts when reusing the shipped JavaScript:
         - Scoped status feedback for the component.
 
 Every editable field needs one ``invalid-feedback`` element in its closest
-``.mb-3`` or ``.form-check`` wrapper. Modal, toast and button-template elements
-must remain inside the component root. All DOM lookups are scoped to that root,
-so multiple components remain independent.
+``data-ie-field-wrapper``, ``data-ie-group-control`` or ``.form-check`` wrapper.
+Modal, toast and compatibility-template elements must remain inside the
+component root. All DOM lookups are scoped to that root, so multiple components
+remain independent.
 
 Tests
 =====

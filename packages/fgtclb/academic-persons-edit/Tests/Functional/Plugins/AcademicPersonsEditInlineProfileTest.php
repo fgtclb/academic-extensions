@@ -228,6 +228,54 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
     }
 
     #[Test]
+    public function imageCardUsesCompactBootstrapOverlayEditButton(): void
+    {
+        $template = $this->getInlineProfilePartial('Image/Card');
+
+        $this->assertStringContainsString('class="position-relative"', $template);
+        $this->assertMatchesRegularExpression(
+            '@<button\b(?=[^>]*data-ie-open-image-modal)'
+                . '(?=[^>]*class="[^"]*\bbtn-sm\b[^"]*\bposition-absolute\b'
+                . '[^"]*\btop-0\b[^"]*\bend-0\b)[^>]*>@s',
+            $template,
+        );
+        $this->assertStringContainsString(
+            'identifier="academic-persons-inline-edit-pencil"',
+            $template,
+        );
+        $this->assertStringContainsString('title="{f:translate(', $template);
+        $this->assertStringContainsString('aria-label="{f:translate(', $template);
+        $this->assertStringNotContainsString('w-100', $template);
+        $this->assertStringNotContainsString('academic-persons-edit-add-image', $template);
+        $this->assertStringNotContainsString('style=', $template);
+    }
+
+    #[Test]
+    public function stickyImageUsesDynamicPageHeaderOffset(): void
+    {
+        $module = file_get_contents(__DIR__ . '/../../../Resources/Public/JavaScript/frontend/profile.js');
+        $template = file_get_contents(__DIR__ . '/../../../Resources/Private/Templates/InlineProfile/Index.html');
+
+        $this->assertIsString($module);
+        $this->assertIsString($template);
+        $this->assertStringContainsString('data-ie-sticky-image', $template);
+        $this->assertStringNotContainsString('style="top:', $template);
+        $this->assertStringContainsString('const pageHeaderSelector = "#page-header";', $module);
+        $this->assertStringContainsString('pageHeader.getBoundingClientRect().height', $module);
+        $this->assertStringContainsString('stickyImage.style.setProperty(', $module);
+        $this->assertStringContainsString('`${headerOuterHeight}px`,', $module);
+        $this->assertStringContainsString('"important",', $module);
+        $this->assertStringContainsString('globalThis.ResizeObserver', $module);
+        $this->assertStringContainsString('new HeaderResizeObserver(updateOffset)', $module);
+        $this->assertStringContainsString(
+            'resizeObserver.observe(pageHeader, { box: "border-box" });',
+            $module,
+        );
+        $this->assertStringContainsString('globalThis.addEventListener("resize", updateOffset);', $module);
+        $this->assertStringContainsString('initializeStickyImageOffset(root);', $module);
+    }
+
+    #[Test]
     public function frontendModuleSupportsPreservedGridAndScopedComponentUi(): void
     {
         $module = file_get_contents(__DIR__ . '/../../../Resources/Public/JavaScript/frontend/profile.js');

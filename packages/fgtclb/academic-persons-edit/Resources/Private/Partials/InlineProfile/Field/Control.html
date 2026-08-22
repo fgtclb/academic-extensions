@@ -7,7 +7,7 @@
             <f:if condition="{richText}">
                 <f:then>
                     <div
-                        class="d-none flex-grow-1 w-100"
+                        class="flex-grow-1 w-100"
                         data-ie-editor-container>
                         <f:form.textarea
                             name="{identifier}"
@@ -26,7 +26,7 @@
                         name="{identifier}"
                         id="{elementId}"
                         value="{profile.{identifier}}"
-                        class="d-none flex-grow-1 w-100 form-control form-control-sm academic-persons-inline-edit__field"
+                        class="flex-grow-1 w-100 form-control form-control-sm academic-persons-inline-edit__field"
                         rows="{rows}"
                         disabled="{validation.disabled ? 'disabled' : ''}"
                         required="{validation.required ? 'required' : ''}"
@@ -40,7 +40,7 @@
                 id="{elementId}"
                 value="{profile.{identifier}}"
                 type="{resolvedInputType}"
-                class="d-none flex-grow-1 w-100 form-control form-control-sm academic-persons-inline-edit__field"
+                class="flex-grow-1 w-100 form-control form-control-sm academic-persons-inline-edit__field"
                 disabled="{validation.disabled ? 'disabled' : ''}"
                 required="{validation.required ? 'required' : ''}"
                 readonly="{validation.readOnly ? 'readonly' : ''}"

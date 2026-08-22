@@ -442,6 +442,24 @@
       <trans-unit id="inlineProfile.section.settings">
         <source>Settings</source>
       </trans-unit>
+      <trans-unit id="inlineProfile.section.about">
+        <source>About me</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.about.description">
+        <source>Description:</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.visibility.private">
+        <source>Private</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.field.empty">
+        <source>Not specified</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.heading">
+        <source>Profile image</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.edit">
+        <source>Edit</source>
+      </trans-unit>
       <trans-unit id="inlineProfile.status.saving">
         <source>Saving changes…</source>
       </trans-unit>

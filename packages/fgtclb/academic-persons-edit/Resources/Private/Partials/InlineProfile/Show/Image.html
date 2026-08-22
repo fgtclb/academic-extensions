@@ -4,8 +4,8 @@
     data-namespace-typo3-fluid="true">
     <f:if condition="{profile.image}">
         <f:then>
-            <figure>
-                <picture>
+            <figure class="mb-0">
+                <picture class="d-block">
                     <source
                         srcset="{f:uri.image(
                             image: profile.image,
@@ -43,7 +43,7 @@
                             maxWidth: 690,
                         )}"
                         alt="{profile.image.originalResource.alternative}"
-                        class="w-100 h-100 object-fit-contain border rounded border-secondary"
+                        class="img-fluid w-100 object-fit-cover"
                         title="{profile.image.originalResource.title}"
                         loading="lazy" />
                 </picture>
@@ -55,11 +55,11 @@
             </figure>
         </f:then>
         <f:else>
-            <figure>
+            <figure class="mb-0">
                 <img
                     src="{f:uri.resource(path: 'Images/profile-placeholder.png')}"
                     alt="{f:translate(key: 'profile.image.placeholder.alt', extensionName: 'academic_persons_edit')}"
-                    class="w-100 h-100 object-fit-contain border rounded border-secondary"
+                    class="img-fluid w-100 object-fit-cover"
                     title="{f:translate(key: 'inlineProfile.user_image_not_available', extensionName: 'academic_persons_edit')}"
                     loading="lazy" />
                 <figcaption class="visually-hidden">

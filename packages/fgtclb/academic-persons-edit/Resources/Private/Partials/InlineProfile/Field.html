@@ -20,47 +20,64 @@
     </f:if>
 
     <div class="{columnClass}">
-        <div class="mb-3">
-            <label class="form-label" for="{elementId}">
-                {f:translate(key: 'profile.{identifier}.label', extensionName:
-                'academic_persons_edit')}
-                <f:if condition="{validation.required}">
-                    <abbr title="required">*</abbr>
-                </f:if>
-            </label>
-
+        <div
+            class="rounded-1 p-3 p-lg-4 {rowClass}"
+            data-ie-field-wrapper>
             <f:render
                 partial="InlineProfile/Field/Preview"
                 arguments="{
                     profile: profile,
                     identifier: identifier,
+                    labelKey: labelKey,
                     elementId: elementId,
                     validation: validation,
                     richText: richText
                 }" />
-
-            <div class="d-flex flex-column flex-md-row gap-2 align-items-start">
-                <f:render
-                    partial="InlineProfile/Field/Control"
-                    arguments="{
-                        profile: profile,
-                        identifier: identifier,
-                        elementId: elementId,
-                        validation: validation,
-                        resolvedInputType: resolvedInputType,
-                        autocomplete: autocomplete,
-                        textarea: textarea,
-                        richText: richText,
-                        rows: rows
-                    }" />
-                <f:if
-                    condition="!{validation.disabled} && !{validation.readOnly}">
+            <div
+                id="{elementId}-editor"
+                class="d-none mt-3"
+                data-ie-field-editor
+                data-ie-for="{elementId}">
+                <label class="form-label fw-semibold" for="{elementId}">
+                    <f:if condition="{labelKey}">
+                        <f:then>
+                            <f:translate
+                                key="{labelKey}"
+                                extensionName="academic_persons_edit" />
+                        </f:then>
+                        <f:else>
+                            <f:translate
+                                key="profile.{identifier}.label"
+                                extensionName="academic_persons_edit" />
+                        </f:else>
+                    </f:if>
+                    <f:if condition="{validation.required}">
+                        <abbr title="required">*</abbr>
+                    </f:if>
+                </label>
+                <div class="d-flex flex-column flex-xl-row gap-2 align-items-start">
                     <f:render
-                        partial="InlineProfile/Field/Actions"
-                        arguments="{elementId: elementId}" />
-                </f:if>
+                        partial="InlineProfile/Field/Control"
+                        arguments="{
+                            profile: profile,
+                            identifier: identifier,
+                            elementId: elementId,
+                            validation: validation,
+                            resolvedInputType: resolvedInputType,
+                            autocomplete: autocomplete,
+                            textarea: textarea,
+                            richText: richText,
+                            rows: rows
+                        }" />
+                    <f:if
+                        condition="!{validation.disabled} && !{validation.readOnly}">
+                        <f:render
+                            partial="InlineProfile/Field/Actions"
+                            arguments="{elementId: elementId}" />
+                    </f:if>
+                </div>
+                <div class="invalid-feedback"></div>
             </div>
-            <div class="invalid-feedback"></div>
         </div>
     </div>
 </html>

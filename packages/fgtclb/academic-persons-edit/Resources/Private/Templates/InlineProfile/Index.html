@@ -6,7 +6,9 @@
         <f:then>
             <f:asset.module
                 identifier="@fgtclb/academic-persons-edit/frontend/profile.js?t={f:format.date(format: '%s', date: 'now')}" />
-
+            <f:asset.css
+                identifier="academics-personal-edit-additional-css"
+                href="EXT:academic_persons_edit/Resources/Public/Css/additional.css" />
             <f:variable
                 name="updateUrl"
                 value="{f:uri.action(action: 'update', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
@@ -44,27 +46,28 @@
                 data-message-image-uploaded="{f:translate(key: 'inlineProfile.image.status.uploaded', extensionName: 'academic_persons_edit')}"
                 data-message-image-upload-missing="{f:translate(key: 'inlineProfile.image.status.missing', extensionName: 'academic_persons_edit')}"
                 data-message-image-deleted="{f:translate(key: 'inlineProfile.image.status.deleted', extensionName: 'academic_persons_edit')}">
-                <f:render partial="InlineProfile/Header" />
-
-                <div class="conainer-fluid">
-                    <div class="row">
+                <div class="container-fluid px-0">
+                    <div class="row gx-lg-5 gy-5 align-items-stretch">
                         <div class="col-12 col-lg-4">
-                            <f:render
-                                partial="InlineProfile/Image/Card"
-                                arguments="{profile: profile}" />
-                            <f:render
-                                partial="InlineProfile/Settings/Sync"
-                                arguments="{profile: profile, validations: validations}" />
+                            <div class="sticky-top" data-ie-sticky-image>
+                                <f:render
+                                    partial="InlineProfile/Image/Card"
+                                    arguments="{profile: profile}" />
+                            </div>
                         </div>
                         <div class="col-12 col-lg-8">
                             <f:render
                                 partial="InlineProfile/Forms/Profile"
                                 arguments="{profile: profile, validations: validations, genderOptions: genderOptions}" />
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-12">
-                            <f:render
-                                partial="InlineProfile/Forms/Content"
-                                arguments="{profile: profile, validations: validations}" />
+                            <div class="mt-5">
+                                <f:render
+                                    partial="InlineProfile/Forms/Content"
+                                    arguments="{profile: profile, validations: validations}" />
+                            </div>
                         </div>
                     </div>
                 </div>
