@@ -469,8 +469,20 @@
       <trans-unit id="inlineProfile.status.validation">
         <source>Please check the highlighted fields.</source>
       </trans-unit>
+      <trans-unit id="inlineProfile.status.editorError">
+        <source>The rich text editor could not be loaded. Please reload the page and try again.</source>
+      </trans-unit>
       <trans-unit id="inlineProfile.status.unchanged">
         <source>There are no changes to save.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.actions.clear">
+        <source>Delete content</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.actions.group">
+        <source>Field actions</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.content.empty">
+        <source>No content</source>
       </trans-unit>
       <trans-unit id="inlineProfile.noProfile">
         <source>No editable profile is assigned to the current frontend user.</source>
@@ -490,11 +502,8 @@
       <trans-unit id="inlineProfile.image.modal.close">
         <source>Close image modal</source>
       </trans-unit>
-      <trans-unit id="inlineProfile.image.modal.hint.add">
-        <source>Select an image to add it to the profile.</source>
-      </trans-unit>
-      <trans-unit id="inlineProfile.image.modal.hint.replace">
-        <source>Select a new image to replace the current profile image.</source>
+      <trans-unit id="inlineProfile.image.modal.hint.select">
+        <source>Select an image to preview it. The profile image changes only after you save.</source>
       </trans-unit>
       <trans-unit id="inlineProfile.image.modal.deleteHint">
         <source>The profile image is removed permanently unless another record still uses the file.</source>
@@ -504,6 +513,9 @@
       </trans-unit>
       <trans-unit id="inlineProfile.image.status.uploaded">
         <source>The profile image has been saved.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.missing">
+        <source>No new profile image was received. Please select the image again.</source>
       </trans-unit>
       <trans-unit id="inlineProfile.image.status.deleted">
         <source>The profile image has been deleted.</source>
@@ -537,6 +549,9 @@
       </trans-unit>
       <trans-unit id="actions.delete">
         <source>Delete</source>
+      </trans-unit>
+      <trans-unit id="actions.undo">
+        <source>Undo</source>
       </trans-unit>
       <trans-unit id="actions.cancel">
         <source>Cancel</source>

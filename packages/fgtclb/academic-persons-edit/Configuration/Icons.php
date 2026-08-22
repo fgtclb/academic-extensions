@@ -58,4 +58,24 @@ return [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/sort-vertical-icon.svg',
     ],
+    'academic-persons-inline-edit-clear' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-clear.svg',
+    ],
+    'academic-persons-inline-edit-undo' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-undo.svg',
+    ],
+    'academic-persons-inline-edit-save' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-save.svg',
+    ],
+    'academic-persons-inline-edit-pencil' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-edit.svg',
+    ],
+    'academic-persons-inline-edit-add' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-add.svg',
+    ],
 ];

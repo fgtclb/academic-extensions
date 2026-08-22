@@ -19,7 +19,8 @@ final readonly class ProfileUpdateRequestService
         private Context $context,
         private ProfileRepository $profileRepository,
         private ProfileUpdatePayloadParser $payloadParser,
-    ) {}
+    ) {
+    }
 
     public function validate(ServerRequestInterface $request): ProfileUpdateRequestResult
     {
@@ -29,6 +30,14 @@ final readonly class ProfileUpdateRequestService
                 405,
             );
         }
+        $contentType = strtolower(trim(explode(';', $request->getHeaderLine('Content-Type'), 2)[0]));
+        if ($contentType !== 'application/json') {
+            return ProfileUpdateRequestResult::failure(
+                'unsupported_media_type',
+                415,
+            );
+        }
+
         try {
             $payload = $this->payloadParser->parse(
                 (string)$request->getBody()
@@ -44,6 +53,7 @@ final readonly class ProfileUpdateRequestService
                 400,
             );
         }
+
         if (
             $this->context->getPropertyFromAspect(
                 'frontend.user',
@@ -60,12 +70,14 @@ final readonly class ProfileUpdateRequestService
         $profile = $this->findEditableProfile(
             $payload->getProfileUid()
         );
+
         if ($profile === null) {
             return ProfileUpdateRequestResult::failure(
                 'profile_not_editable',
                 403,
             );
         }
+
         return ProfileUpdateRequestResult::success(
             $payload,
             $profile,
@@ -84,6 +96,7 @@ final readonly class ProfileUpdateRequestService
             'id',
             0,
         );
+
         foreach (
             $this->profileRepository->findByFrontendUser($frontendUserId)
             as $profile
@@ -95,6 +108,7 @@ final readonly class ProfileUpdateRequestService
                 return $profile;
             }
         }
+
         return null;
     }
 }

@@ -18,10 +18,29 @@ use FGTCLB\AcademicPersonsEdit\{
 
 final readonly class ProfileUpdateValidationService
 {
+    private const EDITABLE_PROPERTIES = [
+        'gender',
+        'title',
+        'firstName',
+        'middleName',
+        'lastName',
+        'website',
+        'websiteTitle',
+        'publicationsLink',
+        'publicationsLinkTitle',
+        'coreCompetences',
+        'teachingArea',
+        'supervisedDoctoralThesis',
+        'supervisedThesis',
+        'miscellaneous',
+        'skipSync',
+    ];
+
     public function __construct(
         private ProfileFormDataFactoryInterface $profileFormDataFactory,
         private ProfileFormDataValidator $profileFormDataValidator,
         private ProfileGenderOptionsService $profileGenderOptionsService,
+        private ProfileRichTextSanitizerInterface $profileRichTextSanitizer,
     ) {
     }
 
@@ -36,7 +55,10 @@ final readonly class ProfileUpdateValidationService
         );
 
         foreach ($payload->getData() as $propertyName => $value) {
-            if (!$profileFormData->_hasProperty($propertyName)) {
+            if (
+                !in_array($propertyName, self::EDITABLE_PROPERTIES, true)
+                || !$profileFormData->_hasProperty($propertyName)
+            ) {
                 throw new UnexpectedValueException(
                     sprintf('Unknown profile property "%s".', $propertyName)
                 );
@@ -50,8 +72,18 @@ final readonly class ProfileUpdateValidationService
                         'Invalid gender value.'
                     );
                 }
+            } elseif ($propertyName === 'skipSync') {
+                if (!is_bool($value)) {
+                    throw new UnexpectedValueException('Invalid skipSync value.');
+                }
+            } elseif (!is_string($value)) {
+                throw new UnexpectedValueException(
+                    sprintf('Invalid value for profile property "%s".', $propertyName)
+                );
             }
-
+            if ($this->profileRichTextSanitizer->supports($propertyName)) {
+                $value = $this->profileRichTextSanitizer->sanitize($value);
+            }
             $profileFormData->setPropertyOverride(
                 $propertyName,
                 $value,
@@ -59,6 +91,25 @@ final readonly class ProfileUpdateValidationService
         }
 
         return $profileFormData;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getNormalizedData(
+        ProfileFormData $profileFormData,
+        ProfileUpdatePayload $payload,
+    ): array {
+        $data = [];
+        foreach (array_keys($payload->getData()) as $propertyName) {
+            if (!$profileFormData->hasPropertyOverride($propertyName)) {
+                throw new UnexpectedValueException(
+                    sprintf('Profile property "%s" was not normalized.', $propertyName)
+                );
+            }
+            $data[$propertyName] = $profileFormData->getPropertyOverride($propertyName);
+        }
+        return $data;
     }
 
     public function validate(ProfileFormData $profileFormData): Result

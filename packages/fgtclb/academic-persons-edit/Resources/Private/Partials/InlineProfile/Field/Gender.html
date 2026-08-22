@@ -1,0 +1,48 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:p="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <f:variable name="genderValidation"
+        ><p:validationEnsure validations="{validations}" identifier="gender"
+    /></f:variable>
+
+    <div class="col-12 col-sm-6">
+        <div class="mb-3">
+            <label class="form-label" for="inline-profile-{profile.uid}-gender">
+                <f:translate
+                    key="profile.gender.label"
+                    extensionName="academic_persons_edit" />
+                <f:if condition="{genderValidation.required}">
+                    <abbr title="required">*</abbr>
+                </f:if>
+            </label>
+            <f:if condition="{genderValidation.readOnly}">
+                <f:then>
+                    <f:form.select
+                        name="gender"
+                        id="inline-profile-{profile.uid}-gender"
+                        class="form-select form-select-sm academic-persons-inline-edit__field"
+                        options="{genderOptions}"
+                        value="{profile.gender}"
+                        prependOptionLabel="---"
+                        prependOptionValue=""
+                        disabled="true" />
+                </f:then>
+                <f:else>
+                    <f:form.select
+                        name="gender"
+                        id="inline-profile-{profile.uid}-gender"
+                        class="form-select form-select-sm academic-persons-inline-edit__field"
+                        options="{genderOptions}"
+                        value="{profile.gender}"
+                        prependOptionLabel="---"
+                        prependOptionValue=""
+                        disabled="{genderValidation.disabled}"
+                        required="{genderValidation.required}" />
+                </f:else>
+            </f:if>
+            <div class="invalid-feedback"></div>
+        </div>
+    </div>
+</html>
