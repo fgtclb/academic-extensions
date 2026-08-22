@@ -28,15 +28,37 @@ value-to-label map used to render the Fluid select.
 The synchronization checkbox has a dedicated JSON endpoint and is persisted
 immediately without submitting unrelated fields. Clicking the profile image or
 its placeholder opens an accessible Bootstrap 5 modal without inline styles or
-additional CSS. Depending on the current state, the modal allows users to add,
-replace or delete the image exclusively through dedicated AJAX requests. The
-active action shows a Bootstrap spinner, duplicate requests are prevented and
-the image previews and actions are updated without reloading the page.
+additional CSS. The image flow exposes only :guilabel:`Delete`,
+:guilabel:`Cancel` and
+:guilabel:`Save`: selecting a file immediately changes the modal preview,
+whereas the page preview changes only after a successful upload. Failures stay
+inside the open modal. The active action shows a Bootstrap spinner and
+duplicate requests are prevented.
 
 Image uploads use Extbase file handling and the configured MIME type, maximum
 size and target-folder settings. Profile ownership is checked before a file is
 mapped or stored. Deleting or replacing an image removes the physical file only
 when no other record references it.
+
+The main template is composed from focused partials for image UI, settings,
+forms, sections, field preview/control/actions, status output and button
+templates. The responsive grid and JavaScript data hooks remain unchanged.
+
+The five fields in the profile content section use TYPO3's bundled CKEditor 5.
+Editor instances are initialized only when a field is opened and expose a
+deliberately small formatting toolbar. The existing JSON update endpoint
+remains the only persistence path. Rich-text input is sanitized server-side
+with an explicit allowlist before validation and persistence, and the response
+returns the normalized markup used to update the editor state.
+
+Rich-text read mode renders the formatted value directly with a compact edit
+control. In edit mode every field has separate delete, cancel and save actions.
+Delete clears the local draft without closing or saving, cancel restores the
+last persisted value and closes the field, and save uses the JSON AJAX
+endpoint. Bootstrap sizing and alignment utilities keep the action group from
+stretching to the editor height without additional CSS or inline styles. Bulk
+cancellation still uses ``data-ie-cancel-all`` and restores all successfully
+persisted values.
 
 Impact
 ======
@@ -46,4 +68,4 @@ Projects overriding the inline template should compare their markup with the
 new template and preserve the JavaScript hooks described in
 :ref:`inline-profile-editing`.
 
-..  index:: AJAX, Fluid, Frontend, JSON, Profile image
+..  index:: AJAX, CKEditor, Fluid, Frontend, JSON, Profile image, Rich text

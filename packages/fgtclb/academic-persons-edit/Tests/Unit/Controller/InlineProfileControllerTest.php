@@ -11,6 +11,7 @@ use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFormDataFactoryInterface;
 use FGTCLB\AcademicPersonsEdit\Domain\Parser\ProfileUpdatePayloadParser;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use PHPUnit\Framework\Attributes\Test;
@@ -280,6 +281,7 @@ final class InlineProfileControllerTest extends UnitTestCase
                 $profileFormDataFactory,
                 new ProfileFormDataValidator(),
                 $profileGenderOptionsService,
+                $this->createStub(ProfileRichTextSanitizerInterface::class),
             ),
             $profileGenderOptionsService,
         );
@@ -304,6 +306,7 @@ final class InlineProfileControllerTest extends UnitTestCase
         $serverRequest = (new ServerRequest())
             ->withMethod($method)
             ->withBody($stream)
+            ->withHeader('Content-Type', 'application/json')
             ->withAttribute(
                 'extbase',
                 new ExtbaseRequestParameters(),

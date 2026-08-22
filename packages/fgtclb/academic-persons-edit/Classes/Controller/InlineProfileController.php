@@ -67,10 +67,13 @@ final class InlineProfileController extends AbstractActionController
     protected function errorAction(): ResponseInterface
     {
         if ($this->request->getControllerActionName() === 'uploadImage') {
-            return $this->jsonError(
-                'validation_failed',
-                422,
-                $this->getFlattenedValidationErrorMessage(),
+            throw new PropagateResponseException(
+                $this->jsonError(
+                    'validation_failed',
+                    422,
+                    $this->getFlattenedValidationErrorMessage(),
+                ),
+                1776760202,
             );
         }
 
@@ -175,7 +178,10 @@ final class InlineProfileController extends AbstractActionController
             return new JsonResponse([
                 'success' => true,
                 'profile' => $updatedProfile->getUid(),
-                'data' => $payload->getData(),
+                'data' => $this->profileUpdateValidationService->getNormalizedData(
+                    $profileFormData,
+                    $payload,
+                ),
             ]);
         } catch (UnexpectedValueException $exception) {
             return $this->jsonError(
@@ -352,13 +358,27 @@ final class InlineProfileController extends AbstractActionController
     public function uploadImageAction(Profile $profile): ResponseInterface
     {
         try {
-            $this->persistUploadedProfileImage($profile);
+            $replacedImageFile = $this->getPersistedProfileImageFile($profile);
+            if (!$this->hasNewProfileImage($profile, $replacedImageFile)) {
+                throw new PropagateResponseException(
+                    $this->jsonError(
+                        'image_upload_missing',
+                        422,
+                        'No new profile image was received.',
+                    ),
+                    1776760203,
+                );
+            }
+
+            $this->persistUploadedProfileImage($profile, $replacedImageFile);
 
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
-                'hasImage' => $profile->getImage() !== null,
+                'hasImage' => true,
             ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
         } catch (Throwable $exception) {
             GeneralUtility::makeInstance(LogManager::class)
                 ->getLogger(self::class)
@@ -366,10 +386,13 @@ final class InlineProfileController extends AbstractActionController
                     'exception' => $exception,
                 ]);
 
-            return $this->jsonError(
-                'internal_server_error',
-                500,
-                'The profile image could not be uploaded.',
+            throw new PropagateResponseException(
+                $this->jsonError(
+                    'internal_server_error',
+                    500,
+                    'The profile image could not be uploaded.',
+                ),
+                1776760204,
             );
         }
     }
@@ -423,13 +446,19 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
-    private function persistUploadedProfileImage(Profile $profile): void
+    private function hasNewProfileImage(Profile $profile, ?File $persistedImageFile): bool
     {
-        // The file handling service already stored the uploaded file and rewired the profile
-        // image property to it, so the replaced file can only be determined from the state
-        // still persisted at this point - which the update below overwrites.
-        $replacedImageFile = $this->getPersistedProfileImageFile($profile);
+        $submittedImageFile = $profile->getImage()?->getOriginalResource()->getOriginalFile();
+        if ($submittedImageFile === null) {
+            return false;
+        }
 
+        return $persistedImageFile === null
+            || $submittedImageFile->getUid() !== $persistedImageFile->getUid();
+    }
+
+    private function persistUploadedProfileImage(Profile $profile, ?File $replacedImageFile): void
+    {
         $this->profileRepository->update($profile);
         $this->persistenceManager->persistAll();
 

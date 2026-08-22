@@ -613,9 +613,26 @@
         <source>Please check the highlighted fields.</source>
         <target>Bitte die markierten Felder überprüfen.</target>
       </trans-unit>
+      <trans-unit id="inlineProfile.status.editorError">
+        <source>The rich text editor could not be loaded. Please reload the page and try again.</source>
+        <target>Der Rich-Text-Editor konnte nicht geladen werden. Bitte laden Sie die Seite neu und
+          versuchen Sie es erneut.</target>
+      </trans-unit>
       <trans-unit id="inlineProfile.status.unchanged">
         <source>There are no changes to save.</source>
         <target>Es sind keine Änderungen zu speichern.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.actions.clear">
+        <source>Delete content</source>
+        <target>Inhalt löschen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.actions.group">
+        <source>Field actions</source>
+        <target>Feldaktionen</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.content.empty">
+        <source>No content</source>
+        <target>Kein Inhalt</target>
       </trans-unit>
       <trans-unit id="inlineProfile.noProfile">
         <source>No editable profile is assigned to the current frontend user.</source>
@@ -641,17 +658,15 @@
         <source>Close image modal</source>
         <target>Bildbearbeitung schließen</target>
       </trans-unit>
-      <trans-unit id="inlineProfile.image.modal.hint.add">
-        <source>Select an image to add it to the profile.</source>
-        <target>Wählen Sie ein Bild aus, um es dem Profil hinzuzufügen.</target>
-      </trans-unit>
-      <trans-unit id="inlineProfile.image.modal.hint.replace">
-        <source>Select a new image to replace the current profile image.</source>
-        <target>Wählen Sie ein neues Bild aus, um das aktuelle Profilbild zu ersetzen.</target>
+      <trans-unit id="inlineProfile.image.modal.hint.select">
+        <source>Select an image to preview it. The profile image changes only after you save.</source>
+        <target>Wählen Sie ein Bild für die Vorschau aus. Das Profilbild wird erst beim Speichern
+          geändert.</target>
       </trans-unit>
       <trans-unit id="inlineProfile.image.modal.deleteHint">
         <source>The profile image is removed permanently unless another record still uses the file.</source>
-        <target>Das Profilbild wird dauerhaft entfernt, sofern keine andere Verwendung der Datei besteht.</target>
+        <target>Das Profilbild wird dauerhaft entfernt, sofern keine andere Verwendung der Datei
+          besteht.</target>
       </trans-unit>
       <trans-unit id="inlineProfile.image.upload.label">
         <source>Choose image</source>
@@ -660,6 +675,10 @@
       <trans-unit id="inlineProfile.image.status.uploaded">
         <source>The profile image has been saved.</source>
         <target>Das Profilbild wurde gespeichert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.status.missing">
+        <source>No new profile image was received. Please select the image again.</source>
+        <target>Es wurde kein neues Profilbild empfangen. Bitte wählen Sie das Bild erneut aus.</target>
       </trans-unit>
       <trans-unit id="inlineProfile.image.status.deleted">
         <source>The profile image has been deleted.</source>
@@ -703,6 +722,10 @@
       <trans-unit id="actions.delete">
         <source>Delete</source>
         <target>Löschen</target>
+      </trans-unit>
+      <trans-unit id="actions.undo">
+        <source>Undo</source>
+        <target>Rückgängig</target>
       </trans-unit>
       <trans-unit id="actions.cancel">
         <source>Cancel</source>

@@ -11,6 +11,7 @@ use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileUpdatePayload;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator\Fixtures\RecordingValidator;
 use FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator\Fixtures\ValidationSettings;
@@ -172,6 +173,61 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     }
 
     #[Test]
+    public function richTextIsSanitizedBeforeItIsRegisteredAsOverride(): void
+    {
+        $formData = new ProfileFormData();
+        $factory = $this->createStub(ProfileFormDataFactoryInterface::class);
+        $factory->method('createFromProfile')->willReturn($formData);
+        $sanitizer = $this->createMock(ProfileRichTextSanitizerInterface::class);
+        $sanitizer
+            ->expects(self::once())
+            ->method('supports')
+            ->with('coreCompetences')
+            ->willReturn(true);
+        $sanitizer
+            ->expects(self::once())
+            ->method('sanitize')
+            ->with('<p onclick="alert(1)">Secure content</p>')
+            ->willReturn('<p>Secure content</p>');
+        $subject = new ProfileUpdateValidationService(
+            $factory,
+            new ProfileFormDataValidator(),
+            new ProfileGenderOptionsService(),
+            $sanitizer,
+        );
+        $payload = new ProfileUpdatePayload(
+            profileUid: 123,
+            data: ['coreCompetences' => '<p onclick="alert(1)">Secure content</p>'],
+        );
+        $result = $subject->createFormData(
+            $this->createPluginControllerActionContext(),
+            new Profile(),
+            $payload,
+        );
+        self::assertSame('<p>Secure content</p>', $result->getPropertyOverride('coreCompetences'));
+        self::assertSame(
+            ['coreCompetences' => '<p>Secure content</p>'],
+            $subject->getNormalizedData($result, $payload),
+        );
+    }
+
+    #[Test]
+    public function nonStringProfileFieldValueIsRejected(): void
+    {
+        $subject = $this->createSubjectForFormData(new ProfileFormData());
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Invalid value for profile property "firstName".');
+        $subject->createFormData(
+            $this->createPluginControllerActionContext(),
+            new Profile(),
+            new ProfileUpdatePayload(
+                profileUid: 123,
+                data: ['firstName' => ['not', 'a', 'string']],
+            ),
+        );
+    }
+
+    #[Test]
     public function validateReturnsErrorsFromProfileFormDataValidator(): void
     {
         $validator = new ProfileFormDataValidator();
@@ -185,6 +241,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             $this->createStub(ProfileFormDataFactoryInterface::class),
             $validator,
             new ProfileGenderOptionsService(),
+            $this->createStub(ProfileRichTextSanitizerInterface::class),
         );
 
         $result = $subject->validate(
@@ -211,10 +268,13 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     private function createSubject(
         ProfileFormDataFactoryInterface $factory,
     ): ProfileUpdateValidationService {
+        $richTextSanitizer = $this->createStub(ProfileRichTextSanitizerInterface::class);
+        $richTextSanitizer->method('supports')->willReturn(false);
         return new ProfileUpdateValidationService(
             $factory,
             new ProfileFormDataValidator(),
             new ProfileGenderOptionsService(),
+            $richTextSanitizer,
         );
     }
 

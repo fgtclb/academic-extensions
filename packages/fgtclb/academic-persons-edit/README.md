@@ -14,10 +14,23 @@ Profiles get connected with a frontend user and the frontend user is allow to ed
 The `Inline profile editing` content element provides a responsive form that
 saves only changed profile fields through a JSON endpoint without reloading the
 page. The synchronization checkbox and profile image use dedicated AJAX
-endpoints. Clicking the image opens a Bootstrap 5 modal for adding, replacing
-or deleting it through AJAX, without additional CSS or inline styles.
+endpoints. Clicking the image opens a Bootstrap 5 modal: selecting a file
+updates the local modal preview, saving uploads and replaces the page preview,
+and deleting removes the current image. Upload errors retain their non-success
+HTTP status, are shown inside the open modal and do not change the page preview.
+No additional CSS or inline styles are required.
 Authentication, profile ownership, configured validators, file validation and
 TCA gender options are checked server-side.
+
+The five fields in the profile content section use TYPO3's bundled CKEditor 5
+and are saved through the same partial-update endpoint. Submitted rich text is
+sanitized server-side with an explicit tag, attribute and URI-scheme allowlist
+before it is validated and persisted. Rich-text fields show their formatted
+content directly with a compact edit control. While editing, separate delete,
+cancel and save actions clear the draft, restore the last persisted value or
+persist the field through AJAX. See the
+[inline-editing documentation](./Documentation/InlineEditing/Index.rst) for the
+editor, AJAX and security contracts.
 
 > [!NOTE]
 > This extension is currently in beta state - please notice that there might be changes to the structure
@@ -26,7 +39,7 @@ TCA gender options are checked server-side.
 
 | Branch | Version     | TYPO3     | PHP                                          |
 |--------|-------------|-----------|----------------------------------------------|
-| main   | ^3, 3.x-dev | v13 + v14 | 8.2, 8.3, 8.4, 8.5                           |
+| main   | ^3, 3.x-dev | v13.4.31+ + v14.3.6+ | 8.2, 8.3, 8.4, 8.5                |
 | 2, 2.x | ^2, 2.x-dev | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
 | 1      | ^1, 1.x-dev | v11 + v12 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
 

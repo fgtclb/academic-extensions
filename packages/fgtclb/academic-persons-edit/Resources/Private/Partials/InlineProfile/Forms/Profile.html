@@ -1,0 +1,14 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <form class="academic-persons-inline-edit__form" data-ie-fields-form>
+        <f:render
+            partial="InlineProfile/Sections/Personal"
+            arguments="{profile: profile, validations: validations, genderOptions: genderOptions}" />
+        <f:render
+            partial="InlineProfile/Sections/Links"
+            arguments="{profile: profile, validations: validations}" />
+        <f:render partial="InlineProfile/Forms/FooterActions" />
+    </form>
+</html>
