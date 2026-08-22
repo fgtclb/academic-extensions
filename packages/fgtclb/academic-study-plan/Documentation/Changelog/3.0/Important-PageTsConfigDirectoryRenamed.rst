@@ -21,12 +21,12 @@ of these extensions resolved on one machine and silently not on another — and
 a page TSconfig :typoscript:`@import` that does not resolve raises no error, the
 configuration is simply absent.
 
-This extension additionally registers :file:`Configuration/TSconfig/Default.tsconfig`
-as a selectable static page TSconfig include, through
-:php:`ExtensionManagementUtility::registerPageTSConfigFile()`. The registration
-itself is updated, so the entry keeps working under its unchanged label
-*Academic StudyPlan (Default)* — but an installation that referenced the old
-path directly rather than selecting the entry has to follow the rename.
+This extension additionally registers a selectable static page TSconfig include,
+through :php:`ExtensionManagementUtility::registerPageTSConfigFile()`. The
+registration was updated with the directory — and reorganised again in the same
+release, which changed both its label and the value a page record stores. See
+:ref:`breaking-site-sets-and-static-templates-restructured` for what to select
+instead.
 
 Impact
 ======
@@ -36,7 +36,10 @@ the extension were updated in the same change, so an installation that only
 installs the extension has nothing to do.
 
 **An integrator who references these paths from their own configuration has to
-update them**, because the old path no longer exists:
+update them**, because the old path no longer exists. The files below the
+directory were reorganised in the same release, so the new path is not the old
+one with the spelling corrected — take it from the table in
+:ref:`breaking-site-sets-and-static-templates-restructured`:
 
 ..  code-block:: typoscript
     :caption: Page TSconfig of your own site package
@@ -44,12 +47,12 @@ update them**, because the old path no longer exists:
     # before
     @import 'EXT:academic_study_plan/Configuration/TsConfig/Default.tsconfig'
     # after
-    @import 'EXT:academic_study_plan/Configuration/TSconfig/Default.tsconfig'
+    @import 'EXT:academic_study_plan/Configuration/TSconfig/ContentElement/page.tsconfig'
 
     # before
     @import 'EXT:academic_study_plan/Configuration/TsConfig/Includes/academic-study-plan.tsconfig'
     # after
-    @import 'EXT:academic_study_plan/Configuration/TSconfig/Includes/academic-study-plan.tsconfig'
+    @import 'EXT:academic_study_plan/Configuration/TSconfig/ContentElement/page.tsconfig'
 
 Affected Installations
 ======================

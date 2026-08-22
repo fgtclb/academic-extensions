@@ -14,15 +14,27 @@ defined('TYPO3') || die();
     // The files are the same ones the sets of this extension deliver. Use one mechanism per site, not both.
     //==================================================================================================================
     ExtensionManagementUtility::registerPageTSConfigFile(
-        'academic_study_plan',
-        'Configuration/TSconfig/ContentElement/page.tsconfig',
-        'Academic Study Plan: Content element',
+        'academic_jobs',
+        'Configuration/TSconfig/NewJobForm/page.tsconfig',
+        'Academic Jobs: Jobs New',
     );
 
     ExtensionManagementUtility::registerPageTSConfigFile(
-        'academic_study_plan',
+        'academic_jobs',
+        'Configuration/TSconfig/List/page.tsconfig',
+        'Academic Jobs: Jobs List',
+    );
+
+    ExtensionManagementUtility::registerPageTSConfigFile(
+        'academic_jobs',
+        'Configuration/TSconfig/Detail/page.tsconfig',
+        'Academic Jobs: Jobs Detail',
+    );
+
+    ExtensionManagementUtility::registerPageTSConfigFile(
+        'academic_jobs',
         'Configuration/TSconfig/Full/page.tsconfig',
-        'Academic Study Plan: All components',
+        'Academic Jobs: All components',
     );
 
 })();

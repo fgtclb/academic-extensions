@@ -52,8 +52,8 @@ modules, and categorization features.
 
     ..  card:: :ref:`Configuration <configuration>`
 
-        Learn how to include the site set `fgtclb/academic-persons-default`
-        and how to use settings to configure this extension.
+        Learn how to include the site set `fgtclb/academic-study-plan` and how
+        to configure the content element of this extension.
 
     ..  card:: :ref:`Frequently Asked Questions (FAQ) <faq>`
 

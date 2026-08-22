@@ -1,0 +1,12 @@
+# The study plan content element.
+#
+# "typoscript" points at the folder that "Configuration/TCA/Overrides/sys_template.php"
+# registers as a static template, and "pagets" at the file that
+# "Configuration/TCA/Overrides/pages.php" registers - there is exactly one
+# physical copy of each, so the two delivery mechanisms can never drift apart.
+name: fgtclb/academic-study-plan-content-element
+label: 'Academic Study Plan: Content element'
+dependencies:
+  - fgtclb/academic-base-ctype-group
+typoscript: 'EXT:academic_study_plan/Configuration/TypoScript/ContentElement/'
+pagets: 'EXT:academic_study_plan/Configuration/TSconfig/ContentElement/page.tsconfig'

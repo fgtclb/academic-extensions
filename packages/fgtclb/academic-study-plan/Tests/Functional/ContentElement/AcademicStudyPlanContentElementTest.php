@@ -54,10 +54,11 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
             typoScriptFiles: [
                 'constants' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
+                    'EXT:academic_study_plan/Configuration/TypoScript/ContentElement/constants.typoscript',
                 ],
                 'setup' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
-                    'EXT:academic_study_plan/Configuration/TypoScript/Default/setup.typoscript',
+                    'EXT:academic_study_plan/Configuration/TypoScript/ContentElement/setup.typoscript',
                     'EXT:academic_study_plan/Tests/Functional/ContentElement/Fixtures/TypoScript/Setup/Rendering.typoscript',
                 ],
             ],
