@@ -35,11 +35,12 @@ aggregate set that depends on it.
 
     *   -   Set
         -   Delivers
-    *   -   `fgtclb/academic-persons-edit-profile-editing`
-        -   The :guilabel:`Profile editing` content element: its TypoScript
-            (`plugin.tx_academicpersonsedit`) and the page TSconfig that makes
-            the content element selectable in the backend.
-    *   -   `fgtclb/academic-persons-edit`
+    *   -   `fgtclb/academic-contacts4pages-list`
+        -   The :guilabel:`Contact list` content element: its TypoScript
+            (`plugin.tx_academiccontacts4pages`), the data processor that
+            assigns the contacts of a page to the page template, and the page
+            TSconfig that makes the content element selectable in the backend.
+    *   -   `fgtclb/academic-contacts4pages`
         -   Everything above. This is the set to use unless you deliberately
             want a subset.
 
@@ -47,19 +48,31 @@ Both depend on `fgtclb/academic-base-ctype-group`, the set of
 :guilabel:`EXT:academic_base` that labels the content element group all academic
 extensions sort their elements into.
 
-The plugin renders partials of :guilabel:`EXT:academic_persons`, but it reads
-them from :file:`Resources/`, not from that extension's TypoScript. There is
-therefore no set dependency on any `fgtclb/academic-persons-…` set, and none is
-needed.
+..  note::
+
+    The setup of this extension reads
+    :typoscript:`{$plugin.tx_academicpersons.detailPid}` — a constant this
+    extension does not declare and that belongs to
+    :guilabel:`EXT:academic_persons`.
+
+    Nothing has to be done about it. The component names that extension's
+    TypoScript in its own :file:`include_static_file.txt`, and both delivery
+    mechanisms read that file, so the constant resolves whether this extension
+    arrives through its site set or through its static template.
+
+    The site set deliberately does *not* depend on a set of
+    :guilabel:`EXT:academic_persons`. Such a dependency would not deliver the
+    constant, it does not exist on TYPO3 v12 at all, and it would make that
+    extension's content element selectable wherever this one is enabled.
 
 ..  _configuration-hidden-by-default:
 
 The content element is hidden by default
 ========================================
 
-:guilabel:`EXT:academic_persons_edit` hides its content element for the whole
+:guilabel:`EXT:academic_contacts4pages` hides its content element for the whole
 installation and brings it back per component. Whichever of the two mechanisms
-below you use, it is what makes :guilabel:`Profile editing` selectable in the
+below you use, it is what makes :guilabel:`Contact list` selectable in the
 backend again — without one of them the content element is not offered, and
 existing records keep rendering.
 
@@ -82,7 +95,7 @@ offer the content element:
      base: 'https://example.com/'
      rootPageId: 1
     +dependencies:
-    +  - fgtclb/academic-persons-edit
+    +  - fgtclb/academic-contacts4pages
 
 See also `TYPO3 Explained, Using a site set as dependency in a site
 <https://docs.typo3.org/permalink/t3coreapi:site-sets-usage>`__.
@@ -120,9 +133,9 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
 
     *   -   Entry
         -   Delivers
-    *   -   :guilabel:`Academic Persons Edit: Profile editing (academic_persons_edit)`
-        -   The TypoScript of the :guilabel:`Profile editing` content element.
-    *   -   :guilabel:`Academic Persons Edit: All components (academic_persons_edit)`
+    *   -   :guilabel:`Academic Contacts4Pages: Contact list (academic_contacts4pages)`
+        -   The TypoScript of the :guilabel:`Contact list` content element.
+    *   -   :guilabel:`Academic Contacts4Pages: All components (academic_contacts4pages)`
         -   Every component this extension ships, in one entry.
 
 ..  _static-pagetsconfig:
@@ -138,10 +151,10 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
 
     *   -   Entry
         -   Delivers
-    *   -   :guilabel:`Academic Persons Edit: Profile editing (academic_persons_edit)`
-        -   Makes the :guilabel:`Profile editing` content element selectable,
-            and configures its entry in the new content element wizard.
-    *   -   :guilabel:`Academic Persons Edit: All components (academic_persons_edit)`
+    *   -   :guilabel:`Academic Contacts4Pages: Contact list (academic_contacts4pages)`
+        -   Makes the :guilabel:`Contact list` content element selectable, and
+            configures its entry in the new content element wizard.
+    *   -   :guilabel:`Academic Contacts4Pages: All components (academic_contacts4pages)`
         -   Every component this extension ships, in one entry.
 
 The setting is inherited by every page below the one it is set on.
@@ -156,14 +169,9 @@ static template reads the shipped files twice. The site set is applied before
 the :sql:`sys_template` record, so the second read happens after the site
 settings and after :file:`config/sites/<site>/constants.typoscript` — and it
 resets every constant the extension ships a default for back to that default.
+For this extension those are the three Fluid root paths of the plugin.
 
 Nothing else is damaged: the :guilabel:`Constants` and :guilabel:`Setup` fields
 of the :sql:`sys_template` record, the page TSconfig of a page and the page
 TSconfig files selected on a page are all applied afterwards and still win. Use
 one mechanism per site and the question does not arise.
-
-..  toctree::
-   :maxdepth: 5
-   :titlesonly:
-
-   General/Index

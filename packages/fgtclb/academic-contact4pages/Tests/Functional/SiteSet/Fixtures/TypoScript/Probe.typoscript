@@ -1,0 +1,33 @@
+# Renders what the extension contributed to the TypoScript of this site, and nothing
+# else. The constant is what "constants.typoscript" of the component assigns, the copied
+# value is what its "setup.typoscript" assigns - so a delivery mechanism that did not
+# reach this site renders an empty or a literal value here.
+page = PAGE
+page {
+  10 = TEXT
+  10.value = {$plugin.tx_academiccontacts4pages.view.templateRootPath}
+  10.wrap = <div id="constant">|</div>
+
+  20 = TEXT
+  20.value < plugin.tx_academiccontacts4pages.view.partialRootPaths.5
+  20.wrap = <div id="setup">|</div>
+
+  # The constant this extension does NOT declare: it belongs to "academic_persons"
+  # and reaches a site through the include_static_file.txt of this component. An
+  # unresolved constant renders as its own literal text rather than raising, so this
+  # is the only way to see it went missing.
+  #
+  # It is read here directly rather than through the setting below, because a
+  # component that was not delivered at all leaves that setting unset - and an unset
+  # value renders empty, which would satisfy an assertion on the absence of the
+  # literal just as well as a correct delivery does.
+  30 = TEXT
+  30.value = {$plugin.tx_academicpersons.detailPid}
+  30.wrap = <div id="foreign-constant">|</div>
+
+  # The setting the setup of this component builds from that constant. Rendered
+  # beside it so that a failure says which of the two went missing.
+  40 = TEXT
+  40.value < plugin.tx_academiccontacts4pages.settings.detailPid
+  40.wrap = <div id="foreign-constant-in-settings">|</div>
+}

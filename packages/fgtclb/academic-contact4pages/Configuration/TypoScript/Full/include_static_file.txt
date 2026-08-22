@@ -1,0 +1,1 @@
+EXT:academic_contacts4pages/Configuration/TypoScript/List

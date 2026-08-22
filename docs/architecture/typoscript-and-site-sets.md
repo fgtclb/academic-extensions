@@ -322,8 +322,8 @@ Breaking changelog entry, because every conversion moves paths that a site
 package may `@import`. On this branch it is a backport of the work done on
 `main`, and it runs in five slices.
 
-Converted so far: `academic-base`, `academic-bite-jobs` and `academic-persons`.
-Still on the old shape: `academic-contact4pages`, `academic-persons-edit`,
+Converted so far: `academic-base`, `academic-bite-jobs`, `academic-persons`,
+`academic-contact4pages` and `academic-persons-edit`. Still on the old shape:
 `academic-jobs`, `academic-study-plan`, `academic-partners`,
 `academic-programs` and `academic-projects`. The remaining two,
 `academic-persons-sync` and `typo3-category-types`, ship neither a

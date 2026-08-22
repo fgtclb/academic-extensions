@@ -1,0 +1,30 @@
+plugin.tx_academiccontacts4pages {
+  settings {
+    detailPid = {$plugin.tx_academicpersons.detailPid}
+  }
+  view {
+    templateRootPaths {
+      10 = {$plugin.tx_academiccontacts4pages.view.templateRootPath}
+    }
+
+    partialRootPaths {
+      5 = EXT:academic_persons/Resources/Private/Partials/
+      10 = {$plugin.tx_academiccontacts4pages.view.partialRootPath}
+    }
+
+    layoutRootPaths {
+      10 = {$plugin.tx_academiccontacts4pages.view.layoutRootPath}
+    }
+  }
+}
+
+# The data processor that assigns the contacts of the current page to the page template.
+# It belongs to this component because it reads the same records and renders them through
+# the same partials as the content element does.
+page {
+  10 {
+    dataProcessing {
+      400 = FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor
+    }
+  }
+}

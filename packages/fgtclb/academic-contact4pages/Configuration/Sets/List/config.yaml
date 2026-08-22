@@ -1,0 +1,29 @@
+# The contact list content element.
+#
+# "typoscript" points at the folder that "Configuration/TCA/Overrides/sys_template.php"
+# registers as a static template, and "pagets" at the file that
+# "Configuration/TCA/Overrides/pages.php" registers - there is exactly one
+# physical copy of each, so the two delivery mechanisms can never drift apart.
+#
+# Site sets arrived in TYPO3 v13.1 and are inert on TYPO3 v12: this file is
+# never read there, and the static registration is the only delivery path.
+name: fgtclb/academic-contacts4pages-list
+label: 'Academic Contacts4Pages: Contact list'
+dependencies:
+  - fgtclb/academic-base-ctype-group
+#
+# That folder's "include_static_file.txt" names the TypoScript of
+# "academic_persons". The setup of this component reads
+# "{$plugin.tx_academicpersons.detailPid}", a constant of that extension, and
+# this is what makes it resolve - on BOTH mechanisms, because
+# "SysTemplateTreeBuilder::handleSetInclude()" reads "include_static_file.txt"
+# out of the folder this key names, exactly as the static template path does.
+# Measured, not assumed: removing the entry turns the static half of
+# "SiteSet\StaticDeliveryTest" red, and a set dependency on "academic_persons"
+# does not deliver the constant on either path.
+#
+# There is deliberately no dependency on an "academic_persons" set. It would not
+# carry the constant, and it would make that extension's content element
+# selectable wherever this one is enabled.
+typoscript: 'EXT:academic_contacts4pages/Configuration/TypoScript/List/'
+pagets: 'EXT:academic_contacts4pages/Configuration/TSconfig/List/page.tsconfig'

@@ -94,7 +94,7 @@ pages:
         # Deliberately the "Default" static of EXT:academic_persons and not
         # its "Standalone" one: standalone defines its own "page" object and
         # would replace the theme.
-        include_static_file: 'EXT:bootstrap_package/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Default,EXT:academic_persons_edit/Configuration/TypoScript,EXT:academic_programs/Configuration/TypoScript/,EXT:academic_partners/Configuration/TypoScript/'
+        include_static_file: 'EXT:bootstrap_package/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Default,EXT:academic_persons_edit/Configuration/TypoScript/Full,EXT:academic_programs/Configuration/TypoScript/,EXT:academic_partners/Configuration/TypoScript/'
         # What a development instance has to correct, and nothing else. These
         # are constants of the includes above, not site settings: a site's
         # "settings.yaml" is inserted at the position the record clears, which
