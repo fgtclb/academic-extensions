@@ -62,9 +62,9 @@ in and out of `sqlite-databases/` with `ddev composer sqlite:backup` and
 `sqlite:apply`, and `ddev composer instance:fresh` drops the database and stops
 the automatic seeding so an instance can be rebuilt from nothing.
 
-What those templates contain is not clicked together but described, in
-`packages-dev/dev-site/Configuration/Seeds/Instance.yaml`, and
-`ddev composer instance:seed` writes it into an empty instance — that is how a
+What those templates contain is not clicked together but described, in the seed
+set `packages-dev/dev-site/Configuration/DataFactory/academics-instance/`, and
+`ddev composer instance:seed` imports it into an empty instance — that is how a
 template is refreshed once it has gone stale.
 
 → [`README.md`](README.md#development-instances) ·

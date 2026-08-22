@@ -77,7 +77,7 @@ at the end of a rebuild, so what stays is the hash committed in the repository.
 
 ### Frontend
 
-The seed creates one frontend user, and it exists for a reason: **`EXT:academic_persons_edit`
+The seed set creates one frontend user, and it exists for a reason: **`EXT:academic_persons_edit`
 cannot be looked at without it.** Its controller refuses every action when no
 frontend user is logged in, and it finds the profile to edit through the
 `frontend_users` relation of the profile record rather than through a storage
@@ -114,9 +114,9 @@ empty state for it.
 
 ## What the instances contain
 
-The page tree is written from
-`packages-dev/dev-site/Configuration/Seeds/Instance.yaml` — one section per
-extension, one page per plugin:
+The page tree is written from the seed set
+`packages-dev/dev-site/Configuration/DataFactory/academics-instance/` — one
+section per extension, one page per plugin:
 
 | Page                    | What is on it                                                                                                                                                                               |
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -129,7 +129,7 @@ extension, one page per plugin:
 | `/data-partners`        | storage folder: partner roles                                                                                                                                                               |
 | `/academic-partners/*`  | the four plugins of `EXT:academic_partners`, and two partner pages (`doktype: 40`)                                                                                                          |
 
-Changing that content is a change to the definition, not a click path — see
+Changing that content is a change to the seed set, not a click path — see
 [Seeding an instance](environment.md#seeding-an-instance).
 
 ## Database backup and restore

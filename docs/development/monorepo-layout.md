@@ -107,10 +107,11 @@ Both are themed with `bk2k/bootstrap-package` and each serves exactly one site,
 identifier `academics`, `rootPageId: 1` and `base: /`
 (`core-13/config/sites/academics/config.yaml`,
 `core-14/config/sites/academics/config.yaml`). The page tree behind that root
-page is not clicked together but described, in
-`packages-dev/dev-site/Configuration/Seeds/Instance.yaml`, and written into an
-empty instance with `ddev composer instance:seed`. Both instances use the same
-seed, so a page tree found in one is the page tree of the other.
+page is not clicked together but described, in the seed set
+`packages-dev/dev-site/Configuration/DataFactory/academics-instance/`, and
+written into an empty instance with `ddev composer instance:seed`. Both
+instances use the same set, so a page tree found in one is the page tree of the
+other.
 
 Their `config/` and `composer.lock` are tracked; `public/`, `var/`, `vendor/`
 and `config/system/additional/*.php` are not (`.gitignore`). They consume the
@@ -270,13 +271,11 @@ development instances require in turn (`composer.json:14`,
 `core-13/composer.json:16`, `core-14/composer.json:16`).
 
 The instances require two packages on top of it:
-`fgtclb/academics-monorepo-dev-site` for the seed definitions
+`fgtclb/academics-monorepo-dev-site` for the seed set
 (`core-13/composer.json:15`, `core-14/composer.json:15`), which the root does
-not require at all, and `sbuerk/theme-extension-development` for the
-`theme:seed` command that applies them (`core-13/composer.json:18`,
-`core-14/composer.json:18`; the root carries it as a dev dependency,
-`composer.json:66`). The latter is required for its seeder only — its theme is
-not used.
+not require at all, and `sbuerk/data-factory` for the `data-factory:import`
+command that applies it (`core-13/composer.json:17`, `core-14/composer.json:17`;
+the root carries it as a dev dependency, `composer.json:65`).
 
 Its point is that the TYPO3 core constraint appears once per system extension
 rather than once per consuming package. Every `typo3/cms-*` entry in
@@ -316,19 +315,19 @@ test code. The package is development-only and is never part of a release.
 
 `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`,
 holds the description of what a development instance contains: the page tree,
-the content elements and the records, in
-`packages-dev/dev-site/Configuration/Seeds/Instance.yaml`. Both instances
-require it and write it in with `ddev composer instance:seed`.
+the content elements and the records, in the seed set
+`packages-dev/dev-site/Configuration/DataFactory/academics-instance/`. Both
+instances require it and write it in with `ddev composer instance:seed`.
 
 It is the only package below `packages-dev/` with type `typo3-cms-extension`
-rather than `library`, and the extension key is the whole reason: a seed is
-addressed as `EXT:academics_dev_site/Configuration/Seeds/Instance.yaml`, which
-is the one path form that resolves the same inside DDEV and on a host stack. A
-`library` is not an installed extension, so `EXT:` could not reach it.
+rather than `library`, and the extension key is the whole reason: seed sets are
+discovered in the `Configuration/DataFactory/` of the **active packages** of an
+installation, and a `library` is not an installed extension, so nothing would
+ever find it.
 
 Everything else about it is deliberately minimal. It carries no PHP and no
-`Classes/` — only the seed, a `composer.json`, a `VERSION` file, a `LICENSE` and
-a `README.md`. Like its two siblings it has no `ext_emconf.php`: it is never
+`Classes/` — only the seed set, a `composer.json`, a `VERSION` file, a `LICENSE`
+and a `README.md`. Like its two siblings it has no `ext_emconf.php`: it is never
 released, never split out to a read-only repository and never published to the
 TER, so `bin/set-version` needs no special case for it. It is versioned along
 with everything else for one reason only — it is a path package, so its version

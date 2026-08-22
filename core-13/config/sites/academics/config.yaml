@@ -1,7 +1,7 @@
 # Site of the seeded page tree.
 #
 # "rootPageId" is 1 because the seed definition declares that uid - see
-# "packages-dev/dev-site/Configuration/Seeds/Instance.yaml". Declaring uids is
+# "packages-dev/dev-site/Configuration/DataFactory/academics-instance/". Declaring uids is
 # the whole reason a seed may do so: without it this file could not be
 # committed, because the root page would get whatever the database assigned.
 #
