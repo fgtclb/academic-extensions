@@ -1,0 +1,4 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title","tsconfig_includes"
+,1,0,1,0,0,0,0,0,"/","Site Root",""
+,2,1,1,0,0,0,0,0,"/jobs","Jobs","EXT:academic_bite_jobs/Configuration/TSconfig/List/page.tsconfig"
