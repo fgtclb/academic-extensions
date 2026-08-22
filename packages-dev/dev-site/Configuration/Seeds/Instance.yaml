@@ -94,7 +94,22 @@ pages:
         # Deliberately the "Default" static of EXT:academic_persons and not
         # its "Standalone" one: standalone defines its own "page" object and
         # would replace the theme.
-        include_static_file: 'EXT:bootstrap_package/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Default,EXT:academic_persons_edit/Configuration/TypoScript/Full,EXT:academic_programs/Configuration/TypoScript/,EXT:academic_partners/Configuration/TypoScript/'
+        #
+        # EXT:academic_programs and EXT:academic_partners are included through
+        # their "Full" aggregate rather than through their plain
+        # "Configuration/TypoScript" folder. That folder still exists and still
+        # carries the shared plugin block, but since the configuration of those
+        # two was cut per component it no longer carries the
+        # "styles.content.getContent" override - and the page templates of their
+        # page types (doktypes 20 and 40, both seeded below) render exactly that
+        # path with "f:cObject", which throws when it is undefined. The aggregate
+        # delivers the same shared block plus that override, so the instance
+        # renders what it rendered before.
+        #
+        # EXT:academic_persons_edit is included through its "Full" aggregate for
+        # a plainer reason: its plain folder no longer holds a
+        # "constants.typoscript" or a "setup.typoscript" at all.
+        include_static_file: 'EXT:bootstrap_package/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Default,EXT:academic_persons_edit/Configuration/TypoScript/Full,EXT:academic_programs/Configuration/TypoScript/Full,EXT:academic_partners/Configuration/TypoScript/Full'
         # What a development instance has to correct, and nothing else. These
         # are constants of the includes above, not site settings: a site's
         # "settings.yaml" is inserted at the position the record clears, which

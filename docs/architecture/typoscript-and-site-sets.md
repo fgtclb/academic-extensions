@@ -322,12 +322,13 @@ Breaking changelog entry, because every conversion moves paths that a site
 package may `@import`. On this branch it is a backport of the work done on
 `main`, and it runs in five slices.
 
-Converted so far: `academic-base`, `academic-bite-jobs`, `academic-persons`,
-`academic-contact4pages`, `academic-persons-edit`, `academic-jobs` and
-`academic-study-plan`. Still on the old shape: `academic-partners`,
-`academic-programs` and `academic-projects`. The remaining two,
-`academic-persons-sync` and `typo3-category-types`, ship neither a
-`Configuration/TypoScript/` nor a `Configuration/Sets/` and have nothing to
+All ten extensions that have configuration to convert now follow this layout:
+`academic-base`, `academic-bite-jobs`, `academic-persons`,
+`academic-contact4pages`, `academic-persons-edit`, `academic-jobs`,
+`academic-study-plan`, `academic-partners`, `academic-programs` and
+`academic-projects`. The remaining two, `academic-persons-sync` and
+`typo3-category-types`, ship neither a `Configuration/TypoScript/` nor a
+`Configuration/Sets/` and have nothing to
 convert.
 
 Each slice also renames the page TSconfig directory of the extensions it

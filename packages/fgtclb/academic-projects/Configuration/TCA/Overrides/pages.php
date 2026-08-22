@@ -179,4 +179,32 @@ if (!defined('TYPO3')) {
         ]),
         [PageTypes::TYPE_ACEDEMIC_PROJECT]
     );
+
+    //==================================================================================================================
+    // Page TSconfig, selectable in the page field "Page TSconfig" for installations that do not use site sets.
+    //
+    // The files are the same ones the sets of this extension deliver. Use one mechanism per site, not both. On TYPO3
+    // v12 this is the only mechanism there is - site sets arrived in TYPO3 v13.1.
+    //
+    // The page type registered above and its backend layout are deliberately NOT part of this: they are stored on page
+    // records, so they have to resolve on every installation. The page type is registered in TCA and the backend layout
+    // is imported by the always included "Configuration/page.tsconfig".
+    //==================================================================================================================
+    ExtensionManagementUtility::registerPageTSConfigFile(
+        'academic_projects',
+        'Configuration/TSconfig/ProjectList/page.tsconfig',
+        'Academic Projects: Projects',
+    );
+
+    ExtensionManagementUtility::registerPageTSConfigFile(
+        'academic_projects',
+        'Configuration/TSconfig/ProjectListSingle/page.tsconfig',
+        'Academic Projects: Projects (selected)',
+    );
+
+    ExtensionManagementUtility::registerPageTSConfigFile(
+        'academic_projects',
+        'Configuration/TSconfig/Full/page.tsconfig',
+        'Academic Projects: All components',
+    );
 })();
