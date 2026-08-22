@@ -242,21 +242,20 @@ one line — `academic-base` ships no TypoScript and no content element, and its
 that. Omitting the section instead is what makes a shared cross-reference
 impossible.
 
-## What is not converted yet
+## What is converted
 
+All ten extensions that have configuration to convert follow this layout:
 `academic-base`, `academic-bite-jobs`, `academic-persons`,
-`academic-contact4pages`, `academic-persons-edit`, `academic-jobs` and
-`academic-study-plan` follow this layout. Three extensions still ship a single
-`Configuration/TypoScript/` folder, a set whose `setup.typoscript` is a one-line
-`@import` of it, no page TSconfig registration and no hide-by-default:
-`academic-partners`, `academic-programs` and `academic-projects`. The
-remaining two, `academic-persons-sync` and `typo3-category-types`, ship neither
-a `Configuration/TypoScript/` nor a `Configuration/Sets/` and have nothing to
-convert.
+`academic-contact4pages`, `academic-persons-edit`, `academic-jobs`,
+`academic-study-plan`, `academic-partners`, `academic-programs` and
+`academic-projects`. The remaining two, `academic-persons-sync` and
+`typo3-category-types`, ship neither a `Configuration/TypoScript/` nor a
+`Configuration/Sets/` and have nothing to convert.
 
-Converting the rest is tracked as ACE-458 and happens per extension, each with
-its own Breaking changelog entry, because every conversion moves paths that a
-site package may `@import`.
+It was done as ACE-458, per extension, each with its own Breaking changelog
+entry, because every conversion moves paths that a site package may `@import`.
+A new extension follows the layout from the start; `academic-bite-jobs` is the
+smallest complete example to copy.
 
 `academic-persons` is the one extension where six content elements share a
 single `plugin.tx_academicpersons` block. It keeps that block in
@@ -265,6 +264,14 @@ single `plugin.tx_academicpersons` block. It keeps that block in
 integrator chapter. The folder deliberately keeps the name `Default`: it is the
 value stored in existing `sys_template` records and the path several functional
 tests load directly.
+
+The three extensions with a page type of their own — `academic-partners`,
+`academic-programs` and `academic-projects` — draw one extra line the others do
+not need. A page doktype and a backend layout identifier are values persisted on
+`pages` records, so they stay registered installation-wide (TCA and the
+auto-loaded `Configuration/page.tsconfig`) and never move behind a component
+set; only the content element visibility does. Each of the three carries a
+`Tests/Functional/SiteSet/InstallationWideRegistrationTest.php` that pins it.
 
 ## See also
 

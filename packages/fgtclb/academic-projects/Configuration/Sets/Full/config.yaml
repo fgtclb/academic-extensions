@@ -1,0 +1,14 @@
+# Aggregate set: everything this extension ships, in one dependency.
+#
+# It carries no TypoScript and no page TSconfig of its own - each component is
+# delivered by the set that owns it, and listing a payload here would parse the
+# same files a second time.
+#
+# The name is the one this extension published before the configuration was cut
+# per component, so a site configuration that depends on it needs no change.
+name: fgtclb/academic-projects
+label: Academic Projects
+dependencies:
+  - fgtclb/academic-projects-project-list
+  - fgtclb/academic-projects-project-list-single
+  - fgtclb/academic-projects-content-load
