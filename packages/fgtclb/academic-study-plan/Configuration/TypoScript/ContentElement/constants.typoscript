@@ -1,0 +1,15 @@
+# The constants of the study plan content element.
+#
+# The three Fluid root paths below were assigned in "setup.typoscript" directly
+# until version 2.4. They are constants now, so an installation can point the
+# content element at its own templates without overriding the whole object.
+plugin.tx_academicstudyplan {
+    view {
+        # cat=plugin.tx_academicstudyplan/file; type=string; label=Path to template root (FE)
+        templateRootPath = EXT:academic_study_plan/Resources/Private/Frontend/Default/Templates/
+        # cat=plugin.tx_academicstudyplan/file; type=string; label=Path to template partials (FE)
+        partialRootPath = EXT:academic_study_plan/Resources/Private/Frontend/Default/Partials/
+        # cat=plugin.tx_academicstudyplan/file; type=string; label=Path to template layouts (FE)
+        layoutRootPath = EXT:academic_study_plan/Resources/Private/Frontend/Default/Layouts/
+    }
+}

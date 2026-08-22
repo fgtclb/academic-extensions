@@ -78,6 +78,50 @@ component keeps its own folder and its own set like any other, and the global
 `Configuration/page.tsconfig` imports it in addition to hiding what is opt-in.
 That is the only reason that file ever holds an `@import`.
 
+### When several content elements share one TypoScript block
+
+The layout above assumes each component owns its own `constants.typoscript` and
+`setup.typoscript`. Two extensions do not work that way: `academic-persons`
+delivers six content elements and `academic-jobs` three, all of them configured
+by a single `plugin.tx_<key>` block. Splitting such a block per component would
+duplicate the same settings; delivering it from every component set would parse
+it once per enabled component.
+
+Neither is necessary. The shared block stays in one folder, and each component
+folder holds nothing but a one-line `include_static_file.txt` naming it:
+
+```text
+Configuration/
+  TypoScript/
+    <shared>/                        # the one plugin.tx_<key> block
+      constants.typoscript
+      setup.typoscript
+    <Component>/
+      include_static_file.txt        # -> EXT:<key>/Configuration/TypoScript/<shared>
+```
+
+This needs no special case in either mechanism.
+`SysTemplateTreeBuilder::handleSetInclude()` reads `include_static_file.txt` out
+of the folder a set's `typoscript:` key names, exactly as the static template
+path does, so the shared block reaches a component whether it arrived through a
+site set or through a `sys_template` record — and it exists exactly once on
+disk.
+
+**The shared folder keeps whatever name it already had.** It is the value
+stored in existing `sys_template` records and often the path functional tests
+load directly, so renaming it costs a migration and buys nothing. The two
+extensions therefore differ, and deliberately: `academic-persons` keeps
+`TypoScript/Default/`, `academic-jobs` keeps the TypoScript root itself, with
+its component folders as subfolders of it. Read what `addStaticFile()`
+registers today before choosing.
+
+The same mechanism serves a component that needs another *extension's*
+TypoScript. `academic-contact4pages` reads a constant of `academic-persons`, and
+names that extension's folder in its own `include_static_file.txt` rather than
+depending on one of its sets — a set dependency delivers the constant on
+neither path, and would make the other extension's content element selectable
+as a side effect.
+
 Three details that are easy to get wrong:
 
 | Detail                                                        | Why                                                                                                                                                    |
@@ -201,14 +245,13 @@ impossible.
 ## What is not converted yet
 
 `academic-base`, `academic-bite-jobs`, `academic-persons`,
-`academic-contact4pages` and `academic-persons-edit` follow this layout. Five
-extensions still ship a single `Configuration/TypoScript/` folder, a set whose
-`setup.typoscript` is a one-line `@import` of it, and — with the single
-exception of `academic-study-plan` — no page TSconfig registration and no
-hide-by-default: `academic-jobs`, `academic-partners`, `academic-programs`,
-`academic-projects` and `academic-study-plan`. The remaining two,
-`academic-persons-sync` and `typo3-category-types`, ship neither a
-`Configuration/TypoScript/` nor a `Configuration/Sets/` and have nothing to
+`academic-contact4pages`, `academic-persons-edit`, `academic-jobs` and
+`academic-study-plan` follow this layout. Three extensions still ship a single
+`Configuration/TypoScript/` folder, a set whose `setup.typoscript` is a one-line
+`@import` of it, no page TSconfig registration and no hide-by-default:
+`academic-partners`, `academic-programs` and `academic-projects`. The
+remaining two, `academic-persons-sync` and `typo3-category-types`, ship neither
+a `Configuration/TypoScript/` nor a `Configuration/Sets/` and have nothing to
 convert.
 
 Converting the rest is tracked as ACE-458 and happens per extension, each with
