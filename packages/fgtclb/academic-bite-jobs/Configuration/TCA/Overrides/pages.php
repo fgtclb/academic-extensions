@@ -9,20 +9,19 @@ defined('TYPO3') || die();
 (static function (): void {
 
     //==================================================================================================================
-    // Static TypoScript templates, selectable in a "sys_template" record for installations that do not use site sets.
+    // Page TSconfig, selectable in the page field "Page TSconfig" for installations that do not use site sets.
     //
-    // The registered folders are the same ones the sets of this extension deliver through their "typoscript" key.
-    // Use one mechanism per site, not both - see the extension documentation, chapter "Configuration".
+    // The files are the same ones the sets of this extension deliver. Use one mechanism per site, not both.
     //==================================================================================================================
-    ExtensionManagementUtility::addStaticFile(
+    ExtensionManagementUtility::registerPageTSConfigFile(
         'academic_bite_jobs',
-        'Configuration/TypoScript/List',
+        'Configuration/TSconfig/List/page.tsconfig',
         'Academic Bite Jobs: Job list',
     );
 
-    ExtensionManagementUtility::addStaticFile(
+    ExtensionManagementUtility::registerPageTSConfigFile(
         'academic_bite_jobs',
-        'Configuration/TypoScript/Full',
+        'Configuration/TSconfig/Full/page.tsconfig',
         'Academic Bite Jobs: All components',
     );
 

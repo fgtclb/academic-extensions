@@ -50,6 +50,10 @@ extensions.
         Install :guilabel:`academic_base` via Composer, the Extension
         Manager or a TER upload.
 
+    ..  card:: :ref:`Configuration <configuration>`
+
+        Configure the extension and its site sets for your installation.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -66,6 +70,7 @@ extensions.
 
     Introduction/Index
     Installation/Index
+    Configuration/Index
     KnownProblems/Index
     Changelog/Changelog-3
     Changelog/Changelog-2

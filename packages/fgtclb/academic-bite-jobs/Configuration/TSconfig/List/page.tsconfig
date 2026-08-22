@@ -1,0 +1,24 @@
+# Page TSconfig of the job list content element.
+#
+# Delivered by the set "fgtclb/academic-bite-jobs-list" and registered for the
+# page field "Page TSconfig" by "Configuration/TCA/Overrides/pages.php" - one
+# physical copy, two ways to it.
+#
+# The content element is hidden for the whole installation by
+# "Configuration/page.tsconfig"; this file is what makes it selectable again,
+# so it applies where the component is actually wanted instead of everywhere.
+TCEFORM.tt_content.CType.removeItems := removeFromList(academicbitejobs_list)
+
+mod.wizards.newContentElement.wizardItems.academic {
+  elements {
+    academicbitejobs_list {
+      iconIdentifier = bitejobs_list
+      title = LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label
+      tt_content_defValues {
+        CType = academicbitejobs_list
+      }
+    }
+  }
+
+  show := addToList(academicbitejobs_list)
+}

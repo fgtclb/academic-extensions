@@ -52,11 +52,11 @@ final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestC
             typoScriptFiles: [
                 'constants' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
-                    'EXT:academic_bite_jobs/Configuration/TypoScript/constants.typoscript',
+                    'EXT:academic_bite_jobs/Configuration/TypoScript/List/constants.typoscript',
                 ],
                 'setup' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
-                    'EXT:academic_bite_jobs/Configuration/TypoScript/setup.typoscript',
+                    'EXT:academic_bite_jobs/Configuration/TypoScript/List/setup.typoscript',
                     'EXT:academic_bite_jobs/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/Rendering.typoscript',
                 ],
             ],
