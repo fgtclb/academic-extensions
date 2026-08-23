@@ -41,6 +41,22 @@ pages:
     # Subpages inherit the content layout unless they say otherwise, so a new
     # page added by hand later renders like the rest.
     backend_layout_next_level: 'pagets__default'
+    # Since ACE-458 every academic extension hides its own content elements for
+    # the whole installation and re-enables them per component, through the page
+    # TSconfig of the component that owns them. Site sets are the other way to
+    # that file and are not available here: they arrived in TYPO3 v13.1 and this
+    # branch also supports v12. So a development instance names the aggregate of
+    # every extension in this field, and an editor is offered everything.
+    #
+    # Comma separated, like "include_static_file" above and for the same reason:
+    # core reads it with "GeneralUtility::trimExplode(',', ...)". An entry that
+    # does not resolve contributes nothing, silently.
+    #
+    # The entry of EXT:academic_base is redundant - its group header is shipped
+    # by an auto-loaded "Configuration/page.tsconfig" on every installation -
+    # and it is listed anyway, so that this field reads as "every extension"
+    # rather than "every extension except one, for a reason you have to know".
+    tsconfig_includes: 'EXT:academic_base/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_bite_jobs/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_contacts4pages/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_jobs/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_partners/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_persons/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_persons_edit/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_programs/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_projects/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_study_plan/Configuration/TSconfig/Full/page.tsconfig'
     content:
       - identifier: home-heading
         CType: header
@@ -70,9 +86,10 @@ pages:
       # available: they arrived in TYPO3 v13.1 (Feature: #103437) and this
       # branch also supports v12, where "config/sites/*/config.yaml" has no
       # "dependencies" key and a site provides no TypoScript at all. A root
-      # "sys_template" record works unchanged on both versions, and every set
-      # the academic extensions ship is a plain "@import" of exactly the files
-      # included below - so nothing is lost by taking the older road here.
+      # "sys_template" record works unchanged on both versions, and since
+      # ACE-458 each component set points its "typoscript" key at exactly the
+      # folder the static template below registers - one physical copy, two ways
+      # to it - so nothing is lost by taking the older road here.
       #
       # "root" makes it the root template of the site, "clear = 3" clears both
       # constants and setup of anything above it, which is also what pulls in
