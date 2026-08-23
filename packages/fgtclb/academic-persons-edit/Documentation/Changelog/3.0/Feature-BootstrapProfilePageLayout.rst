@@ -40,10 +40,14 @@ required.
 
 Gender has no delete, cancel or save buttons. Changing the select persists its
 new value immediately. The restored small :guilabel:`Edit all` button sits
-beside the personal-data heading and opens both single fields and grouped rows.
-The compact :guilabel:`Private` switch sits immediately left of that button in
-its own, valid sibling form. A successful name update also refreshes the main
-heading without a page reload.
+beside the personal-data heading and toggles both single fields and grouped
+rows. While active it uses Bootstrap's active state and reads
+:guilabel:`Close all`; activating it again collapses all editors while keeping
+unsaved browser-side drafts. The former global footer save/cancel area was
+removed, so persistence stays explicit on each field. The compact
+:guilabel:`Private` switch sits immediately left of the toggle in its own,
+valid sibling form. A successful name update also refreshes the main heading
+without a page reload.
 
 The image itself is now passive. A small pencil button overlays its upper-right
 corner and opens the unchanged image modal. Image upload, deletion, validation,

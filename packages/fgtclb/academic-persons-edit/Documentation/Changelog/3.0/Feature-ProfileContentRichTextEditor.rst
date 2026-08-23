@@ -33,7 +33,8 @@ request. Cancel (``data-ie-cancel``) restores the last persisted value and
 closes the field. Save (``data-ie-save``) uses the existing JSON AJAX endpoint.
 Bootstrap alignment and sizing utilities keep this action group from stretching
 to the CKEditor height; no additional stylesheet or inline style is introduced.
-Bulk cancellation remains available through ``data-ie-cancel-all``.
+The header's :guilabel:`Edit all`/:guilabel:`Close all` toggle controls all
+editors without a global footer save or cancel action.
 
 Impact
 ======

@@ -20,9 +20,7 @@
     </f:if>
 
     <div class="{columnClass}">
-        <div
-            class="rounded-1 p-3 p-lg-4 {rowClass}"
-            data-ie-field-wrapper>
+        <div class="rounded-1 p-3 p-lg-4 {rowClass}" data-ie-field-wrapper>
             <f:render
                 partial="InlineProfile/Field/Preview"
                 arguments="{
@@ -55,7 +53,8 @@
                         <abbr title="required">*</abbr>
                     </f:if>
                 </label>
-                <div class="d-flex flex-column flex-xl-row gap-2 align-items-start">
+                <div
+                    class="d-flex flex-column flex-xl-row gap-2 align-items-start">
                     <f:render
                         partial="InlineProfile/Field/Control"
                         arguments="{

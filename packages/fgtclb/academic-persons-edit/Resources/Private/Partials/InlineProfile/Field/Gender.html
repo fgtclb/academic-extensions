@@ -6,13 +6,9 @@
     <f:variable name="genderValidation"
         ><p:validationEnsure validations="{validations}" identifier="gender"
     /></f:variable>
-    <f:variable
-        name="elementId"
-        value="inline-profile-{profile.uid}-gender" />
+    <f:variable name="elementId" value="inline-profile-{profile.uid}-gender" />
     <div class="{columnClass}">
-        <div
-            class="rounded-1 p-3 p-lg-4 {rowClass}"
-            data-ie-field-wrapper>
+        <div class="rounded-1 p-3 p-lg-4 {rowClass}" data-ie-field-wrapper>
             <f:render
                 partial="InlineProfile/Field/Preview"
                 arguments="{

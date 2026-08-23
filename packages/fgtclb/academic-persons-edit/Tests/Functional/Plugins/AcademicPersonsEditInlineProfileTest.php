@@ -276,6 +276,48 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
     }
 
     #[Test]
+    public function editAllTogglesAllEditorsWithoutGlobalFooterActions(): void
+    {
+        $module = file_get_contents(__DIR__ . '/../../../Resources/Public/JavaScript/frontend/profile.js');
+        $header = $this->getInlineProfilePartial('Header');
+        $profileForm = $this->getInlineProfilePartial('Forms/Profile');
+        $actions = $this->getInlineProfilePartial('Field/Actions');
+        $fluidSources = $this->getInlineProfileFluidSources();
+
+        $this->assertIsString($module);
+        $this->assertFileDoesNotExist(
+            __DIR__ . '/../../../Resources/Private/Partials/InlineProfile/Forms/FooterActions.html',
+        );
+        $this->assertStringContainsString(
+            'class="btn-group btn-group-sm d-none flex-shrink-0 align-self-end"',
+            $actions,
+        );
+        $this->assertStringContainsString('data-ie-edit-all-label="{f:translate(', $header);
+        $this->assertStringContainsString('data-ie-close-all-label="{f:translate(', $header);
+        $this->assertStringContainsString('key: \'inlineProfile.btnCloseAll\'', $header);
+        $this->assertStringContainsString('data-ie-edit-all-button-label', $header);
+        $this->assertStringContainsString('aria-pressed="false"', $header);
+        $this->assertStringNotContainsString('InlineProfile/Forms/FooterActions', $profileForm);
+        $this->assertStringNotContainsString('data-ie-footer-button-area', $fluidSources);
+        $this->assertStringNotContainsString('data-ie-cancel-all', $fluidSources);
+        $this->assertStringContainsString('const setEditAllButtonState = (root, active) => {', $module);
+        $this->assertStringContainsString('button.classList.toggle("active", active);', $module);
+        $this->assertStringContainsString(
+            'button.setAttribute("aria-pressed", String(active));',
+            $module,
+        );
+        $this->assertStringContainsString('editAllActive = !editAllActive;', $module);
+        $this->assertStringContainsString('closeFields(root, fields);', $module);
+        $this->assertStringContainsString(
+            'form.addEventListener("submit", (event) => event.preventDefault());',
+            $module,
+        );
+        $this->assertStringNotContainsString('footerButtonAreaSelector', $module);
+        $this->assertStringNotContainsString('[data-ie-cancel-all]', $module);
+        $this->assertStringNotContainsString('savesAllFields', $module);
+    }
+
+    #[Test]
     public function frontendModuleSupportsPreservedGridAndScopedComponentUi(): void
     {
         $module = file_get_contents(__DIR__ . '/../../../Resources/Public/JavaScript/frontend/profile.js');
@@ -308,7 +350,8 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         $this->assertStringNotContainsString('nextElementSibling', $module);
         $this->assertSame(2, substr_count($fluidSources, 'data-ie-fields-form'));
         $this->assertStringContainsString('data-ie-content-fields-form', $fluidSources);
-        $this->assertStringContainsString('data-ie-cancel-all', $fluidSources);
+        $this->assertStringNotContainsString('data-ie-cancel-all', $fluidSources);
+        $this->assertStringNotContainsString('InlineProfile/Forms/FooterActions', $fluidSources);
         $this->assertStringContainsString('partial="InlineProfile/Image/Modal"', $template);
         $this->assertStringContainsString('partial="InlineProfile/Forms/Profile"', $template);
         $this->assertStringContainsString('partial="InlineProfile/Forms/Content"', $template);
@@ -357,6 +400,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
         $this->assertStringContainsString('<f:form.textfield', $control);
         $this->assertStringContainsString('data-ie-rich-text-preview', $preview);
         $this->assertStringContainsString('flex-shrink-0', $actions);
+        $this->assertStringContainsString('align-self-end', $actions);
         $this->assertStringNotContainsString('position-absolute', $preview);
         $this->assertStringNotContainsString('style=', $field . $preview . $control . $actions);
     }
@@ -597,6 +641,8 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
     public function inlineEditorLabelsAreShippedInBothLanguages(): void
     {
         $expectedEnglish = [
+            'inlineProfile.btnEditAll' => 'Edit all',
+            'inlineProfile.btnCloseAll' => 'Close all',
             'inlineProfile.image.modal.title' => 'Edit profile image',
             'inlineProfile.image.modal.open' => 'Edit profile image',
             'inlineProfile.image.modal.close' => 'Close image modal',
@@ -638,5 +684,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractProfileEditingP
             $this->assertArrayHasKey($key, $germanTranslations, sprintf('No German translation for "%s".', $key));
             $this->assertNotSame('', $germanTranslations[$key]);
         }
+        $this->assertSame('Alle bearbeiten', $germanTranslations['inlineProfile.btnEditAll']);
+        $this->assertSame('Alle schließen', $germanTranslations['inlineProfile.btnCloseAll']);
     }
 }

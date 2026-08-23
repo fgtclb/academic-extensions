@@ -62,10 +62,10 @@ The template is intentionally a composition root. The main partial groups are:
           overlay, file selection, modal preview and image actions.
     *   - ``Settings/Sync.html``
         - Independently persisted synchronization switch immediately left of
-          the bulk edit button.
+          the edit-all toggle.
     *   - ``Forms/*``
-        - Personal-data and about-section form boundaries plus the retained
-          bulk footer actions.
+        - Personal-data and about-section form boundaries. Persistence actions
+          live beside their respective fields.
     *   - ``Sections/*``
         - Personal, link and rich-text field composition in display order.
     *   - ``Field.html``, ``Field/Group.html`` and ``Field/*``
@@ -243,12 +243,13 @@ exception and saves immediately when its select value changes.
     there is no changed value to persist.
 
 The action group uses Bootstrap utility classes to remain content-sized and
-aligned to the start of the editor instead of stretching to the CKEditor
-height. No additional stylesheet or inline style is required. The bulk
-:guilabel:`Edit all` button beside the personal-data heading opens both regular
-fields and grouped rows. The bulk :guilabel:`Cancel` button has the separate
-``data-ie-cancel-all`` hook; it restores all last successfully persisted values
-and closes the editors.
+align itself to the end of the editor row instead of stretching to the
+CKEditor height. No additional stylesheet or inline style is required. The
+:guilabel:`Edit all` toggle beside the personal-data heading opens both regular
+fields and grouped rows, receives Bootstrap's ``active`` state and changes its
+label to :guilabel:`Close all`. Activating it again collapses every editor
+without saving or discarding browser-side drafts. There is no global footer
+action area; save and undo remain explicit per-field actions.
 
 The pencil is rendered through TYPO3's ``core:icon`` ViewHelper. Template
 overrides may replace the icon but must retain the button's edit hook,
@@ -284,8 +285,9 @@ Synchronization checkbox
 ========================
 
 The synchronization checkbox appears as the compact :guilabel:`Private` switch
-immediately left of :guilabel:`Edit all` in the personal-section header and is
-persisted immediately through ``updateSkipSyncAction()``. Its form is a sibling
+immediately left of the :guilabel:`Edit all`/:guilabel:`Close all` toggle in
+the personal-section header and is persisted immediately through
+``updateSkipSyncAction()``. Its form is a sibling
 of the profile form, not a nested form. The visual label follows the supplied
 profile-page design; the underlying data and endpoint semantics remain
 ``skipSync``. It does not submit or mutate any other field. The endpoint accepts
@@ -458,8 +460,8 @@ shipped JavaScript:
         - Image deletion endpoint.
     *   - ``data-ie-fields-form`` and
           ``academic-persons-inline-edit__field``
-        - Generic field forms and controls. The first form owns the bulk action;
-          additional forms preserve valid markup in separate grid sections.
+        - Generic field forms and controls. Separate forms preserve valid markup
+          across the personal-data and about-section grid areas.
     *   - ``data-ie-rich-text`` and ``data-ie-editor-container``
         - Marks a textarea for lazy CKEditor initialization and its wrapper for
           show/hide handling.
@@ -486,7 +488,12 @@ shipped JavaScript:
     *   - ``data-ie-autosave-on-change``
         - Saves the gender select immediately after a changed selection.
     *   - ``data-academic-persons-inline-edit-edit-all-btn``
-        - Opens all editable single fields and grouped rows.
+        - Toggles all editable single fields and grouped rows between open and
+          collapsed states.
+    *   - ``data-ie-edit-all-label``, ``data-ie-close-all-label`` and
+          ``data-ie-edit-all-button-label``
+        - Localized labels and replaceable label container for the edit-all
+          toggle.
     *   - ``data-ie-dismiss``
         - Deletes the current draft value without closing or saving it.
     *   - ``data-ie-cancel``
@@ -494,8 +501,6 @@ shipped JavaScript:
           request.
     *   - ``data-ie-save``
         - Persists one field through the generic JSON endpoint.
-    *   - ``data-ie-cancel-all``
-        - Restores all persisted field values and closes the bulk editor.
     *   - ``data-ie-sync-form`` and
           ``academic-persons-inline-edit__sync-checkbox``
         - Synchronization control.
