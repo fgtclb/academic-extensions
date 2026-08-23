@@ -374,13 +374,16 @@ not the Extbase one.
 
 ## Core-version-aware code (v13 vs v14)
 
-There is no `Core13/`/`Core14/` split in any academic extension yet. The two
-places that currently differ per core version are single switches on
-`(new Typo3Version())->getMajorVersion()`, both in
-`academic-base/Classes/TcaManipulator.php`:
-`addContentElementPlugin()` (the `addPlugin()` signature changed) and
-`addContentElementPluginFlexForm()` (the FlexForm `ds` shape differs and
-**neither version tolerates the other's**, see ACE-293).
+There is no `Core13/`/`Core14/` split in any academic extension yet. Every
+difference is resolved inside the file that has it, with a switch on
+`(new Typo3Version())->getMajorVersion()` — in a class, in a `Configuration/`
+file, or in an event listener. The most instructive one is
+`academic-base/Classes/TcaManipulator.php`: `addContentElementPlugin()` (the
+`addPlugin()` signature changed) and `addContentElementPluginFlexForm()` (the
+FlexForm `ds` shape differs and **neither version tolerates the other's**, see
+ACE-293). The counts per mechanism are measured in
+[Core version aware code](docs/architecture/core-version-aware-code.md) and are
+deliberately not repeated here.
 
 Keep it that way while the difference is a line or two. Reach for the folder
 split below only when a whole class has to differ — the technique can be looked

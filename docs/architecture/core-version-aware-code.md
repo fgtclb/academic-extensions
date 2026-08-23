@@ -14,14 +14,15 @@ Verified across the whole repository: no `Core13/` or `Core14/` directory
 exists under `packages/` or `packages-dev/`. Every core version difference is
 currently resolved **inside** the file that has it.
 
-Three mechanisms are in use, and they differ by *where* the difference sits —
+Four mechanisms are in use, and they differ by *where* the difference sits —
 not by preference:
 
-| Mechanism                                  | Used in                               | Count              |
-|--------------------------------------------|---------------------------------------|--------------------|
-| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`          | 1 file, 2 switches |
-| Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`    | 15 files           |
-| Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php` | 2 files            |
+| Mechanism                                  | Used in                                    | Count              |
+|--------------------------------------------|--------------------------------------------|--------------------|
+| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`               | 1 file, 2 switches |
+| Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`         | 12 files           |
+| Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/` | 3 files            |
+| Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`      | 2 files            |
 
 All of them switch on `(new Typo3Version())->getMajorVersion()`.
 
@@ -81,7 +82,7 @@ loads". Both directions are covered by tests, see
 
 TCA, TypoScript and `ext_localconf.php` are loaded by TYPO3 from a fixed path
 and cannot be swapped per core version. A difference there has to be resolved
-in the file. 15 files under `packages/fgtclb/*/Configuration/` do this, and
+in the file. 12 files under `packages/fgtclb/*/Configuration/` do this, and
 they follow a consistent shape: build the array, adjust it at the end, return
 it. For example
 [`packages/fgtclb/academic-jobs/Configuration/TCA/tx_academicjobs_domain_model_job.php`](../../packages/fgtclb/academic-jobs/Configuration/TCA/tx_academicjobs_domain_model_job.php)
@@ -113,15 +114,60 @@ copying:
 Dropping the option instead of guarding it is not equivalent: v14 removed it,
 but v13 still evaluates it and would search nothing without it.
 
-[`packages/fgtclb/academic-programs/Configuration/TCA/Overrides/pages.php`](../../packages/fgtclb/academic-programs/Configuration/TCA/Overrides/pages.php)
-line 62 shows the same shape for a registry call rather than an array key: v13
-has no `allowedRecordTypes` TCA option and still resolves allowed tables
-through `PageDoktypeRegistry`, whose `ext_tables.php` registration was
-deprecated in v14.3.
+### A switch inside an event listener
+
+`academic_programs`, `academic_projects` and `academic_partners` each register a
+page type, and each needs both forms of it: the TCA option `allowedRecordTypes`
+that TYPO3 v14 reads, and the `PageDoktypeRegistry` that v13 still resolves
+allowed tables through. Only the first of the two can live in
+`Configuration/TCA/Overrides/pages.php`. The second is done by a listener on
+`BootCompletedEvent`, one per extension, e.g.
+[`packages/fgtclb/academic-programs/Classes/EventListener/RegisterAcademicPageDoktype.php`](../../packages/fgtclb/academic-programs/Classes/EventListener/RegisterAcademicPageDoktype.php):
+
+```php
+public function __invoke(BootCompletedEvent $event): void
+{
+    if ((new Typo3Version())->getMajorVersion() >= 14) {
+        return;
+    }
+
+    $this->pageDoktypeRegistry->add(PageTypes::TYPE_ACADEMIC_PROGRAM, ['allowedTables' => '*']);
+}
+```
+
+**Why not in the TCA override.** On v13 the first call to
+`PageDoktypeRegistry->add()` runs `initializeTca()`, which collects every table
+declaring `security.ignorePageTypeRestriction` — `tt_content`, `sys_template`,
+`backend_layout` — from `TcaSchemaFactory` and then latches
+`$tcaHasBeenInitialized`. A TCA override runs *before*
+`TcaSchemaFactory::load()`, which `Bootstrap::init()` calls on the line right
+before it dispatches `BootCompletedEvent`, so the factory is still empty, the allow list of the `default` page type never gains
+`tt_content`, and the DataHandler refuses content elements on every standard
+page — but only while the TCA cache is cold, which is every functional test,
+every CLI import after a cache flush, and the first backend request after one
+(ACE-462). Warm, the override does not run at all and the page type is simply
+not registered, so it falls back to the `default` allow list instead of `*`.
+
+**Why not `ext_tables.php`.** That file is loaded after the TCA and would fix
+both halves — it is what `PageDoktypeRegistry`'s own class docblock suggests —
+but TYPO3 v14.3 deprecates *loading an `ext_tables.php` at all*, per extension
+and independently of its content (`ExtTablesFactory`, lines 73 and 110). Since
+the functional suites run with `failOnDeprecation`, shipping one turns the whole
+v14 suite red and writes two deprecations per request into every v14
+installation's log. `BootCompletedEvent` is dispatched one line after
+`TcaSchemaFactory::load()`, on every request and in every context, and carries
+no deprecation on either version.
+
+The v14 copy of `add()` does none of the latching; it assigns and raises the v15
+deprecation. That is why the guard is a `Typo3Version` check and not a feature
+detection: the method exists on both versions, so there is nothing to detect.
+The listener itself is registered on both versions through TYPO3's
+`#[AsEventListener]` and returns immediately on v14 — cheaper and simpler than
+making the service registration itself version aware.
 
 ### A constant, when the difference is inside an attribute argument
 
-The third mechanism exists because the other two are unavailable. PHP attribute
+The fourth mechanism exists because the other three are unavailable. PHP attribute
 arguments must be constant expressions, so a version switch cannot be written
 inside one. The Extbase `#[Cascade]` attribute takes the array form
 `['value' => 'remove']` on v13 and the plain string `'remove'` on v14, and
