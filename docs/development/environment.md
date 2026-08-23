@@ -543,6 +543,40 @@ belongs, so it creates an empty one and reports that it is not installed.
 marker file along with everything else that is git-ignored, so the sequence is
 teardown first, marker second, start third — never the other way round.
 
+#### When a single field of the seed changes
+
+A full rebuild is the right tool when the *shape* of an instance changes. It is
+the wrong one when a single field of the seed definition changes, because a
+rebuild regenerates every table and every generated value — the diff on a
+committed template is then dominated by churn that has nothing to do with the
+change under review.
+
+For that case, apply the changed field to both committed templates directly and
+verify it against the definition, which stays the single source of truth:
+
+```shell
+python3 - <<'EOF'
+import yaml, sqlite3
+seed = yaml.safe_load(open('packages-dev/dev-site/Configuration/Seeds/Instance.yaml'))
+# ... locate the record in the definition, then, for each template:
+#     UPDATE <table> SET <field> = ? WHERE uid = ?
+#     and assert the stored value now equals the definition's
+EOF
+```
+
+Two things make this safe rather than a shortcut, and both have to hold:
+
+1. **The definition is edited first**, and the template is updated *from* it —
+   never the other way round. A template that says something the definition does
+   not is a template the next rebuild silently reverts.
+2. **Every path in the field is checked to exist.** `include_static_file` and
+   `pages.tsconfig_includes` are both read with
+   `GeneralUtility::trimExplode(',', ...)` and both fail silently: an entry that
+   does not resolve contributes nothing, with no exception and no log line.
+
+If the change adds or removes records, or changes anything structural, rebuild
+instead.
+
 #### The walk-through
 
 Every command below was run against `core-13/` on this branch; the output quoted
