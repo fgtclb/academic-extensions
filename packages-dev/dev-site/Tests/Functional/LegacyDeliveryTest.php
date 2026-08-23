@@ -169,7 +169,8 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
      * `200`, except for the two pages the seed puts behind a frontend user
      * group, which answer `403` to a visitor who is not logged in - that is
      * what those pages are in the seed for - and the profile detail page, which
-     * answers `404` on TYPO3 v14 for the reason given at {@see self::mirroredPages()}.
+     * this harness sees as `404` on TYPO3 v14 only, for the reason given at
+     * {@see self::mirroredPages()}.
      */
     #[Test]
     public function everyMirroredPageAnswersItsExpectedStatusInBothTrees(): void
@@ -260,11 +261,18 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
 
             // The profile detail page, asked without a profile. The plugin
             // answers `ErrorController::pageNotFoundAction()` by design in that
-            // case - ProfileController::detailAction() opens with exactly that -
-            // and the two cores do different things with the response it
-            // returns: on TYPO3 v13 the page still comes out as 200, on v14 the
-            // 404 reaches the response. Same seed, same extension, two cores, so
-            // this is stated rather than asserted away.
+            // case - `ProfileController::detailAction()` opens with exactly that
+            // - and a real request answers `404` on BOTH cores; measured against
+            // the development instances of each (ACE-465).
+            //
+            // Only this harness sees a difference, and it is an artifact of how
+            // the two Extbase bootstraps publish the status of a plugin
+            // response. TYPO3 v13 sets it with a bare `header()` call, guarded
+            // by `headers_sent()`, which never reaches the PSR-7 response a
+            // functional test reads; v14 writes it into `frontend.response.data`
+            // instead - the `@todo: Remove when ContentObjectRenderer is
+            // response aware` that v13 carries, implemented. So the expectation
+            // is version dependent while the behaviour is not.
             if ($uid === self::PROFILE_DETAIL_PAGE && (new Typo3Version())->getMajorVersion() >= 14) {
                 $pages[$uid]['status'] = 404;
             }
