@@ -164,6 +164,14 @@ return [
     ],
     'SYS' => [
         'UTF8filesystem' => true,
+        // Pinned, and deliberately not the timezone of whoever runs this instance.
+        // TYPO3 stores a date field as a timestamp it derives with the server
+        // timezone, so the same seed produces different integers in Berlin and in
+        // UTC - and the committed "sqlite-databases/core-NN.sqlite" snapshot has to
+        // be reproducible by anyone, not only by somebody in the same timezone as
+        // the person who last regenerated it. Left empty, TYPO3 falls back to the
+        // server timezone (Bootstrap::setDefaultTimezone()).
+        'phpTimeZone' => 'UTC',
         'caching' => [
             'cacheConfigurations' => [
                 'hash' => [

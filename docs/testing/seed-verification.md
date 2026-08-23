@@ -160,17 +160,38 @@ versions 15 and 16.
 — the aggregate folders of the academic extensions hold nothing but the third
 one.
 
-## The ACE-462 workaround
+## Why the manifest and the snapshot can agree at all
 
-`AbstractSeedTestCase` re-runs the initialisation of `PageDoktypeRegistry` after
-the TCA is built, on TYPO3 v13 only. Without it `DataHandler` refuses every
-`tt_content` element and every academic record of the import — "Attempt to
-insert record on pages:221 where table … is not allowed" — and the seed comes
-out as a page tree with nothing on it.
+The manifest is generated from an import in a **functional test instance** and
+then used to measure the `sqlite-databases/core-NN.sqlite` snapshot, which is
+produced by an import in a **real DDEV instance**. Those are two different
+environments, and two of their differences reach the stored data. Both are
+pinned rather than excluded from the projection, because both are real
+differences that a reader would otherwise have to know about:
 
-It is in the harness and not in the seed on purpose: the defect is in the
-registry, and a seed that compensated for it would hide the fix when ACE-462
-lands. Remove it then.
+**The timezone.** TYPO3 derives the timestamp it stores in a date field with the
+server timezone, so `valid_from: 1704067200` in the seed does not come back out
+as `1704067200` — it comes back out shifted by whatever the running instance is
+set to. The DDEV containers are `Europe/Berlin`, the test containers are UTC,
+and the two imports disagreed on 24 `pages` rows and 2 contracts by exactly one
+hour. `core-NN/config/system/settings.php` therefore pins
+`SYS/phpTimeZone` to `UTC`. That is not only about these two environments: left
+unpinned, a maintainer in another timezone regenerating the snapshot would
+commit a different binary for an unchanged seed.
+
+**The site configurations.** `DataHandler` builds the prefix of a translated
+field — `[Translate to German:]` — from the *title of the site language* the
+record is translated into. With no site there is no language and the prefix
+comes out as `[Translate to :]`, which the seed then writes into 22 translated
+`sys_file_reference` rows. `AbstractSeedTestCase::importSeed()` therefore adopts
+the committed site configurations of `core-NN/config/sites/` through
+`SiteWriter` before it imports. They are copied, not rebuilt, so a site setting
+changed in the instance reaches the measurement without anyone remembering to
+mirror it.
+
+The rule behind both: when the manifest and the snapshot disagree, ask which
+environment is wrong before adjusting what is measured. Dropping a column from
+the projection hides a difference that is real.
 
 ## See also
 
