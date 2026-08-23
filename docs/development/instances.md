@@ -118,8 +118,8 @@ Each instance serves exactly one site, identifier `academics`, `rootPageId: 1`
 and `base: /` (`core-12/config/sites/academics/config.yaml`,
 `core-13/config/sites/academics/config.yaml`). The page tree behind that root
 page is written from
-`packages-dev/dev-site/Configuration/Seeds/Instance.yaml` — one section per
-extension, one page per plugin:
+`packages-dev/dev-site/Configuration/DataFactory/academics-instance/` — one
+section per extension, one page per plugin:
 
 | Page                    | What is on it                                                                                                                                                                               |
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

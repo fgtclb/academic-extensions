@@ -160,8 +160,8 @@ cd core-12 && ddev start && ddev launch /typo3/
 ```
 
 What is in those templates is **described rather than clicked together**:
-`packages-dev/dev-site/Configuration/Seeds/Instance.yaml` holds the page tree,
-the content and the records, and `ddev composer instance:seed` writes it into an
+`packages-dev/dev-site/Configuration/DataFactory/academics-instance/` holds the page
+tree, the content and the records, and `ddev composer instance:seed` writes it into an
 empty instance. That is how a template is rebuilt once it has gone stale — see
 [Rebuilding an instance from nothing](#rebuilding-an-instance-from-nothing).
 
