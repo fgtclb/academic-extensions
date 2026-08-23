@@ -32,9 +32,23 @@ final class SqliteFileRowReader extends SeedRowReader
             );
         }
 
+        // PHP 8.5 deprecates the `PDO::SQLITE_*` constants in favour of the ones
+        // on `Pdo\Sqlite`, which does not exist before PHP 8.4 - and this
+        // repository is tested on 8.2 to 8.5. Both spellings name the same
+        // integers, so the pair is resolved by name and the deprecated one is
+        // never touched on a PHP that has the replacement. A `defined()` check
+        // and not a `PHP_VERSION_ID` one: what matters is whether the constant
+        // is there, and the suites run with `failOnDeprecation`.
+        $openFlags = defined('Pdo\Sqlite::ATTR_OPEN_FLAGS')
+            ? (int)constant('Pdo\Sqlite::ATTR_OPEN_FLAGS')
+            : (int)constant('PDO::SQLITE_ATTR_OPEN_FLAGS');
+        $readOnly = defined('Pdo\Sqlite::OPEN_READONLY')
+            ? (int)constant('Pdo\Sqlite::OPEN_READONLY')
+            : (int)constant('PDO::SQLITE_OPEN_READONLY');
+
         $this->connection = new \PDO('sqlite:file:' . $file . '?mode=ro', null, null, [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::SQLITE_ATTR_OPEN_FLAGS => \PDO::SQLITE_OPEN_READONLY,
+            $openFlags => $readOnly,
         ]);
     }
 
