@@ -23,9 +23,12 @@ controls. Related name and link properties are presented as groups and edited
 together.
 
 The profile name is displayed as the main heading above the sticky image. The
-compact `Private` switch sits immediately left of the small `Edit all` button
+compact `Private` switch sits immediately left of the small `Edit all` toggle
 beside the personal-data heading and keeps using its dedicated `skipSync` AJAX
-endpoint. A small pencil button in the upper-right corner of the profile image
+endpoint. The toggle changes to `Close all` while the editors are open. Closing
+all editors keeps unsaved browser-side drafts; persistence remains available
+only through each field's own save action. A small pencil button in the
+upper-right corner of the profile image
 opens a Bootstrap 5 modal: selecting a file updates the local modal preview,
 saving uploads and replaces the page preview, and deleting removes the current
 image. Upload errors retain their non-success HTTP status, are shown inside the

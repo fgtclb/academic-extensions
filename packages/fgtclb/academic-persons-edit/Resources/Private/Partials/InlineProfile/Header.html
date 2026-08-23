@@ -17,12 +17,17 @@
                 partial="InlineProfile/Settings/Sync"
                 arguments="{profile: profile, validations: validations}" />
             <button
-                class="btn btn-outline-secondary btn-sm flex-shrink-0"
+                class="btn rounded-0 btn-outline-secondary btn-sm flex-shrink-0"
                 type="button"
-                data-academic-persons-inline-edit-edit-all-btn>
-                <f:translate
-                    key="inlineProfile.btnEditAll"
-                    extensionName="academic_persons_edit" />
+                data-academic-persons-inline-edit-edit-all-btn
+                data-ie-edit-all-label="{f:translate(key: 'inlineProfile.btnEditAll', extensionName: 'academic_persons_edit')}"
+                data-ie-close-all-label="{f:translate(key: 'inlineProfile.btnCloseAll', extensionName: 'academic_persons_edit')}"
+                aria-pressed="false">
+                <span data-ie-edit-all-button-label>
+                    <f:translate
+                        key="inlineProfile.btnEditAll"
+                        extensionName="academic_persons_edit" />
+                </span>
             </button>
         </div>
     </header>

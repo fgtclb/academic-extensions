@@ -56,9 +56,10 @@ control. In edit mode every field has separate delete, cancel and save actions.
 Delete clears the local draft without closing or saving, cancel restores the
 last persisted value and closes the field, and save uses the JSON AJAX
 endpoint. Bootstrap sizing and alignment utilities keep the action group from
-stretching to the editor height without additional CSS or inline styles. Bulk
-cancellation still uses ``data-ie-cancel-all`` and restores all successfully
-persisted values.
+stretching to the editor height without additional CSS or inline styles. The
+former bulk footer actions are no longer rendered. The header toggle opens all
+editors and changes from :guilabel:`Edit all` to :guilabel:`Close all`; closing
+them retains browser-side drafts and performs no request.
 
 Impact
 ======

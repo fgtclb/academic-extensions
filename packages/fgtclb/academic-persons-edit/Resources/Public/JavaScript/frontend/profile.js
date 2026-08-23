@@ -10,7 +10,7 @@ const fieldsFormSelector = "[data-ie-fields-form]";
 const editButtonSelector = "[data-academic-persons-inline-edit-activate-btn]";
 const editAllButtonSelector =
   "[data-academic-persons-inline-edit-edit-all-btn]";
-const footerButtonAreaSelector = "[data-ie-footer-button-area]";
+const editAllButtonLabelSelector = "[data-ie-edit-all-button-label]";
 const buttonAreaSelector = "[data-form-field-button-area]";
 const fieldSelector = ".academic-persons-inline-edit__field";
 const fieldPreviewSelector = "[data-ie-field-preview]";
@@ -308,10 +308,20 @@ const toggleEditGroup = (root, group, state = true) => {
   }
 };
 
-const setFooterVisible = (root, visible) => {
-  root
-    .querySelector(footerButtonAreaSelector)
-    ?.classList.toggle("d-none", !visible);
+const setEditAllButtonState = (root, active) => {
+  const button = root.querySelector(editAllButtonSelector);
+  if (!(button instanceof HTMLButtonElement)) {
+    return;
+  }
+  button.classList.toggle("active", active);
+  button.setAttribute("aria-pressed", String(active));
+  const label = button.querySelector(editAllButtonLabelSelector);
+  const nextLabel = active
+    ? button.dataset.ieCloseAllLabel
+    : button.dataset.ieEditAllLabel;
+  if (label instanceof HTMLElement && nextLabel) {
+    label.textContent = nextLabel;
+  }
 };
 
 const showStatus = (root, type, message = null) => {
@@ -553,11 +563,6 @@ const closeFields = (root, fields) => {
   groups.forEach((group) => toggleEditGroup(root, group, false));
 };
 
-const closeAllFields = (root, fields) => {
-  closeFields(root, fields);
-  setFooterVisible(root, false);
-};
-
 const requestJson = async (url, options) => {
   const { headers = {}, ...requestOptions } = options;
   const response = await fetch(url, {
@@ -625,8 +630,7 @@ const initializeFieldEditing = (root) => {
   const forms = Array.from(root.querySelectorAll(fieldsFormSelector)).filter(
     (element) => element instanceof HTMLFormElement,
   );
-  const primaryForm = forms[0];
-  if (!(primaryForm instanceof HTMLFormElement)) {
+  if (forms.length === 0) {
     return;
   }
 
@@ -655,17 +659,22 @@ const initializeFieldEditing = (root) => {
       renderActivateButton(root, field, getFieldValue(field)),
     );
   const normalizedRichTextBaselines = new WeakSet();
-  let bulkEditing = false;
+  let editAllActive = false;
+  setEditAllButtonState(root, editAllActive);
 
-  const finishBulkEditingWhenClosed = () => {
-    const hasOpenTextField = fields.some(
+  const finishEditAllWhenClosed = () => {
+    if (!editAllActive) {
+      return;
+    }
+    const hasOpenField = fields.some(
       (field) =>
-        !(field instanceof HTMLSelectElement) &&
+        !field.disabled &&
+        !field.readOnly &&
         !getFieldEditElement(field).classList.contains("d-none"),
     );
-    if (!hasOpenTextField) {
-      bulkEditing = false;
-      setFooterVisible(root, false);
+    if (!hasOpenField) {
+      editAllActive = false;
+      setEditAllButtonState(root, false);
     }
   };
 
@@ -676,7 +685,7 @@ const initializeFieldEditing = (root) => {
     clearValidationErrors(fieldsToReset);
   };
 
-  const saveFields = async (fieldsToSave, closeEverything = false) => {
+  const saveFields = async (fieldsToSave) => {
     if (root.getAttribute("aria-busy") === "true") {
       return false;
     }
@@ -708,13 +717,8 @@ const initializeFieldEditing = (root) => {
     );
 
     if (changedFields.length === 0) {
-      if (closeEverything) {
-        closeAllFields(root, fields);
-        bulkEditing = false;
-      } else {
-        closeFields(root, fieldsToSave);
-        finishBulkEditingWhenClosed();
-      }
+      closeFields(root, fieldsToSave);
+      finishEditAllWhenClosed();
       showStatus(root, "info", root.dataset.messageUnchanged ?? null);
       return true;
     }
@@ -765,13 +769,8 @@ const initializeFieldEditing = (root) => {
       });
       renderProfileName(root);
 
-      if (closeEverything) {
-        closeAllFields(root, fields);
-        bulkEditing = false;
-      } else {
-        closeFields(root, changedFields);
-        finishBulkEditingWhenClosed();
-      }
+      closeFields(root, changedFields);
+      finishEditAllWhenClosed();
       showStatus(root, "success");
       return true;
     } catch (error) {
@@ -825,6 +824,7 @@ const initializeFieldEditing = (root) => {
         resetFields(groupFields);
         renderFieldGroupPreview(root, group);
         toggleEditGroup(root, group, false);
+        finishEditAllWhenClosed();
       }
       return;
     }
@@ -838,18 +838,22 @@ const initializeFieldEditing = (root) => {
     }
     if (button.matches(editAllButtonSelector)) {
       event.preventDefault();
-      root.querySelectorAll(fieldGroupSelector).forEach((group) => {
-        if (group instanceof HTMLElement) {
-          toggleEditGroup(root, group, true);
-        }
-      });
-      root.querySelectorAll(editButtonSelector).forEach((editButton) => {
-        if (editButton.dataset.ieFor) {
-          toggleEditField(root, editButton.dataset.ieFor, true);
-        }
-      });
-      bulkEditing = true;
-      setFooterVisible(root, true);
+      editAllActive = !editAllActive;
+      if (editAllActive) {
+        root.querySelectorAll(fieldGroupSelector).forEach((group) => {
+          if (group instanceof HTMLElement) {
+            toggleEditGroup(root, group, true);
+          }
+        });
+        root.querySelectorAll(editButtonSelector).forEach((editButton) => {
+          if (editButton.dataset.ieFor) {
+            toggleEditField(root, editButton.dataset.ieFor, true);
+          }
+        });
+      } else {
+        closeFields(root, fields);
+      }
+      setEditAllButtonState(root, editAllActive);
       return;
     }
 
@@ -882,16 +886,8 @@ const initializeFieldEditing = (root) => {
         setFieldValue(field, persistedValues.get(field) ?? "");
         clearValidationErrors([field]);
         toggleEditField(root, field.id, false);
-        finishBulkEditingWhenClosed();
+        finishEditAllWhenClosed();
       }
-      return;
-    }
-
-    if (button.matches("[data-ie-cancel-all]")) {
-      event.preventDefault();
-      resetFields(fields);
-      closeAllFields(root, fields);
-      bulkEditing = false;
       return;
     }
 
@@ -913,23 +909,8 @@ const initializeFieldEditing = (root) => {
   });
 
   forms.forEach((form) => {
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const savesAllFields = form === primaryForm;
-      const fieldsToSave = savesAllFields
-        ? fields
-        : fields.filter((field) => form.contains(field));
-      void saveFields(fieldsToSave, savesAllFields);
-    });
+    form.addEventListener("submit", (event) => event.preventDefault());
     form.addEventListener("reset", (event) => event.preventDefault());
-  });
-
-  // Keep the footer state coherent when a field is saved individually while
-  // the bulk editor is open.
-  root.addEventListener("input", () => {
-    if (bulkEditing) {
-      setFooterVisible(root, true);
-    }
   });
 };
 
