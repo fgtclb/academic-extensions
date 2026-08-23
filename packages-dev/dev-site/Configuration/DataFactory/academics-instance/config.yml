@@ -1,0 +1,31 @@
+# The seed set the development instances are built from.
+#
+# Imported with "vendor/bin/typo3 data-factory:import academics-instance" in
+# "core-12/" and "core-13/", which is the only way those instances get content:
+# they are set up from nothing and import no example data.
+#
+# One set serves both core versions. Everything it declares - the backend
+# layouts of bk2k/bootstrap-package, the academic CTypes, the felogin plugin
+# and its FlexForm - is identical on TYPO3 v12 and v13, so a second set would
+# be two definitions to keep in sync and no difference to express. That
+# includes the TypoScript wiring: the root "sys_template" record of the
+# scenario is what delivers it, because site sets arrived in TYPO3 v13.1 and
+# this branch still supports v12.
+#
+# No "files" and no "references": FAL is deliberately left out for now.
+#
+# No "sites" either. The site configurations of the two instances are committed
+# at "core-12/config/sites/academics/" and "core-13/config/sites/academics/",
+# they carry per-instance settings the seed set has nothing to say about, and
+# "SiteConfigurationSeeder" refuses an identifier that already exists - so a
+# seed that wrote them would fail on the second run of the very rebuild
+# procedure it exists to support.
+identifier: academics-instance
+title: 'Academic extensions development instance'
+description: >-
+  The page tree, the content elements and the records of the "core-12" and
+  "core-13" development instances of the fgtclb/academic-extensions mono
+  repository.
+
+scenarios:
+  - Scenario.yaml

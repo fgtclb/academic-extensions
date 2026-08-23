@@ -15,7 +15,7 @@
         "fgtclb/academics-monorepo-dev-site": "~2.4.0@dev",
         "fgtclb/academics-monorepo-shared": "~2.4.0@dev",
         "sbuerk/extended-path-repository": "^1.1.0",
-        "sbuerk/theme-extension-development": "^1.0.0@dev",
+        "sbuerk/data-factory": "^1.0",
         "typo3/cms-adminpanel": "~12.4.0@dev",
         "typo3/cms-dashboard": "~12.4.0@dev",
         "typo3/cms-form": "~12.4.0@dev",
@@ -76,7 +76,7 @@
             "@php ../Build/Scripts/instanceDatabase.php fresh"
         ],
         "instance:seed": [
-            "@php vendor/bin/typo3 theme:seed EXT:academics_dev_site/Configuration/Seeds/Instance.yaml"
+            "@php vendor/bin/typo3 data-factory:import academics-instance"
         ],
         "sqlite:apply": [
             "@php ../Build/Scripts/sqliteSnapshot.php restore ../sqlite-databases/core-12.sqlite var/sqlite/core-12.sqlite",
@@ -98,7 +98,7 @@
     },
     "scripts-descriptions": {
         "instance:fresh": "Drop this instance's database and stop the automatic seeding, so it can be rebuilt from nothing.",
-        "instance:seed": "Write the page tree, content and records of \"packages-dev/dev-site\" into this instance. Needs an empty page tree.",
+        "instance:seed": "Import the seed set \"academics-instance\" of \"packages-dev/dev-site\" - the page tree, its content and its records - into this instance. Needs an empty page tree.",
         "sqlite:apply": "Restore this instance from \"../sqlite-databases/core-12.sqlite\", discarding its current database.",
         "sqlite:backup": "Copy this instance's database to \"../sqlite-databases/core-12.sqlite\" so it can be committed.",
         "system:refresh": "Refresh the system after changes: flush and warm up caches (DI), update languages, run extension setup."

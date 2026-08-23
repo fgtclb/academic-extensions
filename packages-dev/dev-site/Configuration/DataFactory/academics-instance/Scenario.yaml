@@ -1,0 +1,1143 @@
+# The records of the seed set "academics-instance", in the scenario format of
+# sbuerk/data-factory.
+#
+# The uids are declared because the committed site configurations reference
+# them: "rootPageId: 1", and every plugin points at a page or a record by uid.
+# A declared "id" is a *suggestion* to DataHandler, honoured only for an admin
+# backend user - which is why the import runs as one.
+#
+# Records that carry no relation and are named by nothing declare an "id" all
+# the same. An item without one is not written with an auto increment uid: it
+# gets a value from a counter that starts at 10000 and runs per entity name, so
+# two entities on the same table would collide on "10000". Declaring the uid is
+# the only way to keep the result of an import reproducible.
+#
+# "hidden: 0" sits on the wildcard entity and nowhere else. The "pages" TCA
+# defaults the column to 1, so a page written without it exists and renders
+# nothing. It must not be repeated on a declared entity either: the wildcard is
+# merged with array_merge_recursive(), so a key on both sides becomes the list
+# [0, 0] and reaches the database as the string "Array".
+entitySettings:
+  '*':
+    nodeColumnName: 'pid'
+    columnNames: {id: 'uid'}
+    defaultValues: {pid: 0, hidden: 0}
+  page:
+    isNode: true
+    tableName: 'pages'
+    parentColumnName: 'pid'
+  content:
+    tableName: 'tt_content'
+  feGroup:
+    tableName: 'fe_groups'
+  feUser:
+    tableName: 'fe_users'
+  organisationalUnit:
+    tableName: 'tx_academicpersons_domain_model_organisational_unit'
+  functionType:
+    tableName: 'tx_academicpersons_domain_model_function_type'
+  location:
+    tableName: 'tx_academicpersons_domain_model_location'
+  profile:
+    tableName: 'tx_academicpersons_domain_model_profile'
+  contract:
+    tableName: 'tx_academicpersons_domain_model_contract'
+  emailAddress:
+    tableName: 'tx_academicpersons_domain_model_email'
+  phoneNumber:
+    tableName: 'tx_academicpersons_domain_model_phone_number'
+  physicalAddress:
+    tableName: 'tx_academicpersons_domain_model_address'
+  profileInformation:
+    tableName: 'tx_academicpersons_domain_model_profile_information'
+  category:
+    tableName: 'sys_category'
+  partnerRole:
+    tableName: 'tx_academicpartners_domain_model_role'
+  partnership:
+    tableName: 'tx_academicpartners_domain_model_partnership'
+  template:
+    tableName: 'sys_template'
+
+entities:
+  page:
+    #================================================================================================================
+    # The site root.
+    #================================================================================================================
+    - self:
+        id: 1
+        title: 'Academic extensions'
+        slug: '/'
+        is_siteroot: 1
+        doktype: 1
+        # Bootstrap package resolves the frontend template from this value:
+        # "pagets__special_start" renders "Templates/Page/SpecialStart.html".
+        backend_layout: 'pagets__special_start'
+        # Subpages inherit the content layout unless they say otherwise, so a
+        # new page added by hand later renders like the rest.
+        backend_layout_next_level: 'pagets__default'
+        # Since ACE-458 every academic extension hides its own content elements
+        # for the whole installation and re-enables them per component, through
+        # the page TSconfig of the component that owns them. Site sets are the
+        # other way to those files and are not available on TYPO3 v12, so a
+        # development instance of this branch names the aggregate of every
+        # extension here and an editor is offered everything.
+        #
+        # Comma separated, like "include_static_file" below and for the same
+        # reason: core reads it with "GeneralUtility::trimExplode(',', ...)". An
+        # entry that does not resolve contributes nothing, silently.
+        #
+        # The entry of EXT:academic_base is redundant - its group header is
+        # shipped by an auto-loaded "Configuration/page.tsconfig" on every
+        # installation - and it is listed anyway, so that this field reads as
+        # "every extension" rather than "every extension except one, for a
+        # reason you have to know".
+        tsconfig_includes: 'EXT:academic_base/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_bite_jobs/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_contacts4pages/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_jobs/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_partners/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_persons/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_persons_edit/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_programs/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_projects/Configuration/TSconfig/Full/page.tsconfig,EXT:academic_study_plan/Configuration/TSconfig/Full/page.tsconfig'
+      entities:
+        template:
+          #====================================================================================================
+          # The TypoScript of the whole instance.
+          #
+          # Site sets would be the modern way to say this, and they are not
+          # available: they arrived in TYPO3 v13.1 (Feature: #103437) and this
+          # branch also supports v12, where "config/sites/*/config.yaml" has no
+          # "dependencies" key and a site provides no TypoScript at all. A root
+          # "sys_template" record works unchanged on both versions, and since
+          # ACE-458 each component set points its "typoscript" key at exactly
+          # the folder the static template below registers - one physical copy,
+          # two ways to it - so nothing is lost by taking the older road here.
+          #
+          # "root" makes it the root template of the site, "clear = 3" clears
+          # both constants and setup of anything above it, which is also what
+          # pulls in $TYPO3_CONF_VARS['FE']['defaultTypoScript_*'] - the only
+          # way the TypoScript of EXT:felogin arrives, on either version: it
+          # registers itself with "includeInSiteSets = false" on v13 and has no
+          # such parameter at all on v12.
+          #====================================================================================================
+          - self:
+              id: 1
+              title: 'Academic extensions'
+              root: 1
+              clear: 3
+              # Order matters: bootstrap package defines the "page" object and
+              # the extensions add their page types and their plugin
+              # configuration on top of it.
+              #
+              # Deliberately the "Default" static of EXT:academic_persons and
+              # not its "Standalone" one: standalone defines its own "page"
+              # object and would replace the theme.
+              #
+              # EXT:academic_programs and EXT:academic_partners are included
+              # through their "Full" aggregate rather than through their plain
+              # "Configuration/TypoScript" folder. That folder still carries the
+              # shared plugin block, but since the configuration of those two
+              # was cut per component it no longer carries the
+              # "styles.content.getContent" override - and the page templates of
+              # their page types render exactly that path with "f:cObject",
+              # which throws when it is undefined.
+              #
+              # EXT:academic_persons_edit is included through its "Full"
+              # aggregate for a plainer reason: its plain folder no longer holds
+              # a "constants.typoscript" or a "setup.typoscript" at all.
+              include_static_file: 'EXT:bootstrap_package/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Default,EXT:academic_persons_edit/Configuration/TypoScript/Full,EXT:academic_programs/Configuration/TypoScript/Full,EXT:academic_partners/Configuration/TypoScript/Full'
+              # What a development instance has to correct, and nothing else.
+              # These are constants of the includes above, not site settings: a
+              # site's "settings.yaml" is inserted at the position the record
+              # clears, which is *before* its static includes, so a static
+              # template would overwrite every one of them. The record's own
+              # field is applied after its children and therefore wins.
+              constants: |
+                # Bootstrap package fetches the font from fonts.googleapis.com
+                # through a PageRenderer hook that has no try/catch, so on a
+                # machine without outbound HTTPS the first frontend request ends
+                # in a 500. A development instance has no business calling out.
+                page.theme.googleFont.enable = 0
+                # Nothing here sets a cookie worth consenting to, and the banner
+                # covers the page while looking at a plugin.
+                page.theme.cookieconsent.enable = 0
+                # The detail page of the seeded tree. The plugins declare it in
+                # their FlexForm as well; this is the fallback for one added by
+                # hand later.
+                plugin.tx_academicpersons.detailPid = 6
+                # The extension ships an empty value, which is not one of the
+                # two the extension configuration allows ("firstName",
+                # "lastName" - see "config/system/settings.php"). An unknown
+                # value is dropped silently, which means no ordering at all.
+                plugin.tx_academicpersons.demand.sortBy = lastName
+                plugin.tx_academicpersons.demand.sortByDirection = asc
+                # The extension ships 1.
+                plugin.tx_academicpersons.pagination.resultsPerPage = 10
+        content:
+          - self:
+              id: 1
+              CType: header
+              header: 'Academic extensions development instance'
+              header_layout: 1
+          - self:
+              id: 2
+              CType: text
+              header: 'What this is'
+              header_layout: 2
+              bodytext: |
+                <p>A development instance of the <strong>fgtclb/academic-extensions</strong>
+                mono repository. The page tree, its content and every record below it are
+                written by a seed definition, so the instance can be rebuilt from nothing
+                instead of being clicked together by hand.</p>
+                <p>One branch per extension, with one page per plugin:
+                <a href="t3://page?uid=3">Academic persons</a>,
+                <a href="t3://page?uid=13">Academic programs</a> and
+                <a href="t3://page?uid=21">Academic partners</a>. Logging in at
+                <a href="t3://page?uid=10">Login</a> as <code>jane.doe</code> opens
+                <a href="t3://page?uid=11">My profile</a>, the editing form of
+                EXT:academic_persons_edit.</p>
+      # Everything else is a child of the site root: a page outside the
+      # rootline of "rootPageId: 1" is not part of the site and answers
+      # with a 404, whatever its slug says.
+      children:
+
+        #============================================================================================================
+        # The record storage.
+        #
+        # Everything the plugins read lives here: profiles with their contracts
+        # and the children of those, plus the frontend user a profile is
+        # connected to. One folder rather than one per table, because a
+        # development instance is read far more often than it is navigated.
+        #============================================================================================================
+        - self:
+            id: 2
+            title: 'Data'
+            slug: '/data'
+            doktype: 254
+          entities:
+            #--------------------------------------------------------------------------------------------------------
+            # Frontend user and group.
+            #
+            # The password is written in plain text on purpose: DataHandler
+            # hashes it on save (checkValueForPassword()), and a pre-hashed
+            # value would pin the hashing algorithm of whoever generated it
+            # into this file.
+            #--------------------------------------------------------------------------------------------------------
+            feGroup:
+              - self:
+                  id: 1
+                  title: 'Website users'
+            feUser:
+              - self:
+                  id: 1
+                  username: 'jane.doe'
+                  password: 'Frontend-User-1701D.'
+                  usergroup: 1
+                  first_name: 'Jane'
+                  last_name: 'Doe'
+                  name: 'Jane Doe'
+                  email: 'jane.doe@example.com'
+
+            #--------------------------------------------------------------------------------------------------------
+            # The three tables a contract selects from. They are ordinary
+            # records on this folder; the contract points at them by uid.
+            #--------------------------------------------------------------------------------------------------------
+            organisationalUnit:
+              - self:
+                  id: 1
+                  unit_name: 'TYPO3 University'
+              - self:
+                  id: 2
+                  parent: 1
+                  unit_name: 'Department of TYPO3 Development'
+              - self:
+                  id: 3
+                  parent: 1
+                  unit_name: 'Department of TYPO3 Integration'
+            functionType:
+              - self:
+                  id: 1
+                  function_name: 'Professor'
+              - self:
+                  id: 2
+                  function_name: 'Lecturer'
+            location:
+              - self:
+                  id: 1
+                  title: 'Campus Mönchengladbach'
+
+            #--------------------------------------------------------------------------------------------------------
+            # Profiles.
+            #
+            # "slug" is declared empty rather than left out: DataHandler
+            # generates it from first and last name when the value is empty, and
+            # does so on both core versions. A hand written slug would only be
+            # sanitized, and the route enhancer of the detail plugin reads
+            # exactly this column.
+            #
+            # "first_name_alpha" and "last_name_alpha" are deliberately absent -
+            # the extension's DataHandler hook computes them from the names in
+            # the same write, and overwrites anything declared here.
+            #
+            # The contracts, the vita and the publication entries are declared
+            # as records of this folder and named by the relation field of the
+            # profile, as a comma separated list of the uids they declare. The
+            # scenario format expresses an inline relation this way and no
+            # other: DataHandler resolves the list exactly like a backend form
+            # submit, which is what writes the parent pointer, the sorting and -
+            # for the profile information relations - the "type" column from
+            # "foreign_match_fields".
+            #--------------------------------------------------------------------------------------------------------
+            profile:
+              - self:
+                  id: 1
+                  slug: ''
+                  gender: 'ms'
+                  title: 'Professor'
+                  first_name: 'Jane'
+                  last_name: 'Doe'
+                  website: 'https://example.org/jane-doe'
+                  website_title: 'Personal website'
+                  core_competences: '<p>TYPO3 core development, content management, accessibility.</p>'
+                  teaching_area: '<p>Web engineering, content management systems.</p>'
+                  # The frontend user this profile belongs to. This is the local
+                  # side of the MM relation - "fe_users.tx_academicpersons_profiles"
+                  # is the opposite field and is written by DataHandler.
+                  frontend_users: 1
+                  contracts: '1'
+                  vita: '1'
+                  publications: '2'
+              - self:
+                  id: 2
+                  slug: ''
+                  gender: 'mr'
+                  first_name: 'Erik'
+                  last_name: 'Mustermann'
+                  contracts: '2'
+              - self:
+                  id: 3
+                  slug: ''
+                  gender: 'diverse'
+                  first_name: 'Alina'
+                  last_name: 'Sorge'
+                  contracts: '3'
+            contract:
+              # Declared uids, because the "selected contracts" plugin names
+              # contracts 1 and 2 by uid.
+              - self:
+                  id: 1
+                  organisational_unit: 2
+                  function_type: 1
+                  location: 1
+                  position: 'Head of TYPO3 Development'
+                  room: '404'
+                  office_hours: "Mo. 09:00 - 11:00\nDo. 14:00 - 16:00"
+                  publish: 1
+                  email_addresses: '1'
+                  phone_numbers: '1'
+                  physical_addresses: '1'
+              - self:
+                  id: 2
+                  organisational_unit: 3
+                  function_type: 2
+                  location: 1
+                  position: 'Lecturer for TYPO3 Integration'
+                  room: '201'
+                  publish: 1
+                  email_addresses: '2'
+              - self:
+                  id: 3
+                  organisational_unit: 2
+                  function_type: 2
+                  location: 1
+                  position: 'Research assistant'
+                  publish: 1
+                  phone_numbers: '2'
+            emailAddress:
+              - self:
+                  id: 1
+                  type: 'business'
+                  email: 'jane.doe@example.com'
+              - self:
+                  id: 2
+                  type: 'business'
+                  email: 'erik.mustermann@example.com'
+            phoneNumber:
+              - self:
+                  id: 1
+                  type: 'business'
+                  phone_number: '+49 2166 9404540'
+              - self:
+                  id: 2
+                  type: 'mobile'
+                  phone_number: '+49 160 1234567'
+            physicalAddress:
+              - self:
+                  id: 1
+                  type: 'business'
+                  street: 'An der Eickesmühle'
+                  street_number: '38'
+                  zip: '41238'
+                  city: 'Mönchengladbach'
+                  country: 'DE'
+            profileInformation:
+              # One table for both relations of a profile. "type" is not
+              # declared here: it comes from the "foreign_match_fields" of the
+              # relation the profile names them in.
+              - self:
+                  id: 1
+                  title: 'Professor of Web Engineering'
+                  year_start: 2018
+                  year: 2018
+              - self:
+                  id: 2
+                  title: 'Content management at scale'
+                  year: 2024
+                  link: 'https://example.org/publications/content-management-at-scale'
+
+        #============================================================================================================
+        # One page per plugin of EXT:academic_persons.
+        #
+        # The FlexForm of a plugin is written as the XML string DataHandler
+        # stores: "checkValueForFlex()" passes a non-array value through
+        # untouched, so this is exactly what a backend save produces. Only the
+        # settings that matter are declared - everything else falls back to the
+        # site set defaults.
+        #
+        # "settings.detailPid" points at page 6, the page carrying the detail
+        # plugin. Without it every "read more" link goes back to the list page
+        # itself.
+        #============================================================================================================
+        - self:
+            id: 3
+            title: 'Academic persons'
+            slug: '/academic-persons'
+            doktype: 1
+            backend_layout: 'pagets__default'
+          entities:
+            content:
+              - self:
+                  id: 3
+                  CType: header
+                  header: 'Academic persons'
+                  header_layout: 1
+              - self:
+                  id: 4
+                  CType: text
+                  bodytext: |
+                    <p>One page per plugin of EXT:academic_persons. All of them read the
+                    profiles stored in the <em>Data</em> folder.</p>
+          children:
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 4
+                title: 'Profile list'
+                slug: '/academic-persons/list'
+                doktype: 1
+              entities:
+                content:
+                  - self:
+                      id: 5
+                      CType: academicpersons_list
+                      header: 'Profile list'
+                      header_layout: 2
+                      # The storage. This is the only source the list reads it
+                      # from: an empty value switches the storage page
+                      # restriction off entirely rather than falling back to a
+                      # TypoScript storagePid.
+                      pages: '2'
+                      pi_flexform: |
+                        <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                        <T3FlexForms>
+                            <data>
+                                <sheet index="sDEF">
+                                    <language index="lDEF">
+                                        <field index="settings.detailPid">
+                                            <value index="vDEF">6</value>
+                                        </field>
+                                        <field index="settings.demand.sortBy">
+                                            <value index="vDEF">lastName</value>
+                                        </field>
+                                        <field index="settings.demand.sortByDirection">
+                                            <value index="vDEF">asc</value>
+                                        </field>
+                                        <field index="settings.paginationEnabled">
+                                            <value index="vDEF">1</value>
+                                        </field>
+                                        <field index="settings.pagination.resultsPerPage">
+                                            <value index="vDEF">10</value>
+                                        </field>
+                                        <field index="settings.showFields">
+                                            <value index="vDEF">contracts.position,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
+                                        </field>
+                                        <field index="settings.fallbackForNonTranslated">
+                                            <value index="vDEF">1</value>
+                                        </field>
+                                    </language>
+                                </sheet>
+                            </data>
+                        </T3FlexForms>
+
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 5
+                title: 'Profile list and detail'
+                slug: '/academic-persons/list-and-detail'
+                doktype: 1
+              entities:
+                content:
+                  - self:
+                      id: 6
+                      CType: academicpersons_listanddetail
+                      header: 'Profile list and detail'
+                      header_layout: 2
+                      pages: '2'
+                      # No "settings.detailPid": this plugin renders the detail
+                      # view on its own page, which is the difference to the
+                      # list plugin above.
+                      pi_flexform: |
+                        <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                        <T3FlexForms>
+                            <data>
+                                <sheet index="sDEF">
+                                    <language index="lDEF">
+                                        <field index="settings.demand.sortBy">
+                                            <value index="vDEF">lastName</value>
+                                        </field>
+                                        <field index="settings.demand.sortByDirection">
+                                            <value index="vDEF">asc</value>
+                                        </field>
+                                        <field index="settings.fallbackForNonTranslated">
+                                            <value index="vDEF">1</value>
+                                        </field>
+                                    </language>
+                                </sheet>
+                            </data>
+                        </T3FlexForms>
+
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 6
+                title: 'Profile detail'
+                slug: '/academic-persons/detail'
+                doktype: 1
+              entities:
+                content:
+                  - self:
+                      id: 7
+                      CType: academicpersons_detail
+                      header: 'Profile detail'
+                      header_layout: 2
+                      pi_flexform: |
+                        <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                        <T3FlexForms>
+                            <data>
+                                <sheet index="sDEF">
+                                    <language index="lDEF">
+                                        <field index="settings.pageTitleFormat">
+                                            <value index="vDEF">%%LAST_NAME%%, %%FIRST_NAME%%</value>
+                                        </field>
+                                    </language>
+                                </sheet>
+                            </data>
+                        </T3FlexForms>
+
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 7
+                title: 'Profile card'
+                slug: '/academic-persons/card'
+                doktype: 1
+              entities:
+                content:
+                  - self:
+                      id: 8
+                      CType: academicpersons_card
+                      header: 'Profile card'
+                      header_layout: 2
+                      # The card renders exactly the profiles named here, in
+                      # this order, and reads no storage page at all.
+                      pi_flexform: |
+                        <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                        <T3FlexForms>
+                            <data>
+                                <sheet index="sDEF">
+                                    <language index="lDEF">
+                                        <field index="settings.demand.profileList">
+                                            <value index="vDEF">1,2</value>
+                                        </field>
+                                        <field index="settings.detailPid">
+                                            <value index="vDEF">6</value>
+                                        </field>
+                                        <field index="settings.fallbackForNonTranslated">
+                                            <value index="vDEF">1</value>
+                                        </field>
+                                    </language>
+                                </sheet>
+                            </data>
+                        </T3FlexForms>
+
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 8
+                title: 'Selected profiles'
+                slug: '/academic-persons/selected-profiles'
+                doktype: 1
+              entities:
+                content:
+                  - self:
+                      id: 9
+                      CType: academicpersons_selectedprofiles
+                      header: 'Selected profiles'
+                      header_layout: 2
+                      pi_flexform: |
+                        <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                        <T3FlexForms>
+                            <data>
+                                <sheet index="sDEF">
+                                    <language index="lDEF">
+                                        <field index="settings.selectedProfiles">
+                                            <value index="vDEF">1,3</value>
+                                        </field>
+                                        <field index="settings.detailPid">
+                                            <value index="vDEF">6</value>
+                                        </field>
+                                        <field index="settings.showFields">
+                                            <value index="vDEF">contracts.position,contracts.emailAddresses</value>
+                                        </field>
+                                    </language>
+                                </sheet>
+                            </data>
+                        </T3FlexForms>
+
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 9
+                title: 'Selected contracts'
+                slug: '/academic-persons/selected-contracts'
+                doktype: 1
+              entities:
+                content:
+                  - self:
+                      id: 10
+                      CType: academicpersons_selectedcontracts
+                      header: 'Selected contracts'
+                      header_layout: 2
+                      pi_flexform: |
+                        <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                        <T3FlexForms>
+                            <data>
+                                <sheet index="sDEF">
+                                    <language index="lDEF">
+                                        <field index="settings.selectedContracts">
+                                            <value index="vDEF">1,2</value>
+                                        </field>
+                                        <field index="settings.detailPid">
+                                            <value index="vDEF">6</value>
+                                        </field>
+                                    </language>
+                                </sheet>
+                            </data>
+                        </T3FlexForms>
+
+        #============================================================================================================
+        # Login.
+        #
+        # "settings.pages" has to name the folder the fe_users sit on: felogin
+        # turns it into a signed pid restriction, and a value naming the wrong
+        # folder makes a correct password fail silently.
+        #============================================================================================================
+        - self:
+            id: 10
+            title: 'Login'
+            slug: '/login'
+            doktype: 1
+          entities:
+            content:
+              - self:
+                  id: 11
+                  CType: felogin_login
+                  header: 'Login'
+                  header_layout: 2
+                  pi_flexform: |
+                    <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                    <T3FlexForms>
+                        <data>
+                            <sheet index="sDEF">
+                                <language index="lDEF">
+                                    <field index="settings.pages">
+                                        <value index="vDEF">2</value>
+                                    </field>
+                                    <field index="settings.showForgotPassword">
+                                        <value index="vDEF">0</value>
+                                    </field>
+                                    <field index="settings.showPermaLogin">
+                                        <value index="vDEF">1</value>
+                                    </field>
+                                </language>
+                            </sheet>
+                            <sheet index="s_redirect">
+                                <language index="lDEF">
+                                    <field index="settings.redirectMode">
+                                        <value index="vDEF">login</value>
+                                    </field>
+                                    <field index="settings.redirectPageLogin">
+                                        <value index="vDEF">11</value>
+                                    </field>
+                                </language>
+                            </sheet>
+                        </data>
+                    </T3FlexForms>
+
+        #============================================================================================================
+        # Profile editing, EXT:academic_persons_edit.
+        #
+        # The controller aborts with an access denied response when no frontend
+        # user is logged in, and it finds the profile through the
+        # "frontend_users" relation of the profile - not through a storage page
+        # and not through a FlexForm, which this CType does not have. So the
+        # page needs nothing but the plugin and a login, and "jane.doe" is
+        # connected to profile 1 above.
+        #
+        # "fe_group: -2" is "show at any login": the page then does not appear
+        # in a menu for a visitor who is not logged in and cannot be opened by
+        # one either, which is a better demonstration than a page that answers
+        # with a 403.
+        #============================================================================================================
+        - self:
+            id: 11
+            title: 'My profile'
+            slug: '/my-profile'
+            doktype: 1
+            fe_group: -2
+          entities:
+            content:
+              - self:
+                  id: 12
+                  CType: academicpersonsedit_profileediting
+                  header: 'My profile'
+                  header_layout: 2
+
+        #============================================================================================================
+        # Categories.
+        #
+        # EXT:category_types adds "sys_category.type", which is the TCA record
+        # type of the table and is what makes a category visible to an academic
+        # extension: a category with an empty type is invisible to the
+        # repositories and cannot even be picked in the backend, because the
+        # FlexForm restricts the selection with "type != ''". The identifiers
+        # come from each extension's "Configuration/CategoryTypes.yaml".
+        #
+        # "sys_language_uid" stays 0 - every CategoryRepository query restricts
+        # to (0, -1), so a translated category is silently invisible everywhere.
+        #============================================================================================================
+        - self:
+            id: 12
+            title: 'Data · categories'
+            slug: '/data-categories'
+            doktype: 254
+          entities:
+            category:
+              - self:
+                  id: 1
+                  type: 'degree'
+                  title: 'Bachelor of Engineering'
+              - self:
+                  id: 2
+                  type: 'degree'
+                  title: 'Master of Science'
+              - self:
+                  id: 3
+                  type: 'topic'
+                  title: 'Informatics'
+              - self:
+                  id: 4
+                  type: 'teaching_language'
+                  title: 'German'
+              # The partners group has its own type identifiers, from
+              # "academic_partners/Configuration/CategoryTypes.yaml". A category
+              # whose type belongs to another group is invisible to this
+              # extension.
+              - self:
+                  id: 5
+                  type: 'region'
+                  title: 'North Rhine-Westphalia'
+              - self:
+                  id: 6
+                  type: 'partner_type'
+                  title: 'University'
+
+        #============================================================================================================
+        # EXT:academic_programs.
+        #
+        # A program is not a record but a **page** with "doktype: 20", carrying
+        # four columns the extension adds to "pages" - so the program page and
+        # its detail view are the same page, and the list links to it with
+        # "f:uri.page". There is no "detailPid" setting anywhere.
+        #
+        # The category relation is written by declaring the uids of the
+        # categories above in the core "categories" field: DataHandler creates
+        # the rows in "sys_category_record_mm" and maintains the counter column.
+        #============================================================================================================
+        - self:
+            id: 13
+            title: 'Academic programs'
+            slug: '/academic-programs'
+            doktype: 1
+            backend_layout: 'pagets__default'
+          # Program pages are children of this one, so the list finds them with
+          # a starting point of "this page" and one level of recursion.
+          entities:
+            content:
+              - self:
+                  id: 13
+                  CType: header
+                  header: 'Academic programs'
+                  header_layout: 1
+              - self:
+                  id: 14
+                  CType: academicprograms_programlist
+                  header: 'All programs'
+                  header_layout: 2
+                  pages: '13'
+                  recursive: 1
+                  # "settings.sorting" must never be empty: DemandFactory splits
+                  # it on a space and reads the second element, so an empty
+                  # string raises an undefined array key warning rather than
+                  # falling back to a default.
+                  pi_flexform: |
+                    <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                    <T3FlexForms>
+                        <data>
+                            <sheet index="sDEF">
+                                <language index="lDEF">
+                                    <field index="settings.hideFilter">
+                                        <value index="vDEF">0</value>
+                                    </field>
+                                    <field index="settings.hideSorting">
+                                        <value index="vDEF">0</value>
+                                    </field>
+                                    <field index="settings.sorting">
+                                        <value index="vDEF">title asc</value>
+                                    </field>
+                                    <field index="settings.categories">
+                                        <value index="vDEF">0</value>
+                                    </field>
+                                    <field index="settings.showHiddenRecords">
+                                        <value index="vDEF">0</value>
+                                    </field>
+                                </language>
+                            </sheet>
+                        </data>
+                    </T3FlexForms>
+          children:
+            #--------------------------------------------------------------------------------------------------------
+            # The program pages. "backend_layout" is what makes the frontend
+            # render the extension's page template: the theme derives the
+            # template name from it, and the extension adds
+            # "Resources/Private/Pages/" to the template root paths for
+            # "doktype == 20".
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 14
+                title: 'Bachelor of Engineering'
+                slug: '/academic-programs/bachelor-of-engineering'
+                doktype: 20
+                backend_layout: 'pagets__AcademicProgram'
+                subtitle: 'Six semesters, full time'
+                abstract: 'An engineering degree with a focus on web technologies.'
+                categories: '1,3,4'
+                credit_points: 180
+                job_profile: '<p>Software engineering, systems integration, technical consulting.</p>'
+                performance_scope: '<p>180 credit points over six semesters, including a practical semester.</p>'
+                prerequisites: '<p>University entrance qualification, no admission restriction.</p>'
+              entities:
+                content:
+                  # The detail plugin reads the page it sits on - it has no
+                  # settings at all and no storage page. It therefore belongs on
+                  # the program page itself, never on a list page.
+                  - self:
+                      id: 15
+                      CType: academicprograms_programdetails
+                      header: 'Key facts'
+                      header_layout: 2
+            - self:
+                id: 15
+                title: 'Master of Science'
+                slug: '/academic-programs/master-of-science'
+                doktype: 20
+                backend_layout: 'pagets__AcademicProgram'
+                subtitle: 'Four semesters, full time'
+                abstract: 'A research oriented master programme.'
+                categories: '2,3'
+                credit_points: 120
+                job_profile: '<p>Research, data engineering, software architecture.</p>'
+                prerequisites: '<p>A bachelor degree in a related subject.</p>'
+              entities:
+                content:
+                  - self:
+                      id: 16
+                      CType: academicprograms_programdetails
+                      header: 'Key facts'
+                      header_layout: 2
+            - self:
+                id: 16
+                title: 'Bachelor of Arts'
+                slug: '/academic-programs/bachelor-of-arts'
+                doktype: 20
+                backend_layout: 'pagets__AcademicProgram'
+                # Deliberately sparse: a program page with nothing but a title,
+                # a slug and one category is a legitimate record, and the list
+                # has to render it next to the two rich ones without falling
+                # over.
+                categories: '4'
+              entities:
+                content:
+                  - self:
+                      id: 17
+                      CType: academicprograms_programdetails
+                      header: 'Key facts'
+                      header_layout: 2
+
+        #============================================================================================================
+        # EXT:academic_partners.
+        #
+        # Partners are pages too, "doktype: 40", with the address and geocoding
+        # columns the extension adds to "pages". Partnerships and roles are
+        # ordinary records; a partnership names the partner page, a role, and
+        # the page it is shown on.
+        #
+        # "PartnershipRepository::findByPid()" matches "page" against the pid of
+        # the content element, and lifts the storage page restriction - so a
+        # partnership may live in this folder while pointing at the page
+        # carrying the plugin.
+        #
+        # Nothing here calls out to a geocoding service: the extension geocodes
+        # in the "GeocodeCommand" CLI command, and registers no DataHandler hook
+        # and no event listener, so seeding an address writes an address and
+        # nothing else.
+        #============================================================================================================
+        - self:
+            id: 20
+            title: 'Data · partners'
+            slug: '/data-partners'
+            doktype: 254
+          entities:
+            partnerRole:
+              - self:
+                  id: 1
+                  name: 'Strategic partner'
+                  description: 'A long term partnership with a shared roadmap.'
+              - self:
+                  id: 2
+                  name: 'Research partner'
+                  description: 'A partnership around a single research programme.'
+
+        - self:
+            id: 21
+            title: 'Academic partners'
+            slug: '/academic-partners'
+            doktype: 1
+            backend_layout: 'pagets__default'
+          entities:
+            content:
+              - self:
+                  id: 18
+                  CType: header
+                  header: 'Academic partners'
+                  header_layout: 1
+              - self:
+                  id: 19
+                  CType: text
+                  bodytext: |
+                    <p>One page per plugin of EXT:academic_partners. The partner pages
+                    themselves are children of this page, so a starting point of this page
+                    plus one level of recursion finds them.</p>
+            # The partnerships sit on *this* page and are named by the relation
+            # field of the two pages below, as the comma separated list of the
+            # uids they declare. The relation is what writes the child's "page"
+            # column and its sorting, and the plugins read exactly that column;
+            # the pid is only where the records are stored, and
+            # "PartnershipRepository::findByPid()" lifts the storage page
+            # restriction anyway.
+            partnership:
+              - self:
+                  id: 1
+                  partner: 26
+                  role: 1
+              - self:
+                  id: 2
+                  partner: 27
+                  role: 2
+              - self:
+                  id: 3
+                  partner: 26
+                  role: 1
+          children:
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 22
+                title: 'Partner list'
+                slug: '/academic-partners/list'
+                doktype: 1
+              entities:
+                content:
+                  - self:
+                      id: 20
+                      CType: academicpartners_list
+                      header: 'Partner list'
+                      header_layout: 2
+                      pages: '21'
+                      recursive: 1
+                      pi_flexform: |
+                        <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                        <T3FlexForms>
+                            <data>
+                                <sheet index="sDEF">
+                                    <language index="lDEF">
+                                        <field index="settings.hideFilter">
+                                            <value index="vDEF">0</value>
+                                        </field>
+                                        <field index="settings.hideSorting">
+                                            <value index="vDEF">0</value>
+                                        </field>
+                                        <field index="settings.sorting">
+                                            <value index="vDEF">title asc</value>
+                                        </field>
+                                        <field index="settings.categories">
+                                            <value index="vDEF">0</value>
+                                        </field>
+                                        <field index="settings.showHiddenRecords">
+                                            <value index="vDEF">0</value>
+                                        </field>
+                                    </language>
+                                </sheet>
+                            </data>
+                        </T3FlexForms>
+
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 23
+                title: 'Partner map'
+                slug: '/academic-partners/map'
+                doktype: 1
+              entities:
+                content:
+                  # The map renders the partners that carry "show_on_map" and a
+                  # geocode. Nothing here is geocoded - that is the "geocode"
+                  # CLI command's job - so the map comes up empty until it has
+                  # run, which is the honest state of a freshly seeded instance.
+                  - self:
+                      id: 21
+                      CType: academicpartners_map
+                      header: 'Partner map'
+                      header_layout: 2
+                      pages: '21'
+                      recursive: 1
+                      pi_flexform: |
+                        <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                        <T3FlexForms>
+                            <data>
+                                <sheet index="sDEF">
+                                    <language index="lDEF">
+                                        <field index="settings.hideFilter">
+                                            <value index="vDEF">1</value>
+                                        </field>
+                                        <field index="settings.hideSorting">
+                                            <value index="vDEF">1</value>
+                                        </field>
+                                        <field index="settings.sorting">
+                                            <value index="vDEF">title asc</value>
+                                        </field>
+                                        <field index="settings.categories">
+                                            <value index="vDEF">0</value>
+                                        </field>
+                                        <field index="settings.showHiddenRecords">
+                                            <value index="vDEF">0</value>
+                                        </field>
+                                    </language>
+                                </sheet>
+                            </data>
+                        </T3FlexForms>
+
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 24
+                title: 'Partnerships list'
+                slug: '/academic-partners/partnerships'
+                doktype: 1
+                tx_academicpartners_partnerships: '1,2'
+              entities:
+                content:
+                  # No FlexForm and no storage page: this plugin shows the
+                  # partnerships whose "page" is the page it sits on - which is
+                  # why the teaser page below needs partnerships of its own
+                  # rather than sharing these.
+                  - self:
+                      id: 22
+                      CType: academicpartners_partnershipslist
+                      header: 'Partnerships'
+                      header_layout: 2
+
+            #--------------------------------------------------------------------------------------------------------
+            - self:
+                id: 25
+                title: 'Partnerships teaser'
+                slug: '/academic-partners/partnerships-teaser'
+                doktype: 1
+                tx_academicpartners_partnerships: '3'
+              entities:
+                content:
+                  - self:
+                      id: 23
+                      CType: academicpartners_partnershipsteaser
+                      header: 'Selected partnerships'
+                      header_layout: 2
+
+            #--------------------------------------------------------------------------------------------------------
+            # The partner pages themselves.
+            #--------------------------------------------------------------------------------------------------------
+            # Both carry coordinates and "geocode_status: manually", and both
+            # are deliberate:
+            #
+            # * "geocode_status" is a TCA select with the default "open", which
+            #   is the one value the "academic:geocodepartners" command picks
+            #   up. A partner seeded without the column would therefore queue
+            #   itself for a request to nominatim.openstreetmap.org the moment
+            #   somebody runs that command. Nothing else in the extension talks
+            #   to the network, and nothing at all does so while seeding.
+            # * neither the list nor the map filters on the coordinates or on
+            #   "show_on_map" - a partner without them renders a marker at 0/0,
+            #   off the coast of West Africa.
+            - self:
+                id: 26
+                title: 'TYPO3 Association'
+                slug: '/academic-partners/typo3-association'
+                doktype: 40
+                backend_layout: 'pagets__AcademicPartner'
+                abbreviation: 'T3A'
+                address_street: 'Sihlbruggstrasse'
+                address_street_number: '105'
+                address_zip: '6340'
+                address_city: 'Baar'
+                address_country: 'CH'
+                geocode_latitude: '47.1953'
+                geocode_longitude: '8.5264'
+                geocode_status: 'manually'
+                show_on_map: 1
+                categories: '5,6'
+                link: 'https://typo3.org/'
+                description: '<p>The association behind the TYPO3 CMS project.</p>'
+            - self:
+                id: 27
+                title: 'web-vision GmbH'
+                slug: '/academic-partners/web-vision'
+                doktype: 40
+                backend_layout: 'pagets__AcademicPartner'
+                abbreviation: 'WV'
+                address_street: 'An der Eickesmühle'
+                address_street_number: '38'
+                address_zip: '41238'
+                address_city: 'Mönchengladbach'
+                address_country: 'DE'
+                geocode_latitude: '51.1854'
+                geocode_longitude: '6.4419'
+                geocode_status: 'manually'
+                show_on_map: 1
+                categories: '5'
+                link: 'https://www.web-vision.de/'
+                description: '<p>TYPO3 agency and long standing contributor.</p>'

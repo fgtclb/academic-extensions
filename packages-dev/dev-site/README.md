@@ -8,12 +8,12 @@ Extension key `academics_dev_site`, composer package
 This package carries the **seed definitions** for the development instances of
 this mono repository, [`core-12/`](../../core-12) and
 [`core-13/`](../../core-13). It holds content and instance configuration, no
-application code: the YAML file below `Configuration/Seeds/` describes the page
-tree, the records and the content elements a freshly set up instance is filled
+application code: the YAML files below `Configuration/DataFactory/` describe the
+page tree, the records and the content elements a freshly set up instance is filled
 with, so that an instance can be rebuilt from nothing and still look the same on
 every machine.
 
-There is one definition, `Configuration/Seeds/Instance.yaml`, and it serves both
+There is one seed set, `Configuration/DataFactory/academics-instance/`, and it serves both
 instances: the backend layouts, the CTypes and the plugin FlexForms in it are
 identical on TYPO3 v12 and v13. It is applied from within an instance:
 
@@ -22,15 +22,13 @@ cd core-12
 ddev composer instance:seed
 ```
 
-which runs
-`vendor/bin/typo3 theme:seed EXT:academics_dev_site/Configuration/Seeds/Instance.yaml`.
-The `theme:seed` command comes from `sbuerk/theme-extension-development`, which
-both instances require **for its seeder only** — the theme itself is not used,
-the instances are themed with `bk2k/bootstrap-package`.
+which runs `vendor/bin/typo3 data-factory:import academics-instance`. The
+`data-factory:import` command comes from `sbuerk/data-factory`, which both
+instances require.
 
-A seed is always addressed through its extension path, never through a relative
-filesystem path: that is the one form which resolves inside DDEV and on a host
-stack alike.
+A set is addressed by its identifier, never by a filesystem path: the command
+looks for a `Configuration/DataFactory/<identifier>/config.yml` in every active
+extension, which resolves inside DDEV and on a host stack alike.
 
 Two rules the definition follows, both of which matter when changing it:
 
