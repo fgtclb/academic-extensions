@@ -12,7 +12,10 @@ use SBUERK\DataFactory\Seeding\DataHandling\ScenarioSeedResult;
 use SBUERK\DataFactory\Seeding\Parser\SeedDefinitionParser;
 use SBUERK\DataFactory\Seeding\Scenario\ScenarioComposer;
 use SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase;
+use Symfony\Component\Yaml\Yaml;
+use TYPO3\CMS\Core\Configuration\SiteWriter;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -74,6 +77,8 @@ abstract class AbstractSeedTestCase extends FunctionalTestCase
      */
     protected function importSeed(): ScenarioSeedResult
     {
+        $this->adoptTheCommittedSiteConfigurations();
+
         $definition = (new SeedDefinitionParser())->parseFile(SeedDefinition::CONFIG_FILE);
         $factory = (new ScenarioComposer())->compose($definition, 0);
 
@@ -81,6 +86,44 @@ abstract class AbstractSeedTestCase extends FunctionalTestCase
             new FileSeeder(GeneralUtility::makeInstance(StorageRepository::class)),
             new FileReferenceSeeder(GeneralUtility::makeInstance(ConnectionPool::class)),
         ))->seed($definition, $factory, $this->setUpBackendUser(1));
+    }
+
+    /**
+     * The site configurations of the development instance of the running core
+     * version, copied into this test instance before the import.
+     *
+     * They are not decoration. `DataHandler` builds the prefix of a translated
+     * field - `[Translate to German:]` - from the title of the site language the
+     * record is translated into, and with no site there is no language and the
+     * prefix comes out as `[Translate to :]`. The seed writes that prefix into
+     * every translated `sys_file_reference`, so an import without the sites
+     * produces content a real installation never produces, and the manifest
+     * generated from it disagrees with the committed snapshot on 22 rows.
+     *
+     * Copied rather than built, so that a site setting changed in the instance
+     * reaches this measurement without anyone remembering to mirror it here.
+     */
+    private function adoptTheCommittedSiteConfigurations(): void
+    {
+        $source = sprintf(
+            '%s/core-%d/config/sites',
+            dirname(__DIR__, 4),
+            (new Typo3Version())->getMajorVersion(),
+        );
+        $writer = $this->get(SiteWriter::class);
+
+        foreach ((array)glob($source . '/*', GLOB_ONLYDIR) as $site) {
+            $identifier = basename((string)$site);
+            /** @var array<string, mixed> $configuration */
+            $configuration = Yaml::parseFile($site . '/config.yaml');
+            $writer->write($identifier, $configuration);
+
+            if (is_file($site . '/settings.yaml')) {
+                /** @var array<string, mixed> $settings */
+                $settings = Yaml::parseFile($site . '/settings.yaml');
+                $writer->writeSettings($identifier, $settings);
+            }
+        }
     }
 
     /**
