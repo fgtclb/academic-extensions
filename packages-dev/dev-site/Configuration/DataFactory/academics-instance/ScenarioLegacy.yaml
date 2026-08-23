@@ -3122,7 +3122,7 @@ entities:
                   categories: '19'
                   tx_academicprojects_project_title: 'Digital archive of the university'
                   tx_academicprojects_short_description: '<p>Digitising the university archive.</p>'
-                  tx_academicprojects_start_date: 1640995200
+                  tx_academicprojects_start_date: 1643673600
                   tx_academicprojects_end_date: 1735603200
                   tx_academicprojects_budget: '120000.00'
               languageVariants:
@@ -3136,7 +3136,7 @@ entities:
                       categories: '19'
                       tx_academicprojects_project_title: 'Digital archive of the university'
                       tx_academicprojects_short_description: '<p>Digitising the university archive.</p>'
-                      tx_academicprojects_start_date: 1640995200
+                      tx_academicprojects_start_date: 1643673600
                       tx_academicprojects_end_date: 1735603200
                       tx_academicprojects_budget: '120000.00'
             - self:
@@ -3168,7 +3168,7 @@ entities:
                   categories: '17'
                   hidden: 1
                   tx_academicprojects_short_description: '<p>Not announced yet.</p>'
-                  tx_academicprojects_start_date: 1704067200
+                  tx_academicprojects_start_date: 1706745600
                   tx_academicprojects_end_date: 2082758400
               languageVariants:
                 - self:
@@ -3181,7 +3181,7 @@ entities:
                       categories: '17'
                       hidden: 1
                       tx_academicprojects_short_description: '<p>Not announced yet.</p>'
-                      tx_academicprojects_start_date: 1704067200
+                      tx_academicprojects_start_date: 1706745600
                       tx_academicprojects_end_date: 2082758400
         - self:
               id: 1270
