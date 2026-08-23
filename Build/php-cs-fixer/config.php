@@ -51,6 +51,12 @@ return (new Config())
             ->ignoreVCSIgnored(true)
             ->in([
                 __DIR__ . '/../../packages/fgtclb/',
+                // The development packages too, since the seed of
+                // "packages-dev/dev-site" gained tests of its own: they are PHP
+                // of this repository like any other, and a formatting standard
+                // that stops at a directory boundary is a standard nobody can
+                // remember.
+                __DIR__ . '/../../packages-dev/',
                 __DIR__ . '/../../Build',
             ])
             ->exclude([

@@ -1,0 +1,7 @@
+name: fgtclb/academics-dev-site-page-object
+label: 'Academics development site page object'
+dependencies:
+  # What EXT:bootstrap_package brings to the "/" tree and what this set stands in
+  # for when a test renders the two trees against each other: the rendering
+  # definitions of the core content elements.
+  - typo3/fluid-styled-content

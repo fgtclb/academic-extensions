@@ -40,6 +40,13 @@
                 test location path needs to be given to phpunit.
             -->
             <directory>../../packages/*/*/Tests/Unit/</directory>
+            <!--
+                "packages-dev/" as well, and not only "packages/": the seed definition of
+                "packages-dev/dev-site" is verified by tests of its own, and a suite that does
+                not collect them is a suite that reports the seed as green because it never
+                looked at it.
+            -->
+            <directory>../../packages-dev/*/Tests/Unit/</directory>
         </testsuite>
     </testsuites>
     <php>

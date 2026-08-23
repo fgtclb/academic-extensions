@@ -39,13 +39,14 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 
 ## [Testing](testing/Index.md)
 
-| Page                                                      | Contents                                                                              |
-|-----------------------------------------------------------|---------------------------------------------------------------------------------------|
-| [PHPUnit configuration](testing/phpunit-configuration.md) | Where the configuration comes from, the deliberate deviations, the strictness policy. |
-| [Unit tests](testing/unit-tests.md)                       | Running them, discovery across all extensions, core version aware tests.              |
-| [Functional tests](testing/functional-tests.md)           | Databases, why SQLite alone is not enough, loading extensions.                        |
-| [Fixture extensions](testing/fixture-extensions.md)       | Test-only extensions and how they are wired.                                          |
-| [Testing helper](testing/testing-helper.md)               | The shared traits in `packages-dev/testing-helper/` and the trap each one exists for. |
+| Page                                                      | Contents                                                                                                     |
+|-----------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| [PHPUnit configuration](testing/phpunit-configuration.md) | Where the configuration comes from, the deliberate deviations, the strictness policy.                        |
+| [Unit tests](testing/unit-tests.md)                       | Running them, discovery across all extensions, core version aware tests.                                     |
+| [Functional tests](testing/functional-tests.md)           | Databases, why SQLite alone is not enough, loading extensions.                                               |
+| [Fixture extensions](testing/fixture-extensions.md)       | Test-only extensions and how they are wired.                                                                 |
+| [Testing helper](testing/testing-helper.md)               | The shared traits in `packages-dev/testing-helper/` and the trap each one exists for.                        |
+| [Seed verification](testing/seed-verification.md)         | The manifest of the development seed, and the four checks that keep it, the YAML and the snapshots together. |
 
 ## [Workflow](workflow/Index.md)
 

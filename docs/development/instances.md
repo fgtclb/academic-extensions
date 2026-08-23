@@ -132,6 +132,15 @@ section per extension, one page per plugin:
 Changing that content is a change to the seed set, not a click path — see
 [Seeding an instance](environment.md#seeding-an-instance).
 
+The records the seed writes reference **files**, and those cannot live in the
+instance: `core-*/public/` is git-ignored. They are committed in the seed
+package below `packages-dev/dev-site/Resources/Public/SeedFiles/`, drawn by
+`Build/Scripts/generateSeedFiles.php`, and copied into `fileadmin/` by
+`config/system/additional.php` on the same first request that installs the
+database template — so a fresh clone gets the database and the files it points
+at together. See
+[Seed files, and how they reach an instance](environment.md#seed-files-and-how-they-reach-an-instance).
+
 ## Database backup and restore
 
 The instance database is git-ignored (`core-*/var/`); the template next to it is
@@ -157,6 +166,11 @@ Rebuilding one from nothing, including the exact `typo3 setup` invocation and
 the two things it leaves behind, is
 [Rebuilding an instance from nothing](environment.md#rebuilding-an-instance-from-nothing).
 
+A committed template that no longer matches the seed definition next to it is
+what `SnapshotManifestTest` reports — the two used to drift apart in silence.
+Change the seed and the snapshot in the same change, and regenerate the manifest
+with them: [Seed verification](../testing/seed-verification.md).
+
 ## See also
 
 - [Development environment](environment.md) — the harness, and the seeding and
@@ -165,3 +179,5 @@ the two things it leaves behind, is
   package sit in the repository.
 - [Validation settings](../architecture/validation-settings.md) — why the name
   fields of a profile are read only in the editing form.
+- [Seed verification](../testing/seed-verification.md) — the checks that keep the
+  seed definition, the committed snapshots and the manifest in agreement.

@@ -17,8 +17,10 @@ page:
 plugin:
   tx_academicpersons:
     # The detail page of the seeded tree. The plugins declare it in their
-    # FlexForm as well; this is the fallback for one added by hand later.
-    detailPid: 6
+    # FlexForm as well; this is the fallback for one added by hand later, and it
+    # is what EXT:academic_contacts4pages reads - that extension has no detail
+    # page setting of its own.
+    detailPid: 205
     demand:
       # The set ships "title", which is not one of the values the extension
       # configuration allows ("firstName", "lastName" - see
@@ -29,3 +31,20 @@ plugin:
     pagination:
       # The set ships 1.
       resultsPerPage: 10
+  tx_academicjobs:
+    persistence:
+      # "/data/jobs". The jobs are storage pid addressed, so both page trees of
+      # this installation read the same records from the same folder.
+      storagePid: 120
+    # The three pages of the "/jobs" branch the plugins link to and redirect to.
+    detailPid: 233
+    listPid: 231
+    saveForm:
+      # Where the "post a job" form sends the visitor after a successful save.
+      fallbackRedirectPageId: 235
+    email:
+      # Both addresses must be non-empty: the form mails the notification to
+      # "recipientEmail" from "from", and an empty one raises an exception in
+      # the middle of a frontend request rather than a warning in a log.
+      from: seed-noreply@example.org
+      recipientEmail: jobs@example.org

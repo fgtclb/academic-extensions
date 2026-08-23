@@ -486,6 +486,8 @@ Two consequences follow, and both have cost time before:
   test groups follow from it.
 - [PHPUnit configuration](../testing/phpunit-configuration.md) — the two
   configurations and their bootstraps in detail.
+- [Seed verification](../testing/seed-verification.md) — the one committed
+  artifact a gate rewrites, and the suite that rewrites it.
 - [Core version aware code](../architecture/core-version-aware-code.md)
 - [Pull requests](../workflow/pull-requests.md) — what has to be green before
   pushing, and how to read a red pipeline.

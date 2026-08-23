@@ -24,7 +24,7 @@ printSummary() {
     fi
     echo "PHP: ${PHP_VERSION}" >&2
     echo "TYPO3: ${CORE_VERSION}" >&2
-    if [[ ${TEST_SUITE} =~ ^(functional|functionalDeprecated|acceptance|acceptanceInstall)$ ]]; then
+    if [[ ${TEST_SUITE} =~ ^(functional|seedManifest|functionalDeprecated|acceptance|acceptanceInstall)$ ]]; then
         case "${DBMS}" in
             mariadb|mysql|postgres)
                 echo "DBMS: ${DBMS}  version ${DBMS_VERSION}  driver ${DATABASE_DRIVER}" >&2
@@ -289,6 +289,7 @@ Options:
             - openDocumentation: Open a rendered extension documentation in the browser (only linux for now)
             - phpstan: phpstan tests
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
+            - seedManifest: regenerate the committed manifest of the development seed from a real import
             - typecheckJs: "tsc --noEmit" over the TypeScript sources, which the build does not do
             - unit: PHP unit tests
             - unitRandom: PHP unit tests in random order, "-o <number>" to use a specific seed
@@ -360,7 +361,7 @@ Options:
             - 16    maintained until 2028-11-09
 
     -t <13|14>
-        Only with -s composerUpdate|functional|phpstan|phpstanGenerateBaseline|unit|unitRandom
+        Only with -s composerUpdate|functional|phpstan|phpstanGenerateBaseline|seedManifest|unit|unitRandom
         Specifies the TYPO3 core version to be used
             - 13: (default) use TYPO3 v13
             - 14: use TYPO3 v14
@@ -843,9 +844,20 @@ case ${TEST_SUITE} in
         fi
         [[ -f composer.json.orig ]] && \cp -f composer.json.orig composer.json
         ;;
-    functional)
+    functional|seedManifest)
         PHPUNIT_CONFIG_FILE="Build/phpunit/FunctionalTests.xml"
-        COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group not-${DBMS} --exclude-group not-core-${CORE_VERSION} "$@")
+        if [ "${TEST_SUITE}" == "seedManifest" ]; then
+            # The one test of the suite that writes rather than checks: it imports the
+            # development seed and rewrites its committed manifest from what the import
+            # produced. It is a suite of its own and not a "--group" on "functional",
+            # because phpunit lets a command line group filter replace the one in the
+            # configuration file wholesale - so the exclusion below is the only thing
+            # that keeps it out of a normal run, and a run that wants it has to be a run
+            # that does not carry the exclusion.
+            COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --group seed-manifest-update packages-dev/dev-site/Tests/Functional/SeedManifestTest.php)
+        else
+            COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group seed-manifest-update --exclude-group not-${DBMS} --exclude-group not-core-${CORE_VERSION} "$@")
+        fi
         # Each functional test case gets its own TYPO3 instance below
         # "typo3temp/var/tests/functional-<identifier>". The testing framework derives that
         # identifier itself, as "substr(sha1(<test class>), 0, 7)", so it is the same in every

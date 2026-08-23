@@ -219,22 +219,111 @@ This is a bigger trap than the double parse. It is also what an installation
 in that state recovers from by selecting the static template: the record that
 wiped the set contribution can carry the same configuration itself.
 
+## Both mechanisms, one site each: the development instances
+
+The instructions above say **one mechanism per site**. The development instances
+follow that by running one site per mechanism, side by side in one installation:
+
+| Site directory                           | Root page | Base       | TypoScript arrives through                                                                           |
+|------------------------------------------|-----------|------------|------------------------------------------------------------------------------------------------------|
+| `core-NN/config/sites/academics/`        | 1         | `/`        | `dependencies:` — `bootstrap-package/full`, the ten academic aggregates, `typo3/felogin`             |
+| `core-NN/config/sites/academics-legacy/` | 1001      | `/legacy/` | the `include_static_file` column of a root `sys_template` record, and the page's `tsconfig_includes` |
+
+The second tree is a **full mirror** of the first — the same content pages, the
+same content elements, the same images, the same slugs — written by
+`packages-dev/dev-site/Configuration/DataFactory/academics-instance/ScenarioLegacy.yaml`.
+That is what makes a difference between the two delivery paths observable: the
+same page renders under `/persons/list` and under `/legacy/persons/list`, and
+the markup either matches or it does not. A smoke tree of a handful of pages
+would only find a difference somebody guessed at in advance.
+
+The mirror is the content pages only. The nine storage folders below `/data`
+are **not** mirrored: their records are shared, so a mirrored folder would be an
+empty folder in the backend that looks like it should hold something. `/` is 65
+pages, `/legacy/` is 56, and the `pages` table carries 242 rows once the German
+variant of every one of them is counted.
+
+The two trees share their record storage. Roughly fifteen of the seeded tables
+are addressed by a storage pid, so they exist once, under `/data`, and both
+trees name those pids. Four are addressed by a page or by a content element —
+`tx_academiccontacts4pages_domain_model_contact`,
+`tx_academicpartners_domain_model_partnership`,
+`tx_academicstudyplan_domain_model_semester` and, through its semester,
+`tx_academicstudyplan_domain_model_module` — and those are duplicated with the
+page that owns them, because no configuration can make the reading code look
+somewhere else.
+
+The legacy site names no site set, and it carries no `settings.yaml`. What the
+site settings of `academics` say, it says in the `constants` field of its
+`sys_template` record, with the page uids of its own tree. Both are the same
+statement; making it twice in two different ways is the point of the site.
+
+### The legacy tree is not themed, and cannot be
+
+`bootstrap-package/full` is a site set, and from version 16 of that extension it
+is the *only* way it delivers anything: version 15 still shipped
+`Configuration/TypoScript/` and registered it with `addStaticFile()`, version 16
+removed both, along with its `registerPageTSConfigFile()` calls. The `core-13`
+instance runs 15 and the `core-14` instance runs 16, so a `sys_template` record
+naming the theme would render one instance and render nothing at all in the
+other.
+
+The `/legacy/` tree therefore gets no theme. It names
+`EXT:academics_dev_site/Configuration/TypoScript` instead — the smallest page
+object that puts the content of a page on the page, shipped by the seed package
+in both delivery forms and described in
+[its README](../../packages-dev/dev-site/README.md). The consequence to know
+about is visual only: `/legacy/` renders unstyled, and its pages'
+`backend_layout` values name layouts that tree does not define.
+
+This is also the first finding of the drift gate described in
+[Seed verification](../testing/seed-verification.md), and a good illustration of
+why its second half exists: the theme's static template folder *resolved*
+perfectly well on `core-13` while nothing offered it any more.
+
+## Route enhancers are not loaded by anything
+
+Five files ship route enhancers and **none of them is read by TYPO3 on its own**:
+
+| Extension           | Files                                                   |
+|---------------------|---------------------------------------------------------|
+| `academic_persons`  | `Configuration/Routes/{List,ListAndDetail,Detail}.yaml` |
+| `academic_jobs`     | `Configuration/Routes/Detail.yaml`                      |
+| `academic_programs` | `Configuration/Yaml/Routes.yaml`                        |
+
+A site configuration has to `imports:` them, or every detail page is reachable
+only through a raw `tx_…[…]` argument. Both instance site configurations do:
+
+```yaml
+imports:
+  - resource: 'EXT:academic_persons/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
+```
+
+Not through a site set: a set may carry a `route-enhancers.yaml` only from TYPO3
+v14.1, and this branch supports v13 as well, so `imports:` is the form that
+works on both. The five enhancer keys are distinct, so importing all five into
+one site is not a conflict.
+
 ## The integrator chapter
 
 Each converted extension documents the two mechanisms in its own
 `Documentation/Configuration/Index.rst`, and every package uses the same eight
 anchors so a cross-reference written once holds everywhere:
 
-| Anchor                             | Section                                                          |
-|------------------------------------|------------------------------------------------------------------|
-| `configuration`                    | The chapter itself.                                              |
-| `configuration-components`         | What the sets contain, one row per component plus the aggregate. |
-| `configuration-hidden-by-default`  | Which content elements are hidden and what brings them back.     |
-| `site-set`                         | How to name the set in `config.yaml`.                            |
-| `static-templates`                 | The classic mechanism, and the `clear = 3` warning.              |
-| `static-typoscript`                | The `sys_template` entries to select.                            |
-| `static-pagetsconfig`              | The page TSconfig entries to select.                             |
-| `one-mechanism-per-site`           | Why not to combine the two.                                      |
+| Anchor                            | Section                                                          |
+|-----------------------------------|------------------------------------------------------------------|
+| `configuration`                   | The chapter itself.                                              |
+| `configuration-components`        | What the sets contain, one row per component plus the aggregate. |
+| `configuration-hidden-by-default` | Which content elements are hidden and what brings them back.     |
+| `site-set`                        | How to name the set in `config.yaml`.                            |
+| `static-templates`                | The classic mechanism, and the `clear = 3` warning.              |
+| `static-typoscript`               | The `sys_template` entries to select.                            |
+| `static-pagetsconfig`             | The page TSconfig entries to select.                             |
+| `one-mechanism-per-site`          | Why not to combine the two.                                      |
 
 An extension that ships nothing for one of them keeps the anchor and says so in
 one line — `academic-base` ships no TypoScript and no content element, and its

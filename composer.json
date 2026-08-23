@@ -54,6 +54,7 @@
     },
     "require-dev": {
         "bnf/phpstan-psr-container": "^1.0.1",
+        "fgtclb/academics-monorepo-dev-site": "@dev",
         "fgtclb/academics-monorepo-testing-helper": "@dev",
         "friendsofphp/php-cs-fixer": "^3.80.0",
         "friendsoftypo3/phpstan-typo3": "^0.9.0",
@@ -96,6 +97,11 @@
             "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms-core/Tests/",
             "TYPO3\\CMS\\Extbase\\Tests\\": ".Build/vendor/typo3/cms-extbase/Tests/",
             "TYPO3\\CMS\\Frontend\\Tests\\": ".Build/vendor/typo3/cms-frontend/Tests/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FGTCLB\\AcademicsDevSite\\Tests\\": "packages-dev/dev-site/Tests/"
         }
     }
 }

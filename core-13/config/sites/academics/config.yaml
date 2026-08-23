@@ -1,3 +1,21 @@
+# The route enhancers of the academic extensions.
+#
+# None of the five files is loaded by TYPO3 on its own - a "Routes.yaml" or a
+# "Configuration/Routes/*.yaml" is inert until a site configuration imports it -
+# so without this block every detail page below is reachable only through a raw
+# "tx_...[...]" argument, and half of the seeded tree looks broken for a reason
+# that is not the seed.
+#
+# Imported here rather than carried by a site set: a set may ship a
+# "route-enhancers.yaml" only from TYPO3 v14.1, and this branch supports v13 as
+# well, so "imports" is the form that works on both.
+imports:
+  - resource: 'EXT:academic_persons/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
+
 # Site of the seeded page tree.
 #
 # "rootPageId" is 1 because the seed definition declares that uid - see
@@ -53,4 +71,20 @@ languages:
     locale: en_US.UTF-8
     navigationTitle: English
     flag: us
+    websiteTitle: ''
+  # "fallbackType: strict" - a page without a translation is a 404 in "/de/",
+  # not the English page served under a German URL. That is the setting the seed
+  # is written for: every page and every translatable record it declares carries
+  # its German variant, so a hole in "/de/" is a defect in the seed and shows up
+  # as one instead of being papered over by the default language.
+  -
+    title: German
+    enabled: true
+    languageId: 1
+    base: /de/
+    locale: de_DE.UTF-8
+    navigationTitle: Deutsch
+    flag: de
+    fallbackType: strict
+    fallbacks: ''
     websiteTitle: ''
