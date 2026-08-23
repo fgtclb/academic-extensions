@@ -325,9 +325,18 @@ discovered in the `Configuration/DataFactory/` of the **active packages** of an
 installation, and a `library` is not an installed extension, so nothing would
 ever find it.
 
-Everything else about it is deliberately minimal. It carries no PHP and no
-`Classes/` — only the seed set, a `composer.json`, a `VERSION` file, a `LICENSE`
-and a `README.md`. Like its two siblings it has no `ext_emconf.php`: it is never
+Everything else about it is deliberately minimal. It carries no `Classes/` — the
+seed set, the files that set references in `Resources/Public/SeedFiles/`, one
+page object shipped twice (`Configuration/TypoScript/` and
+`Configuration/Sets/PageObject/`, because the `/legacy/` tree cannot be themed),
+the `Configuration/TCA/Overrides/sys_template.php` that registers the first of
+those, its own `Tests/` — see
+[Seed verification](../testing/seed-verification.md) — plus a `composer.json`, a
+`VERSION` file, a `LICENSE` and a `README.md`. The files are committed because `core-*/public/` is
+git-ignored and a `sys_file` row without its file is a broken image; they are
+drawn by `Build/Scripts/generateSeedFiles.php` and copied into `fileadmin/` by
+each instance's `config/system/additional.php` — see
+[Seed files, and how they reach an instance](environment.md#seed-files-and-how-they-reach-an-instance). Like its two siblings it has no `ext_emconf.php`: it is never
 released, never split out to a read-only repository and never published to the
 TER, so `bin/set-version` needs no special case for it. It is versioned along
 with everything else for one reason only — it is a path package, so its version

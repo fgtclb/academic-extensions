@@ -1,0 +1,512 @@
+{
+    "README": [
+        "This file is generated. See FGTCLB\\AcademicsDevSite\\Tests\\Functional\\Support\\SeedManifest for the command that writes it.",
+        "It belongs to one TYPO3 core version - the two initialise a column the seed does",
+        "not name differently - and there is a second file next to it for the other one.",
+        "It is the measurement of one real import of the seed set \"academics-instance\":",
+        "the number of rows the set wrote per table, the columns the set states a value",
+        "for, and a checksum over those columns of those rows.",
+        "A row is addressed by the uid the seed declares, except in \"sys_file\" and",
+        "\"sys_file_reference\", which are read whole because the seed does not declare",
+        "every row of them - a translated page and a translated profile inherit their",
+        "file relation and produce rows no \"references:\" entry names."
+    ],
+    "tables": {
+        "be_groups": {
+            "rows": 1,
+            "columns": [
+                "db_mountpoints",
+                "explicit_allowdeny",
+                "file_mountpoints",
+                "groupMods",
+                "hidden",
+                "non_exclude_fields",
+                "pagetypes_select",
+                "pid",
+                "tables_modify",
+                "tables_select",
+                "title",
+                "uid"
+            ],
+            "checksum": "3fa9c6d10f25aa635cdf5e7893377f4342515aa5"
+        },
+        "be_users": {
+            "rows": 1,
+            "columns": [
+                "admin",
+                "email",
+                "pid",
+                "realName",
+                "uid",
+                "usergroup",
+                "username"
+            ],
+            "checksum": "10b86dc14e353b61eaffabdae5e508eeb464f77d"
+        },
+        "fe_groups": {
+            "rows": 2,
+            "columns": [
+                "hidden",
+                "pid",
+                "title",
+                "uid"
+            ],
+            "checksum": "3dd92a216d37058382681eddf84af3bddd0f1136"
+        },
+        "fe_users": {
+            "rows": 4,
+            "columns": [
+                "email",
+                "first_name",
+                "last_name",
+                "name",
+                "pid",
+                "uid",
+                "usergroup",
+                "username"
+            ],
+            "checksum": "29722b68cbf6ecc46dfbbebe8251df58d511a146"
+        },
+        "pages": {
+            "rows": 242,
+            "columns": [
+                "abbreviation",
+                "abstract",
+                "address_city",
+                "address_country",
+                "address_street",
+                "address_street_number",
+                "address_zip",
+                "backend_layout",
+                "backend_layout_next_level",
+                "categories",
+                "credit_points",
+                "description",
+                "doktype",
+                "fe_group",
+                "geocode_latitude",
+                "geocode_longitude",
+                "geocode_status",
+                "hidden",
+                "is_siteroot",
+                "job_profile",
+                "l10n_parent",
+                "l10n_source",
+                "lastUpdated",
+                "link",
+                "performance_scope",
+                "perms_group",
+                "perms_groupid",
+                "pid",
+                "prerequisites",
+                "show_on_map",
+                "slug",
+                "subtitle",
+                "sys_language_uid",
+                "title",
+                "tsconfig_includes",
+                "tx_academiccontacts4pages_contacts",
+                "tx_academicpartners_partnerships",
+                "tx_academicprojects_budget",
+                "tx_academicprojects_end_date",
+                "tx_academicprojects_funders",
+                "tx_academicprojects_project_title",
+                "tx_academicprojects_short_description",
+                "tx_academicprojects_start_date",
+                "uid"
+            ],
+            "checksum": "20d4792c9d2496e23d3b9b2f5340bcfbe9da33b3"
+        },
+        "sys_category": {
+            "rows": 56,
+            "columns": [
+                "hidden",
+                "l10n_parent",
+                "pid",
+                "sys_language_uid",
+                "title",
+                "type",
+                "uid"
+            ],
+            "checksum": "284010b42dadb1d186f6cb496ce91d3397cda250"
+        },
+        "sys_file": {
+            "rows": 27,
+            "columns": [
+                "extension",
+                "identifier",
+                "mime_type",
+                "missing",
+                "name",
+                "sha1",
+                "size",
+                "storage",
+                "type"
+            ],
+            "checksum": "e80439a5860199d8130fc39372d459e2aac0ba3e"
+        },
+        "sys_file_reference": {
+            "rows": 86,
+            "columns": [
+                "@file",
+                "alternative",
+                "fieldname",
+                "pid",
+                "sorting_foreign",
+                "sys_language_uid",
+                "tablenames",
+                "title",
+                "uid_foreign"
+            ],
+            "checksum": "1b89ea576fcc81e71eda43e640bac5108a30b4a3"
+        },
+        "sys_filemounts": {
+            "rows": 1,
+            "columns": [
+                "hidden",
+                "identifier",
+                "pid",
+                "title",
+                "uid"
+            ],
+            "checksum": "0f7a222521e69f9e2e8353dd2385b14969307283"
+        },
+        "sys_template": {
+            "rows": 1,
+            "columns": [
+                "clear",
+                "constants",
+                "hidden",
+                "include_static_file",
+                "pid",
+                "root",
+                "title",
+                "uid"
+            ],
+            "checksum": "7bd89bd96d2113fdb6879200e71e04959d4b2081"
+        },
+        "tt_content": {
+            "rows": 252,
+            "columns": [
+                "CType",
+                "bodytext",
+                "header",
+                "header_layout",
+                "hidden",
+                "imageorient",
+                "imagewidth",
+                "l10n_source",
+                "l18n_parent",
+                "pages",
+                "pi_flexform",
+                "pid",
+                "recursive",
+                "sys_language_uid",
+                "tx_academicstudyplan_footer_note",
+                "tx_academicstudyplan_semesters",
+                "uid"
+            ],
+            "checksum": "aeeec7bce2aab858d9dbe7b64b70394dac3b2fb9"
+        },
+        "tx_academiccontacts4pages_domain_model_contact": {
+            "rows": 44,
+            "columns": [
+                "contract",
+                "email_address",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "phone_number",
+                "physical_address",
+                "pid",
+                "role",
+                "sys_language_uid",
+                "uid"
+            ],
+            "checksum": "be86ede13c42a9809c5f0d34fdfa5f440ac47b86"
+        },
+        "tx_academiccontacts4pages_domain_model_role": {
+            "rows": 8,
+            "columns": [
+                "description",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "name",
+                "pid",
+                "sys_language_uid",
+                "uid"
+            ],
+            "checksum": "061933558bbae840b4a561a4d751951f487f57a1"
+        },
+        "tx_academicjobs_domain_model_job": {
+            "rows": 20,
+            "columns": [
+                "alumni_recommend",
+                "company_name",
+                "contact_email",
+                "contact_name",
+                "contact_phone",
+                "contractual_relationship",
+                "description",
+                "employment_start_date",
+                "employment_type",
+                "hidden",
+                "internationals_welcome",
+                "l10n_parent",
+                "link",
+                "pid",
+                "required_degree",
+                "sector",
+                "slug",
+                "sys_language_uid",
+                "title",
+                "type",
+                "uid",
+                "work_location"
+            ],
+            "checksum": "3c66d98baabbde68544a231631cb57392ced5e04"
+        },
+        "tx_academicpartners_domain_model_partnership": {
+            "rows": 32,
+            "columns": [
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "partner",
+                "pid",
+                "role",
+                "sys_language_uid",
+                "uid"
+            ],
+            "checksum": "b6bfd2068b0c5248fcce738e8e340a225a6caaf5"
+        },
+        "tx_academicpartners_domain_model_role": {
+            "rows": 8,
+            "columns": [
+                "description",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "name",
+                "pid",
+                "sys_language_uid",
+                "uid"
+            ],
+            "checksum": "08ce23e3bf1cb0675a147300b1ffa589d8087dfa"
+        },
+        "tx_academicpersons_domain_model_address": {
+            "rows": 16,
+            "columns": [
+                "additional",
+                "city",
+                "country",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "pid",
+                "state",
+                "street",
+                "street_number",
+                "sys_language_uid",
+                "type",
+                "uid",
+                "zip"
+            ],
+            "checksum": "6bbc2a7cea8c569df1a6542abf8a6ce19308c8f4"
+        },
+        "tx_academicpersons_domain_model_contract": {
+            "rows": 32,
+            "columns": [
+                "email_addresses",
+                "employee_type",
+                "function_type",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "location",
+                "office_hours",
+                "organisational_unit",
+                "phone_numbers",
+                "physical_addresses",
+                "pid",
+                "position",
+                "publish",
+                "room",
+                "sys_language_uid",
+                "uid",
+                "valid_from",
+                "valid_to"
+            ],
+            "checksum": "3bf1520e27aea4904e8879d8bb70364fbbe5e054"
+        },
+        "tx_academicpersons_domain_model_email": {
+            "rows": 36,
+            "columns": [
+                "email",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "pid",
+                "sys_language_uid",
+                "type",
+                "uid"
+            ],
+            "checksum": "dcc6ad89ace5eb7bd01f70a1ea54c9559bbd4350"
+        },
+        "tx_academicpersons_domain_model_function_type": {
+            "rows": 8,
+            "columns": [
+                "function_name",
+                "function_name_female",
+                "function_name_male",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "pid",
+                "sys_language_uid",
+                "uid"
+            ],
+            "checksum": "9aa1038b0b0f634b36b2af673a0f79851058706b"
+        },
+        "tx_academicpersons_domain_model_location": {
+            "rows": 6,
+            "columns": [
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "pid",
+                "sys_language_uid",
+                "title",
+                "uid"
+            ],
+            "checksum": "755510cfc81b0ff678fa911e9739cc968c04149e"
+        },
+        "tx_academicpersons_domain_model_organisational_unit": {
+            "rows": 12,
+            "columns": [
+                "display_text",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "parent",
+                "pid",
+                "sys_language_uid",
+                "uid",
+                "unique_name",
+                "unit_name"
+            ],
+            "checksum": "fe96eedb647b0aa49b84ff3162dfb30ccfbd6a10"
+        },
+        "tx_academicpersons_domain_model_phone_number": {
+            "rows": 40,
+            "columns": [
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "phone_number",
+                "pid",
+                "sys_language_uid",
+                "type",
+                "uid"
+            ],
+            "checksum": "92716543be4bf4dfc7c3d673b6772383e6b7ab41"
+        },
+        "tx_academicpersons_domain_model_profile": {
+            "rows": 28,
+            "columns": [
+                "contracts",
+                "cooperation",
+                "core_competences",
+                "first_name",
+                "frontend_users",
+                "gender",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "last_name",
+                "lectures",
+                "memberships",
+                "pid",
+                "press_media",
+                "publications",
+                "publications_link",
+                "publications_link_title",
+                "scientific_research",
+                "skip_sync",
+                "slug",
+                "sys_language_uid",
+                "teaching_area",
+                "title",
+                "uid",
+                "vita",
+                "website",
+                "website_title"
+            ],
+            "checksum": "fd519e0ada6c025a86018dac4264412a2a47baae"
+        },
+        "tx_academicpersons_domain_model_profile_information": {
+            "rows": 42,
+            "columns": [
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "link",
+                "pid",
+                "sys_language_uid",
+                "title",
+                "uid",
+                "year",
+                "year_end",
+                "year_start"
+            ],
+            "checksum": "4745737226b1e22e8dd9b3f59bc661008a457dcf"
+        },
+        "tx_academicstudyplan_domain_model_category": {
+            "rows": 10,
+            "columns": [
+                "colour",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "label",
+                "pid",
+                "sys_language_uid",
+                "uid"
+            ],
+            "checksum": "db4e6a02d0d5fe2fda7169f6e6bb7c7af66573ed"
+        },
+        "tx_academicstudyplan_domain_model_module": {
+            "rows": 96,
+            "columns": [
+                "categories",
+                "credit_points",
+                "description",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "label",
+                "pid",
+                "sys_language_uid",
+                "uid"
+            ],
+            "checksum": "33f400bdd7c845f6770ee91a7ac4d79a460e0ee1"
+        },
+        "tx_academicstudyplan_domain_model_semester": {
+            "rows": 32,
+            "columns": [
+                "credit_points",
+                "hidden",
+                "l10n_parent",
+                "l10n_source",
+                "label",
+                "modules",
+                "note",
+                "pid",
+                "sys_language_uid",
+                "uid"
+            ],
+            "checksum": "7d49893417524e2333469b6b31eb4e9c48282df5"
+        }
+    }
+}

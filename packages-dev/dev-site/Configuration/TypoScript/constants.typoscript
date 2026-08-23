@@ -1,0 +1,3 @@
+# Nothing to declare, and the file is here anyway: a static template folder
+# without a "constants.typoscript" is a folder TYPO3 reads half of, and the
+# missing half is reported nowhere.

@@ -4,23 +4,547 @@
 # "core-13/" and "core-14/", which is the only way those instances get content:
 # they are set up from nothing and import no example data.
 #
-# One set serves both core versions. Everything it declares - the backend
-# layouts of bk2k/bootstrap-package, the six "academicpersons_*" CTypes, the
-# felogin plugin and its FlexForm - is identical on TYPO3 v13 and v14, so a
-# second set would be two definitions to keep in sync and no difference to
-# express.
+# One set serves both core versions. Everything it declares is identical on
+# TYPO3 v13 and v14, so a second set would be two definitions to keep in sync
+# and no difference to express.
 #
-# No "files" and no "references": FAL is deliberately left out for now.
+# The set is written from scenario files listed under "scenarios". They are
+# composed into one scenario before anything is written, so a record of one
+# file may name a record of another, and "entitySettings" is declared in
+# "Scenario.yaml" alone - the composer merges the files with
+# ArrayUtility::mergeRecursiveWithOverrule() and every further file inherits
+# them. "ScenarioLegacy.yaml", the "/legacy/" tree that is delivered through a
+# root "sys_template" record instead of through site sets, is appended to that
+# list.
 #
-# No "sites" either. The site configurations of the two instances are committed
-# at "core-13/config/sites/academics/" and "core-14/config/sites/academics/",
-# and they carry per-instance settings the seed set has nothing to say about.
+# "files" and "references" live here, once, for both scenarios. A file
+# reference is the one relation the scenario format cannot express: a
+# "sys_file_reference" points at its file through "uid_local", and that uid is
+# handed out by the FAL indexer while the file is being placed, so nobody can
+# write it down in a scenario in advance.
+#
+# No "sites". The site configurations of the two instances are committed at
+# "core-NN/config/sites/", they carry per-instance settings the seed set has
+# nothing to say about, and "SiteConfigurationSeeder" refuses an identifier
+# that already exists - so a seed that wrote them would fail on the second run
+# of the very rebuild procedure it exists to support.
 identifier: academics-instance
 title: 'Academic extensions development instance'
 description: >-
-  The page tree, the content elements and the records of the "core-13" and
-  "core-14" development instances of the fgtclb/academic-extensions mono
-  repository.
+  The two page trees, the content elements, the shared record storage and the
+  German translations of the "core-13" and "core-14" development instances of
+  the fgtclb/academic-extensions mono repository.
 
 scenarios:
   - Scenario.yaml
+  - ScenarioLegacy.yaml
+
+# The generated placeholder files, copied into "fileadmin/academics-seed/" of
+# the default storage before any record is written. "FileSeeder" passes
+# $removeOriginal = false, so the sources stay in this package and a rebuild
+# finds them again.
+files:
+  - identifier: profile-01
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/profile-01.png'
+    folder: 'academics-seed'
+  - identifier: profile-02
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/profile-02.png'
+    folder: 'academics-seed'
+  - identifier: profile-03
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/profile-03.png'
+    folder: 'academics-seed'
+  - identifier: profile-04
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/profile-04.png'
+    folder: 'academics-seed'
+  - identifier: profile-05
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/profile-05.png'
+    folder: 'academics-seed'
+  - identifier: profile-06
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/profile-06.png'
+    folder: 'academics-seed'
+  - identifier: profile-07
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/profile-07.png'
+    folder: 'academics-seed'
+  - identifier: profile-08
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/profile-08.png'
+    folder: 'academics-seed'
+  - identifier: media-01
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-01.png'
+    folder: 'academics-seed'
+  - identifier: media-02
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-02.png'
+    folder: 'academics-seed'
+  - identifier: media-03
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-03.png'
+    folder: 'academics-seed'
+  - identifier: media-04
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-04.png'
+    folder: 'academics-seed'
+  - identifier: media-05
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-05.png'
+    folder: 'academics-seed'
+  - identifier: media-06
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-06.png'
+    folder: 'academics-seed'
+  - identifier: media-07
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-07.png'
+    folder: 'academics-seed'
+  - identifier: media-08
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-08.png'
+    folder: 'academics-seed'
+  - identifier: media-09
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/media-09.svg'
+    folder: 'academics-seed'
+  - identifier: content-01
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/content-01.png'
+    folder: 'academics-seed'
+  - identifier: content-02
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/content-02.png'
+    folder: 'academics-seed'
+  - identifier: content-03
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/content-03.png'
+    folder: 'academics-seed'
+  - identifier: content-04
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/content-04.png'
+    folder: 'academics-seed'
+  - identifier: logo-01
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/logo-01.png'
+    folder: 'academics-seed'
+  - identifier: logo-02
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/logo-02.png'
+    folder: 'academics-seed'
+  - identifier: logo-03
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/logo-03.png'
+    folder: 'academics-seed'
+  - identifier: partner-01
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/partner-01.png'
+    folder: 'academics-seed'
+  - identifier: partner-02
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/partner-02.png'
+    folder: 'academics-seed'
+  - identifier: module-audio
+    source: 'EXT:academics_dev_site/Resources/Public/SeedFiles/academics-seed/module-audio.wav'
+    folder: 'academics-seed'
+
+# Every file relation of the seed. "uid" is the uid an entity of a scenario
+# declares as its "id", and it is resolved against what the run actually wrote
+# rather than trusted - a reference naming a record no entity declares is
+# refused before anything is written.
+#
+# WHAT HAS TO BE DECLARED TWICE, AND WHAT DOES NOT
+#
+# A translated page and a translated profile inherit the file relation of their
+# original: DataHandler writes a "sys_file_reference" row for the translation
+# that this file does not declare, and declaring it anyway would produce two.
+# "tt_content.assets", "tx_academicjobs_domain_model_job.image" and
+# "tx_academicstudyplan_domain_model_module.audio_file" do not inherit, so the
+# German variant of each of them carries its own entry - the ones at the
+# original's uid plus 500.
+#
+# The "/legacy/" tree carries the same images as the "/" tree (ACE-460, S3-2),
+# which is what lets "LegacyDeliveryTest" compare the two trees as markup rather
+# than as markup with the image tags cut out of it. Its entries are the block at
+# the end of this file. Only the mirrored tables appear there: the profiles, the
+# jobs and everything else under "/data" exist once and are read by both trees,
+# so their file relations exist once as well.
+references:
+  - file: profile-01
+    table: tx_academicpersons_domain_model_profile
+    uid: 1
+    field: image
+    values:
+      title: 'Jane Doe'
+      alternative: 'Portrait of Jane Doe'
+  - file: profile-02
+    table: tx_academicpersons_domain_model_profile
+    uid: 2
+    field: image
+    values:
+      title: 'Erik Mustermann'
+      alternative: 'Portrait of Erik Mustermann'
+  - file: profile-03
+    table: tx_academicpersons_domain_model_profile
+    uid: 3
+    field: image
+    values:
+      title: 'Alina Sorge'
+      alternative: 'Portrait of Alina Sorge'
+  - file: profile-04
+    table: tx_academicpersons_domain_model_profile
+    uid: 4
+    field: image
+    values:
+      title: 'Bruno Falk'
+      alternative: 'Portrait of Bruno Falk'
+  - file: profile-05
+    table: tx_academicpersons_domain_model_profile
+    uid: 5
+    field: image
+    values:
+      title: 'Carla Neumann'
+      alternative: 'Portrait of Carla Neumann'
+  - file: profile-06
+    table: tx_academicpersons_domain_model_profile
+    uid: 7
+    field: image
+    values:
+      title: 'Elena Petrova'
+      alternative: 'Portrait of Elena Petrova'
+  - file: profile-07
+    table: tx_academicpersons_domain_model_profile
+    uid: 8
+    field: image
+    values:
+      title: 'Farid Karim'
+      alternative: 'Portrait of Farid Karim'
+  - file: profile-08
+    table: tx_academicpersons_domain_model_profile
+    uid: 13
+    field: image
+    values:
+      title: 'Katrin Vogel'
+      alternative: 'Portrait of Katrin Vogel'
+  - file: media-08
+    table: pages
+    uid: 1
+    field: media
+    values:
+      title: 'Academic extensions'
+      alternative: 'The development instance'
+  - file: media-01
+    table: pages
+    uid: 300
+    field: media
+    values:
+      title: 'Bachelor of Engineering'
+      alternative: 'Students in a lab'
+  - file: media-02
+    table: pages
+    uid: 301
+    field: media
+    values:
+      title: 'Master of Science'
+      alternative: 'A lecture hall'
+  - file: media-03
+    table: pages
+    uid: 302
+    field: media
+    values:
+      title: 'Master of Education'
+      alternative: 'A seminar room'
+  - file: media-09
+    table: pages
+    uid: 303
+    field: media
+    values:
+      title: 'Bachelor of Arts'
+      alternative: 'A vector placeholder'
+  - file: media-04
+    table: pages
+    uid: 320
+    field: media
+    values:
+      title: 'Accessible learning platform'
+      alternative: 'A screen reader'
+  - file: media-05
+    table: pages
+    uid: 321
+    field: media
+    values:
+      title: 'Open research data pipeline'
+      alternative: 'A data centre'
+  - file: media-06
+    table: pages
+    uid: 322
+    field: media
+    values:
+      title: 'Campus energy monitoring'
+      alternative: 'A solar roof'
+  - file: partner-01
+    table: pages
+    uid: 340
+    field: media
+    values:
+      title: 'TYPO3 Association'
+      alternative: 'The association office'
+  - file: partner-02
+    table: pages
+    uid: 341
+    field: media
+    values:
+      title: 'web-vision GmbH'
+      alternative: 'The agency office'
+  - file: media-07
+    table: pages
+    uid: 342
+    field: media
+    values:
+      title: 'Hochschule Worms'
+      alternative: 'The main building'
+  - file: content-01
+    table: tt_content
+    uid: 3
+    field: assets
+    values:
+      title: 'Seeded assets'
+      alternative: 'A generated placeholder'
+  - file: content-02
+    table: tt_content
+    uid: 38
+    field: assets
+    values:
+      title: 'Campus impressions'
+      alternative: 'A generated placeholder'
+  - file: content-03
+    table: tt_content
+    uid: 51
+    field: assets
+    values:
+      title: 'The platform'
+      alternative: 'A generated placeholder'
+  - file: content-04
+    table: tt_content
+    uid: 60
+    field: assets
+    values:
+      title: 'The association'
+      alternative: 'A generated placeholder'
+  - file: content-01
+    table: tt_content
+    uid: 503
+    field: assets
+    values:
+      title: 'Bilder aus dem Seed'
+      alternative: 'Ein generierter Platzhalter'
+  - file: content-02
+    table: tt_content
+    uid: 538
+    field: assets
+    values:
+      title: 'Eindrücke vom Campus'
+      alternative: 'Ein generierter Platzhalter'
+  - file: content-03
+    table: tt_content
+    uid: 551
+    field: assets
+    values:
+      title: 'Die Plattform'
+      alternative: 'Ein generierter Platzhalter'
+  - file: content-04
+    table: tt_content
+    uid: 560
+    field: assets
+    values:
+      title: 'Der Verein'
+      alternative: 'Ein generierter Platzhalter'
+  - file: logo-01
+    table: tx_academicjobs_domain_model_job
+    uid: 1
+    field: image
+    values:
+      title: 'web-vision GmbH'
+      alternative: 'Company logo'
+  - file: logo-02
+    table: tx_academicjobs_domain_model_job
+    uid: 2
+    field: image
+    values:
+      title: 'TYPO3 University'
+      alternative: 'University logo'
+  - file: logo-03
+    table: tx_academicjobs_domain_model_job
+    uid: 3
+    field: image
+    values:
+      title: 'TYPO3 University'
+      alternative: 'University logo'
+  - file: logo-01
+    table: tx_academicjobs_domain_model_job
+    uid: 501
+    field: image
+    values:
+      title: 'web-vision GmbH'
+      alternative: 'Firmenlogo'
+  - file: logo-02
+    table: tx_academicjobs_domain_model_job
+    uid: 502
+    field: image
+    values:
+      title: 'TYPO3 Universität'
+      alternative: 'Logo der Hochschule'
+  - file: logo-03
+    table: tx_academicjobs_domain_model_job
+    uid: 503
+    field: image
+    values:
+      title: 'TYPO3 Universität'
+      alternative: 'Logo der Hochschule'
+  - file: module-audio
+    table: tx_academicstudyplan_domain_model_module
+    uid: 1
+    field: audio_file
+    values:
+      title: 'Programming I'
+      alternative: 'Spoken module description'
+  - file: module-audio
+    table: tx_academicstudyplan_domain_model_module
+    uid: 501
+    field: audio_file
+    values:
+      title: 'Programmierung I'
+      alternative: 'Gesprochene Modulbeschreibung'
+
+  # The "/legacy/" mirror. Same files, same metadata, at the mirrored uids -
+  # pages and "tt_content" at the original plus 1000, the four duplicated record
+  # tables at the original plus 200, and a German variant still at plus 500 on
+  # top of that. Written by hand rather than generated, because "config.yml" is
+  # not what "Build/Scripts/generateLegacyScenario.php" writes; a missing entry
+  # here is caught by "LegacyDeliveryTest", which renders both trees and
+  # compares the markup.
+  - file: media-08
+    table: pages
+    uid: 1001
+    field: media
+    values:
+      title: 'Academic extensions'
+      alternative: 'The development instance'
+  - file: media-01
+    table: pages
+    uid: 1300
+    field: media
+    values:
+      title: 'Bachelor of Engineering'
+      alternative: 'Students in a lab'
+  - file: media-02
+    table: pages
+    uid: 1301
+    field: media
+    values:
+      title: 'Master of Science'
+      alternative: 'A lecture hall'
+  - file: media-03
+    table: pages
+    uid: 1302
+    field: media
+    values:
+      title: 'Master of Education'
+      alternative: 'A seminar room'
+  - file: media-09
+    table: pages
+    uid: 1303
+    field: media
+    values:
+      title: 'Bachelor of Arts'
+      alternative: 'A vector placeholder'
+  - file: media-04
+    table: pages
+    uid: 1320
+    field: media
+    values:
+      title: 'Accessible learning platform'
+      alternative: 'A screen reader'
+  - file: media-05
+    table: pages
+    uid: 1321
+    field: media
+    values:
+      title: 'Open research data pipeline'
+      alternative: 'A data centre'
+  - file: media-06
+    table: pages
+    uid: 1322
+    field: media
+    values:
+      title: 'Campus energy monitoring'
+      alternative: 'A solar roof'
+  - file: partner-01
+    table: pages
+    uid: 1340
+    field: media
+    values:
+      title: 'TYPO3 Association'
+      alternative: 'The association office'
+  - file: partner-02
+    table: pages
+    uid: 1341
+    field: media
+    values:
+      title: 'web-vision GmbH'
+      alternative: 'The agency office'
+  - file: media-07
+    table: pages
+    uid: 1342
+    field: media
+    values:
+      title: 'Hochschule Worms'
+      alternative: 'The main building'
+  - file: content-01
+    table: tt_content
+    uid: 1003
+    field: assets
+    values:
+      title: 'Seeded assets'
+      alternative: 'A generated placeholder'
+  - file: content-02
+    table: tt_content
+    uid: 1038
+    field: assets
+    values:
+      title: 'Campus impressions'
+      alternative: 'A generated placeholder'
+  - file: content-03
+    table: tt_content
+    uid: 1051
+    field: assets
+    values:
+      title: 'The platform'
+      alternative: 'A generated placeholder'
+  - file: content-04
+    table: tt_content
+    uid: 1060
+    field: assets
+    values:
+      title: 'The association'
+      alternative: 'A generated placeholder'
+  - file: content-01
+    table: tt_content
+    uid: 1503
+    field: assets
+    values:
+      title: 'Bilder aus dem Seed'
+      alternative: 'Ein generierter Platzhalter'
+  - file: content-02
+    table: tt_content
+    uid: 1538
+    field: assets
+    values:
+      title: 'Eindrücke vom Campus'
+      alternative: 'Ein generierter Platzhalter'
+  - file: content-03
+    table: tt_content
+    uid: 1551
+    field: assets
+    values:
+      title: 'Die Plattform'
+      alternative: 'Ein generierter Platzhalter'
+  - file: content-04
+    table: tt_content
+    uid: 1560
+    field: assets
+    values:
+      title: 'Der Verein'
+      alternative: 'Ein generierter Platzhalter'
+  - file: module-audio
+    table: tx_academicstudyplan_domain_model_module
+    uid: 201
+    field: audio_file
+    values:
+      title: 'Programming I'
+      alternative: 'Spoken module description'
+  - file: module-audio
+    table: tx_academicstudyplan_domain_model_module
+    uid: 701
+    field: audio_file
+    values:
+      title: 'Programmierung I'
+      alternative: 'Gesprochene Modulbeschreibung'

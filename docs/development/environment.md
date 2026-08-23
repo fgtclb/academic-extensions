@@ -195,24 +195,25 @@ workflow in `.github/workflows/` uses the separator.
 Taken from the `case ${TEST_SUITE} in` statement, which is the authority — the
 help text is prose and can drift, see below.
 
-| Suite                     | What it runs                                                                                        |
-|---------------------------|-----------------------------------------------------------------------------------------------------|
-| `cgl`                     | php-cs-fixer with `Build/php-cs-fixer/config.php`. Fixes in place, `-n` only reports.               |
-| `cglHeader`               | php-cs-fixer with `Build/php-cs-fixer/header-comment.php` for the file header.                      |
-| `checkRstRenderingAll`    | Renders `Documentation/` of every extension in `packages/fgtclb/`.                                  |
-| `checkRstRenderingSingle` | The same for one extension folder, given as trailing argument.                                      |
-| `composer`                | `composer` with all remaining arguments dispatched into the container.                              |
-| `composerUpdate`          | Installs the dependency set for `-t`, see below.                                                    |
-| `functional`              | PHPUnit with `Build/phpunit/FunctionalTests.xml` against the DBMS from `-d`.                        |
-| `lintMarkdown`            | `Build/markdown.mjs` over every Markdown file. Fixes in place, `-n` only reports.                   |
-| `lintPhp`                 | `php -l` over every `*.php` outside the excluded trees.                                             |
-| `openDocumentation`       | Opens a previously rendered documentation in the browser (Linux only, `xdg-open`).                  |
-| `phpstan`                 | PHPStan with `Build/phpstan/Core<13\|14>/phpstan.neon`.                                             |
-| `phpstanGenerateBaseline` | Rewrites `Build/phpstan/Core<13\|14>/phpstan-baseline.neon`.                                        |
-| `unit`                    | PHPUnit with `Build/phpunit/UnitTests.xml`.                                                         |
-| `unitRandom`              | The same, with `--order-by=random` and the seed from `-o`.                                          |
-| `update`                  | Pulls newer `ghcr.io/typo3/core-testing-*` images and removes dangling ones. Also reached via `-u`. |
-| `help`                    | Prints the help text. This is the default when `-s` is omitted.                                     |
+| Suite                     | What it runs                                                                                                  |
+|---------------------------|---------------------------------------------------------------------------------------------------------------|
+| `cgl`                     | php-cs-fixer with `Build/php-cs-fixer/config.php`. Fixes in place, `-n` only reports.                         |
+| `cglHeader`               | php-cs-fixer with `Build/php-cs-fixer/header-comment.php` for the file header.                                |
+| `checkRstRenderingAll`    | Renders `Documentation/` of every extension in `packages/fgtclb/`.                                            |
+| `checkRstRenderingSingle` | The same for one extension folder, given as trailing argument.                                                |
+| `composer`                | `composer` with all remaining arguments dispatched into the container.                                        |
+| `composerUpdate`          | Installs the dependency set for `-t`, see below.                                                              |
+| `functional`              | PHPUnit with `Build/phpunit/FunctionalTests.xml` against the DBMS from `-d`.                                  |
+| `lintMarkdown`            | `Build/markdown.mjs` over every Markdown file. Fixes in place, `-n` only reports.                             |
+| `lintPhp`                 | `php -l` over every `*.php` outside the excluded trees.                                                       |
+| `openDocumentation`       | Opens a previously rendered documentation in the browser (Linux only, `xdg-open`).                            |
+| `phpstan`                 | PHPStan with `Build/phpstan/Core<13\|14>/phpstan.neon`.                                                       |
+| `phpstanGenerateBaseline` | Rewrites `Build/phpstan/Core<13\|14>/phpstan-baseline.neon`.                                                  |
+| `seedManifest`            | Rewrites `packages-dev/dev-site/Tests/Functional/Fixtures/SeedManifest-core<13\|14>.json` from a real import. |
+| `unit`                    | PHPUnit with `Build/phpunit/UnitTests.xml`.                                                                   |
+| `unitRandom`              | The same, with `--order-by=random` and the seed from `-o`.                                                    |
+| `update`                  | Pulls newer `ghcr.io/typo3/core-testing-*` images and removes dangling ones. Also reached via `-u`.           |
+| `help`                    | Prints the help text. This is the default when `-s` is omitted.                                               |
 
 Anything else falls to the `*)` arm, which prints the help and exits non-zero.
 
@@ -523,6 +524,105 @@ Adding a page, a plugin or a record is therefore a reviewable diff, and
 [rebuilding the instance](#rebuilding-an-instance-from-nothing) reproduces it
 byte for byte on every machine.
 
+### Seed files, and how they reach an instance
+
+The seed does not only describe records, it references **files**: profile
+images, page media, content element assets, job logos and one audio file. They
+are real `sys_file` and `sys_file_reference` rows, because a seed that fakes
+them proves nothing about the FAL wiring of the extensions.
+
+The files are committed in the seed package, below
+`packages-dev/dev-site/Resources/Public/SeedFiles/`, in a tree that mirrors
+`fileadmin/` one to one:
+
+| Path in `SeedFiles/`               | n   | Pixels   | Ratio | Referenced from                                       |
+|------------------------------------|-----|----------|-------|-------------------------------------------------------|
+| `academics-seed/profile-01…08.png` | 8   | 600×800  | 3:4   | `tx_academicpersons_domain_model_profile.image`       |
+| `academics-seed/media-01…08.png`   | 8   | 1600×900 | 16:9  | `pages.media`                                         |
+| `academics-seed/media-09.svg`      | 1   | 1600×900 | 16:9  | `pages.media`, the vector case                        |
+| `academics-seed/content-01…04.png` | 4   | 1200×800 | 3:2   | `tt_content.assets`                                   |
+| `academics-seed/logo-01…03.png`    | 3   | 800×800  | 1:1   | `tx_academicjobs_domain_model_job.image`              |
+| `academics-seed/partner-01…02.png` | 2   | 1600×900 | 16:9  | `pages.media` of the partner pages                    |
+| `academics-seed/module-audio.wav`  | 1   | —        | —     | `tx_academicstudyplan_domain_model_module.audio_file` |
+| `global-content/jobs/logos/`       | —   | —        | —     | upload target of the `academic_jobs` job form         |
+| `profile-images/`                  | —   | —        | —     | upload target of the `academic_persons_edit` form     |
+
+27 files, together some 55 kB. Every picture draws its own name, the table
+column it belongs to and its pixel dimensions on a background in a colour no
+other file uses, so a **wrong reference is visible without opening the record**:
+a page header that reads `PROFILE 03` is one, and so is a portrait that reads
+`PAGE MEDIA 07`.
+
+The two folders without files are there because nothing creates them at runtime.
+They are the upload targets of the two frontend forms, and an upload into a
+missing folder fails at the moment somebody tries the form. A dot file keeps
+them in git and stays invisible in the TYPO3 file list, which hides dot files.
+
+The `.wav` earns its place: `module.audio_file` is the only `type: file` column
+in this repository whose `allowed` list is not images, so it is the only proof
+that the non-image FAL path is wired. The `.svg` earns its place for the
+opposite reason: `pages.media` has neither an `allowed` list nor a `maxitems`,
+and the page templates hand the first file to `f:image`.
+
+#### Regenerating them
+
+```shell
+php Build/Scripts/generateSeedFiles.php          # write the files
+php Build/Scripts/generateSeedFiles.php --list   # show the table, write nothing
+```
+
+[`Build/Scripts/generateSeedFiles.php`](../../Build/Scripts/generateSeedFiles.php)
+needs nothing but PHP with `ext-gd`, which the host, a DDEV instance and the
+`typo3/core-testing-*` images all have. It does not go through `runTests.sh`: it
+writes committed artefacts and is run by hand, not by a gate.
+
+The drawing is deterministic — no randomness, no timestamps, no font file, no
+resampling. Text is GD's built-in bitmap font 5, whose glyphs are compiled into
+GD, enlarged by drawing one filled rectangle per source pixel rather than with
+`imagecopyresized()`, whose interpolation is an implementation detail. The same
+invocation therefore produces the same *picture* anywhere.
+
+**The same picture is not the same bytes, and there is deliberately no
+`checkSeedFilesClean` gate.** `imagepng()` output depends on the zlib and libpng
+build behind GD, so a byte-equality check analogous to `checkJsBuildClean` could
+go red on a contributor's machine with no defect behind it — a worse outcome
+than no gate at all. The committed files are the artefact of record; the
+generator is how they came to be. (SVG throughout would have been
+byte-reproducible by construction and was rejected for a different reason: a
+seed made only of vectors never exercises the raster path every real
+installation uses.)
+
+#### Getting them into an instance
+
+`core-*/public/` is git-ignored, so a file committed under `packages-dev/`
+does not reach `fileadmin/` by itself — and a committed database template full
+of `sys_file` rows whose files are missing is a fresh clone with every image
+broken.
+
+`config/system/additional.php` therefore copies `SeedFiles/` into
+`public/fileadmin/`, next to the branch that copies the sqlite template, and by
+the same rule: seed what is missing.
+
+- The check is one `is_dir()` per request. The copy runs when
+  `fileadmin/academics-seed/` is absent — on a fresh clone, and again when
+  somebody empties `fileadmin/` by hand.
+- An existing file is never overwritten. What an editor uploaded into the
+  instance is theirs.
+- Both switches that suppress the database seeding suppress this too, and for a
+  stronger reason than symmetry: while an instance is rebuilt from nothing,
+  `composer instance:seed` writes these files itself through the FAL API, and
+  FAL renames rather than overwrites. A leftover `profile-01.png` would make the
+  import store `profile-01_01.png`, and the snapshot committed afterwards would
+  name a file that exists nowhere else. `composer instance:fresh` removes
+  `public/fileadmin/academics-seed/` for the same reason — only that folder,
+  never anything else somebody put in `fileadmin/`.
+
+Verified on TYPO3 v13 by copying the tree into a functional test instance and
+retrieving the files through `ResourceFactory`: all of them index, the PNGs with
+their dimensions and `image/png`, the SVG with `image/svg+xml` and 1600×900 —
+which is why the generated SVG carries `width`, `height` **and** `viewBox` — and
+the WAV with `audio/x-wav` and no dimensions.
+
 ### Rebuilding an instance from nothing
 
 `config/system/additional.php` copies the committed template into `var/sqlite/`
@@ -558,7 +658,9 @@ teardown first, marker second, start third — never the other way round.
 #### The walk-through
 
 Every command below was run against `core-13/`; the output quoted is what it
-produced.
+produced. For `core-14/` the three values that carry the version have to move
+with it: the directory, `TYPO3_PROJECT_NAME="Academic extensions (TYPO3 v14)"`
+and `var/sqlite/core-14.sqlite`. Nothing else differs.
 
 ```shell
 cd core-13
@@ -639,9 +741,9 @@ ddev composer sqlite:backup                        # commit the result
 ddev composer sqlite:apply                         # back to normal, clears the marker
 ```
 
-**Check `config/sites/` before and after.** It must contain nothing but the
-tracked `academics/`. TYPO3 writes a site configuration for every new **root**
-page, so a seed run that puts pages at the tree root — a set whose sections are
+**Check `config/sites/` before and after.** It must contain nothing but the two
+tracked sites, `academics/` and `academics-legacy/`. TYPO3 writes a site
+configuration for every new **root** page, so a seed run that puts pages at the tree root — a set whose sections are
 not children of the site root — leaves a set of
 `config/sites/autogenerated-<uid>-<hash>/` directories behind. They then claim
 those pages, and every URL below them answers 404 while the page tree looks
@@ -655,7 +757,21 @@ ddev exec vendor/bin/typo3 cache:flush
 #### Verifying the result before committing it
 
 A snapshot is a committed binary, so it is worth proving that the rebuild
-produced what was intended rather than trusting that it did. `sqlite:backup`
+produced what was intended rather than trusting that it did. The first thing to
+run is the check that does it for you:
+
+```shell
+Build/Scripts/runTests.sh -t 13 -p 8.2 -s functional \
+    packages-dev/dev-site/Tests/Functional/SnapshotManifestTest.php
+```
+
+It measures the committed snapshot against the manifest of the seed and names
+every table that disagrees — see
+[Seed verification](../testing/seed-verification.md). The manual comparison
+below is what to reach for when it reports a difference and the question is
+which rows moved.
+
+`sqlite:backup`
 writes `sqlite-databases/core-NN.sqlite`, creating it when it does not exist and
 overwriting it when it does, which means the previous state is still in git and
 can be compared against.
@@ -665,13 +781,13 @@ definition, a core update — extract the committed snapshot and diff the seeded
 tables:
 
 ```shell
-git show HEAD:sqlite-databases/core-13.sqlite > /dev/shm/old-core-13.sqlite
+git show HEAD:sqlite-databases/core-13.sqlite > .agent/tmp/old-core-13.sqlite
 ```
 
 ```python
 import sqlite3
 
-old = sqlite3.connect('file:/dev/shm/old-core-13.sqlite?mode=ro', uri=True)
+old = sqlite3.connect('file:.agent/tmp/old-core-13.sqlite?mode=ro', uri=True)
 new = sqlite3.connect('file:sqlite-databases/core-13.sqlite?mode=ro', uri=True)
 
 print(
@@ -684,15 +800,21 @@ Do the same for `tt_content` and for every `tx_academic*` table. Note that
 `sqlite3` is a Python module here, not necessarily a command line tool — the
 host does not have to have the `sqlite3` binary installed.
 
-Two differences are expected and are not regressions:
+One difference is expected and is not a regression:
 
-| Difference                                    | Why                                                                                                                                             |
-|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| `sys_file` rows present before, gone after    | FAL indexes a file the first time the frontend renders it. A snapshot taken from a browsed instance carries rows a pure post-seed one does not. |
-| Table count higher than the previous template | A rebuild creates every table the installed code declares today; a hand-maintained template only has the ones it accumulated.                   |
+| Difference                                    | Why                                                                                                                           |
+|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| Table count higher than the previous template | A rebuild creates every table the installed code declares today; a hand-maintained template only has the ones it accumulated. |
 
 Anything else is a real difference and needs an explanation before the snapshot
 is committed.
+
+`sys_file` used to be an expected difference too, on the grounds that FAL only
+indexes a file the first time the frontend renders it, so a snapshot taken from
+a browsed instance carried rows a pure post-seed one did not. That no longer
+holds: the seed declares its images itself, so the import writes `sys_file` and
+`sys_file_reference` rows. **Their absence is now a defect, not an
+expectation** — it means the seed files never reached `fileadmin/`.
 
 `sqlite:apply` clearing the marker is deliberate: restoring the committed
 template *is* the end of a rebuild, and a marker that outlives one is a trap —

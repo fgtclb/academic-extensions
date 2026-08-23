@@ -1,0 +1,53 @@
+# The page object of the "/legacy/" tree.
+#
+# WHY THIS EXISTS AT ALL
+#
+# The "/" tree is themed by EXT:bootstrap_package, which delivers everything it
+# has through site sets and nothing through a static template: version 15 still
+# shipped "Configuration/TypoScript/" and registered it with addStaticFile(),
+# version 16 removed both ("[!!!][TASK] Migrate TypoScript configuration to site
+# sets"). The "core-13" instance runs 15 and the "core-14" instance runs 16, so a
+# "sys_template" record naming the theme renders one instance and renders nothing
+# at all in the other.
+#
+# The "/legacy/" tree therefore cannot be themed. It is delivered the way an
+# installation that predates site sets is delivered, and there is no pre-site-set
+# delivery of that theme any more. What it gets instead is this: the smallest
+# page object that puts the content of a page on the page, so the tree renders
+# and the content elements and plugins of the academic extensions can be compared
+# with the ones the site set driven tree renders.
+#
+# It is shipped twice, in the two forms a development instance needs it in - as
+# this static template folder, named by the "include_static_file" of the legacy
+# root "sys_template" record, and as the site set "fgtclb/academics-dev-site-page-object",
+# whose "setup.typoscript" imports this file. The set is what
+# "LegacyDeliveryTest" puts in the place of the theme on the "/" side, so that
+# both trees are rendered by the same text and a difference the test reports is a
+# difference in what the academic extensions deliver.
+
+page = PAGE
+page {
+    typeNum = 0
+
+    10 = COA
+    10 {
+        10 = TEXT
+        10.data = page:title
+        10.wrap = <h1>|</h1>
+
+        20 < styles.content.get
+    }
+
+    meta.viewport = width=device-width, initial-scale=1
+}
+
+config {
+    # Absolute paths, so a link of the mirrored tree differs from its original by
+    # the "/legacy" segment and by nothing else.
+    absRefPrefix = /
+    # An exception in a content element is something to see, not something to
+    # replace with a box that renders the same on both sides of a comparison.
+    contentObjectExceptionHandler = 0
+    disablePrefixComment = 1
+    headerComment = Delivered by the static template of EXT:academics_dev_site.
+}

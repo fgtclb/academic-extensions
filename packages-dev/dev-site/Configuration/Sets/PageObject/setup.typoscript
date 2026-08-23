@@ -1,0 +1,4 @@
+# Imported rather than repeated. The set half and the static template half of
+# this package have to deliver the same text, or a comparison of the two
+# delivery mechanisms would be comparing this file with itself.
+@import 'EXT:academics_dev_site/Configuration/TypoScript/setup.typoscript'

@@ -105,10 +105,10 @@ together.
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Seven of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
-- `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed set `Configuration/DataFactory/academics-instance/` the DDEV instances are built from. Content, not code. Written into an empty instance with `ddev composer instance:seed`, which runs the `data-factory:import academics-instance` command of `sbuerk/data-factory`.
+- `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed set `Configuration/DataFactory/academics-instance/` the DDEV instances are built from. Content, not code, apart from one page object it ships twice (as a static template and as a site set) because the `/legacy/` tree cannot be themed. Written into an empty instance with `ddev composer instance:seed`, which runs the `data-factory:import academics-instance` command of `sbuerk/data-factory`. `ScenarioLegacy.yaml` is **generated** by `Build/Scripts/generateLegacyScenario.php` from `Scenario.yaml` — change the generator, never the generated file, and `--check` reports a stale one. The seed is verified by tests of its own, see [Seed verification](docs/testing/seed-verification.md).
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
-- `core-13/`, `core-14/` — ready-to-start development instances, one per core version, both themed with `bk2k/bootstrap-package`. SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`, and those templates are themselves produced by seeding an empty instance from `packages-dev/dev-site`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
+- `core-13/`, `core-14/` — ready-to-start development instances, one per core version, both themed with `bk2k/bootstrap-package` — the `/` tree only: that extension delivers through site sets and nothing through a static template from its version 16 on, so the `/legacy/` tree is delivered by a minimal page object of `packages-dev/dev-site` instead. See [TypoScript and site sets](docs/architecture/typoscript-and-site-sets.md). SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`, and those templates are themselves produced by seeding an empty instance from `packages-dev/dev-site`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
 - `sqlite-databases/` — committed database templates for those instances. `core-*/patches` symlinks into the shared `patches/` pool consumed by `vaimo/composer-patches`.
 - Deleting an instance database does **not** empty the instance: `config/system/additional.php` seeds it from the template again on the next request. `ddev composer instance:fresh` drops it and writes the git-ignored marker `core-NN/.no-database-seed` that suppresses the seeding, so an instance can be rebuilt from nothing; `sqlite:apply` clears the marker. See [Rebuilding an instance from nothing](docs/development/environment.md#rebuilding-an-instance-from-nothing).
 - Switching branches in one checkout collides in DDEV: the instance folders have the same path on every branch but the project names differ per version line (`core13-academics-v3` on `main`, `core13-academics-v2` on `2`), and DDEV refuses a second name for a known path. `ddev stop --unlist <other-name>` clears it; it removes only the registration. The instance database in the git-ignored `core-*/var/` survives the switch, so reset it with `ddev composer sqlite:apply`. So does `core-*/vendor/`, and that one is then wrong — its autoloader points at the other branch's path packages and `vendor/bin/typo3` dies on a missing `EXT_CONSTANTS.php`; `ddev composer install` rebuilds it. Two leftovers are ignored rather than cleaned: `core-*/.ddev/traefik/`, which DDEV lists in its own `.gitignore` under the current project name only, so a rename leaves a stale certificate and private key visible, and the instance folder of the other version line (`core-12/` here, `core-14/` on branch `2`).
@@ -197,8 +197,14 @@ The complete suite list is `buildJs`, `cgl`, `cglHeader`, `checkJsBuildClean`,
 (dispatch an arbitrary composer command), `composerUpdate`, `functional`,
 `lintMarkdown`, `lintPhp`, `lintTypescript`, `npm` (dispatch an arbitrary npm
 command),
-`openDocumentation`, `phpstan`, `phpstanGenerateBaseline`, `typecheckJs`,
-`unit`, `unitRandom`; plus `help` and `update`.
+`openDocumentation`, `phpstan`, `phpstanGenerateBaseline`, `seedManifest`,
+`typecheckJs`, `unit`, `unitRandom`; plus `help` and `update`.
+
+`seedManifest` is the one suite that *writes* a committed artifact: it imports
+the development seed and rewrites
+`packages-dev/dev-site/Tests/Functional/Fixtures/SeedManifest-core<13|14>.json` from what
+the import produced. Run it after any change to the seed, once per core version,
+and commit the result — see [Seed verification](docs/testing/seed-verification.md).
 
 The seven node suites — `buildJs`, `checkJsBuildClean`, `cleanJs`,
 `lintMarkdown`, `lintTypescript`, `npm` and `typecheckJs` — are **core version
@@ -213,9 +219,12 @@ trailing whitespace, a `## See also` on every `docs/` page. Like `cgl` it fixes
 by default and only reports with `-n`. It needs no node dependency, so it is
 the one node suite that runs without an `npm ci`.
 
-Test discovery: phpunit globs `packages/*/*/Tests/Unit/` and
-`packages/*/*/Tests/Functional/` across **all** extensions at once
-(`Build/phpunit/*.xml`) — there is no per-extension test config.
+Test discovery: phpunit globs `packages/*/*/Tests/Unit/`,
+`packages/*/*/Tests/Functional/` **and** `packages-dev/*/Tests/{Unit,Functional}/`
+across everything at once (`Build/phpunit/*.xml`) — there is no per-extension
+test config. `packages-dev/` is in the glob because the seed definition of
+`packages-dev/dev-site` carries tests of its own; `cgl` covers that directory
+for the same reason. `phpstan` still does not.
 
 ## CI (`.github/workflows/`)
 

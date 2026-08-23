@@ -13,7 +13,7 @@ trait ExtensionsLoadedTestsTrait
     public static function expectedLoadedExtensionIdentifiers(): \Generator
     {
         foreach (self::$expectedLoadedExtensions as $identifier) {
-            yield sprintf("%s: %s", (str_contains($identifier, '/') ? 'composer package name' : 'extension key'), $identifier) => [
+            yield sprintf('%s: %s', (str_contains($identifier, '/') ? 'composer package name' : 'extension key'), $identifier) => [
                 'identifier' => $identifier,
             ];
         }
@@ -25,7 +25,7 @@ trait ExtensionsLoadedTestsTrait
     {
         $this->assertTrue(ExtensionManagementUtility::isLoaded($identifier), sprintf(
             '"%s" returns true using identifier "%s" (%s)',
-            sprintf("%s::%s()", ExtensionManagementUtility::class, 'isLoaded'),
+            sprintf('%s::%s()', ExtensionManagementUtility::class, 'isLoaded'),
             $identifier,
             (str_contains($identifier, '/') ? 'composer package name' : 'extension key'),
         ));
