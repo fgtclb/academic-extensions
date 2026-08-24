@@ -311,7 +311,7 @@ So a site-set test class lives in `Tests/Functional/Core13/` *and* carries
 what satisfies PHPUnit, which still collects that folder. Everything the static
 half covers stays in a shared class that runs on both versions — otherwise v12
 gets no coverage of the only mechanism it has. `academic-bite-jobs` splits it
-that way: `Tests/Functional/SiteSet/StaticDeliveryTest.php` on both versions,
+that way: `Tests/Functional/SiteSet/StaticTemplateDeliveryTest.php` on both versions,
 `Tests/Functional/Core13/SiteSet/SiteSetDeliveryTest.php` on v13 alone, with the
 scaffolding they share in an abstract case next to the shared one.
 

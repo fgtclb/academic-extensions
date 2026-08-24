@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicStudyPlan\Tests\Functional\Delivery;
+namespace FGTCLB\AcademicStudyPlan\Tests\Functional\SiteSet;
 
 use FGTCLB\AcademicStudyPlan\Tests\Functional\AbstractAcademicStudyPlanTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;

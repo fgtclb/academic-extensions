@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicContacts4pages\Tests\Functional\SiteSet;
+namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\SiteSet;
 
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -24,7 +24,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * everything the site sets contributed, and so does
  * `FunctionalTestCase::setUpFrontendRootPage()`.
  */
-final class StaticDeliveryTest extends AbstractDeliveryTestCase
+final class StaticTemplateDeliveryTest extends AbstractDeliveryTestCase
 {
     /**
      * Covers `Configuration/TypoScript/Full/include_static_file.txt`, whose entries are
@@ -33,55 +33,19 @@ final class StaticDeliveryTest extends AbstractDeliveryTestCase
     #[Test]
     public function aggregateStaticTemplateDeliversTheComponentTypoScript(): void
     {
-        $this->setUpSite(includeStaticFile: 'EXT:academic_contacts4pages/Configuration/TypoScript/Full');
+        $this->setUpSite(includeStaticFile: 'EXT:academic_persons_edit/Configuration/TypoScript/Full');
 
         $body = $this->renderFrontendPage($this->frontendPluginTestBase());
 
         $this->assertStringContainsString(
-            '<div id="constant">EXT:academic_contacts4pages/Resources/Private/Templates/</div>',
+            '<div id="constant">EXT:academic_persons_edit/Resources/Private/Templates/</div>',
             $body,
             'The aggregate static template did not deliver "constants.typoscript" of the component.',
         );
         $this->assertStringContainsString(
-            '<div id="setup">EXT:academic_persons/Resources/Private/Partials/</div>',
+            '<div id="setup">1:/profile-images</div>',
             $body,
             'The aggregate static template did not deliver "setup.typoscript" of the component.',
-        );
-    }
-
-    /**
-     * The component reads `{$plugin.tx_academicpersons.detailPid}`, a constant of
-     * another extension.
-     *
-     * What delivers it, measured rather than assumed: the
-     * `include_static_file.txt` of this component, which BOTH mechanisms read -
-     * `SysTemplateTreeBuilder::handleSetInclude()` reads it out of the folder the
-     * set's `typoscript` key names, exactly as the static template path does.
-     * Removing it turns this test red. A set dependency on an `academic_persons` set
-     * is deliberately NOT declared: it does not deliver the constant on either path,
-     * and it would make that extension's content element selectable wherever this one
-     * is enabled.
-     *
-     * This needs its own test because the failure is invisible: TypoScript leaves an
-     * unresolved constant as its own literal text instead of raising, so the link to a
-     * profile would be built from the string `{$plugin.tx_academicpersons.detailPid}`
-     * and nothing anywhere would report it.
-     *
-     * Only the substitution is asserted, not the value: the shipped default of
-     * `plugin.tx_academicpersons.detailPid` belongs to `EXT:academic_persons` and is
-     * changed by a different slice of this restructuring.
-     */
-    #[Test]
-    public function theConstantOfAcademicPersonsIsResolvedOnTheStaticPath(): void
-    {
-        $this->setUpSite(includeStaticFile: 'EXT:academic_contacts4pages/Configuration/TypoScript/Full');
-
-        $body = $this->renderFrontendPage($this->frontendPluginTestBase());
-
-        $this->assertStringNotContainsString(
-            '{$plugin.tx_academicpersons.detailPid}',
-            $body,
-            'The constant of "academic_persons" was not substituted through the static template.',
         );
     }
 
@@ -100,7 +64,7 @@ final class StaticDeliveryTest extends AbstractDeliveryTestCase
     #[Test]
     public function theRegisteredPageTsConfigFileReEnablesTheContentElement(): void
     {
-        $this->setUpSite(pageTsConfigInclude: 'EXT:academic_contacts4pages/Configuration/TSconfig/Full/page.tsconfig');
+        $this->setUpSite(pageTsConfigInclude: 'EXT:academic_persons_edit/Configuration/TSconfig/Full/page.tsconfig');
 
         $pageTsConfig = BackendUtility::getPagesTSconfig(1);
         $removeItems = GeneralUtility::trimExplode(
@@ -111,17 +75,17 @@ final class StaticDeliveryTest extends AbstractDeliveryTestCase
         $wizardGroup = $pageTsConfig['mod.']['wizards.']['newContentElement.']['wizardItems.']['academic.'] ?? [];
 
         $this->assertNotContains(
-            'academiccontacts4pages_list',
+            'academicpersonsedit_profileediting',
             $removeItems,
             'The page TSconfig file did not re-enable the content element.',
         );
         $this->assertArrayHasKey(
-            'academiccontacts4pages_list.',
+            'academicpersonsedit_profileediting.',
             $wizardGroup['elements.'] ?? [],
             'The page TSconfig file did not deliver the new content element wizard entry.',
         );
         $this->assertContains(
-            'academiccontacts4pages_list',
+            'academicpersonsedit_profileediting',
             GeneralUtility::trimExplode(',', (string)($wizardGroup['show'] ?? ''), true),
             'The wizard group does not list the content element in "show", which TYPO3 v12 requires.',
         );
@@ -146,7 +110,7 @@ final class StaticDeliveryTest extends AbstractDeliveryTestCase
         );
 
         $this->assertContains(
-            'academiccontacts4pages_list',
+            'academicpersonsedit_profileediting',
             $removeItems,
             'The content element is selectable although no set and no page TSconfig enable it.',
         );
