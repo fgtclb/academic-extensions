@@ -31,28 +31,6 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  */
 final class ProfileTest extends UnitTestCase
 {
-    #[Test]
-    public function publicProfileContactsAreIndependentValuesWithOptInFlags(): void
-    {
-        $profile = new Profile();
-
-        $this->assertSame('', $profile->getEmailAddress());
-        $this->assertFalse($profile->getPublishEmailAddress());
-        $this->assertSame('', $profile->getPhoneNumber());
-        $this->assertFalse($profile->getPublishPhoneNumber());
-
-        $profile
-            ->setEmailAddress('profile@example.org')
-            ->setPublishEmailAddress(true)
-            ->setPhoneNumber('+49 123 456')
-            ->setPublishPhoneNumber(true);
-
-        $this->assertSame('profile@example.org', $profile->getEmailAddress());
-        $this->assertTrue($profile->getPublishEmailAddress());
-        $this->assertSame('+49 123 456', $profile->getPhoneNumber());
-        $this->assertTrue($profile->getPublishPhoneNumber());
-    }
-
     /**
      * Every `ObjectStorage` property is a typed property without a default. Reading one
      * that `initializeObject()` forgot is a fatal error, not an empty result, so each of

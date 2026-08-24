@@ -21,17 +21,17 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
     #[Test]
     public function profileSectionsAndFieldsAreResolvedByTheirIdentifiers(): void
     {
-        $field = $this->profileField('emailAddress', 'email', 'email');
+        $field = $this->profileField('profileWebsite', 'website', 'website');
         $section = new ProfileSection(
             identifier: 'information',
-            fields: ['emailAddress' => $field],
-            validationSet: new ValidationSet(identifier: 'information', validations: ['email' => $field->validation]),
+            fields: ['profileWebsite' => $field],
+            validationSet: new ValidationSet(identifier: 'information', validations: ['website' => $field->validation]),
             position: 0,
         );
         $subject = new AcademicPersonsSettings(profileSections: ['information' => $section]);
         self::assertSame($section, $subject->getProfileSection('information'));
-        self::assertSame($field, $subject->getProfileField('emailAddress'));
-        self::assertSame($field, $subject->getProfileField('email'));
+        self::assertSame($field, $subject->getProfileField('profileWebsite'));
+        self::assertSame($field, $subject->getProfileField('website'));
         self::assertNull($subject->getProfileField('unknown'));
     }
 
@@ -62,48 +62,47 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
     #[Test]
     public function profileValidationSubsetMapsConfiguredIdentifiersToDtoProperties(): void
     {
-        $email = $this->profileField('emailAddress', 'email', 'email');
-        $phone = $this->profileField('phoneNumber', 'phoneNumber', 'phone_number');
+        $website = $this->profileField('website', 'website', 'website');
+        $title = $this->profileField('title', 'title', 'title');
         $subject = new AcademicPersonsSettings(
-            profileSections: ['information' => $this->profileSection('information', [$email, $phone])],
+            profileSections: ['information' => $this->profileSection('information', [$website, $title])],
         );
-        $subset = $subject->getProfileValidationSetForFields(['emailAddress'], 'information');
+        $subset = $subject->getProfileValidationSetForFields(['website'], 'information');
         self::assertSame('information', $subset->identifier);
-        self::assertSame(['email'], array_keys($subset->validations));
-        self::assertSame($email->validation, $subset->get('email'));
-        self::assertSame([], $subject->getProfileValidationSetForFields(['emailAddress'], 'aboutme')->validations);
+        self::assertSame(['website'], array_keys($subset->validations));
+        self::assertSame($website->validation, $subset->get('website'));
+        self::assertSame([], $subject->getProfileValidationSetForFields(['website'], 'aboutme')->validations);
     }
 
     #[Test]
     public function contractContactsNeverFallBackToProfileFieldsOrAnotherContactSection(): void
     {
-        $profileEmail = $this->profileField('emailAddress', 'emailAddress', 'email_address');
-        $contractEmail = $this->contractContactField(
-            'emailAddress',
-            'emailAddresses',
-            'email',
-            'email',
+        $profileStreet = $this->profileField('street', 'street', 'street');
+        $contractStreet = $this->contractContactField(
+            'street',
+            'physicalAddresses',
+            'street',
+            'street',
         );
         $subject = new AcademicPersonsSettings(
             profileSections: [
-                'information' => $this->profileSection('information', [$profileEmail]),
+                'information' => $this->profileSection('information', [$profileStreet]),
             ],
             contractContactSections: [
-                'emailAddresses' => $this->contractContactSection('emailAddresses', [$contractEmail]),
+                'physicalAddresses' => $this->contractContactSection('physicalAddresses', [$contractStreet]),
             ],
         );
-
-        self::assertSame($profileEmail, $subject->getProfileField('emailAddress'));
-        self::assertSame($contractEmail, $subject->getContractContactField('emailAddress'));
-        self::assertSame(['email'], array_keys(
-            $subject->getContractContactValidationSet('emailAddresses')->validations,
+        self::assertSame($profileStreet, $subject->getProfileField('street'));
+        self::assertSame($contractStreet, $subject->getContractContactField('street'));
+        self::assertSame(['street'], array_keys(
+            $subject->getContractContactValidationSet('physicalAddresses')->validations,
         ));
-        self::assertSame([], $subject->getContractContactValidationSet('phoneNumbers')->validations);
+        self::assertSame([], $subject->getContractContactValidationSet('emailAddresses')->validations);
         self::assertSame(
             [],
             $subject->getContractContactValidationSetForFields(
-                ['emailAddress'],
-                'phoneNumbers',
+                ['street'],
+                'emailAddresses',
             )->validations,
         );
     }

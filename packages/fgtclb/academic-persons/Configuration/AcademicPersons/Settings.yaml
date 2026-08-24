@@ -55,30 +55,6 @@ profile:
     validators:
       - readonly
       - disabled
-  # Public profile contacts are direct Profile properties. They are deliberately
-  # independent of contacts belonging to an employment contract. A value is
-  # rendered in the public detail view only when its matching publish flag is
-  # enabled. Both flags default to false in the database.
-  emailAddress:
-    section: information
-    fieldType: input
-    renderType: email
-    validators:
-      - email
-  publishEmailAddress:
-    section: information
-    fieldType: check
-    renderType: checkbox
-  phoneNumber:
-    section: information
-    fieldType: input
-    renderType: phone
-    validators:
-      - tel
-  publishPhoneNumber:
-    section: information
-    fieldType: check
-    renderType: checkbox
   # `combinedLink` edits the URL together with its companion title property
   # (`websiteTitle` or `publicationsLinkTitle`).
   website:

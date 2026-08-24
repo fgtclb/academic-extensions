@@ -252,30 +252,6 @@
         <source>Employee Contracts</source>
         <target>Mitarbeiterverträge</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile.columns.email_address.label">
-        <source>Public profile email address</source>
-        <target>Öffentliche Profil-E-Mail-Adresse</target>
-      </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile.columns.publish_email_address.label">
-        <source>Publish profile email address</source>
-        <target>Profil-E-Mail-Adresse veröffentlichen</target>
-      </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile.columns.publish_email_address.description">
-        <source>Show this email address in the public profile.</source>
-        <target>Diese E-Mail-Adresse im öffentlichen Profil anzeigen.</target>
-      </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile.columns.phone_number.label">
-        <source>Public profile phone number</source>
-        <target>Öffentliche Profil-Telefonnummer</target>
-      </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile.columns.publish_phone_number.label">
-        <source>Publish profile phone number</source>
-        <target>Profil-Telefonnummer veröffentlichen</target>
-      </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile.columns.publish_phone_number.description">
-        <source>Show this phone number in the public profile.</source>
-        <target>Diese Telefonnummer im öffentlichen Profil anzeigen.</target>
-      </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile.columns.cooperation.label">
         <source>Networks and Cooperations</source>
         <target>Netzwerke/Kooperationen</target>

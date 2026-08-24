@@ -30,16 +30,12 @@ Every key below :yaml:`profile` is a stable field identifier:
 ..  code-block:: yaml
 
     profile:
-      emailAddress:
+      website:
         section: information
         fieldType: input
-        renderType: email
+        renderType: combinedLink
         validators:
-          - email
-      publishEmailAddress:
-        section: information
-        fieldType: check
-        renderType: checkbox
+          - url
       miscellaneous:
         section: aboutme
         fieldType: textarea
@@ -61,8 +57,7 @@ The available properties are:
         - Base TCA type, for example :yaml:`input`, :yaml:`select`,
           :yaml:`textarea` or :yaml:`check`.
     *   - :yaml:`renderType`
-        - Inline presentation such as :yaml:`text`, :yaml:`phone`,
-          :yaml:`email`, :yaml:`select`, :yaml:`checkbox`,
+        - Inline presentation such as :yaml:`text`, :yaml:`select`,
           :yaml:`combinedLink` or :yaml:`ckeditor`.
     *   - :yaml:`propertyName`
         - Optional DTO/domain property when it differs from the map key.
@@ -71,12 +66,6 @@ The available properties are:
           property name.
     *   - :yaml:`validators`
         - Flags belonging only to this field in its declared section.
-
-The shipped ``emailAddress`` and ``phoneNumber`` entries are direct Profile
-properties. Their matching ``publishEmailAddress`` and ``publishPhoneNumber``
-flags are opt-in switches for the public detail profile. They are independent
-of all contacts stored below an employment contract and are not populated by
-contract synchronization.
 
 Special inline components
 =========================
