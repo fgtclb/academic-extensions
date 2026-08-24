@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicStudyPlan\Tests\Functional\Delivery;
+namespace FGTCLB\AcademicStudyPlan\Tests\Functional\SiteSet;
 
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
@@ -105,7 +105,7 @@ trait DeliveryProbeTrait
                 'clear' => 0,
                 'title' => 'Probe',
                 'constants' => '',
-                'config' => '@import \'EXT:academic_study_plan/Tests/Functional/Delivery/Fixtures/Probe.typoscript\'',
+                'config' => '@import \'EXT:academic_study_plan/Tests/Functional/SiteSet/Fixtures/Probe.typoscript\'',
                 'include_static_file' => $includeStaticFile,
             ],
         );

@@ -19,7 +19,7 @@ dependencies:
 # "SysTemplateTreeBuilder::handleSetInclude()" reads "include_static_file.txt"
 # out of the folder this key names, exactly as the static template path does.
 # Measured, not assumed: removing the entry turns the static half of
-# "SiteSet\StaticDeliveryTest" red, and a set dependency on "academic_persons"
+# "SiteSet\StaticTemplateDeliveryTest" red, and a set dependency on "academic_persons"
 # does not deliver the constant on either path.
 #
 # There is deliberately no dependency on an "academic_persons" set. It would not
