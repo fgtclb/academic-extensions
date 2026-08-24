@@ -20,7 +20,6 @@ trait TcaHelperMethodsTrait
 
     /**
      * @param bool $force If true backup is forcefully created, otherwise exception is thrown if backup already exists.
-     * @return void
      */
     private function createTCABackup(bool $force): void
     {

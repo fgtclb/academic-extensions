@@ -76,7 +76,7 @@
             "@php ../Build/Scripts/instanceDatabase.php fresh"
         ],
         "instance:seed": [
-            "@php vendor/bin/typo3 data-factory:import academics-instance"
+            "@php vendor/bin/typo3 data-factory:import academics-instance-sets"
         ],
         "sqlite:apply": [
             "@php ../Build/Scripts/sqliteSnapshot.php restore ../sqlite-databases/core-13.sqlite var/sqlite/core-13.sqlite",
@@ -98,7 +98,7 @@
     },
     "scripts-descriptions": {
         "instance:fresh": "Drop this instance's database and stop the automatic seeding, so it can be rebuilt from nothing.",
-        "instance:seed": "Import the seed set \"academics-instance\" of \"packages-dev/dev-site\" - the page tree, its content and its records - into this instance. Needs an empty page tree.",
+        "instance:seed": "Import the seed set \"academics-instance-sets\" of \"packages-dev/dev-site\" - the page tree, its content and its records - into this instance. Needs an empty page tree.",
         "sqlite:apply": "Restore this instance from \"../sqlite-databases/core-13.sqlite\", discarding its current database.",
         "sqlite:backup": "Copy this instance's database to \"../sqlite-databases/core-13.sqlite\" so it can be committed.",
         "system:refresh": "Refresh the system after changes: flush and warm up caches (DI), update languages, run extension setup."

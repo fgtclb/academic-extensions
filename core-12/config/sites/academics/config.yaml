@@ -1,3 +1,17 @@
+# The route enhancers of the academic extensions.
+#
+# None of the five files is loaded by TYPO3 on its own - a "Routes.yaml" or a
+# "Configuration/Routes/*.yaml" is inert until a site configuration imports it -
+# so without this block every detail page below is reachable only through a raw
+# "tx_...[...]" argument, and half of the seeded tree looks broken for a reason
+# that is not the seed.
+imports:
+  - resource: 'EXT:academic_persons/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
+
 # Site of the seeded page tree.
 #
 # "rootPageId" is 1 because the seed definition declares that uid - see
@@ -8,13 +22,17 @@
 # The base carries no host name, so the instance is reachable under its DDEV
 # host name and under whatever a host stack serves it as.
 #
-# There is deliberately no "dependencies" list and no "settings.yaml". Site
-# sets arrived in TYPO3 v13.1 and this branch also supports v12, so the
-# TypoScript of the instance is delivered by the root "sys_template" record the
-# seed writes, on both versions alike. The same goes for the settings: on v12 a
-# site's settings are inserted before the static includes and are overwritten
-# by them, so what a development instance has to correct is in the "constants"
-# field of that record instead.
+# There is deliberately no "dependencies" list and no "settings.yaml": site sets
+# arrived in TYPO3 v13.1 and do not exist on v12 at all. The TypoScript of this
+# instance is delivered by the root "sys_template" record the seed writes, and
+# the settings with it - on v12 a site's settings are inserted before the static
+# includes and are overwritten by them, so what a development instance has to
+# correct lives in the "constants" field of that record instead.
+#
+# This is why the "core-12" instance imports the seed set "academics-instance"
+# and the "core-13" instance imports "academics-instance-sets": the same tree,
+# once with that record and once without it. See
+# "packages-dev/dev-site/Configuration/DataFactory/".
 rootPageId: 1
 base: /
 websiteTitle: 'Academic extensions (TYPO3 v12)'
@@ -27,4 +45,18 @@ languages:
     locale: en_US.UTF-8
     navigationTitle: English
     flag: us
+    websiteTitle: ''
+  -
+    title: German
+    enabled: true
+    languageId: 1
+    base: /de/
+    locale: de_DE.UTF-8
+    navigationTitle: Deutsch
+    flag: de
+    # Strict, and not a fallback to English: the seed translates every record,
+    # so a page that renders English text under "/de/" is a defect of the seed
+    # rather than a gap in the content - and with a fallback nobody would see it.
+    fallbackType: strict
+    fallbacks: ''
     websiteTitle: ''

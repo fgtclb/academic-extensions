@@ -28,6 +28,47 @@ if (!$sqliteDatabaseSeedSuppressed && !file_exists($sqliteDatabaseFile)) {
     @copy($sqliteDatabaseTemplateFile, $sqliteDatabaseFile);
 }
 //======================================================================================================================
+// Deliver the seed files into "fileadmin/" on first start-up.
+//
+// The committed template above carries "sys_file" rows, and a "sys_file" row without its file is a broken image on
+// every page that references it. Those files cannot be committed inside this instance - "public/" is git-ignored. They
+// are committed in the seed package instead, in a tree that mirrors "fileadmin/" one to one, and are copied out of it
+// here: the same "seed what is missing" rule the database follows, so a database and the files it points at always
+// arrive together.
+//
+// The check costs one "is_dir()" per request, and the copy runs only when the seeded folder is absent - on a fresh
+// clone, and again when somebody empties "fileadmin/" by hand. An existing file is never overwritten: what an editor
+// uploaded into this instance is theirs.
+//
+// The same switches suppress it that suppress the database seeding, and for a stronger reason than symmetry: while an
+// instance is rebuilt from nothing, "composer instance:seed" writes these files itself through the FAL API. A file
+// already sitting in the target folder would make it store a renamed copy ("profile-01_01.png"), and the snapshot
+// taken afterwards would reference a name that does not exist in a fresh clone.
+//
+// The files are drawn by "Build/Scripts/generateSeedFiles.php". See "docs/development/environment.md", section
+// "Seed files, and how they reach an instance".
+//======================================================================================================================
+$seedFilesPath = __DIR__ . '/../../../packages-dev/dev-site/Resources/Public/SeedFiles';
+$seedFilesTargetPath = __DIR__ . '/../../public/fileadmin';
+$seedFilesMarkerPath = $seedFilesTargetPath . '/academics-seed';
+if (!$sqliteDatabaseSeedSuppressed && is_dir($seedFilesPath) && !is_dir($seedFilesMarkerPath)) {
+    $seedFiles = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($seedFilesPath, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST,
+    );
+    foreach ($seedFiles as $seedFile) {
+        $seedFileTarget = $seedFilesTargetPath . substr($seedFile->getPathname(), strlen($seedFilesPath));
+        if ($seedFile->isDir()) {
+            @mkdir($seedFileTarget, 0775, true);
+        } elseif (!file_exists($seedFileTarget)) {
+            @mkdir(dirname($seedFileTarget), 0775, true);
+            @copy($seedFile->getPathname(), $seedFileTarget);
+        }
+    }
+}
+//======================================================================================================================
+
+//======================================================================================================================
 
 //======================================================================================================================
 // Include additional files from subfolder `additional/`.

@@ -1,0 +1,6 @@
+This folder exists because "1:/global-content/jobs/logos/" is an upload target of a frontend
+form and nothing creates it at runtime. It is copied into an instance's
+"fileadmin/" together with the seeded files, and it is invisible in the
+TYPO3 file list, which hides dot files.
+
+Written by "Build/Scripts/generateSeedFiles.php".
