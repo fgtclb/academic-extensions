@@ -2,44 +2,62 @@
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
-    <f:variable name="elementId" value="inline-profile-{profile.uid}-{field.identifier}" />
+    <f:variable
+        name="elementId"
+        value="inline-profile-{profile.uid}-{field.identifier}" />
     <div class="col-12">
         <div class="rounded-1 p-3 p-lg-4 {rowClass}" data-ie-field-wrapper>
-            <f:render partial="InlineProfile/Field/Preview" arguments="{profile: profile, field: field, elementId: elementId}" />
-            <div id="{elementId}-editor" class="d-none mt-3" data-ie-field-editor data-ie-for="{elementId}">
+            <f:render
+                partial="InlineProfile/Field/Preview"
+                arguments="{profile: profile, field: field, elementId: elementId}" />
+            <div
+                id="{elementId}-editor"
+                class="d-none mt-3"
+                data-ie-field-editor
+                data-ie-for="{elementId}">
                 <label class="form-label fw-semibold" for="{elementId}">
-                    <f:translate key="profile.{field.identifier}.label" extensionName="academic_persons_edit" />
-                    <f:if condition="{field.validation.required}"><abbr title="required">*</abbr></f:if>
+                    <f:translate
+                        key="profile.{field.identifier}.label"
+                        extensionName="academic_persons_edit" />
+                    <f:if condition="{field.validation.required}"
+                        ><abbr title="required">*</abbr></f:if
+                    >
                 </label>
-                <f:if condition="{field.validation.disabled} || {field.validation.readOnly}">
-                    <f:then>
-                        <f:form.select
-                            name="{field.propertyName}"
-                            id="{elementId}"
-                            class="form-select form-select-sm academic-persons-inline-edit__field"
-                            options="{options}"
-                            value="{profile.{field.propertyName}}"
-                            prependOptionLabel="---"
-                            prependOptionValue=""
-                            disabled="true" />
-                    </f:then>
-                    <f:else>
-                        <f:form.select
-                            name="{field.propertyName}"
-                            id="{elementId}"
-                            class="form-select form-select-sm academic-persons-inline-edit__field"
-                            options="{options}"
-                            value="{profile.{field.propertyName}}"
-                            prependOptionLabel="---"
-                            prependOptionValue=""
-                            required="{field.validation.required}"
-                            data-ie-autosave-on-change="true" />
-                    </f:else>
-                </f:if>
+                <div class="d-flex flex-row align-items-center">
+                    <f:if
+                        condition="{field.validation.disabled} || {field.validation.readOnly}">
+                        <f:then>
+                            <f:form.select
+                                name="{field.propertyName}"
+                                id="{elementId}"
+                                class="form-select form-select-sm academic-persons-inline-edit__field"
+                                options="{options}"
+                                value="{profile.{field.propertyName}}"
+                                prependOptionLabel="---"
+                                prependOptionValue=""
+                                disabled="true" />
+                        </f:then>
+                        <f:else>
+                            <f:form.select
+                                name="{field.propertyName}"
+                                id="{elementId}"
+                                class="form-select form-select-sm academic-persons-inline-edit__field"
+                                options="{options}"
+                                value="{profile.{field.propertyName}}"
+                                prependOptionLabel="---"
+                                prependOptionValue=""
+                                required="{field.validation.required}"
+                                data-ie-autosave-on-change="true" />
+                        </f:else>
+                    </f:if>
+                    <f:if
+                        condition="!{field.validation.disabled} && !{field.validation.readOnly}">
+                        <f:render
+                            partial="InlineProfile/Field/AutosaveUndo"
+                            arguments="{elementId: elementId}" />
+                    </f:if>
+                </div>
                 <div class="invalid-feedback"></div>
-                <f:if condition="!{field.validation.disabled} && !{field.validation.readOnly}">
-                    <f:render partial="InlineProfile/Field/AutosaveUndo" arguments="{elementId: elementId}" />
-                </f:if>
             </div>
         </div>
     </div>

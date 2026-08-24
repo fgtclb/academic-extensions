@@ -5,8 +5,7 @@
     <div data-ie-document-items>
         <f:for each="{items}" as="contract" iteration="itemIteration">
             <article
-                class="row g-3 align-items-start rounded-1 px-3 px-lg-4 py-4
-                    {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
+                class="row g-3 align-items-start rounded-1 px-3 px-lg-4 py-4 {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
                 data-ie-document-item
                 data-item-uid="{contract.uid}"
                 data-item-sorting="{contract.sorting}"
@@ -20,7 +19,9 @@
                     <div>
                         <f:if condition="{contract.validFrom}">
                             <f:then>
-                                <f:format.date format="d.m.Y">{contract.validFrom}</f:format.date>
+                                <f:format.date format="d.m.Y"
+                                    >{contract.validFrom}</f:format.date
+                                >
                             </f:then>
                             <f:else>—</f:else>
                         </f:if>

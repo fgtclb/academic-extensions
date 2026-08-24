@@ -10,8 +10,13 @@
                 class="h2 fw-normal text-break mb-4"
                 data-ie-profile-name
                 data-ie-profile-name-field-ids="{title.fieldIdentifiers}">
-                <f:for each="{title.fields}" as="field" iteration="fieldIteration">
-                    {profile.{field.propertyName}}<f:if condition="!{fieldIteration.isLast}"> </f:if>
+                <f:for
+                    each="{title.fields}"
+                    as="field"
+                    iteration="fieldIteration">
+                    {profile.{field.propertyName}}<f:if
+                        condition="!{fieldIteration.isLast}">
+                    </f:if>
                 </f:for>
             </h1>
         </f:if>

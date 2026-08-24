@@ -56,14 +56,16 @@
         </f:then>
         <f:else>
             <figure>
-                <f:image
-                    src="EXT:academic_persons_edit/Resources/Public/Images/profile-placeholder.png"
+                <img
+                    src="{f:uri.resource(path: 'Images/profile-placeholder.png')}"
                     alt="{f:translate(key: 'profile.image.placeholder.alt', extensionName:
                     'academic_persons_edit')}"
                     class="w-100 h-100 object-fit-contain border rounded border-secondary"
                     title="{f:translate(key: 'inlineProfile.user_image_not_available', extensionName:
                     'academic_persons_edit')}"
-                    loading="lazy" />
+                    loading="lazy"
+                    width="180"
+                    height="180" />
                 <figcaption class="visually-hidden">
                     {f:translate(key: 'inlineProfile.user_image_not_available',
                     extensionName: 'academic_persons_edit')}

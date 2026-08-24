@@ -5,8 +5,7 @@
     <div data-ie-document-items>
         <f:for each="{items}" as="item" iteration="itemIteration">
             <article
-                class="row g-3 align-items-start rounded-1 px-3 px-lg-4 py-4
-                    {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
+                class="row g-3 align-items-start rounded-1 px-3 px-lg-4 py-4 {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
                 data-ie-document-item
                 data-item-uid="{item.uid}"
                 data-item-sorting="{item.sorting}"
@@ -87,7 +86,9 @@
                         </f:if>
                     </div>
                     <f:if condition="{item.bodytext}">
-                        <div class="mt-2">{item.bodytext -> f:format.html()}</div>
+                        <div class="mt-2">
+                            {item.bodytext -> f:format.html()}
+                        </div>
                     </f:if>
                 </div>
             </article>
