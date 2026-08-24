@@ -18,16 +18,16 @@
                     <renderType>selectSingle</renderType>
                     <items>
                         <numIndex index="0" type="array">
-                            <numIndex index="0">LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.view.items.list</numIndex>
-                            <numIndex index="1">List</numIndex>
+                            <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.view.items.list</label>
+                            <value>List</value>
                         </numIndex>
                         <numIndex index="1" type="array">
-                            <numIndex index="0">LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.view.items.card</numIndex>
-                            <numIndex index="1">Card</numIndex>
+                            <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.view.items.card</label>
+                            <value>Card</value>
                         </numIndex>
                         <numIndex index="2" type="array">
-                            <numIndex index="0">LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.view.items.table</numIndex>
-                            <numIndex index="1">Table</numIndex>
+                            <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.view.items.table</label>
+                            <value>Table</value>
                         </numIndex>
                     </items>
                 </config>
@@ -39,12 +39,12 @@
                     <renderType>selectSingle</renderType>
                     <items>
                         <numIndex index="0" type="array">
-                            <numIndex index="0">LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.sortBy.items.ends_on</numIndex>
-                            <numIndex index="1">endsOn</numIndex>
+                            <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.sortBy.items.ends_on</label>
+                            <value>endsOn</value>
                         </numIndex>
                         <numIndex index="1" type="array">
-                            <numIndex index="0">LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.sortBy.items.title</numIndex>
-                            <numIndex index="1">title</numIndex>
+                            <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.sortBy.items.title</label>
+                            <value>title</value>
                         </numIndex>
                     </items>
                     <default>endsOn</default>
@@ -57,12 +57,12 @@
                     <renderType>selectSingle</renderType>
                     <items>
                         <numIndex index="0" type="array">
-                            <numIndex index="0">LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.sortByDirection.items.asc</numIndex>
-                            <numIndex index="1">asc</numIndex>
+                            <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.sortByDirection.items.asc</label>
+                            <value>asc</value>
                         </numIndex>
                         <numIndex index="1" type="array">
-                            <numIndex index="0">LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.sortByDirection.items.desc</numIndex>
-                            <numIndex index="1">desc</numIndex>
+                            <label>LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:flexform.el.sortByDirection.items.desc</label>
+                            <value>desc</value>
                         </numIndex>
                     </items>
                     <default>asc</default>
