@@ -92,6 +92,39 @@ final class ShippedFlexFormsTest extends UnitTestCase
     }
 
     /**
+     * The `<TCEforms>` wrapper below `<ROOT>` or an element is a compatibility
+     * layer TYPO3 announces as removed in v13: "It should be omitted while the
+     * underlying configuration ascends one level up." Two FlexForms of
+     * `academic_persons` carried it (ACE-467).
+     */
+    #[Test]
+    public function noShippedFlexFormWrapsItsConfigurationInTceforms(): void
+    {
+        $scanRoot = $this->determineScanRoot();
+        $files = $this->collectFlexFormFiles($scanRoot);
+
+        $failures = [];
+        foreach ($files as $file) {
+            if (str_contains((string)file_get_contents($file), '<TCEforms>')) {
+                $failures[] = ' - ' . substr($file, strlen($scanRoot) + 1);
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $failures,
+            sprintf(
+                '%d of the %d shipped FlexForms below "%s" wrap their configuration in'
+                . " \"<TCEforms>\". Omit the tag and move its content one level up:\n%s",
+                count($failures),
+                count($files),
+                $scanRoot,
+                implode("\n", $failures),
+            ),
+        );
+    }
+
+    /**
      * The lines of one file that declare an item positionally.
      *
      * A `<numIndex index="N" type="array">` opens an item; inside it, a nested
@@ -104,6 +137,7 @@ final class ShippedFlexFormsTest extends UnitTestCase
     {
         $found = [];
         $valuePickerDepth = 0;
+        $inItems = false;
         $inItem = false;
 
         foreach (explode("\n", (string)file_get_contents($file)) as $index => $line) {
@@ -119,7 +153,18 @@ final class ShippedFlexFormsTest extends UnitTestCase
             if ($valuePickerDepth > 0) {
                 continue;
             }
-            if (preg_match('/^<numIndex index="\d+" type="array">$/', $trimmed) === 1) {
+            if ($trimmed === '<items>') {
+                $inItems = true;
+                continue;
+            }
+            if ($trimmed === '</items>') {
+                $inItems = false;
+                $inItem = false;
+                continue;
+            }
+            // The "type" attribute is optional and both spellings occur, so an item
+            // is recognised by where it sits rather than by how it is annotated.
+            if ($inItems && !$inItem && preg_match('/^<numIndex index="\d+"( type="array")?>$/', $trimmed) === 1) {
                 $inItem = true;
                 continue;
             }
@@ -164,8 +209,14 @@ final class ShippedFlexFormsTest extends UnitTestCase
                     return !in_array($current->getFilename(), self::SKIPPED_DIRECTORIES, true);
                 }
 
+                // Case insensitively, because the directory is not spelled the same
+                // everywhere: eleven extensions use "Configuration/FlexForms/" and
+                // "academic_jobs" uses "Configuration/Flexforms/". Matching the
+                // majority spelling exactly is how this check silently skipped that
+                // extension, and with it four data structures that needed the fix
+                // (ACE-467).
                 return strtolower($current->getExtension()) === 'xml'
-                    && str_contains($current->getPathname(), '/Configuration/FlexForms/');
+                    && str_contains(strtolower($current->getPathname()), '/configuration/flexforms/');
             },
         );
 
