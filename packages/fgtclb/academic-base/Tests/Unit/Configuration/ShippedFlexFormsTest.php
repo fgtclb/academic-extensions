@@ -125,6 +125,90 @@ final class ShippedFlexFormsTest extends UnitTestCase
     }
 
     /**
+     * Character data between two elements, which XML permits and TYPO3 ignores.
+     *
+     * A FlexForm is a tree of elements, so a stray character between them means
+     * exactly one thing: a typo. `academic_persons` carried a lone `s` after
+     * `</settings.organisationalUnits>` through several releases (ACE-464) - the
+     * file was well formed, the parser dropped the text node, and nothing in this
+     * repository looks at XML, so no gate ever saw it.
+     *
+     * The check is on the parsed tree rather than on the text, because that is
+     * what makes "between two elements" a decidable question.
+     */
+    #[Test]
+    public function noShippedFlexFormCarriesStrayCharacterData(): void
+    {
+        $scanRoot = $this->determineScanRoot();
+        $files = $this->collectFlexFormFiles($scanRoot);
+
+        $failures = [];
+        foreach ($files as $file) {
+            $document = new \DOMDocument();
+            $document->preserveWhiteSpace = true;
+            if (!@$document->loadXML((string)file_get_contents($file))) {
+                $failures[] = sprintf(' - %s: not well formed XML', substr($file, strlen($scanRoot) + 1));
+                continue;
+            }
+
+            foreach (self::strayTextOf($document->documentElement) as $stray) {
+                $failures[] = sprintf(
+                    ' - %s: "%s" between elements below <%s>',
+                    substr($file, strlen($scanRoot) + 1),
+                    $stray['text'],
+                    $stray['parent'],
+                );
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $failures,
+            sprintf(
+                '%d stray text nodes in the %d shipped FlexForms below "%s".'
+                . " XML allows them and TYPO3 drops them, so they are always a typo:\n%s",
+                count($failures),
+                count($files),
+                $scanRoot,
+                implode("\n", $failures),
+            ),
+        );
+    }
+
+    /**
+     * Text nodes of an element that also has element children, which is where
+     * character data can only be an accident.
+     *
+     * @return list<array{parent: string, text: string}>
+     */
+    private static function strayTextOf(?\DOMElement $element): array
+    {
+        if ($element === null) {
+            return [];
+        }
+
+        $stray = [];
+        $hasElementChild = false;
+        foreach ($element->childNodes as $child) {
+            if ($child instanceof \DOMElement) {
+                $hasElementChild = true;
+            }
+        }
+
+        foreach ($element->childNodes as $child) {
+            if ($child instanceof \DOMElement) {
+                $stray = array_merge($stray, self::strayTextOf($child));
+                continue;
+            }
+            if ($hasElementChild && $child instanceof \DOMText && trim($child->wholeText) !== '') {
+                $stray[] = ['parent' => $element->nodeName, 'text' => trim($child->wholeText)];
+            }
+        }
+
+        return $stray;
+    }
+
+    /**
      * The lines of one file that declare an item positionally.
      *
      * A `<numIndex index="N" type="array">` opens an item; inside it, a nested
