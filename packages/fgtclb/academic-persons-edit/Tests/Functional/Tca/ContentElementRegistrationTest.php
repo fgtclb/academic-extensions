@@ -11,8 +11,8 @@ use PHPUnit\Framework\Attributes\Test;
  * Pins InlineProfile as the only editing content element offered in the backend.
  *
  * ProfileEditing remains as source and runtime compatibility reference until the inline
- * migration is complete, but editors must not be able to create new legacy elements.
- * `ExtensionManagementUtility::addPlugin()` writes three places, and all three are asserted.
+ * migration is complete. Its hidden record type keeps existing elements renderable, but the
+ * missing select item and icon prevent editors from creating new legacy elements.
  */
 final class ContentElementRegistrationTest extends AbstractAcademicPersonsEditTestCase
 {
@@ -43,10 +43,10 @@ final class ContentElementRegistrationTest extends AbstractAcademicPersonsEditTe
     }
 
     #[Test]
-    public function legacyProfileEditingPluginIsNotSelectable(): void
+    public function legacyProfileEditingPluginKeepsRuntimeTypeWithoutBeingSelectable(): void
     {
         $this->assertNotContains(self::LEGACY_CONTENT_TYPE, $this->getContentTypeValues());
-        $this->assertArrayNotHasKey(
+        $this->assertArrayHasKey(
             self::LEGACY_CONTENT_TYPE,
             $GLOBALS['TCA']['tt_content']['types'],
         );

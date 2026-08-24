@@ -2,7 +2,9 @@
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
-    <f:variable name="elementId" value="inline-profile-{profile.uid}-{field.identifier}" />
+    <f:variable
+        name="elementId"
+        value="inline-profile-{profile.uid}-{field.identifier}" />
     <div class="col-12">
         <div class="rounded-1 p-3 p-lg-4 {rowClass}" data-ie-field-wrapper>
             <f:render
@@ -26,7 +28,8 @@
                         <abbr title="required">*</abbr>
                     </f:if>
                 </label>
-                <div class="d-flex flex-column flex-xl-row gap-2 align-items-start">
+                <div
+                    class="d-flex flex-column flex-xl-row gap-2 align-items-start">
                     <f:render
                         partial="InlineProfile/Field/Control"
                         arguments="{
@@ -37,7 +40,8 @@
                             richText: richText,
                             rows: rows
                         }" />
-                    <f:if condition="!{field.validation.disabled} && !{field.validation.readOnly}">
+                    <f:if
+                        condition="!{field.validation.disabled} && !{field.validation.readOnly}">
                         <f:render
                             partial="InlineProfile/Field/Actions"
                             arguments="{elementId: elementId}" />

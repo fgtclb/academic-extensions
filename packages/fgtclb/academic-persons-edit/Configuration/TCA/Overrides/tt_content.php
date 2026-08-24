@@ -16,6 +16,10 @@ use FGTCLB\AcademicBase\TcaManipulator;
     // which is a hard dependency for this extension extending that dependency with additional features.
     // ProfileEditing remains in the source tree as a temporary legacy reference,
     // but InlineProfile is the only editing content element offered to editors.
+    // Keep a hidden record type for existing ProfileEditing records: TYPO3 v14
+    // resolves content fields through the CType-specific TCA schema while rendering.
+    $GLOBALS['TCA']['tt_content']['types']['academicpersonsedit_profileediting'] =
+        $GLOBALS['TCA']['tt_content']['types']['header'];
     (new TcaManipulator())->addContentElementPlugin(
         [
             'label' => 'LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_be.xlf:plugin.profile_inlineediting.label',

@@ -13,14 +13,21 @@
             <div class="d-flex align-items-start gap-3" data-ie-group-preview>
                 <div class="flex-grow-1 overflow-hidden">
                     <div class="fw-semibold">
-                        <f:translate key="{labelKey}" extensionName="academic_persons_edit" />
+                        <f:translate
+                            key="{labelKey}"
+                            extensionName="academic_persons_edit" />
                     </div>
                     <div
                         class="text-break"
                         data-ie-group-preview-content
                         data-empty-label="{f:translate(key: 'inlineProfile.field.empty', extensionName: 'academic_persons_edit')}">
-                        <f:for each="{displayFields}" as="field" iteration="fieldIteration">
-                            {profile.{field.propertyName}}<f:if condition="!{fieldIteration.isLast}"> </f:if>
+                        <f:for
+                            each="{displayFields}"
+                            as="field"
+                            iteration="fieldIteration">
+                            {profile.{field.propertyName}}<f:if
+                                condition="!{fieldIteration.isLast}">
+                            </f:if>
                         </f:for>
                     </div>
                 </div>
@@ -32,7 +39,10 @@
                     aria-expanded="false"
                     title="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
                     aria-label="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}">
-                    <core:icon identifier="academic-persons-inline-edit-pencil" size="small" alternativeMarkupIdentifier="inline" />
+                    <core:icon
+                        identifier="academic-persons-inline-edit-pencil"
+                        size="small"
+                        alternativeMarkupIdentifier="inline" />
                 </button>
             </div>
             <div
@@ -41,13 +51,19 @@
                 data-ie-group-editor>
                 <div class="row g-3">
                     <f:for each="{fields}" as="field">
-                        <f:variable name="elementId" value="inline-profile-{profile.uid}-{field.identifier}" />
+                        <f:variable
+                            name="elementId"
+                            value="inline-profile-{profile.uid}-{field.identifier}" />
                         <div
                             class="{f:if(condition: field.columnClass, then: field.columnClass, else: 'col-12')}"
                             data-ie-group-control>
                             <label class="form-label" for="{elementId}">
-                                <f:translate key="profile.{field.identifier}.label" extensionName="academic_persons_edit" />
-                                <f:if condition="{field.validation.required}"><abbr title="required">*</abbr></f:if>
+                                <f:translate
+                                    key="profile.{field.identifier}.label"
+                                    extensionName="academic_persons_edit" />
+                                <f:if condition="{field.validation.required}"
+                                    ><abbr title="required">*</abbr></f:if
+                                >
                             </label>
                             <f:render
                                 partial="InlineProfile/Field/Control"
@@ -56,16 +72,51 @@
                         </div>
                     </f:for>
                 </div>
-                <div class="d-flex justify-content-end mt-3" data-ie-group-actions>
-                    <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="{f:translate(key: 'inlineProfile.actions.group', extensionName: 'academic_persons_edit')}">
-                        <button class="btn rounded-0 btn-outline-danger" data-ie-group-dismiss type="button" title="{f:translate(key: 'inlineProfile.actions.clear', extensionName: 'academic_persons_edit')}" aria-label="{f:translate(key: 'inlineProfile.actions.clear', extensionName: 'academic_persons_edit')}">
-                            <span aria-hidden="true" class="fs-5 lh-1"><core:icon identifier="academic-persons-inline-edit-clear" size="small" alternativeMarkupIdentifier="inline" /></span>
+                <div
+                    class="d-flex justify-content-end mt-3"
+                    data-ie-group-actions>
+                    <div
+                        class="btn-group btn-group-sm flex-shrink-0"
+                        role="group"
+                        aria-label="{f:translate(key: 'inlineProfile.actions.group', extensionName: 'academic_persons_edit')}">
+                        <button
+                            class="btn rounded-0 btn-outline-danger"
+                            data-ie-group-dismiss
+                            type="button"
+                            title="{f:translate(key: 'inlineProfile.actions.clear', extensionName: 'academic_persons_edit')}"
+                            aria-label="{f:translate(key: 'inlineProfile.actions.clear', extensionName: 'academic_persons_edit')}">
+                            <span aria-hidden="true" class="fs-5 lh-1"
+                                ><core:icon
+                                    identifier="academic-persons-inline-edit-clear"
+                                    size="small"
+                                    alternativeMarkupIdentifier="inline"
+                            /></span>
                         </button>
-                        <button class="btn rounded-0 btn-outline-secondary" data-ie-group-cancel type="button" title="{f:translate(key: 'actions.undo', extensionName: 'academic_persons_edit')}" aria-label="{f:translate(key: 'actions.undo', extensionName: 'academic_persons_edit')}">
-                            <span aria-hidden="true" class="fs-5 lh-1"><core:icon identifier="academic-persons-inline-edit-undo" size="small" alternativeMarkupIdentifier="inline" /></span>
+                        <button
+                            class="btn rounded-0 btn-outline-secondary"
+                            data-ie-group-cancel
+                            type="button"
+                            title="{f:translate(key: 'actions.undo', extensionName: 'academic_persons_edit')}"
+                            aria-label="{f:translate(key: 'actions.undo', extensionName: 'academic_persons_edit')}">
+                            <span aria-hidden="true" class="fs-5 lh-1"
+                                ><core:icon
+                                    identifier="academic-persons-inline-edit-undo"
+                                    size="small"
+                                    alternativeMarkupIdentifier="inline"
+                            /></span>
                         </button>
-                        <button class="btn rounded-0 btn-success" data-ie-group-save type="button" title="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}" aria-label="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}">
-                            <span aria-hidden="true" class="fs-5 lh-1"><core:icon identifier="academic-persons-inline-edit-save" size="small" alternativeMarkupIdentifier="inline" /></span>
+                        <button
+                            class="btn rounded-0 btn-success"
+                            data-ie-group-save
+                            type="button"
+                            title="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}"
+                            aria-label="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}">
+                            <span aria-hidden="true" class="fs-5 lh-1"
+                                ><core:icon
+                                    identifier="academic-persons-inline-edit-save"
+                                    size="small"
+                                    alternativeMarkupIdentifier="inline"
+                            /></span>
                         </button>
                     </div>
                 </div>

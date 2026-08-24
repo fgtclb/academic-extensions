@@ -50,7 +50,8 @@
                     <div class="row gx-lg-5 gy-5 align-items-stretch">
                         <div class="col-12 col-lg-4">
                             <div class="sticky-top" data-ie-sticky-image>
-                                <f:if condition="{specialFields.title} || {specialFields.image}">
+                                <f:if
+                                    condition="{specialFields.title} || {specialFields.image}">
                                     <f:render
                                         partial="InlineProfile/Image/Card"
                                         arguments="{profile: profile, title: specialFields.title, image: specialFields.image}" />
