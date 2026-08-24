@@ -47,10 +47,6 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
                 'firstName',
                 'middleName',
                 'lastName',
-                'emailAddress',
-                'publishEmailAddress',
-                'phoneNumber',
-                'publishPhoneNumber',
                 'website',
                 'publicationsLink',
                 'coreCompetences',
@@ -67,7 +63,7 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
         $this->assertTrue($firstName->validation->readOnly);
         $this->assertSame('input', $firstName->fieldType);
         $this->assertSame('text', $firstName->renderType);
-        $this->assertSame('emailAddress', $settings->getProfileField('emailAddress')?->propertyName);
+        $this->assertSame('website', $settings->getProfileField('website')?->propertyName);
         $this->assertSame(0, $settings->getProfileField('gender')?->position);
         $this->assertSame(0, $settings->getProfileField('miscellaneous')?->position);
     }
@@ -144,20 +140,13 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     }
 
     #[Test]
-    public function shippedUrlEmailAndTelephoneFlagsProduceFrontendAndServerMetadata(): void
+    public function shippedUrlFlagProducesFrontendAndServerMetadata(): void
     {
         $settings = $this->normalize($this->getShippedConfiguration());
         $website = $settings->getProfileField('website')?->validation;
-        $email = $settings->getProfileField('emailAddress')?->validation;
-        $phoneNumber = $settings->getProfileField('phoneNumber')?->validation;
         $this->assertNotNull($website);
         $this->assertSame('url', $website->inputType);
         $this->assertSame([UrlValidator::class], $website->validatorClassNames);
-        $this->assertNotNull($email);
-        $this->assertSame('email', $email->inputType);
-        $this->assertSame([EmailAddressValidator::class], $email->validatorClassNames);
-        $this->assertNotNull($phoneNumber);
-        $this->assertSame('tel', $phoneNumber->inputType);
     }
 
     #[Test]

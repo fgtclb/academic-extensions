@@ -64,9 +64,8 @@ as a list view and detail view for each person.
 Profile fields and structured document collections are configured in
 `Configuration/AcademicPersons/Settings.yaml`. The ordered `profile`,
 `special`, `contractContact` and `documentSections` maps keep field metadata
-and validation attached to their own section. Direct public-profile email and
-telephone values use explicit opt-in flags and stay independent of contacts
-owned by an employment contract.
+and validation attached to their own section. Email, telephone and address data
+is stored as contact records owned by an employment contract.
 
 > [!NOTE]
 > This extension is currently in beta state - please notice that there might be changes to the structure

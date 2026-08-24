@@ -55,19 +55,6 @@
 
       <!-- Detail -->
 
-      <trans-unit id="detail.profileContact" resname="detail.profileContact">
-        <source>Contact</source>
-        <target>Kontakt</target>
-      </trans-unit>
-      <trans-unit id="detail.emailAddress" resname="detail.emailAddress">
-        <source>Email address</source>
-        <target>E-Mail-Adresse</target>
-      </trans-unit>
-      <trans-unit id="detail.phoneNumber" resname="detail.phoneNumber">
-        <source>Phone number</source>
-        <target>Telefonnummer</target>
-      </trans-unit>
-
       <trans-unit id="detail.contracts" resname="detail.contracts">
         <source>Contracts</source>
         <target>Verträge</target>

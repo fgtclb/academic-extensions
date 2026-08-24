@@ -247,46 +247,6 @@ $tcaConfiguration = [
                 'max' => 1,
             ],
         ],
-        'email_address' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.email_address.label',
-            'exclude' => true,
-            'config' => [
-                'type' => 'email',
-                'size' => 50,
-                'max' => 255,
-            ],
-        ],
-        'publish_email_address' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publish_email_address.label',
-            'description' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publish_email_address.description',
-            'exclude' => true,
-            'config' => [
-                'type' => 'check',
-                'renderType' => 'checkboxToggle',
-                'items' => [['label' => '']],
-                'default' => 0,
-            ],
-        ],
-        'phone_number' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.phone_number.label',
-            'exclude' => true,
-            'config' => [
-                'type' => 'input',
-                'size' => 50,
-                'max' => 255,
-            ],
-        ],
-        'publish_phone_number' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publish_phone_number.label',
-            'description' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publish_phone_number.description',
-            'exclude' => true,
-            'config' => [
-                'type' => 'check',
-                'renderType' => 'checkboxToggle',
-                'items' => [['label' => '']],
-                'default' => 0,
-            ],
-        ],
         'image' => [
             'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.image.label',
             'l10n_mode' => 'exclude',
@@ -476,15 +436,6 @@ $tcaConfiguration = [
                 'website_title',
             ]),
         ],
-        'profileContact' => [
-            'showitem' => implode(',', [
-                'email_address',
-                'publish_email_address',
-                '--linebreak--',
-                'phone_number',
-                'publish_phone_number',
-            ]),
-        ],
         'publications' => [
             'showitem' => implode(',', [
                 'publications_link_title',
@@ -523,7 +474,6 @@ $tcaConfiguration = [
             'showitem' => implode(',', [
                 '--div--;LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.div.general.label',
                 '--palette--;;name',
-                '--palette--;;profileContact',
                 '--palette--;;website',
                 'image',
                 '--palette--;;slug',
@@ -622,10 +572,6 @@ ArrayUtility::mergeRecursiveWithOverrule(
         'firstName',
         'middleName',
         'lastName',
-        'emailAddress',
-        'publishEmailAddress',
-        'phoneNumber',
-        'publishPhoneNumber',
         'website',
         'publicationsLink',
         'coreCompetences',

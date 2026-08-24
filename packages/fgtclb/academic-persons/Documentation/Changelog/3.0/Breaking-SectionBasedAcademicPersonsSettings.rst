@@ -40,10 +40,6 @@ move every validator list below its field or document section. Integrations usin
 the internal ``ProfileInformationType`` or global validation-set APIs must use
 the new section accessors instead.
 
-Direct public-profile email/phone values now live on ``Profile`` with explicit
-opt-in publication flags. They are separate from contact records owned by a
-Contract.
-
 Settings are still merged at the top level. An override of :yaml:`profile`,
 :yaml:`special`, :yaml:`contractContact` or :yaml:`documentSections` must
 contain the complete desired map. Flush all TYPO3

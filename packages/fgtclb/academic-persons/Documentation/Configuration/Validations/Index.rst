@@ -19,12 +19,12 @@ Profile validation
 ..  code-block:: yaml
 
     profile:
-      emailAddress:
+      website:
         section: information
         fieldType: input
-        renderType: email
+        renderType: combinedLink
         validators:
-          - email
+          - url
 
 The inline JSON endpoint accepts only writable configured Profile properties.
 Validation is submission-aware: only a property sent in the current request or
@@ -37,17 +37,11 @@ to their :yaml:`special` entry. Composite special components such as
 ``special.title`` reuse their listed regular profile fields and do not create a
 second persisted property.
 
-Profile contacts and contract contacts
-======================================
+Contract contact validation
+===========================
 
-The similarly named contact values are intentionally isolated:
-
-*   ``profile.emailAddress`` and ``profile.phoneNumber`` validate scalar values
-    stored on :sql:`tx_academicpersons_domain_model_profile`. Their publish
-    flags control output in the public detail profile.
-*   :yaml:`contractContact.emailAddress` maps to the ``email`` property of an
-    Email record below a Contract. Phone and physical-address records follow
-    the same pattern.
+Contact data belongs to address, email and telephone records below a Contract.
+Its validation is configured independently from direct Profile properties.
 
 ..  code-block:: yaml
 
@@ -70,7 +64,7 @@ The similarly named contact values are intentionally isolated:
 
 Contract-contact validators select exactly ``physicalAddresses``,
 ``emailAddresses`` or ``phoneNumbers``. A rule from one section is never used
-for another contact record and is never merged into direct Profile validation.
+for another contact record and is never merged into Profile validation.
 Type-field read-only/disabled rules are included in controller, validator,
 factory and TCA validation sets as well.
 
@@ -162,11 +156,10 @@ Shipped defaults
 ================
 
 ``firstName``, ``middleName`` and ``lastName`` are read only because they are
-normally synchronized from the frontend user. The direct public profile email
-and telephone are optional and both publication switches default to false.
-Contract email, phone and the required physical-address parts keep their own
-section-local requirements. The contracts document section is read only; every
-other document section owns its rules independently.
+normally synchronized from the frontend user. Contract email, phone and the
+required physical-address parts keep their own section-local requirements. The
+contracts document section is read only; every other document section owns its
+rules independently.
 
 Overrides
 =========
