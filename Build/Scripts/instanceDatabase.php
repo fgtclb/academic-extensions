@@ -38,6 +38,15 @@ declare(strict_types=1);
  * rebuild - and a marker that outlives one is a trap: the instance would come
  * up empty after the next teardown, long after anybody remembers why.
  *
+ * "fresh" also removes the folder the seeded files were delivered into, and that
+ * is not tidiness. "composer instance:seed" writes those files itself, through
+ * the FAL API - and FAL renames rather than overwrites, so a leftover
+ * "profile-01.png" makes the import store "profile-01_01.png" and point its
+ * "sys_file" row at it. The snapshot committed afterwards would then name a file
+ * that does not exist anywhere else, and every image would be broken in a fresh
+ * clone. Only the seed's own folder is touched; anything else in "fileadmin/"
+ * belongs to whoever put it there.
+ *
  * The marker is git-ignored and belongs to one instance, so one core version
  * can be rebuilt while the other keeps working.
  *
@@ -48,6 +57,7 @@ declare(strict_types=1);
 const MARKER_FILE = '.no-database-seed';
 const DATABASE_PATTERN = 'var/sqlite/*.sqlite';
 const SIDECAR_SUFFIXES = ['-wal', '-shm'];
+const SEEDED_FILE_FOLDER = 'public/fileadmin/academics-seed';
 
 /**
  * @param string[] $argv
@@ -87,6 +97,10 @@ function main(array $argv): int
         printf("Removed %s\n", $database);
     }
 
+    if (!removeSeededFiles()) {
+        return 1;
+    }
+
     if (!is_file(MARKER_FILE) && file_put_contents(MARKER_FILE, markerContents()) === false) {
         fwrite(STDERR, sprintf("Could not write \"%s\".\n", MARKER_FILE));
         return 1;
@@ -104,6 +118,34 @@ function main(array $argv): int
     );
 
     return 0;
+}
+
+function removeSeededFiles(): bool
+{
+    if (!is_dir(SEEDED_FILE_FOLDER)) {
+        return true;
+    }
+
+    $entries = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator(SEEDED_FILE_FOLDER, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST,
+    );
+    foreach ($entries as $entry) {
+        $removed = $entry->isDir() ? rmdir($entry->getPathname()) : unlink($entry->getPathname());
+        if (!$removed) {
+            fwrite(STDERR, sprintf("Could not remove \"%s\".\n", $entry->getPathname()));
+            return false;
+        }
+    }
+
+    if (!rmdir(SEEDED_FILE_FOLDER)) {
+        fwrite(STDERR, sprintf("Could not remove \"%s\".\n", SEEDED_FILE_FOLDER));
+        return false;
+    }
+
+    printf("Removed %s\n", SEEDED_FILE_FOLDER);
+
+    return true;
 }
 
 function removeMarker(): int
