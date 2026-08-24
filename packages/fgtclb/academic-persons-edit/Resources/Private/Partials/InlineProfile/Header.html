@@ -13,9 +13,11 @@
         </h2>
         <div
             class="d-flex flex-wrap justify-content-between justify-content-lg-end align-items-center gap-4">
-            <f:render
-                partial="InlineProfile/Settings/Sync"
-                arguments="{profile: profile, validations: validations}" />
+            <f:if condition="{skipSync}">
+                <f:render
+                    partial="InlineProfile/Settings/Sync"
+                    arguments="{profile: profile, special: skipSync}" />
+            </f:if>
             <button
                 class="btn rounded-0 btn-outline-secondary btn-sm flex-shrink-0"
                 type="button"

@@ -66,7 +66,7 @@ final class AcademicPersonsEditProfileFormSubmissionTest extends AbstractProfile
      * both fields would keep their seeded values.
      *
      * `website` and `websiteTitle` are used rather than the name fields, because the shipped
-     * `profile` validation set marks `firstName`, `middleName` and `lastName` as `disabled`,
+     * profile sections mark `firstName`, `middleName` and `lastName` as `readonly`,
      * so `mayApplyProperty()` rejects them before the request is consulted at all.
      */
     #[Test]

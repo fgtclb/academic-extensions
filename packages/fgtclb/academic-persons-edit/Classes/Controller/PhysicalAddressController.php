@@ -78,7 +78,10 @@ final class PhysicalAddressController extends AbstractActionController
             'addressFormData' => new AddressFormData(),
             'availableTypes' => $this->getAvailableTypes(),
             'cancelUrl' => $this->userSessionService->loadRefererFromSession($this->request),
-            'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('physicalAddress')->validations,
+            'validations' => $this->academicPersonsSettings->getContractContactValidationSetForFields(
+                ['street', 'streetNumber', 'additional', 'zip', 'city', 'state', 'country', 'physicalAddressType'],
+                'physicalAddresses',
+            )->validations,
         ]);
         return $this->htmlResponse();
     }
@@ -96,7 +99,10 @@ final class PhysicalAddressController extends AbstractActionController
     public function createAction(Contract $contract, AddressFormData $addressFormData): ResponseInterface
     {
         $physicalAddress = $this->addressFactory->createFromFormData(
-            $this->academicPersonsSettings->getValidationSetWithFallback('physicalAddress'),
+            $this->academicPersonsSettings->getContractContactValidationSetForFields(
+                ['street', 'streetNumber', 'additional', 'zip', 'city', 'state', 'country', 'physicalAddressType'],
+                'physicalAddresses',
+            ),
             $contract,
             $addressFormData
         );
@@ -135,7 +141,10 @@ final class PhysicalAddressController extends AbstractActionController
             'availableTypes' => $this->getAvailableTypes(),
             'addressFormData' => AddressFormData::createFromAddress($physicalAddress),
             'cancelUrl' => $this->userSessionService->loadRefererFromSession($this->request),
-            'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('physicalAddress')->validations,
+            'validations' => $this->academicPersonsSettings->getContractContactValidationSetForFields(
+                ['street', 'streetNumber', 'additional', 'zip', 'city', 'state', 'country', 'physicalAddressType'],
+                'physicalAddresses',
+            )->validations,
         ]);
         return $this->htmlResponse();
     }
@@ -146,7 +155,10 @@ final class PhysicalAddressController extends AbstractActionController
     ): ResponseInterface {
         $this->addressRepository->update(
             $this->addressFactory->updateFromFormData(
-                $this->academicPersonsSettings->getValidationSetWithFallback('physicalAddress'),
+                $this->academicPersonsSettings->getContractContactValidationSetForFields(
+                    ['street', 'streetNumber', 'additional', 'zip', 'city', 'state', 'country', 'physicalAddressType'],
+                    'physicalAddresses',
+                ),
                 $physicalAddress,
                 $addressFormData,
             ),

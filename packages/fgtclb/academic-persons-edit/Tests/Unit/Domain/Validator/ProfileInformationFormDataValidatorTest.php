@@ -24,40 +24,87 @@ use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * Validates the argument of `ProfileInformationController::createAction()` and
- * `updateAction()` against the validation set `profileInformation`. This is the one
- * form data object whose required properties are not strings: `year` is `?int`, so
- * "not submitted" and "submitted empty" both arrive as `null` rather than as `''`.
+ * Profile-information validation is selected by the document section's record type.
  */
 final class ProfileInformationFormDataValidatorTest extends UnitTestCase
 {
-    private const VALIDATION_SET = 'profileInformation';
+    private const VALIDATION_SET = 'publications';
 
     #[Test]
-    public function theValidationSetProfileInformationIsProcessed(): void
+    public function theMatchingDocumentSectionIsProcessed(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['title' => [RecordingValidator::class]]),
-            new ProfileInformationFormData(title: 'A publication')
+            ValidationSettings::forDocumentSection(
+                self::VALIDATION_SET,
+                'publication',
+                ['title' => [RecordingValidator::class]],
+            ),
+            new ProfileInformationFormData(type: 'publication', title: 'A publication')
         );
 
         $this->assertSame(['string(A publication)'], $this->messagesFor($result, 'title'));
     }
 
     #[Test]
-    public function aValidationSetRegisteredUnderAnotherIdentifierIsIgnored(): void
+    public function aDocumentSectionWithAnotherRecordTypeIsIgnored(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier('profileInformations', ['title' => [RecordingValidator::class]]),
-            new ProfileInformationFormData(title: 'A publication')
+            ValidationSettings::forDocumentSection(
+                'lectures',
+                'lecture',
+                ['title' => [RecordingValidator::class]],
+            ),
+            new ProfileInformationFormData(type: 'publication', title: 'A publication')
         );
 
         $this->assertFalse($result->hasErrors());
     }
 
+    #[Test]
+    public function theContractSectionIsNeverAppliedToAProfileInformationRecord(): void
+    {
+        $result = $this->validate(
+            ValidationSettings::forDocumentSection(
+                'contracts',
+                'contracts',
+                ['title' => [RecordingValidator::class]],
+                true,
+            ),
+            new ProfileInformationFormData(type: 'contracts', title: 'Not a contract'),
+        );
+        $this->assertFalse($result->hasErrors());
+    }
+
+    #[Test]
+    public function validatorsFromSiblingDocumentSectionsNeverLeakIntoTheSelectedType(): void
+    {
+        $publications = ValidationSettings::forDocumentSection(
+            'publications',
+            'publication',
+            ['title' => [RecordingValidator::class]],
+        );
+        $lectures = ValidationSettings::forDocumentSection(
+            'lectures',
+            'lecture',
+            ['link' => [RecordingValidator::class]],
+        );
+        $settings = new AcademicPersonsSettings(
+            documentSections: array_replace($publications->documentSections, $lectures->documentSections),
+        );
+        $result = $this->validate(
+            $settings,
+            new ProfileInformationFormData(
+                type: 'publication',
+                title: 'A publication',
+                link: 'https://example.org',
+            ),
+        );
+        $this->assertSame(['string(A publication)'], $this->messagesFor($result, 'title'));
+        $this->assertSame([], $this->messagesFor($result, 'link'));
+    }
+
     /**
-     * `title` and `year` are the two the shipped configuration requires; the others
-     * are what a project adds. All of them have to resolve off the DTO, because an
+     * All normalized document properties have to resolve off the DTO, because an
      * unreadable property silently becomes `null`.
      */
     #[Test]
@@ -65,7 +112,11 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
     public function aConfiguredPropertyResolvesToTheSubmittedValue(string $property, string $expectedDescription): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, [$property => [RecordingValidator::class]]),
+            ValidationSettings::forDocumentSection(
+                self::VALIDATION_SET,
+                'publication',
+                [$property => [RecordingValidator::class]],
+            ),
             new ProfileInformationFormData(
                 type: 'publication',
                 title: 'A publication',
@@ -86,15 +137,15 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
     public static function configuredProperties(): array
     {
         return [
-            // Both required in the shipped Configuration/AcademicPersons/Settings.yaml.
+            // Validator properties used by the shipped document sections.
             'title' => ['title', 'string(A publication)'],
             'year' => ['year', 'int(2024)'],
-            // Readable, but not configured by default.
-            'type' => ['type', 'string(publication)'],
             'bodytext' => ['bodytext', 'string(Some text)'],
             'link' => ['link', 'string(https://example.org)'],
             'yearStart' => ['yearStart', 'int(2020)'],
             'yearEnd' => ['yearEnd', 'int(2023)'],
+            // Section-selection metadata is readable for project-specific rules.
+            'type' => ['type', 'string(publication)'],
         ];
     }
 
@@ -108,8 +159,12 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
     public function anOmittedNullableIntIsHandedOverAsNull(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['year' => [RecordingValidator::class]]),
-            new ProfileInformationFormData(title: 'A publication')
+            ValidationSettings::forDocumentSection(
+                self::VALIDATION_SET,
+                'publication',
+                ['year' => [RecordingValidator::class]],
+            ),
+            new ProfileInformationFormData(type: 'publication', title: 'A publication')
         );
 
         $this->assertSame(['null'], $this->messagesFor($result, 'year'));
@@ -124,7 +179,9 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
     public function anythingButProfileInformationFormDataIsRejected(mixed $subject): void
     {
         $validator = new ProfileInformationFormDataValidator();
-        $validator->injectAcademicPersonsSettings(ValidationSettings::forIdentifier(self::VALIDATION_SET, []));
+        $validator->injectAcademicPersonsSettings(
+            ValidationSettings::forDocumentSection(self::VALIDATION_SET, 'publication', []),
+        );
 
         $this->expectException(UnsuitableValidatorException::class);
         $this->expectExceptionCode(1297418975);

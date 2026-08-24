@@ -21,9 +21,11 @@ are returned as JSON with an appropriate HTTP status code. Field-specific
 validation errors are rendered next to the corresponding control.
 
 Gender values are restricted to the options configured for the profile gender
-field in TCA. The empty string remains valid so an existing selection can be
-cleared. Validation reads the raw TCA values independently from the translated
-value-to-label map used to render the Fluid select.
+field in TCA. The empty string passes payload normalization so a configuration
+without ``required`` can clear an existing selection; the shipped profile
+section marks gender as required and therefore rejects that value during
+section validation. Option checks read the raw TCA values independently from
+the translated value-to-label map used to render the Fluid select.
 
 The synchronization checkbox has a dedicated JSON endpoint and is persisted
 immediately without submitting unrelated fields. Clicking the profile image or
@@ -44,12 +46,12 @@ The main template is composed from focused partials for image UI, settings,
 forms, sections, field preview/control/actions, status output and button
 templates. The responsive grid and JavaScript data hooks remain unchanged.
 
-The five fields in the profile content section use TYPO3's bundled CKEditor 5.
-Editor instances are initialized only when a field is opened and expose a
-deliberately small formatting toolbar. The existing JSON update endpoint
-remains the only persistence path. Rich-text input is sanitized server-side
-with an explicit allowlist before validation and persistence, and the response
-returns the normalized markup used to update the editor state.
+Profile fields configured with ``renderType: ckeditor`` use TYPO3's bundled
+CKEditor 5. Editor instances are initialized only when a field is opened and
+expose a deliberately small formatting toolbar. The existing JSON update
+endpoint remains the only persistence path. Rich-text input is sanitized
+server-side with an explicit allowlist before validation and persistence, and
+the response returns the normalized markup used to update the editor state.
 
 Rich-text read mode renders the formatted value directly with a compact edit
 control. In edit mode every field has separate delete, cancel and save actions.

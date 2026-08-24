@@ -23,7 +23,7 @@ controls. Related name and link properties are presented as groups and edited
 together.
 
 The profile name is displayed as the main heading above the sticky image. The
-compact `Private` switch sits immediately left of the small `Edit all` toggle
+compact `Disable profile sync` switch sits immediately left of the small `Edit all` toggle
 beside the personal-data heading and keeps using its dedicated `skipSync` AJAX
 endpoint. The toggle changes to `Close all` while the editors are open. Closing
 all editors keeps unsaved browser-side drafts; persistence remains available
@@ -32,14 +32,15 @@ upper-right corner of the profile image
 opens a Bootstrap 5 modal: selecting a file updates the local modal preview,
 saving uploads and replaces the page preview, and deleting removes the current
 image. Upload errors retain their non-success HTTP status, are shown inside the
-open modal and do not change the page preview.
-No additional CSS or inline styles are required.
+open modal and do not change the page preview. Bootstrap provides the layout;
+the existing small compatibility stylesheet only adjusts surrounding overflow,
+frame spacing and sticky-card stacking. The templates require no inline styles.
 Authentication, profile ownership, configured validators, file validation and
-TCA gender options are checked server-side.
+the TCA allow lists of all configured select fields are checked server-side.
 
-The five rich-text properties use TYPO3's bundled CKEditor 5; four appear in
-the personal-data column and `miscellaneous` appears as the `About me`
-description. They are saved through the same partial-update endpoint. Submitted rich text is
+The profile fields configured with `renderType: ckeditor` use TYPO3's bundled
+CKEditor 5; in the shipped settings four appear in the `information` section
+and `miscellaneous` appears in `aboutme`. They are saved through the same partial-update endpoint. Submitted rich text is
 sanitized server-side with an explicit tag, attribute and URI-scheme allowlist
 before it is validated and persisted. Rich-text fields show their formatted
 content directly with a compact pencil control. While editing, separate delete,
@@ -47,6 +48,20 @@ cancel and save actions clear the draft, restore the last persisted value or
 persist the field through AJAX. See the
 [inline-editing documentation](./Documentation/InlineEditing/Index.rst) for the
 editor, AJAX and security contracts.
+
+The inline controller consumes the ordered `profile`, `special`,
+`contractContact` and `documentSections` configuration from
+`academic_persons`. Fluid fields are selected by `renderType`, select options
+remain in TCA, and the JavaScript entry delegates to focused feature modules.
+Direct public-profile email/telephone values and their opt-in flags stay
+separate from Contract contact data. Validation and structured-section metadata
+remain attached to their respective section.
+
+Select and checkbox controls save on change and expose a compact undo action
+that restores the last persisted value and closes the inline editor. Frontend
+unit and DOM interaction tests are isolated in
+`Resources/Public/Development/`; run `npm i` and then `npm test` in that
+directory.
 
 > [!NOTE]
 > This extension is currently in beta state - please notice that there might be changes to the structure

@@ -1,34 +1,16 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-    xmlns:p="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
     data-namespace-typo3-fluid="true">
-    <f:variable name="validation"
-        ><p:validationEnsure
-            validations="{validations}"
-            identifier="{identifier}"
-    /></f:variable>
-    <f:variable
-        name="elementId"
-        value="inline-profile-{profile.uid}-{identifier}" />
-    <f:variable name="resolvedInputType" value="text" />
-    <f:if condition="{validation.inputType}">
-        <f:variable name="resolvedInputType" value="{validation.inputType}" />
-    </f:if>
-    <f:if condition="{inputType}">
-        <f:variable name="resolvedInputType" value="{inputType}" />
-    </f:if>
-
-    <div class="{columnClass}">
+    <f:variable name="elementId" value="inline-profile-{profile.uid}-{field.identifier}" />
+    <div class="col-12">
         <div class="rounded-1 p-3 p-lg-4 {rowClass}" data-ie-field-wrapper>
             <f:render
                 partial="InlineProfile/Field/Preview"
                 arguments="{
                     profile: profile,
-                    identifier: identifier,
-                    labelKey: labelKey,
+                    field: field,
                     elementId: elementId,
-                    validation: validation,
                     richText: richText
                 }" />
             <div
@@ -37,39 +19,25 @@
                 data-ie-field-editor
                 data-ie-for="{elementId}">
                 <label class="form-label fw-semibold" for="{elementId}">
-                    <f:if condition="{labelKey}">
-                        <f:then>
-                            <f:translate
-                                key="{labelKey}"
-                                extensionName="academic_persons_edit" />
-                        </f:then>
-                        <f:else>
-                            <f:translate
-                                key="profile.{identifier}.label"
-                                extensionName="academic_persons_edit" />
-                        </f:else>
-                    </f:if>
-                    <f:if condition="{validation.required}">
+                    <f:translate
+                        key="profile.{field.identifier}.label"
+                        extensionName="academic_persons_edit" />
+                    <f:if condition="{field.validation.required}">
                         <abbr title="required">*</abbr>
                     </f:if>
                 </label>
-                <div
-                    class="d-flex flex-column flex-xl-row gap-2 align-items-start">
+                <div class="d-flex flex-column flex-xl-row gap-2 align-items-start">
                     <f:render
                         partial="InlineProfile/Field/Control"
                         arguments="{
                             profile: profile,
-                            identifier: identifier,
+                            field: field,
                             elementId: elementId,
-                            validation: validation,
-                            resolvedInputType: resolvedInputType,
-                            autocomplete: autocomplete,
                             textarea: textarea,
                             richText: richText,
                             rows: rows
                         }" />
-                    <f:if
-                        condition="!{validation.disabled} && !{validation.readOnly}">
+                    <f:if condition="!{field.validation.disabled} && !{field.validation.readOnly}">
                         <f:render
                             partial="InlineProfile/Field/Actions"
                             arguments="{elementId: elementId}" />

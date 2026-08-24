@@ -4,45 +4,45 @@
     data-namespace-typo3-fluid="true">
     <f:if condition="{textarea}">
         <f:then>
-            <f:if condition="{richText}">
-                <f:then>
-                    <div class="flex-grow-1 w-100" data-ie-editor-container>
+            <div class="flex-grow-1 w-100" data-ie-editor-container>
+                <f:if condition="{richText}">
+                    <f:then>
                         <f:form.textarea
-                            name="{identifier}"
+                            name="{field.propertyName}"
                             id="{elementId}"
-                            value="{profile.{identifier}}"
+                            value="{profile.{field.propertyName}}"
                             class="form-control form-control-sm academic-persons-inline-edit__field"
                             rows="{rows}"
-                            disabled="{validation.disabled ? 'disabled' : ''}"
-                            required="{validation.required ? 'required' : ''}"
-                            readonly="{validation.readOnly ? 'readonly' : ''}"
+                            disabled="{field.validation.disabled ? 'disabled' : ''}"
+                            required="{field.validation.required ? 'required' : ''}"
+                            readonly="{field.validation.readOnly ? 'readonly' : ''}"
                             data-ie-rich-text="true" />
-                    </div>
-                </f:then>
-                <f:else>
-                    <f:form.textarea
-                        name="{identifier}"
-                        id="{elementId}"
-                        value="{profile.{identifier}}"
-                        class="flex-grow-1 w-100 form-control form-control-sm academic-persons-inline-edit__field"
-                        rows="{rows}"
-                        disabled="{validation.disabled ? 'disabled' : ''}"
-                        required="{validation.required ? 'required' : ''}"
-                        readonly="{validation.readOnly ? 'readonly' : ''}" />
-                </f:else>
-            </f:if>
+                    </f:then>
+                    <f:else>
+                        <f:form.textarea
+                            name="{field.propertyName}"
+                            id="{elementId}"
+                            value="{profile.{field.propertyName}}"
+                            class="form-control form-control-sm academic-persons-inline-edit__field"
+                            rows="{rows}"
+                            disabled="{field.validation.disabled ? 'disabled' : ''}"
+                            required="{field.validation.required ? 'required' : ''}"
+                            readonly="{field.validation.readOnly ? 'readonly' : ''}" />
+                    </f:else>
+                </f:if>
+            </div>
         </f:then>
         <f:else>
             <f:form.textfield
-                name="{identifier}"
+                name="{field.propertyName}"
                 id="{elementId}"
-                value="{profile.{identifier}}"
-                type="{resolvedInputType}"
+                value="{profile.{field.propertyName}}"
+                type="{field.validation.inputType}"
                 class="flex-grow-1 w-100 form-control form-control-sm academic-persons-inline-edit__field"
-                disabled="{validation.disabled ? 'disabled' : ''}"
-                required="{validation.required ? 'required' : ''}"
-                readonly="{validation.readOnly ? 'readonly' : ''}"
-                autocomplete="{autocomplete}" />
+                disabled="{field.validation.disabled ? 'disabled' : ''}"
+                required="{field.validation.required ? 'required' : ''}"
+                readonly="{field.validation.readOnly ? 'readonly' : ''}"
+                autocomplete="{field.autocomplete}" />
         </f:else>
     </f:if>
 </html>

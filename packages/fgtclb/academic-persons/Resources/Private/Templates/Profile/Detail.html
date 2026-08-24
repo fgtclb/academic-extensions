@@ -23,6 +23,10 @@
         />
     </f:if>
 
+    <f:render
+        partial="Profile/Contact"
+        arguments="{profile: profile, data: data}" />
+
     <f:if condition="{profile.contracts}">
         <f:render
             partial="Profile/SectionHeader"

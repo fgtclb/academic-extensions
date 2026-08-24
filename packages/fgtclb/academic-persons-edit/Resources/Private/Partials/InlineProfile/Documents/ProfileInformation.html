@@ -1,0 +1,96 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <div data-ie-document-items>
+        <f:for each="{items}" as="item" iteration="itemIteration">
+            <article
+                class="row g-3 align-items-start rounded-1 px-3 px-lg-4 py-4
+                    {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
+                data-ie-document-item
+                data-item-uid="{item.uid}"
+                data-item-sorting="{item.sorting}"
+                data-item-position="{itemIteration.index}">
+                <f:switch expression="{dateMode}">
+                    <f:case value="range">
+                        <div class="col-12 col-sm-4 col-lg-3">
+                            <div class="fw-semibold">
+                                <f:translate
+                                    key="inlineProfile.documents.from"
+                                    extensionName="academic_persons_edit" />
+                            </div>
+                            <div>
+                                <f:render
+                                    partial="InlineProfile/Documents/DateValue"
+                                    arguments="{value: item.yearStart, fallback: item.year}" />
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4 col-lg-3">
+                            <div class="fw-semibold">
+                                <f:translate
+                                    key="inlineProfile.documents.to"
+                                    extensionName="academic_persons_edit" />
+                            </div>
+                            <div>
+                                <f:render
+                                    partial="InlineProfile/Documents/DateValue"
+                                    arguments="{value: item.yearEnd}" />
+                            </div>
+                        </div>
+                    </f:case>
+                    <f:case value="year">
+                        <div class="col-12 col-sm-4">
+                            <div class="fw-semibold">
+                                <f:translate
+                                    key="inlineProfile.documents.year"
+                                    extensionName="academic_persons_edit" />
+                            </div>
+                            <div>
+                                <f:render
+                                    partial="InlineProfile/Documents/DateValue"
+                                    arguments="{value: item.year, fallback: item.yearStart}" />
+                            </div>
+                        </div>
+                    </f:case>
+                    <f:case value="start">
+                        <div class="col-12 col-sm-4">
+                            <div class="fw-semibold">
+                                <f:translate
+                                    key="inlineProfile.documents.start"
+                                    extensionName="academic_persons_edit" />
+                            </div>
+                            <div>
+                                <f:render
+                                    partial="InlineProfile/Documents/DateValue"
+                                    arguments="{value: item.yearStart, fallback: item.year}" />
+                            </div>
+                        </div>
+                    </f:case>
+                </f:switch>
+                <div class="col-12 col-sm">
+                    <div class="fw-semibold">
+                        <f:translate
+                            key="inlineProfile.documents.title"
+                            extensionName="academic_persons_edit" />
+                    </div>
+                    <div>
+                        <f:if condition="{item.link}">
+                            <f:then>
+                                <f:link.typolink
+                                    parameter="{item.link}"
+                                    target="_blank"
+                                    absolute="true">
+                                    {item.title}
+                                </f:link.typolink>
+                            </f:then>
+                            <f:else>{item.title}</f:else>
+                        </f:if>
+                    </div>
+                    <f:if condition="{item.bodytext}">
+                        <div class="mt-2">{item.bodytext -> f:format.html()}</div>
+                    </f:if>
+                </div>
+            </article>
+        </f:for>
+    </div>
+</html>

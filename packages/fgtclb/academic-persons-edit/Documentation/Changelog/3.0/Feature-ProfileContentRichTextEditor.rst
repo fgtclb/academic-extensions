@@ -7,13 +7,13 @@ Feature: Secure profile content rich-text editor
 Description
 ===========
 
-The five fields in the inline profile :guilabel:`Content` section now use
+Every inline profile field configured with ``renderType: ckeditor`` now uses
 TYPO3's bundled CKEditor 5. The frontend module resolves CKEditor through the
 TYPO3 JavaScript import map and creates each editor lazily. No CDN asset or
 additional stylesheet is introduced.
 
 Only paragraphs, line breaks, bold and italic text, lists and links are offered
-by the editor. The server independently sanitizes every submitted content value
+by the editor. The server independently sanitizes every submitted CKEditor value
 before validation and persistence. Its explicit allowlist accepts the matching
 HTML tags and allows only local, HTTP, HTTPS, email and telephone links. The
 AJAX success response contains the sanitized values, which become the new
@@ -42,7 +42,8 @@ Impact
 ``typo3/cms-rte-ckeditor`` is a required dependency. The minimum supported core
 versions are TYPO3 13.4.31 and 14.3.6 so installations include the sanitizer
 security fixes published with TYPO3-CORE-SA-2026-006. Template overrides for
-the content section must retain the rich-text and editor-container data
+sections containing fields with ``renderType: ckeditor`` must retain the
+rich-text and editor-container data
 attributes, preview hooks and three-action group documented in
 :ref:`inline-profile-editing`.
 

@@ -377,7 +377,8 @@ $tcaConfiguration = [
 ];
 
 // @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
-$validations = GeneralUtility::makeInstance(AcademicPersonsSettings::class)->getValidationTcaTableConfig('contract');
+$validations = GeneralUtility::makeInstance(AcademicPersonsSettings::class)
+    ->getDocumentValidationTcaTableConfig('contracts');
 $tcaConfiguration = array_replace_recursive($tcaConfiguration, $validations);
 
 return $tcaConfiguration;

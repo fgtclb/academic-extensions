@@ -33,15 +33,17 @@ use TYPO3\CMS\Core\Http\RedirectResponse;
 final class ContractController extends AbstractActionController
 {
     public function __construct(
-        private readonly ContractFactory $contractFactory,
-        private readonly ContractRepository $contractRepository,
-        private readonly FunctionTypeRepository $functionTypeRepository,
+        private readonly ContractFactory              $contractFactory,
+        private readonly ContractRepository           $contractRepository,
+        private readonly FunctionTypeRepository       $functionTypeRepository,
         private readonly OrganisationalUnitRepository $organisationalUnitRepository,
-        private readonly LocationRepository $locationRepository,
-        private readonly AddressRepository $addressRepository,
-        private readonly EmailRepository $emailAddressRepository,
-        private readonly PhoneNumberRepository $phoneNumberRepository,
-    ) {}
+        private readonly LocationRepository           $locationRepository,
+        private readonly AddressRepository            $addressRepository,
+        private readonly EmailRepository              $emailAddressRepository,
+        private readonly PhoneNumberRepository        $phoneNumberRepository,
+    )
+    {
+    }
 
     // =================================================================================================================
     // Handle readonly display like list forms and detail view
@@ -66,11 +68,8 @@ final class ContractController extends AbstractActionController
             ['profile' => $contract->getProfile()],
             'Profile'
         );
-
         $this->userSessionService->saveRefererToSession($this->request);
-
         $contractUid = (int)$contract->getUid();
-
         $this->view->assignMultiple([
             'data' => $this->getCurrentContentObjectRenderer()?->data,
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
@@ -101,7 +100,7 @@ final class ContractController extends AbstractActionController
             'organisationalUnits' => $this->organisationalUnitRepository->findAll(),
             'locations' => $this->locationRepository->findAll(),
             'cancelUrl' => $this->userSessionService->loadRefererFromSession($this->request),
-            'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('contract')->validations,
+            'validations' => $this->academicPersonsSettings->getDocumentValidationSet('contracts')->validations,
         ]);
         return $this->htmlResponse();
     }
@@ -119,7 +118,7 @@ final class ContractController extends AbstractActionController
     public function createAction(Profile $profile, ContractFormData $contractFormData): ResponseInterface
     {
         $contract = $this->contractFactory->createFromFormData(
-            $this->academicPersonsSettings->getValidationSetWithFallback('contract'),
+            $this->academicPersonsSettings->getDocumentValidationSet('contracts'),
             $profile,
             $contractFormData,
         );
@@ -132,10 +131,9 @@ final class ContractController extends AbstractActionController
         $contract->setSorting($maxSortingValue);
         $this->contractRepository->add($contract);
         $this->persistAndDispatchProfileUpdate($profile);
-
         $this->addTranslatedSuccessMessage('contract.create.success');
-
-        if ($this->request->hasArgument('submit')
+        if (
+            $this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
         ) {
             return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
@@ -159,7 +157,7 @@ final class ContractController extends AbstractActionController
             'organisationalUnits' => $this->organisationalUnitRepository->findAll(),
             'locations' => $this->locationRepository->findAll(),
             'cancelUrl' => $this->userSessionService->loadRefererFromSession($this->request),
-            'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('contract')->validations,
+            'validations' => $this->academicPersonsSettings->getDocumentValidationSet('contracts')->validations,
         ]);
         return $this->htmlResponse();
     }
@@ -167,17 +165,15 @@ final class ContractController extends AbstractActionController
     public function updateAction(Contract $contract, ContractFormData $contractFormData): ResponseInterface
     {
         $this->contractRepository->update(
-            $this->contractFactory->updateFromFormData(
-                $this->academicPersonsSettings->getValidationSetWithFallback('contract'),
+            $this->contractFactory->updateContractFromFormData(
                 $contract,
                 $contractFormData,
             ),
         );
         $this->persistAndDispatchProfileUpdate($contract->getProfile());
-
         $this->addTranslatedSuccessMessage('contract.update.success');
-
-        if ($this->request->hasArgument('submit')
+        if (
+            $this->request->hasArgument('submit')
             && $this->request->getArgument('submit') === 'save-and-close'
         ) {
             return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request));
@@ -196,7 +192,8 @@ final class ContractController extends AbstractActionController
             );
         }
         $sortMode = ListSortingMode::tryFromDefault($sortDirection);
-        if ($sortMode === ListSortingMode::NONE
+        if (
+            $sortMode === ListSortingMode::NONE
             || $profile->getContracts()->count() <= 1
         ) {
             $this->addTranslatedErrorMessage('contracts.sort.error.notPossible');

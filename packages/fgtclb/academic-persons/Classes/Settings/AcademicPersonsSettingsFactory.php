@@ -20,6 +20,12 @@ use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
  */
 class AcademicPersonsSettingsFactory
 {
+    private const DOCUMENT_PROPERTY_ALIASES = [
+        'from' => 'yearStart',
+        'to' => 'yearEnd',
+        'description' => 'bodytext',
+    ];
+
     public function __construct(
         #[Autowire(service: 'cache.core')]
         protected readonly PhpFrontend $cache,
@@ -61,122 +67,328 @@ class AcademicPersonsSettingsFactory
     }
 
     /**
-     * @return non-empty-string string
+     * @return non-empty-string
      */
     private function academicPersonsSettingsIdentifier(): string
     {
-        return 'AcademicPersons_Settings';
+        return 'AcademicPersons_Settings_SectionSchema_v2';
     }
 
     /**
      * @param array<string, mixed> $settings
-     * @return AcademicPersonsSettings
      */
     private function normalize(array $settings): AcademicPersonsSettings
     {
         return new AcademicPersonsSettings(
-            profileInformationTypes: $this->normalizeProfileInformationsTypes($settings),
-            validations: $this->normalizeValidations($settings),
+            profileSections: $this->normalizeProfileSections($settings),
+            specialFields: $this->normalizeSpecialFields($settings),
+            contractContactSections: $this->normalizeContractContactSections($settings),
+            documentSections: $this->normalizeDocumentSections($settings),
             raw: $settings,
         );
     }
 
     /**
      * @param array<string, mixed> $settings
-     * @return array<string, ValidationSet>
+     * @return array<string, ProfileSection>
      */
-    private function normalizeValidations(array $settings): array
+    private function normalizeProfileSections(array $settings): array
     {
-        $validations = [];
-        if (
-            array_key_exists('validations', $settings)
-            && is_array($settings['validations'])
-            && $settings['validations'] !== []
-        ) {
-            foreach ($settings['validations'] as $identifier => $options) {
-                $itemValidations = [];
-                foreach ($options as $fieldIdentifier => $validators) {
-                    $tcaConfig = [];
-                    $validators = array_map('strtolower', $validators);
-                    $readOnly = in_array('readonly', $validators, true);
-                    $disabled = in_array('disabled', $validators, true);
-                    $required = !$disabled && !$readOnly && in_array('required', $validators, true);
-                    $inputType = 'text';
-                    /** @var class-string<ValidatorInterface>[] $validatorClassNames */
-                    $validatorClassNames = [];
-                    if ($disabled) {
-                        // @todo Investigate how to handle that for the backend / TCA FormEngine, therefore switch to
-                        //       readOnly for now
-                        $readOnly = true;
-                    }
-                    $tcaConfig['readOnly'] = $readOnly;
-                    $tcaConfig['required'] = false;
-                    if ($required) {
-                        $validatorClassNames[] = NotEmptyValidator::class;
-                        $tcaConfig['required'] = true;
-                        $tcaConfig['minitems'] = 1;
-                    }
-                    if (in_array('email', $validators, true)) {
-                        $validatorClassNames[] = EmailAddressValidator::class;
-                        $tcaConfig['type'] = 'email';
-                        $inputType = 'email';
-                    }
-                    if (in_array('number', $validators, true)) {
-                        // @todo Investigate if we want to use NumberValidator for the frontend
-                        $tcaConfig['type'] = 'number';
-                        $inputType = 'number';
-                    }
-                    if (in_array('url', $validators, true)) {
-                        $validatorClassNames[] = UrlValidator::class;
-                        $inputType = 'url';
-                    }
-                    if (in_array('tel', $validators, true)) {
-                        $inputType = 'tel';
-                    }
-                    $itemValidations[$fieldIdentifier] = new Validation(
-                        identifier: $fieldIdentifier,
-                        fieldName: GeneralUtility::camelCaseToLowerCaseUnderscored($fieldIdentifier),
-                        required: $required,
-                        disabled: $disabled,
-                        readOnly: $readOnly,
-                        validatorClassNames: $validatorClassNames,
-                        tcaConfig: $tcaConfig,
-                        inputType: $inputType,
-                    );
-                }
-                $validations[$identifier] = new ValidationSet(
-                    identifier: $identifier,
-                    validations: $itemValidations,
-                );
-            }
+        $profile = $settings['profile'] ?? null;
+        if (!is_array($profile)) {
+            return [];
         }
-        return $validations;
+        $groupedFields = [];
+        $sectionPositions = [];
+        foreach ($profile as $identifier => $options) {
+            if (!is_array($options)) {
+                continue;
+            }
+            $sectionIdentifier = (string)($options['section'] ?? '');
+            $fieldType = (string)($options['fieldType'] ?? '');
+            $renderType = (string)($options['renderType'] ?? '');
+            $propertyName = (string)($options['propertyName'] ?? $identifier);
+            $fieldName = (string)($options['fieldName'] ?? GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName));
+            $validators = is_array($options['validators'] ?? null) ? $options['validators'] : [];
+            $field = new ProfileField(
+                identifier: (string)$identifier,
+                section: $sectionIdentifier,
+                propertyName: $propertyName,
+                fieldName: $fieldName,
+                fieldType: $fieldType,
+                renderType: $renderType,
+                validation: $this->normalizeValidation(
+                    identifier: $propertyName,
+                    fieldName: $fieldName,
+                    validators: $validators,
+                    fieldType: $fieldType,
+                    renderType: $renderType,
+                ),
+                position: count($groupedFields[$sectionIdentifier] ?? []),
+            );
+            if (!$field->isValid()) {
+                continue;
+            }
+            if (!array_key_exists($sectionIdentifier, $sectionPositions)) {
+                $sectionPositions[$sectionIdentifier] = count($sectionPositions);
+            }
+            $groupedFields[$sectionIdentifier][$field->identifier] = $field;
+        }
+        $sections = [];
+        foreach ($groupedFields as $identifier => $fields) {
+            $validations = [];
+            foreach ($fields as $field) {
+                $validations[$field->propertyName] = $field->validation;
+            }
+            $sections[$identifier] = new ProfileSection(
+                identifier: $identifier,
+                fields: $fields,
+                validationSet: new ValidationSet(identifier: $identifier, validations: $validations),
+                position: $sectionPositions[$identifier],
+            );
+        }
+        return $sections;
     }
 
     /**
      * @param array<string, mixed> $settings
-     * @return array<string, ProfileInformationType>
+     * @return array<string, SpecialField>
      */
-    private function normalizeProfileInformationsTypes(array $settings): array
+    private function normalizeSpecialFields(array $settings): array
     {
-        $profileInformationTypes = [];
-        if (
-            array_key_exists('profileInformationsTypes', $settings)
-            && is_array($settings['profileInformationsTypes'])
-            && $settings['profileInformationsTypes'] !== []
-        ) {
-            foreach ($settings['profileInformationsTypes'] as $identifier => $options) {
-                $profileInformationType = new ProfileInformationType(
-                    identifier: (string)$identifier,
-                    fieldName: (string)($options['fieldName'] ?? GeneralUtility::camelCaseToLowerCaseUnderscored($identifier)),
-                    type: (string)($options['type']),
-                    label: (string)($options['label'] ?? ''),
-                );
-                if ($profileInformationType->isValid()) {
-                    $profileInformationTypes[$profileInformationType->identifier] = $profileInformationType;
+        $configuredFields = $settings['special'] ?? null;
+        if (!is_array($configuredFields)) {
+            return [];
+        }
+        $fields = [];
+        foreach ($configuredFields as $identifier => $options) {
+            if (!is_array($options)) {
+                continue;
+            }
+            $fieldIdentifiers = [];
+            foreach (is_array($options['fields'] ?? null) ? $options['fields'] : [] as $fieldIdentifier) {
+                if (is_string($fieldIdentifier) && $fieldIdentifier !== '' && !in_array($fieldIdentifier, $fieldIdentifiers, true)) {
+                    $fieldIdentifiers[] = $fieldIdentifier;
                 }
             }
+            $fieldType = (string)($options['fieldType'] ?? '');
+            $renderType = (string)($options['renderType'] ?? '');
+            $validators = is_array($options['validators'] ?? null) ? $options['validators'] : [];
+            $fieldName = GeneralUtility::camelCaseToLowerCaseUnderscored((string)$identifier);
+            $field = new SpecialField(
+                identifier: (string)$identifier,
+                type: strtolower((string)($options['type'] ?? '')),
+                fieldType: $fieldType,
+                renderType: $renderType,
+                fieldIdentifiers: $fieldIdentifiers,
+                validation: $this->normalizeValidation(
+                    identifier: (string)$identifier,
+                    fieldName: $fieldName,
+                    validators: $validators,
+                    fieldType: $fieldType,
+                    renderType: $renderType,
+                ),
+                position: count($fields),
+            );
+            if ($field->isValid()) {
+                $fields[$field->identifier] = $field;
+            }
         }
-        return $profileInformationTypes;
+        return $fields;
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     * @return array<string, ContractContactSection>
+     */
+    private function normalizeContractContactSections(array $settings): array
+    {
+        $configuredFields = $settings['contractContact'] ?? null;
+        if (!is_array($configuredFields)) {
+            return [];
+        }
+        $groupedFields = [];
+        $sectionPositions = [];
+        foreach ($configuredFields as $identifier => $options) {
+            if (!is_array($options)) {
+                continue;
+            }
+            $sectionIdentifier = (string)($options['section'] ?? '');
+            $propertyName = (string)($options['propertyName'] ?? $identifier);
+            $fieldName = (string)($options['fieldName'] ?? GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName));
+            $fieldType = (string)($options['fieldType'] ?? '');
+            $renderType = (string)($options['renderType'] ?? '');
+            $validators = is_array($options['validators'] ?? null) ? $options['validators'] : [];
+            $field = new ContractContactField(
+                identifier: (string)$identifier,
+                section: $sectionIdentifier,
+                propertyName: $propertyName,
+                fieldName: $fieldName,
+                fieldType: $fieldType,
+                renderType: $renderType,
+                validation: $this->normalizeValidation(
+                    identifier: $propertyName,
+                    fieldName: $fieldName,
+                    validators: $validators,
+                    fieldType: $fieldType,
+                    renderType: $renderType,
+                ),
+                position: count($groupedFields[$sectionIdentifier] ?? []),
+            );
+            if (!$field->isValid()) {
+                continue;
+            }
+            if (!array_key_exists($sectionIdentifier, $sectionPositions)) {
+                $sectionPositions[$sectionIdentifier] = count($sectionPositions);
+            }
+            $groupedFields[$sectionIdentifier][$field->identifier] = $field;
+        }
+        $sections = [];
+        foreach ($groupedFields as $identifier => $fields) {
+            $validations = [];
+            foreach ($fields as $field) {
+                $validations[$field->propertyName] = $field->validation;
+            }
+            $sections[$identifier] = new ContractContactSection(
+                identifier: $identifier,
+                fields: $fields,
+                validationSet: new ValidationSet(identifier: $identifier, validations: $validations),
+                position: $sectionPositions[$identifier],
+            );
+        }
+        return $sections;
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     * @return array<string, DocumentSection>
+     */
+    private function normalizeDocumentSections(array $settings): array
+    {
+        $configuredSections = $settings['documentSections'] ?? null;
+        if (!is_array($configuredSections)) {
+            return [];
+        }
+        $sections = [];
+        foreach ($configuredSections as $identifier => $options) {
+            if (!is_array($options)) {
+                continue;
+            }
+            $validations = [];
+            $configuredValidations = is_array($options['validators'] ?? null) ? $options['validators'] : [];
+            foreach ($configuredValidations as $fieldIdentifier => $validators) {
+                if (!is_array($validators)) {
+                    continue;
+                }
+                $propertyName = self::DOCUMENT_PROPERTY_ALIASES[(string)$fieldIdentifier]
+                    ?? (string)$fieldIdentifier;
+                $fieldName = GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName);
+                $validations[$propertyName] = $this->normalizeValidation(
+                    identifier: $propertyName,
+                    fieldName: $fieldName,
+                    validators: $validators,
+                );
+            }
+            $section = new DocumentSection(
+                identifier: (string)$identifier,
+                label: (string)($options['label'] ?? ''),
+                type: (string)($options['type'] ?? ''),
+                fieldName: (string)($options['fieldName'] ?? ''),
+                readOnly: (bool)($options['readonly'] ?? false),
+                validationSet: new ValidationSet(identifier: (string)$identifier, validations: $validations),
+                position: count($sections),
+            );
+            if ($section->isValid()) {
+                $sections[$section->identifier] = $section;
+            }
+        }
+        return $sections;
+    }
+
+    /**
+     * @param array<int, mixed> $validators
+     */
+    private function normalizeValidation(
+        string $identifier,
+        string $fieldName,
+        array $validators,
+        string $fieldType = '',
+        string $renderType = '',
+    ): Validation {
+        $flags = [];
+        foreach ($validators as $validator) {
+            if (!is_string($validator)) {
+                continue;
+            }
+            $flag = strtolower(trim($validator));
+            if ($flag !== '' && !in_array($flag, $flags, true)) {
+                $flags[] = $flag;
+            }
+        }
+        $disabled = in_array('disabled', $flags, true);
+        $readOnly = $disabled || in_array('readonly', $flags, true);
+        $required = !$readOnly && in_array('required', $flags, true);
+        $inputType = match (strtolower($renderType)) {
+            'select' => 'select',
+            'checkbox' => 'checkbox',
+            'phone' => 'tel',
+            'email' => 'email',
+            'number' => 'number',
+            'combinedlink' => 'url',
+            'ckeditor' => 'textarea',
+            default => 'text',
+        };
+        $tcaConfig = [
+            'readOnly' => $readOnly,
+            'required' => false,
+        ];
+        if ($fieldType === 'check') {
+            $tcaConfig['type'] = 'check';
+        } elseif ($fieldType === 'textarea') {
+            $tcaConfig['type'] = 'text';
+        } elseif (in_array($fieldType, ['input', 'select'], true)) {
+            $tcaConfig['type'] = $fieldType;
+        }
+        /** @var class-string<ValidatorInterface>[] $validatorClassNames */
+        $validatorClassNames = [];
+        if ($required) {
+            $validatorClassNames[] = NotEmptyValidator::class;
+            $tcaConfig['required'] = true;
+            $tcaConfig['minitems'] = 1;
+        }
+        if (in_array('email', $flags, true)) {
+            $validatorClassNames[] = EmailAddressValidator::class;
+            $tcaConfig['type'] = 'email';
+            $inputType = 'email';
+        }
+        if (in_array('number', $flags, true)) {
+            $tcaConfig['type'] = 'number';
+            $inputType = 'number';
+        }
+        if (in_array('url', $flags, true)) {
+            $validatorClassNames[] = UrlValidator::class;
+            $inputType = 'url';
+        }
+        if (in_array('tel', $flags, true)) {
+            $inputType = 'tel';
+        }
+        if (in_array('date', $flags, true)) {
+            $inputType = 'date';
+        }
+        if (in_array('textarea', $flags, true) || in_array('html', $flags, true)) {
+            $inputType = 'textarea';
+            $tcaConfig['type'] = 'text';
+        }
+        return new Validation(
+            identifier: $identifier,
+            fieldName: $fieldName,
+            required: $required,
+            disabled: $disabled,
+            readOnly: $readOnly,
+            validatorClassNames: $validatorClassNames,
+            tcaConfig: $tcaConfig,
+            inputType: $inputType,
+            flags: $flags,
+        );
     }
 }

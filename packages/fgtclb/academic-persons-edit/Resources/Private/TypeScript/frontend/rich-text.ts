@@ -21,7 +21,7 @@ interface CkEditorStatic {
   replace(elementId: string, config: Record<string, unknown>): void;
 }
 
-const editorConfig: Record<string, unknown> = {
+export const editorConfig: Record<string, unknown> = {
   language: "en",
   height: 200,
   versionCheck: false,
@@ -35,18 +35,17 @@ const editorConfig: Record<string, unknown> = {
   removeButtons: ["Strike", "Subscript", "Superscript"],
 };
 
-const editor = (): CkEditorStatic | undefined =>
+export const getEditor = (): CkEditorStatic | undefined =>
   (window as unknown as { CKEDITOR?: CkEditorStatic }).CKEDITOR;
 
-const waitForEditor = window.setInterval((): void => {
-  const ckeditor = editor();
+export const initializeEditors = (
+  scope: ParentNode = document,
+  ckeditor: CkEditorStatic | undefined = getEditor(),
+): boolean => {
   if (ckeditor === undefined) {
-    return;
+    return false;
   }
-
-  window.clearInterval(waitForEditor);
-
-  document
+  scope
     .querySelectorAll<HTMLTextAreaElement>(".rich-text")
     .forEach((textarea): void => {
       const identifier = textarea.getAttribute("id");
@@ -57,6 +56,19 @@ const waitForEditor = window.setInterval((): void => {
         ckeditor.replace(identifier, editorConfig);
       }
     });
-}, 100);
+  return true;
+};
 
-export {};
+let waitForEditor: number;
+
+export const pollForEditor = (): void => {
+  const ckeditor = getEditor();
+  if (!initializeEditors(document, ckeditor)) {
+    return;
+  }
+  window.clearInterval(waitForEditor);
+};
+
+waitForEditor = window.setInterval((): void => {
+  pollForEditor();
+}, 100);

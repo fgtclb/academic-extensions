@@ -62,6 +62,10 @@ final class ProfileFormDataFactoryTest extends AbstractFactoryTestCase
         $this->assertSame('James', $formData->getFirstName());
         $this->assertSame('Tiberius', $formData->getMiddleName());
         $this->assertSame('Kirk', $formData->getLastName());
+        $this->assertSame('profile@example.org', $formData->getEmailAddress());
+        $this->assertTrue($formData->getPublishEmailAddress());
+        $this->assertSame('+49 123 456', $formData->getPhoneNumber());
+        $this->assertTrue($formData->getPublishPhoneNumber());
         $this->assertSame('https://stored.example.com', $formData->getWebsite());
         $this->assertSame('Stored Website', $formData->getWebsiteTitle());
         $this->assertSame('https://stored.example.com/publications', $formData->getPublicationsLink());

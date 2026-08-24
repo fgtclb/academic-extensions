@@ -20,7 +20,11 @@ final class ProfileInformationFormDataValidator extends AbstractFormDataValidato
                 1297418975
             );
         }
-
-        $this->processValidations($profileInformationFormData, 'profileInformation');
+        $section = $this->getAcademicPersonsSettings()
+            ->getDocumentSectionByType($profileInformationFormData->getType());
+        if ($section === null || $section->isContractSection()) {
+            return;
+        }
+        $this->processValidationSet($profileInformationFormData, $section->validationSet);
     }
 }

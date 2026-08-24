@@ -24,7 +24,7 @@ final class ContractFormDataValidator extends AbstractFormDataValidator
                 1297418975
             );
         }
-
-        $this->processValidations($contractFormData, 'contract');
+        $validationSet = $this->getAcademicPersonsSettings()->getDocumentValidationSet('contracts');
+        $this->processValidationSet($contractFormData, $validationSet);
     }
 }

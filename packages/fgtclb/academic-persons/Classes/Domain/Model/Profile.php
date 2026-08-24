@@ -29,6 +29,10 @@ class Profile extends AbstractEntity
     protected string $middleName = '';
     protected string $lastName = '';
     protected string $lastNameAlpha = '';
+    protected string $emailAddress = '';
+    protected bool $publishEmailAddress = false;
+    protected string $phoneNumber = '';
+    protected bool $publishPhoneNumber = false;
     #[Cascade(ACADEMIC_PERSONS_CASCADE_REMOVE)]
     protected ?FileReference $image = null;
     /**
@@ -191,6 +195,50 @@ class Profile extends AbstractEntity
     public function getLastNameAlpha(): string
     {
         return $this->lastNameAlpha;
+    }
+
+    public function setEmailAddress(string $emailAddress): self
+    {
+        $this->emailAddress = $emailAddress;
+        return $this;
+    }
+
+    public function getEmailAddress(): string
+    {
+        return $this->emailAddress;
+    }
+
+    public function setPublishEmailAddress(bool $publishEmailAddress): self
+    {
+        $this->publishEmailAddress = $publishEmailAddress;
+        return $this;
+    }
+
+    public function getPublishEmailAddress(): bool
+    {
+        return $this->publishEmailAddress;
+    }
+
+    public function setPhoneNumber(string $phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
+        return $this;
+    }
+
+    public function getPhoneNumber(): string
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPublishPhoneNumber(bool $publishPhoneNumber): self
+    {
+        $this->publishPhoneNumber = $publishPhoneNumber;
+        return $this;
+    }
+
+    public function getPublishPhoneNumber(): bool
+    {
+        return $this->publishPhoneNumber;
     }
 
     public function setImage(?FileReference $image): self

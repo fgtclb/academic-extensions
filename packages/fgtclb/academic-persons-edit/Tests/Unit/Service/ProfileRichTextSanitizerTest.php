@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Service;
 
 use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizer;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerBuilder;
+use FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator\Fixtures\ValidationSettings;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
@@ -69,6 +70,16 @@ final class ProfileRichTextSanitizerTest extends UnitTestCase
 
     private function createSubject(): ProfileRichTextSanitizer
     {
-        return new ProfileRichTextSanitizer(new ProfileRichTextSanitizerBuilder());
+        return new ProfileRichTextSanitizer(
+            new ProfileRichTextSanitizerBuilder(),
+            ValidationSettings::forProfileFields([
+                'coreCompetences' => 'ckeditor',
+                'teachingArea' => 'ckeditor',
+                'supervisedDoctoralThesis' => 'ckeditor',
+                'supervisedThesis' => 'ckeditor',
+                'miscellaneous' => 'ckeditor',
+                'firstName' => 'text',
+            ]),
+        );
     }
 }

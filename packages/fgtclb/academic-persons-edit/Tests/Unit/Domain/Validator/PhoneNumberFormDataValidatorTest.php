@@ -24,20 +24,17 @@ use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * Validates the argument of `PhoneNumberController::createAction()` and
- * `updateAction()` against the validation set `phoneNumber`. Set identifier and
- * property name are spelled the same here, which makes a mix-up of the two easy
- * and invisible - both are pinned separately below.
+ * Phone-number validation is derived from its contract-contact section.
  */
 final class PhoneNumberFormDataValidatorTest extends UnitTestCase
 {
-    private const VALIDATION_SET = 'phoneNumber';
+    private const VALIDATION_SET = 'phoneNumbers';
 
     #[Test]
-    public function theValidationSetPhoneNumberIsProcessed(): void
+    public function theConfiguredPhoneNumberFieldIsProcessed(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['phoneNumber' => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection(self::VALIDATION_SET, ['phoneNumber' => [RecordingValidator::class]]),
             new PhoneNumberFormData(phoneNumber: '+49 89 123456')
         );
 
@@ -45,10 +42,10 @@ final class PhoneNumberFormDataValidatorTest extends UnitTestCase
     }
 
     #[Test]
-    public function aValidationSetRegisteredUnderAnotherIdentifierIsIgnored(): void
+    public function aConfiguredFieldFromAnotherContactSectionIsIgnored(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier('phoneNumbers', ['phoneNumber' => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection('emailAddresses', ['email' => [RecordingValidator::class]]),
             new PhoneNumberFormData(phoneNumber: '+49 89 123456')
         );
 
@@ -56,15 +53,18 @@ final class PhoneNumberFormDataValidatorTest extends UnitTestCase
     }
 
     /**
-     * Both properties the shipped configuration requires have to resolve off the
-     * DTO; a rename would degrade them to `null` instead of raising.
+     * The configured profile field must resolve to the submitted DTO value.
      */
     #[Test]
     #[DataProvider('configuredProperties')]
     public function aConfiguredPropertyResolvesToTheSubmittedValue(string $property, string $expectedDescription): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, [$property => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection(
+                self::VALIDATION_SET,
+                [$property => [RecordingValidator::class]],
+                $property === 'type' ? ['type' => 'phoneNumberType'] : [],
+            ),
             new PhoneNumberFormData(phoneNumber: '+49 89 123456', type: 'mobile')
         );
 
@@ -77,7 +77,6 @@ final class PhoneNumberFormDataValidatorTest extends UnitTestCase
     public static function configuredProperties(): array
     {
         return [
-            // Both required in the shipped Configuration/AcademicPersons/Settings.yaml.
             'phoneNumber' => ['phoneNumber', 'string(+49 89 123456)'],
             'type' => ['type', 'string(mobile)'],
         ];
@@ -92,7 +91,9 @@ final class PhoneNumberFormDataValidatorTest extends UnitTestCase
     public function anythingButPhoneNumberFormDataIsRejected(mixed $subject): void
     {
         $validator = new PhoneNumberFormDataValidator();
-        $validator->injectAcademicPersonsSettings(ValidationSettings::forIdentifier(self::VALIDATION_SET, []));
+        $validator->injectAcademicPersonsSettings(
+            ValidationSettings::forContractContactSection(self::VALIDATION_SET, []),
+        );
 
         $this->expectException(UnsuitableValidatorException::class);
         $this->expectExceptionCode(1297418975);

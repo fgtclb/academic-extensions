@@ -45,40 +45,44 @@ assigned profile and that meets the criteria logs in.
 Which fields can be edited
 ==========================
 
-Which profile fields the editing forms offer, which are mandatory and which are
-locked is **not** configured in this extension. It comes from the validation
-settings shipped by :guilabel:`academic_persons`, in
-:file:`Configuration/AcademicPersons/Settings.yaml`, which the editing forms
-read directly.
+Which profile fields belong to each visual section, how they are rendered,
+which are mandatory and which are locked is **not** configured in this
+extension. It comes from the :yaml:`profile` map shipped by
+:guilabel:`academic_persons` in
+:file:`Configuration/AcademicPersons/Settings.yaml`. Structured records use the
+same model through :yaml:`documentSections`.
 
 Consequences worth knowing before reporting a problem:
 
-*   A field configured :yaml:`disabled` or :yaml:`readonly` is rendered locked,
-    and a value submitted for it anyway is discarded rather than stored. This is
-    deliberate and protects already stored data.
+*   A field configured :yaml:`disabled` or :yaml:`readonly` is rendered locked.
+    The inline JSON endpoint rejects attempts to submit it.
 *   :guilabel:`First name`, :guilabel:`Middle name` and :guilabel:`Last name` are
     **locked by default**, because profile names are usually owned by the
     connected frontend user record and synchronised from elsewhere. They are
     therefore not editable in the frontend form — and, since the same
     configuration also drives the backend, not in the TYPO3 record editor
     either.
+*   Document validators are selected by the section's stored record ``type``;
+    validators from sibling sections are never merged as a fallback.
 *   Because both editing contexts share one configuration, unlocking a field for
-    the frontend form also unlocks it in the backend.
+    the frontend also unlocks it in the backend.
 
-See `Validation settings
+See `Profile and document sections
+<https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Configuration/Sections/Index.html>`__
+and `Validation settings
 <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Configuration/Validations/Index.html>`__
-in the :guilabel:`academic_persons` manual for the available flags, the shipped
-defaults and how to override them.
+in the :guilabel:`academic_persons` manual for the schema, available flags,
+shipped defaults and override rules.
 
 ..  _configuration-general-webp:
 
 Image processing: WebP
 ======================
 
-The profile detail view of the profile editing plugin offers the profile image
-as `WebP`_ through the :html:`<picture>` candidates, with the :html:`<img>`
-fallback in the source format. TYPO3 has to be allowed to produce WebP,
-otherwise rendering a profile **that has an image** fails with:
+The InlineProfile image view offers the profile image as `WebP`_ through the
+:html:`<picture>` candidates, with the :html:`<img>` fallback in the source
+format. TYPO3 has to be allowed to produce WebP, otherwise rendering a profile
+**that has an image** fails with:
 
 ..  code-block:: text
 

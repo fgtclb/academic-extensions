@@ -6,11 +6,12 @@ namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Service;
 
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
+use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFormDataFactoryInterface;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileUpdatePayload;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
-use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator\Fixtures\RecordingValidator;
@@ -105,6 +106,52 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     }
 
     #[Test]
+    public function profileFieldsMarkedReadOnlyByTheirSectionAreRejected(): void
+    {
+        $formData = new ProfileFormData(firstName: 'Persisted');
+        $factory = $this->createStub(ProfileFormDataFactoryInterface::class);
+        $factory->method('createFromProfile')->willReturn($formData);
+        $settings = ValidationSettings::forProfileFields(['firstName' => 'text'], ['firstName']);
+        $subject = new ProfileUpdateValidationService(
+            $factory,
+            new ProfileFormDataValidator(),
+            new ProfileFieldOptionsService($settings),
+            $this->createStub(ProfileRichTextSanitizerInterface::class),
+            $settings,
+        );
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Unknown profile property "firstName".');
+        $subject->createFormData(
+            $this->createPluginControllerActionContext(),
+            new Profile(),
+            new ProfileUpdatePayload(profileUid: 123, data: ['firstName' => 'Submitted']),
+        );
+    }
+
+    #[Test]
+    public function aConfiguredReadOnlyRuleOverridesAnInlineInternalDefault(): void
+    {
+        $formData = new ProfileFormData(title: 'Persisted');
+        $factory = $this->createStub(ProfileFormDataFactoryInterface::class);
+        $factory->method('createFromProfile')->willReturn($formData);
+        $settings = ValidationSettings::forProfileFields(['title' => 'text'], ['title']);
+        $subject = new ProfileUpdateValidationService(
+            $factory,
+            new ProfileFormDataValidator(),
+            new ProfileFieldOptionsService($settings),
+            $this->createStub(ProfileRichTextSanitizerInterface::class),
+            $settings,
+        );
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Unknown profile property "title".');
+        $subject->createFormData(
+            $this->createPluginControllerActionContext(),
+            new Profile(),
+            new ProfileUpdatePayload(profileUid: 123, data: ['title' => 'Submitted']),
+        );
+    }
+
+    #[Test]
     #[DataProvider('invalidGenderValues')]
     public function invalidGenderIsRejected(mixed $gender): void
     {
@@ -141,7 +188,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
 
     #[Test]
     #[DataProvider('validGenderValues')]
-    public function configuredOrEmptyGenderIsAccepted(string $gender): void
+    public function configuredOrEmptyGenderPassesPayloadNormalization(string $gender): void
     {
         $this->setGenderItems([
             ['label' => 'Female', 'value' => 'female'],
@@ -173,6 +220,34 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     }
 
     #[Test]
+    public function anotherConfiguredSelectUsesTheSameStrictTcaAllowList(): void
+    {
+        $this->setSelectItems('first_name', [
+            ['label' => 'Jane', 'value' => 'jane'],
+        ]);
+        $formData = new ProfileFormData(firstName: 'Persisted');
+        $factory = $this->createStub(ProfileFormDataFactoryInterface::class);
+        $factory->method('createFromProfile')->willReturn($formData);
+        $settings = ValidationSettings::forProfileFields(['firstName' => 'select']);
+        $subject = new ProfileUpdateValidationService(
+            $factory,
+            new ProfileFormDataValidator(),
+            new ProfileFieldOptionsService($settings),
+            $this->createStub(ProfileRichTextSanitizerInterface::class),
+            $settings,
+        );
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Invalid select value for profile property "firstName".');
+
+        $subject->createFormData(
+            $this->createPluginControllerActionContext(),
+            new Profile(),
+            new ProfileUpdatePayload(profileUid: 123, data: ['firstName' => 'unknown']),
+        );
+    }
+
+    #[Test]
     public function richTextIsSanitizedBeforeItIsRegisteredAsOverride(): void
     {
         $formData = new ProfileFormData();
@@ -189,11 +264,13 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             ->method('sanitize')
             ->with('<p onclick="alert(1)">Secure content</p>')
             ->willReturn('<p>Secure content</p>');
+        $settings = $this->createSettings();
         $subject = new ProfileUpdateValidationService(
             $factory,
             new ProfileFormDataValidator(),
-            new ProfileGenderOptionsService(),
+            new ProfileFieldOptionsService($settings),
             $sanitizer,
+            $settings,
         );
         $payload = new ProfileUpdatePayload(
             profileUid: 123,
@@ -228,25 +305,69 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     }
 
     #[Test]
+    public function configuredProfileContactFlagsRequireBooleanPayloadValues(): void
+    {
+        $subject = $this->createSubjectForFormData(new ProfileFormData());
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'Invalid boolean value for profile property "publishEmailAddress".',
+        );
+        $subject->createFormData(
+            $this->createPluginControllerActionContext(),
+            new Profile(),
+            new ProfileUpdatePayload(
+                profileUid: 123,
+                data: ['publishEmailAddress' => '1'],
+            ),
+        );
+    }
+
+    #[Test]
+    public function configuredProfileContactsAreNormalizedAsDirectProfileOverrides(): void
+    {
+        $subject = $this->createSubjectForFormData(new ProfileFormData());
+        $payload = new ProfileUpdatePayload(
+            profileUid: 123,
+            data: [
+                'emailAddress' => 'profile@example.org',
+                'publishEmailAddress' => true,
+                'phoneNumber' => '+49 123 456',
+                'publishPhoneNumber' => false,
+            ],
+        );
+
+        $result = $subject->createFormData(
+            $this->createPluginControllerActionContext(),
+            new Profile(),
+            $payload,
+        );
+
+        self::assertSame($payload->getData(), $subject->getNormalizedData($result, $payload));
+    }
+
+    #[Test]
     public function validateReturnsErrorsFromProfileFormDataValidator(): void
     {
         $validator = new ProfileFormDataValidator();
         $validator->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier(
-                'profile',
+            ValidationSettings::forProfileSection(
+                'information',
                 ['firstName' => [RecordingValidator::class]],
             ),
         );
+        $settings = $this->createSettings();
         $subject = new ProfileUpdateValidationService(
             $this->createStub(ProfileFormDataFactoryInterface::class),
             $validator,
-            new ProfileGenderOptionsService(),
+            new ProfileFieldOptionsService($settings),
             $this->createStub(ProfileRichTextSanitizerInterface::class),
+            $settings,
         );
 
-        $result = $subject->validate(
-            new ProfileFormData(firstName: 'Jane'),
-        );
+        $formData = new ProfileFormData(firstName: 'Persisted');
+        $formData->setPropertyOverride('firstName', 'Jane');
+        $result = $subject->validate($formData);
 
         self::assertSame(
             ['string(Jane)'],
@@ -270,12 +391,35 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     ): ProfileUpdateValidationService {
         $richTextSanitizer = $this->createStub(ProfileRichTextSanitizerInterface::class);
         $richTextSanitizer->method('supports')->willReturn(false);
+        $settings = $this->createSettings();
         return new ProfileUpdateValidationService(
             $factory,
             new ProfileFormDataValidator(),
-            new ProfileGenderOptionsService(),
+            new ProfileFieldOptionsService($settings),
             $richTextSanitizer,
+            $settings,
         );
+    }
+
+    private function createSettings(): AcademicPersonsSettings
+    {
+        return ValidationSettings::forProfileFields([
+            'gender' => 'select',
+            'firstName' => 'text',
+            'middleName' => 'text',
+            'lastName' => 'text',
+            'emailAddress' => 'email',
+            'publishEmailAddress' => 'checkbox',
+            'phoneNumber' => 'phone',
+            'publishPhoneNumber' => 'checkbox',
+            'website' => 'combinedLink',
+            'publicationsLink' => 'combinedLink',
+            'coreCompetences' => 'ckeditor',
+            'teachingArea' => 'ckeditor',
+            'supervisedDoctoralThesis' => 'ckeditor',
+            'supervisedThesis' => 'ckeditor',
+            'miscellaneous' => 'ckeditor',
+        ]);
     }
 
     private function createPluginControllerActionContext(): PluginControllerActionContext
@@ -296,10 +440,18 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
      */
     private function setGenderItems(array $items): void
     {
+        $this->setSelectItems('gender', $items);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $items
+     */
+    private function setSelectItems(string $fieldName, array $items): void
+    {
         $GLOBALS['TCA'] = [
             'tx_academicpersons_domain_model_profile' => [
                 'columns' => [
-                    'gender' => [
+                    $fieldName => [
                         'config' => [
                             'items' => $items,
                         ],

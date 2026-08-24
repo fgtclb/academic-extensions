@@ -12,22 +12,10 @@ declare(strict_types=1);
 use FGTCLB\AcademicBase\TcaManipulator;
 
 (static function (): void {
-
     // Note that tca select group does not need to be registered here, because that is done in `academic-persons`
     // which is a hard dependency for this extension extending that dependency with additional features.
-
-    //==================================================================================================================
-    // Plugin: academicpersonsedit_profileediting
-    //==================================================================================================================
-    (new TcaManipulator())->addContentElementPlugin(
-        [
-            'label' => 'LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_be.xlf:plugin.profile_editing.label',
-            'value' => 'academicpersonsedit_profileediting',
-            'icon' => 'persons_edit_icon',
-            'group' => 'academic',
-        ],
-        'academic_persons_edit'
-    );
+    // ProfileEditing remains in the source tree as a temporary legacy reference,
+    // but InlineProfile is the only editing content element offered to editors.
     (new TcaManipulator())->addContentElementPlugin(
         [
             'label' => 'LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_be.xlf:plugin.profile_inlineediting.label',

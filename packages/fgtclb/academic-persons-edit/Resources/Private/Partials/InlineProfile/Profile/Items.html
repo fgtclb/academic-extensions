@@ -1,0 +1,29 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <f:for each="{items}" as="item" iteration="itemIteration">
+        <f:variable
+            name="rowClass"
+            value="{f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}" />
+        <f:switch expression="{item.kind}">
+            <f:case value="special">
+                <f:switch expression="{item.special.renderType}">
+                    <f:case value="title">
+                        <f:render
+                            partial="InlineProfile/Special/TitleFields"
+                            arguments="{profile: profile, special: item.special, rowClass: rowClass}" />
+                    </f:case>
+                </f:switch>
+            </f:case>
+            <f:case value="field">
+                <f:variable
+                    name="options"
+                    value="{fieldOptions.{item.field.identifier}}" />
+                <f:render
+                    partial="InlineProfile/Field/Renderer"
+                    arguments="{profile: profile, field: item.field, options: options, rowClass: rowClass}" />
+            </f:case>
+        </f:switch>
+    </f:for>
+</html>

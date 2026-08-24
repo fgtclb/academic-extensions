@@ -25,6 +25,10 @@ final class EmailFormDataValidator extends AbstractFormDataValidator
             );
         }
 
-        $this->processValidations($emailFormData, 'emailAddress');
+        $validationSet = $this->getAcademicPersonsSettings()->getContractContactValidationSetForFields(
+            ['emailAddress', 'emailAddressType'],
+            'emailAddresses',
+        );
+        $this->processValidationSet($emailFormData, $validationSet);
     }
 }

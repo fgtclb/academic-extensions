@@ -78,7 +78,12 @@ final class PhoneNumberController extends AbstractActionController
             'contract' => $contract,
             'phoneNumberFormData' => new PhoneNumberFormData(),
             'cancelUrl' => $this->userSessionService->loadRefererFromSession($this->request),
-            'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('phoneNumber')->validations,
+            'validations' => $this->academicPersonsSettings
+                ->getContractContactValidationSetForFields(
+                    ['phoneNumber', 'phoneNumberType'],
+                    'phoneNumbers',
+                )
+                ->validations,
         ]);
         return $this->htmlResponse();
     }
@@ -96,7 +101,10 @@ final class PhoneNumberController extends AbstractActionController
     public function createAction(Contract $contract, PhoneNumberFormData $phoneNumberFormData): ResponseInterface
     {
         $phoneNumber = $this->phoneNumberFactory->createFromFormData(
-            $this->academicPersonsSettings->getValidationSetWithFallback('phoneNumber'),
+            $this->academicPersonsSettings->getContractContactValidationSetForFields(
+                ['phoneNumber', 'phoneNumberType'],
+                'phoneNumbers',
+            ),
             $contract,
             $phoneNumberFormData,
         );
@@ -135,7 +143,12 @@ final class PhoneNumberController extends AbstractActionController
             'phoneNumber' => $phoneNumber,
             'phoneNumberFormData' => PhoneNumberFormData::createFromPhoneNumber($phoneNumber),
             'cancelUrl' => $this->userSessionService->loadRefererFromSession($this->request),
-            'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('phoneNumber')->validations,
+            'validations' => $this->academicPersonsSettings
+                ->getContractContactValidationSetForFields(
+                    ['phoneNumber', 'phoneNumberType'],
+                    'phoneNumbers',
+                )
+                ->validations,
         ]);
         return $this->htmlResponse();
     }
@@ -146,7 +159,10 @@ final class PhoneNumberController extends AbstractActionController
     ): ResponseInterface {
         $this->phoneNumberRepository->update(
             $this->phoneNumberFactory->updateFromFormData(
-                $this->academicPersonsSettings->getValidationSetWithFallback('phoneNumber'),
+                $this->academicPersonsSettings->getContractContactValidationSetForFields(
+                    ['phoneNumber', 'phoneNumberType'],
+                    'phoneNumbers',
+                ),
                 $phoneNumber,
                 $phoneNumberFormData,
             ),

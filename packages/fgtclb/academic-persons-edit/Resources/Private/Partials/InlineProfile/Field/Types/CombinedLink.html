@@ -1,0 +1,15 @@
+<html lang="en" xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+    <f:render
+        partial="InlineProfile/Field/Group"
+        arguments="{
+            profile: profile,
+            identifier: field.identifier,
+            labelKey: field.labelKey,
+            fields: field.groupFields,
+            displayFields: field.groupDisplayFields,
+            fieldIds: field.groupFieldIdentifiers,
+            displayFieldIds: field.groupDisplayFieldIdentifiers,
+            displayMode: 'first',
+            rowClass: rowClass
+        }" />
+</html>

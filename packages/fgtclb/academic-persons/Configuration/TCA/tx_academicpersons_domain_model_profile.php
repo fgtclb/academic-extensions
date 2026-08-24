@@ -247,6 +247,46 @@ $tcaConfiguration = [
                 'max' => 1,
             ],
         ],
+        'email_address' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.email_address.label',
+            'exclude' => true,
+            'config' => [
+                'type' => 'email',
+                'size' => 50,
+                'max' => 255,
+            ],
+        ],
+        'publish_email_address' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publish_email_address.label',
+            'description' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publish_email_address.description',
+            'exclude' => true,
+            'config' => [
+                'type' => 'check',
+                'renderType' => 'checkboxToggle',
+                'items' => [['label' => '']],
+                'default' => 0,
+            ],
+        ],
+        'phone_number' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.phone_number.label',
+            'exclude' => true,
+            'config' => [
+                'type' => 'input',
+                'size' => 50,
+                'max' => 255,
+            ],
+        ],
+        'publish_phone_number' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publish_phone_number.label',
+            'description' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publish_phone_number.description',
+            'exclude' => true,
+            'config' => [
+                'type' => 'check',
+                'renderType' => 'checkboxToggle',
+                'items' => [['label' => '']],
+                'default' => 0,
+            ],
+        ],
         'image' => [
             'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.image.label',
             'l10n_mode' => 'exclude',
@@ -436,6 +476,15 @@ $tcaConfiguration = [
                 'website_title',
             ]),
         ],
+        'profileContact' => [
+            'showitem' => implode(',', [
+                'email_address',
+                'publish_email_address',
+                '--linebreak--',
+                'phone_number',
+                'publish_phone_number',
+            ]),
+        ],
         'publications' => [
             'showitem' => implode(',', [
                 'publications_link_title',
@@ -474,6 +523,7 @@ $tcaConfiguration = [
             'showitem' => implode(',', [
                 '--div--;LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.div.general.label',
                 '--palette--;;name',
+                '--palette--;;profileContact',
                 '--palette--;;website',
                 'image',
                 '--palette--;;slug',
@@ -509,11 +559,14 @@ $tcaConfiguration = [
 
 // @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
 $settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
-if ($settings->profileInformationTypes !== []) {
-    foreach ($settings->profileInformationTypes as $type => $typeSettings) {
-        $columnIdentifier = $typeSettings->fieldName;
+if ($settings->documentSections !== []) {
+    foreach ($settings->documentSections as $section) {
+        if ($section->isContractSection()) {
+            continue;
+        }
+        $columnIdentifier = $section->fieldName;
         $tcaConfiguration['columns'][$columnIdentifier] = [
-            'label' => $typeSettings->label ?: $columnIdentifier,
+            'label' => $section->label,
             'exclude' => true,
             'config' => [
                 'type' => 'inline',
@@ -546,13 +599,13 @@ if ($settings->profileInformationTypes !== []) {
                 'foreign_sortby' => 'sorting',
                 'foreign_table' => 'tx_academicpersons_domain_model_profile_information',
                 'foreign_match_fields' => [
-                    'type' => $typeSettings->type,
+                    'type' => $section->type,
                 ],
                 'overrideChildTca' => [
                     'columns' => [
                         'type' => [
                             'config' => [
-                                'default' => $typeSettings->type ?: '',
+                                'default' => $section->type,
                             ],
                         ],
                     ],
@@ -563,7 +616,24 @@ if ($settings->profileInformationTypes !== []) {
 }
 ArrayUtility::mergeRecursiveWithOverrule(
     $tcaConfiguration,
-    $settings->getValidationTcaTableConfig('profile'),
+    $settings->getProfileValidationTcaTableConfig([
+        'gender',
+        'title',
+        'firstName',
+        'middleName',
+        'lastName',
+        'emailAddress',
+        'publishEmailAddress',
+        'phoneNumber',
+        'publishPhoneNumber',
+        'website',
+        'publicationsLink',
+        'coreCompetences',
+        'supervisedThesis',
+        'supervisedDoctoralThesis',
+        'teachingArea',
+        'miscellaneous',
+    ]),
 );
 
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);

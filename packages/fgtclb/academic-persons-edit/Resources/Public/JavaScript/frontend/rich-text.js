@@ -1,5 +1,5 @@
 /* Generated from Resources/Private/TypeScript — do not edit. */
-const editorConfig = {
+export const editorConfig = {
   language: "en",
   height: 200,
   versionCheck: false,
@@ -16,17 +16,27 @@ const editorConfig = {
     "Superscript"
   ]
 };
-const editor = () => window.CKEDITOR;
-const waitForEditor = window.setInterval(() => {
-  const ckeditor = editor();
+export const getEditor = () => window.CKEDITOR;
+export const initializeEditors = (scope = document, ckeditor = getEditor()) => {
   if (ckeditor === void 0) {
-    return;
+    return false;
   }
-  window.clearInterval(waitForEditor);
-  document.querySelectorAll(".rich-text").forEach((textarea) => {
+  scope.querySelectorAll(".rich-text").forEach((textarea) => {
     const identifier = textarea.getAttribute("id");
     if (identifier !== null) {
       ckeditor.replace(identifier, editorConfig);
     }
   });
+  return true;
+};
+let waitForEditor;
+export const pollForEditor = () => {
+  const ckeditor = getEditor();
+  if (!initializeEditors(document, ckeditor)) {
+    return;
+  }
+  window.clearInterval(waitForEditor);
+};
+waitForEditor = window.setInterval(() => {
+  pollForEditor();
 }, 100);
