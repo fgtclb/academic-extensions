@@ -52,6 +52,7 @@ entitySettings:
     tableName: tx_academicjobs_domain_model_job
     languageColumnNames:
       - l10n_parent
+      - l10n_source
   organisationalUnit:
     tableName: tx_academicpersons_domain_model_organisational_unit
     languageColumnNames:
