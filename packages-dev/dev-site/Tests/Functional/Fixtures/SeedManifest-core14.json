@@ -254,6 +254,7 @@
                 "hidden",
                 "internationals_welcome",
                 "l10n_parent",
+                "l10n_source",
                 "link",
                 "pid",
                 "required_degree",
@@ -265,7 +266,7 @@
                 "uid",
                 "work_location"
             ],
-            "checksum": "3c66d98baabbde68544a231631cb57392ced5e04"
+            "checksum": "83855cf860c380cffd57b99aacef36106f45ae4d"
         },
         "tx_academicpartners_domain_model_partnership": {
             "rows": 32,

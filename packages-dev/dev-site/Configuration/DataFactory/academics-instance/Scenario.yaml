@@ -63,16 +63,18 @@ entitySettings:
     tableName: 'fe_groups'
   feUser:
     tableName: 'fe_users'
-  # "sys_category" and the jobs table are the only two tables here that declare
-  # a "languageField" and no "translationSource". Naming "l10n_source" for them
-  # anyway is not an error that is reported - the column does not exist for
-  # DataHandler and the value is dropped in silence.
+  # "sys_category" is the only table here that declares a "languageField" and no
+  # "translationSource" - it is a core table and not ours to change. Naming
+  # "l10n_source" for it anyway is not an error that is reported: the column does
+  # not exist for DataHandler and the value is dropped in silence.
+  #
+  # The jobs table was the second one until ACE-463 gave it the missing key.
   category:
     tableName: 'sys_category'
     languageColumnNames: ['l10n_parent']
   job:
     tableName: 'tx_academicjobs_domain_model_job'
-    languageColumnNames: ['l10n_parent']
+    languageColumnNames: ['l10n_parent', 'l10n_source']
   organisationalUnit:
     tableName: 'tx_academicpersons_domain_model_organisational_unit'
     languageColumnNames: ['l10n_parent', 'l10n_source']
