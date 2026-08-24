@@ -1,0 +1,46 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <f:variable name="elementId" value="inline-profile-{profile.uid}-{field.identifier}" />
+    <div class="col-12">
+        <div class="rounded-1 p-3 p-lg-4 {rowClass}" data-ie-field-wrapper>
+            <f:render partial="InlineProfile/Field/Preview" arguments="{profile: profile, field: field, elementId: elementId}" />
+            <div id="{elementId}-editor" class="d-none mt-3" data-ie-field-editor data-ie-for="{elementId}">
+                <div class="form-check form-switch">
+                    <f:if condition="{field.validation.disabled} || {field.validation.readOnly}">
+                        <f:then>
+                            <f:form.checkbox
+                                name="{field.propertyName}"
+                                id="{elementId}"
+                                class="form-check-input academic-persons-inline-edit__field"
+                                value="1"
+                                checked="{profile.{field.propertyName}}"
+                                disabled="true"
+                                data-ie-checked-label="{f:translate(key: 'inlineProfile.visibility.public', extensionName: 'academic_persons_edit')}"
+                                data-ie-unchecked-label="{f:translate(key: 'inlineProfile.visibility.private', extensionName: 'academic_persons_edit')}" />
+                        </f:then>
+                        <f:else>
+                            <f:form.checkbox
+                                name="{field.propertyName}"
+                                id="{elementId}"
+                                class="form-check-input academic-persons-inline-edit__field"
+                                value="1"
+                                checked="{profile.{field.propertyName}}"
+                                data-ie-autosave-on-change="true"
+                                data-ie-checked-label="{f:translate(key: 'inlineProfile.visibility.public', extensionName: 'academic_persons_edit')}"
+                                data-ie-unchecked-label="{f:translate(key: 'inlineProfile.visibility.private', extensionName: 'academic_persons_edit')}" />
+                        </f:else>
+                    </f:if>
+                    <label class="form-check-label" for="{elementId}">
+                        <f:translate key="profile.{field.identifier}.label" extensionName="academic_persons_edit" />
+                    </label>
+                    <div class="invalid-feedback"></div>
+                </div>
+                <f:if condition="!{field.validation.disabled} && !{field.validation.readOnly}">
+                    <f:render partial="InlineProfile/Field/AutosaveUndo" arguments="{elementId: elementId}" />
+                </f:if>
+            </div>
+        </div>
+    </div>
+</html>

@@ -1,114 +1,394 @@
-#-----------------------------------------------------------------------------------------------------------------------
-# EXT:academic_persons - Profile information types and field validation configuration.
+# Central, section-based configuration for profile fields, special inline
+# components, contract contacts and structured document collections.
 #
-# The "validations" section below is the single source of truth for both editing contexts: the TYPO3
-# backend FormEngine, through TCA merged by the table files of this extension, and the frontend
-# editing forms of EXT:academic_persons_edit. It applies to the backend whether or not that extension
-# is installed.
+# Important:
+# - Map order is preserved and controls the presentation order in the inline
+#   profile view.
+# - Settings from active packages are merged only at the top level. A site
+#   package overriding one of the maps below must therefore repeat the complete
+#   map it wants to keep.
+# - Flush the TYPO3 caches after changing this file so the typed settings graph
+#   is rebuilt.
 #
-# Documented at:
-# https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Configuration/Validations/Index.html
-#-----------------------------------------------------------------------------------------------------------------------
-# @internal The syntax of this configuration file is considered experimental and may still change.
-#-----------------------------------------------------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Profile information types
-#-----------------------------------------------------------------------------------------------------------------------
-profileInformationsTypes:
+# Validator flags are section-local. Common flags are `required`, `readonly`,
+# `disabled`, `email`, `url`, `number`, `tel`, `date`, `textarea` and `html`.
+# Profile fields
+# --------------
+# The map key is the stable field identifier.
+# - `section` groups the field into the matching visual template section.
+# - `fieldType` supplies the base TCA field type.
+# - `renderType` controls the inline editor presentation/input metadata.
+# - `validators` applies only to this field inside its declared section.
+profile:
+  gender:
+    section: information
+    fieldType: select
+    renderType: select
+    validators:
+      - required
+  # Academic or honorific prefix. Do not confuse this direct Profile property
+  # with `special.title`, which is the composed display name.
+  title:
+    section: information
+    fieldType: input
+    renderType: text
+  # These name fields are normally synchronized from the frontend user and
+  # are deliberately not writable through inline editing.
+  firstName:
+    section: information
+    fieldType: input
+    renderType: text
+    validators:
+      - readonly
+      - disabled
+  middleName:
+    section: information
+    fieldType: input
+    renderType: text
+    validators:
+      - readonly
+      - disabled
+  lastName:
+    section: information
+    fieldType: input
+    renderType: text
+    validators:
+      - readonly
+      - disabled
+  # Public profile contacts are direct Profile properties. They are deliberately
+  # independent of contacts belonging to an employment contract. A value is
+  # rendered in the public detail view only when its matching publish flag is
+  # enabled. Both flags default to false in the database.
+  emailAddress:
+    section: information
+    fieldType: input
+    renderType: email
+    validators:
+      - email
+  publishEmailAddress:
+    section: information
+    fieldType: check
+    renderType: checkbox
+  phoneNumber:
+    section: information
+    fieldType: input
+    renderType: phone
+    validators:
+      - tel
+  publishPhoneNumber:
+    section: information
+    fieldType: check
+    renderType: checkbox
+  # `combinedLink` edits the URL together with its companion title property
+  # (`websiteTitle` or `publicationsLinkTitle`).
+  website:
+    section: information
+    fieldType: input
+    renderType: combinedLink
+    validators:
+      - url
+  publicationsLink:
+    section: information
+    fieldType: input
+    renderType: combinedLink
+    validators:
+      - url
+  # The `ckeditor` render type selects sanitized rich-text handling; the `html`
+  # flag keeps the matching validation/input metadata explicit.
+  coreCompetences:
+    section: information
+    fieldType: textarea
+    renderType: ckeditor
+    validators:
+      - html
+  supervisedThesis:
+    section: information
+    fieldType: textarea
+    renderType: ckeditor
+    validators:
+      - html
+  supervisedDoctoralThesis:
+    section: information
+    fieldType: textarea
+    renderType: ckeditor
+    validators:
+      - html
+  teachingArea:
+    section: information
+    fieldType: textarea
+    renderType: ckeditor
+    validators:
+      - html
+  # `aboutme` mirrors the separate About-me section in the inline templates.
+  miscellaneous:
+    section: aboutme
+    fieldType: textarea
+    renderType: ckeditor
+    validators:
+      - html
+# Special inline components
+# -------------------------
+# These entries are not ordinary rows generated from one Profile property.
+# `Index.html` decides where they are placed. Their render type selects the
+# dedicated Fluid/JavaScript module; no layout information belongs here.
+special:
+  # The page title is the composed profile name. `fields` is also the single
+  # source used by JavaScript to re-render it after an inline name update.
+  title:
+    type: special
+    renderType: title
+    fields:
+      - title
+      - firstName
+      - middleName
+      - lastName
+  image:
+    type: special
+    renderType: image
+  skipSync:
+    type: special
+    fieldType: check
+    renderType: checkbox
+# Contract contact fields
+# -----------------------
+# These fields belong to Address, Email and PhoneNumber records below a
+# Contract. They intentionally do not take part in Profile validation or in the
+# generic Profile JSON endpoint. `propertyName` is only needed where the public
+# field identifier differs from the DTO/domain property.
+contractContact:
+  phoneNumber:
+    section: phoneNumbers
+    fieldType: input
+    renderType: phone
+    validators:
+      - required
+      - tel
+  phoneNumberType:
+    section: phoneNumbers
+    propertyName: type
+    fieldName: type
+    fieldType: select
+    renderType: select
+  emailAddress:
+    section: emailAddresses
+    propertyName: email
+    fieldName: email
+    fieldType: input
+    renderType: email
+    validators:
+      - required
+      - email
+  emailAddressType:
+    section: emailAddresses
+    propertyName: type
+    fieldName: type
+    fieldType: select
+    renderType: select
+  street:
+    section: physicalAddresses
+    fieldType: input
+    renderType: text
+    validators:
+      - required
+  streetNumber:
+    section: physicalAddresses
+    fieldType: input
+    renderType: text
+    validators:
+      - required
+  additional:
+    section: physicalAddresses
+    fieldType: input
+    renderType: text
+  zip:
+    section: physicalAddresses
+    fieldType: input
+    renderType: text
+    validators:
+      - required
+  city:
+    section: physicalAddresses
+    fieldType: input
+    renderType: text
+    validators:
+      - required
+  state:
+    section: physicalAddresses
+    fieldType: input
+    renderType: text
+  country:
+    section: physicalAddresses
+    fieldType: input
+    renderType: text
+    validators:
+      - required
+  physicalAddressType:
+    section: physicalAddresses
+    propertyName: type
+    fieldName: type
+    fieldType: select
+    renderType: select
+# Document sections
+# -----------------
+# Each key is a stable section identifier and the order is the display order.
+# - `label` is the LLL reference used for the section heading.
+# - `type` is the ProfileInformation discriminator. `contracts` is the reserved
+#   marker for the special Contract entity section.
+# - `fieldName` is the exact Profile relation/database field. Collection
+#   relations are plural; underscored names are converted to their getter.
+# - `readonly` is frontend capability metadata and does not replace endpoint
+#   authorization.
+# - `validators` belongs exclusively to records of the containing section.
+# Document validation aliases:
+# - `from` -> DTO `yearStart` -> database field `year_start`
+# - `to` -> DTO `yearEnd` -> database field `year_end`
+# - `description` -> DTO `bodytext` -> database field `bodytext`
+documentSections:
+  # Contracts use their own Contract model rather than ProfileInformation.
+  # The relation is Profile::$contracts / Profile::getContracts(), whereas
+  # `contract` denotes one individual item or form argument.
+  contracts:
+    label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.contracts.label"
+    type: contracts
+    fieldName: contracts
+    readonly: true
+  # All following sections contain ProfileInformation records. Their `type`
+  # selects the records and their `fieldName` selects the Profile collection.
   cooperation:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.cooperation.label"
     type: cooperation
     fieldName: cooperation
+    validators:
+      title:
+        - required
+      from:
+        - required
+        - date
+      to:
+        - required
+        - date
+      year:
+        - required
+        - date
+      description:
+        - textarea
   lectures:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.lectures.label"
     type: lecture
     fieldName: lectures
+    validators:
+      title:
+        - required
+      link:
+        - url
+      from:
+        - required
+        - date
+      to:
+        - required
+        - date
+      year:
+        - required
+        - date
+      description:
+        - textarea
   memberships:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.memberships.label"
     type: membership
     fieldName: memberships
+    validators:
+      title:
+        - required
+      link:
+        - url
+      from:
+        - required
+        - date
+      to:
+        - required
+        - date
+      year:
+        - required
+        - date
+      description:
+        - textarea
   pressMedia:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.press_media.label"
     type: press_media
     fieldName: press_media
+    validators:
+      title:
+        - required
+      link:
+        - url
+      from:
+        - required
+        - date
+      to:
+        - required
+        - date
+      year:
+        - required
+        - date
+      description:
+        - textarea
   publications:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publications.label"
     type: publication
     fieldName: publications
+    validators:
+      title:
+        - required
+      link:
+        - url
+      from:
+        - required
+        - date
+      to:
+        - required
+        - date
+      year:
+        - required
+        - date
+      description:
+        - textarea
   scientificResearch:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.scientific_research.label"
     type: scientific_research
     fieldName: scientific_research
+    validators:
+      title:
+        - required
+      link:
+        - url
+      from:
+        - required
+        - date
+      to:
+        - required
+        - date
+      year:
+        - required
+        - date
+      description:
+        - textarea
   vita:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.vita.label"
     type: curriculum_vitae
     fieldName: vita
-#-----------------------------------------------------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Validation configuration for frontend fluid forms and backend formengine configured using TCA adoption.
-#-----------------------------------------------------------------------------------------------------------------------
-validations:
-  # @todo We either need a translation map (to TCA) or simply matching convention which resolves needs to be added.
-  # @todo Syntax and build-up is more than sub-optimal and needs a complete redesign and implementation.
-  #
-  # <identifier>:
-  #   <propertyName>:
-  #      - required  # Must not be empty
-  #     - email      # Valid email address and input type="email"
-  #     - url        # Valid URL and input type="url"
-  #     - number     # Renders input type="number"
-  #     - tel        # Renders input type="tel"; no additional server validation
-  #     - disabled   # Must not be edited
-  #     - readonly   # Shown but not writable
-  # Flag names are matched case insensitively, anything not listed above is ignored. A "disabled" or
-  # "readonly" property is never written by the frontend transformation, which is what protects
-  # already stored data from being emptied by a submitted form.
-  contract:
-    position:
-      - required
-  emailAddress:
-    email:
-      - required
-      - email
-    type:
-      - required
-  phoneNumber:
-    phoneNumber:
-      - required
-      - tel
-    type:
-      - required
-  physicalAddress:
-    street:
-      - required
-    streetNumber:
-      - required
-      - number
-    zip:
-      - required
-      - number
-    city:
-      - required
-    country:
-      - required
-  profile:
-    firstName:
-      - disabled
-      - required
-    middleName:
-      - disabled
-    lastName:
-      - disabled
-    website:
-      - url
-    publicationsLink:
-      - url
-  profileInformation:
-    year:
-      - required
-      - number
-    title:
-      - required
-#-----------------------------------------------------------------------------------------------------------------------
+    validators:
+      title:
+        - required
+      link:
+        - url
+      from:
+        - required
+        - date
+      to:
+        - required
+        - date
+      year:
+        - required
+        - date
+      description:
+        - textarea

@@ -260,6 +260,22 @@
         <source>Doe</source>
         <target>Mustermann</target>
       </trans-unit>
+      <trans-unit id="profile.emailAddress.label">
+        <source>Public email address</source>
+        <target>Öffentliche E-Mail-Adresse</target>
+      </trans-unit>
+      <trans-unit id="profile.publishEmailAddress.label">
+        <source>Publish email address</source>
+        <target>E-Mail-Adresse veröffentlichen</target>
+      </trans-unit>
+      <trans-unit id="profile.phoneNumber.label">
+        <source>Public phone number</source>
+        <target>Öffentliche Telefonnummer</target>
+      </trans-unit>
+      <trans-unit id="profile.publishPhoneNumber.label">
+        <source>Publish phone number</source>
+        <target>Telefonnummer veröffentlichen</target>
+      </trans-unit>
       <trans-unit id="profile.website.label">
         <source>Website</source>
         <target>Webseite</target>
@@ -589,9 +605,73 @@
         <source>Description:</source>
         <target>Beschreibung:</target>
       </trans-unit>
+      <trans-unit id="inlineProfile.documents.start">
+        <source>Start</source>
+        <target>Start</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.from">
+        <source>From</source>
+        <target>Von</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.to">
+        <source>To</source>
+        <target>Bis</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.year">
+        <source>Year</source>
+        <target>Jahr</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.title">
+        <source>Title</source>
+        <target>Titel</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.position">
+        <source>Position</source>
+        <target>Position</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty">
+        <source>No entries have been added yet.</source>
+        <target>Es wurden noch keine Einträge hinterlegt.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.contracts">
+        <source>No contracts have been added yet.</source>
+        <target>Es wurden noch keine Verträge hinterlegt.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.cooperation">
+        <source>No cooperation entries have been added yet.</source>
+        <target>Es wurden noch keine Kooperationen hinterlegt.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.lectures">
+        <source>No lectures have been added yet.</source>
+        <target>Es wurden noch keine Vorlesungen hinterlegt.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.memberships">
+        <source>No memberships have been added yet.</source>
+        <target>Es wurden noch keine Mitgliedschaften hinterlegt.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.pressMedia">
+        <source>No press releases have been added yet.</source>
+        <target>Es wurden noch keine Pressemitteilungen hinterlegt.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.vita">
+        <source>No vita entries have been added yet.</source>
+        <target>Es wurden noch keine Vita-Einträge hinterlegt.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.publications">
+        <source>No publications have been added yet.</source>
+        <target>Es wurden noch keine Publikationen hinterlegt.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.scientificResearch">
+        <source>No scientific research entries have been added yet.</source>
+        <target>Es wurden noch keine wissenschaftlichen Forschungen hinterlegt.</target>
+      </trans-unit>
       <trans-unit id="inlineProfile.visibility.private">
         <source>Private</source>
         <target>Privat</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.visibility.public">
+        <source>Public</source>
+        <target>Öffentlich</target>
       </trans-unit>
       <trans-unit id="inlineProfile.field.empty">
         <source>Not specified</source>

@@ -26,11 +26,8 @@ use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * `AbstractFormDataValidator::processValidations()` is the only piece of validation
- * logic in this extension - the six concrete validators do nothing but a type guard
- * and a call into it with their validation set identifier. Everything a profile
- * editor is allowed to save therefore goes through this one method, driven by
- * `Configuration/AcademicPersons/Settings.yaml`, which an integrator overrides.
+ * Exercises the shared execution of the validation set attached to a profile or
+ * document section. Concrete validators are responsible for selecting that section.
  */
 final class AbstractFormDataValidatorTest extends UnitTestCase
 {
@@ -43,7 +40,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     {
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', ['readable' => [RecordingValidator::class]])
+            ValidationSettings::forProfileSection('testSet', ['readable' => [RecordingValidator::class]])
         );
 
         $this->assertSame(
@@ -61,7 +58,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     {
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', ['readable' => [RecordingValidator::class]])
+            ValidationSettings::forProfileSection('testSet', ['readable' => [RecordingValidator::class]])
         );
 
         $errors = $subject->validate(new TestFormData())->forProperty('readable')->getErrors();
@@ -71,23 +68,21 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     }
 
     /**
-     * An identifier that no `Settings.yaml` registers must not raise - it means
-     * "nothing configured for this form", which is a valid state for a project that
-     * only overrides one of the six sets.
+     * An unknown section must not raise; it produces an empty validation set.
      */
     #[Test]
-    public function anUnregisteredValidationSetValidatesNothing(): void
+    public function anUnregisteredProfileSectionValidatesNothing(): void
     {
         $subject = new TestFormDataValidator('setThatNobodyRegistered');
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', ['readable' => [RecordingValidator::class]])
+            ValidationSettings::forProfileSection('testSet', ['readable' => [RecordingValidator::class]])
         );
 
         $this->assertFalse($subject->validate(new TestFormData())->hasErrors());
     }
 
     /**
-     * `Settings.yaml` maps a property to a list, and a required email field maps to
+     * A section maps a property to a list, and a required email field maps to
      * both `NotEmptyValidator` and `EmailAddressValidator` - dropping the second one
      * silently would let any string through.
      */
@@ -96,7 +91,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     {
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', [
+            ValidationSettings::forProfileSection('testSet', [
                 'readable' => [SilentValidator::class, RecordingValidator::class, RecordingValidator::class],
             ])
         );
@@ -116,7 +111,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     {
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', [
+            ValidationSettings::forProfileSection('testSet', [
                 'readable' => [RecordingValidator::class],
                 'nullableYear' => [RecordingValidator::class],
                 'flag' => [SilentValidator::class],
@@ -133,7 +128,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
      * The DTO properties are `protected`, so the value has to be reached through the
      * public getter - including the `is*()` form a boolean uses. A property that has
      * no getter, or no declaration at all, is silently handed over as `null` instead
-     * of raising: a typo in an integrator's `Settings.yaml` therefore turns into a
+     * of raising: a typo in section configuration therefore turns into a
      * "must not be empty" error on a field the form never rendered.
      *
      * @param 'readable'|'nullableYear'|'flag'|'withoutGetter'|'notDeclaredAtAll' $property
@@ -144,7 +139,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     {
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', [$property => [RecordingValidator::class]])
+            ValidationSettings::forProfileSection('testSet', [$property => [RecordingValidator::class]])
         );
 
         $this->assertSame(
@@ -168,7 +163,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     }
 
     /**
-     * `Settings.yaml` is normalized into class names without any check, so an
+     * Section validators are normalized into class names without any check, so an
      * integrator override reaches `GeneralUtility::makeInstance()` unverified. The
      * guard has to be loud, because a silently skipped entry would mean a field that
      * is no longer validated at all.
@@ -178,7 +173,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     {
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', ['readable' => [NotAValidator::class]])
+            ValidationSettings::forProfileSection('testSet', ['readable' => [NotAValidator::class]])
         );
 
         $this->expectException(UnknownValidatorException::class);
@@ -191,11 +186,11 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     /**
      * The counterpart of `Domain/Factory/*`: those ask `shouldApplyProperty()` before
      * they write a value onto the domain model, so a property that was not submitted
-     * is not applied. `processValidations()` does not ask - it reads every configured
-     * property off the DTO, where an unsubmitted one still carries its declared
-     * default. A partial form submit is therefore validated as if the missing fields
-     * had been sent empty, and a required field that a template does not render at
-     * all can never be saved.
+     * is not applied. The shared section processor does not ask - it reads every
+     * property selected by the concrete validator off the DTO, where an unsubmitted
+     * one still carries its declared default. Concrete validators which support
+     * partial submissions, such as ``ProfileFormDataValidator``, must filter their
+     * section validation set before calling the shared processor.
      */
     #[Test]
     public function aPropertyThatWasNotSubmittedIsValidatedNevertheless(): void
@@ -208,12 +203,27 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
 
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', ['readable' => [RecordingValidator::class]])
+            ValidationSettings::forProfileSection('testSet', ['readable' => [RecordingValidator::class]])
         );
 
         $this->assertFalse($formData->shouldApplyProperty('readable'));
         $this->assertSame(
             ['readable' => ['string()']],
+            $this->messagesByProperty($subject->validate($formData))
+        );
+    }
+
+    #[Test]
+    public function aRegisteredOverrideIsTheValuePassedToTheConfiguredValidator(): void
+    {
+        $formData = new TestFormData('persisted');
+        $formData->setPropertyOverride('readable', 'overridden');
+        $subject = new TestFormDataValidator();
+        $subject->injectAcademicPersonsSettings(
+            ValidationSettings::forProfileSection('testSet', ['readable' => [RecordingValidator::class]])
+        );
+        $this->assertSame(
+            ['readable' => ['string(overridden)']],
             $this->messagesByProperty($subject->validate($formData))
         );
     }
@@ -231,7 +241,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     {
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', ['readable' => [RecordingValidator::class]])
+            ValidationSettings::forProfileSection('testSet', ['readable' => [RecordingValidator::class]])
         );
 
         $this->assertFalse($subject->validate($value)->hasErrors());
@@ -258,7 +268,7 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
     {
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(
-            ValidationSettings::forIdentifier('testSet', ['readable' => [RecordingValidator::class]])
+            ValidationSettings::forProfileSection('testSet', ['readable' => [RecordingValidator::class]])
         );
 
         $subject->validate(new TestFormData('first'));

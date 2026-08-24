@@ -6,7 +6,9 @@
         class="academic-persons-inline-edit__form mt-5 pt-lg-3"
         data-ie-fields-form
         data-ie-content-fields-form>
-        <section aria-labelledby="inline-profile-{profile.uid}-about-heading">
+        <section
+            aria-labelledby="inline-profile-{profile.uid}-about-heading"
+            data-profile-section="{section.identifier}">
             <h2
                 id="inline-profile-{profile.uid}-about-heading"
                 class="display-6 fw-normal mb-4">
@@ -16,18 +18,8 @@
             </h2>
             <div class="row g-3">
                 <f:render
-                    partial="InlineProfile/Field"
-                    arguments="{
-                        profile: profile,
-                        validations: validations,
-                        identifier: 'miscellaneous',
-                        labelKey: 'inlineProfile.about.description',
-                        textarea: true,
-                        richText: true,
-                        rows: 8,
-                        columnClass: 'col-12',
-                        rowClass: 'bg-body-tertiary'
-                    }" />
+                    partial="InlineProfile/Profile/Items"
+                    arguments="{profile: profile, items: section.items, fieldOptions: fieldOptions}" />
             </div>
         </section>
     </form>

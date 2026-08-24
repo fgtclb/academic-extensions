@@ -5,295 +5,349 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersons\Tests\Unit\Settings;
 
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
-use FGTCLB\AcademicPersons\Settings\ProfileInformationType;
+use FGTCLB\AcademicPersons\Settings\ContractContactField;
+use FGTCLB\AcademicPersons\Settings\ContractContactSection;
+use FGTCLB\AcademicPersons\Settings\DocumentSection;
+use FGTCLB\AcademicPersons\Settings\ProfileField;
+use FGTCLB\AcademicPersons\Settings\ProfileSection;
+use FGTCLB\AcademicPersons\Settings\SpecialField;
 use FGTCLB\AcademicPersons\Settings\Validation;
 use FGTCLB\AcademicPersons\Settings\ValidationSet;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-/**
- * The settings object is what `AcademicPersonsSettingsFactory` hands to TCA overrides
- * and to the Extbase validation, and it is what the factory writes into the core cache
- * as `return <var_export>;`. Two things therefore have to hold: the lookups must fail
- * softly, because TCA files ask for identifiers that need not be configured, and the
- * object must survive `var_export()`/`require`, because that is how it is restored on
- * every request after the first.
- */
 final class AcademicPersonsSettingsTest extends UnitTestCase
 {
     #[Test]
-    public function aRegisteredProfileInformationTypeIsReturned(): void
+    public function profileSectionsAndFieldsAreResolvedByTheirIdentifiers(): void
     {
-        $profileInformationType = $this->profileInformationType('email');
-
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: ['email' => $profileInformationType],
-            validations: [],
-            raw: [],
+        $field = $this->profileField('emailAddress', 'email', 'email');
+        $section = new ProfileSection(
+            identifier: 'information',
+            fields: ['emailAddress' => $field],
+            validationSet: new ValidationSet(identifier: 'information', validations: ['email' => $field->validation]),
+            position: 0,
         );
-
-        $this->assertSame($profileInformationType, $subject->getProfileInformationType('email'));
-    }
-
-    /**
-     * TCA files ask by identifier for types an integrator may never have configured.
-     * Returning null rather than raising is what lets them skip the column instead of
-     * taking the TCA build down.
-     */
-    #[Test]
-    public function anUnknownProfileInformationTypeIsNull(): void
-    {
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: ['email' => $this->profileInformationType('email')],
-            validations: [],
-            raw: [],
-        );
-
-        $this->assertNull($subject->getProfileInformationType('phone'));
+        $subject = new AcademicPersonsSettings(profileSections: ['information' => $section]);
+        self::assertSame($section, $subject->getProfileSection('information'));
+        self::assertSame($field, $subject->getProfileField('emailAddress'));
+        self::assertSame($field, $subject->getProfileField('email'));
+        self::assertNull($subject->getProfileField('unknown'));
     }
 
     #[Test]
-    public function aRegisteredValidationSetIsReturned(): void
+    public function unknownProfileSectionReturnsAnEmptySectionSpecificObject(): void
     {
-        $validationSet = new ValidationSet(identifier: 'profile', validations: []);
-
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: ['profile' => $validationSet],
-            raw: [],
-        );
-
-        $this->assertSame($validationSet, $subject->getValidationSet('profile'));
+        $subject = new AcademicPersonsSettings();
+        $section = $subject->getProfileSectionOrEmpty('aboutme');
+        self::assertSame('aboutme', $section->identifier);
+        self::assertSame([], $section->fields);
+        self::assertSame('aboutme', $section->validationSet->identifier);
+        self::assertSame([], $section->validationSet->validations);
     }
 
     #[Test]
-    public function anUnknownValidationSetIsNull(): void
+    public function profileValidationCanBeReadPerSectionOrAggregated(): void
     {
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: [],
-            raw: [],
-        );
-
-        $this->assertNull($subject->getValidationSet('profile'));
-    }
-
-    /**
-     * The fallback is the variant callers use when they need to ask a set for a field
-     * unconditionally. It has to carry the *requested* identifier, not an empty one -
-     * anything logging or comparing the returned set would otherwise attribute it to
-     * the wrong table.
-     */
-    #[Test]
-    public function anUnknownValidationSetFallsBackToAnEmptySetOfTheSameIdentifier(): void
-    {
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: [],
-            raw: [],
-        );
-
-        $fallback = $subject->getValidationSetWithFallback('profile');
-
-        $this->assertSame('profile', $fallback->identifier);
-        $this->assertSame([], $fallback->validations);
-        $this->assertNull($fallback->get('first_name'));
+        $informationField = $this->profileField('gender', 'gender', 'gender');
+        $aboutField = $this->profileField('miscellaneous', 'miscellaneous', 'miscellaneous', 'aboutme');
+        $information = $this->profileSection('information', [$informationField]);
+        $about = $this->profileSection('aboutme', [$aboutField]);
+        $subject = new AcademicPersonsSettings(profileSections: ['information' => $information, 'aboutme' => $about]);
+        self::assertSame($information->validationSet, $subject->getProfileValidationSet('information'));
+        self::assertSame(['gender', 'miscellaneous'], array_keys($subject->getProfileValidationSet()->validations));
+        self::assertSame([], $subject->getProfileValidationSet('unknown')->validations);
     }
 
     #[Test]
-    public function aRegisteredValidationSetIsNotReplacedByTheFallback(): void
+    public function profileValidationSubsetMapsConfiguredIdentifiersToDtoProperties(): void
     {
-        $validationSet = new ValidationSet(identifier: 'profile', validations: []);
-
+        $email = $this->profileField('emailAddress', 'email', 'email');
+        $phone = $this->profileField('phoneNumber', 'phoneNumber', 'phone_number');
         $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: ['profile' => $validationSet],
-            raw: [],
+            profileSections: ['information' => $this->profileSection('information', [$email, $phone])],
         );
-
-        $this->assertSame($validationSet, $subject->getValidationSetWithFallback('profile'));
+        $subset = $subject->getProfileValidationSetForFields(['emailAddress'], 'information');
+        self::assertSame('information', $subset->identifier);
+        self::assertSame(['email'], array_keys($subset->validations));
+        self::assertSame($email->validation, $subset->get('email'));
+        self::assertSame([], $subject->getProfileValidationSetForFields(['emailAddress'], 'aboutme')->validations);
     }
 
-    /**
-     * The result is merged into `$GLOBALS['TCA']`, so the array key is the column name
-     * - the `fieldName` of the validation, not the key it is registered under. Those
-     * two are deliberately different here, because a set is keyed by validation
-     * identifier and nothing enforces that it equals the column.
-     */
     #[Test]
-    public function theTcaConfigIsKeyedByTheFieldNameOfEachValidation(): void
+    public function contractContactsNeverFallBackToProfileFieldsOrAnotherContactSection(): void
     {
+        $profileEmail = $this->profileField('emailAddress', 'emailAddress', 'email_address');
+        $contractEmail = $this->contractContactField(
+            'emailAddress',
+            'emailAddresses',
+            'email',
+            'email',
+        );
         $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: [
-                'profile' => new ValidationSet(
-                    identifier: 'profile',
-                    validations: [
-                        'firstName' => $this->validation('first_name', ['type' => 'input', 'required' => true]),
-                        'lastName' => $this->validation('last_name', ['type' => 'input', 'max' => 60]),
-                    ],
-                ),
+            profileSections: [
+                'information' => $this->profileSection('information', [$profileEmail]),
             ],
-            raw: [],
+            contractContactSections: [
+                'emailAddresses' => $this->contractContactSection('emailAddresses', [$contractEmail]),
+            ],
         );
 
-        $this->assertSame(
+        self::assertSame($profileEmail, $subject->getProfileField('emailAddress'));
+        self::assertSame($contractEmail, $subject->getContractContactField('emailAddress'));
+        self::assertSame(['email'], array_keys(
+            $subject->getContractContactValidationSet('emailAddresses')->validations,
+        ));
+        self::assertSame([], $subject->getContractContactValidationSet('phoneNumbers')->validations);
+        self::assertSame(
+            [],
+            $subject->getContractContactValidationSetForFields(
+                ['emailAddress'],
+                'phoneNumbers',
+            )->validations,
+        );
+    }
+
+    #[Test]
+    public function profileUpdateValidationAddsOnlyDirectSpecialProperties(): void
+    {
+        $profileField = $this->profileField('gender', 'gender', 'gender');
+        $title = new SpecialField(
+            identifier: 'title',
+            type: 'special',
+            fieldType: '',
+            renderType: 'title',
+            fieldIdentifiers: ['firstName', 'lastName'],
+            validation: $this->validation('title', 'title', []),
+            position: 0,
+        );
+        $skipSync = new SpecialField(
+            identifier: 'skipSync',
+            type: 'special',
+            fieldType: 'check',
+            renderType: 'checkbox',
+            fieldIdentifiers: [],
+            validation: $this->validation('skipSync', 'skip_sync', ['type' => 'check']),
+            position: 1,
+        );
+        $subject = new AcademicPersonsSettings(
+            profileSections: [
+                'information' => $this->profileSection('information', [$profileField]),
+            ],
+            specialFields: ['title' => $title, 'skipSync' => $skipSync],
+        );
+
+        self::assertSame(
+            ['gender', 'skipSync'],
+            array_keys($subject->getProfileUpdateValidationSet()->validations),
+        );
+    }
+
+    #[Test]
+    public function documentSectionsAreResolvedByIdentifierAndRecordType(): void
+    {
+        $section = $this->documentSection('publications', 'publication');
+        $subject = new AcademicPersonsSettings(documentSections: ['publications' => $section]);
+        self::assertSame($section, $subject->getDocumentSection('publications'));
+        self::assertSame($section, $subject->getDocumentSectionByType('publication'));
+        self::assertNull($subject->getDocumentSection('unknown'));
+        self::assertNull($subject->getDocumentSectionByType('unknown'));
+    }
+
+    #[Test]
+    public function documentValidationNeverFallsBackToAnotherSection(): void
+    {
+        $publication = $this->documentSection('publications', 'publication');
+        $subject = new AcademicPersonsSettings(documentSections: ['publications' => $publication]);
+        self::assertSame($publication->validationSet, $subject->getDocumentValidationSet('publications'));
+        self::assertSame($publication->validationSet, $subject->getDocumentValidationSetByType('publication'));
+        self::assertSame([], $subject->getDocumentValidationSet('lectures')->validations);
+        self::assertSame([], $subject->getDocumentValidationSetByType('lecture')->validations);
+    }
+
+    #[Test]
+    public function profileTcaConfigurationUsesDatabaseFieldNamesAndSkipsEmptyConfiguration(): void
+    {
+        $firstName = $this->profileField('firstName', 'firstName', 'first_name', 'information', ['required' => true]);
+        $middleName = $this->profileField('middleName', 'middleName', 'middle_name');
+        $subject = new AcademicPersonsSettings(
+            profileSections: ['information' => $this->profileSection('information', [$firstName, $middleName])],
+        );
+        self::assertSame(
+            ['columns' => ['first_name' => ['config' => ['required' => true]]]],
+            $subject->getProfileValidationTcaTableConfig(),
+        );
+        self::assertSame(
+            [],
+            $subject->getProfileValidationTcaTableConfig(['firstName'], 'aboutme'),
+        );
+    }
+
+    #[Test]
+    public function documentTcaConfigurationStaysAttachedToItsRecordType(): void
+    {
+        $publication = $this->documentSection('publications', 'publication', ['required' => true]);
+        $lecture = $this->documentSection('lectures', 'lecture', ['readOnly' => true]);
+        $contracts = $this->documentSection('contracts', 'contracts', ['required' => true]);
+        $subject = new AcademicPersonsSettings(
+            documentSections: [
+                'contracts' => $contracts,
+                'publications' => $publication,
+                'lectures' => $lecture,
+            ],
+        );
+        self::assertSame(
             [
-                'columns' => [
-                    'first_name' => ['config' => ['type' => 'input', 'required' => true]],
-                    'last_name' => ['config' => ['type' => 'input', 'max' => 60]],
+                'types' => [
+                    'publication' => ['columnsOverrides' => ['title' => ['config' => ['required' => true]]]],
+                    'lecture' => ['columnsOverrides' => ['title' => ['config' => ['readOnly' => true]]]],
                 ],
             ],
-            $subject->getValidationTcaTableConfig('profile'),
+            $subject->getDocumentValidationTcaTypesConfig(),
         );
     }
 
-    /**
-     * A validation may only exist to attach an Extbase validator, in which case it has
-     * nothing to say about TCA. Skipping it matters beyond tidiness: writing an empty
-     * `config` into `$GLOBALS['TCA']` would drop the column's own configuration.
-     */
     #[Test]
-    public function aValidationWithoutTcaConfigContributesNothing(): void
+    public function completeSectionGraphSurvivesTheSettingsCacheRoundTrip(): void
     {
+        $field = $this->profileField('miscellaneous', 'miscellaneous', 'miscellaneous', 'aboutme');
         $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: [
-                'profile' => new ValidationSet(
-                    identifier: 'profile',
-                    validations: [
-                        'firstName' => $this->validation('first_name', []),
-                        'lastName' => $this->validation('last_name', ['type' => 'input']),
-                    ],
+            profileSections: ['aboutme' => $this->profileSection('aboutme', [$field])],
+            specialFields: [
+                'image' => new SpecialField(
+                    identifier: 'image',
+                    type: 'special',
+                    fieldType: '',
+                    renderType: 'image',
+                    fieldIdentifiers: [],
+                    validation: $this->validation('image', 'image', []),
+                    position: 0,
                 ),
             ],
-            raw: [],
-        );
-
-        $this->assertSame(
-            ['columns' => ['last_name' => ['config' => ['type' => 'input']]]],
-            $subject->getValidationTcaTableConfig('profile'),
-        );
-    }
-
-    /**
-     * Not even an empty `columns` key: the caller merges the result into the table TCA,
-     * and `['columns' => []]` is not the same neutral element as `[]` for every merge
-     * strategy.
-     */
-    #[Test]
-    public function aSetWithoutAnyTcaConfigProducesAnEmptyArray(): void
-    {
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: [
-                'profile' => new ValidationSet(
-                    identifier: 'profile',
-                    validations: ['firstName' => $this->validation('first_name', [])],
+            contractContactSections: [
+                'emailAddresses' => $this->contractContactSection(
+                    'emailAddresses',
+                    [$this->contractContactField('emailAddress', 'emailAddresses', 'email', 'email')],
                 ),
             ],
-            raw: [],
+            documentSections: ['publications' => $this->documentSection('publications', 'publication')],
+            raw: ['profile' => ['miscellaneous' => ['section' => 'aboutme']]],
         );
-
-        $this->assertSame([], $subject->getValidationTcaTableConfig('profile'));
-    }
-
-    /**
-     * TCA override files call this for every table the extension knows, whether or not
-     * an integrator configured a validation set for it.
-     */
-    #[Test]
-    public function anUnknownIdentifierProducesAnEmptyArray(): void
-    {
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: [],
-            raw: [],
-        );
-
-        $this->assertSame([], $subject->getValidationTcaTableConfig('profile'));
-    }
-
-    /**
-     * Two validations of one set naming the same column silently collapse into the last
-     * one - the earlier `config` is replaced, not merged. Pinned because the set is
-     * keyed by validation identifier, so nothing stops a configuration from doing it.
-     */
-    #[Test]
-    public function twoValidationsOnOneColumnKeepTheLastTcaConfig(): void
-    {
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: [],
-            validations: [
-                'profile' => new ValidationSet(
-                    identifier: 'profile',
-                    validations: [
-                        'firstName' => $this->validation('first_name', ['type' => 'input']),
-                        'firstNameAgain' => $this->validation('first_name', ['type' => 'text']),
-                    ],
-                ),
-            ],
-            raw: [],
-        );
-
-        $this->assertSame(
-            ['columns' => ['first_name' => ['config' => ['type' => 'text']]]],
-            $subject->getValidationTcaTableConfig('profile'),
-        );
-    }
-
-    /**
-     * `AcademicPersonsSettingsFactory` caches the settings as `return <var_export>;` in
-     * a `PhpFrontend` and restores them with `require`, which is the only reason the
-     * four `__set_state()` implementations exist. This exercises the whole nesting in
-     * one go - a property added to any of them without being added to its
-     * `__set_state()` breaks the cached request but not the uncached one, so it is a
-     * defect that only shows on the second hit.
-     */
-    #[Test]
-    public function theWholeObjectGraphSurvivesTheVarExportRoundTrip(): void
-    {
-        $subject = new AcademicPersonsSettings(
-            profileInformationTypes: ['email' => $this->profileInformationType('email')],
-            validations: [
-                'profile' => new ValidationSet(
-                    identifier: 'profile',
-                    validations: ['firstName' => $this->validation('first_name', ['type' => 'input'])],
-                ),
-            ],
-            raw: ['profileInformationTypes' => ['email' => ['fieldName' => 'email']]],
-        );
-
         $restored = eval('return ' . var_export($subject, true) . ';');
+        self::assertInstanceOf(AcademicPersonsSettings::class, $restored);
+        self::assertEquals($subject, $restored);
+        self::assertNotSame($subject, $restored);
+    }
 
-        $this->assertInstanceOf(AcademicPersonsSettings::class, $restored);
-        $this->assertEquals($subject, $restored);
-        $this->assertNotSame($subject, $restored);
+    private function contractContactField(
+        string $identifier,
+        string $section,
+        string $propertyName,
+        string $fieldName,
+    ): ContractContactField {
+        return new ContractContactField(
+            identifier: $identifier,
+            section: $section,
+            propertyName: $propertyName,
+            fieldName: $fieldName,
+            fieldType: 'input',
+            renderType: 'text',
+            validation: $this->validation($propertyName, $fieldName, []),
+            position: 0,
+        );
+    }
+
+    /**
+     * @param list<ContractContactField> $fields
+     */
+    private function contractContactSection(string $identifier, array $fields): ContractContactSection
+    {
+        $indexedFields = [];
+        $validations = [];
+        foreach ($fields as $field) {
+            $indexedFields[$field->identifier] = $field;
+            $validations[$field->propertyName] = $field->validation;
+        }
+        return new ContractContactSection(
+            identifier: $identifier,
+            fields: $indexedFields,
+            validationSet: new ValidationSet(identifier: $identifier, validations: $validations),
+            position: 0,
+        );
     }
 
     /**
      * @param array<string, mixed> $tcaConfig
      */
-    private function validation(string $fieldName, array $tcaConfig): Validation
+    private function profileField(
+        string $identifier,
+        string $propertyName,
+        string $fieldName,
+        string $section = 'information',
+        array $tcaConfig = [],
+    ): ProfileField {
+        $validation = $this->validation($propertyName, $fieldName, $tcaConfig);
+        return new ProfileField(
+            identifier: $identifier,
+            section: $section,
+            propertyName: $propertyName,
+            fieldName: $fieldName,
+            fieldType: 'input',
+            renderType: 'text',
+            validation: $validation,
+            position: 0,
+        );
+    }
+
+    /**
+     * @param list<ProfileField> $fields
+     */
+    private function profileSection(string $identifier, array $fields): ProfileSection
+    {
+        $indexedFields = [];
+        $validations = [];
+        foreach ($fields as $field) {
+            $indexedFields[$field->identifier] = $field;
+            $validations[$field->propertyName] = $field->validation;
+        }
+        return new ProfileSection(
+            identifier: $identifier,
+            fields: $indexedFields,
+            validationSet: new ValidationSet(identifier: $identifier, validations: $validations),
+            position: 0,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $tcaConfig
+     */
+    private function documentSection(string $identifier, string $type, array $tcaConfig = []): DocumentSection
+    {
+        $validation = $this->validation('title', 'title', $tcaConfig);
+        return new DocumentSection(
+            identifier: $identifier,
+            label: ucfirst($identifier),
+            type: $type,
+            fieldName: $identifier,
+            readOnly: false,
+            validationSet: new ValidationSet(identifier: $identifier, validations: ['title' => $validation]),
+            position: 0,
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $tcaConfig
+     */
+    private function validation(string $identifier, string $fieldName, array $tcaConfig): Validation
     {
         return new Validation(
-            identifier: 'validation of ' . $fieldName,
+            identifier: $identifier,
             fieldName: $fieldName,
             required: false,
             disabled: false,
             readOnly: false,
             validatorClassNames: [],
             tcaConfig: $tcaConfig,
-        );
-    }
-
-    private function profileInformationType(string $identifier): ProfileInformationType
-    {
-        return new ProfileInformationType(
-            identifier: $identifier,
-            fieldName: $identifier,
-            type: 'string',
-            label: 'Label of ' . $identifier,
         );
     }
 }

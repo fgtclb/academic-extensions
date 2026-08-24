@@ -8,17 +8,17 @@ use FGTCLB\AcademicPersonsEdit\Tests\Functional\AbstractAcademicPersonsEditTestC
 use PHPUnit\Framework\Attributes\Test;
 
 /**
- * Pins which content elements the extension registers.
+ * Pins InlineProfile as the only editing content element offered in the backend.
  *
- * `academicpersonsedit_profileswitcher` was selectable long after the plugin behind it was
- * gone (ACE-306). `ExtensionManagementUtility::addPlugin()` writes three places, and all
- * three are asserted here — a leftover in any of them keeps the dead type reachable in one
- * form or another.
+ * ProfileEditing remains as source and runtime compatibility reference until the inline
+ * migration is complete, but editors must not be able to create new legacy elements.
+ * `ExtensionManagementUtility::addPlugin()` writes three places, and all three are asserted.
  */
 final class ContentElementRegistrationTest extends AbstractAcademicPersonsEditTestCase
 {
     private const REMOVED_CONTENT_TYPE = 'academicpersonsedit_profileswitcher';
-    private const PROFILE_EDITING_CONTENT_TYPE = 'academicpersonsedit_profileediting';
+    private const LEGACY_CONTENT_TYPE = 'academicpersonsedit_profileediting';
+    private const INLINE_CONTENT_TYPE = 'academicpersonsedit_inlineprofile';
 
     /**
      * @return list<string>
@@ -29,18 +29,57 @@ final class ContentElementRegistrationTest extends AbstractAcademicPersonsEditTe
         foreach ($GLOBALS['TCA']['tt_content']['columns']['CType']['config']['items'] ?? [] as $item) {
             $values[] = (string)($item['value'] ?? '');
         }
-
         return $values;
     }
 
     #[Test]
-    public function profileEditingPluginIsSelectable(): void
+    public function inlineProfilePluginIsSelectable(): void
     {
-        $this->assertContains(self::PROFILE_EDITING_CONTENT_TYPE, $this->getContentTypeValues());
+        $this->assertContains(self::INLINE_CONTENT_TYPE, $this->getContentTypeValues());
         $this->assertArrayHasKey(
-            self::PROFILE_EDITING_CONTENT_TYPE,
+            self::INLINE_CONTENT_TYPE,
             $GLOBALS['TCA']['tt_content']['types'],
         );
+    }
+
+    #[Test]
+    public function legacyProfileEditingPluginIsNotSelectable(): void
+    {
+        $this->assertNotContains(self::LEGACY_CONTENT_TYPE, $this->getContentTypeValues());
+        $this->assertArrayNotHasKey(
+            self::LEGACY_CONTENT_TYPE,
+            $GLOBALS['TCA']['tt_content']['types'],
+        );
+        $this->assertArrayNotHasKey(
+            self::LEGACY_CONTENT_TYPE,
+            $GLOBALS['TCA']['tt_content']['ctrl']['typeicon_classes'] ?? [],
+        );
+    }
+
+    #[Test]
+    public function contentElementWizardOffersOnlyInlineProfileEditing(): void
+    {
+        $pageTsConfig = file_get_contents(__DIR__ . '/../../../Configuration/TSconfig/page.tsconfig');
+        $this->assertIsString($pageTsConfig);
+        $this->assertStringContainsString(self::INLINE_CONTENT_TYPE, $pageTsConfig);
+        $this->assertStringNotContainsString(self::LEGACY_CONTENT_TYPE, $pageTsConfig);
+    }
+
+    #[Test]
+    public function legacyProfileEditingImplementationRemainsAvailableAsReference(): void
+    {
+        $extensionRoot = __DIR__ . '/../../..';
+        foreach ([
+            '/Classes/Controller/ProfileController.php',
+            '/Classes/Controller/ProfileInformationController.php',
+            '/Classes/Controller/ContractController.php',
+            '/Resources/Private/Templates/Profile/Edit.html',
+            '/Resources/Private/Templates/ProfileInformation/Edit.html',
+            '/Resources/Private/Templates/Contract/Edit.html',
+            '/Tests/Functional/Plugins/AbstractProfileEditingPluginTestCase.php',
+        ] as $referenceFile) {
+            $this->assertFileExists($extensionRoot . $referenceFile);
+        }
     }
 
     #[Test]

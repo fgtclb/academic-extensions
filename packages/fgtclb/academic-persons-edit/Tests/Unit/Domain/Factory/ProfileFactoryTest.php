@@ -41,6 +41,10 @@ final class ProfileFactoryTest extends UnitTestCase
         $profile->setLastName('OldLast');
         $profile->setGender('OldGender');
         $profile->setTitle('OldTitle');
+        $profile->setEmailAddress('old@example.org');
+        $profile->setPublishEmailAddress(false);
+        $profile->setPhoneNumber('OldPhone');
+        $profile->setPublishPhoneNumber(false);
         $profile->setWebsite('OldWebsite');
         $profile->setSkipSync(false);
         return $profile;
@@ -97,6 +101,28 @@ final class ProfileFactoryTest extends UnitTestCase
         $profile = (new ProfileFactory())->updateFromFormData($validationSet, $this->createExistingProfile(), $form);
 
         $this->assertTrue($profile->getSkipSync());
+    }
+
+    #[Test]
+    public function updateAppliesDirectProfileContactsAndTheirOptInFlags(): void
+    {
+        $validationSet = new ValidationSet('profile', []);
+        $form = new ProfileFormData();
+        $form->setPropertyOverride('emailAddress', 'public@example.org');
+        $form->setPropertyOverride('publishEmailAddress', true);
+        $form->setPropertyOverride('phoneNumber', '+49 123 456');
+        $form->setPropertyOverride('publishPhoneNumber', true);
+
+        $profile = (new ProfileFactory())->updateFromFormData(
+            $validationSet,
+            $this->createExistingProfile(),
+            $form,
+        );
+
+        $this->assertSame('public@example.org', $profile->getEmailAddress());
+        $this->assertTrue($profile->getPublishEmailAddress());
+        $this->assertSame('+49 123 456', $profile->getPhoneNumber());
+        $this->assertTrue($profile->getPublishPhoneNumber());
     }
 
     #[Test]

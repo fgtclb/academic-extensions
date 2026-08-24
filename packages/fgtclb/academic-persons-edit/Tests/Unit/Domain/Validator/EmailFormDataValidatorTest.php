@@ -25,20 +25,21 @@ use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * Validates the argument of `EmailAddressController::createAction()` and
- * `updateAction()` against the validation set `emailAddress`. It is the only
- * shipped set that stacks two validators on one property: `email` is both required
- * and syntax checked.
+ * Email validation is derived from the email-address contract-contact section.
  */
 final class EmailFormDataValidatorTest extends UnitTestCase
 {
-    private const VALIDATION_SET = 'emailAddress';
+    private const VALIDATION_SET = 'emailAddresses';
 
     #[Test]
-    public function theValidationSetEmailAddressIsProcessed(): void
+    public function theConfiguredEmailAddressFieldIsProcessed(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['email' => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection(
+                self::VALIDATION_SET,
+                ['email' => [RecordingValidator::class]],
+                ['email' => 'emailAddress'],
+            ),
             new EmailFormData(email: 'jane.doe@example.org')
         );
 
@@ -46,10 +47,10 @@ final class EmailFormDataValidatorTest extends UnitTestCase
     }
 
     #[Test]
-    public function aValidationSetRegisteredUnderAnotherIdentifierIsIgnored(): void
+    public function aConfiguredFieldFromAnotherContactSectionIsIgnored(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier('email', ['email' => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection('phoneNumbers', ['phoneNumber' => [RecordingValidator::class]]),
             new EmailFormData(email: 'jane.doe@example.org')
         );
 
@@ -57,15 +58,22 @@ final class EmailFormDataValidatorTest extends UnitTestCase
     }
 
     /**
-     * Both properties the shipped configuration names have to resolve off the DTO;
-     * a rename would degrade them to `null` instead of raising.
+     * The aliased YAML identifier `emailAddress` must resolve to the DTO's `email` property.
      */
     #[Test]
     #[DataProvider('configuredProperties')]
     public function aConfiguredPropertyResolvesToTheSubmittedValue(string $property, string $expectedDescription): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, [$property => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection(
+                self::VALIDATION_SET,
+                [$property => [RecordingValidator::class]],
+                match ($property) {
+                    'email' => ['email' => 'emailAddress'],
+                    'type' => ['type' => 'emailAddressType'],
+                    default => [],
+                },
+            ),
             new EmailFormData(email: 'jane.doe@example.org', type: 'work')
         );
 
@@ -78,7 +86,6 @@ final class EmailFormDataValidatorTest extends UnitTestCase
     public static function configuredProperties(): array
     {
         return [
-            // Both required in the shipped Configuration/AcademicPersons/Settings.yaml.
             'email' => ['email', 'string(jane.doe@example.org)'],
             'type' => ['type', 'string(work)'],
         ];
@@ -94,9 +101,11 @@ final class EmailFormDataValidatorTest extends UnitTestCase
     public function bothValidatorsOfTheEmailPropertyContributeSeparateErrors(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, [
-                'email' => [RecordingValidator::class, SilentValidator::class, RecordingValidator::class],
-            ]),
+            ValidationSettings::forContractContactSection(
+                self::VALIDATION_SET,
+                ['email' => [RecordingValidator::class, SilentValidator::class, RecordingValidator::class]],
+                ['email' => 'emailAddress'],
+            ),
             new EmailFormData()
         );
 
@@ -112,7 +121,9 @@ final class EmailFormDataValidatorTest extends UnitTestCase
     public function anythingButEmailFormDataIsRejected(mixed $subject): void
     {
         $validator = new EmailFormDataValidator();
-        $validator->injectAcademicPersonsSettings(ValidationSettings::forIdentifier(self::VALIDATION_SET, []));
+        $validator->injectAcademicPersonsSettings(
+            ValidationSettings::forContractContactSection(self::VALIDATION_SET, []),
+        );
 
         $this->expectException(UnsuitableValidatorException::class);
         $this->expectExceptionCode(1297418975);

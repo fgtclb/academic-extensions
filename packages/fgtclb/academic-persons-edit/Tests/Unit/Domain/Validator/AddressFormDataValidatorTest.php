@@ -24,23 +24,20 @@ use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * Validates the argument of `PhysicalAddressController::createAction()` and
- * `updateAction()` against the validation set `physicalAddress`.
+ * Address validation is derived only from the physical-address contract-contact section.
  */
 final class AddressFormDataValidatorTest extends UnitTestCase
 {
-    private const VALIDATION_SET = 'physicalAddress';
+    private const VALIDATION_SET = 'physicalAddresses';
 
     /**
-     * The set identifier is the contract with `Settings.yaml`. Changing it - or
-     * changing the key in the yaml file - disables address validation completely
-     * rather than raising, because an unregistered set validates nothing.
+     * Address fields are resolved only from the configured contract-contact section.
      */
     #[Test]
-    public function theValidationSetPhysicalAddressIsProcessed(): void
+    public function configuredAddressFieldsAreProcessed(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['city' => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection(self::VALIDATION_SET, ['city' => [RecordingValidator::class]]),
             new AddressFormData(city: 'Munich')
         );
 
@@ -48,10 +45,10 @@ final class AddressFormDataValidatorTest extends UnitTestCase
     }
 
     #[Test]
-    public function aValidationSetRegisteredUnderAnotherIdentifierIsIgnored(): void
+    public function aConfiguredFieldFromAnotherContactSectionIsIgnored(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier('address', ['city' => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection('emailAddresses', ['email' => [RecordingValidator::class]]),
             new AddressFormData(city: 'Munich')
         );
 
@@ -59,7 +56,7 @@ final class AddressFormDataValidatorTest extends UnitTestCase
     }
 
     /**
-     * The property names in `Settings.yaml` are resolved off the DTO through
+     * The section's property names are resolved off the DTO through
      * `ObjectAccess`, which yields `null` for anything it cannot read instead of
      * raising. Renaming a DTO property without touching the yaml file would
      * therefore keep validating - against `null` - and a required address field
@@ -71,7 +68,11 @@ final class AddressFormDataValidatorTest extends UnitTestCase
     public function aConfiguredPropertyResolvesToTheSubmittedValue(string $property, string $expectedDescription): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, [$property => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection(
+                self::VALIDATION_SET,
+                [$property => [RecordingValidator::class]],
+                $property === 'type' ? ['type' => 'physicalAddressType'] : [],
+            ),
             new AddressFormData(
                 street: 'Bahnhofstrasse',
                 streetNumber: '12a',
@@ -99,7 +100,7 @@ final class AddressFormDataValidatorTest extends UnitTestCase
             'zip' => ['zip', 'string(80331)'],
             'city' => ['city', 'string(Munich)'],
             'country' => ['country', 'string(DE)'],
-            // Not configured by default, but readable, so a project may require them.
+            // Not configured by default, but supported when added to the profile section.
             'additional' => ['additional', 'string(c/o Faculty)'],
             'state' => ['state', 'string(Bavaria)'],
             'type' => ['type', 'string(work)'],
@@ -107,18 +108,17 @@ final class AddressFormDataValidatorTest extends UnitTestCase
     }
 
     /**
-     * The counter example to the test above: this is what a stale property name in
-     * `Settings.yaml` looks like from the inside.
+     * A profile field which is not part of the address DTO mapping is not processed.
      */
     #[Test]
-    public function aPropertyTheFormDataDoesNotHaveIsValidatedAsNull(): void
+    public function anUnknownAddressPropertyIsIgnored(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['houseNumber' => [RecordingValidator::class]]),
+            ValidationSettings::forContractContactSection(self::VALIDATION_SET, ['houseNumber' => [RecordingValidator::class]]),
             new AddressFormData(streetNumber: '12a')
         );
 
-        $this->assertSame(['null'], $this->messagesFor($result, 'houseNumber'));
+        $this->assertFalse($result->hasErrors());
     }
 
     /**
@@ -130,7 +130,9 @@ final class AddressFormDataValidatorTest extends UnitTestCase
     public function anythingButAddressFormDataIsRejected(mixed $subject): void
     {
         $validator = new AddressFormDataValidator();
-        $validator->injectAcademicPersonsSettings(ValidationSettings::forIdentifier(self::VALIDATION_SET, []));
+        $validator->injectAcademicPersonsSettings(
+            ValidationSettings::forContractContactSection(self::VALIDATION_SET, []),
+        );
 
         $this->expectException(UnsuitableValidatorException::class);
         $this->expectExceptionCode(1297418975);

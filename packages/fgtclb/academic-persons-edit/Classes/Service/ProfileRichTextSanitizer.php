@@ -4,28 +4,22 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Service;
 
+use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use TYPO3\HtmlSanitizer\InitiatorInterface;
 
 #[AsAlias(id: ProfileRichTextSanitizerInterface::class)]
 final readonly class ProfileRichTextSanitizer implements ProfileRichTextSanitizerInterface, InitiatorInterface
 {
-    private const RICH_TEXT_PROPERTIES = [
-        'coreCompetences',
-        'teachingArea',
-        'supervisedDoctoralThesis',
-        'supervisedThesis',
-        'miscellaneous',
-    ];
-
     public function __construct(
         private ProfileRichTextSanitizerBuilder $builder,
-    ) {
-    }
+        private AcademicPersonsSettings $academicPersonsSettings,
+    ) {}
 
     public function supports(string $propertyName): bool
     {
-        return in_array($propertyName, self::RICH_TEXT_PROPERTIES, true);
+        return strtolower($this->academicPersonsSettings->getProfileField($propertyName)?->renderType ?? '')
+            === 'ckeditor';
     }
 
     public function sanitize(string $value): string

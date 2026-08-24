@@ -14,9 +14,12 @@ three independently persisted areas:
 *   the synchronization checkbox using its own JSON endpoint, and
 *   the profile image modal using dedicated upload and delete endpoints.
 
-The frontend module
+The small frontend entry
 :file:`Resources/Public/JavaScript/frontend/profile.js` initializes every
-``data-academic-persons-inline-edit`` component on the page. All changes are
+``data-academic-persons-inline-edit`` component on the page. Feature modules in
+:file:`Resources/Public/JavaScript/frontend/profile/` separately own common
+requests/status output, field editing, rich text, synchronization, image
+editing and sticky positioning. All changes are
 saved through AJAX without reloading the page. Editable fields are discovered
 across the complete component root, even when the responsive page layout
 places them in separate ``data-ie-fields-form`` elements. Modal, toast and
@@ -35,12 +38,19 @@ The controller assigns the following variables to the Fluid template:
     *   - ``{profile}``
         - Profile assigned to the authenticated frontend user, or
           :php:`null` when no editable profile exists.
-    *   - ``{genderOptions}``
-        - Associative select options from the profile gender TCA field. TCA
-          values are option keys and translated labels are option values.
-    *   - ``{validations}``
-        - Effective ``profile`` validation set. It controls required,
-          disabled, read-only and input-type attributes.
+    *   - ``{profileSections}``
+        - Ordered Fluid view models generated from :yaml:`profile`. Every
+          section contains regular fields and inserted composite special items.
+    *   - ``{specialFields}``
+        - Typed :yaml:`special` components, including composed title, image and
+          synchronization metadata.
+    *   - ``{profileFieldOptions}``
+        - Options for every configured :yaml:`renderType: select` field. The
+          option source remains the matching Profile TCA field.
+    *   - ``{documentSections}``
+        - Ordered structured-section view models derived from
+          :yaml:`documentSections`, including mapping, read-only and validation
+          metadata plus the typed records.
     *   - ``{imageAllowedMimeTypes}``
         - Comma-separated MIME types accepted by the image input. The server
           validates the configured values independently.
@@ -66,11 +76,16 @@ The template is intentionally a composition root. The main partial groups are:
     *   - ``Forms/*``
         - Personal-data and about-section form boundaries. Persistence actions
           live beside their respective fields.
-    *   - ``Sections/*``
-        - Personal, link and rich-text field composition in display order.
-    *   - ``Field.html``, ``Field/Group.html`` and ``Field/*``
-        - Shared field orchestration, plain read previews, grouped fields,
-          textfield/textarea controls, gender select and per-field actions.
+    *   - ``Profile/Items.html`` and ``Field/Renderer.html``
+        - Ordered iteration and ``renderType`` dispatch for settings-driven
+          profile fields.
+    *   - ``Field/Types/*``
+        - One focused partial for input, textarea, CKEditor, select, checkbox
+          and combined-link controls.
+    *   - ``Sections/Documents.html`` and ``Documents/*``
+        - Read-only structured document composition.
+    *   - ``Field.html``, ``Field/Group.html`` and shared ``Field/*``
+        - Preview, control, grouped fields and per-field actions.
     *   - ``Header.html`` and ``StatusToast.html``
         - Personal-section heading, synchronization/edit controls and scoped
           status output.
@@ -81,9 +96,11 @@ The template is intentionally a composition root. The main partial groups are:
 Layout and responsive behavior
 ==============================
 
-The view uses only Bootstrap 5 grid, spacing, typography, background,
-positioning and form utilities. It ships no extension-specific stylesheet and
-the Fluid templates contain no inline style declarations.
+The view uses Bootstrap 5 grid, spacing, typography, background, positioning
+and form utilities. The small :file:`Resources/Public/Css/additional.css`
+compatibility layer only releases a surrounding ``.section`` overflow,
+normalizes one frame spacing variable and keeps the sticky card below the page
+header; the Fluid templates contain no inline style declarations.
 
 On ``lg`` and larger viewports the first row uses a ``4 / 8`` column split.
 The profile image block has ``sticky-top`` so the image and its edit action
@@ -92,8 +109,9 @@ document order. The about section follows the complete first row and therefore
 never overlaps the sticky column.
 
 At runtime ``initializeStickyImageOffset()`` reads the visible outer height of
-``#page-header`` through ``getBoundingClientRect().height`` and assigns that
-pixel value to the ``top`` property of ``data-ie-sticky-image``. A
+``#page-header`` through ``getBoundingClientRect().height``, adds a 10-pixel
+visual gap and assigns the result to the ``top`` property of
+``data-ie-sticky-image``. A
 ``ResizeObserver`` watches the header's ``border-box`` and keeps the offset
 synchronized whenever the navbar changes height, including height or padding
 changes caused by a scroll-dependent header state. Environments without it use
@@ -105,22 +123,39 @@ inherits the stretched cross-axis size, giving the sticky image a containing
 block as tall as the adjacent profile data. The full-width about section keeps
 its own ``col-12`` in a separate sibling row below it.
 
-The complete profile name is the page's ``h1`` above the image and replaces the
-former :guilabel:`Profile image` heading. The heading uses
-``data-ie-profile-name-field-ids`` so a successful inline name update is shown
-without reloading the page.
+The complete profile name is the page's ``h1`` above the image. Both Fluid and
+JavaScript use the ordered ``fields`` list from :yaml:`special.title`. Fluid
+renders the initial name; ``data-ie-profile-name-field-ids`` lets JavaScript
+recompose the same name after a successful update without reloading the page.
 
 Profile values are rendered as readable text rows with alternating
 ``bg-body-tertiary`` surfaces. The only read-mode action is a borderless pencil
 button with an accessible label. Name components and the URL/title pair of
 each link share one preview row and open as one inline-edit group.
+The special name editor retains the established responsive grid (academic
+title / first name at ``4 / 8`` and middle / last name at ``6 / 6``) without
+putting layout metadata into YAML.
 
-Supported controls
-==================
+Settings-driven controls
+========================
 
-The :file:`Resources/Private/Partials/InlineProfile/Field.html` partial
-resolves validation, element ID and input type before composing three focused
-partials:
+``ProfileSectionProvider`` converts the typed :yaml:`profile` and
+:yaml:`special` settings into an ordered Fluid view model. Section placement
+itself remains explicit in :file:`Templates/InlineProfile/Index.html`: the
+template decides where ``profileSections.information`` and
+``profileSections.aboutme`` appear. It does not enumerate their individual
+fields.
+
+``Field/Renderer.html`` chooses a partial from :file:`Field/Types/` solely from
+``renderType``. Option values are not duplicated in YAML: for a select field,
+``ProfileFieldOptionsService`` reads the corresponding Profile TCA items.
+Preview behavior likewise follows the rendered control type.
+Removing a special component removes its controls; marking the image or
+synchronization special ``readonly`` or ``disabled`` also blocks the matching
+write endpoint, not just its Fluid control.
+
+The shared :file:`Resources/Private/Partials/InlineProfile/Field.html` partial
+composes three focused partials:
 
 *   :file:`Field/Preview.html` renders the text preview and pencil trigger,
 *   :file:`Field/Control.html` renders either ``f:form.textfield`` or
@@ -133,12 +168,9 @@ partials:
 preview joins values (the name) or uses the first non-empty value (link title
 falling back to its URL).
 
-``validation.inputType`` or the explicit ``inputType`` argument can select HTML
-input types such as ``tel`` and ``url``. Setting ``textarea`` renders a
-textarea instead. The dedicated :file:`Field/Gender.html` partial handles the
-select field without an action group. Its ``change`` event saves immediately
-through the generic update endpoint. :file:`Settings/Sync.html` contains the
-separately persisted checkbox.
+``validation.inputType`` supplies the concrete HTML input type. Select and
+checkbox controls save immediately on change. :file:`Settings/Sync.html`
+contains the separately persisted special checkbox.
 
 ..  list-table::
     :header-rows: 1
@@ -154,13 +186,11 @@ separately persisted checkbox.
     *   - Free text input
         - Default textfield.
     *   - Select
-        - ``f:form.select`` with the
-          ``academic-persons-inline-edit__field`` class. Gender additionally
-          uses ``data-ie-autosave-on-change``.
+        - :file:`Field/Types/Select.html`; options come from the configured
+          field's TCA items and changes save immediately.
     *   - Checkbox
-        - The synchronization control uses
-          ``academic-persons-inline-edit__sync-checkbox`` and its dedicated
-          form.
+        - :file:`Field/Types/Checkbox.html` for direct Profile flags. The
+          synchronization special uses its own form and endpoint.
     *   - Multiline text
         - Field partial with ``textarea: true``. Passing ``richText: true``
           additionally turns the textarea into the TYPO3 CKEditor 5 when the
@@ -172,8 +202,9 @@ Generic field update
 The URL is generated by ``f:uri.action`` for ``updateAction()`` with page type
 :php:`1733735`. Requests must use ``POST`` and
 ``Content-Type: application/json``. Only values changed since the last
-successful save are sent. An empty string clears a property; omitted
-properties remain unchanged.
+successful save are sent. An empty string clears a property when its
+section-local validation permits an empty value; omitted properties remain
+unchanged.
 
 ..  code-block:: json
     :caption: Partial profile update
@@ -181,27 +212,52 @@ properties remain unchanged.
     {
       "profile": 123,
       "data": {
-        "firstName": "Jane",
+        "gender": "female",
         "website": ""
       }
     }
 
-Unknown profile properties and gender values not configured in TCA are
-rejected. Extbase validation errors are returned in an ``errors`` object keyed
-by property path and are mapped back to the corresponding form controls by the
+Unknown profile properties, configured read-only/disabled fields and select
+values not configured in the matching TCA field are rejected. The direct academic/honorific
+``profile.title`` field is an ordinary configured Profile property; the
+composed display name is :yaml:`special.title`. ``skipSync`` is a direct special
+property. A configured ``combinedLink`` additionally enables its matching
+``*Title`` companion. All other writable Profile properties come from
+:yaml:`profile`.
+Extbase validation errors are returned in an ``errors`` object keyed by
+property path and are mapped back to the corresponding form controls by the
 frontend module.
 
-``ProfileGenderOptionsService::getAllowedValues()`` reads only the non-empty TCA
-values required for strict validation. ``getOptions()`` additionally resolves
-the labels for the Fluid select. Keeping validation independent of localization
-also keeps the service usable in isolated unit tests.
+``ProfileFieldOptionsService`` supplies both the presentation options and the
+strict allow-list validation for every configured select. Thus another select
+does not require a new Fluid partial, validator service or JavaScript branch.
+
+Direct public-profile contacts
+==============================
+
+The inline ``information`` section edits four direct Profile properties:
+
+*   ``emailAddress`` and ``publishEmailAddress``;
+*   ``phoneNumber`` and ``publishPhoneNumber``.
+
+These are not Contract contact records. The values are persisted on
+:sql:`tx_academicpersons_domain_model_profile`; each publication checkbox is a
+separate opt-in flag and defaults to false. The public Profile detail template
+renders an email or telephone link only when both the value and its matching
+flag are set. Contract email/phone/address collections continue to render in
+their own contract section and use :yaml:`contractContact` validation.
+
+The direct contact values are deliberately not copied from synchronized
+contract contacts. This prevents an employment contact update from silently
+changing what a person explicitly chose to publish as general profile contact
+data.
 
 Rich-text content fields
 ========================
 
-Five profile properties are rich-text fields. Four are displayed with the
-personal data, while ``miscellaneous`` is the :guilabel:`About me`
-description:
+The shipped configuration marks five profile properties with
+:yaml:`renderType: ckeditor`. Four are displayed with the ``information``
+section, while ``miscellaneous`` belongs to :yaml:`aboutme`:
 
 *   ``coreCompetences``,
 *   ``teachingArea``,
@@ -210,9 +266,9 @@ description:
 *   ``miscellaneous``.
 
 The editor is TYPO3's shipped CKEditor 5 from the
-``typo3/cms-rte-ckeditor`` package. The frontend module imports its CKEditor
-modules through TYPO3's JavaScript import map; it does not load an editor from
-a CDN. An editor instance is created lazily when a rich-text field is opened.
+``typo3/cms-rte-ckeditor`` package. The ``profile/rich-text.js`` module imports
+its CKEditor modules through TYPO3's JavaScript import map; it does not load an
+editor from a CDN. An editor instance is created lazily when a rich-text field is opened.
 If initialization fails, the original textarea remains available and the
 component reports an error.
 
@@ -231,8 +287,8 @@ sanitized markup returned by the server. The frontend applies the same strict
 tag, attribute and URI-scheme allowlist without assigning markup through
 ``innerHTML``.
 
-Each open text or rich-text field has three explicit actions. Gender is the
-exception and saves immediately when its select value changes.
+Each open text or rich-text field has three explicit actions. Selects and
+checkboxes save immediately when their value changes.
 
 *   :guilabel:`Delete` (``data-ie-dismiss``) clears the current browser-side
     draft. The editor stays open and no request is sent.
@@ -260,10 +316,11 @@ Server-side sanitization
 ------------------------
 
 Client-side editor configuration is not treated as a security boundary.
-``ProfileUpdateValidationService`` accepts an explicit list of editable
-properties and passes the five rich-text values through
-``ProfileRichTextSanitizer`` before validation and persistence. The sanitizer
-uses TYPO3's allow-list based HTML sanitizer and permits only:
+``ProfileUpdateValidationService`` derives writable properties from the
+configured profile sections. It passes every configured
+:yaml:`renderType: ckeditor` property through ``ProfileRichTextSanitizer``
+before validation and persistence. The sanitizer uses TYPO3's allow-list based
+HTML sanitizer and permits only:
 
 *   the tags ``p``, ``br``, ``strong``, ``em``, ``ul``, ``ol``, ``li`` and
     ``a``;
@@ -277,21 +334,100 @@ normalized, sanitized values. The frontend replaces its local editor and
 preview state with exactly those returned values rather than trusting the
 submitted markup.
 
+Each AJAX request is validated as a partial profile submission. The validator
+selects only submitted or explicitly overridden DTO properties from their
+configured profile sections. A ``required`` rule on an omitted sibling field
+therefore does not block a field update or the dedicated ``skipSync`` request.
+Submitted inline overrides are validated after normalization and sanitization.
+
 The extension requires at least TYPO3 13.4.31 or TYPO3 14.3.6. These constraints
 include the HTML-sanitizer fixes published with TYPO3-CORE-SA-2026-006. Projects
 must still keep TYPO3 security updates current.
 
+Read-only structured profile sections
+=====================================
+
+The inline profile view renders the structured records directly below the
+:guilabel:`About me` field. ``ProfileDocumentSectionProvider`` supplies one
+ordered view model instead of duplicating relation mapping in Fluid. It reads
+all sections, including ``contracts``, directly from
+``AcademicPersonsSettings::documentSections``. That settings object is built
+from the active packages'
+:file:`Configuration/AcademicPersons/Settings.yaml` files, so configured order
+is also presentation order.
+
+For every document section the provider reuses the configured ``identifier``,
+``fieldName``, record ``type``, LLL ``label``, ``readonly`` state and the
+section-local validations. The heading is translated directly from that label.
+A newly configured type consequently does not require another section registry
+in ``academic_persons_edit``. The generic localized empty state is used until
+an identifier-specific message is added.
+
+``contracts`` contains ``FGTCLB\AcademicPersons\Domain\Model\Contract``
+objects. Every other collection contains
+``FGTCLB\AcademicPersons\Domain\Model\ProfileInformation`` objects. Contract
+rows show the start date and position. Profile-information rows use a range,
+year or start-date presentation appropriate to the section and retain the
+stored title, link and formatted body text. All sections remain visible when
+empty and display a localized empty state.
+
+The current inline view presents structured records without mutation controls.
+The section's configured ``readonly`` state and validations are exposed as view
+metadata, but the markup contains no add, edit, delete, visibility or sorting
+controls and :guilabel:`Edit all` targets only profile fields. The InlineProfile
+plugin registers only ``InlineProfileController``; legacy contract,
+profile-information and contact controllers are not exposed through its normal
+or non-cacheable action maps.
+
+Section order is centralized and every section emits ``data-section-key`` and
+``data-section-position`` together with the configured
+``data-section-field-name`` and ``data-section-record-type``. Records
+additionally emit ``data-item-uid``, ``data-item-sorting`` and
+``data-item-position``. These attributes are passive metadata in this release:
+there is no ``draggable`` state, handle, sorting JavaScript or persistence
+endpoint yet. A later drag-and-drop implementation can replace the settings
+order and attach behavior to these stable boundaries without restructuring the
+templates.
+
+The presentation uses Bootstrap rows, spacing, rounded corners and alternating
+``bg-body-tertiary`` records. No additional extension-specific CSS is required.
+
+Inline-only development boundary
+================================
+
+``academicpersonsedit_inlineprofile`` is the only profile-editing content
+element offered in the backend CType selector and new-content-element wizard.
+All new profile-editing behavior must be implemented through the
+``InlineProfile`` template and partial tree, ``InlineProfileController`` AJAX
+actions and the inline JavaScript component. Inline code must not render a
+``Profile``, ``ProfileInformation`` or ``Contract`` template from the legacy
+``ProfileEditing`` plugin and must not route to one of its controllers.
+
+The old controllers, templates, language keys and functional reference tests
+remain in the package during the migration so their previous behavior can be
+consulted without reconstructing it. The legacy ``ProfileEditing`` Extbase
+configuration also remains temporarily for existing content records and its
+reference tests, but it is not selectable for new records. This compatibility
+block is not an implementation source for InlineProfile and can be removed as
+one isolated cleanup step after the inline migration is complete.
+
+The InlineProfile functional test setup reflects the same boundary. It uses a
+dedicated ``academicpersonsedit_inlineprofile`` fixture and the neutral
+``AbstractFrontendProfilePluginTestCase`` base. It does not create a
+``ProfileEditing`` record and change its CType afterwards.
+
 Synchronization checkbox
 ========================
 
-The synchronization checkbox appears as the compact :guilabel:`Private` switch
+The synchronization checkbox appears as the compact
+:guilabel:`Disable profile sync` switch
 immediately left of the :guilabel:`Edit all`/:guilabel:`Close all` toggle in
 the personal-section header and is persisted immediately through
-``updateSkipSyncAction()``. Its form is a sibling
-of the profile form, not a nested form. The visual label follows the supplied
-profile-page design; the underlying data and endpoint semantics remain
-``skipSync``. It does not submit or mutate any other field. The endpoint accepts
-exactly one boolean property:
+``updateSkipSyncAction()``. Its form is a sibling of the profile form, not a
+nested form. Its presence and writable metadata follow the
+``special.skipSync`` configuration; the underlying data and endpoint semantics
+remain ``skipSync``. It does not submit or mutate any other field. The endpoint
+accepts exactly one boolean property:
 
 ..  code-block:: json
     :caption: Synchronization update
@@ -354,12 +490,12 @@ modal. The controller additionally compares the submitted image with the
 persisted FAL reference. It returns ``image_upload_missing`` with status
 ``422`` instead of reporting success when no new file arrived.
 
-The upload action propagates non-successful JSON responses out of TYPO3's
+All inline AJAX actions propagate non-successful JSON responses out of TYPO3's
 Extbase ``USER`` content rendering with ``PropagateResponseException``. A
 ``JsonResponse`` returned by the action alone would contribute its body to the
 surrounding ``PAGE`` object while the outer frontend response retained status
-``200``. Propagation therefore preserves the documented ``422`` and ``500``
-HTTP status codes for the AJAX client.
+``200``. Propagation therefore preserves the documented non-``200`` status
+codes for the AJAX client.
 
 The relevant TypoScript settings are:
 
@@ -396,8 +532,8 @@ Authentication and responses
 
 All four endpoints require an authenticated frontend user and accept only the
 profile assigned to that user. The generic update, synchronization and delete
-endpoints return machine-readable errors directly. Image upload validation is
-also converted to JSON by the controller's error action.
+endpoints propagate machine-readable JSON errors. Image upload validation is
+also converted to and propagated as JSON by the controller's error action.
 
 ..  list-table:: Response status codes
     :header-rows: 1
@@ -476,7 +612,22 @@ shipped JavaScript:
         - Main heading and the name controls used to refresh it after saving.
     *   - ``data-ie-sticky-image``
         - Sticky image container receiving the measured ``#page-header`` height
-          as its runtime ``top`` offset.
+          plus a 10-pixel visual gap as its runtime ``top`` offset.
+    *   - ``data-ie-document-sections`` and ``data-ie-document-section``
+        - Read-only structured-section list and stable boundary for each future
+          reorderable section.
+    *   - ``data-section-key`` and ``data-section-position``
+        - Stable section identity and current zero-based presentation position.
+    *   - ``data-section-field-name`` and ``data-section-record-type``
+        - Field and relation type taken from ``AcademicPersonsSettings`` for a
+          future section-specific persistence endpoint.
+    *   - ``data-ie-document-items`` and ``data-ie-document-item``
+        - Read-only item collection and record boundaries inside a section.
+    *   - ``data-item-uid``, ``data-item-sorting`` and ``data-item-position``
+        - Persisted record identity, domain sorting value and current zero-based
+          presentation position reserved for a later drag-and-drop workflow.
+    *   - ``data-ie-document-empty-state``
+        - Localized placeholder rendered when a structured collection is empty.
     *   - ``data-ie-field-group``, ``data-ie-field-ids`` and
           ``data-ie-display-field-ids``
         - Grouped preview/editor and the controls participating in it.
@@ -486,7 +637,12 @@ shipped JavaScript:
     *   - ``data-ie-field-actions``
         - Content-sized Bootstrap group for the three per-field actions.
     *   - ``data-ie-autosave-on-change``
-        - Saves the gender select immediately after a changed selection.
+        - Saves configured select and checkbox controls immediately after a
+          change.
+    *   - ``data-ie-autosave-undo`` and ``data-ie-cancel``
+        - Marks the undo action beside an editable select or checkbox. It
+          restores the last successfully persisted value and closes the editor
+          without sending another request.
     *   - ``data-academic-persons-inline-edit-edit-all-btn``
         - Toggles all editable single fields and grouped rows between open and
           collapsed states.
@@ -522,6 +678,23 @@ Modal, toast and compatibility-template elements must remain inside the
 component root. All DOM lookups are scoped to that root, so multiple components
 remain independent.
 
+JavaScript tests
+================
+
+The standalone Jest/jsdom project in
+:file:`Resources/Public/Development/` covers the frontend entry modules and
+their exported helpers. TYPO3-provided CKEditor imports are represented by
+local test doubles, so no TYPO3 instance is required. Run it independently:
+
+..  code-block:: bash
+
+    cd packages/fgtclb/academic-persons-edit/Resources/Public/Development
+    npm i
+    npm test
+
+``npm run test:coverage`` additionally creates the HTML report in
+:file:`Resources/Public/Development/coverage/`.
+
 Tests
 =====
 
@@ -533,13 +706,27 @@ sanitization happens before a value is registered for persistence.
 
 Functional plugin tests render both Bootstrap modal states, verify the
 decomposed Fluid contracts, AJAX-only controls, direct rich-text previews and
-the separate delete, cancel and save actions. They persist malicious rich-text
-input through the real update endpoint and assert that only the sanitized
-response is stored. The inline image tests verify that a missing file can never
-return success and that a real multipart upload returns ``hasImage: true`` and
-creates the FAL relation. They also exercise the dedicated image deletion
-endpoint through the generated action URL. Form submissions reuse the complete
-rendered action URL, including the JSON page type, so the tests exercise the
-same routing contract as the browser. Upload tests are assigned to the
-``not-core-13`` PHPUnit group because TYPO3 v13's CLI upload permission check
-requires a real HTTP upload.
+the separate delete, cancel and save actions. The section-provider unit test
+verifies that order, identifiers, field names, relation types and labels come
+from ``AcademicPersonsSettings`` while presentation modes and typed records are
+preserved. Functional fixtures cover contracts and every configured
+profile-information relation; the rendered page test derives the expected
+order and metadata from the same settings service, then checks placement below
+:guilabel:`About me`, alternating records, empty states, passive sorting
+metadata and the absence of write controls. It also guards the InlineProfile
+plugin against accidentally exposing legacy mutation controllers. Registration
+tests ensure that InlineProfile is the only editing content element offered to
+editors while the complete legacy implementation remains present as a
+temporary source reference. The architecture unit test scans the InlineProfile
+controller, Fluid tree and JavaScript for forbidden legacy controller, template
+and plugin references.
+
+The AJAX tests persist malicious rich-text input through the real update
+endpoint and assert that only the sanitized response is stored. The inline
+image tests verify that a missing file can never return success and that a real
+multipart upload returns ``hasImage: true`` and creates the FAL relation. They
+also exercise the dedicated image deletion endpoint through the generated
+action URL. Form submissions reuse the complete rendered action URL, including
+the JSON page type, so the tests exercise the same routing contract as the
+browser. Upload tests are assigned to the ``not-core-13`` PHPUnit group because
+TYPO3 v13's CLI upload permission check requires a real HTTP upload.

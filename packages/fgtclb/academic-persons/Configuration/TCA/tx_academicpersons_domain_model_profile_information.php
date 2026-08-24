@@ -291,7 +291,7 @@ $tcaConfiguration = [
 // @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
 ArrayUtility::mergeRecursiveWithOverrule(
     $tcaConfiguration,
-    GeneralUtility::makeInstance(AcademicPersonsSettings::class)->getValidationTcaTableConfig('profileInformation'),
+    GeneralUtility::makeInstance(AcademicPersonsSettings::class)->getDocumentValidationTcaTypesConfig(),
 );
 
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);

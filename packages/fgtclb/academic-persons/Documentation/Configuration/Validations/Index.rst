@@ -5,235 +5,171 @@
 Validation settings
 ===================
 
-:file:`Configuration/AcademicPersons/Settings.yaml` describes, per record type
-and per field, whether a field is **required**, **read only** or **disabled**.
+Validation is declared on a field in :yaml:`profile`, :yaml:`special` or
+:yaml:`contractContact`, or below one :yaml:`documentSections` entry. There is
+no global validation registry and no fallback to a sibling section.
 
-One file drives **both editing contexts**:
+The same normalized metadata supplies TCA overrides, Fluid input metadata and
+server-side Extbase validation. See :ref:`configuration-sections` for the full
+schema.
 
-*   the TYPO3 backend record editor (FormEngine), through generated TCA, and
-*   the frontend editing forms of `EXT:academic_persons_edit
-    <https://extensions.typo3.org/extension/academic_persons_edit>`__.
-
-This is why the file ships with :guilabel:`academic_persons`, which owns the
-records and their TCA, and not with the editing extension. The backend half
-applies even when the editing extension is not installed.
-
-..  attention::
-    The syntax of this file is still considered experimental and may change in
-    a future release.
-
-Where the sets live
-===================
-
-Six sets exist, one per editable record type. The set name selects the record
-type, the keys below it are **property names** in camel case, and each property
-carries a list of flags:
+Profile validation
+==================
 
 ..  code-block:: yaml
 
-    validations:
-      profile:
-        firstName:
-          - disabled
-        website:
-          - required
+    profile:
+      emailAddress:
+        section: information
+        fieldType: input
+        renderType: email
+        validators:
+          - email
 
-The six set names, and the records they configure:
+The inline JSON endpoint accepts only writable configured Profile properties.
+Validation is submission-aware: only a property sent in the current request or
+registered as an explicit override is validated. A required sibling omitted by
+a one-field AJAX update therefore cannot reject that request. An override is
+validated with its submitted value rather than the persisted value.
+
+Direct special properties, currently ``skipSync``, use the validation attached
+to their :yaml:`special` entry. Composite special components such as
+``special.title`` reuse their listed regular profile fields and do not create a
+second persisted property.
+
+Profile contacts and contract contacts
+======================================
+
+The similarly named contact values are intentionally isolated:
+
+*   ``profile.emailAddress`` and ``profile.phoneNumber`` validate scalar values
+    stored on :sql:`tx_academicpersons_domain_model_profile`. Their publish
+    flags control output in the public detail profile.
+*   :yaml:`contractContact.emailAddress` maps to the ``email`` property of an
+    Email record below a Contract. Phone and physical-address records follow
+    the same pattern.
+
+..  code-block:: yaml
+
+    contractContact:
+      emailAddress:
+        section: emailAddresses
+        propertyName: email
+        fieldName: email
+        fieldType: input
+        renderType: email
+        validators:
+          - required
+          - email
+      emailAddressType:
+        section: emailAddresses
+        propertyName: type
+        fieldName: type
+        fieldType: select
+        renderType: select
+
+Contract-contact validators select exactly ``physicalAddresses``,
+``emailAddresses`` or ``phoneNumbers``. A rule from one section is never used
+for another contact record and is never merged into direct Profile validation.
+Type-field read-only/disabled rules are included in controller, validator,
+factory and TCA validation sets as well.
+
+Document validation
+===================
+
+Document validators belong to their containing section:
+
+..  code-block:: yaml
+
+    documentSections:
+      publications:
+        label: "LLL:EXT:site_package/Resources/Private/Language/locallang.xlf:profile.publications"
+        type: publication
+        fieldName: publications
+        validators:
+          title:
+            - required
+          link:
+            - url
+      lectures:
+        label: "LLL:EXT:site_package/Resources/Private/Language/locallang.xlf:profile.lectures"
+        type: lecture
+        fieldName: lectures
+        validators:
+          title:
+            - readonly
+
+The record type selects exactly one document section. FormEngine receives the
+same isolation through type-specific ``columnsOverrides``.
+
+Document field aliases
+----------------------
 
 ..  list-table::
     :header-rows: 1
 
-    *   -   Set
-        -   Record
-    *   -   :yaml:`profile`
-        -   Profile
-    *   -   :yaml:`contract`
-        -   Contract
-    *   -   :yaml:`emailAddress`
-        -   Email address
-    *   -   :yaml:`phoneNumber`
-        -   Phone number
-    *   -   :yaml:`physicalAddress`
-        -   Physical address
-    *   -   :yaml:`profileInformation`
-        -   Profile information
-
-A property that is not listed is unconfigured: it is editable, not required, and
-no validator runs for it.
+    *   - YAML key
+        - DTO property
+        - Database field
+    *   - :yaml:`from`
+        - ``yearStart``
+        - :sql:`year_start`
+    *   - :yaml:`to`
+        - ``yearEnd``
+        - :sql:`year_end`
+    *   - :yaml:`description`
+        - ``bodytext``
+        - :sql:`bodytext`
 
 Available flags
 ===============
 
-Flag names are matched case insensitively. Anything not listed here is ignored.
+Flag names are case-insensitive. Unknown flags remain metadata but add no
+built-in behavior.
 
 ..  list-table::
     :header-rows: 1
 
-    *   -   Flag
-        -   Effect
-    *   -   :yaml:`required`
-        -   The field must not be empty. Adds a *not empty* validation in the
-            frontend and marks the field required in the backend.
-    *   -   :yaml:`disabled`
-        -   The field must not be edited at all. See the note below.
-    *   -   :yaml:`readonly`
-        -   The field is shown but cannot be written.
-    *   -   :yaml:`email`
-        -   The value must be a valid email address, and the field is rendered
-            as an email input.
-    *   -   :yaml:`number`
-        -   The field is rendered as a number input. No additional server side
-            validation is performed.
+    *   - Flag
+        - Effect
+    *   - :yaml:`required`
+        - Adds TYPO3's ``NotEmptyValidator`` and required input/TCA metadata.
+    *   - :yaml:`readonly`
+        - Shows the value but prevents frontend and backend writes.
+    *   - :yaml:`disabled`
+        - Disables frontend editing and implies read-only TCA metadata.
+    *   - :yaml:`email`
+        - Adds ``EmailAddressValidator`` and email input metadata.
+    *   - :yaml:`url`
+        - Adds ``UrlValidator`` and URL input metadata.
+    *   - :yaml:`number`
+        - Selects numeric input/TCA metadata.
+    *   - :yaml:`tel`
+        - Selects telephone input metadata; no format-specific validator is
+          added.
+    *   - :yaml:`date`
+        - Selects date input metadata. Year values remain integer-backed.
+    *   - :yaml:`textarea`
+        - Selects multiline input metadata and TCA's text type.
+    *   - :yaml:`html`
+        - Selects multiline metadata. Profile fields rendered as CKEditor are
+          sanitized before persistence.
 
-..  note::
-    :yaml:`disabled` and :yaml:`readonly` both **cancel** :yaml:`required`. A
-    field that cannot be edited cannot be demanded from the editor, so combining
-    them has no effect — the field is simply locked.
+:yaml:`readonly` and :yaml:`disabled` cancel :yaml:`required`; a field which
+cannot be edited is never demanded from the editor.
 
-    :yaml:`disabled` additionally implies :yaml:`readonly`. FormEngine has no
-    equivalent of the HTML :html:`disabled` attribute, so a disabled field is
-    presented as read only in the backend.
+Shipped defaults
+================
 
-..  _configuration-validations-defaults:
+``firstName``, ``middleName`` and ``lastName`` are read only because they are
+normally synchronized from the frontend user. The direct public profile email
+and telephone are optional and both publication switches default to false.
+Contract email, phone and the required physical-address parts keep their own
+section-local requirements. The contracts document section is read only; every
+other document section owns its rules independently.
 
-Fields that are locked by default
-=================================
+Overrides
+=========
 
-Three profile fields ship as :yaml:`disabled`:
-
-..  code-block:: yaml
-
-    validations:
-      profile:
-        firstName:
-          - disabled
-          - required
-        middleName:
-          - disabled
-        lastName:
-          - disabled
-
-This is intentional. Profile names are usually owned by the connected frontend
-user record — commonly fed from a directory service such as LDAP or Active
-Directory, and synchronised into the profile — so they must not be overwritten
-from an editing form.
-
-The consequences, which surprise people who did not expect them:
-
-*   :guilabel:`First name`, :guilabel:`Middle name` and :guilabel:`Last name`
-    are **read only in the backend** record editor, for every backend user.
-*   The same three fields are rendered disabled in the frontend editing form,
-    and a value submitted for them is discarded on the server.
-
-The :yaml:`required` entry on :yaml:`firstName` has no effect, because
-:yaml:`disabled` cancels it.
-
-If the profile names are maintained in TYPO3 rather than synchronised from
-elsewhere, remove those entries as described below.
-
-Effects in the TYPO3 backend
-============================
-
-The settings are merged into the TCA of the matching table, so a locked field is
-read only in the record editor and a required field is marked as such:
-
-..  list-table::
-    :header-rows: 1
-
-    *   -   Set
-        -   Table
-    *   -   :yaml:`profile`
-        -   :sql:`tx_academicpersons_domain_model_profile`
-    *   -   :yaml:`contract`
-        -   :sql:`tx_academicpersons_domain_model_contract`
-    *   -   :yaml:`emailAddress`
-        -   :sql:`tx_academicpersons_domain_model_email`
-    *   -   :yaml:`phoneNumber`
-        -   :sql:`tx_academicpersons_domain_model_phone_number`
-    *   -   :yaml:`physicalAddress`
-        -   :sql:`tx_academicpersons_domain_model_address`
-    *   -   :yaml:`profileInformation`
-        -   :sql:`tx_academicpersons_domain_model_profile_information`
-
-The property name is translated to the database column automatically:
-:yaml:`firstName` addresses :sql:`first_name`.
-
-Effects in the frontend editing plugin
-======================================
-
-When `EXT:academic_persons_edit
-<https://extensions.typo3.org/extension/academic_persons_edit>`__ is installed,
-the same configuration is used three times:
-
-#.  The form field is rendered with the matching :html:`disabled`,
-    :html:`readonly` and :html:`required` attributes.
-#.  :yaml:`required` and :yaml:`email` add server side validation of the
-    submitted form.
-#.  A :yaml:`disabled` or :yaml:`readonly` property is **never written** to the
-    record, whatever the request contains. This is deliberate: it protects
-    already stored data, and it is what prevents a locked field from being
-    emptied when a form is submitted.
-
-..  _configuration-validations-override:
-
-Overriding the settings
-=======================
-
-Settings are collected from **all installed extensions**. Every package that
-contains :file:`Configuration/AcademicPersons/Settings.yaml` contributes, and
-the package loaded last wins.
-
-To change them for an installation:
-
-#.  Add :file:`Configuration/AcademicPersons/Settings.yaml` to your site
-    package.
-#.  Make the site package **depend on** :guilabel:`academic_persons` in its
-    :file:`composer.json` or :file:`ext_emconf.php`, so that it is loaded after
-    it.
-#.  Repeat the **complete** :yaml:`validations` block, see the warning below.
-#.  Flush the TYPO3 caches.
-
-..  warning::
-    The files are merged on the top level only. :yaml:`validations` is a
-    top-level key, so a site package that defines it replaces **all six sets**
-    at once — the sets it does not repeat are lost, not inherited.
-
-    Copy the whole :yaml:`validations` block from
-    :file:`EXT:academic_persons/Configuration/AcademicPersons/Settings.yaml`
-    and edit the copy. There is no syntax for removing a single flag from a
-    single field.
-
-Example — making the profile names editable again, in the backend and in the
-frontend editing form. The other five sets are repeated unchanged and are
-shortened here for readability:
-
-..  code-block:: yaml
-
-    validations:
-      profile:
-        # The three name fields are no longer listed and are therefore editable.
-        website:
-          - required
-      contract:
-        position:
-          - required
-      emailAddress:
-        email:
-          - required
-          - email
-      phoneNumber:
-        phoneNumber:
-          - required
-      physicalAddress:
-        street:
-          - required
-      profileInformation:
-        title:
-          - required
-
-..  note::
-    Because both editing contexts read the same configuration, an override
-    always changes them together. Unlocking the profile names for the frontend
-    editing form also makes those columns writable in the backend record editor.
-
-There is no TypoScript and no site set equivalent for these settings.
+A site package overriding one of the four top-level maps must repeat that
+complete map. Flush TYPO3 caches after changing settings.

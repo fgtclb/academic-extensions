@@ -5,26 +5,30 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Controller;
 
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
+use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersonsEdit\Controller\InlineProfileController;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFormDataFactoryInterface;
 use FGTCLB\AcademicPersonsEdit\Domain\Parser\ProfileUpdatePayloadParser;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
-use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileDocumentSectionProvider;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileSectionProvider;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ResponseInterface;
 use ReflectionProperty;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Http\Stream;
-use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
-use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 
 final class InlineProfileControllerTest extends UnitTestCase
 {
@@ -35,7 +39,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             $this->createRequest('GET')
         );
 
-        $response = $subject->updateAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->updateAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -57,7 +63,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             )
         );
 
-        $response = $subject->updateAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->updateAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -84,7 +92,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             )
         );
 
-        $response = $subject->updateAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->updateAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -112,7 +122,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             )
         );
 
-        $response = $subject->updateAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->updateAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -131,7 +143,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             $this->createRequest('GET')
         );
 
-        $response = $subject->updateSkipSyncAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->updateSkipSyncAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -159,7 +173,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             )
         );
 
-        $response = $subject->updateSkipSyncAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->updateSkipSyncAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -181,7 +197,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             )
         );
 
-        $response = $subject->updateSkipSyncAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->updateSkipSyncAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -200,7 +218,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             $this->createRequest('GET')
         );
 
-        $response = $subject->deleteImageAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->deleteImageAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -222,7 +242,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             )
         );
 
-        $response = $subject->deleteImageAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->deleteImageAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -250,7 +272,9 @@ final class InlineProfileControllerTest extends UnitTestCase
             )
         );
 
-        $response = $subject->deleteImageAction();
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->deleteImageAction(),
+        );
 
         $this->assertJsonResponse(
             $response,
@@ -266,7 +290,12 @@ final class InlineProfileControllerTest extends UnitTestCase
     {
         $profileRepository = $this->createStub(ProfileRepository::class);
         $profileFormDataFactory = $this->createStub(ProfileFormDataFactoryInterface::class);
-        $profileGenderOptionsService = new ProfileGenderOptionsService();
+        $academicPersonsSettings = new AcademicPersonsSettings(
+            profileSections: [],
+            documentSections: [],
+            raw: [],
+        );
+        $profileFieldOptionsService = new ProfileFieldOptionsService($academicPersonsSettings);
 
         $subject = new InlineProfileController(
             $this->createStub(ProfileFactory::class),
@@ -280,10 +309,15 @@ final class InlineProfileControllerTest extends UnitTestCase
             new ProfileUpdateValidationService(
                 $profileFormDataFactory,
                 new ProfileFormDataValidator(),
-                $profileGenderOptionsService,
+                $profileFieldOptionsService,
                 $this->createStub(ProfileRichTextSanitizerInterface::class),
+                $academicPersonsSettings,
             ),
-            $profileGenderOptionsService,
+            $profileFieldOptionsService,
+            new ProfileSectionProvider($academicPersonsSettings),
+            new ProfileDocumentSectionProvider(
+                $academicPersonsSettings,
+            ),
         );
 
         $requestProperty = new ReflectionProperty(
@@ -313,6 +347,19 @@ final class InlineProfileControllerTest extends UnitTestCase
             );
 
         return new Request($serverRequest);
+    }
+
+    /**
+     * @param callable(): ResponseInterface $action
+     */
+    private function getPropagatedResponse(callable $action): ResponseInterface
+    {
+        try {
+            $action();
+        } catch (PropagateResponseException $exception) {
+            return $exception->getResponse();
+        }
+        $this->fail('The JSON error response was not propagated to the middleware stack.');
     }
 
     /**

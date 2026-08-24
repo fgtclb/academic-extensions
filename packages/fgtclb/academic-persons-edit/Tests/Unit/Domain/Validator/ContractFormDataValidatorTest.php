@@ -24,23 +24,25 @@ use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * Validates the argument of `ContractController::createAction()` and
- * `updateAction()` against the validation set `contract`. `position` is the only
- * property the shipped `Settings.yaml` requires.
+ * Contract validation is read exclusively from the `contracts` document section.
  */
 final class ContractFormDataValidatorTest extends UnitTestCase
 {
-    private const VALIDATION_SET = 'contract';
+    private const VALIDATION_SET = 'contracts';
 
     /**
-     * The set identifier is the contract with `Settings.yaml`; an identifier that
-     * does not match a registered set disables contract validation silently.
+     * Contract rules are resolved only from the `contracts` document section.
      */
     #[Test]
-    public function theValidationSetContractIsProcessed(): void
+    public function theContractsDocumentSectionIsProcessed(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['position' => [RecordingValidator::class]]),
+            ValidationSettings::forDocumentSection(
+                self::VALIDATION_SET,
+                'contracts',
+                ['position' => [RecordingValidator::class]],
+                true,
+            ),
             new ContractFormData(position: 'Professor')
         );
 
@@ -48,10 +50,14 @@ final class ContractFormDataValidatorTest extends UnitTestCase
     }
 
     #[Test]
-    public function aValidationSetRegisteredUnderAnotherIdentifierIsIgnored(): void
+    public function anotherDocumentSectionIsIgnored(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier('contracts', ['position' => [RecordingValidator::class]]),
+            ValidationSettings::forDocumentSection(
+                'employmentContracts',
+                'contract',
+                ['position' => [RecordingValidator::class]],
+            ),
             new ContractFormData(position: 'Professor')
         );
 
@@ -69,7 +75,12 @@ final class ContractFormDataValidatorTest extends UnitTestCase
     public function aConfiguredPropertyResolvesToTheSubmittedValue(string $property, string $expectedDescription): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, [$property => [RecordingValidator::class]]),
+            ValidationSettings::forDocumentSection(
+                self::VALIDATION_SET,
+                'contracts',
+                [$property => [RecordingValidator::class]],
+                true,
+            ),
             new ContractFormData(
                 validFrom: new \DateTime('2024-01-01'),
                 position: 'Professor',
@@ -88,7 +99,8 @@ final class ContractFormDataValidatorTest extends UnitTestCase
     public static function configuredProperties(): array
     {
         return [
-            // Required in the shipped Configuration/AcademicPersons/Settings.yaml.
+            // The shipped section is read only and has no validators; these properties
+            // remain supported for project-specific section validators.
             'position' => ['position', 'string(Professor)'],
             // Readable, but not configured by default.
             'room' => ['room', 'string(B 2.14)'],
@@ -111,7 +123,9 @@ final class ContractFormDataValidatorTest extends UnitTestCase
     public function anythingButContractFormDataIsRejected(mixed $subject): void
     {
         $validator = new ContractFormDataValidator();
-        $validator->injectAcademicPersonsSettings(ValidationSettings::forIdentifier(self::VALIDATION_SET, []));
+        $validator->injectAcademicPersonsSettings(
+            ValidationSettings::forDocumentSection(self::VALIDATION_SET, 'contracts', [], true),
+        );
 
         $this->expectException(UnsuitableValidatorException::class);
         $this->expectExceptionCode(1297418975);

@@ -18,9 +18,11 @@ use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileDocumentSectionProvider;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
-use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileSectionProvider;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -46,7 +48,9 @@ final class InlineProfileController extends AbstractActionController
         private readonly ResourceFactory $resourceFactory,
         private readonly ProfileUpdateRequestService $profileUpdateRequestService,
         private readonly ProfileUpdateValidationService $profileUpdateValidationService,
-        private readonly ProfileGenderOptionsService $profileGenderOptionsService,
+        private readonly ProfileFieldOptionsService $profileFieldOptionsService,
+        private readonly ProfileSectionProvider $profileSectionProvider,
+        private readonly ProfileDocumentSectionProvider $profileDocumentSectionProvider,
     ) {}
 
     public function initializeAction(): void
@@ -76,7 +80,6 @@ final class InlineProfileController extends AbstractActionController
                 1776760202,
             );
         }
-
         return parent::errorAction();
     }
 
@@ -92,8 +95,12 @@ final class InlineProfileController extends AbstractActionController
             'data' => $this->getCurrentContentObjectRenderer()?->data,
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
             'profile' => $profile,
-            'genderOptions' => $this->profileGenderOptionsService->getOptions(),
-            'validations' => $this->academicPersonsSettings->getValidationSetWithFallback('profile')->validations,
+            'profileSections' => $this->profileSectionProvider->getSections(),
+            'specialFields' => $this->profileSectionProvider->getSpecialFields(),
+            'profileFieldOptions' => $this->profileFieldOptionsService->getOptionsByField(),
+            'documentSections' => $profile !== null
+                ? $this->profileDocumentSectionProvider->getSections($profile)
+                : [],
             'imageAllowedMimeTypes' => (string)(
                 $this->settings['editForm']['profileImage']['validation']['allowedMimeTypes']
                 ?? 'image/jpeg,image/png,image/webp'
@@ -130,7 +137,7 @@ final class InlineProfileController extends AbstractActionController
             $this->request
         );
         if (!$requestResult->isValid()) {
-            return $this->jsonError(
+            $this->throwJsonError(
                 $requestResult->getError() ?? 'invalid_request',
                 $requestResult->getStatusCode(),
             );
@@ -138,7 +145,7 @@ final class InlineProfileController extends AbstractActionController
         $payload = $requestResult->getPayload();
         $profile = $requestResult->getProfile();
         if ($payload === null || $profile === null) {
-            return $this->jsonError('internal_server_error', 500);
+            $this->throwJsonError('internal_server_error', 500);
         }
         try {
             $pluginControllerActionContext = new PluginControllerActionContext(
@@ -161,7 +168,7 @@ final class InlineProfileController extends AbstractActionController
                         $errors[$propertyPath][] = $propertyError->getMessage();
                     }
                 }
-                return $this->jsonError(
+                $this->throwJsonError(
                     'validation_failed',
                     422,
                     'The submitted profile data is invalid.',
@@ -169,7 +176,7 @@ final class InlineProfileController extends AbstractActionController
                 );
             }
             $updatedProfile = $this->profileFactory->updateFromFormData(
-                $this->academicPersonsSettings->getValidationSetWithFallback('profile'),
+                $this->academicPersonsSettings->getProfileUpdateValidationSet(),
                 $profile,
                 $profileFormData,
             );
@@ -183,8 +190,10 @@ final class InlineProfileController extends AbstractActionController
                     $payload,
                 ),
             ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
         } catch (UnexpectedValueException $exception) {
-            return $this->jsonError(
+            $this->throwJsonError(
                 'invalid_profile_data',
                 422,
                 $exception->getMessage(),
@@ -195,7 +204,7 @@ final class InlineProfileController extends AbstractActionController
                 ->error('Updating the inline profile failed.', [
                     'exception' => $exception,
                 ]);
-            return $this->jsonError(
+            $this->throwJsonError(
                 'internal_server_error',
                 500,
                 'The profile could not be updated.',
@@ -215,7 +224,7 @@ final class InlineProfileController extends AbstractActionController
             $this->request,
         );
         if (!$requestResult->isValid()) {
-            return $this->jsonError(
+            $this->throwJsonError(
                 $requestResult->getError() ?? 'invalid_request',
                 $requestResult->getStatusCode(),
             );
@@ -224,7 +233,7 @@ final class InlineProfileController extends AbstractActionController
         $payload = $requestResult->getPayload();
         $profile = $requestResult->getProfile();
         if ($payload === null || $profile === null) {
-            return $this->jsonError('internal_server_error', 500);
+            $this->throwJsonError('internal_server_error', 500);
         }
 
         $data = $payload->getData();
@@ -232,7 +241,7 @@ final class InlineProfileController extends AbstractActionController
             array_keys($data) !== ['skipSync']
             || !is_bool($data['skipSync'])
         ) {
-            return $this->jsonError(
+            $this->throwJsonError(
                 'invalid_payload',
                 400,
                 'The payload must contain exactly one boolean skipSync value.',
@@ -259,7 +268,7 @@ final class InlineProfileController extends AbstractActionController
                         $errors[$propertyPath][] = $propertyError->getMessage();
                     }
                 }
-                return $this->jsonError(
+                $this->throwJsonError(
                     'validation_failed',
                     422,
                     'The submitted synchronization setting is invalid.',
@@ -268,7 +277,7 @@ final class InlineProfileController extends AbstractActionController
             }
 
             $updatedProfile = $this->profileFactory->updateFromFormData(
-                $this->academicPersonsSettings->getValidationSetWithFallback('profile'),
+                $this->academicPersonsSettings->getProfileUpdateValidationSet(),
                 $profile,
                 $profileFormData,
             );
@@ -280,6 +289,14 @@ final class InlineProfileController extends AbstractActionController
                 'profile' => $updatedProfile->getUid(),
                 'skipSync' => $updatedProfile->getSkipSync(),
             ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (UnexpectedValueException $exception) {
+            $this->throwJsonError(
+                'invalid_profile_data',
+                422,
+                $exception->getMessage(),
+            );
         } catch (Throwable $exception) {
             GeneralUtility::makeInstance(LogManager::class)
                 ->getLogger(self::class)
@@ -287,7 +304,7 @@ final class InlineProfileController extends AbstractActionController
                     'exception' => $exception,
                 ]);
 
-            return $this->jsonError(
+            $this->throwJsonError(
                 'internal_server_error',
                 500,
                 'The synchronization setting could not be updated.',
@@ -317,6 +334,21 @@ final class InlineProfileController extends AbstractActionController
         return new JsonResponse($body, $statusCode);
     }
 
+    /**
+     * @param array<string, list<string>> $errors
+     */
+    private function throwJsonError(
+        string $error,
+        int $statusCode,
+        ?string $message = null,
+        array $errors = [],
+    ): never {
+        throw new PropagateResponseException(
+            $this->jsonError($error, $statusCode, $message, $errors),
+            1776760205,
+        );
+    }
+
 
     // =================================================================================================================
     //  Handle entity translation
@@ -336,13 +368,18 @@ final class InlineProfileController extends AbstractActionController
     // =================================================================================================================
     public function initializeUploadImageAction(): void
     {
+        if (!$this->isSpecialFieldWritable('image')) {
+            throw new PropagateResponseException(
+                $this->jsonError('image_not_editable', 403),
+                1776760206,
+            );
+        }
         $profileArgument = $this->request->hasArgument('profile')
             ? $this->request->getArgument('profile')
             : null;
         $profileUid = is_array($profileArgument)
             ? (int)($profileArgument['__identity'] ?? 0)
             : (int)$profileArgument;
-
         // This check happens before Extbase maps the upload. An unauthorized
         // request therefore cannot create an unreferenced file in FAL.
         if ($this->profileUpdateRequestService->findEditableProfile($profileUid) === null) {
@@ -351,7 +388,6 @@ final class InlineProfileController extends AbstractActionController
                 1776760201,
             );
         }
-
         $this->configureImageFileUpload();
     }
 
@@ -369,9 +405,7 @@ final class InlineProfileController extends AbstractActionController
                     1776760203,
                 );
             }
-
             $this->persistUploadedProfileImage($profile, $replacedImageFile);
-
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
@@ -385,7 +419,6 @@ final class InlineProfileController extends AbstractActionController
                 ->error('Uploading the inline profile image failed.', [
                     'exception' => $exception,
                 ]);
-
             throw new PropagateResponseException(
                 $this->jsonError(
                     'internal_server_error',
@@ -403,28 +436,28 @@ final class InlineProfileController extends AbstractActionController
             $this->request,
         );
         if (!$requestResult->isValid()) {
-            return $this->jsonError(
+            $this->throwJsonError(
                 $requestResult->getError() ?? 'invalid_request',
                 $requestResult->getStatusCode(),
             );
         }
-
         $payload = $requestResult->getPayload();
         $profile = $requestResult->getProfile();
         if ($payload === null || $profile === null) {
-            return $this->jsonError('internal_server_error', 500);
+            $this->throwJsonError('internal_server_error', 500);
+        }
+        if (!$this->isSpecialFieldWritable('image')) {
+            $this->throwJsonError('image_not_editable', 403);
         }
         if ($payload->getData() !== []) {
-            return $this->jsonError(
+            $this->throwJsonError(
                 'invalid_payload',
                 400,
                 'The image deletion payload must not contain profile fields.',
             );
         }
-
         try {
             $deleted = $this->deleteProfileImage($profile);
-
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
@@ -437,8 +470,7 @@ final class InlineProfileController extends AbstractActionController
                 ->error('Deleting the inline profile image failed.', [
                     'exception' => $exception,
                 ]);
-
-            return $this->jsonError(
+            $this->throwJsonError(
                 'internal_server_error',
                 500,
                 'The profile image could not be deleted.',
@@ -452,16 +484,22 @@ final class InlineProfileController extends AbstractActionController
         if ($submittedImageFile === null) {
             return false;
         }
-
         return $persistedImageFile === null
             || $submittedImageFile->getUid() !== $persistedImageFile->getUid();
+    }
+
+    private function isSpecialFieldWritable(string $identifier): bool
+    {
+        $field = $this->academicPersonsSettings->getSpecialField($identifier);
+        return $field !== null
+            && !$field->validation->readOnly
+            && !$field->validation->disabled;
     }
 
     private function persistUploadedProfileImage(Profile $profile, ?File $replacedImageFile): void
     {
         $this->profileRepository->update($profile);
         $this->persistenceManager->persistAll();
-
         $this->deleteReplacedProfileImageFile($replacedImageFile, $profile);
     }
 
@@ -471,7 +509,6 @@ final class InlineProfileController extends AbstractActionController
         if ($image === null) {
             return false;
         }
-
         $imageFile = $image->getOriginalResource()->getOriginalFile();
         // The relation is dropped first, for two reasons: deleting the file alone leaves
         // the reference count on the profile record pointing at a reference that no longer
@@ -481,11 +518,9 @@ final class InlineProfileController extends AbstractActionController
         $this->profileRepository->update($profile);
         $this->persistenceManager->remove($image);
         $this->persistenceManager->persistAll();
-
         if ($this->countFileReferences($imageFile) === 0) {
             $imageFile->getStorage()->deleteFile($imageFile);
         }
-
         return true;
     }
 
@@ -500,7 +535,6 @@ final class InlineProfileController extends AbstractActionController
     private function configureImageFileUpload(): void
     {
         $profileArgument = $this->arguments->getArgument('profile');
-
         $fileUploadConfiguration = (new FileUploadConfiguration('image'))
             // The profile holds a single image, but the limit is validated against the already
             // referenced file plus the upload. Allowing two therefore means "replace", which is
@@ -512,13 +546,11 @@ final class InlineProfileController extends AbstractActionController
             ->setUploadFolder(
                 (string) ($this->settings['editForm']['profileImage']['targetFolder'] ?? '1:/user_upload/')
             );
-
         $fileSizeValidator = GeneralUtility::makeInstance(FileSizeValidator::class);
         $fileSizeValidator->setOptions([
             'maximum' => (string) ($this->settings['editForm']['profileImage']['validation']['maxFileSize'] ?? PHP_INT_MAX . 'B'),
         ]);
         $fileUploadConfiguration->addValidator($fileSizeValidator);
-
         // An empty list means "no mime type restriction". `MimeTypeValidator` throws
         // for an empty `allowedMimeTypes` option, so it is only added when configured.
         $allowedMimeTypes = GeneralUtility::trimExplode(
@@ -531,7 +563,6 @@ final class InlineProfileController extends AbstractActionController
             $mimeTypeValidator->setOptions(['allowedMimeTypes' => $allowedMimeTypes]);
             $fileUploadConfiguration->addValidator($mimeTypeValidator);
         }
-
         $profileArgument->getFileHandlingServiceConfiguration()
             ->addFileUploadConfiguration($fileUploadConfiguration);
         // The upload is handled by the file handling service, not by the property mapper.
@@ -550,7 +581,6 @@ final class InlineProfileController extends AbstractActionController
         if ($profileUid === null) {
             return null;
         }
-
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file_reference');
         $queryBuilder->getRestrictions()
@@ -579,7 +609,6 @@ final class InlineProfileController extends AbstractActionController
         if ($fileUid <= 0) {
             return null;
         }
-
         try {
             return $this->resourceFactory->getFileObject($fileUid);
         } catch (FileDoesNotExistException) {

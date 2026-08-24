@@ -50,31 +50,42 @@
                     <div class="row gx-lg-5 gy-5 align-items-stretch">
                         <div class="col-12 col-lg-4">
                             <div class="sticky-top" data-ie-sticky-image>
-                                <f:render
-                                    partial="InlineProfile/Image/Card"
-                                    arguments="{profile: profile}" />
+                                <f:if condition="{specialFields.title} || {specialFields.image}">
+                                    <f:render
+                                        partial="InlineProfile/Image/Card"
+                                        arguments="{profile: profile, title: specialFields.title, image: specialFields.image}" />
+                                </f:if>
                             </div>
                         </div>
                         <div class="col-12 col-lg-8">
-                            <f:render
-                                partial="InlineProfile/Forms/Profile"
-                                arguments="{profile: profile, validations: validations, genderOptions: genderOptions}" />
+                            <f:if condition="{profileSections.information}">
+                                <f:render
+                                    partial="InlineProfile/Forms/Profile"
+                                    arguments="{profile: profile, section: profileSections.information, specialFields: specialFields, fieldOptions: profileFieldOptions}" />
+                            </f:if>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12">
                             <div class="mt-5">
+                                <f:if condition="{profileSections.aboutme}">
+                                    <f:render
+                                        partial="InlineProfile/Forms/Content"
+                                        arguments="{profile: profile, section: profileSections.aboutme, fieldOptions: profileFieldOptions}" />
+                                </f:if>
                                 <f:render
-                                    partial="InlineProfile/Forms/Content"
-                                    arguments="{profile: profile, validations: validations}" />
+                                    partial="InlineProfile/Sections/Documents"
+                                    arguments="{profile: profile, sections: documentSections}" />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <f:render
-                    partial="InlineProfile/Image/Modal"
-                    arguments="{profile: profile, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
+                <f:if condition="{specialFields.image.writable}">
+                    <f:render
+                        partial="InlineProfile/Image/Modal"
+                        arguments="{profile: profile, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
+                </f:if>
                 <f:render partial="InlineProfile/StatusToast" />
                 <f:render partial="InlineProfile/ButtonTemplates" />
             </div>

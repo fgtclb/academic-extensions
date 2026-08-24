@@ -201,6 +201,18 @@
       <trans-unit id="profile.lastName.placeholder">
         <source>Doe</source>
       </trans-unit>
+      <trans-unit id="profile.emailAddress.label">
+        <source>Public email address</source>
+      </trans-unit>
+      <trans-unit id="profile.publishEmailAddress.label">
+        <source>Publish email address</source>
+      </trans-unit>
+      <trans-unit id="profile.phoneNumber.label">
+        <source>Public phone number</source>
+      </trans-unit>
+      <trans-unit id="profile.publishPhoneNumber.label">
+        <source>Publish phone number</source>
+      </trans-unit>
       <trans-unit id="profile.website.label">
         <source>Website</source>
       </trans-unit>
@@ -451,8 +463,56 @@
       <trans-unit id="inlineProfile.about.description">
         <source>Description:</source>
       </trans-unit>
+      <trans-unit id="inlineProfile.documents.start">
+        <source>Start</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.from">
+        <source>From</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.to">
+        <source>To</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.year">
+        <source>Year</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.title">
+        <source>Title</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.position">
+        <source>Position</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty">
+        <source>No entries have been added yet.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.contracts">
+        <source>No contracts have been added yet.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.cooperation">
+        <source>No cooperation entries have been added yet.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.lectures">
+        <source>No lectures have been added yet.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.memberships">
+        <source>No memberships have been added yet.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.pressMedia">
+        <source>No press releases have been added yet.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.vita">
+        <source>No vita entries have been added yet.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.publications">
+        <source>No publications have been added yet.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.empty.scientificResearch">
+        <source>No scientific research entries have been added yet.</source>
+      </trans-unit>
       <trans-unit id="inlineProfile.visibility.private">
         <source>Private</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.visibility.public">
+        <source>Public</source>
       </trans-unit>
       <trans-unit id="inlineProfile.field.empty">
         <source>Not specified</source>
