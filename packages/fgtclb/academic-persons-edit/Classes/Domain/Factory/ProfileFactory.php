@@ -22,10 +22,6 @@ class ProfileFactory
         $profile = $this->setFirstName($validationSet, $profile, $form);
         $profile = $this->setMiddleName($validationSet, $profile, $form);
         $profile = $this->setLastName($validationSet, $profile, $form);
-        $profile = $this->setEmailAddress($validationSet, $profile, $form);
-        $profile = $this->setPublishEmailAddress($validationSet, $profile, $form);
-        $profile = $this->setPhoneNumber($validationSet, $profile, $form);
-        $profile = $this->setPublishPhoneNumber($validationSet, $profile, $form);
         $profile = $this->setWebsite($validationSet, $profile, $form);
         $profile = $this->setWebsiteTitle($validationSet, $profile, $form);
         $profile = $this->setPublicationsLink($validationSet, $profile, $form);
@@ -46,10 +42,6 @@ class ProfileFactory
         $profile = $this->setFirstName($validationSet, $profile, $form);
         $profile = $this->setMiddleName($validationSet, $profile, $form);
         $profile = $this->setLastName($validationSet, $profile, $form);
-        $profile = $this->setEmailAddress($validationSet, $profile, $form);
-        $profile = $this->setPublishEmailAddress($validationSet, $profile, $form);
-        $profile = $this->setPhoneNumber($validationSet, $profile, $form);
-        $profile = $this->setPublishPhoneNumber($validationSet, $profile, $form);
         $profile = $this->setWebsite($validationSet, $profile, $form);
         $profile = $this->setWebsiteTitle($validationSet, $profile, $form);
         $profile = $this->setPublicationsLink($validationSet, $profile, $form);
@@ -121,42 +113,6 @@ class ProfileFactory
         if ($this->mayApplyProperty($validationSet, $form, 'lastName')) {
             $override = $form->getPropertyOverride('lastName');
             $model->setLastName(is_string($override) ? $override : $form->getLastName());
-        }
-        return $model;
-    }
-
-    private function setEmailAddress(ValidationSet $validationSet, ProfileModel $model, ProfileFormData $form): ProfileModel
-    {
-        if ($this->mayApplyProperty($validationSet, $form, 'emailAddress')) {
-            $override = $form->getPropertyOverride('emailAddress');
-            $model->setEmailAddress(is_string($override) ? $override : $form->getEmailAddress());
-        }
-        return $model;
-    }
-
-    private function setPublishEmailAddress(ValidationSet $validationSet, ProfileModel $model, ProfileFormData $form): ProfileModel
-    {
-        if ($this->mayApplyProperty($validationSet, $form, 'publishEmailAddress')) {
-            $override = $form->getPropertyOverride('publishEmailAddress');
-            $model->setPublishEmailAddress(is_bool($override) ? $override : $form->getPublishEmailAddress());
-        }
-        return $model;
-    }
-
-    private function setPhoneNumber(ValidationSet $validationSet, ProfileModel $model, ProfileFormData $form): ProfileModel
-    {
-        if ($this->mayApplyProperty($validationSet, $form, 'phoneNumber')) {
-            $override = $form->getPropertyOverride('phoneNumber');
-            $model->setPhoneNumber(is_string($override) ? $override : $form->getPhoneNumber());
-        }
-        return $model;
-    }
-
-    private function setPublishPhoneNumber(ValidationSet $validationSet, ProfileModel $model, ProfileFormData $form): ProfileModel
-    {
-        if ($this->mayApplyProperty($validationSet, $form, 'publishPhoneNumber')) {
-            $override = $form->getPropertyOverride('publishPhoneNumber');
-            $model->setPublishPhoneNumber(is_bool($override) ? $override : $form->getPublishPhoneNumber());
         }
         return $model;
     }

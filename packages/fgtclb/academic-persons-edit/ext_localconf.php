@@ -177,6 +177,11 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
                 'updateSkipSync',
                 'uploadImage',
                 'deleteImage',
+                'documentForm',
+                'createDocument',
+                'updateDocument',
+                'deleteDocument',
+                'sortDocument',
             ]),
         ],
         [
@@ -186,6 +191,11 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
                 'updateSkipSync',
                 'uploadImage',
                 'deleteImage',
+                'documentForm',
+                'createDocument',
+                'updateDocument',
+                'deleteDocument',
+                'sortDocument',
             ]),
         ],
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT

@@ -1,5 +1,5 @@
 const stickyImageSelector = "[data-ie-sticky-image]";
-const pageHeaderSelector = "#page-header";
+const pageHeaderSelector = "#page-header.navbar-fixed-top";
 
 export const initializeStickyImageOffset = (root) => {
   const stickyImage = root.querySelector(stickyImageSelector);

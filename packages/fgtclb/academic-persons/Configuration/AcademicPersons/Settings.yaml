@@ -212,8 +212,12 @@ contractContact:
 #   marker for the special Contract entity section.
 # - `fieldName` is the exact Profile relation/database field. Collection
 #   relations are plural; underscored names are converted to their getter.
-# - `readonly` is frontend capability metadata and does not replace endpoint
-#   authorization.
+# - `readonly` disables all mutating frontend actions for the section.
+# - `rowFields` selects and orders the values rendered in each compact row.
+#   ProfileInformation supports `from`, `to`, `year`, `title` and
+#   `description`; Contract supports `from`, `to` and `position`.
+# - `actions` selects and orders the available per-row actions. Supported
+#   values are `view`, `down`, `up`, `delete` and `edit`.
 # - `validators` belongs exclusively to records of the containing section.
 # Document validation aliases:
 # - `from` -> DTO `yearStart` -> database field `year_start`
@@ -228,12 +232,27 @@ documentSections:
     type: contracts
     fieldName: contracts
     readonly: true
+    rowFields:
+      - from
+      - position
+    actions:
+      - view
   # All following sections contain ProfileInformation records. Their `type`
   # selects the records and their `fieldName` selects the Profile collection.
   cooperation:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.cooperation.label"
     type: cooperation
     fieldName: cooperation
+    rowFields:
+      - from
+      - to
+      - title
+    actions:
+      - view
+      - down
+      - up
+      - delete
+      - edit
     validators:
       title:
         - required
@@ -247,11 +266,20 @@ documentSections:
         - required
         - date
       description:
-        - textarea
+        - html
   lectures:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.lectures.label"
     type: lecture
     fieldName: lectures
+    rowFields:
+      - year
+      - title
+    actions:
+      - view
+      - down
+      - up
+      - delete
+      - edit
     validators:
       title:
         - required
@@ -267,11 +295,21 @@ documentSections:
         - required
         - date
       description:
-        - textarea
+        - html
   memberships:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.memberships.label"
     type: membership
     fieldName: memberships
+    rowFields:
+      - from
+      - to
+      - title
+    actions:
+      - view
+      - down
+      - up
+      - delete
+      - edit
     validators:
       title:
         - required
@@ -287,11 +325,20 @@ documentSections:
         - required
         - date
       description:
-        - textarea
+        - html
   pressMedia:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.press_media.label"
     type: press_media
     fieldName: press_media
+    rowFields:
+      - year
+      - title
+    actions:
+      - view
+      - down
+      - up
+      - delete
+      - edit
     validators:
       title:
         - required
@@ -307,11 +354,20 @@ documentSections:
         - required
         - date
       description:
-        - textarea
+        - html
   publications:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publications.label"
     type: publication
     fieldName: publications
+    rowFields:
+      - year
+      - title
+    actions:
+      - view
+      - down
+      - up
+      - delete
+      - edit
     validators:
       title:
         - required
@@ -327,11 +383,20 @@ documentSections:
         - required
         - date
       description:
-        - textarea
+        - html
   scientificResearch:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.scientific_research.label"
     type: scientific_research
     fieldName: scientific_research
+    rowFields:
+      - year
+      - title
+    actions:
+      - view
+      - down
+      - up
+      - delete
+      - edit
     validators:
       title:
         - required
@@ -347,11 +412,20 @@ documentSections:
         - required
         - date
       description:
-        - textarea
+        - html
   vita:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.vita.label"
     type: curriculum_vitae
     fieldName: vita
+    rowFields:
+      - from
+      - title
+    actions:
+      - view
+      - down
+      - up
+      - delete
+      - edit
     validators:
       title:
         - required
@@ -367,4 +441,4 @@ documentSections:
         - required
         - date
       description:
-        - textarea
+        - html

@@ -71,7 +71,7 @@ class AcademicPersonsSettingsFactory
      */
     private function academicPersonsSettingsIdentifier(): string
     {
-        return 'AcademicPersons_Settings_SectionSchema_v2';
+        return 'AcademicPersons_Settings_SectionSchema_v3';
     }
 
     /**
@@ -274,6 +274,10 @@ class AcademicPersonsSettingsFactory
             if (!is_array($options)) {
                 continue;
             }
+            $sectionIdentifier = (string)$identifier;
+            $sectionType = (string)($options['type'] ?? '');
+            $contractSection = $sectionIdentifier === 'contracts'
+                || in_array($sectionType, ['contract', 'contracts'], true);
             $validations = [];
             $configuredValidations = is_array($options['validators'] ?? null) ? $options['validators'] : [];
             foreach ($configuredValidations as $fieldIdentifier => $validators) {
@@ -290,19 +294,52 @@ class AcademicPersonsSettingsFactory
                 );
             }
             $section = new DocumentSection(
-                identifier: (string)$identifier,
+                identifier: $sectionIdentifier,
                 label: (string)($options['label'] ?? ''),
-                type: (string)($options['type'] ?? ''),
+                type: $sectionType,
                 fieldName: (string)($options['fieldName'] ?? ''),
                 readOnly: (bool)($options['readonly'] ?? false),
-                validationSet: new ValidationSet(identifier: (string)$identifier, validations: $validations),
+                validationSet: new ValidationSet(identifier: $sectionIdentifier, validations: $validations),
                 position: count($sections),
+                rowFields: $this->normalizeDocumentOptionList(
+                    $options['rowFields'] ?? null,
+                    $contractSection
+                        ? DocumentSection::SUPPORTED_CONTRACT_ROW_FIELDS
+                        : DocumentSection::SUPPORTED_PROFILE_INFORMATION_ROW_FIELDS,
+                ),
+                actions: $this->normalizeDocumentOptionList(
+                    $options['actions'] ?? null,
+                    DocumentSection::SUPPORTED_ACTIONS,
+                ),
             );
             if ($section->isValid()) {
                 $sections[$section->identifier] = $section;
             }
         }
         return $sections;
+    }
+
+    /**
+     * @param mixed $configuredValues
+     * @param list<string> $allowedValues
+     * @return list<string>
+     */
+    private function normalizeDocumentOptionList(mixed $configuredValues, array $allowedValues): array
+    {
+        if (!is_array($configuredValues)) {
+            return [];
+        }
+        $values = [];
+        foreach ($configuredValues as $configuredValue) {
+            if (!is_string($configuredValue)) {
+                continue;
+            }
+            $value = strtolower(trim($configuredValue));
+            if ($value !== '' && in_array($value, $allowedValues, true) && !in_array($value, $values, true)) {
+                $values[] = $value;
+            }
+        }
+        return $values;
     }
 
     /**

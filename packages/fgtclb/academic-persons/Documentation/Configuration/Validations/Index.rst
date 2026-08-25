@@ -85,6 +85,8 @@ Document validators belong to their containing section:
             - required
           link:
             - url
+          description:
+            - html
       lectures:
         label: "LLL:EXT:site_package/Resources/Private/Language/locallang.xlf:profile.lectures"
         type: lecture
@@ -146,8 +148,9 @@ built-in behavior.
     *   - :yaml:`textarea`
         - Selects multiline input metadata and TCA's text type.
     *   - :yaml:`html`
-        - Selects multiline metadata. Profile fields rendered as CKEditor are
-          sanitized before persistence.
+        - Selects multiline rich-text metadata. Profile fields and structured
+          document descriptions rendered as CKEditor are sanitized before
+          persistence.
 
 :yaml:`readonly` and :yaml:`disabled` cancel :yaml:`required`; a field which
 cannot be edited is never demanded from the editor.
@@ -159,7 +162,9 @@ Shipped defaults
 normally synchronized from the frontend user. Contract email, phone and the
 required physical-address parts keep their own section-local requirements. The
 contracts document section is read only; every other document section owns its
-rules independently.
+rules independently. The shipped structured descriptions use :yaml:`html`, so
+their modal control is a full-width CKEditor field rather than a plain
+textarea.
 
 Overrides
 =========

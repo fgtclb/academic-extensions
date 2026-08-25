@@ -23,8 +23,8 @@ Production JavaScript ES-module scope: OK
 Danach müssen alle Test-Suites und Tests erfolgreich sein. Zum Zeitpunkt der Erstellung sind dies:
 
 ```text
-Test Suites: 8 passed, 8 total
-Tests:       60 passed, 60 total
+Test Suites: 9 passed, 9 total
+Tests:       63 passed, 63 total
 ```
 
 Die Anzahl kann steigen, wenn weitere Testfälle ergänzt werden. Entscheidend ist, dass keine Suite und kein Test fehlschlägt.
@@ -87,6 +87,7 @@ Die frühere Option `--experimental-vm-modules` wird nicht mehr verwendet. Eine 
 | --- | --- |
 | `tests/ckeditor.test.js` | CKEditor-Konfiguration, Auflösung der globalen Editor-Instanz, Initialisierung und Polling |
 | `tests/common.test.js` | gemeinsame Selektoren und Hilfsfunktionen, Profil-IDs, Statusmeldungen und JSON-Requests |
+| `tests/documents.test.js` | Modale Formulare mit Datensatztitel, fünf Zeilenaktionen, CRUD-Requests, Sortierung und DOM-Aktualisierung der strukturierten Sections |
 | `tests/fields.test.js` | Feldtypen, Vorschauen, Validierung, Autosave, Abbrechen, Speichern, Gruppenaktionen, „Alle bearbeiten“ und Rich-Text-Initialisierung |
 | `tests/image.test.js` | Bildvorschau, Upload, Löschen, Validierung, Modalzustände und Fehlerbehandlung |
 | `tests/profile.test.js` | Initialisierung der Profil-Komponenten über das Einstiegsmodul |

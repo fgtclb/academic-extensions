@@ -20,33 +20,69 @@
                 class="d-none mt-3"
                 data-ie-field-editor
                 data-ie-for="{elementId}">
-                <label class="form-label fw-semibold" for="{elementId}">
-                    <f:translate
-                        key="profile.{field.identifier}.label"
-                        extensionName="academic_persons_edit" />
-                    <f:if condition="{field.validation.required}">
-                        <abbr title="required">*</abbr>
-                    </f:if>
-                </label>
-                <div
-                    class="d-flex flex-column flex-xl-row gap-2 align-items-start">
-                    <f:render
-                        partial="InlineProfile/Field/Control"
-                        arguments="{
-                            profile: profile,
-                            field: field,
-                            elementId: elementId,
-                            textarea: textarea,
-                            richText: richText,
-                            rows: rows
-                        }" />
-                    <f:if
-                        condition="!{field.validation.disabled} && !{field.validation.readOnly}">
+                <f:if condition="{richText}">
+                    <f:then>
+                        <div
+                            class="d-flex align-items-center gap-2 mb-2"
+                            data-ie-rich-text-heading>
+                            <label
+                                class="form-label fw-semibold mb-0"
+                                for="{elementId}">
+                                <f:translate
+                                    key="profile.{field.identifier}.label"
+                                    extensionName="academic_persons_edit" />
+                                <f:if condition="{field.validation.required}">
+                                    <abbr title="required">*</abbr>
+                                </f:if>
+                            </label>
+                            <f:if
+                                condition="!{field.validation.disabled} && !{field.validation.readOnly}">
+                                <f:render
+                                    partial="InlineProfile/Field/Actions"
+                                    arguments="{elementId: elementId, besideHeading: true}" />
+                            </f:if>
+                        </div>
                         <f:render
-                            partial="InlineProfile/Field/Actions"
-                            arguments="{elementId: elementId}" />
-                    </f:if>
-                </div>
+                            partial="InlineProfile/Field/Control"
+                            arguments="{
+                                profile: profile,
+                                field: field,
+                                elementId: elementId,
+                                textarea: textarea,
+                                richText: richText,
+                                rows: rows
+                            }" />
+                    </f:then>
+                    <f:else>
+                        <label class="form-label fw-semibold" for="{elementId}">
+                            <f:translate
+                                key="profile.{field.identifier}.label"
+                                extensionName="academic_persons_edit" />
+                            <f:if condition="{field.validation.required}">
+                                <abbr title="required">*</abbr>
+                            </f:if>
+                        </label>
+                        <div
+                            class="d-flex flex-column flex-xl-row gap-2 align-items-start">
+                            <f:render
+                                partial="InlineProfile/Field/Control"
+                                arguments="{
+                                    profile: profile,
+                                    field: field,
+                                    elementId: elementId,
+                                    textarea: textarea,
+                                    richText: richText,
+                                    rows: rows
+                                }" />
+                            <f:if
+                                condition="!{field.validation.disabled} && !{field.validation.readOnly}">
+                                <f:render
+                                    partial="InlineProfile/Field/Actions"
+                                    arguments="{elementId: elementId, besideHeading: false}" />
+                            </f:if>
+                        </div>
+                    </f:else>
+                </f:if>
                 <div class="invalid-feedback"></div>
             </div>
         </div>

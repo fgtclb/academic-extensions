@@ -17,10 +17,6 @@ class ProfileFormData extends AbstractFormData
     protected string $middleName = '';
     protected string $lastName = '';
     protected string $gender = '';
-    protected string $emailAddress = '';
-    protected bool $publishEmailAddress = false;
-    protected string $phoneNumber = '';
-    protected bool $publishPhoneNumber = false;
     protected string $publicationsLink = '';
     protected string $publicationsLinkTitle = '';
     protected string $website = '';
@@ -38,10 +34,6 @@ class ProfileFormData extends AbstractFormData
         string $middleName = '',
         string $lastName = '',
         string $gender = '',
-        string $emailAddress = '',
-        bool $publishEmailAddress = false,
-        string $phoneNumber = '',
-        bool $publishPhoneNumber = false,
         string $publicationsLink = '',
         string $publicationsLinkTitle = '',
         string $website = '',
@@ -58,10 +50,6 @@ class ProfileFormData extends AbstractFormData
         $this->middleName = $middleName;
         $this->lastName = $lastName;
         $this->gender = $gender;
-        $this->emailAddress = $emailAddress;
-        $this->publishEmailAddress = $publishEmailAddress;
-        $this->phoneNumber = $phoneNumber;
-        $this->publishPhoneNumber = $publishPhoneNumber;
         $this->publicationsLink = $publicationsLink;
         $this->publicationsLinkTitle = $publicationsLinkTitle;
         $this->website = $website;
@@ -90,10 +78,6 @@ class ProfileFormData extends AbstractFormData
             middleName: $profile->getMiddleName(),
             lastName: $profile->getLastName(),
             gender: $profile->getGender(),
-            emailAddress: $profile->getEmailAddress(),
-            publishEmailAddress: $profile->getPublishEmailAddress(),
-            phoneNumber: $profile->getPhoneNumber(),
-            publishPhoneNumber: $profile->getPublishPhoneNumber(),
             publicationsLink: $profile->getPublicationsLink(),
             publicationsLinkTitle: $profile->getPublicationsLinkTitle(),
             website: $profile->getWebsite(),
@@ -130,26 +114,6 @@ class ProfileFormData extends AbstractFormData
     public function getGender(): string
     {
         return $this->gender;
-    }
-
-    public function getEmailAddress(): string
-    {
-        return $this->emailAddress;
-    }
-
-    public function getPublishEmailAddress(): bool
-    {
-        return $this->publishEmailAddress;
-    }
-
-    public function getPhoneNumber(): string
-    {
-        return $this->phoneNumber;
-    }
-
-    public function getPublishPhoneNumber(): bool
-    {
-        return $this->publishPhoneNumber;
     }
 
     public function getPublicationsLink(): string

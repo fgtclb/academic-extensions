@@ -60,4 +60,9 @@ final class Validation
             flags: $array['flags'] ?? [],
         );
     }
+
+    public function isRichText(): bool
+    {
+        return in_array('html', $this->flags, true);
+    }
 }

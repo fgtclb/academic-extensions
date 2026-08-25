@@ -305,45 +305,22 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     }
 
     #[Test]
-    public function configuredProfileContactFlagsRequireBooleanPayloadValues(): void
+    public function configuredCheckboxFieldsRequireBooleanPayloadValues(): void
     {
         $subject = $this->createSubjectForFormData(new ProfileFormData());
 
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage(
-            'Invalid boolean value for profile property "publishEmailAddress".',
+            'Invalid boolean value for profile property "skipSync".',
         );
         $subject->createFormData(
             $this->createPluginControllerActionContext(),
             new Profile(),
             new ProfileUpdatePayload(
                 profileUid: 123,
-                data: ['publishEmailAddress' => '1'],
+                data: ['skipSync' => '1'],
             ),
         );
-    }
-
-    #[Test]
-    public function configuredProfileContactsAreNormalizedAsDirectProfileOverrides(): void
-    {
-        $subject = $this->createSubjectForFormData(new ProfileFormData());
-        $payload = new ProfileUpdatePayload(
-            profileUid: 123,
-            data: [
-                'emailAddress' => 'profile@example.org',
-                'publishEmailAddress' => true,
-                'phoneNumber' => '+49 123 456',
-                'publishPhoneNumber' => false,
-            ],
-        );
-
-        $result = $subject->createFormData(
-            $this->createPluginControllerActionContext(),
-            new Profile(),
-            $payload,
-        );
-
-        self::assertSame($payload->getData(), $subject->getNormalizedData($result, $payload));
     }
 
     #[Test]
@@ -408,10 +385,6 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             'firstName' => 'text',
             'middleName' => 'text',
             'lastName' => 'text',
-            'emailAddress' => 'email',
-            'publishEmailAddress' => 'checkbox',
-            'phoneNumber' => 'phone',
-            'publishPhoneNumber' => 'checkbox',
             'website' => 'combinedLink',
             'publicationsLink' => 'combinedLink',
             'coreCompetences' => 'ckeditor',

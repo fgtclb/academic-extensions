@@ -101,6 +101,8 @@ and form utilities. The small :file:`Resources/Public/Css/additional.css`
 compatibility layer only releases a surrounding ``.section`` overflow,
 normalizes one frame spacing variable and keeps the sticky card below the page
 header; the Fluid templates contain no inline style declarations.
+All Bootstrap button controls and visible modal surfaces in the shipped inline
+and retained legacy views carry ``rounded-0`` so their corners remain square.
 
 On ``lg`` and larger viewports the first row uses a ``4 / 8`` column split.
 The profile image block has ``sticky-top`` so the image and its edit action
@@ -109,14 +111,14 @@ document order. The about section follows the complete first row and therefore
 never overlaps the sticky column.
 
 At runtime ``initializeStickyImageOffset()`` reads the visible outer height of
-``#page-header`` through ``getBoundingClientRect().height``, adds a 10-pixel
-visual gap and assigns the result to the ``top`` property of
+``#page-header.navbar-fixed-top`` through ``getBoundingClientRect().height``,
+adds a 10-pixel visual gap and assigns the result to the ``top`` property of
 ``data-ie-sticky-image``. A
 ``ResizeObserver`` watches the header's ``border-box`` and keeps the offset
 synchronized whenever the navbar changes height, including height or padding
 changes caused by a scroll-dependent header state. Environments without it use
-the window ``resize`` event as a fallback. If the page header is absent,
-Bootstrap's regular ``sticky-top`` value remains in control.
+the window ``resize`` event as a fallback. If the matching fixed page header
+is absent, Bootstrap's regular ``sticky-top`` value remains in control.
 
 The two columns live in their own ``align-items-stretch`` row. The image column
 inherits the stretched cross-axis size, giving the sticky image a containing
@@ -232,26 +234,6 @@ frontend module.
 strict allow-list validation for every configured select. Thus another select
 does not require a new Fluid partial, validator service or JavaScript branch.
 
-Direct public-profile contacts
-==============================
-
-The inline ``information`` section edits four direct Profile properties:
-
-*   ``emailAddress`` and ``publishEmailAddress``;
-*   ``phoneNumber`` and ``publishPhoneNumber``.
-
-These are not Contract contact records. The values are persisted on
-:sql:`tx_academicpersons_domain_model_profile`; each publication checkbox is a
-separate opt-in flag and defaults to false. The public Profile detail template
-renders an email or telephone link only when both the value and its matching
-flag are set. Contract email/phone/address collections continue to render in
-their own contract section and use :yaml:`contractContact` validation.
-
-The direct contact values are deliberately not copied from synchronized
-contract contacts. This prevents an employment contact update from silently
-changing what a person explicitly chose to publish as general profile contact
-data.
-
 Rich-text content fields
 ========================
 
@@ -287,8 +269,11 @@ sanitized markup returned by the server. The frontend applies the same strict
 tag, attribute and URI-scheme allowlist without assigning markup through
 ``innerHTML``.
 
-Each open text or rich-text field has three explicit actions. Selects and
-checkboxes save immediately when their value changes.
+Each open text or rich-text field has three explicit actions. For
+``renderType: ckeditor`` only, the action group sits in the label row with
+Bootstrap's ``ms-auto`` utility, leaving the editor itself full width. Other
+field types retain the action group beside their control. Selects and checkboxes
+save immediately when their value changes.
 
 *   :guilabel:`Delete` (``data-ie-dismiss``) clears the current browser-side
     draft. The editor stays open and no request is sent.
@@ -344,7 +329,7 @@ The extension requires at least TYPO3 13.4.31 or TYPO3 14.3.6. These constraints
 include the HTML-sanitizer fixes published with TYPO3-CORE-SA-2026-006. Projects
 must still keep TYPO3 security updates current.
 
-Read-only structured profile sections
+Editable structured profile sections
 =====================================
 
 The inline profile view renders the structured records directly below the
@@ -357,8 +342,9 @@ from the active packages'
 is also presentation order.
 
 For every document section the provider reuses the configured ``identifier``,
-``fieldName``, record ``type``, LLL ``label``, ``readonly`` state and the
-section-local validations. The heading is translated directly from that label.
+``fieldName``, record ``type``, LLL ``label``, ``readonly`` state,
+``rowFields``, ``actions`` and the section-local validations. The heading is
+translated directly from that label.
 A newly configured type consequently does not require another section registry
 in ``academic_persons_edit``. The generic localized empty state is used until
 an identifier-specific message is added.
@@ -366,31 +352,64 @@ an identifier-specific message is added.
 ``contracts`` contains ``FGTCLB\AcademicPersons\Domain\Model\Contract``
 objects. Every other collection contains
 ``FGTCLB\AcademicPersons\Domain\Model\ProfileInformation`` objects. Contract
-rows show the start date and position. Profile-information rows use a range,
-year or start-date presentation appropriate to the section and retain the
-stored title, link and formatted body text. All sections remain visible when
+rows show the configured values, which are start date and position in the
+shipped settings. Profile-information rows render only the configured values in
+their declared order. The aliases ``from``, ``to`` and ``description`` map to
+``yearStart``, ``yearEnd`` and ``bodytext``. All sections remain visible when
 empty and display a localized empty state.
 
-The current inline view presents structured records without mutation controls.
-The section's configured ``readonly`` state and validations are exposed as view
-metadata, but the markup contains no add, edit, delete, visibility or sorting
-controls and :guilabel:`Edit all` targets only profile fields. The InlineProfile
-plugin registers only ``InlineProfileController``; legacy contract,
-profile-information and contact controllers are not exposed through its normal
-or non-cacheable action maps.
+Every writable section heading has an :guilabel:`Add` action. Record controls
+are rendered in the exact order of the configured ``actions`` list. The first
+row's move-up action and the final row's move-down action are disabled. A list
+with both directions also has a drag handle; dropping a row submits the complete
+UID order and the server accepts it only when it contains every current section
+record exactly once. After a successful mutation JavaScript updates the row
+collection, alternating background, sort controls and empty placeholder without
+reloading the page.
+
+The add, view, edit and delete workflows share one Bootstrap modal. Its field
+schema and current values are loaded through ``documentFormAction()``. Contract
+fields include the current organisational-unit, function-type and location
+options. Profile-information fields use the section's validation metadata. In
+every mode the modal heading uses the non-empty ``title`` field of the current
+record. New records, contracts and records without a title fall back to the
+translated section heading; the mode label remains as its prefix.
+A field carrying the ``html`` flag is rendered as a full-width CKEditor 5
+control; ordinary textareas are full width as well. Rich-text values are
+sanitized before persistence and parsed into the row or read-only modal without
+assigning ``innerHTML``.
+When the modal enters delete mode, its submit control removes ``btn-primary``
+and ``btn-success`` and uses ``btn-danger``. All other writable modes restore
+``btn-primary``.
+
+``createDocumentAction()``, ``updateDocumentAction()``,
+``deleteDocumentAction()`` and ``sortDocumentAction()`` complete the JSON API.
+Up, down and drag-and-drop intentionally share the sort endpoint. All endpoints
+resolve the profile from the authenticated frontend user and then resolve a
+record only inside the requested section. A UID from another profile, model kind
+or profile-information type is therefore rejected. They additionally enforce
+``readonly`` and the configured action list. The shipped contracts section can
+therefore load its view modal but cannot open an add/edit form, create, update,
+delete or sort a record, even through a handcrafted JSON request.
+
+The InlineProfile plugin still registers only ``InlineProfileController``;
+legacy contract, profile-information and contact controllers are not exposed
+through its normal or non-cacheable action maps.
 
 Section order is centralized and every section emits ``data-section-key`` and
 ``data-section-position`` together with the configured
 ``data-section-field-name`` and ``data-section-record-type``. Records
 additionally emit ``data-item-uid``, ``data-item-sorting`` and
-``data-item-position``. These attributes are passive metadata in this release:
-there is no ``draggable`` state, handle, sorting JavaScript or persistence
-endpoint yet. A later drag-and-drop implementation can replace the settings
-order and attach behavior to these stable boundaries without restructuring the
-templates.
+``data-item-position``. ``data-section-sortable`` exposes whether both sorting
+directions are available. The explicit up/down controls and drag handle persist
+the same record order.
 
 The presentation uses Bootstrap rows, spacing, rounded corners and alternating
-``bg-body-tertiary`` records. No additional extension-specific CSS is required.
+``bg-body-tertiary`` records. During drag sorting the browser uses the complete
+record row as the drag image. Extension-specific state classes outline both the
+source row and active list, while a prominent line above or below the hovered
+row marks the exact insertion edge. Dropping into free list space shows the
+same line at the end of the list.
 
 Inline-only development boundary
 ================================
@@ -420,7 +439,7 @@ Synchronization checkbox
 ========================
 
 The synchronization checkbox appears as the compact
-:guilabel:`Disable profile sync` switch
+:guilabel:`Private` switch
 immediately left of the :guilabel:`Edit all`/:guilabel:`Close all` toggle in
 the personal-section header and is persisted immediately through
 ``updateSkipSyncAction()``. Its form is a sibling of the profile form, not a
@@ -611,23 +630,31 @@ shipped JavaScript:
           ``data-ie-profile-name-field-ids``
         - Main heading and the name controls used to refresh it after saving.
     *   - ``data-ie-sticky-image``
-        - Sticky image container receiving the measured ``#page-header`` height
-          plus a 10-pixel visual gap as its runtime ``top`` offset.
+        - Sticky image container receiving the measured
+          ``#page-header.navbar-fixed-top`` height plus a 10-pixel visual gap
+          as its runtime ``top`` offset.
     *   - ``data-ie-document-sections`` and ``data-ie-document-section``
-        - Read-only structured-section list and stable boundary for each future
-          reorderable section.
+        - Editable structured-section list and stable boundary for its AJAX
+          controls.
     *   - ``data-section-key`` and ``data-section-position``
         - Stable section identity and current zero-based presentation position.
     *   - ``data-section-field-name`` and ``data-section-record-type``
-        - Field and relation type taken from ``AcademicPersonsSettings`` for a
-          future section-specific persistence endpoint.
+        - Field and relation type taken from ``AcademicPersonsSettings`` for
+          section-specific persistence.
     *   - ``data-ie-document-items`` and ``data-ie-document-item``
-        - Read-only item collection and record boundaries inside a section.
+        - Mutable item collection and record boundaries inside a section.
     *   - ``data-item-uid``, ``data-item-sorting`` and ``data-item-position``
         - Persisted record identity, domain sorting value and current zero-based
-          presentation position reserved for a later drag-and-drop workflow.
+          presentation position.
     *   - ``data-ie-document-empty-state``
         - Localized placeholder rendered when a structured collection is empty.
+    *   - ``data-ie-document-add``, ``data-ie-document-view``,
+          ``data-ie-document-edit`` and ``data-ie-document-delete``
+        - Section creation and modal-based row actions.
+    *   - ``data-ie-document-sort``
+        - Up/down row action persisted through the shared sort endpoint.
+    *   - ``data-ie-document-modal`` and ``data-ie-document-form``
+        - Scoped Bootstrap modal and form used for add, view, edit and delete.
     *   - ``data-ie-field-group``, ``data-ie-field-ids`` and
           ``data-ie-display-field-ids``
         - Grouped preview/editor and the controls participating in it.
@@ -708,12 +735,16 @@ Functional plugin tests render both Bootstrap modal states, verify the
 decomposed Fluid contracts, AJAX-only controls, direct rich-text previews and
 the separate delete, cancel and save actions. The section-provider unit test
 verifies that order, identifiers, field names, relation types and labels come
-from ``AcademicPersonsSettings`` while presentation modes and typed records are
-preserved. Functional fixtures cover contracts and every configured
-profile-information relation; the rendered page test derives the expected
+from ``AcademicPersonsSettings`` while row fields, action capabilities,
+presentation modes and typed records are preserved. Functional fixtures cover
+contracts and every configured profile-information relation; the rendered page
+test derives the expected
 order and metadata from the same settings service, then checks placement below
-:guilabel:`About me`, alternating records, empty states, passive sorting
-metadata and the absence of write controls. It also guards the InlineProfile
+:guilabel:`About me`, alternating records, empty states, writable add controls
+and exactly the configured row actions. AJAX lifecycle tests cover schema
+loading, CKEditor modal fields, creation, partial updates, arrow and drag
+sorting, cross-section rejection, deletion and read-only endpoint denial. It
+also guards the InlineProfile
 plugin against accidentally exposing legacy mutation controllers. Registration
 tests ensure that InlineProfile is the only editing content element offered to
 editors while the complete legacy implementation remains present as a

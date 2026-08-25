@@ -34,8 +34,6 @@ final readonly class ProfileSectionProvider
         'firstName' => 'given-name',
         'middleName' => 'additional-name',
         'lastName' => 'family-name',
-        'emailAddress' => 'email',
-        'phoneNumber' => 'tel',
         'website' => 'url',
         'publicationsLink' => 'url',
     ];

@@ -8,7 +8,7 @@
     date="2025-02-24T11:41:07Z"
     product-name="academic_persons"
   >
-    <header/>
+    <header />
     <body>
       <!-- Addresses -->
 
@@ -87,7 +87,8 @@
         <source>Addresses</source>
         <target>Anschriften</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_contract.columns.physical_addresses_chosen.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_contract.columns.physical_addresses_chosen.label">
         <source>Address</source>
         <target>Anschrift</target>
       </trans-unit>
@@ -160,11 +161,13 @@
         <source>Function Name</source>
         <target>Funktionsname</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_function_type.columns.function_name_female.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_function_type.columns.function_name_female.label">
         <source>Function Name Female</source>
         <target>Funktionsname weiblich</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_function_type.columns.function_name_male.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_function_type.columns.function_name_male.label">
         <source>Function Name Male</source>
         <target>Funktionsname männlich</target>
       </trans-unit>
@@ -186,7 +189,8 @@
 
       <!-- Organisational Units -->
 
-      <trans-unit id="tx_academicpersons_domain_model_organisational_unit.columns.display_text.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_organisational_unit.columns.display_text.label">
         <source>Display Text</source>
         <target>Anzeigetext</target>
       </trans-unit>
@@ -198,7 +202,8 @@
         <source>Parent</source>
         <target>Übergeordnete Einheit</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_organisational_unit.columns.parent.default.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_organisational_unit.columns.parent.default.label">
         <source>No parent</source>
         <target>Keine übergeordnete Einheit</target>
       </trans-unit>
@@ -233,7 +238,8 @@
         <source>Phone Number</source>
         <target>Telefonnummer</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_phone_number.columns.type.items.undefined.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_phone_number.columns.type.items.undefined.label">
         <source>Undefined</source>
         <target>Nicht definiert</target>
       </trans-unit>
@@ -340,7 +346,8 @@
         <source>URL Path</source>
         <target>URL-Pfad</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile.columns.supervised_doctoral_thesis.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile.columns.supervised_doctoral_thesis.label">
         <source>Supervised doctoral theses</source>
         <target>Beaufsichtigte Doktorarbeit</target>
       </trans-unit>
@@ -393,8 +400,10 @@
         <target>Profil-Synchronisation deaktivieren</target>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile.columns.skip_sync.description">
-        <source>Disabling the profile synchronization will prevent automatic updates from external sources.</source>
-        <target>Die Deaktivierung der Profil-Synchronisation verhindert automatische Aktualisierungen aus externen Quellen.</target>
+        <source>Disabling the profile synchronization will prevent automatic updates from external
+          sources.</source>
+        <target>Die Deaktivierung der Profil-Synchronisation verhindert automatische
+          Aktualisierungen aus externen Quellen.</target>
       </trans-unit>
 
       <!-- Profile Information -->
@@ -415,23 +424,28 @@
         <source>Title</source>
         <target>Titel</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.cooperation.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.cooperation.label">
         <source>Network / cooperation</source>
         <target>Netzwerk/Kooperation</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.curriculum_vitae.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.curriculum_vitae.label">
         <source>Curriculum vitae</source>
         <target>Lebenslauf</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.lecture.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.lecture.label">
         <source>Lecture</source>
         <target>Vorlesung</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.membership.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.membership.label">
         <source>Membership / committee</source>
         <target>Mitgliedschaft / Ausschuss</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.publication.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.publication.label">
         <source>Publication</source>
         <target>Veröffentlichung</target>
       </trans-unit>

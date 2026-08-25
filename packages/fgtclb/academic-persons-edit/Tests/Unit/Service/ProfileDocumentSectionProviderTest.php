@@ -32,6 +32,8 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
                     readOnly: false,
                     validationSet: new ValidationSet(identifier: 'career', validations: []),
                     position: 0,
+                    rowFields: ['from', 'title'],
+                    actions: ['view', 'down', 'up', 'delete', 'edit'],
                 ),
             ],
         );
@@ -61,6 +63,8 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
                     readOnly: true,
                     validationSet: new ValidationSet(identifier: 'contracts', validations: []),
                     position: 0,
+                    rowFields: ['from', 'position'],
+                    actions: ['view'],
                 ),
                 'vita' => new DocumentSection(
                     identifier: 'vita',
@@ -70,6 +74,8 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
                     readOnly: false,
                     validationSet: new ValidationSet(identifier: 'vita', validations: []),
                     position: 1,
+                    rowFields: ['from', 'title'],
+                    actions: ['view', 'down', 'up', 'delete', 'edit'],
                 ),
                 'lectures' => new DocumentSection(
                     identifier: 'lectures',
@@ -79,6 +85,8 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
                     readOnly: false,
                     validationSet: new ValidationSet(identifier: 'lectures', validations: []),
                     position: 2,
+                    rowFields: ['year', 'title'],
+                    actions: ['view', 'down', 'up', 'delete', 'edit'],
                 ),
                 'cooperation' => new DocumentSection(
                     identifier: 'cooperation',
@@ -88,6 +96,8 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
                     readOnly: false,
                     validationSet: new ValidationSet(identifier: 'cooperation', validations: []),
                     position: 3,
+                    rowFields: ['from', 'to', 'title'],
+                    actions: ['view', 'down', 'up', 'delete', 'edit'],
                 ),
             ],
             raw: [],
@@ -120,6 +130,26 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
             array_column($sections, 'kind'),
         );
         $this->assertSame([true, false, false, false], array_column($sections, 'readOnly'));
+        $this->assertSame(
+            [
+                ['from', 'position'],
+                ['from', 'title'],
+                ['year', 'title'],
+                ['from', 'to', 'title'],
+            ],
+            array_column($sections, 'rowFields'),
+        );
+        $this->assertSame(
+            [
+                ['view'],
+                ['view', 'down', 'up', 'delete', 'edit'],
+                ['view', 'down', 'up', 'delete', 'edit'],
+                ['view', 'down', 'up', 'delete', 'edit'],
+            ],
+            array_column($sections, 'actions'),
+        );
+        $this->assertSame([false, true, true, true], array_column($sections, 'canCreate'));
+        $this->assertSame([false, true, true, true], array_column($sections, 'sortable'));
         $this->assertSame(
             ['date', 'start', 'year', 'range'],
             array_column($sections, 'dateMode'),

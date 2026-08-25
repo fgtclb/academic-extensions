@@ -17,8 +17,8 @@ use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 /**
- * Covers the AJAX contracts, read-only structured sections and both image-modal
- * states of the `academicpersonsedit_inlineprofile` content element.
+ * Covers the profile and structured-section AJAX contracts as well as both
+ * image-modal states of the `academicpersonsedit_inlineprofile` content element.
  */
 final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfilePluginTestCase
 {
@@ -162,7 +162,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             ),
             'The inline image form is missing.',
         );
-
         $action = html_entity_decode($formMatch[1]);
         if (str_starts_with($action, '/')) {
             $action = 'https://www.acme.com' . $action;
@@ -247,8 +246,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     public function imageModalTemplateUsesBootstrapAndAjaxValidationOnly(): void
     {
         $template = $this->getInlineProfilePartial('Image/Modal');
-
-        $this->assertStringContainsString('class="modal fade"', $template);
+        $this->assertStringContainsString('class="modal fade rounded-0"', $template);
         $this->assertStringContainsString('data-ie-upload-image', $template);
         $this->assertStringContainsString('data-ie-delete-image', $template);
         $this->assertStringContainsString('data-ie-image-error', $template);
@@ -267,7 +265,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     public function imageCardUsesCompactBootstrapOverlayEditButton(): void
     {
         $template = $this->getInlineProfilePartial('Image/Card');
-
         $this->assertStringContainsString('class="position-relative"', $template);
         $this->assertMatchesRegularExpression(
             '@<button\b(?=[^>]*data-ie-open-image-modal)'
@@ -291,12 +288,14 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     {
         $module = $this->getInlineProfileJavaScriptSources();
         $template = file_get_contents(__DIR__ . '/../../../Resources/Private/Templates/InlineProfile/Index.html');
-
         $this->assertIsString($module);
         $this->assertIsString($template);
         $this->assertStringContainsString('data-ie-sticky-image', $template);
         $this->assertStringNotContainsString('style="top:', $template);
-        $this->assertStringContainsString('const pageHeaderSelector = "#page-header";', $module);
+        $this->assertStringContainsString(
+            'const pageHeaderSelector = "#page-header.navbar-fixed-top";',
+            $module,
+        );
         $this->assertStringContainsString('pageHeader.getBoundingClientRect().height', $module);
         $this->assertStringContainsString('stickyImage.style.setProperty(', $module);
         $this->assertMatchesRegularExpression(
@@ -322,15 +321,13 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $profileForm = $this->getInlineProfilePartial('Forms/Profile');
         $actions = $this->getInlineProfilePartial('Field/Actions');
         $fluidSources = $this->getInlineProfileFluidSources();
-
         $this->assertIsString($module);
         $this->assertFileDoesNotExist(
             __DIR__ . '/../../../Resources/Private/Partials/InlineProfile/Forms/FooterActions.html',
         );
-        $this->assertStringContainsString(
-            'class="btn-group btn-group-sm d-none flex-shrink-0 align-self-end"',
-            $actions,
-        );
+        $this->assertStringContainsString('condition: besideHeading', $actions);
+        $this->assertStringContainsString("then: 'ms-auto'", $actions);
+        $this->assertStringContainsString("else: 'align-self-end'", $actions);
         $this->assertStringContainsString('data-ie-edit-all-label="{f:translate(', $header);
         $this->assertStringContainsString('data-ie-close-all-label="{f:translate(', $header);
         $this->assertStringContainsString('key: \'inlineProfile.btnCloseAll\'', $header);
@@ -411,7 +408,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             __DIR__ . '/../../../Resources/Public/JavaScript/frontend/profile.js',
         );
         $this->assertIsString($entry);
-        foreach (['common', 'fields', 'image', 'sticky-image', 'sync'] as $module) {
+        foreach (['common', 'documents', 'fields', 'image', 'sticky-image', 'sync'] as $module) {
             $this->assertStringContainsString('./profile/' . $module . '.js', $entry);
         }
         $this->assertStringNotContainsString('@ckeditor/', $entry);
@@ -440,9 +437,11 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             preg_match_all('@\bdata-ie-rich-text-preview-content(?=[\s>])@', $content),
         );
         $fieldActionCount = substr_count($content, 'data-ie-field-actions');
+        $autosaveControlCount = substr_count($content, 'data-ie-autosave-on-change');
         $autosaveUndoCount = substr_count($content, 'data-ie-autosave-undo');
         $this->assertGreaterThanOrEqual(5, $fieldActionCount);
-        $this->assertSame(3, $autosaveUndoCount);
+        $this->assertGreaterThanOrEqual(1, $autosaveControlCount);
+        $this->assertSame($autosaveControlCount, $autosaveUndoCount);
         $this->assertSame($fieldActionCount, substr_count($content, 'data-ie-dismiss'));
         $this->assertSame($fieldActionCount, substr_count($content, 'data-ie-save'));
         $this->assertSame(
@@ -453,7 +452,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringContainsString('Cancel', $content);
         $this->assertStringContainsString('Save', $content);
         $this->assertStringContainsString('No content', $content);
-
         $field = $this->getInlineProfilePartial('Field');
         $preview = $this->getInlineProfilePartial('Field/Preview');
         $control = $this->getInlineProfilePartial('Field/Control');
@@ -464,8 +462,105 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringContainsString('data-ie-rich-text-preview', $preview);
         $this->assertStringContainsString('flex-shrink-0', $actions);
         $this->assertStringContainsString('align-self-end', $actions);
+        $this->assertStringContainsString('ms-auto', $actions);
+        $this->assertStringContainsString('data-ie-rich-text-heading', $field);
+        $this->assertStringContainsString(
+            'arguments="{elementId: elementId, besideHeading: true}"',
+            $field,
+        );
+        $this->assertSame(1, substr_count($field, 'besideHeading: true'));
+        $this->assertSame(1, substr_count($field, 'besideHeading: false'));
+        $ckeditor = $this->getInlineProfilePartial('Field/Types/Ckeditor');
+        $textarea = $this->getInlineProfilePartial('Field/Types/Textarea');
+        $this->assertStringContainsString('richText: true', $ckeditor);
+        $this->assertStringNotContainsString('richText: true', $textarea);
         $this->assertStringNotContainsString('position-absolute', $preview);
         $this->assertStringNotContainsString('style=', $field . $preview . $control . $actions);
+        $document = new DOMDocument();
+        $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
+        $xpath = new DOMXPath($document);
+        $richTextControls = $xpath->query('//*[@data-ie-rich-text]');
+        $this->assertNotFalse($richTextControls);
+        foreach ($richTextControls as $richTextControl) {
+            $headings = $xpath->query(
+                'ancestor::*[@data-ie-field-editor][1]/*[@data-ie-rich-text-heading]',
+                $richTextControl,
+            );
+            $this->assertNotFalse($headings);
+            $this->assertCount(1, $headings);
+            $heading = $headings->item(0);
+            $this->assertInstanceOf(DOMElement::class, $heading);
+            $headingActions = $xpath->query('.//*[@data-ie-field-actions]', $heading);
+            $this->assertNotFalse($headingActions);
+            $this->assertCount(1, $headingActions);
+            $headingAction = $headingActions->item(0);
+            $this->assertInstanceOf(DOMElement::class, $headingAction);
+            $this->assertStringContainsString('ms-auto', $headingAction->getAttribute('class'));
+            $this->assertStringNotContainsString('align-self-end', $headingAction->getAttribute('class'));
+        }
+    }
+
+    #[Test]
+    public function documentDragSortingExposesSourceAndInsertionStates(): void
+    {
+        $module = $this->getInlineProfileJavaScriptSources();
+        $styles = file_get_contents(__DIR__ . '/../../../Resources/Public/Css/additional.css');
+        $this->assertIsString($module);
+        $this->assertIsString($styles);
+        $this->assertStringContainsString('event.dataTransfer.setDragImage?.(row, offsetX, offsetY);', $module);
+        $this->assertStringContainsString('bounds.top + bounds.height / 2', $module);
+        foreach ([
+            '[data-ie-document-items].is-drag-active',
+            '[data-ie-document-item].is-dragging',
+            '[data-ie-document-item].is-drop-before::before',
+            '[data-ie-document-item].is-drop-after::after',
+            '[data-ie-document-items].is-drop-at-end::after',
+        ] as $selector) {
+            $this->assertStringContainsString($selector, $styles);
+        }
+    }
+
+    #[Test]
+    public function fluidViewsUseSquareBootstrapButtonsAndModalSurfaces(): void
+    {
+        $privateResourcesPath = realpath(__DIR__ . '/../../../Resources/Private');
+        $this->assertIsString($privateResourcesPath);
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($privateResourcesPath, \FilesystemIterator::SKIP_DOTS),
+        );
+        $buttonClassCount = 0;
+        $modalClassCount = 0;
+        $modalSurfaceClasses = [
+            'modal',
+            'modal-buttons',
+            'modal-dialog',
+            'modal-content',
+            'modal-header',
+            'modal-body',
+            'modal-footer',
+        ];
+        foreach ($iterator as $file) {
+            if (!$file->isFile() || strtolower($file->getExtension()) !== 'html') {
+                continue;
+            }
+            $content = file_get_contents($file->getPathname());
+            $this->assertIsString($content);
+            $matchCount = preg_match_all('@class="([^"]*)"@', $content, $classMatches, PREG_SET_ORDER);
+            $this->assertNotFalse($matchCount);
+            foreach ($classMatches as $classMatch) {
+                $classes = preg_split('/\s+/', trim($classMatch[1])) ?: [];
+                if (in_array('btn', $classes, true) || in_array('btn-close', $classes, true)) {
+                    ++$buttonClassCount;
+                    $this->assertContains('rounded-0', $classes, $file->getPathname());
+                }
+                if (array_intersect($modalSurfaceClasses, $classes) !== []) {
+                    ++$modalClassCount;
+                    $this->assertContains('rounded-0', $classes, $file->getPathname());
+                }
+            }
+        }
+        $this->assertGreaterThan(0, $buttonClassCount);
+        $this->assertGreaterThan(0, $modalClassCount);
     }
 
     #[Test]
@@ -492,13 +587,9 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     {
         $this->setUpInlineProfileTestCase();
         $content = $this->renderInlineProfilePage();
-
-        $this->assertStringContainsString('id="inline-profile-1-emailAddress"', $content);
-        $this->assertStringContainsString('type="email"', $content);
-        $this->assertStringContainsString('id="inline-profile-1-phoneNumber"', $content);
-        $this->assertStringContainsString('type="tel"', $content);
-        $this->assertStringContainsString('id="inline-profile-1-publishEmailAddress"', $content);
-        $this->assertStringContainsString('id="inline-profile-1-publishPhoneNumber"', $content);
+        $this->assertStringContainsString('id="inline-profile-1-firstName"', $content);
+        $this->assertStringContainsString('id="inline-profile-1-website"', $content);
+        $this->assertStringContainsString('type="url"', $content);
         $this->assertStringContainsString(
             'data-ie-profile-name-field-ids="title firstName middleName lastName"',
             $content,
@@ -508,15 +599,14 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     }
 
     #[Test]
-    public function editableSelectAndCheckboxControlsAreRenderedAsInteractiveFields(): void
+    public function editableSelectControlsAreRenderedAsInteractiveFields(): void
     {
         $this->setUpInlineProfileTestCase();
         $content = $this->renderInlineProfilePage();
         $document = new DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
         $xpath = new DOMXPath($document);
-
-        foreach (['gender', 'publishEmailAddress', 'publishPhoneNumber'] as $identifier) {
+        foreach (['gender'] as $identifier) {
             $elementId = 'inline-profile-' . self::PROFILE_ID . '-' . $identifier;
             $controls = $xpath->query(sprintf('//*[@id="%s"]', $elementId));
             $this->assertNotFalse($controls);
@@ -535,7 +625,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
                 $control->hasAttribute('data-ie-autosave-on-change'),
                 sprintf('Editable control "%s" must opt into autosave-on-change.', $identifier),
             );
-
             $undoButtons = $xpath->query(sprintf(
                 '//*[@data-ie-autosave-undo and @data-ie-cancel and @data-ie-for="%s"]',
                 $elementId,
@@ -546,7 +635,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
                 $undoButtons->length,
                 sprintf('Missing autosave undo button for "%s".', $identifier),
             );
-
             $editButtons = $xpath->query(sprintf(
                 '//*[@data-academic-persons-inline-edit-activate-btn and @data-ie-for="%s"]',
                 $elementId,
@@ -556,7 +644,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             $editButton = $editButtons->item(0);
             $this->assertInstanceOf(DOMElement::class, $editButton);
             $this->assertSame($elementId . '-editor', $editButton->getAttribute('aria-controls'));
-
             $editors = $xpath->query(sprintf('//*[@id="%s-editor" and @data-ie-field-editor]', $elementId));
             $this->assertNotFalse($editors);
             $this->assertSame(1, $editors->length, sprintf('Missing editor for "%s".', $identifier));
@@ -567,7 +654,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     }
 
     #[Test]
-    public function structuredDocumentSectionsRenderReadOnlyAndInFutureSortableOrder(): void
+    public function structuredDocumentSectionsHonorConfiguredRowsActionsAndReadonlyState(): void
     {
         $this->setUpInlineProfileTestCase();
         $this->seedStructuredDocumentSections();
@@ -592,10 +679,60 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
                 (string)$position,
                 $section->attributes?->getNamedItem('data-section-position')?->nodeValue,
             );
-            $actions = $xpath->query('.//button | .//form | .//*[@data-ie-save] | .//*[@data-ie-group-edit]', $section);
-            $this->assertNotFalse($actions);
-            $this->assertCount(0, $actions);
+            $addButtons = $xpath->query('.//button[@data-ie-document-add]', $section);
+            $this->assertNotFalse($addButtons);
             $sectionSettings = $configuredSections[$position];
+            $this->assertCount($sectionSettings->allowsCreate() ? 1 : 0, $addButtons);
+            $items = $xpath->query('.//*[@data-ie-document-items]/*[@data-ie-document-item]', $section);
+            $this->assertNotFalse($items);
+            foreach ($items as $item) {
+                $actions = $xpath->query('.//*[@data-ie-document-actions]/button', $item);
+                $this->assertNotFalse($actions);
+                $this->assertCount(
+                    count($sectionSettings->getAllowedActions()) + ($sectionSettings->allowsDragSorting() ? 1 : 0),
+                    $actions,
+                );
+                $actualActions = [];
+                foreach ($actions as $actionElement) {
+                    $this->assertInstanceOf(\DOMElement::class, $actionElement);
+                    $actualActions[] = match (true) {
+                        $actionElement->hasAttribute('data-ie-document-drag') => 'drag',
+                        $actionElement->hasAttribute('data-ie-document-view') => 'view',
+                        $actionElement->hasAttribute('data-ie-document-sort') => $actionElement->getAttribute('data-ie-document-sort'),
+                        $actionElement->hasAttribute('data-ie-document-delete') => 'delete',
+                        $actionElement->hasAttribute('data-ie-document-edit') => 'edit',
+                        default => 'unknown',
+                    };
+                }
+                $expectedActions = $sectionSettings->allowsDragSorting() ? ['drag'] : [];
+                array_push($expectedActions, ...$sectionSettings->getAllowedActions());
+                $this->assertSame($expectedActions, $actualActions);
+                $rowValueElements = $xpath->query('.//*[@data-ie-document-value or @data-ie-document-title]', $item);
+                $this->assertNotFalse($rowValueElements);
+                $actualRowFields = [];
+                foreach ($rowValueElements as $rowValueElement) {
+                    $this->assertInstanceOf(\DOMElement::class, $rowValueElement);
+                    $actualRowFields[] = $rowValueElement->hasAttribute('data-ie-document-title')
+                        ? 'title'
+                        : $rowValueElement->getAttribute('data-ie-document-value');
+                }
+                $expectedRowFields = array_map(
+                    static fn(string $field): string => $sectionSettings->isContractSection()
+                        ? match ($field) {
+                            'from' => 'validFrom',
+                            'to' => 'validTo',
+                            default => $field,
+                        }
+                        : match ($field) {
+                            'from' => 'yearStart',
+                            'to' => 'yearEnd',
+                            'description' => 'bodytext',
+                            default => $field,
+                        },
+                    $sectionSettings->rowFields,
+                );
+                $this->assertSame($expectedRowFields, $actualRowFields);
+            }
             $this->assertSame(
                 $sectionSettings->fieldName,
                 $section->attributes?->getNamedItem('data-section-field-name')?->nodeValue,
@@ -608,14 +745,57 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
                 $sectionSettings->readOnly ? '1' : '0',
                 $section->attributes?->getNamedItem('data-section-readonly')?->nodeValue,
             );
+            $this->assertSame(
+                $sectionSettings->allowsDragSorting() ? '1' : '0',
+                $section->attributes?->getNamedItem('data-section-sortable')?->nodeValue,
+            );
         }
         $this->assertSame(array_keys($documentSections), $sectionKeys);
         $documentsPartial = $this->getInlineProfilePartial('Sections/Documents');
         $this->assertStringContainsString('key="{section.label}"', $documentsPartial);
         $this->assertStringNotContainsString('key="profile.{section.identifier}"', $documentsPartial);
-        $contractItems = $xpath->query('//*[@data-section-key="contracts"]//*[@data-ie-document-item]');
+        $this->assertStringContainsString('data-ie-document-add', $documentsPartial);
+        $actionsPartial = $this->getInlineProfilePartial('Documents/Actions');
+        foreach ([
+            'academic-persons-inline-edit-grip',
+            'academic-persons-inline-edit-open',
+            'academic-persons-inline-edit-down',
+            'academic-persons-inline-edit-up',
+            'academic-persons-inline-edit-delete',
+            'academic-persons-inline-edit-pencil',
+        ] as $iconIdentifier) {
+            $this->assertStringContainsString($iconIdentifier, $actionsPartial);
+        }
+        $actionPositions = array_map(
+            static fn(string $hook): int|false => strpos($actionsPartial, $hook),
+            [
+                'data-ie-document-view',
+                'data-ie-document-sort="down"',
+                'data-ie-document-sort="up"',
+                'data-ie-document-delete',
+                'data-ie-document-edit',
+            ],
+        );
+        foreach ($actionPositions as $actionPosition) {
+            $this->assertIsInt($actionPosition);
+        }
+        $this->assertSame($actionPositions, array_values(array_unique($actionPositions)));
+        $sortedActionPositions = $actionPositions;
+        sort($sortedActionPositions);
+        $this->assertSame($sortedActionPositions, $actionPositions);
+        $contractItems = $xpath->query(
+            '//*[@data-section-key="contracts"]//*[@data-ie-document-items]/*[@data-ie-document-item]',
+        );
         $this->assertNotFalse($contractItems);
         $this->assertCount(2, $contractItems);
+        foreach ($contractItems as $contractItem) {
+            $contractActions = $xpath->query('.//*[@data-ie-document-actions]/button', $contractItem);
+            $this->assertNotFalse($contractActions);
+            $this->assertCount(1, $contractActions);
+            $contractAction = $contractActions->item(0);
+            $this->assertInstanceOf(\DOMElement::class, $contractAction);
+            $this->assertTrue($contractAction->hasAttribute('data-ie-document-view'));
+        }
         $this->assertStringContainsString(
             'bg-body-tertiary',
             (string)$contractItems->item(0)?->attributes?->getNamedItem('class')?->nodeValue,
@@ -637,8 +817,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             'Vita first',
             'Publication first',
             'Research first',
-            'Cooperation body',
-            'Publication body',
             '31.08.2030',
             '31.08.2025',
         ];
@@ -646,6 +824,216 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             $this->assertStringContainsString($expectedValue, $content);
         }
         $this->assertStringContainsString('No press releases have been added yet.', $content);
+    }
+
+    #[Test]
+    public function profileInformationDocumentAjaxActionsCoverFormCreateUpdateSortAndDelete(): void
+    {
+        $this->setUpInlineProfileTestCase();
+        $this->seedStructuredDocumentSections();
+        $content = $this->renderInlineProfilePage();
+        $formUrl = $this->extractDataUrl($content, 'data-document-form-url');
+        $createUrl = $this->extractDataUrl($content, 'data-create-document-url');
+        $updateUrl = $this->extractDataUrl($content, 'data-update-document-url');
+        $sortUrl = $this->extractDataUrl($content, 'data-sort-document-url');
+        $deleteUrl = $this->extractDataUrl($content, 'data-delete-document-url');
+        $formResponse = $this->postJson($formUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'cooperation', 'record' => 1, 'mode' => 'edit'],
+        ]);
+        $this->assertSame(200, $formResponse->getStatusCode(), (string)$formResponse->getBody());
+        $formBody = json_decode((string)$formResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(true, $formBody['success'] ?? null);
+        $this->assertSame(1, $formBody['record'] ?? null);
+        $this->assertSame(
+            ['title', 'link', 'year', 'yearStart', 'yearEnd', 'bodytext'],
+            array_column($formBody['fields'] ?? [], 'name'),
+        );
+        $formFieldsByName = array_column($formBody['fields'] ?? [], null, 'name');
+        $this->assertTrue($formFieldsByName['bodytext']['richText'] ?? false);
+        $createResponse = $this->postJson($createUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'fields' => [
+                    'title' => 'AJAX cooperation',
+                    'link' => 'https://example.com/ajax-cooperation',
+                    'year' => '2027',
+                    'yearStart' => '2025',
+                    'yearEnd' => '2027',
+                    'bodytext' => '<p><strong>Created inline</strong></p>',
+                ],
+            ],
+        ]);
+        $this->assertSame(200, $createResponse->getStatusCode(), (string)$createResponse->getBody());
+        $createBody = json_decode((string)$createResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $createdUid = (int)($createBody['item']['uid'] ?? 0);
+        $this->assertGreaterThan(0, $createdUid, (string)$createResponse->getBody());
+        $this->assertSame('AJAX cooperation', $createBody['item']['display']['title'] ?? null);
+        $storedCreatedRecord = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile_information')
+            ->executeQuery(
+                'SELECT profile, type, title, sorting FROM tx_academicpersons_domain_model_profile_information'
+                    . ' WHERE uid = ? AND deleted = 0',
+                [$createdUid],
+            )
+            ->fetchAssociative();
+        $this->assertIsArray($storedCreatedRecord);
+        $this->assertSame(self::PROFILE_ID, (int)$storedCreatedRecord['profile']);
+        $this->assertSame('cooperation', $storedCreatedRecord['type']);
+        $this->assertSame('AJAX cooperation', $storedCreatedRecord['title']);
+        $this->assertSame(30, (int)$storedCreatedRecord['sorting']);
+        $updateResponse = $this->postJson($updateUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'record' => $createdUid,
+                'fields' => [
+                    'title' => 'AJAX cooperation updated',
+                    'bodytext' => '<p><strong>Updated inline</strong><script>alert(1)</script></p>',
+                ],
+            ],
+        ]);
+        $this->assertSame(200, $updateResponse->getStatusCode(), (string)$updateResponse->getBody());
+        $updateBody = json_decode((string)$updateResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('AJAX cooperation updated', $updateBody['item']['display']['title'] ?? null);
+        $this->assertStringContainsString('<strong>Updated inline</strong>', $updateBody['item']['display']['bodytext'] ?? '');
+        $this->assertStringNotContainsString('<script', $updateBody['item']['display']['bodytext'] ?? '');
+        $sortResponse = $this->postJson($sortUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'record' => $createdUid,
+                'direction' => 'up',
+            ],
+        ]);
+        $this->assertSame(200, $sortResponse->getStatusCode(), (string)$sortResponse->getBody());
+        $sortBody = json_decode((string)$sortResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame([1, $createdUid, 2], $sortBody['order'] ?? null);
+        $dragSortResponse = $this->postJson($sortUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'order' => [$createdUid, 2, 1],
+            ],
+        ]);
+        $this->assertSame(200, $dragSortResponse->getStatusCode(), (string)$dragSortResponse->getBody());
+        $dragSortBody = json_decode((string)$dragSortResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame([$createdUid, 2, 1], $dragSortBody['order'] ?? null);
+        $incompleteDragSortResponse = $this->postJson($sortUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'order' => [$createdUid, 2],
+            ],
+        ]);
+        $this->assertSame(400, $incompleteDragSortResponse->getStatusCode());
+        $wrongSectionResponse = $this->postJson($updateUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'publications',
+                'record' => $createdUid,
+                'fields' => ['title' => 'Must not be persisted'],
+            ],
+        ]);
+        $this->assertSame(404, $wrongSectionResponse->getStatusCode());
+        $deleteResponse = $this->postJson($deleteUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'cooperation', 'record' => $createdUid],
+        ]);
+        $this->assertSame(200, $deleteResponse->getStatusCode(), (string)$deleteResponse->getBody());
+        $deleteBody = json_decode((string)$deleteResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame($createdUid, $deleteBody['deleted'] ?? null);
+        $activeCount = (int)$this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile_information')
+            ->executeQuery(
+                'SELECT COUNT(*) FROM tx_academicpersons_domain_model_profile_information'
+                    . ' WHERE uid = ? AND deleted = 0',
+                [$createdUid],
+            )
+            ->fetchOne();
+        $this->assertSame(0, $activeCount);
+    }
+
+    #[Test]
+    public function contractDocumentAjaxIsViewOnlyWhenTheSectionIsReadonly(): void
+    {
+        $this->setUpInlineProfileTestCase();
+        $this->seedStructuredDocumentSections();
+        $content = $this->renderInlineProfilePage();
+        $formUrl = $this->extractDataUrl($content, 'data-document-form-url');
+        $createUrl = $this->extractDataUrl($content, 'data-create-document-url');
+        $updateUrl = $this->extractDataUrl($content, 'data-update-document-url');
+        $sortUrl = $this->extractDataUrl($content, 'data-sort-document-url');
+        $deleteUrl = $this->extractDataUrl($content, 'data-delete-document-url');
+        $formResponse = $this->postJson($formUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'contracts', 'record' => 1, 'mode' => 'view'],
+        ]);
+        $this->assertSame(200, $formResponse->getStatusCode(), (string)$formResponse->getBody());
+        $formBody = json_decode((string)$formResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame('contract', $formBody['kind'] ?? null);
+        $this->assertSame(
+            [
+                'position',
+                'organisationalUnit',
+                'functionType',
+                'validFrom',
+                'validTo',
+                'location',
+                'room',
+                'officeHours',
+                'publish',
+            ],
+            array_column($formBody['fields'] ?? [], 'name'),
+        );
+        $editFormResponse = $this->postJson($formUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'contracts', 'record' => 1, 'mode' => 'edit'],
+        ]);
+        $this->assertSame(403, $editFormResponse->getStatusCode());
+        $addFormResponse = $this->postJson($formUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'contracts', 'record' => 0, 'mode' => 'add'],
+        ]);
+        $this->assertSame(403, $addFormResponse->getStatusCode());
+        $createResponse = $this->postJson($createUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'contracts',
+                'fields' => [
+                    'position' => 'Visiting professor',
+                    'organisationalUnit' => '',
+                    'functionType' => '',
+                    'validFrom' => '2026-01-15',
+                    'validTo' => '2026-12-15',
+                    'location' => '',
+                    'room' => 'B 1.23',
+                    'officeHours' => '<p>By appointment</p>',
+                    'publish' => true,
+                ],
+            ],
+        ]);
+        $this->assertSame(403, $createResponse->getStatusCode());
+        $updateResponse = $this->postJson($updateUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'contracts',
+                'record' => 1,
+                'fields' => ['position' => 'Guest professor'],
+            ],
+        ]);
+        $this->assertSame(403, $updateResponse->getStatusCode());
+        $sortResponse = $this->postJson($sortUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'contracts', 'record' => 1, 'direction' => 'down'],
+        ]);
+        $this->assertSame(403, $sortResponse->getStatusCode());
+        $deleteResponse = $this->postJson($deleteUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'contracts', 'record' => 1],
+        ]);
+        $this->assertSame(403, $deleteResponse->getStatusCode());
     }
 
     #[Test]
@@ -744,46 +1132,10 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     }
 
     #[Test]
-    public function inlineUpdatePersistsDirectProfileContactsAndTheirVisibilityFlags(): void
-    {
-        $this->setUpInlineProfileTestCase();
-        $updateUrl = $this->extractDataUrl($this->renderInlineProfilePage(), 'data-update-url');
-        $data = [
-            'emailAddress' => 'public-profile@example.org',
-            'publishEmailAddress' => true,
-            'phoneNumber' => '+49 123 456',
-            'publishPhoneNumber' => true,
-        ];
-
-        $response = $this->postJson(
-            $updateUrl,
-            ['profile' => self::PROFILE_ID, 'data' => $data],
-        );
-        $this->assertSame(200, $response->getStatusCode(), (string)$response->getBody());
-        $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame($data, $body['data'] ?? null);
-
-        $row = $this->getConnectionPool()
-            ->getConnectionForTable('tx_academicpersons_domain_model_profile')
-            ->executeQuery(
-                'SELECT email_address, publish_email_address, phone_number, publish_phone_number '
-                    . 'FROM tx_academicpersons_domain_model_profile WHERE uid = ?',
-                [self::PROFILE_ID],
-            )
-            ->fetchAssociative();
-        $this->assertIsArray($row);
-        $this->assertSame('public-profile@example.org', $row['email_address']);
-        $this->assertSame(1, (int)$row['publish_email_address']);
-        $this->assertSame('+49 123 456', $row['phone_number']);
-        $this->assertSame(1, (int)$row['publish_phone_number']);
-    }
-
-    #[Test]
     public function inlineAcademicTitleUpdatePersistsTheConfiguredNameComponent(): void
     {
         $this->setUpInlineProfileTestCase();
         $updateUrl = $this->extractDataUrl($this->renderInlineProfilePage(), 'data-update-url');
-
         $response = $this->postJson(
             $updateUrl,
             ['profile' => self::PROFILE_ID, 'data' => ['title' => 'Prof. Dr.']],
@@ -791,7 +1143,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertSame(200, $response->getStatusCode(), (string)$response->getBody());
         $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame(['title' => 'Prof. Dr.'], $body['data'] ?? null);
-
         $storedTitle = $this->getConnectionPool()
             ->getConnectionForTable('tx_academicpersons_domain_model_profile')
             ->executeQuery(
@@ -812,6 +1163,15 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertIsString($inlineConfiguration);
         $this->assertStringContainsString("'uploadImage'", $inlineConfiguration);
         $this->assertStringContainsString("'deleteImage'", $inlineConfiguration);
+        foreach ([
+            'documentForm',
+            'createDocument',
+            'updateDocument',
+            'deleteDocument',
+            'sortDocument',
+        ] as $documentAction) {
+            $this->assertStringContainsString(sprintf("'%s'", $documentAction), $inlineConfiguration);
+        }
         foreach (['editImage', 'addImage', 'removeImage', 'toggleSkipSync'] as $legacyAction) {
             $this->assertStringNotContainsString(sprintf("'%s'", $legacyAction), $inlineConfiguration);
         }
@@ -876,6 +1236,12 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringContainsString('[action]=updateSkipSync', $decodedContent);
         $this->assertStringContainsString('[action]=uploadImage', $decodedContent);
         $this->assertStringContainsString('[action]=deleteImage', $decodedContent);
+        $this->assertStringContainsString('[action]=documentForm', $decodedContent);
+        $this->assertStringContainsString('[action]=createDocument', $decodedContent);
+        $this->assertStringContainsString('[action]=updateDocument', $decodedContent);
+        $this->assertStringContainsString('[action]=deleteDocument', $decodedContent);
+        $this->assertStringContainsString('[action]=sortDocument', $decodedContent);
+        $this->assertStringContainsString('data-ie-document-modal', $content);
         $this->assertStringContainsString('Save', $content);
         $this->assertStringNotContainsString('data-add-label', $content);
         $this->assertStringNotContainsString('data-replace-label', $content);
@@ -1028,10 +1394,6 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     public function inlineEditorLabelsAreShippedInBothLanguages(): void
     {
         $expectedEnglish = [
-            'profile.emailAddress.label' => 'Public email address',
-            'profile.publishEmailAddress.label' => 'Publish email address',
-            'profile.phoneNumber.label' => 'Public phone number',
-            'profile.publishPhoneNumber.label' => 'Publish phone number',
             'inlineProfile.btnEditAll' => 'Edit all',
             'inlineProfile.btnCloseAll' => 'Close all',
             'inlineProfile.image.modal.title' => 'Edit profile image',

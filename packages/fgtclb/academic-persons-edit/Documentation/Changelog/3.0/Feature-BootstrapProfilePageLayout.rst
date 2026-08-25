@@ -19,6 +19,10 @@ corresponding inline editor. Alternating ``bg-body-tertiary`` rows create the
 visual rhythm from the reference design. The ``miscellaneous`` field is shown
 separately as the :guilabel:`About me` description.
 
+Every Bootstrap button and visible modal surface across the shipped inline and
+retained legacy Fluid views now carries ``rounded-0``. This keeps action links,
+close controls, confirmation dialogs and modal sections consistently square.
+
 The name fields and both link URL/title pairs use the new
 :file:`Field/Group.html` partial. One pencil opens all controls in a group;
 clear empties every editable draft value without a request, cancel restores
@@ -32,11 +36,11 @@ image column has the full height of the adjacent profile fields as its
 containing block.
 
 The sticky image's runtime ``top`` offset follows the rendered height of the
-fixed ``#page-header`` plus a 10-pixel visual gap. A ``ResizeObserver`` watches
-the header's ``border-box`` and updates the value whenever responsive or
-scroll-dependent navigation styles change its height or vertical padding, with
-a window-resize fallback for older browsers. No fixed header height or
-additional stylesheet is required.
+fixed ``#page-header.navbar-fixed-top`` plus a 10-pixel visual gap. A
+``ResizeObserver`` watches the header's ``border-box`` and updates the value
+whenever responsive or scroll-dependent navigation styles change its height or
+vertical padding, with a window-resize fallback for older browsers. No fixed
+header height or additional stylesheet is required.
 
 Gender has no delete, cancel or save buttons. Changing the select persists its
 new value immediately. The restored small :guilabel:`Edit all` button sits
@@ -45,7 +49,7 @@ rows. While active it uses Bootstrap's active state and reads
 :guilabel:`Close all`; activating it again collapses all editors while keeping
 unsaved browser-side drafts. The former global footer save/cancel area was
 removed, so persistence stays explicit on each field. The compact
-:guilabel:`Disable profile sync` switch sits immediately left of the toggle in its own,
+:guilabel:`Private` switch sits immediately left of the toggle in its own,
 valid sibling form. A successful name update also refreshes the main heading
 without a page reload.
 
@@ -60,7 +64,7 @@ Projects using the shipped Fluid files receive the new responsive layout
 without adding CSS. Overrides should preserve the documented single-field and
 group data attributes from :ref:`inline-profile-editing`.
 
-The :guilabel:`Disable profile sync` control represents the existing
+The :guilabel:`Private` control represents the existing
 ``skipSync`` setting; this change does not introduce a separate visibility
 property.
 

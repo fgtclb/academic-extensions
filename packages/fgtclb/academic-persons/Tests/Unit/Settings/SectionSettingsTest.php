@@ -63,6 +63,8 @@ final class SectionSettingsTest extends UnitTestCase
                         validations: ['yearStart' => $validation],
                     ),
                     position: 0,
+                    rowFields: ['from', 'title'],
+                    actions: ['view', 'down', 'up', 'edit'],
                 ),
             ],
             raw: [],
@@ -80,6 +82,29 @@ final class SectionSettingsTest extends UnitTestCase
             $settings->getDocumentValidationTcaTypesConfig(),
         );
         $this->assertSame('cooperation', $settings->getDocumentSectionByType('cooperation')?->identifier);
+        $this->assertSame(['from', 'title'], $settings->getDocumentSection('cooperation')?->rowFields);
+        $this->assertTrue($settings->getDocumentSection('cooperation')?->allowsAction('edit'));
+        $this->assertTrue($settings->getDocumentSection('cooperation')?->allowsDragSorting());
+    }
+
+    #[Test]
+    public function readonlyDocumentSectionKeepsOnlyItsViewCapability(): void
+    {
+        $section = new DocumentSection(
+            identifier: 'contracts',
+            label: 'Contracts',
+            type: 'contracts',
+            fieldName: 'contracts',
+            readOnly: true,
+            validationSet: new ValidationSet(identifier: 'contracts', validations: []),
+            position: 0,
+            rowFields: ['from', 'position'],
+            actions: ['view', 'down', 'up', 'delete', 'edit'],
+        );
+        $this->assertSame(['view'], $section->getAllowedActions());
+        $this->assertFalse($section->allowsCreate());
+        $this->assertFalse($section->allowsDragSorting());
+        $this->assertFalse($section->allowsAction('edit'));
     }
 
     #[Test]
@@ -108,12 +133,30 @@ final class SectionSettingsTest extends UnitTestCase
                     position: 0,
                 ),
             ],
+            documentSections: [
+                'publications' => new DocumentSection(
+                    identifier: 'publications',
+                    label: 'Publications',
+                    type: 'publication',
+                    fieldName: 'publications',
+                    readOnly: false,
+                    validationSet: new ValidationSet(identifier: 'publications', validations: []),
+                    position: 0,
+                    rowFields: ['year', 'title'],
+                    actions: ['view', 'down', 'up', 'delete', 'edit'],
+                ),
+            ],
             raw: ['profile' => ['miscellaneous' => ['section' => 'aboutme']]],
         );
         $restored = eval('return ' . var_export($subject, true) . ';');
         $this->assertInstanceOf(AcademicPersonsSettings::class, $restored);
         $this->assertEquals($subject, $restored);
         $this->assertSame('ckeditor', $restored->getProfileField('miscellaneous')?->renderType);
+        $this->assertSame(['year', 'title'], $restored->getDocumentSection('publications')?->rowFields);
+        $this->assertSame(
+            ['view', 'down', 'up', 'delete', 'edit'],
+            $restored->getDocumentSection('publications')?->actions,
+        );
     }
 
     /**

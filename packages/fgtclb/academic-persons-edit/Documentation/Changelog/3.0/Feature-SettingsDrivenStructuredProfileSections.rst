@@ -15,14 +15,17 @@ prepends a locally defined contract section or relies on the removed
 ``profileInformationTypes`` registry.
 
 Every view-model entry carries the configured identifier, relation field,
-record type, LLL label, read-only state, validation metadata and position.
+record type, LLL label, read-only state, row fields, allowed actions, validation
+metadata and position.
 Contracts and profile-information records remain strongly typed. Date
 presentation is selected from the configured record type.
 
-The current inline templates display these records without mutation controls.
-They expose the configured read-only and validation metadata at the stable
-section boundary for template integrations, while :guilabel:`Edit all` remains
-limited to direct profile fields.
+The inline templates enforce read-only state, render the configured row fields
+and actions, and expose the resulting capability metadata at the stable section
+boundary for integrations. The structured-section CRUD
+controls and their JSON endpoints are described in
+:ref:`feature-inline-structured-section-crud`, while :guilabel:`Edit all`
+remains limited to direct profile fields.
 
 The InlineProfile plugin registers only ``InlineProfileController``. Legacy
 contract, profile-information and contact controllers are not part of its

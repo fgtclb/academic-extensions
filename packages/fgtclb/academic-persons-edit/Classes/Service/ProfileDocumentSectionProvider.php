@@ -37,6 +37,10 @@ final class ProfileDocumentSectionProvider
      *     kind: 'contract'|'profileInformation',
      *     dateMode: 'date'|'range'|'year'|'start',
      *     readOnly: bool,
+     *     rowFields: list<string>,
+     *     actions: list<string>,
+     *     canCreate: bool,
+     *     sortable: bool,
      *     validations: array<string, Validation>,
      *     position: int,
      *     items: list<Contract|ProfileInformation>
@@ -55,6 +59,10 @@ final class ProfileDocumentSectionProvider
                 'kind' => $contractSection ? 'contract' : 'profileInformation',
                 'dateMode' => $contractSection ? 'date' : $this->getDateMode($section),
                 'readOnly' => $section->readOnly,
+                'rowFields' => $section->rowFields,
+                'actions' => $section->getAllowedActions(),
+                'canCreate' => $section->allowsCreate(),
+                'sortable' => $section->allowsDragSorting(),
                 'validations' => $section->validationSet->validations,
                 'position' => $section->position,
                 'items' => $contractSection

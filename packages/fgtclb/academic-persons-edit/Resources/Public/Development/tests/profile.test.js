@@ -5,6 +5,7 @@ describe("frontend/profile entry module", () => {
   test("initializes every HTML root in the supplied scope and ignores non-HTML roots", () => {
     const header = document.createElement("header");
     header.id = "page-header";
+    header.classList.add("navbar-fixed-top");
     jest.spyOn(header, "getBoundingClientRect").mockReturnValue({ height: 20 });
     document.body.append(header);
     const scope = document.createElement("div");
