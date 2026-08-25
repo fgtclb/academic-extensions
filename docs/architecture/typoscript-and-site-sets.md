@@ -305,8 +305,61 @@ imports:
 
 Not through a site set: a set may carry a `route-enhancers.yaml` only from TYPO3
 v14.1, and this branch supports v13 as well, so `imports:` is the form that
-works on both. The five enhancer keys are distinct, so importing all five into
-one site is not a conflict.
+works on both.
+
+### Importing is half of it — the enhancers have to be limited to their pages
+
+Importing all five is not enough, and the distinct enhancer keys do not make it
+safe. TYPO3 offers **every** enhancer of a site to **every** page unless the
+enhancer carries `limitToPages`, and `PageUriMatcher::matchCollection()` takes
+the first candidate route whose path matches *and* whose aspects resolve. The
+insertion order is the `imports:` order.
+
+Three of the five routes are declared twice, byte identical down to the mapper:
+
+| Route                       | Declared in                             |
+|-----------------------------|-----------------------------------------|
+| `/{profile_name}`           | `Detail.yaml`, `ListAndDetail.yaml`     |
+| `{localized_page}-{page}`   | `List.yaml`, `ListAndDetail.yaml`       |
+| `/{letter}`                 | `List.yaml`, `ListAndDetail.yaml`       |
+
+So the file imported first takes those URLs on every page of the site, and the
+plugin on the other page never receives its argument. That is ACE-470: the
+dedicated `/persons/detail` page answered 404 for every link the list plugins
+generated for it, on both instances, in both languages and in both page trees,
+while `/persons/list-and-detail/<slug>` kept working. Only *resolving* is
+ambiguous — generation is scoped to the plugin namespace being linked, so the
+links look right and the defect surfaces as a broken page instead.
+
+The jobs and programs enhancers are not caught by this even though
+`/{job_title}` compiles to the same greedy `.+` — an aspect variable without an
+explicit `requirements` entry always does. Their mappers read other tables, so
+a persons route that matched the path is skipped when the slug is not a profile
+slug and the matcher falls through. That is a thin guarantee, not a design.
+
+All four instance site configurations therefore pin every enhancer:
+
+```yaml
+routeEnhancers:
+  ProfileListPlugin:
+    limitToPages: [201, 202, 203]
+  ProfileListAndDetailPlugin:
+    limitToPages: [204]
+  ProfileDetailPlugin:
+    limitToPages: [205]
+  AcademicJobsDetailPlugin:
+    limitToPages: [233]
+  AcademicPrograms:
+    limitToPages: [251, 252]
+```
+
+The uids are the ones the seed declares, `+1000` in the `academics-legacy`
+site, and they are the uids of the **default language**: matching derives the
+page as `l10n_parent ?: uid`, so one list covers `/persons/detail` and
+`/de/personal/detail` alike. Generation on the other hand uses the linked page
+uid, which is the default-language uid too — naming a translated page's own uid
+would work for neither direction. Plain uids work on v13 and v14; the
+ExpressionLanguage form of `limitToPages` is v14.2 and later only.
 
 ## The integrator chapter
 
