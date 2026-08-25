@@ -7,6 +7,9 @@ body:has(.academic-persons-inline-edit) .frame-space-after-none {
 body:has(.academic-persons-inline-edit) .sticky-top {
     z-index: 900 !important;
 }
+.academic-persons-inline-edit .bg-body-tertiary {
+    --bs-tertiary-bg-rgb: 246, 248, 253;
+}
 .academic-persons-inline-edit [data-ie-document-drag] {
     cursor: grab;
 }
