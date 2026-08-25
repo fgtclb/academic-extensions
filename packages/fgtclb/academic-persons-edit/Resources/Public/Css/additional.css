@@ -10,6 +10,9 @@ body:has(.academic-persons-inline-edit) .sticky-top {
 .academic-persons-inline-edit .bg-body-tertiary {
     --bs-tertiary-bg-rgb: 246, 248, 253;
 }
+[data-ie-document-modal] .modal-dialog {
+    max-width: 800px;
+}
 .academic-persons-inline-edit [data-ie-document-drag] {
     cursor: grab;
 }
