@@ -7,6 +7,7 @@ import {
 const createElements = () => {
   const header = document.createElement("header");
   header.id = "page-header";
+  header.classList.add("navbar-fixed-top");
   const root = document.createElement("section");
   root.innerHTML = '<aside data-ie-sticky-image></aside>';
   document.body.append(header, root);
@@ -30,10 +31,12 @@ describe("profile/sticky-image", () => {
     expect(sticky.style.getPropertyValue("top")).toBe("10px");
   });
 
-  test("does nothing without a sticky image and clears stale offsets without a header", () => {
+  test("does nothing without a sticky image and clears stale offsets without a matching header", () => {
     const root = document.createElement("section");
     expect(() => initializeStickyImageOffset(root)).not.toThrow();
-
+    const nonFixedHeader = document.createElement("header");
+    nonFixedHeader.id = "page-header";
+    document.body.append(nonFixedHeader);
     root.innerHTML = '<aside data-ie-sticky-image style="top: 99px"></aside>';
     initializeStickyImageOffset(root);
     expect(root.querySelector("aside").style.getPropertyValue("top")).toBe("");

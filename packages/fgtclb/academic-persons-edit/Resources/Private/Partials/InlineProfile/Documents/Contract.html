@@ -4,43 +4,14 @@
     data-namespace-typo3-fluid="true">
     <div data-ie-document-items>
         <f:for each="{items}" as="contract" iteration="itemIteration">
-            <article
-                class="row g-3 align-items-start rounded-1 px-3 px-lg-4 py-4 {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
-                data-ie-document-item
-                data-item-uid="{contract.uid}"
-                data-item-sorting="{contract.sorting}"
-                data-item-position="{itemIteration.index}">
-                <div class="col-12 col-md-5">
-                    <div class="fw-semibold">
-                        <f:translate
-                            key="inlineProfile.documents.start"
-                            extensionName="academic_persons_edit" />
-                    </div>
-                    <div>
-                        <f:if condition="{contract.validFrom}">
-                            <f:then>
-                                <f:format.date format="d.m.Y"
-                                    >{contract.validFrom}</f:format.date
-                                >
-                            </f:then>
-                            <f:else>—</f:else>
-                        </f:if>
-                    </div>
-                </div>
-                <div class="col-12 col-md-7">
-                    <div class="fw-semibold">
-                        <f:translate
-                            key="inlineProfile.documents.position"
-                            extensionName="academic_persons_edit" />
-                    </div>
-                    <div>
-                        <f:if condition="{contract.position}">
-                            <f:then>{contract.position}</f:then>
-                            <f:else>—</f:else>
-                        </f:if>
-                    </div>
-                </div>
-            </article>
+            <f:render
+                partial="InlineProfile/Documents/ContractRow"
+                arguments="{contract: contract, itemIteration: itemIteration, rowFields: rowFields, actions: actions, sortable: sortable}" />
         </f:for>
     </div>
+    <template data-ie-document-item-template>
+        <f:render
+            partial="InlineProfile/Documents/ContractRow"
+            arguments="{template: true, rowFields: rowFields, actions: actions, sortable: sortable}" />
+    </template>
 </html>

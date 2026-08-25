@@ -260,22 +260,6 @@
         <source>Doe</source>
         <target>Mustermann</target>
       </trans-unit>
-      <trans-unit id="profile.emailAddress.label">
-        <source>Public email address</source>
-        <target>Öffentliche E-Mail-Adresse</target>
-      </trans-unit>
-      <trans-unit id="profile.publishEmailAddress.label">
-        <source>Publish email address</source>
-        <target>E-Mail-Adresse veröffentlichen</target>
-      </trans-unit>
-      <trans-unit id="profile.phoneNumber.label">
-        <source>Public phone number</source>
-        <target>Öffentliche Telefonnummer</target>
-      </trans-unit>
-      <trans-unit id="profile.publishPhoneNumber.label">
-        <source>Publish phone number</source>
-        <target>Telefonnummer veröffentlichen</target>
-      </trans-unit>
       <trans-unit id="profile.website.label">
         <source>Website</source>
         <target>Webseite</target>
@@ -349,8 +333,8 @@
         <target>z.B. Hobbys, Interessen</target>
       </trans-unit>
       <trans-unit id="profile.skipSync.label">
-        <source>Disable profile sync</source>
-        <target>Profil-Synchronisation deaktivieren</target>
+        <source>Private</source>
+        <target>Private</target>
       </trans-unit>
       <trans-unit id="profile.skipSync.description">
         <source>Disabling the profile synchronization will prevent automatic updates from external
@@ -629,6 +613,27 @@
         <source>Position</source>
         <target>Position</target>
       </trans-unit>
+      <trans-unit id="inlineProfile.documents.actions">
+        <source>Entry actions</source>
+        <target>Aktionen für diesen Eintrag</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.delete.confirm">
+        <source>Do you really want to delete this entry? This action cannot be undone.</source>
+        <target>Möchten Sie diesen Eintrag wirklich löschen? Diese Aktion kann nicht rückgängig
+          gemacht werden.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.status.saved">
+        <source>The entry has been saved.</source>
+        <target>Der Eintrag wurde gespeichert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.status.deleted">
+        <source>The entry has been deleted.</source>
+        <target>Der Eintrag wurde gelöscht.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.status.sorted">
+        <source>The order has been updated.</source>
+        <target>Die Reihenfolge wurde aktualisiert.</target>
+      </trans-unit>
       <trans-unit id="inlineProfile.documents.empty">
         <source>No entries have been added yet.</source>
         <target>Es wurden noch keine Einträge hinterlegt.</target>
@@ -818,6 +823,10 @@
       <trans-unit id="actions.sortDown">
         <source>Move downwards</source>
         <target>Nach unten verschieben</target>
+      </trans-unit>
+      <trans-unit id="actions.dragSort">
+        <source>Drag to reorder</source>
+        <target>Zum Sortieren ziehen</target>
       </trans-unit>
       <trans-unit id="actions.setToTop">
         <source>Move to the top</source>

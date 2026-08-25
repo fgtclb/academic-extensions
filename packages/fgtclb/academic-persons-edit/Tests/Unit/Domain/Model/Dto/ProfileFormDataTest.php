@@ -44,10 +44,6 @@ final class ProfileFormDataTest extends UnitTestCase
         $profile->setMiddleName('Q.');
         $profile->setLastName('Doe');
         $profile->setGender('female');
-        $profile->setEmailAddress('profile@example.org');
-        $profile->setPublishEmailAddress(true);
-        $profile->setPhoneNumber('+49 123 456');
-        $profile->setPublishPhoneNumber(true);
         $profile->setPublicationsLink('https://example.org/publications');
         $profile->setPublicationsLinkTitle('All publications');
         $profile->setWebsite('https://example.org/jane');
@@ -62,7 +58,7 @@ final class ProfileFormDataTest extends UnitTestCase
     }
 
     /**
-     * Nineteen properties, most of them same-typed strings, and several of them
+     * Fifteen properties, most of them same-typed strings, and several of them
      * confusable pairs (`website`/`websiteTitle`, `supervisedThesis`/
      * `supervisedDoctoralThesis`). Only asserting all of them at once against distinct
      * values catches a swapped or forgotten assignment.
@@ -82,10 +78,6 @@ final class ProfileFormDataTest extends UnitTestCase
                 'middleName' => 'Q.',
                 'lastName' => 'Doe',
                 'gender' => 'female',
-                'emailAddress' => 'profile@example.org',
-                'publishEmailAddress' => true,
-                'phoneNumber' => '+49 123 456',
-                'publishPhoneNumber' => true,
                 'publicationsLink' => 'https://example.org/publications',
                 'publicationsLinkTitle' => 'All publications',
                 'website' => 'https://example.org/jane',
@@ -103,10 +95,6 @@ final class ProfileFormDataTest extends UnitTestCase
                 'middleName' => $formData->getMiddleName(),
                 'lastName' => $formData->getLastName(),
                 'gender' => $formData->getGender(),
-                'emailAddress' => $formData->getEmailAddress(),
-                'publishEmailAddress' => $formData->getPublishEmailAddress(),
-                'phoneNumber' => $formData->getPhoneNumber(),
-                'publishPhoneNumber' => $formData->getPublishPhoneNumber(),
                 'publicationsLink' => $formData->getPublicationsLink(),
                 'publicationsLinkTitle' => $formData->getPublicationsLinkTitle(),
                 'website' => $formData->getWebsite(),

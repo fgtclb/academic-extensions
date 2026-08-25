@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Controller;
 
+use FGTCLB\AcademicPersons\Domain\Repository\ContractRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\FunctionTypeRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\LocationRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\OrganisationalUnitRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\ProfileInformationRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersonsEdit\Controller\InlineProfileController;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\ContractFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFormDataFactoryInterface;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileInformationFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Parser\ProfileUpdatePayloadParser;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileDocumentSectionProvider;
@@ -286,6 +293,55 @@ final class InlineProfileControllerTest extends UnitTestCase
         );
     }
 
+    #[Test]
+    public function documentFormReturnsJsonWhenAuthenticationIsRequired(): void
+    {
+        $subject = $this->createSubject(
+            $this->createRequest(
+                'POST',
+                json_encode(
+                    [
+                        'profile' => 123,
+                        'data' => ['section' => 'cooperation', 'record' => 0],
+                    ],
+                    JSON_THROW_ON_ERROR,
+                ),
+            ),
+        );
+
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->documentFormAction(),
+        );
+
+        $this->assertJsonResponse(
+            $response,
+            401,
+            [
+                'success' => false,
+                'error' => 'authentication_required',
+            ],
+        );
+    }
+
+    #[Test]
+    public function sortDocumentRejectsNonPostRequest(): void
+    {
+        $subject = $this->createSubject($this->createRequest('GET'));
+
+        $response = $this->getPropagatedResponse(
+            static fn(): ResponseInterface => $subject->sortDocumentAction(),
+        );
+
+        $this->assertJsonResponse(
+            $response,
+            405,
+            [
+                'success' => false,
+                'error' => 'method_not_allowed',
+            ],
+        );
+    }
+
     private function createSubject(Request $request): InlineProfileController
     {
         $profileRepository = $this->createStub(ProfileRepository::class);
@@ -318,6 +374,14 @@ final class InlineProfileControllerTest extends UnitTestCase
             new ProfileDocumentSectionProvider(
                 $academicPersonsSettings,
             ),
+            $this->createStub(ContractFactory::class),
+            $this->createStub(ContractRepository::class),
+            $this->createStub(ProfileInformationFactory::class),
+            $this->createStub(ProfileInformationRepository::class),
+            $this->createStub(FunctionTypeRepository::class),
+            $this->createStub(OrganisationalUnitRepository::class),
+            $this->createStub(LocationRepository::class),
+            $this->createStub(ProfileRichTextSanitizerInterface::class),
         );
 
         $requestProperty = new ReflectionProperty(

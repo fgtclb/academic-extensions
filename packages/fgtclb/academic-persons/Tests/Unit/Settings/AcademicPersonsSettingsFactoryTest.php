@@ -32,7 +32,7 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
         $factory = (new ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $method = new ReflectionMethod(AcademicPersonsSettingsFactory::class, 'academicPersonsSettingsIdentifier');
         $method->setAccessible(true);
-        $this->assertSame('AcademicPersons_Settings_SectionSchema_v2', $method->invoke($factory));
+        $this->assertSame('AcademicPersons_Settings_SectionSchema_v3', $method->invoke($factory));
     }
 
     #[Test]
@@ -127,8 +127,17 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
         $this->assertTrue($contracts->isContractSection());
         $this->assertSame('contracts', $contracts->type);
         $this->assertSame('contracts', $contracts->fieldName);
+        $this->assertSame(['from', 'position'], $contracts->rowFields);
+        $this->assertSame(['view'], $contracts->actions);
+        $this->assertSame(['view'], $contracts->getAllowedActions());
+        $this->assertFalse($contracts->allowsCreate());
+        $this->assertFalse($contracts->allowsDragSorting());
         $cooperation = $settings->getDocumentSection('cooperation');
         $this->assertNotNull($cooperation);
+        $this->assertSame(['from', 'to', 'title'], $cooperation->rowFields);
+        $this->assertSame(['view', 'down', 'up', 'delete', 'edit'], $cooperation->actions);
+        $this->assertTrue($cooperation->allowsCreate());
+        $this->assertTrue($cooperation->allowsDragSorting());
         $this->assertSame(
             ['title', 'yearStart', 'yearEnd', 'year', 'bodytext'],
             array_keys($cooperation->validationSet->validations),
@@ -136,7 +145,29 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
         $this->assertSame('year_start', $cooperation->validationSet->get('yearStart')?->fieldName);
         $this->assertSame('date', $cooperation->validationSet->get('yearStart')?->inputType);
         $this->assertSame('textarea', $cooperation->validationSet->get('bodytext')?->inputType);
+        $this->assertSame(['html'], $cooperation->validationSet->get('bodytext')?->flags);
+        $this->assertTrue($cooperation->validationSet->get('bodytext')?->isRichText());
         $this->assertTrue($cooperation->validationSet->get('title')?->required);
+    }
+
+    #[Test]
+    public function unsupportedOrDuplicateDocumentPresentationValuesAreIgnored(): void
+    {
+        $settings = $this->normalize([
+            'documentSections' => [
+                'publications' => [
+                    'label' => 'Publications',
+                    'type' => 'publication',
+                    'fieldName' => 'publications',
+                    'rowFields' => ['year', 'unsupported', 'year', 123, ' title ', 'position'],
+                    'actions' => ['view', 'unsupported', 'VIEW', null, 'edit'],
+                ],
+            ],
+        ]);
+        $section = $settings->getDocumentSection('publications');
+        $this->assertNotNull($section);
+        $this->assertSame(['year', 'title'], $section->rowFields);
+        $this->assertSame(['view', 'edit'], $section->actions);
     }
 
     #[Test]

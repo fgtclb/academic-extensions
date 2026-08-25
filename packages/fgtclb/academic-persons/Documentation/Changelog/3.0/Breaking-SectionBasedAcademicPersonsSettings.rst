@@ -17,8 +17,10 @@ removed.
 Each direct profile and contract-contact field declares its visual ``section``,
 base ``fieldType``, frontend ``renderType`` and validators. Special inline
 components declare their render type and, where applicable, composed fields.
-Each document section declares its label, stored
-record type, relation field, optional read-only state and its own validators.
+Each document section declares its label, stored record type, relation field,
+optional read-only state, ordered ``rowFields`` and ordered ``actions`` as well
+as its own validators. Read-only sections expose only viewing even if a
+mutating action is accidentally configured.
 Document fields are normalized from ``from``, ``to`` and ``description`` to the
 existing DTO properties ``yearStart``, ``yearEnd`` and ``bodytext``.
 

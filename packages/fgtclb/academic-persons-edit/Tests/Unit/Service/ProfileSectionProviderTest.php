@@ -23,13 +23,13 @@ final class ProfileSectionProviderTest extends UnitTestCase
         $title = $this->field('title', 'information', 'input', 'text', 1);
         $firstName = $this->field('firstName', 'information', 'input', 'text', 2, true);
         $lastName = $this->field('lastName', 'information', 'input', 'text', 3, true);
-        $email = $this->field('emailAddress', 'information', 'input', 'email', 4);
+        $website = $this->field('website', 'information', 'input', 'url', 4);
         $about = $this->field('miscellaneous', 'aboutme', 'textarea', 'ckeditor', 0);
         $settings = new AcademicPersonsSettings(
             profileSections: [
                 'information' => $this->section(
                     'information',
-                    [$gender, $title, $firstName, $lastName, $email],
+                    [$gender, $title, $firstName, $lastName, $website],
                     0,
                 ),
                 'aboutme' => $this->section('aboutme', [$about], 1),
@@ -73,7 +73,7 @@ final class ProfileSectionProviderTest extends UnitTestCase
             $sections['information']['items'][1]['special']['fieldIdentifiers'],
         );
         $this->assertSame(
-            'emailAddress',
+            'website',
             $sections['information']['items'][2]['field']['identifier'],
         );
         $this->assertSame(
@@ -96,7 +96,7 @@ final class ProfileSectionProviderTest extends UnitTestCase
             $sections['information']['items'][1]['special']['fields'][0]['autocomplete'],
         );
         $this->assertSame(
-            'email',
+            'url',
             $sections['information']['items'][2]['field']['autocomplete'],
         );
         $this->assertTrue($subject->getSpecialFields()['image']['writable']);

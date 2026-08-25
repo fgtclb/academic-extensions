@@ -140,6 +140,15 @@ Every key below :yaml:`documentSections` identifies one collection:
         label: "LLL:EXT:site_package/Resources/Private/Language/locallang.xlf:profile.publications"
         type: publication
         fieldName: publications
+        rowFields:
+          - year
+          - title
+        actions:
+          - view
+          - down
+          - up
+          - delete
+          - edit
         validators:
           title:
             - required
@@ -149,7 +158,7 @@ Every key below :yaml:`documentSections` identifies one collection:
             - required
             - date
           description:
-            - textarea
+            - html
 
 The available properties are:
 
@@ -166,14 +175,30 @@ The available properties are:
     *   - :yaml:`fieldName`
         - Required Profile relation/database field.
     *   - :yaml:`readonly`
-        - Optional frontend capability metadata. The shipped contracts section
-          is read only.
+        - Optional section lock. A read-only section can only expose its
+          :yaml:`view` action; creation, editing, deletion and sorting are
+          rejected by the inline editor. The shipped contracts section is read
+          only.
+    *   - :yaml:`rowFields`
+        - Ordered list of values rendered in each compact row. Supported values
+          for profile-information rows are :yaml:`from`, :yaml:`to`,
+          :yaml:`year`, :yaml:`title` and :yaml:`description`. Contract rows
+          support :yaml:`from`, :yaml:`to` and :yaml:`position`.
+    *   - :yaml:`actions`
+        - Ordered list of row actions. Supported values are :yaml:`view`,
+          :yaml:`down`, :yaml:`up`, :yaml:`delete` and :yaml:`edit`. Drag and
+          drop is available when both sorting directions are enabled.
     *   - :yaml:`validators`
         - Field flags used only for records of this section and type.
 
 The document aliases :yaml:`from`, :yaml:`to` and :yaml:`description` map to
 ``yearStart``, ``yearEnd`` and ``bodytext`` and to :sql:`year_start`,
 :sql:`year_end` and :sql:`bodytext`.
+
+The section-level add control follows :yaml:`readonly`; :yaml:`actions` governs
+the controls attached to existing rows. Configuration order is preserved for
+both :yaml:`rowFields` and :yaml:`actions`. Unsupported and duplicate values are
+ignored while the settings graph is normalized.
 
 The special :yaml:`contracts` section uses :yaml:`fieldName: contracts`,
 matching ``Profile::$contracts``, ``Profile::getContracts()`` and the

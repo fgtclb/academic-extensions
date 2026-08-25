@@ -3,7 +3,7 @@
     data-namespace-typo3-fluid="true"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers">
-    <dialog class="modal-buttons" id="delete-{property}-{id}">
+    <dialog class="modal-buttons rounded-0" id="delete-{property}-{id}">
         <span class="h4"
             >{f:translate(key: '{property}.delete', extensionName:
             'academic_persons_edit')}</span
@@ -11,7 +11,7 @@
 
         <div class="btn-wrapper right text-end">
             <button
-                class="btn btn-outline-danger"
+                class="btn rounded-0 btn-outline-danger"
                 onclick="this.closest('dialog').close()">
                 {f:translate(key: 'actions.cancel', extensionName:
                 'academic_persons_edit')}
@@ -21,7 +21,7 @@
                     alternativeMarkupIdentifier="inline" />
             </button>
 
-            <a href="{deleteUrl}" class="btn btn-danger">
+            <a href="{deleteUrl}" class="btn rounded-0 btn-danger">
                 {f:translate(key: 'actions.delete', extensionName:
                 'academic_persons_edit')}
 

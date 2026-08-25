@@ -18,40 +18,55 @@
                 data-section-field-name="{section.fieldName}"
                 data-section-record-type="{section.type}"
                 data-section-readonly="{f:if(condition: section.readOnly, then: '1', else: '0')}"
+                data-section-sortable="{f:if(condition: section.sortable, then: '1', else: '0')}"
+                data-section-date-mode="{section.dateMode}"
                 data-section-position="{section.position}">
-                <h2
-                    id="inline-profile-{profile.uid}-document-section-{section.identifier}-heading"
-                    class="display-6 fw-normal mb-4">
+                <div
+                    class="d-flex align-items-center justify-content-between gap-3 mb-4">
+                    <h2
+                        id="inline-profile-{profile.uid}-document-section-{section.identifier}-heading"
+                        class="display-6 fw-normal mb-0">
+                        <f:translate
+                            key="{section.label}"
+                            default="{section.identifier}" />
+                    </h2>
+                    <f:if condition="{section.canCreate}">
+                        <button
+                            type="button"
+                            class="btn rounded-0 btn-sm btn-link p-2"
+                            data-ie-document-add>
+                            <core:icon
+                                identifier="academic-persons-inline-edit-add"
+                                size="small"
+                                alternativeMarkupIdentifier="inline" />
+                            <span class="visually-hidden">
+                                <f:translate
+                                    key="actions.add"
+                                    extensionName="academic_persons_edit" />
+                            </span>
+                        </button>
+                    </f:if>
+                </div>
+                <f:switch expression="{section.kind}">
+                    <f:case value="contract">
+                        <f:render
+                            partial="InlineProfile/Documents/Contract"
+                            arguments="{items: section.items, rowFields: section.rowFields, actions: section.actions, sortable: section.sortable}" />
+                    </f:case>
+                    <f:case value="profileInformation">
+                        <f:render
+                            partial="InlineProfile/Documents/ProfileInformation"
+                            arguments="{items: section.items, rowFields: section.rowFields, actions: section.actions, sortable: section.sortable}" />
+                    </f:case>
+                </f:switch>
+                <div
+                    class="bg-body-tertiary rounded-1 px-3 px-lg-4 py-4 {f:if(condition: section.items, then: 'd-none')}"
+                    data-ie-document-empty-state>
                     <f:translate
-                        key="{section.label}"
-                        default="{section.identifier}" />
-                </h2>
-                <f:if condition="{section.items}">
-                    <f:then>
-                        <f:switch expression="{section.kind}">
-                            <f:case value="contract">
-                                <f:render
-                                    partial="InlineProfile/Documents/Contract"
-                                    arguments="{items: section.items}" />
-                            </f:case>
-                            <f:case value="profileInformation">
-                                <f:render
-                                    partial="InlineProfile/Documents/ProfileInformation"
-                                    arguments="{items: section.items, dateMode: section.dateMode}" />
-                            </f:case>
-                        </f:switch>
-                    </f:then>
-                    <f:else>
-                        <div
-                            class="bg-body-tertiary rounded-1 px-3 px-lg-4 py-4"
-                            data-ie-document-empty-state>
-                            <f:translate
-                                key="inlineProfile.documents.empty.{section.identifier}"
-                                extensionName="academic_persons_edit"
-                                default="{defaultEmptyMessage}" />
-                        </div>
-                    </f:else>
-                </f:if>
+                        key="inlineProfile.documents.empty.{section.identifier}"
+                        extensionName="academic_persons_edit"
+                        default="{defaultEmptyMessage}" />
+                </div>
             </section>
         </f:for>
     </div>

@@ -201,18 +201,6 @@
       <trans-unit id="profile.lastName.placeholder">
         <source>Doe</source>
       </trans-unit>
-      <trans-unit id="profile.emailAddress.label">
-        <source>Public email address</source>
-      </trans-unit>
-      <trans-unit id="profile.publishEmailAddress.label">
-        <source>Publish email address</source>
-      </trans-unit>
-      <trans-unit id="profile.phoneNumber.label">
-        <source>Public phone number</source>
-      </trans-unit>
-      <trans-unit id="profile.publishPhoneNumber.label">
-        <source>Publish phone number</source>
-      </trans-unit>
       <trans-unit id="profile.website.label">
         <source>Website</source>
       </trans-unit>
@@ -268,7 +256,7 @@
         <source>e.g. Hobbies, Interests</source>
       </trans-unit>
       <trans-unit id="profile.skipSync.label">
-        <source>Disable profile sync</source>
+        <source>Private</source>
       </trans-unit>
       <trans-unit id="profile.skipSync.description">
         <source>Disabling the profile synchronization will prevent automatic updates from external
@@ -481,6 +469,21 @@
       <trans-unit id="inlineProfile.documents.position">
         <source>Position</source>
       </trans-unit>
+      <trans-unit id="inlineProfile.documents.actions">
+        <source>Entry actions</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.delete.confirm">
+        <source>Do you really want to delete this entry? This action cannot be undone.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.status.saved">
+        <source>The entry has been saved.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.status.deleted">
+        <source>The entry has been deleted.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.documents.status.sorted">
+        <source>The order has been updated.</source>
+      </trans-unit>
       <trans-unit id="inlineProfile.documents.empty">
         <source>No entries have been added yet.</source>
       </trans-unit>
@@ -621,6 +624,9 @@
       </trans-unit>
       <trans-unit id="actions.sortDown">
         <source>Move downwards</source>
+      </trans-unit>
+      <trans-unit id="actions.dragSort">
+        <source>Drag to reorder</source>
       </trans-unit>
       <trans-unit id="actions.setToTop">
         <source>Move to the top</source>

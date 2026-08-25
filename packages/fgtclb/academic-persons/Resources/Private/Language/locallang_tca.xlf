@@ -7,7 +7,7 @@
     date="2025-02-24T11:41:07Z"
     product-name="academic_persons"
   >
-    <header/>
+    <header />
     <body>
       <!-- Addresses -->
 
@@ -77,7 +77,8 @@
       <trans-unit id="tx_academicpersons_domain_model_contract.columns.physical_addresses.label">
         <source>Addresses</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_contract.columns.physical_addresses_chosen.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_contract.columns.physical_addresses_chosen.label">
         <source>Address</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_contract.columns.position.label">
@@ -137,10 +138,12 @@
       <trans-unit id="tx_academicpersons_domain_model_function_type.columns.function_name.label">
         <source>Function Name</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_function_type.columns.function_name_female.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_function_type.columns.function_name_female.label">
         <source>Function Name Female</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_function_type.columns.function_name_male.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_function_type.columns.function_name_male.label">
         <source>Function Name Male</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_function_type.ctrl.label">
@@ -157,7 +160,8 @@
       </trans-unit>
 
       <!-- Organisational Units -->
-      <trans-unit id="tx_academicpersons_domain_model_organisational_unit.columns.display_text.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_organisational_unit.columns.display_text.label">
         <source>Display Text</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_organisational_unit.columns.long_text.label">
@@ -166,7 +170,8 @@
       <trans-unit id="tx_academicpersons_domain_model_organisational_unit.columns.parent.label">
         <source>Parent</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_organisational_unit.columns.parent.default.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_organisational_unit.columns.parent.default.label">
         <source>No parent</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_organisational_unit.columns.unique_name.label">
@@ -196,7 +201,8 @@
       <trans-unit id="tx_academicpersons_domain_model_phone_number.columns.phone_number.label">
         <source>Phone Number</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_phone_number.columns.type.items.undefined.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_phone_number.columns.type.items.undefined.label">
         <source>Undefined</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_phone_number.columns.type.label">
@@ -277,7 +283,8 @@
       <trans-unit id="tx_academicpersons_domain_model_profile.columns.slug.label">
         <source>URL Path</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile.columns.supervised_doctoral_thesis.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile.columns.supervised_doctoral_thesis.label">
         <source>Supervised doctoral theses</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile.columns.supervised_thesis.label">
@@ -314,10 +321,11 @@
         <source>Profile (Text)</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile.columns.skip_sync.label">
-        <source>Disable profile sync</source>
+        <source>Private</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile.columns.skip_sync.description">
-        <source>Disabling the profile synchronization will prevent automatic updates from external sources.</source>
+        <source>Disabling the profile synchronization will prevent automatic updates from external
+          sources.</source>
       </trans-unit>
 
       <!-- Profile Information -->
@@ -334,19 +342,24 @@
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.title.label">
         <source>Title</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.cooperation.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.cooperation.label">
         <source>Network / cooperation</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.curriculum_vitae.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.curriculum_vitae.label">
         <source>Curriculum vitae</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.lecture.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.lecture.label">
         <source>Lecture</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.membership.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.membership.label">
         <source>Membership / committee</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.items.publication.label">
+      <trans-unit
+        id="tx_academicpersons_domain_model_profile_information.columns.type.items.publication.label">
         <source>Publication</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.label">

@@ -1,7 +1,7 @@
 # TYPO3 Extension `Academic person database - frontend editing` (READ-ONLY)
 
 |                  | URL                                                                        |
-|------------------|----------------------------------------------------------------------------|
+| ---------------- | -------------------------------------------------------------------------- |
 | **Repository:**  | https://github.com/fgtclb/academic-persons-edit                            |
 | **Read online:** | https://docs.typo3.org/p/fgtclb/academic/academic-persons-edit/main/en-us/ |
 | **TER:**         | https://extensions.typo3.org/extension/academic_persons_edit/              |
@@ -23,7 +23,7 @@ controls. Related name and link properties are presented as groups and edited
 together.
 
 The profile name is displayed as the main heading above the sticky image. The
-compact `Disable profile sync` switch sits immediately left of the small `Edit all` toggle
+compact `Private` switch sits immediately left of the small `Edit all` toggle
 beside the personal-data heading and keeps using its dedicated `skipSync` AJAX
 endpoint. The toggle changes to `Close all` while the editors are open. Closing
 all editors keeps unsaved browser-side drafts; persistence remains available
@@ -35,6 +35,8 @@ image. Upload errors retain their non-success HTTP status, are shown inside the
 open modal and do not change the page preview. Bootstrap provides the layout;
 the existing small compatibility stylesheet only adjusts surrounding overflow,
 frame spacing and sticky-card stacking. The templates require no inline styles.
+Every Bootstrap button and modal surface in the shipped Fluid views uses
+`rounded-0` for consistent square corners.
 Authentication, profile ownership, configured validators, file validation and
 the TCA allow lists of all configured select fields are checked server-side.
 
@@ -45,7 +47,9 @@ sanitized server-side with an explicit tag, attribute and URI-scheme allowlist
 before it is validated and persisted. Rich-text fields show their formatted
 content directly with a compact pencil control. While editing, separate delete,
 cancel and save actions clear the draft, restore the last persisted value or
-persist the field through AJAX. See the
+persist the field through AJAX. For CKEditor fields only, this action group is
+placed beside the field heading so the editor keeps the complete row width;
+ordinary field controls retain their existing action placement. See the
 [inline-editing documentation](./Documentation/InlineEditing/Index.rst) for the
 editor, AJAX and security contracts.
 
@@ -56,6 +60,20 @@ remain in TCA, and the JavaScript entry delegates to focused feature modules.
 Direct public-profile email/telephone values and their opt-in flags stay
 separate from Contract contact data. Validation and structured-section metadata
 remain attached to their respective section.
+
+Editable structured document sections have an add button beside their heading.
+Their compact row values and ordered controls follow `rowFields` and `actions`
+from `academic_persons`. Sections marked `readonly`, including the shipped
+contracts section, expose viewing only. Editable lists can be reordered with
+the configured up/down controls or by dragging the additional sort handle. The
+full row is used as the drag image, the source row and active list are outlined,
+and a strong insertion line marks whether the row will be placed before or after
+the current target. The shared Bootstrap modal uses full-width CKEditor 5
+controls for HTML descriptions. Its heading uses a record's non-empty `title`
+and falls back to the section heading. Delete mode renders the modal submit as
+`btn-danger` and explicitly removes primary or success styling. Ownership- and
+capability-checked JSON actions complete the workflow without calling the
+retained legacy controllers or reloading the page.
 
 Select and checkbox controls save on change and expose a compact undo action
 that restores the last persisted value and closes the inline editor. Frontend
@@ -68,19 +86,19 @@ directory.
 
 ## Compatibility
 
-| Branch | Version     | TYPO3     | PHP                                          |
-|--------|-------------|-----------|----------------------------------------------|
-| main   | ^3, 3.x-dev | v13.4.31+ + v14.3.6+ | 8.2, 8.3, 8.4, 8.5                |
-| 2, 2.x | ^2, 2.x-dev | v12 + v13 | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
-| 1      | ^1, 1.x-dev | v11 + v12 | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
+| Branch | Version     | TYPO3                | PHP                                          |
+| ------ | ----------- | -------------------- | -------------------------------------------- |
+| main   | ^3, 3.x-dev | v13.4.31+ + v14.3.6+ | 8.2, 8.3, 8.4, 8.5                           |
+| 2, 2.x | ^2, 2.x-dev | v12 + v13            | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
+| 1      | ^1, 1.x-dev | v11 + v12            | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |
 
 ## Installation
 
 Install with your flavour:
 
-* [TER](https://extensions.typo3.org/extension/academic_persons_edit/)
-* Extension Manager
-* composer
+- [TER](https://extensions.typo3.org/extension/academic_persons_edit/)
+- Extension Manager
+- composer
 
 We prefer composer installation:
 

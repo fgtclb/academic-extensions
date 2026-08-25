@@ -11,14 +11,34 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Controller;
 
+use DateTime;
+use FGTCLB\AcademicPersons\Domain\Model\Contract;
+use FGTCLB\AcademicPersons\Domain\Model\FunctionType;
+use FGTCLB\AcademicPersons\Domain\Model\Location;
+use FGTCLB\AcademicPersons\Domain\Model\OrganisationalUnit;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 use UnexpectedValueException;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
+use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
+use FGTCLB\AcademicPersons\Domain\Repository\ContractRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\FunctionTypeRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\LocationRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\OrganisationalUnitRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\ProfileInformationRepository;
+use FGTCLB\AcademicPersons\Settings\DocumentSection;
+use FGTCLB\AcademicPersons\Settings\Validation;
+use FGTCLB\AcademicPersonsEdit\Attributes\ListSortingMode;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\ContractFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileInformationFactory;
+use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\AbstractFormData;
+use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ContractFormData;
+use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileDocumentSectionProvider;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
@@ -34,6 +54,7 @@ use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Extbase\Mvc\Controller\FileUploadConfiguration;
+use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
 
@@ -51,6 +72,14 @@ final class InlineProfileController extends AbstractActionController
         private readonly ProfileFieldOptionsService $profileFieldOptionsService,
         private readonly ProfileSectionProvider $profileSectionProvider,
         private readonly ProfileDocumentSectionProvider $profileDocumentSectionProvider,
+        private readonly ContractFactory $contractFactory,
+        private readonly ContractRepository $contractRepository,
+        private readonly ProfileInformationFactory $profileInformationFactory,
+        private readonly ProfileInformationRepository $profileInformationRepository,
+        private readonly FunctionTypeRepository $functionTypeRepository,
+        private readonly OrganisationalUnitRepository $organisationalUnitRepository,
+        private readonly LocationRepository $locationRepository,
+        private readonly ProfileRichTextSanitizerInterface $profileRichTextSanitizer,
     ) {}
 
     public function initializeAction(): void
@@ -60,7 +89,16 @@ final class InlineProfileController extends AbstractActionController
         // response propagated by the shared controller initialization.
         if (in_array(
             $this->request->getControllerActionName(),
-            ['update', 'updateSkipSync', 'deleteImage'],
+            [
+                'update',
+                'updateSkipSync',
+                'deleteImage',
+                'documentForm',
+                'createDocument',
+                'updateDocument',
+                'deleteDocument',
+                'sortDocument',
+            ],
             true,
         )) {
             return;
@@ -229,13 +267,11 @@ final class InlineProfileController extends AbstractActionController
                 $requestResult->getStatusCode(),
             );
         }
-
         $payload = $requestResult->getPayload();
         $profile = $requestResult->getProfile();
         if ($payload === null || $profile === null) {
             $this->throwJsonError('internal_server_error', 500);
         }
-
         $data = $payload->getData();
         if (
             array_keys($data) !== ['skipSync']
@@ -247,7 +283,6 @@ final class InlineProfileController extends AbstractActionController
                 'The payload must contain exactly one boolean skipSync value.',
             );
         }
-
         try {
             $pluginControllerActionContext = new PluginControllerActionContext(
                 $this->request,
@@ -275,7 +310,6 @@ final class InlineProfileController extends AbstractActionController
                     $errors,
                 );
             }
-
             $updatedProfile = $this->profileFactory->updateFromFormData(
                 $this->academicPersonsSettings->getProfileUpdateValidationSet(),
                 $profile,
@@ -283,7 +317,6 @@ final class InlineProfileController extends AbstractActionController
             );
             $this->profileRepository->update($updatedProfile);
             $this->persistenceManager->persistAll();
-
             return new JsonResponse([
                 'success' => true,
                 'profile' => $updatedProfile->getUid(),
@@ -303,13 +336,874 @@ final class InlineProfileController extends AbstractActionController
                 ->error('Updating the inline profile synchronization flag failed.', [
                     'exception' => $exception,
                 ]);
-
             $this->throwJsonError(
                 'internal_server_error',
                 500,
                 'The synchronization setting could not be updated.',
             );
         }
+    }
+
+    // =================================================================================================================
+    // Handle structured document sections through the InlineProfile JSON API
+    // =================================================================================================================
+
+    /**
+     * Returns the field schema and current values used by the add, view and edit modal.
+     */
+    public function documentFormAction(): ResponseInterface
+    {
+        try {
+            [$profile, $section, $data] = $this->getDocumentRequest();
+            $this->assertDocumentPayload($data, ['section', 'record', 'mode'], ['section', 'mode']);
+            $mode = $this->getRequiredDocumentMode($data);
+            $recordUid = $this->getOptionalPositiveInteger($data, 'record');
+            if (($mode === 'add') !== ($recordUid === null)) {
+                $this->throwJsonError('invalid_payload', 400, 'The document record does not match the requested mode.');
+            }
+            $this->assertDocumentActionAllowed($section, $mode);
+            $record = $recordUid === null
+                ? null
+                : $this->findDocumentRecord($profile, $section, $recordUid);
+            if ($recordUid !== null && $record === null) {
+                $this->throwJsonError('document_not_found', 404);
+            }
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'section' => $section->identifier,
+                'kind' => $section->isContractSection() ? 'contract' : 'profileInformation',
+                'record' => $record?->getUid(),
+                'fields' => $this->getDocumentFieldDefinitions($section, $record),
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            $this->handleDocumentFailure('Loading a structured document form failed.', $exception);
+        }
+    }
+
+    public function createDocumentAction(): ResponseInterface
+    {
+        try {
+            [$profile, $section, $data] = $this->getDocumentRequest();
+            $this->assertDocumentPayload($data, ['section', 'fields'], ['section', 'fields']);
+            $this->assertDocumentActionAllowed($section, 'add');
+            $fields = $this->getSubmittedDocumentFields($data);
+            $normalizedFields = $this->normalizeAndValidateDocumentFields(
+                $section,
+                $fields,
+                true,
+            );
+            if ($section->isContractSection()) {
+                $record = $this->contractFactory->createFromFormData(
+                    $section->validationSet,
+                    $profile,
+                    $this->createContractFormData($normalizedFields),
+                );
+                $record->setSorting($this->getNextSortingValue($this->getDocumentRecords($profile, $section)));
+                $record->setPid((int)$profile->getPid());
+                $this->contractRepository->add($record);
+            } else {
+                $record = $this->profileInformationFactory->createFromFormData(
+                    $section->validationSet,
+                    $profile,
+                    $this->createProfileInformationFormData($section, $normalizedFields),
+                );
+                $record->setSorting($this->getNextSortingValue($this->getDocumentRecords($profile, $section)));
+                $record->setPid((int)$profile->getPid());
+                $this->profileInformationRepository->add($record);
+            }
+            $this->persistenceManager->persistAll();
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'section' => $section->identifier,
+                'item' => $this->serializeDocumentItem($section, $record),
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            $this->handleDocumentFailure('Creating a structured document failed.', $exception);
+        }
+    }
+
+    public function updateDocumentAction(): ResponseInterface
+    {
+        try {
+            [$profile, $section, $data] = $this->getDocumentRequest();
+            $this->assertDocumentPayload(
+                $data,
+                ['section', 'record', 'fields'],
+                ['section', 'record', 'fields'],
+            );
+            $this->assertDocumentActionAllowed($section, 'edit');
+            $recordUid = $this->getRequiredPositiveInteger($data, 'record');
+            $record = $this->findDocumentRecord($profile, $section, $recordUid);
+            if ($record === null) {
+                $this->throwJsonError('document_not_found', 404);
+            }
+            $normalizedFields = $this->normalizeAndValidateDocumentFields(
+                $section,
+                $this->getSubmittedDocumentFields($data),
+                false,
+            );
+            if ($record instanceof Contract) {
+                $this->contractRepository->update(
+                    $this->contractFactory->updateFromFormData(
+                        $section->validationSet,
+                        $record,
+                        $this->createContractFormData($normalizedFields),
+                    ),
+                );
+            } else {
+                $this->profileInformationRepository->update(
+                    $this->profileInformationFactory->updateFromFormData(
+                        $section->validationSet,
+                        $record,
+                        $this->createProfileInformationFormData($section, $normalizedFields),
+                    ),
+                );
+            }
+            $this->persistenceManager->persistAll();
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'section' => $section->identifier,
+                'item' => $this->serializeDocumentItem($section, $record),
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            $this->handleDocumentFailure('Updating a structured document failed.', $exception);
+        }
+    }
+
+    public function deleteDocumentAction(): ResponseInterface
+    {
+        try {
+            [$profile, $section, $data] = $this->getDocumentRequest();
+            $this->assertDocumentPayload($data, ['section', 'record'], ['section', 'record']);
+            $this->assertDocumentActionAllowed($section, 'delete');
+            $recordUid = $this->getRequiredPositiveInteger($data, 'record');
+            $record = $this->findDocumentRecord($profile, $section, $recordUid);
+            if ($record === null) {
+                $this->throwJsonError('document_not_found', 404);
+            }
+            if ($record instanceof Contract) {
+                $this->contractRepository->remove($record);
+            } else {
+                $this->profileInformationRepository->remove($record);
+            }
+            $this->persistenceManager->persistAll();
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'section' => $section->identifier,
+                'deleted' => $recordUid,
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            $this->handleDocumentFailure('Deleting a structured document failed.', $exception);
+        }
+    }
+
+    public function sortDocumentAction(): ResponseInterface
+    {
+        try {
+            [$profile, $section, $data] = $this->getDocumentRequest();
+            if (array_key_exists('order', $data)) {
+                $this->assertDocumentPayload($data, ['section', 'order'], ['section', 'order']);
+                $this->assertDocumentActionAllowed($section, 'reorder');
+                $process = $this->reorderDocumentRecords(
+                    $this->getDocumentRecords($profile, $section),
+                    $this->getSubmittedDocumentOrder($data),
+                );
+                return new JsonResponse([
+                    'success' => true,
+                    'profile' => $profile->getUid(),
+                    'section' => $section->identifier,
+                    'changed' => $process['changed'],
+                    'order' => array_values(array_map(
+                        static fn(Contract|ProfileInformation $record): int => (int)$record->getUid(),
+                        $process['records'],
+                    )),
+                ]);
+            }
+            $this->assertDocumentPayload($data, ['section', 'record', 'direction'], ['section', 'record', 'direction']);
+            $recordUid = $this->getRequiredPositiveInteger($data, 'record');
+            if ($this->findDocumentRecord($profile, $section, $recordUid) === null) {
+                $this->throwJsonError('document_not_found', 404);
+            }
+            $direction = $data['direction'];
+            if (!is_string($direction) || !in_array($direction, ['up', 'down'], true)) {
+                $this->throwJsonError('invalid_payload', 400, 'The direction must be up or down.');
+            }
+            $this->assertDocumentActionAllowed($section, $direction);
+            $records = $this->getDocumentRecords($profile, $section);
+            $process = $this->sortItems(
+                $records,
+                $recordUid,
+                $direction === 'up' ? ListSortingMode::UP : ListSortingMode::DOWN,
+            );
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'section' => $section->identifier,
+                'changed' => $process->changed,
+                'order' => array_values(array_map(
+                    static fn(Contract|ProfileInformation $record): int => (int)$record->getUid(),
+                    $process->items,
+                )),
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            $this->handleDocumentFailure('Sorting a structured document failed.', $exception);
+        }
+    }
+
+    /**
+     * @return array{0: Profile, 1: DocumentSection, 2: array<string, mixed>}
+     */
+    private function getDocumentRequest(): array
+    {
+        $requestResult = $this->profileUpdateRequestService->validate($this->request);
+        if (!$requestResult->isValid()) {
+            $this->throwJsonError(
+                $requestResult->getError() ?? 'invalid_request',
+                $requestResult->getStatusCode(),
+            );
+        }
+        $payload = $requestResult->getPayload();
+        $profile = $requestResult->getProfile();
+        if ($payload === null || $profile === null) {
+            $this->throwJsonError('internal_server_error', 500);
+        }
+        $data = $payload->getData();
+        $sectionIdentifier = $data['section'] ?? null;
+        if (!is_string($sectionIdentifier) || $sectionIdentifier === '') {
+            $this->throwJsonError('invalid_payload', 400, 'A document section is required.');
+        }
+        $section = $this->academicPersonsSettings->getDocumentSection($sectionIdentifier);
+        if ($section === null) {
+            $this->throwJsonError('unknown_document_section', 404);
+        }
+        return [$profile, $section, $data];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param list<string> $allowedKeys
+     * @param list<string> $requiredKeys
+     */
+    private function assertDocumentPayload(array $data, array $allowedKeys, array $requiredKeys): void
+    {
+        foreach (array_keys($data) as $key) {
+            if (!is_string($key) || !in_array($key, $allowedKeys, true)) {
+                $this->throwJsonError('invalid_payload', 400, 'The document payload contains an unknown property.');
+            }
+        }
+        foreach ($requiredKeys as $requiredKey) {
+            if (!array_key_exists($requiredKey, $data)) {
+                $this->throwJsonError('invalid_payload', 400, 'The document payload is incomplete.');
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function getRequiredPositiveInteger(array $data, string $property): int
+    {
+        $value = $data[$property] ?? null;
+        if (!is_int($value) || $value <= 0) {
+            $this->throwJsonError('invalid_payload', 400, sprintf('%s must be a positive integer.', $property));
+        }
+        return $value;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function getOptionalPositiveInteger(array $data, string $property): ?int
+    {
+        if (!array_key_exists($property, $data) || $data[$property] === null || $data[$property] === 0) {
+            return null;
+        }
+        return $this->getRequiredPositiveInteger($data, $property);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return 'add'|'view'|'edit'|'delete'
+     */
+    private function getRequiredDocumentMode(array $data): string
+    {
+        $mode = $data['mode'] ?? null;
+        if (!is_string($mode) || !in_array($mode, ['add', 'view', 'edit', 'delete'], true)) {
+            $this->throwJsonError('invalid_payload', 400, 'The document mode is invalid.');
+        }
+        return $mode;
+    }
+
+    private function assertDocumentActionAllowed(DocumentSection $section, string $action): void
+    {
+        $allowed = match ($action) {
+            'add' => $section->allowsCreate(),
+            'reorder' => $section->allowsDragSorting(),
+            default => $section->allowsAction($action),
+        };
+        if (!$allowed) {
+            $this->throwJsonError('document_action_not_allowed', 403, 'This action is not allowed for the document section.');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function getSubmittedDocumentFields(array $data): array
+    {
+        $fields = $data['fields'] ?? null;
+        if (!is_array($fields)) {
+            $this->throwJsonError('invalid_payload', 400, 'Document fields must be a JSON object.');
+        }
+        foreach (array_keys($fields) as $fieldName) {
+            if (!is_string($fieldName)) {
+                $this->throwJsonError('invalid_payload', 400, 'Document field names must be strings.');
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return list<int>
+     */
+    private function getSubmittedDocumentOrder(array $data): array
+    {
+        $order = $data['order'] ?? null;
+        if (!is_array($order) || !array_is_list($order)) {
+            $this->throwJsonError('invalid_payload', 400, 'The document order must be a JSON list.');
+        }
+        foreach ($order as $recordUid) {
+            if (!is_int($recordUid) || $recordUid <= 0) {
+                $this->throwJsonError('invalid_payload', 400, 'Every document order value must be a positive integer.');
+            }
+        }
+        return $order;
+    }
+
+    private function findDocumentRecord(
+        Profile $profile,
+        DocumentSection $section,
+        int $recordUid,
+    ): Contract|ProfileInformation|null {
+        foreach ($this->getDocumentRecords($profile, $section) as $record) {
+            if ((int)$record->getUid() === $recordUid) {
+                return $record;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return list<Contract|ProfileInformation>
+     */
+    private function getDocumentRecords(Profile $profile, DocumentSection $section): array
+    {
+        if ($section->isContractSection()) {
+            return array_values(array_filter(
+                $profile->getContracts()->toArray(),
+                static fn(mixed $record): bool => $record instanceof Contract,
+            ));
+        }
+        return array_values(array_filter(
+            $this->profileInformationRepository->findByProfileAndType($profile, $section->type)->toArray(),
+            static fn(mixed $record): bool => $record instanceof ProfileInformation,
+        ));
+    }
+
+    /**
+     * @param list<Contract|ProfileInformation> $records
+     */
+    private function getNextSortingValue(array $records): int
+    {
+        $maximum = 0;
+        foreach ($records as $record) {
+            $maximum = max($maximum, $record->getSorting());
+        }
+        return $maximum + 10;
+    }
+
+    /**
+     * @param list<Contract|ProfileInformation> $records
+     * @param list<int> $order
+     * @return array{changed: bool, records: list<Contract|ProfileInformation>}
+     */
+    private function reorderDocumentRecords(array $records, array $order): array
+    {
+        $recordsByUid = [];
+        foreach ($records as $record) {
+            $recordsByUid[(int)$record->getUid()] = $record;
+        }
+        $currentOrder = array_keys($recordsByUid);
+        $normalizedCurrentOrder = $currentOrder;
+        $normalizedSubmittedOrder = $order;
+        sort($normalizedCurrentOrder);
+        sort($normalizedSubmittedOrder);
+        if ($normalizedSubmittedOrder !== $normalizedCurrentOrder || count(array_unique($order)) !== count($order)) {
+            $this->throwJsonError('invalid_payload', 400, 'The document order must contain every section record exactly once.');
+        }
+        $orderedRecords = [];
+        $changed = false;
+        foreach ($order as $position => $recordUid) {
+            $record = $recordsByUid[$recordUid];
+            $expectedSorting = ($position + 1) * 10;
+            if ($record->getSorting() !== $expectedSorting) {
+                $record->setSorting($expectedSorting);
+                $this->persistenceManager->update($record);
+                $changed = true;
+            }
+            $orderedRecords[] = $record;
+        }
+        if ($changed) {
+            $this->persistenceManager->persistAll();
+        }
+        return ['changed' => $changed, 'records' => $orderedRecords];
+    }
+
+    /**
+     * @param Contract|ProfileInformation|null $record
+     * @return list<array{
+     *     name: string,
+     *     label: string,
+     *     type: string,
+     *     required: bool,
+     *     readOnly: bool,
+     *     disabled: bool,
+     *     richText: bool,
+     *     value: mixed,
+     *     displayValue: string,
+     *     options: list<array{value: int|string, label: string}>
+     * }>
+     */
+    private function getDocumentFieldDefinitions(
+        DocumentSection $section,
+        Contract|ProfileInformation|null $record,
+    ): array {
+        $definitions = $section->isContractSection()
+            ? $this->getContractFieldDefinitions($record instanceof Contract ? $record : null)
+            : $this->getProfileInformationFieldDefinitions(
+                $record instanceof ProfileInformation ? $record : null,
+            );
+        foreach ($definitions as &$definition) {
+            $validation = $section->validationSet->get($definition['name']);
+            $definition['required'] = $validation?->required ?? false;
+            $definition['readOnly'] = $validation?->readOnly ?? false;
+            $definition['disabled'] = $validation?->disabled ?? false;
+            $definition['richText'] = $definition['richText']
+                || ($validation?->isRichText() ?? false);
+        }
+        unset($definition);
+        return $definitions;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function getContractFieldDefinitions(?Contract $record): array
+    {
+        $organisationalUnits = $this->getEntityOptions(
+            $this->organisationalUnitRepository->findAll(),
+            static fn(OrganisationalUnit $item): string => $item->getUnitName(),
+        );
+        $functionTypes = $this->getEntityOptions(
+            $this->functionTypeRepository->findAll(),
+            static fn(FunctionType $item): string => $item->getFunctionName(),
+        );
+        $locations = $this->getEntityOptions(
+            $this->locationRepository->findAll(),
+            static fn(Location $item): string => $item->getTitle(),
+        );
+        return [
+            $this->createDocumentField('contract', 'position', 'text', $record?->getPosition() ?? ''),
+            $this->createDocumentField(
+                'contract',
+                'organisationalUnit',
+                'select',
+                $record?->getOrganisationalUnit()?->getUid(),
+                $organisationalUnits,
+            ),
+            $this->createDocumentField(
+                'contract',
+                'functionType',
+                'select',
+                $record?->getFunctionType()?->getUid(),
+                $functionTypes,
+            ),
+            $this->createDocumentField(
+                'contract',
+                'validFrom',
+                'date',
+                $record?->getValidFrom()?->format('Y-m-d'),
+            ),
+            $this->createDocumentField(
+                'contract',
+                'validTo',
+                'date',
+                $record?->getValidTo()?->format('Y-m-d'),
+            ),
+            $this->createDocumentField(
+                'contract',
+                'location',
+                'select',
+                $record?->getLocation()?->getUid(),
+                $locations,
+            ),
+            $this->createDocumentField('contract', 'room', 'text', $record?->getRoom() ?? ''),
+            $this->createDocumentField(
+                'contract',
+                'officeHours',
+                'textarea',
+                $record?->getOfficeHours() ?? '',
+                richText: true,
+            ),
+            $this->createDocumentField('contract', 'publish', 'checkbox', $record?->isPublish() ?? false),
+        ];
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function getProfileInformationFieldDefinitions(?ProfileInformation $record): array
+    {
+        return [
+            $this->createDocumentField('profileInformation', 'title', 'text', $record?->getTitle() ?? ''),
+            $this->createDocumentField('profileInformation', 'link', 'url', $record?->getLink() ?? ''),
+            $this->createDocumentField('profileInformation', 'year', 'number', $record?->getYear()),
+            $this->createDocumentField('profileInformation', 'yearStart', 'number', $record?->getYearStart()),
+            $this->createDocumentField('profileInformation', 'yearEnd', 'number', $record?->getYearEnd()),
+            $this->createDocumentField(
+                'profileInformation',
+                'bodytext',
+                'textarea',
+                $record?->getBodytext() ?? '',
+            ),
+        ];
+    }
+
+    /**
+     * @param list<array{value: int|string, label: string}> $options
+     * @return array<string, mixed>
+     */
+    private function createDocumentField(
+        string $translationPrefix,
+        string $name,
+        string $type,
+        mixed $value,
+        array $options = [],
+        bool $richText = false,
+    ): array {
+        return [
+            'name' => $name,
+            'label' => $this->localizationUtility->translate(
+                $translationPrefix . '.' . $name . '.label',
+                'academic_persons_edit',
+            ) ?? $name,
+            'type' => $type,
+            'required' => false,
+            'readOnly' => false,
+            'disabled' => false,
+            'richText' => $richText,
+            'value' => $value,
+            'displayValue' => $this->getDocumentDisplayValue($type, $value, $options),
+            'options' => $options,
+        ];
+    }
+
+    /**
+     * @param iterable<object> $items
+     * @param callable(object): string $labelCallback
+     * @return list<array{value: int, label: string}>
+     */
+    private function getEntityOptions(iterable $items, callable $labelCallback): array
+    {
+        $options = [];
+        foreach ($items as $item) {
+            $uid = method_exists($item, 'getUid') ? (int)$item->getUid() : 0;
+            if ($uid > 0) {
+                $options[] = ['value' => $uid, 'label' => $labelCallback($item)];
+            }
+        }
+        return $options;
+    }
+
+    /**
+     * @param list<array{value: int|string, label: string}> $options
+     */
+    private function getDocumentDisplayValue(string $type, mixed $value, array $options): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+        if ($type === 'date' && is_string($value)) {
+            $date = DateTime::createFromFormat('!Y-m-d', $value);
+            return $date instanceof DateTime ? $date->format('d.m.Y') : $value;
+        }
+        if ($type === 'select') {
+            foreach ($options as $option) {
+                if ((string)$option['value'] === (string)$value) {
+                    return $option['label'];
+                }
+            }
+            return '';
+        }
+        if ($type === 'checkbox') {
+            return $this->localizationUtility->translate(
+                $value ? 'inlineProfile.visibility.public' : 'inlineProfile.visibility.private',
+                'academic_persons_edit',
+            ) ?? ($value ? 'Yes' : 'No');
+        }
+        return (string)$value;
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     * @return array<string, mixed>
+     */
+    private function normalizeAndValidateDocumentFields(
+        DocumentSection $section,
+        array $fields,
+        bool $creating,
+    ): array {
+        $definitions = $this->getDocumentFieldDefinitions($section, null);
+        $definitionsByName = [];
+        foreach ($definitions as $definition) {
+            $definitionsByName[$definition['name']] = $definition;
+        }
+        $errors = [];
+        $normalized = [];
+        foreach ($fields as $name => $value) {
+            $definition = $definitionsByName[$name] ?? null;
+            if ($definition === null || $definition['readOnly'] || $definition['disabled']) {
+                $errors[$name][] = 'This field cannot be changed.';
+                continue;
+            }
+            try {
+                $normalized[$name] = $this->normalizeDocumentFieldValue(
+                    $name,
+                    $definition['type'],
+                    $value,
+                    $definition['richText'],
+                );
+            } catch (UnexpectedValueException $exception) {
+                $errors[$name][] = $exception->getMessage();
+            }
+        }
+        foreach ($definitionsByName as $name => $definition) {
+            if ($creating && $definition['required'] && !array_key_exists($name, $normalized)) {
+                $errors[$name][] = 'This field is required.';
+            }
+            if (!array_key_exists($name, $normalized)) {
+                continue;
+            }
+            $validation = $section->validationSet->get($name);
+            if ($validation !== null) {
+                $this->validateDocumentField($name, $normalized[$name], $validation, $errors);
+            }
+        }
+        if ($errors !== []) {
+            $this->throwJsonError(
+                'validation_failed',
+                422,
+                'The submitted document data is invalid.',
+                $errors,
+            );
+        }
+        return $normalized;
+    }
+
+    private function normalizeDocumentFieldValue(
+        string $name,
+        string $type,
+        mixed $value,
+        bool $richText,
+    ): mixed
+    {
+        if ($type === 'checkbox') {
+            if (!is_bool($value)) {
+                throw new UnexpectedValueException('The value must be boolean.');
+            }
+            return $value;
+        }
+        if ($type === 'number') {
+            if ($value === null || $value === '') {
+                return null;
+            }
+            if (is_int($value)) {
+                return $value;
+            }
+            if (is_string($value) && preg_match('/^-?\d+$/', $value) === 1) {
+                return (int)$value;
+            }
+            throw new UnexpectedValueException('The value must be an integer.');
+        }
+        if ($type === 'date') {
+            if ($value === null || $value === '') {
+                return null;
+            }
+            if (!is_string($value)) {
+                throw new UnexpectedValueException('The value must be a date.');
+            }
+            $date = DateTime::createFromFormat('!Y-m-d', $value);
+            $dateErrors = DateTime::getLastErrors();
+            if (
+                !$date instanceof DateTime
+                || ($dateErrors !== false && ($dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0))
+                || $date->format('Y-m-d') !== $value
+            ) {
+                throw new UnexpectedValueException('The value must be a valid date.');
+            }
+            return $date;
+        }
+        if ($type === 'select') {
+            if ($value === null || $value === '' || $value === 0) {
+                return null;
+            }
+            $uid = is_int($value)
+                ? $value
+                : (is_string($value) && preg_match('/^\d+$/', $value) === 1 ? (int)$value : 0);
+            if ($uid <= 0) {
+                throw new UnexpectedValueException('The selected value is invalid.');
+            }
+            $entity = $this->findDocumentSelectEntity($name, $uid);
+            if ($entity === null) {
+                throw new UnexpectedValueException('The selected value is not available.');
+            }
+            return $entity;
+        }
+        if (!is_string($value)) {
+            throw new UnexpectedValueException('The value must be a string.');
+        }
+        return ($richText || in_array($name, ['bodytext', 'officeHours'], true))
+            ? $this->profileRichTextSanitizer->sanitize($value)
+            : trim($value);
+    }
+
+    private function findDocumentSelectEntity(
+        string $name,
+        int $uid,
+    ): FunctionType|OrganisationalUnit|Location|null {
+        $items = match ($name) {
+            'functionType' => $this->functionTypeRepository->findAll(),
+            'organisationalUnit' => $this->organisationalUnitRepository->findAll(),
+            'location' => $this->locationRepository->findAll(),
+            default => [],
+        };
+        foreach ($items as $item) {
+            if (
+                ($item instanceof FunctionType || $item instanceof OrganisationalUnit || $item instanceof Location)
+                && (int)$item->getUid() === $uid
+            ) {
+                return $item;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param array<string, list<string>> $errors
+     */
+    private function validateDocumentField(
+        string $name,
+        mixed $value,
+        Validation $validation,
+        array &$errors,
+    ): void {
+        foreach ($validation->validatorClassNames as $validatorClassName) {
+            $validator = GeneralUtility::makeInstance($validatorClassName);
+            if (!$validator instanceof ValidatorInterface) {
+                continue;
+            }
+            $validationResult = $validator->validate($value);
+            foreach ($validationResult->getErrors() as $error) {
+                $errors[$name][] = $error->getMessage();
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     */
+    private function createContractFormData(array $fields): ContractFormData
+    {
+        $formData = new ContractFormData();
+        $this->applyDocumentFormOverrides($formData, $fields);
+        return $formData;
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     */
+    private function createProfileInformationFormData(
+        DocumentSection $section,
+        array $fields,
+    ): ProfileInformationFormData {
+        $formData = ProfileInformationFormData::createEmptyForType($section->type);
+        $formData->setPropertyOverride('type', $section->type);
+        $this->applyDocumentFormOverrides($formData, $fields);
+        return $formData;
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     */
+    private function applyDocumentFormOverrides(AbstractFormData $formData, array $fields): void
+    {
+        foreach ($fields as $name => $value) {
+            $formData->setPropertyOverride($name, $value);
+        }
+    }
+
+    /**
+     * @return array{
+     *     uid: int,
+     *     sorting: int,
+     *     values: array<string, mixed>,
+     *     display: array<string, string>
+     * }
+     */
+    private function serializeDocumentItem(
+        DocumentSection $section,
+        Contract|ProfileInformation $record,
+    ): array {
+        $values = [];
+        $display = [];
+        foreach ($this->getDocumentFieldDefinitions($section, $record) as $field) {
+            $values[$field['name']] = $field['value'];
+            $display[$field['name']] = $field['displayValue'];
+        }
+        return [
+            'uid' => (int)$record->getUid(),
+            'sorting' => $record->getSorting(),
+            'values' => $values,
+            'display' => $display,
+        ];
+    }
+
+    private function handleDocumentFailure(string $logMessage, Throwable $exception): never
+    {
+        GeneralUtility::makeInstance(LogManager::class)
+            ->getLogger(self::class)
+            ->error($logMessage, ['exception' => $exception]);
+        $this->throwJsonError(
+            'internal_server_error',
+            500,
+            'The document operation could not be completed.',
+        );
     }
 
     /**

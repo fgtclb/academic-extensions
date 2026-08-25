@@ -79,7 +79,7 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
         foreach (glob($moduleDirectory . '/profile/*.js') ?: [] as $module) {
             $modules[$module] = $testDirectory . '/' . basename($module, '.js') . '.test.js';
         }
-        $this->assertCount(8, $modules);
+        $this->assertCount(9, $modules);
 
         foreach ($modules as $module => $testFile) {
             $this->assertFileExists($module);

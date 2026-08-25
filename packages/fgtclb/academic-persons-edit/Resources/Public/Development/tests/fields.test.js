@@ -62,18 +62,18 @@ const createRoot = () => {
         </div>
       </div>
       <div class="field-row" data-ie-field-wrapper>
-        <div data-ie-field-preview data-ie-for="inline-profile-1-publishEmailAddress" data-empty-label="Empty">
-          <span data-ie-field-preview-content>Private</span>
-          <button type="button" data-academic-persons-inline-edit-activate-btn data-ie-for="inline-profile-1-publishEmailAddress" aria-expanded="false"></button>
+        <div data-ie-field-preview data-ie-for="inline-profile-1-skipSync" data-empty-label="Empty">
+          <span data-ie-field-preview-content>Enabled</span>
+          <button type="button" data-academic-persons-inline-edit-activate-btn data-ie-for="inline-profile-1-skipSync" aria-expanded="false"></button>
         </div>
-        <div id="inline-profile-1-publishEmailAddress-editor" class="d-none" data-ie-field-editor>
+        <div id="inline-profile-1-skipSync-editor" class="d-none" data-ie-field-editor>
           <div class="form-check">
-            <input id="inline-profile-1-publishEmailAddress" name="profile[publishEmailAddress]" type="checkbox"
+            <input id="inline-profile-1-skipSync" name="profile[skipSync]" type="checkbox"
               class="academic-persons-inline-edit__field" data-ie-autosave-on-change
-              data-ie-checked-label="Public" data-ie-unchecked-label="Private">
+              data-ie-checked-label="Disabled" data-ie-unchecked-label="Enabled">
             <div class="invalid-feedback"></div>
           </div>
-          <button type="button" data-ie-autosave-undo data-ie-cancel data-ie-for="inline-profile-1-publishEmailAddress"></button>
+          <button type="button" data-ie-autosave-undo data-ie-cancel data-ie-for="inline-profile-1-skipSync"></button>
         </div>
       </div>
       <div data-ie-field-group data-ie-field-ids="website websiteTitle" data-ie-display-field-ids="websiteTitle website" data-ie-display-mode="first">
@@ -157,19 +157,19 @@ describe("profile/fields helpers", () => {
     const root = createRoot();
     const firstName = get(root, "firstName");
     const gender = get(root, "gender");
-    const publish = get(root, "publishEmailAddress");
+    const skipSync = get(root, "skipSync");
     const biography = get(root, "biography");
 
     expect(fields.getFieldValue(firstName)).toBe("Jane");
-    expect(fields.getFieldValue(publish)).toBe(false);
+    expect(fields.getFieldValue(skipSync)).toBe(false);
     fields.setFieldValue(firstName, null);
-    fields.setFieldValue(publish, 1);
+    fields.setFieldValue(skipSync, 1);
     expect(firstName.value).toBe("");
-    expect(publish.checked).toBe(true);
+    expect(skipSync.checked).toBe(true);
 
     expect(fields.getFieldDisplayValue(firstName, " Name ")).toBe("Name");
-    expect(fields.getFieldDisplayValue(publish, true)).toBe("Public");
-    expect(fields.getFieldDisplayValue(publish, false)).toBe("Private");
+    expect(fields.getFieldDisplayValue(skipSync, true)).toBe("Disabled");
+    expect(fields.getFieldDisplayValue(skipSync, false)).toBe("Enabled");
     expect(fields.getFieldDisplayValue(gender, "f")).toBe("Female");
     expect(fields.getFieldDisplayValue(biography, "<p>Rich <strong>text</strong></p>"))
       .toBe("Rich text");
@@ -327,7 +327,7 @@ describe("profile/fields interactions", () => {
 
   test.each([
     ["gender", "m", "f"],
-    ["publishEmailAddress", true, false],
+    ["skipSync", true, false],
   ])("undo restores and closes the %s editor", (identifier, draftValue, storedValue) => {
     const root = createRoot();
     fields.initializeFieldEditing(root);

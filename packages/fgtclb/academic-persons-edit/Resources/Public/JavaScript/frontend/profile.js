@@ -1,5 +1,6 @@
 import { rootSelector } from "./profile/common.js";
 import { initializeFieldEditing } from "./profile/fields.js";
+import { initializeDocumentSections } from "./profile/documents.js";
 import { initializeImageEditing } from "./profile/image.js";
 import { initializeStickyImageOffset } from "./profile/sticky-image.js";
 import { initializeSkipSync } from "./profile/sync.js";
@@ -11,6 +12,7 @@ export const initializeInlineProfiles = (scope = document) => {
     }
     initializeStickyImageOffset(root);
     initializeFieldEditing(root);
+    initializeDocumentSections(root);
     initializeSkipSync(root);
     initializeImageEditing(root);
   });

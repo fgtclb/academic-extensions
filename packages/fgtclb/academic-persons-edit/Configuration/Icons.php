@@ -78,4 +78,24 @@ return [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-add.svg',
     ],
+    'academic-persons-inline-edit-open' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-eye.svg',
+    ],
+    'academic-persons-inline-edit-up' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-up.svg',
+    ],
+    'academic-persons-inline-edit-down' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-down.svg',
+    ],
+    'academic-persons-inline-edit-delete' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-bin.svg',
+    ],
+    'academic-persons-inline-edit-grip' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-griplines.svg',
+    ],
 ];
