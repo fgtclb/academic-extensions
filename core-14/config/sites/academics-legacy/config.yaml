@@ -16,6 +16,40 @@ imports:
   - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
   - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
 
+# Bind every one of those enhancers to the pages that carry the plugin it
+# belongs to.
+#
+# Without this block TYPO3 offers all five to every page of the site, and the
+# matcher takes the first candidate route whose path matches and whose aspects
+# also resolve. "ListAndDetail.yaml" and "Detail.yaml" declare a byte identical
+# "/{profile_name}" over the same slug mapper, so the one that is imported
+# first takes every profile URL of the whole site and the other plugin never
+# receives its argument - a 404 on the dedicated detail page, from a link that
+# was generated correctly, because generation is scoped to the plugin namespace
+# being linked and is therefore not ambiguous at all (ACE-470). The two list
+# routes collide the same way and more quietly: the wrong namespace renders an
+# unfiltered list with status 200.
+#
+# The uids below are the ones the seed declares, and they are the uids of the
+# default language. Matching derives the page as "l10n_parent ?: uid", so one
+# list covers "/persons/detail" and "/de/personal/detail" alike.
+routeEnhancers:
+  # "/persons/list", "/persons/list-alphabet", "/persons/list-filtered"
+  ProfileListPlugin:
+    limitToPages: [1201, 1202, 1203]
+  # "/persons/list-and-detail"
+  ProfileListAndDetailPlugin:
+    limitToPages: [1204]
+  # "/persons/detail"
+  ProfileDetailPlugin:
+    limitToPages: [1205]
+  # "/jobs/detail"
+  AcademicJobsDetailPlugin:
+    limitToPages: [1233]
+  # "/programs/list", "/programs/list-preset"
+  AcademicPrograms:
+    limitToPages: [1251, 1252]
+
 # Site of the "/legacy/" page tree - the 56 content pages of "academics",
 # delivered the way an installation that predates site sets delivers them. The
 # nine storage folders of "/data" are not mirrored: their records are shared,
