@@ -272,6 +272,88 @@ This is a bigger trap than the double parse. It is also what an installation
 in that state recovers from by selecting the static template: the record that
 wiped the set contribution can carry the same configuration itself.
 
+## Route enhancers are not loaded by anything
+
+Five files ship route enhancers and **none of them is read by TYPO3 on its own**:
+
+| Extension           | Files                                                   |
+|---------------------|---------------------------------------------------------|
+| `academic_persons`  | `Configuration/Routes/{List,ListAndDetail,Detail}.yaml` |
+| `academic_jobs`     | `Configuration/Routes/Detail.yaml`                      |
+| `academic_programs` | `Configuration/Yaml/Routes.yaml`                        |
+
+A site configuration has to `imports:` them, or every detail page is reachable
+only through a raw `tx_…[…]` argument. All three instance site configurations
+do — `core-12/config/sites/academics/`, `core-13/config/sites/academics/` and
+`core-13/config/sites/academics-legacy/`:
+
+```yaml
+imports:
+  - resource: 'EXT:academic_persons/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
+```
+
+Not through a site set. A set may carry a `route-enhancers.yaml` only from TYPO3
+v14.1, which this branch never reaches, and the `core-12` instance has no site
+sets at all — so `imports:` is the one form that works everywhere here.
+
+### Importing is half of it — the enhancers have to be limited to their pages
+
+Importing all five is not enough, and the distinct enhancer keys do not make it
+safe. TYPO3 offers **every** enhancer of a site to **every** page unless the
+enhancer carries `limitToPages`, and `PageUriMatcher::matchCollection()` takes
+the first candidate route whose path matches *and* whose aspects resolve. The
+insertion order is the `imports:` order.
+
+Three of the five routes are declared twice, byte identical down to the mapper:
+
+| Route                       | Declared in                             |
+|-----------------------------|-----------------------------------------|
+| `/{profile_name}`           | `Detail.yaml`, `ListAndDetail.yaml`     |
+| `{localized_page}-{page}`   | `List.yaml`, `ListAndDetail.yaml`       |
+| `/{letter}`                 | `List.yaml`, `ListAndDetail.yaml`       |
+
+So the file imported first takes those URLs on every page of the site, and the
+plugin on the other page never receives its argument. That is ACE-470: the
+dedicated `/persons/detail` page answers 404 for every link the list plugins
+generate for it, in both languages and in both page trees, while
+`/persons/list-and-detail/<slug>` keeps working. Only *resolving* is ambiguous —
+generation is scoped to the plugin namespace being linked, so the links look
+right and the defect surfaces as a broken page instead.
+
+The jobs and programs enhancers are not caught by this even though
+`/{job_title}` compiles to the same greedy `.+` — an aspect variable without an
+explicit `requirements` entry always does. Their mappers read other tables, so
+a persons route that matched the path is skipped when the slug is not a profile
+slug and the matcher falls through. That is a thin guarantee, not a design.
+
+All three instance site configurations therefore pin every enhancer:
+
+```yaml
+routeEnhancers:
+  ProfileListPlugin:
+    limitToPages: [201, 202, 203]
+  ProfileListAndDetailPlugin:
+    limitToPages: [204]
+  ProfileDetailPlugin:
+    limitToPages: [205]
+  AcademicJobsDetailPlugin:
+    limitToPages: [233]
+  AcademicPrograms:
+    limitToPages: [251, 252]
+```
+
+The uids are the ones the seed declares, `+1000` in the `academics-legacy`
+site, and they are the uids of the **default language**: matching derives the
+page as `l10n_parent ?: uid`, so one list covers `/persons/detail` and
+`/de/personal/detail` alike. Generation on the other hand uses the linked page
+uid, which is the default-language uid too — naming a translated page's own uid
+would work for neither direction. `PageRouter` reads `limitToPages` identically
+on v12.4 and v13.4, so a plain list of uids is right on both.
+
 ## The integrator chapter
 
 Each converted extension documents the two mechanisms in its own
