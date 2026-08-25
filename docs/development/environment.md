@@ -436,6 +436,53 @@ the same relative path on both sides, because each instance bind-mounts the
 repository's `Build/` into its container
 (`core-*/.ddev/docker-compose.mounts.yaml`).
 
+#### And a snapshot carries no runtime rows
+
+`sqlite:backup` runs `cache:flush` before the copy, which is right and is not
+enough. The flush and the copy are two steps against a **running** instance, so
+any request that lands between them refills `cache_pages` and `cache_rootline`,
+and the helper is usable on its own — where nothing flushes anything at all.
+
+The search index is the larger half of the same problem, and no cache flush has
+ever touched it. Measured on `core-13` after one crawl of the seeded tree:
+
+| Table                    | Live instance | Committed template |
+|--------------------------|---------------|--------------------|
+| `index_rel`              | 8401          | 0                  |
+| `index_words`            | 1038          | 0                  |
+| `index_phash`            | 247           | 0                  |
+| `cache_pages_tags`       | 514           | 0                  |
+| `sys_file_processedfile` | 64            | 0                  |
+| `fe_sessions`            | 6             | 0                  |
+| **file size**            | **11.18 MB**  | **5.95 MB**        |
+
+None of that is content, all of it comes back by using the instance, and every
+byte of it would land in a binary git cannot delta-compress. So a backup empties
+it in the **copy** — never in the live database — and vacuums afterwards:
+
+* every table named `cache_*`, which is every database-backed TYPO3 cache,
+* every table named `index_*`, the index of EXT:indexed_search,
+* `be_sessions`, `fe_sessions`, `sys_lockedrecords` and
+  `sys_file_processedfile`,
+* and the rows of `sys_file`/`sys_file_metadata` whose `storage` is `0` — the
+  records TYPO3 writes when a file delivered from an extension, a theme logo for
+  instance, is used for the first time. No committed template has ever held one;
+  files in a real storage are content and are left alone.
+
+The count is reported, so a backup says what it took out:
+
+```text
+Backed up var/sqlite/core-13.sqlite -> ../sqlite-databases/core-13.sqlite
+    (170 tables, 5.7 MB, 11827 transient rows removed)
+```
+
+A restore is left alone. It writes an instance, and an instance is allowed to
+hold caches and a search index — it rebuilds them on the next request anyway.
+
+This is a floor, not a proof. What proves a snapshot is
+[`SnapshotManifestTest`](../testing/seed-verification.md), which measures the
+committed file against the manifest of the seed.
+
 ### Site sets are cached, and the cache outlives a `git pull`
 
 The set definitions an installation knows are cached. After pulling a branch
