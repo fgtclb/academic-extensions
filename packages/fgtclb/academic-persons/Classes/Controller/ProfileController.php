@@ -21,6 +21,7 @@ use FGTCLB\AcademicPersons\Event\ModifyListProfilesEvent;
 use FGTCLB\AcademicPersons\Event\ModifySelectedContractsEvent;
 use FGTCLB\AcademicPersons\Event\ModifySelectedProfilesEvent;
 use FGTCLB\AcademicPersons\PageTitle\ProfileTitleProvider;
+use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use GeorgRinger\NumberedPagination\NumberedPagination;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheTag;
@@ -40,6 +41,12 @@ final class ProfileController extends ActionController
     private ContractRepository $contractRepository;
     private ProfileRepository $profileRepository;
     private ProfileTitleProvider $profileTitleProvider;
+    private AcademicPersonsSettings $academicPersonsSettings;
+
+    public function injectAcademicPersonsSettings(AcademicPersonsSettings $academicPersonsSettings): void
+    {
+        $this->academicPersonsSettings = $academicPersonsSettings;
+    }
 
     public function injectContractRepository(ContractRepository $contractRepository): void
     {
@@ -258,7 +265,6 @@ final class ProfileController extends ActionController
                 ['code' => PageAccessFailureReasons::PAGE_NOT_FOUND]
             );
         }
-
         $pluginControllerActionContext = new PluginControllerActionContext($this->request, $this->settings);
         /** @var ModifyDetailProfileEvent $event */
         $event = $this->eventDispatcher->dispatch(new ModifyDetailProfileEvent(
@@ -269,23 +275,21 @@ final class ProfileController extends ActionController
             $this->resolveDetailPageTitleFormat(),
         ));
         $profile = $event->getProfile();
-
         // Add page title based on profile name
         $this->profileTitleProvider->setFromProfile(
             $pluginControllerActionContext,
             $profile,
             $event->getPageTitleFormatToUse(),
         );
-
         // Set additional detail page cache tags
         $this->addCacheTags(
             'profile_detail_view',
             sprintf('profile_detail_view_%d', $profile->getUid()),
         );
-
         $this->view->assignMultiple([
             'data' => $this->getCurrentContentObjectRenderer()?->data,
             'profile' => $profile,
+            'publicProfile' => $this->academicPersonsSettings->publicProfile,
         ]);
         return $this->htmlResponse();
     }

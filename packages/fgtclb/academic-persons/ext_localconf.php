@@ -8,6 +8,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please read the
  * LICENSE file that was distributed with this source code.
  */
+
 use FGTCLB\AcademicPersons\Controller\ProfileController;
 use FGTCLB\AcademicPersons\Hook\DataHandlerHooks;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
@@ -64,7 +65,9 @@ if (!defined('ACADEMIC_PERSONS_CASCADE_REMOVE')) {
         [
             ProfileController::class => 'detail',
         ],
-        [],
+        [
+            ProfileController::class => 'detail',
+        ],
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
 

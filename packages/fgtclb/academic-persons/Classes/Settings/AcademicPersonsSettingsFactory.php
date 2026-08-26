@@ -71,7 +71,7 @@ class AcademicPersonsSettingsFactory
      */
     private function academicPersonsSettingsIdentifier(): string
     {
-        return 'AcademicPersons_Settings_SectionSchema_v3';
+        return 'AcademicPersons_Settings_SectionSchema_v4';
     }
 
     /**
@@ -84,8 +84,91 @@ class AcademicPersonsSettingsFactory
             specialFields: $this->normalizeSpecialFields($settings),
             contractContactSections: $this->normalizeContractContactSections($settings),
             documentSections: $this->normalizeDocumentSections($settings),
+            publicProfile: $this->normalizePublicProfile($settings),
             raw: $settings,
         );
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     */
+    private function normalizePublicProfile(array $settings): PublicProfileSettings
+    {
+        $configuredPublicProfile = $settings['publicProfile'] ?? null;
+        if (!is_array($configuredPublicProfile)) {
+            return new PublicProfileSettings();
+        }
+        $structure = [];
+        $configuredStructure = is_array($configuredPublicProfile['structure'] ?? null)
+            ? $configuredPublicProfile['structure']
+            : [];
+        foreach ($configuredStructure as $columnIdentifier => $elementIdentifiers) {
+            if (!is_string($columnIdentifier) || $columnIdentifier === '' || !is_array($elementIdentifiers)) {
+                continue;
+            }
+            $structure[$columnIdentifier] = $this->normalizePublicProfileList($elementIdentifiers);
+        }
+        $details = [];
+        $configuredDetails = is_array($configuredPublicProfile['details'] ?? null)
+            ? $configuredPublicProfile['details']
+            : [];
+        foreach ($configuredDetails as $detailIdentifier => $detailConfiguration) {
+            if (!is_string($detailIdentifier) || $detailIdentifier === '') {
+                continue;
+            }
+            if (is_string($detailConfiguration) && $detailConfiguration !== '') {
+                $details[$detailIdentifier] = $detailConfiguration;
+                continue;
+            }
+            if (!is_array($detailConfiguration)) {
+                continue;
+            }
+            $details[$detailIdentifier] = array_is_list($detailConfiguration)
+                ? $this->normalizePublicProfileList($detailConfiguration)
+                : $this->normalizePublicProfileMap($detailConfiguration);
+        }
+        return new PublicProfileSettings(structure: $structure, details: $details);
+    }
+
+    /**
+     * @param array<int, mixed> $configuredValues
+     * @return list<string>
+     */
+    private function normalizePublicProfileList(array $configuredValues): array
+    {
+        $values = [];
+        foreach ($configuredValues as $configuredValue) {
+            if (!is_string($configuredValue)) {
+                continue;
+            }
+            $value = trim($configuredValue);
+            if ($value !== '' && !in_array($value, $values, true)) {
+                $values[] = $value;
+            }
+        }
+        return $values;
+    }
+
+    /**
+     * @param array<string|int, mixed> $configuredValues
+     * @return array<string, string>
+     */
+    private function normalizePublicProfileMap(array $configuredValues): array
+    {
+        $values = [];
+        foreach ($configuredValues as $configuredIdentifier => $configuredValue) {
+            if (!is_string($configuredIdentifier)
+                || $configuredIdentifier === ''
+                || !is_string($configuredValue)
+            ) {
+                continue;
+            }
+            $value = trim($configuredValue);
+            if ($value !== '') {
+                $values[$configuredIdentifier] = $value;
+            }
+        }
+        return $values;
     }
 
     /**

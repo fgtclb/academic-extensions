@@ -442,3 +442,48 @@ documentSections:
         - date
       description:
         - html
+publicProfile:
+  structure:
+    left:
+      - menuSections
+    right:
+      - headline
+      - position
+      - profileImage
+      - contact
+      - subline
+      - profileEntries
+      - menuSectionsDatas
+  details:
+    menuSections:
+      - researchProjects
+      - academicCareer
+      - membershipsCommitteeActivities
+      - networkCooperation
+      - publications
+      - lectures
+    headline:
+      - title
+      - firstName
+      - middleName
+      - lastName
+    position:
+      special: datasFromContracts
+    profileImage:
+      - image
+    contact:
+      special: datasFromContracts
+    subline: "LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:detail.subline"
+    profileEntries:
+      - teachingArea
+      - coreCompetences
+      - supervisedThesis
+      - supervisedDoctoralThesis
+      - miscellaneous
+    menuSectionsDatas:
+      researchProjects: scientificResearch
+      academicCareer: vita
+      membershipsCommitteeActivities: memberships
+      networkCooperation: cooperation
+      publications: publications
+      lectures: lectures
