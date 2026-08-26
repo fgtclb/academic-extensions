@@ -8,7 +8,7 @@
     date="2025-02-24T11:41:07Z"
     product-name="academic_persons"
   >
-    <header/>
+    <header />
     <body>
 
       <!-- Contracts -->
@@ -55,6 +55,18 @@
 
       <!-- Detail -->
 
+      <trans-unit id="detail.subline" resname="detail.subline">
+        <source>Academic activities and publications</source>
+        <target>Akademische Tätigkeiten und Publikationen</target>
+      </trans-unit>
+      <trans-unit id="detail.contact" resname="detail.contact">
+        <source>Contact</source>
+        <target>Kontakt</target>
+      </trans-unit>
+      <trans-unit id="detail.navigation" resname="detail.navigation">
+        <source>Profile sections</source>
+        <target>Profilbereiche</target>
+      </trans-unit>
       <trans-unit id="detail.contracts" resname="detail.contracts">
         <source>Contracts</source>
         <target>Verträge</target>

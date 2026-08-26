@@ -1,0 +1,19 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<header class="academic-persons-detail__header">
+    <h1
+        class="academic-persons-detail__headline"
+        id="academic-persons-detail-headline-{data.uid}-{profile.uid}"
+    >
+        <f:for each="{publicProfile.details.headline}" as="fieldName">
+            <f:if condition="{profile.{fieldName}}">
+                <span class="academic-persons-detail__headline-part">{profile.{fieldName}}</span>
+            </f:if>
+        </f:for>
+    </h1>
+</header>
+
+</html>

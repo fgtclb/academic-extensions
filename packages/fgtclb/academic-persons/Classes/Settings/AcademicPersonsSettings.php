@@ -18,6 +18,7 @@ final class AcademicPersonsSettings
     public readonly array $contractContactSections;
     /** @var array<string, DocumentSection> */
     public readonly array $documentSections;
+    public readonly PublicProfileSettings $publicProfile;
     /** @var array<string, mixed> */
     public readonly array $raw;
 
@@ -33,12 +34,14 @@ final class AcademicPersonsSettings
         array $specialFields = [],
         array $contractContactSections = [],
         array $documentSections = [],
+        ?PublicProfileSettings $publicProfile = null,
         array $raw = [],
     ) {
         $this->profileSections = $profileSections;
         $this->specialFields = $specialFields;
         $this->contractContactSections = $contractContactSections;
         $this->documentSections = $documentSections;
+        $this->publicProfile = $publicProfile ?? new PublicProfileSettings();
         $this->raw = $raw;
     }
 
@@ -48,6 +51,7 @@ final class AcademicPersonsSettings
      *     specialFields?: array<string, SpecialField>,
      *     contractContactSections?: array<string, ContractContactSection>,
      *     documentSections?: array<string, DocumentSection>,
+     *     publicProfile?: PublicProfileSettings,
      *     raw: array<string, mixed>,
      * } $array
      */
@@ -58,8 +62,14 @@ final class AcademicPersonsSettings
             specialFields: $array['specialFields'] ?? [],
             contractContactSections: $array['contractContactSections'] ?? [],
             documentSections: $array['documentSections'] ?? [],
+            publicProfile: $array['publicProfile'] ?? null,
             raw: $array['raw'] ?? [],
         );
+    }
+
+    public function getPublicProfile(): PublicProfileSettings
+    {
+        return $this->publicProfile;
     }
 
     public function getProfileSection(string $identifier): ?ProfileSection

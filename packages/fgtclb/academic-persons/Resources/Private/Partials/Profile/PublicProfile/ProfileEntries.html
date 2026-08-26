@@ -1,0 +1,47 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<div class="academic-persons-detail__profile-entries rounded-0">
+    <f:for each="{publicProfile.details.profileEntries}" as="fieldName">
+        <f:if condition="{profile.{fieldName}}">
+            <section class="academic-persons-detail__accordion-item rounded-0">
+                <h3 class="academic-persons-detail__accordion-heading">
+                    <button
+                        class="academic-persons-detail__accordion-button rounded-0"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="academic-persons-profile-entry-{data.uid}-{profile.uid}-{fieldName}"
+                        data-academic-persons-accordion-trigger="true"
+                    >
+                        <span class="academic-persons-detail__accordion-label">
+                            <f:translate key="detail.{fieldName}" extensionName="academic_persons" />
+                        </span>
+                        <span class="academic-persons-detail__accordion-icon" aria-hidden="true">
+                            <img
+                                class="academic-persons-detail__accordion-icon-plus rounded-0"
+                                src="{f:uri.resource(path: 'Icons/detail-plus.svg', extensionName: 'AcademicPersons')}"
+                                alt=""
+                            />
+                            <img
+                                class="academic-persons-detail__accordion-icon-minus rounded-0"
+                                src="{f:uri.resource(path: 'Icons/detail-minus.svg', extensionName: 'AcademicPersons')}"
+                                alt=""
+                            />
+                        </span>
+                    </button>
+                </h3>
+                <div
+                    class="academic-persons-detail__accordion-panel rounded-0"
+                    id="academic-persons-profile-entry-{data.uid}-{profile.uid}-{fieldName}"
+                    hidden="hidden"
+                >
+                    {profile.{fieldName} -> f:format.html()}
+                </div>
+            </section>
+        </f:if>
+    </f:for>
+</div>
+
+</html>

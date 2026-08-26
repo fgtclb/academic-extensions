@@ -1,0 +1,33 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<f:switch expression="{element}">
+    <f:case value="menuSections">
+        <f:render partial="Profile/PublicProfile/MenuSections" arguments="{_all}" />
+    </f:case>
+    <f:case value="headline">
+        <f:render partial="Profile/PublicProfile/Headline" arguments="{_all}" />
+    </f:case>
+    <f:case value="position">
+        <f:render partial="Profile/PublicProfile/Position" arguments="{_all}" />
+    </f:case>
+    <f:case value="profileImage">
+        <f:render partial="Profile/PublicProfile/ProfileImage" arguments="{_all}" />
+    </f:case>
+    <f:case value="contact">
+        <f:render partial="Profile/PublicProfile/Contact" arguments="{_all}" />
+    </f:case>
+    <f:case value="subline">
+        <f:render partial="Profile/PublicProfile/Subline" arguments="{_all}" />
+    </f:case>
+    <f:case value="profileEntries">
+        <f:render partial="Profile/PublicProfile/ProfileEntries" arguments="{_all}" />
+    </f:case>
+    <f:case value="menuSectionsDatas">
+        <f:render partial="Profile/PublicProfile/MenuSectionsDatas" arguments="{_all}" />
+    </f:case>
+</f:switch>
+
+</html>
