@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersons\Tests\Unit\Domain\Model;
 
+use DateTime;
 use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
@@ -62,6 +63,23 @@ final class ProfileInformationTest extends UnitTestCase
     public function getYearEndReturnsNullForNewModel(): void
     {
         $this->assertNull((new ProfileInformation())->getYearEnd());
+    }
+
+    #[Test]
+    public function completeDatesAndYearOnlyFlagRoundTripWithoutTimeConversion(): void
+    {
+        $year = new DateTime('2026-04-17');
+        $yearStart = new DateTime('2024-02-29');
+        $yearEnd = new DateTime('2028-12-31');
+        $subject = (new ProfileInformation())
+            ->setYear($year)
+            ->setYearStart($yearStart)
+            ->setYearEnd($yearEnd)
+            ->setYearOnly(true);
+        $this->assertSame($year, $subject->getYear());
+        $this->assertSame($yearStart, $subject->getYearStart());
+        $this->assertSame($yearEnd, $subject->getYearEnd());
+        $this->assertTrue($subject->isYearOnly());
     }
 
     #[Test]

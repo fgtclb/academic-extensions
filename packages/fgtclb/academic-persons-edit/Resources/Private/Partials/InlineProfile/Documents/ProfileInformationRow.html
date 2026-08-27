@@ -16,7 +16,7 @@
                             <f:translate key="inlineProfile.documents.from" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="yearStart">
-                            <f:render partial="InlineProfile/Documents/DateValue" arguments="{value: item.yearStart, fallback: item.year}" />
+                            <f:render partial="InlineProfile/Documents/DateValue" arguments="{value: item.yearStart, fallback: item.year, yearOnly: item.yearOnly}" />
                         </div>
                     </div>
                 </f:case>
@@ -26,7 +26,7 @@
                             <f:translate key="inlineProfile.documents.to" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="yearEnd">
-                            <f:render partial="InlineProfile/Documents/DateValue" arguments="{value: item.yearEnd}" />
+                            <f:render partial="InlineProfile/Documents/DateValue" arguments="{value: item.yearEnd, yearOnly: item.yearOnly}" />
                         </div>
                     </div>
                 </f:case>
@@ -36,7 +36,7 @@
                             <f:translate key="inlineProfile.documents.year" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="year">
-                            <f:render partial="InlineProfile/Documents/DateValue" arguments="{value: item.year, fallback: item.yearStart}" />
+                            <f:render partial="InlineProfile/Documents/DateValue" arguments="{value: item.year, fallback: item.yearStart, yearOnly: item.yearOnly}" />
                         </div>
                     </div>
                 </f:case>

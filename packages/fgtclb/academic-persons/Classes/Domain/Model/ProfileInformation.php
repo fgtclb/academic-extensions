@@ -20,9 +20,10 @@ class ProfileInformation extends AbstractEntity
     protected string $title = '';
     protected string $bodytext = '';
     protected string $link = '';
-    protected ?int $year = null;
-    protected ?int $yearStart = null;
-    protected ?int $yearEnd = null;
+    protected ?\DateTime $year = null;
+    protected ?\DateTime $yearStart = null;
+    protected ?\DateTime $yearEnd = null;
+    protected bool $yearOnly = false;
     protected int $sorting = 0;
 
     public function __construct()
@@ -90,37 +91,48 @@ class ProfileInformation extends AbstractEntity
         return $this->link;
     }
 
-    public function setYear(?int $year): self
+    public function setYear(?\DateTime $year): self
     {
         $this->year = $year;
         return $this;
     }
 
-    public function getYear(): ?int
+    public function getYear(): ?\DateTime
     {
         return $this->year;
     }
 
-    public function setYearStart(?int $yearStart): self
+    public function setYearStart(?\DateTime $yearStart): self
     {
         $this->yearStart = $yearStart;
         return $this;
     }
 
-    public function getYearStart(): ?int
+    public function getYearStart(): ?\DateTime
     {
         return $this->yearStart;
     }
 
-    public function setYearEnd(?int $yearEnd): self
+    public function setYearEnd(?\DateTime $yearEnd): self
     {
         $this->yearEnd = $yearEnd;
         return $this;
     }
 
-    public function getYearEnd(): ?int
+    public function getYearEnd(): ?\DateTime
     {
         return $this->yearEnd;
+    }
+
+    public function setYearOnly(bool $yearOnly): self
+    {
+        $this->yearOnly = $yearOnly;
+        return $this;
+    }
+
+    public function isYearOnly(): bool
+    {
+        return $this->yearOnly;
     }
 
     public function setSorting(int $sorting): self

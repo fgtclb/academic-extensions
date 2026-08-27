@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Plugins;
 
+use DOMDocument;
+use DOMElement;
 use FGTCLB\AcademicPersonsEdit\Tests\Functional\AbstractAcademicPersonsEditTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -61,10 +63,14 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
             typoScriptFiles: [
                 'constants' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
+                    'EXT:academic_persons/Configuration/TypoScript/constants.typoscript',
                     'EXT:academic_persons_edit/Configuration/TypoScript/constants.typoscript',
+                    'EXT:academic_persons_edit/Tests/Functional/Plugins/Fixtures/'
+                        . 'TypoScript/Constants/Configuration.typoscript',
                 ],
                 'setup' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
+                    'EXT:academic_persons/Configuration/TypoScript/setup.typoscript',
                     'EXT:academic_persons_edit/Configuration/TypoScript/setup.typoscript',
                     'EXT:academic_persons_edit/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/Rendering.typoscript',
                 ],
@@ -104,6 +110,34 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
     protected function getPageAsFrontendUser(string $url): string
     {
         return $this->renderFrontendPage($this->withFrontendUserSession(new InternalRequest($url)));
+    }
+
+    /**
+     * Returns a rendered Extbase action link including the request-specific cHash.
+     */
+    protected function extractPluginActionLink(
+        string $content,
+        string $namespace,
+        string $action,
+        string $profileArgument,
+        int $profileUid,
+    ): string {
+        $document = new DOMDocument();
+        $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
+        foreach ($document->getElementsByTagName('a') as $link) {
+            $this->assertInstanceOf(DOMElement::class, $link);
+            $href = html_entity_decode($link->getAttribute('href'));
+            parse_str((string)parse_url($href, PHP_URL_QUERY), $query);
+            $arguments = $query[$namespace] ?? null;
+            if (
+                is_array($arguments)
+                && ($arguments['action'] ?? null) === $action
+                && (int)($arguments[$profileArgument] ?? 0) === $profileUid
+            ) {
+                return str_starts_with($href, '/') ? 'https://www.acme.com' . $href : $href;
+            }
+        }
+        $this->fail(sprintf('No "%s" link for profile %d was rendered.', $action, $profileUid));
     }
 
     private function withFrontendUserSession(InternalRequest $request): InternalRequest

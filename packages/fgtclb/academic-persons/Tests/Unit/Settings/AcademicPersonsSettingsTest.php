@@ -10,6 +10,7 @@ use FGTCLB\AcademicPersons\Settings\ContractContactSection;
 use FGTCLB\AcademicPersons\Settings\DocumentSection;
 use FGTCLB\AcademicPersons\Settings\ProfileField;
 use FGTCLB\AcademicPersons\Settings\ProfileSection;
+use FGTCLB\AcademicPersons\Settings\PublicProfileSettings;
 use FGTCLB\AcademicPersons\Settings\SpecialField;
 use FGTCLB\AcademicPersons\Settings\Validation;
 use FGTCLB\AcademicPersons\Settings\ValidationSet;
@@ -44,6 +45,23 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
         self::assertSame([], $section->fields);
         self::assertSame('aboutme', $section->validationSet->identifier);
         self::assertSame([], $section->validationSet->validations);
+    }
+
+    #[Test]
+    public function publicProfileDefaultsToEmptySettingsAndIsExposedByGetter(): void
+    {
+        $defaultSettings = new AcademicPersonsSettings();
+        self::assertSame([], $defaultSettings->publicProfile->structure);
+        self::assertSame([], $defaultSettings->publicProfile->details);
+        self::assertSame($defaultSettings->publicProfile, $defaultSettings->getPublicProfile());
+        $publicProfile = new PublicProfileSettings(
+            structure: ['left' => ['menuSections'], 'right' => ['headline']],
+            details: ['headline' => ['firstName', 'lastName']],
+        );
+        $subject = new AcademicPersonsSettings(publicProfile: $publicProfile);
+        self::assertSame($publicProfile, $subject->publicProfile);
+        self::assertSame(['menuSections'], $subject->publicProfile->getColumn('left'));
+        self::assertSame([], $subject->publicProfile->getColumn('unknown'));
     }
 
     #[Test]
@@ -135,7 +153,6 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
             ],
             specialFields: ['title' => $title, 'skipSync' => $skipSync],
         );
-
         self::assertSame(
             ['gender', 'skipSync'],
             array_keys($subject->getProfileUpdateValidationSet()->validations),
@@ -230,12 +247,21 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
                 ),
             ],
             documentSections: ['publications' => $this->documentSection('publications', 'publication')],
+            publicProfile: new PublicProfileSettings(
+                structure: ['left' => ['menuSections'], 'right' => ['headline', 'profileEntries']],
+                details: [
+                    'headline' => ['title', 'firstName', 'lastName'],
+                    'subline' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:detail.subline',
+                ],
+            ),
             raw: ['profile' => ['miscellaneous' => ['section' => 'aboutme']]],
         );
         $restored = eval('return ' . var_export($subject, true) . ';');
         self::assertInstanceOf(AcademicPersonsSettings::class, $restored);
         self::assertEquals($subject, $restored);
         self::assertNotSame($subject, $restored);
+        self::assertSame(['headline', 'profileEntries'], $restored->publicProfile->getColumn('right'));
+        self::assertSame(['title', 'firstName', 'lastName'], $restored->publicProfile->details['headline']);
     }
 
     private function contractContactField(

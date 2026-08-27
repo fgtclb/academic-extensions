@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import {
+  createCroppedImageFile,
   getImagePreview,
   getImagePreviews,
   initializeImageEditing,
+  parseImageRatio,
   setImagePreviewUrl,
   setImageState,
 } from "../../JavaScript/frontend/profile/image.js";
@@ -102,6 +104,52 @@ describe("profile/image", () => {
       writable: true,
       value: jest.fn(),
     });
+  });
+
+  test("parses configured cropper ratios and rejects unusable values", () => {
+    expect(parseImageRatio("1x1")).toBe(1);
+    expect(parseImageRatio("9:16")).toBeCloseTo(9 / 16);
+    expect(parseImageRatio("3 / 2")).toBe(1.5);
+    expect(parseImageRatio("1.25")).toBe(1.25);
+    expect(parseImageRatio(2)).toBe(2);
+    expect(parseImageRatio("")).toBeNull();
+    expect(parseImageRatio("0")).toBeNull();
+    expect(parseImageRatio("1x0")).toBeNull();
+    expect(parseImageRatio("invalid")).toBeNull();
+  });
+
+  test("creates a cropped image file with a safe output format", async () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1600;
+    canvas.height = 900;
+    canvas.toBlob = jest.fn((callback, mimeType) => {
+      callback(new Blob(["cropped"], { type: mimeType }));
+    });
+    const selection = {
+      width: 800,
+      height: 450,
+      $toCanvas: jest.fn().mockResolvedValue(canvas),
+    };
+    const cropper = {
+      getCropperSelection: jest.fn(() => selection),
+      getCropperImage: jest.fn(() => ({ $getTransform: () => [0.5, 0, 0, 0.5, 0, 0] })),
+    };
+    const source = new File(["image"], "portrait.gif", { type: "image/gif" });
+
+    const cropped = await createCroppedImageFile(cropper, source);
+
+    expect(selection.$toCanvas).toHaveBeenCalledWith({ width: 1600 });
+    expect(canvas.toBlob).toHaveBeenCalledWith(expect.any(Function), "image/png", undefined);
+    expect(cropped).toBeInstanceOf(File);
+    expect(cropped.name).toBe("portrait.png");
+    expect(cropped.type).toBe("image/png");
+  });
+
+  test("rejects cropping when CropperJS has no usable selection", async () => {
+    const source = new File(["image"], "portrait.png", { type: "image/png" });
+
+    await expect(createCroppedImageFile({ getCropperSelection: () => null }, source))
+      .rejects.toThrow("The image crop is unavailable.");
   });
 
   test("finds previews, updates image attributes and toggles image state", () => {

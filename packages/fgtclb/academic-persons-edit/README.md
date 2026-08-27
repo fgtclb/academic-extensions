@@ -12,8 +12,12 @@ This extension extends the `academic_persons` extension by the option to edit pr
 Profiles get connected with a frontend user and the frontend user is allow to edit its assigned profiles.
 
 The `Inline profile editing` content element provides a responsive, Bootstrap
-5 based profile page that saves only changed profile fields through a JSON
-endpoint without reloading the page. On large viewports the profile image
+5 based overview of all profiles assigned to the authenticated frontend user.
+Each row shows the profile image, complete name and site-language label. The
+`View` action opens the public `academic_persons` detail plugin on its configured
+`detailPid`; the `Edit` action opens the selected profile in the inline editor.
+The editor saves only changed profile fields through a JSON endpoint without
+reloading the page. On large viewports the profile image
 column remains sticky while the personal data scrolls. Its runtime top offset
 tracks the rendered border-box height of `#page-header`, including responsive
 and scroll-dependent height or padding changes. On smaller viewports the
@@ -22,10 +26,11 @@ are plain text with a borderless pencil action instead of button-like value
 controls. Related name and link properties are presented as groups and edited
 together.
 
-The profile name is displayed as the main heading above the sticky image. The
-compact `Private` switch sits immediately left of the small `Edit all` toggle
-beside the personal-data heading and keeps using its dedicated `skipSync` AJAX
-endpoint. The toggle changes to `Close all` while the editors are open. Closing
+The profile name is displayed as the full-width main heading above both editor
+columns. The compact `Private` switch and the small `Edit all` toggle sit in the
+same responsive heading row. The image column starts with `Profile image`, and
+the data column starts with `Personal data`. The switch keeps using its dedicated
+`skipSync` AJAX endpoint. The toggle changes to `Close all` while the editors are open. Closing
 all editors keeps unsaved browser-side drafts; persistence remains available
 only through each field's own save action. A small pencil button in the
 upper-right corner of the profile image
@@ -33,7 +38,14 @@ opens a Bootstrap 5 modal: selecting a file updates the local modal preview,
 saving uploads and replaces the page preview, and deleting removes the current
 image. Upload errors retain their non-success HTTP status, are shown inside the
 open modal and do not change the page preview. Bootstrap provides the layout;
-the existing small compatibility stylesheet only adjusts surrounding overflow,
+when `special.image.renderType` is `cropper`, the locally shipped CropperJS
+module constrains the selection to `special.image.settings.ratio` before the
+cropped file is uploaded. The selection cannot be moved, and the cropper stays
+inactive for the fallback image until a real file is selected. The upload
+writes the composed profile name to both
+the FAL alternative text and title metadata.
+
+The existing small compatibility stylesheet only adjusts surrounding overflow,
 frame spacing and sticky-card stacking. The templates require no inline styles.
 Every Bootstrap button and modal surface in the shipped Fluid views uses
 `rounded-0` for consistent square corners.
@@ -55,15 +67,19 @@ editor, AJAX and security contracts.
 
 The inline controller consumes the ordered `profile`, `special`,
 `contractContact` and `documentSections` configuration from
-`academic_persons`. Fluid fields are selected by `renderType`, select options
-remain in TCA, and the JavaScript entry delegates to focused feature modules.
+`Configuration/AcademicsPersonsEdit/Settings.yaml`. This edit graph is loaded
+and cached independently from the public `academic-persons` profile layout.
+Fluid fields are selected by `renderType`, select options remain in TCA, and
+the JavaScript entry delegates to focused feature modules.
 Direct public-profile email/telephone values and their opt-in flags stay
 separate from Contract contact data. Validation and structured-section metadata
-remain attached to their respective section.
+remain attached to their respective section. These editor rules drive only the
+frontend controls, JSON metadata and server-side validation; they never
+override backend TCA.
 
 Editable structured document sections have an add button beside their heading.
 Their compact row values and ordered controls follow `rowFields` and `actions`
-from `academic_persons`. Sections marked `readonly`, including the shipped
+from the edit settings. Sections marked `readonly`, including the shipped
 contracts section, expose viewing only. Editable lists can be reordered with
 the configured up/down controls or by dragging the additional sort handle. The
 full row is used as the drag image, the source row and active list are outlined,
@@ -74,6 +90,16 @@ and falls back to the section heading. Delete mode renders the modal submit as
 `btn-danger` and explicitly removes primary or success styling. Ownership- and
 capability-checked JSON actions complete the workflow without calling the
 retained legacy controllers or reloading the page.
+
+The `date` flag on configured `from`, `to` and `year` validators renders a
+native date picker. Profile-information records persist the complete selected
+calendar date in native `DATE` fields; no time value is stored. The three date
+fields and the compact year-only checkbox each use `col-12 col-md-3` and share
+one responsive modal row. `required` is taken from the same settings, so the
+shipped `year` field is mandatory while `from` and `to` are optional. Required
+markers are generated from that metadata, not from field names. A per-record
+`Show year only` switch controls presentation without discarding the stored
+month or day.
 
 Select and checkbox controls save on change and expose a compact undo action
 that restores the last persisted value and closes the inline editor. Frontend

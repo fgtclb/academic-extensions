@@ -137,7 +137,7 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
     public static function configuredProperties(): array
     {
         return [
-            // Named in the shipped Configuration/AcademicPersons/Settings.yaml.
+            // Named in the shipped Configuration/AcademicsPersonsEdit/Settings.yaml.
             'gender' => ['gender', 'string(female)'],
             'firstName' => ['firstName', 'string(Jane)'],
             'middleName' => ['middleName', 'string(M.)'],

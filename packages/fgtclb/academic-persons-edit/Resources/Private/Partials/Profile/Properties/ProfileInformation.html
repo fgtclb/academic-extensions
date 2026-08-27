@@ -32,7 +32,7 @@
 
         <div class="col-12 col-sm-6 col-lg-4">
             <f:render
-                partial="Profile/Forms/Textfield"
+                partial="Profile/Forms/DateTime"
                 arguments="{
                 element: {
                     form: 'profileInformation',
@@ -44,7 +44,7 @@
 
         <div class="col-12 col-sm-6 col-lg-4">
             <f:render
-                partial="Profile/Forms/Textfield"
+                partial="Profile/Forms/DateTime"
                 arguments="{
                 element: {
                     form: 'profileInformation',
@@ -56,11 +56,23 @@
 
         <div class="col-12 col-sm-6 col-lg-4">
             <f:render
-                partial="Profile/Forms/Textfield"
+                partial="Profile/Forms/DateTime"
                 arguments="{
                 element: {
                     form: 'profileInformation',
                     identifier: 'yearEnd',
+                    validations: validations
+                }
+            }" />
+        </div>
+
+        <div class="col-12">
+            <f:render
+                partial="Profile/Forms/Checkbox"
+                arguments="{
+                element: {
+                    form: 'profileInformation',
+                    identifier: 'yearOnly',
                     validations: validations
                 }
             }" />

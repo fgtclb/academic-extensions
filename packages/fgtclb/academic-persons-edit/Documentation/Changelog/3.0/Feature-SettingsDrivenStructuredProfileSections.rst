@@ -37,6 +37,6 @@ Impact
 Template overrides must consume ``{documentSections}`` and should retain the
 document ``data-section-*`` and record ``data-item-*`` attributes. Section order
 and mapping now have one source of truth in
-:file:`Configuration/AcademicPersons/Settings.yaml`.
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`.
 
 ..  index:: AJAX, Contracts, Fluid, Frontend, Profile information, NotScanned, ext:academic_persons_edit

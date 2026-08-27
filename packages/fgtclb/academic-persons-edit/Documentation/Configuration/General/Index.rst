@@ -46,11 +46,9 @@ Which fields can be edited
 ==========================
 
 Which profile fields belong to each visual section, how they are rendered,
-which are mandatory and which are locked is **not** configured in this
-extension. It comes from the :yaml:`profile` map shipped by
-:guilabel:`academic_persons` in
-:file:`Configuration/AcademicPersons/Settings.yaml`. Structured records use the
-same model through :yaml:`documentSections`.
+which are mandatory and which are locked is configured by this extension in
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`. Structured records
+use the :yaml:`documentSections` map from the same file.
 
 Consequences worth knowing before reporting a problem:
 
@@ -59,20 +57,17 @@ Consequences worth knowing before reporting a problem:
 *   :guilabel:`First name`, :guilabel:`Middle name` and :guilabel:`Last name` are
     **locked by default**, because profile names are usually owned by the
     connected frontend user record and synchronised from elsewhere. They are
-    therefore not editable in the frontend form — and, since the same
-    configuration also drives the backend, not in the TYPO3 record editor
-    either.
+    therefore not editable in the frontend form. This setting does not affect
+    the TYPO3 record editor.
 *   Document validators are selected by the section's stored record ``type``;
     validators from sibling sections are never merged as a fallback.
-*   Because both editing contexts share one configuration, unlocking a field for
-    the frontend also unlocks it in the backend.
+*   The normalized rules are applied to the frontend controls and server-side
+    Extbase validation. Backend TCA remains completely independent.
 
-See `Profile and document sections
-<https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Configuration/Sections/Index.html>`__
-and `Validation settings
-<https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Configuration/Validations/Index.html>`__
-in the :guilabel:`academic_persons` manual for the schema, available flags,
-shipped defaults and override rules.
+See :ref:`configuration-editor-settings` for the schema, supported validator
+flags, document aliases, shipped defaults and override rules. The similarly
+named :yaml:`profile` map in :guilabel:`academic_persons` controls only the
+public detail layout.
 
 ..  _configuration-general-webp:
 

@@ -3,16 +3,26 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
     <header
-        class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-4 mb-4">
-        <h2
-            id="inline-profile-{profile.uid}-personal-heading"
-            class="h2 fw-normal mb-0">
-            <f:translate
-                key="inlineProfile.section.personal"
-                extensionName="academic_persons_edit" />
-        </h2>
+        class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4 mb-5 pt-5 mt-5"
+        data-ie-profile-header>
+        <f:if condition="{title}">
+            <h1
+                id="inline-profile-{profile.uid}-name-heading"
+                class="h2 fw-bolder mb-0"
+                data-ie-profile-name
+                data-ie-profile-name-field-ids="{title.fieldIdentifiers}">
+                <f:for
+                    each="{title.fields}"
+                    as="field"
+                    iteration="fieldIteration">
+                    {profile.{field.propertyName}}<f:if
+                        condition="!{fieldIteration.isLast}">
+                    </f:if>
+                </f:for>
+            </h1>
+        </f:if>
         <div
-            class="d-flex flex-wrap justify-content-between justify-content-lg-end align-items-center gap-4">
+            class="d-flex flex-wrap justify-content-between justify-content-lg-end align-items-center gap-4 ms-lg-auto">
             <f:if condition="{skipSync}">
                 <f:render
                     partial="InlineProfile/Settings/Sync"

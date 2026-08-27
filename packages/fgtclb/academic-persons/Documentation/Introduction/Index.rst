@@ -44,7 +44,7 @@ The following profile data is available to users after installation:
     * Miscellaneous information
 * Profile timeline entries
     * All timeline entries allow the chronological presentation of content, usually
-      with a start and/or end year, a title, a short description and a link
+      with a start and/or end date, a title, a short description and a link
     * Research projects
     * Academic career
     * Memberships/committee activities

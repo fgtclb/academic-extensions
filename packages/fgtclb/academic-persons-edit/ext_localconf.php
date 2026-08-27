@@ -172,6 +172,7 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
         'InlineProfile',
         [
             InlineProfileController::class => implode(',', [
+                'list',
                 'index',
                 'update',
                 'updateSkipSync',
@@ -186,6 +187,7 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
         ],
         [
             InlineProfileController::class => implode(',', [
+                'list',
                 'index',
                 'update',
                 'updateSkipSync',

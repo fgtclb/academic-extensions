@@ -5,10 +5,13 @@
 Inline profile editing
 ======================
 
-The :guilabel:`Inline profile editing` content element renders the profile
-assigned to the authenticated frontend user. The shipped
-:file:`Resources/Private/Templates/InlineProfile/Index.html` template contains
-three independently persisted areas:
+The :guilabel:`Inline profile editing` content element first renders all
+profiles assigned to the authenticated frontend user. Its :guilabel:`Edit`
+action opens the selected profile in the inline editor; :guilabel:`View` opens
+the public ``academic_persons`` Detail plugin on the configured
+``plugin.tx_academicpersons.detailPid`` page. The shipped
+:file:`Resources/Private/Templates/InlineProfile/Index.html` editor template
+contains three independently persisted areas:
 
 *   profile fields using the generic JSON update endpoint,
 *   the synchronization checkbox using its own JSON endpoint, and
@@ -25,6 +28,24 @@ across the complete component root, even when the responsive page layout
 places them in separate ``data-ie-fields-form`` elements. Modal, toast and
 compatibility-template elements live in the same component scope.
 
+Assigned profile overview
+=========================
+
+``InlineProfileController::listAction()`` is the default action. It uses the
+authenticated frontend-user relation and passes ``{profileListItems}`` to
+:file:`Resources/Private/Templates/InlineProfile/List.html`. Every item contains
+the Profile object and the title of its ``sys_language_uid`` from the current
+site configuration. The profile column contains a square thumbnail or the
+shipped placeholder followed by the complete name. :guilabel:`Edit` passes the
+explicit ``profileUid`` to ``indexAction()``; the action resolves that UID again
+through the authenticated user's assigned profiles before rendering anything.
+An unassigned or manipulated UID receives a ``403`` response.
+
+The :guilabel:`View` URI uses extension ``academicpersons``, controller
+``Profile``, action ``detail`` and plugin ``Detail``. Its page UID uses the
+canonical ``plugin.tx_academicpersons.detailPid`` value. No second detail-page
+setting is introduced by this extension.
+
 View data
 =========
 
@@ -36,8 +57,11 @@ The controller assigns the following variables to the Fluid template:
     *   - Variable
         - Description
     *   - ``{profile}``
-        - Profile assigned to the authenticated frontend user, or
-          :php:`null` when no editable profile exists.
+        - Explicitly selected profile after its assignment to the authenticated
+          frontend user has been verified.
+    *   - ``{profileListItems}``
+        - Assigned Profiles and their readable site-language labels. This
+          variable belongs to the default list action and list template.
     *   - ``{profileSections}``
         - Ordered Fluid view models generated from :yaml:`profile`. Every
           section contains regular fields and inserted composite special items.
@@ -68,8 +92,9 @@ The template is intentionally a composition root. The main partial groups are:
     *   - Partial group
         - Responsibility
     *   - ``Image/Card.html`` and ``Image/Modal.html``
-        - Profile-name heading above the sticky page preview, dedicated edit
-          overlay, file selection, modal preview and image actions.
+        - :guilabel:`Profile image` heading above the sticky page preview,
+          dedicated edit overlay, file selection, modal preview and image
+          actions.
     *   - ``Settings/Sync.html``
         - Independently persisted synchronization switch immediately left of
           the edit-all toggle.
@@ -87,8 +112,9 @@ The template is intentionally a composition root. The main partial groups are:
     *   - ``Field.html``, ``Field/Group.html`` and shared ``Field/*``
         - Preview, control, grouped fields and per-field actions.
     *   - ``Header.html`` and ``StatusToast.html``
-        - Personal-section heading, synchronization/edit controls and scoped
-          status output.
+        - Complete profile-name heading with synchronization/edit-all controls,
+          and scoped status output. The personal form renders its own
+          :guilabel:`Personal data` heading.
           ``ButtonTemplates.html`` remains a compatibility fallback for
           existing template overrides; the shipped read view does not use its
           button-shaped value controls.
@@ -104,7 +130,10 @@ header; the Fluid templates contain no inline style declarations.
 All Bootstrap button controls and visible modal surfaces in the shipped inline
 and retained legacy views carry ``rounded-0`` so their corners remain square.
 
-On ``lg`` and larger viewports the first row uses a ``4 / 8`` column split.
+Above the grid, the complete profile name and the synchronization/edit-all
+controls share one responsive header row. The controls wrap below the name on
+narrow viewports. On ``lg`` and larger viewports the first content row uses a
+``4 / 8`` column split.
 The profile image block has ``sticky-top`` so the image and its edit action
 stay visible while the profile data scrolls. Below ``lg`` both columns stack in
 document order. The about section follows the complete first row and therefore
@@ -125,7 +154,7 @@ inherits the stretched cross-axis size, giving the sticky image a containing
 block as tall as the adjacent profile data. The full-width about section keeps
 its own ``col-12`` in a separate sibling row below it.
 
-The complete profile name is the page's ``h1`` above the image. Both Fluid and
+The complete profile name is the page's ``h1`` above both columns. Both Fluid and
 JavaScript use the ordered ``fields`` list from :yaml:`special.title`. Fluid
 renders the initial name; ``data-ie-profile-name-field-ids`` lets JavaScript
 recompose the same name after a successful update without reloading the page.
@@ -286,7 +315,7 @@ save immediately when their value changes.
 The action group uses Bootstrap utility classes to remain content-sized and
 align itself to the end of the editor row instead of stretching to the
 CKEditor height. No additional stylesheet or inline style is required. The
-:guilabel:`Edit all` toggle beside the personal-data heading opens both regular
+:guilabel:`Edit all` toggle beside the page heading opens both regular
 fields and grouped rows, receives Bootstrap's ``active`` state and changes its
 label to :guilabel:`Close all`. Activating it again collapses every editor
 without saving or discarding browser-side drafts. There is no global footer
@@ -335,11 +364,11 @@ Editable structured profile sections
 The inline profile view renders the structured records directly below the
 :guilabel:`About me` field. ``ProfileDocumentSectionProvider`` supplies one
 ordered view model instead of duplicating relation mapping in Fluid. It reads
-all sections, including ``contracts``, directly from
-``AcademicPersonsSettings::documentSections``. That settings object is built
-from the active packages'
-:file:`Configuration/AcademicPersons/Settings.yaml` files, so configured order
-is also presentation order.
+all sections, including ``contracts``, from the edit settings graph. That graph
+is built from the active packages'
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml` files, so configured
+order is also presentation order. The public-profile factory and cache are not
+involved.
 
 For every document section the provider reuses the configured ``identifier``,
 ``fieldName``, record ``type``, LLL ``label``, ``readonly`` state,
@@ -357,6 +386,44 @@ shipped settings. Profile-information rows render only the configured values in
 their declared order. The aliases ``from``, ``to`` and ``description`` map to
 ``yearStart``, ``yearEnd`` and ``bodytext``. All sections remain visible when
 empty and display a localized empty state.
+
+When a section validation marks ``from``, ``to`` or ``year`` with the ``date``
+flag, the corresponding add/edit control is an HTML date picker. The complete
+selected date is passed as :php:`\DateTime` and persisted in a nullable native
+:sql:`DATE` column. The legacy property names ``year``, ``yearStart`` and
+``yearEnd`` remain for compatibility, but no time or time zone is stored. The
+three date controls and the year-only checkbox each use ``col-12 col-md-3`` and
+share one responsive row on medium and larger viewports. Their HTML and
+server-side required states come from the same validation set: only a field
+with the additional ``required`` flag must be filled. In the shipped settings
+this applies to ``year`` but not to ``from`` or ``to``.
+
+The same modal contains a :guilabel:`Show year only` switch. It is stored on the
+profile-information record and changes the compact row, view modal and public
+profile to render ``Y`` instead of the complete date. The underlying native
+:sql:`DATE` values are not modified.
+
+Why the modal creates controls in JavaScript
+--------------------------------------------
+
+Fluid renders the modal shell, buttons, error area and fields container once.
+The same Bootstrap modal is then reused for add, view, edit and delete actions
+across every YAML-defined document section. When an action is opened, the
+permission-checked endpoint returns JSON containing the selected record,
+localized labels, values, select options and normalized validation metadata.
+JavaScript turns that runtime schema into controls and manages the CKEditor
+lifecycle. This avoids pre-rendering one hidden form per section and record and
+lets validation errors map directly back to the returned field names.
+
+More rendering can be moved to Fluid, but that requires an API change rather
+than a template-only change: the endpoint would need to return a
+server-rendered HTML fragment, or the page would need hidden Fluid forms for
+every mode. JavaScript would still insert or replace the fragment, bind modal
+events, initialize and destroy CKEditor and map asynchronous errors. A fragment
+endpoint would reduce DOM-construction code but increase the number of
+server-rendered variants and their integration-test surface. The current
+boundary therefore keeps static modal structure in Fluid and only the record-
+and settings-dependent controls in JavaScript.
 
 Every writable section heading has an :guilabel:`Add` action. Record controls
 are rendered in the exact order of the configured ``actions`` list. The first
@@ -441,7 +508,7 @@ Synchronization checkbox
 The synchronization checkbox appears as the compact
 :guilabel:`Private` switch
 immediately left of the :guilabel:`Edit all`/:guilabel:`Close all` toggle in
-the personal-section header and is persisted immediately through
+the page header and is persisted immediately through
 ``updateSkipSyncAction()``. Its form is a sibling of the profile form, not a
 nested form. Its presence and writable metadata follow the
 ``special.skipSync`` configuration; the underlying data and endpoint semantics
@@ -484,6 +551,17 @@ both previews, closes the modal and shows the saved image directly. Cancel or
 closing the modal discards the selected preview and restores the persisted
 image. :guilabel:`Delete` is shown only while an image is persisted.
 
+If ``special.image.renderType`` is ``cropper`` and
+``special.image.settings.ratio`` contains a positive ratio such as ``1x1`` or
+``16:9``, the modal instantiates the locally packaged CropperJS 2.2 module. The
+selection remains constrained to that ratio and only the generated cropped
+file is added to the multipart request. No CDN or other runtime request is
+used. The selection's ``movable`` property is disabled, so its position cannot
+be dragged. The cropper is instantiated only for a persisted profile image or
+a newly selected local file. If the profile currently uses the placeholder,
+the fallback preview remains visible and cannot itself become crop input. The
+original upload behavior remains active for every other render type.
+
 The save button remains disabled until a file is selected. While an upload or
 deletion is pending, the image controls and modal close buttons are disabled
 and the active action displays a Bootstrap spinner. This prevents duplicate
@@ -502,6 +580,11 @@ allowed MIME types, stores the file in the configured target folder and updates
 the FAL relation. Authorization is checked before Extbase maps or stores the
 uploaded file. A replaced physical file is removed only when it has no other
 references.
+After persistence, the ordered non-empty values ``title``, ``firstName``,
+``middleName`` and ``lastName`` are joined with spaces. That composed profile
+name is written to ``alternative`` and ``title`` in both the FAL file metadata
+and the profile's file-reference overlay. The JSON response returns the same
+values so the in-page preview immediately uses the persisted metadata.
 
 The modal does not render ``f:form.validationResults``. Upload validation
 failures are returned as JSON and displayed in an alert inside the still-open
@@ -639,7 +722,7 @@ shipped JavaScript:
     *   - ``data-section-key`` and ``data-section-position``
         - Stable section identity and current zero-based presentation position.
     *   - ``data-section-field-name`` and ``data-section-record-type``
-        - Field and relation type taken from ``AcademicPersonsSettings`` for
+        - Field and relation type taken from the edit settings graph for
           section-specific persistence.
     *   - ``data-ie-document-items`` and ``data-ie-document-item``
         - Mutable item collection and record boundaries inside a section.
@@ -696,6 +779,12 @@ shipped JavaScript:
     *   - ``data-ie-image-preview`` and
           ``data-ie-image-modal-preview``
         - Image locations updated after upload or deletion.
+    *   - ``data-ie-image-cropper-stage`` and
+          ``data-ie-image-cropper-source``
+        - Local CropperJS host and its direct source image. The modal exposes
+          render type and configured ratio through
+          ``data-ie-image-render-type`` and
+          ``data-ie-image-cropper-ratio``.
     *   - ``data-ie-status-toast``
         - Scoped status feedback for the component.
 
@@ -735,7 +824,7 @@ Functional plugin tests render both Bootstrap modal states, verify the
 decomposed Fluid contracts, AJAX-only controls, direct rich-text previews and
 the separate delete, cancel and save actions. The section-provider unit test
 verifies that order, identifiers, field names, relation types and labels come
-from ``AcademicPersonsSettings`` while row fields, action capabilities,
+from the edit settings graph while row fields, action capabilities,
 presentation modes and typed records are preserved. Functional fixtures cover
 contracts and every configured profile-information relation; the rendered page
 test derives the expected

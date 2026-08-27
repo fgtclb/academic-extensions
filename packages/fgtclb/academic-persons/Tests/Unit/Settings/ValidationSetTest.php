@@ -10,9 +10,9 @@ use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * A validation set is the per-table bundle the Extbase validation and the TCA overrides
- * ask a single field of. `get()` has to answer for a field nobody configured, because
- * the caller iterates over the model's fields, not over the configured ones.
+ * A validation set is the section-local bundle used by frontend validation.
+ * `get()` has to answer for a field nobody configured, because the caller
+ * iterates over the model's fields, not over the configured ones.
  */
 final class ValidationSetTest extends UnitTestCase
 {

@@ -25,9 +25,21 @@
         <source>Profile</source>
         <target>Profil</target>
       </trans-unit>
+      <trans-unit id="list.language">
+        <source>Language</source>
+        <target>Sprache</target>
+      </trans-unit>
+      <trans-unit id="list.language.all">
+        <source>All languages</source>
+        <target>Alle Sprachen</target>
+      </trans-unit>
+      <trans-unit id="list.language.unknown">
+        <source>Language %d</source>
+        <target>Sprache %d</target>
+      </trans-unit>
       <trans-unit id="list.profileInformations.year">
-        <source>Year</source>
-        <target>Jahr</target>
+        <source>Date</source>
+        <target>Datum</target>
       </trans-unit>
       <trans-unit id="list.profileInformations.title">
         <source>Title</source>
@@ -334,7 +346,7 @@
       </trans-unit>
       <trans-unit id="profile.skipSync.label">
         <source>Private</source>
-        <target>Private</target>
+        <target>Privat</target>
       </trans-unit>
       <trans-unit id="profile.skipSync.description">
         <source>Disabling the profile synchronization will prevent automatic updates from external
@@ -362,28 +374,40 @@
         <target>https://www.beispiel.de</target>
       </trans-unit>
       <trans-unit id="profileInformation.year.label">
-        <source>Year</source>
-        <target>Jahr</target>
+        <source>Date</source>
+        <target>Datum</target>
       </trans-unit>
       <trans-unit id="profileInformation.year.placeholder">
-        <source>e.g. 2025</source>
-        <target>z.B. 2025</target>
+        <source>dd.mm.yyyy</source>
+        <target>TT.MM.JJJJ</target>
       </trans-unit>
       <trans-unit id="profileInformation.yearStart.label">
-        <source>Start year</source>
-        <target>Startjahr</target>
+        <source>Start date</source>
+        <target>Startdatum</target>
       </trans-unit>
       <trans-unit id="profileInformation.yearStart.placeholder">
-        <source>e.g. 2020</source>
-        <target>z.B. 2020</target>
+        <source>dd.mm.yyyy</source>
+        <target>TT.MM.JJJJ</target>
       </trans-unit>
       <trans-unit id="profileInformation.yearEnd.label">
-        <source>End year</source>
-        <target>Endjahr</target>
+        <source>End date</source>
+        <target>Enddatum</target>
       </trans-unit>
       <trans-unit id="profileInformation.yearEnd.placeholder">
-        <source>e.g. 2025</source>
-        <target>z.B. 2025</target>
+        <source>dd.mm.yyyy</source>
+        <target>TT.MM.JJJJ</target>
+      </trans-unit>
+      <trans-unit id="profileInformation.yearOnly.label">
+        <source>Show year only</source>
+        <target>Nur Jahr anzeigen</target>
+      </trans-unit>
+      <trans-unit id="profileInformation.yearOnly.enabled">
+        <source>Yes</source>
+        <target>Ja</target>
+      </trans-unit>
+      <trans-unit id="profileInformation.yearOnly.disabled">
+        <source>No</source>
+        <target>Nein</target>
       </trans-unit>
       <trans-unit id="profileInformation.bodytext.label">
         <source>Text</source>
@@ -552,6 +576,10 @@
         <source>Edit profile</source>
         <target>Profil bearbeiten</target>
       </trans-unit>
+      <trans-unit id="inlineProfile.backToList">
+        <source>Back to profile overview</source>
+        <target>Zurück zur Profilübersicht</target>
+      </trans-unit>
       <trans-unit id="inlineProfile.btnEditAll">
         <source>Edit all</source>
         <target>Alle bearbeiten</target>
@@ -602,8 +630,8 @@
         <target>Bis</target>
       </trans-unit>
       <trans-unit id="inlineProfile.documents.year">
-        <source>Year</source>
-        <target>Jahr</target>
+        <source>Date</source>
+        <target>Datum</target>
       </trans-unit>
       <trans-unit id="inlineProfile.documents.title">
         <source>Title</source>
@@ -775,6 +803,10 @@
         <source>Select an image to preview it. The profile image changes only after you save.</source>
         <target>Wählen Sie ein Bild für die Vorschau aus. Das Profilbild wird erst beim Speichern
           geändert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.hint.ratio">
+        <source>Required aspect ratio</source>
+        <target>Erforderliches Seitenverhältnis</target>
       </trans-unit>
       <trans-unit id="inlineProfile.image.modal.deleteHint">
         <source>The profile image is removed permanently unless another record still uses the file.</source>
@@ -1145,13 +1177,17 @@
         <source>"Valid from" must be a valid date. (Seperated by .)</source>
         <target>"Gültig von" muss ein gültiges Datum sein. (Getrennt durch .)</target>
       </trans-unit>
-      <trans-unit id="profileInformationFormData.yearStart.error.1332933658">
-        <source>"Year start" must be a number.</source>
-        <target>"Startjahr" muss eine Zahl sein.</target>
+      <trans-unit id="profileInformationFormData.year.error.1307719788">
+        <source>"Date" must be a valid date. (Separated by .)</source>
+        <target>"Datum" muss ein gültiges Datum sein. (Getrennt durch .)</target>
       </trans-unit>
-      <trans-unit id="profileInformationFormData.yearEnd.error.1332933658">
-        <source>"Year end" must be a number.</source>
-        <target>"Endjahr" muss eine Zahl sein.</target>
+      <trans-unit id="profileInformationFormData.yearStart.error.1307719788">
+        <source>"Start date" must be a valid date. (Separated by .)</source>
+        <target>"Startdatum" muss ein gültiges Datum sein. (Getrennt durch .)</target>
+      </trans-unit>
+      <trans-unit id="profileInformationFormData.yearEnd.error.1307719788">
+        <source>"End date" must be a valid date. (Separated by .)</source>
+        <target>"Enddatum" muss ein gültiges Datum sein. (Getrennt durch .)</target>
       </trans-unit>
     </body>
   </file>

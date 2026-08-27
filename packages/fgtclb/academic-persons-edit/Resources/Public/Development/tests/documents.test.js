@@ -134,6 +134,65 @@ const publicationFields = (title = "First") => [
   },
 ];
 
+const configuredDateFields = () => [
+  {
+    name: "year",
+    label: "Date",
+    type: "date",
+    required: true,
+    readOnly: false,
+    disabled: false,
+    richText: false,
+    columnClass: "col-12 col-md-3",
+    compactCheckbox: false,
+    value: "2025-01-01",
+    displayValue: "01.01.2025",
+    options: [],
+  },
+  {
+    name: "yearStart",
+    label: "Start date",
+    type: "date",
+    required: false,
+    readOnly: false,
+    disabled: false,
+    richText: false,
+    columnClass: "col-12 col-md-3",
+    compactCheckbox: false,
+    value: "",
+    displayValue: "",
+    options: [],
+  },
+  {
+    name: "yearEnd",
+    label: "End date",
+    type: "date",
+    required: false,
+    readOnly: false,
+    disabled: false,
+    richText: false,
+    columnClass: "col-12 col-md-3",
+    compactCheckbox: false,
+    value: "",
+    displayValue: "",
+    options: [],
+  },
+  {
+    name: "yearOnly",
+    label: "Show year only",
+    type: "checkbox",
+    required: false,
+    readOnly: false,
+    disabled: false,
+    richText: false,
+    columnClass: "col-12 col-md-3",
+    compactCheckbox: true,
+    value: true,
+    displayValue: "Yes",
+    options: [],
+  },
+];
+
 const createEditor = (initialData) => {
   let data = initialData;
   return {
@@ -229,6 +288,35 @@ describe("profile/documents", () => {
       .toBe("Add: Publications");
     const request = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
     expect(request.data).toEqual({ section: "publications", record: 0, mode: "add" });
+  });
+  test("renders configured date requirements and compact checkbox in one responsive row", async () => {
+    const root = createRoot();
+    initializeDocumentSections(root);
+    globalThis.fetch.mockResolvedValueOnce(response({
+      success: true,
+      record: null,
+      fields: configuredDateFields(),
+    }));
+    root.querySelector("[data-ie-document-add]").click();
+    await flushPromises();
+    const year = root.querySelector('input[name="year"]');
+    const yearStart = root.querySelector('input[name="yearStart"]');
+    const yearEnd = root.querySelector('input[name="yearEnd"]');
+    const yearOnly = root.querySelector('input[name="yearOnly"]');
+    expect(year.required).toBe(true);
+    expect(yearStart.required).toBe(false);
+    expect(yearEnd.required).toBe(false);
+    expect(year.closest("div.col-md-3").querySelector("label .text-danger").textContent).toBe("*");
+    expect(yearStart.closest("div.col-md-3").querySelector("label .text-danger")).toBeNull();
+    expect(yearEnd.closest("div.col-md-3").querySelector("label .text-danger")).toBeNull();
+    const dateColumns = root.querySelectorAll("[data-ie-document-fields] > .col-12.col-md-3");
+    expect(dateColumns).toHaveLength(4);
+    const formCheck = yearOnly.parentElement;
+    expect(formCheck.classList.contains("form-check")).toBe(true);
+    expect(formCheck.classList.contains("mt-auto")).toBe(true);
+    expect(formCheck.parentElement.classList.contains("d-flex")).toBe(true);
+    expect(formCheck.querySelector("label").htmlFor).toBe(yearOnly.id);
+    expect(formCheck.querySelector('[data-ie-document-field-error="yearOnly"]')).not.toBeNull();
   });
   test("creates, edits, sorts, views and deletes records through JSON endpoints", async () => {
     const root = createRoot();

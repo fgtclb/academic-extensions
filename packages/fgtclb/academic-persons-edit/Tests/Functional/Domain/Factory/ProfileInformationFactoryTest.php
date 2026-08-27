@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Domain\Factory;
 
+use DateTime;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
 use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileInformationFactory;
@@ -11,12 +12,12 @@ use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
- * Profile information is the only form of the package with nullable integer properties
+ * Profile information is the only form of the package with nullable date properties
  * (`year`, `yearStart`, `yearEnd`), and `null` there is a meaningful stored value rather than
  * an "empty" one. That makes it the place to pin two things the string based forms cannot show:
  *
  * - an empty year field that *was* submitted has to reach the record as `NULL`, and
- * - the override type check is `is_int()`, so `null` - the only value that could express
+ * - the override type check is ``DateTime``, so `null` - the only value that could express
  *   "clear this year" - is the one value an override cannot carry.
  */
 final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
@@ -44,11 +45,12 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
                     'title' => 'New Title',
                     'bodytext' => 'New bodytext',
                     'link' => 'https://new.example.com',
-                    'year' => '2020',
+                    'year' => '01.01.2020',
                 ],
             ],
+            ['year' => 'd.m.Y', 'yearStart' => 'd.m.Y', 'yearEnd' => 'd.m.Y'],
         );
-        $this->assertSame(2020, $formData->getYear());
+        $this->assertSame('2020-01-01', $formData->getYear()?->format('Y-m-d'));
         $this->assertNull($formData->getYearStart());
         $profile = $this->persistenceManager()->getObjectByIdentifier(1, Profile::class);
         $this->assertInstanceOf(Profile::class, $profile);
@@ -98,16 +100,19 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
     }
 
     #[Test]
-    public function updateAppliesIntegerOverrideForYearThatWasNotSubmitted(): void
+    public function updateAppliesDateOverrideForYearThatWasNotSubmitted(): void
     {
-        $this->updateProfileInformationWith(['title' => 'New Title'], ['year' => 2021]);
+        $this->updateProfileInformationWith(
+            ['title' => 'New Title'],
+            ['year' => new DateTime('2021-01-01')],
+        );
 
         $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndOverriddenYear.csv');
     }
 
     /**
      * Documents current behaviour, and it is the shape of a defect: `setYear()` applies the
-     * override only when it `is_int()`, so an override of `null` - the only way to say "clear
+     * override only when it is a ``DateTime``, so an override of `null` - the only way to say "clear
      * the year" - falls through to the submitted value instead. A listener meaning to clear the
      * year silently keeps whatever the editor sent.
      *
@@ -117,7 +122,7 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
     public function nullOverrideCannotClearAYearAndFallsBackToTheSubmittedValue(): void
     {
         $this->updateProfileInformationWith(
-            ['title' => 'New Title', 'year' => '2022'],
+            ['title' => 'New Title', 'year' => '01.01.2022'],
             ['year' => null],
         );
 
@@ -179,6 +184,7 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
                 'profileInformation' => '1',
                 'profileInformationFormData' => $submitted,
             ],
+            ['year' => 'd.m.Y', 'yearStart' => 'd.m.Y', 'yearEnd' => 'd.m.Y'],
         );
     }
 

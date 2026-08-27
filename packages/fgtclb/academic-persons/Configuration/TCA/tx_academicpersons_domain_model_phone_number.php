@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersons\Tca\RecordTypes;
-use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the "academic_persons" Extension for TYPO3 CMS.
@@ -153,16 +150,6 @@ $tcaConfiguration = [
         ],
     ],
 ];
-
-// @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
-ArrayUtility::mergeRecursiveWithOverrule(
-    $tcaConfiguration,
-    GeneralUtility::makeInstance(AcademicPersonsSettings::class)
-        ->getContractContactValidationTcaTableConfig(
-            ['phoneNumber', 'phoneNumberType'],
-            'phoneNumbers',
-        ),
-);
 
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);
 // v14 makes suitable field types searchable by default. Keep the explicit

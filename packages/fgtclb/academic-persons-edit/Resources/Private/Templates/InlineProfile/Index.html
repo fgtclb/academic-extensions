@@ -1,6 +1,7 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true">
     <f:if condition="{profile}">
         <f:then>
@@ -36,6 +37,18 @@
             <f:variable
                 name="placeholderImageUrl"
                 value="{f:uri.resource(path: 'Images/profile-placeholder.png')}" />
+
+            <f:link.action
+                action="list"
+                controller="InlineProfile"
+                class="back-link d-inline-flex align-items-center gap-2 mb-4">
+                <core:icon
+                    identifier="academic-persons-inline-edit-back"
+                    alternativeMarkupIdentifier="inline" />
+                <f:translate
+                    key="inlineProfile.backToList"
+                    extensionName="academic_persons_edit" />
+            </f:link.action>
 
             <div
                 class="academic-persons-inline-edit container-fluid px-0"
@@ -77,15 +90,17 @@
                 data-label-document-save="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}"
                 data-label-document-close="{f:translate(key: 'actions.cancel', extensionName: 'academic_persons_edit')}"
                 data-label-document-empty="{f:translate(key: 'inlineProfile.field.empty', extensionName: 'academic_persons_edit')}">
+                <f:render
+                    partial="InlineProfile/Header"
+                    arguments="{profile: profile, title: specialFields.title, skipSync: specialFields.skipSync}" />
                 <div class="container-fluid px-0">
                     <div class="row gx-lg-5 gy-5 align-items-stretch">
                         <div class="col-12 col-lg-4">
                             <div class="sticky-top" data-ie-sticky-image>
-                                <f:if
-                                    condition="{specialFields.title} || {specialFields.image}">
+                                <f:if condition="{specialFields.image}">
                                     <f:render
                                         partial="InlineProfile/Image/Card"
-                                        arguments="{profile: profile, title: specialFields.title, image: specialFields.image}" />
+                                        arguments="{profile: profile, image: specialFields.image}" />
                                 </f:if>
                             </div>
                         </div>
@@ -116,7 +131,7 @@
                 <f:if condition="{specialFields.image.writable}">
                     <f:render
                         partial="InlineProfile/Image/Modal"
-                        arguments="{profile: profile, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
+                        arguments="{profile: profile, image: specialFields.image, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
                 </f:if>
                 <f:render partial="InlineProfile/Documents/Modal" />
                 <f:render partial="InlineProfile/StatusToast" />

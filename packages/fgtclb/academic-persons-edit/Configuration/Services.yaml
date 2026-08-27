@@ -3,9 +3,21 @@ services:
     autowire: true
     autoconfigure: true
     public: false
+    bind:
+      $academicPersonsSettings: '@academic_persons_edit.settings'
 
   FGTCLB\AcademicPersonsEdit\:
     resource: '../Classes/*'
+
+  academic_persons_edit.settings:
+    class: FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings
+    public: true
+    factory:
+      - '@FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory'
+      - 'get'
+
+  FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory:
+    public: true
 
   FGTCLB\AcademicPersonsEdit\EventListener\GenerateSlugForProfile:
     tags:

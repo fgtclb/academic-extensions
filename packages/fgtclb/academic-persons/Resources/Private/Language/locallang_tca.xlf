@@ -366,13 +366,16 @@
         <source>Type</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year.label">
-        <source>Year</source>
+        <source>Date</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_end.label">
-        <source>End Year</source>
+        <source>End date</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_start.label">
-        <source>Start Year</source>
+        <source>Start date</source>
+      </trans-unit>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_only.label">
+        <source>Show year only</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.ctrl.label">
         <source>Profile information</source>

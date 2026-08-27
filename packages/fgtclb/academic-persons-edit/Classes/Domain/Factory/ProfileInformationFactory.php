@@ -26,6 +26,7 @@ class ProfileInformationFactory
         $profileInformation = $this->setYear($validationSet, $profileInformation, $form);
         $profileInformation = $this->setYearStart($validationSet, $profileInformation, $form);
         $profileInformation = $this->setYearEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setYearOnly($validationSet, $profileInformation, $form);
         return $profileInformation;
     }
 
@@ -38,6 +39,7 @@ class ProfileInformationFactory
         $profileInformation = $this->setYear($validationSet, $profileInformation, $form);
         $profileInformation = $this->setYearStart($validationSet, $profileInformation, $form);
         $profileInformation = $this->setYearEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setYearOnly($validationSet, $profileInformation, $form);
         return $profileInformation;
     }
 
@@ -105,7 +107,7 @@ class ProfileInformationFactory
     {
         if ($this->mayApplyProperty($validationSet, $form, 'year')) {
             $override = $form->getPropertyOverride('year');
-            $model->setYear(is_int($override) ? $override : $form->getYear());
+            $model->setYear($override instanceof \DateTime ? $override : $form->getYear());
         }
         return $model;
     }
@@ -114,7 +116,7 @@ class ProfileInformationFactory
     {
         if ($this->mayApplyProperty($validationSet, $form, 'yearStart')) {
             $override = $form->getPropertyOverride('yearStart');
-            $model->setYearStart(is_int($override) ? $override : $form->getYearStart());
+            $model->setYearStart($override instanceof \DateTime ? $override : $form->getYearStart());
         }
         return $model;
     }
@@ -123,7 +125,16 @@ class ProfileInformationFactory
     {
         if ($this->mayApplyProperty($validationSet, $form, 'yearEnd')) {
             $override = $form->getPropertyOverride('yearEnd');
-            $model->setYearEnd(is_int($override) ? $override : $form->getYearEnd());
+            $model->setYearEnd($override instanceof \DateTime ? $override : $form->getYearEnd());
+        }
+        return $model;
+    }
+
+    private function setYearOnly(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    {
+        if ($this->mayApplyProperty($validationSet, $form, 'yearOnly')) {
+            $override = $form->getPropertyOverride('yearOnly');
+            $model->setYearOnly(is_bool($override) ? $override : $form->isYearOnly());
         }
         return $model;
     }
