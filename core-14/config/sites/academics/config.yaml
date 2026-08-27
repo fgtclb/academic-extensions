@@ -100,7 +100,6 @@ languages:
     locale: en_US.UTF-8
     navigationTitle: English
     flag: us
-<<<<<<< HEAD
     websiteTitle: ""
   # "fallbackType: strict" - a page without a translation is a 404 in "/de/",
   # not the English page served under a German URL. That is the setting the seed
@@ -117,20 +116,3 @@ languages:
     fallbackType: strict
     fallbacks: ""
     websiteTitle: ""
-=======
-    websiteTitle: ''
-  -
-    title: German
-    enabled: true
-    locale: de_DE
-    hreflang: ''
-    base: /de/
-    websiteTitle: ''
-    navigationTitle: Deutsch
-    fallbackType: strict
-    fallbacks: '0'
-    flag: de
-    languageId: 1
-rootPageId: 1
-websiteTitle: 'Academic extensions (TYPO3 v14)'
->>>>>>> 7322879e ([FEATURE] ACE-262 Add configurable document rows and actions with drag-and-drop support)
