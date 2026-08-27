@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Site settings of the seeded site.
 #
 # Only what a development instance has to correct is set here; everything else
@@ -49,11 +48,3 @@ plugin:
       # the middle of a frontend request rather than a warning in a log.
       from: seed-noreply@example.org
       recipientEmail: jobs@example.org
-=======
-page.theme.cookieconsent.enable: false
-page.theme.googleFont.enable: false
-plugin.tx_academicpersons.detailPid: 6
-plugin.tx_academicpersons.demand.sortBy: lastName
-plugin.tx_academicpersons.pagination.resultsPerPage: 10
-page.theme.navigation.type: top
->>>>>>> 7322879e ([FEATURE] ACE-262 Add configurable document rows and actions with drag-and-drop support)
