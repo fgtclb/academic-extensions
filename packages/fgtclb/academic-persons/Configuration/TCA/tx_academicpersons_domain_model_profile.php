@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
-use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 /**
  * This file is part of the "academic_persons" Extension for TYPO3 CMS.
  *
@@ -507,80 +503,71 @@ $tcaConfiguration = [
     ],
 ];
 
-// @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
-$settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
-if ($settings->documentSections !== []) {
-    foreach ($settings->documentSections as $section) {
-        if ($section->isContractSection()) {
-            continue;
-        }
-        $columnIdentifier = $section->fieldName;
-        $tcaConfiguration['columns'][$columnIdentifier] = [
-            'label' => $section->label,
-            'exclude' => true,
-            'config' => [
-                'type' => 'inline',
-                'appearance' => [
-                    'collapseAll' => true,
-                    'expandSingle' => false,
-                    'showNewRecordLink' => true,
-                    'newRecordLinkAddTitle' => true,
-                    'levelLinksPosition' => 'top',
-                    'useCombination' => false,
-                    'suppressCombinationWarning' => false,
-                    'useSortable' => true,
-                    'showPossibleLocalizationRecords' => true,
-                    'showAllLocalizationLink' => true,
-                    'showSynchronizationLink' => true,
-                    'enabledControls' => [
-                        'info' => true,
-                        'new' => true,
-                        'dragdrop' => true,
-                        'sort' => false,
-                        'hide' => true,
-                        'delete' => true,
-                        'localize' => true,
-                    ],
-                    'showPossibleRecordsSelector' => false,
-                    'elementBrowserEnabled' => false,
+// These relations are part of the Academic Persons domain model and therefore
+// remain available without the optional frontend editor. Presentation order,
+// actions and validation are supplied independently by academic_persons_edit.
+$profileInformationRelations = [
+    'scientific_research' => 'scientific_research',
+    'vita' => 'curriculum_vitae',
+    'memberships' => 'membership',
+    'cooperation' => 'cooperation',
+    'publications' => 'publication',
+    'lectures' => 'lecture',
+    'press_media' => 'press_media',
+];
+foreach ($profileInformationRelations as $columnIdentifier => $recordType) {
+    $tcaConfiguration['columns'][$columnIdentifier] = [
+        'label' => sprintf(
+            'LLL:EXT:academic_persons/Resources/Private/Language/'
+                . 'locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.%s.label',
+            $columnIdentifier,
+        ),
+        'exclude' => true,
+        'config' => [
+            'type' => 'inline',
+            'appearance' => [
+                'collapseAll' => true,
+                'expandSingle' => false,
+                'showNewRecordLink' => true,
+                'newRecordLinkAddTitle' => true,
+                'levelLinksPosition' => 'top',
+                'useCombination' => false,
+                'suppressCombinationWarning' => false,
+                'useSortable' => true,
+                'showPossibleLocalizationRecords' => true,
+                'showAllLocalizationLink' => true,
+                'showSynchronizationLink' => true,
+                'enabledControls' => [
+                    'info' => true,
+                    'new' => true,
+                    'dragdrop' => true,
+                    'sort' => false,
+                    'hide' => true,
+                    'delete' => true,
+                    'localize' => true,
                 ],
-                'enableCascadingDelete' => true,
-                'foreign_field' => 'profile',
-                'foreign_sortby' => 'sorting',
-                'foreign_table' => 'tx_academicpersons_domain_model_profile_information',
-                'foreign_match_fields' => [
-                    'type' => $section->type,
-                ],
-                'overrideChildTca' => [
-                    'columns' => [
-                        'type' => [
-                            'config' => [
-                                'default' => $section->type,
-                            ],
+                'showPossibleRecordsSelector' => false,
+                'elementBrowserEnabled' => false,
+            ],
+            'enableCascadingDelete' => true,
+            'foreign_field' => 'profile',
+            'foreign_sortby' => 'sorting',
+            'foreign_table' => 'tx_academicpersons_domain_model_profile_information',
+            'foreign_match_fields' => [
+                'type' => $recordType,
+            ],
+            'overrideChildTca' => [
+                'columns' => [
+                    'type' => [
+                        'config' => [
+                            'default' => $recordType,
                         ],
                     ],
                 ],
             ],
-        ];
-    }
+        ],
+    ];
 }
-ArrayUtility::mergeRecursiveWithOverrule(
-    $tcaConfiguration,
-    $settings->getProfileValidationTcaTableConfig([
-        'gender',
-        'title',
-        'firstName',
-        'middleName',
-        'lastName',
-        'website',
-        'publicationsLink',
-        'coreCompetences',
-        'supervisedThesis',
-        'supervisedDoctoralThesis',
-        'teachingArea',
-        'miscellaneous',
-    ]),
-);
 
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);
 // v14 makes suitable field types searchable by default. Keep the explicit

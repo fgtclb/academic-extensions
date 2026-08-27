@@ -52,8 +52,11 @@ use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\Index\MetaDataRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Extbase\Mvc\Controller\FileUploadConfiguration;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
@@ -122,13 +125,34 @@ final class InlineProfileController extends AbstractActionController
     }
 
     // =================================================================================================================
-    // Initial display of profile data, either for editing or inline display
+    // Assigned profile list and initial display of the selected profile
     // =================================================================================================================
 
-    public function indexAction(): ResponseInterface
+    public function listAction(): ResponseInterface
     {
-        $frontendUserId = (int) $this->context->getPropertyFromAspect('frontend.user', 'id', 0);
-        $profile = $this->profileRepository->findByIdentifier($frontendUserId);
+        $profiles = $this->profileRepository->findByFrontendUser(
+            (int)$this->context->getPropertyFromAspect('frontend.user', 'id', 0),
+        );
+        $site = $this->request->getAttribute('site');
+        $this->view->assignMultiple([
+            'data' => $this->getCurrentContentObjectRenderer()?->data,
+            'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
+            'profiles' => $profiles,
+            'profileListItems' => $this->createProfileListItems(
+                $profiles,
+                $site instanceof Site ? $site : null,
+            ),
+        ]);
+        return $this->htmlResponse();
+    }
+
+    public function indexAction(int $profileUid): ResponseInterface
+    {
+        $profile = $this->profileUpdateRequestService->findEditableProfile($profileUid);
+        if ($profile === null) {
+            $this->view->assign('profile', null);
+            return $this->htmlResponse()->withStatus(403);
+        }
         $this->view->assignMultiple([
             'data' => $this->getCurrentContentObjectRenderer()?->data,
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
@@ -136,15 +160,51 @@ final class InlineProfileController extends AbstractActionController
             'profileSections' => $this->profileSectionProvider->getSections(),
             'specialFields' => $this->profileSectionProvider->getSpecialFields(),
             'profileFieldOptions' => $this->profileFieldOptionsService->getOptionsByField(),
-            'documentSections' => $profile !== null
-                ? $this->profileDocumentSectionProvider->getSections($profile)
-                : [],
+            'documentSections' => $this->profileDocumentSectionProvider->getSections($profile),
             'imageAllowedMimeTypes' => (string)(
                 $this->settings['editForm']['profileImage']['validation']['allowedMimeTypes']
                 ?? 'image/jpeg,image/png,image/webp'
             ),
         ]);
         return $this->htmlResponse();
+    }
+
+    /**
+     * @param iterable<Profile> $profiles
+     * @return list<array{profile: Profile, language: string}>
+     */
+    private function createProfileListItems(iterable $profiles, ?Site $site): array
+    {
+        $languageLabels = [];
+        foreach ($site?->getAllLanguages() ?? [] as $siteLanguage) {
+            $languageLabels[$siteLanguage->getLanguageId()] = $siteLanguage->getTitle();
+        }
+        $items = [];
+        foreach ($profiles as $profile) {
+            if (!$profile instanceof Profile) {
+                continue;
+            }
+            $languageUid = $profile->getLanguageUid();
+            if ($languageUid === -1) {
+                $language = LocalizationUtility::translate(
+                    'list.language.all',
+                    'academic_persons_edit',
+                ) ?? 'All languages';
+            } else {
+                $language = $languageLabels[$languageUid]
+                    ?? LocalizationUtility::translate(
+                        'list.language.unknown',
+                        'academic_persons_edit',
+                        [$languageUid],
+                    )
+                    ?? sprintf('Language %d', $languageUid);
+            }
+            $items[] = [
+                'profile' => $profile,
+                'language' => $language,
+            ];
+        }
+        return $items;
     }
 
     // =================================================================================================================
@@ -785,6 +845,8 @@ final class InlineProfileController extends AbstractActionController
      *     readOnly: bool,
      *     disabled: bool,
      *     richText: bool,
+     *     columnClass: string,
+     *     compactCheckbox: bool,
      *     value: mixed,
      *     displayValue: string,
      *     options: list<array{value: int|string, label: string}>
@@ -806,6 +868,9 @@ final class InlineProfileController extends AbstractActionController
             $definition['disabled'] = $validation?->disabled ?? false;
             $definition['richText'] = $definition['richText']
                 || ($validation?->isRichText() ?? false);
+            if ($validation?->inputType === 'date') {
+                $definition['type'] = 'date';
+            }
         }
         unset($definition);
         return $definitions;
@@ -880,12 +945,42 @@ final class InlineProfileController extends AbstractActionController
      */
     private function getProfileInformationFieldDefinitions(?ProfileInformation $record): array
     {
+        $yearOnly = $record?->isYearOnly() ?? false;
         return [
             $this->createDocumentField('profileInformation', 'title', 'text', $record?->getTitle() ?? ''),
             $this->createDocumentField('profileInformation', 'link', 'url', $record?->getLink() ?? ''),
-            $this->createDocumentField('profileInformation', 'year', 'number', $record?->getYear()),
-            $this->createDocumentField('profileInformation', 'yearStart', 'number', $record?->getYearStart()),
-            $this->createDocumentField('profileInformation', 'yearEnd', 'number', $record?->getYearEnd()),
+            $this->createDocumentField(
+                'profileInformation',
+                'year',
+                'date',
+                $record?->getYear()?->format('Y-m-d'),
+                yearOnly: $yearOnly,
+                columnClass: 'col-12 col-md-3',
+            ),
+            $this->createDocumentField(
+                'profileInformation',
+                'yearStart',
+                'date',
+                $record?->getYearStart()?->format('Y-m-d'),
+                yearOnly: $yearOnly,
+                columnClass: 'col-12 col-md-3',
+            ),
+            $this->createDocumentField(
+                'profileInformation',
+                'yearEnd',
+                'date',
+                $record?->getYearEnd()?->format('Y-m-d'),
+                yearOnly: $yearOnly,
+                columnClass: 'col-12 col-md-3',
+            ),
+            $this->createDocumentField(
+                'profileInformation',
+                'yearOnly',
+                'checkbox',
+                $yearOnly,
+                columnClass: 'col-12 col-md-3',
+                compactCheckbox: true,
+            ),
             $this->createDocumentField(
                 'profileInformation',
                 'bodytext',
@@ -906,6 +1001,9 @@ final class InlineProfileController extends AbstractActionController
         mixed $value,
         array $options = [],
         bool $richText = false,
+        bool $yearOnly = false,
+        string $columnClass = '',
+        bool $compactCheckbox = false,
     ): array {
         return [
             'name' => $name,
@@ -918,8 +1016,16 @@ final class InlineProfileController extends AbstractActionController
             'readOnly' => false,
             'disabled' => false,
             'richText' => $richText,
+            'columnClass' => $columnClass,
+            'compactCheckbox' => $compactCheckbox,
             'value' => $value,
-            'displayValue' => $this->getDocumentDisplayValue($type, $value, $options),
+            'displayValue' => $this->getDocumentDisplayValue(
+                $name,
+                $type,
+                $value,
+                $options,
+                $yearOnly,
+            ),
             'options' => $options,
         ];
     }
@@ -944,14 +1050,20 @@ final class InlineProfileController extends AbstractActionController
     /**
      * @param list<array{value: int|string, label: string}> $options
      */
-    private function getDocumentDisplayValue(string $type, mixed $value, array $options): string
+    private function getDocumentDisplayValue(
+        string $name,
+        string $type,
+        mixed $value,
+        array $options,
+        bool $yearOnly,
+    ): string
     {
         if ($value === null || $value === '') {
             return '';
         }
         if ($type === 'date' && is_string($value)) {
             $date = DateTime::createFromFormat('!Y-m-d', $value);
-            return $date instanceof DateTime ? $date->format('d.m.Y') : $value;
+            return $date instanceof DateTime ? $date->format($yearOnly ? 'Y' : 'd.m.Y') : $value;
         }
         if ($type === 'select') {
             foreach ($options as $option) {
@@ -962,6 +1074,12 @@ final class InlineProfileController extends AbstractActionController
             return '';
         }
         if ($type === 'checkbox') {
+            if ($name === 'yearOnly') {
+                return $this->localizationUtility->translate(
+                    $value ? 'profileInformation.yearOnly.enabled' : 'profileInformation.yearOnly.disabled',
+                    'academic_persons_edit',
+                ) ?? ($value ? 'Yes' : 'No');
+            }
             return $this->localizationUtility->translate(
                 $value ? 'inlineProfile.visibility.public' : 'inlineProfile.visibility.private',
                 'academic_persons_edit',
@@ -1299,11 +1417,13 @@ final class InlineProfileController extends AbstractActionController
                     1776760203,
                 );
             }
-            $this->persistUploadedProfileImage($profile, $replacedImageFile);
+            $imageMetadata = $this->persistUploadedProfileImage($profile, $replacedImageFile);
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
                 'hasImage' => true,
+                'imageAlternative' => $imageMetadata['alternative'],
+                'imageTitle' => $imageMetadata['title'],
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
@@ -1390,11 +1510,92 @@ final class InlineProfileController extends AbstractActionController
             && !$field->validation->disabled;
     }
 
-    private function persistUploadedProfileImage(Profile $profile, ?File $replacedImageFile): void
+    /**
+     * @return array{alternative: string, title: string}
+     */
+    private function persistUploadedProfileImage(Profile $profile, ?File $replacedImageFile): array
     {
         $this->profileRepository->update($profile);
         $this->persistenceManager->persistAll();
+        $imageMetadata = $this->updateUploadedProfileImageMetadata($profile);
         $this->deleteReplacedProfileImageFile($replacedImageFile, $profile);
+        return $imageMetadata;
+    }
+
+    /**
+     * @return array{alternative: string, title: string}
+     */
+    private function updateUploadedProfileImageMetadata(Profile $profile): array
+    {
+        $imageReference = $profile->getImage()?->getOriginalResource();
+        $imageFile = $imageReference?->getOriginalFile();
+        if ($imageReference === null || $imageFile === null) {
+            throw new UnexpectedValueException('The uploaded profile image is unavailable.');
+        }
+        $metadataText = $this->buildProfileImageMetadataText($profile);
+        $metadata = ['alternative' => $metadataText, 'title' => $metadataText];
+        GeneralUtility::makeInstance(MetaDataRepository::class)
+            ->update($imageFile->getUid(), $metadata);
+        $imageReferenceUid = $this->getPersistedProfileImageReferenceUid($profile, $imageFile);
+        if ($imageReferenceUid > 0) {
+            GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getConnectionForTable('sys_file_reference')
+                ->update('sys_file_reference', $metadata, ['uid' => $imageReferenceUid]);
+        }
+        return $metadata;
+    }
+
+    private function getPersistedProfileImageReferenceUid(Profile $profile, File $imageFile): int
+    {
+        $imageReferenceUid = $profile->getImage()?->getOriginalResource()->getUid() ?? 0;
+        if ($imageReferenceUid > 0) {
+            return $imageReferenceUid;
+        }
+        $profileUid = $profile->getUid();
+        if ($profileUid === null) {
+            return 0;
+        }
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('sys_file_reference');
+        $queryBuilder->getRestrictions()
+            ->removeAll()
+            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+        return (int)$queryBuilder
+            ->select('uid')
+            ->from('sys_file_reference')
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'tablenames',
+                    $queryBuilder->createNamedParameter('tx_academicpersons_domain_model_profile'),
+                ),
+                $queryBuilder->expr()->eq(
+                    'fieldname',
+                    $queryBuilder->createNamedParameter('image'),
+                ),
+                $queryBuilder->expr()->eq(
+                    'uid_foreign',
+                    $queryBuilder->createNamedParameter($profileUid, Connection::PARAM_INT),
+                ),
+                $queryBuilder->expr()->eq(
+                    'uid_local',
+                    $queryBuilder->createNamedParameter($imageFile->getUid(), Connection::PARAM_INT),
+                ),
+            )
+            ->orderBy('uid', 'DESC')
+            ->setMaxResults(1)
+            ->executeQuery()
+            ->fetchOne();
+    }
+
+    private function buildProfileImageMetadataText(Profile $profile): string
+    {
+        $parts = array_map(
+            static fn(string $part): string => trim(
+                (string)(preg_replace('/\s+/u', ' ', $part) ?? $part),
+            ),
+            [$profile->getTitle(), $profile->getFirstName(), $profile->getMiddleName(), $profile->getLastName()],
+        );
+        return implode(' ', array_filter($parts, static fn(string $part): bool => $part !== ''));
     }
 
     private function deleteProfileImage(Profile $profile): bool

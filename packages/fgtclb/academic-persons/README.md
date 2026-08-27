@@ -49,7 +49,7 @@ The following profile data is available to users after installation:
     * Miscellaneous information
 * Profile timeline entries
     * All timeline entries allow the chronological presentation of content, usually
-      with a start and/or end year, a title, a short description and a link
+      with a start and/or end date, a title, a short description and a link
     * Research projects
     * Academic career
     * Memberships/committee activities
@@ -61,13 +61,19 @@ The following profile data is available to users after installation:
 The extension also provides some plugins to display the persons in the frontend
 as a list view and detail view for each person.
 
-Profile fields and structured document collections are configured in
-`Configuration/AcademicPersons/Settings.yaml`. The ordered `profile`,
-`special`, `contractContact` and `documentSections` maps keep field metadata
-and validation attached to their own section. Document sections additionally
-declare their compact row fields and ordered row actions; read-only sections
-permit viewing only. Email, telephone and address data is stored as contact
-records owned by an employment contract.
+The public detail layout is configured exclusively in
+`Configuration/AcademicPersons/Settings.yaml`. Its ordered
+`profile.structure` controls the detail elements in each layout column and
+`profile.details` maps them to Profile properties, relation collections,
+labels or supported special renderers. Frontend-editable fields, structured
+document sections and their validators live separately in
+`academic-persons-edit/Configuration/AcademicsPersonsEdit/Settings.yaml`; the
+two identically named `profile` maps are never merged. Edit validator flags do
+not modify this extension's backend TCA. Email, telephone and
+address data is stored as contact records owned by an employment contract.
+Profile-information dates use native SQL `DATE` storage on TYPO3 13 and 14; a
+per-record `Show year only` switch can reduce their display to the four-digit
+year without changing the stored calendar date.
 
 > [!NOTE]
 > This extension is currently in beta state - please notice that there might be changes to the structure

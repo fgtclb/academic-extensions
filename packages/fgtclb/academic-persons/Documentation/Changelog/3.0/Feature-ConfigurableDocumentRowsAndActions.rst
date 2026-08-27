@@ -7,7 +7,8 @@ Feature: Configurable document rows and actions
 Description
 ===========
 
-Entries below :yaml:`documentSections` can now define ordered
+Entries below :yaml:`documentSections` in
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml` can define ordered
 :yaml:`rowFields` and :yaml:`actions` lists. ``DocumentSection`` preserves the
 normalized lists and provides capability helpers for row rendering, creation
 and drag sorting. Unknown values and duplicates are discarded.
@@ -19,9 +20,10 @@ A section marked :yaml:`readonly` can only allow ``view``. Both ``up`` and
 ``down`` are required before an editor may offer arbitrary drag-and-drop
 reordering.
 
-The shipped profile-information descriptions use the :yaml:`html` validation
-flag so frontend editors can select the rich-text control and apply the same
-sanitization contract as direct Profile rich text.
+The shipped profile-information descriptions use ``editor.type: ckeditor``,
+which normalizes to :yaml:`html` input metadata so frontend editors select the
+rich-text control and apply the same sanitization contract as direct Profile
+rich text.
 
 Impact
 ======

@@ -7,6 +7,8 @@
         class="modal fade rounded-0"
         tabindex="-1"
         data-ie-image-modal
+        data-ie-image-render-type="{image.renderType}"
+        data-ie-image-cropper-ratio="{image.settings.ratio}"
         aria-labelledby="inline-profile-{profile.uid}-image-modal-title"
         aria-hidden="true">
         <div
@@ -46,15 +48,35 @@
                 </div>
                 <div class="modal-body rounded-0">
                     <div class="mb-3" data-ie-image-modal-preview>
-                        <f:render
-                            partial="InlineProfile/Show/Image"
-                            arguments="{profile: profile}" />
+                        <div
+                            class="academic-persons-inline-edit__image-cropper d-none"
+                            data-ie-image-cropper-stage>
+                            <img
+                                src="{f:uri.resource(path: 'Images/profile-placeholder.png')}"
+                                alt=""
+                                data-ie-image-cropper-source />
+                        </div>
+                        <div data-ie-image-modal-fallback>
+                            <f:render
+                                partial="InlineProfile/Show/Image"
+                                arguments="{profile: profile}" />
+                        </div>
                     </div>
                     <p class="text-body-secondary">
                         <f:translate
                             key="inlineProfile.image.modal.hint.select"
                             extensionName="academic_persons_edit" />
                     </p>
+                    <f:if condition="{image.renderType} == 'cropper'">
+                        <p
+                            class="text-body-secondary"
+                            data-ie-image-cropper-hint>
+                            <f:translate
+                                key="inlineProfile.image.modal.hint.ratio"
+                                extensionName="academic_persons_edit" />:
+                            <strong>{image.settings.ratio}</strong>
+                        </p>
+                    </f:if>
                     <label
                         class="form-label"
                         for="inline-profile-{profile.uid}-image">

@@ -38,9 +38,14 @@
                                             extensionName: 'academic_persons')}
                                         </f:if>
 
-                                        {f:if(condition:
-                                        '{profileInformation.yearStart}', then:
-                                        '{profileInformation.yearStart}')}
+                                        <f:if condition="{profileInformation.yearStart}">
+                                            <f:render
+                                                partial="InlineProfile/Documents/DateValue"
+                                                arguments="{
+                                                    value: profileInformation.yearStart,
+                                                    yearOnly: profileInformation.yearOnly
+                                                }" />
+                                        </f:if>
 
                                         <f:if
                                             condition="{profileInformation.yearEnd} && {profileInformation.yearStart}">
@@ -53,12 +58,22 @@
                                             extensionName: 'academic_persons')}
                                         </f:if>
 
-                                        {f:if(condition:
-                                        '{profileInformation.yearEnd}', then:
-                                        '{profileInformation.yearEnd}')}
+                                        <f:if condition="{profileInformation.yearEnd}">
+                                            <f:render
+                                                partial="InlineProfile/Documents/DateValue"
+                                                arguments="{
+                                                    value: profileInformation.yearEnd,
+                                                    yearOnly: profileInformation.yearOnly
+                                                }" />
+                                        </f:if>
                                     </f:then>
                                     <f:else if="{profileInformation.year}">
-                                        {profileInformation.year}
+                                        <f:render
+                                            partial="InlineProfile/Documents/DateValue"
+                                            arguments="{
+                                                value: profileInformation.year,
+                                                yearOnly: profileInformation.yearOnly
+                                            }" />
                                     </f:else>
                                 </f:if>
                             </td>

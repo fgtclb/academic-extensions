@@ -7,7 +7,7 @@ namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Plugins;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
-use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
+use FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ResponseInterface;
@@ -31,7 +31,16 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
 
     private function renderInlineProfilePage(): string
     {
-        return $this->getPageAsFrontendUser('https://www.acme.com/home');
+        $listPage = $this->getPageAsFrontendUser('https://www.acme.com/home');
+        return $this->getPageAsFrontendUser(
+            $this->extractPluginActionLink(
+                $listPage,
+                'tx_academicpersonsedit_inlineprofile',
+                'index',
+                'profileUid',
+                self::PROFILE_ID,
+            ),
+        );
     }
 
     private function seedStructuredDocumentSections(): void
@@ -67,7 +76,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     private function getInlineProfileFluidSources(): string
     {
         $paths = [
-            __DIR__ . '/../../../Resources/Private/Templates/InlineProfile/Index.html',
+            ...(glob(__DIR__ . '/../../../Resources/Private/Templates/InlineProfile/*.html') ?: []),
             ...(glob(__DIR__ . '/../../../Resources/Private/Partials/InlineProfile/*.html') ?: []),
             ...(glob(__DIR__ . '/../../../Resources/Private/Partials/InlineProfile/*/*.html') ?: []),
             ...(glob(__DIR__ . '/../../../Resources/Private/Partials/InlineProfile/*/*/*.html') ?: []),
@@ -262,23 +271,25 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     }
 
     #[Test]
-    public function imageCardUsesCompactBootstrapOverlayEditButton(): void
+    public function imageCardUsesFullWidthBootstrapEditButton(): void
     {
         $template = $this->getInlineProfilePartial('Image/Card');
-        $this->assertStringContainsString('class="position-relative"', $template);
+        $this->assertStringContainsString('key="inlineProfile.image.heading"', $template);
+        $this->assertStringNotContainsString('data-ie-profile-name', $template);
+        $this->assertStringContainsString('data-ie-image-preview', $template);
         $this->assertMatchesRegularExpression(
             '@<button\b(?=[^>]*data-ie-open-image-modal)'
-                . '(?=[^>]*class="[^"]*\bbtn-sm\b[^"]*\bposition-absolute\b'
-                . '[^"]*\btop-0\b[^"]*\bend-0\b)[^>]*>@s',
+                . '(?=[^>]*class="[^"]*\bbtn-sm\b[^"]*\bw-100\b'
+                . '[^"]*\bd-inline-flex\b)[^>]*>@s',
             $template,
         );
         $this->assertStringContainsString(
-            'identifier="academic-persons-inline-edit-pencil"',
+            'identifier="academic-persons-inline-edit-camera"',
             $template,
         );
         $this->assertStringContainsString('title="{f:translate(', $template);
         $this->assertStringContainsString('aria-label="{f:translate(', $template);
-        $this->assertStringNotContainsString('w-100', $template);
+        $this->assertStringNotContainsString('position-absolute', $template);
         $this->assertStringNotContainsString('academic-persons-edit-add-image', $template);
         $this->assertStringNotContainsString('style=', $template);
     }
@@ -332,7 +343,12 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringContainsString('data-ie-close-all-label="{f:translate(', $header);
         $this->assertStringContainsString('key: \'inlineProfile.btnCloseAll\'', $header);
         $this->assertStringContainsString('data-ie-edit-all-button-label', $header);
+        $this->assertStringContainsString('data-ie-profile-header', $header);
+        $this->assertStringContainsString('data-ie-profile-name', $header);
+        $this->assertStringContainsString('partial="InlineProfile/Settings/Sync"', $header);
         $this->assertStringContainsString('aria-pressed="false"', $header);
+        $this->assertStringContainsString('key="inlineProfile.section.personal"', $profileForm);
+        $this->assertStringNotContainsString('partial="InlineProfile/Header"', $profileForm);
         $this->assertStringNotContainsString('InlineProfile/Forms/FooterActions', $profileForm);
         $this->assertStringNotContainsString('data-ie-footer-button-area', $fluidSources);
         $this->assertStringNotContainsString('data-ie-cancel-all', $fluidSources);
@@ -381,7 +397,18 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertSame(2, substr_count($module, 'renderProfileName(root);'));
         $this->assertStringContainsString('content.replaceChildren(fragment);', $module);
         $this->assertStringContainsString('previewSelectedFile(file);', $module);
-        $this->assertStringContainsString('commitSelectedPreview(file);', $module);
+        $this->assertStringContainsString('const uploadFile = cropperRequested', $module);
+        $this->assertStringContainsString(
+            'await createCroppedImageFile(cropperEnabled ? cropper : null, file)',
+            $module,
+        );
+        $this->assertStringContainsString(
+            'formData.set(fileInput.name, uploadFile, uploadFile.name);',
+            $module,
+        );
+        $this->assertStringContainsString('commitUploadedPreview(', $module);
+        $this->assertStringContainsString('result.imageAlternative,', $module);
+        $this->assertStringContainsString('result.imageTitle,', $module);
         $this->assertStringContainsString('const formData = new FormData(form);', $module);
         $this->assertGreaterThan(
             strpos($module, 'const formData = new FormData(form);'),
@@ -394,6 +421,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringNotContainsString('data-ie-cancel-all', $fluidSources);
         $this->assertStringNotContainsString('InlineProfile/Forms/FooterActions', $fluidSources);
         $this->assertStringContainsString('partial="InlineProfile/Image/Modal"', $template);
+        $this->assertStringContainsString('partial="InlineProfile/Header"', $template);
         $this->assertStringContainsString('partial="InlineProfile/Forms/Profile"', $template);
         $this->assertStringContainsString('partial="InlineProfile/Forms/Content"', $template);
         $this->assertSame(1, substr_count($template, 'class="col-12 col-lg-4"'));
@@ -599,6 +627,45 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     }
 
     #[Test]
+    public function profileNameAndGlobalControlsRenderAboveTheImageAndPersonalHeadings(): void
+    {
+        $this->setUpInlineProfileTestCase();
+        $content = $this->renderInlineProfilePage();
+        $document = new DOMDocument();
+        $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
+        $xpath = new DOMXPath($document);
+        $headers = $xpath->query('//*[@data-ie-profile-header]');
+        $this->assertNotFalse($headers);
+        $this->assertCount(1, $headers);
+        $header = $headers->item(0);
+        $this->assertInstanceOf(DOMElement::class, $header);
+        foreach ([
+            './/*[@data-ie-profile-name]',
+            './/*[@data-ie-sync-form]',
+            './/*[@data-academic-persons-inline-edit-edit-all-btn]',
+        ] as $query) {
+            $elements = $xpath->query($query, $header);
+            $this->assertNotFalse($elements);
+            $this->assertCount(1, $elements);
+        }
+        $imageHeading = $xpath->query('//*[@id="inline-profile-1-image-heading"]');
+        $personalHeading = $xpath->query('//*[@id="inline-profile-1-personal-heading"]');
+        $this->assertNotFalse($imageHeading);
+        $this->assertNotFalse($personalHeading);
+        $this->assertSame('Profile image', trim($imageHeading->item(0)?->textContent ?? ''));
+        $this->assertSame('Personal data', trim($personalHeading->item(0)?->textContent ?? ''));
+        $this->assertLessThan(
+            strpos($content, 'inline-profile-1-image-heading'),
+            strpos($content, 'data-ie-profile-header'),
+        );
+        $this->assertLessThan(
+            strpos($content, 'inline-profile-1-personal-heading'),
+            strpos($content, 'data-ie-profile-header'),
+        );
+        $this->assertStringContainsString('Back to profile overview', $content);
+    }
+
+    #[Test]
     public function editableSelectControlsAreRenderedAsInteractiveFields(): void
     {
         $this->setUpInlineProfileTestCase();
@@ -669,7 +736,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $xpath = new DOMXPath($document);
         $sections = $xpath->query('//*[@data-ie-document-section]');
         $this->assertNotFalse($sections);
-        $documentSections = $this->get(AcademicPersonsSettings::class)->documentSections;
+        $documentSections = $this->get(AcademicPersonsEditSettingsFactory::class)->get()->documentSections;
         $this->assertCount(count($documentSections), $sections);
         $sectionKeys = [];
         $configuredSections = array_values($documentSections);
@@ -846,11 +913,36 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertSame(true, $formBody['success'] ?? null);
         $this->assertSame(1, $formBody['record'] ?? null);
         $this->assertSame(
-            ['title', 'link', 'year', 'yearStart', 'yearEnd', 'bodytext'],
+            ['title', 'link', 'year', 'yearStart', 'yearEnd', 'yearOnly', 'bodytext'],
             array_column($formBody['fields'] ?? [], 'name'),
         );
         $formFieldsByName = array_column($formBody['fields'] ?? [], null, 'name');
         $this->assertTrue($formFieldsByName['bodytext']['richText'] ?? false);
+        $this->assertSame('date', $formFieldsByName['year']['type'] ?? null);
+        $this->assertTrue($formFieldsByName['year']['required'] ?? false);
+        $this->assertFalse($formFieldsByName['yearStart']['required'] ?? true);
+        $this->assertFalse($formFieldsByName['yearEnd']['required'] ?? true);
+        foreach (['year', 'yearStart', 'yearEnd', 'yearOnly'] as $dateField) {
+            $this->assertSame('col-12 col-md-3', $formFieldsByName[$dateField]['columnClass'] ?? null);
+        }
+        $this->assertTrue($formFieldsByName['yearOnly']['compactCheckbox'] ?? false);
+        $missingYearResponse = $this->postJson($createUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'fields' => ['title' => 'Missing required date'],
+            ],
+        ]);
+        $this->assertSame(422, $missingYearResponse->getStatusCode());
+        $missingYearBody = json_decode(
+            (string)$missingYearResponse->getBody(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+        $this->assertArrayHasKey('year', $missingYearBody['errors'] ?? []);
+        $this->assertArrayNotHasKey('yearStart', $missingYearBody['errors'] ?? []);
+        $this->assertArrayNotHasKey('yearEnd', $missingYearBody['errors'] ?? []);
         $createResponse = $this->postJson($createUrl, [
             'profile' => self::PROFILE_ID,
             'data' => [
@@ -858,9 +950,8 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
                 'fields' => [
                     'title' => 'AJAX cooperation',
                     'link' => 'https://example.com/ajax-cooperation',
-                    'year' => '2027',
-                    'yearStart' => '2025',
-                    'yearEnd' => '2027',
+                    'year' => '2027-01-01',
+                    'yearOnly' => true,
                     'bodytext' => '<p><strong>Created inline</strong></p>',
                 ],
             ],
@@ -873,7 +964,8 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $storedCreatedRecord = $this->getConnectionPool()
             ->getConnectionForTable('tx_academicpersons_domain_model_profile_information')
             ->executeQuery(
-                'SELECT profile, type, title, sorting FROM tx_academicpersons_domain_model_profile_information'
+                'SELECT profile, type, title, year, year_start, year_end, year_only, sorting'
+                    . ' FROM tx_academicpersons_domain_model_profile_information'
                     . ' WHERE uid = ? AND deleted = 0',
                 [$createdUid],
             )
@@ -882,6 +974,10 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertSame(self::PROFILE_ID, (int)$storedCreatedRecord['profile']);
         $this->assertSame('cooperation', $storedCreatedRecord['type']);
         $this->assertSame('AJAX cooperation', $storedCreatedRecord['title']);
+        $this->assertSame('2027-01-01', $storedCreatedRecord['year']);
+        $this->assertNull($storedCreatedRecord['year_start']);
+        $this->assertNull($storedCreatedRecord['year_end']);
+        $this->assertSame(1, (int)$storedCreatedRecord['year_only']);
         $this->assertSame(30, (int)$storedCreatedRecord['sorting']);
         $updateResponse = $this->postJson($updateUrl, [
             'profile' => self::PROFILE_ID,
@@ -1161,6 +1257,10 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertIsString($configuration);
         $inlineConfiguration = strstr($configuration, "'InlineProfile',");
         $this->assertIsString($inlineConfiguration);
+        $this->assertMatchesRegularExpression(
+            "@InlineProfileController::class => implode\\(',', \\[\\s*'list',\\s*'index',@",
+            $inlineConfiguration,
+        );
         $this->assertStringContainsString("'uploadImage'", $inlineConfiguration);
         $this->assertStringContainsString("'deleteImage'", $inlineConfiguration);
         foreach ([
@@ -1212,6 +1312,18 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringContainsString('data-ie-open-image-modal', $content);
         $this->assertStringContainsString('data-bs-toggle="modal"', $content);
         $this->assertStringContainsString('data-ie-image-modal', $content);
+        $this->assertStringContainsString('data-ie-image-render-type="cropper"', $content);
+        $configuredRatio = $this->get(AcademicPersonsEditSettingsFactory::class)
+            ->get()
+            ->raw['special']['image']['settings']['ratio'] ?? null;
+        $this->assertIsString($configuredRatio);
+        $this->assertNotSame('', trim($configuredRatio));
+        $this->assertStringContainsString(
+            'data-ie-image-cropper-ratio="'
+                . htmlspecialchars($configuredRatio, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+                . '"',
+            $content,
+        );
         $this->assertMatchesRegularExpression(
             '@<div\b(?=[^>]*class="[^"]*\bmodal\b[^"]*\bfade\b)(?=[^>]*data-ie-image-modal)[^>]*>@s',
             $content,
@@ -1316,6 +1428,8 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
                 'success' => true,
                 'profile' => self::PROFILE_ID,
                 'hasImage' => true,
+                'imageAlternative' => 'Max Müllermann',
+                'imageTitle' => 'Max Müllermann',
             ],
             json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR),
         );
@@ -1394,8 +1508,13 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     public function inlineEditorLabelsAreShippedInBothLanguages(): void
     {
         $expectedEnglish = [
+            'list.language' => 'Language',
+            'list.language.all' => 'All languages',
+            'list.language.unknown' => 'Language %d',
+            'inlineProfile.backToList' => 'Back to profile overview',
             'inlineProfile.btnEditAll' => 'Edit all',
             'inlineProfile.btnCloseAll' => 'Close all',
+            'inlineProfile.image.heading' => 'Profile image',
             'inlineProfile.image.modal.title' => 'Edit profile image',
             'inlineProfile.image.modal.open' => 'Edit profile image',
             'inlineProfile.image.modal.close' => 'Close image modal',
@@ -1418,7 +1537,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             'inlineProfile.documents.start' => 'Start',
             'inlineProfile.documents.from' => 'From',
             'inlineProfile.documents.to' => 'To',
-            'inlineProfile.documents.year' => 'Year',
+            'inlineProfile.documents.year' => 'Date',
             'inlineProfile.documents.title' => 'Title',
             'inlineProfile.documents.position' => 'Position',
             'inlineProfile.documents.empty' => 'No entries have been added yet.',
@@ -1457,8 +1576,12 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         }
         $this->assertSame('Alle bearbeiten', $germanTranslations['inlineProfile.btnEditAll']);
         $this->assertSame('Alle schließen', $germanTranslations['inlineProfile.btnCloseAll']);
+        $this->assertSame('Sprache', $germanTranslations['list.language']);
+        $this->assertSame('Zurück zur Profilübersicht', $germanTranslations['inlineProfile.backToList']);
+        $this->assertSame('Profilbild', $germanTranslations['inlineProfile.image.heading']);
         $this->assertSame('Von', $germanTranslations['inlineProfile.documents.from']);
         $this->assertSame('Bis', $germanTranslations['inlineProfile.documents.to']);
+        $this->assertSame('Datum', $germanTranslations['inlineProfile.documents.year']);
         $this->assertSame(
             'Es wurden noch keine Einträge hinterlegt.',
             $germanTranslations['inlineProfile.documents.empty'],

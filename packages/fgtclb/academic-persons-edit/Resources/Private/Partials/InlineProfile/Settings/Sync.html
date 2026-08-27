@@ -5,7 +5,8 @@
     <form
         class="academic-persons-inline-edit__sync-form flex-shrink-0"
         data-ie-sync-form>
-        <div class="form-check form-switch mb-0">
+        <div
+            class="form-check form-switch form-check-lg mb-0 d-flex flex-row align-items-center">
             <f:if condition="{special.validation.readOnly}">
                 <f:then>
                     <f:form.checkbox
@@ -27,7 +28,7 @@
                 </f:else>
             </f:if>
             <label
-                class="form-check-label"
+                class="form-check-label ms-3 cursor-pointer"
                 for="inline-profile-{profile.uid}-skipSync"
                 title="{f:translate(key: 'profile.skipSync.description', extensionName: 'academic_persons_edit')}">
                 <f:translate

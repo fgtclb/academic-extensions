@@ -59,7 +59,23 @@
                                     'profileInformation.{field}.label',
                                     extensionName: 'academic_persons_edit' )}:
                                 </th>
-                                <td>{profileInformation.{field}}</td>
+                                <td>
+                                    <f:if
+                                        condition="{field} == 'year' || {field} == 'yearStart' || {field} == 'yearEnd'">
+                                        <f:then>
+                                            <f:if condition="{profileInformation.{field}}">
+                                                <f:format.date
+                                                    date="{profileInformation.{field}}"
+                                                    format="{f:if(
+                                                        condition: profileInformation.yearOnly,
+                                                        then: 'Y',
+                                                        else: 'd.m.Y'
+                                                    )}" />
+                                            </f:if>
+                                        </f:then>
+                                        <f:else>{profileInformation.{field}}</f:else>
+                                    </f:if>
+                                </td>
                             </tr>
                         </f:else>
                     </f:if>

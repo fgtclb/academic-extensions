@@ -12,6 +12,11 @@ element exposed in the backend CType selector and new-content-element wizard.
 New editing features, AJAX routes, Fluid templates and browser behavior must be
 implemented exclusively in the InlineProfile component.
 
+InlineProfile now owns both the assigned-profile list and the selected-profile
+editor. Its default ``list`` action does not re-enable or call the retained
+``ProfileController``. Only the list's public :guilabel:`View` link deliberately
+targets the ``academic_persons`` Detail plugin.
+
 The previous ProfileEditing controllers, templates, translations and tests are
 deliberately retained during the migration as a reference. Its Extbase
 registration also remains temporarily compatible with existing content

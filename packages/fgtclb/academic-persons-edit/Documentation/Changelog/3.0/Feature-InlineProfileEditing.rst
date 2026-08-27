@@ -42,7 +42,12 @@ size and target-folder settings. Profile ownership is checked before a file is
 mapped or stored. Deleting or replacing an image removes the physical file only
 when no other record references it.
 
-The main template is composed from focused partials for image UI, settings,
+The content element starts with an assigned-profile overview. Editing is opened
+only after selecting a row, and the requested profile UID is verified against
+the authenticated user's assignments. The row's public view action links to the
+``academic_persons`` Detail plugin on its configured detail page.
+
+The main editor template is composed from focused partials for image UI, settings,
 forms, sections, field preview/control/actions, status output and button
 templates. The responsive grid and JavaScript data hooks remain unchanged.
 
@@ -59,7 +64,10 @@ Delete clears the local draft without closing or saving, cancel restores the
 last persisted value and closes the field, and save uses the JSON AJAX
 endpoint. Bootstrap sizing and alignment utilities keep the action group from
 stretching to the editor height without additional CSS or inline styles. The
-former bulk footer actions are no longer rendered. The header toggle opens all
+former bulk footer actions are no longer rendered. The complete name,
+synchronization switch and header toggle share one row above the image and
+personal-data columns. The image column is headed :guilabel:`Profile image`;
+the personal form retains its :guilabel:`Personal data` heading. The header toggle opens all
 editors and changes from :guilabel:`Edit all` to :guilabel:`Close all`; closing
 them retains browser-side drafts and performs no request.
 

@@ -20,6 +20,7 @@ final class InlineProfileIsolationTest extends TestCase
         $sourceFiles = [
             self::EXTENSION_ROOT . '/Classes/Controller/InlineProfileController.php',
             self::EXTENSION_ROOT . '/Resources/Private/Templates/InlineProfile/Index.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Templates/InlineProfile/List.html',
             self::EXTENSION_ROOT . '/Resources/Public/JavaScript/frontend/profile.js',
         ];
         $partials = new RecursiveIteratorIterator(
@@ -53,7 +54,6 @@ final class InlineProfileIsolationTest extends TestCase
             'partial="Profile/',
             'partial="ProfileInformation/',
             'partial="Contract/',
-            'controller="Profile"',
             'controller="ProfileInformation"',
             'controller="Contract"',
         ];
@@ -71,6 +71,21 @@ final class InlineProfileIsolationTest extends TestCase
     }
 
     #[Test]
+    public function inlineListUsesOnlyThePublicAcademicPersonsDetailController(): void
+    {
+        $template = file_get_contents(
+            self::EXTENSION_ROOT . '/Resources/Private/Templates/InlineProfile/List.html',
+        );
+        $this->assertIsString($template);
+        $this->assertStringContainsString('action="detail"', $template);
+        $this->assertStringContainsString('controller="Profile"', $template);
+        $this->assertStringContainsString('pluginName="Detail"', $template);
+        $this->assertStringContainsString('extensionName="academicpersons"', $template);
+        $this->assertStringNotContainsString('action="show"', $template);
+        $this->assertStringNotContainsString('action="edit"', $template);
+    }
+
+    #[Test]
     public function inlineFunctionalFixtureStartsWithInlineContentType(): void
     {
         $fixture = file_get_contents(
@@ -80,5 +95,47 @@ final class InlineProfileIsolationTest extends TestCase
         $this->assertIsString($fixture);
         $this->assertStringContainsString('academicpersonsedit_inlineprofile', $fixture);
         $this->assertStringNotContainsString('academicpersonsedit_profileediting', $fixture);
+    }
+
+    #[Test]
+    public function inlineServicesUseTheSeparatedEditorSettingsService(): void
+    {
+        $services = file_get_contents(self::EXTENSION_ROOT . '/Configuration/Services.yaml');
+        $factory = file_get_contents(
+            self::EXTENSION_ROOT . '/Classes/Settings/AcademicPersonsEditSettingsFactory.php',
+        );
+        $this->assertIsString($services);
+        $this->assertIsString($factory);
+        $this->assertStringContainsString(
+            '$academicPersonsSettings: \'@academic_persons_edit.settings\'',
+            $services,
+        );
+        $this->assertStringContainsString('academic_persons_edit.settings:', $services);
+        $this->assertStringContainsString(
+            'Configuration/AcademicsPersonsEdit/Settings.yaml',
+            $factory,
+        );
+        $this->assertStringNotContainsString('Configuration/AcademicPersons/Settings.yaml', $factory);
+    }
+
+    #[Test]
+    public function editorSettingsAreNeverAppliedToBackendTca(): void
+    {
+        $compatibilityMarkerPath = self::EXTENSION_ROOT . '/Classes/Tca/SettingsValidationOverrides.php';
+        if (is_file($compatibilityMarkerPath)) {
+            $compatibilityMarker = file_get_contents($compatibilityMarkerPath);
+            $this->assertIsString($compatibilityMarker);
+            $this->assertStringNotContainsString('AcademicPersonsEditSettingsFactory', $compatibilityMarker);
+            $this->assertStringNotContainsString('$GLOBALS[\'TCA\']', $compatibilityMarker);
+            $this->assertStringNotContainsString('function apply', $compatibilityMarker);
+        }
+        $overrideFiles = glob(self::EXTENSION_ROOT . '/Configuration/TCA/Overrides/*.php');
+        $this->assertIsArray($overrideFiles);
+        foreach ($overrideFiles as $overrideFile) {
+            $source = file_get_contents($overrideFile);
+            $this->assertIsString($source);
+            $this->assertStringNotContainsString('AcademicPersonsEditSettingsFactory', $source);
+            $this->assertStringNotContainsString('SettingsValidationOverrides', $source);
+        }
     }
 }

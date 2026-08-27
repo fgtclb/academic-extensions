@@ -1,5 +1,6 @@
 plugin.tx_academicpersonsedit {
   settings {
+    detailPid = {$plugin.tx_academicpersons.detailPid}
     editForm {
       profileImage {
         targetFolder = 1:/profile-images

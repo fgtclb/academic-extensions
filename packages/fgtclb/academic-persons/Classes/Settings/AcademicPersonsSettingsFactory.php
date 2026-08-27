@@ -71,7 +71,7 @@ class AcademicPersonsSettingsFactory
      */
     private function academicPersonsSettingsIdentifier(): string
     {
-        return 'AcademicPersons_Settings_SectionSchema_v4';
+        return 'AcademicPersons_Settings_PublicProfileSchema_v5';
     }
 
     /**
@@ -80,11 +80,28 @@ class AcademicPersonsSettingsFactory
     private function normalize(array $settings): AcademicPersonsSettings
     {
         return new AcademicPersonsSettings(
+            publicProfile: $this->normalizePublicProfile($settings),
+            raw: $settings,
+        );
+    }
+
+    /**
+     * Normalizes the editor settings without mixing them into the public
+     * profile configuration loaded by this factory.
+     *
+     * The value objects live in academic_persons because they describe its
+     * domain records. Loading, caching and injecting this graph is owned by
+     * academic_persons_edit.
+     *
+     * @param array<string, mixed> $settings
+     */
+    public function normalizeEditConfiguration(array $settings): AcademicPersonsSettings
+    {
+        return new AcademicPersonsSettings(
             profileSections: $this->normalizeProfileSections($settings),
             specialFields: $this->normalizeSpecialFields($settings),
             contractContactSections: $this->normalizeContractContactSections($settings),
             documentSections: $this->normalizeDocumentSections($settings),
-            publicProfile: $this->normalizePublicProfile($settings),
             raw: $settings,
         );
     }
@@ -94,7 +111,7 @@ class AcademicPersonsSettingsFactory
      */
     private function normalizePublicProfile(array $settings): PublicProfileSettings
     {
-        $configuredPublicProfile = $settings['publicProfile'] ?? null;
+        $configuredPublicProfile = $settings['profile'] ?? null;
         if (!is_array($configuredPublicProfile)) {
             return new PublicProfileSettings();
         }
@@ -363,8 +380,8 @@ class AcademicPersonsSettingsFactory
                 || in_array($sectionType, ['contract', 'contracts'], true);
             $validations = [];
             $configuredValidations = is_array($options['validators'] ?? null) ? $options['validators'] : [];
-            foreach ($configuredValidations as $fieldIdentifier => $validators) {
-                if (!is_array($validators)) {
+            foreach ($configuredValidations as $fieldIdentifier => $validationConfiguration) {
+                if (!is_array($validationConfiguration)) {
                     continue;
                 }
                 $propertyName = self::DOCUMENT_PROPERTY_ALIASES[(string)$fieldIdentifier]
@@ -373,7 +390,7 @@ class AcademicPersonsSettingsFactory
                 $validations[$propertyName] = $this->normalizeValidation(
                     identifier: $propertyName,
                     fieldName: $fieldName,
-                    validators: $validators,
+                    validators: $this->normalizeDocumentValidationFlags($validationConfiguration),
                 );
             }
             $section = new DocumentSection(
@@ -426,6 +443,50 @@ class AcademicPersonsSettingsFactory
     }
 
     /**
+     * Document fields support the regular validator flag list and the richer
+     * editor map used for descriptions. Keeping this conversion here makes
+     * the resulting Validation object the single source for Fluid, JSON and
+     * Extbase validation metadata. Backend TCA is configured independently.
+     *
+     * @param array<int|string, mixed> $configuration
+     * @return list<mixed>
+     */
+    private function normalizeDocumentValidationFlags(array $configuration): array
+    {
+        if (array_is_list($configuration)) {
+            return array_values($configuration);
+        }
+        $flags = is_array($configuration['validators'] ?? null)
+            ? array_values($configuration['validators'])
+            : [];
+        $supportedFlags = [
+            'required',
+            'readonly',
+            'disabled',
+            'email',
+            'url',
+            'number',
+            'tel',
+            'date',
+            'textarea',
+            'html',
+        ];
+        foreach ($supportedFlags as $flag) {
+            if (($configuration[$flag] ?? false) === true) {
+                $flags[] = $flag;
+            }
+        }
+        $editor = is_array($configuration['editor'] ?? null) ? $configuration['editor'] : [];
+        $editorType = strtolower(trim((string)($editor['type'] ?? '')));
+        if ($editorType === 'ckeditor') {
+            $flags[] = 'html';
+        } elseif ($editorType === 'textarea') {
+            $flags[] = 'textarea';
+        }
+        return $flags;
+    }
+
+    /**
      * @param array<int, mixed> $validators
      */
     private function normalizeValidation(
@@ -474,7 +535,9 @@ class AcademicPersonsSettingsFactory
         if ($required) {
             $validatorClassNames[] = NotEmptyValidator::class;
             $tcaConfig['required'] = true;
-            $tcaConfig['minitems'] = 1;
+            if ($fieldType === 'select') {
+                $tcaConfig['minitems'] = 1;
+            }
         }
         if (in_array('email', $flags, true)) {
             $validatorClassNames[] = EmailAddressValidator::class;

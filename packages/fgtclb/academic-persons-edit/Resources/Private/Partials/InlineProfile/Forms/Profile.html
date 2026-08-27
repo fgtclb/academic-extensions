@@ -5,9 +5,13 @@
     <section
         aria-labelledby="inline-profile-{profile.uid}-personal-heading"
         data-profile-section="{section.identifier}">
-        <f:render
-            partial="InlineProfile/Header"
-            arguments="{profile: profile, skipSync: specialFields.skipSync}" />
+        <h2
+            id="inline-profile-{profile.uid}-personal-heading"
+            class="h2 fw-normal mb-4">
+            <f:translate
+                key="inlineProfile.section.personal"
+                extensionName="academic_persons_edit" />
+        </h2>
         <form class="academic-persons-inline-edit__form" data-ie-fields-form>
             <fieldset class="border-0 p-0 m-0">
                 <legend class="visually-hidden">

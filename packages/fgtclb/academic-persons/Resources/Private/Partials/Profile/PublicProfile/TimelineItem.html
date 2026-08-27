@@ -4,22 +4,30 @@
 >
 
 <article class="academic-persons-detail__timeline-item">
+    <f:variable
+        name="dateFormat"
+        value="{f:if(condition: item.yearOnly, then: 'Y', else: 'd.m.Y')}" />
     <f:if condition="{item.year} || {item.yearStart} || {item.yearEnd}">
         <p class="academic-persons-detail__timeline-date">
             <f:if condition="{item.year}">
-                <f:then>{item.year}</f:then>
+                <f:then><f:format.date format="{dateFormat}">{item.year}</f:format.date></f:then>
                 <f:else>
                     <f:if condition="{item.yearStart}">
                         <f:then>
                             <f:if condition="{item.yearEnd}">
-                                <f:then>{item.yearStart}–{item.yearEnd}</f:then>
+                                <f:then>
+                                    <f:format.date format="{dateFormat}">{item.yearStart}</f:format.date>
+                                    –<f:format.date format="{dateFormat}">{item.yearEnd}</f:format.date>
+                                </f:then>
                                 <f:else>
-                                    <f:translate key="detail.since" extensionName="academic_persons" /> {item.yearStart}
+                                    <f:translate key="detail.since" extensionName="academic_persons" />
+                                    <f:format.date format="{dateFormat}">{item.yearStart}</f:format.date>
                                 </f:else>
                             </f:if>
                         </f:then>
                         <f:else if="{item.yearEnd}">
-                            <f:translate key="detail.till" extensionName="academic_persons" /> {item.yearEnd}
+                            <f:translate key="detail.till" extensionName="academic_persons" />
+                            <f:format.date format="{dateFormat}">{item.yearEnd}</f:format.date>
                         </f:else>
                     </f:if>
                 </f:else>

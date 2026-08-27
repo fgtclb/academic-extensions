@@ -1,215 +1,142 @@
-..  index:: Configuration; Profile sections, Configuration; Special fields, Configuration; Contract contacts, Configuration; Document sections
+..  index:: Configuration; Public profile
 ..  _configuration-sections:
 
-====================================
-Profile and related settings sections
-====================================
+=======================
+Public profile settings
+=======================
 
-:file:`Configuration/AcademicPersons/Settings.yaml` contains four ordered
-top-level maps:
+:file:`Configuration/AcademicPersons/Settings.yaml` belongs exclusively to
+:guilabel:`academic_persons`. Its single top-level :yaml:`profile` map builds
+the public detail view. Frontend editing fields, document sections and their
+validators are configured separately by :guilabel:`academic_persons_edit` in
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`.
 
-``profile``
-    Direct properties of ``Profile``, grouped into the visual inline sections.
-``special``
-    Inline components which are not one ordinary generated field row, such as
-    the composed profile name, image and synchronization switch.
-``contractContact``
-    Fields of address, email and telephone records owned by a ``Contract``.
-``documentSections``
-    Contracts and the structured profile-information collections rendered
-    below the direct profile fields.
+The split is intentional: a site package can replace the public presentation
+without changing which values may be edited, and it can adapt editing rules
+without changing the detail layout.
 
-The settings factory preserves map order and creates typed settings objects.
-Validation stays attached to the field and section in which it is declared.
+Profile layout
+==============
 
-Direct profile fields
-=====================
-
-Every key below :yaml:`profile` is a stable field identifier:
+The default :file:`Resources/Private/Templates/Profile/Detail.html` receives
+the normalized map as ``publicProfile``. The YAML key remains simply
+:yaml:`profile`:
 
 ..  code-block:: yaml
 
     profile:
-      website:
-        section: information
-        fieldType: input
-        renderType: combinedLink
-        validators:
-          - url
-      miscellaneous:
-        section: aboutme
-        fieldType: textarea
-        renderType: ckeditor
-        validators:
-          - html
-
-The available properties are:
-
-..  list-table::
-    :header-rows: 1
-
-    *   - Property
-        - Purpose
-    *   - :yaml:`section`
-        - Required visual section identifier. The shipped inline template
-          places :yaml:`information` and :yaml:`aboutme`.
-    *   - :yaml:`fieldType`
-        - Base TCA type, for example :yaml:`input`, :yaml:`select`,
-          :yaml:`textarea` or :yaml:`check`.
-    *   - :yaml:`renderType`
-        - Inline presentation such as :yaml:`text`, :yaml:`select`,
-          :yaml:`combinedLink` or :yaml:`ckeditor`.
-    *   - :yaml:`propertyName`
-        - Optional DTO/domain property when it differs from the map key.
-    *   - :yaml:`fieldName`
-        - Optional database/TCA field when it differs from the underscored
-          property name.
-    *   - :yaml:`validators`
-        - Flags belonging only to this field in its declared section.
-
-Special inline components
-=========================
-
-The :yaml:`special` map contains components whose placement is decided by
-:file:`academic-persons-edit/Resources/Private/Templates/InlineProfile/Index.html`:
-
-..  code-block:: yaml
-
-    special:
-      title:
-        type: special
-        renderType: title
-        fields:
+      structure:
+        left:
+          - menuSections
+        right:
+          - headline
+          - position
+          - profileImage
+          - contact
+          - subline
+          - profileEntries
+          - menuSectionsDatas
+      details:
+        headline:
           - title
           - firstName
           - middleName
           - lastName
-      image:
-        type: special
-        renderType: image
-      skipSync:
-        type: special
-        fieldType: check
-        renderType: checkbox
 
-``special.title`` is the composed display name, not a second persisted title
-property. Its ``fields`` list controls both the initial Fluid heading and its
-JavaScript re-render after a successful inline update. A special entry without
-``fields`` and with a ``fieldType`` represents a direct Profile property; the
-shipped ``skipSync`` entry is the current example.
+``structure``
+    Defines the layout columns and the ordered elements in each column. The
+    shipped template consumes ``left`` and ``right``. On mobile, the left
+    elements are inserted again immediately before ``subline``.
+``details``
+    Supplies the Profile properties, relation mappings, LLL labels or special
+    renderers used by every element.
 
-Contract contact fields
-=======================
-
-:yaml:`contractContact` is deliberately separate from :yaml:`profile`:
-
-..  code-block:: yaml
-
-    contractContact:
-      emailAddress:
-        section: emailAddresses
-        propertyName: email
-        fieldName: email
-        fieldType: input
-        renderType: email
-        validators:
-          - required
-          - email
-      emailAddressType:
-        section: emailAddresses
-        propertyName: type
-        fieldName: type
-        fieldType: select
-        renderType: select
-
-The shipped section identifiers are ``physicalAddresses``, ``emailAddresses``
-and ``phoneNumbers``. Address, email and telephone validators and their TCA
-overrides select exactly one of these sections. The type fields use distinct
-identifiers (for example ``emailAddressType``) while mapping to the common DTO
-property and database field ``type``.
-
-Document sections
-=================
-
-Every key below :yaml:`documentSections` identifies one collection:
-
-..  code-block:: yaml
-
-    documentSections:
-      publications:
-        label: "LLL:EXT:site_package/Resources/Private/Language/locallang.xlf:profile.publications"
-        type: publication
-        fieldName: publications
-        rowFields:
-          - year
-          - title
-        actions:
-          - view
-          - down
-          - up
-          - delete
-          - edit
-        validators:
-          title:
-            - required
-          link:
-            - url
-          year:
-            - required
-            - date
-          description:
-            - html
-
-The available properties are:
+Supported elements
+==================
 
 ..  list-table::
     :header-rows: 1
 
-    *   - Property
-        - Purpose
-    *   - :yaml:`label`
-        - Required LLL reference used for the relation and section heading.
-    *   - :yaml:`type`
-        - Required profile-information discriminator. ``contracts`` is the
-          reserved marker for Contract entities.
-    *   - :yaml:`fieldName`
-        - Required Profile relation/database field.
-    *   - :yaml:`readonly`
-        - Optional section lock. A read-only section can only expose its
-          :yaml:`view` action; creation, editing, deletion and sorting are
-          rejected by the inline editor. The shipped contracts section is read
-          only.
-    *   - :yaml:`rowFields`
-        - Ordered list of values rendered in each compact row. Supported values
-          for profile-information rows are :yaml:`from`, :yaml:`to`,
-          :yaml:`year`, :yaml:`title` and :yaml:`description`. Contract rows
-          support :yaml:`from`, :yaml:`to` and :yaml:`position`.
-    *   - :yaml:`actions`
-        - Ordered list of row actions. Supported values are :yaml:`view`,
-          :yaml:`down`, :yaml:`up`, :yaml:`delete` and :yaml:`edit`. Drag and
-          drop is available when both sorting directions are enabled.
-    *   - :yaml:`validators`
-        - Field flags used only for records of this section and type.
+    *   - Identifier
+        - Configuration
+        - Output
+    *   - :yaml:`menuSections`
+        - Ordered stable navigation identifiers.
+        - Links for configured relations which contain data.
+    *   - :yaml:`headline`
+        - Ordered direct ``Profile`` properties.
+        - Non-empty parts of the public heading.
+    *   - :yaml:`position`
+        - Special renderer map.
+        - Contract positions for :yaml:`special: datasFromContracts`.
+    *   - :yaml:`profileImage`
+        - Ordered image properties.
+        - Configured non-empty profile images.
+    *   - :yaml:`contact`
+        - Special renderer map.
+        - Contract contact data for :yaml:`special: datasFromContracts`.
+    *   - :yaml:`subline`
+        - LLL translation key.
+        - Translated heading and mobile-navigation insertion point.
+    *   - :yaml:`profileEntries`
+        - Ordered rich-text properties.
+        - Non-empty accordion entries.
+    *   - :yaml:`menuSectionsDatas`
+        - Navigation identifier to Profile relation map.
+        - Timeline sections and their related records.
 
-The document aliases :yaml:`from`, :yaml:`to` and :yaml:`description` map to
-``yearStart``, ``yearEnd`` and ``bodytext`` and to :sql:`year_start`,
-:sql:`year_end` and :sql:`bodytext`.
+The shipped detail mapping
+==========================
 
-The section-level add control follows :yaml:`readonly`; :yaml:`actions` governs
-the controls attached to existing rows. Configuration order is preserved for
-both :yaml:`rowFields` and :yaml:`actions`. Unsupported and duplicate values are
-ignored while the settings graph is normalized.
+..  code-block:: yaml
 
-The special :yaml:`contracts` section uses :yaml:`fieldName: contracts`,
-matching ``Profile::$contracts``, ``Profile::getContracts()`` and the
-:sql:`contracts` relation. The singular ``contract`` denotes one related
-record or form argument.
+    profile:
+      details:
+        menuSections:
+          - researchProjects
+          - academicCareer
+          - membershipsCommitteeActivities
+          - networkCooperation
+          - publications
+          - lectures
+        position:
+          special: datasFromContracts
+        profileImage:
+          - image
+        contact:
+          special: datasFromContracts
+        subline: "LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:detail.subline"
+        profileEntries:
+          - teachingArea
+          - coreCompetences
+          - supervisedThesis
+          - supervisedDoctoralThesis
+          - miscellaneous
+        menuSectionsDatas:
+          researchProjects: scientificResearch
+          academicCareer: vita
+          membershipsCommitteeActivities: memberships
+          networkCooperation: cooperation
+          publications: publications
+          lectures: lectures
 
-Overrides
-=========
+``menuSections`` and ``menuSectionsDatas`` share stable navigation identifiers.
+Timeline records use ``year``, ``yearStart``, ``yearEnd``, ``yearOnly``,
+``title``, ``link`` and ``bodytext``. ``yearOnly`` affects only formatting and
+does not discard month or day from the stored native ``DATE`` value.
 
-Settings from active packages are merged at the top level. A site package that
-defines :yaml:`profile`, :yaml:`special`, :yaml:`contractContact` or
-:yaml:`documentSections` replaces that complete map and must repeat every entry
-it wants to keep. Flush TYPO3 caches after a change so the typed settings graph
-is rebuilt.
+Normalization and overrides
+===========================
+
+List values are trimmed, deduplicated and kept in order. Invalid or empty
+values are ignored. Unknown structure elements render nothing. Empty Profile
+properties and relations are skipped.
+
+Settings from active packages are merged at the top level. Because
+:yaml:`profile` is the only top-level map, an override replaces its complete
+``structure`` and ``details`` maps and must repeat every desired entry. Flush
+TYPO3 caches after a change so the typed settings object is rebuilt.
+
+The similarly named :yaml:`profile` map in
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml` is a separate
+configuration namespace and is never merged with this public layout.

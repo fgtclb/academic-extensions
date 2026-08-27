@@ -21,8 +21,17 @@
       <trans-unit id="list.profile">
         <source>Profile</source>
       </trans-unit>
+      <trans-unit id="list.language">
+        <source>Language</source>
+      </trans-unit>
+      <trans-unit id="list.language.all">
+        <source>All languages</source>
+      </trans-unit>
+      <trans-unit id="list.language.unknown">
+        <source>Language %d</source>
+      </trans-unit>
       <trans-unit id="list.profileInformations.year">
-        <source>Year</source>
+        <source>Date</source>
       </trans-unit>
       <trans-unit id="list.profileInformations.title">
         <source>Title</source>
@@ -278,22 +287,31 @@
         <source>https://www.example.com</source>
       </trans-unit>
       <trans-unit id="profileInformation.year.label">
-        <source>Year</source>
+        <source>Date</source>
       </trans-unit>
       <trans-unit id="profileInformation.year.placeholder">
-        <source>e.g. 2025</source>
+        <source>dd.mm.yyyy</source>
       </trans-unit>
       <trans-unit id="profileInformation.yearStart.label">
-        <source>Start year</source>
+        <source>Start date</source>
       </trans-unit>
       <trans-unit id="profileInformation.yearStart.placeholder">
-        <source>e.g. 2020</source>
+        <source>dd.mm.yyyy</source>
       </trans-unit>
       <trans-unit id="profileInformation.yearEnd.label">
-        <source>End year</source>
+        <source>End date</source>
       </trans-unit>
       <trans-unit id="profileInformation.yearEnd.placeholder">
-        <source>e.g. 2025</source>
+        <source>dd.mm.yyyy</source>
+      </trans-unit>
+      <trans-unit id="profileInformation.yearOnly.label">
+        <source>Show year only</source>
+      </trans-unit>
+      <trans-unit id="profileInformation.yearOnly.enabled">
+        <source>Yes</source>
+      </trans-unit>
+      <trans-unit id="profileInformation.yearOnly.disabled">
+        <source>No</source>
       </trans-unit>
       <trans-unit id="profileInformation.bodytext.label">
         <source>Text</source>
@@ -424,6 +442,9 @@
       <trans-unit id="inlineProfile.heading">
         <source>Edit profile</source>
       </trans-unit>
+      <trans-unit id="inlineProfile.backToList">
+        <source>Back to profile overview</source>
+      </trans-unit>
       <trans-unit id="inlineProfile.btnEditAll">
         <source>Edit all</source>
       </trans-unit>
@@ -461,7 +482,7 @@
         <source>To</source>
       </trans-unit>
       <trans-unit id="inlineProfile.documents.year">
-        <source>Year</source>
+        <source>Date</source>
       </trans-unit>
       <trans-unit id="inlineProfile.documents.title">
         <source>Title</source>
@@ -588,6 +609,9 @@
       </trans-unit>
       <trans-unit id="inlineProfile.image.modal.hint.select">
         <source>Select an image to preview it. The profile image changes only after you save.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.image.modal.hint.ratio">
+        <source>Required aspect ratio</source>
       </trans-unit>
       <trans-unit id="inlineProfile.image.modal.deleteHint">
         <source>The profile image is removed permanently unless another record still uses the file.</source>
@@ -868,11 +892,14 @@
       <trans-unit id="contractFormData.validFrom.error.1307719788">
         <source>"Valid from" must be a valid date. (Seperated by .)</source>
       </trans-unit>
-      <trans-unit id="profileInformationFormData.yearStart.error.1332933658">
-        <source>"Year start" must be a number.</source>
+      <trans-unit id="profileInformationFormData.year.error.1307719788">
+        <source>"Date" must be a valid date. (Separated by .)</source>
       </trans-unit>
-      <trans-unit id="profileInformationFormData.yearEnd.error.1332933658">
-        <source>"Year end" must be a number.</source>
+      <trans-unit id="profileInformationFormData.yearStart.error.1307719788">
+        <source>"Start date" must be a valid date. (Separated by .)</source>
+      </trans-unit>
+      <trans-unit id="profileInformationFormData.yearEnd.error.1307719788">
+        <source>"End date" must be a valid date. (Separated by .)</source>
       </trans-unit>
     </body>
   </file>

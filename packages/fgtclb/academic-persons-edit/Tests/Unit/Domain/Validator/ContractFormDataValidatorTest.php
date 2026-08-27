@@ -106,7 +106,7 @@ final class ContractFormDataValidatorTest extends UnitTestCase
             'room' => ['room', 'string(B 2.14)'],
             'officeHours' => ['officeHours', 'string(Tue 10-12)'],
             'publish behind an is*() getter' => ['publish', 'bool(true)'],
-            'validFrom as an object' => ['validFrom', 'DateTime'],
+            'validFrom as an object' => ['validFrom', 'datetime(2024-01-01)'],
             'unset date' => ['validTo', 'null'],
             'unset relation' => ['organisationalUnit', 'null'],
             'unset function type' => ['functionType', 'null'],

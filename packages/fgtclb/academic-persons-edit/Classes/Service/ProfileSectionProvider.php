@@ -96,6 +96,7 @@ final readonly class ProfileSectionProvider
      *     validation: mixed,
      *     writable: bool,
      *     position: int,
+     *     settings: array<string, mixed>,
      *     fields: list<array<string, mixed>>
      * }>
      */
@@ -148,10 +149,24 @@ final readonly class ProfileSectionProvider
             'writable' => !$specialField->validation->readOnly
                 && !$specialField->validation->disabled,
             'position' => $specialField->position,
+            'settings' => $this->getSpecialFieldSettings($specialField->identifier),
             'fields' => $fields,
             'fieldIdentifiers' => implode(' ', array_column($fields, 'identifier')),
             'displayFieldIdentifiers' => implode(' ', array_column($fields, 'identifier')),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getSpecialFieldSettings(string $identifier): array
+    {
+        $specialSettings = $this->academicPersonsSettings->raw['special'] ?? null;
+        if (!is_array($specialSettings) || !is_array($specialSettings[$identifier] ?? null)) {
+            return [];
+        }
+        $settings = $specialSettings[$identifier]['settings'] ?? null;
+        return is_array($settings) ? $settings : [];
     }
 
     /**

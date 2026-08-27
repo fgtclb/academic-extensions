@@ -94,7 +94,7 @@ final class AddressFormDataValidatorTest extends UnitTestCase
     public static function configuredProperties(): array
     {
         return [
-            // Required in the shipped Configuration/AcademicPersons/Settings.yaml.
+            // Required in the shipped Configuration/AcademicsPersonsEdit/Settings.yaml.
             'street' => ['street', 'string(Bahnhofstrasse)'],
             'streetNumber' => ['streetNumber', 'string(12a)'],
             'zip' => ['zip', 'string(80331)'],

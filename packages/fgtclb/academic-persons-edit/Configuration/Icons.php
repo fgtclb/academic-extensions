@@ -98,4 +98,12 @@ return [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-griplines.svg',
     ],
+    'academic-persons-inline-edit-back' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-left.svg',
+    ],
+    'academic-persons-inline-edit-camera' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-camera.svg',
+    ],
 ];

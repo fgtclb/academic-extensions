@@ -8,10 +8,10 @@ Description
 ===========
 
 The inline profile editor now follows the supplied profile-page design using
-Bootstrap 5 utilities without an extension-specific stylesheet. The profile
-name is the main heading above the sticky image and replaces the former profile
-image label. The first content row uses a responsive ``4 / 8`` grid with the
-personal data beside it. The layout stacks below the ``lg`` breakpoint.
+Bootstrap 5 utilities. The profile name is the main heading above both content
+columns. The sticky image column restores the :guilabel:`Profile image` label;
+the personal form keeps :guilabel:`Personal data`. The first content row uses a
+responsive ``4 / 8`` grid and stacks below the ``lg`` breakpoint.
 
 Read values are plain text instead of button-shaped controls. A borderless
 pencil icon rendered through TYPO3's ``core:icon`` ViewHelper opens the
@@ -44,7 +44,7 @@ header height or additional stylesheet is required.
 
 Gender has no delete, cancel or save buttons. Changing the select persists its
 new value immediately. The restored small :guilabel:`Edit all` button sits
-beside the personal-data heading and toggles both single fields and grouped
+beside the profile name in the page header and toggles both single fields and grouped
 rows. While active it uses Bootstrap's active state and reads
 :guilabel:`Close all`; activating it again collapses all editors while keeping
 unsaved browser-side drafts. The former global footer save/cancel area was

@@ -4,12 +4,12 @@
 ,2,100,0,0,0,0,1,1756598400,"Professor",1,20
 "tx_academicpersons_domain_model_profile_information",
 ,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","profile","type","title","bodytext","link","year","year_start","year_end","sorting"
-,1,100,0,0,0,0,1,"cooperation","Cooperation first","<p>Cooperation body</p>","https://example.com/cooperation-first",,2025,2026,10
-,2,100,0,0,0,0,1,"cooperation","Cooperation second","","",,2024,2025,20
-,3,100,0,0,0,0,1,"lecture","Social work lecture","","",2025,,,10
-,4,100,0,0,0,0,1,"membership","Biodiversity monitoring association","","",,2025,2026,10
-,5,100,0,0,0,0,1,"membership","Sustainable development network","","",,2024,2025,20
-,6,100,0,0,0,0,1,"curriculum_vitae","Vita first","","",2025,,,10
-,7,100,0,0,0,0,1,"curriculum_vitae","Vita second","","",2024,,,20
-,8,100,0,0,0,0,1,"publication","Publication first","<p>Publication body</p>","https://example.com/publication",2023,,,10
-,9,100,0,0,0,0,1,"scientific_research","Research first","","",,2021,2024,10
+,1,100,0,0,0,0,1,"cooperation","Cooperation first","<p>Cooperation body</p>","https://example.com/cooperation-first",\NULL,"2025-01-01","2026-01-01",10
+,2,100,0,0,0,0,1,"cooperation","Cooperation second","","",\NULL,"2024-01-01","2025-01-01",20
+,3,100,0,0,0,0,1,"lecture","Social work lecture","","","2025-01-01",\NULL,\NULL,10
+,4,100,0,0,0,0,1,"membership","Biodiversity monitoring association","","",\NULL,"2025-01-01","2026-01-01",10
+,5,100,0,0,0,0,1,"membership","Sustainable development network","","",\NULL,"2024-01-01","2025-01-01",20
+,6,100,0,0,0,0,1,"curriculum_vitae","Vita first","","","2025-01-01",\NULL,\NULL,10
+,7,100,0,0,0,0,1,"curriculum_vitae","Vita second","","","2024-01-01",\NULL,\NULL,20
+,8,100,0,0,0,0,1,"publication","Publication first","<p>Publication body</p>","https://example.com/publication","2023-01-01",\NULL,\NULL,10
+,9,100,0,0,0,0,1,"scientific_research","Research first","","",\NULL,"2021-01-01","2024-01-01",10

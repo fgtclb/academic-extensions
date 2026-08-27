@@ -7,10 +7,11 @@ Breaking: Section-based AcademicPersons settings
 Description
 ===========
 
-The settings schema in
-:file:`Configuration/AcademicPersons/Settings.yaml` now consists of the ordered
-:yaml:`profile`, :yaml:`special`, :yaml:`contractContact` and
-:yaml:`documentSections` maps. The former
+The section-based editing schema consists of the ordered :yaml:`profile`,
+:yaml:`special`, :yaml:`contractContact` and :yaml:`documentSections` maps in
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`. The public layout is
+configured independently below :yaml:`profile` in
+:file:`Configuration/AcademicPersons/Settings.yaml`. The former
 :yaml:`profileInformationsTypes` and global :yaml:`validations` maps have been
 removed.
 
@@ -24,27 +25,30 @@ mutating action is accidentally configured.
 Document fields are normalized from ``from``, ``to`` and ``description`` to the
 existing DTO properties ``yearStart``, ``yearEnd`` and ``bodytext``.
 
-``AcademicPersonsSettingsFactory`` now creates typed ``ProfileSection``,
-``ProfileField``, ``SpecialField``, ``ContractContactSection`` and
-``DocumentSection`` objects. TCA and frontend validation
-consume these objects directly. Document validation is emitted as type-specific
-``columnsOverrides`` so one section can no longer influence another record type.
-The settings cache uses a schema-specific identifier so an exported object from
-the removed global schema cannot be restored as an empty section graph after an
+The shared normalizer creates typed ``ProfileSection``,
+``ProfileField``, ``SpecialField``, ``ContractContactSection``,
+``DocumentSection`` objects for the edit graph. The public factory creates a
+separate ``PublicProfileSettings`` object. Frontend validation consumes the
+edit graph directly and remains isolated by document section. Backend TCA does
+not consume this graph and is never changed by its validator flags. The
+settings cache uses a schema-specific identifier so an exported object from the
+removed global schema cannot be restored as an empty section graph after an
 extension update.
 
 Impact
 ======
 
-Every project-specific :file:`Configuration/AcademicPersons/Settings.yaml` must
-be migrated. Replace the former global maps with the new section-based schema and
-move every validator list below its field or document section. Integrations using
-the internal ``ProfileInformationType`` or global validation-set APIs must use
-the new section accessors instead.
+Every project-specific configuration must be migrated. Move editable maps to
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`, put the public layout
+below :yaml:`profile` in :file:`Configuration/AcademicPersons/Settings.yaml`,
+and move every validator list below its field or document section. Integrations
+using the internal ``ProfileInformationType`` or global validation-set APIs
+must use the new section accessors instead.
 
-Settings are still merged at the top level. An override of :yaml:`profile`,
+Each settings namespace is merged at the top level. An edit override of :yaml:`profile`,
 :yaml:`special`, :yaml:`contractContact` or :yaml:`documentSections` must
-contain the complete desired map. Flush all TYPO3
-caches after migration.
+contain the complete desired map. A public :yaml:`profile` override likewise
+must repeat its complete :yaml:`structure` and :yaml:`details` maps. Flush all
+TYPO3 caches after migration.
 
-..  index:: Backend, Configuration, Frontend, TCA, NotScanned, ext:academic_persons
+..  index:: Configuration, Frontend, Validation, NotScanned, ext:academic_persons

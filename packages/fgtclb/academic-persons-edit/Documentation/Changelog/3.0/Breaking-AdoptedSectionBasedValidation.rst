@@ -25,10 +25,10 @@ normalization instead of validating the previously persisted value.
 Impact
 ======
 
-Projects must migrate their
-:file:`Configuration/AcademicPersons/Settings.yaml` to the ``profile``,
+Projects must migrate their edit configuration to
+:file:`Configuration/AcademicsPersonsEdit/Settings.yaml` using the ``profile``,
 ``special``, ``contractContact`` and ``documentSections`` schema supplied by
-:guilabel:`academic_persons`. Custom
+:guilabel:`academic_persons_edit`. Custom
 controllers, validators or tests using global validation-set identifiers must
 switch to the profile- or document-section accessors.
 

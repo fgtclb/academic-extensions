@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator;
 
+use DateTime;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\EmailFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
@@ -122,9 +123,10 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
                 title: 'A publication',
                 bodytext: 'Some text',
                 link: 'https://example.org',
-                year: 2024,
-                yearStart: 2020,
-                yearEnd: 2023
+                year: new DateTime('2024-05-10'),
+                yearStart: new DateTime('2020-02-03'),
+                yearEnd: new DateTime('2023-11-29'),
+                yearOnly: true,
             )
         );
 
@@ -139,19 +141,20 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
         return [
             // Validator properties used by the shipped document sections.
             'title' => ['title', 'string(A publication)'],
-            'year' => ['year', 'int(2024)'],
+            'year' => ['year', 'datetime(2024-05-10)'],
             'bodytext' => ['bodytext', 'string(Some text)'],
             'link' => ['link', 'string(https://example.org)'],
-            'yearStart' => ['yearStart', 'int(2020)'],
-            'yearEnd' => ['yearEnd', 'int(2023)'],
+            'yearStart' => ['yearStart', 'datetime(2020-02-03)'],
+            'yearEnd' => ['yearEnd', 'datetime(2023-11-29)'],
+            'yearOnly' => ['yearOnly', 'bool(true)'],
             // Section-selection metadata is readable for project-specific rules.
             'type' => ['type', 'string(publication)'],
         ];
     }
 
     /**
-     * A `?int` property has no empty-string state: an omitted or non numeric `year`
-     * arrives as `null`, which `NotEmptyValidator` reports with its *null* message
+     * A nullable date property has no empty-string state: an omitted or invalid
+     * ``year`` arrives as ``null``, which ``NotEmptyValidator`` reports with its null message
      * and code 1221560910 rather than the empty one. That distinction is what a
      * template branching on the error code sees.
      */

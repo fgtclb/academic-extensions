@@ -176,23 +176,43 @@ const renderEditFields = async (root, parts, fields, fieldIdPrefix) => {
   fields.forEach((field, index) => {
     const wrapper = document.createElement("div");
     const checkbox = field.type === "checkbox";
+    const compactCheckbox = checkbox && field.compactCheckbox === true;
     const fullWidth = checkbox || field.type === "textarea";
-    wrapper.className = checkbox ? "col-12 form-check ms-2" : fullWidth ? "col-12" : "col-12 col-md-6";
+    const columnClass = String(field.columnClass ?? "").trim();
+    wrapper.className = compactCheckbox
+      ? `${columnClass || "col-12"} d-flex`
+      : checkbox
+        ? `${columnClass || "col-12"} form-check`
+        : columnClass || (fullWidth ? "col-12" : "col-12 col-md-6");
+    if (compactCheckbox) {
+      wrapper.dataset.ieDocumentCompactCheckbox = "";
+    }
     const fieldId = `${fieldIdPrefix}-${index}-${field.name}`;
     const control = createFieldControl(field, fieldId);
     const label = document.createElement("label");
     label.htmlFor = fieldId;
     label.className = checkbox ? "form-check-label" : "form-label";
     label.textContent = field.label ?? field.name;
-    if (checkbox) {
-      wrapper.append(control, label);
-    } else {
-      wrapper.append(label, control);
+    if (field.required === true) {
+      const requiredMarker = document.createElement("span");
+      requiredMarker.className = "text-danger ms-1";
+      requiredMarker.setAttribute("aria-hidden", "true");
+      requiredMarker.textContent = "*";
+      label.append(requiredMarker);
     }
     const feedback = document.createElement("div");
     feedback.className = "invalid-feedback";
     feedback.dataset.ieDocumentFieldError = field.name;
-    wrapper.append(feedback);
+    if (compactCheckbox) {
+      const formCheck = document.createElement("div");
+      formCheck.className = "form-check mt-auto";
+      formCheck.append(control, label, feedback);
+      wrapper.append(formCheck);
+    } else if (checkbox) {
+      wrapper.append(control, label, feedback);
+    } else {
+      wrapper.append(label, control, feedback);
+    }
     fragment.append(wrapper);
     if (field.richText && control instanceof HTMLTextAreaElement) {
       richTextControls.push(control);
