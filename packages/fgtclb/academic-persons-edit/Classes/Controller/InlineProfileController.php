@@ -874,6 +874,13 @@ final class InlineProfileController extends AbstractActionController
             if ($validation?->inputType === 'date') {
                 $definition['type'] = 'date';
             }
+            $helptext = $this->profileDocumentSectionProvider->getFieldHelptext(
+                $section,
+                $definition['name'],
+            );
+            $definition['helptext'] = $helptext === ''
+                ? ''
+                : ($this->localizationUtility->translate($helptext) ?? $helptext);
         }
         unset($definition);
         return $definitions;
@@ -1060,8 +1067,7 @@ final class InlineProfileController extends AbstractActionController
         mixed $value,
         array $options,
         bool $yearOnly,
-    ): string
-    {
+    ): string {
         if ($value === null || $value === '') {
             return '';
         }
@@ -1153,8 +1159,7 @@ final class InlineProfileController extends AbstractActionController
         string $type,
         mixed $value,
         bool $richText,
-    ): mixed
-    {
+    ): mixed {
         if ($type === 'checkbox') {
             if (!is_bool($value)) {
                 throw new UnexpectedValueException('The value must be boolean.');

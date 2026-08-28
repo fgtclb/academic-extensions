@@ -97,7 +97,10 @@ final readonly class ProfileSectionProvider
      *     writable: bool,
      *     position: int,
      *     settings: array<string, mixed>,
-     *     fields: list<array<string, mixed>>
+     *     fields: list<array<string, mixed>>,
+     *     fieldIdentifiers: string,
+     *     displayFieldIdentifiers: string,
+     *     helptext: string,
      * }>
      */
     public function getSpecialFields(): array
@@ -153,6 +156,7 @@ final readonly class ProfileSectionProvider
             'fields' => $fields,
             'fieldIdentifiers' => implode(' ', array_column($fields, 'identifier')),
             'displayFieldIdentifiers' => implode(' ', array_column($fields, 'identifier')),
+            'helptext' => $this->getHelptext('special', $specialField->identifier),
         ];
     }
 
@@ -185,6 +189,7 @@ final readonly class ProfileSectionProvider
             'autocomplete' => self::FIELD_AUTOCOMPLETE[$field->propertyName] ?? '',
             'validation' => $field->validation,
             'position' => $field->position,
+            'helptext' => $this->getHelptext('profile', $field->identifier),
         ];
         if (strtolower($field->renderType) === 'combinedlink') {
             $titleProperty = $field->propertyName . 'Title';
@@ -219,5 +224,15 @@ final readonly class ProfileSectionProvider
             $view['groupDisplayFieldIdentifiers'] = $titleIdentifier . ' ' . $field->identifier;
         }
         return $view;
+    }
+
+    private function getHelptext(string $scope, string $identifier): string
+    {
+        $configuration = $this->academicPersonsSettings->raw[$scope][$identifier] ?? null;
+        if (!is_array($configuration)) {
+            return '';
+        }
+        $helptext = $configuration['helptext'] ?? '';
+        return is_string($helptext) ? $helptext : '';
     }
 }

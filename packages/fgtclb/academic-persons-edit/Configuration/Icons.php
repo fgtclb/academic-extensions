@@ -106,4 +106,8 @@ return [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-camera.svg',
     ],
+    'academic-persons-inline-edit-info' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-info.svg',
+    ],
 ];

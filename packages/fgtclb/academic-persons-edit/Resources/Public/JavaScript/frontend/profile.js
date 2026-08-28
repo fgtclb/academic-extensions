@@ -1,4 +1,4 @@
-import { rootSelector } from "./profile/common.js";
+import { rootSelector, initializePopover } from "./profile/common.js";
 import { initializeFieldEditing } from "./profile/fields.js";
 import { initializeDocumentSections } from "./profile/documents.js";
 import { initializeImageEditing } from "./profile/image.js";
@@ -16,6 +16,7 @@ export const initializeInlineProfiles = (scope = document) => {
     initializeSkipSync(root);
     initializeImageEditing(root);
   });
+  initializePopover();
 };
 
 initializeInlineProfiles();

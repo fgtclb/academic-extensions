@@ -24,6 +24,12 @@ use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
  */
 final class ProfileDocumentSectionProvider
 {
+    private const HELPTEXT_FIELD_ALIASES = [
+        'yearStart' => 'from',
+        'yearEnd' => 'to',
+        'bodytext' => 'description',
+    ];
+
     public function __construct(
         private readonly AcademicPersonsSettings $academicPersonsSettings,
     ) {}
@@ -113,5 +119,23 @@ final class ProfileDocumentSectionProvider
             'curriculum_vitae' => 'start',
             default => 'year',
         };
+    }
+
+    /**
+     * @return string
+     */
+    public function getFieldHelptext(DocumentSection $section, string $fieldName): string
+    {
+        $sectionSettings = $this->academicPersonsSettings->raw['documentSections'][$section->identifier] ?? null;
+        if (!is_array($sectionSettings)) {
+            return '';
+        }
+        $helptexts = $sectionSettings['helptext'] ?? null;
+        if (!is_array($helptexts)) {
+            return '';
+        }
+        $configurationFieldName = self::HELPTEXT_FIELD_ALIASES[$fieldName] ?? $fieldName;
+        $helptext = $helptexts[$configurationFieldName] ?? '';
+        return is_string($helptext) ? $helptext : '';
     }
 }
