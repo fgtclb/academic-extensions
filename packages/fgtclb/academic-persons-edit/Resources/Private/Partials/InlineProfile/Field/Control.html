@@ -16,7 +16,18 @@
                             disabled="{field.validation.disabled ? 'disabled' : ''}"
                             required="{field.validation.required ? 'required' : ''}"
                             readonly="{field.validation.readOnly ? 'readonly' : ''}"
-                            data-ie-rich-text="true" />
+                            data-ie-rich-text="true"
+                            data-ie-character-limit="{field.validation.characterLimit}" />
+                        <f:if condition="{field.validation.characterLimit}">
+                            <div
+                                id="{elementId}-character-counter"
+                                class="form-text text-end"
+                                aria-live="polite"
+                                data-ie-character-counter
+                                data-ie-for="{elementId}">
+                                0 / {field.validation.characterLimit}
+                            </div>
+                        </f:if>
                     </f:then>
                     <f:else>
                         <f:form.textarea

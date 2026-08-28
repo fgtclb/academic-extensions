@@ -7,11 +7,12 @@ Feature: Editor validation character-limit metadata
 Description
 ===========
 
-The shared edit-settings normalizer now preserves a positive
-``editor.limit`` from CKEditor document-field configuration as typed
+The shared edit-settings normalizer now preserves both a positive
+``editor.limit`` from CKEditor document-field configuration and a positive
+``characterLimit`` from CKEditor profile-field configuration as typed
 ``Validation.characterLimit`` metadata. The value survives the cached
-``var_export()`` round trip and remains zero for non-CKEditor controls,
-invalid values and fields without a limit.
+``var_export()`` round trip and remains zero for non-CKEditor controls, invalid
+values and fields without a limit.
 
 Impact
 ======

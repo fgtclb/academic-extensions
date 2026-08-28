@@ -79,6 +79,33 @@ Rules remain attached to the configured profile, contact or document section.
 They are not collected from a sibling section. Only submitted fields are
 validated during a partial AJAX update.
 
+Profile CKEditor character limit
+================================
+
+A profile field configured as CKEditor may declare its character limit directly
+on the field:
+
+..  code-block:: yaml
+
+    profile:
+      miscellaneous:
+        section: aboutme
+        fieldType: textarea
+        renderType: ckeditor
+        characterLimit: 500
+        validators:
+          - html
+
+A positive integer ``characterLimit`` adds a live ``current / limit`` counter
+and prevents the editor from accepting additional visible characters beyond
+the limit. The partial AJAX update is checked independently by the same
+server-side Extbase validation. HTML tags do not count. The property is ignored
+when ``renderType`` is not ``ckeditor`` or its value is invalid or non-positive.
+
+This deliberately differs from document descriptions, which keep their
+existing nested ``editor.limit`` schema. Both forms normalize to the same typed
+validation metadata and neither one changes backend TCA.
+
 Document validators and aliases
 ===============================
 

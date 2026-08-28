@@ -199,7 +199,7 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
             ),
         );
         $this->assertSame(
-            ['The text must not exceed %d characters.'],
+            ['The text must not exceed 5 characters.'],
             $this->messagesFor($invalidResult, 'bodytext'),
         );
     }

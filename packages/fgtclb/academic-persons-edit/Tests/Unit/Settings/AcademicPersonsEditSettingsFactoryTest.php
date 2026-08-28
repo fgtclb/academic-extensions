@@ -38,7 +38,7 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         $factory = $reflection->newInstanceWithoutConstructor();
         $identifier = new ReflectionMethod(AcademicPersonsEditSettingsFactory::class, 'settingsIdentifier');
         $identifier->setAccessible(true);
-        $this->assertSame('AcademicPersonsEdit_Settings_SectionSchema_v2', $identifier->invoke($factory));
+        $this->assertSame('AcademicPersonsEdit_Settings_SectionSchema_v3', $identifier->invoke($factory));
     }
 
     #[Test]
@@ -143,6 +143,18 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         $this->assertTrue($description->isRichText());
         $this->assertSame(100, $description->characterLimit);
         $this->assertArrayNotHasKey('max', $description->tcaConfig);
+    }
+
+    #[Test]
+    public function configuredProfileEditorProducesCharacterLimitMetadata(): void
+    {
+        $settings = $this->normalize($this->getShippedConfiguration());
+        $miscellaneous = $settings->getProfileField('miscellaneous')?->validation;
+        $this->assertNotNull($miscellaneous);
+        $this->assertTrue($miscellaneous->isRichText());
+        $this->assertSame(500, $miscellaneous->characterLimit);
+        $this->assertArrayNotHasKey('max', $miscellaneous->tcaConfig);
+        $this->assertSame(0, $settings->getProfileField('teachingArea')?->validation->characterLimit);
     }
 
     #[Test]

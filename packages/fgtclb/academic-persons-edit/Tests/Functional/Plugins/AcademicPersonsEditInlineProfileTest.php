@@ -532,6 +532,19 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             $this->assertStringContainsString('ms-auto', $headingAction->getAttribute('class'));
             $this->assertStringNotContainsString('align-self-end', $headingAction->getAttribute('class'));
         }
+        $limitedControl = $xpath->query('//*[@id="inline-profile-1-miscellaneous"]');
+        $this->assertNotFalse($limitedControl);
+        $this->assertCount(1, $limitedControl);
+        $this->assertSame(
+            '500',
+            $limitedControl->item(0)?->attributes?->getNamedItem('data-ie-character-limit')?->nodeValue,
+        );
+        $characterCounters = $xpath->query(
+            '//*[@data-ie-character-counter and @data-ie-for="inline-profile-1-miscellaneous"]',
+        );
+        $this->assertNotFalse($characterCounters);
+        $this->assertCount(1, $characterCounters);
+        $this->assertSame('0 / 500', trim($characterCounters->item(0)?->textContent ?? ''));
     }
 
     #[Test]
@@ -1197,6 +1210,43 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringNotContainsString('<script', $storedValue);
         $this->assertStringNotContainsString('onclick', $storedValue);
         $this->assertStringNotContainsString('javascript:', $storedValue);
+    }
+
+    #[Test]
+    public function richTextAjaxUpdateRejectsConfiguredProfileCharacterLimit(): void
+    {
+        $this->setUpInlineProfileTestCase();
+        $connection = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile');
+        $persistedValue = (string)$connection->executeQuery(
+            'SELECT miscellaneous FROM tx_academicpersons_domain_model_profile WHERE uid = ?',
+            [self::PROFILE_ID],
+        )->fetchOne();
+        $updateUrl = $this->extractDataUrl($this->renderInlineProfilePage(), 'data-update-url');
+        $response = $this->postJson(
+            $updateUrl,
+            [
+                'profile' => self::PROFILE_ID,
+                'data' => [
+                    'miscellaneous' => '<p><strong>' . str_repeat('a', 501) . '</strong></p>',
+                ],
+            ],
+        );
+        $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(422, $response->getStatusCode(), (string)$response->getBody());
+        $this->assertSame(false, $body['success'] ?? null);
+        $this->assertSame('validation_failed', $body['error'] ?? null);
+        $this->assertSame(
+            ['The text must not exceed 500 characters.'],
+            $body['errors']['miscellaneous'] ?? null,
+        );
+        $this->assertSame(
+            $persistedValue,
+            (string)$connection->executeQuery(
+                'SELECT miscellaneous FROM tx_academicpersons_domain_model_profile WHERE uid = ?',
+                [self::PROFILE_ID],
+            )->fetchOne(),
+        );
     }
 
     #[Test]
