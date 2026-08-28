@@ -9,7 +9,14 @@ export const getProfileUid = (root) => {
   const profileUid = Number.parseInt(root.dataset.profileUid ?? "", 10);
   return Number.isInteger(profileUid) && profileUid > 0 ? profileUid : null;
 };
-
+export const initializePopover = () => {
+  const popoverTriggerList = document.querySelectorAll(
+    `[data-bs-toggle='popover']`,
+  );
+  return [...popoverTriggerList].map(
+    (popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl),
+  );
+};
 export const showStatus = (root, type, message = null) => {
   const statusValues = {
     danger: {

@@ -34,6 +34,7 @@ profile:
     section: information
     fieldType: input
     renderType: text
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   # These name fields are normally synchronized from the frontend user and
   # are deliberately not writable through inline editing.
   firstName:
@@ -43,6 +44,7 @@ profile:
     validators:
       - readonly
       - disabled
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   middleName:
     section: information
     fieldType: input
@@ -50,6 +52,7 @@ profile:
     validators:
       - readonly
       - disabled
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   lastName:
     section: information
     fieldType: input
@@ -57,6 +60,7 @@ profile:
     validators:
       - readonly
       - disabled
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   # `combinedLink` edits the URL together with its companion title property
   # (`websiteTitle` or `publicationsLinkTitle`).
   website:
@@ -65,12 +69,14 @@ profile:
     renderType: combinedLink
     validators:
       - url
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   publicationsLink:
     section: information
     fieldType: input
     renderType: combinedLink
     validators:
       - url
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   # The `ckeditor` render type selects sanitized rich-text handling; the `html`
   # flag keeps the matching validation/input metadata explicit.
   coreCompetences:
@@ -79,24 +85,28 @@ profile:
     renderType: ckeditor
     validators:
       - html
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   supervisedThesis:
     section: information
     fieldType: textarea
     renderType: ckeditor
     validators:
       - html
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   supervisedDoctoralThesis:
     section: information
     fieldType: textarea
     renderType: ckeditor
     validators:
       - html
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   teachingArea:
     section: information
     fieldType: textarea
     renderType: ckeditor
     validators:
       - html
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   # `aboutme` mirrors the separate About-me section in the inline templates.
   miscellaneous:
     section: aboutme
@@ -105,6 +115,7 @@ profile:
     characterLimit: 500
     validators:
       - html
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
 # Special inline components
 # -------------------------
 # These entries are not ordinary rows generated from one Profile property.
@@ -130,6 +141,7 @@ special:
     type: special
     fieldType: check
     renderType: checkbox
+    helptext: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
 # Contract contact fields
 # -----------------------
 # These fields belong to Address, Email and PhoneNumber records below a
@@ -273,6 +285,12 @@ documentSections:
         editor:
           limit: 100
           type: ckeditor
+    helptext:
+      title: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      from: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      to: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      year: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      description: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   lectures:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.lectures.label"
     type: lecture
@@ -302,6 +320,12 @@ documentSections:
         editor:
           limit: 100
           type: ckeditor
+    helptext:
+      title: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      from: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      to: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      year: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      description: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   memberships:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.memberships.label"
     type: membership
@@ -332,6 +356,12 @@ documentSections:
         editor:
           limit: 100
           type: ckeditor
+    helptext:
+      title: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      from: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      to: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      year: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      description: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   pressMedia:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.press_media.label"
     type: press_media
@@ -361,6 +391,12 @@ documentSections:
         editor:
           limit: 100
           type: ckeditor
+    helptext:
+      title: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      from: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      to: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      year: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      description: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   publications:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publications.label"
     type: publication
@@ -390,6 +426,12 @@ documentSections:
         editor:
           limit: 100
           type: ckeditor
+    helptext:
+      title: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      from: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      to: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      year: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      description: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   scientificResearch:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.scientific_research.label"
     type: scientific_research
@@ -419,6 +461,12 @@ documentSections:
         editor:
           limit: 100
           type: ckeditor
+    helptext:
+      title: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      from: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      to: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      year: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      description: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
   vita:
     label: "LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.vita.label"
     type: curriculum_vitae
@@ -448,3 +496,9 @@ documentSections:
         editor:
           limit: 100
           type: ckeditor
+    helptext:
+      title: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      from: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      to: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      year: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"
+      description: "LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:list.noTranslationFound"

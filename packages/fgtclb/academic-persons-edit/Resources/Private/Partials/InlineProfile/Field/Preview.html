@@ -10,12 +10,28 @@
         data-ie-for="{elementId}"
         data-empty-label="{f:translate(key: 'inlineProfile.field.empty', extensionName: 'academic_persons_edit')}">
         <div class="flex-grow-1 overflow-hidden">
-            <div class="fw-semibold">
+            <div class="fw-semibold d-flex flex-row align-items-center">
                 <f:translate
                     key="profile.{field.identifier}.label"
                     extensionName="academic_persons_edit" />
                 <f:if condition="{field.validation.required}">
-                    <abbr title="required">*</abbr>
+                    <abbr class="align-self-start" title="required">*</abbr>
+                </f:if>
+                <f:if condition="{field.helptext}">
+                    <button
+                        type="button"
+                        class="btn btn-link link-info p-0 ms-2 mb-1"
+                        data-bs-toggle="popover"
+                        data-bs-trigger="focus"
+                        data-bs-placement="right"
+                        data-bs-custom-class="custom-popover"
+                        data-bs-title="{f:translate(key: 'profile.{field.identifier}.label', extensionName: 'academic_persons_edit')}"
+                        data-bs-content="{f:translate(key: '{field.helptext}')}">
+                        <core:icon
+                            identifier="academic-persons-inline-edit-info"
+                            size="small"
+                            alternativeMarkupIdentifier="inline" />
+                    </button>
                 </f:if>
             </div>
             <f:if condition="{richText}">
