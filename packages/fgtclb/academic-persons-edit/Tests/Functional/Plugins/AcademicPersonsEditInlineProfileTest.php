@@ -1237,7 +1237,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertSame(false, $body['success'] ?? null);
         $this->assertSame('validation_failed', $body['error'] ?? null);
         $this->assertSame(
-            ['The text must not exceed 500 characters.'],
+            ['The text must not exceed %d characters.'],
             $body['errors']['miscellaneous'] ?? null,
         );
         $this->assertSame(
