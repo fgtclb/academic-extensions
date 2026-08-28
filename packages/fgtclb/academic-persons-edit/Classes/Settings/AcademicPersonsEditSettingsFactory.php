@@ -68,6 +68,6 @@ final class AcademicPersonsEditSettingsFactory
      */
     private function settingsIdentifier(): string
     {
-        return 'AcademicPersonsEdit_Settings_SectionSchema_v2';
+        return 'AcademicPersonsEdit_Settings_SectionSchema_v3';
     }
 }

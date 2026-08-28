@@ -99,6 +99,26 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
         $this->assertSame(['string(Submitted)'], $this->messagesFor($result, 'lastName'));
     }
 
+    #[Test]
+    public function configuredProfileRichTextCharacterLimitCountsVisibleTextWithoutMarkup(): void
+    {
+        $settings = ValidationSettings::forProfileSection(
+            'aboutme',
+            [],
+            characterLimits: ['miscellaneous' => 5],
+        );
+        $valid = new ProfileFormData(miscellaneous: 'Persisted');
+        $valid->setPropertyOverride('miscellaneous', '<p><strong>12345</strong></p>');
+        $this->assertSame([], $this->messagesFor($this->validate($settings, $valid), 'miscellaneous'));
+
+        $invalid = new ProfileFormData(miscellaneous: 'Persisted');
+        $invalid->setPropertyOverride('miscellaneous', '<p><strong>123456</strong></p>');
+        $this->assertSame(
+            ['The text must not exceed 5 characters.'],
+            $this->messagesFor($this->validate($settings, $invalid), 'miscellaneous'),
+        );
+    }
+
     /**
      * All direct profile properties used by the inline view must resolve off the DTO.
      */

@@ -170,6 +170,42 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     }
 
     #[Test]
+    public function editConfigurationNormalizesProfileCkeditorCharacterLimitsWithoutChangingTca(): void
+    {
+        $factory = (new ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
+        $settings = $factory->normalizeEditConfiguration([
+            'profile' => [
+                'miscellaneous' => [
+                    'section' => 'aboutme',
+                    'fieldType' => 'textarea',
+                    'renderType' => 'ckeditor',
+                    'characterLimit' => 500,
+                    'validators' => ['html'],
+                ],
+                'firstName' => [
+                    'section' => 'information',
+                    'fieldType' => 'input',
+                    'renderType' => 'text',
+                    'characterLimit' => 60,
+                ],
+                'teachingArea' => [
+                    'section' => 'information',
+                    'fieldType' => 'textarea',
+                    'renderType' => 'ckeditor',
+                    'characterLimit' => 'invalid',
+                ],
+            ],
+        ]);
+        $miscellaneous = $settings->getProfileField('miscellaneous')?->validation;
+        $this->assertNotNull($miscellaneous);
+        $this->assertSame(500, $miscellaneous->characterLimit);
+        $this->assertTrue($miscellaneous->isRichText());
+        $this->assertArrayNotHasKey('max', $miscellaneous->tcaConfig);
+        $this->assertSame(0, $settings->getProfileField('firstName')?->validation->characterLimit);
+        $this->assertSame(0, $settings->getProfileField('teachingArea')?->validation->characterLimit);
+    }
+
+    #[Test]
     public function publicSettingsSurviveThePhpCacheRoundTrip(): void
     {
         $settings = $this->normalize($this->getShippedConfiguration());

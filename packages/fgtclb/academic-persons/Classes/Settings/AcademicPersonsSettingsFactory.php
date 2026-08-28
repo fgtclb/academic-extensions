@@ -223,6 +223,10 @@ class AcademicPersonsSettingsFactory
                     validators: $validators,
                     fieldType: $fieldType,
                     renderType: $renderType,
+                    characterLimit: $this->normalizeProfileCharacterLimit(
+                        $options,
+                        $renderType,
+                    ),
                 ),
                 position: count($groupedFields[$sectionIdentifier] ?? []),
             );
@@ -496,7 +500,22 @@ class AcademicPersonsSettingsFactory
         if (strtolower(trim((string)($editor['type'] ?? ''))) !== 'ckeditor') {
             return 0;
         }
-        $limit = $editor['limit'] ?? 0;
+        return $this->normalizeCharacterLimit($editor['limit'] ?? 0);
+    }
+
+    /**
+     * @param array<string, mixed> $configuration
+     */
+    private function normalizeProfileCharacterLimit(array $configuration, string $renderType): int
+    {
+        if (strtolower(trim($renderType)) !== 'ckeditor') {
+            return 0;
+        }
+        return $this->normalizeCharacterLimit($configuration['characterLimit'] ?? 0);
+    }
+
+    private function normalizeCharacterLimit(mixed $limit): int
+    {
         if (is_int($limit)) {
             return max(0, $limit);
         }

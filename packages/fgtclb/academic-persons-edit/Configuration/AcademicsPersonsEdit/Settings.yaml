@@ -102,6 +102,7 @@ profile:
     section: aboutme
     fieldType: textarea
     renderType: ckeditor
+    characterLimit: 500
     validators:
       - html
 # Special inline components

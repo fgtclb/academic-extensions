@@ -295,6 +295,14 @@ the existing JSON request remain the single persistence path. CKEditor's
 initial HTML normalization becomes the local comparison baseline; merely
 opening an editor therefore does not submit or rewrite legacy content.
 
+Profile fields may configure a positive ``characterLimit`` next to
+``renderType: ckeditor``. Fluid then adds the limit metadata and an accessible
+live counter to that field. The shared rich-text module counts normalized
+visible text, keeps the last accepted value when an addition would exceed the
+limit and still allows older over-limit content to be shortened. The Extbase
+validator checks the submitted sanitized value again before the partial update
+is persisted. The shipped ``miscellaneous`` field uses a limit of 500.
+
 Outside edit mode, each rich-text field renders its formatted content directly
 and provides a borderless pencil action on the right. Empty values show a
 localized placeholder. The preview is initially rendered through TYPO3's

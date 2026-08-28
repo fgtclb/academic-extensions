@@ -59,7 +59,10 @@ CKEditor 5; in the shipped settings four appear in the `information` section
 and `miscellaneous` appears in `aboutme`. They are saved through the same
 partial-update endpoint. Submitted rich text is
 sanitized server-side with an explicit tag, attribute and URI-scheme allowlist
-before it is validated and persisted. Rich-text fields show their formatted
+before it is validated and persisted. A positive profile-field
+`characterLimit`, such as the shipped limit of 500 for `miscellaneous`, adds a
+visible-text counter and matching browser- and server-side validation without
+changing TCA. Rich-text fields show their formatted
 content directly with a compact pencil control. While editing, separate delete,
 cancel and save actions clear the draft, restore the last persisted value or
 persist the field through AJAX. For CKEditor fields only, this action group is

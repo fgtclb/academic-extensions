@@ -62,24 +62,36 @@ final class ValidationSettings
     /**
      * @param array<string, array<int, class-string>> $propertyValidators
      * @param array<string, string> $fieldIdentifiers
+     * @param array<string, int> $characterLimits
      */
     public static function forProfileSection(
         string $sectionIdentifier,
         array $propertyValidators,
         array $fieldIdentifiers = [],
+        array $characterLimits = [],
     ): AcademicPersonsSettings {
         $fields = [];
         $validations = [];
-        foreach ($propertyValidators as $property => $validatorClassNames) {
+        $properties = array_values(array_unique([
+            ...array_keys($propertyValidators),
+            ...array_keys($characterLimits),
+        ]));
+        foreach ($properties as $property) {
+            $validatorClassNames = $propertyValidators[$property] ?? [];
+            $characterLimit = $characterLimits[$property] ?? 0;
             $fieldIdentifier = $fieldIdentifiers[$property] ?? $property;
-            $validation = self::validation($property, $validatorClassNames);
+            $validation = self::validation(
+                $property,
+                $validatorClassNames,
+                $characterLimit,
+            );
             $fields[$fieldIdentifier] = new ProfileField(
                 identifier: $fieldIdentifier,
                 section: $sectionIdentifier,
                 propertyName: $property,
                 fieldName: $validation->fieldName,
-                fieldType: 'input',
-                renderType: 'text',
+                fieldType: $characterLimit > 0 ? 'textarea' : 'input',
+                renderType: $characterLimit > 0 ? 'ckeditor' : 'text',
                 validation: $validation,
                 position: count($fields),
             );
@@ -161,10 +173,12 @@ final class ValidationSettings
     /**
      * @param array<string, string> $fieldRenderTypes
      * @param list<string> $readOnlyProperties
+     * @param array<string, int> $characterLimits
      */
     public static function forProfileFields(
         array $fieldRenderTypes,
         array $readOnlyProperties = [],
+        array $characterLimits = [],
     ): AcademicPersonsSettings {
         $fields = [];
         $validations = [];
@@ -178,6 +192,9 @@ final class ValidationSettings
                 readOnly: $readOnly,
                 validatorClassNames: [],
                 tcaConfig: [],
+                characterLimit: $renderType === 'ckeditor'
+                    ? ($characterLimits[$property] ?? 0)
+                    : 0,
             );
             $fields[$property] = new ProfileField(
                 identifier: $property,
