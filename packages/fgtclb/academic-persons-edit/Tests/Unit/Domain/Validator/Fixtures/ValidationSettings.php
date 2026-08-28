@@ -119,16 +119,27 @@ final class ValidationSettings
 
     /**
      * @param array<string, array<int, class-string>> $propertyValidators
+     * @param array<string, int> $characterLimits
      */
     public static function forDocumentSection(
         string $sectionIdentifier,
         string $type,
         array $propertyValidators,
         bool $readOnly = false,
+        array $characterLimits = [],
     ): AcademicPersonsSettings {
         $validations = [];
         foreach ($propertyValidators as $property => $validatorClassNames) {
-            $validations[$property] = self::validation($property, $validatorClassNames);
+            $validations[$property] = self::validation(
+                $property,
+                $validatorClassNames,
+                $characterLimits[$property] ?? 0,
+            );
+        }
+        foreach ($characterLimits as $property => $characterLimit) {
+            if (!isset($validations[$property])) {
+                $validations[$property] = self::validation($property, [], $characterLimit);
+            }
         }
         return new AcademicPersonsSettings(
             documentSections: [
@@ -215,7 +226,11 @@ final class ValidationSettings
     /**
      * @param array<int, class-string> $validatorClassNames
      */
-    private static function validation(string $property, array $validatorClassNames): Validation
+    private static function validation(
+        string $property,
+        array $validatorClassNames,
+        int $characterLimit = 0,
+    ): Validation
     {
         /** @var array<int, class-string<ValidatorInterface>> $validatorClassNames */
         return new Validation(
@@ -226,6 +241,7 @@ final class ValidationSettings
             readOnly: false,
             validatorClassNames: $validatorClassNames,
             tcaConfig: [],
+            characterLimit: $characterLimit,
         );
     }
 }

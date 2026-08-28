@@ -128,6 +128,7 @@ const publicationFields = (title = "First") => [
     readOnly: false,
     disabled: false,
     richText: true,
+    characterLimit: 100,
     value: "<p>Text</p>",
     displayValue: "<p>Text</p>",
     options: [],
@@ -281,9 +282,14 @@ describe("profile/documents", () => {
     expect(submit.classList.contains("btn-danger")).toBe(false);
     expect(submit.classList.contains("btn-success")).toBe(false);
     expect(textarea.dataset.ieRichText).toBe("");
+    expect(textarea.dataset.ieCharacterLimit).toBe("100");
     expect(textarea.parentElement.classList.contains("col-12")).toBe(true);
     expect(textarea.parentElement.classList.contains("col-md-6")).toBe(false);
     expect(ClassicEditor.create).toHaveBeenCalledWith(textarea, expect.any(Object));
+    const counter = root.querySelector("[data-ie-character-counter]");
+    expect(counter.dataset.ieFor).toBe(textarea.id);
+    expect(counter.getAttribute("aria-live")).toBe("polite");
+    expect(counter.textContent).toBe("4 / 100");
     expect(root.querySelector("[data-ie-document-modal-title]").textContent)
       .toBe("Add: Publications");
     const request = JSON.parse(globalThis.fetch.mock.calls[0][1].body);

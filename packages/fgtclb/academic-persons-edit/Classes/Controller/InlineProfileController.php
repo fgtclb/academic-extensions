@@ -43,6 +43,7 @@ use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileSectionProvider;
+use FGTCLB\AcademicPersonsEdit\Service\RichTextCharacterCounter;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -845,6 +846,7 @@ final class InlineProfileController extends AbstractActionController
      *     readOnly: bool,
      *     disabled: bool,
      *     richText: bool,
+     *     characterLimit: int,
      *     columnClass: string,
      *     compactCheckbox: bool,
      *     value: mixed,
@@ -868,6 +870,7 @@ final class InlineProfileController extends AbstractActionController
             $definition['disabled'] = $validation?->disabled ?? false;
             $definition['richText'] = $definition['richText']
                 || ($validation?->isRichText() ?? false);
+            $definition['characterLimit'] = $validation?->characterLimit ?? 0;
             if ($validation?->inputType === 'date') {
                 $definition['type'] = 'date';
             }
@@ -1016,6 +1019,7 @@ final class InlineProfileController extends AbstractActionController
             'readOnly' => false,
             'disabled' => false,
             'richText' => $richText,
+            'characterLimit' => 0,
             'columnClass' => $columnClass,
             'compactCheckbox' => $compactCheckbox,
             'value' => $value,
@@ -1241,6 +1245,16 @@ final class InlineProfileController extends AbstractActionController
         Validation $validation,
         array &$errors,
     ): void {
+        if (
+            $validation->characterLimit > 0
+            && is_string($value)
+            && RichTextCharacterCounter::count($value) > $validation->characterLimit
+        ) {
+            $errors[$name][] = sprintf(
+                'The text must not exceed %d characters.',
+                $validation->characterLimit,
+            );
+        }
         foreach ($validation->validatorClassNames as $validatorClassName) {
             $validator = GeneralUtility::makeInstance($validatorClassName);
             if (!$validator instanceof ValidatorInterface) {

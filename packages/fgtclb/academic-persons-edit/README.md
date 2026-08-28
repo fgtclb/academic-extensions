@@ -88,7 +88,9 @@ the configured up/down controls or by dragging the additional sort handle. The
 full row is used as the drag image, the source row and active list are outlined,
 and a strong insertion line marks whether the row will be placed before or after
 the current target. The shared Bootstrap modal uses full-width CKEditor 5
-controls for HTML descriptions. Its heading uses a record's non-empty `title`
+controls for HTML descriptions. A positive `description.editor.limit` adds a
+live visible-character counter and matching client- and server-side limit;
+markup does not count and backend TCA remains unchanged. Its heading uses a record's non-empty `title`
 and falls back to the section heading. Delete mode renders the modal submit as
 `btn-danger` and explicitly removes primary or success styling. Ownership- and
 capability-checked JSON actions complete the workflow without calling the

@@ -30,6 +30,7 @@ final class Validation
         public readonly array $tcaConfig,
         public readonly string $inputType = '',
         public readonly array $flags = [],
+        public readonly int $characterLimit = 0,
     ) {}
 
     /**
@@ -43,6 +44,7 @@ final class Validation
      *     tcaConfig: array<string, mixed>,
      *     inputType: string,
      *     flags?: list<string>,
+     *     characterLimit?: int,
      * } $array
      * @return self
      */
@@ -58,6 +60,7 @@ final class Validation
             tcaConfig: $array['tcaConfig'],
             inputType: $array['inputType'],
             flags: $array['flags'] ?? [],
+            characterLimit: $array['characterLimit'] ?? 0,
         );
     }
 

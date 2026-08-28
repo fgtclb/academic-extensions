@@ -150,6 +150,10 @@ const createFieldControl = (field, fieldId) => {
     control.value = String(field.value ?? "");
     if (field.richText) {
       control.dataset.ieRichText = "";
+      const characterLimit = Number.parseInt(String(field.characterLimit ?? ""), 10);
+      if (Number.isSafeInteger(characterLimit) && characterLimit > 0) {
+        control.dataset.ieCharacterLimit = String(characterLimit);
+      }
     }
   } else {
     control = document.createElement("input");
@@ -203,6 +207,16 @@ const renderEditFields = async (root, parts, fields, fieldIdPrefix) => {
     const feedback = document.createElement("div");
     feedback.className = "invalid-feedback";
     feedback.dataset.ieDocumentFieldError = field.name;
+    const characterLimit = Number.parseInt(String(field.characterLimit ?? ""), 10);
+    const characterCounter = document.createElement("div");
+    if (field.richText && Number.isSafeInteger(characterLimit) && characterLimit > 0) {
+      characterCounter.id = `${fieldId}-character-counter`;
+      characterCounter.className = "form-text text-end";
+      characterCounter.setAttribute("aria-live", "polite");
+      characterCounter.dataset.ieCharacterCounter = "";
+      characterCounter.dataset.ieFor = fieldId;
+      characterCounter.textContent = `0 / ${characterLimit}`;
+    }
     if (compactCheckbox) {
       const formCheck = document.createElement("div");
       formCheck.className = "form-check mt-auto";
@@ -211,7 +225,11 @@ const renderEditFields = async (root, parts, fields, fieldIdPrefix) => {
     } else if (checkbox) {
       wrapper.append(control, label, feedback);
     } else {
-      wrapper.append(label, control, feedback);
+      wrapper.append(label, control);
+      if (characterCounter.dataset.ieCharacterCounter !== undefined) {
+        wrapper.append(characterCounter);
+      }
+      wrapper.append(feedback);
     }
     fragment.append(wrapper);
     if (field.richText && control instanceof HTMLTextAreaElement) {

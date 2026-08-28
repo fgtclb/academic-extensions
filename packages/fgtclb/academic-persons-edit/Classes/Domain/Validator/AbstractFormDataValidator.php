@@ -7,9 +7,11 @@ namespace FGTCLB\AcademicPersonsEdit\Domain\Validator;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersons\Settings\ValidationSet;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\AbstractFormData;
-use FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory;
 use FGTCLB\AcademicPersonsEdit\Exception\UnknownValidatorException;
+use FGTCLB\AcademicPersonsEdit\Service\RichTextCharacterCounter;
+use FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
@@ -50,6 +52,17 @@ abstract class AbstractFormDataValidator extends AbstractValidator
                     'Unknown validator',
                     1702379249
                 );
+            }
+            if (
+                $validation->characterLimit > 0
+                && is_string($value)
+                && RichTextCharacterCounter::count($value) > $validation->characterLimit
+            ) {
+                $this->result->forProperty($property)->addError(new Error(
+                    'The text must not exceed %d characters.',
+                    1787904001,
+                    [$validation->characterLimit],
+                ));
             }
         }
     }

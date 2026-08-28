@@ -383,7 +383,13 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringContainsString('root.querySelector("[data-ie-status-toast]")', $module);
         $this->assertStringContainsString('"[data-ie-edit-button-template]"', $module);
         $this->assertStringContainsString('@ckeditor/ckeditor5-editor-classic', $module);
-        $this->assertStringContainsString('richTextInitialValues.set(field, createdEditor.getData())', $module);
+        $this->assertStringContainsString('const initialValue = createdEditor.getData();', $module);
+        $this->assertStringContainsString('richTextInitialValues.set(field, initialValue);', $module);
+        $this->assertStringContainsString('richTextAcceptedValues.set(field, initialValue);', $module);
+        $this->assertStringContainsString(
+            'updateRichTextCharacterCounter(root, field, initialValue);',
+            $module,
+        );
         $this->assertStringContainsString('persistedValues.set(field, initialValue)', $module);
         $this->assertStringContainsString('setFieldValue(field, "");', $module);
         $this->assertStringContainsString('toggleEditField(root, editButton.dataset.ieFor, true);', $module);
@@ -918,6 +924,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         );
         $formFieldsByName = array_column($formBody['fields'] ?? [], null, 'name');
         $this->assertTrue($formFieldsByName['bodytext']['richText'] ?? false);
+        $this->assertSame(100, $formFieldsByName['bodytext']['characterLimit'] ?? null);
         $this->assertSame('date', $formFieldsByName['year']['type'] ?? null);
         $this->assertTrue($formFieldsByName['year']['required'] ?? false);
         $this->assertFalse($formFieldsByName['yearStart']['required'] ?? true);
@@ -943,6 +950,28 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertArrayHasKey('year', $missingYearBody['errors'] ?? []);
         $this->assertArrayNotHasKey('yearStart', $missingYearBody['errors'] ?? []);
         $this->assertArrayNotHasKey('yearEnd', $missingYearBody['errors'] ?? []);
+        $overLimitResponse = $this->postJson($createUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'fields' => [
+                    'title' => 'Description over its configured limit',
+                    'year' => '2027-01-01',
+                    'bodytext' => '<p><strong>' . str_repeat('a', 101) . '</strong></p>',
+                ],
+            ],
+        ]);
+        $this->assertSame(422, $overLimitResponse->getStatusCode());
+        $overLimitBody = json_decode(
+            (string)$overLimitResponse->getBody(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
+        $this->assertSame(
+            ['The text must not exceed 100 characters.'],
+            $overLimitBody['errors']['bodytext'] ?? null,
+        );
         $createResponse = $this->postJson($createUrl, [
             'profile' => self::PROFILE_ID,
             'data' => [

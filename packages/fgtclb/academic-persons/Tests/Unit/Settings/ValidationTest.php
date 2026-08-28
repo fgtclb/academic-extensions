@@ -32,6 +32,7 @@ final class ValidationTest extends UnitTestCase
             tcaConfig: ['type' => 'input', 'max' => 60, 'eval' => 'trim'],
             inputType: 'text',
             flags: ['required', 'readonly'],
+            characterLimit: 100,
         );
 
         $restored = eval('return ' . var_export($subject, true) . ';');
@@ -50,6 +51,7 @@ final class ValidationTest extends UnitTestCase
         $this->assertSame(['type' => 'input', 'max' => 60, 'eval' => 'trim'], $restored->tcaConfig);
         $this->assertSame('text', $restored->inputType);
         $this->assertSame(['required', 'readonly'], $restored->flags);
+        $this->assertSame(100, $restored->characterLimit);
     }
 
     /**
@@ -73,5 +75,6 @@ final class ValidationTest extends UnitTestCase
         $this->assertInstanceOf(Validation::class, $restored);
         $this->assertSame('', $restored->inputType);
         $this->assertSame([], $restored->flags);
+        $this->assertSame(0, $restored->characterLimit);
     }
 }
