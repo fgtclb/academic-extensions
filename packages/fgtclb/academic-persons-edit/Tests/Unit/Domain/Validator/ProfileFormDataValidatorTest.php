@@ -114,7 +114,7 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
         $invalid = new ProfileFormData(miscellaneous: 'Persisted');
         $invalid->setPropertyOverride('miscellaneous', '<p><strong>123456</strong></p>');
         $this->assertSame(
-            ['The text must not exceed 5 characters.'],
+            ['The text must not exceed %d characters.'],
             $this->messagesFor($this->validate($settings, $invalid), 'miscellaneous'),
         );
     }
@@ -253,8 +253,7 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
         AcademicPersonsSettings $settings,
         mixed $subject,
         array $submittedProperties = [],
-    ): Result
-    {
+    ): Result {
         if ($subject instanceof ProfileFormData) {
             foreach ($submittedProperties as $property) {
                 $subject->setPropertyOverride($property, $subject->_getProperty($property));
