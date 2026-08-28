@@ -18,22 +18,20 @@ editor. Its default ``list`` action does not re-enable or call the retained
 targets the ``academic_persons`` Detail plugin.
 
 The previous ProfileEditing controllers, templates, translations and tests are
-deliberately retained during the migration as a reference. Its Extbase
-registration also remains temporarily compatible with existing content
-records. InlineProfile does not call those controllers or render those views,
-and its test fixture creates the InlineProfile CType directly.
+temporarily retained as source references. They are no longer offered through
+a site set, static TypoScript template or selectable page TSconfig.
+InlineProfile does not call those controllers or render those views, and its
+test fixture creates the InlineProfile CType directly.
 
 Impact
 ======
 
-Editors can create only new InlineProfile elements. Existing ProfileEditing
-records can continue to render during the transition, but projects should move
-them to InlineProfile. Once the inline implementation is complete, the isolated
-legacy compatibility block and reference sources can be removed without
-changing InlineProfile.
+Editors and integrators are offered only InlineProfile. Projects that still
+carry ProfileEditing records must migrate them to InlineProfile before removing
+their own manually retained legacy configuration.
 
-InlineProfile owns a separate TypoScript component, site set and page TSconfig.
-The old ProfileEditing page-TSconfig path remains resolvable as a compatibility
-no-op and never exposes the legacy CType.
+InlineProfile owns the only shipped TypoScript component, component site set
+and selectable page TSconfig. The stable aggregate set and static template now
+deliver InlineProfile alone.
 
 ..  index:: Backend, CType, Extbase, Inline editing, Migration

@@ -25,10 +25,6 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
      */
     public static function staticTemplateIsRegisteredDataProvider(): \Generator
     {
-        yield 'profile editing' => [
-            'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing',
-            'Academic Persons Edit: Profile editing compatibility (academic_persons_edit)',
-        ];
         yield 'inline profile editing' => [
             'EXT:academic_persons_edit/Configuration/TypoScript/InlineProfile',
             'Academic Persons Edit: Inline profile editing (academic_persons_edit)',
@@ -88,10 +84,6 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
      */
     public static function pageTsConfigFileIsRegisteredDataProvider(): \Generator
     {
-        yield 'profile editing' => [
-            'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig',
-            'Academic Persons Edit: Profile editing compatibility (academic_persons_edit)',
-        ];
         yield 'inline profile editing' => [
             'EXT:academic_persons_edit/Configuration/TSconfig/InlineProfile/page.tsconfig',
             'Academic Persons Edit: Inline profile editing (academic_persons_edit)',
@@ -124,6 +116,28 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
         $this->assertFileExists(
             GeneralUtility::getFileAbsFileName($value),
             sprintf('The file registered as "%s" does not exist.', $label),
+        );
+    }
+
+    #[Test]
+    public function legacyCompatibilityConfigurationIsNotOffered(): void
+    {
+        $staticTemplateValues = array_column(
+            $GLOBALS['TCA']['sys_template']['columns']['include_static_file']['config']['items'] ?? [],
+            'value',
+        );
+        $this->assertNotContains(
+            'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing',
+            $staticTemplateValues,
+        );
+
+        $pageTsConfigValues = array_column(
+            $GLOBALS['TCA']['pages']['columns']['tsconfig_includes']['config']['items'] ?? [],
+            'value',
+        );
+        $this->assertNotContains(
+            'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig',
+            $pageTsConfigValues,
         );
     }
 }

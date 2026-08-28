@@ -40,7 +40,7 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
     ];
 
     private const AGGREGATE_SET = 'fgtclb/academic-persons-edit';
-    private const LEGACY_COMPONENT_SET = 'fgtclb/academic-persons-edit-profile-editing';
+    private const REMOVED_LEGACY_COMPONENT_SET = 'fgtclb/academic-persons-edit-profile-editing';
     private const INLINE_COMPONENT_SET = 'fgtclb/academic-persons-edit-inline-profile';
 
     protected function setUp(): void
@@ -169,7 +169,8 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
     /**
      * Pins the two strings the tests above depend on, and the files they point at. The
      * aggregate carries no payload of its own on purpose: it delivers through the
-     * component set, and a `typoscript:` of its own would parse the same files twice.
+     * InlineProfile component set, and a `typoscript:` of its own would parse the
+     * same files twice.
      */
     #[Test]
     public function setDefinitionsPointAtTheFilesTheStaticRegistrationUses(): void
@@ -177,30 +178,21 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
         $setRegistry = $this->get(SetRegistry::class);
         $this->assertInstanceOf(SetRegistry::class, $setRegistry);
 
-        $legacyComponent = $setRegistry->getSet(self::LEGACY_COMPONENT_SET);
         $inlineComponent = $setRegistry->getSet(self::INLINE_COMPONENT_SET);
         $aggregate = $setRegistry->getSet(self::AGGREGATE_SET);
 
-        $this->assertNotNull(
-            $legacyComponent,
-            sprintf('The set "%s" is not registered.', self::LEGACY_COMPONENT_SET),
+        $this->assertNull(
+            $setRegistry->getSet(self::REMOVED_LEGACY_COMPONENT_SET),
+            sprintf(
+                'The removed legacy set "%s" must not be registered.',
+                self::REMOVED_LEGACY_COMPONENT_SET,
+            ),
         );
         $this->assertNotNull(
             $inlineComponent,
             sprintf('The set "%s" is not registered.', self::INLINE_COMPONENT_SET),
         );
         $this->assertNotNull($aggregate, sprintf('The set "%s" is not registered.', self::AGGREGATE_SET));
-
-        $this->assertSame(
-            'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing/',
-            $legacyComponent->typoscript,
-        );
-        $this->assertSame(
-            'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig',
-            $legacyComponent->pagets,
-        );
-        $this->assertDirectoryExists(GeneralUtility::getFileAbsFileName((string)$legacyComponent->typoscript));
-        $this->assertFileExists(GeneralUtility::getFileAbsFileName((string)$legacyComponent->pagets));
 
         $this->assertSame(
             'EXT:academic_persons_edit/Configuration/TypoScript/InlineProfile/',
@@ -213,7 +205,7 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
         $this->assertDirectoryExists(GeneralUtility::getFileAbsFileName((string)$inlineComponent->typoscript));
         $this->assertFileExists(GeneralUtility::getFileAbsFileName((string)$inlineComponent->pagets));
 
-        $this->assertContains(self::LEGACY_COMPONENT_SET, $aggregate->dependencies);
+        $this->assertNotContains(self::REMOVED_LEGACY_COMPONENT_SET, $aggregate->dependencies);
         $this->assertContains(self::INLINE_COMPONENT_SET, $aggregate->dependencies);
         $this->assertSetCarriesNoPayload($aggregate);
     }

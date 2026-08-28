@@ -19,23 +19,20 @@ Pick one of them per site and stay with it — see
 What the sets contain
 =====================
 
-The extension ships the current InlineProfile component, the retained legacy
-runtime component and one aggregate set that depends on both.
+The extension ships the InlineProfile component and one aggregate set that
+keeps the stable extension-level set name.
 
 ..  list-table::
     :header-rows: 1
 
     *   -   Set
         -   Delivers
-    *   -   `fgtclb/academic-persons-edit-profile-editing`
-        -   Legacy ProfileEditing TypoScript. Its retained page-TSconfig path is
-            a compatibility no-op and does not expose the legacy CType.
     *   -   `fgtclb/academic-persons-edit-inline-profile`
         -   The assigned-profile list, inline editor, AJAX page type and the
             page TSconfig that offers InlineProfile in the backend.
     *   -   `fgtclb/academic-persons-edit`
-        -   Everything above. This is the set to use unless you deliberately
-            want a subset.
+        -   InlineProfile under the stable aggregate name. This is the normal
+            set to use.
 
 Both depend on `fgtclb/academic-base-ctype-group`, the set of
 :guilabel:`EXT:academic_base` that labels the content element group all academic
@@ -51,12 +48,10 @@ needed.
 The content element is hidden by default
 ========================================
 
-:guilabel:`EXT:academic_persons_edit` hides both editing content types for the whole
-installation and brings it back per component. Whichever of the two mechanisms
-below you use, it is what makes :guilabel:`Profile editing` selectable in the
-backend again — without one of them InlineProfile is not offered. The legacy
-ProfileEditing type always remains hidden for new records, while existing
-records keep rendering.
+:guilabel:`EXT:academic_persons_edit` hides the editing content type for the
+whole installation and brings InlineProfile back per component. Whichever of
+the two mechanisms below you use, InlineProfile is the only profile-editing
+content element offered in the backend.
 
 ..  _site-set:
 
@@ -116,8 +111,6 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
 
     *   -   Entry
         -   Delivers
-    *   -   :guilabel:`Academic Persons Edit: Profile editing compatibility (academic_persons_edit)`
-        -   The retained TypoScript for existing legacy records.
     *   -   :guilabel:`Academic Persons Edit: Inline profile editing (academic_persons_edit)`
         -   The TypoScript and AJAX page type of InlineProfile.
     *   -   :guilabel:`Academic Persons Edit: All components (academic_persons_edit)`
@@ -136,9 +129,6 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
 
     *   -   Entry
         -   Delivers
-    *   -   :guilabel:`Academic Persons Edit: Profile editing compatibility (academic_persons_edit)`
-        -   Resolvable compatibility path which deliberately changes no
-            backend configuration.
     *   -   :guilabel:`Academic Persons Edit: Inline profile editing (academic_persons_edit)`
         -   Makes InlineProfile selectable and configures its wizard entry.
     *   -   :guilabel:`Academic Persons Edit: All components (academic_persons_edit)`

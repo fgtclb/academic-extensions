@@ -510,18 +510,15 @@ actions and the inline JavaScript component. Inline code must not render a
 ``ProfileEditing`` plugin and must not route to one of its controllers.
 
 The old controllers, templates, language keys and functional reference tests
-remain in the package during the migration so their previous behavior can be
-consulted without reconstructing it. The legacy ``ProfileEditing`` Extbase
-configuration also remains temporarily for existing content records and its
-reference tests, but it is not selectable for new records. This compatibility
-block is not an implementation source for InlineProfile and can be removed as
-one isolated cleanup step after the inline migration is complete.
+remain in the source tree temporarily so their previous behavior can be
+consulted without reconstructing it. They are not delivered through a site
+set, an aggregate static template or selectable page TSconfig. This reference
+code is not an implementation source for InlineProfile.
 
 The InlineProfile TypoScript, AJAX page type, site set and page TSconfig live in
-their own ``Configuration/*/InlineProfile`` components. The retained
-``ProfileEditing`` paths contain only legacy runtime configuration. Its page
-TSconfig path remains resolvable for existing references but is a deliberate
-no-op; InlineProfile is enabled only through its own component or the aggregate.
+their own ``Configuration/*/InlineProfile`` components. InlineProfile is the
+only component enabled through either its component configuration or the
+aggregate.
 
 The InlineProfile functional test setup reflects the same boundary. It uses a
 dedicated ``academicpersonsedit_inlineprofile`` fixture and the neutral
