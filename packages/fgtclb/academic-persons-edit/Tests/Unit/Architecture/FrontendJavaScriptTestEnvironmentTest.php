@@ -73,7 +73,7 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
         $moduleDirectory = self::EXTENSION_ROOT . '/Resources/Public/JavaScript/frontend';
         $testDirectory = self::EXTENSION_ROOT . '/Resources/Public/Development/tests';
         $modules = [
-            $moduleDirectory . '/ckeditor.js' => $testDirectory . '/ckeditor.test.js',
+            $moduleDirectory . '/rich-text.js' => $testDirectory . '/ckeditor.test.js',
             $moduleDirectory . '/profile.js' => $testDirectory . '/profile.test.js',
         ];
         foreach (glob($moduleDirectory . '/profile/*.js') ?: [] as $module) {

@@ -71,7 +71,7 @@ final class InlineProfileIsolationTest extends TestCase
     }
 
     #[Test]
-    public function inlineListUsesOnlyThePublicAcademicPersonsDetailController(): void
+    public function inlineListUsesThePublicAcademicPersonsDetailPlugin(): void
     {
         $template = file_get_contents(
             self::EXTENSION_ROOT . '/Resources/Private/Templates/InlineProfile/List.html',
@@ -80,7 +80,9 @@ final class InlineProfileIsolationTest extends TestCase
         $this->assertStringContainsString('action="detail"', $template);
         $this->assertStringContainsString('controller="Profile"', $template);
         $this->assertStringContainsString('pluginName="Detail"', $template);
+        $this->assertStringContainsString('pageUid="{settings.detailPid}"', $template);
         $this->assertStringContainsString('extensionName="academicpersons"', $template);
+        $this->assertStringNotContainsString('pluginName="ListAndDetail"', $template);
         $this->assertStringNotContainsString('action="show"', $template);
         $this->assertStringNotContainsString('action="edit"', $template);
     }

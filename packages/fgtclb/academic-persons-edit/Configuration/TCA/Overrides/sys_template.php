@@ -24,7 +24,13 @@ defined('TYPO3') || die();
     ExtensionManagementUtility::addStaticFile(
         'academic_persons_edit',
         'Configuration/TypoScript/ProfileEditing',
-        'Academic Persons Edit: Profile editing',
+        'Academic Persons Edit: Profile editing compatibility',
+    );
+
+    ExtensionManagementUtility::addStaticFile(
+        'academic_persons_edit',
+        'Configuration/TypoScript/InlineProfile',
+        'Academic Persons Edit: Inline profile editing',
     );
 
     ExtensionManagementUtility::addStaticFile(

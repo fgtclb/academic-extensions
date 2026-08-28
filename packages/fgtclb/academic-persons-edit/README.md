@@ -14,8 +14,10 @@ Profiles get connected with a frontend user and the frontend user is allow to ed
 The `Inline profile editing` content element provides a responsive, Bootstrap
 5 based overview of all profiles assigned to the authenticated frontend user.
 Each row shows the profile image, complete name and site-language label. The
-`View` action opens the public `academic_persons` detail plugin on its configured
-`detailPid`; the `Edit` action opens the selected profile in the inline editor.
+`View` action opens the public `academic_persons` `Detail` plugin on the same
+page used by Academic Persons list views. The target comes from
+`plugin.tx_academicpersons.detailPid`; the `Edit` action opens the selected
+profile in the inline editor.
 The editor saves only changed profile fields through a JSON endpoint without
 reloading the page. On large viewports the profile image
 column remains sticky while the personal data scrolls. Its runtime top offset
@@ -40,7 +42,7 @@ image. Upload errors retain their non-success HTTP status, are shown inside the
 open modal and do not change the page preview. Bootstrap provides the layout;
 when `special.image.renderType` is `cropper`, the locally shipped CropperJS
 module constrains the selection to `special.image.settings.ratio` before the
-cropped file is uploaded. The selection cannot be moved, and the cropper stays
+cropped file is uploaded. The selection remains movable, and the cropper stays
 inactive for the fallback image until a real file is selected. The upload
 writes the composed profile name to both
 the FAL alternative text and title metadata.
@@ -54,7 +56,8 @@ the TCA allow lists of all configured select fields are checked server-side.
 
 The profile fields configured with `renderType: ckeditor` use TYPO3's bundled
 CKEditor 5; in the shipped settings four appear in the `information` section
-and `miscellaneous` appears in `aboutme`. They are saved through the same partial-update endpoint. Submitted rich text is
+and `miscellaneous` appears in `aboutme`. They are saved through the same
+partial-update endpoint. Submitted rich text is
 sanitized server-side with an explicit tag, attribute and URI-scheme allowlist
 before it is validated and persisted. Rich-text fields show their formatted
 content directly with a compact pencil control. While editing, separate delete,

@@ -59,7 +59,9 @@ final class ContentElementRegistrationTest extends AbstractAcademicPersonsEditTe
     #[Test]
     public function contentElementWizardOffersOnlyInlineProfileEditing(): void
     {
-        $pageTsConfig = file_get_contents(__DIR__ . '/../../../Configuration/TSconfig/page.tsconfig');
+        $pageTsConfig = file_get_contents(
+            __DIR__ . '/../../../Configuration/TSconfig/InlineProfile/page.tsconfig',
+        );
         $this->assertIsString($pageTsConfig);
         $this->assertStringContainsString(self::INLINE_CONTENT_TYPE, $pageTsConfig);
         $this->assertStringNotContainsString(self::LEGACY_CONTENT_TYPE, $pageTsConfig);

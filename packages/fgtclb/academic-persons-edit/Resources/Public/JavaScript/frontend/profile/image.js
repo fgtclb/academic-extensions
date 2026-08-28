@@ -28,6 +28,12 @@ export const parseImageRatio = (value) => {
   return Number.isFinite(ratio) && ratio > 0 ? ratio : null;
 };
 
+export const configureCropperSelection = (selection, ratio) => {
+  selection.aspectRatio = ratio;
+  selection.initialAspectRatio = ratio;
+  selection.initialCoverage = 0.7;
+};
+
 export const getImagePreviews = (root) =>
   Array.from(
     root.querySelectorAll(
@@ -266,11 +272,7 @@ export const initializeImageEditing = (root) => {
       if (!selection || typeof cropperImage?.$ready !== "function") {
         throw new Error("The CropperJS image or selection is unavailable.");
       }
-      selection.aspectRatio = cropperRatio;
-      selection.initialAspectRatio = cropperRatio;
-      selection.initialCoverage = 0.7;
-      //selection.movable = false;
-      //selection.removeAttribute("movable");
+      configureCropperSelection(selection, cropperRatio);
       const activeCropper = cropper;
       cropperImage
         .$ready()

@@ -23,7 +23,13 @@ defined('TYPO3') || die();
     ExtensionManagementUtility::registerPageTSConfigFile(
         'academic_persons_edit',
         'Configuration/TSconfig/ProfileEditing/page.tsconfig',
-        'Academic Persons Edit: Profile editing',
+        'Academic Persons Edit: Profile editing compatibility',
+    );
+
+    ExtensionManagementUtility::registerPageTSConfigFile(
+        'academic_persons_edit',
+        'Configuration/TSconfig/InlineProfile/page.tsconfig',
+        'Academic Persons Edit: Inline profile editing',
     );
 
     ExtensionManagementUtility::registerPageTSConfigFile(

@@ -8,8 +8,9 @@ Inline profile editing
 The :guilabel:`Inline profile editing` content element first renders all
 profiles assigned to the authenticated frontend user. Its :guilabel:`Edit`
 action opens the selected profile in the inline editor; :guilabel:`View` opens
-the public ``academic_persons`` Detail plugin on the configured
-``plugin.tx_academicpersons.detailPid`` page. The shipped
+the public ``academic_persons`` Detail plugin on the page configured through
+``plugin.tx_academicpersons.detailPid``. This is the same target setting used
+by the Academic Persons list views. The shipped
 :file:`Resources/Private/Templates/InlineProfile/Index.html` editor template
 contains three independently persisted areas:
 
@@ -42,9 +43,13 @@ through the authenticated user's assigned profiles before rendering anything.
 An unassigned or manipulated UID receives a ``403`` response.
 
 The :guilabel:`View` URI uses extension ``academicpersons``, controller
-``Profile``, action ``detail`` and plugin ``Detail``. Its page UID uses the
-canonical ``plugin.tx_academicpersons.detailPid`` value. No second detail-page
-setting is introduced by this extension.
+``Profile``, action ``detail`` and plugin ``Detail``. Its target page comes
+from ``plugin.tx_academicpersons.detailPid`` and must contain the
+``academicpersons_detail`` content element. The InlineProfile TypoScript copies
+the Academic Persons constant into ``plugin.tx_academicpersonsedit.settings``;
+there is no separate editor-specific detail PID. Importing
+:file:`EXT:academic_persons/Configuration/Routes/Detail.yaml` is optional and
+turns the query-string link into a speaking URI.
 
 View data
 =========
@@ -497,6 +502,12 @@ reference tests, but it is not selectable for new records. This compatibility
 block is not an implementation source for InlineProfile and can be removed as
 one isolated cleanup step after the inline migration is complete.
 
+The InlineProfile TypoScript, AJAX page type, site set and page TSconfig live in
+their own ``Configuration/*/InlineProfile`` components. The retained
+``ProfileEditing`` paths contain only legacy runtime configuration. Its page
+TSconfig path remains resolvable for existing references but is a deliberate
+no-op; InlineProfile is enabled only through its own component or the aggregate.
+
 The InlineProfile functional test setup reflects the same boundary. It uses a
 dedicated ``academicpersonsedit_inlineprofile`` fixture and the neutral
 ``AbstractFrontendProfilePluginTestCase`` base. It does not create a
@@ -556,8 +567,8 @@ If ``special.image.renderType`` is ``cropper`` and
 ``16:9``, the modal instantiates the locally packaged CropperJS 2.2 module. The
 selection remains constrained to that ratio and only the generated cropped
 file is added to the multipart request. No CDN or other runtime request is
-used. The selection's ``movable`` property is disabled, so its position cannot
-be dragged. The cropper is instantiated only for a persisted profile image or
+used. The ratio remains fixed while the selection can be dragged to choose the
+visible image area. The cropper is instantiated only for a persisted profile image or
 a newly selected local file. If the profile currently uses the placeholder,
 the fallback preview remains visible and cannot itself become crop input. The
 original upload behavior remains active for every other render type.
