@@ -17,22 +17,13 @@
                 <f:if condition="{field.validation.required}">
                     <abbr class="align-self-start" title="required">*</abbr>
                 </f:if>
-                <f:if condition="{field.helptext}">
-                    <button
-                        type="button"
-                        class="btn btn-link link-info p-0 ms-2 mb-1"
-                        data-bs-toggle="popover"
-                        data-bs-trigger="focus"
-                        data-bs-placement="right"
-                        data-bs-custom-class="custom-popover"
-                        data-bs-title="{f:translate(key: 'profile.{field.identifier}.label', extensionName: 'academic_persons_edit')}"
-                        data-bs-content="{f:translate(key: '{field.helptext}')}">
-                        <core:icon
-                            identifier="academic-persons-inline-edit-info"
-                            size="small"
-                            alternativeMarkupIdentifier="inline" />
-                    </button>
-                </f:if>
+                <f:render
+                    partial="InlineProfile/Field/Helptext"
+                    arguments="{
+                        helptext: field.helptext,
+                        labelKey: field.labelKey,
+                        elementId: elementId
+                    }" />
             </div>
             <f:if condition="{richText}">
                 <f:then>

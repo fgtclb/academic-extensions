@@ -643,6 +643,22 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         );
         $this->assertStringContainsString('data-ie-sync-form', $content);
         $this->assertStringContainsString('data-ie-image-preview', $content);
+        $document = new DOMDocument();
+        $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
+        $xpath = new DOMXPath($document);
+        foreach (['firstName', 'miscellaneous', 'skipSync'] as $identifier) {
+            $helptexts = $xpath->query(sprintf(
+                '//*[@data-ie-helptext and @data-ie-for="inline-profile-%d-%s"]',
+                self::PROFILE_ID,
+                $identifier,
+            ));
+            $this->assertNotFalse($helptexts);
+            $this->assertGreaterThanOrEqual(1, $helptexts->length);
+            foreach ($helptexts as $helptext) {
+                $this->assertInstanceOf(DOMElement::class, $helptext);
+                $this->assertSame('No translation found.', $helptext->getAttribute('data-bs-content'));
+            }
+        }
     }
 
     #[Test]
@@ -946,6 +962,16 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             $this->assertSame('col-12 col-md-3', $formFieldsByName[$dateField]['columnClass'] ?? null);
         }
         $this->assertTrue($formFieldsByName['yearOnly']['compactCheckbox'] ?? false);
+        foreach (['title', 'year', 'yearStart', 'yearEnd', 'bodytext'] as $helptextField) {
+            $this->assertSame(
+                'No translation found.',
+                $formFieldsByName[$helptextField]['helptext'] ?? null,
+                sprintf('Missing translated helptext for document field "%s".', $helptextField),
+            );
+        }
+        foreach (['link', 'yearOnly'] as $fieldWithoutHelptext) {
+            $this->assertSame('', $formFieldsByName[$fieldWithoutHelptext]['helptext'] ?? null);
+        }
         $missingYearResponse = $this->postJson($createUrl, [
             'profile' => self::PROFILE_ID,
             'data' => [

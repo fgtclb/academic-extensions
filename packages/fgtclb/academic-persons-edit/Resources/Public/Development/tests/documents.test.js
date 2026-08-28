@@ -73,6 +73,9 @@ const createRoot = () => {
       <template data-ie-document-item-template>${itemMarkup("", "")}</template>
       <div class="d-none" data-ie-document-empty-state>Empty</div>
     </section>
+    <template data-ie-document-helptext-button-template>
+      <button type="button" data-ie-helptext data-bs-toggle="popover"></button>
+    </template>
     <div class="modal" data-ie-document-modal>
       <form data-ie-document-form>
         <h2 data-ie-document-modal-title></h2>
@@ -106,6 +109,7 @@ const publicationFields = (title = "First") => [
     richText: false,
     value: title,
     displayValue: title,
+    helptext: "Title help",
     options: [],
   },
   {
@@ -131,6 +135,7 @@ const publicationFields = (title = "First") => [
     characterLimit: 100,
     value: "<p>Text</p>",
     displayValue: "<p>Text</p>",
+    helptext: "Description help",
     options: [],
   },
 ];
@@ -148,6 +153,7 @@ const configuredDateFields = () => [
     compactCheckbox: false,
     value: "2025-01-01",
     displayValue: "01.01.2025",
+    helptext: "Date help",
     options: [],
   },
   {
@@ -190,6 +196,7 @@ const configuredDateFields = () => [
     compactCheckbox: true,
     value: true,
     displayValue: "Yes",
+    helptext: "Year only help",
     options: [],
   },
 ];
@@ -230,6 +237,7 @@ describe("profile/documents", () => {
     modalInstance = { show: jest.fn(), hide: jest.fn() };
     globalThis.bootstrap = {
       Modal: { getOrCreateInstance: jest.fn(() => modalInstance) },
+      Popover: jest.fn(),
     };
     globalThis.fetch = jest.fn();
     ClassicEditor.create.mockReset();
@@ -290,6 +298,14 @@ describe("profile/documents", () => {
     expect(counter.dataset.ieFor).toBe(textarea.id);
     expect(counter.getAttribute("aria-live")).toBe("polite");
     expect(counter.textContent).toBe("4 / 100");
+    const helptextButtons = root.querySelectorAll("[data-ie-document-fields] [data-ie-helptext]");
+    expect(helptextButtons).toHaveLength(2);
+    const titleHelptext = root.querySelector('[data-ie-helptext][data-ie-for$="-title"]');
+    expect(titleHelptext.dataset.bsTitle).toBe("Title");
+    expect(titleHelptext.dataset.bsContent).toBe("Title help");
+    const bodytextHelptext = root.querySelector(`[data-ie-helptext][data-ie-for="${textarea.id}"]`);
+    expect(bodytextHelptext.dataset.bsContent).toBe("Description help");
+    expect(globalThis.bootstrap.Popover).toHaveBeenCalledTimes(2);
     expect(root.querySelector("[data-ie-document-modal-title]").textContent)
       .toBe("Add: Publications");
     const request = JSON.parse(globalThis.fetch.mock.calls[0][1].body);
@@ -322,6 +338,11 @@ describe("profile/documents", () => {
     expect(formCheck.classList.contains("mt-auto")).toBe(true);
     expect(formCheck.parentElement.classList.contains("d-flex")).toBe(true);
     expect(formCheck.querySelector("label").htmlFor).toBe(yearOnly.id);
+    const yearOnlyHelptext = formCheck.querySelector("[data-ie-helptext]");
+    expect(yearOnlyHelptext.dataset.ieFor).toBe(yearOnly.id);
+    expect(yearOnlyHelptext.dataset.bsContent).toBe("Year only help");
+    expect(year.closest("div.col-md-3").querySelector("[data-ie-helptext]").dataset.bsContent)
+      .toBe("Date help");
     expect(formCheck.querySelector('[data-ie-document-field-error="yearOnly"]')).not.toBeNull();
   });
   test("creates, edits, sorts, views and deletes records through JSON endpoints", async () => {
@@ -381,6 +402,9 @@ describe("profile/documents", () => {
     expect(modalTitle.textContent).toBe("View: Second updated");
     expect(root.querySelector("[data-ie-document-submit]").classList.contains("d-none")).toBe(true);
     expect(root.querySelector("[data-ie-document-fields]").textContent).toContain("Second updated");
+    const viewHelptext = root.querySelector("[data-ie-document-fields] dt [data-ie-helptext]");
+    expect(viewHelptext.dataset.bsTitle).toBe("Title");
+    expect(viewHelptext.dataset.bsContent).toBe("Title help");
     section.querySelector('[data-item-uid="2"] [data-ie-document-delete]').click();
     await flushPromises();
     expect(modalTitle.textContent).toBe("Delete: Second updated");

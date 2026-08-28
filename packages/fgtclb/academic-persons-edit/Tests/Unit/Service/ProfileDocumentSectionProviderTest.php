@@ -42,6 +42,45 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
     }
 
     #[Test]
+    public function configuredHelptextsResolveDocumentFieldAliases(): void
+    {
+        $section = new DocumentSection(
+            identifier: 'cooperation',
+            fieldName: 'cooperation',
+            type: 'cooperation',
+            label: 'Cooperation',
+            readOnly: false,
+            validationSet: new ValidationSet(identifier: 'cooperation', validations: []),
+            position: 0,
+            rowFields: ['from', 'to', 'title'],
+            actions: ['view', 'edit'],
+        );
+        $settings = new AcademicPersonsSettings(
+            documentSections: ['cooperation' => $section],
+            raw: [
+                'documentSections' => [
+                    'cooperation' => [
+                        'helptext' => [
+                            'title' => 'help-title',
+                            'from' => 'help-from',
+                            'to' => 'help-to',
+                            'year' => 'help-year',
+                            'description' => 'help-description',
+                        ],
+                    ],
+                ],
+            ],
+        );
+        $subject = new ProfileDocumentSectionProvider($settings);
+        $this->assertSame('help-title', $subject->getFieldHelptext($section, 'title'));
+        $this->assertSame('help-from', $subject->getFieldHelptext($section, 'yearStart'));
+        $this->assertSame('help-to', $subject->getFieldHelptext($section, 'yearEnd'));
+        $this->assertSame('help-year', $subject->getFieldHelptext($section, 'year'));
+        $this->assertSame('help-description', $subject->getFieldHelptext($section, 'bodytext'));
+        $this->assertSame('', $subject->getFieldHelptext($section, 'link'));
+    }
+
+    #[Test]
     public function sectionsFollowAcademicPersonsSettingsAndPreserveTypedItems(): void
     {
         $profile = new Profile();

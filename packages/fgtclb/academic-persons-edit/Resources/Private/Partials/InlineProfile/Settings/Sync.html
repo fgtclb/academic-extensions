@@ -2,6 +2,9 @@
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
+    <f:variable
+        name="syncElementId"
+        value="inline-profile-{profile.uid}-skipSync" />
     <form
         class="academic-persons-inline-edit__sync-form flex-shrink-0"
         data-ie-sync-form>
@@ -35,6 +38,13 @@
                     key="profile.skipSync.label"
                     extensionName="academic_persons_edit" />
             </label>
+            <f:render
+                partial="InlineProfile/Field/Helptext"
+                arguments="{
+                    helptext: special.helptext,
+                    labelKey: 'profile.skipSync.label',
+                    elementId: syncElementId
+                }" />
             <div class="invalid-feedback"></div>
         </div>
     </form>

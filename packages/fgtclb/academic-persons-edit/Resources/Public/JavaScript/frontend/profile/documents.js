@@ -13,6 +13,7 @@ const itemsSelector = "[data-ie-document-items]";
 const itemTemplateSelector = "template[data-ie-document-item-template]";
 const emptyStateSelector = "[data-ie-document-empty-state]";
 const modalSelector = "[data-ie-document-modal]";
+const helptextButtonTemplateSelector = "template[data-ie-document-helptext-button-template]";
 const initializedRoots = new WeakSet();
 const modalStates = new WeakMap();
 const dragStates = new WeakMap();
@@ -107,13 +108,59 @@ const appendRichText = (container, value) => {
   container.replaceChildren(fragment);
 };
 
+const createDocumentHelptextButton = (root, field, fieldId = "") => {
+  const helptext = String(field.helptext ?? "").trim();
+  if (helptext === "") {
+    return null;
+  }
+  const template = root.querySelector(helptextButtonTemplateSelector);
+  if (!(template instanceof HTMLTemplateElement)) {
+    return null;
+  }
+  const button = template.content.querySelector("button")?.cloneNode(true);
+  if (!(button instanceof HTMLButtonElement)) {
+    return null;
+  }
+  const label = String(field.label ?? field.name ?? "").trim();
+  button.dataset.bsTitle = label;
+  button.dataset.bsContent = helptext;
+  if (fieldId !== "") {
+    button.dataset.ieFor = fieldId;
+  }
+  button.setAttribute("aria-label", label === "" ? helptext : `${label}: ${helptext}`);
+  return button;
+};
+
+const initializeDocumentHelptextPopovers = (container) => {
+  if (typeof globalThis.bootstrap?.Popover !== "function") {
+    return;
+  }
+  container.querySelectorAll(`[data-bs-toggle="popover"]`).forEach((trigger) => {
+    new globalThis.bootstrap.Popover(trigger);
+  });
+};
+
+const disposeDocumentHelptextPopovers = (container) => {
+  const Popover = globalThis.bootstrap?.Popover;
+  if (typeof Popover?.getInstance !== "function") {
+    return;
+  }
+  container.querySelectorAll(`[data-bs-toggle="popover"]`).forEach((trigger) => {
+    Popover.getInstance(trigger)?.dispose();
+  });
+};
+
 const renderViewFields = (root, parts, fields) => {
   const list = document.createElement("dl");
   list.className = "row mb-0";
   fields.forEach((field) => {
     const term = document.createElement("dt");
-    term.className = "col-sm-4";
+    term.className = "col-sm-4 d-flex align-items-start";
     term.textContent = field.label ?? field.name;
+    const helptextButton = createDocumentHelptextButton(root, field);
+    if (helptextButton !== null) {
+      term.append(helptextButton);
+    }
     const description = document.createElement("dd");
     description.className = "col-sm-8";
     const displayValue = String(field.displayValue ?? "");
@@ -124,7 +171,9 @@ const renderViewFields = (root, parts, fields) => {
     }
     list.append(term, description);
   });
+  disposeDocumentHelptextPopovers(parts.fields);
   parts.fields.replaceChildren(list);
+  initializeDocumentHelptextPopovers(parts.fields);
 };
 
 const createFieldControl = (field, fieldId) => {
@@ -204,6 +253,7 @@ const renderEditFields = async (root, parts, fields, fieldIdPrefix) => {
       requiredMarker.textContent = "*";
       label.append(requiredMarker);
     }
+    const helptextButton = createDocumentHelptextButton(root, field, fieldId);
     const feedback = document.createElement("div");
     feedback.className = "invalid-feedback";
     feedback.dataset.ieDocumentFieldError = field.name;
@@ -220,12 +270,26 @@ const renderEditFields = async (root, parts, fields, fieldIdPrefix) => {
     if (compactCheckbox) {
       const formCheck = document.createElement("div");
       formCheck.className = "form-check mt-auto";
-      formCheck.append(control, label, feedback);
+      formCheck.append(control, label);
+      if (helptextButton !== null) {
+        formCheck.append(helptextButton);
+      }
+      formCheck.append(feedback);
       wrapper.append(formCheck);
     } else if (checkbox) {
-      wrapper.append(control, label, feedback);
+      wrapper.append(control, label);
+      if (helptextButton !== null) {
+        wrapper.append(helptextButton);
+      }
+      wrapper.append(feedback);
     } else {
-      wrapper.append(label, control);
+      const heading = document.createElement("div");
+      heading.className = "d-flex align-items-center";
+      heading.append(label);
+      if (helptextButton !== null) {
+        heading.append(helptextButton);
+      }
+      wrapper.append(heading, control);
       if (characterCounter.dataset.ieCharacterCounter !== undefined) {
         wrapper.append(characterCounter);
       }
@@ -236,7 +300,9 @@ const renderEditFields = async (root, parts, fields, fieldIdPrefix) => {
       richTextControls.push(control);
     }
   });
+  disposeDocumentHelptextPopovers(parts.fields);
   parts.fields.replaceChildren(fragment);
+  initializeDocumentHelptextPopovers(parts.fields);
   await Promise.all(richTextControls.map((control) => ensureRichTextEditor(root, control)));
 };
 

@@ -104,6 +104,45 @@ final class ProfileSectionProviderTest extends UnitTestCase
     }
 
     #[Test]
+    public function configuredHelptextsAreExposedForProfileAndSpecialFields(): void
+    {
+        $title = $this->field('title', 'information', 'input', 'text', 0);
+        $skipSync = new SpecialField(
+            identifier: 'skipSync',
+            type: 'special',
+            fieldType: 'check',
+            renderType: 'checkbox',
+            fieldIdentifiers: [],
+            validation: $this->validation('skipSync', 'skip_sync'),
+            position: 0,
+        );
+        $settings = new AcademicPersonsSettings(
+            profileSections: [
+                'information' => $this->section('information', [$title], 0),
+            ],
+            specialFields: ['skipSync' => $skipSync],
+            raw: [
+                'profile' => [
+                    'title' => ['helptext' => 'LLL:EXT:test/profile.title.helptext'],
+                ],
+                'special' => [
+                    'skipSync' => ['helptext' => 'LLL:EXT:test/special.skipSync.helptext'],
+                ],
+            ],
+        );
+        $subject = new ProfileSectionProvider($settings);
+        $sections = $subject->getSections();
+        $this->assertSame(
+            'LLL:EXT:test/profile.title.helptext',
+            $sections['information']['items'][0]['field']['helptext'],
+        );
+        $this->assertSame(
+            'LLL:EXT:test/special.skipSync.helptext',
+            $subject->getSpecialFields()['skipSync']['helptext'],
+        );
+    }
+
+    #[Test]
     public function readOnlySpecialComponentIsNotWritable(): void
     {
         $settings = new AcademicPersonsSettings(
