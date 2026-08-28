@@ -122,6 +122,54 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     }
 
     #[Test]
+    public function editConfigurationNormalizesCkeditorCharacterLimitsWithoutChangingTca(): void
+    {
+        $factory = (new ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
+        $settings = $factory->normalizeEditConfiguration([
+            'documentSections' => [
+                'publications' => [
+                    'label' => 'Publications',
+                    'type' => 'publication',
+                    'fieldName' => 'publications',
+                    'validators' => [
+                        'description' => [
+                            'editor' => [
+                                'type' => 'ckeditor',
+                                'limit' => 100,
+                            ],
+                        ],
+                        'title' => [
+                            'editor' => [
+                                'type' => 'textarea',
+                                'limit' => 60,
+                            ],
+                        ],
+                        'link' => [
+                            'editor' => [
+                                'type' => 'ckeditor',
+                                'limit' => 'invalid',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $validation = $settings->getDocumentValidationSet('publications')->get('bodytext');
+        $this->assertNotNull($validation);
+        $this->assertSame(100, $validation->characterLimit);
+        $this->assertTrue($validation->isRichText());
+        $this->assertArrayNotHasKey('max', $validation->tcaConfig);
+        $this->assertSame(
+            0,
+            $settings->getDocumentValidationSet('publications')->get('title')?->characterLimit,
+        );
+        $this->assertSame(
+            0,
+            $settings->getDocumentValidationSet('publications')->get('link')?->characterLimit,
+        );
+    }
+
+    #[Test]
     public function publicSettingsSurviveThePhpCacheRoundTrip(): void
     {
         $settings = $this->normalize($this->getShippedConfiguration());

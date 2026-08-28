@@ -450,6 +450,13 @@ A field carrying the ``html`` flag is rendered as a full-width CKEditor 5
 control; ordinary textareas are full width as well. Rich-text values are
 sanitized before persistence and parsed into the row or read-only modal without
 assigning ``innerHTML``.
+When that field's ``editor.limit`` is a positive integer, the textarea carries
+the normalized limit and the modal renders an accessible live character
+counter below CKEditor. The count uses normalized visible text rather than the
+stored HTML. CKEditor rejects additions past the limit while still allowing an
+older over-limit value to be shortened. The JSON endpoint and the Extbase
+form-data validator independently reject over-limit submissions, so client-side
+code is not the security boundary. This setting does not alter backend TCA.
 When the modal enters delete mode, its submit control removes ``btn-primary``
 and ``btn-success`` and uses ``btn-danger``. All other writable modes restore
 ``btn-primary``.

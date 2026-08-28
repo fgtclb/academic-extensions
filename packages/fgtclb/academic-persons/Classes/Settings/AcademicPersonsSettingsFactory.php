@@ -391,6 +391,7 @@ class AcademicPersonsSettingsFactory
                     identifier: $propertyName,
                     fieldName: $fieldName,
                     validators: $this->normalizeDocumentValidationFlags($validationConfiguration),
+                    characterLimit: $this->normalizeDocumentCharacterLimit($validationConfiguration),
                 );
             }
             $section = new DocumentSection(
@@ -487,6 +488,25 @@ class AcademicPersonsSettingsFactory
     }
 
     /**
+     * @param array<int|string, mixed> $configuration
+     */
+    private function normalizeDocumentCharacterLimit(array $configuration): int
+    {
+        $editor = is_array($configuration['editor'] ?? null) ? $configuration['editor'] : [];
+        if (strtolower(trim((string)($editor['type'] ?? ''))) !== 'ckeditor') {
+            return 0;
+        }
+        $limit = $editor['limit'] ?? 0;
+        if (is_int($limit)) {
+            return max(0, $limit);
+        }
+        if (is_string($limit) && preg_match('/^\d+$/', trim($limit)) === 1) {
+            return (int)trim($limit);
+        }
+        return 0;
+    }
+
+    /**
      * @param array<int, mixed> $validators
      */
     private function normalizeValidation(
@@ -495,6 +515,7 @@ class AcademicPersonsSettingsFactory
         array $validators,
         string $fieldType = '',
         string $renderType = '',
+        int $characterLimit = 0,
     ): Validation {
         $flags = [];
         foreach ($validators as $validator) {
@@ -572,6 +593,7 @@ class AcademicPersonsSettingsFactory
             tcaConfig: $tcaConfig,
             inputType: $inputType,
             flags: $flags,
+            characterLimit: max(0, $characterLimit),
         );
     }
 }

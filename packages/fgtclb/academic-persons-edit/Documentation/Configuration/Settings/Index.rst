@@ -134,7 +134,19 @@ The richer description form remains supported:
         type: ckeditor
 
 ``editor.type: ckeditor`` is normalized to the ``html`` validation/input
-metadata so the JSON modal and server-side sanitizer agree.
+metadata so the JSON modal and server-side sanitizer agree. A positive integer
+``editor.limit`` additionally defines the maximum number of visible
+characters. HTML tags do not consume that allowance; entities, non-breaking
+spaces and repeated whitespace are normalized before counting. The modal
+returns the limit in its JSON field metadata, displays a live ``current / limit``
+counter and prevents CKEditor from accepting further characters beyond it.
+Both the document JSON actions and the Extbase form-data validator enforce the
+same limit on the server.
+
+``editor.limit`` is frontend validation metadata, not TCA configuration. It is
+ignored for non-CKEditor controls, and removing it or setting it to a non-
+positive value disables both the counter and the additional validation without
+changing backend FormEngine.
 
 Backend TCA isolation
 =====================

@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { ClassicEditor } from "./mocks/ckeditor-modules.js";
 import {
+  countRichTextCharacters,
   ensureRichTextEditor,
   getPlainText,
+  getRichTextCharacterLimit,
   getRichTextEditorValue,
   getRichTextInitialValue,
   isAllowedRichTextLink,
@@ -10,15 +12,28 @@ import {
   parseRichTextPreview,
   renderRichTextPreview,
   setRichTextEditorValue,
+  updateRichTextCharacterCounter,
 } from "../../JavaScript/frontend/profile/rich-text.js";
 
-const createRoot = (fieldId = "inline-profile-1-biography") => {
+const createRoot = (
+  fieldId = "inline-profile-1-biography",
+  characterLimit = 0,
+) => {
   const root = document.createElement("section");
   root.dataset.messageEditorError = "Editor unavailable";
   root.dataset.messageErrorTitle = "Error";
   root.dataset.messageErrorMessage = "Failed";
   root.innerHTML = `
-    <textarea id="${fieldId}" data-ie-rich-text></textarea>
+    <textarea
+      id="${fieldId}"
+      data-ie-rich-text
+      ${characterLimit > 0 ? `data-ie-character-limit="${characterLimit}"` : ""}></textarea>
+    ${characterLimit > 0 ? `
+      <div
+        data-ie-character-counter
+        data-ie-for="${fieldId}"
+        aria-live="polite"></div>
+    ` : ""}
     <div data-ie-rich-text-preview data-ie-for="${fieldId}" data-empty-label="No content">
       <div data-ie-rich-text-preview-content></div>
     </div>
@@ -64,6 +79,20 @@ describe("profile/rich-text", () => {
     expect(isRichTextField(document.createElement("textarea"))).toBe(false);
     expect(getPlainText("<p>Hello&nbsp; <strong>world</strong></p>\n<p>Again</p>"))
       .toBe("Hello world Again");
+    expect(countRichTextCharacters("<p>Grüße&nbsp;<strong>Welt</strong></p>"))
+      .toBe(10);
+  });
+
+  test("reads positive limits and updates the visible character counter", () => {
+    const { root, field } = createRoot("limited-field", 5);
+    expect(getRichTextCharacterLimit(field)).toBe(5);
+    updateRichTextCharacterCounter(root, field, "<p>123456</p>");
+    const counter = root.querySelector("[data-ie-character-counter]");
+    expect(counter.textContent).toBe("6 / 5");
+    expect(counter.classList.contains("text-danger")).toBe(true);
+
+    delete field.dataset.ieCharacterLimit;
+    expect(getRichTextCharacterLimit(field)).toBe(0);
   });
 
   test.each([
@@ -135,6 +164,41 @@ describe("profile/rich-text", () => {
     setRichTextEditorValue(field, "<p>Changed</p>");
     expect(editor.setData).toHaveBeenCalledTimes(1);
     await expect(ensureRichTextEditor(root, field)).resolves.toBe(editor);
+  });
+
+  test("keeps CKEditor at the configured visible character limit", async () => {
+    const { root, field } = createRoot("limited-field", 5);
+    const editor = createEditor("<p>1234</p>");
+    ClassicEditor.create.mockResolvedValue(editor);
+    const inputListener = jest.fn();
+    field.addEventListener("input", inputListener);
+    await ensureRichTextEditor(root, field);
+    expect(root.querySelector("[data-ie-character-counter]").textContent).toBe("4 / 5");
+
+    editor.setData("<p><strong>12345</strong></p>");
+    editor.emit("change:data");
+    expect(field.value).toBe("<p><strong>12345</strong></p>");
+    expect(root.querySelector("[data-ie-character-counter]").textContent).toBe("5 / 5");
+
+    editor.setData("<p>123456</p>");
+    editor.emit("change:data");
+    expect(editor.getData()).toBe("<p><strong>12345</strong></p>");
+    expect(field.value).toBe("<p><strong>12345</strong></p>");
+    expect(root.querySelector("[data-ie-character-counter]").textContent).toBe("5 / 5");
+    expect(inputListener).toHaveBeenCalledTimes(1);
+  });
+
+  test("allows existing over-limit content to be shortened", async () => {
+    const { root, field } = createRoot("legacy-limited-field", 5);
+    const editor = createEditor("<p>1234567</p>");
+    ClassicEditor.create.mockResolvedValue(editor);
+    await ensureRichTextEditor(root, field);
+    expect(root.querySelector("[data-ie-character-counter]").textContent).toBe("7 / 5");
+
+    editor.setData("<p>123456</p>");
+    editor.emit("change:data");
+    expect(field.value).toBe("<p>123456</p>");
+    expect(root.querySelector("[data-ie-character-counter]").textContent).toBe("6 / 5");
   });
 
   test("returns null for unavailable or locked editors", async () => {

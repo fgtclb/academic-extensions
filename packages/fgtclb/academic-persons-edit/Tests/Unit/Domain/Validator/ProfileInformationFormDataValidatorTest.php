@@ -173,6 +173,37 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
         $this->assertSame(['null'], $this->messagesFor($result, 'year'));
     }
 
+    #[Test]
+    public function configuredRichTextCharacterLimitCountsVisibleTextWithoutMarkup(): void
+    {
+        $settings = ValidationSettings::forDocumentSection(
+            self::VALIDATION_SET,
+            'publication',
+            [],
+            characterLimits: ['bodytext' => 5],
+        );
+        $validResult = $this->validate(
+            $settings,
+            new ProfileInformationFormData(
+                type: 'publication',
+                bodytext: '<p><strong>12345</strong></p>',
+            ),
+        );
+        $this->assertSame([], $this->messagesFor($validResult, 'bodytext'));
+
+        $invalidResult = $this->validate(
+            $settings,
+            new ProfileInformationFormData(
+                type: 'publication',
+                bodytext: '<p><strong>123456</strong></p>',
+            ),
+        );
+        $this->assertSame(
+            ['The text must not exceed %d characters.'],
+            $this->messagesFor($invalidResult, 'bodytext'),
+        );
+    }
+
     /**
      * A wrong argument type is a wiring mistake and must surface instead of letting
      * an unvalidated object through.

@@ -12,6 +12,7 @@ const richTextPreviewContentSelector = "[data-ie-rich-text-preview-content]";
 const richTextEditors = new WeakMap();
 const richTextEditorPromises = new WeakMap();
 const richTextInitialValues = new WeakMap();
+const richTextAcceptedValues = new WeakMap();
 const allowedRichTextPreviewTags = new Set([
   "a",
   "br",
@@ -70,9 +71,12 @@ export const getRichTextEditorValue = (field) => {
 
 export const setRichTextEditorValue = (field, value) => {
   const editor = richTextEditors.get(field);
+  richTextAcceptedValues.set(field, value);
+  field.value = value;
   if (editor && editor.getData() !== value) {
     editor.setData(value);
   }
+  updateRichTextCharacterCounter(field.getRootNode(), field, value);
 };
 
 export const getRichTextInitialValue = (field) => richTextInitialValues.get(field);
@@ -83,6 +87,33 @@ export const getPlainText = (value) => {
     .replaceAll("\u00a0", " ")
     .replace(/\s+/g, " ")
     .trim();
+};
+
+export const countRichTextCharacters = (value) => Array.from(getPlainText(value)).length;
+
+export const getRichTextCharacterLimit = (field) => {
+  const configuredLimit = field.dataset.ieCharacterLimit?.trim() ?? "";
+  if (!/^\d+$/.test(configuredLimit)) {
+    return 0;
+  }
+  const limit = Number.parseInt(configuredLimit, 10);
+  return Number.isSafeInteger(limit) && limit > 0 ? limit : 0;
+};
+
+export const updateRichTextCharacterCounter = (root, field, value) => {
+  const limit = getRichTextCharacterLimit(field);
+  if (limit === 0 || !field.id) {
+    return;
+  }
+  const counter = root.querySelector(
+    `[data-ie-character-counter][data-ie-for="${CSS.escape(field.id)}"]`,
+  );
+  if (!(counter instanceof HTMLElement)) {
+    return;
+  }
+  const count = countRichTextCharacters(value);
+  counter.textContent = `${count} / ${limit}`;
+  counter.classList.toggle("text-danger", count > limit);
 };
 
 export const isAllowedRichTextLink = (value) => {
@@ -161,9 +192,27 @@ export const ensureRichTextEditor = (root, field) => {
   const editorPromise = ClassicEditor.create(field, richTextEditorConfig)
     .then((createdEditor) => {
       richTextEditors.set(field, createdEditor);
-      richTextInitialValues.set(field, createdEditor.getData());
+      const initialValue = createdEditor.getData();
+      richTextInitialValues.set(field, initialValue);
+      richTextAcceptedValues.set(field, initialValue);
+      updateRichTextCharacterCounter(root, field, initialValue);
       createdEditor.model.document.on("change:data", () => {
-        field.value = createdEditor.getData();
+        const value = createdEditor.getData();
+        const acceptedValue = richTextAcceptedValues.get(field) ?? "";
+        const limit = getRichTextCharacterLimit(field);
+        const count = countRichTextCharacters(value);
+        const acceptedCount = countRichTextCharacters(acceptedValue);
+        if (limit > 0 && count > limit && count >= acceptedCount) {
+          if (value !== acceptedValue) {
+            createdEditor.setData(acceptedValue);
+          }
+          field.value = acceptedValue;
+          updateRichTextCharacterCounter(root, field, acceptedValue);
+          return;
+        }
+        richTextAcceptedValues.set(field, value);
+        field.value = value;
+        updateRichTextCharacterCounter(root, field, value);
         field.dispatchEvent(new Event("input", { bubbles: true }));
       });
       return createdEditor;

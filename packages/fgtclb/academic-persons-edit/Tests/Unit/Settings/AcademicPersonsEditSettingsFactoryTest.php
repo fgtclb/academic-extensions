@@ -38,7 +38,7 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         $factory = $reflection->newInstanceWithoutConstructor();
         $identifier = new ReflectionMethod(AcademicPersonsEditSettingsFactory::class, 'settingsIdentifier');
         $identifier->setAccessible(true);
-        $this->assertSame('AcademicPersonsEdit_Settings_SectionSchema_v1', $identifier->invoke($factory));
+        $this->assertSame('AcademicPersonsEdit_Settings_SectionSchema_v2', $identifier->invoke($factory));
     }
 
     #[Test]
@@ -141,6 +141,8 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         $this->assertSame(['html'], $description->flags);
         $this->assertSame('textarea', $description->inputType);
         $this->assertTrue($description->isRichText());
+        $this->assertSame(100, $description->characterLimit);
+        $this->assertArrayNotHasKey('max', $description->tcaConfig);
     }
 
     #[Test]
