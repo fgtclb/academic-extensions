@@ -19,8 +19,8 @@ Pick one of them per site and stay with it — see
 What the sets contain
 =====================
 
-The extension ships one content element, so it ships one component set and one
-aggregate set that depends on it.
+The extension ships the current InlineProfile component, the retained legacy
+runtime component and one aggregate set that depends on both.
 
 ..  list-table::
     :header-rows: 1
@@ -28,9 +28,11 @@ aggregate set that depends on it.
     *   -   Set
         -   Delivers
     *   -   `fgtclb/academic-persons-edit-profile-editing`
-        -   The :guilabel:`Profile editing` content element: its TypoScript
-            (`plugin.tx_academicpersonsedit`) and the page TSconfig that makes
-            the content element selectable in the backend.
+        -   Legacy ProfileEditing TypoScript. Its retained page-TSconfig path is
+            a compatibility no-op and does not expose the legacy CType.
+    *   -   `fgtclb/academic-persons-edit-inline-profile`
+        -   The assigned-profile list, inline editor, AJAX page type and the
+            page TSconfig that offers InlineProfile in the backend.
     *   -   `fgtclb/academic-persons-edit`
         -   Everything above. This is the set to use unless you deliberately
             want a subset.
@@ -49,11 +51,12 @@ needed.
 The content element is hidden by default
 ========================================
 
-:guilabel:`EXT:academic_persons_edit` hides its content element for the whole
+:guilabel:`EXT:academic_persons_edit` hides both editing content types for the whole
 installation and brings it back per component. Whichever of the two mechanisms
 below you use, it is what makes :guilabel:`Profile editing` selectable in the
-backend again — without one of them the content element is not offered, and
-existing records keep rendering.
+backend again — without one of them InlineProfile is not offered. The legacy
+ProfileEditing type always remains hidden for new records, while existing
+records keep rendering.
 
 ..  _site-set:
 
@@ -73,6 +76,13 @@ element:
 
 See also `TYPO3 Explained, Using a site set as dependency in a site
 <https://docs.typo3.org/permalink/t3coreapi:site-sets-usage>`__.
+
+The :guilabel:`View` action in the assigned-profile list uses the same public
+detail page as the Academic Persons list plugins. Configure
+``plugin.tx_academicpersons.detailPid`` in the Academic Persons site settings
+or TypoScript constants. InlineProfile copies that value into its own Extbase
+settings and targets the ``academicpersons_detail`` content element; it does
+not require a second page setting in Academic Persons Edit.
 
 ..  _static-templates:
 
@@ -106,8 +116,10 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
 
     *   -   Entry
         -   Delivers
-    *   -   :guilabel:`Academic Persons Edit: Profile editing (academic_persons_edit)`
-        -   The TypoScript of the :guilabel:`Profile editing` content element.
+    *   -   :guilabel:`Academic Persons Edit: Profile editing compatibility (academic_persons_edit)`
+        -   The retained TypoScript for existing legacy records.
+    *   -   :guilabel:`Academic Persons Edit: Inline profile editing (academic_persons_edit)`
+        -   The TypoScript and AJAX page type of InlineProfile.
     *   -   :guilabel:`Academic Persons Edit: All components (academic_persons_edit)`
         -   Every component this extension ships, in one entry.
 
@@ -124,9 +136,11 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
 
     *   -   Entry
         -   Delivers
-    *   -   :guilabel:`Academic Persons Edit: Profile editing (academic_persons_edit)`
-        -   Makes the :guilabel:`Profile editing` content element selectable,
-            and configures its entry in the new content element wizard.
+    *   -   :guilabel:`Academic Persons Edit: Profile editing compatibility (academic_persons_edit)`
+        -   Resolvable compatibility path which deliberately changes no
+            backend configuration.
+    *   -   :guilabel:`Academic Persons Edit: Inline profile editing (academic_persons_edit)`
+        -   Makes InlineProfile selectable and configures its wizard entry.
     *   -   :guilabel:`Academic Persons Edit: All components (academic_persons_edit)`
         -   Every component this extension ships, in one entry.
 

@@ -55,33 +55,51 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
         parent::tearDown();
     }
 
-    protected function setUpFrontendProfileTestCase(string $contentElementFixture): void
-    {
+    /**
+     * @param array<string, mixed> $additionalSiteConfiguration
+     */
+    protected function setUpFrontendProfileTestCase(
+        string $contentElementFixture,
+        string $editingComponent = 'InlineProfile',
+        array $additionalSiteConfiguration = [],
+    ): void {
         $this->importCSVDataSet($contentElementFixture);
+        $editingTypoScriptPath = sprintf(
+            'EXT:academic_persons_edit/Configuration/TypoScript/%s/',
+            $editingComponent,
+        );
         $this->setUpFrontendRootPage(
             pageId: 1,
             typoScriptFiles: [
                 'constants' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
-                    'EXT:academic_persons/Configuration/TypoScript/constants.typoscript',
-                    'EXT:academic_persons_edit/Configuration/TypoScript/constants.typoscript',
+                    'EXT:academic_persons/Configuration/TypoScript/Default/constants.typoscript',
+                    $editingTypoScriptPath . 'constants.typoscript',
                     'EXT:academic_persons_edit/Tests/Functional/Plugins/Fixtures/'
                         . 'TypoScript/Constants/Configuration.typoscript',
                 ],
                 'setup' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
-                    'EXT:academic_persons/Configuration/TypoScript/setup.typoscript',
-                    'EXT:academic_persons_edit/Configuration/TypoScript/setup.typoscript',
+                    'EXT:academic_persons/Configuration/TypoScript/Default/setup.typoscript',
+                    $editingTypoScriptPath . 'setup.typoscript',
                     'EXT:academic_persons_edit/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/Rendering.typoscript',
                 ],
             ],
         );
-        $this->writeFrontendPluginTestSite([
-            $this->buildDefaultLanguageConfiguration(
-                identifier: 'EN',
-                base: '/',
+        $this->writeSiteConfiguration(
+            identifier: 'acme',
+            site: $this->buildSiteConfiguration(
+                rootPageId: 1,
+                base: self::FRONTEND_PLUGIN_TEST_BASE,
+                additionalRootConfiguration: $additionalSiteConfiguration,
             ),
-        ]);
+            languages: [
+                $this->buildDefaultLanguageConfiguration(
+                    identifier: 'EN',
+                    base: '/',
+                ),
+            ],
+        );
         $this->logInFrontendUser();
     }
 

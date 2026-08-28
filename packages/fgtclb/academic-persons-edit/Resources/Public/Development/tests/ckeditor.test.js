@@ -1,11 +1,18 @@
-import { afterEach, beforeEach, describe, expect, jest, test } from "@jest/globals";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  jest,
+  test,
+} from "@jest/globals";
 
 const importModule = async () => {
   jest.resetModules();
-  return import("../../JavaScript/frontend/ckeditor.js");
+  return import("../../JavaScript/frontend/rich-text.js");
 };
 
-describe("frontend/ckeditor", () => {
+describe("frontend/rich-text", () => {
   beforeEach(() => {
     jest.useFakeTimers();
     delete window.CKEDITOR;
@@ -44,7 +51,8 @@ describe("frontend/ckeditor", () => {
   });
 
   test("polls until CKEditor exists and then clears its interval", async () => {
-    document.body.innerHTML = '<textarea id="biography" class="rich-text"></textarea>';
+    document.body.innerHTML =
+      '<textarea id="biography" class="rich-text"></textarea>';
     const module = await importModule();
     expect(jest.getTimerCount()).toBe(1);
     jest.advanceTimersByTime(100);
@@ -53,12 +61,16 @@ describe("frontend/ckeditor", () => {
     const editor = { replace: jest.fn() };
     window.CKEDITOR = editor;
     jest.advanceTimersByTime(100);
-    expect(editor.replace).toHaveBeenCalledWith("biography", module.editorConfig);
+    expect(editor.replace).toHaveBeenCalledWith(
+      "biography",
+      module.editorConfig,
+    );
     expect(jest.getTimerCount()).toBe(0);
   });
 
   test("allows the poll operation to be invoked directly", async () => {
-    document.body.innerHTML = '<textarea id="direct" class="rich-text"></textarea>';
+    document.body.innerHTML =
+      '<textarea id="direct" class="rich-text"></textarea>';
     const module = await importModule();
     const editor = { replace: jest.fn() };
     window.CKEDITOR = editor;

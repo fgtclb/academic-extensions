@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import {
+  configureCropperSelection,
   createCroppedImageFile,
   getImagePreview,
   getImagePreviews,
@@ -116,6 +117,21 @@ describe("profile/image", () => {
     expect(parseImageRatio("0")).toBeNull();
     expect(parseImageRatio("1x0")).toBeNull();
     expect(parseImageRatio("invalid")).toBeNull();
+  });
+
+  test("configures the ratio without disabling the movable cropper selection", () => {
+    const selection = {
+      movable: true,
+      removeAttribute: jest.fn(),
+    };
+
+    configureCropperSelection(selection, 4 / 3);
+
+    expect(selection.aspectRatio).toBe(4 / 3);
+    expect(selection.initialAspectRatio).toBe(4 / 3);
+    expect(selection.initialCoverage).toBe(0.7);
+    expect(selection.movable).toBe(true);
+    expect(selection.removeAttribute).not.toHaveBeenCalledWith("movable");
   });
 
   test("creates a cropped image file with a safe output format", async () => {

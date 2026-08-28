@@ -32,4 +32,8 @@ them to InlineProfile. Once the inline implementation is complete, the isolated
 legacy compatibility block and reference sources can be removed without
 changing InlineProfile.
 
+InlineProfile owns a separate TypoScript component, site set and page TSconfig.
+The old ProfileEditing page-TSconfig path remains resolvable as a compatibility
+no-op and never exposes the legacy CType.
+
 ..  index:: Backend, CType, Extbase, Inline editing, Migration

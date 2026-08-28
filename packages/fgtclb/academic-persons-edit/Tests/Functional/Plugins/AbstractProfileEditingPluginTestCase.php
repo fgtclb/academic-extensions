@@ -20,6 +20,7 @@ abstract class AbstractProfileEditingPluginTestCase extends AbstractFrontendProf
     {
         $this->setUpFrontendProfileTestCase(
             __DIR__ . '/Fixtures/AcademicPersonsEditProfilePlugin/profileEditingPage.csv',
+            'ProfileEditing',
         );
     }
 

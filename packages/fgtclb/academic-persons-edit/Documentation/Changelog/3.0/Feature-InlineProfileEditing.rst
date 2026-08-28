@@ -45,7 +45,8 @@ when no other record references it.
 The content element starts with an assigned-profile overview. Editing is opened
 only after selecting a row, and the requested profile UID is verified against
 the authenticated user's assignments. The row's public view action links to the
-``academic_persons`` Detail plugin on its configured detail page.
+``academic_persons`` Detail plugin on the page configured through
+``plugin.tx_academicpersons.detailPid``.
 
 The main editor template is composed from focused partials for image UI, settings,
 forms, sections, field preview/control/actions, status output and button

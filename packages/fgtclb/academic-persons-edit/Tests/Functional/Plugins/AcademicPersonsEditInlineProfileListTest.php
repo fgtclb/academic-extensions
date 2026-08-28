@@ -15,6 +15,7 @@ final class AcademicPersonsEditInlineProfileListTest extends AbstractFrontendPro
     {
         $this->setUpFrontendProfileTestCase(
             __DIR__ . '/Fixtures/AcademicPersonsEditInlineProfile/inlineProfilePage.csv',
+            'InlineProfile',
         );
     }
 
@@ -142,9 +143,10 @@ final class AcademicPersonsEditInlineProfileListTest extends AbstractFrontendPro
             'tx_academicpersons_detail',
             'detail',
             'profile',
-            self::PROFILE_ID,
+            1,
         );
-        $this->assertStringContainsString('/profiles?', $viewUrl);
+        $this->assertStringStartsWith('https://www.acme.com/academic-persons/detail?', $viewUrl);
+        $this->assertStringNotContainsString('tx_academicpersons_listanddetail', $viewUrl);
         $content = $this->getPageAsFrontendUser($viewUrl);
         $this->assertStringContainsString('data-academic-persons-detail', $content);
         $this->assertStringContainsString('Max', $content);

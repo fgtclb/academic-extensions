@@ -27,7 +27,11 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
     {
         yield 'profile editing' => [
             'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing',
-            'Academic Persons Edit: Profile editing (academic_persons_edit)',
+            'Academic Persons Edit: Profile editing compatibility (academic_persons_edit)',
+        ];
+        yield 'inline profile editing' => [
+            'EXT:academic_persons_edit/Configuration/TypoScript/InlineProfile',
+            'Academic Persons Edit: Inline profile editing (academic_persons_edit)',
         ];
         yield 'all components' => [
             'EXT:academic_persons_edit/Configuration/TypoScript/Full',
@@ -86,7 +90,11 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
     {
         yield 'profile editing' => [
             'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig',
-            'Academic Persons Edit: Profile editing (academic_persons_edit)',
+            'Academic Persons Edit: Profile editing compatibility (academic_persons_edit)',
+        ];
+        yield 'inline profile editing' => [
+            'EXT:academic_persons_edit/Configuration/TSconfig/InlineProfile/page.tsconfig',
+            'Academic Persons Edit: Inline profile editing (academic_persons_edit)',
         ];
         yield 'all components' => [
             'EXT:academic_persons_edit/Configuration/TSconfig/Full/page.tsconfig',
