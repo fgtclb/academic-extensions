@@ -10,6 +10,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Resource\FileRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -28,7 +29,10 @@ final class StudyPlanService
     {
         $context ??= GeneralUtility::makeInstance(Context::class);
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_academicstudyplan_domain_model_semester');
-        $queryBuilder->getRestrictions()->removeByType(HiddenRestriction::class)->removeByType(DeletedRestriction::class);
+        $queryBuilder->getRestrictions()
+            ->removeByType(HiddenRestriction::class)
+            ->removeByType(DeletedRestriction::class)
+            ->add(GeneralUtility::makeInstance(WorkspaceRestriction::class, $this->getWorkspaceId($context)));
         $result = $queryBuilder
             ->select('*')
             ->from('tx_academicstudyplan_domain_model_semester')
@@ -42,9 +46,13 @@ final class StudyPlanService
             // Ensuring deterministic sorting behaviour
             ->addOrderBy('uid', 'ASC')
             ->executeQuery();
-        $pageRepository ??= GeneralUtility::makeInstance(PageRepository::class);
+        $pageRepository ??= GeneralUtility::makeInstance(PageRepository::class, $context);
         $semesters = [];
         while ($row = $result->fetchAssociative()) {
+            $row = $this->getWorkspaceRecord('tx_academicstudyplan_domain_model_semester', $row, $pageRepository);
+            if ($row === null) {
+                continue;
+            }
             $row = $this->getTranslatedRecord('tx_academicstudyplan_domain_model_semester', $row, $languageUid, $pageRepository);
             $row['modules'] = $this->fetchModules((int)$row['uid'], $languageUid, $pageRepository, $context);
             $semesters[] = $row;
@@ -59,7 +67,10 @@ final class StudyPlanService
     {
         $context ??= GeneralUtility::makeInstance(Context::class);
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_academicstudyplan_domain_model_module');
-        $queryBuilder->getRestrictions()->removeByType(HiddenRestriction::class)->removeByType(DeletedRestriction::class);
+        $queryBuilder->getRestrictions()
+            ->removeByType(HiddenRestriction::class)
+            ->removeByType(DeletedRestriction::class)
+            ->add(GeneralUtility::makeInstance(WorkspaceRestriction::class, $this->getWorkspaceId($context)));
         $result = $queryBuilder
             ->select('*')
             ->from('tx_academicstudyplan_domain_model_module')
@@ -73,9 +84,13 @@ final class StudyPlanService
             // Ensuring deterministic sorting behaviour
             ->addOrderBy('uid', 'ASC')
             ->executeQuery();
-        $pageRepository ??= GeneralUtility::makeInstance(PageRepository::class);
+        $pageRepository ??= GeneralUtility::makeInstance(PageRepository::class, $context);
         $modules = [];
         while ($row = $result->fetchAssociative()) {
+            $row = $this->getWorkspaceRecord('tx_academicstudyplan_domain_model_module', $row, $pageRepository);
+            if ($row === null) {
+                continue;
+            }
             $row = $this->getTranslatedRecord('tx_academicstudyplan_domain_model_module', $row, $languageUid, $pageRepository);
             $row['categories'] = $this->fetchCategoriesForModule((int)$row['uid'], $languageUid, $pageRepository, $context);
             $row['audioFiles'] = $this->fetchAudioFiles((int)$row['uid']);
@@ -91,7 +106,10 @@ final class StudyPlanService
     {
         $context ??= GeneralUtility::makeInstance(Context::class);
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_academicstudyplan_domain_model_category');
-        $queryBuilder->getRestrictions()->removeByType(HiddenRestriction::class)->removeByType(DeletedRestriction::class);
+        $queryBuilder->getRestrictions()
+            ->removeByType(HiddenRestriction::class)
+            ->removeByType(DeletedRestriction::class)
+            ->add(GeneralUtility::makeInstance(WorkspaceRestriction::class, $this->getWorkspaceId($context)));
         $result = $queryBuilder
             ->select('c.*')
             ->from('tx_academicstudyplan_domain_model_category', 'c')
@@ -115,6 +133,10 @@ final class StudyPlanService
         $pageRepository ??= GeneralUtility::makeInstance(PageRepository::class, $context);
         $categories = [];
         while ($row = $result->fetchAssociative()) {
+            $row = $this->getWorkspaceRecord('tx_academicstudyplan_domain_model_category', $row, $pageRepository);
+            if ($row === null) {
+                continue;
+            }
             $row = $this->getTranslatedRecord('tx_academicstudyplan_domain_model_category', $row, $languageUid, $pageRepository);
             $categories[] = $row;
         }
@@ -153,6 +175,29 @@ final class StudyPlanService
             return $row;
         }
         return $pageRepository->getLanguageOverlay($table, $row) ?? $row;
+    }
+
+    private function getWorkspaceId(Context $context): int
+    {
+        return (int)$context->getPropertyFromAspect('workspace', 'id', 0);
+    }
+
+    /**
+     * Replaces a row with its version in the current workspace, and drops it when the
+     * workspace deletes it. A no-op in the live workspace, where "versionOL()" returns
+     * immediately and the "WorkspaceRestriction" on the query has already excluded every
+     * workspace row.
+     *
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>|null
+     */
+    private function getWorkspaceRecord(string $table, array $row, PageRepository $pageRepository): ?array
+    {
+        $pageRepository->versionOL($table, $row, true);
+        if (!is_array($row)) {
+            return null;
+        }
+        return $row;
     }
 
     private function getTableLanguageFieldName(string $tableName): ?string
