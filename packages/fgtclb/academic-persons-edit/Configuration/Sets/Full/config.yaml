@@ -1,13 +1,11 @@
-# Aggregate set: everything this extension ships, in one dependency.
+# Aggregate set: the InlineProfile component under the extension's stable set name.
 #
-# It carries no TypoScript or page-TSconfig payload of its own - each current or
-# compatibility component is delivered by the set that owns it, and listing it
-# here would parse the same files a second time.
+# It carries no TypoScript or page-TSconfig payload of its own. The InlineProfile
+# component owns those files, and listing them here would parse them twice.
 #
 # Do not rename the set: it is the name this extension has always published, and
 # site configurations depend on it.
 name: fgtclb/academic-persons-edit
 label: Academic Persons Edit
 dependencies:
-  - fgtclb/academic-persons-edit-profile-editing
   - fgtclb/academic-persons-edit-inline-profile

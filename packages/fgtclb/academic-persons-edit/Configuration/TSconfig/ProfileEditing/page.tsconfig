@@ -1,10 +1,7 @@
 # Compatibility Page TSconfig of the former ProfileEditing content element.
 #
-# Delivered by the set "fgtclb/academic-persons-edit-profile-editing" and
-# registered for the page field "Page TSconfig" by
-# "Configuration/TCA/Overrides/pages.php" - one physical copy, two ways to it.
-#
-# Existing page records and site sets may still refer to this path, so the file
-# remains resolvable. It deliberately changes no backend configuration: the
-# legacy CType stays hidden and InlineProfile is enabled only by its own
-# component or by the aggregate configuration.
+# This path remains as an inert source reference for installations migrating
+# old records. It is not registered as a site set or selectable page TSconfig.
+# It deliberately changes no backend configuration: the legacy CType stays
+# hidden and InlineProfile is enabled only by its own component or by the
+# aggregate configuration.

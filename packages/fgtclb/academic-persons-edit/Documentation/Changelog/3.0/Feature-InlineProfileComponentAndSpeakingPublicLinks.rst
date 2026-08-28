@@ -10,8 +10,9 @@ Description
 InlineProfile now owns its TypoScript, AJAX page type, site set and page
 TSconfig in dedicated ``Configuration/*/InlineProfile`` paths. Functional tests
 load that component explicitly, while retained ProfileEditing reference tests
-load only their legacy component. This prevents missing AJAX ``typeNum`` and
-Fluid partial configuration after rebases or component restructuring.
+load their legacy TypoScript files directly. This prevents missing AJAX
+``typeNum`` and Fluid partial configuration after rebases or component
+restructuring.
 
 The assigned-profile :guilabel:`View` action targets the public
 ``academicpersons_detail`` content element. Configure its page through
