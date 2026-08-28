@@ -1,7 +1,23 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true">
+    <template data-ie-document-helptext-button-template>
+        <button
+            type="button"
+            class="btn rounded-0 btn-link link-info p-0 ms-2 mb-1"
+            data-ie-helptext
+            data-bs-toggle="popover"
+            data-bs-trigger="focus"
+            data-bs-placement="right"
+            data-bs-custom-class="custom-popover">
+            <core:icon
+                identifier="academic-persons-inline-edit-info"
+                size="small"
+                alternativeMarkupIdentifier="inline" />
+        </button>
+    </template>
     <div
         class="modal fade rounded-0"
         tabindex="-1"

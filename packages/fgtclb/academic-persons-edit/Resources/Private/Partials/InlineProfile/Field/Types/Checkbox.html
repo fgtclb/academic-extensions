@@ -47,6 +47,13 @@
                                 key="profile.{field.identifier}.label"
                                 extensionName="academic_persons_edit" />
                         </label>
+                        <f:render
+                            partial="InlineProfile/Field/Helptext"
+                            arguments="{
+                                helptext: field.helptext,
+                                labelKey: field.labelKey,
+                                elementId: elementId
+                            }" />
                         <f:if
                             condition="!{field.validation.disabled} && !{field.validation.readOnly}">
                             <f:render

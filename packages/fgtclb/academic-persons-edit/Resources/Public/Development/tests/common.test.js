@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import {
   getProfileUid,
+  initializePopover,
   isEditableField,
   requestJson,
   rootSelector,
@@ -51,6 +52,35 @@ describe("profile/common", () => {
     expect(getProfileUid(root)).toBeNull();
     delete root.dataset.profileUid;
     expect(getProfileUid(root)).toBeNull();
+  });
+
+  test("initializes Bootstrap popovers for all configured triggers", () => {
+    document.body.innerHTML = `
+      <button type="button" data-bs-toggle="popover"></button>
+      <button type="button" data-bs-toggle="popover"></button>
+    `;
+    const Popover = jest.fn((element) => ({ element }));
+    globalThis.bootstrap = { Popover };
+
+    const instances = initializePopover();
+    const triggers = document.querySelectorAll("[data-bs-toggle='popover']");
+
+    expect(Popover).toHaveBeenCalledTimes(2);
+    expect(Popover).toHaveBeenNthCalledWith(1, triggers[0]);
+    expect(Popover).toHaveBeenNthCalledWith(2, triggers[1]);
+    expect(instances).toEqual([
+      { element: triggers[0] },
+      { element: triggers[1] },
+    ]);
+  });
+
+  test("returns an empty list when no popover triggers exist", () => {
+    document.body.replaceChildren();
+    const Popover = jest.fn();
+    globalThis.bootstrap = { Popover };
+
+    expect(initializePopover()).toEqual([]);
+    expect(Popover).not.toHaveBeenCalled();
   });
 
   test.each([
