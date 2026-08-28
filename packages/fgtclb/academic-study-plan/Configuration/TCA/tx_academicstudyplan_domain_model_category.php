@@ -8,6 +8,11 @@ $tcaConfiguration = [
         'label' => 'label',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
+        // Workspace aware like the semester and module records this table belongs
+        // to. The TYPO3 v14 auto-migration only covers inline children, and this
+        // one is related through tx_academicstudyplan_module_category_mm, so it
+        // has to be declared explicitly.
+        'versioningWS' => true,
         'delete' => 'deleted',
         'sortby' => 'sorting',
         'default_sortby' => 'label',
