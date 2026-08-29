@@ -63,7 +63,14 @@ use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
 
 /**
- * @internal to be used only in `EXT:academic_person_edit` and not part of public API.
+ * Controller for inline profile editing via JSON-based frontend requests.
+ *
+ * This controller handles profile actions such as validation,
+ * updates and data retrieval without relying on the shared HTML authentication
+ * flow used by regular Extbase pages.
+ *
+ * @internal This controller is intentionally internal to `EXT:academic_person_edit`
+ *           and is not part of the public API.
  */
 final class InlineProfileController extends AbstractActionController
 {
@@ -86,11 +93,15 @@ final class InlineProfileController extends AbstractActionController
         private readonly ProfileRichTextSanitizerInterface $profileRichTextSanitizer,
     ) {}
 
+    /**
+     * Initializes the controller without the shared HTML auth flow for JSON endpoints.
+     *
+     * These actions validate and answer their own requests as machine-readable
+     * payloads, so they must bypass the extbase parent initialization to return
+     * their own 401/422/403 responses instead of the generic HTML error page.
+     */
     public function initializeAction(): void
     {
-        // The JSON update endpoint performs its own authentication check so it
-        // can return a machine-readable 401 response instead of the HTML error
-        // response propagated by the shared controller initialization.
         if (in_array(
             $this->request->getControllerActionName(),
             [
@@ -110,6 +121,14 @@ final class InlineProfileController extends AbstractActionController
         parent::initializeAction();
     }
 
+    /**
+     * Converts validation failures from the image upload flow into a JSON error response.
+     *
+     * This keeps upload-related form validation machine-readable instead of falling
+     * back to the generic HTML error handling from the parent controller.
+     *
+     * @return ResponseInterface The rendered response for the current error state.
+     */
     protected function errorAction(): ResponseInterface
     {
         if ($this->request->getControllerActionName() === 'uploadImage') {
@@ -129,6 +148,14 @@ final class InlineProfileController extends AbstractActionController
     // Assigned profile list and initial display of the selected profile
     // =================================================================================================================
 
+    /**
+     * Renders the list of profiles assigned to the currently authenticated frontend user.
+     *
+     * The method loads the user-related profiles, resolves the current site for
+     * language labels and exposes the prepared data to the view template.
+     *
+     * @return ResponseInterface The rendered HTML response for the profile list.
+     */
     public function listAction(): ResponseInterface
     {
         $profiles = $this->profileRepository->findByFrontendUser(
@@ -147,6 +174,15 @@ final class InlineProfileController extends AbstractActionController
         return $this->htmlResponse();
     }
 
+    /**
+     * Displays the editable profile view for a given user profile ID.
+     *
+     * This action fetches the editable profile data, checks for existence,
+     * and assigns necessary data structures to the view for rendering.
+     *
+     * @param int $profileUid The unique ID of the profile to edit.
+     * @return ResponseInterface The HTML response containing the editable profile view.
+     */
     public function indexAction(int $profileUid): ResponseInterface
     {
         $profile = $this->profileUpdateRequestService->findEditableProfile($profileUid);
@@ -162,17 +198,39 @@ final class InlineProfileController extends AbstractActionController
             'specialFields' => $this->profileSectionProvider->getSpecialFields(),
             'profileFieldOptions' => $this->profileFieldOptionsService->getOptionsByField(),
             'documentSections' => $this->profileDocumentSectionProvider->getSections($profile),
-            'imageAllowedMimeTypes' => (string)(
-                $this->settings['editForm']['profileImage']['validation']['allowedMimeTypes']
-                ?? 'image/jpeg,image/png,image/webp'
-            ),
+            'imageAllowedMimeTypes' => $this->resolveImageAllowedMimeTypes(),
         ]);
         return $this->htmlResponse();
     }
 
     /**
-     * @param iterable<Profile> $profiles
-     * @return list<array{profile: Profile, language: string}>
+     * Resolves the allowed MIME types for profile image uploads.
+     *
+     * Falls back to the default browser-safe image formats when the settings are
+     * missing, empty or not configured as a string.
+     *
+     * @return string A comma-separated list of allowed MIME types.
+     */
+    private function resolveImageAllowedMimeTypes(): string
+    {
+        $mimeTypes = $this->settings['editForm']['profileImage']['validation']['allowedMimeTypes'] ?? null;
+        if (!is_string($mimeTypes) || trim($mimeTypes) === '') {
+            return 'image/jpeg,image/png,image/webp';
+        }
+        return $mimeTypes;
+    }
+
+    /**
+     * Builds the display list for the profile overview.
+     *
+     * Each entry contains the profile entity and the localized language label that
+     * should be shown alongside it in the frontend list. Profiles without a
+     * valid language mapping fall back to the generic "all languages" or
+     * translated "unknown" label.
+     *
+     * @param iterable<Profile> $profiles The profiles assigned to the current frontend user.
+     * @param Site|null $site The current site used to resolve language labels.
+     * @return list<array{profile: Profile, language: string}> The normalized list items for the template.
      */
     private function createProfileListItems(iterable $profiles, ?Site $site): array
     {
@@ -213,22 +271,14 @@ final class InlineProfileController extends AbstractActionController
     // =================================================================================================================
 
     /**
-     * JSON
+     * Updates one or more profile fields through the inline JSON API.
      *
-     * Expected:
-     * {
-     *   "profile": 123,
-     *   "data": {
-     *     "firstName": "Max",
-     *     "website": "",
-     *     .......
-     *   }
-     * }
+     * The request payload contains the profile identifier and a partial field map.
+     * Missing properties keep the current value, empty strings clear the value,
+     * and concrete values replace it. The method validates the payload and form
+     * data before persisting the updated entity and returning the normalized data.
      *
-     * Property update rules:
-     * - missing property: keep current value
-     * - property with "": clear current value
-     * - property with value: replace current value
+     * @return ResponseInterface A JSON response with the updated profile UID and normalized values.
      */
     public function updateAction(): ResponseInterface
     {
@@ -312,10 +362,14 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * Updates the synchronization flag through its own JSON endpoint.
+     * Updates the profile synchronization flag through its dedicated JSON endpoint.
      *
-     * Keeping this separate from the generic field endpoint allows the
-     * checkbox to persist immediately without submitting unrelated fields.
+     * The endpoint accepts exactly one boolean field, skipSync, so the checkbox
+     * can be persisted independently from other profile data without submitting
+     * unrelated values. It validates the payload before storing the updated flag
+     * and returning the persisted result.
+     *
+     * @return ResponseInterface A JSON response containing the updated profile UID and synchronization state.
      */
     public function updateSkipSyncAction(): ResponseInterface
     {
@@ -410,7 +464,18 @@ final class InlineProfileController extends AbstractActionController
     // =================================================================================================================
 
     /**
-     * Returns the field schema and current values used by the add, view and edit modal.
+     * Returns the field schema and current values for a structured document section.
+     *
+     * The request must contain a valid section identifier and a matching mode
+     * ("add", "view", "edit" or "delete"). In add mode, no record UID is allowed;
+     * in all other modes, a positive record UID must reference an existing
+     * contract/profile information entry for the current profile.
+     *
+     * The JSON response contains the profile ID, section identifier, kind and the
+     * full field definitions used by the frontend modal for creating or editing the
+     * selected document record.
+     *
+     * @return ResponseInterface JSON response with the current form definition and record data.
      */
     public function documentFormAction(): ResponseInterface
     {
@@ -444,6 +509,17 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
+    /**
+     * Creates a new structured document record for the given profile section.
+     *
+     * Validates the submitted payload, normalizes and validates the document fields,
+     * creates the matching record type (contract or profile information), assigns
+     * sorting and PID values, persists it, and returns the serialized result as JSON.
+     *
+     * @return ResponseInterface JSON response containing the created document item.
+     * @throws PropagateResponseException If the response should be propagated without wrapping.
+     * @throws \Throwable If the creation fails, the error is handled as a document failure.
+     */
     public function createDocumentAction(): ResponseInterface
     {
         try {
@@ -489,6 +565,17 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
+    /**
+     * Updates an existing structured document item for a profile section.
+     *
+     * Validates the submitted payload, resolves the target record, normalizes and
+     * validates the changed fields, and persists the updated values for either a
+     * contract or a profile information record.
+     *
+     * @return ResponseInterface JSON response containing the updated document item.
+     * @throws PropagateResponseException If a response is intentionally propagated.
+     * @throws Throwable If validation or persistence fails while updating the record.
+     */
     public function updateDocumentAction(): ResponseInterface
     {
         try {
@@ -540,6 +627,19 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
+    /**
+     * Deletes a single record from a structured document section.
+     *
+     * Validates the provided payload, ensures the section allows the delete
+     * action, loads the requested record, and removes it from the matching
+     * repository.
+     *
+     * @return ResponseInterface JSON response with the delete result.
+     *
+     * @throws PropagateResponseException If an error response should be
+     *      propagated without being wrapped.
+     * @throws Throwable If the delete operation fails unexpectedly.
+     */
     public function deleteDocumentAction(): ResponseInterface
     {
         try {
@@ -570,6 +670,16 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
+    /**
+     * Sorts the records of a structured document section.
+     *
+     * Supports reordering by a submitted complete order list as well as
+     * moving a single record one step up or down within the section.
+     *
+     * @return ResponseInterface JSON response with the updated order and change state.
+     * @throws PropagateResponseException When the request should be handled by the caller.
+     * @throws \Throwable When the sorting operation fails unexpectedly.
+     */
     public function sortDocumentAction(): ResponseInterface
     {
         try {
@@ -626,7 +736,12 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
+     * Validates the current request payload and resolves the profile and document section.
+     *
      * @return array{0: Profile, 1: DocumentSection, 2: array<string, mixed>}
+     *   The validated profile, the resolved document section, and the request payload data.
+     *
+     * @throws \TYPO3\CMS\Core\Http\PropagateResponseException If the request validation pipeline propagates an exception.
      */
     private function getDocumentRequest(): array
     {
@@ -655,9 +770,13 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @param list<string> $allowedKeys
-     * @param list<string> $requiredKeys
+     * Validates the document payload and ensures that only allowed keys are present
+     * and all required keys are available.
+     *
+     * @param array<string, mixed> $data The payload to validate.
+     * @param list<string> $allowedKeys A list of allowed property names.
+     * @param list<string> $requiredKeys A list of property names that must be present.
+     * @return void
      */
     private function assertDocumentPayload(array $data, array $allowedKeys, array $requiredKeys): void
     {
@@ -674,7 +793,11 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $data
+     * Validates that a required property exists and is a positive integer.
+     *
+     * @param array<string, mixed> $data The payload to validate.
+     * @param string $property The property name to read.
+     * @return int The validated positive integer value.
      */
     private function getRequiredPositiveInteger(array $data, string $property): int
     {
@@ -686,7 +809,13 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $data
+     * Gets an optional positive integer property from the payload.
+     *
+     * Returns null when the property is missing, null, or zero.
+     *
+     * @param array<string, mixed> $data The payload to validate.
+     * @param string $property The property name to read.
+     * @return int|null The validated positive integer value or null when not set.
      */
     private function getOptionalPositiveInteger(array $data, string $property): ?int
     {
@@ -697,8 +826,12 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @return 'add'|'view'|'edit'|'delete'
+     * Gets the required document mode from the payload.
+     *
+     * Valid modes are: "add", "view", "edit", and "delete".
+     *
+     * @param array<string, mixed> $data The payload to validate.
+     * @return 'add'|'view'|'edit'|'delete' The validated document mode.
      */
     private function getRequiredDocumentMode(array $data): string
     {
@@ -709,6 +842,18 @@ final class InlineProfileController extends AbstractActionController
         return $mode;
     }
 
+    /**
+     * Verifies that the requested action is allowed for the given document section.
+     *
+     * Some actions are mapped to specific section capabilities, such as creating
+     * a new item or drag-and-drop reordering.
+     *
+     * @param DocumentSection $section The document section to validate.
+     * @param string $action The action name to check, for example "add", "reorder",
+     *                       or any action supported by the section.
+     * @throws \RuntimeException Thrown when the action is not permitted for the section,
+     *                           which results in a JSON error response.
+     */
     private function assertDocumentActionAllowed(DocumentSection $section, string $action): void
     {
         $allowed = match ($action) {
@@ -722,8 +867,12 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @return array<string, mixed>
+     * Validates and returns the submitted document field payload.
+     *
+     * @param array<string, mixed> $data The raw request payload.
+     * @return array<string, mixed> The validated document fields as an associative array.
+     * @throws \RuntimeException Thrown when the payload is invalid or field names are not strings,
+     *                           which results in a JSON error response.
      */
     private function getSubmittedDocumentFields(array $data): array
     {
@@ -740,8 +889,11 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @return list<int>
+     * Validates and returns the submitted document order payload.
+     *
+     * @param array<string, mixed> $data The raw request payload.
+     * @return list<int> The validated order as a list of positive integer record UIDs.
+     * @throws \RuntimeException Thrown when the payload is invalid, which results in a JSON error response.
      */
     private function getSubmittedDocumentOrder(array $data): array
     {
@@ -757,6 +909,14 @@ final class InlineProfileController extends AbstractActionController
         return $order;
     }
 
+    /**
+     * Finds a document record for the given profile and section by its UID.
+     *
+     * @param Profile $profile The profile whose document records should be searched.
+     * @param DocumentSection $section The document section to inspect.
+     * @param int $recordUid The UID of the record to find.
+     * @return Contract|ProfileInformation|null The matching record, or null if no record with the given UID exists.
+     */
     private function findDocumentRecord(
         Profile $profile,
         DocumentSection $section,
@@ -771,7 +931,14 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @return list<Contract|ProfileInformation>
+     * Returns all document records belonging to the provided profile and section.
+     *
+     * For contract sections, the method returns the profile's contract records.
+     * For all other sections, it returns the corresponding profile information records.
+     *
+     * @param Profile $profile The profile whose records should be retrieved.
+     * @param DocumentSection $section The section whose records should be inspected.
+     * @return list<Contract|ProfileInformation> The matching records, filtered to valid record instances.
      */
     private function getDocumentRecords(Profile $profile, DocumentSection $section): array
     {
@@ -788,7 +955,11 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param list<Contract|ProfileInformation> $records
+     * Determines the next sorting value for a document record by taking the highest
+     * existing sort value and adding a new increment.
+     *
+     * @param list<Contract|ProfileInformation> $records The records for which the next sorting position should be calculated.
+     * @return int The next available sorting value, offset by 10 from the current maximum.
      */
     private function getNextSortingValue(array $records): int
     {
@@ -800,9 +971,16 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param list<Contract|ProfileInformation> $records
-     * @param list<int> $order
-     * @return array{changed: bool, records: list<Contract|ProfileInformation>}
+     * Reorders document records to the submitted sequence and updates their sorting values.
+     *
+     * The submitted order is validated to contain each record exactly once. Records are
+     * then assigned their new sorting position in increments of 10 and persisted when a
+     * change is required.
+     *
+     * @param list<Contract|ProfileInformation> $records The records that should be reordered.
+     * @param list<int> $order The desired order as a list of record UIDs.
+     * @return array{changed: bool, records: list<Contract|ProfileInformation>} The reorder result including whether
+     *     the sorting changed and the ordered records in their new sequence.
      */
     private function reorderDocumentRecords(array $records, array $order): array
     {
@@ -837,7 +1015,11 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param Contract|ProfileInformation|null $record
+     * Builds the field definitions for a document section and applies validation,
+     * help text and type overrides for the current record.
+     *
+     * @param DocumentSection $section The document section whose fields should be resolved.
+     * @param Contract|ProfileInformation|null $record The current record used to populate field values.
      * @return list<array{
      *     name: string,
      *     label: string,
@@ -852,6 +1034,7 @@ final class InlineProfileController extends AbstractActionController
      *     compactCheckbox: bool,
      *     value: mixed,
      *     displayValue: string,
+     *     helptext: string,
      *     options: list<array{value: int|string, label: string}>
      * }>
      */
@@ -888,7 +1071,10 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @return list<array<string, mixed>>
+     * Returns the field definitions for a contract record.
+     *
+     * @param Contract|null $record The contract record for which the field definitions should be created.
+     * @return list<array<string, mixed>> The list of field definitions used to render contract form fields.
      */
     private function getContractFieldDefinitions(?Contract $record): array
     {
@@ -952,7 +1138,14 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @return list<array<string, mixed>>
+     * Returns the form field definitions for a profile information record.
+     *
+     * Uses the record state to determine whether the year fields are rendered in
+     * a single-year mode and builds the corresponding input definitions for the
+     * inline profile editor.
+     *
+     * @param ProfileInformation|null $record The profile information record or null for a new entry.
+     * @return list<array<string, mixed>> Field configuration for the document form.
      */
     private function getProfileInformationFieldDefinitions(?ProfileInformation $record): array
     {
@@ -1002,8 +1195,18 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param list<array{value: int|string, label: string}> $options
-     * @return array<string, mixed>
+     * Creates a configuration array for a document form field.
+     *
+     * @param string $translationPrefix Translation key prefix used to resolve the field label.
+     * @param string $name Field name identifier.
+     * @param string $type Field type such as text, date, checkbox or textarea.
+     * @param mixed $value Current field value.
+     * @param list<array{value: int|string, label: string}> $options Optional select-like options for the field.
+     * @param bool $richText Whether the field uses rich text editing.
+     * @param bool $yearOnly Whether the date field should be treated as a year-only input.
+     * @param string $columnClass CSS column class for layout handling.
+     * @param bool $compactCheckbox Whether the checkbox should be rendered in compact mode.
+     * @return array<string, mixed> Field configuration array for the frontend form renderer.
      */
     private function createDocumentField(
         string $translationPrefix,
@@ -1044,9 +1247,18 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
+     * Builds a list of selectable entity options from the provided items.
+     *
+     * Each item is converted into an option entry containing its UID as the value
+     * and a label generated by the provided callback. Items without a valid UID are
+     * ignored.
+     *
      * @param iterable<object> $items
+     *   Iterable collection of entities from which the options should be built.
      * @param callable(object): string $labelCallback
+     *   Callback that returns the label text for a single entity.
      * @return list<array{value: int, label: string}>
+     *   List of normalized option arrays with numeric values and labels.
      */
     private function getEntityOptions(iterable $items, callable $labelCallback): array
     {
@@ -1061,7 +1273,25 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
+     * Converts a raw field value into the display value shown in the UI.
+     *
+     * Handles date, select, checkbox and fallback string values. For select fields,
+     * the matching label is resolved from the provided option list. Checkbox fields
+     * use translated labels depending on the field name and boolean value.
+     *
+     * @param string $name
+     *   The field name used to determine checkbox-specific display behavior.
+     * @param string $type
+     *   The field type (for example: date, select, checkbox or fallback).
+     * @param mixed $value
+     *   The raw field value to be rendered.
      * @param list<array{value: int|string, label: string}> $options
+     *   Available select options used to resolve option labels.
+     * @param bool $yearOnly
+     *   Whether a date should be displayed as year-only.
+     *
+     * @return string
+     *   The formatted display value for the frontend or an empty string for null/empty values.
      */
     private function getDocumentDisplayValue(
         string $name,
@@ -1101,8 +1331,17 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $fields
-     * @return array<string, mixed>
+     * Normalize and validate submitted document field values for a section.
+     *
+     * The method checks whether each field exists in the section definition,
+     * whether it is editable, normalizes the incoming values to the expected PHP
+     * types, and applies the section's validation rules. Required fields are also
+     * enforced when creating a new document.
+     *
+     * @param DocumentSection $section The document section whose field definitions and validation rules apply.
+     * @param array<string, mixed> $fields Raw field data submitted by the client, keyed by field name.
+     * @param bool $creating Whether the document is currently being created.
+     * @return array<string, mixed> Normalized and validated field values keyed by field name.
      */
     private function normalizeAndValidateDocumentFields(
         DocumentSection $section,
@@ -1156,6 +1395,16 @@ final class InlineProfileController extends AbstractActionController
         return $normalized;
     }
 
+    /**
+     * Normalizes a submitted document field value according to its declared field type.
+     *
+     * @param string $name The field name used to resolve select-based entity lookups.
+     * @param string $type The document field type (for example: checkbox, number, date, select, or text).
+     * @param mixed $value The submitted raw value to normalize.
+     * @param bool $richText Whether the value should be sanitized as rich text.
+     * @return mixed The normalized value for storage or validation.
+     * @throws UnexpectedValueException If the value does not match the expected format for the given type.
+     */
     private function normalizeDocumentFieldValue(
         string $name,
         string $type,
@@ -1222,6 +1471,13 @@ final class InlineProfileController extends AbstractActionController
             : trim($value);
     }
 
+    /**
+     * Finds the matching document select entity for the given field name and UID.
+     *
+     * @param string $name The field name identifying the repository to search in.
+     * @param int $uid The UID of the entity to look up.
+     * @return FunctionType|OrganisationalUnit|Location|null The matching entity or null if no entity with the given UID exists.
+     */
     private function findDocumentSelectEntity(
         string $name,
         int $uid,
@@ -1244,7 +1500,12 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, list<string>> $errors
+     * Validates a single document field against the configured character limit and custom validators.
+     *
+     * @param string $name The field name used as the validation error key.
+     * @param mixed $value The submitted value to validate.
+     * @param Validation $validation The validation configuration for the field.
+     * @param array<string, list<string>> $errors Reference to the collected validation errors by field name.
      */
     private function validateDocumentField(
         string $name,
@@ -1275,7 +1536,10 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $fields
+     * Creates a contract form data object and applies the provided field overrides.
+     *
+     * @param array<string, mixed> $fields The raw form fields to override on the contract form.
+     * @return ContractFormData The initialized contract form data instance.
      */
     private function createContractFormData(array $fields): ContractFormData
     {
@@ -1285,7 +1549,11 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $fields
+     * Creates a profile information form data object and applies the provided field overrides.
+     *
+     * @param DocumentSection $section The document section used to determine the profile information type.
+     * @param array<string, mixed> $fields The raw form fields to override on the profile information form.
+     * @return ProfileInformationFormData The initialized profile information form data instance.
      */
     private function createProfileInformationFormData(
         DocumentSection $section,
@@ -1298,7 +1566,11 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, mixed> $fields
+     * Applies the provided field overrides to the form data instance.
+     *
+     * @param AbstractFormData $formData The target form data object receiving the overrides.
+     * @param array<string, mixed> $fields The raw form fields keyed by property name with their override values.
+     * @return void
      */
     private function applyDocumentFormOverrides(AbstractFormData $formData, array $fields): void
     {
@@ -1308,6 +1580,14 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
+     * Serializes a document item into a frontend-safe payload.
+     *
+     * This compiles the field definitions for the given document section and record
+     * into a normalized array that contains the stored values as well as the
+     * corresponding display labels for the editor UI.
+     *
+     * @param DocumentSection $section The document section that defines the fields to serialize.
+     * @param Contract|ProfileInformation $record The record associated with the document item.
      * @return array{
      *     uid: int,
      *     sorting: int,
@@ -1333,6 +1613,12 @@ final class InlineProfileController extends AbstractActionController
         ];
     }
 
+    /**
+     * Logs a failed document operation and terminates the request with a JSON error response.
+     *
+     * @param string $logMessage Message to log for diagnosing the failure
+     * @param Throwable $exception The exception that caused the document operation to fail
+     */
     private function handleDocumentFailure(string $logMessage, Throwable $exception): never
     {
         GeneralUtility::makeInstance(LogManager::class)
@@ -1346,7 +1632,13 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, list<string>> $errors
+     * Creates a JSON error response payload for failed requests.
+     *
+     * @param string $error Machine-readable error identifier.
+     * @param int $statusCode HTTP status code to return in the response.
+     * @param string|null $message Optional human-readable message describing the error.
+     * @param array<string, list<string>> $errors Optional field-specific validation errors keyed by field name.
+     * @return JsonResponse The generated JSON error response.
      */
     private function jsonError(
         string $error,
@@ -1368,7 +1660,18 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @param array<string, list<string>> $errors
+     * Throws a JSON error response as a propagated exception.
+     *
+     * This method creates a JSON error payload and wraps it in a
+     * PropagateResponseException so the framework can handle the response
+     * without continuing the normal controller flow.
+     *
+     * @param string $error The machine-readable error code.
+     * @param int $statusCode The HTTP status code to send with the response.
+     * @param string|null $message An optional human-readable error message.
+     * @param array<string, list<string>> $errors Optional field-specific validation errors keyed by field name.
+     * @throws PropagateResponseException Thrown when the JSON error response should be propagated.
+     * @return never This method does not return normally because it always throws.
      */
     private function throwJsonError(
         string $error,
@@ -1382,23 +1685,22 @@ final class InlineProfileController extends AbstractActionController
         );
     }
 
-
-    // =================================================================================================================
-    //  Handle entity translation
-    // =================================================================================================================
-
-    /*
-    public function translateAction(int $profileUid, int $languageUid): ResponseInterface
-    {
-        $this->profileTranslator->translateTo($profileUid, $languageUid);
-
-        return $this->redirectToProfileEditResponse();
-    }
-    */
-
     // =================================================================================================================
     //  Handle entity image operations
     // =================================================================================================================
+    /**
+     * Initializes the upload process for a profile image.
+     *
+     * Validates that the image field is writable and that the referenced profile
+     * can be edited by the current user before configuring the file upload.
+     * This check is performed before Extbase maps the uploaded file to avoid
+     * creating unreferenced files in the file abstraction layer for unauthorized
+     * requests.
+     *
+     * @return void
+     * @throws PropagateResponseException If the image field is not writable or the
+     *         profile is not editable for the current request.
+     */
     public function initializeUploadImageAction(): void
     {
         if (!$this->isSpecialFieldWritable('image')) {
@@ -1424,6 +1726,19 @@ final class InlineProfileController extends AbstractActionController
         $this->configureImageFileUpload();
     }
 
+    /**
+     * Uploads a new profile image for the given profile.
+     *
+     * The method validates that a new file was submitted, stores the uploaded
+     * image in the configured FAL storage, and returns the updated image
+     * metadata as JSON.
+     *
+     * @param Profile $profile The profile whose image should be updated.
+     * @return ResponseInterface JSON response containing the upload result and
+     *                          image metadata.
+     * @throws PropagateResponseException If the upload is missing, invalid or not
+     *                                   permitted.
+     */
     public function uploadImageAction(Profile $profile): ResponseInterface
     {
         try {
@@ -1465,6 +1780,16 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
+    /**
+     * Deletes the current profile image for the validated inline profile.
+     *
+     * Validates the incoming request payload, ensures the image field is writable,
+     * and removes the existing profile image if no profile fields were submitted.
+     *
+     * @return ResponseInterface JSON response indicating whether the image was deleted
+     * @throws PropagateResponseException When the request is invalid and a JSON error
+     *         response should be propagated
+     */
     public function deleteImageAction(): ResponseInterface
     {
         $requestResult = $this->profileUpdateRequestService->validate(
@@ -1513,6 +1838,13 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
+    /**
+     * Checks whether the submitted profile image differs from the persisted image.
+     *
+     * @param Profile $profile The profile currently being processed.
+     * @param File|null $persistedImageFile The previously persisted image file, if available.
+     * @return bool True if a new image was submitted or the persisted image is different, otherwise false.
+     */
     private function hasNewProfileImage(Profile $profile, ?File $persistedImageFile): bool
     {
         $submittedImageFile = $profile->getImage()?->getOriginalResource()->getOriginalFile();
@@ -1523,6 +1855,12 @@ final class InlineProfileController extends AbstractActionController
             || $submittedImageFile->getUid() !== $persistedImageFile->getUid();
     }
 
+    /**
+     * Checks whether the given special field is editable.
+     *
+     * @param string $identifier The identifier of the special field to check.
+     * @return bool True if the field exists and is not marked as read-only or disabled, otherwise false.
+     */
     private function isSpecialFieldWritable(string $identifier): bool
     {
         $field = $this->academicPersonsSettings->getSpecialField($identifier);
@@ -1532,7 +1870,13 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @return array{alternative: string, title: string}
+     * Persists the uploaded profile image and updates the associated metadata.
+     *
+     * The profile is saved, pending database changes are flushed, the image metadata is updated,
+     * and the previously replaced image file is deleted afterwards.
+     *
+     * @param File|null $replacedImageFile The image file that was replaced by the newly uploaded one, if any.
+     * @return array{alternative: string, title: string} The updated metadata for the uploaded profile image.
      */
     private function persistUploadedProfileImage(Profile $profile, ?File $replacedImageFile): array
     {
@@ -1544,7 +1888,14 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * @return array{alternative: string, title: string}
+     * Updates the metadata for the uploaded profile image and its file reference.
+     *
+     * The metadata text is generated from the profile data and written to the file
+     * metadata as well as the related sys_file_reference record, if one exists.
+     *
+     * @param Profile $profile The profile whose uploaded image metadata should be updated.
+     * @return array{alternative: string, title: string} The updated image metadata.
+     * @throws UnexpectedValueException If the uploaded image reference or file is missing.
      */
     private function updateUploadedProfileImageMetadata(Profile $profile): array
     {
@@ -1566,6 +1917,17 @@ final class InlineProfileController extends AbstractActionController
         return $metadata;
     }
 
+    /**
+     * Retrieves the persisted UID of the file reference for the profile image.
+     *
+     * The method first checks the current in-memory image relation and falls back to a
+     * direct lookup in the sys_file_reference table when the relation has not yet been
+     * persisted to the database.
+     *
+     * @param Profile $profile The profile whose image reference should be resolved.
+     * @param File $imageFile The image file associated with the profile.
+     * @return int The UID of the persisted file reference, or 0 if no persisted reference exists.
+     */
     private function getPersistedProfileImageReferenceUid(Profile $profile, File $imageFile): int
     {
         $imageReferenceUid = $profile->getImage()?->getOriginalResource()->getUid() ?? 0;
@@ -1608,6 +1970,16 @@ final class InlineProfileController extends AbstractActionController
             ->fetchOne();
     }
 
+    /**
+     * Builds the image metadata text from the profile's name parts.
+     *
+     * The method normalizes whitespace and concatenates the available name
+     * components (title, first name, middle name, and last name) into a single
+     * string that can be used as metadata for the profile image.
+     *
+     * @param Profile $profile The profile whose name metadata should be assembled.
+     * @return string A normalized name string without empty parts.
+     */
     private function buildProfileImageMetadataText(Profile $profile): string
     {
         $parts = array_map(
@@ -1619,6 +1991,16 @@ final class InlineProfileController extends AbstractActionController
         return implode(' ', array_filter($parts, static fn(string $part): bool => $part !== ''));
     }
 
+    /**
+     * Deletes the currently assigned image of a profile and removes the file from storage
+     * when it is no longer referenced by any other record.
+     *
+     * The image relation is cleared before the file is removed so that stale references
+     * do not remain on the profile record and other usages can be checked correctly.
+     *
+     * @param Profile $profile The profile whose image should be deleted.
+     * @return bool True if an image was deleted, otherwise false if no image was assigned.
+     */
     private function deleteProfileImage(Profile $profile): bool
     {
         $image = $profile->getImage();
@@ -1640,24 +2022,21 @@ final class InlineProfileController extends AbstractActionController
         return true;
     }
 
+
     /**
-     * Configures the native Extbase file upload handling for the profile image.
+     * Configures the upload handling for the profile image field.
      *
-     * The configuration is built here instead of using the `#[FileUpload]` attribute, because
-     * upload folder and both validation limits are integrator configuration read from TypoScript
-     * at runtime, which a static attribute cannot provide - and the attribute would have to be
-     * placed on the `Profile` persistence model of `EXT:academic_persons`.
+     * Sets the upload folder, maximum number of files, validates file size and
+     * MIME types according to the configured settings, and registers the upload
+     * configuration on the profile argument while skipping the image property in
+     * the property mapping process.
+     *
+     * @return void
      */
     private function configureImageFileUpload(): void
     {
         $profileArgument = $this->arguments->getArgument('profile');
         $fileUploadConfiguration = (new FileUploadConfiguration('image'))
-            // The profile holds a single image, but the limit is validated against the already
-            // referenced file plus the upload. Allowing two therefore means "replace", which is
-            // what this form does - the file handling service repoints the existing reference to
-            // the uploaded file, and `uploadImageAction()` cleans the replaced file up afterwards.
-            // Registering a file deletion instead would delete the replaced file unconditionally,
-            // even when another record still references it.
             ->setMaxFiles(2)
             ->setUploadFolder(
                 (string) ($this->settings['editForm']['profileImage']['targetFolder'] ?? '1:/user_upload/')
@@ -1667,8 +2046,6 @@ final class InlineProfileController extends AbstractActionController
             'maximum' => (string) ($this->settings['editForm']['profileImage']['validation']['maxFileSize'] ?? PHP_INT_MAX . 'B'),
         ]);
         $fileUploadConfiguration->addValidator($fileSizeValidator);
-        // An empty list means "no mime type restriction". `MimeTypeValidator` throws
-        // for an empty `allowedMimeTypes` option, so it is only added when configured.
         $allowedMimeTypes = GeneralUtility::trimExplode(
             ',',
             (string) ($this->settings['editForm']['profileImage']['validation']['allowedMimeTypes'] ?? ''),
@@ -1681,15 +2058,18 @@ final class InlineProfileController extends AbstractActionController
         }
         $profileArgument->getFileHandlingServiceConfiguration()
             ->addFileUploadConfiguration($fileUploadConfiguration);
-        // The upload is handled by the file handling service, not by the property mapper.
         $profileArgument->getPropertyMappingConfiguration()->skipProperties('image');
     }
 
     /**
-     * Returns the file currently referenced as profile image according to the database.
+     * Returns the file currently referenced as the profile image in the persisted database state.
      *
      * Reading the persisted state instead of the mapped object is intentional: the in-memory
-     * profile already carries the newly uploaded file when an upload action is processed.
+     * profile already carries a newly uploaded file during upload processing and therefore does
+     * not necessarily reflect the original stored file reference.
+     *
+     * @param Profile $profile The profile whose persisted image reference should be resolved.
+     * @return File|null The referenced file object or null if no persisted profile image exists.
      */
     private function getPersistedProfileImageFile(Profile $profile): ?File
     {
@@ -1732,12 +2112,16 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
+
     /**
-     * Removes the file a profile image upload replaced.
+     * Deletes a previously replaced profile image file if it is no longer used.
      *
-     * The native file upload handling generates the stored file name and therefore always adds
-     * a new file instead of overwriting the previous one, so it has to be cleaned up explicitly
-     * to avoid orphaned files piling up in the upload folder with every re-upload.
+     * The method checks whether the uploaded image actually replaced an existing
+     * file and ensures that the previous file is removed only when it is not
+     * referenced anymore by the profile or any other record.
+     *
+     * @param File|null $replacedImageFile The old image file that was replaced
+     * @param Profile $profile The profile whose image was updated
      */
     private function deleteReplacedProfileImageFile(?File $replacedImageFile, Profile $profile): void
     {
@@ -1756,6 +2140,15 @@ final class InlineProfileController extends AbstractActionController
         $replacedImageFile->getStorage()->deleteFile($replacedImageFile);
     }
 
+    /**
+     * Counts how many file references point to the given file.
+     *
+     * This is used to decide whether a replaced image can be removed safely after
+     * an update without deleting still-referenced files from other records.
+     *
+     * @param File $file The file whose references should be counted
+     * @return int The number of active references in sys_file_reference for this file
+     */
     private function countFileReferences(File $file): int
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -1776,12 +2169,22 @@ final class InlineProfileController extends AbstractActionController
             ->fetchOne();
     }
 
+
     /**
-     * @return array<int<0, max>, array{
-     *      label: string,
-     *      labelTranslationIdentifier: string,
-     *      value: string,
-     *  }>
+     * Returns the configured gender select items from the profile TCA.
+     *
+     * Only directly configured TCA items are considered, since evaluating all
+     * itemProcFunc and FormEngine logic in the frontend is not feasible.
+     * Empty values are skipped because the Fluid select field adds the empty
+     * placeholder separately.
+     *
+     * @return array<int, array{
+     *     label: string,
+     *     labelTranslationIdentifier: string,
+     *     value: string,
+     * }>
+     *
+     *
      * @todo Evaluating TCA in frontend for available options is a hard task to do correctly requiring to execute
      *       TCA item proc functions and so on. It also does not account for eventually FormEngine nodes processing
      *       additional stuff. Current implementation takes only directly added TCA items into account to show them
