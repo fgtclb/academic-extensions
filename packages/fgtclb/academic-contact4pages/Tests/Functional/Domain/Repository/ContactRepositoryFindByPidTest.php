@@ -8,7 +8,6 @@ use FGTCLB\AcademicContacts4pages\Domain\Model\Contact;
 use FGTCLB\AcademicContacts4pages\Domain\Repository\ContactRepository;
 use FGTCLB\AcademicContacts4pages\Tests\Functional\AbstractAcademicContacts4PagesTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\LanguageAspect;
@@ -230,116 +229,57 @@ final class ContactRepositoryFindByPidTest extends AbstractAcademicContacts4Page
     }
 
     /**
-     * DEFECT PINNED DOWN, NOT ENDORSED. `findByPid()` lifts `respectSysLanguage`, so the
-     * query carries no language constraint at all and every translation is selected next to
-     * its default language record. The German translation 3 is therefore mapped a second
-     * time onto contact 2 - the same contact rendered twice on a page that is not even
-     * translated, once in German - and the German-only contact 4 shows up in the default
-     * language as well.
-     *
-     * Lifting `respectSysLanguage` is what a manual uid selection needs (see ACE-341); this
-     * query selects by page and has no such reason. Kept as an assertion so the day the
-     * language handling is corrected the change is visible here rather than in a report.
+     * ACE-484: in the default language only default-language records (and "all
+     * languages" records) are returned. The German translation 3 no longer duplicates
+     * its default record 2, and the German-only contact 4 no longer leaks into the
+     * default language. Identical on TYPO3 v13 and v14.
      */
     #[Test]
-    public function defaultLanguageAlsoReturnsTranslationsAndSoDuplicatesTheirDefaultRecord(): void
+    public function defaultLanguageReturnsOnlyDefaultAndAllLanguageRecords(): void
     {
-        $this->assertLanguageResult(0, [1, 2, 2, 4, 5], [1, 2, 3, 4, 5]);
+        $this->assertLanguageResult(0, [1, 2, 5], [1, 2, 5]);
     }
 
     /**
-     * DEFECT PINNED DOWN, NOT ENDORSED, AND WORSE ON v14. The same duplication in the
-     * translated language: contact 2 arrives twice, once from its default language record
-     * overlaid into German and once from the German record itself. On TYPO3 v14 contact 1
-     * is additionally *dropped*, because the overlay type the method forces is
-     * `OVERLAYS_ON` - "hide non translated" - which is a decision the site configuration
-     * usually makes.
-     *
-     * The v13 counterpart below shows the same call keeping contact 1. Two versions, two
-     * different wrong answers, from one unchanged repository method.
+     * ACE-484: under the translated language each contact arrives exactly once - the
+     * untranslated contact 1 as its default record, contact 2 represented by its
+     * German translation 3, the German-only contact 4 as itself, and the "all
+     * languages" contact 5. The order follows the `sorting` of the rows actually
+     * fetched (10, 25, 30, 40). Identical on TYPO3 v13 and v14.
      */
     #[Test]
-    #[Group('not-core-13')]
-    public function translatedLanguageReturnsEachTranslatedContactTwiceAndDropsTheUntranslatedOne(): void
+    public function translatedLanguageReturnsEachContactExactlyOnce(): void
     {
-        $this->assertLanguageResult(1, [2, 2, 4, 5], [3, 3, 4, 5]);
+        $this->assertLanguageResult(1, [1, 2, 4, 5], [1, 3, 4, 5]);
     }
 
     /**
-     * DEFECT PINNED DOWN, NOT ENDORSED. On TYPO3 v13 the overlay removes nothing: the
-     * translated language returns all five rows, contact 2 among them twice - and both
-     * copies carry the localized uid 3, so the German record is mapped twice while the
-     * untranslated contact 1 survives, where v14 drops it.
+     * ACE-484: a language with no translated contact at all falls back to the
+     * default-language records plus the "all languages" record - no foreign-language
+     * rows leak in, no untranslated contact is dropped. Identical on TYPO3 v13 and v14.
      */
     #[Test]
-    #[Group('not-core-14')]
-    public function translatedLanguageReturnsEveryRowIncludingTheUntranslatedOne(): void
+    public function languageWithoutTranslationsReturnsTheDefaultLanguageRecords(): void
     {
-        $this->assertLanguageResult(1, [1, 2, 2, 4, 5], [1, 3, 3, 4, 5]);
+        $this->assertLanguageResult(3, [1, 2, 5], [1, 2, 5]);
     }
 
     /**
-     * DEFECT PINNED DOWN, NOT ENDORSED. Language 3 has no translated contact whatsoever,
-     * yet on TYPO3 v14 the two German records leak into its result while the untranslated
-     * default language contacts are dropped. A frontend in that language renders German
-     * contacts and loses its own.
+     * ACE-484: `count()` and iteration agree in every language context, because the
+     * query selects exactly one row per contact and the overlay maps rows one to one
+     * instead of removing or duplicating any. `{contacts -> f:count()}` and an
+     * iterating template can no longer disagree.
      */
     #[Test]
-    #[Group('not-core-13')]
-    public function languageWithoutTranslationsReturnsTheRecordsOfAForeignLanguage(): void
-    {
-        $this->assertLanguageResult(3, [2, 4, 5], [3, 4, 5]);
-    }
-
-    /**
-     * DEFECT PINNED DOWN, NOT ENDORSED. On TYPO3 v13 a language with no translations at all
-     * gets the raw five rows, exactly as the default language does - the language of the
-     * request makes no difference whatsoever to what this method returns.
-     */
-    #[Test]
-    #[Group('not-core-14')]
-    public function languageWithoutTranslationsReturnsTheSameRowsAsEveryOtherLanguage(): void
-    {
-        $this->assertLanguageResult(3, [1, 2, 2, 4, 5], [1, 2, 3, 4, 5]);
-    }
-
-    /**
-     * DEFECT PINNED DOWN, NOT ENDORSED. `count()` is answered by a `COUNT(*)` that never
-     * runs the overlay, so it reports the raw row count of every language at once while
-     * iterating the same result yields fewer objects. A template asking `{contacts -> f:count()}`
-     * and a template iterating disagree.
-     *
-     * Only reproducible on TYPO3 v14: on v13 the iteration returns the raw rows as well, so
-     * the two happen to agree - which is the v13 counterpart below.
-     */
-    #[Test]
-    #[Group('not-core-13')]
-    public function countIgnoresTheLanguageOverlayAndDisagreesWithTheIteration(): void
+    public function countAgreesWithTheIterationInEveryLanguage(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactRepositoryFindByPid/contactsWithTranslations.csv');
-        $this->setUpLanguageAspect(3);
 
-        $result = $this->subject()->findByPid(2);
-
-        $this->assertSame(5, $result->count());
-        $this->assertCount(3, iterator_to_array($result));
-    }
-
-    /**
-     * On TYPO3 v13 counting and iterating agree - both report the five raw rows, because
-     * nothing is overlaid away. That is not the method being correct here; it is the same
-     * missing language constraint, showing from the other side.
-     */
-    #[Test]
-    #[Group('not-core-14')]
-    public function countAndIterationAgreeBecauseNothingIsOverlaidAway(): void
-    {
-        $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactRepositoryFindByPid/contactsWithTranslations.csv');
-        $this->setUpLanguageAspect(3);
-
-        $result = $this->subject()->findByPid(2);
-
-        $this->assertSame(5, $result->count());
-        $this->assertCount(5, iterator_to_array($result));
+        foreach ([0 => 3, 1 => 4, 3 => 3] as $languageId => $expectedCount) {
+            $this->setUpLanguageAspect($languageId);
+            $result = $this->subject()->findByPid(2);
+            $this->assertSame($expectedCount, $result->count(), sprintf('Unexpected count() in language %d.', $languageId));
+            $this->assertCount($expectedCount, iterator_to_array($result), sprintf('Unexpected number of objects in language %d.', $languageId));
+        }
     }
 }

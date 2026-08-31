@@ -17,29 +17,29 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * Characterisation of what `RecordSynchronizer` does to `academic_contacts4pages`
- * contact records today (ACE-103 / HNEE-1249, resolution planned as ACE-484).
+ * Target behaviour of the translation synchronization for `academic_contacts4pages`
+ * contact records (ACE-484, resolving ACE-103 / HNEE-1249).
  *
- * A contact is an inline child of a contract (foreign_field `contract`), and since
- * ACE-483 routed the synchroniser through the DataHandler the inline cascade is ALIVE
- * AGAIN: a profile synchronisation localizes the contract and the contact below it.
- * That makes the `page`-copy defect this class pins urgent, because it is now reachable
- * from the production path - not only by handing the contact table to the service
- * directly:
+ * A contact is an inline child of a contract (foreign_field `contract`), so the
+ * DataHandler cascade of a profile synchronization localizes the contract and the
+ * contact below it. The contact's `page` column is a plain `group` relation holding
+ * the default-language page uid, copied verbatim by `localize`. The policy guard
+ * (`DataHandlerHooks::processCmdmap_afterFinish`) therefore removes a freshly
+ * localized contact again when its page has no translation in the target language;
+ * a contact whose page IS translated keeps its translation, still pointing at the
+ * default-language page uid - that is how TYPO3 models page references.
  *
- * DataHandler `localize` copies the contact's `page` column verbatim. It is a plain
- * `group` field pointing at `pages` without `l10n_mode=exclude` and without any policy,
- * so the translated contact carries the default-language page uid whether or not that
- * page is translated. The read side (`ContactRepository::findByPid()`) then returns the
- * one contact twice under the translated language.
- *
- * The page-copy tests pin CURRENT behaviour, defects included; none of it is endorsed.
- * When ACE-484 changes the policy - no translated contact for an untranslated page -
- * these assertions are where the change must become visible.
+ * The read side (`ContactRepository::findByPid()`) returns each contact exactly
+ * once per language context, including for legacy duplicated translations that an
+ * earlier synchronizer version already wrote into a database.
  */
 final class ContactTranslationSynchronizationTest extends AbstractAcademicContacts4PagesTestCase
 {
     use SiteBasedTestTrait;
+
+    private const TABLE_PROFILE = 'tx_academicpersons_domain_model_profile';
+    private const TABLE_CONTRACT = 'tx_academicpersons_domain_model_contract';
+    private const TABLE_CONTACT = 'tx_academiccontacts4pages_domain_model_contact';
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8', 'iso' => 'en', 'hrefLang' => 'en-US', 'direction' => ''],
@@ -85,7 +85,7 @@ final class ContactTranslationSynchronizationTest extends AbstractAcademicContac
     }
 
     /**
-     * @return array<int, array<string, mixed>> All rows of the table, keyed and ordered by uid.
+     * @return array<int, array<string, mixed>> All rows of the table, deleted ones included, keyed and ordered by uid.
      */
     private function fetchAllRows(string $tableName): array
     {
@@ -136,6 +136,23 @@ final class ContactTranslationSynchronizationTest extends AbstractAcademicContac
     }
 
     /**
+     * The guard removes a freshly localized contact with a regular DataHandler soft
+     * delete, so "no translated contact" means: no undeleted row carrying a language.
+     * The soft-deleted remains are asserted explicitly where a localization happened.
+     */
+    private function assertNoLiveTranslatedContact(): void
+    {
+        foreach ($this->fetchAllRows(self::TABLE_CONTACT) as $row) {
+            if ((int)$row['deleted'] === 0) {
+                $this->assertSame(0, (int)$row['sys_language_uid'], sprintf(
+                    'Contact %d is an undeleted translated contact - the ACE-484 guard did not remove it.',
+                    (int)$row['uid'],
+                ));
+            }
+        }
+    }
+
+    /**
      * Extbase reads the language aspect of the global context when it builds the query
      * settings, so this is what a frontend request in that language leaves behind.
      */
@@ -148,108 +165,164 @@ final class ContactTranslationSynchronizationTest extends AbstractAcademicContac
     }
 
     /**
-     * Flipped ACE-483 pin: the DataHandler cascade reaches contract AND contact when
-     * the profile is synchronised. The translated contact carries the untranslated
-     * default-language page uid 2 verbatim - the ACE-484 defect, now reachable from
-     * the production path again, which is what makes ACE-484 urgent.
+     * ACE-484: the DataHandler cascade still reaches contract AND contact when the
+     * profile is synchronised, but the contact translation pointing at the
+     * untranslated page 2 is removed again by the policy guard - as a soft delete,
+     * observable in the remains: exactly one undeleted contact (the default), and
+     * the removed translation row still present with `deleted=1`.
      */
     #[Test]
-    public function profileSynchronizationCascadesIntoContractAndContact(): void
+    public function profileSynchronizationWithUntranslatedPageYieldsNoTranslatedContact(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageNotTranslated.csv');
         $this->assertPageTwoHasNoTranslation();
 
-        $this->synchronizeIntoGerman('tx_academicpersons_domain_model_profile', 1);
+        $this->synchronizeIntoGerman(self::TABLE_PROFILE, 1);
 
-        $translatedProfile = $this->fetchTranslatedRow('tx_academicpersons_domain_model_profile');
+        $translatedProfile = $this->fetchTranslatedRow(self::TABLE_PROFILE);
         $this->assertSame(1, (int)$translatedProfile['l10n_parent']);
-        $this->assertCount(2, $this->fetchAllRows('tx_academicpersons_domain_model_contract'), 'Expected the contract to be translated by the cascade.');
-        $translatedContract = $this->fetchTranslatedRow('tx_academicpersons_domain_model_contract');
+        $this->assertCount(2, $this->fetchAllRows(self::TABLE_CONTRACT), 'Expected the contract to be translated by the cascade.');
+        $translatedContract = $this->fetchTranslatedRow(self::TABLE_CONTRACT);
         $this->assertSame((int)$translatedProfile['uid'], (int)$translatedContract['profile']);
-        $this->assertCount(2, $this->fetchAllRows('tx_academiccontacts4pages_domain_model_contact'), 'Expected the contact to be translated by the cascade.');
-        $translatedContact = $this->fetchTranslatedRow('tx_academiccontacts4pages_domain_model_contact');
-        $this->assertSame(1, (int)$translatedContact['l10n_parent']);
-        // The ACE-484 defect: the German contact points at the untranslated default-language page.
-        $this->assertSame(2, (int)$translatedContact['page']);
+        $this->assertNoLiveTranslatedContact();
+        $contactRows = $this->fetchAllRows(self::TABLE_CONTACT);
+        $this->assertCount(2, $contactRows, 'Expected the default contact and the soft-deleted remains of the removed translation.');
+        $this->assertSame(0, (int)$contactRows[1]['deleted']);
+        $this->assertSame(1, (int)$contactRows[2]['deleted']);
+        $this->assertSame(1, (int)$contactRows[2]['sys_language_uid']);
     }
 
     /**
-     * DEFECT PINNED DOWN, NOT ENDORSED (ACE-484). Page 2 has no German translation, yet
-     * synchronising the contact creates a German contact whose `page` column holds the
-     * default-language page uid 2 - DataHandler `localize` copies a `group` column
-     * verbatim, and nothing supplies a policy. The `contract` pointer is copied verbatim
-     * too when the contact is localized directly (not through the profile cascade), so
-     * the German contact hangs below the default-language contract. The intended policy
-     * (ACE-484) is that an untranslated page yields no translated contact at all; the
-     * day that lands, this test is the one that has to change.
+     * The same policy holds when the contact table is synchronised directly, without
+     * the profile cascade: page 2 has no German translation, so no German contact
+     * survives the run.
      */
     #[Test]
-    public function contactSynchronizationCreatesAGermanContactForAPageThatHasNoGermanTranslation(): void
+    public function contactSynchronizationWithUntranslatedPageYieldsNoTranslatedContact(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageNotTranslated.csv');
         $this->assertPageTwoHasNoTranslation();
 
-        $this->synchronizeIntoGerman('tx_academiccontacts4pages_domain_model_contact', 1);
+        $this->synchronizeIntoGerman(self::TABLE_CONTACT, 1);
 
-        $this->assertCount(2, $this->fetchAllRows('tx_academiccontacts4pages_domain_model_contact'), 'Expected the default contact and one created translation.');
-        $translatedContact = $this->fetchTranslatedRow('tx_academiccontacts4pages_domain_model_contact');
+        $this->assertNoLiveTranslatedContact();
+        $contactRows = $this->fetchAllRows(self::TABLE_CONTACT);
+        $this->assertCount(2, $contactRows, 'Expected the default contact and the soft-deleted remains of the removed translation.');
+        $this->assertSame(1, (int)$contactRows[2]['deleted']);
+    }
+
+    /**
+     * ACE-484 contrast case: when page 2 IS translated into German, the cascade's
+     * contact translation is kept - and its `page` column holds the default-language
+     * uid 2, not the uid 3 of the German page row, because pointing a relation at
+     * the default-language uid is how TYPO3 models page references.
+     */
+    #[Test]
+    public function profileSynchronizationWithTranslatedPageKeepsTheTranslatedContact(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageTranslated.csv');
+
+        $this->synchronizeIntoGerman(self::TABLE_PROFILE, 1);
+
+        $translatedContact = $this->fetchTranslatedRow(self::TABLE_CONTACT);
+        $this->assertSame(0, (int)$translatedContact['deleted']);
+        $this->assertSame(1, (int)$translatedContact['l10n_parent']);
+        $this->assertSame(2, (int)$translatedContact['page']);
+        $this->assertNotSame(3, (int)$translatedContact['page']);
+        $translatedContract = $this->fetchTranslatedRow(self::TABLE_CONTRACT);
+        $this->assertSame((int)$translatedContract['uid'], (int)$translatedContact['contract']);
+    }
+
+    /**
+     * The direct contact synchronisation keeps the translation for a translated page
+     * as well, wired below the default-language contract (the `contract` pointer is
+     * copied verbatim when the cascade does not run).
+     */
+    #[Test]
+    public function contactSynchronizationWithTranslatedPageKeepsTheTranslationPointingAtTheDefaultPageUid(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageTranslated.csv');
+
+        $this->synchronizeIntoGerman(self::TABLE_CONTACT, 1);
+
+        $this->assertCount(2, $this->fetchAllRows(self::TABLE_CONTACT), 'Expected the default contact and one kept translation.');
+        $translatedContact = $this->fetchTranslatedRow(self::TABLE_CONTACT);
+        $this->assertSame(0, (int)$translatedContact['deleted']);
         $this->assertSame(1, (int)$translatedContact['l10n_parent']);
         $this->assertSame(1, (int)$translatedContact['l10n_source']);
         $this->assertSame(100, (int)$translatedContact['pid']);
         $this->assertSame(1, (int)$translatedContact['contract']);
-        // The defect: the German contact points at the untranslated default-language page.
         $this->assertSame(2, (int)$translatedContact['page']);
     }
 
     /**
-     * DEFECT PINNED DOWN, NOT ENDORSED (ACE-484). The read side of the same defect, and
-     * the duplication users report: `findByPid()` lifts `respectSysLanguage`, so under a
-     * German language aspect the default contact and the German row the synchronizer
-     * created both match `page = 2` - one contact, rendered twice. Both result objects
-     * map to contact 1 with the German row as their localized uid, on v13 and v14 alike.
-     * The German row is arranged through the profile cascade - the production path since
-     * ACE-483 revived the recursion.
+     * Read side, untranslated page: after the profile synchronisation (which leaves
+     * no contact translation behind) the one contact of page 2 arrives exactly once
+     * under the German language aspect, as the overlaid default record.
      */
     #[Test]
-    public function findByPidUnderTheTranslatedLanguageReturnsTheSynchronizedContactTwice(): void
+    public function findByPidUnderTheTranslatedLanguageReturnsTheContactOnceForAnUntranslatedPage(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageNotTranslated.csv');
-        $this->synchronizeIntoGerman('tx_academicpersons_domain_model_profile', 1);
-        $translatedContactUid = (int)$this->fetchTranslatedRow('tx_academiccontacts4pages_domain_model_contact')['uid'];
+        $this->synchronizeIntoGerman(self::TABLE_PROFILE, 1);
         $this->setUpLanguageAspect(1);
 
         $contacts = iterator_to_array($this->get(ContactRepository::class)->findByPid(2));
 
-        $this->assertCount(2, $contacts, 'Expected the one contact of page 2 to arrive twice.');
-        $this->assertSame(
-            [1, 1],
-            array_map(static fn(Contact $contact): int => (int)$contact->getUid(), $contacts),
-        );
-        $this->assertSame(
-            [$translatedContactUid, $translatedContactUid],
-            array_map(static fn(Contact $contact): int => (int)$contact->_getProperty('_localizedUid'), $contacts),
-        );
+        $this->assertCount(1, $contacts, 'Expected the one contact of page 2 to arrive exactly once.');
+        $this->assertSame(1, (int)$contacts[0]->getUid());
+        $this->assertSame(1, (int)$contacts[0]->_getProperty('_localizedUid'));
     }
 
     /**
-     * CURRENT BEHAVIOUR PINNED DOWN (ACE-484 contrast case). When page 2 IS translated
-     * into German, the synchronizer behaves exactly as in the untranslated case: the
-     * German contact's `page` column holds the default-language uid 2, not the uid 3 of
-     * the German page row. Pointing a relation at the default-language uid is how TYPO3
-     * models page references, so ACE-484 intends to keep this translation - the value
-     * pinned here is what "correct semantics" has to preserve, while the sibling test
-     * above documents the case that must stop producing a translation.
+     * Read side, translated page: the kept contact translation represents the contact
+     * under the German language aspect - once, with the translation row as its
+     * localized uid.
      */
     #[Test]
-    public function synchronizedContactOfATranslatedPagePointsAtTheDefaultLanguagePageUid(): void
+    public function findByPidUnderTheTranslatedLanguageReturnsTheTranslatedContactOnce(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageTranslated.csv');
+        $this->synchronizeIntoGerman(self::TABLE_PROFILE, 1);
+        $translatedContactUid = (int)$this->fetchTranslatedRow(self::TABLE_CONTACT)['uid'];
+        $this->setUpLanguageAspect(1);
 
-        $this->synchronizeIntoGerman('tx_academiccontacts4pages_domain_model_contact', 1);
+        $contacts = iterator_to_array($this->get(ContactRepository::class)->findByPid(2));
 
-        $translatedContact = $this->fetchTranslatedRow('tx_academiccontacts4pages_domain_model_contact');
-        $this->assertSame(1, (int)$translatedContact['l10n_parent']);
-        $this->assertSame(2, (int)$translatedContact['page']);
-        $this->assertNotSame(3, (int)$translatedContact['page']);
+        $this->assertCount(1, $contacts, 'Expected the one contact of page 2 to arrive exactly once.');
+        $this->assertSame(1, (int)$contacts[0]->getUid());
+        $this->assertSame($translatedContactUid, (int)$contacts[0]->_getProperty('_localizedUid'));
+    }
+
+    /**
+     * The real-world value of the read-side fix (HNEE-class installations): a legacy
+     * duplicated contact translation that an earlier synchronizer version already
+     * wrote into the database - page untranslated, `page` column copied verbatim -
+     * collapses to one contact per language context without any database cleanup.
+     * No synchronisation runs here; the fixture IS the legacy state.
+     */
+    #[Test]
+    public function findByPidCollapsesALegacyDuplicatedContactTranslationToOneContact(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageNotTranslatedLegacyDuplicate.csv');
+        $this->assertPageTwoHasNoTranslation();
+        $contactRepository = $this->get(ContactRepository::class);
+
+        $this->setUpLanguageAspect(1);
+        $germanContacts = iterator_to_array($contactRepository->findByPid(2));
+        $this->assertCount(1, $germanContacts, 'Expected the legacy duplicate to collapse to one contact under German.');
+        $this->assertSame(1, (int)$germanContacts[0]->getUid());
+        $this->assertSame(2, (int)$germanContacts[0]->_getProperty('_localizedUid'));
+
+        $this->setUpLanguageAspect(0);
+        $defaultContacts = iterator_to_array($contactRepository->findByPid(2));
+        $this->assertCount(1, $defaultContacts, 'Expected the legacy duplicate to stay invisible in the default language.');
+        $this->assertSame(1, (int)$defaultContacts[0]->getUid());
+        $this->assertSame(1, (int)$defaultContacts[0]->_getProperty('_localizedUid'));
+        $this->assertSame(
+            count($defaultContacts),
+            $contactRepository->findByPid(2)->count(),
+            'count() must agree with the number of iterated objects.',
+        );
     }
 }
