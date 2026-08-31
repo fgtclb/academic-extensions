@@ -13,7 +13,7 @@ unsupported no longer receive security fixes; please upgrade before
 reporting an issue against them.
 
 | Version | Supported          |
-| ------- | ------------------ |
+|---------|--------------------|
 | 3.x     | :white_check_mark: |
 | 2.x     | :white_check_mark: |
 | 1.x     | :x:                |
@@ -35,7 +35,7 @@ open a public GitHub/GitLab issue.
 ### What to expect
 
 | Step                                | Timeframe                                                              |
-| ----------------------------------- | ---------------------------------------------------------------------- |
+|-------------------------------------|------------------------------------------------------------------------|
 | Acknowledgement of your report      | within 1 business day (typically much faster)                          |
 | Status updates                      | at least every 7 days until resolved                                   |
 | Fix / mitigation, based on severity | Critical/High: as fast as possible; Medium/Low: next scheduled release |
