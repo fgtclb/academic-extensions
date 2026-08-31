@@ -147,58 +147,18 @@ without checking its copy first is how a change lands that is confidently wrong.
 
 ## Build / test / lint — `Build/Scripts/runTests.sh`
 
-All checks run through the containerized harness (docker or podman, auto-selected;
-override with `-b docker|podman`). It mirrors the TYPO3 Core `runTests.sh`. Key flags:
-
-- `-s <suite>` — suite to run.
-- `-t <13|14>` — TYPO3 core version (default 13). Drives `composerUpdate`/install and which `Build/phpstan/Core13|Core14` config is used.
-- `-p <8.2|8.3|8.4|8.5>` — PHP version (default 8.2).
-- `-d <sqlite|mariadb|mysql|postgres>` — DBMS for functional tests (default sqlite).
-- `-i <version>` — DBMS version, when the default of the selected `-d` does not fit.
-- `-a <driver>` — database driver, e.g. `pdo_mysql` or `mysqli` (default: driver of `-d`).
-- `-n` — dry-run for `cgl` (report only, don't modify).
-- `-x` / `-y <port>` — enable xdebug to a host IDE (default port 9003).
-- `-o <seed>` — random order seed for `unitRandom`.
-- `-u` — update the `typo3/core-testing-*` container images.
-- Trailing `[file]` — restrict phpunit to a path.
+All checks run through the containerized harness. `Build/Scripts/runTests.sh -h`
+lists every suite and flag, and [Development environment](docs/development/environment.md)
+explains them. What follows is only what neither of those tells you.
 
 There is **no `-e` option**. Everything after a `--` separator is appended to the
 suite's command, so `-s unit -- --filter Foo` reaches phpunit. Prefer restricting
 a run with the trailing path, and `-o` for the random order seed.
 
-Typical workflow — **always prepare deps first** for the target core version:
-
-```bash
-# Install/refresh dependencies for the core version you will test against
-Build/Scripts/runTests.sh -t 13 -p 8.3 -s composerUpdate
-
-Build/Scripts/runTests.sh -t 13 -p 8.3 -s cgl        # auto-fix CGL (php-cs-fixer)
-Build/Scripts/runTests.sh -t 13 -p 8.3 -s cgl -n     # CGL check only (CI mode)
-Build/Scripts/runTests.sh -t 13 -p 8.3 -s phpstan    # static analysis (level 8)
-Build/Scripts/runTests.sh -t 13 -p 8.3 -s lintPhp    # php lint
-Build/Scripts/runTests.sh -t 13 -p 8.3 -s unit       # unit tests
-Build/Scripts/runTests.sh -t 13 -p 8.3 -s functional # functional tests (sqlite)
-```
-
-Restrict a run to a directory or a single test file:
-
-```bash
-Build/Scripts/runTests.sh -t 13 -s functional packages/fgtclb/academic-persons/Tests/Functional/Domain
-Build/Scripts/runTests.sh -t 13 -s unit packages/fgtclb/academic-persons/Tests/Unit/Domain/Model/ProfileInformationTest.php
-```
-
 `-t` selects configuration only, it does **not** reinstall dependencies. After a
 `composerUpdate` for one core version, a run for the other one silently uses the
 wrong vendor tree and fails in confusing ways — always `composerUpdate` for the
 version you are about to test.
-
-The complete suite list is `buildJs`, `cgl`, `cglHeader`, `checkJsBuildClean`,
-`checkRstRenderingAll`, `checkRstRenderingSingle`, `cleanJs`, `composer`
-(dispatch an arbitrary composer command), `composerUpdate`, `functional`,
-`lintMarkdown`, `lintPhp`, `lintTypescript`, `npm` (dispatch an arbitrary npm
-command),
-`openDocumentation`, `phpstan`, `phpstanGenerateBaseline`, `seedManifest`,
-`typecheckJs`, `unit`, `unitRandom`; plus `help` and `update`.
 
 `seedManifest` is the one suite that *writes* a committed artifact: it imports
 the development seed and rewrites
@@ -228,23 +188,16 @@ for the same reason. `phpstan` still does not.
 
 ## CI (`.github/workflows/`)
 
-`ci.yml` is the single pull-request workflow. The TYPO3 core version is a matrix
-dimension, not a separate file, which is what makes the staging below possible —
-job dependencies cannot cross workflows:
-
-```
-cgl     ─┐
-phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
-lint    ─┘
-documentation   (independent)
-```
+`ci.yml` is the single pull-request workflow, and its `needs:` chain is the
+reason: the TYPO3 core version is a matrix dimension rather than a separate
+file, because job dependencies cannot cross workflows.
 
 The DBMS matrix (16 jobs) only starts once the same functional tests passed on
 SQLite for both core versions and both edge PHP versions, so a defect that is
 not DBMS specific is reported by 4 jobs instead of 20.
 
-Three PHP sets, to be changed together: `lint` uses all of 8.2–8.5, `unit` and
-`functional` use the edges 8.2 + 8.5, `cgl` and `phpstan` use 8.2 only.
+The three PHP sets in the matrix — one for `lint`, one for `unit`/`functional`,
+one for `cgl`/`phpstan` — **are to be changed together**.
 `phpstan` is the only source gate that runs per core version (it analyses
 against the installed core via `Build/phpstan/Core13|Core14`). `lint` needs
 neither `-t` nor `composerUpdate` — `lintPhp` runs `php -l` over the sources and
