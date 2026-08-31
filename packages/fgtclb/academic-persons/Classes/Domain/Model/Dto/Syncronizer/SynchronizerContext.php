@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersons\Domain\Model\Dto\Syncronizer;
 
+use FGTCLB\AcademicBase\Tca\TableConfiguration;
 use FGTCLB\AcademicPersons\Service\RecordSynchronizerInterface;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
@@ -15,6 +16,7 @@ final class SynchronizerContext
      */
     public function __construct(
         public readonly RecordSynchronizerInterface $recordSyncronizer,
+        public readonly TableConfiguration $tableConfiguration,
         public readonly Site $site,
         public readonly SiteLanguage $defaultLanguage,
         public readonly array $allowedSiteLanguages,
@@ -48,7 +50,7 @@ final class SynchronizerContext
                 $allowedSiteLanguages[$siteLanguage->getLanguageId()] = $siteLanguage;
             } catch (\InvalidArgumentException $e) {
                 if ($e->getCode() !== 1522960188) {
-                    // Some unexpected exception occorued, rethrow. We only want to handle the
+                    // Some unexpected exception occurred, rethrow. We only want to handle the
                     // specific TYPO3 exception code indicating that passed language id does
                     // not exist for the passed site configuration.
                     throw $e;
@@ -57,6 +59,7 @@ final class SynchronizerContext
         }
         return new self(
             recordSyncronizer: $recordSyncronizer,
+            tableConfiguration: TableConfiguration::create($tableName),
             site: $site,
             defaultLanguage: $site->getDefaultLanguage(),
             allowedSiteLanguages: $allowedSiteLanguages,
@@ -69,6 +72,7 @@ final class SynchronizerContext
     {
         return new self(
             recordSyncronizer: $this->recordSyncronizer,
+            tableConfiguration: TableConfiguration::create($tableName),
             site: $this->site,
             defaultLanguage: $this->defaultLanguage,
             allowedSiteLanguages: $this->allowedSiteLanguages,
