@@ -303,7 +303,16 @@ plausible, wrong statement. Two habits prevent it:
 
 ## Database queries
 
-Two rules, both learned from defects that reached a release (ACE-349, ACE-356).
+Three rules, all learned from defects that reached a release (ACE-349,
+ACE-356, ACE-482/ACE-491).
+
+**Order every result a caller renders or limits.** A query without an
+`ORDER BY` is deterministic-looking on SQLite/MySQL (uid order in practice)
+and arbitrary on PostgreSQL, where an added index reorders it silently.
+Manually sortable tables (TCA ctrl `sortby`, which Extbase does not read)
+order by `sorting` + `uid` tiebreaker; a demanded ordering gets a `uid`
+tiebreaker appended; everything else orders by `uid`. Details and how to test
+it: [Database queries](docs/architecture/database-queries.md).
 
 **Never hand a raw array to `in()` or `notIn()`.** Quote it with the query
 builder helper meant for it:
