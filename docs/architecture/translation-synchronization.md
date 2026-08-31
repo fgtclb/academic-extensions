@@ -70,7 +70,8 @@ the database, not the object, so a dispatch is only meaningful after
 
 | Dispatch site                                                                | Context                                                                                                 | Notes                                                               |
 |------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
-| `AbstractProfileFactory::createProfileForUser()` (persons)                   | Profile auto-creation on frontend user login; also reached by the `academic:createprofiles` CLI command | The only in-repo dispatch between 2.0 and 3.0                       |
+| `AbstractProfileFactory::createProfileForUser()` (persons)                   | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | The only in-repo dispatch between 2.0 and 3.0                       |
+| `AbstractProfileFactory::updateProfileForUser()` (persons)                   | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | Dispatches per profile the update ran through (ACE-490)             |
 | `AbstractActionController::persistAndDispatchProfileUpdate()` (persons_edit) | Every frontend editing action that persists a change to the profile aggregate, in all six controllers   | Restored with ACE-485 — the 2.x restructuring had lost the dispatch |
 | Project-side `DataHandler` hooks                                             | Backend edits, in installations that wire it up themselves                                              | Outside this repository; the main production path                   |
 
@@ -83,11 +84,12 @@ translation guard of its own, so dispatching an overlay would regenerate the
 default record's slug from the wrong context — the guards sit at the dispatch
 for that reason.
 
-Two things deliberately do **not** dispatch:
-`AbstractProfileFactory::updateProfileForUser()` (and with it the
-`academic:updateprofiles` command), and the profile's `skip_sync` flag has
-nothing to do with any of this — it gates the fe_users→profile data
-synchronisation in `FrontendUserProvider`, not the translation sync.
+The `skip_sync` flag cuts across the two paths differently: in the frontend
+editing flow it has nothing to do with the dispatch — it gates only the
+fe_users→profile data synchronisation. In `updateProfileForUser()` it gates
+**both** since ACE-490: a `skip_sync` profile is neither data-updated nor
+announced, even when its frontend user is selected through a second,
+synchronisable profile.
 
 ### The listener and its gates
 
@@ -293,7 +295,6 @@ Stated so they are decisions, not surprises:
 | ~~Update-path gaps~~ — resolved by ACE-487: children's exclude columns are re-propagated by the inline-tree datamap now, and the late-file/MM half turned out never to be a gap (core's `DataMapProcessor` carries both; probed, pinned by tests). `enableLogging` stays on by decision — see above. | ACE-487    |
 | Branch `2` still carries the contract relation select defect the rework surfaced: the "please select" items wrote `''` into nullable integer columns, which PostgreSQL rejects (`main` fixed it as ACE-489 — the columns are `NOT NULL DEFAULT 0` there now).                                        | ACE-488    |
 | The frontend workspace refusal is hardcoded; configurability is a named follow-up of ACE-480 without an issue yet.                                                                                                                                                                                   | —          |
-| `AbstractProfileFactory::updateProfileForUser()` / `academic:updateprofiles` does not dispatch the event, so a profile updated from its frontend user data is not synchronised.                                                                                                                      | —          |
 
 ## See also
 
