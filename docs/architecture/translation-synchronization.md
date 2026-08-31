@@ -123,12 +123,14 @@ languages of the context and issues DataHandler work per language:
   addresses, emails, phone numbers), `sys_file_reference` rows, MM relations,
   `l10n_diffsource` — because that is simply what the DataHandler does.
 - **Existing translations → exclude propagation + inline synchronize.** The
-  current values of the default record's propagatable `l10n_mode=exclude`
-  columns are re-submitted as a datamap **once per run**, and
-  `DataMapProcessor` carries them into every translation at the same time. Then
-  an `inlineLocalizeSynchronize` command (`action: synchronize`) per TCA
-  `inline` column and language carries children added to the default record
-  after the translation was created — including their own children.
+  current values of the propagatable `l10n_mode=exclude` columns — of the
+  default record *and of every default-language record in its inline child
+  tree* (ACE-487) — are re-submitted as **one datamap per run**, and
+  `DataMapProcessor` carries them into every translation of every touched
+  record at the same time. Then an `inlineLocalizeSynchronize` command
+  (`action: synchronize`) per TCA `inline` column and language carries children
+  added to the default record after the translation was created — including
+  their own children.
 
 Two implementation choices worth their comments:
 
@@ -137,8 +139,14 @@ Two implementation choices worth their comments:
   are excluded from the datamap: their database values are counters or uid
   CSVs that a datamap re-submission would reinterpret as relation writes (the
   profile's `frontend_users` counter `1` would become "relate to fe_user 1").
-  Their create-path synchronisation is covered by `localize`; on the update
-  path they are deliberately left alone — see the gaps below.
+  That filter costs nothing on the sync side: `DataMapProcessor` synchronizes
+  **all** `l10n_mode=exclude` columns of a record the datamap touches, reading
+  their values from the database row (`populateTranslationItem()` — file and
+  inline references via `synchronizeReferences()`, MM via
+  `synchronizeDirectRelations()`). A file reference or MM relation added to
+  the default record after its translation exists is therefore carried over
+  by the update path too — probed and pinned for ACE-487, which had recorded
+  the opposite, design-inferred claim.
 - **One DataHandler instance per command.** A cmdmap is keyed
   `[table][uid][command]`, so it can hold only *one* command per record uid —
   `localize` per language and `inlineLocalizeSynchronize` per inline column
@@ -187,8 +195,8 @@ workspace aspect.
 
 One consequence is accepted rather than solved: DataHandler runs under the
 synthetic user write `sys_log` rows with `userid=0`. `enableLogging` stays on
-deliberately — switching it off is a follow-up decision parked in ACE-487, not
-something to smuggle into a rework.
+**by decision** (ACE-487): the rows are the audit trail of what the
+synchronisation wrote, and that trail outweighs the noise of a bulk CLI run.
 
 ## Workspace semantics
 
@@ -280,13 +288,12 @@ legacy rows stay, they just stop being selected alongside their originals.
 
 Stated so they are decisions, not surprises:
 
-| Gap                                                                                                                                                                                                                                                                                                                                                                                 | Tracked as |
-|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
-| The update path does not re-propagate exclude columns of already-translated **children** (a contract's `l10n_mode=exclude` value changed after its translation exists stays stale), and file references or MM relations added after the translation exists are not carried — `inlineLocalizeSynchronize` is issued for TCA `inline` columns only. The create path covers all of it. | ACE-487    |
-| `sys_log` rows with `userid=0` from synthetic-user runs; whether to turn `enableLogging` off is parked with the update-path gaps.                                                                                                                                                                                                                                                   | ACE-487    |
-| Branch `2` still carries the contract relation select defect the rework surfaced: the "please select" items wrote `''` into nullable integer columns, which PostgreSQL rejects (`main` fixed it as ACE-489 — the columns are `NOT NULL DEFAULT 0` there now).                                                                                                                       | ACE-488    |
-| The frontend workspace refusal is hardcoded; configurability is a named follow-up of ACE-480 without an issue yet.                                                                                                                                                                                                                                                                  | —          |
-| `AbstractProfileFactory::updateProfileForUser()` / `academic:updateprofiles` does not dispatch the event, so a profile updated from its frontend user data is not synchronised.                                                                                                                                                                                                     | —          |
+| Gap                                                                                                                                                                                                                                                                                                  | Tracked as |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| ~~Update-path gaps~~ — resolved by ACE-487: children's exclude columns are re-propagated by the inline-tree datamap now, and the late-file/MM half turned out never to be a gap (core's `DataMapProcessor` carries both; probed, pinned by tests). `enableLogging` stays on by decision — see above. | ACE-487    |
+| Branch `2` still carries the contract relation select defect the rework surfaced: the "please select" items wrote `''` into nullable integer columns, which PostgreSQL rejects (`main` fixed it as ACE-489 — the columns are `NOT NULL DEFAULT 0` there now).                                        | ACE-488    |
+| The frontend workspace refusal is hardcoded; configurability is a named follow-up of ACE-480 without an issue yet.                                                                                                                                                                                   | —          |
+| `AbstractProfileFactory::updateProfileForUser()` / `academic:updateprofiles` does not dispatch the event, so a profile updated from its frontend user data is not synchronised.                                                                                                                      | —          |
 
 ## See also
 
