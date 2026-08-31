@@ -59,6 +59,10 @@ error about the unknown columns:
     is specific to a table gaining columns and an index over exactly those new
     columns in one step — which is what this change is. Verified on TYPO3 v13.
 
+    This is a TYPO3 Core defect, tracked as `forge issue #110422
+    <https://forge.typo3.org/issues/110422>`__ with a fix under review that is
+    scheduled for TYPO3 v13.4, v14.3 and main.
+
     Take the schema from a database built with the new state rather than
     migrating an existing one, and check afterwards that
     :sql:`tx_academicstudyplan_domain_model_category` really carries the four
