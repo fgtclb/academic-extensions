@@ -35,7 +35,7 @@ It is **not** the Extbase query object. `TYPO3\CMS\Extbase\Persistence\Generic\Q
 also offers an `in()` method (line 503 on v13.4.34, line 512 on v12.4.45), but
 that one takes a plain PHP array by design and builds an object-level
 constraint, not SQL. Extbase repository code such as
-`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:233`
+`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:246`
 (`$query->matching($query->in('uid', $profileUidArray))`) is therefore outside
 the scope of both rules below — ten such call sites exist across five
 repositories. Check which object is in the variable before applying either rule
