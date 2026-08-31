@@ -84,6 +84,10 @@ class ProjectRepository extends Repository
         $query->setOrderings(
             [
                 $demand->getSortingField() => strtoupper($demand->getSortingDirection()),
+                // Records equal in the demanded ordering would otherwise follow the DBMS
+                // row order, which is not the same list twice (ACE-491). None of the
+                // `SortingOptions` sorts by `uid`, so the tiebreaker never collides.
+                'uid' => QueryInterface::ORDER_ASCENDING,
             ]
         );
 
