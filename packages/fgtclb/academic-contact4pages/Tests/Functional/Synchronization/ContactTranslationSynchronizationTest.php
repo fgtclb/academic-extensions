@@ -20,27 +20,20 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Characterisation of what `RecordSynchronizer` does to `academic_contacts4pages`
  * contact records today (ACE-103 / HNEE-1249, resolution planned as ACE-484).
  *
- * A contact is an inline child of a contract (foreign_field `contract`), so the
- * synchronizer's inline recursion is meant to reach it when a profile is synchronised
- * into a target language. Two independent defects meet here:
+ * A contact is an inline child of a contract (foreign_field `contract`), and since
+ * ACE-483 routed the synchroniser through the DataHandler the inline cascade is ALIVE
+ * AGAIN: a profile synchronisation localizes the contract and the contact below it.
+ * That makes the `page`-copy defect this class pins urgent, because it is now reachable
+ * from the production path - not only by handing the contact table to the service
+ * directly:
  *
- * 1. The recursion is dead code. `synchronizeRecord()` reads the column type from
- *    `$columnDefinition['type']` - a key that does not exist in TCA, where the type
- *    lives in `config` - so every column resolves to `unknown` and no inline child is
- *    ever visited. A profile synchronisation translates the profile row and nothing
- *    below it. The lookup broke when the code was extracted out of
- *    `SyncChangesToTranslations` (819ceebe8, first released in 2.1.0); the listener
- *    before that read `config['type']` and did recurse, which is how the duplicated
- *    contacts of ACE-103 came into existence. The first test pins the dead recursion.
- * 2. `createTranslation()` copies every non-inline column verbatim. The contact's
- *    `page` column is a plain `group` field pointing at `pages` without
- *    `l10n_mode=exclude`, so the moment a contact is synchronised - today only by
- *    handing the contact table to the service directly, after a recursion fix through
- *    the profile as well - the translated contact carries the default-language page
- *    uid, whether or not that page is translated. The remaining tests pin that copy
- *    mechanism and the read-side duplication it produces.
+ * DataHandler `localize` copies the contact's `page` column verbatim. It is a plain
+ * `group` field pointing at `pages` without `l10n_mode=exclude` and without any policy,
+ * so the translated contact carries the default-language page uid whether or not that
+ * page is translated. The read side (`ContactRepository::findByPid()`) then returns the
+ * one contact twice under the translated language.
  *
- * Every test here pins CURRENT behaviour, defects included; none of it is endorsed.
+ * The page-copy tests pin CURRENT behaviour, defects included; none of it is endorsed.
  * When ACE-484 changes the policy - no translated contact for an untranslated page -
  * these assertions are where the change must become visible.
  */
@@ -155,36 +148,40 @@ final class ContactTranslationSynchronizationTest extends AbstractAcademicContac
     }
 
     /**
-     * DEFECT PINNED DOWN, NOT ENDORSED (ACE-484). Synchronising the profile translates
-     * the profile row and stops there: no contract translation, no contact translation.
-     * The inline recursion of `RecordSynchronizer::synchronizeRecord()` tests
-     * `$columnDefinition['type']`, a key TCA does not have - the type sits in
-     * `config['type']` - so every column falls into the skip branch. Fixing that lookup
-     * makes the recursion reach contract and contact and this test fail; whoever gets
-     * there inherits the `page` copy defect the sibling tests document.
+     * Flipped ACE-483 pin: the DataHandler cascade reaches contract AND contact when
+     * the profile is synchronised. The translated contact carries the untranslated
+     * default-language page uid 2 verbatim - the ACE-484 defect, now reachable from
+     * the production path again, which is what makes ACE-484 urgent.
      */
     #[Test]
-    public function profileSynchronizationTranslatesTheProfileButNoInlineChild(): void
+    public function profileSynchronizationCascadesIntoContractAndContact(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageNotTranslated.csv');
+        $this->assertPageTwoHasNoTranslation();
 
         $this->synchronizeIntoGerman('tx_academicpersons_domain_model_profile', 1);
 
         $translatedProfile = $this->fetchTranslatedRow('tx_academicpersons_domain_model_profile');
         $this->assertSame(1, (int)$translatedProfile['l10n_parent']);
-        $this->assertCount(1, $this->fetchAllRows('tx_academicpersons_domain_model_contract'), 'Expected no contract translation - the inline recursion is dead code.');
-        $this->assertCount(1, $this->fetchAllRows('tx_academiccontacts4pages_domain_model_contact'), 'Expected no contact translation - the inline recursion is dead code.');
+        $this->assertCount(2, $this->fetchAllRows('tx_academicpersons_domain_model_contract'), 'Expected the contract to be translated by the cascade.');
+        $translatedContract = $this->fetchTranslatedRow('tx_academicpersons_domain_model_contract');
+        $this->assertSame((int)$translatedProfile['uid'], (int)$translatedContract['profile']);
+        $this->assertCount(2, $this->fetchAllRows('tx_academiccontacts4pages_domain_model_contact'), 'Expected the contact to be translated by the cascade.');
+        $translatedContact = $this->fetchTranslatedRow('tx_academiccontacts4pages_domain_model_contact');
+        $this->assertSame(1, (int)$translatedContact['l10n_parent']);
+        // The ACE-484 defect: the German contact points at the untranslated default-language page.
+        $this->assertSame(2, (int)$translatedContact['page']);
     }
 
     /**
      * DEFECT PINNED DOWN, NOT ENDORSED (ACE-484). Page 2 has no German translation, yet
      * synchronising the contact creates a German contact whose `page` column holds the
-     * default-language page uid 2, copied verbatim because nothing in
-     * `createTranslation()` looks at what a `group` column points at. The `contract`
-     * pointer is copied verbatim too, so the German contact hangs below the
-     * default-language contract. The intended policy (ACE-484) is that an untranslated
-     * page yields no translated contact at all; the day that lands, this test is the one
-     * that has to change.
+     * default-language page uid 2 - DataHandler `localize` copies a `group` column
+     * verbatim, and nothing supplies a policy. The `contract` pointer is copied verbatim
+     * too when the contact is localized directly (not through the profile cascade), so
+     * the German contact hangs below the default-language contract. The intended policy
+     * (ACE-484) is that an untranslated page yields no translated contact at all; the
+     * day that lands, this test is the one that has to change.
      */
     #[Test]
     public function contactSynchronizationCreatesAGermanContactForAPageThatHasNoGermanTranslation(): void
@@ -210,12 +207,14 @@ final class ContactTranslationSynchronizationTest extends AbstractAcademicContac
      * German language aspect the default contact and the German row the synchronizer
      * created both match `page = 2` - one contact, rendered twice. Both result objects
      * map to contact 1 with the German row as their localized uid, on v13 and v14 alike.
+     * The German row is arranged through the profile cascade - the production path since
+     * ACE-483 revived the recursion.
      */
     #[Test]
     public function findByPidUnderTheTranslatedLanguageReturnsTheSynchronizedContactTwice(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactTranslationSynchronization/pageNotTranslated.csv');
-        $this->synchronizeIntoGerman('tx_academiccontacts4pages_domain_model_contact', 1);
+        $this->synchronizeIntoGerman('tx_academicpersons_domain_model_profile', 1);
         $translatedContactUid = (int)$this->fetchTranslatedRow('tx_academiccontacts4pages_domain_model_contact')['uid'];
         $this->setUpLanguageAspect(1);
 
