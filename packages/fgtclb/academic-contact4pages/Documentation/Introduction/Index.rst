@@ -52,3 +52,29 @@ or directly in a page template through the data processor
 adds the contacts and their roles to the page rendering. Both display the person
 through the :file:`Profile/Item` partial of `EXT:academic_persons`, so contacts
 look like the profiles rendered by that extension.
+
+..  _introduction-page-translations:
+
+Contacts and page translations
+------------------------------
+
+The :guilabel:`Page` field of a contact always stores the uid of the
+default-language page — that is how TYPO3 models references to pages, and it
+does not change when the contact is translated.
+
+Since version 3.0 a contact follows its page's translations: localizing a
+contact — directly, by translating the contract or profile above it, or through
+the translation synchronisation of `EXT:academic_persons` — only yields a
+translated contact when the page it points at is translated into that language.
+For an untranslated page the freshly localized contact is removed again
+immediately (in the live workspace as a regular soft delete, in a workspace the
+new record is discarded), because such a translation carries no content of its
+own and would only make the contact appear twice on the page.
+
+The frontend shows each contact **exactly once per language**: where a
+translation exists it represents the contact, otherwise the default-language
+record is shown. Translated contact duplicates created by versions before 3.0
+therefore stop rendering without any database cleanup; the rows themselves are
+left untouched. Contacts copied into a language without a connection to a
+default-language record (free mode) are independent records and are exempt from
+all of this.
