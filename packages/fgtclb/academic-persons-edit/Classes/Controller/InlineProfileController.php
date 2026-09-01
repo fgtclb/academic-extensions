@@ -59,6 +59,7 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
+use TYPO3\CMS\Frontend\Controller\ErrorController;
 
 /**
  * Controller for inline profile editing via JSON-based frontend requests.
@@ -195,15 +196,31 @@ final class InlineProfileController extends AbstractActionController
      * This action fetches the editable profile data, checks for existence,
      * and assigns necessary data structures to the view for rendering.
      *
+     * A profile the authenticated user is not assigned to is answered with the
+     * access denied response of the site rather than with a rendered page carrying
+     * a 403 status: on TYPO3 v13 the status of an Extbase plugin response never
+     * reaches the frontend response - `Bootstrap::handleFrontendRequest()` passes
+     * it to `header()` and returns the body alone - so a `withStatus(403)` here
+     * would be answered with 200 on that version. The propagated response is the
+     * one both supported versions honour, and it is the same one
+     * {@see AbstractActionController::initializeAction()} raises for a visitor who
+     * is not logged in at all.
+     *
      * @param int $profileUid The unique ID of the profile to edit.
      * @return ResponseInterface The HTML response containing the editable profile view.
+     * @throws PropagateResponseException If the profile is not assigned to the authenticated user.
      */
     public function indexAction(int $profileUid): ResponseInterface
     {
         $profile = $this->profileUpdateRequestService->findEditableProfile($profileUid);
         if ($profile === null) {
-            $this->view->assign('profile', null);
-            return $this->htmlResponse()->withStatus(403);
+            throw new PropagateResponseException(
+                GeneralUtility::makeInstance(ErrorController::class)->accessDeniedAction(
+                    $this->request,
+                    'Profile not editable',
+                ),
+                1777046201,
+            );
         }
         $this->view->assignMultiple([
             'data' => $this->getCurrentContentObjectRenderer()?->data,
@@ -345,7 +362,7 @@ final class InlineProfileController extends AbstractActionController
                 $profileFormData,
             );
             $this->profileRepository->update($updatedProfile);
-            $this->persistenceManager->persistAll();
+            $this->persistAndDispatchProfileUpdate($updatedProfile);
             return new JsonResponse([
                 'success' => true,
                 'profile' => $updatedProfile->getUid(),
@@ -446,7 +463,7 @@ final class InlineProfileController extends AbstractActionController
                 $profileFormData,
             );
             $this->profileRepository->update($updatedProfile);
-            $this->persistenceManager->persistAll();
+            $this->persistAndDispatchProfileUpdate($updatedProfile);
             return new JsonResponse([
                 'success' => true,
                 'profile' => $updatedProfile->getUid(),
@@ -566,7 +583,7 @@ final class InlineProfileController extends AbstractActionController
                 $record->setPid((int)$profile->getPid());
                 $this->profileInformationRepository->add($record);
             }
-            $this->persistenceManager->persistAll();
+            $this->persistAndDispatchProfileUpdate($profile);
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
@@ -628,7 +645,7 @@ final class InlineProfileController extends AbstractActionController
                     ),
                 );
             }
-            $this->persistenceManager->persistAll();
+            $this->persistAndDispatchProfileUpdate($profile);
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
@@ -671,7 +688,7 @@ final class InlineProfileController extends AbstractActionController
             } else {
                 $this->profileInformationRepository->remove($record);
             }
-            $this->persistenceManager->persistAll();
+            $this->persistAndDispatchProfileUpdate($profile);
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
@@ -706,6 +723,9 @@ final class InlineProfileController extends AbstractActionController
                     $this->getDocumentRecords($profile, $section),
                     $this->getSubmittedDocumentOrder($data),
                 );
+                if ($process['changed']) {
+                    $this->persistAndDispatchProfileUpdate($profile);
+                }
                 return new JsonResponse([
                     'success' => true,
                     'profile' => $profile->getUid(),
@@ -733,6 +753,9 @@ final class InlineProfileController extends AbstractActionController
                 $recordUid,
                 $direction === 'up' ? ListSortingMode::UP : ListSortingMode::DOWN,
             );
+            if ($process->changed) {
+                $this->persistAndDispatchProfileUpdate($profile);
+            }
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
@@ -988,8 +1011,9 @@ final class InlineProfileController extends AbstractActionController
      * Reorders document records to the submitted sequence and updates their sorting values.
      *
      * The submitted order is validated to contain each record exactly once. Records are
-     * then assigned their new sorting position in increments of 10 and persisted when a
-     * change is required.
+     * then assigned their new sorting position in increments of 10 and marked as changed.
+     * Flushing them is left to the caller, which announces the change through
+     * {@see AbstractActionController::persistAndDispatchProfileUpdate()}.
      *
      * @param list<Contract|ProfileInformation> $records The records that should be reordered.
      * @param list<int> $order The desired order as a list of record UIDs.
@@ -1021,9 +1045,6 @@ final class InlineProfileController extends AbstractActionController
                 $changed = true;
             }
             $orderedRecords[] = $record;
-        }
-        if ($changed) {
-            $this->persistenceManager->persistAll();
         }
         return ['changed' => $changed, 'records' => $orderedRecords];
     }
@@ -1862,8 +1883,9 @@ final class InlineProfileController extends AbstractActionController
     /**
      * Persists the uploaded profile image and updates the associated metadata.
      *
-     * The profile is saved, pending database changes are flushed, the image metadata is updated,
-     * and the previously replaced image file is deleted afterwards.
+     * The profile is saved, pending database changes are flushed and the change is announced,
+     * the image metadata is updated, and the previously replaced image file is deleted
+     * afterwards.
      *
      * @param File|null $replacedImageFile The image file that was replaced by the newly uploaded one, if any.
      * @return array{alternative: string, title: string} The updated metadata for the uploaded profile image.
@@ -1871,7 +1893,7 @@ final class InlineProfileController extends AbstractActionController
     private function persistUploadedProfileImage(Profile $profile, ?File $replacedImageFile): array
     {
         $this->profileRepository->update($profile);
-        $this->persistenceManager->persistAll();
+        $this->persistAndDispatchProfileUpdate($profile);
         $imageMetadata = $this->updateUploadedProfileImageMetadata($profile);
         $this->deleteReplacedProfileImageFile($replacedImageFile, $profile);
         return $imageMetadata;
@@ -2005,7 +2027,7 @@ final class InlineProfileController extends AbstractActionController
         $profile->setImage(null);
         $this->profileRepository->update($profile);
         $this->persistenceManager->remove($image);
-        $this->persistenceManager->persistAll();
+        $this->persistAndDispatchProfileUpdate($profile);
         if ($this->countFileReferences($imageFile) === 0) {
             $imageFile->getStorage()->deleteFile($imageFile);
         }

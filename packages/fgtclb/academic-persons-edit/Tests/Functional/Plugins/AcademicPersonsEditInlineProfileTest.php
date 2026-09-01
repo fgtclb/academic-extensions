@@ -1606,6 +1606,71 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertSame([], $this->getStoredFiles());
     }
 
+    /**
+     * The sorting values of one document section, keyed by record uid and ordered
+     * the way the database holds them.
+     *
+     * @return array<int, int>
+     */
+    private function getPersistedDocumentSorting(string $type): array
+    {
+        $rows = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile_information')
+            ->executeQuery(
+                'SELECT uid, sorting FROM tx_academicpersons_domain_model_profile_information'
+                . ' WHERE profile = ? AND type = ? AND deleted = 0 ORDER BY sorting ASC, uid ASC',
+                [self::PROFILE_ID, $type],
+            )
+            ->fetchAllAssociative();
+        $sorting = [];
+        foreach ($rows as $row) {
+            $sorting[(int)$row['uid']] = (int)$row['sorting'];
+        }
+        return $sorting;
+    }
+
+    /**
+     * Both branches of "sortDocument" write what they answer.
+     *
+     * The response of the action is built from the in-memory objects and the existing
+     * coverage asserts only that, so it reports the new order whether or not the same
+     * order reached the database. This asserts the rows. Neither branch flushes by
+     * itself - the step-wise one delegates to `ListSortingService`, which marks the
+     * records through the persistence manager and leaves them there, and the reorder
+     * branch does the same inline - so what makes the two agree today is the
+     * `persistAll()` of `Extbase\Core\Bootstrap::resetSingletons()` at the end of every
+     * plugin dispatch, plus the flush of `persistAndDispatchProfileUpdate()`. This pins
+     * the outcome rather than either mechanism.
+     */
+    #[Test]
+    public function sortDocumentPersistsTheNewOrderOfASection(): void
+    {
+        $this->setUpInlineProfileTestCase();
+        $this->seedStructuredDocumentSections();
+        $sortUrl = $this->extractDataUrl($this->renderInlineProfilePage(), 'data-sort-document-url');
+        $this->assertSame([1 => 10, 2 => 20], $this->getPersistedDocumentSorting('cooperation'));
+
+        $stepResponse = $this->postJson($sortUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'cooperation', 'record' => 2, 'direction' => 'up'],
+        ]);
+        $this->assertSame(200, $stepResponse->getStatusCode(), (string)$stepResponse->getBody());
+        $stepBody = json_decode((string)$stepResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertTrue($stepBody['changed'] ?? null);
+        $this->assertSame([2, 1], $stepBody['order'] ?? null);
+        $this->assertSame([2 => 10, 1 => 20], $this->getPersistedDocumentSorting('cooperation'));
+
+        $reorderResponse = $this->postJson($sortUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'cooperation', 'order' => [1, 2]],
+        ]);
+        $this->assertSame(200, $reorderResponse->getStatusCode(), (string)$reorderResponse->getBody());
+        $reorderBody = json_decode((string)$reorderResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertTrue($reorderBody['changed'] ?? null);
+        $this->assertSame([1, 2], $reorderBody['order'] ?? null);
+        $this->assertSame([1 => 10, 2 => 20], $this->getPersistedDocumentSorting('cooperation'));
+    }
+
     #[Test]
     public function inlineEditorLabelsAreShippedInBothLanguages(): void
     {
