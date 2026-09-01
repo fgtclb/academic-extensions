@@ -30,10 +30,10 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
             position: 0,
         );
         $subject = new AcademicPersonsSettings(profileSections: ['information' => $section]);
-        self::assertSame($section, $subject->getProfileSection('information'));
-        self::assertSame($field, $subject->getProfileField('profileWebsite'));
-        self::assertSame($field, $subject->getProfileField('website'));
-        self::assertNull($subject->getProfileField('unknown'));
+        $this->assertSame($section, $subject->getProfileSection('information'));
+        $this->assertSame($field, $subject->getProfileField('profileWebsite'));
+        $this->assertSame($field, $subject->getProfileField('website'));
+        $this->assertNull($subject->getProfileField('unknown'));
     }
 
     #[Test]
@@ -41,27 +41,27 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
     {
         $subject = new AcademicPersonsSettings();
         $section = $subject->getProfileSectionOrEmpty('aboutme');
-        self::assertSame('aboutme', $section->identifier);
-        self::assertSame([], $section->fields);
-        self::assertSame('aboutme', $section->validationSet->identifier);
-        self::assertSame([], $section->validationSet->validations);
+        $this->assertSame('aboutme', $section->identifier);
+        $this->assertSame([], $section->fields);
+        $this->assertSame('aboutme', $section->validationSet->identifier);
+        $this->assertSame([], $section->validationSet->validations);
     }
 
     #[Test]
     public function publicProfileDefaultsToEmptySettingsAndIsExposedByGetter(): void
     {
         $defaultSettings = new AcademicPersonsSettings();
-        self::assertSame([], $defaultSettings->publicProfile->structure);
-        self::assertSame([], $defaultSettings->publicProfile->details);
-        self::assertSame($defaultSettings->publicProfile, $defaultSettings->getPublicProfile());
+        $this->assertSame([], $defaultSettings->publicProfile->structure);
+        $this->assertSame([], $defaultSettings->publicProfile->details);
+        $this->assertSame($defaultSettings->publicProfile, $defaultSettings->getPublicProfile());
         $publicProfile = new PublicProfileSettings(
             structure: ['left' => ['menuSections'], 'right' => ['headline']],
             details: ['headline' => ['firstName', 'lastName']],
         );
         $subject = new AcademicPersonsSettings(publicProfile: $publicProfile);
-        self::assertSame($publicProfile, $subject->publicProfile);
-        self::assertSame(['menuSections'], $subject->publicProfile->getColumn('left'));
-        self::assertSame([], $subject->publicProfile->getColumn('unknown'));
+        $this->assertSame($publicProfile, $subject->publicProfile);
+        $this->assertSame(['menuSections'], $subject->publicProfile->getColumn('left'));
+        $this->assertSame([], $subject->publicProfile->getColumn('unknown'));
     }
 
     #[Test]
@@ -72,9 +72,9 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
         $information = $this->profileSection('information', [$informationField]);
         $about = $this->profileSection('aboutme', [$aboutField]);
         $subject = new AcademicPersonsSettings(profileSections: ['information' => $information, 'aboutme' => $about]);
-        self::assertSame($information->validationSet, $subject->getProfileValidationSet('information'));
-        self::assertSame(['gender', 'miscellaneous'], array_keys($subject->getProfileValidationSet()->validations));
-        self::assertSame([], $subject->getProfileValidationSet('unknown')->validations);
+        $this->assertSame($information->validationSet, $subject->getProfileValidationSet('information'));
+        $this->assertSame(['gender', 'miscellaneous'], array_keys($subject->getProfileValidationSet()->validations));
+        $this->assertSame([], $subject->getProfileValidationSet('unknown')->validations);
     }
 
     #[Test]
@@ -86,10 +86,10 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
             profileSections: ['information' => $this->profileSection('information', [$website, $title])],
         );
         $subset = $subject->getProfileValidationSetForFields(['website'], 'information');
-        self::assertSame('information', $subset->identifier);
-        self::assertSame(['website'], array_keys($subset->validations));
-        self::assertSame($website->validation, $subset->get('website'));
-        self::assertSame([], $subject->getProfileValidationSetForFields(['website'], 'aboutme')->validations);
+        $this->assertSame('information', $subset->identifier);
+        $this->assertSame(['website'], array_keys($subset->validations));
+        $this->assertSame($website->validation, $subset->get('website'));
+        $this->assertSame([], $subject->getProfileValidationSetForFields(['website'], 'aboutme')->validations);
     }
 
     #[Test]
@@ -110,13 +110,13 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
                 'physicalAddresses' => $this->contractContactSection('physicalAddresses', [$contractStreet]),
             ],
         );
-        self::assertSame($profileStreet, $subject->getProfileField('street'));
-        self::assertSame($contractStreet, $subject->getContractContactField('street'));
-        self::assertSame(['street'], array_keys(
+        $this->assertSame($profileStreet, $subject->getProfileField('street'));
+        $this->assertSame($contractStreet, $subject->getContractContactField('street'));
+        $this->assertSame(['street'], array_keys(
             $subject->getContractContactValidationSet('physicalAddresses')->validations,
         ));
-        self::assertSame([], $subject->getContractContactValidationSet('emailAddresses')->validations);
-        self::assertSame(
+        $this->assertSame([], $subject->getContractContactValidationSet('emailAddresses')->validations);
+        $this->assertSame(
             [],
             $subject->getContractContactValidationSetForFields(
                 ['street'],
@@ -153,7 +153,7 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
             ],
             specialFields: ['title' => $title, 'skipSync' => $skipSync],
         );
-        self::assertSame(
+        $this->assertSame(
             ['gender', 'skipSync'],
             array_keys($subject->getProfileUpdateValidationSet()->validations),
         );
@@ -164,10 +164,10 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
     {
         $section = $this->documentSection('publications', 'publication');
         $subject = new AcademicPersonsSettings(documentSections: ['publications' => $section]);
-        self::assertSame($section, $subject->getDocumentSection('publications'));
-        self::assertSame($section, $subject->getDocumentSectionByType('publication'));
-        self::assertNull($subject->getDocumentSection('unknown'));
-        self::assertNull($subject->getDocumentSectionByType('unknown'));
+        $this->assertSame($section, $subject->getDocumentSection('publications'));
+        $this->assertSame($section, $subject->getDocumentSectionByType('publication'));
+        $this->assertNull($subject->getDocumentSection('unknown'));
+        $this->assertNull($subject->getDocumentSectionByType('unknown'));
     }
 
     #[Test]
@@ -175,10 +175,10 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
     {
         $publication = $this->documentSection('publications', 'publication');
         $subject = new AcademicPersonsSettings(documentSections: ['publications' => $publication]);
-        self::assertSame($publication->validationSet, $subject->getDocumentValidationSet('publications'));
-        self::assertSame($publication->validationSet, $subject->getDocumentValidationSetByType('publication'));
-        self::assertSame([], $subject->getDocumentValidationSet('lectures')->validations);
-        self::assertSame([], $subject->getDocumentValidationSetByType('lecture')->validations);
+        $this->assertSame($publication->validationSet, $subject->getDocumentValidationSet('publications'));
+        $this->assertSame($publication->validationSet, $subject->getDocumentValidationSetByType('publication'));
+        $this->assertSame([], $subject->getDocumentValidationSet('lectures')->validations);
+        $this->assertSame([], $subject->getDocumentValidationSetByType('lecture')->validations);
     }
 
     #[Test]
@@ -189,11 +189,11 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
         $subject = new AcademicPersonsSettings(
             profileSections: ['information' => $this->profileSection('information', [$firstName, $middleName])],
         );
-        self::assertSame(
+        $this->assertSame(
             ['columns' => ['first_name' => ['config' => ['required' => true]]]],
             $subject->getProfileValidationTcaTableConfig(),
         );
-        self::assertSame(
+        $this->assertSame(
             [],
             $subject->getProfileValidationTcaTableConfig(['firstName'], 'aboutme'),
         );
@@ -212,7 +212,7 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
                 'lectures' => $lecture,
             ],
         );
-        self::assertSame(
+        $this->assertSame(
             [
                 'types' => [
                     'publication' => ['columnsOverrides' => ['title' => ['config' => ['required' => true]]]],
@@ -257,11 +257,11 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
             raw: ['profile' => ['miscellaneous' => ['section' => 'aboutme']]],
         );
         $restored = eval('return ' . var_export($subject, true) . ';');
-        self::assertInstanceOf(AcademicPersonsSettings::class, $restored);
-        self::assertEquals($subject, $restored);
-        self::assertNotSame($subject, $restored);
-        self::assertSame(['headline', 'profileEntries'], $restored->publicProfile->getColumn('right'));
-        self::assertSame(['title', 'firstName', 'lastName'], $restored->publicProfile->details['headline']);
+        $this->assertInstanceOf(AcademicPersonsSettings::class, $restored);
+        $this->assertEquals($subject, $restored);
+        $this->assertNotSame($subject, $restored);
+        $this->assertSame(['headline', 'profileEntries'], $restored->publicProfile->getColumn('right'));
+        $this->assertSame(['title', 'firstName', 'lastName'], $restored->publicProfile->details['headline']);
     }
 
     private function contractContactField(

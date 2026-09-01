@@ -26,7 +26,6 @@ use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ResponseInterface;
-use ReflectionProperty;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -384,7 +383,7 @@ final class InlineProfileControllerTest extends UnitTestCase
             $this->createStub(ProfileRichTextSanitizerInterface::class),
         );
 
-        $requestProperty = new ReflectionProperty(
+        $requestProperty = new \ReflectionProperty(
             ActionController::class,
             'request',
         );
@@ -442,7 +441,7 @@ final class InlineProfileControllerTest extends UnitTestCase
         $this->assertSame(
             $expectedBody,
             json_decode(
-                (string) $response->getBody(),
+                (string)$response->getBody(),
                 true,
                 512,
                 JSON_THROW_ON_ERROR,

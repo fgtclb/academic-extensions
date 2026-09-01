@@ -484,6 +484,9 @@ The class docblock carries a `@todo` proposing extraction into a dedicated
 public helper package with its own TYPO3 and testing-framework constraints. Not
 done; the trait is used by one test class today.
 
+## `Frontend Test JavaScript for: academic-persons-edit`
+[Frontend Tests: academic-persons-edit](academic-persons-edit-frontend-tests.md)
+
 ## See also
 
 - [Functional tests](functional-tests.md)

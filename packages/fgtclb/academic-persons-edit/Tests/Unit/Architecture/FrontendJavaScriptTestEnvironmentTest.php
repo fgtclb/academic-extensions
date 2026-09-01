@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Architecture;
 
-use JsonException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -22,8 +21,8 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
         $this->assertIsString($packageSource);
         try {
             $package = json_decode($packageSource, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $exception) {
-            self::fail('Invalid JavaScript development package: ' . $exception->getMessage());
+        } catch (\JsonException $exception) {
+            $this->fail('Invalid JavaScript development package: ' . $exception->getMessage());
         }
         $this->assertIsArray($package);
         $this->assertSame('module', $package['type'] ?? null);
@@ -36,11 +35,13 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
             '--experimental-vm-modules',
             (string)($package['scripts']['test'] ?? ''),
         );
-        $this->assertArrayHasKey('@babel/core', $package['devDependencies'] ?? []);
-        $this->assertArrayHasKey('@babel/preset-env', $package['devDependencies'] ?? []);
-        $this->assertArrayHasKey('babel-jest', $package['devDependencies'] ?? []);
-        $this->assertArrayHasKey('jest', $package['devDependencies'] ?? []);
-        $this->assertArrayHasKey('jest-environment-jsdom', $package['devDependencies'] ?? []);
+        $devDependencies = $package['devDependencies'] ?? [];
+        $this->assertIsArray($devDependencies);
+        $this->assertArrayHasKey('@babel/core', $devDependencies);
+        $this->assertArrayHasKey('@babel/preset-env', $devDependencies);
+        $this->assertArrayHasKey('babel-jest', $devDependencies);
+        $this->assertArrayHasKey('jest', $devDependencies);
+        $this->assertArrayHasKey('jest-environment-jsdom', $devDependencies);
         $jestConfigFile = $developmentDirectory . '/jest.config.cjs';
         $this->assertFileExists($jestConfigFile);
         $jestConfigSource = file_get_contents($jestConfigFile);
@@ -59,8 +60,8 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
         $this->assertIsString($modulePackageSource);
         try {
             $modulePackage = json_decode($modulePackageSource, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $exception) {
-            self::fail('Invalid JavaScript module package: ' . $exception->getMessage());
+        } catch (\JsonException $exception) {
+            $this->fail('Invalid JavaScript module package: ' . $exception->getMessage());
         }
         $this->assertIsArray($modulePackage);
         $this->assertSame('module', $modulePackage['type'] ?? null);

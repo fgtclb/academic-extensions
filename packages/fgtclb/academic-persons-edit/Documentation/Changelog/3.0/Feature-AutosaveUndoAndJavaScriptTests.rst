@@ -1,4 +1,3 @@
-..  include:: /Includes.rst.txt
 
 ..  _feature-autosave-undo-and-javascript-tests:
 

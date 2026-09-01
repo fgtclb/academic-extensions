@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersonsEdit\Domain\Model\Dto;
 
 /**
- *
  * @internal to be used only in `EXT:academic_persons_edit` and not part of public API. May change at any time.
- * 
+ *
  *  Properties:
  * - property missing from $data: do not change the persisted value
  * - property present with "": explicitly clear the persisted value
  * - property present with a value: update the persisted value
- * 
  */
 final readonly class ProfileUpdatePayload
 {
@@ -22,8 +20,7 @@ final readonly class ProfileUpdatePayload
     public function __construct(
         private int $profileUid,
         private array $data,
-    ) {
-    }
+    ) {}
 
     public function getProfileUid(): int
     {

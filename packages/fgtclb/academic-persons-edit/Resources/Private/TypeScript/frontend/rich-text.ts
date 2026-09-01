@@ -59,7 +59,9 @@ export const initializeEditors = (
   return true;
 };
 
-let waitForEditor: number;
+const waitForEditor = window.setInterval((): void => {
+  pollForEditor();
+}, 100);
 
 export const pollForEditor = (): void => {
   const ckeditor = getEditor();
@@ -68,7 +70,3 @@ export const pollForEditor = (): void => {
   }
   window.clearInterval(waitForEditor);
 };
-
-waitForEditor = window.setInterval((): void => {
-  pollForEditor();
-}, 100);

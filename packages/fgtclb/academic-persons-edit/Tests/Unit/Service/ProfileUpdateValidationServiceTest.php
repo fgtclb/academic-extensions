@@ -22,7 +22,6 @@ use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
-use UnexpectedValueException;
 
 final class ProfileUpdateValidationServiceTest extends UnitTestCase
 {
@@ -59,7 +58,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
         );
         $factory = $this->createMock(ProfileFormDataFactoryInterface::class);
         $factory
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('createFromProfile')
             ->with($context, $profile)
             ->willReturn($formData);
@@ -78,13 +77,13 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             ),
         );
 
-        self::assertSame($formData, $result);
-        self::assertSame('Submitted', $result->getPropertyOverride('firstName'));
-        self::assertSame('', $result->getPropertyOverride('website'));
-        self::assertTrue($result->getPropertyOverride('skipSync'));
-        self::assertTrue($result->shouldApplyProperty('firstName'));
-        self::assertFalse($result->hasPropertyOverride('lastName'));
-        self::assertFalse($result->shouldApplyProperty('lastName'));
+        $this->assertSame($formData, $result);
+        $this->assertSame('Submitted', $result->getPropertyOverride('firstName'));
+        $this->assertSame('', $result->getPropertyOverride('website'));
+        $this->assertTrue($result->getPropertyOverride('skipSync'));
+        $this->assertTrue($result->shouldApplyProperty('firstName'));
+        $this->assertFalse($result->hasPropertyOverride('lastName'));
+        $this->assertFalse($result->shouldApplyProperty('lastName'));
     }
 
     #[Test]
@@ -92,7 +91,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     {
         $subject = $this->createSubjectForFormData(new ProfileFormData());
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Unknown profile property "unknown".');
 
         $subject->createFormData(
@@ -119,7 +118,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             $this->createStub(ProfileRichTextSanitizerInterface::class),
             $settings,
         );
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Unknown profile property "firstName".');
         $subject->createFormData(
             $this->createPluginControllerActionContext(),
@@ -142,7 +141,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             $this->createStub(ProfileRichTextSanitizerInterface::class),
             $settings,
         );
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Unknown profile property "title".');
         $subject->createFormData(
             $this->createPluginControllerActionContext(),
@@ -160,7 +159,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
         ]);
         $subject = $this->createSubjectForFormData(new ProfileFormData());
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Invalid gender value.');
 
         $subject->createFormData(
@@ -204,8 +203,8 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             ),
         );
 
-        self::assertTrue($result->hasPropertyOverride('gender'));
-        self::assertSame($gender, $result->getPropertyOverride('gender'));
+        $this->assertTrue($result->hasPropertyOverride('gender'));
+        $this->assertSame($gender, $result->getPropertyOverride('gender'));
     }
 
     /**
@@ -237,7 +236,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             $settings,
         );
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Invalid select value for profile property "firstName".');
 
         $subject->createFormData(
@@ -255,12 +254,12 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
         $factory->method('createFromProfile')->willReturn($formData);
         $sanitizer = $this->createMock(ProfileRichTextSanitizerInterface::class);
         $sanitizer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('supports')
             ->with('coreCompetences')
             ->willReturn(true);
         $sanitizer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('sanitize')
             ->with('<p onclick="alert(1)">Secure content</p>')
             ->willReturn('<p>Secure content</p>');
@@ -281,8 +280,8 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
             new Profile(),
             $payload,
         );
-        self::assertSame('<p>Secure content</p>', $result->getPropertyOverride('coreCompetences'));
-        self::assertSame(
+        $this->assertSame('<p>Secure content</p>', $result->getPropertyOverride('coreCompetences'));
+        $this->assertSame(
             ['coreCompetences' => '<p>Secure content</p>'],
             $subject->getNormalizedData($result, $payload),
         );
@@ -292,7 +291,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     public function nonStringProfileFieldValueIsRejected(): void
     {
         $subject = $this->createSubjectForFormData(new ProfileFormData());
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Invalid value for profile property "firstName".');
         $subject->createFormData(
             $this->createPluginControllerActionContext(),
@@ -309,7 +308,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
     {
         $subject = $this->createSubjectForFormData(new ProfileFormData());
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage(
             'Invalid boolean value for profile property "skipSync".',
         );
@@ -346,7 +345,7 @@ final class ProfileUpdateValidationServiceTest extends UnitTestCase
         $formData->setPropertyOverride('firstName', 'Jane');
         $result = $subject->validate($formData);
 
-        self::assertSame(
+        $this->assertSame(
             ['string(Jane)'],
             array_map(
                 static fn($error): string => $error->getMessage(),

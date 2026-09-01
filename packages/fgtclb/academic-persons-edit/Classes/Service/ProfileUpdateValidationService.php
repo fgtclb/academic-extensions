@@ -12,7 +12,6 @@ use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileUpdatePayload;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
 use TYPO3\CMS\Extbase\Error\Result;
-use UnexpectedValueException;
 
 final readonly class ProfileUpdateValidationService
 {
@@ -33,13 +32,13 @@ final readonly class ProfileUpdateValidationService
         $editableProperties = $this->getEditableProperties($profileFormData);
         foreach ($payload->getData() as $propertyName => $value) {
             if (!in_array($propertyName, $editableProperties, true)) {
-                throw new UnexpectedValueException(sprintf('Unknown profile property "%s".', $propertyName));
+                throw new \UnexpectedValueException(sprintf('Unknown profile property "%s".', $propertyName));
             }
             $profileField = $this->academicPersonsSettings->getProfileField($propertyName);
             $specialField = $this->academicPersonsSettings->getSpecialField($propertyName);
             if (strtolower($profileField?->renderType ?? '') === 'select') {
                 if (!is_string($value) || !$this->profileFieldOptionsService->isAllowed($propertyName, $value)) {
-                    throw new UnexpectedValueException(
+                    throw new \UnexpectedValueException(
                         $propertyName === 'gender'
                             ? 'Invalid gender value.'
                             : sprintf('Invalid select value for profile property "%s".', $propertyName),
@@ -50,12 +49,12 @@ final readonly class ProfileUpdateValidationService
                 || strtolower($profileField?->renderType ?? $specialField?->renderType ?? '') === 'checkbox'
             ) {
                 if (!is_bool($value)) {
-                    throw new UnexpectedValueException(sprintf('Invalid boolean value for profile property "%s".', $propertyName));
+                    throw new \UnexpectedValueException(sprintf('Invalid boolean value for profile property "%s".', $propertyName));
                 }
             } elseif (!is_string($value)) {
-                throw new UnexpectedValueException(sprintf('Invalid value for profile property "%s".', $propertyName));
+                throw new \UnexpectedValueException(sprintf('Invalid value for profile property "%s".', $propertyName));
             }
-            if ($this->profileRichTextSanitizer->supports($propertyName)) {
+            if (is_string($value) && $this->profileRichTextSanitizer->supports($propertyName)) {
                 $value = $this->profileRichTextSanitizer->sanitize($value);
             }
             $profileFormData->setPropertyOverride($propertyName, $value);
@@ -73,7 +72,7 @@ final readonly class ProfileUpdateValidationService
         $data = [];
         foreach (array_keys($payload->getData()) as $propertyName) {
             if (!$profileFormData->hasPropertyOverride($propertyName)) {
-                throw new UnexpectedValueException(sprintf('Profile property "%s" was not normalized.', $propertyName));
+                throw new \UnexpectedValueException(sprintf('Profile property "%s" was not normalized.', $propertyName));
             }
             $data[$propertyName] = $profileFormData->getPropertyOverride($propertyName);
         }

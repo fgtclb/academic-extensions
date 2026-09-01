@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Model\Dto;
 
-use DateTime;
 use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
 use PHPUnit\Framework\Attributes\Test;
@@ -68,9 +67,9 @@ final class ProfileInformationFormDataTest extends UnitTestCase
         $profileInformation->setTitle('Research assistant');
         $profileInformation->setBodytext('Worked on distributed systems.');
         $profileInformation->setLink('https://example.org/vita');
-        $profileInformation->setYear(new DateTime('2021-05-12'));
-        $profileInformation->setYearStart(new DateTime('2018-02-03'));
-        $profileInformation->setYearEnd(new DateTime('2024-11-30'));
+        $profileInformation->setYear(new \DateTime('2021-05-12'));
+        $profileInformation->setYearStart(new \DateTime('2018-02-03'));
+        $profileInformation->setYearEnd(new \DateTime('2024-11-30'));
         $profileInformation->setYearOnly(true);
 
         $formData = ProfileInformationFormData::createFromProfileInformation($profileInformation);
@@ -107,7 +106,7 @@ final class ProfileInformationFormDataTest extends UnitTestCase
     public function unsetYearsStayNullInsteadOfBecomingZero(): void
     {
         $profileInformation = new ProfileInformation();
-        $profileInformation->setYearStart(new DateTime('2018-06-15'));
+        $profileInformation->setYearStart(new \DateTime('2018-06-15'));
 
         $formData = ProfileInformationFormData::createFromProfileInformation($profileInformation);
 

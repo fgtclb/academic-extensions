@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Architecture;
 
-use FilesystemIterator;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 
 final class InlineProfileIsolationTest extends TestCase
 {
@@ -23,10 +20,10 @@ final class InlineProfileIsolationTest extends TestCase
             self::EXTENSION_ROOT . '/Resources/Private/Templates/InlineProfile/List.html',
             self::EXTENSION_ROOT . '/Resources/Public/JavaScript/frontend/profile.js',
         ];
-        $partials = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
+        $partials = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
                 self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile',
-                FilesystemIterator::SKIP_DOTS,
+                \FilesystemIterator::SKIP_DOTS,
             ),
         );
         foreach ($partials as $partial) {
@@ -34,10 +31,10 @@ final class InlineProfileIsolationTest extends TestCase
                 $sourceFiles[] = $partial->getPathname();
             }
         }
-        $javaScriptModules = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
+        $javaScriptModules = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
                 self::EXTENSION_ROOT . '/Resources/Public/JavaScript/frontend/profile',
-                FilesystemIterator::SKIP_DOTS,
+                \FilesystemIterator::SKIP_DOTS,
             ),
         );
         foreach ($javaScriptModules as $javaScriptModule) {

@@ -23,9 +23,9 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
     public function nonPostRequestIsRejectedBeforeParsingOrAuthentication(): void
     {
         $context = $this->createMock(Context::class);
-        $context->expects(self::never())->method('getPropertyFromAspect');
+        $context->expects($this->never())->method('getPropertyFromAspect');
         $profileRepository = $this->createMock(ProfileRepository::class);
-        $profileRepository->expects(self::never())->method('findByFrontendUser');
+        $profileRepository->expects($this->never())->method('findByFrontendUser');
 
         $result = $this->createSubject($context, $profileRepository)->validate(
             $this->createRequest('GET', 'not json'),
@@ -38,9 +38,9 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
     public function malformedJsonIsRejectedBeforeAuthentication(): void
     {
         $context = $this->createMock(Context::class);
-        $context->expects(self::never())->method('getPropertyFromAspect');
+        $context->expects($this->never())->method('getPropertyFromAspect');
         $profileRepository = $this->createMock(ProfileRepository::class);
-        $profileRepository->expects(self::never())->method('findByFrontendUser');
+        $profileRepository->expects($this->never())->method('findByFrontendUser');
 
         $result = $this->createSubject($context, $profileRepository)->validate(
             $this->createRequest('POST', '{"profile": 123,'),
@@ -53,9 +53,9 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
     public function nonJsonContentTypeIsRejectedBeforeParsingOrAuthentication(): void
     {
         $context = $this->createMock(Context::class);
-        $context->expects(self::never())->method('getPropertyFromAspect');
+        $context->expects($this->never())->method('getPropertyFromAspect');
         $profileRepository = $this->createMock(ProfileRepository::class);
-        $profileRepository->expects(self::never())->method('findByFrontendUser');
+        $profileRepository->expects($this->never())->method('findByFrontendUser');
         $result = $this->createSubject($context, $profileRepository)->validate(
             $this->createRequest('POST', '{"profile":123,"data":[]}', 'text/plain'),
         );
@@ -66,9 +66,9 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
     public function structurallyInvalidPayloadIsRejectedBeforeAuthentication(): void
     {
         $context = $this->createMock(Context::class);
-        $context->expects(self::never())->method('getPropertyFromAspect');
+        $context->expects($this->never())->method('getPropertyFromAspect');
         $profileRepository = $this->createMock(ProfileRepository::class);
-        $profileRepository->expects(self::never())->method('findByFrontendUser');
+        $profileRepository->expects($this->never())->method('findByFrontendUser');
 
         $result = $this->createSubject($context, $profileRepository)->validate(
             $this->createJsonRequest([
@@ -84,7 +84,7 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
     {
         $context = $this->createContext(false);
         $profileRepository = $this->createMock(ProfileRepository::class);
-        $profileRepository->expects(self::never())->method('findByFrontendUser');
+        $profileRepository->expects($this->never())->method('findByFrontendUser');
 
         $result = $this->createSubject($context, $profileRepository)->validate(
             $this->createValidRequest(),
@@ -99,7 +99,7 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
         $context = $this->createContext(true, 37);
         $profileRepository = $this->createMock(ProfileRepository::class);
         $profileRepository
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findByFrontendUser')
             ->with(37)
             ->willReturn($this->createQueryResult([
@@ -120,7 +120,7 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
         $requestedProfile = $this->createProfile(123);
         $profileRepository = $this->createMock(ProfileRepository::class);
         $profileRepository
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('findByFrontendUser')
             ->with(37)
             ->willReturn($this->createQueryResult([
@@ -132,15 +132,17 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
             $this->createValidRequest(),
         );
 
-        self::assertTrue($result->isValid());
-        self::assertSame($requestedProfile, $result->getProfile());
-        self::assertSame(123, $result->getPayload()?->getProfileUid());
-        self::assertSame(
+        $this->assertTrue($result->isValid());
+        $this->assertSame($requestedProfile, $result->getProfile());
+        $payload = $result->getPayload();
+        $this->assertNotNull($payload);
+        $this->assertSame(123, $payload->getProfileUid());
+        $this->assertSame(
             ['firstName' => 'Jane'],
-            $result->getPayload()?->getData(),
+            $payload->getData(),
         );
-        self::assertNull($result->getError());
-        self::assertSame(200, $result->getStatusCode());
+        $this->assertNull($result->getError());
+        $this->assertSame(200, $result->getStatusCode());
     }
 
     private function createSubject(
@@ -216,6 +218,7 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
 
     /**
      * @param list<Profile> $profiles
+     * @return QueryResultInterface<int, Profile>
      */
     private function createQueryResult(array $profiles): QueryResultInterface
     {
@@ -264,10 +267,10 @@ final class ProfileUpdateRequestServiceTest extends UnitTestCase
         string $error,
         int $statusCode,
     ): void {
-        self::assertFalse($result->isValid());
-        self::assertNull($result->getPayload());
-        self::assertNull($result->getProfile());
-        self::assertSame($error, $result->getError());
-        self::assertSame($statusCode, $result->getStatusCode());
+        $this->assertFalse($result->isValid());
+        $this->assertNull($result->getPayload());
+        $this->assertNull($result->getProfile());
+        $this->assertSame($error, $result->getError());
+        $this->assertSame($statusCode, $result->getStatusCode());
     }
 }

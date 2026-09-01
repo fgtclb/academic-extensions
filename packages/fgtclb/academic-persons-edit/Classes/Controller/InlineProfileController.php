@@ -11,23 +11,19 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Controller;
 
-use DateTime;
+use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicPersons\Domain\Model\Contract;
 use FGTCLB\AcademicPersons\Domain\Model\FunctionType;
 use FGTCLB\AcademicPersons\Domain\Model\Location;
 use FGTCLB\AcademicPersons\Domain\Model\OrganisationalUnit;
-use Psr\Http\Message\ResponseInterface;
-use Throwable;
-use UnexpectedValueException;
-use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
 use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
 use FGTCLB\AcademicPersons\Domain\Repository\ContractRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\FunctionTypeRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\LocationRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\OrganisationalUnitRepository;
-use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileInformationRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
 use FGTCLB\AcademicPersons\Settings\DocumentSection;
 use FGTCLB\AcademicPersons\Settings\Validation;
 use FGTCLB\AcademicPersonsEdit\Attributes\ListSortingMode;
@@ -38,13 +34,13 @@ use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\AbstractFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ContractFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileDocumentSectionProvider;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileSectionProvider;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
-use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
-use FGTCLB\AcademicPersonsEdit\Service\ProfileSectionProvider;
 use FGTCLB\AcademicPersonsEdit\Service\RichTextCharacterCounter;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -56,11 +52,13 @@ use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Index\MetaDataRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Mvc\Controller\FileUploadConfiguration;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
+use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 /**
  * Controller for inline profile editing via JSON-based frontend requests.
@@ -68,6 +66,23 @@ use TYPO3\CMS\Extbase\Validation\Validator\MimeTypeValidator;
  * This controller handles profile actions such as validation,
  * updates and data retrieval without relying on the shared HTML authentication
  * flow used by regular Extbase pages.
+ *
+ * @phpstan-type DocumentFieldDefinition array{
+ *      name: string,
+ *      label: string,
+ *      type: string,
+ *      required: bool,
+ *      readOnly: bool,
+ *      disabled: bool,
+ *      richText: bool,
+ *      characterLimit: int,
+ *      helptext: string,
+ *      columnClass: string,
+ *      compactCheckbox: bool,
+ *      value: mixed,
+ *      displayValue: string,
+ *      options: list<array{value: int|string, label: string}>
+ *  }
  *
  * @internal This controller is intentionally internal to `EXT:academic_person_edit`
  *           and is not part of the public API.
@@ -341,13 +356,13 @@ final class InlineProfileController extends AbstractActionController
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
-        } catch (UnexpectedValueException $exception) {
+        } catch (\UnexpectedValueException $exception) {
             $this->throwJsonError(
                 'invalid_profile_data',
                 422,
                 $exception->getMessage(),
             );
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             GeneralUtility::makeInstance(LogManager::class)
                 ->getLogger(self::class)
                 ->error('Updating the inline profile failed.', [
@@ -439,13 +454,13 @@ final class InlineProfileController extends AbstractActionController
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
-        } catch (UnexpectedValueException $exception) {
+        } catch (\UnexpectedValueException $exception) {
             $this->throwJsonError(
                 'invalid_profile_data',
                 422,
                 $exception->getMessage(),
             );
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             GeneralUtility::makeInstance(LogManager::class)
                 ->getLogger(self::class)
                 ->error('Updating the inline profile synchronization flag failed.', [
@@ -504,7 +519,7 @@ final class InlineProfileController extends AbstractActionController
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->handleDocumentFailure('Loading a structured document form failed.', $exception);
         }
     }
@@ -560,7 +575,7 @@ final class InlineProfileController extends AbstractActionController
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->handleDocumentFailure('Creating a structured document failed.', $exception);
         }
     }
@@ -574,7 +589,7 @@ final class InlineProfileController extends AbstractActionController
      *
      * @return ResponseInterface JSON response containing the updated document item.
      * @throws PropagateResponseException If a response is intentionally propagated.
-     * @throws Throwable If validation or persistence fails while updating the record.
+     * @throws \Throwable If validation or persistence fails while updating the record.
      */
     public function updateDocumentAction(): ResponseInterface
     {
@@ -622,7 +637,7 @@ final class InlineProfileController extends AbstractActionController
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->handleDocumentFailure('Updating a structured document failed.', $exception);
         }
     }
@@ -638,7 +653,7 @@ final class InlineProfileController extends AbstractActionController
      *
      * @throws PropagateResponseException If an error response should be
      *      propagated without being wrapped.
-     * @throws Throwable If the delete operation fails unexpectedly.
+     * @throws \Throwable If the delete operation fails unexpectedly.
      */
     public function deleteDocumentAction(): ResponseInterface
     {
@@ -665,7 +680,7 @@ final class InlineProfileController extends AbstractActionController
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->handleDocumentFailure('Deleting a structured document failed.', $exception);
         }
     }
@@ -724,13 +739,13 @@ final class InlineProfileController extends AbstractActionController
                 'section' => $section->identifier,
                 'changed' => $process->changed,
                 'order' => array_values(array_map(
-                    static fn(Contract|ProfileInformation $record): int => (int)$record->getUid(),
+                    static fn(AbstractEntity $record): int => (int)$record->getUid(),
                     $process->items,
                 )),
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->handleDocumentFailure('Sorting a structured document failed.', $exception);
         }
     }
@@ -776,7 +791,6 @@ final class InlineProfileController extends AbstractActionController
      * @param array<string, mixed> $data The payload to validate.
      * @param list<string> $allowedKeys A list of allowed property names.
      * @param list<string> $requiredKeys A list of property names that must be present.
-     * @return void
      */
     private function assertDocumentPayload(array $data, array $allowedKeys, array $requiredKeys): void
     {
@@ -797,7 +811,7 @@ final class InlineProfileController extends AbstractActionController
      *
      * @param array<string, mixed> $data The payload to validate.
      * @param string $property The property name to read.
-     * @return int The validated positive integer value.
+     * @return int<1, max> The validated positive integer value.
      */
     private function getRequiredPositiveInteger(array $data, string $property): int
     {
@@ -1020,23 +1034,7 @@ final class InlineProfileController extends AbstractActionController
      *
      * @param DocumentSection $section The document section whose fields should be resolved.
      * @param Contract|ProfileInformation|null $record The current record used to populate field values.
-     * @return list<array{
-     *     name: string,
-     *     label: string,
-     *     type: string,
-     *     required: bool,
-     *     readOnly: bool,
-     *     disabled: bool,
-     *     richText: bool,
-     *     characterLimit: int,
-     *     helptext: string,
-     *     columnClass: string,
-     *     compactCheckbox: bool,
-     *     value: mixed,
-     *     displayValue: string,
-     *     helptext: string,
-     *     options: list<array{value: int|string, label: string}>
-     * }>
+     * @return list<DocumentFieldDefinition>
      */
     private function getDocumentFieldDefinitions(
         DocumentSection $section,
@@ -1074,7 +1072,7 @@ final class InlineProfileController extends AbstractActionController
      * Returns the field definitions for a contract record.
      *
      * @param Contract|null $record The contract record for which the field definitions should be created.
-     * @return list<array<string, mixed>> The list of field definitions used to render contract form fields.
+     * @return list<DocumentFieldDefinition>
      */
     private function getContractFieldDefinitions(?Contract $record): array
     {
@@ -1145,7 +1143,7 @@ final class InlineProfileController extends AbstractActionController
      * inline profile editor.
      *
      * @param ProfileInformation|null $record The profile information record or null for a new entry.
-     * @return list<array<string, mixed>> Field configuration for the document form.
+     * @return list<DocumentFieldDefinition>
      */
     private function getProfileInformationFieldDefinitions(?ProfileInformation $record): array
     {
@@ -1206,7 +1204,7 @@ final class InlineProfileController extends AbstractActionController
      * @param bool $yearOnly Whether the date field should be treated as a year-only input.
      * @param string $columnClass CSS column class for layout handling.
      * @param bool $compactCheckbox Whether the checkbox should be rendered in compact mode.
-     * @return array<string, mixed> Field configuration array for the frontend form renderer.
+     * @return DocumentFieldDefinition
      */
     private function createDocumentField(
         string $translationPrefix,
@@ -1252,13 +1250,10 @@ final class InlineProfileController extends AbstractActionController
      * Each item is converted into an option entry containing its UID as the value
      * and a label generated by the provided callback. Items without a valid UID are
      * ignored.
-     *
-     * @param iterable<object> $items
-     *   Iterable collection of entities from which the options should be built.
-     * @param callable(object): string $labelCallback
-     *   Callback that returns the label text for a single entity.
+     * @template T of object
+     * @param iterable<T> $items
+     * @param callable(T): string $labelCallback
      * @return list<array{value: int, label: string}>
-     *   List of normalized option arrays with numeric values and labels.
      */
     private function getEntityOptions(iterable $items, callable $labelCallback): array
     {
@@ -1304,8 +1299,8 @@ final class InlineProfileController extends AbstractActionController
             return '';
         }
         if ($type === 'date' && is_string($value)) {
-            $date = DateTime::createFromFormat('!Y-m-d', $value);
-            return $date instanceof DateTime ? $date->format($yearOnly ? 'Y' : 'd.m.Y') : $value;
+            $date = \DateTime::createFromFormat('!Y-m-d', $value);
+            return $date instanceof \DateTime ? $date->format($yearOnly ? 'Y' : 'd.m.Y') : $value;
         }
         if ($type === 'select') {
             foreach ($options as $option) {
@@ -1368,7 +1363,7 @@ final class InlineProfileController extends AbstractActionController
                     $value,
                     $definition['richText'],
                 );
-            } catch (UnexpectedValueException $exception) {
+            } catch (\UnexpectedValueException $exception) {
                 $errors[$name][] = $exception->getMessage();
             }
         }
@@ -1403,7 +1398,7 @@ final class InlineProfileController extends AbstractActionController
      * @param mixed $value The submitted raw value to normalize.
      * @param bool $richText Whether the value should be sanitized as rich text.
      * @return mixed The normalized value for storage or validation.
-     * @throws UnexpectedValueException If the value does not match the expected format for the given type.
+     * @throws \UnexpectedValueException If the value does not match the expected format for the given type.
      */
     private function normalizeDocumentFieldValue(
         string $name,
@@ -1413,7 +1408,7 @@ final class InlineProfileController extends AbstractActionController
     ): mixed {
         if ($type === 'checkbox') {
             if (!is_bool($value)) {
-                throw new UnexpectedValueException('The value must be boolean.');
+                throw new \UnexpectedValueException('The value must be boolean.');
             }
             return $value;
         }
@@ -1427,23 +1422,23 @@ final class InlineProfileController extends AbstractActionController
             if (is_string($value) && preg_match('/^-?\d+$/', $value) === 1) {
                 return (int)$value;
             }
-            throw new UnexpectedValueException('The value must be an integer.');
+            throw new \UnexpectedValueException('The value must be an integer.');
         }
         if ($type === 'date') {
             if ($value === null || $value === '') {
                 return null;
             }
             if (!is_string($value)) {
-                throw new UnexpectedValueException('The value must be a date.');
+                throw new \UnexpectedValueException('The value must be a date.');
             }
-            $date = DateTime::createFromFormat('!Y-m-d', $value);
-            $dateErrors = DateTime::getLastErrors();
+            $date = \DateTime::createFromFormat('!Y-m-d', $value);
+            $dateErrors = \DateTime::getLastErrors();
             if (
-                !$date instanceof DateTime
+                !$date instanceof \DateTime
                 || ($dateErrors !== false && ($dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0))
                 || $date->format('Y-m-d') !== $value
             ) {
-                throw new UnexpectedValueException('The value must be a valid date.');
+                throw new \UnexpectedValueException('The value must be a valid date.');
             }
             return $date;
         }
@@ -1455,16 +1450,16 @@ final class InlineProfileController extends AbstractActionController
                 ? $value
                 : (is_string($value) && preg_match('/^\d+$/', $value) === 1 ? (int)$value : 0);
             if ($uid <= 0) {
-                throw new UnexpectedValueException('The selected value is invalid.');
+                throw new \UnexpectedValueException('The selected value is invalid.');
             }
             $entity = $this->findDocumentSelectEntity($name, $uid);
             if ($entity === null) {
-                throw new UnexpectedValueException('The selected value is not available.');
+                throw new \UnexpectedValueException('The selected value is not available.');
             }
             return $entity;
         }
         if (!is_string($value)) {
-            throw new UnexpectedValueException('The value must be a string.');
+            throw new \UnexpectedValueException('The value must be a string.');
         }
         return ($richText || in_array($name, ['bodytext', 'officeHours'], true))
             ? $this->profileRichTextSanitizer->sanitize($value)
@@ -1489,10 +1484,7 @@ final class InlineProfileController extends AbstractActionController
             default => [],
         };
         foreach ($items as $item) {
-            if (
-                ($item instanceof FunctionType || $item instanceof OrganisationalUnit || $item instanceof Location)
-                && (int)$item->getUid() === $uid
-            ) {
+            if ((int)$item->getUid() === $uid) {
                 return $item;
             }
         }
@@ -1570,7 +1562,6 @@ final class InlineProfileController extends AbstractActionController
      *
      * @param AbstractFormData $formData The target form data object receiving the overrides.
      * @param array<string, mixed> $fields The raw form fields keyed by property name with their override values.
-     * @return void
      */
     private function applyDocumentFormOverrides(AbstractFormData $formData, array $fields): void
     {
@@ -1617,9 +1608,9 @@ final class InlineProfileController extends AbstractActionController
      * Logs a failed document operation and terminates the request with a JSON error response.
      *
      * @param string $logMessage Message to log for diagnosing the failure
-     * @param Throwable $exception The exception that caused the document operation to fail
+     * @param \Throwable $exception The exception that caused the document operation to fail
      */
-    private function handleDocumentFailure(string $logMessage, Throwable $exception): never
+    private function handleDocumentFailure(string $logMessage, \Throwable $exception): never
     {
         GeneralUtility::makeInstance(LogManager::class)
             ->getLogger(self::class)
@@ -1670,8 +1661,8 @@ final class InlineProfileController extends AbstractActionController
      * @param int $statusCode The HTTP status code to send with the response.
      * @param string|null $message An optional human-readable error message.
      * @param array<string, list<string>> $errors Optional field-specific validation errors keyed by field name.
-     * @throws PropagateResponseException Thrown when the JSON error response should be propagated.
      * @return never This method does not return normally because it always throws.
+     * @throws PropagateResponseException Thrown when the JSON error response should be propagated.
      */
     private function throwJsonError(
         string $error,
@@ -1697,7 +1688,6 @@ final class InlineProfileController extends AbstractActionController
      * creating unreferenced files in the file abstraction layer for unauthorized
      * requests.
      *
-     * @return void
      * @throws PropagateResponseException If the image field is not writable or the
      *         profile is not editable for the current request.
      */
@@ -1763,7 +1753,7 @@ final class InlineProfileController extends AbstractActionController
             ]);
         } catch (PropagateResponseException $exception) {
             throw $exception;
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             GeneralUtility::makeInstance(LogManager::class)
                 ->getLogger(self::class)
                 ->error('Uploading the inline profile image failed.', [
@@ -1824,7 +1814,7 @@ final class InlineProfileController extends AbstractActionController
                 'deleted' => $deleted,
                 'hasImage' => false,
             ]);
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             GeneralUtility::makeInstance(LogManager::class)
                 ->getLogger(self::class)
                 ->error('Deleting the inline profile image failed.', [
@@ -1895,14 +1885,14 @@ final class InlineProfileController extends AbstractActionController
      *
      * @param Profile $profile The profile whose uploaded image metadata should be updated.
      * @return array{alternative: string, title: string} The updated image metadata.
-     * @throws UnexpectedValueException If the uploaded image reference or file is missing.
+     * @throws \UnexpectedValueException If the uploaded image reference or file is missing.
      */
     private function updateUploadedProfileImageMetadata(Profile $profile): array
     {
         $imageReference = $profile->getImage()?->getOriginalResource();
         $imageFile = $imageReference?->getOriginalFile();
         if ($imageReference === null || $imageFile === null) {
-            throw new UnexpectedValueException('The uploaded profile image is unavailable.');
+            throw new \UnexpectedValueException('The uploaded profile image is unavailable.');
         }
         $metadataText = $this->buildProfileImageMetadataText($profile);
         $metadata = ['alternative' => $metadataText, 'title' => $metadataText];
@@ -2022,7 +2012,6 @@ final class InlineProfileController extends AbstractActionController
         return true;
     }
 
-
     /**
      * Configures the upload handling for the profile image field.
      *
@@ -2030,8 +2019,6 @@ final class InlineProfileController extends AbstractActionController
      * MIME types according to the configured settings, and registers the upload
      * configuration on the profile argument while skipping the image property in
      * the property mapping process.
-     *
-     * @return void
      */
     private function configureImageFileUpload(): void
     {
@@ -2039,16 +2026,16 @@ final class InlineProfileController extends AbstractActionController
         $fileUploadConfiguration = (new FileUploadConfiguration('image'))
             ->setMaxFiles(2)
             ->setUploadFolder(
-                (string) ($this->settings['editForm']['profileImage']['targetFolder'] ?? '1:/user_upload/')
+                (string)($this->settings['editForm']['profileImage']['targetFolder'] ?? '1:/user_upload/')
             );
         $fileSizeValidator = GeneralUtility::makeInstance(FileSizeValidator::class);
         $fileSizeValidator->setOptions([
-            'maximum' => (string) ($this->settings['editForm']['profileImage']['validation']['maxFileSize'] ?? PHP_INT_MAX . 'B'),
+            'maximum' => (string)($this->settings['editForm']['profileImage']['validation']['maxFileSize'] ?? PHP_INT_MAX . 'B'),
         ]);
         $fileUploadConfiguration->addValidator($fileSizeValidator);
         $allowedMimeTypes = GeneralUtility::trimExplode(
             ',',
-            (string) ($this->settings['editForm']['profileImage']['validation']['allowedMimeTypes'] ?? ''),
+            (string)($this->settings['editForm']['profileImage']['validation']['allowedMimeTypes'] ?? ''),
             true
         );
         if ($allowedMimeTypes !== []) {
@@ -2082,7 +2069,7 @@ final class InlineProfileController extends AbstractActionController
         $queryBuilder->getRestrictions()
             ->removeAll()
             ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-        $fileUid = (int) $queryBuilder
+        $fileUid = (int)$queryBuilder
             ->select('uid_local')
             ->from('sys_file_reference')
             ->where(
@@ -2111,7 +2098,6 @@ final class InlineProfileController extends AbstractActionController
             return null;
         }
     }
-
 
     /**
      * Deletes a previously replaced profile image file if it is no longer used.
@@ -2156,7 +2142,7 @@ final class InlineProfileController extends AbstractActionController
         $queryBuilder->getRestrictions()
             ->removeAll()
             ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-        return (int) $queryBuilder
+        return (int)$queryBuilder
             ->count('uid')
             ->from('sys_file_reference')
             ->where(
@@ -2167,50 +2153,5 @@ final class InlineProfileController extends AbstractActionController
             )
             ->executeQuery()
             ->fetchOne();
-    }
-
-
-    /**
-     * Returns the configured gender select items from the profile TCA.
-     *
-     * Only directly configured TCA items are considered, since evaluating all
-     * itemProcFunc and FormEngine logic in the frontend is not feasible.
-     * Empty values are skipped because the Fluid select field adds the empty
-     * placeholder separately.
-     *
-     * @return array<int, array{
-     *     label: string,
-     *     labelTranslationIdentifier: string,
-     *     value: string,
-     * }>
-     *
-     *
-     * @todo Evaluating TCA in frontend for available options is a hard task to do correctly requiring to execute
-     *       TCA item proc functions and so on. It also does not account for eventually FormEngine nodes processing
-     *       additional stuff. Current implementation takes only directly added TCA items into account to show them
-     *       as valid select options.
-     * @todo Use TcaSchema for TYPO3 v13, either as dual version OR when dropping TYPO3 v12 support.
-     */
-    private function getAvailableGenderSelectItems(): array
-    {
-        $items = [];
-        foreach ($GLOBALS['TCA']['tx_academicpersons_domain_model_profile']['columns']['gender']['config']['items'] ?? [] as $item) {
-            $itemValue = (string) ($item['value'] ?? '');
-            if ($itemValue === '') {
-                // Skip empty string values, handled with `<f:form.select prependOptionLabel="---" />`
-                // in the fluid template.
-                continue;
-            }
-            $labelIdentifier = (string) ($item['label'] ?? '');
-            $items[] = [
-                'label' => ($this->localizationUtility->translate(
-                    $labelIdentifier,
-                    'persons_edit',
-                ) ?? $labelIdentifier) ?: $labelIdentifier,
-                'labelTranslationIdentifier' => $labelIdentifier,
-                'value' => $itemValue,
-            ];
-        }
-        return $items;
     }
 }

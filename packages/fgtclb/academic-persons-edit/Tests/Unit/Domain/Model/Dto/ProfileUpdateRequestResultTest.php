@@ -26,11 +26,11 @@ final class ProfileUpdateRequestResultTest extends UnitTestCase
             $profile,
         );
 
-        self::assertTrue($subject->isValid());
-        self::assertSame($payload, $subject->getPayload());
-        self::assertSame($profile, $subject->getProfile());
-        self::assertNull($subject->getError());
-        self::assertSame(200, $subject->getStatusCode());
+        $this->assertTrue($subject->isValid());
+        $this->assertSame($payload, $subject->getPayload());
+        $this->assertSame($profile, $subject->getProfile());
+        $this->assertNull($subject->getError());
+        $this->assertSame(200, $subject->getStatusCode());
     }
 
     #[Test]
@@ -41,10 +41,10 @@ final class ProfileUpdateRequestResultTest extends UnitTestCase
             400,
         );
 
-        self::assertFalse($subject->isValid());
-        self::assertNull($subject->getPayload());
-        self::assertNull($subject->getProfile());
-        self::assertSame('invalid_payload', $subject->getError());
-        self::assertSame(400, $subject->getStatusCode());
+        $this->assertFalse($subject->isValid());
+        $this->assertNull($subject->getPayload());
+        $this->assertNull($subject->getProfile());
+        $this->assertSame('invalid_payload', $subject->getError());
+        $this->assertSame(400, $subject->getStatusCode());
     }
 }

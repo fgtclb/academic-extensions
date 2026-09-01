@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Plugins;
 
-use DOMDocument;
-use DOMElement;
 use FGTCLB\AcademicPersonsEdit\Tests\Functional\AbstractAcademicPersonsEditTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -56,7 +54,7 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
     }
 
     /**
-     * @param array<string, mixed> $additionalSiteConfiguration
+     * @param array<non-empty-string, mixed> $additionalSiteConfiguration
      */
     protected function setUpFrontendProfileTestCase(
         string $contentElementFixture,
@@ -76,7 +74,7 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
                     'EXT:academic_persons/Configuration/TypoScript/Default/constants.typoscript',
                     $editingTypoScriptPath . 'constants.typoscript',
                     'EXT:academic_persons_edit/Tests/Functional/Plugins/Fixtures/'
-                        . 'TypoScript/Constants/Configuration.typoscript',
+                    . 'TypoScript/Constants/Configuration.typoscript',
                 ],
                 'setup' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
@@ -140,10 +138,10 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
         string $profileArgument,
         int $profileUid,
     ): string {
-        $document = new DOMDocument();
+        $document = new \DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
         foreach ($document->getElementsByTagName('a') as $link) {
-            $this->assertInstanceOf(DOMElement::class, $link);
+            $this->assertInstanceOf(\DOMElement::class, $link);
             $href = html_entity_decode($link->getAttribute('href'));
             parse_str((string)parse_url($href, PHP_URL_QUERY), $query);
             $arguments = $query[$namespace] ?? null;
@@ -230,14 +228,15 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
         }
         return $files;
     }
+
     /**
      * @param string $string recive the string to clear
      * @return string returns the cleared string
      */
     protected function clearHtmlString(string $string): string
     {
-        $string = preg_replace('/>\s+/u', '>', $string);
-        $string = preg_replace('/\s+</u', '<', $string);
+        $string = preg_replace('/>\s+/u', '>', $string) ?? $string;
+        $string = preg_replace('/\s+</u', '<', $string) ?? $string;
         return $string;
     }
 }

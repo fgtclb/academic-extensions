@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Plugins;
 
-use DOMDocument;
-use DOMXPath;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
@@ -73,9 +71,9 @@ final class AcademicPersonsEditInlineProfileListTest extends AbstractFrontendPro
         $this->assertStringNotContainsString('Nicht', $content);
         $this->assertStringNotContainsString('Zugewiesen', $content);
         $this->assertStringContainsString('academic-persons-inline-list__image', $content);
-        $document = new DOMDocument();
+        $document = new \DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
-        $xpath = new DOMXPath($document);
+        $xpath = new \DOMXPath($document);
         $headers = $xpath->query('//*[@data-academic-persons-inline-list]//thead/tr/th');
         $this->assertNotFalse($headers);
         $this->assertCount(3, $headers);

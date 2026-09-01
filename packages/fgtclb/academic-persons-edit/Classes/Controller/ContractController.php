@@ -33,17 +33,15 @@ use TYPO3\CMS\Core\Http\RedirectResponse;
 final class ContractController extends AbstractActionController
 {
     public function __construct(
-        private readonly ContractFactory              $contractFactory,
-        private readonly ContractRepository           $contractRepository,
-        private readonly FunctionTypeRepository       $functionTypeRepository,
+        private readonly ContractFactory $contractFactory,
+        private readonly ContractRepository $contractRepository,
+        private readonly FunctionTypeRepository $functionTypeRepository,
         private readonly OrganisationalUnitRepository $organisationalUnitRepository,
-        private readonly LocationRepository           $locationRepository,
-        private readonly AddressRepository            $addressRepository,
-        private readonly EmailRepository              $emailAddressRepository,
-        private readonly PhoneNumberRepository        $phoneNumberRepository,
-    )
-    {
-    }
+        private readonly LocationRepository $locationRepository,
+        private readonly AddressRepository $addressRepository,
+        private readonly EmailRepository $emailAddressRepository,
+        private readonly PhoneNumberRepository $phoneNumberRepository,
+    ) {}
 
     // =================================================================================================================
     // Handle readonly display like list forms and detail view
@@ -165,7 +163,8 @@ final class ContractController extends AbstractActionController
     public function updateAction(Contract $contract, ContractFormData $contractFormData): ResponseInterface
     {
         $this->contractRepository->update(
-            $this->contractFactory->updateContractFromFormData(
+            $this->contractFactory->updateFromFormData(
+                $this->academicPersonsSettings->getDocumentValidationSet('contracts'),
                 $contract,
                 $contractFormData,
             ),

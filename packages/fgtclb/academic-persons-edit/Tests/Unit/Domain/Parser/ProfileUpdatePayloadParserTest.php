@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Parser;
 
 use FGTCLB\AcademicPersonsEdit\Domain\Parser\ProfileUpdatePayloadParser;
-use JsonException;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
-use UnexpectedValueException;
 
 final class ProfileUpdatePayloadParserTest extends UnitTestCase
 {
@@ -30,8 +28,8 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
             )
         );
 
-        self::assertSame(123, $result->getProfileUid());
-        self::assertSame(
+        $this->assertSame(123, $result->getProfileUid());
+        $this->assertSame(
             [
                 'firstName' => 'Max',
                 'lastName' => 'Mustermann',
@@ -57,8 +55,8 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
             )
         );
 
-        self::assertTrue($result->hasProperty('website'));
-        self::assertSame('', $result->getData()['website']);
+        $this->assertTrue($result->hasProperty('website'));
+        $this->assertSame('', $result->getData()['website']);
     }
 
     #[Test]
@@ -78,8 +76,8 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
             )
         );
 
-        self::assertTrue($result->hasProperty('firstName'));
-        self::assertFalse($result->hasProperty('lastName'));
+        $this->assertTrue($result->hasProperty('firstName'));
+        $this->assertFalse($result->hasProperty('lastName'));
     }
 
     #[Test]
@@ -97,8 +95,8 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
             )
         );
 
-        self::assertSame(123, $result->getProfileUid());
-        self::assertSame([], $result->getData());
+        $this->assertSame(123, $result->getProfileUid());
+        $this->assertSame([], $result->getData());
     }
 
     #[Test]
@@ -106,7 +104,7 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
     {
         $subject = new ProfileUpdatePayloadParser();
 
-        $this->expectException(JsonException::class);
+        $this->expectException(\JsonException::class);
 
         $subject->parse('{"profile": 123,');
     }
@@ -116,7 +114,7 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
     {
         $subject = new ProfileUpdatePayloadParser();
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('The JSON root must be an object.');
 
         $subject->parse('"foobar"');
@@ -127,7 +125,7 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
     {
         $subject = new ProfileUpdatePayloadParser();
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage(
             'The payload must contain a positive integer profile and a data object.'
         );
@@ -149,7 +147,7 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
     {
         $subject = new ProfileUpdatePayloadParser();
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
 
         $subject->parse(
             json_encode(
@@ -167,7 +165,7 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
     {
         $subject = new ProfileUpdatePayloadParser();
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
 
         $subject->parse(
             json_encode(
@@ -185,7 +183,7 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
     {
         $subject = new ProfileUpdatePayloadParser();
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
 
         $subject->parse(
             json_encode(
@@ -203,7 +201,7 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
     {
         $subject = new ProfileUpdatePayloadParser();
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
 
         $subject->parse(
             json_encode(
@@ -220,7 +218,7 @@ final class ProfileUpdatePayloadParserTest extends UnitTestCase
     {
         $subject = new ProfileUpdatePayloadParser();
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
 
         $subject->parse(
             json_encode(

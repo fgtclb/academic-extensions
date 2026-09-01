@@ -26,8 +26,8 @@ final class ProfileUpdatePayloadTest extends UnitTestCase
             data: $data,
         );
 
-        self::assertSame(123, $subject->getProfileUid());
-        self::assertSame($data, $subject->getData());
+        $this->assertSame(123, $subject->getProfileUid());
+        $this->assertSame($data, $subject->getData());
     }
 
     #[Test]
@@ -40,10 +40,10 @@ final class ProfileUpdatePayloadTest extends UnitTestCase
             data: ['property' => $value],
         );
 
-        self::assertTrue($subject->hasProperty('property'));
-        self::assertSame($value, $subject->getProperty('property'));
-        self::assertFalse($subject->hasProperty('missing'));
-        self::assertNull($subject->getProperty('missing'));
+        $this->assertTrue($subject->hasProperty('property'));
+        $this->assertSame($value, $subject->getProperty('property'));
+        $this->assertFalse($subject->hasProperty('missing'));
+        $this->assertNull($subject->getProperty('missing'));
     }
 
     /**

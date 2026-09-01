@@ -8,8 +8,6 @@ use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettingsFactory;
 use FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory;
 use PHPUnit\Framework\Attributes\Test;
-use ReflectionClass;
-use ReflectionMethod;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Extbase\Validation\Validator\EmailAddressValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator;
@@ -30,13 +28,13 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
     #[Test]
     public function factoryUsesTheSeparatedPathAndCacheEntry(): void
     {
-        $reflection = new ReflectionClass(AcademicPersonsEditSettingsFactory::class);
+        $reflection = new \ReflectionClass(AcademicPersonsEditSettingsFactory::class);
         $this->assertSame(
             'Configuration/AcademicsPersonsEdit/Settings.yaml',
             $reflection->getConstant('SETTINGS_FILE'),
         );
         $factory = $reflection->newInstanceWithoutConstructor();
-        $identifier = new ReflectionMethod(AcademicPersonsEditSettingsFactory::class, 'settingsIdentifier');
+        $identifier = new \ReflectionMethod(AcademicPersonsEditSettingsFactory::class, 'settingsIdentifier');
         $identifier->setAccessible(true);
         $this->assertSame('AcademicPersonsEdit_Settings_SectionSchema_v3', $identifier->invoke($factory));
     }
@@ -221,7 +219,7 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
      */
     private function normalize(array $configuration): AcademicPersonsSettings
     {
-        $factory = (new ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
+        $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $settings = $factory->normalizeEditConfiguration($configuration);
         $this->assertInstanceOf(AcademicPersonsSettings::class, $settings);
         return $settings;

@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator;
 
-use DateTime;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\EmailFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
@@ -123,9 +122,9 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
                 title: 'A publication',
                 bodytext: 'Some text',
                 link: 'https://example.org',
-                year: new DateTime('2024-05-10'),
-                yearStart: new DateTime('2020-02-03'),
-                yearEnd: new DateTime('2023-11-29'),
+                year: new \DateTime('2024-05-10'),
+                yearStart: new \DateTime('2020-02-03'),
+                yearEnd: new \DateTime('2023-11-29'),
                 yearOnly: true,
             )
         );

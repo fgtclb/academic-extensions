@@ -64,40 +64,52 @@ final class ProfileSectionProviderTest extends UnitTestCase
             ['field', 'special', 'field'],
             array_column($sections['information']['items'], 'kind'),
         );
+        $informationItems = $sections['information']['items'];
+        if (
+            $informationItems[0]['kind'] !== 'field'
+            || $informationItems[1]['kind'] !== 'special'
+            || $informationItems[2]['kind'] !== 'field'
+        ) {
+            $this->fail('Unexpected information section item structure.');
+        }
+        $aboutmeItem = $sections['aboutme']['items'][0];
+        if ($aboutmeItem['kind'] !== 'field') {
+            $this->fail('Unexpected aboutme section item structure.');
+        }
         $this->assertSame(
             'gender',
-            $sections['information']['items'][0]['field']['identifier'],
+            $informationItems[0]['field']['identifier'],
         );
         $this->assertSame(
             'title firstName lastName',
-            $sections['information']['items'][1]['special']['fieldIdentifiers'],
+            $informationItems[1]['special']['fieldIdentifiers'],
         );
         $this->assertSame(
             'website',
-            $sections['information']['items'][2]['field']['identifier'],
+            $informationItems[2]['field']['identifier'],
         );
         $this->assertSame(
             'ckeditor',
-            $sections['aboutme']['items'][0]['field']['renderType'],
+            $aboutmeItem['field']['renderType'],
         );
         $this->assertTrue(
-            $sections['information']['items'][1]['special']['fields'][1]['validation']->readOnly,
+            $informationItems[1]['special']['fields'][1]['validation']->readOnly,
         );
         $this->assertSame(
             'col-12 col-sm-4',
-            $sections['information']['items'][1]['special']['fields'][0]['columnClass'],
+            $informationItems[1]['special']['fields'][0]['columnClass'],
         );
         $this->assertSame(
             'col-12 col-sm-8',
-            $sections['information']['items'][1]['special']['fields'][1]['columnClass'],
+            $informationItems[1]['special']['fields'][1]['columnClass'],
         );
         $this->assertSame(
             'honorific-prefix',
-            $sections['information']['items'][1]['special']['fields'][0]['autocomplete'],
+            $informationItems[1]['special']['fields'][0]['autocomplete'],
         );
         $this->assertSame(
             'url',
-            $sections['information']['items'][2]['field']['autocomplete'],
+            $informationItems[2]['field']['autocomplete'],
         );
         $this->assertTrue($subject->getSpecialFields()['image']['writable']);
         $this->assertSame(['title', 'image'], array_keys($subject->getSpecialFields()));
@@ -132,9 +144,13 @@ final class ProfileSectionProviderTest extends UnitTestCase
         );
         $subject = new ProfileSectionProvider($settings);
         $sections = $subject->getSections();
+        $informationItem = $sections['information']['items'][0];
+        if ($informationItem['kind'] !== 'field') {
+            $this->fail('Unexpected information section item structure.');
+        }
         $this->assertSame(
             'LLL:EXT:test/profile.title.helptext',
-            $sections['information']['items'][0]['field']['helptext'],
+            $informationItem['field']['helptext'],
         );
         $this->assertSame(
             'LLL:EXT:test/special.skipSync.helptext',

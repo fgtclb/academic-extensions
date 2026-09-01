@@ -114,7 +114,12 @@ final readonly class ProfileSectionProvider
 
     /**
      * @param list<array{kind: 'field', field: array<string, mixed>}|array{kind: 'special', special: array<string, mixed>}> $items
-     * @return array<string, mixed>
+     * @return array{
+     *     identifier: string,
+     *     position: int,
+     *     validations: array<string, mixed>,
+     *     items: list<array{kind: 'field', field: array<string, mixed>}|array{kind: 'special', special: array<string, mixed>}>
+     * }
      */
     private function createSectionView(ProfileSection $section, array $items): array
     {
@@ -127,7 +132,20 @@ final readonly class ProfileSectionProvider
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{
+     *     identifier: string,
+     *     type: string,
+     *     fieldType: string,
+     *     renderType: string,
+     *     validation: mixed,
+     *     writable: bool,
+     *     position: int,
+     *     settings: array<string, mixed>,
+     *     fields: list<array<string, mixed>>,
+     *     fieldIdentifiers: string,
+     *     displayFieldIdentifiers: string,
+     *     helptext: string
+     * }
      */
     private function createSpecialView(SpecialField $specialField): array
     {

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Plugins;
 
-use DOMDocument;
-use DOMElement;
-use DOMXPath;
 use FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -510,9 +507,9 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertStringNotContainsString('richText: true', $textarea);
         $this->assertStringNotContainsString('position-absolute', $preview);
         $this->assertStringNotContainsString('style=', $field . $preview . $control . $actions);
-        $document = new DOMDocument();
+        $document = new \DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
-        $xpath = new DOMXPath($document);
+        $xpath = new \DOMXPath($document);
         $richTextControls = $xpath->query('//*[@data-ie-rich-text]');
         $this->assertNotFalse($richTextControls);
         foreach ($richTextControls as $richTextControl) {
@@ -523,12 +520,12 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             $this->assertNotFalse($headings);
             $this->assertCount(1, $headings);
             $heading = $headings->item(0);
-            $this->assertInstanceOf(DOMElement::class, $heading);
+            $this->assertInstanceOf(\DOMElement::class, $heading);
             $headingActions = $xpath->query('.//*[@data-ie-field-actions]', $heading);
             $this->assertNotFalse($headingActions);
             $this->assertCount(1, $headingActions);
             $headingAction = $headingActions->item(0);
-            $this->assertInstanceOf(DOMElement::class, $headingAction);
+            $this->assertInstanceOf(\DOMElement::class, $headingAction);
             $this->assertStringContainsString('ms-auto', $headingAction->getAttribute('class'));
             $this->assertStringNotContainsString('align-self-end', $headingAction->getAttribute('class'));
         }
@@ -643,9 +640,9 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         );
         $this->assertStringContainsString('data-ie-sync-form', $content);
         $this->assertStringContainsString('data-ie-image-preview', $content);
-        $document = new DOMDocument();
+        $document = new \DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
-        $xpath = new DOMXPath($document);
+        $xpath = new \DOMXPath($document);
         foreach (['firstName', 'miscellaneous', 'skipSync'] as $identifier) {
             $helptexts = $xpath->query(sprintf(
                 '//*[@data-ie-helptext and @data-ie-for="inline-profile-%d-%s"]',
@@ -655,7 +652,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             $this->assertNotFalse($helptexts);
             $this->assertGreaterThanOrEqual(1, $helptexts->length);
             foreach ($helptexts as $helptext) {
-                $this->assertInstanceOf(DOMElement::class, $helptext);
+                $this->assertInstanceOf(\DOMElement::class, $helptext);
                 $this->assertSame('No translation found.', $helptext->getAttribute('data-bs-content'));
             }
         }
@@ -666,14 +663,14 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     {
         $this->setUpInlineProfileTestCase();
         $content = $this->renderInlineProfilePage();
-        $document = new DOMDocument();
+        $document = new \DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
-        $xpath = new DOMXPath($document);
+        $xpath = new \DOMXPath($document);
         $headers = $xpath->query('//*[@data-ie-profile-header]');
         $this->assertNotFalse($headers);
         $this->assertCount(1, $headers);
         $header = $headers->item(0);
-        $this->assertInstanceOf(DOMElement::class, $header);
+        $this->assertInstanceOf(\DOMElement::class, $header);
         foreach ([
             './/*[@data-ie-profile-name]',
             './/*[@data-ie-sync-form]',
@@ -705,9 +702,9 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
     {
         $this->setUpInlineProfileTestCase();
         $content = $this->renderInlineProfilePage();
-        $document = new DOMDocument();
+        $document = new \DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
-        $xpath = new DOMXPath($document);
+        $xpath = new \DOMXPath($document);
         foreach (['gender'] as $identifier) {
             $elementId = 'inline-profile-' . self::PROFILE_ID . '-' . $identifier;
             $controls = $xpath->query(sprintf('//*[@id="%s"]', $elementId));
@@ -718,7 +715,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
                 sprintf('Missing unique control for "%s".', $identifier),
             );
             $control = $controls->item(0);
-            $this->assertInstanceOf(DOMElement::class, $control);
+            $this->assertInstanceOf(\DOMElement::class, $control);
             $this->assertFalse(
                 $control->hasAttribute('disabled'),
                 sprintf('Editable control "%s" must not be rendered disabled.', $identifier),
@@ -744,13 +741,13 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             $this->assertNotFalse($editButtons);
             $this->assertSame(1, $editButtons->length, sprintf('Missing edit button for "%s".', $identifier));
             $editButton = $editButtons->item(0);
-            $this->assertInstanceOf(DOMElement::class, $editButton);
+            $this->assertInstanceOf(\DOMElement::class, $editButton);
             $this->assertSame($elementId . '-editor', $editButton->getAttribute('aria-controls'));
             $editors = $xpath->query(sprintf('//*[@id="%s-editor" and @data-ie-field-editor]', $elementId));
             $this->assertNotFalse($editors);
             $this->assertSame(1, $editors->length, sprintf('Missing editor for "%s".', $identifier));
             $editor = $editors->item(0);
-            $this->assertInstanceOf(DOMElement::class, $editor);
+            $this->assertInstanceOf(\DOMElement::class, $editor);
             $this->assertStringContainsString('d-none', $editor->getAttribute('class'));
         }
     }
@@ -766,9 +763,9 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertIsInt($aboutPosition);
         $this->assertIsInt($contractsPosition);
         $this->assertGreaterThan($aboutPosition, $contractsPosition);
-        $document = new DOMDocument();
+        $document = new \DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
-        $xpath = new DOMXPath($document);
+        $xpath = new \DOMXPath($document);
         $sections = $xpath->query('//*[@data-ie-document-section]');
         $this->assertNotFalse($sections);
         $documentSections = $this->get(AcademicPersonsEditSettingsFactory::class)->get()->documentSections;
@@ -825,31 +822,31 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
                             'to' => 'validTo',
                             default => $field,
                         }
-                        : match ($field) {
-                            'from' => 'yearStart',
-                            'to' => 'yearEnd',
-                            'description' => 'bodytext',
-                            default => $field,
-                        },
+                    : match ($field) {
+                        'from' => 'yearStart',
+                        'to' => 'yearEnd',
+                        'description' => 'bodytext',
+                        default => $field,
+                    },
                     $sectionSettings->rowFields,
                 );
                 $this->assertSame($expectedRowFields, $actualRowFields);
             }
             $this->assertSame(
                 $sectionSettings->fieldName,
-                $section->attributes?->getNamedItem('data-section-field-name')?->nodeValue,
+                $section->attributes->getNamedItem('data-section-field-name')?->nodeValue,
             );
             $this->assertSame(
                 $sectionSettings->type,
-                $section->attributes?->getNamedItem('data-section-record-type')?->nodeValue,
+                $section->attributes->getNamedItem('data-section-record-type')?->nodeValue,
             );
             $this->assertSame(
                 $sectionSettings->readOnly ? '1' : '0',
-                $section->attributes?->getNamedItem('data-section-readonly')?->nodeValue,
+                $section->attributes->getNamedItem('data-section-readonly')?->nodeValue,
             );
             $this->assertSame(
                 $sectionSettings->allowsDragSorting() ? '1' : '0',
-                $section->attributes?->getNamedItem('data-section-sortable')?->nodeValue,
+                $section->attributes->getNamedItem('data-section-sortable')?->nodeValue,
             );
         }
         $this->assertSame(array_keys($documentSections), $sectionKeys);
@@ -945,7 +942,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         ]);
         $this->assertSame(200, $formResponse->getStatusCode(), (string)$formResponse->getBody());
         $formBody = json_decode((string)$formResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame(true, $formBody['success'] ?? null);
+        $this->assertTrue($formBody['success'] ?? null);
         $this->assertSame(1, $formBody['record'] ?? null);
         $this->assertSame(
             ['title', 'link', 'year', 'yearStart', 'yearEnd', 'yearOnly', 'bodytext'],
@@ -1222,7 +1219,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $this->assertSame(200, $response->getStatusCode());
         $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertIsArray($body, (string)$response->getBody());
-        $this->assertSame(true, $body['success'] ?? null, (string)$response->getBody());
+        $this->assertTrue($body['success'] ?? null, (string)$response->getBody());
         $this->assertIsArray($body['data'] ?? null, (string)$response->getBody());
         $storedValue = (string)$this->getConnectionPool()
             ->getConnectionForTable('tx_academicpersons_domain_model_profile')
@@ -1260,7 +1257,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         );
         $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame(422, $response->getStatusCode(), (string)$response->getBody());
-        $this->assertSame(false, $body['success'] ?? null);
+        $this->assertFalse($body['success'] ?? null);
         $this->assertSame('validation_failed', $body['error'] ?? null);
         $this->assertSame(
             ['The text must not exceed %d characters.'],
@@ -1286,7 +1283,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         );
         $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame(422, $response->getStatusCode(), (string)$response->getBody());
-        $this->assertSame(false, $body['success']);
+        $this->assertFalse($body['success']);
         $this->assertSame('invalid_profile_data', $body['error']);
         $this->assertSame('Unknown profile property "firstName".', $body['message']);
         $storedValue = $this->getConnectionPool()
@@ -1318,7 +1315,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
         $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertIsArray($body);
         $this->assertSame(422, $response->getStatusCode(), (string)$response->getBody());
-        $this->assertSame(false, $body['success']);
+        $this->assertFalse($body['success']);
         $this->assertSame('validation_failed', $body['error']);
         $this->assertIsArray($body['errors'] ?? null);
         $this->assertNotEmpty($body['errors']['gender'] ?? []);
@@ -1666,7 +1663,7 @@ final class AcademicPersonsEditInlineProfileTest extends AbstractFrontendProfile
             );
         }
         $file = __DIR__ . '/../../../Resources/Private/Language/de.locallang.xlf';
-        $document = new DOMDocument();
+        $document = new \DOMDocument();
         $this->assertTrue($document->load($file));
         $germanTranslations = [];
         foreach ($document->getElementsByTagName('trans-unit') as $unit) {

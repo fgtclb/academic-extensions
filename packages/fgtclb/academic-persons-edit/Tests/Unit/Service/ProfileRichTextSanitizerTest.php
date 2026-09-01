@@ -20,8 +20,8 @@ final class ProfileRichTextSanitizerTest extends UnitTestCase
         $value = '<p><strong>Strong</strong> and <em>emphasized</em></p>'
             . '<ul><li><a href="https://example.com/path">Linked item</a></li></ul>';
         $result = $subject->sanitize($value);
-        self::assertStringContainsString('<p><strong>Strong</strong> and <em>emphasized</em></p>', $result);
-        self::assertStringContainsString('<ul><li><a href="https://example.com/path">Linked item</a></li></ul>', $result);
+        $this->assertStringContainsString('<p><strong>Strong</strong> and <em>emphasized</em></p>', $result);
+        $this->assertStringContainsString('<ul><li><a href="https://example.com/path">Linked item</a></li></ul>', $result);
     }
 
     #[Test]
@@ -34,13 +34,13 @@ final class ProfileRichTextSanitizerTest extends UnitTestCase
             . '<a href="javascript:alert(3)" style="color:red">Link</a>'
             . '<img src="x" onerror="alert(4)">',
         );
-        self::assertStringNotContainsString('<script', $result);
-        self::assertStringNotContainsString('onclick', $result);
-        self::assertStringNotContainsString('javascript:', $result);
-        self::assertStringNotContainsString('style=', $result);
-        self::assertStringNotContainsString('<img', $result);
-        self::assertStringNotContainsString('class=', $result);
-        self::assertStringContainsString('<p>Text</p>', $result);
+        $this->assertStringNotContainsString('<script', $result);
+        $this->assertStringNotContainsString('onclick', $result);
+        $this->assertStringNotContainsString('javascript:', $result);
+        $this->assertStringNotContainsString('style=', $result);
+        $this->assertStringNotContainsString('<img', $result);
+        $this->assertStringNotContainsString('class=', $result);
+        $this->assertStringContainsString('<p>Text</p>', $result);
     }
 
     #[Test]
@@ -49,7 +49,7 @@ final class ProfileRichTextSanitizerTest extends UnitTestCase
         string $propertyName,
         bool $expected,
     ): void {
-        self::assertSame($expected, $this->createSubject()->supports($propertyName));
+        $this->assertSame($expected, $this->createSubject()->supports($propertyName));
     }
 
     /**
