@@ -206,6 +206,16 @@ parameters:
 			path: ../../../packages/fgtclb/academic-study-plan/Tests/Functional/ExtensionLoadedTest.php
 
 		-
+			message: "#^Cannot call method getVariableProvider\\(\\) on TYPO3Fluid\\\\Fluid\\\\Core\\\\Rendering\\\\RenderingContextInterface\\|null\\.$#"
+			count: 2
+			path: ../../../packages/fgtclb/typo3-category-types/Classes/ViewHelpers/Form/AbstractSelectViewHelper.php
+
+		-
+			message: "#^Cannot call method getViewHelperVariableContainer\\(\\) on TYPO3Fluid\\\\Fluid\\\\Core\\\\Rendering\\\\RenderingContextInterface\\|null\\.$#"
+			count: 4
+			path: ../../../packages/fgtclb/typo3-category-types/Classes/ViewHelpers/Form/AbstractSelectViewHelper.php
+
+		-
 			message: "#^Property FGTCLB\\\\CategoryTypes\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/typo3-category-types/Tests/Functional/ExtensionLoadedTest.php
