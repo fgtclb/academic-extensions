@@ -20,7 +20,7 @@ plugin:
     # FlexForm as well; this is the fallback for one added by hand later, and it
     # is what EXT:academic_contacts4pages reads - that extension has no detail
     # page setting of its own.
-    detailPid: 6
+    detailPid: 205
     demand:
       # The set ships "title", which is not one of the values the extension
       # configuration allows ("firstName", "lastName" - see

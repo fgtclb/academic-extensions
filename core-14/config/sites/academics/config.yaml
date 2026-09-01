@@ -10,11 +10,11 @@
 # "route-enhancers.yaml" only from TYPO3 v14.1, and this branch supports v13 as
 # well, so "imports" is the form that works on both.
 imports:
-  - resource: "EXT:academic_persons/Configuration/Routes/List.yaml"
-  - resource: "EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml"
-  - resource: "EXT:academic_persons/Configuration/Routes/Detail.yaml"
-  - resource: "EXT:academic_jobs/Configuration/Routes/Detail.yaml"
-  - resource: "EXT:academic_programs/Configuration/Yaml/Routes.yaml"
+  - resource: 'EXT:academic_persons/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
+  - resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
+  - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
 
 # Bind every one of those enhancers to the pages that carry the plugin it
 # belongs to.
@@ -61,7 +61,11 @@ routeEnhancers:
 # host name and under whatever a host stack serves it as.
 rootPageId: 1
 base: /
+websiteTitle: 'Academic extensions (TYPO3 v14)'
 dependencies:
+  # The frontend theme. "full" pulls in the backend layouts, the content
+  # elements, Bootstrap 5, the RTE preset and the rest - the seed's
+  # "backend_layout" values are its identifiers.
   - bootstrap-package/full
   # Every academic extension that ships a site set, by its aggregate. Since
   # ACE-458 each extension hides its own content elements for the whole
@@ -93,20 +97,22 @@ dependencies:
   # in a site set driven installation it arrives only through this dependency.
   - typo3/felogin
 languages:
-  - title: English
+  -
+    title: English
     enabled: true
     languageId: 0
     base: /
     locale: en_US.UTF-8
     navigationTitle: English
     flag: us
-    websiteTitle: ""
+    websiteTitle: ''
   # "fallbackType: strict" - a page without a translation is a 404 in "/de/",
   # not the English page served under a German URL. That is the setting the seed
   # is written for: every page and every translatable record it declares carries
   # its German variant, so a hole in "/de/" is a defect in the seed and shows up
   # as one instead of being papered over by the default language.
-  - title: German
+  -
+    title: German
     enabled: true
     languageId: 1
     base: /de/
@@ -114,5 +120,5 @@ languages:
     navigationTitle: Deutsch
     flag: de
     fallbackType: strict
-    fallbacks: ""
-    websiteTitle: ""
+    fallbacks: ''
+    websiteTitle: ''
