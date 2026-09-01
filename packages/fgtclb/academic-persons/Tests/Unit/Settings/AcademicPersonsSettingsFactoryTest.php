@@ -23,7 +23,6 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     {
         $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $method = new \ReflectionMethod(AcademicPersonsSettingsFactory::class, 'academicPersonsSettingsIdentifier');
-        $method->setAccessible(true);
         $this->assertSame('AcademicPersons_Settings_PublicProfileSchema_v5', $method->invoke($factory));
     }
 
@@ -230,7 +229,6 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     {
         $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $method = new \ReflectionMethod(AcademicPersonsSettingsFactory::class, 'normalize');
-        $method->setAccessible(true);
         $settings = $method->invoke($factory, $configuration);
         $this->assertInstanceOf(AcademicPersonsSettings::class, $settings);
         return $settings;
