@@ -314,7 +314,7 @@
                 "uid",
                 "zip"
             ],
-            "checksum": "6bbc2a7cea8c569df1a6542abf8a6ce19308c8f4"
+            "checksum": "0aa50cddb60735ca1335e94623bce82ad550fd28"
         },
         "tx_academicpersons_domain_model_contract": {
             "rows": 32,
@@ -461,7 +461,7 @@
                 "year_end",
                 "year_start"
             ],
-            "checksum": "4745737226b1e22e8dd9b3f59bc661008a457dcf"
+            "checksum": "70b24a6059b4912f5f5de5cfde52dedc35cfff86"
         },
         "tx_academicstudyplan_domain_model_category": {
             "rows": 10,
