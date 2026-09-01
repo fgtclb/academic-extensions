@@ -247,8 +247,7 @@ final class ValidationSettings
         string $property,
         array $validatorClassNames,
         int $characterLimit = 0,
-    ): Validation
-    {
+    ): Validation {
         /** @var array<int, class-string<ValidatorInterface>> $validatorClassNames */
         return new Validation(
             identifier: $property,

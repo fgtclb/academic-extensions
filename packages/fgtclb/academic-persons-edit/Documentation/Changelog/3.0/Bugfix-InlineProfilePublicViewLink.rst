@@ -1,4 +1,3 @@
-..  include:: /Includes.rst.txt
 
 ..  _bugfix-inline-profile-public-view-link:
 

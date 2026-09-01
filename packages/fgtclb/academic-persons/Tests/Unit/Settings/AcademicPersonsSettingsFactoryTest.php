@@ -7,8 +7,6 @@ namespace FGTCLB\AcademicPersons\Tests\Unit\Settings;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettingsFactory;
 use PHPUnit\Framework\Attributes\Test;
-use ReflectionClass;
-use ReflectionMethod;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
@@ -23,8 +21,8 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     #[Test]
     public function separatedPublicProfileSchemaUsesANewCacheEntry(): void
     {
-        $factory = (new ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
-        $method = new ReflectionMethod(AcademicPersonsSettingsFactory::class, 'academicPersonsSettingsIdentifier');
+        $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
+        $method = new \ReflectionMethod(AcademicPersonsSettingsFactory::class, 'academicPersonsSettingsIdentifier');
         $method->setAccessible(true);
         $this->assertSame('AcademicPersons_Settings_PublicProfileSchema_v5', $method->invoke($factory));
     }
@@ -124,7 +122,7 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     #[Test]
     public function editConfigurationNormalizesCkeditorCharacterLimitsWithoutChangingTca(): void
     {
-        $factory = (new ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
+        $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $settings = $factory->normalizeEditConfiguration([
             'documentSections' => [
                 'publications' => [
@@ -172,7 +170,7 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     #[Test]
     public function editConfigurationNormalizesProfileCkeditorCharacterLimitsWithoutChangingTca(): void
     {
-        $factory = (new ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
+        $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $settings = $factory->normalizeEditConfiguration([
             'profile' => [
                 'miscellaneous' => [
@@ -230,8 +228,8 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
      */
     private function normalize(array $configuration): AcademicPersonsSettings
     {
-        $factory = (new ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
-        $method = new ReflectionMethod(AcademicPersonsSettingsFactory::class, 'normalize');
+        $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
+        $method = new \ReflectionMethod(AcademicPersonsSettingsFactory::class, 'normalize');
         $method->setAccessible(true);
         $settings = $method->invoke($factory, $configuration);
         $this->assertInstanceOf(AcademicPersonsSettings::class, $settings);

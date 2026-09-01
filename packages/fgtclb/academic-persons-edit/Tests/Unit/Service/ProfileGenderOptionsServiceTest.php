@@ -41,7 +41,7 @@ final class ProfileGenderOptionsServiceTest extends UnitTestCase
             ['label' => 'Diverse', 'value' => 'diverse'],
         ]);
 
-        self::assertSame(
+        $this->assertSame(
             ['ms', 'mr', 'diverse'],
             (new ProfileGenderOptionsService())->getAllowedValues(),
         );
@@ -52,7 +52,7 @@ final class ProfileGenderOptionsServiceTest extends UnitTestCase
     {
         $GLOBALS['TCA'] = [];
 
-        self::assertSame(
+        $this->assertSame(
             [],
             (new ProfileGenderOptionsService())->getAllowedValues(),
         );
@@ -73,7 +73,7 @@ final class ProfileGenderOptionsServiceTest extends UnitTestCase
             ],
         ];
 
-        self::assertSame(
+        $this->assertSame(
             [],
             (new ProfileGenderOptionsService())->getAllowedValues(),
         );
@@ -87,9 +87,9 @@ final class ProfileGenderOptionsServiceTest extends UnitTestCase
         ]);
         $subject = new ProfileGenderOptionsService();
 
-        self::assertTrue($subject->isAllowed('female'));
-        self::assertFalse($subject->isAllowed('Female'));
-        self::assertFalse($subject->isAllowed('unknown'));
+        $this->assertTrue($subject->isAllowed('female'));
+        $this->assertFalse($subject->isAllowed('Female'));
+        $this->assertFalse($subject->isAllowed('unknown'));
     }
 
     #[Test]
@@ -97,7 +97,7 @@ final class ProfileGenderOptionsServiceTest extends UnitTestCase
     {
         $GLOBALS['TCA'] = [];
 
-        self::assertTrue(
+        $this->assertTrue(
             (new ProfileGenderOptionsService())->isAllowed(''),
         );
     }

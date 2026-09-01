@@ -1,7 +1,7 @@
 # TYPO3 Extension `Academic person database - frontend editing` (READ-ONLY)
 
 |                  | URL                                                                        |
-| ---------------- | -------------------------------------------------------------------------- |
+|------------------|----------------------------------------------------------------------------|
 | **Repository:**  | https://github.com/fgtclb/academic-persons-edit                            |
 | **Read online:** | https://docs.typo3.org/p/fgtclb/academic/academic-persons-edit/main/en-us/ |
 | **TER:**         | https://extensions.typo3.org/extension/academic_persons_edit/              |
@@ -121,7 +121,7 @@ directory.
 ## Compatibility
 
 | Branch | Version     | TYPO3                | PHP                                          |
-| ------ | ----------- | -------------------- | -------------------------------------------- |
+|--------|-------------|----------------------|----------------------------------------------|
 | main   | ^3, 3.x-dev | v13.4.31+ + v14.3.6+ | 8.2, 8.3, 8.4, 8.5                           |
 | 2, 2.x | ^2, 2.x-dev | v12 + v13            | 8.1, 8.2, 8.3, 8.4, 8.5 (depending on TYPO3) |
 | 1      | ^1, 1.x-dev | v11 + v12            | 8.1, 8.2, 8.3, 8.4 (depending on TYPO3)      |

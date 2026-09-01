@@ -11,14 +11,14 @@ declare(strict_types=1);
 
 use FGTCLB\AcademicPersonsEdit\Controller\ContractController;
 use FGTCLB\AcademicPersonsEdit\Controller\EmailAddressController;
+use FGTCLB\AcademicPersonsEdit\Controller\InlineProfileController;
 use FGTCLB\AcademicPersonsEdit\Controller\PhoneNumberController;
 use FGTCLB\AcademicPersonsEdit\Controller\PhysicalAddressController;
 use FGTCLB\AcademicPersonsEdit\Controller\ProfileController;
 use FGTCLB\AcademicPersonsEdit\Controller\ProfileInformationController;
-use FGTCLB\AcademicPersonsEdit\Controller\InlineProfileController;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
-(static function (): void{
+(static function (): void {
     // Temporary legacy compatibility registration. Keep existing ProfileEditing
     // records and reference tests working, but do not use these controllers from
     // InlineProfile or expose this CType for new backend content elements.

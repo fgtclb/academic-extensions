@@ -89,12 +89,12 @@ final class AcademicPersonsPublicProfilePluginTest extends AbstractAcademicPerso
         $profileEntriesPosition = strpos($content, 'academic-persons-detail__profile-entries');
         $lastNamePosition = strpos($content, 'academic-persons-detail__headline-part">Müllermann</span>');
         $firstNamePosition = strpos($content, 'academic-persons-detail__headline-part">[EN] Max</span>');
-        self::assertNotFalse($profileEntriesPosition);
-        self::assertNotFalse($lastNamePosition);
-        self::assertNotFalse($firstNamePosition);
-        self::assertTrue($profileEntriesPosition < $lastNamePosition);
-        self::assertTrue($lastNamePosition < $firstNamePosition);
-        self::assertStringNotContainsString('academic-persons-detail__navigation', $content);
-        self::assertStringNotContainsString('academic-persons-detail__subline', $content);
+        $this->assertNotFalse($profileEntriesPosition);
+        $this->assertNotFalse($lastNamePosition);
+        $this->assertNotFalse($firstNamePosition);
+        $this->assertTrue($profileEntriesPosition < $lastNamePosition);
+        $this->assertTrue($lastNamePosition < $firstNamePosition);
+        $this->assertStringNotContainsString('academic-persons-detail__navigation', $content);
+        $this->assertStringNotContainsString('academic-persons-detail__subline', $content);
     }
 }

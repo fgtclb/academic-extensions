@@ -14,8 +14,7 @@ final readonly class ProfileUpdateRequestResult
         private ?Profile $profile = null,
         private ?string $error = null,
         private int $statusCode = 200,
-    ) {
-    }
+    ) {}
 
     public static function success(
         ProfileUpdatePayload $payload,

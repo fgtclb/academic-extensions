@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator\Fixtures;
 
-use DateTimeInterface;
 use TYPO3\CMS\Extbase\Validation\Validator\AbstractValidator;
 
 /**
@@ -50,7 +49,7 @@ final class RecordingValidator extends AbstractValidator
             is_bool($value) => 'bool(' . ($value ? 'true' : 'false') . ')',
             is_int($value) => 'int(' . $value . ')',
             is_string($value) => 'string(' . $value . ')',
-            $value instanceof DateTimeInterface => 'datetime(' . $value->format('Y-m-d') . ')',
+            $value instanceof \DateTimeInterface => 'datetime(' . $value->format('Y-m-d') . ')',
             default => get_debug_type($value),
         };
     }

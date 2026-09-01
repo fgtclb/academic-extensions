@@ -52,7 +52,7 @@ final class AcademicPersonsSettings
      *     contractContactSections?: array<string, ContractContactSection>,
      *     documentSections?: array<string, DocumentSection>,
      *     publicProfile?: PublicProfileSettings,
-     *     raw: array<string, mixed>,
+     *     raw?: array<string, mixed>,
      * } $array
      */
     public static function __set_state(array $array): self
@@ -229,8 +229,7 @@ final class AcademicPersonsSettings
     public function getProfileValidationTcaTableConfig(
         array $fieldIdentifiers = [],
         ?string $sectionIdentifier = null,
-    ): array
-    {
+    ): array {
         $validationSet = match (true) {
             $fieldIdentifiers === [] => $this->getProfileValidationSet($sectionIdentifier),
             $sectionIdentifier !== null => $this->getProfileValidationSetForFields(
@@ -293,8 +292,7 @@ final class AcademicPersonsSettings
     private function collectProfileValidations(
         array $fieldIdentifiers,
         ?ProfileSection $section = null,
-    ): array
-    {
+    ): array {
         $validations = [];
         $sections = $section === null ? $this->profileSections : [$section];
         foreach ($fieldIdentifiers as $fieldIdentifier) {

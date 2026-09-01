@@ -64,19 +64,19 @@ final class ProfileFieldOptionsServiceTest extends UnitTestCase
         ]);
         $subject = new ProfileFieldOptionsService($settings);
 
-        self::assertSame(
+        $this->assertSame(
             [
                 'gender' => ['female' => 'Female', 'male' => 'Male'],
                 'status' => ['active' => 'Active'],
             ],
             $subject->getOptionsByField(),
         );
-        self::assertTrue($subject->isAllowed('gender', 'female'));
-        self::assertTrue($subject->isAllowed('status', 'active'));
-        self::assertTrue($subject->isAllowed('status', ''));
-        self::assertFalse($subject->isAllowed('status', 'female'));
-        self::assertFalse($subject->isAllowed('firstName', 'active'));
-        self::assertFalse($subject->isAllowed('unknown', 'active'));
+        $this->assertTrue($subject->isAllowed('gender', 'female'));
+        $this->assertTrue($subject->isAllowed('status', 'active'));
+        $this->assertTrue($subject->isAllowed('status', ''));
+        $this->assertFalse($subject->isAllowed('status', 'female'));
+        $this->assertFalse($subject->isAllowed('firstName', 'active'));
+        $this->assertFalse($subject->isAllowed('unknown', 'active'));
     }
 
     #[Test]
@@ -93,7 +93,7 @@ final class ProfileFieldOptionsServiceTest extends UnitTestCase
             ValidationSettings::forProfileFields(['gender' => 'select']),
         );
 
-        self::assertSame(['gender' => []], $subject->getOptionsByField());
-        self::assertFalse($subject->isAllowed('gender', 'female'));
+        $this->assertSame(['gender' => []], $subject->getOptionsByField());
+        $this->assertFalse($subject->isAllowed('gender', 'female'));
     }
 }

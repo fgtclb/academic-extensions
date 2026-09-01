@@ -1,5 +1,5 @@
 /* Generated from Resources/Private/TypeScript — do not edit. */
-export const editorConfig = {
+const editorConfig = {
   language: "en",
   height: 200,
   versionCheck: false,
@@ -10,14 +10,10 @@ export const editorConfig = {
     { name: "clipboard", groups: ["cleanup"] }
   ],
   customConfig: "",
-  removeButtons: [
-    "Strike",
-    "Subscript",
-    "Superscript"
-  ]
+  removeButtons: ["Strike", "Subscript", "Superscript"]
 };
-export const getEditor = () => window.CKEDITOR;
-export const initializeEditors = (scope = document, ckeditor = getEditor()) => {
+const getEditor = () => window.CKEDITOR;
+const initializeEditors = (scope = document, ckeditor = getEditor()) => {
   if (ckeditor === void 0) {
     return false;
   }
@@ -29,14 +25,19 @@ export const initializeEditors = (scope = document, ckeditor = getEditor()) => {
   });
   return true;
 };
-let waitForEditor;
-export const pollForEditor = () => {
+const waitForEditor = window.setInterval(() => {
+  pollForEditor();
+}, 100);
+const pollForEditor = () => {
   const ckeditor = getEditor();
   if (!initializeEditors(document, ckeditor)) {
     return;
   }
   window.clearInterval(waitForEditor);
 };
-waitForEditor = window.setInterval(() => {
-  pollForEditor();
-}, 100);
+export {
+  editorConfig,
+  getEditor,
+  initializeEditors,
+  pollForEditor
+};

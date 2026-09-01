@@ -18,7 +18,7 @@ final class ProfileGenderOptionsService
     {
         $options = [];
         foreach ($this->getConfiguredItems() as $item) {
-            $value = (string) ($item['value'] ?? '');
+            $value = (string)($item['value'] ?? '');
             if ($value === '') {
                 // Skip empty string values, handled with `<f:form.select prependOptionLabel="---" />`
                 // in the fluid template.

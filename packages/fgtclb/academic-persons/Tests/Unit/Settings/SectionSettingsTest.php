@@ -83,8 +83,8 @@ final class SectionSettingsTest extends UnitTestCase
         );
         $this->assertSame('cooperation', $settings->getDocumentSectionByType('cooperation')?->identifier);
         $this->assertSame(['from', 'title'], $settings->getDocumentSection('cooperation')?->rowFields);
-        $this->assertTrue($settings->getDocumentSection('cooperation')?->allowsAction('edit'));
-        $this->assertTrue($settings->getDocumentSection('cooperation')?->allowsDragSorting());
+        $this->assertTrue($settings->getDocumentSection('cooperation')->allowsAction('edit'));
+        $this->assertTrue($settings->getDocumentSection('cooperation')->allowsDragSorting());
     }
 
     #[Test]
@@ -155,7 +155,7 @@ final class SectionSettingsTest extends UnitTestCase
         $this->assertSame(['year', 'title'], $restored->getDocumentSection('publications')?->rowFields);
         $this->assertSame(
             ['view', 'down', 'up', 'delete', 'edit'],
-            $restored->getDocumentSection('publications')?->actions,
+            $restored->getDocumentSection('publications')->actions,
         );
     }
 

@@ -6,12 +6,10 @@ namespace FGTCLB\AcademicPersonsEdit\Service;
 
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
-use FGTCLB\AcademicPersonsEdit\Domain\Parser\ProfileUpdatePayloadParser;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileUpdateRequestResult;
-use JsonException;
+use FGTCLB\AcademicPersonsEdit\Domain\Parser\ProfileUpdatePayloadParser;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Context\Context;
-use UnexpectedValueException;
 
 final readonly class ProfileUpdateRequestService
 {
@@ -19,8 +17,7 @@ final readonly class ProfileUpdateRequestService
         private Context $context,
         private ProfileRepository $profileRepository,
         private ProfileUpdatePayloadParser $payloadParser,
-    ) {
-    }
+    ) {}
 
     public function validate(ServerRequestInterface $request): ProfileUpdateRequestResult
     {
@@ -42,12 +39,12 @@ final readonly class ProfileUpdateRequestService
             $payload = $this->payloadParser->parse(
                 (string)$request->getBody()
             );
-        } catch (JsonException) {
+        } catch (\JsonException) {
             return ProfileUpdateRequestResult::failure(
                 'invalid_json',
                 400,
             );
-        } catch (UnexpectedValueException) {
+        } catch (\UnexpectedValueException) {
             return ProfileUpdateRequestResult::failure(
                 'invalid_payload',
                 400,
@@ -98,8 +95,7 @@ final readonly class ProfileUpdateRequestService
         );
 
         foreach (
-            $this->profileRepository->findByFrontendUser($frontendUserId)
-            as $profile
+            $this->profileRepository->findByFrontendUser($frontendUserId) as $profile
         ) {
             if (
                 $profile instanceof Profile

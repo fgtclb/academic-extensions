@@ -7,6 +7,7 @@ namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Service;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileGenderOptionsService;
 use FGTCLB\AcademicPersonsEdit\Tests\Functional\AbstractAcademicPersonsEditTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use Random\RandomException;
 
 final class ProfileGenderOptionsServiceTest extends AbstractAcademicPersonsEditTestCase
 {
@@ -30,11 +31,17 @@ final class ProfileGenderOptionsServiceTest extends AbstractAcademicPersonsEditT
         ];
     }
 
+    /**
+     * @return list<array{label: string, value: string}>
+     */
     private static function getValuesFromTca(): array
     {
         return $GLOBALS['TCA']['tx_academicpersons_domain_model_profile']['columns']['gender']['config']['items'];
     }
 
+    /**
+     * @return array{label: string, value: string}
+     */
     private static function getValueFromTca(int $index): array
     {
         return $GLOBALS['TCA']['tx_academicpersons_domain_model_profile']['columns']['gender']['config']['items'][$index];
@@ -68,6 +75,10 @@ final class ProfileGenderOptionsServiceTest extends AbstractAcademicPersonsEditT
         $this->assertFalse($profileGenderOptionsService->isAllowed(self::generateRandomString()));
     }
 
+    /**
+     * @param int<1, max> $length
+     * @throws RandomException
+     */
     private function generateRandomString(int $length = 10): string
     {
         return bin2hex(random_bytes($length));

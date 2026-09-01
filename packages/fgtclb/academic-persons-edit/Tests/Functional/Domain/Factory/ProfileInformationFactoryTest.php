@@ -104,7 +104,7 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
     {
         $this->updateProfileInformationWith(
             ['title' => 'New Title'],
-            ['year' => new DateTime('2021-01-01')],
+            ['year' => new \DateTime('2021-01-01')],
         );
 
         $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndOverriddenYear.csv');
