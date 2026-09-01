@@ -40,7 +40,10 @@ site configuration. The profile column contains a square thumbnail or the
 shipped placeholder followed by the complete name. :guilabel:`Edit` passes the
 explicit ``profileUid`` to ``indexAction()``; the action resolves that UID again
 through the authenticated user's assigned profiles before rendering anything.
-An unassigned or manipulated UID receives a ``403`` response.
+An unassigned or manipulated UID receives the ``403`` access denied response of
+the site, the same one an unauthenticated visitor gets — raised as a propagated
+response rather than returned by the action, because on TYPO3 v13 the status
+code of an Extbase plugin response never reaches the frontend response.
 
 The :guilabel:`View` URI uses extension ``academicpersons``, controller
 ``Profile``, action ``detail`` and plugin ``Detail``. Its target page comes
