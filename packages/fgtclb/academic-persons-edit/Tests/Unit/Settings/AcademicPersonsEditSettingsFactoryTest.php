@@ -35,7 +35,6 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         );
         $factory = $reflection->newInstanceWithoutConstructor();
         $identifier = new \ReflectionMethod(AcademicPersonsEditSettingsFactory::class, 'settingsIdentifier');
-        $identifier->setAccessible(true);
         $this->assertSame('AcademicPersonsEdit_Settings_SectionSchema_v3', $identifier->invoke($factory));
     }
 
