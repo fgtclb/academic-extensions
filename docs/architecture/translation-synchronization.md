@@ -294,7 +294,7 @@ Stated so they are decisions, not surprises:
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
 | ~~Update-path gaps~~ — resolved by ACE-487: children's exclude columns are re-propagated by the inline-tree datamap now, and the late-file/MM half turned out never to be a gap (core's `DataMapProcessor` carries both; probed, pinned by tests). `enableLogging` stays on by decision — see above. | ACE-487    |
 | Branch `2` still carries the contract relation select defect the rework surfaced: the "please select" items wrote `''` into nullable integer columns, which PostgreSQL rejects (`main` fixed it as ACE-489 — the columns are `NOT NULL DEFAULT 0` there now).                                        | ACE-488    |
-| The frontend workspace refusal is hardcoded; configurability is a named follow-up of ACE-480 without an issue yet.                                                                                                                                                                                   | —          |
+| The frontend workspace refusal is hardcoded **by decision** (ACE-492, closed as won't implement for now): a frontend-triggered synchronisation never writes workspace content, and no installation has asked for the opt-in. Reopen ACE-492 if one does — the candidate shapes are recorded there.   | ACE-492    |
 
 ## See also
 
