@@ -14,14 +14,7 @@ page:
       # Nothing here sets a cookie worth consenting to, and the banner covers
       # the page while looking at a plugin.
       enable: false
-    navigation:
-      type: top
-
 plugin:
-  bootstrap_package:
-    settings:
-      scss:
-        enable-rounded: false
   tx_academicpersons:
     # The detail page of the seeded tree. The plugins declare it in their
     # FlexForm as well; this is the fallback for one added by hand later, and it
