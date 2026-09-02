@@ -702,6 +702,51 @@ belongs, so it creates an empty one and reports that it is not installed.
 marker file along with everything else that is git-ignored, so the sequence is
 teardown first, marker second, start third — never the other way round.
 
+#### An index that cannot be added leaves the schema short
+
+A rebuild is not only the way to get a *reproducible* template. It is the only
+repair there is when the schema change is an added index, and that is worth
+saying separately, because it looks exactly like something a migration should
+be able to do.
+
+Adding an index to a table of an installation that already exists is where the
+SQLite schema migration gives up here, and it gives up **halfway**: the
+operations it manages are written, the ones it does not are dropped, and it
+reports success. The installation keeps every row it had. What it silently
+loses are the columns and indexes the failed operations would have created.
+
+Nothing looks wrong afterwards. The frontend renders, the backend lists
+records, the seed manifest still matches — that measures the rows the seed
+declares, and those are all there. Only a comparison against what the code
+declares *today* finds the gap.
+
+That is not hypothetical. Making the nine `academic_persons` tables workspace
+aware (ACE-475) added `t3ver_oid`, `t3ver_stage`, `t3ver_state` and
+`t3ver_wsid` to each of them, plus an index over `t3ver_oid`. Migrating the
+existing instances instead of rebuilding them lost every one of those, on
+**both** core versions, and the two committed templates carried the short
+schema until they were rebuilt:
+
+| Measured against the rebuild | core-13 | core-14 |
+|------------------------------|---------|---------|
+| Workspace columns missing    | 36      | 36      |
+| `t3ver_oid` indexes missing  | 9       | 9       |
+| Rows differing               | 0       | 0       |
+
+The row counts are the reason it went unnoticed for as long as it did: the
+content was complete and identical the whole time, so every check that looks
+at rows was green.
+
+So: **a change that adds an index to a table is a rebuild, not a migration.**
+Run the walk-through below against an empty SQLite file, do it for both core
+versions so the two templates stay comparable, and commit the two snapshots
+together.
+
+There may be a way around it in the core itself — change 95187 on
+review.typo3.org, *[BUGFIX] Reject indexes over undeclared columns*
+(https://review.typo3.org/c/Packages/TYPO3.CMS/+/95187), backported as a
+composer patch. That is untested here, and a rebuild is correct either way.
+
 #### The walk-through
 
 Every command below was run against `core-13/`; the output quoted is what it
