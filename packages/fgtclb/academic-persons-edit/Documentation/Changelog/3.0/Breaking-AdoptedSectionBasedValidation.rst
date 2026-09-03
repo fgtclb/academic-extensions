@@ -10,7 +10,8 @@ Description
 Frontend editing no longer reads the removed global validation sets from
 :guilabel:`academic_persons`. Profile fields receive the validation set of their
 ``information`` or ``aboutme`` section. Address, email and telephone validators
-derive their fields from separate ``contractContact`` sections. Direct Profile
+derive their fields from ``contracts.contactSections.<section>.fields``. Direct
+Profile
 email/phone values therefore cannot inherit Contract contact rules. Profile-information
 validation selects exactly one document section by its stored record type.
 
@@ -27,7 +28,7 @@ Impact
 
 Projects must migrate their edit configuration to
 :file:`Configuration/AcademicsPersonsEdit/Settings.yaml` using the ``profile``,
-``special``, ``contractContact`` and ``documentSections`` schema supplied by
+``special``, ``contracts`` and ``documentSections`` schema supplied by
 :guilabel:`academic_persons_edit`. Custom
 controllers, validators or tests using global validation-set identifiers must
 switch to the profile- or document-section accessors.

@@ -1,100 +1,16 @@
-# The route enhancers of the academic extensions.
-#
-# None of the five files is loaded by TYPO3 on its own - a "Routes.yaml" or a
-# "Configuration/Routes/*.yaml" is inert until a site configuration imports it -
-# so without this block every detail page below is reachable only through a raw
-# "tx_...[...]" argument, and half of the seeded tree looks broken for a reason
-# that is not the seed.
-#
-# Imported here rather than carried by a site set: a set may ship a
-# "route-enhancers.yaml" only from TYPO3 v14.1, and this branch supports v13 as
-# well, so "imports" is the form that works on both.
-imports:
-  - resource: 'EXT:academic_persons/Configuration/Routes/List.yaml'
-  - resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
-  - resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
-  - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
-  - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
-
-# Bind every one of those enhancers to the pages that carry the plugin it
-# belongs to.
-#
-# Without this block TYPO3 offers all five to every page of the site, and the
-# matcher takes the first candidate route whose path matches and whose aspects
-# also resolve. "ListAndDetail.yaml" and "Detail.yaml" declare a byte identical
-# "/{profile_name}" over the same slug mapper, so the one that is imported
-# first takes every profile URL of the whole site and the other plugin never
-# receives its argument - a 404 on the dedicated detail page, from a link that
-# was generated correctly, because generation is scoped to the plugin namespace
-# being linked and is therefore not ambiguous at all (ACE-470). The two list
-# routes collide the same way and more quietly: the wrong namespace renders an
-# unfiltered list with status 200.
-#
-# The uids below are the ones the seed declares, and they are the uids of the
-# default language. Matching derives the page as "l10n_parent ?: uid", so one
-# list covers "/persons/detail" and "/de/personal/detail" alike.
-routeEnhancers:
-  # "/persons/list", "/persons/list-alphabet", "/persons/list-filtered"
-  ProfileListPlugin:
-    limitToPages: [201, 202, 203]
-  # "/persons/list-and-detail"
-  ProfileListAndDetailPlugin:
-    limitToPages: [204]
-  # "/persons/detail"
-  ProfileDetailPlugin:
-    limitToPages: [205]
-  # "/jobs/detail"
-  AcademicJobsDetailPlugin:
-    limitToPages: [233]
-  # "/programs/list", "/programs/list-preset"
-  AcademicPrograms:
-    limitToPages: [251, 252]
-
-# Site of the seeded page tree.
-#
-# "rootPageId" is 1 because the seed definition declares that uid - see
-# "packages-dev/dev-site/Configuration/DataFactory/academics-instance/". Declaring uids is
-# the whole reason a seed may do so: without it this file could not be
-# committed, because the root page would get whatever the database assigned.
-#
-# The base carries no host name, so the instance is reachable under its DDEV
-# host name and under whatever a host stack serves it as.
-rootPageId: 1
 base: /
-websiteTitle: 'Academic extensions (TYPO3 v14)'
 dependencies:
-  # The frontend theme. "full" pulls in the backend layouts, the content
-  # elements, Bootstrap 5, the RTE preset and the rest - the seed's
-  # "backend_layout" values are its identifiers.
   - bootstrap-package/full
-  # Every academic extension that ships a site set, by its aggregate. Since
-  # ACE-458 each extension hides its own content elements for the whole
-  # installation and re-enables them per component, so an extension that is not
-  # named here can be installed and still offer nothing an editor can place.
-  # A development instance is meant to offer everything, hence all of them.
-  #
-  # Each aggregate depends on its own component sets, so naming it enables the
-  # whole extension. Do not name component sets here by hand: the three
-  # "-content-load" sets are dependencies of their aggregates and leaving one
-  # out is a fatal error, not a degraded page - nothing else defines
-  # "styles.content.getContent" and the page templates call it through
-  # "f:cObject".
   - fgtclb/academic-base
   - fgtclb/academic-bite-jobs
   - fgtclb/academic-contacts4pages
   - fgtclb/academic-jobs
   - fgtclb/academic-partners
-  # Deliberately the aggregate and not "fgtclb/academic-persons-standalone":
-  # the standalone set defines its own "page" object and would replace the
-  # theme. "fgtclb/academic-persons-default" is kept as a compatibility alias
-  # of this aggregate and would work as well.
   - fgtclb/academic-persons
-  - fgtclb/academic-persons-edit
+  - fgtclb/academic-persons-edit-inline-profile
   - fgtclb/academic-programs
   - fgtclb/academic-projects
   - fgtclb/academic-study-plan
-  # EXT:felogin registers its TypoScript with "includeInSiteSets = false", so
-  # in a site set driven installation it arrives only through this dependency.
   - typo3/felogin
 languages:
   -
@@ -106,11 +22,6 @@ languages:
     navigationTitle: English
     flag: us
     websiteTitle: ''
-  # "fallbackType: strict" - a page without a translation is a 404 in "/de/",
-  # not the English page served under a German URL. That is the setting the seed
-  # is written for: every page and every translatable record it declares carries
-  # its German variant, so a hole in "/de/" is a defect in the seed and shows up
-  # as one instead of being papered over by the default language.
   -
     title: German
     enabled: true
@@ -122,3 +33,35 @@ languages:
     fallbackType: strict
     fallbacks: ''
     websiteTitle: ''
+rootPageId: 1
+routeEnhancers:
+  ProfileListPlugin:
+    limitToPages:
+      - 201
+      - 202
+      - 203
+  ProfileListAndDetailPlugin:
+    limitToPages:
+      - 204
+  ProfileDetailPlugin:
+    limitToPages:
+      - 205
+  AcademicJobsDetailPlugin:
+    limitToPages:
+      - 233
+  AcademicPrograms:
+    limitToPages:
+      - 251
+      - 252
+websiteTitle: 'Academic extensions (TYPO3 v14)'
+imports:
+  -
+    resource: 'EXT:academic_persons/Configuration/Routes/List.yaml'
+  -
+    resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
+  -
+    resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
+  -
+    resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
+  -
+    resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'

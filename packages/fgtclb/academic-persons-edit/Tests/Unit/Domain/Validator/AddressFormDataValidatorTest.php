@@ -40,7 +40,6 @@ final class AddressFormDataValidatorTest extends UnitTestCase
             ValidationSettings::forContractContactSection(self::VALIDATION_SET, ['city' => [RecordingValidator::class]]),
             new AddressFormData(city: 'Munich')
         );
-
         $this->assertSame(['string(Munich)'], $this->messagesFor($result, 'city'));
     }
 
@@ -51,7 +50,6 @@ final class AddressFormDataValidatorTest extends UnitTestCase
             ValidationSettings::forContractContactSection('emailAddresses', ['email' => [RecordingValidator::class]]),
             new AddressFormData(city: 'Munich')
         );
-
         $this->assertFalse($result->hasErrors());
     }
 
@@ -84,7 +82,6 @@ final class AddressFormDataValidatorTest extends UnitTestCase
                 type: 'work'
             )
         );
-
         $this->assertSame([$expectedDescription], $this->messagesFor($result, $property));
     }
 
@@ -94,7 +91,7 @@ final class AddressFormDataValidatorTest extends UnitTestCase
     public static function configuredProperties(): array
     {
         return [
-            // Required in the shipped Configuration/AcademicsPersonsEdit/Settings.yaml.
+            // Required in the shipped academic-persons/Configuration/AcademicPersons/Settings.yaml.
             'street' => ['street', 'string(Bahnhofstrasse)'],
             'streetNumber' => ['streetNumber', 'string(12a)'],
             'zip' => ['zip', 'string(80331)'],
@@ -117,7 +114,6 @@ final class AddressFormDataValidatorTest extends UnitTestCase
             ValidationSettings::forContractContactSection(self::VALIDATION_SET, ['houseNumber' => [RecordingValidator::class]]),
             new AddressFormData(streetNumber: '12a')
         );
-
         $this->assertFalse($result->hasErrors());
     }
 
@@ -133,11 +129,9 @@ final class AddressFormDataValidatorTest extends UnitTestCase
         $validator->injectAcademicPersonsSettings(
             ValidationSettings::forContractContactSection(self::VALIDATION_SET, []),
         );
-
         $this->expectException(UnsuitableValidatorException::class);
         $this->expectExceptionCode(1297418975);
         $this->expectExceptionMessage('Not a valid address object.');
-
         $validator->validate($subject);
     }
 

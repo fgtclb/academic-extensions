@@ -23,6 +23,7 @@ final class ContractContactField
         public readonly string $renderType,
         public readonly Validation $validation,
         public readonly int $position,
+        public readonly string $autocomplete = '',
     ) {}
 
     /**
@@ -35,6 +36,7 @@ final class ContractContactField
      *     renderType: string,
      *     validation: Validation,
      *     position: int,
+     *     autocomplete?: string,
      * } $array
      */
     public static function __set_state(array $array): self
@@ -48,6 +50,7 @@ final class ContractContactField
             renderType: $array['renderType'],
             validation: $array['validation'],
             position: $array['position'],
+            autocomplete: $array['autocomplete'] ?? '',
         );
     }
 

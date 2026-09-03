@@ -1,22 +1,53 @@
-import { rootSelector, initializePopover } from "./profile/common.js";
-import { initializeFieldEditing } from "./profile/fields.js";
-import { initializeDocumentSections } from "./profile/documents.js";
-import { initializeImageEditing } from "./profile/image.js";
-import { initializeStickyImageOffset } from "./profile/sticky-image.js";
-import { initializeSkipSync } from "./profile/sync.js";
-
-export const initializeInlineProfiles = (scope = document) => {
-  scope.querySelectorAll(rootSelector).forEach((root) => {
-    if (!(root instanceof HTMLElement)) {
+/* Generated from Resources/Private/TypeScript — do not edit. */
+import {
+  createApp,
+  onMounted
+} from "@fgtclb/academic-persons-edit/frontend/vue.js";
+import {
+  initializePopover,
+  rootSelector
+} from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
+import {
+  createDocumentEditing,
+  initializeDocumentSections
+} from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
+import { initializeFieldEditing } from "@fgtclb/academic-persons-edit/frontend/profile/fields.js";
+import { createImageEditing } from "@fgtclb/academic-persons-edit/frontend/profile/image.js";
+import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
+import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
+const mountedRoots = /* @__PURE__ */ new WeakSet();
+const createInlineProfileApp = (root) => createApp({
+  setup() {
+    const documentController = createDocumentEditing(root);
+    const imageController = createImageEditing(root);
+    const syncController = createSkipSync(root);
+    onMounted(() => {
+      initializeStickyImageOffset(root);
+      initializeFieldEditing(root);
+      initializeDocumentSections(root);
+      initializePopover(root);
+    });
+    return {
+      ...documentController,
+      ...imageController,
+      ...syncController
+    };
+  }
+});
+const initializeInlineProfiles = (scope = document) => {
+  const applications = [];
+  scope.querySelectorAll(rootSelector).forEach((candidate) => {
+    if (!(candidate instanceof HTMLElement) || mountedRoots.has(candidate)) {
       return;
     }
-    initializeStickyImageOffset(root);
-    initializeFieldEditing(root);
-    initializeDocumentSections(root);
-    initializeSkipSync(root);
-    initializeImageEditing(root);
+    mountedRoots.add(candidate);
+    const application = createInlineProfileApp(candidate);
+    application.mount(candidate);
+    applications.push(application);
   });
-  initializePopover();
+  return applications;
 };
-
 initializeInlineProfiles();
+export {
+  initializeInlineProfiles
+};

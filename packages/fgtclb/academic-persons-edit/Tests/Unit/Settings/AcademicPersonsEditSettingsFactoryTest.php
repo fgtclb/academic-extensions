@@ -17,35 +17,36 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
 {
     #[Test]
-    public function shippedConfigurationContainsOnlyEditorMaps(): void
+    public function shippedConfigurationContainsTheUnifiedSettingsMaps(): void
     {
         $this->assertSame(
-            ['profile', 'special', 'contractContact', 'documentSections'],
+            ['profile', 'special', 'contracts', 'documentSections'],
             array_keys($this->getShippedConfiguration()),
         );
     }
 
     #[Test]
-    public function factoryUsesTheSeparatedPathAndCacheEntry(): void
-    {
-        $reflection = new \ReflectionClass(AcademicPersonsEditSettingsFactory::class);
-        $this->assertSame(
-            'Configuration/AcademicsPersonsEdit/Settings.yaml',
-            $reflection->getConstant('SETTINGS_FILE'),
-        );
-        $factory = $reflection->newInstanceWithoutConstructor();
-        $identifier = new \ReflectionMethod(AcademicPersonsEditSettingsFactory::class, 'settingsIdentifier');
-        $this->assertSame('AcademicPersonsEdit_Settings_SectionSchema_v3', $identifier->invoke($factory));
-    }
-
-    #[Test]
-    public function editorGraphKeepsConfiguredSectionsAndOrder(): void
+    public function unifiedGraphKeepsConfiguredSectionsAndOrder(): void
     {
         $settings = $this->normalize($this->getShippedConfiguration());
         $this->assertSame(['information', 'aboutme'], array_keys($settings->profileSections));
         $this->assertSame(['title', 'image', 'skipSync'], array_keys($settings->specialFields));
         $this->assertSame(
-            ['phoneNumbers', 'emailAddresses', 'physicalAddresses'],
+            [
+                'position',
+                'organisationalUnit',
+                'functionType',
+                'validFrom',
+                'validTo',
+                'location',
+                'room',
+                'officeHours',
+                'publish',
+            ],
+            array_keys($settings->contractFields),
+        );
+        $this->assertSame(
+            ['physicalAddresses', 'emailAddresses', 'phoneNumbers'],
             array_keys($settings->contractContactSections),
         );
         $this->assertSame(
@@ -61,8 +62,30 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
             ],
             array_keys($settings->documentSections),
         );
-        $this->assertSame([], $settings->publicProfile->structure);
-        $this->assertSame([], $settings->publicProfile->details);
+        $this->assertNotEmpty($settings->publicProfile->structure);
+        $this->assertNotEmpty($settings->publicProfile->details);
+    }
+
+    #[Test]
+    public function contractEditorFieldsAreNormalizedFromTheirStructuralConfiguration(): void
+    {
+        $settings = $this->normalize($this->getShippedConfiguration());
+        $this->assertSame('text', $settings->getContractField('position')?->renderType);
+        $this->assertTrue($settings->getContractField('position')->validation->required);
+        $this->assertSame(
+            'organisationalUnits',
+            $settings->getContractField('organisationalUnit')?->optionSource,
+        );
+        $this->assertSame('functionTypes', $settings->getContractField('functionType')?->optionSource);
+        $this->assertSame('date', $settings->getContractField('validFrom')?->validation->inputType);
+        $this->assertSame('date', $settings->getContractField('validTo')?->validation->inputType);
+        $this->assertSame('locations', $settings->getContractField('location')?->optionSource);
+        $this->assertTrue($settings->getContractField('officeHours')?->validation->isRichText());
+        $this->assertSame('checkbox', $settings->getContractField('publish')?->validation->inputType);
+        $this->assertSame(
+            $settings->getContractField('publish')->validation,
+            $settings->getDocumentValidationSet('contracts')->get('publish'),
+        );
     }
 
     #[Test]
@@ -97,7 +120,33 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         $this->assertNotNull($website);
         $this->assertSame('url', $website->inputType);
         $this->assertSame([UrlValidator::class], $website->validatorClassNames);
-        $email = $settings->getContractContactField('emailAddress')?->validation;
+        $country = $settings->getContractContactField('country');
+        $this->assertNotNull($country);
+        $this->assertSame('input', $country->fieldType);
+        $this->assertSame('select', $country->renderType);
+        $this->assertSame('select', $country->validation->inputType);
+        $this->assertSame('country', $country->autocomplete);
+        $this->assertSame(
+            'street-address',
+            $settings->getContractContactField('street')?->autocomplete,
+        );
+        $this->assertSame(
+            'postal-code',
+            $settings->getContractContactField('zip')?->autocomplete,
+        );
+        $this->assertSame(
+            'address-level2',
+            $settings->getContractContactField('city')?->autocomplete,
+        );
+        $this->assertSame(
+            'email',
+            $settings->getContractContactField('emailAddress')?->autocomplete,
+        );
+        $this->assertSame(
+            'tel',
+            $settings->getContractContactField('phoneNumber')?->autocomplete,
+        );
+        $email = $settings->getContractContactField('emailAddress')->validation;
         $this->assertNotNull($email);
         $this->assertSame(
             [NotEmptyValidator::class, EmailAddressValidator::class],
@@ -130,6 +179,63 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
     }
 
     #[Test]
+    public function contractDocumentSectionResolvesItsReferencedTypeConfiguration(): void
+    {
+        $configuration = $this->getShippedConfiguration();
+        $this->assertSame(
+            ['type' => 'contracts'],
+            $configuration['documentSections']['contracts'],
+        );
+        $settings = $this->normalize($configuration);
+        $contracts = $settings->getDocumentSection('contracts');
+        $this->assertNotNull($contracts);
+        $this->assertSame('contracts', $contracts->type);
+        $this->assertSame('contracts', $contracts->fieldName);
+        $this->assertSame(['position'], $contracts->rowFields);
+        $this->assertSame(['view', 'down', 'up', 'delete', 'edit'], $contracts->actions);
+        $this->assertNotNull($contracts->validationSet->get('validFrom'));
+        $this->assertNotNull($contracts->validationSet->get('publish'));
+    }
+
+    #[Test]
+    public function contractDateAliasesResolveToContractDtoAndTcaProperties(): void
+    {
+        $settings = $this->normalize([
+            'documentSections' => [
+                'contracts' => [
+                    'label' => 'Contracts',
+                    'type' => 'contracts',
+                    'fieldName' => 'contracts',
+                    'validators' => [
+                        'from' => ['required', 'date'],
+                        'to' => ['date'],
+                        'position' => ['required'],
+                    ],
+                ],
+            ],
+        ]);
+        $validationSet = $settings->getDocumentValidationSet('contracts');
+        $validFromValidation = $validationSet->get('validFrom');
+        $validToValidation = $validationSet->get('validTo');
+        $positionValidation = $validationSet->get('position');
+        $this->assertNotNull($validFromValidation);
+        $this->assertNotNull($validToValidation);
+        $this->assertNotNull($positionValidation);
+        $this->assertTrue($validFromValidation->required);
+        $this->assertSame('valid_from', $validFromValidation->fieldName);
+        $this->assertSame('valid_to', $validToValidation->fieldName);
+        $this->assertTrue($positionValidation->required);
+        $this->assertSame(
+            ['columns' => [
+                'valid_from' => ['config' => ['readOnly' => false, 'required' => true]],
+                'valid_to' => ['config' => ['readOnly' => false, 'required' => false]],
+                'position' => ['config' => ['readOnly' => false, 'required' => true]],
+            ]],
+            $settings->getDocumentValidationTcaTableConfig('contracts'),
+        );
+    }
+
+    #[Test]
     public function configuredDescriptionEditorProducesRichTextValidationMetadata(): void
     {
         $settings = $this->normalize($this->getShippedConfiguration());
@@ -138,7 +244,7 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         $this->assertSame(['html'], $description->flags);
         $this->assertSame('textarea', $description->inputType);
         $this->assertTrue($description->isRichText());
-        $this->assertSame(100, $description->characterLimit);
+        $this->assertSame(500, $description->characterLimit);
         $this->assertArrayNotHasKey('max', $description->tcaConfig);
     }
 
@@ -149,7 +255,7 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         $miscellaneous = $settings->getProfileField('miscellaneous')?->validation;
         $this->assertNotNull($miscellaneous);
         $this->assertTrue($miscellaneous->isRichText());
-        $this->assertSame(500, $miscellaneous->characterLimit);
+        $this->assertSame(1000, $miscellaneous->characterLimit);
         $this->assertArrayNotHasKey('max', $miscellaneous->tcaConfig);
         $this->assertSame(0, $settings->getProfileField('teachingArea')?->validation->characterLimit);
     }
@@ -189,7 +295,7 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
     }
 
     #[Test]
-    public function editorSettingsSurviveThePhpCacheRoundTrip(): void
+    public function unifiedSettingsSurviveThePhpCacheRoundTrip(): void
     {
         $settings = $this->normalize($this->getShippedConfiguration());
         $restored = eval('return ' . var_export($settings, true) . ';');
@@ -201,13 +307,23 @@ final class AcademicPersonsEditSettingsFactoryTest extends UnitTestCase
         );
     }
 
+    #[Test]
+    public function formerFactoryDelegatesToTheCentralFactory(): void
+    {
+        $settings = new AcademicPersonsSettings();
+        $centralFactory = $this->createMock(AcademicPersonsSettingsFactory::class);
+        $centralFactory->expects($this->once())->method('get')->willReturn($settings);
+        $compatibilityFactory = new AcademicPersonsEditSettingsFactory($centralFactory);
+        $this->assertSame($settings, $compatibilityFactory->get());
+    }
+
     /**
      * @return array<string, mixed>
      */
     private function getShippedConfiguration(): array
     {
         $configuration = Yaml::parseFile(
-            __DIR__ . '/../../../Configuration/AcademicsPersonsEdit/Settings.yaml',
+            __DIR__ . '/../../../../academic-persons/Configuration/AcademicPersons/Settings.yaml',
         );
         $this->assertIsArray($configuration);
         return $configuration;

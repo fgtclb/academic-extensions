@@ -43,7 +43,8 @@ Inline profile template
 
 The inline editor consists of
 :file:`Resources/Private/Templates/InlineProfile/Index.html` and
-:file:`Resources/Private/Partials/InlineProfile/Field.html`. When overriding
-either file while keeping the shipped JavaScript, preserve its form data
+:file:`Resources/Private/Partials/InlineProfile/Profile/Fields.html`, which
+dispatches to the controls below :file:`InlineProfile/Field/`. When overriding
+these files while keeping the shipped JavaScript, preserve their form data
 attributes and field class. The complete contract is documented in
 :ref:`inline-profile-editing`.

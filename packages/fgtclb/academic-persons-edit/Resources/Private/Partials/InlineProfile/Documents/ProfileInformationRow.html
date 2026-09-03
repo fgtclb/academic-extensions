@@ -3,7 +3,7 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
     <article
-        class="row g-3 align-items-start rounded-1 px-3 px-lg-4 py-4 {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
+        class="row g-0 align-items-center border-bottom py-2 py-lg-3 ps-3 {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
         data-ie-document-item
         data-item-uid="{item.uid}"
         data-item-sorting="{item.sorting}"
@@ -11,8 +11,8 @@
         <f:for each="{rowFields}" as="rowField">
             <f:switch expression="{rowField}">
                 <f:case value="from">
-                    <div class="col-12 col-sm">
-                        <div class="fw-semibold">
+                    <div class="col-12 col-md-3 py-1 pe-md-3">
+                        <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="inlineProfile.documents.from" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="yearStart">
@@ -21,8 +21,8 @@
                     </div>
                 </f:case>
                 <f:case value="to">
-                    <div class="col-12 col-sm">
-                        <div class="fw-semibold">
+                    <div class="col-12 col-md-3 py-1 pe-md-3">
+                        <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="inlineProfile.documents.to" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="yearEnd">
@@ -31,8 +31,8 @@
                     </div>
                 </f:case>
                 <f:case value="year">
-                    <div class="col-12 col-sm">
-                        <div class="fw-semibold">
+                    <div class="col-12 col-md-3 py-1 pe-md-3">
+                        <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="inlineProfile.documents.year" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="year">
@@ -41,8 +41,8 @@
                     </div>
                 </f:case>
                 <f:case value="title">
-                    <div class="col-12 col-sm">
-                        <div class="fw-semibold">
+                    <div class="col-12 col-md py-1 pe-md-3">
+                        <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="inlineProfile.documents.title" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-title>
@@ -56,8 +56,8 @@
                     </div>
                 </f:case>
                 <f:case value="description">
-                    <div class="col-12">
-                        <div class="fw-semibold">
+                    <div class="col-12 py-1 pe-md-3">
+                        <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="profileInformation.bodytext.label" extensionName="academic_persons_edit" />
                         </div>
                         <div class="{f:if(condition: item.bodytext, else: 'd-none')}" data-ie-document-value="bodytext">
@@ -68,5 +68,6 @@
             </f:switch>
         </f:for>
         <f:render partial="InlineProfile/Documents/Actions" arguments="{actions: actions, sortable: sortable}" />
+        <div class="col-12 pe-3" data-ie-document-item-collapse-target></div>
     </article>
 </html>

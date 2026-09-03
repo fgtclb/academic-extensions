@@ -14,6 +14,8 @@ final class AcademicPersonsSettings
     public readonly array $profileSections;
     /** @var array<string, SpecialField> */
     public readonly array $specialFields;
+    /** @var array<string, ContractField> */
+    public readonly array $contractFields;
     /** @var array<string, ContractContactSection> */
     public readonly array $contractContactSections;
     /** @var array<string, DocumentSection> */
@@ -25,6 +27,7 @@ final class AcademicPersonsSettings
     /**
      * @param array<string, ProfileSection> $profileSections
      * @param array<string, SpecialField> $specialFields
+     * @param array<string, ContractField> $contractFields
      * @param array<string, ContractContactSection> $contractContactSections
      * @param array<string, DocumentSection> $documentSections
      * @param array<string, mixed> $raw
@@ -32,6 +35,7 @@ final class AcademicPersonsSettings
     public function __construct(
         array $profileSections = [],
         array $specialFields = [],
+        array $contractFields = [],
         array $contractContactSections = [],
         array $documentSections = [],
         ?PublicProfileSettings $publicProfile = null,
@@ -39,6 +43,7 @@ final class AcademicPersonsSettings
     ) {
         $this->profileSections = $profileSections;
         $this->specialFields = $specialFields;
+        $this->contractFields = $contractFields;
         $this->contractContactSections = $contractContactSections;
         $this->documentSections = $documentSections;
         $this->publicProfile = $publicProfile ?? new PublicProfileSettings();
@@ -49,6 +54,7 @@ final class AcademicPersonsSettings
      * @param array{
      *     profileSections?: array<string, ProfileSection>,
      *     specialFields?: array<string, SpecialField>,
+     *     contractFields?: array<string, ContractField>,
      *     contractContactSections?: array<string, ContractContactSection>,
      *     documentSections?: array<string, DocumentSection>,
      *     publicProfile?: PublicProfileSettings,
@@ -60,6 +66,7 @@ final class AcademicPersonsSettings
         return new self(
             profileSections: $array['profileSections'] ?? [],
             specialFields: $array['specialFields'] ?? [],
+            contractFields: $array['contractFields'] ?? [],
             contractContactSections: $array['contractContactSections'] ?? [],
             documentSections: $array['documentSections'] ?? [],
             publicProfile: $array['publicProfile'] ?? null,
@@ -106,6 +113,20 @@ final class AcademicPersonsSettings
     public function getSpecialField(string $identifier): ?SpecialField
     {
         return $this->specialFields[$identifier] ?? null;
+    }
+
+    public function getContractField(string $identifier): ?ContractField
+    {
+        $field = $this->contractFields[$identifier] ?? null;
+        if ($field !== null) {
+            return $field;
+        }
+        foreach ($this->contractFields as $candidate) {
+            if ($candidate->propertyName === $identifier) {
+                return $candidate;
+            }
+        }
+        return null;
     }
 
     public function getContractContactSection(string $identifier): ?ContractContactSection
@@ -242,6 +263,14 @@ final class AcademicPersonsSettings
             ),
         };
         return $this->buildValidationTcaTableConfig($validationSet);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getProfileUpdateValidationTcaTableConfig(): array
+    {
+        return $this->buildValidationTcaTableConfig($this->getProfileUpdateValidationSet());
     }
 
     /**

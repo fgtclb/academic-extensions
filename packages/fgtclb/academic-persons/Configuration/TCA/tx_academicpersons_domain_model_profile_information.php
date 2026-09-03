@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the "academic_persons" Extension for TYPO3 CMS.
  *
@@ -306,5 +310,11 @@ $tcaConfiguration = [
 if ((new \TYPO3\CMS\Core\Information\Typo3Version())->getMajorVersion() < 14) {
     $tcaConfiguration['ctrl']['searchFields'] = 'title,description';
 }
+
+$settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
+ArrayUtility::mergeRecursiveWithOverrule(
+    $tcaConfiguration,
+    $settings->getDocumentValidationTcaTypesConfig(),
+);
 
 return $tcaConfiguration;

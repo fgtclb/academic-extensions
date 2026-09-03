@@ -10,35 +10,36 @@ use PHPUnit\Framework\Attributes\Test;
 final class EditSettingsIsolationTest extends AbstractAcademicPersonsEditTestCase
 {
     #[Test]
-    public function frontendDocumentRequirementsNeverChangeBackendTca(): void
+    public function centralDocumentValidationIsAppliedToBackendTca(): void
     {
         $table = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information'];
-        foreach (['year', 'year_start', 'year_end'] as $fieldName) {
-            $config = $table['columns'][$fieldName]['config'];
-            $this->assertSame('datetime', $config['type']);
-            $this->assertSame('date', $config['format']);
-            $this->assertSame('date', $config['dbType']);
-            $this->assertTrue($config['nullable']);
-            $this->assertArrayNotHasKey('required', $config);
-        }
-        $this->assertArrayNotHasKey('columnsOverrides', $table['types']['cooperation']);
+        $this->assertArrayHasKey('columnsOverrides', $table['types']['cooperation']);
+        $overrides = $table['types']['cooperation']['columnsOverrides'];
+        $this->assertTrue($overrides['year']['config']['required']);
+        $this->assertFalse($overrides['year_start']['config']['required']);
+        $this->assertFalse($overrides['year_end']['config']['required']);
+        $this->assertSame('datetime', $table['columns']['year']['config']['type']);
+        $this->assertSame('date', $table['columns']['year']['config']['format']);
+        $this->assertSame('date', $table['columns']['year']['config']['dbType']);
+        $this->assertTrue($table['columns']['year']['config']['nullable']);
     }
 
     #[Test]
-    public function frontendProfileAndContactRequirementsNeverChangeBackendTca(): void
+    public function centralProfileAndContactValidationIsAppliedToBackendTca(): void
     {
         $profile = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile']['columns'];
-        $this->assertArrayNotHasKey('required', $profile['gender']['config']);
-        $this->assertTrue($profile['first_name']['config']['required']);
-        $this->assertArrayNotHasKey('readOnly', $profile['first_name']['config']);
-
+        $this->assertTrue($profile['gender']['config']['required']);
+        $this->assertSame(1, $profile['gender']['config']['minitems']);
+        $this->assertFalse($profile['first_name']['config']['required']);
+        $this->assertTrue($profile['first_name']['config']['readOnly']);
+        $this->assertSame('check', $profile['skip_sync']['config']['type']);
         $email = $GLOBALS['TCA']['tx_academicpersons_domain_model_email']['columns']['email']['config'];
-        $this->assertSame('input', $email['type']);
-        $this->assertArrayNotHasKey('required', $email);
-
+        $this->assertSame('email', $email['type']);
+        $this->assertTrue($email['required']);
         $address = $GLOBALS['TCA']['tx_academicpersons_domain_model_address']['columns'];
-        $this->assertArrayNotHasKey('required', $address['street']['config']);
-        $this->assertArrayNotHasKey('required', $address['city']['config']);
+        $this->assertTrue($address['street']['config']['required']);
+        $this->assertTrue($address['street_number']['config']['required']);
+        $this->assertTrue($address['city']['config']['required']);
         $this->assertTrue($address['zip']['config']['required']);
     }
 }

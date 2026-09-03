@@ -19,13 +19,6 @@
                         <f:translate
                             key="{labelKey}"
                             extensionName="academic_persons_edit" />
-                        <f:render
-                            partial="InlineProfile/Field/Helptext"
-                            arguments="{
-                                helptext: helptext,
-                                labelKey: labelKey,
-                                elementId: groupElementId
-                            }" />
                     </div>
                     <div
                         class="text-break"
@@ -87,7 +80,10 @@
                             <f:render
                                 partial="InlineProfile/Field/Control"
                                 arguments="{profile: profile, field: field, elementId: elementId}" />
-                            <div class="invalid-feedback"></div>
+                            <div
+                                id="{elementId}-error"
+                                class="invalid-feedback"
+                                role="alert"></div>
                         </div>
                     </f:for>
                 </div>

@@ -10,7 +10,7 @@ Description
 The frontend editing schema has moved from
 :file:`Configuration/AcademicPersons/Settings.yaml` to the extension-owned
 :file:`Configuration/AcademicsPersonsEdit/Settings.yaml`. The ``profile``,
-``special``, ``contractContact`` and ``documentSections`` maps are loaded and
+``special``, ``contracts`` and ``documentSections`` maps are loaded and
 cached by a dedicated edit factory. They are no longer merged with the public
 profile layout from :guilabel:`academic_persons`.
 

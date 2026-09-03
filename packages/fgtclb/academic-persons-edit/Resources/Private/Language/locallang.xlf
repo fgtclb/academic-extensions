@@ -430,6 +430,9 @@
       <trans-unit id="emailAddress.emailAddress.label">
         <source>Email address</source>
       </trans-unit>
+      <trans-unit id="emailAddress.email.label">
+        <source>Email address</source>
+      </trans-unit>
       <trans-unit id="emailAddress.emailAddress.placeholder">
         <source>example@domain.com</source>
       </trans-unit>
@@ -493,6 +496,9 @@
       <trans-unit id="inlineProfile.documents.actions">
         <source>Entry actions</source>
       </trans-unit>
+      <trans-unit id="inlineProfile.documents.actionsHeading">
+        <source>Actions</source>
+      </trans-unit>
       <trans-unit id="inlineProfile.documents.delete.confirm">
         <source>Do you really want to delete this entry? This action cannot be undone.</source>
       </trans-unit>
@@ -504,6 +510,12 @@
       </trans-unit>
       <trans-unit id="inlineProfile.documents.status.sorted">
         <source>The order has been updated.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.contractContacts.delete.confirm">
+        <source>Do you really want to delete this contact? This action cannot be undone.</source>
+      </trans-unit>
+      <trans-unit id="inlineProfile.contractContacts.empty">
+        <source>No contact details have been added yet.</source>
       </trans-unit>
       <trans-unit id="inlineProfile.documents.empty">
         <source>No entries have been added yet.</source>

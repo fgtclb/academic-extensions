@@ -97,28 +97,37 @@ final class InlineProfileIsolationTest extends TestCase
     }
 
     #[Test]
-    public function inlineServicesUseTheSeparatedEditorSettingsService(): void
+    public function inlineServicesUseTheCentralAcademicPersonsSettingsService(): void
     {
         $services = file_get_contents(self::EXTENSION_ROOT . '/Configuration/Services.yaml');
-        $factory = file_get_contents(
-            self::EXTENSION_ROOT . '/Classes/Settings/AcademicPersonsEditSettingsFactory.php',
+        $personsServices = file_get_contents(
+            self::EXTENSION_ROOT . '/../academic-persons/Configuration/Services.yaml',
+        );
+        $personsSettingsFactory = file_get_contents(
+            self::EXTENSION_ROOT . '/../academic-persons/Classes/Settings/AcademicPersonsSettingsFactory.php',
         );
         $this->assertIsString($services);
-        $this->assertIsString($factory);
+        $this->assertIsString($personsServices);
+        $this->assertIsString($personsSettingsFactory);
         $this->assertStringContainsString(
-            '$academicPersonsSettings: \'@academic_persons_edit.settings\'',
+            '$academicPersonsSettings: \'@FGTCLB\\AcademicPersons\\Settings\\AcademicPersonsSettings\'',
             $services,
         );
-        $this->assertStringContainsString('academic_persons_edit.settings:', $services);
+        $this->assertStringNotContainsString('academic_persons_edit.settings:', $services);
         $this->assertStringContainsString(
-            'Configuration/AcademicsPersonsEdit/Settings.yaml',
-            $factory,
+            'Configuration/AcademicPersons/Settings.yaml',
+            $personsSettingsFactory,
         );
-        $this->assertStringNotContainsString('Configuration/AcademicPersons/Settings.yaml', $factory);
+        $this->assertFileExists(
+            self::EXTENSION_ROOT . '/../academic-persons/Configuration/AcademicPersons/Settings.yaml',
+        );
+        $this->assertFileDoesNotExist(
+            self::EXTENSION_ROOT . '/Configuration/AcademicsPersonsEdit/Settings.yaml',
+        );
     }
 
     #[Test]
-    public function editorSettingsAreNeverAppliedToBackendTca(): void
+    public function centralSettingsAreAppliedToBackendTca(): void
     {
         $compatibilityMarkerPath = self::EXTENSION_ROOT . '/Classes/Tca/SettingsValidationOverrides.php';
         if (is_file($compatibilityMarkerPath)) {
@@ -136,5 +145,29 @@ final class InlineProfileIsolationTest extends TestCase
             $this->assertStringNotContainsString('AcademicPersonsEditSettingsFactory', $source);
             $this->assertStringNotContainsString('SettingsValidationOverrides', $source);
         }
+        $tcaFiles = glob(self::EXTENSION_ROOT . '/../academic-persons/Configuration/TCA/*.php');
+        $this->assertIsArray($tcaFiles);
+        $tcaSource = implode('', array_map(static fn(string $file): string => (string)file_get_contents($file), $tcaFiles));
+        $this->assertStringContainsString('getProfileUpdateValidationTcaTableConfig', $tcaSource);
+        $this->assertStringContainsString('getContractContactValidationTcaTableConfig', $tcaSource);
+        $this->assertStringContainsString('getDocumentValidationTca', $tcaSource);
+    }
+
+    #[Test]
+    public function inlineContractFormUsesTheNormalizedContractFieldStructure(): void
+    {
+        $controller = file_get_contents(self::EXTENSION_ROOT . '/Classes/Controller/InlineProfileController.php');
+        $settingsFactory = file_get_contents(
+            self::EXTENSION_ROOT . '/../academic-persons/Classes/Settings/AcademicPersonsSettingsFactory.php',
+        );
+        $this->assertIsString($controller);
+        $this->assertIsString($settingsFactory);
+        $this->assertStringContainsString(
+            'foreach ($this->academicPersonsSettings->contractFields as $field)',
+            $controller,
+        );
+        $this->assertStringContainsString("['contracts']['contactSections']", $controller);
+        $this->assertStringContainsString('($contracts[\'fields\'] ?? null)', $settingsFactory);
+        $this->assertStringContainsString('($contracts[\'contactSections\'] ?? null)', $settingsFactory);
     }
 }

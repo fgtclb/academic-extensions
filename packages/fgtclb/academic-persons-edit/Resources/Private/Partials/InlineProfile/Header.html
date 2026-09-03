@@ -24,9 +24,61 @@
         <div
             class="d-flex flex-wrap justify-content-between justify-content-lg-end align-items-center gap-4 ms-lg-auto">
             <f:if condition="{skipSync}">
-                <f:render
-                    partial="InlineProfile/Settings/Sync"
-                    arguments="{profile: profile, special: skipSync}" />
+                <f:variable
+                    name="syncElementId"
+                    value="inline-profile-{profile.uid}-skipSync" />
+                <form
+                    class="academic-persons-inline-edit__sync-form flex-shrink-0"
+                    data-ie-sync-form
+                    v-on:submit.prevent
+                    v-on:change="updateSkipSync">
+                    <div
+                        class="form-check form-switch form-check-lg mb-0 d-flex flex-row align-items-center">
+                        <f:if condition="{skipSync.validation.readOnly}">
+                            <f:then>
+                                <f:form.checkbox
+                                    name="skipSync"
+                                    id="{syncElementId}"
+                                    class="form-check-input academic-persons-inline-edit__sync-checkbox"
+                                    value="1"
+                                    checked="{profile.skipSync}"
+                                    aria-describedby="{syncElementId}-error"
+                                    aria-invalid="false"
+                                    disabled="true" />
+                            </f:then>
+                            <f:else>
+                                <f:form.checkbox
+                                    name="skipSync"
+                                    id="{syncElementId}"
+                                    class="form-check-input academic-persons-inline-edit__sync-checkbox"
+                                    value="1"
+                                    checked="{profile.skipSync}"
+                                    aria-describedby="{syncElementId}-error"
+                                    aria-invalid="false"
+                                    disabled="{skipSync.validation.disabled}" />
+                            </f:else>
+                        </f:if>
+                        <label
+                            class="form-check-label ms-3 cursor-pointer"
+                            for="{syncElementId}"
+                            title="{f:translate(key: 'profile.skipSync.description', extensionName: 'academic_persons_edit')}">
+                            <f:translate
+                                key="profile.skipSync.label"
+                                extensionName="academic_persons_edit" />
+                        </label>
+                        <f:render
+                            partial="InlineProfile/Field/Helptext"
+                            arguments="{
+                                helptext: skipSync.helptext,
+                                labelKey: 'profile.skipSync.label',
+                                elementId: syncElementId
+                            }" />
+                        <div
+                            id="{syncElementId}-error"
+                            class="invalid-feedback"
+                            role="alert"></div>
+                    </div>
+                </form>
             </f:if>
             <button
                 class="btn rounded-0 btn-outline-secondary btn-sm flex-shrink-0"

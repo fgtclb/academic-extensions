@@ -14,10 +14,14 @@ namespace FGTCLB\AcademicPersonsEdit\Controller;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
+use FGTCLB\AcademicPersons\Event\AfterProfileUpdateEvent;
+use FGTCLB\AcademicPersons\Service\ProfileImageMetadataService;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFormDataFactoryInterface;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
+use FGTCLB\AcademicPersonsEdit\Service\LocalizedProfileUidResolver;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileImageRelationWriter;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -26,6 +30,7 @@ use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\FileUploadConfiguration;
 use TYPO3\CMS\Extbase\Validation\Validator\FileSizeValidator;
@@ -41,6 +46,9 @@ final class ProfileController extends AbstractActionController
         private readonly ProfileRepository $profileRepository,
         private readonly ProfileFormDataFactoryInterface $profileFormDataFactory,
         private readonly ResourceFactory $resourceFactory,
+        private readonly ProfileImageMetadataService $profileImageMetadataService,
+        private readonly LocalizedProfileUidResolver $localizedProfileUidResolver,
+        private readonly ProfileImageRelationWriter $profileImageRelationWriter,
     ) {}
 
     // =================================================================================================================
@@ -161,37 +169,37 @@ final class ProfileController extends AbstractActionController
 
     public function addImageAction(Profile $profile): ResponseInterface
     {
-        // The file handling service already stored the uploaded file and rewired the profile
-        // image property to it, so the replaced file can only be determined from the state
-        // still persisted at this point - which the update below overwrites.
-        $replacedImageFile = $this->getPersistedProfileImageFile($profile);
-
-        $this->profileRepository->update($profile);
-        $this->persistAndDispatchProfileUpdate($profile);
-
-        $this->deleteReplacedProfileImageFile($replacedImageFile, $profile);
+        $uploadedImageFile = $profile->getImage()?->getOriginalResource()->getOriginalFile();
+        if ($uploadedImageFile === null) {
+            throw new \UnexpectedValueException('The uploaded profile image is unavailable.');
+        }
+        $persistedProfileUid = $this->resolvePersistedProfileUid($profile);
+        try {
+            $replacedFileUids = $this->profileImageRelationWriter->replace(
+                $persistedProfileUid,
+                $uploadedImageFile,
+            );
+            if (!$profile->getIsTranslation()) {
+                $this->eventDispatcher->dispatch(new AfterProfileUpdateEvent($profile));
+            }
+            $this->profileImageMetadataService->updateForProfileUid($persistedProfileUid);
+            $this->deleteUnreferencedFiles($replacedFileUids, $uploadedImageFile->getUid());
+        } catch (\Throwable $exception) {
+            if ($this->countFileReferences($uploadedImageFile) === 0) {
+                $uploadedImageFile->getStorage()->deleteFile($uploadedImageFile);
+            }
+            throw $exception;
+        }
 
         return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
     }
 
     public function removeImageAction(Profile $profile): ResponseInterface
     {
-        $image = $profile->getImage();
-        if ($image !== null) {
-            $imageFile = $image->getOriginalResource()->getOriginalFile();
-            // The relation is dropped first, for two reasons: deleting the file alone leaves
-            // the reference count on the profile record pointing at a reference that no longer
-            // exists, and the file can only be checked for other usages once this profile does
-            // not reference it any more.
-            $profile->setImage(null);
-            $this->profileRepository->update($profile);
-            $this->persistenceManager->remove($image);
-            $this->persistAndDispatchProfileUpdate($profile);
-
-            if ($this->countFileReferences($imageFile) === 0) {
-                $imageFile->getStorage()->deleteFile($imageFile);
-            }
-        }
+        $removedFileUids = $this->profileImageRelationWriter->remove(
+            $this->resolvePersistedProfileUid($profile),
+        );
+        $this->deleteUnreferencedFiles($removedFileUids);
         return new RedirectResponse($this->userSessionService->loadRefererFromSession($this->request), 303);
     }
 
@@ -220,8 +228,8 @@ final class ProfileController extends AbstractActionController
         $fileUploadConfiguration = (new FileUploadConfiguration('image'))
             // The profile holds a single image, but the limit is validated against the already
             // referenced file plus the upload. Allowing two therefore means "replace", which is
-            // what this form does - the file handling service repoints the existing reference to
-            // the uploaded file, and `addImageAction()` cleans the replaced file up afterwards.
+            // what this form does - `addImageAction()` assigns the uploaded file through
+            // DataHandler and cleans the replaced file up afterwards.
             // Registering a file deletion instead would delete the replaced file unconditionally,
             // even when another record still references it.
             ->setMaxFiles(2)
@@ -254,77 +262,31 @@ final class ProfileController extends AbstractActionController
         $profileArgument->getPropertyMappingConfiguration()->skipProperties('image');
     }
 
-    /**
-     * Returns the file currently referenced as profile image according to the database.
-     *
-     * Reading the persisted state instead of the mapped object is intentional: the in-memory
-     * profile already carries the newly uploaded file when an upload action is processed.
-     */
-    private function getPersistedProfileImageFile(Profile $profile): ?File
+    private function resolvePersistedProfileUid(Profile $profile): int
     {
-        $profileUid = $profile->getUid();
-        if ($profileUid === null) {
-            return null;
-        }
-
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('sys_file_reference');
-        $queryBuilder->getRestrictions()
-            ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-        $fileUid = (int)$queryBuilder
-            ->select('uid_local')
-            ->from('sys_file_reference')
-            ->where(
-                $queryBuilder->expr()->eq(
-                    'tablenames',
-                    $queryBuilder->createNamedParameter('tx_academicpersons_domain_model_profile')
-                ),
-                $queryBuilder->expr()->eq(
-                    'fieldname',
-                    $queryBuilder->createNamedParameter('image')
-                ),
-                $queryBuilder->expr()->eq(
-                    'uid_foreign',
-                    $queryBuilder->createNamedParameter($profileUid, Connection::PARAM_INT)
-                ),
-            )
-            ->setMaxResults(1)
-            ->executeQuery()
-            ->fetchOne();
-        if ($fileUid <= 0) {
-            return null;
-        }
-
-        try {
-            return $this->resourceFactory->getFileObject($fileUid);
-        } catch (FileDoesNotExistException) {
-            return null;
-        }
+        $siteLanguage = $this->request->getAttribute('language');
+        $languageId = $siteLanguage instanceof SiteLanguage ? $siteLanguage->getLanguageId() : 0;
+        return $this->localizedProfileUidResolver->resolve((int)($profile->getUid() ?? 0), $languageId);
     }
 
     /**
-     * Removes the file a profile image upload replaced.
-     *
-     * The native file upload handling generates the stored file name and therefore always adds
-     * a new file instead of overwriting the previous one, so it has to be cleaned up explicitly
-     * to avoid orphaned files piling up in the upload folder with every re-upload.
+     * @param list<int> $fileUids
      */
-    private function deleteReplacedProfileImageFile(?File $replacedImageFile, Profile $profile): void
+    private function deleteUnreferencedFiles(array $fileUids, int $retainedFileUid = 0): void
     {
-        if ($replacedImageFile === null) {
-            return;
+        foreach (array_unique($fileUids) as $fileUid) {
+            if ($fileUid <= 0 || $fileUid === $retainedFileUid) {
+                continue;
+            }
+            try {
+                $file = $this->resourceFactory->getFileObject($fileUid);
+                if ($this->countFileReferences($file) === 0) {
+                    $file->getStorage()->deleteFile($file);
+                }
+            } catch (FileDoesNotExistException) {
+                // A stale relation may already have pointed to a missing file.
+            }
         }
-        $currentImageFile = $profile->getImage()?->getOriginalResource()->getOriginalFile();
-        if ($currentImageFile !== null && $currentImageFile->getUid() === $replacedImageFile->getUid()) {
-            // The upload did not result in a new file, nothing was replaced.
-            return;
-        }
-        if ($this->countFileReferences($replacedImageFile) > 0) {
-            // Still referenced elsewhere, for example by a content element or another record.
-            return;
-        }
-        $replacedImageFile->getStorage()->deleteFile($replacedImageFile);
     }
 
     private function countFileReferences(File $file): int

@@ -160,6 +160,32 @@ final class AcademicPersonsSettingsTest extends UnitTestCase
     }
 
     #[Test]
+    public function profileUpdateTcaConfigurationIncludesProfileAndDirectSpecialProperties(): void
+    {
+        $profileField = $this->profileField('gender', 'gender', 'gender', 'information', ['required' => true]);
+        $skipSync = new SpecialField(
+            identifier: 'skipSync',
+            type: 'special',
+            fieldType: 'check',
+            renderType: 'checkbox',
+            fieldIdentifiers: [],
+            validation: $this->validation('skipSync', 'skip_sync', ['type' => 'check']),
+            position: 0,
+        );
+        $subject = new AcademicPersonsSettings(
+            profileSections: ['information' => $this->profileSection('information', [$profileField])],
+            specialFields: ['skipSync' => $skipSync],
+        );
+        $this->assertSame(
+            ['columns' => [
+                'gender' => ['config' => ['required' => true]],
+                'skip_sync' => ['config' => ['type' => 'check']],
+            ]],
+            $subject->getProfileUpdateValidationTcaTableConfig(),
+        );
+    }
+
+    #[Test]
     public function documentSectionsAreResolvedByIdentifierAndRecordType(): void
     {
         $section = $this->documentSection('publications', 'publication');

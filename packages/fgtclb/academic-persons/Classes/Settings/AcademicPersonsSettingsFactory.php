@@ -26,6 +26,11 @@ class AcademicPersonsSettingsFactory
         'description' => 'bodytext',
     ];
 
+    private const CONTRACT_PROPERTY_ALIASES = [
+        'from' => 'validFrom',
+        'to' => 'validTo',
+    ];
+
     public function __construct(
         #[Autowire(service: 'cache.core')]
         protected readonly PhpFrontend $cache,
@@ -71,7 +76,7 @@ class AcademicPersonsSettingsFactory
      */
     private function academicPersonsSettingsIdentifier(): string
     {
-        return 'AcademicPersons_Settings_PublicProfileSchema_v5';
+        return 'AcademicPersons_Settings_UnifiedProfileSchema_v8';
     }
 
     /**
@@ -79,31 +84,27 @@ class AcademicPersonsSettingsFactory
      */
     private function normalize(array $settings): AcademicPersonsSettings
     {
+        $contractFields = $this->normalizeContractFields($settings);
         return new AcademicPersonsSettings(
+            profileSections: $this->normalizeProfileSections($settings),
+            specialFields: $this->normalizeSpecialFields($settings),
+            contractFields: $contractFields,
+            contractContactSections: $this->normalizeContractContactSections($settings),
+            documentSections: $this->normalizeDocumentSections($settings, $contractFields),
             publicProfile: $this->normalizePublicProfile($settings),
             raw: $settings,
         );
     }
 
     /**
-     * Normalizes the editor settings without mixing them into the public
-     * profile configuration loaded by this factory.
-     *
-     * The value objects live in academic_persons because they describe its
-     * domain records. Loading, caching and injecting this graph is owned by
-     * academic_persons_edit.
+     * Normalizes the shared profile/editor settings for callers that provide
+     * an already loaded configuration array.
      *
      * @param array<string, mixed> $settings
      */
     public function normalizeEditConfiguration(array $settings): AcademicPersonsSettings
     {
-        return new AcademicPersonsSettings(
-            profileSections: $this->normalizeProfileSections($settings),
-            specialFields: $this->normalizeSpecialFields($settings),
-            contractContactSections: $this->normalizeContractContactSections($settings),
-            documentSections: $this->normalizeDocumentSections($settings),
-            raw: $settings,
-        );
+        return $this->normalize($settings);
     }
 
     /**
@@ -201,6 +202,9 @@ class AcademicPersonsSettingsFactory
         $groupedFields = [];
         $sectionPositions = [];
         foreach ($profile as $identifier => $options) {
+            if (in_array((string)$identifier, ['structure', 'details'], true)) {
+                continue;
+            }
             if (!is_array($options)) {
                 continue;
             }
@@ -303,61 +307,116 @@ class AcademicPersonsSettingsFactory
 
     /**
      * @param array<string, mixed> $settings
-     * @return array<string, ContractContactSection>
+     * @return array<string, ContractField>
      */
-    private function normalizeContractContactSections(array $settings): array
+    private function normalizeContractFields(array $settings): array
     {
-        $configuredFields = $settings['contractContact'] ?? null;
+        $contracts = $settings['contracts'] ?? null;
+        $configuredFields = is_array($contracts) ? ($contracts['fields'] ?? null) : null;
         if (!is_array($configuredFields)) {
             return [];
         }
-        $groupedFields = [];
-        $sectionPositions = [];
+        $fields = [];
         foreach ($configuredFields as $identifier => $options) {
             if (!is_array($options)) {
                 continue;
             }
-            $sectionIdentifier = (string)($options['section'] ?? '');
             $propertyName = (string)($options['propertyName'] ?? $identifier);
             $fieldName = (string)($options['fieldName'] ?? GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName));
             $fieldType = (string)($options['fieldType'] ?? '');
             $renderType = (string)($options['renderType'] ?? '');
             $validators = is_array($options['validators'] ?? null) ? $options['validators'] : [];
-            $field = new ContractContactField(
+            $field = new ContractField(
                 identifier: (string)$identifier,
-                section: $sectionIdentifier,
                 propertyName: $propertyName,
                 fieldName: $fieldName,
                 fieldType: $fieldType,
                 renderType: $renderType,
+                optionSource: trim((string)($options['options'] ?? '')),
+                helptext: trim((string)($options['helptext'] ?? '')),
                 validation: $this->normalizeValidation(
                     identifier: $propertyName,
                     fieldName: $fieldName,
                     validators: $validators,
-                    fieldType: $fieldType,
+                    // Contract TCA already defines the structural field types;
+                    // settings only overlay validation and editability metadata.
+                    fieldType: '',
                     renderType: $renderType,
+                    characterLimit: $this->normalizeProfileCharacterLimit($options, $renderType),
                 ),
-                position: count($groupedFields[$sectionIdentifier] ?? []),
+                position: count($fields),
+                autocomplete: trim((string)($options['autocomplete'] ?? '')),
             );
-            if (!$field->isValid()) {
-                continue;
+            if ($field->isValid()) {
+                $fields[$field->identifier] = $field;
             }
-            if (!array_key_exists($sectionIdentifier, $sectionPositions)) {
-                $sectionPositions[$sectionIdentifier] = count($sectionPositions);
-            }
-            $groupedFields[$sectionIdentifier][$field->identifier] = $field;
+        }
+        return $fields;
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     * @return array<string, ContractContactSection>
+     */
+    private function normalizeContractContactSections(array $settings): array
+    {
+        $contracts = $settings['contracts'] ?? null;
+        $configuredSections = is_array($contracts) ? ($contracts['contactSections'] ?? null) : null;
+        if (!is_array($configuredSections)) {
+            return [];
         }
         $sections = [];
-        foreach ($groupedFields as $identifier => $fields) {
+        foreach ($configuredSections as $sectionIdentifier => $sectionOptions) {
+            if (!is_array($sectionOptions)) {
+                continue;
+            }
+            $configuredFields = $sectionOptions['fields'] ?? null;
+            if (!is_array($configuredFields)) {
+                continue;
+            }
+            $fields = [];
+            foreach ($configuredFields as $identifier => $options) {
+                if (!is_array($options)) {
+                    continue;
+                }
+                $propertyName = (string)($options['propertyName'] ?? $identifier);
+                $fieldName = (string)($options['fieldName'] ?? GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName));
+                $fieldType = (string)($options['fieldType'] ?? '');
+                $renderType = (string)($options['renderType'] ?? '');
+                $validators = is_array($options['validators'] ?? null) ? $options['validators'] : [];
+                $field = new ContractContactField(
+                    identifier: (string)$identifier,
+                    section: (string)$sectionIdentifier,
+                    propertyName: $propertyName,
+                    fieldName: $fieldName,
+                    fieldType: $fieldType,
+                    renderType: $renderType,
+                    validation: $this->normalizeValidation(
+                        identifier: $propertyName,
+                        fieldName: $fieldName,
+                        validators: $validators,
+                        fieldType: $fieldType,
+                        renderType: $renderType,
+                    ),
+                    position: count($fields),
+                    autocomplete: trim((string)($options['autocomplete'] ?? '')),
+                );
+                if ($field->isValid()) {
+                    $fields[$field->identifier] = $field;
+                }
+            }
+            if ($fields === []) {
+                continue;
+            }
             $validations = [];
             foreach ($fields as $field) {
                 $validations[$field->propertyName] = $field->validation;
             }
-            $sections[$identifier] = new ContractContactSection(
-                identifier: $identifier,
+            $sections[(string)$sectionIdentifier] = new ContractContactSection(
+                identifier: (string)$sectionIdentifier,
                 fields: $fields,
-                validationSet: new ValidationSet(identifier: $identifier, validations: $validations),
-                position: $sectionPositions[$identifier],
+                validationSet: new ValidationSet(identifier: (string)$sectionIdentifier, validations: $validations),
+                position: count($sections),
             );
         }
         return $sections;
@@ -365,9 +424,10 @@ class AcademicPersonsSettingsFactory
 
     /**
      * @param array<string, mixed> $settings
+     * @param array<string, ContractField> $contractFields
      * @return array<string, DocumentSection>
      */
-    private function normalizeDocumentSections(array $settings): array
+    private function normalizeDocumentSections(array $settings, array $contractFields = []): array
     {
         $configuredSections = $settings['documentSections'] ?? null;
         if (!is_array($configuredSections)) {
@@ -380,23 +440,36 @@ class AcademicPersonsSettingsFactory
             }
             $sectionIdentifier = (string)$identifier;
             $sectionType = (string)($options['type'] ?? '');
+            $referencedConfiguration = $settings[$sectionType] ?? null;
+            if (is_array($referencedConfiguration)) {
+                $options = array_replace($referencedConfiguration, $options);
+            }
             $contractSection = $sectionIdentifier === 'contracts'
                 || in_array($sectionType, ['contract', 'contracts'], true);
+            $propertyAliases = $contractSection
+                ? self::CONTRACT_PROPERTY_ALIASES
+                : self::DOCUMENT_PROPERTY_ALIASES;
             $validations = [];
-            $configuredValidations = is_array($options['validators'] ?? null) ? $options['validators'] : [];
-            foreach ($configuredValidations as $fieldIdentifier => $validationConfiguration) {
-                if (!is_array($validationConfiguration)) {
-                    continue;
+            if ($contractSection && $contractFields !== []) {
+                foreach ($contractFields as $field) {
+                    $validations[$field->propertyName] = $field->validation;
                 }
-                $propertyName = self::DOCUMENT_PROPERTY_ALIASES[(string)$fieldIdentifier]
-                    ?? (string)$fieldIdentifier;
-                $fieldName = GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName);
-                $validations[$propertyName] = $this->normalizeValidation(
-                    identifier: $propertyName,
-                    fieldName: $fieldName,
-                    validators: $this->normalizeDocumentValidationFlags($validationConfiguration),
-                    characterLimit: $this->normalizeDocumentCharacterLimit($validationConfiguration),
-                );
+            } else {
+                $configuredValidations = is_array($options['validators'] ?? null) ? $options['validators'] : [];
+                foreach ($configuredValidations as $fieldIdentifier => $validationConfiguration) {
+                    if (!is_array($validationConfiguration)) {
+                        continue;
+                    }
+                    $propertyName = $propertyAliases[(string)$fieldIdentifier]
+                        ?? (string)$fieldIdentifier;
+                    $fieldName = GeneralUtility::camelCaseToLowerCaseUnderscored($propertyName);
+                    $validations[$propertyName] = $this->normalizeValidation(
+                        identifier: $propertyName,
+                        fieldName: $fieldName,
+                        validators: $this->normalizeDocumentValidationFlags($validationConfiguration),
+                        characterLimit: $this->normalizeDocumentCharacterLimit($validationConfiguration),
+                    );
+                }
             }
             $section = new DocumentSection(
                 identifier: $sectionIdentifier,
@@ -451,7 +524,7 @@ class AcademicPersonsSettingsFactory
      * Document fields support the regular validator flag list and the richer
      * editor map used for descriptions. Keeping this conversion here makes
      * the resulting Validation object the single source for Fluid, JSON and
-     * Extbase validation metadata. Backend TCA is configured independently.
+     * Extbase and backend TCA validation metadata.
      *
      * @param array<int|string, mixed> $configuration
      * @return list<mixed>

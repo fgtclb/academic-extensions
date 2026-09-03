@@ -561,6 +561,10 @@
         <source>Email address</source>
         <target>E-Mail-Adresse</target>
       </trans-unit>
+      <trans-unit id="emailAddress.email.label">
+        <source>Email address</source>
+        <target>E-Mail-Adresse</target>
+      </trans-unit>
       <trans-unit id="emailAddress.emailAddress.placeholder">
         <source>example@domain.com</source>
         <target>beispiel@domain.de</target>
@@ -645,6 +649,10 @@
         <source>Entry actions</source>
         <target>Aktionen für diesen Eintrag</target>
       </trans-unit>
+      <trans-unit id="inlineProfile.documents.actionsHeading">
+        <source>Actions</source>
+        <target>Aktionen</target>
+      </trans-unit>
       <trans-unit id="inlineProfile.documents.delete.confirm">
         <source>Do you really want to delete this entry? This action cannot be undone.</source>
         <target>Möchten Sie diesen Eintrag wirklich löschen? Diese Aktion kann nicht rückgängig
@@ -661,6 +669,14 @@
       <trans-unit id="inlineProfile.documents.status.sorted">
         <source>The order has been updated.</source>
         <target>Die Reihenfolge wurde aktualisiert.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.contractContacts.delete.confirm">
+        <source>Do you really want to delete this contact? This action cannot be undone.</source>
+        <target>Möchten Sie diese Kontaktdaten wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</target>
+      </trans-unit>
+      <trans-unit id="inlineProfile.contractContacts.empty">
+        <source>No contact details have been added yet.</source>
+        <target>Es wurden noch keine Kontaktdaten hinterlegt.</target>
       </trans-unit>
       <trans-unit id="inlineProfile.documents.empty">
         <source>No entries have been added yet.</source>

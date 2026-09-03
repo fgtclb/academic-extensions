@@ -21,7 +21,7 @@ server before persistence.
 Impact
 ======
 
-The shipped document descriptions use a limit of 100 visible characters.
+The shipped document descriptions use a limit of 500 visible characters.
 Removing ``editor.limit``, using a non-positive value or configuring it on a
 non-CKEditor field disables this feature. The setting belongs exclusively to
 frontend editing metadata and never modifies backend TCA in TYPO3 13 or 14.

@@ -16,18 +16,21 @@ contains three independently persisted areas:
 
 *   profile fields using the generic JSON update endpoint,
 *   the synchronization checkbox using its own JSON endpoint, and
-*   the profile image modal using dedicated upload and delete endpoints.
+*   the expanding profile-image editor using dedicated upload and delete
+    endpoints.
 
-The small frontend entry
-:file:`Resources/Public/JavaScript/frontend/profile.js` initializes every
-``data-academic-persons-inline-edit`` component on the page. Feature modules in
-:file:`Resources/Public/JavaScript/frontend/profile/` separately own common
-requests/status output, field editing, rich text, synchronization, image
-editing and sticky positioning. All changes are
+The Vue 3 Composition API entry is maintained as TypeScript in
+:file:`Resources/Private/TypeScript/frontend/profile.ts`; the frontend build
+generates :file:`Resources/Public/JavaScript/frontend/profile.js`. It mounts
+one application on every ``data-academic-persons-inline-edit`` component.
+Typed feature modules below :file:`Resources/Private/TypeScript/frontend/profile/`
+separately own common requests/status output, field editing, documents, rich
+text, synchronization, image editing and sticky positioning. All changes are
 saved through AJAX without reloading the page. Editable fields are discovered
 across the complete component root, even when the responsive page layout
-places them in separate ``data-ie-fields-form`` elements. Modal, toast and
-compatibility-template elements live in the same component scope.
+places them in separate ``data-ie-fields-form`` elements. Reactive inline
+views, the toast and compatibility-template elements live in the same
+component scope.
 
 Assigned profile overview
 =========================
@@ -99,9 +102,9 @@ The template is intentionally a composition root. The main partial groups are:
 
     *   - Partial group
         - Responsibility
-    *   - ``Image/Card.html`` and ``Image/Modal.html``
+    *   - ``Image/Card.html`` and ``Image/View.html``
         - :guilabel:`Profile image` heading above the sticky page preview,
-          dedicated edit overlay, file selection, modal preview and image
+          animated full-width editor, file selection, crop preview and image
           actions.
     *   - ``Settings/Sync.html``
         - Independently persisted synchronization switch immediately left of
@@ -116,7 +119,7 @@ The template is intentionally a composition root. The main partial groups are:
         - One focused partial for input, textarea, CKEditor, select, checkbox
           and combined-link controls.
     *   - ``Sections/Documents.html`` and ``Documents/*``
-        - Read-only structured document composition.
+        - Structured document rows and their shared Vue-driven inline collapse.
     *   - ``Field.html``, ``Field/Group.html`` and shared ``Field/*``
         - Preview, control, grouped fields and per-field actions.
     *   - ``Header.html`` and ``StatusToast.html``
@@ -135,8 +138,8 @@ and form utilities. The small :file:`Resources/Public/Css/additional.css`
 compatibility layer only releases a surrounding ``.section`` overflow,
 normalizes one frame spacing variable and keeps the sticky card below the page
 header; the Fluid templates contain no inline style declarations.
-All Bootstrap button controls and visible modal surfaces in the shipped inline
-and retained legacy views carry ``rounded-0`` so their corners remain square.
+All Bootstrap button controls in the shipped inline view and the retained
+legacy modal surfaces carry ``rounded-0`` so their corners remain square.
 
 Above the grid, the complete profile name and the synchronization/edit-all
 controls share one responsive header row. The controls wrap below the name on
@@ -193,8 +196,17 @@ Removing a special component removes its controls; marking the image or
 synchronization special ``readonly`` or ``disabled`` also blocks the matching
 write endpoint, not just its Fluid control.
 
-The shared :file:`Resources/Private/Partials/InlineProfile/Field.html` partial
-composes three focused partials:
+A translated profile initially uses TYPO3's ``parent`` localization state for
+the image and follows changes to the default-language image. The first upload
+or deletion in that frontend language changes the image field to ``custom``;
+the translated profile then owns its FAL reference and can select, replace or
+delete its image independently. The image controls therefore remain available
+while editing a translated profile; the endpoint still verifies that the
+requested profile is assigned to the authenticated frontend user.
+
+The shared
+:file:`Resources/Private/Partials/InlineProfile/Field/Editable.html` partial
+composes three focused, reusable partials:
 
 *   :file:`Field/Preview.html` renders the text preview and pencil trigger,
 *   :file:`Field/Control.html` renders either ``f:form.textfield`` or
@@ -207,9 +219,15 @@ composes three focused partials:
 preview joins values (the name) or uses the first non-empty value (link title
 falling back to its URL).
 
-``validation.inputType`` supplies the concrete HTML input type. Select and
-checkbox controls save immediately on change. :file:`Settings/Sync.html`
-contains the separately persisted special checkbox.
+Helptext buttons are edit controls: field and group previews do not render
+them. They appear after the corresponding inline editor is opened. Document
+helptexts follow the same rule and are present in add/edit forms, but not in a
+document inline view opened in view mode.
+
+``validation.inputType`` supplies the concrete HTML input type. Checkbox
+controls save immediately on change. Select controls use the same clear, undo
+and save actions as text fields. The synchronization switch in
+:file:`Header.html` is persisted through its own endpoint.
 
 ..  list-table::
     :header-rows: 1
@@ -304,7 +322,7 @@ live counter to that field. The shared rich-text module counts normalized
 visible text, keeps the last accepted value when an addition would exceed the
 limit and still allows older over-limit content to be shortened. The Extbase
 validator checks the submitted sanitized value again before the partial update
-is persisted. The shipped ``miscellaneous`` field uses a limit of 500.
+is persisted. The shipped ``miscellaneous`` field uses a limit of 1000.
 
 Outside edit mode, each rich-text field renders its formatted content directly
 and provides a borderless pencil action on the right. Empty values show a
@@ -380,11 +398,11 @@ Editable structured profile sections
 The inline profile view renders the structured records directly below the
 :guilabel:`About me` field. ``ProfileDocumentSectionProvider`` supplies one
 ordered view model instead of duplicating relation mapping in Fluid. It reads
-all sections, including ``contracts``, from the edit settings graph. That graph
-is built from the active packages'
-:file:`Configuration/AcademicsPersonsEdit/Settings.yaml` files, so configured
-order is also presentation order. The public-profile factory and cache are not
-involved.
+all sections, including ``contracts``, from the shared settings graph. That
+graph is built from the active packages'
+:file:`Configuration/AcademicPersons/Settings.yaml` files, so configured order
+is also presentation order. The same graph supplies the public profile,
+frontend validation and backend TCA metadata.
 
 For every document section the provider reuses the configured ``identifier``,
 ``fieldName``, record ``type``, LLL ``label``, ``readonly`` state,
@@ -414,32 +432,44 @@ server-side required states come from the same validation set: only a field
 with the additional ``required`` flag must be filled. In the shipped settings
 this applies to ``year`` but not to ``from`` or ``to``.
 
-The same modal contains a :guilabel:`Show year only` switch. It is stored on the
-profile-information record and changes the compact row, view modal and public
+The same inline view contains a :guilabel:`Show year only` switch. It is stored
+on the profile-information record and changes the compact row, read view and public
 profile to render ``Y`` instead of the complete date. The underlying native
 :sql:`DATE` values are not modified.
 
-Why the modal creates controls in JavaScript
+Why Vue creates controls in the inline view
 --------------------------------------------
 
-Fluid renders the modal shell, buttons, error area and fields container once.
-The same Bootstrap modal is then reused for add, view, edit and delete actions
-across every YAML-defined document section. When an action is opened, the
+Fluid renders one reusable collapse shell with Vue directives for fields,
+buttons, errors and pending state. The reactive document controller teleports
+this shell below the selected section heading for add actions and into the
+selected record row for view, edit and delete actions. Exactly one document
+collapse is open at a time, while the complete profile view remains visible.
+When an action is opened, the
 permission-checked endpoint returns JSON containing the selected record,
 localized labels, values, select options and normalized validation metadata.
-JavaScript turns that runtime schema into controls and manages the CKEditor
-lifecycle. This avoids pre-rendering one hidden form per section and record and
-lets validation errors map directly back to the returned field names.
+Vue turns that runtime schema into controls through ``v-for`` and ``v-model``
+and manages the CKEditor lifecycle. This avoids pre-rendering one hidden form
+per section and record while keeping static structure in Fluid and mapping
+validation errors directly back to the returned field names.
 
-More rendering can be moved to Fluid, but that requires an API change rather
-than a template-only change: the endpoint would need to return a
-server-rendered HTML fragment, or the page would need hidden Fluid forms for
-every mode. JavaScript would still insert or replace the fragment, bind modal
-events, initialize and destroy CKEditor and map asynchronous errors. A fragment
-endpoint would reduce DOM-construction code but increase the number of
-server-rendered variants and their integration-test surface. The current
-boundary therefore keeps static modal structure in Fluid and only the record-
-and settings-dependent controls in JavaScript.
+Activating the same add or view trigger a second time closes its collapse with
+the same cleanup as :guilabel:`Cancel`. A hidden ordinary DOM container supplies
+the Fluid-rendered row prototype used after creation. It deliberately is not an
+HTML ``template`` element: Vue consumes such template content while mounting,
+which would leave no row to clone after a successful create response.
+
+``contract`` is retained as a separate reactive document kind. It uses the
+generic collapse renderer for its configured fields and appends three
+contract-specific contact sections in the read view: physical addresses,
+email addresses and phone numbers. Their field schemas and validation flags
+come from ``contracts.contactSections.<section>.fields`` in the shared settings
+graph. The Contract form itself follows the order and metadata in
+``contracts.fields``.
+The shared contact-editor partial is rendered below the contact-section heading
+for add actions and directly inside the selected contact row for view, edit and
+delete actions. The two placements use explicit Vue conditions and do not nest
+another teleport inside the document editor.
 
 Every writable section heading has an :guilabel:`Add` action. Record controls
 are rendered in the exact order of the configured ``actions`` list. The first
@@ -448,43 +478,82 @@ with both directions also has a drag handle; dropping a row submits the complete
 UID order and the server accepts it only when it contains every current section
 record exactly once. After a successful mutation JavaScript updates the row
 collection, alternating background, sort controls and empty placeholder without
-reloading the page.
+reloading the page. The drag handle is hidden below Bootstrap's ``md``
+breakpoint; the explicit up/down controls remain available on mobile.
 
-The add, view, edit and delete workflows share one Bootstrap modal. Its field
+The add, view, edit and delete workflows share one inline Vue collapse. Its field
 schema and current values are loaded through ``documentFormAction()``. Contract
 fields include the current organisational-unit, function-type and location
 options. Profile-information fields use the section's validation metadata. In
-every mode the modal heading uses the non-empty ``title`` field of the current
+every mode the view heading uses the non-empty ``title`` field of the current
 record. New records, contracts and records without a title fall back to the
 translated section heading; the mode label remains as its prefix.
 A field carrying the ``html`` flag is rendered as a full-width CKEditor 5
 control; ordinary textareas are full width as well. Rich-text values are
-sanitized before persistence and parsed into the row or read-only modal without
-assigning ``innerHTML``.
+sanitized before persistence and parsed into the row or read-only view through
+the frontend sanitizer before Vue receives the HTML.
 When that field's ``editor.limit`` is a positive integer, the textarea carries
-the normalized limit and the modal renders an accessible live character
+the normalized limit and the view renders an accessible live character
 counter below CKEditor. The count uses normalized visible text rather than the
 stored HTML. CKEditor rejects additions past the limit while still allowing an
 older over-limit value to be shortened. The JSON endpoint and the Extbase
 form-data validator independently reject over-limit submissions, so client-side
-code is not the security boundary. This setting does not alter backend TCA.
-When the modal enters delete mode, its submit control removes ``btn-primary``
+code is not the security boundary. Character limits do not alter backend TCA or
+the database schema; the shared required, readonly and field-type metadata does.
+The document pending state is released before CKEditor is initialized, because
+CKEditor deliberately skips disabled controls.
+Every JSON request increments one shared busy counter. While at least one
+request is active, the document body exposes ``aria-busy="true"`` and the wait
+cursor; the final request restores the previous cursor and sets
+``aria-busy="false"`` in a ``finally`` path. Document, contact and image editor
+containers mirror that state locally. This keeps failures and concurrent
+requests from leaving a stale loading state.
+
+Opening a different document replaces only the in-memory editor schema and
+values after the new form has loaded. It never calls the submit action: document
+forms have no blur, change, teardown or focus-loss save hook. Only their
+explicit save/delete submit control persists a mutation. Focus moves into the
+first writable control (or the read/delete heading), returns to the action that
+opened a closed editor and remains on native buttons throughout keyboard
+sorting. Drag sorting is an optional pointer enhancement; the up/down actions
+remain the complete keyboard path.
+
+All generated controls keep an explicit label. Validation errors have stable
+IDs referenced through ``aria-describedby`` and update ``aria-invalid``;
+dynamic editor headings and expanded controls expose their relationships via
+``aria-controls`` and ``aria-expanded``. The inline editors are not modal
+dialogs and deliberately do not trap focus.
+When the view enters delete mode, its submit control removes ``btn-primary``
 and ``btn-success`` and uses ``btn-danger``. All other writable modes restore
 ``btn-primary``.
 
 ``createDocumentAction()``, ``updateDocumentAction()``,
-``deleteDocumentAction()`` and ``sortDocumentAction()`` complete the JSON API.
+``deleteDocumentAction()`` and ``sortDocumentAction()`` complete the document
+JSON API.
 Up, down and drag-and-drop intentionally share the sort endpoint. All endpoints
 resolve the profile from the authenticated frontend user and then resolve a
 record only inside the requested section. A UID from another profile, model kind
 or profile-information type is therefore rejected. They additionally enforce
-``readonly`` and the configured action list. The shipped contracts section can
-therefore load its view modal but cannot open an add/edit form, create, update,
-delete or sort a record, even through a handcrafted JSON request.
+``readonly`` and the configured action list. The shipped contracts section is
+writable and exposes the complete configured Contract field set.
+
+The dedicated ``contractContactForm``, ``createContractContact``,
+``updateContractContact``, ``deleteContractContact`` and
+``sortContractContact`` actions operate below a Contract resolved through the
+authenticated Profile. A contact UID from another Contract is rejected. New
+contacts are appended with a normalized sorting value; the up/down controls
+persist their order independently in each contact section. The first and last
+controls are disabled at their respective boundaries. Read-only Contract
+configuration blocks every contact mutation at the endpoint as well.
+Contract and contact helptexts use the same edit-only Bootstrap popovers as
+other inline fields. Physical-address countries are selected from localized
+TYPO3 ``CountryProvider`` options and persisted as ISO alpha-2 codes; submitted
+values outside that list are rejected by the endpoint.
 
 The InlineProfile plugin still registers only ``InlineProfileController``;
-legacy contract, profile-information and contact controllers are not exposed
-through its normal or non-cacheable action maps.
+the legacy contract, profile-information and contact controllers remain source
+references and are not exposed through its normal or non-cacheable action
+maps.
 
 Section order is centralized and every section emits ``data-section-key`` and
 ``data-section-position`` together with the configured
@@ -494,12 +563,17 @@ additionally emit ``data-item-uid``, ``data-item-sorting`` and
 directions are available. The explicit up/down controls and drag handle persist
 the same record order.
 
-The presentation uses Bootstrap rows, spacing, rounded corners and alternating
-``bg-body-tertiary`` records. During drag sorting the browser uses the complete
-record row as the drag image. Extension-specific state classes outline both the
-source row and active list, while a prominent line above or below the hovered
-row marks the exact insertion edge. Dropping into free list space shows the
-same line at the end of the list.
+The presentation uses Bootstrap rows with one shared desktop column heading,
+compact flat records, separating borders and alternating
+``bg-body-tertiary`` backgrounds within each document section. The date columns
+remain narrow while title and position columns consume the available width.
+On small viewports every record repeats its field labels instead of rendering
+the desktop heading. An empty section keeps its heading and add action,
+followed by one unobtrusive translated status line. During drag sorting the
+browser uses the complete record row as the drag image.
+Extension-specific state classes outline both the source row and active list,
+while a prominent line above or below the hovered row marks the exact insertion
+edge. Dropping into free list space shows the same line at the end of the list.
 
 Inline-only development boundary
 ================================
@@ -555,43 +629,67 @@ Any additional property or a non-boolean value returns ``invalid_payload``.
 On failure the JavaScript restores the last successfully persisted checkbox
 state.
 
-Profile image modal
-===================
+Expanding profile image editor
+==============================
 
-Clicking the compact pencil button in the upper-right corner of the current
-profile image or its placeholder opens the Bootstrap 5 modal from
-:file:`Partials/InlineProfile/Image/Modal.html`. It uses only Bootstrap utility
-and component classes; the shipped view requires neither inline styles nor
-additional CSS.
+Clicking the compact edit button below the current profile image or its
+placeholder keeps the profile view active. Vue's ``Teleport`` renders
+:file:`Partials/InlineProfile/Image/Editor.html` into a dedicated full-width
+target above the profile header. The header, profile fields and structured
+sections remain in the same profile flow below the cropper; no
+separate view, modal or overlay is involved. While the editor is open, the
+complete image-preview column is hidden and the profile-fields column animates
+from ``col-lg-8`` to ``col-lg-12``. The editor itself uses a bordered, padded
+surface. Closing it scrolls the restored image-preview column into view and
+focuses its edit action without causing a second browser scroll. The scroll is
+started only after Vue has completed the leave transition and two animation
+frames have applied the final page layout. A ``1.5rem`` scroll margin keeps the
+restored preview clear of the viewport edge.
 
-The image wrapper uses ``position-relative`` and the ``btn-sm`` edit action uses
-``position-absolute top-0 end-0``. Its visible label is the registered pencil
-icon; localized ``title`` and ``aria-label`` attributes retain an accessible
-name.
+Vue's ``Transition`` animates the teleported editor with a short vertical move
+and fade. Its explicit CSS grid row also expands and collapses the editor height,
+padding, margin and border instead of removing the complete block in one layout
+step. Because the target already has its final width when it is inserted, the
+cropper can initialize immediately with the complete available width. The open
+scroll leaves ``2rem`` above the editor. Closing the editor removes the
+teleported content and restores focus to the image edit action. The return
+scroll starts together with the collapse and uses the preview's calculated
+final position. Native scroll anchoring is disabled only during this phase, so
+it cannot introduce a competing correction. Environments requesting reduced
+motion skip the transition.
 
-The modal deliberately has no state-dependent :guilabel:`Add` or
+The full-width ``btn-sm`` edit action sits directly below the preview. Its
+visible label and camera icon are complemented by localized ``title`` and
+``aria-label`` attributes.
+
+The image editor deliberately has no state-dependent :guilabel:`Add` or
 :guilabel:`Replace` action. Selecting a file immediately replaces only the
-modal preview with a local object URL. The page preview and persisted profile
+inline crop preview with a local object URL. The page preview and persisted profile
 remain unchanged until :guilabel:`Save` succeeds. A successful upload replaces
-both previews, closes the modal and shows the saved image directly. Cancel or
-closing the modal discards the selected preview and restores the persisted
+both previews, collapses the editor and shows the saved image directly. During
+the leave transition, the preview remains hidden and the profile fields retain
+their full width. The regular ``4 / 8`` grid is restored only after the editor
+has finished collapsing, preventing competing layout changes while the page
+returns to the image preview.
+:guilabel:`Cancel` discards the selected preview and restores the persisted
 image. :guilabel:`Delete` is shown only while an image is persisted.
 
 If ``special.image.renderType`` is ``cropper`` and
 ``special.image.settings.ratio`` contains a positive ratio such as ``1x1`` or
-``16:9``, the modal instantiates the locally packaged CropperJS 2.2 module. The
+``16:9``, the editor instantiates the locally packaged CropperJS 2.2 module. The
 selection remains constrained to that ratio and only the generated cropped
 file is added to the multipart request. No CDN or other runtime request is
 used. The ratio remains fixed while the selection can be dragged to choose the
-visible image area. The cropper is instantiated only for a persisted profile image or
-a newly selected local file. If the profile currently uses the placeholder,
-the fallback preview remains visible and cannot itself become crop input. The
-original upload behavior remains active for every other render type.
+visible image area. The cropper is instantiated only after a new local file is
+selected. A persisted profile image and the placeholder remain normal previews
+and cannot themselves become crop input. The original upload behavior remains
+active for every other render type.
 
-The save button remains disabled until a file is selected. While an upload or
-deletion is pending, the image controls and modal close buttons are disabled
+The save button remains disabled until a new local file is selected. This also
+prevents an already persisted image from being fetched, cropped and uploaded
+again. While an upload or deletion is pending, all image controls are disabled
 and the active action displays a Bootstrap spinner. This prevents duplicate
-requests and closing the modal during a running operation.
+requests and leaving the inline view during a running operation.
 
 Upload
 ------
@@ -612,11 +710,27 @@ name is written to ``alternative`` and ``title`` in both the FAL file metadata
 and the profile's file-reference overlay. The JSON response returns the same
 values so the in-page preview immediately uses the persisted metadata.
 
-The modal does not render ``f:form.validationResults``. Upload validation
-failures are returned as JSON and displayed in an alert inside the still-open
-modal. The controller additionally compares the submitted image with the
+The inline view does not render ``f:form.validationResults``. Upload validation
+failures are returned as JSON and displayed in an alert inside the active view.
+The controller additionally compares the submitted image with the
 persisted FAL reference. It returns ``image_upload_missing`` with status
 ``422`` instead of reporting success when no new file arrived.
+
+The cropper preserves JPEG, PNG and WebP as output formats and falls back to
+PNG for unsupported source types. Every upload remains a separate FAL file.
+When a profile already has exactly one independent image relation, replacing
+the image keeps the ``sys_file_reference`` uid but assigns the newly uploaded
+file to it through DataHandler and persists ``image=custom`` in the profile's
+``l10n_state``. The old physical file is removed only after no active reference
+uses it anymore. Localized or duplicate legacy references are rebuilt as one
+independent relation, so changing one language cannot overwrite another
+language's custom image.
+
+The upgrade wizard
+``academicPersonsEdit_repairLocalizedProfileImages`` repairs legacy shared,
+localized or duplicate image relations and inconsistent relation counters. It
+copies a shared physical file for the translated profile, rebuilds every
+relation through DataHandler and removes files only when they are unreferenced.
 
 All inline AJAX actions propagate non-successful JSON responses out of TYPO3's
 Extbase ``USER`` content rendering with ``PropagateResponseException``. A
@@ -703,9 +817,10 @@ Customizing the view
 Override :file:`InlineProfile/Index.html` and the partials below
 :file:`Resources/Private/Partials/InlineProfile/` through the regular template
 and partial root paths. The index keeps URL/data setup, the responsive main
-grid and composition. Forms, sections, image UI, field controls and status
-toast are separate partials. Keep the following contracts when reusing the
-shipped JavaScript:
+grid and composition. The ``Profile``, ``Documents``, ``Image`` and ``Field``
+directories group the corresponding UI responsibilities; the status toast and
+client-side button templates remain shared at the root. Keep the following
+contracts when reusing the shipped JavaScript:
 
 ..  list-table::
     :header-rows: 1
@@ -748,10 +863,18 @@ shipped JavaScript:
     *   - ``data-section-key`` and ``data-section-position``
         - Stable section identity and current zero-based presentation position.
     *   - ``data-section-field-name`` and ``data-section-record-type``
-        - Field and relation type taken from the edit settings graph for
+        - Field and relation type taken from the shared settings graph for
           section-specific persistence.
     *   - ``data-ie-document-items`` and ``data-ie-document-item``
         - Mutable item collection and record boundaries inside a section.
+    *   - ``data-ie-document-item-template``
+        - Hidden Fluid-rendered row prototype retained in the mounted DOM and
+          cloned after a successful create response.
+    *   - ``data-ie-document-add-collapse-target`` and
+          ``data-ie-document-item-collapse-target``
+        - Teleport destinations below a section heading and inside an individual
+          record row. The document controller assigns a unique ID when a target
+          is first opened.
     *   - ``data-item-uid``, ``data-item-sorting`` and ``data-item-position``
         - Persisted record identity, domain sorting value and current zero-based
           presentation position.
@@ -759,11 +882,11 @@ shipped JavaScript:
         - Localized placeholder rendered when a structured collection is empty.
     *   - ``data-ie-document-add``, ``data-ie-document-view``,
           ``data-ie-document-edit`` and ``data-ie-document-delete``
-        - Section creation and modal-based row actions.
+        - Section creation and in-place row actions.
     *   - ``data-ie-document-sort``
         - Up/down row action persisted through the shared sort endpoint.
-    *   - ``data-ie-document-modal`` and ``data-ie-document-form``
-        - Scoped Bootstrap modal and form used for add, view, edit and delete.
+    *   - ``data-ie-document-view-container`` and ``data-ie-document-form``
+        - Scoped reactive collapse and form used for add, view, edit and delete.
     *   - ``data-ie-field-group``, ``data-ie-field-ids`` and
           ``data-ie-display-field-ids``
         - Grouped preview/editor and the controls participating in it.
@@ -773,12 +896,12 @@ shipped JavaScript:
     *   - ``data-ie-field-actions``
         - Content-sized Bootstrap group for the three per-field actions.
     *   - ``data-ie-autosave-on-change``
-        - Saves configured select and checkbox controls immediately after a
-          change.
+        - Saves configured checkbox controls immediately after a change.
     *   - ``data-ie-autosave-undo`` and ``data-ie-cancel``
-        - Marks the undo action beside an editable select or checkbox. It
-          restores the last successfully persisted value and closes the editor
-          without sending another request.
+        - Marks the undo action beside an editable checkbox. It restores the
+          last successfully persisted value and closes the editor without
+          sending another request. Select fields use the regular clear, undo
+          and save action group.
     *   - ``data-academic-persons-inline-edit-edit-all-btn``
         - Toggles all editable single fields and grouped rows between open and
           collapsed states.
@@ -797,45 +920,39 @@ shipped JavaScript:
           ``academic-persons-inline-edit__sync-checkbox``
         - Synchronization control.
     *   - ``academic-persons-inline-edit__image-form`` and
-          ``data-ie-image-modal``
-        - AJAX-only multipart upload form and Bootstrap modal.
-    *   - ``data-ie-upload-image`` and ``data-ie-image-error``
-        - Save action and modal-local error output. The save action is enabled
-          only after selecting a file.
+          ``data-ie-image-view-container``
+        - AJAX-only multipart upload form and its teleported Vue editor.
+    *   - ``data-ie-image-editor-target``
+        - Profile-specific full-width destination for the Vue ``Teleport``.
     *   - ``data-ie-image-preview`` and
-          ``data-ie-image-modal-preview``
+          ``data-ie-image-view-preview``
         - Image locations updated after upload or deletion.
-    *   - ``data-ie-image-cropper-stage`` and
-          ``data-ie-image-cropper-source``
-        - Local CropperJS host and its direct source image. The modal exposes
-          render type and configured ratio through
-          ``data-ie-image-render-type`` and
-          ``data-ie-image-cropper-ratio``.
+    *   - ``data-image-render-type`` and ``data-image-cropper-ratio``
+        - Render type and ratio consumed by the local CropperJS host in the
+          image editor.
     *   - ``data-ie-status-toast``
         - Scoped status feedback for the component.
 
 Every editable field needs one ``invalid-feedback`` element in its closest
 ``data-ie-field-wrapper``, ``data-ie-group-control`` or ``.form-check`` wrapper.
-Modal, toast and compatibility-template elements must remain inside the
+Inline collapse targets, views, toast and compatibility-template elements must
+remain inside the
 component root. All DOM lookups are scoped to that root, so multiple components
 remain independent.
 
-JavaScript tests
-================
+Frontend build
+==============
 
-The standalone Jest/jsdom project in
-:file:`Resources/Public/Development/` covers the frontend entry modules and
-their exported helpers. TYPO3-provided CKEditor imports are represented by
-local test doubles, so no TYPO3 instance is required. Run it independently:
+The package has no separate development toolchain below
+:file:`Resources/Public/`. TypeScript sources and committed JavaScript output
+use the repository-wide frontend suites from the repository root:
 
 ..  code-block:: bash
 
-    cd packages/fgtclb/academic-persons-edit/Resources/Public/Development
-    npm i
-    npm test
-
-``npm run test:coverage`` additionally creates the HTML report in
-:file:`Resources/Public/Development/coverage/`.
+    Build/Scripts/runTests.sh -s buildJs
+    Build/Scripts/runTests.sh -s checkJsBuildClean
+    Build/Scripts/runTests.sh -s lintTypescript -n
+    Build/Scripts/runTests.sh -s typecheckJs
 
 Tests
 =====
@@ -846,20 +963,23 @@ allowed editor markup and rejection of scripts, event attributes, styles,
 unknown tags and unsafe link schemes. Validation-service unit tests verify that
 sanitization happens before a value is registered for persistence.
 
-Functional plugin tests render both Bootstrap modal states, verify the
+Functional plugin tests render the Vue inline-collapse targets and image view,
+verify the
 decomposed Fluid contracts, AJAX-only controls, direct rich-text previews and
 the separate delete, cancel and save actions. The section-provider unit test
 verifies that order, identifiers, field names, relation types and labels come
-from the edit settings graph while row fields, action capabilities,
+from the shared settings graph while row fields, action capabilities,
 presentation modes and typed records are preserved. Functional fixtures cover
 contracts and every configured profile-information relation; the rendered page
 test derives the expected
 order and metadata from the same settings service, then checks placement below
 :guilabel:`About me`, alternating records, empty states, writable add controls
 and exactly the configured row actions. AJAX lifecycle tests cover schema
-loading, CKEditor modal fields, creation, partial updates, arrow and drag
-sorting, cross-section rejection, deletion and read-only endpoint denial. It
-also guards the InlineProfile
+loading, CKEditor inline fields, creation, partial updates, arrow and drag
+sorting, cross-section rejection, deletion and read-only endpoint denial.
+Contract tests additionally cover every configured field plus address,
+email-address and phone-number creation, display, update, independent sorting,
+deletion and cross-Contract rejection. They also guard the InlineProfile
 plugin against accidentally exposing legacy mutation controllers. Registration
 tests ensure that InlineProfile is the only editing content element offered to
 editors while the complete legacy implementation remains present as a

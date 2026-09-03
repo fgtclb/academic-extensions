@@ -27,6 +27,8 @@ final class ProfileDocumentSectionProvider
     private const HELPTEXT_FIELD_ALIASES = [
         'yearStart' => 'from',
         'yearEnd' => 'to',
+        'validFrom' => 'from',
+        'validTo' => 'to',
         'bodytext' => 'description',
     ];
 
@@ -126,9 +128,30 @@ final class ProfileDocumentSectionProvider
      */
     public function getFieldHelptext(DocumentSection $section, string $fieldName): string
     {
+        if ($section->isContractSection()) {
+            $contractField = $this->academicPersonsSettings->getContractField($fieldName);
+            if ($contractField !== null) {
+                return $contractField->helptext;
+            }
+        }
         $sectionSettings = $this->academicPersonsSettings->raw['documentSections'][$section->identifier] ?? null;
         if (!is_array($sectionSettings)) {
             return '';
+        }
+        $sectionType = $sectionSettings['type'] ?? null;
+        $referencedSettings = is_string($sectionType)
+            ? ($this->academicPersonsSettings->raw[$sectionType] ?? null)
+            : null;
+        if (is_array($referencedSettings)) {
+            $sectionSettings = array_replace($referencedSettings, $sectionSettings);
+        }
+        $fields = $sectionSettings['fields'] ?? null;
+        if (is_array($fields)) {
+            $fieldSettings = $fields[$fieldName] ?? null;
+            if (is_array($fieldSettings)) {
+                $helptext = $fieldSettings['helptext'] ?? '';
+                return is_string($helptext) ? $helptext : '';
+            }
         }
         $helptexts = $sectionSettings['helptext'] ?? null;
         if (!is_array($helptexts)) {

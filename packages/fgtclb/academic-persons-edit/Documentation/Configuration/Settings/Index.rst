@@ -5,36 +5,42 @@
 Profile editor and validation
 ===============================
 
-:file:`Configuration/AcademicsPersonsEdit/Settings.yaml` belongs exclusively
-to :guilabel:`academic_persons_edit`. It contains the ordered editing schema:
+:file:`academic-persons/Configuration/AcademicPersons/Settings.yaml` is the
+canonical settings source for :guilabel:`academic_persons` and
+:guilabel:`academic_persons_edit`. It contains one ordered profile schema and
+the related inline maps:
 
 ``profile``
-    Direct Profile fields grouped into visual sections.
+    The public detail layout together with direct Profile fields grouped into
+    visual sections. The ``structure`` and ``details`` keys configure public
+    rendering; the remaining entries define editable fields and their shared
+    validation metadata.
 ``special``
     Composed or dedicated components such as the title, image and sync switch.
-``contractContact``
-    Address, email and phone fields owned by Contract records.
+``contracts``
+    The reusable Contract document type. Its ordered ``fields`` map drives the
+    Contract editor; ``contactSections`` contains the physical-address, email
+    and phone editors and their respective ordered fields.
 ``documentSections``
-    Structured collections, row presentation, actions and section-local
-    validators.
+    Ordered structured collections. The Contract entry only references
+    ``type: contracts``; ordinary profile-information entries remain inline.
 
-The public detail layout is a different settings graph in
-:file:`academic-persons/Configuration/AcademicPersons/Settings.yaml`. Its
-top-level key is also named :yaml:`profile`, but the factories, cache entries
-and merge namespaces are separate. Neither plugin reads the other plugin's
-Settings file.
+All consumers receive the same normalized settings graph. This keeps public
+rendering, inline editing, frontend validation and the corresponding backend
+TCA state aligned. Public layout stays below :yaml:`profile`; the other maps
+remain technical sections in the same file.
 
 Loading and overrides
 =====================
 
-The edit factory reads the same relative path from every active package and
-merges maps at the top level. A site package can therefore override the edit
+The central factory reads the same relative path from every active package and
+merges maps at the top level. A site package can therefore override the shared
 configuration by providing
-:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`. Replacing one of the
-four maps replaces that complete map; repeat every entry which must remain.
+:file:`Configuration/AcademicPersons/Settings.yaml`. Replacing one of the four
+maps replaces that complete map; repeat every entry which must remain.
 
-Flush TYPO3 caches after a change. The edit graph uses its own cache identifier
-and cannot reuse a public-profile settings cache entry.
+Flush TYPO3 caches after a change so the unified typed settings graph and its
+cache entry are rebuilt.
 
 Field validators
 ================
@@ -92,7 +98,7 @@ on the field:
         section: aboutme
         fieldType: textarea
         renderType: ckeditor
-        characterLimit: 500
+        characterLimit: 1000
         validators:
           - html
 
@@ -101,10 +107,12 @@ and prevents the editor from accepting additional visible characters beyond
 the limit. The partial AJAX update is checked independently by the same
 server-side Extbase validation. HTML tags do not count. The property is ignored
 when ``renderType`` is not ``ckeditor`` or its value is invalid or non-positive.
+The key is case-sensitive; ``characterlimit`` is not normalized.
 
 This deliberately differs from document descriptions, which keep their
 existing nested ``editor.limit`` schema. Both forms normalize to the same typed
-validation metadata and neither one changes backend TCA.
+validation metadata. Character limits do not alter backend TCA or the database
+schema.
 
 Document validators and aliases
 ===============================
@@ -123,6 +131,12 @@ Document aliases map presentation names to DTO and database properties:
     *   - ``to``
         - ``yearEnd``
         - ``year_end``
+    *   - ``contracts.fields.validFrom``
+        - ``validFrom``
+        - ``valid_from``
+    *   - ``contracts.fields.validTo``
+        - ``validTo``
+        - ``valid_to``
     *   - ``year``
         - ``year``
         - ``year``
@@ -147,9 +161,8 @@ The shipped date rules are deliberately dynamic:
 
 Consequently ``year`` receives a required attribute and marker while ``from``
 and ``to`` remain optional. Removing or adding ``required`` in a site override
-changes JSON metadata, modal markup and Extbase validation together; no field
-name is hard-coded as mandatory. Backend TCA is not read from this file and
-therefore never changes with these flags.
+changes JSON metadata, modal markup, Extbase validation and the corresponding
+backend TCA field state together; no field name is hard-coded as mandatory.
 
 The richer description form remains supported:
 
@@ -157,7 +170,7 @@ The richer description form remains supported:
 
     description:
       editor:
-        limit: 100
+        limit: 500
         type: ckeditor
 
 ``editor.type: ckeditor`` is normalized to the ``html`` validation/input
@@ -175,17 +188,83 @@ ignored for non-CKEditor controls, and removing it or setting it to a non-
 positive value disables both the counter and the additional validation without
 changing backend FormEngine.
 
-Backend TCA isolation
-=====================
+Contract form and contact sections
+==================================
 
-The domain extension owns the backend TCA independently. This settings file is
-used only by the frontend editor and never changes ``$GLOBALS['TCA']``. Adding
-or removing ``required``, ``readonly`` or another edit flag therefore has no
-effect on FormEngine in TYPO3 13 or TYPO3 14.
+The order of :yaml:`contracts.fields` is the form order returned by the JSON
+endpoint. Every entry declares its frontend field and render type, validation,
+option source and helptext together. The shipped ``organisationalUnits``,
+``functionTypes`` and ``locations`` option sources resolve their records
+through the corresponding repositories. Removing or reordering an entry
+therefore removes or reorders that control without changing the template.
 
-The stable domain TCA still describes the three date-only columns with native
-date configuration. That storage definition is independent of the edit
-settings and is not overridden by this extension.
+Physical addresses, email addresses and phone numbers are ordered structural
+children below :yaml:`contracts.contactSections`. Each child owns an ordered
+``fields`` map and an isolated validation set:
+
+..  code-block:: yaml
+
+    contracts:
+      type: contracts
+      fields:
+        position:
+          fieldType: input
+          renderType: text
+          validators:
+            - required
+        organisationalUnit:
+          fieldType: select
+          renderType: select
+          options: organisationalUnits
+      contactSections:
+        physicalAddresses:
+          fields:
+            country:
+              fieldType: input
+              renderType: select
+              autocomplete: country
+              helptext: 'LLL:EXT:site/Resources/Private/Language/locallang.xlf:address.country.helptext'
+              validators:
+                - required
+        emailAddresses:
+          fields:
+            emailAddress:
+              propertyName: email
+              fieldType: input
+              renderType: email
+              autocomplete: email
+        phoneNumbers:
+          fields:
+            phoneNumber:
+              fieldType: input
+              renderType: phone
+              autocomplete: tel
+
+    documentSections:
+      contracts:
+        type: contracts
+
+The shipped physical-address country control obtains its localized labels and
+ISO alpha-2 values from TYPO3's ``CountryProvider``. Keeping ``fieldType`` as
+``input`` preserves the domain extension's existing backend TCA while
+``renderType: select`` selects the frontend control and its option validation.
+Every Contract and contact field helptext is rendered as a Bootstrap popover
+in add/edit mode.
+
+The shipped autocomplete tokens are ``street-address``, ``postal-code``,
+``address-level2``, ``country``, ``email`` and ``tel``. They describe the
+purpose of the corresponding control without changing validation or storage.
+
+Backend TCA integration
+=======================
+
+The domain extension still owns the base TCA and the native date-only storage
+configuration. It applies the normalized validation metadata from the unified
+settings graph to the relevant Profile, contact and Profile-information TCA
+fields. Consequently ``required``, ``readonly`` and field-type metadata remain
+consistent between frontend validation, inline editing and FormEngine in
+TYPO3 13 and TYPO3 14. Character limits remain frontend/server-side metadata
+and do not change the database schema.
 
 Modal date row
 ==============

@@ -47,7 +47,10 @@ class EmailRepository extends Repository
         $query->getQuerySettings()->setIgnoreEnableFields(true);
         $query->getQuerySettings()->setEnableFieldsToBeIgnored(['disabled']);
         $query->matching($query->equals('contract', $contractUid));
-        $query->setOrderings(['sorting' => QueryInterface::ORDER_ASCENDING]);
+        $query->setOrderings([
+            'sorting' => QueryInterface::ORDER_ASCENDING,
+            'uid' => QueryInterface::ORDER_ASCENDING,
+        ]);
         return $query->execute();
     }
 

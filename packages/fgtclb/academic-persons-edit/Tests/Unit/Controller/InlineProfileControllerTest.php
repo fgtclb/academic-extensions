@@ -4,22 +4,35 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Controller;
 
+use FGTCLB\AcademicPersons\Domain\Repository\AddressRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ContractRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\EmailRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\FunctionTypeRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\LocationRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\OrganisationalUnitRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\PhoneNumberRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileInformationRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
+use FGTCLB\AcademicPersons\Service\DataHandlerExecutionContext;
+use FGTCLB\AcademicPersons\Service\ProfileImageMetadataService;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
+use FGTCLB\AcademicPersons\Types\EmailAddressTypes;
+use FGTCLB\AcademicPersons\Types\PhoneNumberTypes;
+use FGTCLB\AcademicPersons\Types\PhysicalAddressTypes;
 use FGTCLB\AcademicPersonsEdit\Controller\InlineProfileController;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\AddressFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ContractFactory;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\EmailFactory;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\PhoneNumberFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFormDataFactoryInterface;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileInformationFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Parser\ProfileUpdatePayloadParser;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\ProfileFormDataValidator;
+use FGTCLB\AcademicPersonsEdit\Service\LocalizedProfileUidResolver;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileDocumentSectionProvider;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileImageRelationWriter;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileSectionProvider;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
@@ -27,13 +40,18 @@ use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Country\CountryProvider;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Http\Stream;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\CMS\Extbase\Mvc\Request;
+use TYPO3\CMS\Frontend\Controller\ErrorController;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 final class InlineProfileControllerTest extends UnitTestCase
@@ -351,11 +369,21 @@ final class InlineProfileControllerTest extends UnitTestCase
             raw: [],
         );
         $profileFieldOptionsService = new ProfileFieldOptionsService($academicPersonsSettings);
+        $resourceFactory = $this->createStub(ResourceFactory::class);
+        $connectionPool = $this->createStub(ConnectionPool::class);
 
         $subject = new InlineProfileController(
             $this->createStub(ProfileFactory::class),
             $profileRepository,
-            $this->createStub(ResourceFactory::class),
+            $this->createStub(CountryProvider::class),
+            $connectionPool,
+            $this->createStub(ErrorController::class),
+            $this->createStub(LogManager::class),
+            $resourceFactory,
+            new ProfileImageMetadataService(
+                $connectionPool,
+                $resourceFactory,
+            ),
             new ProfileUpdateRequestService(
                 new Context(),
                 $profileRepository,
@@ -368,6 +396,14 @@ final class InlineProfileControllerTest extends UnitTestCase
                 $this->createStub(ProfileRichTextSanitizerInterface::class),
                 $academicPersonsSettings,
             ),
+            new LocalizedProfileUidResolver($connectionPool),
+            new ProfileImageRelationWriter(
+                $connectionPool,
+                new DataHandlerExecutionContext(
+                    new Context(),
+                    $this->createStub(LanguageServiceFactory::class),
+                ),
+            ),
             $profileFieldOptionsService,
             new ProfileSectionProvider($academicPersonsSettings),
             new ProfileDocumentSectionProvider(
@@ -375,6 +411,15 @@ final class InlineProfileControllerTest extends UnitTestCase
             ),
             $this->createStub(ContractFactory::class),
             $this->createStub(ContractRepository::class),
+            $this->createStub(AddressFactory::class),
+            $this->createStub(AddressRepository::class),
+            $this->createStub(EmailFactory::class),
+            $this->createStub(EmailRepository::class),
+            $this->createStub(PhoneNumberFactory::class),
+            $this->createStub(PhoneNumberRepository::class),
+            $this->createStub(PhysicalAddressTypes::class),
+            $this->createStub(EmailAddressTypes::class),
+            $this->createStub(PhoneNumberTypes::class),
             $this->createStub(ProfileInformationFactory::class),
             $this->createStub(ProfileInformationRepository::class),
             $this->createStub(FunctionTypeRepository::class),

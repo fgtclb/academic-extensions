@@ -1,0 +1,161 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+        <h4
+            class="h5 mb-0"
+            tabindex="-1"
+            data-ie-contract-contact-heading
+            v-text="contractContact.title"></h4>
+        <button
+            type="button"
+            class="btn rounded-0 btn-outline-secondary btn-sm"
+            v-if="contractContact.mode !== 'delete'"
+            v-on:click="closeContractContact"
+            v-bind:disabled="contractContact.pending">
+            <f:translate
+                key="actions.cancel"
+                extensionName="academic_persons_edit" />
+        </button>
+    </div>
+
+    <div
+        class="alert alert-danger"
+        role="alert"
+        v-if="contractContact.error"
+        v-text="contractContact.error"></div>
+
+    <p
+        class="mb-4"
+        v-if="contractContact.mode === 'delete'"
+        v-text="contractContact.deleteConfirmation"></p>
+
+    <dl class="row mb-0" v-if="contractContact.mode === 'view'">
+        <template
+            v-for="field in contractContact.fields"
+            v-bind:key="field.name">
+            <dt class="col-sm-4" v-text="field.label"></dt>
+            <dd class="col-sm-8">
+                <span v-if="field.displayValue" v-text="field.displayValue"></span>
+                <span v-else>
+                    <f:translate
+                        key="inlineProfile.field.empty"
+                        extensionName="academic_persons_edit" />
+                </span>
+            </dd>
+        </template>
+    </dl>
+
+    <div
+        class="row g-3"
+        v-if="contractContact.mode === 'add' || contractContact.mode === 'edit'"
+        data-ie-contract-contact-fields>
+        <div
+            class="col-12 col-md-6"
+            v-for="(field, fieldIndex) in contractContact.fields"
+            v-bind:key="field.name">
+            <div class="d-flex align-items-center">
+                <label
+                    class="form-label"
+                    v-bind:for="'ie-contract-contact-field-' + section.identifier + '-' + fieldIndex + '-' + field.name">
+                    <span v-text="field.label"></span>
+                    <span
+                        class="text-danger ms-1"
+                        aria-hidden="true"
+                        v-if="field.required">*</span>
+                </label>
+                <button
+                    type="button"
+                    class="btn rounded-0 btn-link link-info p-0 ms-2 mb-1"
+                    v-if="field.helptext"
+                    data-bs-toggle="popover"
+                    data-ie-helptext
+                    data-bs-trigger="focus"
+                    data-bs-placement="right"
+                    data-bs-custom-class="custom-popover"
+                    v-bind:data-bs-title="field.label"
+                    v-bind:data-bs-content="field.helptext"
+                    v-bind:aria-label="field.label + ': ' + field.helptext">
+                    <core:icon
+                        identifier="academic-persons-inline-edit-info"
+                        size="small"
+                        alternativeMarkupIdentifier="inline" />
+                </button>
+            </div>
+            <select
+                class="form-select"
+                v-if="field.type === 'select'"
+                v-bind:id="'ie-contract-contact-field-' + section.identifier + '-' + fieldIndex + '-' + field.name"
+                v-bind:name="field.name"
+                v-bind:required="field.required"
+                v-bind:disabled="field.disabled || contractContact.pending"
+                v-bind:autocomplete="field.autocomplete || null"
+                v-bind:aria-describedby="'ie-contract-contact-field-error-' + section.identifier + '-' + fieldIndex + '-' + field.name"
+                v-bind:aria-invalid="contractContact.errors[field.name] ? 'true' : 'false'"
+                v-model="contractContact.values[field.name]">
+                <option value="">—</option>
+                <option
+                    v-for="option in field.options"
+                    v-bind:key="option.value"
+                    v-bind:value="option.value"
+                    v-text="option.label"></option>
+            </select>
+            <input
+                class="form-control"
+                v-else
+                v-bind:type="field.type || 'text'"
+                v-bind:id="'ie-contract-contact-field-' + section.identifier + '-' + fieldIndex + '-' + field.name"
+                v-bind:name="field.name"
+                v-bind:required="field.required"
+                v-bind:readonly="field.readOnly"
+                v-bind:disabled="field.disabled || contractContact.pending"
+                v-bind:autocomplete="field.autocomplete || null"
+                v-bind:aria-describedby="'ie-contract-contact-field-error-' + section.identifier + '-' + fieldIndex + '-' + field.name"
+                v-bind:aria-invalid="contractContact.errors[field.name] ? 'true' : 'false'"
+                v-model="contractContact.values[field.name]" />
+            <div
+                v-bind:id="'ie-contract-contact-field-error-' + section.identifier + '-' + fieldIndex + '-' + field.name"
+                class="invalid-feedback d-block"
+                role="alert"
+                v-if="contractContact.errors[field.name]"
+                v-text="contractContact.errors[field.name]"></div>
+        </div>
+    </div>
+
+    <div
+        class="d-flex justify-content-end gap-2 mt-4"
+        v-if="contractContact.mode !== 'view'">
+        <button
+            type="button"
+            class="btn rounded-0 btn-outline-secondary"
+            v-on:click="closeContractContact"
+            v-bind:disabled="contractContact.pending">
+            <f:translate
+                key="actions.cancel"
+                extensionName="academic_persons_edit" />
+        </button>
+        <button
+            type="button"
+            class="btn rounded-0"
+            v-bind:class="contractContact.mode === 'delete' ? 'btn-danger' : 'btn-primary'"
+            v-on:click="submitContractContact"
+            v-bind:disabled="contractContact.pending">
+            <span
+                class="spinner-border spinner-border-sm me-1"
+                aria-hidden="true"
+                v-if="contractContact.pending"></span>
+            <span v-if="contractContact.mode === 'delete'">
+                <f:translate
+                    key="actions.delete"
+                    extensionName="academic_persons_edit" />
+            </span>
+            <span v-else>
+                <f:translate
+                    key="actions.save"
+                    extensionName="academic_persons_edit" />
+            </span>
+        </button>
+    </div>
+</html>

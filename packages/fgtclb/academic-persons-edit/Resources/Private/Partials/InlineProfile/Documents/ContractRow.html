@@ -3,7 +3,7 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
     <article
-        class="row g-3 align-items-start rounded-1 px-3 px-lg-4 py-4 {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
+        class="row g-0 align-items-center border-bottom py-2 py-lg-3 ps-3 {f:if(condition: itemIteration.isOdd, then: 'bg-body-tertiary')}"
         data-ie-document-item
         data-item-uid="{contract.uid}"
         data-item-sorting="{contract.sorting}"
@@ -11,8 +11,8 @@
         <f:for each="{rowFields}" as="rowField">
             <f:switch expression="{rowField}">
                 <f:case value="from">
-                    <div class="col-12 col-sm">
-                        <div class="fw-semibold">
+                    <div class="col-12 col-md-3 py-1 pe-md-3">
+                        <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="inlineProfile.documents.start" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="validFrom">
@@ -24,8 +24,8 @@
                     </div>
                 </f:case>
                 <f:case value="to">
-                    <div class="col-12 col-sm">
-                        <div class="fw-semibold">
+                    <div class="col-12 col-md-3 py-1 pe-md-3">
+                        <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="inlineProfile.documents.to" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="validTo">
@@ -37,8 +37,8 @@
                     </div>
                 </f:case>
                 <f:case value="position">
-                    <div class="col-12 col-sm">
-                        <div class="fw-semibold">
+                    <div class="col-12 col-md py-1 pe-md-3">
+                        <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="inlineProfile.documents.position" extensionName="academic_persons_edit" />
                         </div>
                         <div data-ie-document-value="position">
@@ -52,5 +52,6 @@
             </f:switch>
         </f:for>
         <f:render partial="InlineProfile/Documents/Actions" arguments="{actions: actions, sortable: sortable}" />
+        <div class="col-12 pe-3" data-ie-document-item-collapse-target></div>
     </article>
 </html>

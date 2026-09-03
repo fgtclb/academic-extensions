@@ -9,7 +9,6 @@ use FGTCLB\AcademicPersons\Settings\ValidationSet;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\AbstractFormData;
 use FGTCLB\AcademicPersonsEdit\Exception\UnknownValidatorException;
 use FGTCLB\AcademicPersonsEdit\Service\RichTextCharacterCounter;
-use FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
@@ -73,8 +72,6 @@ abstract class AbstractFormDataValidator extends AbstractValidator
      */
     protected function getAcademicPersonsSettings(): AcademicPersonsSettings
     {
-        return $this->academicPersonsSettings ??= GeneralUtility::makeInstance(
-            AcademicPersonsEditSettingsFactory::class,
-        )->get();
+        return $this->academicPersonsSettings ??= GeneralUtility::makeInstance(AcademicPersonsSettings::class);
     }
 }

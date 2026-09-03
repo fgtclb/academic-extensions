@@ -74,9 +74,13 @@ For each remaining language, :php:`synchronize()`:
 *   for an existing translation, re-submits the default record's
     :php:`l10n_mode=exclude` column values as a datamap (core's
     ``DataMapProcessor`` propagates them into every translation) and issues an
-    ``inlineLocalizeSynchronize`` command per inline column, which carries
-    child records added to the default record after the translation was
-    created.
+    ``inlineLocalizeSynchronize`` command per inline and file column. It
+    carries child records added to the default record after the translation
+    was created and removes translated file references after their
+    default-language parent was removed. Fields using
+    ``allowLanguageSynchronization`` additionally follow their Core
+    ``l10n_state``: ``parent`` values are propagated and ``custom`` values stay
+    language-specific.
 
 A missing record, a record that is not in the default language, or a record
 that is invisible in the acting workspace makes the run a silent no-op.
