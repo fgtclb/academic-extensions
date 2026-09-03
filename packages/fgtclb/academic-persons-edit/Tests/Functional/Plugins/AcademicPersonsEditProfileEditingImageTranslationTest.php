@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Plugins;
 
+use FGTCLB\AcademicPersons\Service\DataHandlerExecutionContext;
+use FGTCLB\AcademicPersonsEdit\Profile\ProfileTranslator;
 use FGTCLB\AcademicPersonsEdit\Upgrades\RepairLocalizedProfileImagesUpgradeWizard;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -272,6 +274,33 @@ final class AcademicPersonsEditProfileEditingImageTranslationTest extends Abstra
                     ),
             );
         }
+    }
+
+    #[Test]
+    public function imageCanBeAddedAfterProfileTranslationExists(): void
+    {
+        $this->setUpTestCase();
+
+        $translationUid = 0;
+        $this->get(DataHandlerExecutionContext::class)->runAsBackendUser(
+            function () use (&$translationUid): void {
+                $translationUid = $this->get(ProfileTranslator::class)->translateTo(self::PROFILE_ID, 1);
+            },
+        );
+        $this->assertGreaterThan(0, $translationUid);
+        $this->assertSame([], $this->getActiveImageReferences());
+
+        $this->assertSame(200, $this->uploadImage()->getStatusCode());
+
+        $references = $this->getActiveImageReferences();
+        $this->assertCount(2, $references);
+        $this->assertSame(self::PROFILE_ID, $references[0]['uid_foreign']);
+        $this->assertSame($translationUid, $references[1]['uid_foreign']);
+        $this->assertSame($references[0]['uid'], $references[1]['l10n_parent']);
+        $this->assertSame($references[0]['uid_local'], $references[1]['uid_local']);
+        $this->assertSame('parent', $this->getImageLocalizationState($translationUid));
+        $this->assertFileReferenceIndexMatches($references);
+        $this->assertCount(1, $this->getStoredFiles());
     }
 
     #[Test]
