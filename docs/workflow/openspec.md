@@ -195,6 +195,10 @@ validate --all --strict` checks every change and spec at once.
   workflow does not stop before them — `config.yaml` says so under `rules`.
 - **Tooling-only changes set `skip_specs: true`.** A change to the harness,
   the documentation or the development instances has no behaviour to specify.
+- **A backport is a change of its own on the target branch.** Specs are
+  branch-scoped and are never synced between `main` and `2`; the backport pull
+  request re-derives the delta from its analysis, see
+  [Backporting](backporting.md#backporting-an-openspec-change).
 
 ## Upgrading the CLI
 
@@ -207,6 +211,8 @@ afterwards: it skips the generated directories, but `openspec/` is linted.
 
 - [Pull requests](pull-requests.md) — the pre-flight checklist that a
   `tasks.md` has to end with.
+- [Backporting](backporting.md#backporting-an-openspec-change) — what of a
+  change travels to branch `2`, and what never does.
 - [Commit messages](commit-messages.md) — the verified issue reference the
   change name is derived from.
 - [Changelog and documentation](changelog-and-documentation.md) — the
