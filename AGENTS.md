@@ -122,6 +122,10 @@ What applies on top of the generated workflow:
 - **Never edit the generated tool directories**; `openspec update` rewrites
   them, and `lintMarkdown` skips them for that reason. `openspec/` itself is
   hand-written and is linted.
+- **Specs are branch-scoped.** Never sync `openspec/specs/` or move an
+  archived change between `main` and `2`; a backport is a change of its own on
+  the target branch, re-derived from the backport analysis — see
+  [Backporting](docs/workflow/backporting.md#backporting-an-openspec-change).
 
 The CLI is a global Node.js package outside the container harness. A shell
 where `openspec` or `node` is not found has an uninitialized Node version

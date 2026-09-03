@@ -264,6 +264,36 @@ reasoning, and raise the parts that no longer hold rather than quietly deleting
 them. A message that claims something untrue about the branch it sits on is
 worse than one that is merely terse.
 
+## Backporting an OpenSpec change
+
+An [OpenSpec](openspec.md) change is branch-scoped like everything else here.
+The main specs under `openspec/specs/` describe the behaviour of the branch they
+sit on — on `main` that is 3.x on TYPO3 v13 and v14 — so they are never copied
+to branch `2` wholesale, for the same reason `docs/` is not. A capability
+without a spec on `2` simply has none yet; it gets one with the first change
+there that touches it.
+
+What travels is the delta of one change, in the shape the analysis above
+produced:
+
+1. On `main`, the change is proposed, applied and archived within its pull
+   request. The archive updates `main`'s specs.
+2. The backport is analysed as above: the file-level diff, the API grep, the
+   harness parity check.
+3. On `2`, the backport pull request carries a change of its own, under the
+   same name `ace-NNN-<slug>`. Its proposal states that it backports the `main`
+   change and names the archived folder there. Its delta spec is written from
+   the analysis: the requirements name v12 and v13, and whatever the branch
+   cannot do is left out. When the analysis found the touched files identical,
+   the archived folder from `main` is a fine starting point, with the version
+   statements adjusted.
+4. Apply and archive on `2` as the last commit of the backport pull request,
+   which updates `2`'s own specs.
+
+Never sync `openspec/specs/` between the branches in either direction, and
+never move an archived change across branches unchanged: the spec it carries
+would claim v14 behaviour on a branch that has no v14.
+
 ## See also
 
 - [Changelog and documentation](changelog-and-documentation.md) — where the
@@ -273,6 +303,8 @@ worse than one that is merely terse.
   keeps.
 - [Pull requests](pull-requests.md) — a backport is a pull request like any
   other.
+- [OpenSpec](openspec.md) — the artifacts and the lifecycle a backported
+  change goes through again on the target branch.
 - [Development environment](../development/environment.md) — `-t`, `-p`, `-d`
   and why `composerUpdate` is not optional.
 - `AGENTS.md` in the repository root — the backport policy in its short form.
