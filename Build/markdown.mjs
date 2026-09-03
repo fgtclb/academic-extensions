@@ -38,6 +38,14 @@ const fix = process.argv.includes('--fix');
 const skippedDirectories = new Set([
     '.Build',
     '.agent',
+    // OpenSpec commands and skills, generated per AI coding tool by
+    // "openspec init" and rewritten by "openspec update". Not ours to format;
+    // the hand-written "openspec/" tree stays covered.
+    '.agents',
+    '.claude',
+    '.gemini',
+    '.junie',
+    '.opencode',
     '.git',
     '.idea',
     '.sbuerk',

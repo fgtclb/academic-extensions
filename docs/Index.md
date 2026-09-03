@@ -59,6 +59,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | [Backporting](workflow/backporting.md)                                 | The maintained targets, and analysing a backport instead of cherry-picking it. |
 | [Changelog and documentation](workflow/changelog-and-documentation.md) | The two audiences, rendering the manual, changelog entries per extension.      |
 | [Releasing](workflow/releasing.md)                                     | Versions across fifteen packages, the release scripts, the publishing chain.   |
+| [OpenSpec](workflow/openspec.md)                                       | Spec-driven planning: artifacts, lifecycle, per-tool commands, conventions.    |
 
 ## Conventions of this documentation
 

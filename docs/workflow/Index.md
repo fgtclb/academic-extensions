@@ -7,6 +7,8 @@ How a change gets from a working copy into a release. This is branch `2`, the
 ## The short version
 
 1. Branch from `2`, one branch per issue, with the target branch in the name.
+   A change worth planning gets an OpenSpec proposal first, named after the
+   same issue.
 2. Commit with the TYPO3 Core conventions and a **verified** issue reference.
 3. Run every gate for **both** core versions of this branch, TYPO3 v12 and v13,
    each after its own `composerUpdate`, before opening a pull request — and
@@ -27,6 +29,7 @@ How a change gets from a working copy into a release. This is branch `2`, the
 | [Backporting](backporting.md)                                 | What arrives here from `main`, and why it is analysed rather than cherry-picked — starting with a file-level diff. |
 | [Changelog and documentation](changelog-and-documentation.md) | The two audiences, rendering the manual, and the changelog entry kinds.                                            |
 | [Releasing](releasing.md)                                     | Versions across fifteen packages, `bin/set-version` and `bin/release`, and the three-step publishing chain.        |
+| [OpenSpec](openspec.md)                                       | The spec-driven planning workflow: artifacts, lifecycle, per-tool commands, and the conventions for changes here.  |
 
 ## See also
 

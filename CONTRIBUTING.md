@@ -24,6 +24,7 @@ instead of repeating it.
 - [Backporting](#backporting)
 - [Documentation](#documentation)
 - [Releasing](#releasing)
+- [Planning with OpenSpec](#planning-with-openspec)
 - [AI-assisted contributions](#ai-assisted-contributions)
 
 ## Getting started
@@ -229,6 +230,23 @@ applied across the repository with `bin/set-version` and orchestrated with
 the chain, from the split repositories.
 
 → [Releasing](docs/workflow/releasing.md)
+
+## Planning with OpenSpec
+
+A change worth planning before coding — a new capability, a behaviour change
+across extensions or core versions, a fix that needs a design decision — starts
+as an OpenSpec change: proposal, delta specs, design and tasks under
+`openspec/changes/`, written with your AI coding tool (`/opsx:propose` in
+Claude Code) or by hand, implemented against `tasks.md`, and archived in the
+same pull request. The specs then live on in `openspec/specs/`. A backport
+arriving from `main` is a change of its own here; specs are never synced
+between the branches.
+
+The CLI is a global Node.js package (`npm install -g @fission-ai/openspec`),
+not part of the container harness. The generated command and skill
+directories per tool are committed and never edited by hand.
+
+→ [OpenSpec](docs/workflow/openspec.md)
 
 ## AI-assisted contributions
 
