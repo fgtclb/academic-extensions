@@ -25,9 +25,10 @@ proposal, and nothing here forces one.
 | `.gemini/commands/opsx/`, `.gemini/skills/openspec-*/` | yes     | The same for Gemini CLI.                                                                                                                |
 | `.junie/commands/`, `.junie/skills/openspec-*/`        | yes     | The same for JetBrains Junie.                                                                                                           |
 | `.opencode/commands/`, `.opencode/skills/openspec-*/`  | yes     | The same for OpenCode.                                                                                                                  |
+| `.agents/skills/openspec-*/`                           | yes     | The tool-independent skills directory (`agents` tool id): skills only, no commands, for tools that read `.agents/skills/`.              |
 
 The tool directories were produced by `openspec init --tools
-claude,gemini,junie,opencode` (OpenSpec 1.12.0, recorded as `generatedBy` in
+agents,claude,gemini,junie,opencode` (OpenSpec 1.12.0, recorded as `generatedBy` in
 each skill's front matter) and are refreshed by `openspec update` after a CLI
 upgrade. **Never edit them by hand** — the next `openspec update` overwrites
 them. For the same reason the `lintMarkdown` gate skips those directories

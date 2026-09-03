@@ -92,7 +92,8 @@ Nothing below `.agent/` is ever committed.
 
 The repository is initialized for [OpenSpec](docs/workflow/openspec.md). The
 commands and skills for Claude Code, Gemini CLI, Junie and OpenCode are
-committed (`.claude/`, `.gemini/`, `.junie/`, `.opencode/`); in Claude Code
+committed (`.claude/`, `.gemini/`, `.junie/`, `.opencode/`), and so is the
+tool-independent `.agents/skills/` directory; in Claude Code
 they are `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:update`,
 `/opsx:sync` and `/opsx:archive`, the other tools spell them as the page
 says. `openspec/config.yaml` carries the project context and the per-artifact
