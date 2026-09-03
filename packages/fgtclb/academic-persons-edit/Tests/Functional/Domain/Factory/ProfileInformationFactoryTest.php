@@ -92,7 +92,7 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
     {
         $formData = $this->mapFormDataForUpdate(['title' => 'New Title', 'year' => '']);
         $this->assertNull($formData->getYear());
-        $this->assertTrue($formData->wasPropertySentInRequest('year'));
+        $this->assertTrue($formData->hasPropertyOverride('year'));
 
         $this->applyAndPersist($formData);
 

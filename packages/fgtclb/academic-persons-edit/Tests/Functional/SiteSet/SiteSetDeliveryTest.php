@@ -40,8 +40,8 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
     ];
 
     private const AGGREGATE_SET = 'fgtclb/academic-persons-edit';
-    private const REMOVED_LEGACY_COMPONENT_SET = 'fgtclb/academic-persons-edit-profile-editing';
-    private const INLINE_COMPONENT_SET = 'fgtclb/academic-persons-edit-inline-profile';
+    private const PROFILE_EDITING_COMPONENT_SET = 'fgtclb/academic-persons-edit-profile-editing';
+    private const REMOVED_INLINE_COMPONENT_SET = 'fgtclb/academic-persons-edit-inline-profile';
 
     protected function setUp(): void
     {
@@ -120,11 +120,6 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
             $removeItems,
             'The content element is selectable although no set and no page TSconfig enable it.',
         );
-        $this->assertContains(
-            'academicpersonsedit_inlineprofile',
-            $removeItems,
-            'The inline content element is selectable although no set and no page TSconfig enable it.',
-        );
     }
 
     /**
@@ -146,22 +141,17 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
         );
 
         $this->assertNotContains(
-            'academicpersonsedit_inlineprofile',
+            'academicpersonsedit_profileediting',
             $removeItems,
             'The site set did not deliver the page TSconfig that re-enables the content element.',
         );
-        $this->assertContains(
-            'academicpersonsedit_profileediting',
-            $removeItems,
-            'The retained legacy content element must remain hidden for new records.',
-        );
         $this->assertArrayHasKey(
-            'academicpersonsedit_inlineprofile.',
+            'academicpersonsedit_profileediting.',
             $pageTsConfig['mod.']['wizards.']['newContentElement.']['wizardItems.']['academic.']['elements.'] ?? [],
             'The site set did not deliver the new content element wizard entry.',
         );
         $this->assertArrayNotHasKey(
-            'academicpersonsedit_profileediting.',
+            'academicpersonsedit_inlineprofile.',
             $pageTsConfig['mod.']['wizards.']['newContentElement.']['wizardItems.']['academic.']['elements.'] ?? [],
         );
     }
@@ -169,7 +159,7 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
     /**
      * Pins the two strings the tests above depend on, and the files they point at. The
      * aggregate carries no payload of its own on purpose: it delivers through the
-     * InlineProfile component set, and a `typoscript:` of its own would parse the
+     * ProfileEditing component set, and a `typoscript:` of its own would parse the
      * same files twice.
      */
     #[Test]
@@ -178,35 +168,35 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
         $setRegistry = $this->get(SetRegistry::class);
         $this->assertInstanceOf(SetRegistry::class, $setRegistry);
 
-        $inlineComponent = $setRegistry->getSet(self::INLINE_COMPONENT_SET);
+        $profileEditingComponent = $setRegistry->getSet(self::PROFILE_EDITING_COMPONENT_SET);
         $aggregate = $setRegistry->getSet(self::AGGREGATE_SET);
 
         $this->assertNull(
-            $setRegistry->getSet(self::REMOVED_LEGACY_COMPONENT_SET),
+            $setRegistry->getSet(self::REMOVED_INLINE_COMPONENT_SET),
             sprintf(
-                'The removed legacy set "%s" must not be registered.',
-                self::REMOVED_LEGACY_COMPONENT_SET,
+                'The removed inline set "%s" must not be registered.',
+                self::REMOVED_INLINE_COMPONENT_SET,
             ),
         );
         $this->assertNotNull(
-            $inlineComponent,
-            sprintf('The set "%s" is not registered.', self::INLINE_COMPONENT_SET),
+            $profileEditingComponent,
+            sprintf('The set "%s" is not registered.', self::PROFILE_EDITING_COMPONENT_SET),
         );
         $this->assertNotNull($aggregate, sprintf('The set "%s" is not registered.', self::AGGREGATE_SET));
 
         $this->assertSame(
-            'EXT:academic_persons_edit/Configuration/TypoScript/InlineProfile/',
-            $inlineComponent->typoscript,
+            'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing/',
+            $profileEditingComponent->typoscript,
         );
         $this->assertSame(
-            'EXT:academic_persons_edit/Configuration/TSconfig/InlineProfile/page.tsconfig',
-            $inlineComponent->pagets,
+            'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig',
+            $profileEditingComponent->pagets,
         );
-        $this->assertDirectoryExists(GeneralUtility::getFileAbsFileName((string)$inlineComponent->typoscript));
-        $this->assertFileExists(GeneralUtility::getFileAbsFileName((string)$inlineComponent->pagets));
+        $this->assertDirectoryExists(GeneralUtility::getFileAbsFileName((string)$profileEditingComponent->typoscript));
+        $this->assertFileExists(GeneralUtility::getFileAbsFileName((string)$profileEditingComponent->pagets));
 
-        $this->assertNotContains(self::REMOVED_LEGACY_COMPONENT_SET, $aggregate->dependencies);
-        $this->assertContains(self::INLINE_COMPONENT_SET, $aggregate->dependencies);
+        $this->assertNotContains(self::REMOVED_INLINE_COMPONENT_SET, $aggregate->dependencies);
+        $this->assertContains(self::PROFILE_EDITING_COMPONENT_SET, $aggregate->dependencies);
         $this->assertSetCarriesNoPayload($aggregate);
     }
 

@@ -1,0 +1,7 @@
+# The profile editing content element.
+name: fgtclb/academic-persons-edit-profile-editing
+label: 'Academic Persons Edit: Profile editing'
+dependencies:
+  - fgtclb/academic-base-ctype-group
+typoscript: 'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing/'
+pagets: 'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig'

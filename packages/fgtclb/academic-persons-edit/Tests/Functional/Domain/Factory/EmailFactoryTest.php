@@ -15,13 +15,13 @@ use PHPUnit\Framework\Attributes\Test;
  * makes it the place to pin down the rules every factory of this package repeats verbatim in
  * its own `mayApplyProperty()`:
  *
- * - a property that was not part of the submitted form keeps its persisted value,
- * - a property that was submitted empty is written as empty, and
- * - a property registered as override is written although it was not submitted.
+ * - a property without an explicit JSON override keeps its persisted value,
+ * - an explicit empty override is written as empty, and
+ * - an event listener can replace an override before it is written.
  *
  * The assertions go to the database rather than to the model, because losing a stored value is
  * only harmless as long as it is not persisted, and `updateFromFormData()` feeds straight into
- * `EmailRepository::update()` in `EmailAddressController::updateAction()`.
+ * `EmailRepository::update()` in `ProfileController`.
  */
 final class EmailFactoryTest extends AbstractFactoryTestCase
 {

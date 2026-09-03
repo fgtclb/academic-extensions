@@ -8,6 +8,7 @@ use FGTCLB\AcademicPersonsEdit\Tests\Functional\AbstractAcademicPersonsEditTestC
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use Psr\Http\Message\ResponseInterface;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
+use TYPO3\CMS\Core\Http\Stream;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Session\UserSessionManager;
@@ -17,9 +18,8 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 /**
  * Shared frontend setup for profile content elements authenticated as an editor.
  *
- * The base deliberately contains no plugin-specific fixture, controller route or action
- * assumption. InlineProfile and the retained legacy reference tests opt into their own
- * content element explicitly.
+ * The base deliberately contains no fixture, controller route or action assumption beyond
+ * the stable ProfileEditing component name.
  */
 abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPersonsEditTestCase
 {
@@ -58,7 +58,7 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
      */
     protected function setUpFrontendProfileTestCase(
         string $contentElementFixture,
-        string $editingComponent = 'InlineProfile',
+        string $editingComponent = 'ProfileEditing',
         array $additionalSiteConfiguration = [],
     ): void {
         $this->importCSVDataSet($contentElementFixture);
@@ -126,6 +126,133 @@ abstract class AbstractFrontendProfilePluginTestCase extends AbstractAcademicPer
     protected function getPageAsFrontendUser(string $url): string
     {
         return $this->renderFrontendPage($this->withFrontendUserSession(new InternalRequest($url)));
+    }
+
+    protected function setUpProfileEditingTestCase(): void
+    {
+        $this->setUpFrontendProfileTestCase(
+            __DIR__ . '/Fixtures/AcademicPersonsEditProfileEditing/profileEditingPage.csv',
+        );
+    }
+
+    protected function renderProfileEditingPage(): string
+    {
+        $listPage = $this->getPageAsFrontendUser('https://www.acme.com/home');
+        return $this->getPageAsFrontendUser(
+            $this->extractPluginActionLink(
+                $listPage,
+                'tx_academicpersonsedit_profileediting',
+                'index',
+                'profileUid',
+                self::PROFILE_ID,
+            ),
+        );
+    }
+
+    protected function getPersistedProfileImageCount(): int
+    {
+        return (int)$this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile')
+            ->executeQuery(
+                'SELECT image FROM tx_academicpersons_domain_model_profile WHERE uid = ?',
+                [self::PROFILE_ID],
+            )
+            ->fetchOne();
+    }
+
+    /**
+     * @return array{action: string, body: array<string, mixed>, fileInputName: string}
+     */
+    protected function extractImageFormSubmissionData(string $content): array
+    {
+        $this->assertSame(
+            1,
+            preg_match(
+                '@<form\b(?=[^>]*academic-persons-inline-edit__image-form)'
+                    . '(?=[^>]*action="([^"]+)")[^>]*>(.*?)</form>@s',
+                $content,
+                $formMatch,
+            ),
+            'The profile image form is missing.',
+        );
+        $action = html_entity_decode($formMatch[1]);
+        if (str_starts_with($action, '/')) {
+            $action = 'https://www.acme.com' . $action;
+        }
+        $body = [];
+        preg_match_all(
+            '@<input\b(?=[^>]*type="hidden")(?=[^>]*name="([^"]+)")'
+                . '(?=[^>]*value="([^"]*)")[^>]*>@s',
+            $formMatch[2],
+            $hiddenFields,
+            PREG_SET_ORDER,
+        );
+        foreach ($hiddenFields as $hiddenField) {
+            $this->addNestedFormValue(
+                $body,
+                html_entity_decode($hiddenField[1]),
+                html_entity_decode($hiddenField[2]),
+            );
+        }
+        $this->assertSame(
+            1,
+            preg_match(
+                '@<input\b(?=[^>]*type="file")(?=[^>]*name="([^"]+)")[^>]*>@s',
+                $formMatch[2],
+                $fileInputMatch,
+            ),
+            'The profile image form has no file input.',
+        );
+        return [
+            'action' => $action,
+            'body' => $body,
+            'fileInputName' => html_entity_decode($fileInputMatch[1]),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $target
+     */
+    protected function addNestedFormValue(array &$target, string $name, mixed $value): void
+    {
+        $position = strpos($name, '[');
+        if ($position === false) {
+            $target[$name] = $value;
+            return;
+        }
+        preg_match_all('@\[([^]]*)]@', $name, $matches);
+        $keys = array_merge([substr($name, 0, $position)], $matches[1]);
+        $current = &$target;
+        foreach ($keys as $key) {
+            if (!isset($current[$key]) || !is_array($current[$key])) {
+                $current[$key] = [];
+            }
+            $current = &$current[$key];
+        }
+        $current = $value;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     * @param array<string, mixed> $uploadedFiles
+     */
+    protected function submitProfileImageForm(
+        string $action,
+        array $body,
+        array $uploadedFiles = [],
+    ): ResponseInterface {
+        $stream = new Stream('php://temp', 'rw');
+        $stream->write(http_build_query($body));
+        $stream->rewind();
+        $request = (new InternalRequest($action))
+            ->withMethod('POST')
+            ->withAddedHeader('Content-Type', 'application/x-www-form-urlencoded')
+            ->withBody($stream)
+            ->withParsedBody($body);
+        if ($uploadedFiles !== []) {
+            $request = $request->withUploadedFiles($uploadedFiles);
+        }
+        return $this->requestAsFrontendUser($request);
     }
 
     /**

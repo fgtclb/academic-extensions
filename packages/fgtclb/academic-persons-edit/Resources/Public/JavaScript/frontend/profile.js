@@ -16,7 +16,7 @@ import { createImageEditing } from "@fgtclb/academic-persons-edit/frontend/profi
 import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
 import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
 const mountedRoots = /* @__PURE__ */ new WeakSet();
-const createInlineProfileApp = (root) => createApp({
+const createProfileEditingApp = (root) => createApp({
   setup() {
     const documentController = createDocumentEditing(root);
     const imageController = createImageEditing(root);
@@ -34,20 +34,20 @@ const createInlineProfileApp = (root) => createApp({
     };
   }
 });
-const initializeInlineProfiles = (scope = document) => {
+const initializeProfileEditors = (scope = document) => {
   const applications = [];
   scope.querySelectorAll(rootSelector).forEach((candidate) => {
     if (!(candidate instanceof HTMLElement) || mountedRoots.has(candidate)) {
       return;
     }
     mountedRoots.add(candidate);
-    const application = createInlineProfileApp(candidate);
+    const application = createProfileEditingApp(candidate);
     application.mount(candidate);
     applications.push(application);
   });
   return applications;
 };
-initializeInlineProfiles();
+initializeProfileEditors();
 export {
-  initializeInlineProfiles
+  initializeProfileEditors
 };

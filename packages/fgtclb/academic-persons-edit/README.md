@@ -11,13 +11,13 @@
 This extension extends the `academic_persons` extension by the option to edit profiles in the frontend.
 Profiles get connected with a frontend user and the frontend user is allow to edit its assigned profiles.
 
-The `Inline profile editing` content element provides a responsive, Bootstrap
+The `Profile editing` content element provides a responsive, Bootstrap
 5 based overview of all profiles assigned to the authenticated frontend user.
 Each row shows the profile image, complete name and site-language label. The
 `View` action opens the public `academic_persons` `Detail` plugin on the same
 page used by Academic Persons list views. The target comes from
 `plugin.tx_academicpersons.detailPid`; the `Edit` action opens the selected
-profile in the inline editor.
+profile in Profile editing.
 The editor saves only changed profile fields through a JSON endpoint without
 reloading the page. On large viewports the profile image
 column remains sticky while the personal data scrolls. Its runtime top offset
@@ -49,8 +49,8 @@ the FAL alternative text and title metadata.
 
 The existing small compatibility stylesheet only adjusts surrounding overflow,
 frame spacing and sticky-card stacking. The templates require no inline styles.
-Every Bootstrap button and retained legacy modal surface in the shipped Fluid
-views uses `rounded-0` for consistent square corners.
+Every Bootstrap button and modal control in the shipped Fluid views uses
+`rounded-0` for consistent square corners.
 Authentication, profile ownership, configured validators, file validation and
 the TCA allow lists of all configured select fields are checked server-side.
 
@@ -68,10 +68,10 @@ cancel and save actions clear the draft, restore the last persisted value or
 persist the field through AJAX. For CKEditor fields only, this action group is
 placed beside the field heading so the editor keeps the complete row width;
 ordinary field controls retain their existing action placement. See the
-[inline-editing documentation](./Documentation/InlineEditing/Index.rst) for the
+[profile-editing documentation](./Documentation/ProfileEditing/Index.rst) for the
 editor, AJAX and security contracts.
 
-The inline controller consumes the ordered `profile`, `special`,
+The `ProfileController` consumes the ordered `profile`, `special`,
 `contracts` and `documentSections` configuration from
 `academic-persons/Configuration/AcademicPersons/Settings.yaml`. The single
 settings graph is shared with the public profile and backend TCA; `profile`
@@ -90,8 +90,8 @@ not alter the database schema.
 
 Editable structured document sections have an add button beside their heading.
 Their compact row values and ordered controls follow `rowFields` and `actions`
-from the edit settings. Sections marked `readonly`, including the shipped
-contracts section, expose viewing only. Editable lists can be reordered with
+from the edit settings. Sections marked `readonly` expose viewing only; the
+shipped contracts section remains writable. Editable lists can be reordered with
 the configured up/down controls or by dragging the additional sort handle. The
 full row is used as the drag image, the source row and active list are outlined,
 and a strong insertion line marks whether the row will be placed before or after
@@ -102,8 +102,8 @@ markup does not count and the database schema remains unchanged. Its heading
 uses a record's non-empty `title`
 and falls back to the section heading. Delete mode renders the view submit as
 `btn-danger` and explicitly removes primary or success styling. Ownership- and
-capability-checked JSON actions complete the workflow without calling the
-retained legacy controllers or reloading the page.
+capability-checked JSON actions complete the workflow without reloading the
+page.
 
 The `date` flag on configured `from`, `to` and `year` validators renders a
 native date picker. Profile-information records persist the complete selected
@@ -116,7 +116,7 @@ markers are generated from that metadata, not from field names. A per-record
 month or day.
 
 Select and checkbox controls save on change and expose a compact undo action
-that restores the last persisted value and closes the inline editor. Frontend
+that restores the last persisted value and closes the profile editor. Frontend
 assets use the repository-wide build, lint and typecheck suites through
 `Build/Scripts/runTests.sh`; the package contains no separate development
 toolchain below `Resources/Public/`.

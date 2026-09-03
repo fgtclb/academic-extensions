@@ -20,9 +20,7 @@ use FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator\Fixtures\TestFormData
 use FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator\Fixtures\ValidationSettings;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Extbase\Error\Result;
-use TYPO3\CMS\Extbase\Mvc\ExtbaseRequestParameters;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
@@ -185,21 +183,17 @@ final class AbstractFormDataValidatorTest extends UnitTestCase
 
     /**
      * The counterpart of `Domain/Factory/*`: those ask `shouldApplyProperty()` before
-     * they write a value onto the domain model, so a property that was not submitted
+     * they write a value onto the domain model, so a property without an override
      * is not applied. The shared section processor does not ask - it reads every
-     * property selected by the concrete validator off the DTO, where an unsubmitted
+     * property selected by the concrete validator off the DTO, where an untouched
      * one still carries its declared default. Concrete validators which support
      * partial submissions, such as ``ProfileFormDataValidator``, must filter their
      * section validation set before calling the shared processor.
      */
     #[Test]
-    public function aPropertyThatWasNotSubmittedIsValidatedNevertheless(): void
+    public function aPropertyWithoutOverrideIsValidatedNevertheless(): void
     {
         $formData = new TestFormData();
-        $parameters = new ExtbaseRequestParameters();
-        $parameters->setArguments(['testFormData' => ['flag' => '1']]);
-        $formData->setRequest((new ServerRequest())->withAttribute('extbase', $parameters));
-        $formData->setArgumentName('testFormData');
 
         $subject = new TestFormDataValidator();
         $subject->injectAcademicPersonsSettings(

@@ -40,7 +40,7 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
     #[Test]
     public function inlineProfilePartialsAreGroupedByFeatureResponsibility(): void
     {
-        $partialRoot = self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile';
+        $partialRoot = self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile';
         $expectedPartials = [
             'Documents/ContractContactEditor.html',
             'Documents/ContractContacts.html',
@@ -90,46 +90,46 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
             self::EXTENSION_ROOT . '/Resources/Private/TypeScript/frontend/profile.ts',
         );
         $template = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Templates/InlineProfile/Index.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Templates/Profile/Index.html',
         );
         $documentEditor = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/Editor.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/Editor.html',
         );
         $documentSections = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/Sections.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/Sections.html',
         );
         $documentActions = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/Actions.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/Actions.html',
         );
         $profileInformationDocuments = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/ProfileInformation.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/ProfileInformation.html',
         );
         $contractDocuments = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/Contract.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/Contract.html',
         );
         $contractContacts = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/ContractContacts.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/ContractContacts.html',
         );
         $contractContactEditor = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/ContractContactEditor.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/ContractContactEditor.html',
         );
         $documentHeader = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/Header.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/Header.html',
         );
         $profileInformationRow = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/ProfileInformationRow.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/ProfileInformationRow.html',
         );
         $contractRow = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/ContractRow.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/ContractRow.html',
         );
         $documentTypeScript = file_get_contents(
             self::EXTENSION_ROOT . '/Resources/Private/TypeScript/frontend/profile/documents.ts',
         );
         $imageEditor = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Image/Editor.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Image/Editor.html',
         );
         $imageCard = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Image/Card.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Image/Card.html',
         );
         $imageTypeScript = file_get_contents(
             self::EXTENSION_ROOT . '/Resources/Private/TypeScript/frontend/profile/image.ts',
@@ -191,7 +191,7 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
             2,
             substr_count(
                 $contractContacts,
-                '<f:render partial="InlineProfile/Documents/ContractContactEditor" />',
+                '<f:render partial="Profile/Documents/ContractContactEditor" />',
             ),
         );
         $this->assertMatchesRegularExpression(
@@ -239,7 +239,7 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
         $this->assertStringContainsString('role="status"', $documentSections);
         $this->assertStringContainsString('data-ie-document-add-collapse-target', $documentSections);
         $this->assertStringContainsString(
-            'key="inlineProfile.documents.empty.{section.identifier}"',
+            'key="profileEditing.documents.empty.{section.identifier}"',
             $documentSections,
         );
         $this->assertStringContainsString('default="{defaultEmptyMessage}"', $documentSections);
@@ -249,7 +249,7 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
             $documentHeader,
         );
         $this->assertStringContainsString(
-            'key="inlineProfile.documents.actionsHeading"',
+            'key="profileEditing.documents.actionsHeading"',
             $documentHeader,
         );
         $this->assertStringContainsString(
@@ -309,10 +309,10 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
         );
         $this->assertStringNotContainsString('const setView =', $typeScript);
         $this->assertFileDoesNotExist(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/Modal.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/Modal.html',
         );
         $this->assertFileDoesNotExist(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Image/Modal.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Image/Modal.html',
         );
     }
 
@@ -329,16 +329,16 @@ final class FrontendJavaScriptTestEnvironmentTest extends TestCase
             self::EXTENSION_ROOT . '/Resources/Private/TypeScript/frontend/profile/fields.ts',
         );
         $documentEditor = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/Editor.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/Editor.html',
         );
         $contractContactEditor = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Documents/ContractContactEditor.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Documents/ContractContactEditor.html',
         );
         $fieldControls = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Field/Control.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Field/Control.html',
         );
         $fieldEditor = file_get_contents(
-            self::EXTENSION_ROOT . '/Resources/Private/Partials/InlineProfile/Field/Editable.html',
+            self::EXTENSION_ROOT . '/Resources/Private/Partials/Profile/Field/Editable.html',
         );
         $this->assertIsString($commonTypeScript);
         $this->assertIsString($documentTypeScript);

@@ -10,4 +10,4 @@
 # files, then the site, then the page field "Page TSconfig", then the page
 # record - so both ways to re-enable a content element come after this file and
 # win over it.
-TCEFORM.tt_content.CType.removeItems := addToList(academicpersonsedit_profileediting,academicpersonsedit_inlineprofile)
+TCEFORM.tt_content.CType.removeItems := addToList(academicpersonsedit_profileediting)

@@ -7,12 +7,12 @@ Feature: Assigned profile overview
 Description
 ===========
 
-The :guilabel:`Inline profile editing` content element now opens with a list of
+The :guilabel:`Profile editing` content element now opens with a list of
 all profiles assigned to the authenticated frontend user. Each row contains a
 profile-image thumbnail or placeholder, the complete name, the configured site
 language title and two actions.
 
-:guilabel:`Edit` opens the selected profile in the existing inline editor. The
+:guilabel:`Edit` opens the selected profile in Profile editing. The
 profile UID is resolved through the frontend-user assignment before the editor
 is rendered, so changing the request cannot expose another profile.
 :guilabel:`View` opens the public ``academic_persons`` Detail plugin on the
@@ -28,8 +28,8 @@ headed :guilabel:`Profile image`; the right column remains
 Impact
 ======
 
-Existing InlineProfile content elements automatically use the overview as
-their default action. Projects overriding InlineProfile templates should add a
+Existing ProfileEditing content elements automatically use the overview as
+their default action. Projects overriding ProfileEditing templates should add a
 ``List.html`` override and adapt links to pass ``profileUid`` to ``index``.
 ``plugin.tx_academicpersons.detailPid`` must point to a page containing the
 ``academicpersons_detail`` content element. The site may import

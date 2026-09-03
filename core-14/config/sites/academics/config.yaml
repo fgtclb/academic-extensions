@@ -7,7 +7,7 @@ dependencies:
   - fgtclb/academic-jobs
   - fgtclb/academic-partners
   - fgtclb/academic-persons
-  - fgtclb/academic-persons-edit-inline-profile
+  - fgtclb/academic-persons-edit
   - fgtclb/academic-programs
   - fgtclb/academic-projects
   - fgtclb/academic-study-plan
