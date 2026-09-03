@@ -181,7 +181,8 @@ and `changes/`, one directory per active change plus `archive/` for the
 finished ones. All of it is hand-written and tracked.
 
 `.claude/`, `.gemini/`, `.junie/` and `.opencode/` carry the OpenSpec commands
-and skills for the respective tool. They are **generated** by `openspec init`
+and skills for the respective tool, and `.agents/skills/` the tool-independent
+skills for tools that read that directory. They are **generated** by `openspec init`
 and refreshed by `openspec update`, so they are tracked but never edited by
 hand, and `lintMarkdown` skips them. The `.gitignore` entry that used to cover
 `/.claude` wholesale now covers only `/.claude/*.local.*`, which keeps a
