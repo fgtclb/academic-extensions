@@ -52,7 +52,7 @@ final readonly class ProfileImageRelationWriter
                     $dataMap[self::PROFILE_TABLE] = [
                         $profileUid => $this->buildProfileImageData(
                             (int)$profile['sys_language_uid'],
-                            self::REFERENCE_TABLE . '_' . $referenceUid,
+                            (string)$referenceUid,
                         ),
                     ];
                 }
@@ -80,19 +80,16 @@ final readonly class ProfileImageRelationWriter
                         'l10n_parent' => 0,
                     ],
                 ],
-            ]);
-            $referenceUid = (int)($dataHandler->substNEWwithIDs[$newReferenceId] ?? 0);
-            if ($referenceUid <= 0) {
-                throw new \UnexpectedValueException('The profile image reference could not be created.');
-            }
-            $this->executeDataHandler($backendUser, [
                 self::PROFILE_TABLE => [
                     $profileUid => $this->buildProfileImageData(
                         (int)$profile['sys_language_uid'],
-                        self::REFERENCE_TABLE . '_' . $referenceUid,
+                        $newReferenceId,
                     ),
                 ],
             ]);
+            if ((int)($dataHandler->substNEWwithIDs[$newReferenceId] ?? 0) <= 0) {
+                throw new \UnexpectedValueException('The profile image reference could not be created.');
+            }
         });
         $this->deleteReferences($oldReferences);
         return array_values(array_unique(array_column($oldReferences, 'uid_local')));
