@@ -34,12 +34,12 @@ same responsive heading row. The image column starts with `Profile image`, and
 the data column starts with `Personal data`. The switch keeps using its dedicated
 `skipSync` AJAX endpoint. The toggle changes to `Close all` while the editors are open. Closing
 all editors keeps unsaved browser-side drafts; persistence remains available
-only through each field's own save action. A small pencil button in the
-upper-right corner of the profile image
-opens a Bootstrap 5 modal: selecting a file updates the local modal preview,
-saving uploads and replaces the page preview, and deleting removes the current
-image. Upload errors retain their non-success HTTP status, are shown inside the
-open modal and do not change the page preview. Bootstrap provides the layout;
+only through each field's own save action. A compact button below the profile
+image opens a Vue-driven inline image view: selecting a file updates the local
+crop preview, saving uploads and replaces the page preview, and deleting
+removes the current image. Upload errors retain their non-success HTTP status,
+are shown inside the active inline view and do not change the page preview.
+Bootstrap provides the layout;
 when `special.image.renderType` is `cropper`, the locally shipped CropperJS
 module constrains the selection to `special.image.settings.ratio` before the
 cropped file is uploaded. The selection remains movable, and the cropper stays
@@ -49,8 +49,8 @@ the FAL alternative text and title metadata.
 
 The existing small compatibility stylesheet only adjusts surrounding overflow,
 frame spacing and sticky-card stacking. The templates require no inline styles.
-Every Bootstrap button and modal surface in the shipped Fluid views uses
-`rounded-0` for consistent square corners.
+Every Bootstrap button and retained legacy modal surface in the shipped Fluid
+views uses `rounded-0` for consistent square corners.
 Authentication, profile ownership, configured validators, file validation and
 the TCA allow lists of all configured select fields are checked server-side.
 
@@ -72,16 +72,21 @@ ordinary field controls retain their existing action placement. See the
 editor, AJAX and security contracts.
 
 The inline controller consumes the ordered `profile`, `special`,
-`contractContact` and `documentSections` configuration from
-`Configuration/AcademicsPersonsEdit/Settings.yaml`. This edit graph is loaded
-and cached independently from the public `academic-persons` profile layout.
-Fluid fields are selected by `renderType`, select options remain in TCA, and
-the JavaScript entry delegates to focused feature modules.
+`contracts` and `documentSections` configuration from
+`academic-persons/Configuration/AcademicPersons/Settings.yaml`. The single
+settings graph is shared with the public profile and backend TCA; `profile`
+contains both the public layout and the editable field definitions. Fluid
+fields are selected by `renderType`. The Contract editor follows
+`contracts.fields`; its address, email and phone editors follow the nested
+`contracts.contactSections` maps. Profile select options remain in TCA, and the
+Vue 3 Composition API entry is maintained in TypeScript and delegates to
+focused typed feature modules; the build writes the distributed JavaScript.
 Direct public-profile email/telephone values and their opt-in flags stay
 separate from Contract contact data. Validation and structured-section metadata
-remain attached to their respective section. These editor rules drive only the
-frontend controls, JSON metadata and server-side validation; they never
-override backend TCA.
+remain attached to their respective section. These rules drive the frontend
+controls, JSON metadata, server-side validation and the corresponding backend
+TCA field state. Character limits remain frontend/server-side metadata and do
+not alter the database schema.
 
 Editable structured document sections have an add button beside their heading.
 Their compact row values and ordered controls follow `rowFields` and `actions`
@@ -90,11 +95,12 @@ contracts section, expose viewing only. Editable lists can be reordered with
 the configured up/down controls or by dragging the additional sort handle. The
 full row is used as the drag image, the source row and active list are outlined,
 and a strong insertion line marks whether the row will be placed before or after
-the current target. The shared Bootstrap modal uses full-width CKEditor 5
+the current target. A shared Vue inline view uses full-width CKEditor 5
 controls for HTML descriptions. A positive `description.editor.limit` adds a
 live visible-character counter and matching client- and server-side limit;
-markup does not count and backend TCA remains unchanged. Its heading uses a record's non-empty `title`
-and falls back to the section heading. Delete mode renders the modal submit as
+markup does not count and the database schema remains unchanged. Its heading
+uses a record's non-empty `title`
+and falls back to the section heading. Delete mode renders the view submit as
 `btn-danger` and explicitly removes primary or success styling. Ownership- and
 capability-checked JSON actions complete the workflow without calling the
 retained legacy controllers or reloading the page.
@@ -103,7 +109,7 @@ The `date` flag on configured `from`, `to` and `year` validators renders a
 native date picker. Profile-information records persist the complete selected
 calendar date in native `DATE` fields; no time value is stored. The three date
 fields and the compact year-only checkbox each use `col-12 col-md-3` and share
-one responsive modal row. `required` is taken from the same settings, so the
+one responsive inline-view row. `required` is taken from the same settings, so the
 shipped `year` field is mandatory while `from` and `to` are optional. Required
 markers are generated from that metadata, not from field names. A per-record
 `Show year only` switch controls presentation without discarding the stored
@@ -111,9 +117,9 @@ month or day.
 
 Select and checkbox controls save on change and expose a compact undo action
 that restores the last persisted value and closes the inline editor. Frontend
-unit and DOM interaction tests are isolated in
-`Resources/Public/Development/`; run `npm i` and then `npm test` in that
-directory.
+assets use the repository-wide build, lint and typecheck suites through
+`Build/Scripts/runTests.sh`; the package contains no separate development
+toolchain below `Resources/Public/`.
 
 > [!NOTE]
 > This extension is currently in beta state - please notice that there might be changes to the structure

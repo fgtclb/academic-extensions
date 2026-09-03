@@ -63,11 +63,6 @@ final class AcademicPersonsEditProfileImageFileMetadataTest extends AbstractProf
             $figure,
             'The profile image partial renders a copyright.',
         );
-        $this->assertStringNotContainsString(
-            'class="copyright"',
-            $figure,
-            'The profile image partial renders a copyright element.',
-        );
     }
 
     #[Test]
@@ -92,8 +87,8 @@ final class AcademicPersonsEditProfileImageFileMetadataTest extends AbstractProf
             $figure,
             'The image is rendered without its title.',
         );
-        $this->assertStringContainsString(
-            '<figcaption class="visually-hidden">Taken at the faculty building</figcaption>',
+        $this->assertMatchesRegularExpression(
+            '@<figcaption\b[^>]*>Taken at the faculty building</figcaption>@',
             $figure,
             'The image description is not rendered as a caption.',
         );

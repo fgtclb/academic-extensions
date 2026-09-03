@@ -21,10 +21,10 @@ of every touched record.
 Two things did **not** change, and are now pinned by tests:
 
 *   File references and MM relations added to the default record after its
-    translation exists were *always* carried over — the core synchronizes all
-    exclude columns of a touched record from its database row, including the
-    relational ones. The previously documented gap was design-inferred and did
-    not exist.
+    translation exists are carried over by the core's exclude-column
+    propagation. File-reference removal additionally runs an explicit
+    ``inlineLocalizeSynchronize`` command for the TCA ``file`` column so that
+    a translated reference cannot outlive its default-language parent.
 *   :php:`enableLogging` stays on: :sql:`sys_log` rows with ``userid=0`` are
     the audit trail of what the synchronisation wrote.
 

@@ -183,6 +183,11 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
                 'updateDocument',
                 'deleteDocument',
                 'sortDocument',
+                'contractContactForm',
+                'createContractContact',
+                'updateContractContact',
+                'deleteContractContact',
+                'sortContractContact',
             ]),
         ],
         [
@@ -198,6 +203,11 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
                 'updateDocument',
                 'deleteDocument',
                 'sortDocument',
+                'contractContactForm',
+                'createContractContact',
+                'updateContractContact',
+                'deleteContractContact',
+                'sortContractContact',
             ]),
         ],
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT

@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\Test;
 final class SettingsValidationOverridesTest extends AbstractAcademicPersonsEditTestCase
 {
     #[Test]
-    public function documentDateTcaKeepsNativeDateConfigurationWithoutEditorOverrides(): void
+    public function documentDateTcaKeepsNativeDateConfigurationWithSharedOverrides(): void
     {
         $columns = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']['columns'];
         foreach (['year', 'year_start', 'year_end'] as $fieldName) {
@@ -18,28 +18,32 @@ final class SettingsValidationOverridesTest extends AbstractAcademicPersonsEditT
             $this->assertSame('date', $columns[$fieldName]['config']['format']);
             $this->assertSame('date', $columns[$fieldName]['config']['dbType']);
             $this->assertTrue($columns[$fieldName]['config']['nullable']);
-            $this->assertArrayNotHasKey('required', $columns[$fieldName]['config']);
         }
+        $this->assertArrayHasKey('columnsOverrides', $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']['types']['cooperation']);
     }
 
     #[Test]
-    public function sectionSpecificRequiredStateNeverCreatesBackendColumnsOverrides(): void
+    public function sectionSpecificRequiredStateCreatesBackendColumnsOverrides(): void
     {
         $type = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']
             ['types']['cooperation'];
-        $this->assertArrayNotHasKey('columnsOverrides', $type);
+        $this->assertTrue($type['columnsOverrides']['title']['config']['required']);
+        $this->assertTrue($type['columnsOverrides']['year']['config']['required']);
+        $this->assertFalse($type['columnsOverrides']['year_start']['config']['required']);
+        $this->assertFalse($type['columnsOverrides']['year_end']['config']['required']);
     }
 
     #[Test]
-    public function profileAndContactTcaKeepsIndependentDomainDefaults(): void
+    public function profileAndContactTcaUsesTheSharedFieldTypesAndRequiredState(): void
     {
         $profileColumns = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile']['columns'];
-        $this->assertArrayNotHasKey('required', $profileColumns['gender']['config']);
-        $this->assertArrayNotHasKey('readOnly', $profileColumns['first_name']['config']);
-        $this->assertTrue($profileColumns['first_name']['config']['required']);
+        $this->assertSame('select', $profileColumns['gender']['config']['type']);
+        $this->assertTrue($profileColumns['gender']['config']['required']);
+        $this->assertTrue($profileColumns['first_name']['config']['readOnly']);
+        $this->assertFalse($profileColumns['first_name']['config']['required']);
         $emailColumns = $GLOBALS['TCA']['tx_academicpersons_domain_model_email']['columns'];
-        $this->assertArrayNotHasKey('required', $emailColumns['email']['config']);
-        $this->assertSame('input', $emailColumns['email']['config']['type']);
+        $this->assertSame('email', $emailColumns['email']['config']['type']);
+        $this->assertTrue($emailColumns['email']['config']['required']);
         $phoneColumns = $GLOBALS['TCA']['tx_academicpersons_domain_model_phone_number']['columns'];
         $this->assertSame('input', $phoneColumns['phone_number']['config']['type']);
         $this->assertTrue($phoneColumns['phone_number']['config']['required']);

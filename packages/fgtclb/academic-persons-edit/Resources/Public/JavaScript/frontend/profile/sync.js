@@ -1,55 +1,55 @@
-import { getProfileUid, requestJson, showStatus } from "./common.js";
-
-const syncFormSelector = "[data-ie-sync-form]";
+/* Generated from Resources/Private/TypeScript — do not edit. */
+import {
+  getProfileUid,
+  requestJson,
+  showStatus
+} from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
 const syncCheckboxSelector = ".academic-persons-inline-edit__sync-checkbox";
-
-export const initializeSkipSync = (root) => {
-  const form = root.querySelector(syncFormSelector);
-  const checkbox = form?.querySelector(syncCheckboxSelector);
-  if (
-    !(form instanceof HTMLFormElement) ||
-    !(checkbox instanceof HTMLInputElement)
-  ) {
-    return;
-  }
-
-  let persistedValue = checkbox.checked;
-  form.addEventListener("submit", (event) => event.preventDefault());
-  checkbox.addEventListener("change", async () => {
+const createSkipSync = (root) => {
+  const checkbox = root.querySelector(syncCheckboxSelector);
+  const form = (checkbox == null ? void 0 : checkbox.closest("form")) ?? null;
+  let persistedValue = (checkbox == null ? void 0 : checkbox.checked) ?? false;
+  const updateSkipSync = async (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) {
+      return;
+    }
     const profileUid = getProfileUid(root);
     const updateUrl = root.dataset.skipSyncUrl;
-    if (profileUid === null || !updateUrl) {
-      checkbox.checked = persistedValue;
+    if (profileUid === null || updateUrl === void 0) {
+      target.checked = persistedValue;
       showStatus(root, "danger");
       return;
     }
-
-    const requestedValue = checkbox.checked;
-    form.setAttribute("aria-busy", "true");
-    checkbox.disabled = true;
+    const requestedValue = target.checked;
+    form == null ? void 0 : form.setAttribute("aria-busy", "true");
+    target.disabled = true;
     showStatus(root, "info", root.dataset.messageSaving ?? null);
-
     try {
       const result = await requestJson(updateUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           profile: profileUid,
-          data: { skipSync: requestedValue },
-        }),
+          data: { skipSync: requestedValue }
+        })
       });
       persistedValue = Boolean(result.skipSync);
-      checkbox.checked = persistedValue;
-      checkbox.classList.remove("is-invalid");
+      target.checked = persistedValue;
+      target.classList.remove("is-invalid");
       showStatus(root, "success");
     } catch (error) {
-      const result = error instanceof Error ? error.result : null;
-      checkbox.checked = persistedValue;
-      checkbox.classList.add("is-invalid");
-      showStatus(root, "danger", result?.message ?? null);
+      const result = error.result;
+      target.checked = persistedValue;
+      target.classList.add("is-invalid");
+      showStatus(root, "danger", (result == null ? void 0 : result.message) ?? null);
     } finally {
-      checkbox.disabled = false;
-      form.removeAttribute("aria-busy");
+      target.disabled = false;
+      form == null ? void 0 : form.setAttribute("aria-busy", "false");
     }
-  });
+  };
+  return { updateSkipSync };
+};
+export {
+  createSkipSync
 };

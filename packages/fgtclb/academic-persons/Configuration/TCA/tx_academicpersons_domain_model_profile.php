@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * This file is part of the "academic_persons" Extension for TYPO3 CMS.
  *
@@ -245,12 +249,13 @@ $tcaConfiguration = [
         ],
         'image' => [
             'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.image.label',
-            'l10n_mode' => 'exclude',
-            'l10n_display' => 'defaultAsReadonly',
             'config' => [
                 'type' => 'file',
                 'maxitems' => 1,
                 'allowed' => 'common-image-types',
+                'behaviour' => [
+                    'allowLanguageSynchronization' => true,
+                ],
             ],
         ],
         'contracts' => [
@@ -503,9 +508,8 @@ $tcaConfiguration = [
     ],
 ];
 
-// These relations are part of the Academic Persons domain model and therefore
-// remain available without the optional frontend editor. Presentation order,
-// actions and validation are supplied independently by academic_persons_edit.
+// These relations are part of the Academic Persons domain model and are
+// configured from the shared Academic Persons settings.
 $profileInformationRelations = [
     'scientific_research' => 'scientific_research',
     'vita' => 'curriculum_vitae',
@@ -576,5 +580,11 @@ foreach ($profileInformationRelations as $columnIdentifier => $recordType) {
 if ((new \TYPO3\CMS\Core\Information\Typo3Version())->getMajorVersion() < 14) {
     $tcaConfiguration['ctrl']['searchFields'] = 'first_name,middle_name,last_name';
 }
+
+$settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
+ArrayUtility::mergeRecursiveWithOverrule(
+    $tcaConfiguration,
+    $settings->getProfileUpdateValidationTcaTableConfig(),
+);
 
 return $tcaConfiguration;

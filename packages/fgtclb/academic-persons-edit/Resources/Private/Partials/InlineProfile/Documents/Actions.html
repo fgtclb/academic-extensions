@@ -10,7 +10,7 @@
         <f:if condition="{sortable}">
             <button
                 type="button"
-                class="btn rounded-0 btn-sm btn-link text-body p-2"
+                class="btn rounded-0 btn-sm btn-link text-body p-2 d-none d-md-inline-flex"
                 title="{f:translate(key: 'actions.dragSort', extensionName: 'academic_persons_edit')}"
                 aria-label="{f:translate(key: 'actions.dragSort', extensionName: 'academic_persons_edit')}"
                 draggable="true"
@@ -29,6 +29,8 @@
                         class="btn rounded-0 btn-sm btn-link text-body p-2"
                         title="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
+                        aria-expanded="false"
+                        v-on:click.stop="openDocument('view', $event)"
                         data-ie-document-view>
                         <core:icon
                             identifier="academic-persons-inline-edit-open"
@@ -42,6 +44,7 @@
                         class="btn rounded-0 btn-sm btn-link text-body p-2"
                         title="{f:translate(key: 'actions.sortDown', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.sortDown', extensionName: 'academic_persons_edit')}"
+                        v-on:click.stop="sortDocument('down', $event)"
                         data-ie-document-sort="down">
                         <core:icon
                             identifier="academic-persons-inline-edit-down"
@@ -55,6 +58,7 @@
                         class="btn rounded-0 btn-sm btn-link text-body p-2"
                         title="{f:translate(key: 'actions.sortUp', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.sortUp', extensionName: 'academic_persons_edit')}"
+                        v-on:click.stop="sortDocument('up', $event)"
                         data-ie-document-sort="up">
                         <core:icon
                             identifier="academic-persons-inline-edit-up"
@@ -68,6 +72,8 @@
                         class="btn rounded-0 btn-sm btn-link text-body p-2"
                         title="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
+                        aria-expanded="false"
+                        v-on:click.stop="openDocument('delete', $event)"
                         data-ie-document-delete>
                         <core:icon
                             identifier="academic-persons-inline-edit-delete"
@@ -81,6 +87,8 @@
                         class="btn rounded-0 btn-sm btn-link text-body p-2"
                         title="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
+                        aria-expanded="false"
+                        v-on:click.stop="openDocument('edit', $event)"
                         data-ie-document-edit>
                         <core:icon
                             identifier="academic-persons-inline-edit-pencil"

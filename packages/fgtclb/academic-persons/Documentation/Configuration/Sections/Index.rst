@@ -5,15 +5,15 @@
 Public profile settings
 =======================
 
-:file:`Configuration/AcademicPersons/Settings.yaml` belongs exclusively to
-:guilabel:`academic_persons`. Its single top-level :yaml:`profile` map builds
-the public detail view. Frontend editing fields, document sections and their
-validators are configured separately by :guilabel:`academic_persons_edit` in
-:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`.
-
-The split is intentional: a site package can replace the public presentation
-without changing which values may be edited, and it can adapt editing rules
-without changing the detail layout.
+:file:`Configuration/AcademicPersons/Settings.yaml` is the canonical source
+for :guilabel:`academic_persons` and :guilabel:`academic_persons_edit`. Its
+single top-level :yaml:`profile` map contains the public detail layout and the
+frontend-editable field definitions with their shared validators. The
+:yaml:`special`, :yaml:`contracts` and :yaml:`documentSections` maps in
+the same file describe the remaining inline components and related records.
+The ordered Contract editor fields live below :yaml:`contracts.fields`; its
+physical-address, email and phone fields are grouped in
+:yaml:`contracts.contactSections`.
 
 Profile layout
 ==============
@@ -137,6 +137,5 @@ Settings from active packages are merged at the top level. Because
 ``structure`` and ``details`` maps and must repeat every desired entry. Flush
 TYPO3 caches after a change so the typed settings object is rebuilt.
 
-The similarly named :yaml:`profile` map in
-:file:`Configuration/AcademicsPersonsEdit/Settings.yaml` is a separate
-configuration namespace and is never merged with this public layout.
+The same normalized :yaml:`profile` map is used by the public frontend, inline
+editing, frontend validation and the corresponding backend TCA configuration.

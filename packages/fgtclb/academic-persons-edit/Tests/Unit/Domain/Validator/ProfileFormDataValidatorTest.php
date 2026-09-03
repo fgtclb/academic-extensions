@@ -39,7 +39,6 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
             new ProfileFormData(lastName: 'Doe'),
             ['lastName'],
         );
-
         $this->assertSame(['string(Doe)'], $this->messagesFor($result, 'lastName'));
     }
 
@@ -50,7 +49,6 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
             ValidationSettings::forProfileSection('information', ['email' => [RecordingValidator::class]]),
             new ProfileFormData(lastName: 'Doe')
         );
-
         $this->assertFalse($result->hasErrors());
     }
 
@@ -110,7 +108,6 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
         $valid = new ProfileFormData(miscellaneous: 'Persisted');
         $valid->setPropertyOverride('miscellaneous', '<p><strong>12345</strong></p>');
         $this->assertSame([], $this->messagesFor($this->validate($settings, $valid), 'miscellaneous'));
-
         $invalid = new ProfileFormData(miscellaneous: 'Persisted');
         $invalid->setPropertyOverride('miscellaneous', '<p><strong>123456</strong></p>');
         $this->assertSame(
@@ -147,7 +144,6 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
             ),
             [$property],
         );
-
         $this->assertSame([$expectedDescription], $this->messagesFor($result, $property));
     }
 
@@ -157,7 +153,7 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
     public static function configuredProperties(): array
     {
         return [
-            // Named in the shipped Configuration/AcademicsPersonsEdit/Settings.yaml.
+            // Named in the shipped academic-persons/Configuration/AcademicPersons/Settings.yaml.
             'gender' => ['gender', 'string(female)'],
             'firstName' => ['firstName', 'string(Jane)'],
             'middleName' => ['middleName', 'string(M.)'],
@@ -182,7 +178,6 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
         $settings = ValidationSettings::forProfileSection(self::VALIDATION_SET, []);
         $formData = new ProfileFormData(skipSync: false);
         $formData->setPropertyOverride('skipSync', true);
-
         // Replace the special validation with a recording validator while keeping
         // it outside every regular profile section.
         $special = $settings->getSpecialField('skipSync');
@@ -210,9 +205,8 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
                 ),
             ],
         );
-
         $result = $this->validate($settings, $formData);
-
+        $result = $this->validate($settings, $formData);
         $this->assertSame(['bool(true)'], $this->messagesFor($result, 'skipSync'));
     }
 
@@ -226,11 +220,9 @@ final class ProfileFormDataValidatorTest extends UnitTestCase
     {
         $validator = new ProfileFormDataValidator();
         $validator->injectAcademicPersonsSettings(ValidationSettings::forProfileSection(self::VALIDATION_SET, []));
-
         $this->expectException(UnsuitableValidatorException::class);
         $this->expectExceptionCode(1297418975);
         $this->expectExceptionMessage('Not a valid profile object.');
-
         $validator->validate($subject);
     }
 

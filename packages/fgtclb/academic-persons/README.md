@@ -61,16 +61,15 @@ The following profile data is available to users after installation:
 The extension also provides some plugins to display the persons in the frontend
 as a list view and detail view for each person.
 
-The public detail layout is configured exclusively in
-`Configuration/AcademicPersons/Settings.yaml`. Its ordered
-`profile.structure` controls the detail elements in each layout column and
-`profile.details` maps them to Profile properties, relation collections,
-labels or supported special renderers. Frontend-editable fields, structured
-document sections and their validators live separately in
-`academic-persons-edit/Configuration/AcademicsPersonsEdit/Settings.yaml`; the
-two identically named `profile` maps are never merged. Edit validator flags do
-not modify this extension's backend TCA. Email, telephone and
-address data is stored as contact records owned by an employment contract.
+The complete profile configuration is defined in
+`Configuration/AcademicPersons/Settings.yaml`. Its single `profile` section
+contains the public detail layout as well as the fields, render types and
+validators used by frontend editing, inline editing and backend TCA. The
+`special`, `contracts` and `documentSections` maps in the same file
+describe the remaining inline components and related records. Ordered Contract
+fields live below `contracts.fields`; email, telephone and address fields are
+grouped below `contracts.contactSections` and stored as contact records owned
+by an employment contract.
 Profile-information dates use native SQL `DATE` storage on TYPO3 13 and 14; a
 per-record `Show year only` switch can reduce their display to the four-digit
 year without changing the stored calendar date.

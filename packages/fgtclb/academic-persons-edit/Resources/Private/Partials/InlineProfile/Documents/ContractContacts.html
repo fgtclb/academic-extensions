@@ -1,0 +1,154 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <section
+        class="pt-4 mt-4"
+        v-for="section in document.contactSections"
+        v-bind:key="section.identifier"
+        v-bind:data-ie-contract-contact-section="section.identifier">
+        <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+            <h3 class="h4 mb-0" v-text="section.label"></h3>
+            <button
+                type="button"
+                class="btn rounded-0 btn-sm btn-link p-2"
+                v-on:click="openContractContact('add', section.identifier, $event)"
+                v-bind:disabled="contractContact.pending"
+                v-bind:aria-controls="'ie-contract-contact-editor-' + section.identifier"
+                v-bind:aria-expanded="contractContact.open && contractContact.mode === 'add' && contractContact.section === section.identifier ? 'true' : 'false'"
+                data-ie-contract-contact-add>
+                <core:icon
+                    identifier="academic-persons-inline-edit-add"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
+                <span class="visually-hidden">
+                    <f:translate
+                        key="actions.add"
+                        extensionName="academic_persons_edit" />
+                </span>
+            </button>
+        </div>
+
+        <section
+            v-bind:id="'ie-contract-contact-editor-' + section.identifier"
+            class="border bg-body-tertiary p-3 p-lg-4 mb-3"
+            v-if="contractContact.open && contractContact.mode === 'add' && contractContact.section === section.identifier"
+            v-bind:aria-busy="contractContact.pending ? 'true' : 'false'"
+            v-bind:style="{ cursor: contractContact.pending ? 'wait' : null }"
+            data-ie-contract-contact-editor
+            data-ie-contract-contact-form>
+            <f:render partial="InlineProfile/Documents/ContractContactEditor" />
+        </section>
+
+        <div class="border-top" v-if="section.items.length > 0">
+            <article
+                class="row g-0 align-items-center border-bottom py-2 ps-3"
+                v-for="(item, itemIndex) in section.items"
+                v-bind:key="item.uid"
+                v-bind:class="[{ 'bg-body-tertiary': itemIndex % 2 === 0 }, { 'opacity-50': item.hidden }]"
+                v-bind:data-ie-contract-contact-item="item.uid">
+                <div
+                    class="col-12 col-md py-1 pe-md-3"
+                    v-for="summary in item.summary"
+                    v-bind:key="summary.label">
+                    <div class="d-md-none fw-semibold mb-1" v-text="summary.label"></div>
+                    <span v-text="summary.value || '—'"></span>
+                </div>
+                <div
+                    class="col-12 col-md-auto d-flex flex-nowrap gap-1 justify-content-end align-self-center ms-auto pe-2"
+                    role="group"
+                    data-ie-contract-contact-actions>
+                    <button
+                        type="button"
+                        class="btn rounded-0 btn-sm btn-link text-body p-2"
+                        title="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
+                        aria-label="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
+                        v-on:click="openContractContact('view', section.identifier, $event, item.uid)"
+                        v-bind:disabled="contractContact.pending"
+                        v-bind:aria-controls="'ie-contract-contact-editor-' + section.identifier"
+                        v-bind:aria-expanded="contractContact.open && contractContact.mode === 'view' && contractContact.section === section.identifier && contractContact.record === item.uid ? 'true' : 'false'"
+                        data-ie-contract-contact-view>
+                        <core:icon
+                            identifier="academic-persons-inline-edit-open"
+                            size="small"
+                            alternativeMarkupIdentifier="inline" />
+                    </button>
+                    <button
+                        type="button"
+                        class="btn rounded-0 btn-sm btn-link text-body p-2"
+                        title="{f:translate(key: 'actions.sortDown', extensionName: 'academic_persons_edit')}"
+                        aria-label="{f:translate(key: 'actions.sortDown', extensionName: 'academic_persons_edit')}"
+                        v-on:click="sortContractContact('down', section.identifier, item.uid)"
+                        v-bind:disabled="contractContact.pending || itemIndex === section.items.length - 1"
+                        data-ie-contract-contact-sort="down">
+                        <core:icon
+                            identifier="academic-persons-inline-edit-down"
+                            size="small"
+                            alternativeMarkupIdentifier="inline" />
+                    </button>
+                    <button
+                        type="button"
+                        class="btn rounded-0 btn-sm btn-link text-body p-2"
+                        title="{f:translate(key: 'actions.sortUp', extensionName: 'academic_persons_edit')}"
+                        aria-label="{f:translate(key: 'actions.sortUp', extensionName: 'academic_persons_edit')}"
+                        v-on:click="sortContractContact('up', section.identifier, item.uid)"
+                        v-bind:disabled="contractContact.pending || itemIndex === 0"
+                        data-ie-contract-contact-sort="up">
+                        <core:icon
+                            identifier="academic-persons-inline-edit-up"
+                            size="small"
+                            alternativeMarkupIdentifier="inline" />
+                    </button>
+                    <button
+                        type="button"
+                        class="btn rounded-0 btn-sm btn-link text-body p-2"
+                        title="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
+                        aria-label="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
+                        v-on:click="openContractContact('delete', section.identifier, $event, item.uid)"
+                        v-bind:disabled="contractContact.pending"
+                        v-bind:aria-controls="'ie-contract-contact-editor-' + section.identifier"
+                        v-bind:aria-expanded="contractContact.open && contractContact.mode === 'delete' && contractContact.section === section.identifier && contractContact.record === item.uid ? 'true' : 'false'"
+                        data-ie-contract-contact-delete>
+                        <core:icon
+                            identifier="academic-persons-inline-edit-delete"
+                            size="small"
+                            alternativeMarkupIdentifier="inline" />
+                    </button>
+                    <button
+                        type="button"
+                        class="btn rounded-0 btn-sm btn-link text-body p-2"
+                        title="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
+                        aria-label="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
+                        v-on:click="openContractContact('edit', section.identifier, $event, item.uid)"
+                        v-bind:disabled="contractContact.pending"
+                        v-bind:aria-controls="'ie-contract-contact-editor-' + section.identifier"
+                        v-bind:aria-expanded="contractContact.open && contractContact.mode === 'edit' && contractContact.section === section.identifier && contractContact.record === item.uid ? 'true' : 'false'"
+                        data-ie-contract-contact-edit>
+                        <core:icon
+                            identifier="academic-persons-inline-edit-pencil"
+                            size="small"
+                            alternativeMarkupIdentifier="inline" />
+                    </button>
+                </div>
+
+                <section
+                    v-bind:id="'ie-contract-contact-editor-' + section.identifier"
+                    class="col-12 border bg-body-tertiary p-3 p-lg-4 mt-3"
+                    v-if="contractContact.open && contractContact.mode !== 'add' && contractContact.section === section.identifier && contractContact.record === item.uid"
+                    v-bind:aria-busy="contractContact.pending ? 'true' : 'false'"
+                    v-bind:style="{ cursor: contractContact.pending ? 'wait' : null }"
+                    data-ie-contract-contact-editor
+                    data-ie-contract-contact-form>
+                    <f:render partial="InlineProfile/Documents/ContractContactEditor" />
+                </section>
+            </article>
+        </div>
+
+        <p
+            class="bg-body-tertiary py-2 ps-3 small text-body-secondary"
+            role="status"
+            v-else
+            v-text="document.contactEmptyMessage"></p>
+    </section>
+</html>

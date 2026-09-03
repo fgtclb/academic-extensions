@@ -81,6 +81,37 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
     }
 
     #[Test]
+    public function contractHelptextsResolveFromReferencedTypeConfiguration(): void
+    {
+        $section = new DocumentSection(
+            identifier: 'contracts',
+            fieldName: 'contracts',
+            type: 'contracts',
+            label: 'Contracts',
+            readOnly: false,
+            validationSet: new ValidationSet(identifier: 'contracts', validations: []),
+            position: 0,
+        );
+        $settings = new AcademicPersonsSettings(
+            documentSections: ['contracts' => $section],
+            raw: [
+                'contracts' => [
+                    'fields' => [
+                        'validFrom' => ['helptext' => 'help-valid-from'],
+                        'position' => ['helptext' => 'help-position'],
+                    ],
+                ],
+                'documentSections' => [
+                    'contracts' => ['type' => 'contracts'],
+                ],
+            ],
+        );
+        $subject = new ProfileDocumentSectionProvider($settings);
+        $this->assertSame('help-valid-from', $subject->getFieldHelptext($section, 'validFrom'));
+        $this->assertSame('help-position', $subject->getFieldHelptext($section, 'position'));
+    }
+
+    #[Test]
     public function sectionsFollowAcademicPersonsSettingsAndPreserveTypedItems(): void
     {
         $profile = new Profile();

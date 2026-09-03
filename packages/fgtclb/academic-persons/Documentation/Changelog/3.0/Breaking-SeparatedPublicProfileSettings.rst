@@ -21,7 +21,7 @@ Impact
 ======
 
 Move an existing public ``publicProfile`` map to ``profile``. Move existing
-``profile`` field definitions, ``special``, ``contractContact`` and
+``profile`` field definitions, ``special``, ``contracts`` and
 ``documentSections`` to the edit-extension path. Flush TYPO3 caches and run the
 database schema analyzer after updating both packages.
 

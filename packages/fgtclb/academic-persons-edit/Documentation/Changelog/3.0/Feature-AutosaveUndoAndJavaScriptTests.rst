@@ -5,10 +5,11 @@
 Feature: Autosave undo and isolated JavaScript tests
 ================================================
 
-Editable ``select`` and ``checkbox`` profile fields now render a compact undo
-action. It reuses the generic ``data-ie-cancel`` behavior, restores the last
-successfully persisted value and closes the field editor without issuing an
-additional request. Read-only and disabled controls do not render the action.
+Editable ``checkbox`` profile fields render a compact undo action. It reuses
+the generic ``data-ie-cancel`` behavior, restores the last successfully
+persisted value and closes the field editor without issuing an additional
+request. Select fields instead use the regular clear, undo and save action
+group. Read-only and disabled controls do not render actions.
 
 The frontend modules expose their stateless helpers as named ES module exports.
 This keeps the production entry point unchanged while allowing focused unit and

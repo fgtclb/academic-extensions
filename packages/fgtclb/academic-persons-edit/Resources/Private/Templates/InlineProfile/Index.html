@@ -35,6 +35,21 @@
                 name="sortDocumentUrl"
                 value="{f:uri.action(action: 'sortDocument', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
             <f:variable
+                name="contractContactFormUrl"
+                value="{f:uri.action(action: 'contractContactForm', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
+            <f:variable
+                name="createContractContactUrl"
+                value="{f:uri.action(action: 'createContractContact', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
+            <f:variable
+                name="updateContractContactUrl"
+                value="{f:uri.action(action: 'updateContractContact', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
+            <f:variable
+                name="deleteContractContactUrl"
+                value="{f:uri.action(action: 'deleteContractContact', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
+            <f:variable
+                name="sortContractContactUrl"
+                value="{f:uri.action(action: 'sortContractContact', controller: 'InlineProfile', pageType: 1733735, absolute: true)}" />
+            <f:variable
                 name="placeholderImageUrl"
                 value="{f:uri.resource(path: 'Images/profile-placeholder.png')}" />
 
@@ -53,6 +68,7 @@
             <div
                 class="academic-persons-inline-edit container-fluid px-0"
                 data-academic-persons-inline-edit
+                data-user="{profile.uid}"
                 data-update-url="{updateUrl}"
                 data-skip-sync-url="{skipSyncUrl}"
                 data-delete-image-url="{deleteImageUrl}"
@@ -61,9 +77,16 @@
                 data-update-document-url="{updateDocumentUrl}"
                 data-delete-document-url="{deleteDocumentUrl}"
                 data-sort-document-url="{sortDocumentUrl}"
+                data-contract-contact-form-url="{contractContactFormUrl}"
+                data-create-contract-contact-url="{createContractContactUrl}"
+                data-update-contract-contact-url="{updateContractContactUrl}"
+                data-delete-contract-contact-url="{deleteContractContactUrl}"
+                data-sort-contract-contact-url="{sortContractContactUrl}"
                 data-placeholder-image-url="{placeholderImageUrl}"
                 data-placeholder-image-alt="{f:translate(key: 'profile.image.placeholder.alt', extensionName: 'academic_persons_edit')}"
                 data-has-image="{f:if(condition: profile.image, then: '1', else: '0')}"
+                data-image-render-type="{specialFields.image.renderType}"
+                data-image-cropper-ratio="{specialFields.image.settings.ratio}"
                 data-profile-uid="{profile.uid}"
                 data-message-saving="{f:translate(key: 'inlineProfile.status.saving', extensionName: 'academic_persons_edit')}"
                 data-message-success-message="{f:translate(key: 'inlineProfile.status.success.message', extensionName: 'academic_persons_edit')}"
@@ -83,6 +106,8 @@
                 data-message-document-deleted="{f:translate(key: 'inlineProfile.documents.status.deleted', extensionName: 'academic_persons_edit')}"
                 data-message-document-sorted="{f:translate(key: 'inlineProfile.documents.status.sorted', extensionName: 'academic_persons_edit')}"
                 data-message-document-delete-confirm="{f:translate(key: 'inlineProfile.documents.delete.confirm', extensionName: 'academic_persons_edit')}"
+                data-message-contract-contact-delete-confirm="{f:translate(key: 'inlineProfile.contractContacts.delete.confirm', extensionName: 'academic_persons_edit')}"
+                data-message-contract-contact-empty="{f:translate(key: 'inlineProfile.contractContacts.empty', extensionName: 'academic_persons_edit')}"
                 data-label-document-add="{f:translate(key: 'actions.add', extensionName: 'academic_persons_edit')}"
                 data-label-document-view="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
                 data-label-document-edit="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
@@ -90,39 +115,50 @@
                 data-label-document-save="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}"
                 data-label-document-close="{f:translate(key: 'actions.cancel', extensionName: 'academic_persons_edit')}"
                 data-label-document-empty="{f:translate(key: 'inlineProfile.field.empty', extensionName: 'academic_persons_edit')}">
-                <f:render
-                    partial="InlineProfile/Header"
-                    arguments="{profile: profile, title: specialFields.title, skipSync: specialFields.skipSync}" />
-                <div class="container-fluid px-0">
-                    <div class="row gx-lg-5 gy-5 align-items-stretch">
-                        <div class="col-12 col-lg-4">
-                            <div class="sticky-top" data-ie-sticky-image>
-                                <f:if condition="{specialFields.image}">
+                <div
+                    id="inline-profile-{profile.uid}-image-editor-target"
+                    data-ie-image-editor-target></div>
+                <div data-ie-profile-view>
+                    <f:render
+                        partial="InlineProfile/Header"
+                        arguments="{profile: profile, title: specialFields.title, skipSync: specialFields.skipSync}" />
+                    <div class="container-fluid px-0">
+                        <div class="row gx-lg-5 gy-5 align-items-stretch">
+                            <div
+                                class="col-12 academic-persons-inline-edit__image-preview-column"
+                                v-bind:class="{ 'col-lg-4': !image.editing && !image.closing }"
+                                v-show="!image.editing && !image.closing"
+                                data-ie-image-preview-column>
+                                <div class="sticky-top" data-ie-sticky-image>
+                                    <f:if condition="{specialFields.image}">
+                                        <f:render
+                                            partial="InlineProfile/Image/Card"
+                                            arguments="{profile: profile, image: specialFields.image}" />
+                                    </f:if>
+                                </div>
+                            </div>
+                            <div
+                                class="col-12 academic-persons-inline-edit__profile-fields-column"
+                                v-bind:class="(image.editing || image.closing) ? 'col-lg-12' : 'col-lg-8'">
+                                <f:if condition="{profileSections.information}">
                                     <f:render
-                                        partial="InlineProfile/Image/Card"
-                                        arguments="{profile: profile, image: specialFields.image}" />
+                                        partial="InlineProfile/Profile/Personal"
+                                        arguments="{profile: profile, section: profileSections.information, specialFields: specialFields, fieldOptions: profileFieldOptions}" />
                                 </f:if>
                             </div>
                         </div>
-                        <div class="col-12 col-lg-8">
-                            <f:if condition="{profileSections.information}">
-                                <f:render
-                                    partial="InlineProfile/Forms/Profile"
-                                    arguments="{profile: profile, section: profileSections.information, specialFields: specialFields, fieldOptions: profileFieldOptions}" />
-                            </f:if>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mt-5">
-                                <f:if condition="{profileSections.aboutme}">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mt-5">
+                                    <f:if condition="{profileSections.aboutme}">
+                                        <f:render
+                                            partial="InlineProfile/Profile/About"
+                                            arguments="{profile: profile, section: profileSections.aboutme, fieldOptions: profileFieldOptions}" />
+                                    </f:if>
                                     <f:render
-                                        partial="InlineProfile/Forms/Content"
-                                        arguments="{profile: profile, section: profileSections.aboutme, fieldOptions: profileFieldOptions}" />
-                                </f:if>
-                                <f:render
-                                    partial="InlineProfile/Sections/Documents"
-                                    arguments="{profile: profile, sections: documentSections}" />
+                                        partial="InlineProfile/Documents/Sections"
+                                        arguments="{profile: profile, sections: documentSections}" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -130,10 +166,10 @@
 
                 <f:if condition="{specialFields.image.writable}">
                     <f:render
-                        partial="InlineProfile/Image/Modal"
+                        partial="InlineProfile/Image/Editor"
                         arguments="{profile: profile, image: specialFields.image, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
                 </f:if>
-                <f:render partial="InlineProfile/Documents/Modal" />
+                <f:render partial="InlineProfile/Documents/Editor" />
                 <f:render partial="InlineProfile/StatusToast" />
                 <f:render partial="InlineProfile/ButtonTemplates" />
             </div>

@@ -16,7 +16,7 @@ Existing over-limit content can still be shortened.
 
 The Extbase profile-form validator applies the same normalized limit after
 rich-text sanitization and before a partial AJAX update is persisted. The
-shipped ``miscellaneous`` field uses 500 visible characters.
+shipped ``miscellaneous`` field uses 1000 visible characters.
 
 Impact
 ======

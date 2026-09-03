@@ -124,15 +124,25 @@ languages of the context and issues DataHandler work per language:
   record *and everything below it*: the inline child tree (contracts and their
   addresses, emails, phone numbers), `sys_file_reference` rows, MM relations,
   `l10n_diffsource` — because that is simply what the DataHandler does.
-- **Existing translations → exclude propagation + inline synchronize.** The
+- **Existing translations → exclude propagation + reference synchronize.** The
   current values of the propagatable `l10n_mode=exclude` columns — of the
   default record *and of every default-language record in its inline child
   tree* (ACE-487) — are re-submitted as **one datamap per run**, and
   `DataMapProcessor` carries them into every translation of every touched
   record at the same time. Then an `inlineLocalizeSynchronize` command
-  (`action: synchronize`) per TCA `inline` column and language carries children
-  added to the default record after the translation was created — including
-  their own children.
+  (`action: synchronize`) per TCA `inline` and synchronized `file` column and language
+  carries children added to the default record after the translation was
+  created — including their own children — and removes translated file
+  references whose default-language parent was removed. The explicit `file`
+  pass is required: exclude propagation adds a late reference, but does not
+  remove the localized reference after the source relation disappears.
+
+  The profile `image` field is intentionally localizable and is therefore not
+  included in either pass. Each profile translation owns and manages its image
+  reference independently. Core's `localize` command initially creates the
+  localized file reference together with a new profile translation. It may
+  initially point at the same physical file; the first language-specific upload
+  replaces it with an independent reference and file through DataHandler.
 
 Two implementation choices worth their comments:
 
@@ -147,8 +157,9 @@ Two implementation choices worth their comments:
   inline references via `synchronizeReferences()`, MM via
   `synchronizeDirectRelations()`). A file reference or MM relation added to
   the default record after its translation exists is therefore carried over
-  by the update path too — probed and pinned for ACE-487, which had recorded
-  the opposite, design-inferred claim.
+  by the update path too when its TCA column uses `l10n_mode=exclude`. Removal
+  is asymmetric and needs the explicit `inlineLocalizeSynchronize` pass
+  described above.
 - **One DataHandler instance per command.** A cmdmap is keyed
   `[table][uid][command]`, so it can hold only *one* command per record uid —
   `localize` per language and `inlineLocalizeSynchronize` per inline column

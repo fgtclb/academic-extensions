@@ -320,11 +320,8 @@ final class RecordSynchronizerTest extends AbstractAcademicPersonsTestCase
     }
 
     /**
-     * ACE-487 pin: a file reference added to the default record AFTER its translation
-     * exists IS carried over by the update path - core's `DataMapProcessor`
-     * synchronizes all `l10n_mode=exclude` columns of a record the datamap touches
-     * from its database row, the relational ones included. This was recorded as a gap
-     * by the ACE-483 report; the probe disproved it, and this test keeps it true.
+     * A profile image added after the translation exists is propagated while the
+     * translated image field remains synchronized with its language parent.
      */
     #[Test]
     public function synchronizeCarriesLateFileReferenceIntoExistingTranslation(): void
@@ -342,6 +339,34 @@ final class RecordSynchronizerTest extends AbstractAcademicPersonsTestCase
         $this->assertSame(1, (int)$translatedReference['sys_language_uid']);
         $this->assertSame(1, (int)$translatedReference['uid_local']);
         $this->assertSame((int)$translation['uid'], (int)$translatedReference['uid_foreign']);
+    }
+
+    /**
+     * A language-specific image is represented by the Core localization state
+     * `custom` and must not be replaced from the default-language profile.
+     */
+    #[Test]
+    public function synchronizeKeepsCustomProfileImageIndependent(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/ProfileWithTranslationAndLateRelations.csv');
+        $this->getConnectionPool()
+            ->getConnectionForTable(self::TABLE_PROFILE)
+            ->update(
+                self::TABLE_PROFILE,
+                ['l10n_state' => json_encode(['image' => 'custom'], JSON_THROW_ON_ERROR)],
+                ['uid' => 2],
+            );
+
+        $this->synchronizeProfile(1);
+
+        $translation = $this->fetchTranslation(self::TABLE_PROFILE, 1);
+        $this->assertNotNull($translation);
+        $this->assertSame(0, (int)$translation['image']);
+        $referenceRows = $this->fetchAllRecords('sys_file_reference');
+        $this->assertCount(1, $referenceRows);
+        $this->assertSame(0, (int)$referenceRows[0]['sys_language_uid']);
+        $this->assertSame(1, (int)$referenceRows[0]['uid_local']);
+        $this->assertSame(1, (int)$referenceRows[0]['uid_foreign']);
     }
 
     /**

@@ -13,17 +13,17 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
 {
     #[Test]
-    public function shippedConfigurationContainsOnlyThePublicProfileMap(): void
+    public function shippedConfigurationContainsTheUnifiedProfileAndRelatedMaps(): void
     {
-        $this->assertSame(['profile'], array_keys($this->getShippedConfiguration()));
+        $this->assertSame(['profile', 'special', 'contracts', 'documentSections'], array_keys($this->getShippedConfiguration()));
     }
 
     #[Test]
-    public function separatedPublicProfileSchemaUsesANewCacheEntry(): void
+    public function unifiedProfileSchemaUsesNewCacheEntry(): void
     {
         $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $method = new \ReflectionMethod(AcademicPersonsSettingsFactory::class, 'academicPersonsSettingsIdentifier');
-        $this->assertSame('AcademicPersons_Settings_PublicProfileSchema_v5', $method->invoke($factory));
+        $this->assertSame('AcademicPersons_Settings_UnifiedProfileSchema_v8', $method->invoke($factory));
     }
 
     #[Test]
@@ -100,7 +100,7 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     }
 
     #[Test]
-    public function editSectionsAreNotLoadedIntoThePublicSettingsGraph(): void
+    public function allSectionsAreLoadedIntoTheUnifiedSettingsGraph(): void
     {
         $configuration = $this->getShippedConfiguration();
         $configuration['documentSections'] = [
@@ -111,15 +111,29 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
             ],
         ];
         $settings = $this->normalize($configuration);
-        $this->assertSame([], $settings->profileSections);
-        $this->assertSame([], $settings->specialFields);
-        $this->assertSame([], $settings->contractContactSections);
-        $this->assertSame([], $settings->documentSections);
+        $this->assertSame(['information', 'aboutme'], array_keys($settings->profileSections));
+        $this->assertSame(['title', 'image', 'skipSync'], array_keys($settings->specialFields));
+        $this->assertSame(
+            [
+                'position',
+                'organisationalUnit',
+                'functionType',
+                'validFrom',
+                'validTo',
+                'location',
+                'room',
+                'officeHours',
+                'publish',
+            ],
+            array_keys($settings->contractFields),
+        );
+        $this->assertSame(['physicalAddresses', 'emailAddresses', 'phoneNumbers'], array_keys($settings->contractContactSections));
+        $this->assertSame(['publications'], array_keys($settings->documentSections));
         $this->assertSame($configuration, $settings->raw);
     }
 
     #[Test]
-    public function editConfigurationNormalizesCkeditorCharacterLimitsWithoutChangingTca(): void
+    public function sharedConfigurationNormalizesCkeditorCharacterLimitsWithoutChangingTca(): void
     {
         $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $settings = $factory->normalizeEditConfiguration([
@@ -167,7 +181,7 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
     }
 
     #[Test]
-    public function editConfigurationNormalizesProfileCkeditorCharacterLimitsWithoutChangingTca(): void
+    public function sharedProfileConfigurationNormalizesCkeditorCharacterLimitsWithoutChangingTca(): void
     {
         $factory = (new \ReflectionClass(AcademicPersonsSettingsFactory::class))->newInstanceWithoutConstructor();
         $settings = $factory->normalizeEditConfiguration([

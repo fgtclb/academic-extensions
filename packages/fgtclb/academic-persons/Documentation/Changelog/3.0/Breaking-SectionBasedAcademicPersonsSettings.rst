@@ -8,7 +8,7 @@ Description
 ===========
 
 The section-based editing schema consists of the ordered :yaml:`profile`,
-:yaml:`special`, :yaml:`contractContact` and :yaml:`documentSections` maps in
+:yaml:`special`, :yaml:`contracts` and :yaml:`documentSections` maps in
 :file:`Configuration/AcademicsPersonsEdit/Settings.yaml`. The public layout is
 configured independently below :yaml:`profile` in
 :file:`Configuration/AcademicPersons/Settings.yaml`. The former
@@ -46,7 +46,7 @@ using the internal ``ProfileInformationType`` or global validation-set APIs
 must use the new section accessors instead.
 
 Each settings namespace is merged at the top level. An edit override of :yaml:`profile`,
-:yaml:`special`, :yaml:`contractContact` or :yaml:`documentSections` must
+:yaml:`special`, :yaml:`contracts` or :yaml:`documentSections` must
 contain the complete desired map. A public :yaml:`profile` override likewise
 must repeat its complete :yaml:`structure` and :yaml:`details` maps. Flush all
 TYPO3 caches after migration.

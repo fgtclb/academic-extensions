@@ -22,7 +22,8 @@ The frontend entry delegates to modules for fields, rich text, synchronization,
 image editing, sticky positioning and shared requests/status output. Direct
 public Profile email/telephone values and their opt-in flags use the same
 generic field endpoint. Contract contact validation stays isolated in
-:yaml:`contractContact`.
+:yaml:`contracts.contactSections.<section>.fields`. The Contract editor itself
+uses the ordered :yaml:`contracts.fields` map.
 
 Impact
 ======

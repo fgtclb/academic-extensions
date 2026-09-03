@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersons\Tca\ContractLabels;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * This file is part of the "academic_persons" Extension for TYPO3 CMS.
@@ -373,5 +376,11 @@ $tcaConfiguration = [
         ],
     ],
 ];
+
+$settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
+ArrayUtility::mergeRecursiveWithOverrule(
+    $tcaConfiguration,
+    $settings->getDocumentValidationTcaTableConfig('contracts'),
+);
 
 return $tcaConfiguration;

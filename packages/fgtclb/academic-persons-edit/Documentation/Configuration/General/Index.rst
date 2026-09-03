@@ -47,8 +47,10 @@ Which fields can be edited
 
 Which profile fields belong to each visual section, how they are rendered,
 which are mandatory and which are locked is configured by this extension in
-:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`. Structured records
-use the :yaml:`documentSections` map from the same file.
+:file:`academic-persons/Configuration/AcademicPersons/Settings.yaml`. The
+single :yaml:`profile` map contains both the public layout and the editable
+field definitions. Structured records use the :yaml:`documentSections` map
+from the same file.
 
 Consequences worth knowing before reporting a problem:
 
@@ -61,20 +63,19 @@ Consequences worth knowing before reporting a problem:
     the TYPO3 record editor.
 *   Document validators are selected by the section's stored record ``type``;
     validators from sibling sections are never merged as a fallback.
-*   The normalized rules are applied to the frontend controls and server-side
-    Extbase validation. Backend TCA remains completely independent.
+*   The normalized rules are applied to the frontend controls, server-side
+    Extbase validation and the corresponding backend TCA field state.
 
 See :ref:`configuration-editor-settings` for the schema, supported validator
-flags, document aliases, shipped defaults and override rules. The similarly
-named :yaml:`profile` map in :guilabel:`academic_persons` controls only the
-public detail layout.
+flags, document aliases, shipped defaults and override rules. The same
+:yaml:`profile` map also controls the public detail layout.
 
 ..  _configuration-general-webp:
 
 Image processing: WebP
 ======================
 
-The InlineProfile image view offers the profile image as `WebP`_ through the
+The InlineProfile image editor offers the profile image as `WebP`_ through the
 :html:`<picture>` candidates, with the :html:`<img>` fallback in the source
 format. TYPO3 has to be allowed to produce WebP, otherwise rendering a profile
 **that has an image** fails with:

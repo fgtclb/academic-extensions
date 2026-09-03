@@ -114,7 +114,7 @@ class RecordSynchronizer implements RecordSynchronizerInterface
         }
         $this->propagateExcludeColumnValues($context, $defaultRecord, $backendUser);
         foreach ($languagesWithExistingTranslation as $languageId) {
-            foreach ($this->getInlineColumnNames($context->tableName) as $inlineColumnName) {
+            foreach ($this->getSynchronizableReferenceColumnNames($context->tableName) as $inlineColumnName) {
                 $this->executeDataHandler($backendUser, cmdmap: [
                     $context->tableName => [
                         $context->uid => [
@@ -351,6 +351,29 @@ class RecordSynchronizer implements RecordSynchronizerInterface
         $columnNames = [];
         foreach ($this->getTcaColumns($tableName) as $columnName => $columnDefinition) {
             if (($columnDefinition['config']['type'] ?? '') === 'inline') {
+                $columnNames[] = $columnName;
+            }
+        }
+        return $columnNames;
+    }
+
+    /**
+     * Returns relation columns supported by DataHandler's
+     * `inlineLocalizeSynchronize` command. TCA file fields use
+     * `sys_file_reference` as their inline child table and need the same explicit
+     * synchronization as regular inline fields, especially when a default-language
+     * reference was removed.
+     *
+     * @return list<string>
+     */
+    private function getSynchronizableReferenceColumnNames(string $tableName): array
+    {
+        $columnNames = [];
+        foreach ($this->getTcaColumns($tableName) as $columnName => $columnDefinition) {
+            $type = $columnDefinition['config']['type'] ?? '';
+            if ($type === 'inline'
+                || ($type === 'file' && ($columnDefinition['l10n_mode'] ?? '') === 'exclude')
+            ) {
                 $columnNames[] = $columnName;
             }
         }

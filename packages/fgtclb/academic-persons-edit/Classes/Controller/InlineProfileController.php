@@ -12,35 +12,58 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersonsEdit\Controller;
 
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
+use FGTCLB\AcademicPersons\Domain\Model\Address;
 use FGTCLB\AcademicPersons\Domain\Model\Contract;
+use FGTCLB\AcademicPersons\Domain\Model\Email;
 use FGTCLB\AcademicPersons\Domain\Model\FunctionType;
 use FGTCLB\AcademicPersons\Domain\Model\Location;
 use FGTCLB\AcademicPersons\Domain\Model\OrganisationalUnit;
+use FGTCLB\AcademicPersons\Domain\Model\PhoneNumber;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
 use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
+use FGTCLB\AcademicPersons\Domain\Repository\AddressRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ContractRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\EmailRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\FunctionTypeRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\LocationRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\OrganisationalUnitRepository;
+use FGTCLB\AcademicPersons\Domain\Repository\PhoneNumberRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileInformationRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ProfileRepository;
+use FGTCLB\AcademicPersons\Event\AfterProfileUpdateEvent;
+use FGTCLB\AcademicPersons\Service\ProfileImageMetadataService;
+use FGTCLB\AcademicPersons\Settings\ContractContactField;
+use FGTCLB\AcademicPersons\Settings\ContractContactSection;
+use FGTCLB\AcademicPersons\Settings\ContractField;
 use FGTCLB\AcademicPersons\Settings\DocumentSection;
 use FGTCLB\AcademicPersons\Settings\Validation;
+use FGTCLB\AcademicPersons\Types\EmailAddressTypes;
+use FGTCLB\AcademicPersons\Types\PhoneNumberTypes;
+use FGTCLB\AcademicPersons\Types\PhysicalAddressTypes;
 use FGTCLB\AcademicPersonsEdit\Attributes\ListSortingMode;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\AddressFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ContractFactory;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\EmailFactory;
+use FGTCLB\AcademicPersonsEdit\Domain\Factory\PhoneNumberFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Factory\ProfileInformationFactory;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\AbstractFormData;
+use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\AddressFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ContractFormData;
+use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\EmailFormData;
+use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\PhoneNumberFormData;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
+use FGTCLB\AcademicPersonsEdit\Service\LocalizedProfileUidResolver;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileDocumentSectionProvider;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileFieldOptionsService;
+use FGTCLB\AcademicPersonsEdit\Service\ProfileImageRelationWriter;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileSectionProvider;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateRequestService;
 use FGTCLB\AcademicPersonsEdit\Service\ProfileUpdateValidationService;
 use FGTCLB\AcademicPersonsEdit\Service\RichTextCharacterCounter;
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Country\CountryProvider;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -49,9 +72,9 @@ use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\Index\MetaDataRepository;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Mvc\Controller\FileUploadConfiguration;
@@ -77,12 +100,28 @@ use TYPO3\CMS\Frontend\Controller\ErrorController;
  *      disabled: bool,
  *      richText: bool,
  *      characterLimit: int,
+ *      autocomplete: string,
  *      helptext: string,
  *      columnClass: string,
  *      compactCheckbox: bool,
  *      value: mixed,
  *      displayValue: string,
  *      options: list<array{value: int|string, label: string}>
+ *  }
+ * @phpstan-type ContractContactRecord Address|Email|PhoneNumber
+ * @phpstan-type ContractContactItem array{
+ *      uid: int,
+ *      sorting: int,
+ *      hidden: bool,
+ *      values: array<string, mixed>,
+ *      display: array<string, string>,
+ *      summary: list<array{label: string, value: string}>
+ *  }
+ * @phpstan-type ContractContactSectionDefinition array{
+ *      identifier: string,
+ *      label: string,
+ *      singularLabel: string,
+ *      items: list<ContractContactItem>
  *  }
  *
  * @internal This controller is intentionally internal to `EXT:academic_person_edit`
@@ -93,14 +132,30 @@ final class InlineProfileController extends AbstractActionController
     public function __construct(
         private readonly ProfileFactory $profileFactory,
         private readonly ProfileRepository $profileRepository,
+        private readonly CountryProvider $countryProvider,
+        private readonly ConnectionPool $connectionPool,
+        private readonly ErrorController $errorController,
+        private readonly LogManager $logManager,
         private readonly ResourceFactory $resourceFactory,
+        private readonly ProfileImageMetadataService $profileImageMetadataService,
         private readonly ProfileUpdateRequestService $profileUpdateRequestService,
         private readonly ProfileUpdateValidationService $profileUpdateValidationService,
+        private readonly LocalizedProfileUidResolver $localizedProfileUidResolver,
+        private readonly ProfileImageRelationWriter $profileImageRelationWriter,
         private readonly ProfileFieldOptionsService $profileFieldOptionsService,
         private readonly ProfileSectionProvider $profileSectionProvider,
         private readonly ProfileDocumentSectionProvider $profileDocumentSectionProvider,
         private readonly ContractFactory $contractFactory,
         private readonly ContractRepository $contractRepository,
+        private readonly AddressFactory $addressFactory,
+        private readonly AddressRepository $addressRepository,
+        private readonly EmailFactory $emailFactory,
+        private readonly EmailRepository $emailRepository,
+        private readonly PhoneNumberFactory $phoneNumberFactory,
+        private readonly PhoneNumberRepository $phoneNumberRepository,
+        private readonly PhysicalAddressTypes $physicalAddressTypes,
+        private readonly EmailAddressTypes $emailAddressTypes,
+        private readonly PhoneNumberTypes $phoneNumberTypes,
         private readonly ProfileInformationFactory $profileInformationFactory,
         private readonly ProfileInformationRepository $profileInformationRepository,
         private readonly FunctionTypeRepository $functionTypeRepository,
@@ -129,6 +184,11 @@ final class InlineProfileController extends AbstractActionController
                 'updateDocument',
                 'deleteDocument',
                 'sortDocument',
+                'contractContactForm',
+                'createContractContact',
+                'updateContractContact',
+                'deleteContractContact',
+                'sortContractContact',
             ],
             true,
         )) {
@@ -215,7 +275,7 @@ final class InlineProfileController extends AbstractActionController
         $profile = $this->profileUpdateRequestService->findEditableProfile($profileUid);
         if ($profile === null) {
             throw new PropagateResponseException(
-                GeneralUtility::makeInstance(ErrorController::class)->accessDeniedAction(
+                $this->errorController->accessDeniedAction(
                     $this->request,
                     'Profile not editable',
                 ),
@@ -380,7 +440,7 @@ final class InlineProfileController extends AbstractActionController
                 $exception->getMessage(),
             );
         } catch (\Throwable $exception) {
-            GeneralUtility::makeInstance(LogManager::class)
+            $this->logManager
                 ->getLogger(self::class)
                 ->error('Updating the inline profile failed.', [
                     'exception' => $exception,
@@ -478,7 +538,7 @@ final class InlineProfileController extends AbstractActionController
                 $exception->getMessage(),
             );
         } catch (\Throwable $exception) {
-            GeneralUtility::makeInstance(LogManager::class)
+            $this->logManager
                 ->getLogger(self::class)
                 ->error('Updating the inline profile synchronization flag failed.', [
                     'exception' => $exception,
@@ -526,14 +586,18 @@ final class InlineProfileController extends AbstractActionController
             if ($recordUid !== null && $record === null) {
                 $this->throwJsonError('document_not_found', 404);
             }
-            return new JsonResponse([
+            $response = [
                 'success' => true,
                 'profile' => $profile->getUid(),
                 'section' => $section->identifier,
                 'kind' => $section->isContractSection() ? 'contract' : 'profileInformation',
                 'record' => $record?->getUid(),
                 'fields' => $this->getDocumentFieldDefinitions($section, $record),
-            ]);
+            ];
+            if ($record instanceof Contract) {
+                $response['contactSections'] = $this->getContractContactSections($record);
+            }
+            return new JsonResponse($response);
         } catch (PropagateResponseException $exception) {
             throw $exception;
         } catch (\Throwable $exception) {
@@ -773,6 +837,275 @@ final class InlineProfileController extends AbstractActionController
         }
     }
 
+    // =============================================================================================================
+    // Handle Contract contact records through the InlineProfile JSON API
+    // =============================================================================================================
+
+    /**
+     * Returns the field schema and current values for one Contract contact record.
+     *
+     * The Contract is resolved through the editable Profile before a contact is
+     * loaded. This prevents record UIDs from another Profile or Contract from
+     * being viewed or changed through the endpoint.
+     */
+    public function contractContactFormAction(): ResponseInterface
+    {
+        try {
+            [$profile, $contract, $section, $data] = $this->getContractContactRequest();
+            $this->assertDocumentPayload(
+                $data,
+                ['contract', 'section', 'record', 'mode'],
+                ['contract', 'section', 'mode'],
+            );
+            $mode = $this->getRequiredDocumentMode($data);
+            $recordUid = $this->getOptionalPositiveInteger($data, 'record');
+            if (($mode === 'add') !== ($recordUid === null)) {
+                $this->throwJsonError(
+                    'invalid_payload',
+                    400,
+                    'The contact record does not match the requested mode.',
+                );
+            }
+            $this->assertContractContactActionAllowed($mode);
+            $record = $recordUid === null
+                ? null
+                : $this->findContractContactRecord($contract, $section, $recordUid);
+            if ($recordUid !== null && $record === null) {
+                $this->throwJsonError('contract_contact_not_found', 404);
+            }
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'contract' => $contract->getUid(),
+                'section' => $section->identifier,
+                'record' => $record?->getUid(),
+                'title' => $this->getContractContactSingularLabel($section),
+                'fields' => $this->getContractContactFieldDefinitions($section, $record),
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            $this->handleDocumentFailure('Loading a Contract contact form failed.', $exception);
+        }
+    }
+
+    /**
+     * Creates an address, email address or phone number below an editable Contract.
+     */
+    public function createContractContactAction(): ResponseInterface
+    {
+        try {
+            [$profile, $contract, $section, $data] = $this->getContractContactRequest();
+            $this->assertDocumentPayload(
+                $data,
+                ['contract', 'section', 'fields'],
+                ['contract', 'section', 'fields'],
+            );
+            $this->assertContractContactActionAllowed('add');
+            $normalizedFields = $this->normalizeAndValidateContractContactFields(
+                $section,
+                $this->getSubmittedDocumentFields($data),
+                true,
+            );
+            $record = $this->createContractContactRecord($contract, $section, $normalizedFields);
+            $record->setSorting($this->getNextContractContactSortingValue($contract, $section));
+            $record->setPid((int)$contract->getPid());
+            $this->addContractContactRecord($record);
+            $this->persistAndDispatchProfileUpdate($profile);
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'contract' => $contract->getUid(),
+                'section' => $section->identifier,
+                'item' => $this->serializeContractContactItem($section, $record),
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            $this->handleDocumentFailure('Creating a Contract contact failed.', $exception);
+        }
+    }
+
+    /**
+     * Updates an existing address, email address or phone number below a Contract.
+     */
+    public function updateContractContactAction(): ResponseInterface
+    {
+        try {
+            [$profile, $contract, $section, $data] = $this->getContractContactRequest();
+            $this->assertDocumentPayload(
+                $data,
+                ['contract', 'section', 'record', 'fields'],
+                ['contract', 'section', 'record', 'fields'],
+            );
+            $this->assertContractContactActionAllowed('edit');
+            $recordUid = $this->getRequiredPositiveInteger($data, 'record');
+            $record = $this->findContractContactRecord($contract, $section, $recordUid);
+            if ($record === null) {
+                $this->throwJsonError('contract_contact_not_found', 404);
+            }
+            $normalizedFields = $this->normalizeAndValidateContractContactFields(
+                $section,
+                $this->getSubmittedDocumentFields($data),
+                false,
+            );
+            $this->updateContractContactRecord($section, $record, $normalizedFields);
+            $this->persistAndDispatchProfileUpdate($profile);
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'contract' => $contract->getUid(),
+                'section' => $section->identifier,
+                'item' => $this->serializeContractContactItem($section, $record),
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            $this->handleDocumentFailure('Updating a Contract contact failed.', $exception);
+        }
+    }
+
+    /**
+     * Deletes one address, email address or phone number below a Contract.
+     */
+    public function deleteContractContactAction(): ResponseInterface
+    {
+        try {
+            [$profile, $contract, $section, $data] = $this->getContractContactRequest();
+            $this->assertDocumentPayload(
+                $data,
+                ['contract', 'section', 'record'],
+                ['contract', 'section', 'record'],
+            );
+            $this->assertContractContactActionAllowed('delete');
+            $recordUid = $this->getRequiredPositiveInteger($data, 'record');
+            $record = $this->findContractContactRecord($contract, $section, $recordUid);
+            if ($record === null) {
+                $this->throwJsonError('contract_contact_not_found', 404);
+            }
+            $this->removeContractContactRecord($record);
+            $this->persistAndDispatchProfileUpdate($profile);
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'contract' => $contract->getUid(),
+                'section' => $section->identifier,
+                'deleted' => $recordUid,
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            $this->handleDocumentFailure('Deleting a Contract contact failed.', $exception);
+        }
+    }
+
+    /**
+     * Moves one Contract contact up or down within its configured section.
+     */
+    public function sortContractContactAction(): ResponseInterface
+    {
+        try {
+            [$profile, $contract, $section, $data] = $this->getContractContactRequest();
+            $this->assertDocumentPayload(
+                $data,
+                ['contract', 'section', 'record', 'direction'],
+                ['contract', 'section', 'record', 'direction'],
+            );
+            $this->assertContractContactActionAllowed('sort');
+            $recordUid = $this->getRequiredPositiveInteger($data, 'record');
+            if ($this->findContractContactRecord($contract, $section, $recordUid) === null) {
+                $this->throwJsonError('contract_contact_not_found', 404);
+            }
+            $direction = $data['direction'];
+            if (!is_string($direction) || !in_array($direction, ['up', 'down'], true)) {
+                $this->throwJsonError('invalid_payload', 400, 'The direction must be up or down.');
+            }
+            $process = $this->sortItems(
+                $this->getContractContactRecords($contract, $section),
+                $recordUid,
+                $direction === 'up' ? ListSortingMode::UP : ListSortingMode::DOWN,
+            );
+            if ($process->changed) {
+                $this->persistAndDispatchProfileUpdate($profile);
+            }
+            return new JsonResponse([
+                'success' => true,
+                'profile' => $profile->getUid(),
+                'contract' => $contract->getUid(),
+                'section' => $section->identifier,
+                'changed' => $process->changed,
+                'order' => array_values(array_map(
+                    static fn(AbstractEntity $record): int => (int)$record->getUid(),
+                    $process->items,
+                )),
+            ]);
+        } catch (PropagateResponseException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            $this->handleDocumentFailure('Sorting Contract contacts failed.', $exception);
+        }
+    }
+
+    /**
+     * Validates the current request and resolves the Profile, Contract and
+     * configured contact section.
+     *
+     * @return array{0: Profile, 1: Contract, 2: ContractContactSection, 3: array<string, mixed>}
+     */
+    private function getContractContactRequest(): array
+    {
+        $requestResult = $this->profileUpdateRequestService->validate($this->request);
+        if (!$requestResult->isValid()) {
+            $this->throwJsonError(
+                $requestResult->getError() ?? 'invalid_request',
+                $requestResult->getStatusCode(),
+            );
+        }
+        $payload = $requestResult->getPayload();
+        $profile = $requestResult->getProfile();
+        if ($payload === null || $profile === null) {
+            $this->throwJsonError('internal_server_error', 500);
+        }
+        $data = $payload->getData();
+        $contractUid = $this->getRequiredPositiveInteger($data, 'contract');
+        $contractSection = $this->academicPersonsSettings->getDocumentSection('contracts');
+        if ($contractSection === null || !$contractSection->isContractSection()) {
+            $this->throwJsonError('unknown_document_section', 404);
+        }
+        $contract = $this->findDocumentRecord($profile, $contractSection, $contractUid);
+        if (!$contract instanceof Contract) {
+            $this->throwJsonError('document_not_found', 404);
+        }
+        $sectionIdentifier = $data['section'] ?? null;
+        if (!is_string($sectionIdentifier) || $sectionIdentifier === '') {
+            $this->throwJsonError('invalid_payload', 400, 'A Contract contact section is required.');
+        }
+        $section = $this->academicPersonsSettings->getContractContactSection($sectionIdentifier);
+        if ($section === null || !in_array(
+            $section->identifier,
+            ['physicalAddresses', 'emailAddresses', 'phoneNumbers'],
+            true,
+        )) {
+            $this->throwJsonError('unknown_contract_contact_section', 404);
+        }
+        return [$profile, $contract, $section, $data];
+    }
+
+    private function assertContractContactActionAllowed(string $action): void
+    {
+        if ($action === 'view') {
+            return;
+        }
+        $contractSection = $this->academicPersonsSettings->getDocumentSection('contracts');
+        if ($contractSection === null || $contractSection->readOnly) {
+            $this->throwJsonError(
+                'contract_contact_action_not_allowed',
+                403,
+                'This action is not allowed for Contract contacts.',
+            );
+        }
+    }
+
     /**
      * Validates the current request payload and resolves the profile and document section.
      *
@@ -1008,6 +1341,464 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
+     * @return list<ContractContactSectionDefinition>
+     */
+    private function getContractContactSections(Contract $contract): array
+    {
+        $sections = [];
+        foreach ($this->academicPersonsSettings->contractContactSections as $section) {
+            if (!in_array($section->identifier, ['physicalAddresses', 'emailAddresses', 'phoneNumbers'], true)) {
+                continue;
+            }
+            $sections[] = [
+                'identifier' => $section->identifier,
+                'label' => $this->translateContractContactLabel('contract.' . $section->identifier),
+                'singularLabel' => $this->getContractContactSingularLabel($section),
+                'items' => array_map(
+                    fn(Address|Email|PhoneNumber $record): array => $this->serializeContractContactItem(
+                        $section,
+                        $record,
+                    ),
+                    $this->getContractContactRecords($contract, $section),
+                ),
+            ];
+        }
+        return $sections;
+    }
+
+    private function getContractContactSingularLabel(ContractContactSection $section): string
+    {
+        $key = match ($section->identifier) {
+            'physicalAddresses' => 'contract.physicalAddress',
+            'emailAddresses' => 'contract.emailAddress',
+            'phoneNumbers' => 'contract.phoneNumber',
+            default => $section->identifier,
+        };
+        return $this->translateContractContactLabel($key);
+    }
+
+    private function translateContractContactLabel(string $key): string
+    {
+        return $this->localizationUtility->translate($key, 'academic_persons_edit') ?? $key;
+    }
+
+    /**
+     * @return list<ContractContactRecord>
+     */
+    private function getContractContactRecords(
+        Contract $contract,
+        ContractContactSection $section,
+    ): array {
+        $records = match ($section->identifier) {
+            'physicalAddresses' => $this->addressRepository->findByContractIncludingHidden((int)$contract->getUid()),
+            'emailAddresses' => $this->emailRepository->findByContractIncludingHidden((int)$contract->getUid()),
+            'phoneNumbers' => $this->phoneNumberRepository->findByContractIncludingHidden((int)$contract->getUid()),
+            default => [],
+        };
+        return array_values(array_filter(
+            is_array($records) ? $records : $records->toArray(),
+            static fn(mixed $record): bool => $record instanceof Address
+                || $record instanceof Email
+                || $record instanceof PhoneNumber,
+        ));
+    }
+
+    private function findContractContactRecord(
+        Contract $contract,
+        ContractContactSection $section,
+        int $recordUid,
+    ): Address|Email|PhoneNumber|null {
+        foreach ($this->getContractContactRecords($contract, $section) as $record) {
+            if ((int)$record->getUid() === $recordUid) {
+                return $record;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param ContractContactRecord|null $record
+     * @return list<DocumentFieldDefinition>
+     */
+    private function getContractContactFieldDefinitions(
+        ContractContactSection $section,
+        Address|Email|PhoneNumber|null $record,
+    ): array {
+        $definitions = [];
+        foreach ($section->fields as $field) {
+            $options = $this->getContractContactOptions($section, $field);
+            $definition = $this->createDocumentField(
+                $this->getContractContactTranslationPrefix($section),
+                $field->propertyName,
+                $this->getContractContactInputType($field),
+                $record === null ? '' : $this->getContractContactPropertyValue($record, $field->propertyName),
+                $options,
+            );
+            $definition['required'] = $field->validation->required;
+            $definition['readOnly'] = $field->validation->readOnly;
+            $definition['disabled'] = $field->validation->disabled;
+            $definition['characterLimit'] = $field->validation->characterLimit;
+            $definition['autocomplete'] = $field->autocomplete;
+            $definition['helptext'] = $this->getContractContactHelptext($field);
+            $definitions[] = $definition;
+        }
+        return $definitions;
+    }
+
+    private function getContractContactTranslationPrefix(ContractContactSection $section): string
+    {
+        return match ($section->identifier) {
+            'physicalAddresses' => 'physicalAddress',
+            'emailAddresses' => 'emailAddress',
+            'phoneNumbers' => 'phoneNumber',
+            default => 'contract',
+        };
+    }
+
+    private function getContractContactInputType(ContractContactField $field): string
+    {
+        return match ($field->renderType) {
+            'select' => 'select',
+            'email' => 'email',
+            'phone' => 'tel',
+            default => 'text',
+        };
+    }
+
+    private function getContractContactPropertyValue(
+        Address|Email|PhoneNumber $record,
+        string $propertyName,
+    ): string {
+        $getter = 'get' . ucfirst($propertyName);
+        if (!is_callable([$record, $getter])) {
+            return '';
+        }
+        $value = $record->{$getter}();
+        return is_string($value) ? $value : '';
+    }
+
+    /**
+     * @return list<array{value: string, label: string}>
+     */
+    private function getContractContactOptions(
+        ContractContactSection $section,
+        ContractContactField $field,
+    ): array {
+        if ($field->propertyName === 'country') {
+            return $this->getCountryOptions();
+        }
+        return $field->renderType === 'select'
+            ? $this->getContractContactTypeOptions($section)
+            : [];
+    }
+
+    private function getContractContactHelptext(ContractContactField $field): string
+    {
+        $configuration = $this->academicPersonsSettings
+            ->raw['contracts']['contactSections'][$field->section]['fields'][$field->identifier]
+            ?? null;
+        if (!is_array($configuration)) {
+            return '';
+        }
+        $helptext = $configuration['helptext'] ?? '';
+        if (!is_string($helptext) || $helptext === '') {
+            return '';
+        }
+        return $this->localizationUtility->translate($helptext) ?? $helptext;
+    }
+
+    /**
+     * @return list<array{value: string, label: string}>
+     */
+    private function getCountryOptions(): array
+    {
+        $options = [];
+        foreach ($this->countryProvider->getAll() as $country) {
+            $options[] = [
+                'value' => $country->getAlpha2IsoCode(),
+                'label' => $this->localizationUtility->translate($country->getLocalizedNameLabel())
+                    ?? $country->getName(),
+            ];
+        }
+        usort(
+            $options,
+            static fn(array $left, array $right): int => strnatcasecmp($left['label'], $right['label'])
+                ?: strcmp($left['value'], $right['value']),
+        );
+        return $options;
+    }
+
+    /**
+     * @return list<array{value: string, label: string}>
+     */
+    private function getContractContactTypeOptions(ContractContactSection $section): array
+    {
+        $configuredTypes = match ($section->identifier) {
+            'physicalAddresses' => $this->physicalAddressTypes->getAll(),
+            'emailAddresses' => $this->emailAddressTypes->getAll(),
+            'phoneNumbers' => $this->phoneNumberTypes->getAll(),
+            default => [],
+        };
+        $options = [];
+        foreach ($configuredTypes as $value => $label) {
+            if ($value === '') {
+                continue;
+            }
+            $options[] = [
+                'value' => $value,
+                'label' => $this->localizationUtility->translate($label, 'academic_persons') ?? $label,
+            ];
+        }
+        return $options;
+    }
+
+    /**
+     * @param ContractContactRecord $record
+     * @return ContractContactItem
+     */
+    private function serializeContractContactItem(
+        ContractContactSection $section,
+        Address|Email|PhoneNumber $record,
+    ): array {
+        $values = [];
+        $display = [];
+        foreach ($this->getContractContactFieldDefinitions($section, $record) as $field) {
+            $values[$field['name']] = $field['value'];
+            $display[$field['name']] = $field['displayValue'];
+        }
+        return [
+            'uid' => (int)$record->getUid(),
+            'sorting' => $record->getSorting(),
+            'hidden' => $record->getHidden(),
+            'values' => $values,
+            'display' => $display,
+            'summary' => $this->getContractContactSummary($section, $display),
+        ];
+    }
+
+    /**
+     * @param array<string, string> $display
+     * @return list<array{label: string, value: string}>
+     */
+    private function getContractContactSummary(ContractContactSection $section, array $display): array
+    {
+        $prefix = $this->getContractContactTranslationPrefix($section);
+        $fields = match ($section->identifier) {
+            'physicalAddresses' => [
+                'street' => trim(($display['street'] ?? '') . ' ' . ($display['streetNumber'] ?? '')),
+                'city' => trim(($display['zip'] ?? '') . ' ' . ($display['city'] ?? '')),
+                'country' => $display['country'] ?? '',
+            ],
+            'emailAddresses' => [
+                'type' => $display['type'] ?? '',
+                'email' => $display['email'] ?? '',
+            ],
+            'phoneNumbers' => [
+                'type' => $display['type'] ?? '',
+                'phoneNumber' => $display['phoneNumber'] ?? '',
+            ],
+            default => [],
+        };
+        $summary = [];
+        foreach ($fields as $name => $value) {
+            $summary[] = [
+                'label' => $this->localizationUtility->translate(
+                    $prefix . '.' . $name . '.label',
+                    'academic_persons_edit',
+                ) ?? $name,
+                'value' => $value,
+            ];
+        }
+        return $summary;
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     * @return array<string, string>
+     */
+    private function normalizeAndValidateContractContactFields(
+        ContractContactSection $section,
+        array $fields,
+        bool $creating,
+    ): array {
+        $definitionsByName = [];
+        foreach ($this->getContractContactFieldDefinitions($section, null) as $definition) {
+            $definitionsByName[$definition['name']] = $definition;
+        }
+        $errors = [];
+        $normalized = [];
+        foreach ($fields as $name => $value) {
+            $definition = $definitionsByName[$name] ?? null;
+            if ($definition === null || $definition['readOnly'] || $definition['disabled']) {
+                $errors[$name][] = 'This field cannot be changed.';
+                continue;
+            }
+            try {
+                $normalized[$name] = $this->normalizeContractContactFieldValue($definition, $value);
+            } catch (\UnexpectedValueException $exception) {
+                $errors[$name][] = $exception->getMessage();
+            }
+        }
+        foreach ($definitionsByName as $name => $definition) {
+            if ($creating && $definition['required'] && !array_key_exists($name, $fields)) {
+                $errors[$name][] = 'This field is required.';
+            }
+            if (!array_key_exists($name, $normalized)) {
+                continue;
+            }
+            $validation = $section->validationSet->get($name);
+            if ($validation !== null) {
+                $this->validateDocumentField($name, $normalized[$name], $validation, $errors);
+            }
+        }
+        if ($errors !== []) {
+            $this->throwJsonError(
+                'validation_failed',
+                422,
+                'The submitted Contract contact data is invalid.',
+                $errors,
+            );
+        }
+        return $normalized;
+    }
+
+    /**
+     * @param DocumentFieldDefinition $definition
+     */
+    private function normalizeContractContactFieldValue(array $definition, mixed $value): string
+    {
+        if (!is_string($value)) {
+            throw new \UnexpectedValueException('The value must be a string.');
+        }
+        $value = trim($value);
+        if ($definition['type'] !== 'select' || $value === '') {
+            return $value;
+        }
+        foreach ($definition['options'] as $option) {
+            if ($option['value'] === $value) {
+                return $value;
+            }
+        }
+        throw new \UnexpectedValueException('The selected value is not available.');
+    }
+
+    /**
+     * @param array<string, string> $fields
+     * @return ContractContactRecord
+     */
+    private function createContractContactRecord(
+        Contract $contract,
+        ContractContactSection $section,
+        array $fields,
+    ): Address|Email|PhoneNumber {
+        $formData = $this->createContractContactFormData($section, $fields);
+        return match (true) {
+            $formData instanceof AddressFormData => $this->addressFactory->createFromFormData(
+                $section->validationSet,
+                $contract,
+                $formData,
+            ),
+            $formData instanceof EmailFormData => $this->emailFactory->createFromFormData(
+                $section->validationSet,
+                $contract,
+                $formData,
+            ),
+            $formData instanceof PhoneNumberFormData => $this->phoneNumberFactory->createFromFormData(
+                $section->validationSet,
+                $contract,
+                $formData,
+            ),
+        };
+    }
+
+    /**
+     * @param ContractContactRecord $record
+     * @param array<string, string> $fields
+     */
+    private function updateContractContactRecord(
+        ContractContactSection $section,
+        Address|Email|PhoneNumber $record,
+        array $fields,
+    ): void {
+        $formData = $this->createContractContactFormData($section, $fields);
+        if ($record instanceof Address && $formData instanceof AddressFormData) {
+            $this->addressRepository->update(
+                $this->addressFactory->updateFromFormData($section->validationSet, $record, $formData),
+            );
+            return;
+        }
+        if ($record instanceof Email && $formData instanceof EmailFormData) {
+            $this->emailRepository->update(
+                $this->emailFactory->updateFromFormData($section->validationSet, $record, $formData),
+            );
+            return;
+        }
+        if ($record instanceof PhoneNumber && $formData instanceof PhoneNumberFormData) {
+            $this->phoneNumberRepository->update(
+                $this->phoneNumberFactory->updateFromFormData($section->validationSet, $record, $formData),
+            );
+            return;
+        }
+        throw new \UnexpectedValueException('The Contract contact record does not match its section.');
+    }
+
+    /**
+     * @param array<string, string> $fields
+     */
+    private function createContractContactFormData(
+        ContractContactSection $section,
+        array $fields,
+    ): AddressFormData|EmailFormData|PhoneNumberFormData {
+        $formData = match ($section->identifier) {
+            'physicalAddresses' => new AddressFormData(),
+            'emailAddresses' => new EmailFormData(),
+            'phoneNumbers' => new PhoneNumberFormData(),
+            default => throw new \UnexpectedValueException('The Contract contact section is not supported.'),
+        };
+        $this->applyDocumentFormOverrides($formData, $fields);
+        return $formData;
+    }
+
+    /**
+     * @param ContractContactRecord $record
+     */
+    private function addContractContactRecord(Address|Email|PhoneNumber $record): void
+    {
+        if ($record instanceof Address) {
+            $this->addressRepository->add($record);
+        } elseif ($record instanceof Email) {
+            $this->emailRepository->add($record);
+        } else {
+            $this->phoneNumberRepository->add($record);
+        }
+    }
+
+    /**
+     * @param ContractContactRecord $record
+     */
+    private function removeContractContactRecord(Address|Email|PhoneNumber $record): void
+    {
+        if ($record instanceof Address) {
+            $this->addressRepository->remove($record);
+        } elseif ($record instanceof Email) {
+            $this->emailRepository->remove($record);
+        } else {
+            $this->phoneNumberRepository->remove($record);
+        }
+    }
+
+    private function getNextContractContactSortingValue(
+        Contract $contract,
+        ContractContactSection $section,
+    ): int {
+        $maximum = 0;
+        foreach ($this->getContractContactRecords($contract, $section) as $record) {
+            $maximum = max($maximum, $record->getSorting());
+        }
+        return $maximum + 10;
+    }
+
+    /**
      * Reorders document records to the submitted sequence and updates their sorting values.
      *
      * The submitted order is validated to contain each record exactly once. Records are
@@ -1097,63 +1888,73 @@ final class InlineProfileController extends AbstractActionController
      */
     private function getContractFieldDefinitions(?Contract $record): array
     {
-        $organisationalUnits = $this->getEntityOptions(
-            $this->organisationalUnitRepository->findAll(),
-            static fn(OrganisationalUnit $item): string => $item->getUnitName(),
-        );
-        $functionTypes = $this->getEntityOptions(
-            $this->functionTypeRepository->findAll(),
-            static fn(FunctionType $item): string => $item->getFunctionName(),
-        );
-        $locations = $this->getEntityOptions(
-            $this->locationRepository->findAll(),
-            static fn(Location $item): string => $item->getTitle(),
-        );
-        return [
-            $this->createDocumentField('contract', 'position', 'text', $record?->getPosition() ?? ''),
-            $this->createDocumentField(
+        $definitions = [];
+        foreach ($this->academicPersonsSettings->contractFields as $field) {
+            $definition = $this->createDocumentField(
                 'contract',
-                'organisationalUnit',
-                'select',
-                $record?->getOrganisationalUnit()?->getUid(),
-                $organisationalUnits,
+                $field->propertyName,
+                $this->getContractFieldInputType($field),
+                $this->getContractFieldValue($field, $record),
+                $this->getContractFieldOptions($field),
+                richText: $field->validation->isRichText(),
+            );
+            $definition['autocomplete'] = $field->autocomplete;
+            $definitions[] = $definition;
+        }
+        return $definitions;
+    }
+
+    private function getContractFieldInputType(ContractField $field): string
+    {
+        return match ($field->validation->inputType) {
+            'select', 'checkbox', 'email', 'tel', 'date', 'number', 'textarea' => $field->validation->inputType,
+            default => 'text',
+        };
+    }
+
+    /**
+     * @return list<array{value: int|string, label: string}>
+     */
+    private function getContractFieldOptions(ContractField $field): array
+    {
+        return match ($field->optionSource) {
+            'organisationalUnits' => $this->getEntityOptions(
+                $this->organisationalUnitRepository->findAll(),
+                static fn(OrganisationalUnit $item): string => $item->getUnitName(),
             ),
-            $this->createDocumentField(
-                'contract',
-                'functionType',
-                'select',
-                $record?->getFunctionType()?->getUid(),
-                $functionTypes,
+            'functionTypes' => $this->getEntityOptions(
+                $this->functionTypeRepository->findAll(),
+                static fn(FunctionType $item): string => $item->getFunctionName(),
             ),
-            $this->createDocumentField(
-                'contract',
-                'validFrom',
-                'date',
-                $record?->getValidFrom()?->format('Y-m-d'),
+            'locations' => $this->getEntityOptions(
+                $this->locationRepository->findAll(),
+                static fn(Location $item): string => $item->getTitle(),
             ),
-            $this->createDocumentField(
-                'contract',
-                'validTo',
-                'date',
-                $record?->getValidTo()?->format('Y-m-d'),
-            ),
-            $this->createDocumentField(
-                'contract',
-                'location',
-                'select',
-                $record?->getLocation()?->getUid(),
-                $locations,
-            ),
-            $this->createDocumentField('contract', 'room', 'text', $record?->getRoom() ?? ''),
-            $this->createDocumentField(
-                'contract',
-                'officeHours',
-                'textarea',
-                $record?->getOfficeHours() ?? '',
-                richText: true,
-            ),
-            $this->createDocumentField('contract', 'publish', 'checkbox', $record?->isPublish() ?? false),
-        ];
+            default => [],
+        };
+    }
+
+    private function getContractFieldValue(ContractField $field, ?Contract $record): mixed
+    {
+        if ($record === null) {
+            return match ($this->getContractFieldInputType($field)) {
+                'checkbox' => false,
+                'select', 'date' => null,
+                default => '',
+            };
+        }
+        $getter = $field->propertyName === 'publish'
+            ? 'isPublish'
+            : 'get' . ucfirst($field->propertyName);
+        if (!is_callable([$record, $getter])) {
+            return null;
+        }
+        $value = $record->{$getter}();
+        return match (true) {
+            $value instanceof \DateTimeInterface => $value->format('Y-m-d'),
+            $value instanceof AbstractEntity => $value->getUid(),
+            default => $value,
+        };
     }
 
     /**
@@ -1250,6 +2051,7 @@ final class InlineProfileController extends AbstractActionController
             'disabled' => false,
             'richText' => $richText,
             'characterLimit' => 0,
+            'autocomplete' => '',
             'helptext' => '',
             'columnClass' => $columnClass,
             'compactCheckbox' => $compactCheckbox,
@@ -1537,7 +2339,7 @@ final class InlineProfileController extends AbstractActionController
             );
         }
         foreach ($validation->validatorClassNames as $validatorClassName) {
-            $validator = GeneralUtility::makeInstance($validatorClassName);
+            $validator = $this->validatorResolver->createValidator($validatorClassName);
             if (!$validator instanceof ValidatorInterface) {
                 continue;
             }
@@ -1633,7 +2435,7 @@ final class InlineProfileController extends AbstractActionController
      */
     private function handleDocumentFailure(string $logMessage, \Throwable $exception): never
     {
-        GeneralUtility::makeInstance(LogManager::class)
+        $this->logManager
             ->getLogger(self::class)
             ->error($logMessage, ['exception' => $exception]);
         $this->throwJsonError(
@@ -1764,7 +2566,7 @@ final class InlineProfileController extends AbstractActionController
                     1776760203,
                 );
             }
-            $imageMetadata = $this->persistUploadedProfileImage($profile, $replacedImageFile);
+            $imageMetadata = $this->persistUploadedProfileImage($profile);
             return new JsonResponse([
                 'success' => true,
                 'profile' => $profile->getUid(),
@@ -1775,7 +2577,7 @@ final class InlineProfileController extends AbstractActionController
         } catch (PropagateResponseException $exception) {
             throw $exception;
         } catch (\Throwable $exception) {
-            GeneralUtility::makeInstance(LogManager::class)
+            $this->logManager
                 ->getLogger(self::class)
                 ->error('Uploading the inline profile image failed.', [
                     'exception' => $exception,
@@ -1836,7 +2638,7 @@ final class InlineProfileController extends AbstractActionController
                 'hasImage' => false,
             ]);
         } catch (\Throwable $exception) {
-            GeneralUtility::makeInstance(LogManager::class)
+            $this->logManager
                 ->getLogger(self::class)
                 ->error('Deleting the inline profile image failed.', [
                     'exception' => $exception,
@@ -1858,7 +2660,7 @@ final class InlineProfileController extends AbstractActionController
      */
     private function hasNewProfileImage(Profile $profile, ?File $persistedImageFile): bool
     {
-        $submittedImageFile = $profile->getImage()?->getOriginalResource()->getOriginalFile();
+        $submittedImageFile = $this->getSubmittedProfileImageFile($profile);
         if ($submittedImageFile === null) {
             return false;
         }
@@ -1883,124 +2685,46 @@ final class InlineProfileController extends AbstractActionController
     /**
      * Persists the uploaded profile image and updates the associated metadata.
      *
-     * The profile is saved, pending database changes are flushed and the change is announced,
-     * the image metadata is updated, and the previously replaced image file is deleted
-     * afterwards.
-     *
-     * @param File|null $replacedImageFile The image file that was replaced by the newly uploaded one, if any.
      * @return array{alternative: string, title: string} The updated metadata for the uploaded profile image.
      */
-    private function persistUploadedProfileImage(Profile $profile, ?File $replacedImageFile): array
+    private function persistUploadedProfileImage(Profile $profile): array
     {
-        $this->profileRepository->update($profile);
-        $this->persistAndDispatchProfileUpdate($profile);
-        $imageMetadata = $this->updateUploadedProfileImageMetadata($profile);
-        $this->deleteReplacedProfileImageFile($replacedImageFile, $profile);
-        return $imageMetadata;
-    }
-
-    /**
-     * Updates the metadata for the uploaded profile image and its file reference.
-     *
-     * The metadata text is generated from the profile data and written to the file
-     * metadata as well as the related sys_file_reference record, if one exists.
-     *
-     * @param Profile $profile The profile whose uploaded image metadata should be updated.
-     * @return array{alternative: string, title: string} The updated image metadata.
-     * @throws \UnexpectedValueException If the uploaded image reference or file is missing.
-     */
-    private function updateUploadedProfileImageMetadata(Profile $profile): array
-    {
-        $imageReference = $profile->getImage()?->getOriginalResource();
-        $imageFile = $imageReference?->getOriginalFile();
-        if ($imageReference === null || $imageFile === null) {
+        $persistedProfileUid = $this->resolvePersistedProfileUid($profile);
+        $uploadedImageFile = $this->getSubmittedProfileImageFile($profile);
+        if ($uploadedImageFile === null) {
             throw new \UnexpectedValueException('The uploaded profile image is unavailable.');
         }
-        $metadataText = $this->buildProfileImageMetadataText($profile);
-        $metadata = ['alternative' => $metadataText, 'title' => $metadataText];
-        GeneralUtility::makeInstance(MetaDataRepository::class)
-            ->update($imageFile->getUid(), $metadata);
-        $imageReferenceUid = $this->getPersistedProfileImageReferenceUid($profile, $imageFile);
-        if ($imageReferenceUid > 0) {
-            GeneralUtility::makeInstance(ConnectionPool::class)
-                ->getConnectionForTable('sys_file_reference')
-                ->update('sys_file_reference', $metadata, ['uid' => $imageReferenceUid]);
+        try {
+            $replacedFileUids = $this->profileImageRelationWriter->replace(
+                $persistedProfileUid,
+                $uploadedImageFile,
+            );
+            if (!$profile->getIsTranslation()) {
+                $this->eventDispatcher->dispatch(new AfterProfileUpdateEvent($profile));
+            }
+            $imageMetadata = $this->profileImageMetadataService->updateForProfileUid($persistedProfileUid);
+            if ($imageMetadata === null) {
+                throw new \UnexpectedValueException('The uploaded profile image is unavailable.');
+            }
+            $this->deleteUnreferencedFiles($replacedFileUids, $uploadedImageFile->getUid());
+            return $imageMetadata;
+        } catch (\Throwable $exception) {
+            if ($this->countFileReferences($uploadedImageFile) === 0) {
+                $uploadedImageFile->getStorage()->deleteFile($uploadedImageFile);
+            }
+            throw $exception;
         }
-        return $metadata;
     }
 
     /**
-     * Retrieves the persisted UID of the file reference for the profile image.
+     * Returns the file produced by Extbase's upload handling for the current request.
      *
-     * The method first checks the current in-memory image relation and falls back to a
-     * direct lookup in the sys_file_reference table when the relation has not yet been
-     * persisted to the database.
-     *
-     * @param Profile $profile The profile whose image reference should be resolved.
-     * @param File $imageFile The image file associated with the profile.
-     * @return int The UID of the persisted file reference, or 0 if no persisted reference exists.
+     * @param Profile $profile The profile currently being processed.
+     * @return File|null The newly uploaded file, if one was mapped.
      */
-    private function getPersistedProfileImageReferenceUid(Profile $profile, File $imageFile): int
+    private function getSubmittedProfileImageFile(Profile $profile): ?File
     {
-        $imageReferenceUid = $profile->getImage()?->getOriginalResource()->getUid() ?? 0;
-        if ($imageReferenceUid > 0) {
-            return $imageReferenceUid;
-        }
-        $profileUid = $profile->getUid();
-        if ($profileUid === null) {
-            return 0;
-        }
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('sys_file_reference');
-        $queryBuilder->getRestrictions()
-            ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-        return (int)$queryBuilder
-            ->select('uid')
-            ->from('sys_file_reference')
-            ->where(
-                $queryBuilder->expr()->eq(
-                    'tablenames',
-                    $queryBuilder->createNamedParameter('tx_academicpersons_domain_model_profile'),
-                ),
-                $queryBuilder->expr()->eq(
-                    'fieldname',
-                    $queryBuilder->createNamedParameter('image'),
-                ),
-                $queryBuilder->expr()->eq(
-                    'uid_foreign',
-                    $queryBuilder->createNamedParameter($profileUid, Connection::PARAM_INT),
-                ),
-                $queryBuilder->expr()->eq(
-                    'uid_local',
-                    $queryBuilder->createNamedParameter($imageFile->getUid(), Connection::PARAM_INT),
-                ),
-            )
-            ->orderBy('uid', 'DESC')
-            ->setMaxResults(1)
-            ->executeQuery()
-            ->fetchOne();
-    }
-
-    /**
-     * Builds the image metadata text from the profile's name parts.
-     *
-     * The method normalizes whitespace and concatenates the available name
-     * components (title, first name, middle name, and last name) into a single
-     * string that can be used as metadata for the profile image.
-     *
-     * @param Profile $profile The profile whose name metadata should be assembled.
-     * @return string A normalized name string without empty parts.
-     */
-    private function buildProfileImageMetadataText(Profile $profile): string
-    {
-        $parts = array_map(
-            static fn(string $part): string => trim(
-                (string)(preg_replace('/\s+/u', ' ', $part) ?? $part),
-            ),
-            [$profile->getTitle(), $profile->getFirstName(), $profile->getMiddleName(), $profile->getLastName()],
-        );
-        return implode(' ', array_filter($parts, static fn(string $part): bool => $part !== ''));
+        return $profile->getImage()?->getOriginalResource()->getOriginalFile();
     }
 
     /**
@@ -2015,22 +2739,12 @@ final class InlineProfileController extends AbstractActionController
      */
     private function deleteProfileImage(Profile $profile): bool
     {
-        $image = $profile->getImage();
-        if ($image === null) {
+        $persistedProfileUid = $this->resolvePersistedProfileUid($profile);
+        $removedFileUids = $this->profileImageRelationWriter->remove($persistedProfileUid);
+        if ($removedFileUids === []) {
             return false;
         }
-        $imageFile = $image->getOriginalResource()->getOriginalFile();
-        // The relation is dropped first, for two reasons: deleting the file alone leaves
-        // the reference count on the profile record pointing at a reference that no longer
-        // exists, and the file can only be checked for other usages once this profile does
-        // not reference it any more.
-        $profile->setImage(null);
-        $this->profileRepository->update($profile);
-        $this->persistenceManager->remove($image);
-        $this->persistAndDispatchProfileUpdate($profile);
-        if ($this->countFileReferences($imageFile) === 0) {
-            $imageFile->getStorage()->deleteFile($imageFile);
-        }
+        $this->deleteUnreferencedFiles($removedFileUids);
         return true;
     }
 
@@ -2050,10 +2764,12 @@ final class InlineProfileController extends AbstractActionController
             ->setUploadFolder(
                 (string)($this->settings['editForm']['profileImage']['targetFolder'] ?? '1:/user_upload/')
             );
-        $fileSizeValidator = GeneralUtility::makeInstance(FileSizeValidator::class);
-        $fileSizeValidator->setOptions([
+        $fileSizeValidator = $this->validatorResolver->createValidator(FileSizeValidator::class, [
             'maximum' => (string)($this->settings['editForm']['profileImage']['validation']['maxFileSize'] ?? PHP_INT_MAX . 'B'),
         ]);
+        if (!$fileSizeValidator instanceof FileSizeValidator) {
+            throw new \UnexpectedValueException('The file size validator is unavailable.');
+        }
         $fileUploadConfiguration->addValidator($fileSizeValidator);
         $allowedMimeTypes = GeneralUtility::trimExplode(
             ',',
@@ -2061,8 +2777,13 @@ final class InlineProfileController extends AbstractActionController
             true
         );
         if ($allowedMimeTypes !== []) {
-            $mimeTypeValidator = GeneralUtility::makeInstance(MimeTypeValidator::class);
-            $mimeTypeValidator->setOptions(['allowedMimeTypes' => $allowedMimeTypes]);
+            $mimeTypeValidator = $this->validatorResolver->createValidator(
+                MimeTypeValidator::class,
+                ['allowedMimeTypes' => $allowedMimeTypes],
+            );
+            if (!$mimeTypeValidator instanceof MimeTypeValidator) {
+                throw new \UnexpectedValueException('The MIME type validator is unavailable.');
+            }
             $fileUploadConfiguration->addValidator($mimeTypeValidator);
         }
         $profileArgument->getFileHandlingServiceConfiguration()
@@ -2082,15 +2803,15 @@ final class InlineProfileController extends AbstractActionController
      */
     private function getPersistedProfileImageFile(Profile $profile): ?File
     {
-        $profileUid = $profile->getUid();
-        if ($profileUid === null) {
+        $profileUid = $this->resolvePersistedProfileUid($profile);
+        if ($profileUid <= 0) {
             return null;
         }
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable('sys_file_reference');
         $queryBuilder->getRestrictions()
             ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            ->add(new DeletedRestriction());
         $fileUid = (int)$queryBuilder
             ->select('uid_local')
             ->from('sys_file_reference')
@@ -2122,30 +2843,36 @@ final class InlineProfileController extends AbstractActionController
     }
 
     /**
-     * Deletes a previously replaced profile image file if it is no longer used.
-     *
-     * The method checks whether the uploaded image actually replaced an existing
-     * file and ensures that the previous file is removed only when it is not
-     * referenced anymore by the profile or any other record.
-     *
-     * @param File|null $replacedImageFile The old image file that was replaced
-     * @param Profile $profile The profile whose image was updated
+     * Resolves an Extbase language overlay to the uid of its persisted profile row.
      */
-    private function deleteReplacedProfileImageFile(?File $replacedImageFile, Profile $profile): void
+    private function resolvePersistedProfileUid(Profile $profile): int
     {
-        if ($replacedImageFile === null) {
-            return;
+        $profileUid = (int)($profile->getUid() ?? 0);
+        $siteLanguage = $this->request->getAttribute('language');
+        $languageId = $siteLanguage instanceof SiteLanguage ? $siteLanguage->getLanguageId() : 0;
+        return $this->localizedProfileUidResolver->resolve($profileUid, $languageId);
+    }
+
+    /**
+     * Deletes files only after DataHandler removed every relation to them.
+     *
+     * @param list<int> $fileUids
+     */
+    private function deleteUnreferencedFiles(array $fileUids, int $retainedFileUid = 0): void
+    {
+        foreach (array_unique($fileUids) as $fileUid) {
+            if ($fileUid <= 0 || $fileUid === $retainedFileUid) {
+                continue;
+            }
+            try {
+                $file = $this->resourceFactory->getFileObject($fileUid);
+                if ($this->countFileReferences($file) === 0) {
+                    $file->getStorage()->deleteFile($file);
+                }
+            } catch (FileDoesNotExistException) {
+                // A stale relation may already have pointed to a missing file.
+            }
         }
-        $currentImageFile = $profile->getImage()?->getOriginalResource()->getOriginalFile();
-        if ($currentImageFile !== null && $currentImageFile->getUid() === $replacedImageFile->getUid()) {
-            // The upload did not result in a new file, nothing was replaced.
-            return;
-        }
-        if ($this->countFileReferences($replacedImageFile) > 0) {
-            // Still referenced elsewhere, for example by a content element or another record.
-            return;
-        }
-        $replacedImageFile->getStorage()->deleteFile($replacedImageFile);
     }
 
     /**
@@ -2159,11 +2886,11 @@ final class InlineProfileController extends AbstractActionController
      */
     private function countFileReferences(File $file): int
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable('sys_file_reference');
         $queryBuilder->getRestrictions()
             ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            ->add(new DeletedRestriction());
         return (int)$queryBuilder
             ->count('uid')
             ->from('sys_file_reference')

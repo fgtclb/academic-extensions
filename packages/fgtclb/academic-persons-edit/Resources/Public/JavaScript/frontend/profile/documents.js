@@ -1,104 +1,148 @@
-import { getProfileUid, requestJson, showStatus } from "./common.js";
+/* Generated from Resources/Private/TypeScript — do not edit. */
+import { nextTick, reactive } from "@fgtclb/academic-persons-edit/frontend/vue.js";
+import {
+  getProfileUid,
+  initializePopover,
+  requestJson,
+  showStatus
+} from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
 import {
   ensureRichTextEditor,
   getPlainText,
   getRichTextEditorValue,
   isAllowedRichTextLink,
-  parseRichTextPreview,
-} from "./rich-text.js";
-
+  parseRichTextPreview
+} from "@fgtclb/academic-persons-edit/frontend/profile/rich-text.js";
 const sectionSelector = "[data-ie-document-section]";
 const itemSelector = "[data-ie-document-item]";
 const itemsSelector = "[data-ie-document-items]";
-const itemTemplateSelector = "template[data-ie-document-item-template]";
+const itemTemplateSelector = "[data-ie-document-item-template]";
 const emptyStateSelector = "[data-ie-document-empty-state]";
-const modalSelector = "[data-ie-document-modal]";
-const helptextButtonTemplateSelector = "template[data-ie-document-helptext-button-template]";
-const initializedRoots = new WeakSet();
-const modalStates = new WeakMap();
-const dragStates = new WeakMap();
-
-const getDocumentModalParts = (root) => {
-  const modal = root.querySelector(modalSelector);
-  if (!(modal instanceof HTMLElement)) {
-    return null;
+const listHeaderSelector = "[data-ie-document-list-header]";
+const documentViewSelector = "[data-ie-document-view-container]";
+const addCollapseTargetSelector = "[data-ie-document-add-collapse-target]";
+const itemCollapseTargetSelector = "[data-ie-document-item-collapse-target]";
+const controllers = /* @__PURE__ */ new WeakMap();
+const initializedRoots = /* @__PURE__ */ new WeakSet();
+const dragStates = /* @__PURE__ */ new WeakMap();
+let collapseTargetSequence = 0;
+const isDocumentMode = (value) => ["add", "view", "edit", "delete"].includes(value);
+const getDocumentRows = (section) => {
+  const items = section.querySelector(itemsSelector);
+  if (items === null) {
+    return [];
   }
-  const form = modal.querySelector("[data-ie-document-form]");
-  const title = modal.querySelector("[data-ie-document-modal-title]");
-  const fields = modal.querySelector("[data-ie-document-fields]");
-  const confirmation = modal.querySelector("[data-ie-document-delete-confirmation]");
-  const error = modal.querySelector("[data-ie-document-error]");
-  const submit = modal.querySelector("[data-ie-document-submit]");
-  const submitLabel = modal.querySelector("[data-ie-document-submit-label]");
-  const spinner = modal.querySelector("[data-ie-document-spinner]");
-  if (
-    !(form instanceof HTMLFormElement) ||
-    !(title instanceof HTMLElement) ||
-    !(fields instanceof HTMLElement) ||
-    !(confirmation instanceof HTMLElement) ||
-    !(error instanceof HTMLElement) ||
-    !(submit instanceof HTMLButtonElement) ||
-    !(submitLabel instanceof HTMLElement) ||
-    !(spinner instanceof HTMLElement)
-  ) {
-    return null;
-  }
-  return { modal, form, title, fields, confirmation, error, submit, submitLabel, spinner };
+  return Array.from(items.children).filter(
+    (element) => element instanceof HTMLElement && element.matches(itemSelector)
+  );
 };
-
-const getSectionHeading = (section) => section.querySelector("h2")?.textContent?.trim() ?? "";
-
-const getDocumentModalSubject = (section, fields) => {
-  const titleField = fields.find((field) => field?.name === "title");
-  const title = [titleField?.displayValue, titleField?.value]
-    .map((value) => String(value ?? "").trim())
-    .find((value) => value !== "");
+const asDocumentField = (value) => {
+  if (typeof value !== "object" || value === null) {
+    return null;
+  }
+  const field = value;
+  if (typeof field.name !== "string") {
+    return null;
+  }
+  return {
+    autocomplete: String(field.autocomplete ?? ""),
+    characterLimit: field.characterLimit,
+    columnClass: field.columnClass,
+    compactCheckbox: field.compactCheckbox,
+    disabled: field.disabled === true,
+    displayValue: String(field.displayValue ?? ""),
+    helptext: String(field.helptext ?? ""),
+    label: String(field.label ?? field.name),
+    name: field.name,
+    options: Array.isArray(field.options) ? field.options : [],
+    readOnly: field.readOnly === true,
+    required: field.required === true,
+    richText: field.richText === true,
+    type: String(field.type ?? "text"),
+    value: field.value ?? ""
+  };
+};
+const getResponseFields = (value) => Array.isArray(value) ? value.map(asDocumentField).filter((field) => field !== null) : [];
+const asRecord = (value) => typeof value === "object" && value !== null ? value : {};
+const asContractContactItem = (value) => {
+  const item = asRecord(value);
+  const uid = Number(item.uid);
+  if (!Number.isInteger(uid) || uid <= 0) {
+    return null;
+  }
+  return {
+    display: asRecord(item.display),
+    hidden: item.hidden === true,
+    sorting: Number(item.sorting) || 0,
+    summary: Array.isArray(item.summary) ? item.summary.map((entry) => {
+      const summary = asRecord(entry);
+      return {
+        label: String(summary.label ?? ""),
+        value: String(summary.value ?? "")
+      };
+    }) : [],
+    uid,
+    values: asRecord(item.values)
+  };
+};
+const getResponseContactSections = (value) => Array.isArray(value) ? value.flatMap((entry) => {
+  const section = asRecord(entry);
+  const identifier = String(section.identifier ?? "");
+  if (identifier === "") {
+    return [];
+  }
+  return [{
+    identifier,
+    items: Array.isArray(section.items) ? section.items.map(asContractContactItem).filter((item) => item !== null) : [],
+    label: String(section.label ?? identifier),
+    singularLabel: String(section.singularLabel ?? section.label ?? identifier)
+  }];
+}) : [];
+const getSectionHeading = (section) => {
+  var _a, _b;
+  return ((_b = (_a = section.querySelector("h2")) == null ? void 0 : _a.textContent) == null ? void 0 : _b.trim()) ?? "";
+};
+const getDocumentSubject = (section, fields) => {
+  const titleField = fields.find((field) => field.name === "title");
+  const title = [titleField == null ? void 0 : titleField.displayValue, titleField == null ? void 0 : titleField.value].map((value) => String(value ?? "").trim()).find((value) => value !== "");
   return title ?? getSectionHeading(section);
 };
-
 const getModeLabel = (root, mode) => {
   const labels = {
     add: root.dataset.labelDocumentAdd,
     view: root.dataset.labelDocumentView,
     edit: root.dataset.labelDocumentEdit,
-    delete: root.dataset.labelDocumentDelete,
+    delete: root.dataset.labelDocumentDelete
   };
   return labels[mode] ?? "";
 };
-
-const setModalError = (parts, message = "") => {
-  parts.error.textContent = message;
-  parts.error.classList.toggle("d-none", message === "");
+const getRecordFromButton = (button) => {
+  const row = button.closest(itemSelector);
+  const record = Number.parseInt((row == null ? void 0 : row.dataset.itemUid) ?? "", 10);
+  return Number.isInteger(record) && record > 0 ? record : null;
 };
-
-const setModalPending = (parts, pending) => {
-  if (pending) {
-    parts.modal.setAttribute("aria-busy", "true");
-  } else {
-    parts.modal.removeAttribute("aria-busy");
+const getDocumentCollapseTarget = (button, section, mode) => {
+  var _a;
+  return mode === "add" ? section.querySelector(addCollapseTargetSelector) : ((_a = button.closest(itemSelector)) == null ? void 0 : _a.querySelector(itemCollapseTargetSelector)) ?? null;
+};
+const getDocumentCollapseTargetSelector = (target) => {
+  if (target.id === "") {
+    collapseTargetSequence += 1;
+    target.id = `academic-persons-inline-document-collapse-${collapseTargetSequence}`;
   }
-  parts.modal.querySelectorAll("button, input, select, textarea").forEach((control) => {
-    if (
-      !(control instanceof HTMLButtonElement) &&
-      !(control instanceof HTMLInputElement) &&
-      !(control instanceof HTMLSelectElement) &&
-      !(control instanceof HTMLTextAreaElement)
-    ) {
-      return;
-    }
-    if (pending) {
-      if (control.dataset.ieDocumentWasDisabled === undefined) {
-        control.dataset.ieDocumentWasDisabled = control.disabled ? "1" : "0";
-      }
-      control.disabled = true;
-    } else if (control.dataset.ieDocumentWasDisabled !== undefined) {
-      control.disabled = control.dataset.ieDocumentWasDisabled === "1";
-      delete control.dataset.ieDocumentWasDisabled;
-    }
-  });
-  parts.spinner.classList.toggle("d-none", !pending);
+  return `#${CSS.escape(target.id)}`;
 };
-
+const requestDocument = (root, url, data) => {
+  const profile = getProfileUid(root);
+  if (url === void 0 || profile === null) {
+    return Promise.reject(new Error("The document endpoint is unavailable."));
+  }
+  return requestJson(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ profile, data })
+  });
+};
 const appendRichText = (container, value) => {
   const parsedDocument = parseRichTextPreview(value);
   const fragment = document.createDocumentFragment();
@@ -107,265 +151,6 @@ const appendRichText = (container, value) => {
   });
   container.replaceChildren(fragment);
 };
-
-const createDocumentHelptextButton = (root, field, fieldId = "") => {
-  const helptext = String(field.helptext ?? "").trim();
-  if (helptext === "") {
-    return null;
-  }
-  const template = root.querySelector(helptextButtonTemplateSelector);
-  if (!(template instanceof HTMLTemplateElement)) {
-    return null;
-  }
-  const button = template.content.querySelector("button")?.cloneNode(true);
-  if (!(button instanceof HTMLButtonElement)) {
-    return null;
-  }
-  const label = String(field.label ?? field.name ?? "").trim();
-  button.dataset.bsTitle = label;
-  button.dataset.bsContent = helptext;
-  if (fieldId !== "") {
-    button.dataset.ieFor = fieldId;
-  }
-  button.setAttribute("aria-label", label === "" ? helptext : `${label}: ${helptext}`);
-  return button;
-};
-
-const initializeDocumentHelptextPopovers = (container) => {
-  if (typeof globalThis.bootstrap?.Popover !== "function") {
-    return;
-  }
-  container.querySelectorAll(`[data-bs-toggle="popover"]`).forEach((trigger) => {
-    new globalThis.bootstrap.Popover(trigger);
-  });
-};
-
-const disposeDocumentHelptextPopovers = (container) => {
-  const Popover = globalThis.bootstrap?.Popover;
-  if (typeof Popover?.getInstance !== "function") {
-    return;
-  }
-  container.querySelectorAll(`[data-bs-toggle="popover"]`).forEach((trigger) => {
-    Popover.getInstance(trigger)?.dispose();
-  });
-};
-
-const renderViewFields = (root, parts, fields) => {
-  const list = document.createElement("dl");
-  list.className = "row mb-0";
-  fields.forEach((field) => {
-    const term = document.createElement("dt");
-    term.className = "col-sm-4 d-flex align-items-start";
-    term.textContent = field.label ?? field.name;
-    const helptextButton = createDocumentHelptextButton(root, field);
-    if (helptextButton !== null) {
-      term.append(helptextButton);
-    }
-    const description = document.createElement("dd");
-    description.className = "col-sm-8";
-    const displayValue = String(field.displayValue ?? "");
-    if (field.richText && getPlainText(displayValue) !== "") {
-      appendRichText(description, displayValue);
-    } else {
-      description.textContent = displayValue || root.dataset.labelDocumentEmpty || "—";
-    }
-    list.append(term, description);
-  });
-  disposeDocumentHelptextPopovers(parts.fields);
-  parts.fields.replaceChildren(list);
-  initializeDocumentHelptextPopovers(parts.fields);
-};
-
-const createFieldControl = (field, fieldId) => {
-  let control;
-  if (field.type === "select") {
-    control = document.createElement("select");
-    control.className = "form-select";
-    const emptyOption = document.createElement("option");
-    emptyOption.value = "";
-    emptyOption.textContent = "—";
-    control.append(emptyOption);
-    (field.options ?? []).forEach((optionData) => {
-      const option = document.createElement("option");
-      option.value = String(optionData.value);
-      option.textContent = optionData.label;
-      control.append(option);
-    });
-    control.value = field.value === null ? "" : String(field.value ?? "");
-  } else if (field.type === "textarea") {
-    control = document.createElement("textarea");
-    control.className = "form-control";
-    control.rows = 6;
-    control.value = String(field.value ?? "");
-    if (field.richText) {
-      control.dataset.ieRichText = "";
-      const characterLimit = Number.parseInt(String(field.characterLimit ?? ""), 10);
-      if (Number.isSafeInteger(characterLimit) && characterLimit > 0) {
-        control.dataset.ieCharacterLimit = String(characterLimit);
-      }
-    }
-  } else {
-    control = document.createElement("input");
-    control.className = field.type === "checkbox" ? "form-check-input" : "form-control";
-    control.type = field.type === "checkbox" ? "checkbox" : field.type || "text";
-    if (field.type === "checkbox") {
-      control.checked = field.value === true;
-    } else {
-      control.value = field.value === null ? "" : String(field.value ?? "");
-    }
-  }
-  control.id = fieldId;
-  control.name = field.name;
-  control.required = field.required === true;
-  control.readOnly = field.readOnly === true;
-  control.disabled = field.disabled === true;
-  control.dataset.ieDocumentField = "";
-  return control;
-};
-
-const renderEditFields = async (root, parts, fields, fieldIdPrefix) => {
-  const fragment = document.createDocumentFragment();
-  const richTextControls = [];
-  fields.forEach((field, index) => {
-    const wrapper = document.createElement("div");
-    const checkbox = field.type === "checkbox";
-    const compactCheckbox = checkbox && field.compactCheckbox === true;
-    const fullWidth = checkbox || field.type === "textarea";
-    const columnClass = String(field.columnClass ?? "").trim();
-    wrapper.className = compactCheckbox
-      ? `${columnClass || "col-12"} d-flex`
-      : checkbox
-        ? `${columnClass || "col-12"} form-check`
-        : columnClass || (fullWidth ? "col-12" : "col-12 col-md-6");
-    if (compactCheckbox) {
-      wrapper.dataset.ieDocumentCompactCheckbox = "";
-    }
-    const fieldId = `${fieldIdPrefix}-${index}-${field.name}`;
-    const control = createFieldControl(field, fieldId);
-    const label = document.createElement("label");
-    label.htmlFor = fieldId;
-    label.className = checkbox ? "form-check-label" : "form-label";
-    label.textContent = field.label ?? field.name;
-    if (field.required === true) {
-      const requiredMarker = document.createElement("span");
-      requiredMarker.className = "text-danger ms-1";
-      requiredMarker.setAttribute("aria-hidden", "true");
-      requiredMarker.textContent = "*";
-      label.append(requiredMarker);
-    }
-    const helptextButton = createDocumentHelptextButton(root, field, fieldId);
-    const feedback = document.createElement("div");
-    feedback.className = "invalid-feedback";
-    feedback.dataset.ieDocumentFieldError = field.name;
-    const characterLimit = Number.parseInt(String(field.characterLimit ?? ""), 10);
-    const characterCounter = document.createElement("div");
-    if (field.richText && Number.isSafeInteger(characterLimit) && characterLimit > 0) {
-      characterCounter.id = `${fieldId}-character-counter`;
-      characterCounter.className = "form-text text-end";
-      characterCounter.setAttribute("aria-live", "polite");
-      characterCounter.dataset.ieCharacterCounter = "";
-      characterCounter.dataset.ieFor = fieldId;
-      characterCounter.textContent = `0 / ${characterLimit}`;
-    }
-    if (compactCheckbox) {
-      const formCheck = document.createElement("div");
-      formCheck.className = "form-check mt-auto";
-      formCheck.append(control, label);
-      if (helptextButton !== null) {
-        formCheck.append(helptextButton);
-      }
-      formCheck.append(feedback);
-      wrapper.append(formCheck);
-    } else if (checkbox) {
-      wrapper.append(control, label);
-      if (helptextButton !== null) {
-        wrapper.append(helptextButton);
-      }
-      wrapper.append(feedback);
-    } else {
-      const heading = document.createElement("div");
-      heading.className = "d-flex align-items-center";
-      heading.append(label);
-      if (helptextButton !== null) {
-        heading.append(helptextButton);
-      }
-      wrapper.append(heading, control);
-      if (characterCounter.dataset.ieCharacterCounter !== undefined) {
-        wrapper.append(characterCounter);
-      }
-      wrapper.append(feedback);
-    }
-    fragment.append(wrapper);
-    if (field.richText && control instanceof HTMLTextAreaElement) {
-      richTextControls.push(control);
-    }
-  });
-  disposeDocumentHelptextPopovers(parts.fields);
-  parts.fields.replaceChildren(fragment);
-  initializeDocumentHelptextPopovers(parts.fields);
-  await Promise.all(richTextControls.map((control) => ensureRichTextEditor(root, control)));
-};
-
-const renderDocumentModal = async (root, parts, section, mode, fields) => {
-  const label = getModeLabel(root, mode);
-  const subject = getDocumentModalSubject(section, fields);
-  parts.title.textContent = [label, subject].filter(Boolean).join(": ");
-  parts.confirmation.classList.toggle("d-none", mode !== "delete");
-  parts.confirmation.textContent = mode === "delete" ? (root.dataset.messageDocumentDeleteConfirm ?? "") : "";
-  parts.fields.classList.toggle("d-none", mode === "delete");
-  parts.submit.classList.toggle("d-none", mode === "view");
-  parts.submit.classList.toggle("btn-danger", mode === "delete");
-  parts.submit.classList.toggle("btn-primary", mode !== "delete");
-  parts.submit.classList.remove("btn-success");
-  parts.submitLabel.textContent = mode === "delete" ? (root.dataset.labelDocumentDelete ?? "") : (root.dataset.labelDocumentSave ?? "");
-  if (mode === "view") {
-    renderViewFields(root, parts, fields);
-  } else if (mode === "delete") {
-    parts.fields.replaceChildren();
-  } else {
-    const idPrefix = `ie-document-${root.dataset.profileUid ?? "profile"}-${section.dataset.sectionKey ?? "section"}`.replace(/[^a-zA-Z0-9_-]/g, "-");
-    await renderEditFields(root, parts, fields, idPrefix);
-  }
-};
-
-const requestDocument = (root, url, data) => {
-  const profile = getProfileUid(root);
-  if (!url || profile === null) {
-    return Promise.reject(new Error("The document endpoint is unavailable."));
-  }
-  return requestJson(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ profile, data }),
-  });
-};
-
-const openDocumentModal = async (root, section, mode, record, trigger) => {
-  const parts = getDocumentModalParts(root);
-  const Modal = globalThis.bootstrap?.Modal;
-  if (!parts || typeof Modal?.getOrCreateInstance !== "function") {
-    showStatus(root, "danger");
-    return;
-  }
-  setModalError(parts);
-  setModalPending(parts, true);
-  try {
-    const response = await requestDocument(root, root.dataset.documentFormUrl, {
-      section: section.dataset.sectionKey,
-      record: record ?? 0,
-      mode,
-    });
-    const fields = Array.isArray(response.fields) ? response.fields : [];
-    modalStates.set(parts.modal, { root, section, mode, record: response.record ?? null, fields, trigger });
-    await renderDocumentModal(root, parts, section, mode, fields);
-    Modal.getOrCreateInstance(parts.modal).show();
-  } catch (error) {
-    showStatus(root, "danger", error.result?.message ?? null);
-  } finally {
-    setModalPending(parts, false);
-  }
-};
-
 const getRowDisplayValue = (item, name) => {
   const display = item.display ?? {};
   if (name === "yearStart" && !display.yearStart) {
@@ -376,12 +161,11 @@ const getRowDisplayValue = (item, name) => {
   }
   return display[name] ?? "";
 };
-
 const renderDocumentTitle = (container, title, link) => {
-  const normalizedTitle = title || "—";
-  if (link && isAllowedRichTextLink(String(link))) {
+  const normalizedTitle = title || "\u2014";
+  if (typeof link === "string" && isAllowedRichTextLink(link)) {
     const anchor = document.createElement("a");
-    anchor.href = String(link);
+    anchor.href = link;
     anchor.target = "_blank";
     anchor.rel = "noopener noreferrer";
     anchor.textContent = normalizedTitle;
@@ -392,74 +176,74 @@ const renderDocumentTitle = (container, title, link) => {
   span.textContent = normalizedTitle;
   container.replaceChildren(span);
 };
-
-export const updateDocumentRow = (section, row, item) => {
-  if (!(section instanceof HTMLElement) || !(row instanceof HTMLElement)) {
-    return;
-  }
+const updateDocumentRow = (section, row, item) => {
+  var _a, _b;
   row.dataset.itemUid = String(item.uid ?? "");
   row.dataset.itemSorting = String(item.sorting ?? "");
-  row.querySelectorAll("[data-ie-document-value]").forEach((element) => {
-    if (!(element instanceof HTMLElement)) {
-      return;
-    }
-    const name = element.dataset.ieDocumentValue;
-    const value = getRowDisplayValue(item, name);
-    if (name === "bodytext") {
-      const normalizedValue = String(value ?? "");
-      element.classList.toggle("d-none", getPlainText(normalizedValue) === "");
-      if (normalizedValue === "") {
-        element.replaceChildren();
-      } else {
-        appendRichText(element, normalizedValue);
+  row.querySelectorAll("[data-ie-document-value]").forEach(
+    (element) => {
+      const name = element.dataset.ieDocumentValue ?? "";
+      const value = getRowDisplayValue(item, name);
+      if (name === "bodytext") {
+        const normalizedValue = String(value ?? "");
+        element.classList.toggle("d-none", getPlainText(normalizedValue) === "");
+        if (normalizedValue === "") {
+          element.replaceChildren();
+        } else {
+          appendRichText(element, normalizedValue);
+        }
+        return;
       }
-      return;
+      element.textContent = String(value || "\u2014");
     }
-    element.textContent = String(value || "—");
-  });
+  );
   const title = row.querySelector("[data-ie-document-title]");
-  if (title instanceof HTMLElement) {
-    renderDocumentTitle(title, String(item.display?.title ?? ""), item.values?.link ?? "");
+  if (title !== null) {
+    renderDocumentTitle(
+      title,
+      String(((_a = item.display) == null ? void 0 : _a.title) ?? ""),
+      (_b = item.values) == null ? void 0 : _b.link
+    );
   }
+  void section;
 };
-
-export const refreshDocumentRows = (section) => {
-  if (!(section instanceof HTMLElement)) {
-    return;
-  }
-  const rows = Array.from(section.querySelectorAll(itemSelector)).filter((row) => row instanceof HTMLElement);
+const refreshDocumentRows = (section) => {
+  const rows = getDocumentRows(section);
   const sortable = section.dataset.sectionSortable === "1" && rows.length > 1;
   rows.forEach((row, index) => {
     row.dataset.itemPosition = String(index);
     row.classList.toggle("bg-body-tertiary", index % 2 === 0);
-    const up = row.querySelector('[data-ie-document-sort="up"]');
-    const down = row.querySelector('[data-ie-document-sort="down"]');
+    const up = row.querySelector(
+      '[data-ie-document-sort="up"]'
+    );
+    const down = row.querySelector(
+      '[data-ie-document-sort="down"]'
+    );
     const drag = row.querySelector("[data-ie-document-drag]");
-    if (up instanceof HTMLButtonElement) {
+    if (up !== null) {
       up.disabled = index === 0;
       up.setAttribute("aria-disabled", String(up.disabled));
     }
-    if (down instanceof HTMLButtonElement) {
+    if (down !== null) {
       down.disabled = index === rows.length - 1;
       down.setAttribute("aria-disabled", String(down.disabled));
     }
-    if (drag instanceof HTMLButtonElement) {
+    if (drag !== null) {
       drag.disabled = !sortable;
       drag.draggable = sortable;
       drag.setAttribute("aria-disabled", String(drag.disabled));
     }
   });
   const emptyState = section.querySelector(emptyStateSelector);
-  if (emptyState instanceof HTMLElement) {
-    emptyState.classList.toggle("d-none", rows.length > 0);
-  }
+  emptyState == null ? void 0 : emptyState.classList.toggle("d-none", rows.length > 0);
+  const listHeader = section.querySelector(listHeaderSelector);
+  listHeader == null ? void 0 : listHeader.classList.toggle("d-md-flex", rows.length > 0);
 };
-
 const insertDocumentRow = (section, item) => {
   const template = section.querySelector(itemTemplateSelector);
   const items = section.querySelector(itemsSelector);
-  const templateRow = template instanceof HTMLTemplateElement ? template.content.querySelector(itemSelector) : null;
-  if (!(items instanceof HTMLElement) || !(templateRow instanceof HTMLElement)) {
+  const templateRow = template == null ? void 0 : template.querySelector(itemSelector);
+  if (items === null || templateRow === null || templateRow === void 0) {
     return null;
   }
   const row = templateRow.cloneNode(true);
@@ -471,199 +255,67 @@ const insertDocumentRow = (section, item) => {
   refreshDocumentRows(section);
   return row;
 };
-
-const applyValidationErrors = (parts, errors) => {
-  parts.form.querySelectorAll(".is-invalid").forEach((field) => {
-    field.classList.remove("is-invalid");
-  });
-  if (!errors || typeof errors !== "object") {
-    return;
-  }
-  Object.entries(errors).forEach(([name, messages]) => {
-    const field = parts.form.elements.namedItem(name);
-    const feedback = parts.form.querySelector(`[data-ie-document-field-error="${CSS.escape(name)}"]`);
-    if (
-      field instanceof HTMLInputElement ||
-      field instanceof HTMLSelectElement ||
-      field instanceof HTMLTextAreaElement
-    ) {
-      field.classList.add("is-invalid");
-    }
-    if (feedback instanceof HTMLElement) {
-      feedback.textContent = Array.isArray(messages) ? messages.join(" ") : "";
-    }
-  });
-};
-
-const collectDocumentFields = (parts, fields) => {
-  const values = {};
-  fields.forEach((field) => {
-    if (field.readOnly || field.disabled) {
-      return;
-    }
-    const control = parts.form.elements.namedItem(field.name);
-    if (control instanceof HTMLInputElement && field.type === "checkbox") {
-      values[field.name] = control.checked;
-    } else if (
-      control instanceof HTMLInputElement ||
-      control instanceof HTMLSelectElement ||
-      control instanceof HTMLTextAreaElement
-    ) {
-      values[field.name] = control instanceof HTMLTextAreaElement && field.richText
-        ? (getRichTextEditorValue(control) ?? control.value)
-        : control.value;
-    }
-  });
-  return values;
-};
-
-const submitDocumentModal = async (parts) => {
-  const state = modalStates.get(parts.modal);
-  if (!state) {
-    return;
-  }
-  const { root, section, mode, record, fields } = state;
-  if (mode === "view") {
-    return;
-  }
-  if (mode !== "delete" && !parts.form.reportValidity()) {
-    return;
-  }
-  const endpoint = mode === "add"
-    ? root.dataset.createDocumentUrl
-    : mode === "edit"
-      ? root.dataset.updateDocumentUrl
-      : root.dataset.deleteDocumentUrl;
-  const data = { section: section.dataset.sectionKey };
-  if (mode !== "add") {
-    data.record = record;
-  }
-  if (mode !== "delete") {
-    data.fields = collectDocumentFields(parts, fields);
-  }
-  setModalError(parts);
-  setModalPending(parts, true);
-  showStatus(root, "info", root.dataset.messageSaving ?? null);
-  try {
-    const response = await requestDocument(root, endpoint, data);
-    if (mode === "add") {
-      insertDocumentRow(section, response.item);
-    } else if (mode === "edit") {
-      const row = section.querySelector(`${itemSelector}[data-item-uid="${CSS.escape(String(record))}"]`);
-      if (row instanceof HTMLElement) {
-        updateDocumentRow(section, row, response.item);
-      }
-      refreshDocumentRows(section);
-    } else {
-      const row = section.querySelector(`${itemSelector}[data-item-uid="${CSS.escape(String(record))}"]`);
-      row?.remove();
-      refreshDocumentRows(section);
-    }
-    setModalPending(parts, false);
-    globalThis.bootstrap.Modal.getOrCreateInstance(parts.modal).hide();
-    showStatus(
-      root,
-      "success",
-      mode === "delete" ? (root.dataset.messageDocumentDeleted ?? null) : (root.dataset.messageDocumentSaved ?? null),
-    );
-  } catch (error) {
-    applyValidationErrors(parts, error.result?.errors);
-    setModalError(parts, error.result?.message ?? root.dataset.messageErrorMessage ?? "");
-  } finally {
-    setModalPending(parts, false);
-  }
-};
-
-const setSectionPending = (section, pending) => {
-  if (pending) {
-    section.setAttribute("aria-busy", "true");
-  } else {
-    section.removeAttribute("aria-busy");
-  }
-  section.querySelectorAll("button").forEach((button) => {
-    if (!(button instanceof HTMLButtonElement)) {
-      return;
-    }
-    if (pending) {
-      if (button.dataset.ieDocumentWasDisabled === undefined) {
-        button.dataset.ieDocumentWasDisabled = button.disabled ? "1" : "0";
-      }
-      button.disabled = true;
-    } else if (button.dataset.ieDocumentWasDisabled !== undefined) {
-      button.disabled = button.dataset.ieDocumentWasDisabled === "1";
-      delete button.dataset.ieDocumentWasDisabled;
-    }
-  });
-};
-
-export const getDocumentOrder = (section) => Array.from(section.querySelectorAll(itemSelector), (row) => Number.parseInt(row.dataset.itemUid ?? "", 10)).filter((uid) => Number.isInteger(uid) && uid > 0);
-
-export const applyDocumentOrder = (section, order) => {
+const getDocumentOrder = (section) => Array.from(
+  getDocumentRows(section),
+  (row) => Number.parseInt(row.dataset.itemUid ?? "", 10)
+).filter((uid) => Number.isInteger(uid) && uid > 0);
+const applyDocumentOrder = (section, order) => {
   const items = section.querySelector(itemsSelector);
-  if (!(items instanceof HTMLElement) || !Array.isArray(order)) {
+  if (items === null) {
     return;
   }
-  const rowsByUid = new Map(Array.from(section.querySelectorAll(itemSelector)).map((row) => [row.dataset.itemUid, row]));
+  const rowsByUid = new Map(
+    getDocumentRows(section).map(
+      (row) => [row.dataset.itemUid, row]
+    )
+  );
   order.forEach((uid) => {
     const row = rowsByUid.get(String(uid));
-    if (row instanceof HTMLElement) {
+    if (row !== void 0) {
       items.append(row);
     }
   });
   refreshDocumentRows(section);
 };
-
-const sortDocument = async (root, section, row, direction) => {
-  const record = Number.parseInt(row.dataset.itemUid ?? "", 10);
-  if (!Number.isInteger(record) || record <= 0 || !["up", "down"].includes(direction)) {
-    return;
-  }
-  setSectionPending(section, true);
-  try {
-    const response = await requestDocument(root, root.dataset.sortDocumentUrl, {
-      section: section.dataset.sectionKey,
-      record,
-      direction,
-    });
-    applyDocumentOrder(section, response.order);
-    showStatus(root, "success", root.dataset.messageDocumentSorted ?? null);
-  } catch (error) {
-    showStatus(root, "danger", error.result?.message ?? null);
-  } finally {
-    setSectionPending(section, false);
-    refreshDocumentRows(section);
-  }
+const setSectionPending = (section, pending) => {
+  section.setAttribute("aria-busy", String(pending));
+  section.style.cursor = pending ? "wait" : "";
+  section.querySelectorAll("button").forEach((button) => {
+    if (pending) {
+      if (button.dataset.ieDocumentWasDisabled === void 0) {
+        button.dataset.ieDocumentWasDisabled = button.disabled ? "1" : "0";
+      }
+      button.disabled = true;
+    } else if (button.dataset.ieDocumentWasDisabled !== void 0) {
+      button.disabled = button.dataset.ieDocumentWasDisabled === "1";
+      delete button.dataset.ieDocumentWasDisabled;
+    }
+  });
 };
-
 const persistDocumentOrder = async (root, section, order, previousOrder) => {
+  var _a;
   setSectionPending(section, true);
   try {
     const response = await requestDocument(root, root.dataset.sortDocumentUrl, {
       section: section.dataset.sectionKey,
-      order,
+      order
     });
-    applyDocumentOrder(section, response.order);
+    applyDocumentOrder(section, Array.isArray(response.order) ? response.order.map(Number) : order);
     showStatus(root, "success", root.dataset.messageDocumentSorted ?? null);
   } catch (error) {
     applyDocumentOrder(section, previousOrder);
-    showStatus(root, "danger", error.result?.message ?? null);
+    showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
   } finally {
     setSectionPending(section, false);
     refreshDocumentRows(section);
   }
 };
-
 const clearDocumentDropPosition = (state) => {
-  state.section
-    .querySelectorAll(`${itemSelector}.is-drop-before, ${itemSelector}.is-drop-after`)
-    .forEach((row) => {
-      row.classList.remove("is-drop-before", "is-drop-after");
-    });
+  state.section.querySelectorAll(`${itemSelector}.is-drop-before, ${itemSelector}.is-drop-after`).forEach((row) => row.classList.remove("is-drop-before", "is-drop-after"));
   state.items.classList.remove("is-drop-at-end");
   state.dropRow = null;
   state.dropPosition = null;
 };
-
 const getDocumentDropPosition = (state, targetRow, clientY) => {
   const bounds = targetRow.getBoundingClientRect();
   if (Number.isFinite(clientY) && bounds.height > 0) {
@@ -672,17 +324,13 @@ const getDocumentDropPosition = (state, targetRow, clientY) => {
   const rows = Array.from(state.items.querySelectorAll(itemSelector));
   return rows.indexOf(state.row) < rows.indexOf(targetRow) ? "after" : "before";
 };
-
 const updateDocumentDropPosition = (state, target, clientY) => {
   clearDocumentDropPosition(state);
   const targetRow = target.closest(itemSelector);
   if (targetRow === state.row) {
     return;
   }
-  if (
-    targetRow instanceof HTMLElement &&
-    targetRow.closest(itemsSelector) === state.items
-  ) {
+  if (targetRow !== null && targetRow.closest(itemsSelector) === state.items) {
     const position = getDocumentDropPosition(state, targetRow, clientY);
     targetRow.classList.add(position === "before" ? "is-drop-before" : "is-drop-after");
     state.dropRow = targetRow;
@@ -694,10 +342,9 @@ const updateDocumentDropPosition = (state, target, clientY) => {
     state.dropPosition = "end";
   }
 };
-
 const clearDragState = (root) => {
   const state = dragStates.get(root);
-  if (!state) {
+  if (state === void 0) {
     return;
   }
   clearDocumentDropPosition(state);
@@ -706,25 +353,14 @@ const clearDragState = (root) => {
   state.handle.removeAttribute("aria-grabbed");
   dragStates.delete(root);
 };
-
 const initializeDocumentDragAndDrop = (root) => {
   root.addEventListener("dragstart", (event) => {
     const target = event.target instanceof Element ? event.target : null;
-    const handle = target?.closest("[data-ie-document-drag]");
-    const row = handle?.closest(itemSelector);
-    const section = row?.closest(sectionSelector);
-    const items = row?.closest(itemsSelector);
-    if (!(handle instanceof HTMLButtonElement)) {
-      return;
-    }
-    if (
-      handle.disabled ||
-      !(row instanceof HTMLElement) ||
-      !(section instanceof HTMLElement) ||
-      !(items instanceof HTMLElement) ||
-      section.dataset.sectionSortable !== "1"
-    ) {
-      event.preventDefault();
+    const handle = target == null ? void 0 : target.closest("[data-ie-document-drag]");
+    const row = handle == null ? void 0 : handle.closest(itemSelector);
+    const section = row == null ? void 0 : row.closest(sectionSelector);
+    const items = row == null ? void 0 : row.closest(itemsSelector);
+    if (handle === null || handle === void 0 || handle.disabled || row === null || row === void 0 || section === null || section === void 0 || items === null || items === void 0 || section.dataset.sectionSortable !== "1") {
       return;
     }
     dragStates.set(root, {
@@ -734,28 +370,24 @@ const initializeDocumentDragAndDrop = (root) => {
       handle,
       order: getDocumentOrder(section),
       dropRow: null,
-      dropPosition: null,
+      dropPosition: null
     });
     items.classList.add("is-drag-active");
     row.classList.add("is-dragging");
     handle.setAttribute("aria-grabbed", "true");
-    if (event.dataTransfer) {
+    if (event.dataTransfer !== null) {
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", row.dataset.itemUid ?? "");
       const bounds = row.getBoundingClientRect();
-      const offsetX = Number.isFinite(event.clientX)
-        ? Math.min(Math.max(event.clientX - bounds.left, 0), bounds.width)
-        : 0;
-      const offsetY = Number.isFinite(event.clientY)
-        ? Math.min(Math.max(event.clientY - bounds.top, 0), bounds.height)
-        : 0;
-      event.dataTransfer.setDragImage?.(row, offsetX, offsetY);
+      const offsetX = Math.min(Math.max(event.clientX - bounds.left, 0), bounds.width);
+      const offsetY = Math.min(Math.max(event.clientY - bounds.top, 0), bounds.height);
+      event.dataTransfer.setDragImage(row, offsetX, offsetY);
     }
   });
   root.addEventListener("dragover", (event) => {
     const state = dragStates.get(root);
     const target = event.target instanceof Element ? event.target : null;
-    if (!state || !target) {
+    if (state === void 0 || target === null) {
       return;
     }
     if (target.closest(sectionSelector) !== state.section) {
@@ -764,21 +396,21 @@ const initializeDocumentDragAndDrop = (root) => {
     }
     event.preventDefault();
     updateDocumentDropPosition(state, target, event.clientY);
-    if (event.dataTransfer) {
+    if (event.dataTransfer !== null) {
       event.dataTransfer.dropEffect = "move";
     }
   });
   root.addEventListener("drop", (event) => {
     const state = dragStates.get(root);
     const target = event.target instanceof Element ? event.target : null;
-    if (!state || target?.closest(sectionSelector) !== state.section) {
+    if (state === void 0 || (target == null ? void 0 : target.closest(sectionSelector)) !== state.section) {
       return;
     }
     event.preventDefault();
     updateDocumentDropPosition(state, target, event.clientY);
-    if (state.dropRow instanceof HTMLElement && state.dropPosition === "before") {
+    if (state.dropRow !== null && state.dropPosition === "before") {
       state.dropRow.before(state.row);
-    } else if (state.dropRow instanceof HTMLElement && state.dropPosition === "after") {
+    } else if (state.dropRow !== null && state.dropPosition === "after") {
       state.dropRow.after(state.row);
     } else if (state.dropPosition === "end") {
       state.items.append(state.row);
@@ -793,68 +425,504 @@ const initializeDocumentDragAndDrop = (root) => {
       void persistDocumentOrder(root, section, order, previousOrder);
     }
   });
-  root.addEventListener("dragend", () => {
-    clearDragState(root);
-  });
+  root.addEventListener("dragend", () => clearDragState(root));
 };
-
-export const initializeDocumentSections = (root) => {
-  if (!(root instanceof HTMLElement)) {
-    return;
-  }
+const createDocumentEditing = (root) => {
+  const documentState = reactive({
+    contactEmptyMessage: root.dataset.messageContractContactEmpty ?? "",
+    contactSections: [],
+    deleteConfirmation: root.dataset.messageDocumentDeleteConfirm ?? "",
+    error: "",
+    errors: {},
+    fields: [],
+    kind: "document",
+    mode: "view",
+    open: false,
+    pending: false,
+    record: null,
+    section: "",
+    target: "",
+    title: "",
+    values: {}
+  });
+  const contractContactState = reactive({
+    deleteConfirmation: root.dataset.messageContractContactDeleteConfirm ?? "",
+    error: "",
+    errors: {},
+    fields: [],
+    mode: "view",
+    open: false,
+    pending: false,
+    record: null,
+    section: "",
+    title: "",
+    values: {}
+  });
+  let activeSection = null;
+  let trigger = null;
+  let contractContactTrigger = null;
+  let rowPendingRemoval = null;
+  let sectionPendingRefresh = null;
+  const initializeDocumentEditors = async () => {
+    var _a;
+    await nextTick();
+    const view = root.querySelector(documentViewSelector);
+    if (view === null) {
+      return;
+    }
+    initializePopover(view);
+    await Promise.all(
+      Array.from(
+        view.querySelectorAll("textarea[data-ie-rich-text]")
+      ).map((field) => ensureRichTextEditor(root, field))
+    );
+    if (documentState.mode === "add" || documentState.mode === "edit") {
+      const firstField = view.querySelector("[data-ie-document-field]:not([disabled])");
+      if (firstField instanceof HTMLTextAreaElement && firstField.matches("[data-ie-rich-text]")) {
+        const editor = await ensureRichTextEditor(root, firstField);
+        editor == null ? void 0 : editor.editing.view.focus();
+      } else {
+        firstField == null ? void 0 : firstField.focus();
+      }
+      return;
+    }
+    (_a = view.querySelector("[data-ie-document-heading]")) == null ? void 0 : _a.focus();
+  };
+  const collapseDocument = () => {
+    contractContactState.open = false;
+    documentState.open = false;
+    trigger == null ? void 0 : trigger.setAttribute("aria-expanded", "false");
+  };
+  const openDocument = async (modeValue, event) => {
+    var _a;
+    if (!isDocumentMode(modeValue) || documentState.pending) {
+      return;
+    }
+    const button = event.currentTarget instanceof HTMLButtonElement ? event.currentTarget : event.target instanceof Element ? event.target.closest("button") : null;
+    const section = button == null ? void 0 : button.closest(sectionSelector);
+    if (button === null || section === null || section === void 0) {
+      return;
+    }
+    if (documentState.open && trigger === button && documentState.mode === modeValue) {
+      collapseDocument();
+      return;
+    }
+    const collapseTarget = getDocumentCollapseTarget(button, section, modeValue);
+    if (collapseTarget === null) {
+      return;
+    }
+    const record = modeValue === "add" ? null : getRecordFromButton(button);
+    if (modeValue !== "add" && record === null) {
+      return;
+    }
+    documentState.pending = true;
+    documentState.error = "";
+    documentState.errors = {};
+    try {
+      const response = await requestDocument(root, root.dataset.documentFormUrl, {
+        section: section.dataset.sectionKey,
+        record: record ?? 0,
+        mode: modeValue
+      });
+      const fields = getResponseFields(response.fields);
+      activeSection = section;
+      documentState.fields = fields;
+      documentState.contactSections = getResponseContactSections(
+        response.contactSections
+      );
+      documentState.kind = section.dataset.sectionKind === "contract" ? "contract" : "document";
+      documentState.mode = modeValue;
+      documentState.record = typeof response.record === "number" ? response.record : record;
+      documentState.section = section.dataset.sectionKey ?? "";
+      documentState.title = [
+        getModeLabel(root, modeValue),
+        getDocumentSubject(section, fields)
+      ].filter(Boolean).join(": ");
+      documentState.values = Object.fromEntries(
+        fields.map((field) => [field.name, field.value])
+      );
+      trigger == null ? void 0 : trigger.setAttribute("aria-expanded", "false");
+      trigger = button;
+      documentState.target = getDocumentCollapseTargetSelector(collapseTarget);
+      button.setAttribute("aria-controls", collapseTarget.id);
+      button.setAttribute("aria-expanded", "true");
+      documentState.open = true;
+      documentState.pending = false;
+      await initializeDocumentEditors();
+    } catch (error) {
+      showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+    } finally {
+      documentState.pending = false;
+    }
+  };
+  const closeDocument = () => {
+    if (documentState.pending) {
+      return;
+    }
+    collapseDocument();
+  };
+  const finishDocumentClose = () => {
+    const focusTarget = trigger;
+    rowPendingRemoval == null ? void 0 : rowPendingRemoval.remove();
+    if (sectionPendingRefresh !== null) {
+      refreshDocumentRows(sectionPendingRefresh);
+    }
+    rowPendingRemoval = null;
+    sectionPendingRefresh = null;
+    activeSection = null;
+    trigger = null;
+    documentState.target = "";
+    documentState.fields = [];
+    documentState.contactSections = [];
+    documentState.values = {};
+    contractContactState.fields = [];
+    contractContactState.values = {};
+    if ((focusTarget == null ? void 0 : focusTarget.isConnected) === true) {
+      focusTarget.focus({ preventScroll: true });
+    }
+  };
+  const collectDocumentValues = () => {
+    const values = { ...documentState.values };
+    const view = root.querySelector(documentViewSelector);
+    documentState.fields.forEach((field) => {
+      if (!field.richText || view === null) {
+        return;
+      }
+      const control = view.querySelector(
+        `[data-ie-document-field="${CSS.escape(field.name)}"]`
+      );
+      if (control !== null) {
+        values[field.name] = getRichTextEditorValue(control) ?? control.value;
+      }
+    });
+    return values;
+  };
+  const submitDocument = async () => {
+    if (documentState.pending || documentState.mode === "view" || activeSection === null) {
+      return;
+    }
+    const form = root.querySelector("[data-ie-document-form]");
+    if (documentState.mode !== "delete" && form !== null && !form.reportValidity()) {
+      return;
+    }
+    const endpoint = documentState.mode === "add" ? root.dataset.createDocumentUrl : documentState.mode === "edit" ? root.dataset.updateDocumentUrl : root.dataset.deleteDocumentUrl;
+    const data = { section: documentState.section };
+    if (documentState.mode !== "add") {
+      data.record = documentState.record;
+    }
+    if (documentState.mode !== "delete") {
+      data.fields = collectDocumentValues();
+    }
+    documentState.pending = true;
+    documentState.error = "";
+    documentState.errors = {};
+    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    try {
+      const response = await requestDocument(root, endpoint, data);
+      const item = response.item;
+      if (documentState.mode === "add" && item !== void 0) {
+        insertDocumentRow(activeSection, item);
+      } else if (documentState.mode === "edit" && item !== void 0) {
+        const row = activeSection.querySelector(
+          `${itemSelector}[data-item-uid="${CSS.escape(String(documentState.record))}"]`
+        );
+        if (row !== null) {
+          updateDocumentRow(activeSection, row, item);
+        }
+        refreshDocumentRows(activeSection);
+      } else if (documentState.mode === "delete") {
+        rowPendingRemoval = activeSection.querySelector(
+          `${itemSelector}[data-item-uid="${CSS.escape(String(documentState.record))}"]`
+        );
+        sectionPendingRefresh = activeSection;
+      }
+      const successMessage = documentState.mode === "delete" ? root.dataset.messageDocumentDeleted : root.dataset.messageDocumentSaved;
+      documentState.pending = false;
+      closeDocument();
+      showStatus(root, "success", successMessage ?? null);
+    } catch (error) {
+      const result = error.result;
+      documentState.error = (result == null ? void 0 : result.message) ?? root.dataset.messageErrorMessage ?? "";
+      documentState.errors = Object.fromEntries(
+        Object.entries((result == null ? void 0 : result.errors) ?? {}).map(([name, messages]) => [
+          name,
+          Array.isArray(messages) ? messages.map(String).join(" ") : String(messages)
+        ])
+      );
+    } finally {
+      documentState.pending = false;
+    }
+  };
+  const sortDocument = async (direction, event) => {
+    var _a;
+    const button = event.currentTarget instanceof HTMLButtonElement ? event.currentTarget : event.target instanceof Element ? event.target.closest("button") : null;
+    const section = button == null ? void 0 : button.closest(sectionSelector);
+    const record = button === null ? null : getRecordFromButton(button);
+    if (button === null || section === null || section === void 0 || record === null || !["up", "down"].includes(direction)) {
+      return;
+    }
+    setSectionPending(section, true);
+    try {
+      const response = await requestDocument(root, root.dataset.sortDocumentUrl, {
+        section: section.dataset.sectionKey,
+        record,
+        direction
+      });
+      applyDocumentOrder(
+        section,
+        Array.isArray(response.order) ? response.order.map(Number) : []
+      );
+      showStatus(root, "success", root.dataset.messageDocumentSorted ?? null);
+    } catch (error) {
+      showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+    } finally {
+      setSectionPending(section, false);
+      refreshDocumentRows(section);
+    }
+  };
+  const openContractContact = async (modeValue, section, event, record = 0) => {
+    var _a;
+    if (!isDocumentMode(modeValue) || documentState.record === null || contractContactState.pending) {
+      return;
+    }
+    const normalizedRecord = modeValue === "add" ? null : record;
+    if (modeValue !== "add" && (!Number.isInteger(record) || record <= 0)) {
+      return;
+    }
+    const button = event.currentTarget instanceof HTMLElement ? event.currentTarget : event.target instanceof Element ? event.target.closest("button") : null;
+    if (contractContactState.open && contractContactState.mode === modeValue && contractContactState.section === section && contractContactState.record === normalizedRecord) {
+      closeContractContact();
+      return;
+    }
+    contractContactState.pending = true;
+    contractContactState.error = "";
+    contractContactState.errors = {};
+    try {
+      const response = await requestDocument(
+        root,
+        root.dataset.contractContactFormUrl,
+        {
+          contract: documentState.record,
+          section,
+          record: normalizedRecord ?? 0,
+          mode: modeValue
+        }
+      );
+      const fields = getResponseFields(response.fields);
+      contractContactState.fields = fields;
+      contractContactState.mode = modeValue;
+      contractContactState.record = typeof response.record === "number" ? response.record : normalizedRecord;
+      contractContactState.section = section;
+      contractContactState.title = [
+        getModeLabel(root, modeValue),
+        String(response.title ?? "")
+      ].filter(Boolean).join(": ");
+      contractContactState.values = Object.fromEntries(
+        fields.map((field) => [field.name, field.value])
+      );
+      contractContactTrigger = button;
+      contractContactState.open = true;
+      await nextTick();
+      const editor = root.querySelector(
+        "[data-ie-contract-contact-editor]"
+      );
+      if (editor !== null) {
+        initializePopover(editor);
+        editor.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        const focusTarget = contractContactState.mode === "add" || contractContactState.mode === "edit" ? editor.querySelector(
+          "input:not([disabled]), select:not([disabled])"
+        ) : editor.querySelector("[data-ie-contract-contact-heading]");
+        focusTarget == null ? void 0 : focusTarget.focus({ preventScroll: true });
+      }
+    } catch (error) {
+      showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+    } finally {
+      contractContactState.pending = false;
+    }
+  };
+  const closeContractContact = () => {
+    if (!contractContactState.pending) {
+      contractContactState.open = false;
+      const focusTarget = contractContactTrigger;
+      contractContactTrigger = null;
+      void nextTick().then(() => {
+        if ((focusTarget == null ? void 0 : focusTarget.isConnected) === true) {
+          focusTarget.focus({ preventScroll: true });
+        }
+      });
+    }
+  };
+  const submitContractContact = async () => {
+    if (contractContactState.pending || contractContactState.mode === "view" || documentState.record === null) {
+      return;
+    }
+    const form = root.querySelector("[data-ie-document-form]");
+    if (contractContactState.mode !== "delete" && form !== null && !form.reportValidity()) {
+      return;
+    }
+    const endpoint = contractContactState.mode === "add" ? root.dataset.createContractContactUrl : contractContactState.mode === "edit" ? root.dataset.updateContractContactUrl : root.dataset.deleteContractContactUrl;
+    const data = {
+      contract: documentState.record,
+      section: contractContactState.section
+    };
+    if (contractContactState.mode !== "add") {
+      data.record = contractContactState.record;
+    }
+    if (contractContactState.mode !== "delete") {
+      data.fields = { ...contractContactState.values };
+    }
+    contractContactState.pending = true;
+    contractContactState.error = "";
+    contractContactState.errors = {};
+    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    try {
+      const response = await requestDocument(root, endpoint, data);
+      const section = documentState.contactSections.find(
+        (candidate) => candidate.identifier === contractContactState.section
+      );
+      const item = asContractContactItem(response.item);
+      if (section !== void 0) {
+        if (contractContactState.mode === "add" && item !== null) {
+          section.items.push(item);
+        } else if (contractContactState.mode === "edit" && item !== null) {
+          const index = section.items.findIndex(
+            (candidate) => candidate.uid === contractContactState.record
+          );
+          if (index >= 0) {
+            section.items.splice(index, 1, item);
+          }
+        } else if (contractContactState.mode === "delete") {
+          const index = section.items.findIndex(
+            (candidate) => candidate.uid === contractContactState.record
+          );
+          if (index >= 0) {
+            section.items.splice(index, 1);
+          }
+        }
+      }
+      contractContactState.pending = false;
+      contractContactState.open = false;
+      showStatus(
+        root,
+        "success",
+        contractContactState.mode === "delete" ? root.dataset.messageDocumentDeleted ?? null : root.dataset.messageDocumentSaved ?? null
+      );
+    } catch (error) {
+      const result = error.result;
+      contractContactState.error = (result == null ? void 0 : result.message) ?? root.dataset.messageErrorMessage ?? "";
+      contractContactState.errors = Object.fromEntries(
+        Object.entries((result == null ? void 0 : result.errors) ?? {}).map(
+          ([name, messages]) => [
+            name,
+            Array.isArray(messages) ? messages.map(String).join(" ") : String(messages)
+          ]
+        )
+      );
+    } finally {
+      contractContactState.pending = false;
+    }
+  };
+  const sortContractContact = async (direction, sectionIdentifier, record) => {
+    var _a;
+    if (contractContactState.pending || documentState.record === null || !["up", "down"].includes(direction)) {
+      return;
+    }
+    const section = documentState.contactSections.find(
+      (candidate) => candidate.identifier === sectionIdentifier
+    );
+    if (section === void 0) {
+      return;
+    }
+    contractContactState.pending = true;
+    try {
+      const response = await requestDocument(
+        root,
+        root.dataset.sortContractContactUrl,
+        {
+          contract: documentState.record,
+          section: sectionIdentifier,
+          record,
+          direction
+        }
+      );
+      const itemsByUid = new Map(
+        section.items.map((item) => [item.uid, item])
+      );
+      const order = Array.isArray(response.order) ? response.order.map(Number) : [];
+      const sortedItems = order.flatMap((uid) => {
+        const item = itemsByUid.get(uid);
+        return item === void 0 ? [] : [item];
+      });
+      if (sortedItems.length === section.items.length) {
+        sortedItems.forEach((item, index) => {
+          item.sorting = (index + 1) * 10;
+        });
+        section.items.splice(0, section.items.length, ...sortedItems);
+      }
+      showStatus(root, "success", root.dataset.messageDocumentSorted ?? null);
+    } catch (error) {
+      showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+    } finally {
+      contractContactState.pending = false;
+    }
+  };
+  const documentFieldHtml = (fieldValue) => {
+    const field = asDocumentField(fieldValue);
+    if (field === null || !field.richText) {
+      return "";
+    }
+    return parseRichTextPreview(field.displayValue ?? "").body.innerHTML;
+  };
+  const controller = {
+    contractContact: contractContactState,
+    document: documentState,
+    openDocument,
+    closeDocument,
+    finishDocumentClose,
+    submitDocument,
+    openContractContact,
+    closeContractContact,
+    submitContractContact,
+    sortContractContact,
+    sortDocument,
+    documentFieldHtml
+  };
+  controllers.set(root, controller);
+  return controller;
+};
+const initializeDocumentSections = (root) => {
   root.querySelectorAll(sectionSelector).forEach(refreshDocumentRows);
   if (initializedRoots.has(root)) {
     return;
   }
   initializedRoots.add(root);
-  const parts = getDocumentModalParts(root);
-  parts?.form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    void submitDocumentModal(parts);
-  });
-  parts?.modal.addEventListener("hidden.bs.modal", () => {
-    const trigger = modalStates.get(parts.modal)?.trigger;
-    if (trigger instanceof HTMLElement) {
-      trigger.focus();
-    }
-  });
-  parts?.modal.addEventListener("hide.bs.modal", (event) => {
-    if (parts.modal.getAttribute("aria-busy") === "true") {
-      event.preventDefault();
-    }
-  });
   initializeDocumentDragAndDrop(root);
   root.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target : null;
-    const button = target?.closest(
-      "[data-ie-document-add], [data-ie-document-view], [data-ie-document-edit], " +
-        "[data-ie-document-delete], [data-ie-document-sort]",
+    const button = target == null ? void 0 : target.closest(
+      "[data-ie-document-add], [data-ie-document-view], [data-ie-document-edit], [data-ie-document-delete], [data-ie-document-sort]"
     );
-    if (!(button instanceof HTMLButtonElement) || button.disabled) {
+    if (button === null || button === void 0 || button.disabled) {
       return;
     }
-    const section = button.closest(sectionSelector);
-    if (!(section instanceof HTMLElement)) {
+    const controller = controllers.get(root);
+    if (controller === void 0) {
       return;
     }
-    if (button.matches("[data-ie-document-add]")) {
-      void openDocumentModal(root, section, "add", null, button);
+    const direction = button.dataset.ieDocumentSort;
+    if (direction !== void 0) {
+      void controller.sortDocument(direction, event);
       return;
     }
-    const row = button.closest(itemSelector);
-    const record = Number.parseInt(row?.dataset.itemUid ?? "", 10);
-    if (!(row instanceof HTMLElement) || !Number.isInteger(record) || record <= 0) {
-      return;
-    }
-    if (button.matches("[data-ie-document-sort]")) {
-      void sortDocument(root, section, row, button.dataset.ieDocumentSort);
-      return;
-    }
-    const mode = button.matches("[data-ie-document-view]")
-      ? "view"
-      : button.matches("[data-ie-document-edit]")
-        ? "edit"
-        : "delete";
-    void openDocumentModal(root, section, mode, record, button);
+    const mode = button.matches("[data-ie-document-add]") ? "add" : button.matches("[data-ie-document-view]") ? "view" : button.matches("[data-ie-document-edit]") ? "edit" : "delete";
+    void controller.openDocument(mode, event);
   });
+};
+export {
+  applyDocumentOrder,
+  createDocumentEditing,
+  getDocumentOrder,
+  initializeDocumentSections,
+  refreshDocumentRows,
+  updateDocumentRow
 };
