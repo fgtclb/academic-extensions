@@ -1,7 +1,0 @@
-# The assigned-profile list and inline editor content element.
-name: fgtclb/academic-persons-edit-inline-profile
-label: 'Academic Persons Edit: Inline profile editing'
-dependencies:
-  - fgtclb/academic-base-ctype-group
-typoscript: 'EXT:academic_persons_edit/Configuration/TypoScript/InlineProfile/'
-pagets: 'EXT:academic_persons_edit/Configuration/TSconfig/InlineProfile/page.tsconfig'

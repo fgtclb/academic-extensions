@@ -25,9 +25,9 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
      */
     public static function staticTemplateIsRegisteredDataProvider(): \Generator
     {
-        yield 'inline profile editing' => [
-            'EXT:academic_persons_edit/Configuration/TypoScript/InlineProfile',
-            'Academic Persons Edit: Inline profile editing (academic_persons_edit)',
+        yield 'profile editing' => [
+            'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing',
+            'Academic Persons Edit: Profile editing (academic_persons_edit)',
         ];
         yield 'all components' => [
             'EXT:academic_persons_edit/Configuration/TypoScript/Full',
@@ -84,9 +84,9 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
      */
     public static function pageTsConfigFileIsRegisteredDataProvider(): \Generator
     {
-        yield 'inline profile editing' => [
-            'EXT:academic_persons_edit/Configuration/TSconfig/InlineProfile/page.tsconfig',
-            'Academic Persons Edit: Inline profile editing (academic_persons_edit)',
+        yield 'profile editing' => [
+            'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig',
+            'Academic Persons Edit: Profile editing (academic_persons_edit)',
         ];
         yield 'all components' => [
             'EXT:academic_persons_edit/Configuration/TSconfig/Full/page.tsconfig',
@@ -120,14 +120,14 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
     }
 
     #[Test]
-    public function legacyCompatibilityConfigurationIsNotOffered(): void
+    public function removedInlineProfileConfigurationIsNotOffered(): void
     {
         $staticTemplateValues = array_column(
             $GLOBALS['TCA']['sys_template']['columns']['include_static_file']['config']['items'] ?? [],
             'value',
         );
         $this->assertNotContains(
-            'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing',
+            'EXT:academic_persons_edit/Configuration/TypoScript/InlineProfile',
             $staticTemplateValues,
         );
 
@@ -136,7 +136,7 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
             'value',
         );
         $this->assertNotContains(
-            'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig',
+            'EXT:academic_persons_edit/Configuration/TSconfig/InlineProfile/page.tsconfig',
             $pageTsConfigValues,
         );
     }

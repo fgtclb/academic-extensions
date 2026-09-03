@@ -18,7 +18,7 @@ import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/s
 
 const mountedRoots = new WeakSet<HTMLElement>();
 
-const createInlineProfileApp = (root: HTMLElement): App =>
+const createProfileEditingApp = (root: HTMLElement): App =>
   createApp({
     setup(): Record<string, unknown> {
       const documentController = createDocumentEditing(root);
@@ -40,18 +40,18 @@ const createInlineProfileApp = (root: HTMLElement): App =>
     },
   });
 
-export const initializeInlineProfiles = (scope: ParentNode = document): App[] => {
+export const initializeProfileEditors = (scope: ParentNode = document): App[] => {
   const applications: App[] = [];
   scope.querySelectorAll(rootSelector).forEach((candidate): void => {
     if (!(candidate instanceof HTMLElement) || mountedRoots.has(candidate)) {
       return;
     }
     mountedRoots.add(candidate);
-    const application = createInlineProfileApp(candidate);
+    const application = createProfileEditingApp(candidate);
     application.mount(candidate);
     applications.push(application);
   });
   return applications;
 };
 
-initializeInlineProfiles();
+initializeProfileEditors();

@@ -7,10 +7,10 @@ Feature: Settings-driven Profile editor
 Description
 ===========
 
-The InlineProfile view now generates its field order, validation metadata and
+The ProfileEditing view now generates its field order, validation metadata and
 control selection from the typed :yaml:`profile` settings. ``Index.html`` only
-places the configured visual sections. ``Field/Renderer.html`` dispatches to a
-dedicated input, textarea, CKEditor, select, checkbox or combined-link partial
+places the configured visual sections. ``Profile/Fields.html`` dispatches to
+the input, textarea, CKEditor, select, checkbox or combined-link control
 according to ``renderType``. Select options remain authoritative in Profile
 TCA.
 
@@ -29,11 +29,11 @@ Impact
 ======
 
 Template overrides should place ``profileSections`` and ``specialFields`` but
-must not duplicate the field list. Custom render types need a matching
-``Field/Types`` partial and, only when behavior differs from an existing HTML
-control, a focused JavaScript module extension.
+must not duplicate the field list. Custom render types need a matching control
+below ``Partials/Profile/Field`` and, only when behavior differs from an
+existing HTML control, a focused JavaScript module extension.
 
-The implementation boundary remains InlineProfile; the retained legacy
-ProfileEditing templates are not a source for new editing behavior.
+The implementation boundary is ``ProfileController`` together with the
+``Profile`` template and partial tree.
 
 ..  index:: AJAX, Configuration, Fluid, Frontend, Inline editing, JavaScript

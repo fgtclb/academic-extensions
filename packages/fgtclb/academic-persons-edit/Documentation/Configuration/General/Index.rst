@@ -8,22 +8,6 @@ General configuration
 **Extension configuration**
 There are some options for global extension configuration:
 
-..  confval:: profile.autoCreateProfiles
-
-    :type: boolean
-    :Default: false
-
-    If enabled, a new profile will be created when a frontend user without an
-assigned profile and that meets the criteria logs in.
-
-..  confval:: profile.createProfileForUserGroups
-
-    :type: string
-    :Default:
-
-    A comma-separated list of frontend group IDs. When a user without an assigned profile
-    logs in and is assigned to one of these groups, a new profile will be created.
-
 ..  confval:: profile.allowedLanguages
 
     :type: string
@@ -35,10 +19,8 @@ assigned profile and that meets the criteria logs in.
     The synchronisation into these languages runs after a profile is auto-created
     — on frontend user login or through the :bash:`academic:createprofiles`
     command of :guilabel:`EXT:academic_persons` — and after every change
-    persisted through the frontend editing plugins: the profile form as well as
-    the contract, address, email address, phone number and profile information
-    forms. Left empty, frontend edits do not touch translated profile records at
-    all.
+    persisted through ProfileEditing. Left empty, frontend edits do not touch
+    translated profile records at all.
 
 ..  _configuration-general-validations:
 
@@ -55,7 +37,7 @@ from the same file.
 Consequences worth knowing before reporting a problem:
 
 *   A field configured :yaml:`disabled` or :yaml:`readonly` is rendered locked.
-    The inline JSON endpoint rejects attempts to submit it.
+    The ProfileEditing JSON endpoint rejects attempts to submit it.
 *   :guilabel:`First name`, :guilabel:`Middle name` and :guilabel:`Last name` are
     **locked by default**, because profile names are usually owned by the
     connected frontend user record and synchronised from elsewhere. They are
@@ -75,7 +57,7 @@ flags, document aliases, shipped defaults and override rules. The same
 Image processing: WebP
 ======================
 
-The InlineProfile image editor offers the profile image as `WebP`_ through the
+The ProfileEditing image editor offers the profile image as `WebP`_ through the
 :html:`<picture>` candidates, with the :html:`<img>` fallback in the source
 format. TYPO3 has to be allowed to produce WebP, otherwise rendering a profile
 **that has an image** fails with:

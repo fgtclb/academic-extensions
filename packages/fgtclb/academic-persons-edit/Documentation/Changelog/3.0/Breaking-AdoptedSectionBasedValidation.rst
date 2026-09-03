@@ -27,14 +27,14 @@ Impact
 ======
 
 Projects must migrate their edit configuration to
-:file:`Configuration/AcademicsPersonsEdit/Settings.yaml` using the ``profile``,
+:file:`EXT:academic_persons/Configuration/AcademicPersons/Settings.yaml` using
+the ``profile``,
 ``special``, ``contracts`` and ``documentSections`` schema supplied by
 :guilabel:`academic_persons_edit`. Custom
 controllers, validators or tests using global validation-set identifiers must
 switch to the profile- or document-section accessors.
 
-The supported editing target remains the InlineProfile content element. The
-legacy ProfileEditing implementation is retained only as a compatibility
-reference and is not a source for new behavior.
+The supported editing target remains the ProfileEditing content element and
+its ``ProfileController``.
 
 ..  index:: AJAX, Configuration, Frontend, Validation, NotScanned, ext:academic_persons_edit

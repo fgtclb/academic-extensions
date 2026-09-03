@@ -7,7 +7,7 @@ Feature: Configured document datepickers and image cropper
 Description
 ===========
 
-The InlineProfile document modal now renders ``from``, ``to`` and ``year`` as
+The ProfileEditing document modal now renders ``from``, ``to`` and ``year`` as
 native date pickers whenever the matching section validator carries the
 ``date`` flag. The complete selected calendar date is persisted in the native
 :sql:`DATE` fields used by the ``ProfileInformation`` model; no time value is
@@ -22,7 +22,7 @@ The modal also exposes the persisted :guilabel:`Show year only` switch. It
 changes the row, modal and public-profile presentation to four-digit years
 without altering the stored month or day.
 
-The image modal consumes ``special.image.renderType`` and
+The image editor consumes ``special.image.renderType`` and
 ``special.image.settings.ratio``. A ``cropper`` render type with a valid ratio
 activates the locally packaged CropperJS 2.2 module and uploads only the cropped
 result. The module and its license are shipped with the extension; no CDN is
@@ -38,7 +38,8 @@ Impact
 ======
 
 Projects can enable fixed-ratio profile-image cropping in
-:file:`Configuration/AcademicsPersonsEdit/Settings.yaml`. Existing non-cropper image configurations and
+:file:`EXT:academic_persons/Configuration/AcademicPersons/Settings.yaml`.
+Existing non-cropper image configurations and
 document fields without the ``date`` validator keep their previous controls.
 The date fields require the matching ``academic_persons`` version that stores
 ``year``, ``year_start`` and ``year_end`` as native :sql:`DATE` values and adds

@@ -7,7 +7,7 @@ Feature: Secure profile content rich-text editor
 Description
 ===========
 
-Every inline profile field configured with ``renderType: ckeditor`` now uses
+Every profile-editing field configured with ``renderType: ckeditor`` now uses
 TYPO3's bundled CKEditor 5. The frontend module resolves CKEditor through the
 TYPO3 JavaScript import map and creates each editor lazily. No CDN asset or
 additional stylesheet is introduced.
@@ -48,6 +48,6 @@ security fixes published with TYPO3-CORE-SA-2026-006. Template overrides for
 sections containing fields with ``renderType: ckeditor`` must retain the
 rich-text and editor-container data
 attributes, preview hooks and three-action group documented in
-:ref:`inline-profile-editing`.
+:ref:`profile-editing`.
 
 ..  index:: CKEditor, Frontend editing, HTML sanitizer, Rich text, Security

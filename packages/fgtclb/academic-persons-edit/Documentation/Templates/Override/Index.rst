@@ -34,17 +34,16 @@ We suggest that you use a sitepackage extension. Learn how to
         view {
             templateRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Templates/
             partialRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Partials/
-            layoutRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Layouts/
         }
     }
 
-Inline profile template
+Profile editing template
 -----------------------
 
-The inline editor consists of
-:file:`Resources/Private/Templates/InlineProfile/Index.html` and
-:file:`Resources/Private/Partials/InlineProfile/Profile/Fields.html`, which
-dispatches to the controls below :file:`InlineProfile/Field/`. When overriding
+Profile editing consists of
+:file:`Resources/Private/Templates/Profile/Index.html` and
+:file:`Resources/Private/Partials/Profile/Profile/Fields.html`, which
+dispatches to the controls below :file:`Profile/Field/`. When overriding
 these files while keeping the shipped JavaScript, preserve their form data
 attributes and field class. The complete contract is documented in
-:ref:`inline-profile-editing`.
+:ref:`profile-editing`.

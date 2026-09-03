@@ -24,7 +24,7 @@ use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * The inline profile validator selects submitted fields from all configured profile
+ * The profile validator selects submitted fields from all configured profile
  * sections and ignores configured relation fields which are not part of its DTO.
  */
 final class ProfileFormDataValidatorTest extends UnitTestCase

@@ -19,7 +19,7 @@ Contract contact controls expose the standard ``street-address``,
 ``postal-code``, ``address-level2``, ``country``, ``email`` and ``tel`` browser
 autocomplete purposes from this configuration.
 
-All inline-profile JSON requests now expose a wait cursor and ``aria-busy``
+All profile-editing JSON requests now expose a wait cursor and ``aria-busy``
 state which is cleared after both success and failure. Dynamic profile,
 document, Contract-contact and image controls have explicit label/error
 relationships, ``aria-invalid`` state and deterministic focus transfer. A

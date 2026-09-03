@@ -56,7 +56,7 @@ assigned profiles from the TYPO3 frontend.
 
         Configure the extension and its plugins for your installation.
 
-    ..  card:: :ref:`Inline profile editing <inline-profile-editing>`
+    ..  card:: :ref:`Profile editing <profile-editing>`
 
         Edit fields, synchronization and profile images through dedicated AJAX
         endpoints.
@@ -82,7 +82,7 @@ assigned profiles from the TYPO3 frontend.
     Introduction/Index
     Installation/Index
     Configuration/Index
-    InlineEditing/Index
+    ProfileEditing/Index
     Templates/Index
     KnownProblems/Index
     Changelog/Changelog-3

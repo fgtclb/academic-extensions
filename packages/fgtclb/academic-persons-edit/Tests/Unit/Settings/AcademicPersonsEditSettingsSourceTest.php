@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Settings;
 
-use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettingsFactory;
-use FGTCLB\AcademicPersonsEdit\Settings\AcademicPersonsEditSettingsFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
@@ -72,13 +70,4 @@ final class AcademicPersonsEditSettingsSourceTest extends UnitTestCase
         $this->assertNotEmpty($settings->documentSections);
     }
 
-    #[Test]
-    public function formerFactoryDelegatesToTheCentralFactory(): void
-    {
-        $settings = new AcademicPersonsSettings();
-        $centralFactory = $this->createMock(AcademicPersonsSettingsFactory::class);
-        $centralFactory->expects($this->once())->method('get')->willReturn($settings);
-        $compatibilityFactory = new AcademicPersonsEditSettingsFactory($centralFactory);
-        $this->assertSame($settings, $compatibilityFactory->get());
-    }
 }

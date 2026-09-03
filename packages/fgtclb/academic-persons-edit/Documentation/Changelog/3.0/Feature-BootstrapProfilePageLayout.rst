@@ -7,7 +7,7 @@ Feature: Bootstrap based profile page presentation
 Description
 ===========
 
-The inline profile editor now follows the supplied profile-page design using
+The profile editor now follows the supplied profile-page design using
 Bootstrap 5 utilities. The profile name is the main heading above both content
 columns. The sticky image column restores the :guilabel:`Profile image` label;
 the personal form keeps :guilabel:`Personal data`. The first content row uses a
@@ -15,13 +15,13 @@ responsive ``4 / 8`` grid and stacks below the ``lg`` breakpoint.
 
 Read values are plain text instead of button-shaped controls. A borderless
 pencil icon rendered through TYPO3's ``core:icon`` ViewHelper opens the
-corresponding inline editor. Alternating ``bg-body-tertiary`` rows create the
+corresponding field editor. Alternating ``bg-body-tertiary`` rows create the
 visual rhythm from the reference design. The ``miscellaneous`` field is shown
 separately as the :guilabel:`About me` description.
 
-Every Bootstrap button and visible modal surface across the shipped inline and
-retained legacy Fluid views now carries ``rounded-0``. This keeps action links,
-close controls, confirmation dialogs and modal sections consistently square.
+Every Bootstrap button and visible editor control in the shipped Fluid views
+now carries ``rounded-0``. This keeps action links, close controls,
+confirmation dialogs and editor sections consistently square.
 
 The name fields and both link URL/title pairs use the new
 :file:`Field/Group.html` partial. One pencil opens all controls in a group;
@@ -54,7 +54,7 @@ valid sibling form. A successful name update also refreshes the main heading
 without a page reload.
 
 The image itself is now passive. A small pencil button overlays its upper-right
-corner and opens the unchanged image modal. Image upload, deletion, validation,
+corner and opens the image editor. Image upload, deletion, validation,
 CKEditor and status-toast behavior remain intact.
 
 Impact
@@ -62,7 +62,7 @@ Impact
 
 Projects using the shipped Fluid files receive the new responsive layout
 without adding CSS. Overrides should preserve the documented single-field and
-group data attributes from :ref:`inline-profile-editing`.
+group data attributes from :ref:`profile-editing`.
 
 The :guilabel:`Private` control represents the existing
 ``skipSync`` setting; this change does not introduce a separate visibility
