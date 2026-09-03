@@ -33,6 +33,7 @@ composer resolves the whole graph from the working tree.
 | `.Build/`                 | no      | Generated composer install target. Removed and rebuilt by `composerUpdate`.                       |
 | `.cache/`                 | no      | Composer download cache and the phpstan result cache.                                             |
 | `documentation-rendered/` | no      | Output of the reST rendering suites, one folder per extension.                                    |
+| `openspec/`               | yes     | OpenSpec: living specs, active and archived changes, `config.yaml`. Tool directories: see below.  |
 
 ### `packages/fgtclb/`
 
@@ -174,6 +175,22 @@ phpstan configuration points its `tmpDir` at `../../../.cache/phpstan`
 `checkRstRenderingSingle`, one folder per extension — the output directory is
 built in `executeRstRendering()`. It is git-ignored and uploaded as a
 continuous integration artifact.
+
+### `openspec/` and the generated tool directories
+
+`openspec/` holds the [OpenSpec](../workflow/openspec.md) tree: `config.yaml`
+with the workflow schema, the project context and the artifact rules;
+`specs/`, the living behaviour specification, one directory per capability;
+and `changes/`, one directory per active change plus `archive/` for the
+finished ones. All of it is hand-written and tracked.
+
+`.claude/`, `.gemini/`, `.junie/` and `.opencode/` carry the OpenSpec commands
+and skills for the respective tool, and `.agents/skills/` the tool-independent
+skills for tools that read that directory. They are **generated** by `openspec init`
+and refreshed by `openspec update`, so they are tracked but never edited by
+hand, and `lintMarkdown` skips them. The `.gitignore` entry that used to cover
+`/.claude` wholesale now covers only `/.claude/*.local.*`, which keeps a
+personal `settings.local.json` out while the generated files go in.
 
 ## The extensions and their split repositories
 

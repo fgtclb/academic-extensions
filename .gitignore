@@ -6,7 +6,7 @@
 /.agent
 
 # Agent tool configuration and personal, machine-local instructions.
-/.claude
+/.claude/*.local.*
 /AGENTS.local.md
 /CLAUDE.local.md
 /GEMINI.local.md
