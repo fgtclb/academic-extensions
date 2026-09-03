@@ -27,6 +27,7 @@ handful of things that are easy to get wrong and expensive to discover later.
 | The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                        |
 | Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                     |
 | Analysing a backport instead of cherry-picking it       | [Backporting](docs/workflow/backporting.md)                             |
+| Planning a change with OpenSpec before implementing it  | [OpenSpec](docs/workflow/openspec.md)                                   |
 
 ## Local additions and overrides
 
@@ -86,6 +87,44 @@ costs RAM. Use `.agent/` in the repository root, which is git-ignored:
 | `.agent/tmp/`     | Everything else: scripts, downloads, scratch checkouts, tool output.                         |
 
 Nothing below `.agent/` is ever committed.
+
+## OpenSpec: plan first, then implement
+
+The repository is initialized for [OpenSpec](docs/workflow/openspec.md). The
+commands and skills for Claude Code, Gemini CLI, Junie and OpenCode are
+committed (`.claude/`, `.gemini/`, `.junie/`, `.opencode/`); in Claude Code
+they are `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:update`,
+`/opsx:sync` and `/opsx:archive`, the other tools spell them as the page
+says. `openspec/config.yaml` carries the project context and the per-artifact
+rules, and `openspec instructions <artifact> --change <name>` is the
+authoritative shape of every artifact — follow it over anything recalled.
+
+What applies on top of the generated workflow:
+
+- **Propose plans, apply implements, and the two are separate requests.** A
+  propose never touches code, even when the request said "fix it"; an apply
+  never starts without the artifacts being complete.
+- **The change is named after its verified issue**: `ace-NNN-<short-slug>`.
+  Verify the key first, exactly as for a commit subject.
+- **`tasks.md` ends with this repository's definition of done**, not with the
+  last code change: the gates for every supported core version, `docs/`, the
+  extension's `Documentation/` changelog, and the commit message. An apply
+  that stops before those is not complete.
+- **Delta specs describe behaviour**, on which core versions, as an editor,
+  integrator or visitor observes it. Never class, method or query names — those
+  belong in `design.md`.
+- **Spec paths are `<extension-directory>/<capability>`**, with the directory
+  name under `packages/fgtclb/`, not the extension key.
+- **Archive in the same pull request**, as its last commit, so a merged branch
+  never carries an active change. A change with no behaviour to specify sets
+  `skip_specs: true` rather than inventing a requirement.
+- **Never edit the generated tool directories**; `openspec update` rewrites
+  them, and `lintMarkdown` skips them for that reason. `openspec/` itself is
+  hand-written and is linted.
+
+The CLI is a global Node.js package outside the container harness. A shell
+where `openspec` or `node` is not found has an uninitialized Node version
+manager, not a missing setup — do not install anything to work around it.
 
 ## What this repository is
 

@@ -1,0 +1,45 @@
+schema: spec-driven
+
+# Project context, shown to the agent when it creates artifacts. The rules for
+# working in this repository live in AGENTS.md and docs/ — this only points
+# there and states what an artifact here has to keep in mind.
+context: |
+  fgtclb/academic-extensions: a TYPO3 CMS extension mono repository. Twelve
+  extensions under packages/fgtclb/, developed and tested together, each split
+  out to its own read-only repository. This branch supports TYPO3 v13 and v14
+  on PHP 8.2 to 8.5, and every gate runs once per core version.
+  Read AGENTS.md and docs/ before writing an artifact: they hold the quality
+  gates, the dual core rule, the database query rules, the class design and
+  the commit conventions. Do not repeat them in the artifacts; apply them.
+  Issue references are YouTrack keys (ACE-NNN) and are verified, never assumed.
+  A change is named ace-NNN-<short-slug> after its issue.
+
+# Per-artifact rules.
+rules:
+  proposal:
+    - Name every affected extension by its extension key and its directory under packages/fgtclb/.
+    - State which supported TYPO3 core versions the change affects, and whether the behaviour differs between them.
+    - Keep it under 500 words and include a "Non-goals" section.
+  specs:
+    - Describe behaviour as an editor, integrator or site visitor observes it; never class, method, ViewHelper or query names.
+    - Name the core version when a requirement applies to one version only.
+    - Use the capability path <extension-directory>/<capability>, with the directory name under packages/fgtclb/.
+  design:
+    - Explain the decision and the rejected alternative, not the concept.
+    - A core version difference is a switch in the file that has it while it is a line or two, and a Core13/Core14 split only when a whole class has to differ.
+    - New services are stateless and configured through Symfony attributes; match the style of the surrounding extension.
+  tasks:
+    - Every behaviour change gets a test, and the task says how the test was shown to fail without the change.
+    - The last task group is the definition of done from AGENTS.md - lintPhp, cgl -n, phpstan, unit and functional for every supported core version after its own composerUpdate, docs/ and the extension's Documentation/ changelog updated, the commit message in TYPO3 Core format.
+
+# Per-operation guidance for apply and archive.
+operations:
+  apply:
+    guidance:
+      - Never silence a deprecation, notice or warning to get a run green; fix the cause, or make it a core version split.
+      - Run the gates through Build/Scripts/runTests.sh with -t for the core version; -t selects configuration only, so composerUpdate first.
+      - Working files go below .agent/, never into the repository tree and never into /tmp.
+  archive:
+    guidance:
+      - Archive in the same pull request as the implementation, as its last commit.
+      - Summarize which main specs changed before finishing.
