@@ -1,5 +1,8 @@
 /* Generated from Resources/Private/Scss — do not edit. */
 /* packages/fgtclb/academic-persons-edit/Resources/Private/Scss/frontend/profile-editing.scss */
+academic-persons-edit-profile-editing {
+  display: block;
+}
 body:has(.academic-persons-profile-editing) .section {
   overflow: unset !important;
 }

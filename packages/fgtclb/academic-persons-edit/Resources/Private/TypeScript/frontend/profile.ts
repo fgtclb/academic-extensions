@@ -1,64 +1,19 @@
-import {
-  createApp,
-  onMounted,
-  type App,
-} from "@fgtclb/academic-persons-edit/frontend/vue.js";
-import {
-  initializePopover,
-  rootSelector,
-} from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
-import {
-  readEditingContext,
-  type EditingContext,
-} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
-import {
-  createDocumentEditing,
-  initializeDocumentSections,
-} from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
-import { initializeFieldEditing } from "@fgtclb/academic-persons-edit/frontend/profile/fields.js";
-import { createImageEditing } from "@fgtclb/academic-persons-edit/frontend/profile/image.js";
-import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
-import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
+/**
+ * The entry point of the profile editor, loaded by
+ * `Templates/Profile/Index.html` through `<f:asset.module>`.
+ *
+ * It defines the custom element and does nothing else. Every editor on the page
+ * is a `<academic-persons-edit-profile-editing>` element that starts itself when
+ * the browser upgrades it, which is what replaced the start-up scan for
+ * `[data-academic-persons-profile-editing]` and the `WeakSet` of roots that had
+ * already been mounted.
+ *
+ * `<f:asset.module>` renders `type="module"`, so this file is evaluated after
+ * the document has been parsed and the elements are upgraded rather than
+ * constructed. Neither order matters to the element: a custom element is
+ * upgraded whether it was already in the document when it was defined or is
+ * inserted afterwards.
+ */
+import { registerProfileEditingElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/root.js";
 
-const mountedRoots = new WeakSet<HTMLElement>();
-
-// The root carries the whole configuration of an editor as "data-*"
-// attributes. It is read here, once, and handed to every controller: no module
-// below this point looks at "root.dataset" again.
-const createProfileEditingApp = (context: EditingContext): App =>
-  createApp({
-    setup(): Record<string, unknown> {
-      const documentController = createDocumentEditing(context);
-      const imageController = createImageEditing(context);
-      const syncController = createSkipSync(context);
-
-      onMounted((): void => {
-        initializeStickyImageOffset(context.root);
-        initializeFieldEditing(context);
-        initializeDocumentSections(context);
-        initializePopover(context.root);
-      });
-
-      return {
-        ...documentController,
-        ...imageController,
-        ...syncController,
-      };
-    },
-  });
-
-export const initializeProfileEditors = (scope: ParentNode = document): App[] => {
-  const applications: App[] = [];
-  scope.querySelectorAll(rootSelector).forEach((candidate): void => {
-    if (!(candidate instanceof HTMLElement) || mountedRoots.has(candidate)) {
-      return;
-    }
-    mountedRoots.add(candidate);
-    const application = createProfileEditingApp(readEditingContext(candidate));
-    application.mount(candidate);
-    applications.push(application);
-  });
-  return applications;
-};
-
-initializeProfileEditors();
+registerProfileEditingElement();

@@ -82,6 +82,15 @@ Fluid partials it is rendered from:
 | `sticky-image.test.ts`      | The offset below a fixed page header, and its teardown.                                                                                                                          |
 | `editing-context.test.ts`   | The root's `data-*` contract: every key of a complete root, what a minimal one reads as, the four coercions, and that the result is frozen.                                      |
 
+Two more came with the port itself and cover
+`<academic-persons-edit-profile-editing>`, the element that replaced the start-up
+scan:
+
+| File                                      | What it pins                                                                                                                                                       |
+|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `profile-editing-element.test.ts`         | One context per element, the initialisers it runs, that a move in the document starts nothing twice, both status regions, and the tags Vue is told to leave alone. |
+| `profile-editing-element-upgrade.test.ts` | That an editor starts in both orders: markup before the module, which is what a deferred module always sees, and markup after it.                                  |
+
 That is the coverage the thirteen hook readers needed: a test file fails if a
 `data-pe-*` attribute is queried under a name the templates do not emit.
 

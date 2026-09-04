@@ -1452,6 +1452,16 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $content = $this->renderProfileEditingPage();
         $decodedContent = urldecode(html_entity_decode($content));
         $this->assertStringContainsString('data-academic-persons-profile-editing', $content);
+        // The custom element that starts the editor wraps the root the contract
+        // is carried by, so that the JavaScript has an owner and the attributes
+        // stay where every reader expects them.
+        $document = new \DOMDocument();
+        $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
+        $wrappedRoots = (new \DOMXPath($document))->query(
+            '//academic-persons-edit-profile-editing/*[@data-academic-persons-profile-editing]',
+        );
+        $this->assertNotFalse($wrappedRoots);
+        $this->assertCount(1, $wrappedRoots);
         $this->assertStringContainsString('data-profile-uid="1"', $content);
         $this->assertStringNotContainsString('data-user="', $content);
         $this->assertStringContainsString('data-pe-open-image-view', $content);

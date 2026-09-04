@@ -94,7 +94,7 @@ export const labels = {
   close: "Cancel",
 } as const;
 
-interface RootOptions {
+export interface RootOptions {
   /** The markup below the root, in the order `Index.html:116-172` renders it. */
   content?: string;
   hasImage?: boolean;
@@ -167,6 +167,19 @@ export const profileEditingRoot = ({
   ${content}
   ${statusToast()}
 </div>`;
+
+/**
+ * `Templates/Profile/Index.html:66-73` - the custom element the template wraps
+ * the plugin root in.
+ *
+ * The wrapper is what a browser upgrades and what starts the editor. The
+ * controllers below it neither know nor ask about it, which is why every other
+ * fixture here stops at the root and the controller tests drive that: an
+ * element around markup the module never queries would be arrangement without
+ * a subject.
+ */
+export const profileEditingElement = (options: RootOptions = {}): string => `
+<academic-persons-edit-profile-editing>${profileEditingRoot(options)}</academic-persons-edit-profile-editing>`;
 
 /**
  * `Partials/Profile/StatusToast.html:185-218` - the two live regions

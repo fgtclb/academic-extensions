@@ -45,6 +45,7 @@ const browserGlobals = [
     'Node',
     'addEventListener',
     'cancelAnimationFrame',
+    'customElements',
     'dispatchEvent',
     'getComputedStyle',
     'removeEventListener',

@@ -12,6 +12,20 @@
  */
 
 export interface App {
+  /**
+   * The subset of the application configuration this extension writes.
+   *
+   * `compilerOptions.isCustomElement` tells the runtime template compiler which
+   * unknown tags are custom elements rather than components it should resolve
+   * and warn about. It exists for as long as Vue still renders a part of the
+   * editor that contains one of this extension's elements, and leaves with the
+   * runtime.
+   */
+  readonly config: {
+    compilerOptions: {
+      isCustomElement?: (tag: string) => boolean;
+    };
+  };
   mount(container: Element): unknown;
 }
 

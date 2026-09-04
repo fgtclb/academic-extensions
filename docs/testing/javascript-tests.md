@@ -134,6 +134,18 @@ it is destroyed, and in which order. What it does not buy is anything about the
 libraries themselves. Their integration is proven by a manual check per core
 version, and that is a real gap, named rather than papered over.
 
+The Vue stub is the one that models more than a lifecycle, because the root
+element depends on an ordering: `createApp().mount()` calls `setup()` first and
+the callbacks `onMounted()` collected during it afterwards. It knowingly differs
+from Vue in one point — Vue's own `mount()` takes the container's `innerHTML` as
+its template and then empties the container, and the stub leaves the container
+alone. The fixtures *are* the rendered markup, transcribed from what the Fluid
+partials produce, and re-rendering them is what the port removes. A test using
+the stub therefore proves nothing about rendering; it proves which handler runs,
+with which argument, in which order. The applications it created are readable as
+`createdApps` for the two facts that have no DOM of their own: that an editor is
+mounted exactly once, and which tags Vue is told are custom elements.
+
 The same applies to layout and animation. jsdom computes no transitions and
 every `getBoundingClientRect()` is zero, so scroll and drop-position arithmetic
 is tested with injected rectangles (`setBoundingRect()`), not with real

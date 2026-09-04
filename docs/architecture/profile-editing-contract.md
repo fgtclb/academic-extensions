@@ -58,6 +58,45 @@ changed afterwards is not seen. Nothing in the rendered page changes one — Flu
 writes them once — but a test that wants a root without an endpoint has to build
 the controller *after* removing it, not before.
 
+## The element that owns the root
+
+The template wraps the plugin root in
+`<academic-persons-edit-profile-editing>`
+([`profile/elements/root.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/root.ts)).
+It renders nothing at all: Fluid renders the editor, the element takes that
+markup as its light DOM children, reads the contract of the root below it once
+and starts the editing modules. The `data-*` attributes stay where they were, on
+the root, so every reader above keeps working unchanged.
+
+What it replaces is a start-up scan for `[data-academic-persons-profile-editing]`
+and a module level `WeakSet` of the roots that had already been mounted. The
+custom element registry does that bookkeeping itself, and does more of it: an
+editor rendered into the page later starts by itself, and an editor that is moved
+in the document is not started twice.
+
+Its public surface is small and is API from the moment it ships:
+
+| Member                                    | Contract                                                                              |
+|-------------------------------------------|---------------------------------------------------------------------------------------|
+| `<academic-persons-edit-profile-editing>` | The tag name. It observes no attributes.                                              |
+| `context`                                 | The frozen `EditingContext`, or `null` for an element that carries no root.           |
+| `showStatus(type, message?)`              | Writes one of the two live regions — assertive for `danger`, polite for the rest.     |
+| `pe:status`                               | The event a descendant dispatches, `{ type, message? }`, to have that written for it. |
+
+**The prefix is the extension key**, `academic-persons-edit-`, with its
+underscores replaced — the same token the icon identifiers and the import map
+specifier use. A custom element name is global and has no scoping mechanism of
+any kind, so the prefix has to be one this extension provably owns, and the
+extension key is the only such token. Every element the profile editor adds
+carries it.
+
+The element defines itself with a plain `customElements.define()` and no
+decorator, and the components below it declare `static properties` rather than
+`@property`. The behavioural suite runs the TypeScript sources under node's type
+stripping, which erases annotations but does not transform them, so a decorator
+would not run — `Build/tsconfig.tests.json` sets `erasableSyntaxOnly` to make
+that a type error instead of a runtime one.
+
 ## The seam for a caller that has only the element
 
 The entry points take `EditingTarget`, which is `HTMLElement | EditingContext`.

@@ -12,6 +12,16 @@
 // Vue transition classes) or corrects a theme rule that the editor's sticky and
 // overflowing layout collides with.
 
+// The custom element that owns the editor (`<academic-persons-edit-profile-editing>`,
+// `TypeScript/frontend/profile/elements/root.ts`). An unknown element is
+// `display: inline` in every browser, and this one wraps the block level plugin
+// root - so without this rule the editor would be laid out as an inline box, and
+// a flex or grid parent in the site's theme would take the wrapper as its item
+// instead of the container it wraps.
+academic-persons-edit-profile-editing {
+    display: block;
+}
+
 body:has(.academic-persons-profile-editing) .section {
     overflow: unset !important;
 }

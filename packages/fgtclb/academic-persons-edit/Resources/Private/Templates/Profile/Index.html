@@ -63,112 +63,121 @@
             extensionName="academic_persons_edit" />
     </f:link.action>
 
-    <div
-        class="academic-persons-profile-editing container-fluid px-0"
-        data-academic-persons-profile-editing
-        data-update-url="{updateUrl}"
-        data-skip-sync-url="{skipSyncUrl}"
-        data-delete-image-url="{deleteImageUrl}"
-        data-document-form-url="{documentFormUrl}"
-        data-create-document-url="{createDocumentUrl}"
-        data-update-document-url="{updateDocumentUrl}"
-        data-delete-document-url="{deleteDocumentUrl}"
-        data-sort-document-url="{sortDocumentUrl}"
-        data-contract-contact-form-url="{contractContactFormUrl}"
-        data-create-contract-contact-url="{createContractContactUrl}"
-        data-update-contract-contact-url="{updateContractContactUrl}"
-        data-delete-contract-contact-url="{deleteContractContactUrl}"
-        data-sort-contract-contact-url="{sortContractContactUrl}"
-        data-placeholder-image-url="{placeholderImageUrl}"
-        data-placeholder-image-alt="{f:translate(key: 'profile.image.placeholder.alt', extensionName: 'academic_persons_edit')}"
-        data-has-image="{f:if(condition: profile.image, then: '1', else: '0')}"
-        data-image-render-type="{specialFields.image.renderType}"
-        data-image-cropper-ratio="{specialFields.image.settings.ratio}"
-        data-profile-uid="{profile.uid}"
-        data-editor-language="{editorLanguage}"
-        data-message-saving="{f:translate(key: 'profileEditing.status.saving', extensionName: 'academic_persons_edit')}"
-        data-message-success-message="{f:translate(key: 'profileEditing.status.success.message', extensionName: 'academic_persons_edit')}"
-        data-message-error-message="{f:translate(key: 'profileEditing.status.error.message', extensionName: 'academic_persons_edit')}"
-        data-message-error-title="{f:translate(key: 'profileEditing.status.error.title', extensionName: 'academic_persons_edit')}"
-        data-message-success-title="{f:translate(key: 'profileEditing.status.success.title', extensionName: 'academic_persons_edit')}"
-        data-message-info-title="{f:translate(key: 'profileEditing.status.info.title', extensionName: 'academic_persons_edit')}"
-        data-message-info-message="{f:translate(key: 'profileEditing.status.info.message', extensionName: 'academic_persons_edit')}"
-        data-message-warning-title="{f:translate(key: 'profileEditing.status.warning.title', extensionName: 'academic_persons_edit')}"
-        data-message-validation="{f:translate(key: 'profileEditing.status.validation', extensionName: 'academic_persons_edit')}"
-        data-message-editor-error="{f:translate(key: 'profileEditing.status.editorError', extensionName: 'academic_persons_edit')}"
-        data-message-unchanged="{f:translate(key: 'profileEditing.status.unchanged', extensionName: 'academic_persons_edit')}"
-        data-message-image-uploaded="{f:translate(key: 'profileEditing.image.status.uploaded', extensionName: 'academic_persons_edit')}"
-        data-message-image-upload-missing="{f:translate(key: 'profileEditing.image.status.missing', extensionName: 'academic_persons_edit')}"
-        data-message-image-deleted="{f:translate(key: 'profileEditing.image.status.deleted', extensionName: 'academic_persons_edit')}"
-        data-message-document-saved="{f:translate(key: 'profileEditing.documents.status.saved', extensionName: 'academic_persons_edit')}"
-        data-message-document-deleted="{f:translate(key: 'profileEditing.documents.status.deleted', extensionName: 'academic_persons_edit')}"
-        data-message-document-sorted="{f:translate(key: 'profileEditing.documents.status.sorted', extensionName: 'academic_persons_edit')}"
-        data-message-document-delete-confirm="{f:translate(key: 'profileEditing.documents.delete.confirm', extensionName: 'academic_persons_edit')}"
-        data-message-contract-contact-delete-confirm="{f:translate(key: 'profileEditing.contractContacts.delete.confirm', extensionName: 'academic_persons_edit')}"
-        data-message-contract-contact-empty="{f:translate(key: 'profileEditing.contractContacts.empty', extensionName: 'academic_persons_edit')}"
-        data-label-document-add="{f:translate(key: 'actions.add', extensionName: 'academic_persons_edit')}"
-        data-label-document-view="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
-        data-label-document-edit="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
-        data-label-document-delete="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
-        data-label-document-save="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}"
-        data-label-document-close="{f:translate(key: 'actions.cancel', extensionName: 'academic_persons_edit')}"
-        data-label-document-empty="{f:translate(key: 'profileEditing.field.empty', extensionName: 'academic_persons_edit')}">
+    <!--
+        The element that owns this editor. It renders nothing: Fluid renders
+        the editor and the element takes the markup below it as its light DOM
+        children, reads the "data-*" contract of the root once and starts the
+        editing modules. See
+        "Resources/Private/TypeScript/frontend/profile/elements/root.ts".
+    -->
+    <academic-persons-edit-profile-editing>
         <div
-            id="profile-editing-{profile.uid}-image-editor-target"
-            data-pe-image-editor-target></div>
-        <div data-pe-profile-view>
-            <f:render
-                partial="Profile/Header"
-                arguments="{profile: profile, title: specialFields.title, skipSync: specialFields.skipSync}" />
-            <div class="container-fluid px-0">
-                <div class="row gx-lg-5 gy-5 align-items-stretch">
-                    <div
-                        class="col-12 academic-persons-profile-editing__image-preview-column"
-                        v-bind:class="{ 'col-lg-4': !image.editing && !image.closing }"
-                        v-show="!image.editing && !image.closing"
-                        data-pe-image-preview-column>
-                        <div class="sticky-top" data-pe-sticky-image>
-                            <f:if condition="{specialFields.image}">
+            class="academic-persons-profile-editing container-fluid px-0"
+            data-academic-persons-profile-editing
+            data-update-url="{updateUrl}"
+            data-skip-sync-url="{skipSyncUrl}"
+            data-delete-image-url="{deleteImageUrl}"
+            data-document-form-url="{documentFormUrl}"
+            data-create-document-url="{createDocumentUrl}"
+            data-update-document-url="{updateDocumentUrl}"
+            data-delete-document-url="{deleteDocumentUrl}"
+            data-sort-document-url="{sortDocumentUrl}"
+            data-contract-contact-form-url="{contractContactFormUrl}"
+            data-create-contract-contact-url="{createContractContactUrl}"
+            data-update-contract-contact-url="{updateContractContactUrl}"
+            data-delete-contract-contact-url="{deleteContractContactUrl}"
+            data-sort-contract-contact-url="{sortContractContactUrl}"
+            data-placeholder-image-url="{placeholderImageUrl}"
+            data-placeholder-image-alt="{f:translate(key: 'profile.image.placeholder.alt', extensionName: 'academic_persons_edit')}"
+            data-has-image="{f:if(condition: profile.image, then: '1', else: '0')}"
+            data-image-render-type="{specialFields.image.renderType}"
+            data-image-cropper-ratio="{specialFields.image.settings.ratio}"
+            data-profile-uid="{profile.uid}"
+            data-editor-language="{editorLanguage}"
+            data-message-saving="{f:translate(key: 'profileEditing.status.saving', extensionName: 'academic_persons_edit')}"
+            data-message-success-message="{f:translate(key: 'profileEditing.status.success.message', extensionName: 'academic_persons_edit')}"
+            data-message-error-message="{f:translate(key: 'profileEditing.status.error.message', extensionName: 'academic_persons_edit')}"
+            data-message-error-title="{f:translate(key: 'profileEditing.status.error.title', extensionName: 'academic_persons_edit')}"
+            data-message-success-title="{f:translate(key: 'profileEditing.status.success.title', extensionName: 'academic_persons_edit')}"
+            data-message-info-title="{f:translate(key: 'profileEditing.status.info.title', extensionName: 'academic_persons_edit')}"
+            data-message-info-message="{f:translate(key: 'profileEditing.status.info.message', extensionName: 'academic_persons_edit')}"
+            data-message-warning-title="{f:translate(key: 'profileEditing.status.warning.title', extensionName: 'academic_persons_edit')}"
+            data-message-validation="{f:translate(key: 'profileEditing.status.validation', extensionName: 'academic_persons_edit')}"
+            data-message-editor-error="{f:translate(key: 'profileEditing.status.editorError', extensionName: 'academic_persons_edit')}"
+            data-message-unchanged="{f:translate(key: 'profileEditing.status.unchanged', extensionName: 'academic_persons_edit')}"
+            data-message-image-uploaded="{f:translate(key: 'profileEditing.image.status.uploaded', extensionName: 'academic_persons_edit')}"
+            data-message-image-upload-missing="{f:translate(key: 'profileEditing.image.status.missing', extensionName: 'academic_persons_edit')}"
+            data-message-image-deleted="{f:translate(key: 'profileEditing.image.status.deleted', extensionName: 'academic_persons_edit')}"
+            data-message-document-saved="{f:translate(key: 'profileEditing.documents.status.saved', extensionName: 'academic_persons_edit')}"
+            data-message-document-deleted="{f:translate(key: 'profileEditing.documents.status.deleted', extensionName: 'academic_persons_edit')}"
+            data-message-document-sorted="{f:translate(key: 'profileEditing.documents.status.sorted', extensionName: 'academic_persons_edit')}"
+            data-message-document-delete-confirm="{f:translate(key: 'profileEditing.documents.delete.confirm', extensionName: 'academic_persons_edit')}"
+            data-message-contract-contact-delete-confirm="{f:translate(key: 'profileEditing.contractContacts.delete.confirm', extensionName: 'academic_persons_edit')}"
+            data-message-contract-contact-empty="{f:translate(key: 'profileEditing.contractContacts.empty', extensionName: 'academic_persons_edit')}"
+            data-label-document-add="{f:translate(key: 'actions.add', extensionName: 'academic_persons_edit')}"
+            data-label-document-view="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
+            data-label-document-edit="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
+            data-label-document-delete="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
+            data-label-document-save="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}"
+            data-label-document-close="{f:translate(key: 'actions.cancel', extensionName: 'academic_persons_edit')}"
+            data-label-document-empty="{f:translate(key: 'profileEditing.field.empty', extensionName: 'academic_persons_edit')}">
+            <div
+                id="profile-editing-{profile.uid}-image-editor-target"
+                data-pe-image-editor-target></div>
+            <div data-pe-profile-view>
+                <f:render
+                    partial="Profile/Header"
+                    arguments="{profile: profile, title: specialFields.title, skipSync: specialFields.skipSync}" />
+                <div class="container-fluid px-0">
+                    <div class="row gx-lg-5 gy-5 align-items-stretch">
+                        <div
+                            class="col-12 academic-persons-profile-editing__image-preview-column"
+                            v-bind:class="{ 'col-lg-4': !image.editing && !image.closing }"
+                            v-show="!image.editing && !image.closing"
+                            data-pe-image-preview-column>
+                            <div class="sticky-top" data-pe-sticky-image>
+                                <f:if condition="{specialFields.image}">
+                                    <f:render
+                                        partial="Profile/Image/Card"
+                                        arguments="{profile: profile, image: specialFields.image}" />
+                                </f:if>
+                            </div>
+                        </div>
+                        <div
+                            class="col-12 academic-persons-profile-editing__profile-fields-column"
+                            v-bind:class="(image.editing || image.closing) ? 'col-lg-12' : 'col-lg-8'">
+                            <f:if condition="{profileSections.information}">
                                 <f:render
-                                    partial="Profile/Image/Card"
-                                    arguments="{profile: profile, image: specialFields.image}" />
+                                    partial="Profile/Profile/Personal"
+                                    arguments="{profile: profile, section: profileSections.information, specialFields: specialFields, fieldOptions: profileFieldOptions}" />
                             </f:if>
                         </div>
                     </div>
-                    <div
-                        class="col-12 academic-persons-profile-editing__profile-fields-column"
-                        v-bind:class="(image.editing || image.closing) ? 'col-lg-12' : 'col-lg-8'">
-                        <f:if condition="{profileSections.information}">
-                            <f:render
-                                partial="Profile/Profile/Personal"
-                                arguments="{profile: profile, section: profileSections.information, specialFields: specialFields, fieldOptions: profileFieldOptions}" />
-                        </f:if>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="mt-5">
-                            <f:if condition="{profileSections.aboutme}">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mt-5">
+                                <f:if condition="{profileSections.aboutme}">
+                                    <f:render
+                                        partial="Profile/Profile/About"
+                                        arguments="{profile: profile, section: profileSections.aboutme, fieldOptions: profileFieldOptions}" />
+                                </f:if>
                                 <f:render
-                                    partial="Profile/Profile/About"
-                                    arguments="{profile: profile, section: profileSections.aboutme, fieldOptions: profileFieldOptions}" />
-                            </f:if>
-                            <f:render
-                                partial="Profile/Documents/Sections"
-                                arguments="{profile: profile, sections: documentSections}" />
+                                    partial="Profile/Documents/Sections"
+                                    arguments="{profile: profile, sections: documentSections}" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <f:if condition="{specialFields.image.writable}">
-            <f:render
-                partial="Profile/Image/Editor"
-                arguments="{profile: profile, image: specialFields.image, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
-        </f:if>
-        <f:render partial="Profile/Documents/Editor" />
-        <f:render partial="Profile/StatusToast" />
-        <f:render partial="Profile/ButtonTemplates" />
-    </div>
+            <f:if condition="{specialFields.image.writable}">
+                <f:render
+                    partial="Profile/Image/Editor"
+                    arguments="{profile: profile, image: specialFields.image, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
+            </f:if>
+            <f:render partial="Profile/Documents/Editor" />
+            <f:render partial="Profile/StatusToast" />
+            <f:render partial="Profile/ButtonTemplates" />
+        </div>
+    </academic-persons-edit-profile-editing>
 </html>
