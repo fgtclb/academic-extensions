@@ -1,6 +1,8 @@
 # Testing
 
-Two suites, both containerized, both discovered across all extensions at once.
+Three suites, all containerized, all discovered across all extensions at once:
+PHPUnit for unit and functional tests, and `node --test` for the behavioural
+tests of the frontend TypeScript.
 
 ## Quick start
 
@@ -16,11 +18,15 @@ Build/Scripts/runTests.sh -t 13 -s unit packages/fgtclb/academic-base/Tests/Unit
 
 # Anything that writes to the database is also run on PostgreSQL.
 Build/Scripts/runTests.sh -t 13 -p 8.2 -d postgres -s functional
+
+# The JavaScript suite takes neither "-t" nor a composerUpdate.
+Build/Scripts/runTests.sh -s testJs
 ```
 
 ## Rules that apply to every test
 
-- **The suites are hard breaking.** Deprecations, notices, warnings and risky
+- **Prove a new test can fail**, whatever the suite — see below.
+- **The PHP suites are hard breaking.** Deprecations, notices, warnings and risky
   tests all fail the run. Never silence one to get a run green; fix the cause.
 - **A test without an assertion still passes** — that flag is deliberately
   relaxed. So prove a new test can fail: break what it covers, watch it go red,
@@ -41,6 +47,7 @@ Build/Scripts/runTests.sh -t 13 -p 8.2 -d postgres -s functional
 | [Fixture extensions](fixture-extensions.md)       | The test-only extensions and the mechanism that registers them.                                              |
 | [Testing helper](testing-helper.md)               | Every trait in `packages-dev/testing-helper/`, and the defect each one exists for.                           |
 | [Seed verification](seed-verification.md)         | The manifest of the development seed, and the four checks that keep it, the YAML and the snapshots together. |
+| [JavaScript tests](javascript-tests.md)           | The `node --test` harness: the runner, the resolve hook, the stubs and what they do not cover.               |
 
 ## See also
 

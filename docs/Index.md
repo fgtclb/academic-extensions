@@ -48,6 +48,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | [Fixture extensions](testing/fixture-extensions.md)       | Test-only extensions and how they are wired.                                                                 |
 | [Testing helper](testing/testing-helper.md)               | The shared traits in `packages-dev/testing-helper/` and the trap each one exists for.                        |
 | [Seed verification](testing/seed-verification.md)         | The manifest of the development seed, and the four checks that keep it, the YAML and the snapshots together. |
+| [JavaScript tests](testing/javascript-tests.md)           | The `node --test` harness for the frontend TypeScript: the runner, the resolve hook and the stubs.           |
 
 ## [Workflow](workflow/Index.md)
 

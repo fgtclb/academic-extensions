@@ -69,8 +69,19 @@ export default tseslint.config(
         rules: houseRules,
     },
     {
-        // The build configuration itself runs in node, not in a browser.
-        files: ['Build/*.mjs'],
+        // The behavioural tests of those sources. They drive browser code from
+        // node, so both global sets apply — and the house rules apply here too,
+        // because a test is source like any other.
+        files: ['packages/*/*/Tests/JavaScript/**/*.ts'],
+        languageOptions: {
+            globals: { ...globals.browser, ...globals.nodeBuiltin },
+        },
+        rules: houseRules,
+    },
+    {
+        // The build configuration and the test harness both run in node, not in
+        // a browser.
+        files: ['Build/**/*.mjs', 'Build/**/*.d.mts'],
         languageOptions: {
             globals: globals.nodeBuiltin,
         },

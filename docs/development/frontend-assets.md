@@ -37,24 +37,26 @@ convention, and the build applies it to TypeScript as well.
 
 One script, `Build/esbuild.mjs`, driven by npm scripts and run in a container:
 
-| Suite               | Runs                                                      | Purpose                                                                                  |
-|---------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------|
-| `buildJs`           | `npm ci && npm run build`                                 | Compiles every extension's sources. Run after a source change, and commit the result.    |
-| `checkJsBuildClean` | delete the outputs, rebuild, assert `git status` is empty | The gate that makes committed artifacts trustworthy. Runs in CI.                         |
-| `lintTypescript`    | `npm run lint:fix`, or `lint` with `-n`                   | eslint 9 with typescript-eslint. Mirrors `cgl`: fixes by default, checks only with `-n`. |
-| `typecheckJs`       | `npm run typecheck`                                       | `tsc --noEmit`, which the build does not do.                                             |
-| `npm`               | `npm "$@"` with the working directory set to `Build/`     | Escape hatch, mirroring the `composer` suite.                                            |
-| `cleanJs`           | `rm -rf Build/node_modules`                               | Intermediates only. It never removes a compiled artifact — those are committed files.    |
+| Suite               | Runs                                                      | Purpose                                                                                        |
+|---------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `buildJs`           | `npm ci && npm run build`                                 | Compiles every extension's sources. Run after a source change, and commit the result.          |
+| `checkJsBuildClean` | delete the outputs, rebuild, assert `git status` is empty | The gate that makes committed artifacts trustworthy. Runs in CI.                               |
+| `lintTypescript`    | `npm run lint:fix`, or `lint` with `-n`                   | eslint 9 with typescript-eslint. Mirrors `cgl`: fixes by default, checks only with `-n`.       |
+| `typecheckJs`       | `npm run typecheck`                                       | `tsc --noEmit`, which the build does not do.                                                   |
+| `testJs`            | `npm run test`                                            | The behavioural tests of the sources — see [JavaScript tests](../testing/javascript-tests.md). |
+| `npm`               | `npm "$@"` with the working directory set to `Build/`     | Escape hatch, mirroring the `composer` suite.                                                  |
+| `cleanJs`           | `rm -rf Build/node_modules`                               | Intermediates only. It never removes a compiled artifact — those are committed files.          |
 
 ```bash
 Build/Scripts/runTests.sh -s buildJs
 Build/Scripts/runTests.sh -s checkJsBuildClean
 Build/Scripts/runTests.sh -s lintTypescript -n
 Build/Scripts/runTests.sh -s typecheckJs
+Build/Scripts/runTests.sh -s testJs
 Build/Scripts/runTests.sh -s npm -- install --save-dev sass@latest
 ```
 
-All six are **core version independent**. They look at the sources and the
+All seven are **core version independent**. They look at the sources and the
 committed artifacts and never at the installed core, so `-t` does not change
 what they do and no `composerUpdate` is needed. That makes them the only suites
 that are safe to run while the other core version's dependency set is installed.
