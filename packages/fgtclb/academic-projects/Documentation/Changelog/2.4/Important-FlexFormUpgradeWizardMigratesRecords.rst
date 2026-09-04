@@ -57,12 +57,19 @@ to `active`, anything else to `all`), `settings.filter.options` becomes
 `settings.hideFilter` and `settings.sorting.options` becomes
 `settings.hideSorting`, each keeping its value.
 
-Previously the outcome depended on the database:
+Previously the outcome depended on how many affected content elements existed:
 
-*   MySQL, MariaDB and SQLite reported success and changed nothing.
-*   PostgreSQL aborted with a
+*   The first record compared the new FlexForm XML against `uid`, because the
+    placeholder of the update builder and the one of the select builder
+    happened to carry the same name. MySQL, MariaDB and SQLite reported
+    success and changed nothing, PostgreSQL aborted with a
     `Doctrine\\DBAL\\Exception\\DriverException`, *invalid input syntax for
     integer*.
+*   Every record after it referenced a placeholder that was never bound to the
+    update statement. Doctrine DBAL rejects such a statement before it reaches
+    the database, so the wizard aborted on every DBMS with a
+    `Doctrine\\DBAL\\ArrayParameters\\Exception\\MissingNamedParameter`,
+    *Named parameter "dcValueN" does not have a bound value*.
 
 Affected Installations
 ======================
