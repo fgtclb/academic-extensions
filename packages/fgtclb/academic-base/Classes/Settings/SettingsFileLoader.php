@@ -61,6 +61,24 @@ final class SettingsFileLoader
     public function loadMergedArray(string $relativeFilePath): array
     {
         $loadedSettings = [];
+        foreach ($this->loadPackageArrays($relativeFilePath) as $settingsArray) {
+            $loadedSettings = array_merge($loadedSettings, $settingsArray);
+        }
+        return $loadedSettings;
+    }
+
+    /**
+     * The file of every active package that ships it, keyed by package key
+     * and in package loading order - the order the merge folds them in. A
+     * consumer that needs to know which package contributed what, such as a
+     * migration report, walks this instead of the merged array.
+     *
+     * @param non-empty-string $relativeFilePath
+     * @return array<string, array<string, mixed>>
+     */
+    public function loadPackageArrays(string $relativeFilePath): array
+    {
+        $packageArrays = [];
         foreach ($this->packageManager->getActivePackages() as $package) {
             $settingsFile = $package->getPackagePath() . $relativeFilePath;
             if (!file_exists($settingsFile)) {
@@ -70,8 +88,8 @@ final class SettingsFileLoader
             if (!is_array($settingsArray)) {
                 continue;
             }
-            $loadedSettings = array_merge($loadedSettings, $settingsArray);
+            $packageArrays[$package->getPackageKey()] = $settingsArray;
         }
-        return $loadedSettings;
+        return $packageArrays;
     }
 }
