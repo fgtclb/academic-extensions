@@ -153,10 +153,11 @@ backed `fe_user`, synchronised into the profile — which is also why
 
 ### `- required` on `firstName` is inert
 
-`AcademicPersonsSettingsFactory::normalizeValidations()` (`:99-109`) computes:
+`ValidationNormalizer::normalizeValidation()` in `academic-base` (which
+`AcademicPersonsSettingsFactory::normalizeValidations()` delegates to) computes:
 
 ```php
-$required = !$disabled && !$readOnly && in_array('required', $validators, true);
+$required = !$disabled && !$readOnly && in_array('required', $flags, true);
 ...
 if ($disabled) {
     // @todo Investigate how to handle that for the backend / TCA FormEngine, therefore switch to
@@ -170,12 +171,13 @@ shipped set that means no validator is produced for any of the three properties,
 which is correct — a field the user cannot edit cannot be required of them. The
 `- required` entry on `firstName` is a leftover with no effect.
 
-`disabled` therefore always implies `readOnly` for anything this factory
+`disabled` therefore always implies `readOnly` for anything the normaliser
 produces, so the `||` in rule 1 only distinguishes the two for a `Validation`
 built by hand.
 
 **The same configuration also drives the TYPO3 backend**, deliberately: all six
-TCA tables merge in `getValidationTcaTableConfig()`, so a locked field is read
+TCA tables merge their set in through `TcaValidationMerger::merge()`, so a
+locked field is read
 only in the record editor as well. That coupling — and the reason the settings
 ship in `academic_persons` rather than in the edit extension — is documented in
 [Validation settings](validation-settings.md).
