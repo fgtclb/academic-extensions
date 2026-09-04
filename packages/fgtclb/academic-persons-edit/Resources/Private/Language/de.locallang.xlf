@@ -25,9 +25,9 @@
         <source>Profile</source>
         <target>Profil</target>
       </trans-unit>
-      <trans-unit id="list.profileInformations.year">
-        <source>Year</source>
-        <target>Jahr</target>
+      <trans-unit id="list.profileInformations.date">
+        <source>Date</source>
+        <target>Datum</target>
       </trans-unit>
       <trans-unit id="list.profileInformations.title">
         <source>Title</source>
@@ -355,29 +355,21 @@
         <source>https://www.example.com</source>
         <target>https://www.beispiel.de</target>
       </trans-unit>
-      <trans-unit id="profileInformation.year.label">
-        <source>Year</source>
-        <target>Jahr</target>
+      <trans-unit id="profileInformation.date.label">
+        <source>Date</source>
+        <target>Datum</target>
       </trans-unit>
-      <trans-unit id="profileInformation.year.placeholder">
-        <source>e.g. 2025</source>
-        <target>z.B. 2025</target>
+      <trans-unit id="profileInformation.dateStart.label">
+        <source>Start date</source>
+        <target>Startdatum</target>
       </trans-unit>
-      <trans-unit id="profileInformation.yearStart.label">
-        <source>Start year</source>
-        <target>Startjahr</target>
+      <trans-unit id="profileInformation.dateEnd.label">
+        <source>End date</source>
+        <target>Enddatum</target>
       </trans-unit>
-      <trans-unit id="profileInformation.yearStart.placeholder">
-        <source>e.g. 2020</source>
-        <target>z.B. 2020</target>
-      </trans-unit>
-      <trans-unit id="profileInformation.yearEnd.label">
-        <source>End year</source>
-        <target>Endjahr</target>
-      </trans-unit>
-      <trans-unit id="profileInformation.yearEnd.placeholder">
-        <source>e.g. 2025</source>
-        <target>z.B. 2025</target>
+      <trans-unit id="profileInformation.yearOnly.label">
+        <source>Show year only</source>
+        <target>Nur Jahr anzeigen</target>
       </trans-unit>
       <trans-unit id="profileInformation.bodytext.label">
         <source>Text</source>
@@ -879,13 +871,17 @@
         <source>"Valid from" must be a valid date. (Seperated by .)</source>
         <target>"Gültig von" muss ein gültiges Datum sein. (Getrennt durch .)</target>
       </trans-unit>
-      <trans-unit id="profileInformationFormData.yearStart.error.1332933658">
-        <source>"Year start" must be a number.</source>
-        <target>"Startjahr" muss eine Zahl sein.</target>
+      <trans-unit id="profileInformationFormData.date.error.1307719788">
+        <source>"Date" must be a valid date. (Seperated by .)</source>
+        <target>"Datum" muss ein gültiges Datum sein. (Getrennt durch .)</target>
       </trans-unit>
-      <trans-unit id="profileInformationFormData.yearEnd.error.1332933658">
-        <source>"Year end" must be a number.</source>
-        <target>"Endjahr" muss eine Zahl sein.</target>
+      <trans-unit id="profileInformationFormData.dateStart.error.1307719788">
+        <source>"Start date" must be a valid date. (Seperated by .)</source>
+        <target>"Startdatum" muss ein gültiges Datum sein. (Getrennt durch .)</target>
+      </trans-unit>
+      <trans-unit id="profileInformationFormData.dateEnd.error.1307719788">
+        <source>"End date" must be a valid date. (Seperated by .)</source>
+        <target>"Enddatum" muss ein gültiges Datum sein. (Getrennt durch .)</target>
       </trans-unit>
     </body>
   </file>

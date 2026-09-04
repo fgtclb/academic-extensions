@@ -449,6 +449,9 @@
         "tx_academicpersons_domain_model_profile_information": {
             "rows": 42,
             "columns": [
+                "date",
+                "date_end",
+                "date_start",
                 "hidden",
                 "l10n_parent",
                 "l10n_source",
@@ -457,11 +460,9 @@
                 "sys_language_uid",
                 "title",
                 "uid",
-                "year",
-                "year_end",
-                "year_start"
+                "year_only"
             ],
-            "checksum": "4745737226b1e22e8dd9b3f59bc661008a457dcf"
+            "checksum": "74c40d35a8c823fbcbf6374116d235f62e312a85"
         },
         "tx_academicstudyplan_domain_model_category": {
             "rows": 10,

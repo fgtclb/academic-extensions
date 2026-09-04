@@ -26,7 +26,7 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 /**
  * Validates the argument of `ProfileInformationController::createAction()` and
  * `updateAction()` against the validation set `profileInformation`. This is the one
- * form data object whose required properties are not strings: `year` is `?int`, so
+ * form data object whose required properties are not strings: `date` is `?\DateTime`, so
  * "not submitted" and "submitted empty" both arrive as `null` rather than as `''`.
  */
 final class ProfileInformationFormDataValidatorTest extends UnitTestCase
@@ -56,7 +56,7 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
     }
 
     /**
-     * `title` and `year` are the two the shipped configuration requires; the others
+     * `title` and `date` are the two the shipped configuration requires; the others
      * are what a project adds. All of them have to resolve off the DTO, because an
      * unreadable property silently becomes `null`.
      */
@@ -71,9 +71,9 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
                 title: 'A publication',
                 bodytext: 'Some text',
                 link: 'https://example.org',
-                year: 2024,
-                yearStart: 2020,
-                yearEnd: 2023
+                date: new \DateTime('2024-01-01'),
+                dateStart: new \DateTime('2020-01-01'),
+                dateEnd: new \DateTime('2023-01-01')
             )
         );
 
@@ -88,31 +88,31 @@ final class ProfileInformationFormDataValidatorTest extends UnitTestCase
         return [
             // Both required in the shipped Configuration/AcademicPersons/Settings.yaml.
             'title' => ['title', 'string(A publication)'],
-            'year' => ['year', 'int(2024)'],
+            'date' => ['date', 'DateTime'],
             // Readable, but not configured by default.
             'type' => ['type', 'string(publication)'],
             'bodytext' => ['bodytext', 'string(Some text)'],
             'link' => ['link', 'string(https://example.org)'],
-            'yearStart' => ['yearStart', 'int(2020)'],
-            'yearEnd' => ['yearEnd', 'int(2023)'],
+            'dateStart' => ['dateStart', 'DateTime'],
+            'dateEnd' => ['dateEnd', 'DateTime'],
         ];
     }
 
     /**
-     * A `?int` property has no empty-string state: an omitted or non numeric `year`
+     * A `?\DateTime` property has no empty-string state: an omitted or unparsable `date`
      * arrives as `null`, which `NotEmptyValidator` reports with its *null* message
      * and code 1221560910 rather than the empty one. That distinction is what a
      * template branching on the error code sees.
      */
     #[Test]
-    public function anOmittedNullableIntIsHandedOverAsNull(): void
+    public function anOmittedNullableDateIsHandedOverAsNull(): void
     {
         $result = $this->validate(
-            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['year' => [RecordingValidator::class]]),
+            ValidationSettings::forIdentifier(self::VALIDATION_SET, ['date' => [RecordingValidator::class]]),
             new ProfileInformationFormData(title: 'A publication')
         );
 
-        $this->assertSame(['null'], $this->messagesFor($result, 'year'));
+        $this->assertSame(['null'], $this->messagesFor($result, 'date'));
     }
 
     /**

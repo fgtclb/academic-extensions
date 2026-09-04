@@ -11,7 +11,7 @@
             <thead>
                 <tr>
                     <th class="desktop">
-                        {f:translate(key: 'list.profileInformations.year', extensionName: 'academic_persons_edit')}
+                        {f:translate(key: 'list.profileInformations.date', extensionName: 'academic_persons_edit')}
                     </th>
                     <th>{f:translate(key: 'list.profileInformations.title', extensionName: 'academic_persons_edit')}</th>
                     <th class="actions text-end">{f:translate(key: 'list.actions', extensionName: 'academic_persons_edit')}</th>
@@ -20,27 +20,32 @@
             <tbody>
                 <f:for each="{profileInformations}" as="profileInformation" iteration="profileInformationIteration">
                     <tr>
-                        <td class="year desktop">
-                            <f:if condition="{profileInformation.yearStart} || {profileInformation.yearEnd}">
+                        <td class="date desktop">
+                            <f:variable name="itemDateFormat" value="{f:if(condition: profileInformation.yearOnly, then: 'Y', else: 'd.m.Y')}" />
+                            <f:if condition="{profileInformation.dateStart} || {profileInformation.dateEnd}">
                                 <f:then>
-                                    <f:if condition="!{profileInformation.yearEnd} && {profileInformation.yearStart}">
+                                    <f:if condition="!{profileInformation.dateEnd} && {profileInformation.dateStart}">
                                         {f:translate(key: 'detail.since', extensionName: 'academic_persons')}
                                     </f:if>
 
-                                    {f:if(condition: '{profileInformation.yearStart}', then: '{profileInformation.yearStart}')}
+                                    <f:if condition="{profileInformation.dateStart}">
+                                        {profileInformation.dateStart -> f:format.date(format: itemDateFormat)}
+                                    </f:if>
 
-                                    <f:if condition="{profileInformation.yearEnd} && {profileInformation.yearStart}">
+                                    <f:if condition="{profileInformation.dateEnd} && {profileInformation.dateStart}">
                                         -
                                     </f:if>
 
-                                    <f:if condition="!{profileInformation.yearStart} && {profileInformation.yearEnd}">
+                                    <f:if condition="!{profileInformation.dateStart} && {profileInformation.dateEnd}">
                                         {f:translate(key: 'detail.till', extensionName: 'academic_persons')}
                                     </f:if>
 
-                                    {f:if(condition: '{profileInformation.yearEnd}', then: '{profileInformation.yearEnd}')}
+                                    <f:if condition="{profileInformation.dateEnd}">
+                                        {profileInformation.dateEnd -> f:format.date(format: itemDateFormat)}
+                                    </f:if>
                                 </f:then>
-                                <f:else if="{profileInformation.year}">
-                                    {profileInformation.year}
+                                <f:else if="{profileInformation.date}">
+                                    {profileInformation.date -> f:format.date(format: itemDateFormat)}
                                 </f:else>
                             </f:if>
                         </td>

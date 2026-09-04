@@ -1387,225 +1387,267 @@ entities:
                   - self:
                         id: 1
                         title: 'Professor of Web Engineering'
-                        year_start: 2018
-                        year: 2018
+                        date_start: '2018-01-01'
+                        date: '2018-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 501
                             language: 1
                             title: 'Professorin für Web Engineering'
-                            year_start: 2018
-                            year: 2018
+                            date_start: '2018-01-01'
+                            date: '2018-01-01'
+                            year_only: 1
                   - self:
                         id: 2
                         title: 'Head of Applied Statistics'
-                        year_start: 2016
-                        year_end: 2022
+                        date_start: '2016-01-01'
+                        date_end: '2022-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 502
                             language: 1
                             title: 'Leiterin Angewandte Statistik'
-                            year_start: 2016
-                            year_end: 2022
+                            date_start: '2016-01-01'
+                            date_end: '2022-01-01'
+                            year_only: 1
                   - self:
                         id: 3
                         title: 'Accessibility researcher'
-                        year_start: 2020
+                        date_start: '2020-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 503
                             language: 1
                             title: 'Forscherin für Barrierefreiheit'
-                            year_start: 2020
+                            date_start: '2020-01-01'
+                            year_only: 1
                   - self:
                         id: 4
                         title: 'Content management at scale'
-                        year: 2024
+                        date: '2024-01-01'
+                        year_only: 1
                         link: 'https://example.org/publications/content-management-at-scale'
                     languageVariants:
                       - self:
                             id: 504
                             language: 1
                             title: 'Content-Management im großen Maßstab'
-                            year: 2024
+                            date: '2024-01-01'
+                            year_only: 1
                             link: 'https://example.org/publications/content-management-at-scale'
                   - self:
                         id: 5
                         title: 'Continuous integration for editors'
-                        year: 2023
+                        date: '2023-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 505
                             language: 1
                             title: 'Continuous Integration für Redaktionen'
-                            year: 2023
+                            date: '2023-01-01'
+                            year_only: 1
                   - self:
                         id: 6
                         title: 'Statistical models in teaching'
-                        year: 2022
+                        date: '2022-01-01'
+                        year_only: 1
                         link: 'https://example.org/publications/statistical-models'
                     languageVariants:
                       - self:
                             id: 506
                             language: 1
                             title: 'Statistische Modelle in der Lehre'
-                            year: 2022
+                            date: '2022-01-01'
+                            year_only: 1
                             link: 'https://example.org/publications/statistical-models'
                   - self:
                         id: 7
                         title: 'Web accessibility'
-                        year_start: 2021
+                        date_start: '2021-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 507
                             language: 1
                             title: 'Barrierefreies Web'
-                            year_start: 2021
+                            date_start: '2021-01-01'
+                            year_only: 1
                   - self:
                         id: 8
                         title: 'Media theory I'
-                        year_start: 2019
+                        date_start: '2019-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 508
                             language: 1
                             title: 'Medientheorie I'
-                            year_start: 2019
+                            date_start: '2019-01-01'
+                            year_only: 1
                   - self:
                         id: 9
                         title: 'Introduction to TYPO3'
-                        year_start: 2023
+                        date_start: '2023-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 509
                             language: 1
                             title: 'Einführung in TYPO3'
-                            year_start: 2023
+                            date_start: '2023-01-01'
+                            year_only: 1
                   - self:
                         id: 10
                         title: 'German Informatics Society'
-                        year_start: 2015
+                        date_start: '2015-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 510
                             language: 1
                             title: 'Gesellschaft für Informatik'
-                            year_start: 2015
+                            date_start: '2015-01-01'
+                            year_only: 1
                   - self:
                         id: 11
                         title: 'TYPO3 Association'
-                        year_start: 2012
+                        date_start: '2012-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 511
                             language: 1
                             title: 'TYPO3 Association'
-                            year_start: 2012
+                            date_start: '2012-01-01'
+                            year_only: 1
                   - self:
                         id: 12
                         title: 'Nordic Statistics Network'
-                        year_start: 2018
+                        date_start: '2018-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 512
                             language: 1
                             title: 'Nordisches Statistiknetzwerk'
-                            year_start: 2018
+                            date_start: '2018-01-01'
+                            year_only: 1
                   - self:
                         id: 13
                         title: 'Joint lab with web-vision GmbH'
-                        year_start: 2021
+                        date_start: '2021-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 513
                             language: 1
                             title: 'Gemeinsames Labor mit der web-vision GmbH'
-                            year_start: 2021
+                            date_start: '2021-01-01'
+                            year_only: 1
                   - self:
                         id: 14
                         title: 'Exchange programme Utrecht'
-                        year_start: 2020
+                        date_start: '2020-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 514
                             language: 1
                             title: 'Austauschprogramm Utrecht'
-                            year_start: 2020
+                            date_start: '2020-01-01'
+                            year_only: 1
                   - self:
                         id: 15
                         title: 'Regional industry cooperation'
-                        year_start: 2019
+                        date_start: '2019-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 515
                             language: 1
                             title: 'Regionale Industriekooperation'
-                            year_start: 2019
+                            date_start: '2019-01-01'
+                            year_only: 1
                   - self:
                         id: 16
                         title: 'Interview on media literacy'
-                        year: 2024
+                        date: '2024-01-01'
+                        year_only: 1
                         link: 'https://example.org/press/media-literacy'
                     languageVariants:
                       - self:
                             id: 516
                             language: 1
                             title: 'Interview zur Medienkompetenz'
-                            year: 2024
+                            date: '2024-01-01'
+                            year_only: 1
                             link: 'https://example.org/press/media-literacy'
                   - self:
                         id: 17
                         title: 'Radio feature on open data'
-                        year: 2023
+                        date: '2023-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 517
                             language: 1
                             title: 'Radiobeitrag zu offenen Daten'
-                            year: 2023
+                            date: '2023-01-01'
+                            year_only: 1
                   - self:
                         id: 18
                         title: 'Podcast on deployment'
-                        year: 2025
+                        date: '2025-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 518
                             language: 1
                             title: 'Podcast über Deployment'
-                            year: 2025
+                            date: '2025-01-01'
+                            year_only: 1
                   - self:
                         id: 19
                         title: 'Assistive technology in higher education'
-                        year_start: 2022
+                        date_start: '2022-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 519
                             language: 1
                             title: 'Assistive Technologien in der Hochschullehre'
-                            year_start: 2022
+                            date_start: '2022-01-01'
+                            year_only: 1
                   - self:
                         id: 20
                         title: 'Reproducible research data'
-                        year_start: 2021
+                        date_start: '2021-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 520
                             language: 1
                             title: 'Reproduzierbare Forschungsdaten'
-                            year_start: 2021
+                            date_start: '2021-01-01'
+                            year_only: 1
                   - self:
                         id: 21
                         title: 'Survey methods'
-                        year_start: 2020
-                        year_end: 2024
+                        date_start: '2020-01-01'
+                        date_end: '2024-01-01'
+                        year_only: 1
                     languageVariants:
                       - self:
                             id: 521
                             language: 1
                             title: 'Erhebungsmethoden'
-                            year_start: 2020
-                            year_end: 2024
+                            date_start: '2020-01-01'
+                            date_end: '2024-01-01'
+                            year_only: 1
             # Two profiles on a second storage folder. The selected profiles
             # element of page 207 names one of them by uid, which is what proves
             # that the selection ignores the storage page restriction.

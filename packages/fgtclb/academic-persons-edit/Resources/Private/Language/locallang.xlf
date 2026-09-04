@@ -21,8 +21,8 @@
       <trans-unit id="list.profile">
         <source>Profile</source>
       </trans-unit>
-      <trans-unit id="list.profileInformations.year">
-        <source>Year</source>
+      <trans-unit id="list.profileInformations.date">
+        <source>Date</source>
       </trans-unit>
       <trans-unit id="list.profileInformations.title">
         <source>Title</source>
@@ -273,23 +273,17 @@
       <trans-unit id="profileInformation.link.placeholder">
         <source>https://www.example.com</source>
       </trans-unit>
-      <trans-unit id="profileInformation.year.label">
-        <source>Year</source>
+      <trans-unit id="profileInformation.date.label">
+        <source>Date</source>
       </trans-unit>
-      <trans-unit id="profileInformation.year.placeholder">
-        <source>e.g. 2025</source>
+      <trans-unit id="profileInformation.dateStart.label">
+        <source>Start date</source>
       </trans-unit>
-      <trans-unit id="profileInformation.yearStart.label">
-        <source>Start year</source>
+      <trans-unit id="profileInformation.dateEnd.label">
+        <source>End date</source>
       </trans-unit>
-      <trans-unit id="profileInformation.yearStart.placeholder">
-        <source>e.g. 2020</source>
-      </trans-unit>
-      <trans-unit id="profileInformation.yearEnd.label">
-        <source>End year</source>
-      </trans-unit>
-      <trans-unit id="profileInformation.yearEnd.placeholder">
-        <source>e.g. 2025</source>
+      <trans-unit id="profileInformation.yearOnly.label">
+        <source>Show year only</source>
       </trans-unit>
       <trans-unit id="profileInformation.bodytext.label">
         <source>Text</source>
@@ -672,11 +666,14 @@
       <trans-unit id="contractFormData.validFrom.error.1307719788">
         <source>"Valid from" must be a valid date. (Seperated by .)</source>
       </trans-unit>
-      <trans-unit id="profileInformationFormData.yearStart.error.1332933658">
-        <source>"Year start" must be a number.</source>
+      <trans-unit id="profileInformationFormData.date.error.1307719788">
+        <source>"Date" must be a valid date. (Seperated by .)</source>
       </trans-unit>
-      <trans-unit id="profileInformationFormData.yearEnd.error.1332933658">
-        <source>"Year end" must be a number.</source>
+      <trans-unit id="profileInformationFormData.dateStart.error.1307719788">
+        <source>"Start date" must be a valid date. (Seperated by .)</source>
+      </trans-unit>
+      <trans-unit id="profileInformationFormData.dateEnd.error.1307719788">
+        <source>"End date" must be a valid date. (Seperated by .)</source>
       </trans-unit>
     </body>
   </file>

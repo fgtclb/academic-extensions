@@ -47,21 +47,38 @@ final class ProfileInformationTest extends UnitTestCase
     }
 
     #[Test]
-    public function getYearReturnsNullForNewModel(): void
+    public function getDateReturnsNullForNewModel(): void
     {
-        $this->assertNull((new ProfileInformation())->getYear());
+        $this->assertNull((new ProfileInformation())->getDate());
     }
 
     #[Test]
-    public function getYearStartReturnsNullForNewModel(): void
+    public function getDateStartReturnsNullForNewModel(): void
     {
-        $this->assertNull((new ProfileInformation())->getYearStart());
+        $this->assertNull((new ProfileInformation())->getDateStart());
     }
 
     #[Test]
-    public function getYearEndReturnsNullForNewModel(): void
+    public function getDateEndReturnsNullForNewModel(): void
     {
-        $this->assertNull((new ProfileInformation())->getYearEnd());
+        $this->assertNull((new ProfileInformation())->getDateEnd());
+    }
+
+    #[Test]
+    public function completeDatesAndYearOnlyFlagRoundTripWithoutTimeConversion(): void
+    {
+        $date = new \DateTime('2026-04-17');
+        $dateStart = new \DateTime('2024-02-29');
+        $dateEnd = new \DateTime('2028-12-31');
+        $subject = (new ProfileInformation())
+            ->setDate($date)
+            ->setDateStart($dateStart)
+            ->setDateEnd($dateEnd)
+            ->setYearOnly(true);
+        $this->assertSame($date, $subject->getDate());
+        $this->assertSame($dateStart, $subject->getDateStart());
+        $this->assertSame($dateEnd, $subject->getDateEnd());
+        $this->assertTrue($subject->isYearOnly());
     }
 
     #[Test]

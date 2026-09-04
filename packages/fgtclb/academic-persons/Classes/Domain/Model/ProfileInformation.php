@@ -20,9 +20,10 @@ class ProfileInformation extends AbstractEntity
     protected string $title = '';
     protected string $bodytext = '';
     protected string $link = '';
-    protected ?int $year = null;
-    protected ?int $yearStart = null;
-    protected ?int $yearEnd = null;
+    protected ?\DateTime $date = null;
+    protected ?\DateTime $dateStart = null;
+    protected ?\DateTime $dateEnd = null;
+    protected bool $yearOnly = false;
     protected int $sorting = 0;
 
     public function __construct()
@@ -90,37 +91,48 @@ class ProfileInformation extends AbstractEntity
         return $this->link;
     }
 
-    public function setYear(?int $year): self
+    public function setDate(?\DateTime $date): self
     {
-        $this->year = $year;
+        $this->date = $date;
         return $this;
     }
 
-    public function getYear(): ?int
+    public function getDate(): ?\DateTime
     {
-        return $this->year;
+        return $this->date;
     }
 
-    public function setYearStart(?int $yearStart): self
+    public function setDateStart(?\DateTime $dateStart): self
     {
-        $this->yearStart = $yearStart;
+        $this->dateStart = $dateStart;
         return $this;
     }
 
-    public function getYearStart(): ?int
+    public function getDateStart(): ?\DateTime
     {
-        return $this->yearStart;
+        return $this->dateStart;
     }
 
-    public function setYearEnd(?int $yearEnd): self
+    public function setDateEnd(?\DateTime $dateEnd): self
     {
-        $this->yearEnd = $yearEnd;
+        $this->dateEnd = $dateEnd;
         return $this;
     }
 
-    public function getYearEnd(): ?int
+    public function getDateEnd(): ?\DateTime
     {
-        return $this->yearEnd;
+        return $this->dateEnd;
+    }
+
+    public function setYearOnly(bool $yearOnly): self
+    {
+        $this->yearOnly = $yearOnly;
+        return $this;
+    }
+
+    public function isYearOnly(): bool
+    {
+        return $this->yearOnly;
     }
 
     public function setSorting(int $sorting): self
