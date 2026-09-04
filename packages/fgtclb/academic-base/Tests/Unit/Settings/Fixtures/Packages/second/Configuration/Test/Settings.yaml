@@ -1,0 +1,4 @@
+validations:
+  profile:
+    lastName:
+      - readonly

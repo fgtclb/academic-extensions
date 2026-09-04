@@ -1,13 +1,18 @@
 <?php
 
-namespace FGTCLB\AcademicPersons\Settings;
+declare(strict_types=1);
+
+namespace FGTCLB\AcademicBase\Settings;
 
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
 /**
+ * One field of a validation set: the flags an editor sees on a form control,
+ * the Extbase validators to run on the submitted value and the TCA column
+ * configuration fragment the backend FormEngine merges in.
+ *
  * @internal not part of public API.
- * @todo Move this to `EXT:academic_base`.
  */
 #[Exclude]
 final class Validation

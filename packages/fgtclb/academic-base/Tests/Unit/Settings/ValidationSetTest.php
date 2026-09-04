@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicPersons\Tests\Unit\Settings;
+namespace FGTCLB\AcademicBase\Tests\Unit\Settings;
 
-use FGTCLB\AcademicPersons\Settings\Validation;
-use FGTCLB\AcademicPersons\Settings\ValidationSet;
+use FGTCLB\AcademicBase\Settings\Validation;
+use FGTCLB\AcademicBase\Settings\ValidationSet;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 

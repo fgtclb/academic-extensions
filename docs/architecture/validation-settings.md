@@ -5,11 +5,12 @@ required, read only or disabled. It is the **single source of truth for both
 editing contexts**: the TYPO3 backend FormEngine and the frontend edit form of
 `EXT:academic_persons_edit`.
 
-This page describes the `academic_persons` mechanism. **`academic_jobs` ships a
-second, unrelated implementation** of the same idea, with its own file, its own
-loader and a different keyword vocabulary — see
+This page describes the `academic_persons` mechanism and the shared classes in
+`academic_base` it is built on since ACE-501. **`academic_jobs` ships a second,
+unrelated implementation** of the same idea, with its own file, its own loader
+and a different keyword vocabulary — see
 [The second implementation](#the-second-implementation-in-academic_jobs) at the
-end. The two share no code.
+end. The two share no code yet; moving jobs onto the shared classes is ACE-508.
 
 That is why the file ships in **`academic_persons`** and not in the edit
 extension. `academic_persons` owns the domain models and their TCA, so it must
@@ -49,7 +50,7 @@ Six sets exist, one per editable record type: `profile`, `contract`,
 `emailAddress`, `phoneNumber`, `physicalAddress`, `profileInformation`.
 
 The recognised flags, all matched case-insensitively
-(`AcademicPersonsSettingsFactory::normalizeValidations()`):
+(`ValidationNormalizer::normalizeValidation()` in `academic_base`):
 
 | Flag       | Effect                                                                  |
 |------------|-------------------------------------------------------------------------|
@@ -62,9 +63,42 @@ The recognised flags, all matched case-insensitively
 Anything else in the list is ignored. There is no `url` flag yet; the source
 carries a `@todo` for it.
 
+## The shared classes in `academic_base`
+
+Everything that has no persons knowledge lives in
+`packages/fgtclb/academic-base/Classes/Settings/`, namespace
+`FGTCLB\AcademicBase\Settings`, and is `@internal`:
+
+| Class                                    | Role                                                                                               |
+|------------------------------------------|----------------------------------------------------------------------------------------------------|
+| `Validation`, `ValidationSet`            | The value objects. `#[Exclude]`d from the container, `__set_state()` for the cache                 |
+| `ValidationNormalizer`                   | Flag list → `Validation`; `normalizeValidationSets()` for a whole `validations` map                |
+| `SettingsFileLoader`                     | The package walk, the top-level `array_merge()` and the `cache.core` round trip                    |
+| `TcaValidationMerger`                    | `toTcaTableConfig()` builds the `columns.<field>.config` fragment, `merge()` applies it to a table |
+| `Exception\UnknownValidatorException`    | Raised by a validation engine for a class name that is not an Extbase validator                    |
+| `Exception\UnsuitableValidatorException` | Raised by a validator handed a subject it is not built for                                         |
+
+The ViewHelper `FGTCLB\AcademicBase\ViewHelpers\ValidationEnsureViewHelper`
+sits next to them, declared in a template as
+`xmlns:p="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`.
+
+What stays in `academic_persons` is the persons shape: `AcademicPersonsSettings`
+(the sets, the profile information types, the raw array),
+`ProfileInformationType`, and `AcademicPersonsSettingsFactory`, which is now
+glue — it hands the file path, the cache identifier and its `normalize()`
+closure to the loader and delegates the `validations` map to the normaliser.
+The validation *engine* — `AbstractFormDataValidator::processValidations()` in
+`academic_persons_edit` — deliberately did not move: it is neutral in substance
+but not yet in its types, and it is a second step.
+
+No class aliases exist for the old `FGTCLB\AcademicPersons\Settings\Validation*`
+and `FGTCLB\AcademicPersonsEdit\Exception\*ValidatorException` names. They were
+`@internal`, and nothing outside the two persons extensions referenced them.
+
 ## Normalisation
 
-The factory turns each flag list into one `Validation` value object:
+`ValidationNormalizer::normalizeValidation()` turns each flag list into one
+`Validation` value object:
 
 ```php
 $readOnly = in_array('readonly', $validators, true);
@@ -97,9 +131,10 @@ Extbase property and the TCA column.
 
 ## Consumer 1 — the TYPO3 backend FormEngine
 
-`AcademicPersonsSettings::getValidationTcaTableConfig($identifier)` returns a
-`columns.<field>.config` fragment built from each `Validation::$tcaConfig`, and
-**every one of the six TCA files merges it in**:
+`TcaValidationMerger::merge($tableTca, $validationSet)` returns the table array
+with a `columns.<field>.config` fragment built from each `Validation::$tcaConfig`
+merged in, and **every one of the six TCA files calls it** with the set it gets
+from `AcademicPersonsSettings::getValidationSet()`:
 
 | Set                  | TCA file                                                  |
 |----------------------|-----------------------------------------------------------|
@@ -113,10 +148,11 @@ Extbase property and the TCA column.
 So marking a field `disabled` or `readonly` in the YAML makes it read only in the
 backend record editor as well — by design, and for every backend user.
 
-The merge is not written the same way everywhere: the profile table uses
-`ArrayUtility::mergeRecursiveWithOverrule()`, the contract table uses
-`array_replace_recursive()`. Both achieve the merge; the inconsistency is
-cosmetic. All six call sites carry the same `@todo`:
+The merge is `ArrayUtility::mergeRecursiveWithOverrule()` for all six tables —
+the contract table used `array_replace_recursive()` until ACE-501, which
+produces the same result for these fragments. A missing set is a no-op, so a
+table may be asked about a set nobody configured. All six call sites carry the
+same `@todo`:
 
 > MAIN TCA Files should be kept without dynamic calls, and following should be
 > done in override files.
@@ -144,8 +180,8 @@ through as unconfigured.
 
 ## Overriding the settings in an installation
 
-`AcademicPersonsSettingsFactory::loadUncached()` walks every **active package**,
-reads `Configuration/AcademicPersons/Settings.yaml` if present, and folds them
+`SettingsFileLoader::loadMergedArray()` walks every **active package**, reads
+`Configuration/AcademicPersons/Settings.yaml` if present, and folds them
 together with `array_merge()`. To change a set:
 
 - Ship the file in a site package that **depends on `academic_persons`**, so that
@@ -155,7 +191,10 @@ together with `array_merge()`. To change a set:
   once. There is no deep merge, and no syntax for removing a single flag from a
   single field.
 - Flush the core cache afterwards; the normalised result is cached in
-  `cache.core`.
+  `cache.core` under `AcademicPersons_Settings_v3` (the suffix was added when the
+  graph's classes moved to `academic_base`, so a stale entry naming the old
+  classes is never `require`d), as a `return <var_export>;`
+  statement — which is why every object in the graph has a `__set_state()`.
 
 There is no TypoScript and no site-set path — the site sets do not expose
 validations.
@@ -193,7 +232,11 @@ Two of those deserve emphasis because they are traps rather than gaps:
   documents `disabled` and `readonly`, which do nothing there, and omits `url`
   and `number`, which it actually uses.
 
-The divergence between its three readers is tracked as ACE-429.
+The divergence between its three readers is tracked as ACE-429. Adopting the
+shared `academic_base` classes — which replaces the loader, the three readers
+and the two duplicate exceptions, and turns the dead `getValidationsForTca()`
+into a real TCA merge — is ACE-508, a behaviour change for jobs and therefore a
+change of its own.
 
 ## Documentation state
 
@@ -240,6 +283,9 @@ Still open, in the YAML files themselves rather than in the manuals:
   `ValidationSet` follow.
 - `packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml`
   — the shipped sets.
+- `packages/fgtclb/academic-base/Classes/Settings/` — `Validation`,
+  `ValidationSet`, `ValidationNormalizer`, `SettingsFileLoader` and
+  `TcaValidationMerger`, with their unit tests in
+  `packages/fgtclb/academic-base/Tests/Unit/Settings/`.
 - `packages/fgtclb/academic-persons/Classes/Settings/` —
-  `AcademicPersonsSettingsFactory`, `AcademicPersonsSettings`, `ValidationSet`
-  and `Validation`.
+  `AcademicPersonsSettingsFactory` and `AcademicPersonsSettings`.
