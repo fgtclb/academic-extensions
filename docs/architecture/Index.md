@@ -25,6 +25,10 @@ describing an intention as if it were the state.
 - TypoScript and page TSconfig exist **once** on disk and are delivered twice:
   a site set points at the very files the static template registration points
   at. Content elements are hidden globally and re-enabled per component.
+- A record or brand icon stays with the core `SvgIconProvider`; an action icon
+  is drawn in `currentColor` and registered with the `academic_base` provider
+  that inlines it, so it follows the text colour in the backend and the
+  frontend.
 
 ## Pages
 
@@ -38,6 +42,7 @@ describing an intention as if it were the state.
 | [Form data transformation](form-data-transformation.md)       | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                          |
 | [TypoScript and site sets](typoscript-and-site-sets.md)       | The layout that serves site sets and static templates from one physical copy, hide-by-default, and the `clear = 3` trap.                              |
 | [Translation synchronization](translation-synchronization.md) | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.            |
+| [Icons](icons.md)                                             | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.         |
 
 ## See also
 
