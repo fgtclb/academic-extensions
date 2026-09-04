@@ -56,7 +56,7 @@ services:
 `autoconfigure: true` on the defaults is what makes PHP attributes work at all,
 which is why the two styles coexist without friction. Beyond the header, seven
 files carry real definitions: `event.listener` tags, `data.processor` tags, an
-`extbase.type_converter` tag, two `console.command` tags, factory-produced
+`extbase.type_converter` tag, three `console.command` tags, factory-produced
 services, one interface alias, and several `public: true` markers on
 repositories and registries.
 
@@ -78,8 +78,10 @@ pointing at the model rather than at the code that referenced it.
 
 [`packages/fgtclb/academic-persons/Configuration/Services.php`](../../packages/fgtclb/academic-persons/Configuration/Services.php)
 is not the boilerplate `defaults()` + `load()` file the preference implies. It
-exists for the one thing YAML cannot express — registering autoconfiguration
-for an interface — and it does only that (lines 20–26):
+exists for the things YAML cannot express: registering autoconfiguration for an
+interface, and — since ACE-504 — a compiler pass that registers
+`Report\LegacySettingsStatus` only when EXT:reports is active. The
+autoconfiguration part:
 
 ```php
 return static function (ContainerConfigurator $container, ContainerBuilder $containerBuilder): void {
@@ -94,6 +96,22 @@ return static function (ContainerConfigurator $container, ContainerBuilder $cont
 The registration of the classes themselves still happens in that package's
 `Services.yaml`. TYPO3 loads both files when both are present.
 
+The compiler pass is there because of a timing fact worth knowing: a
+`Services.php` runs while the container is being built, and at that point
+neither `ExtensionManagementUtility::isLoaded()` nor the `PackageManager`
+service is available — `Bootstrap` hands the package manager to
+`ExtensionManagementUtility` only after `createDependencyInjectionContainer()`
+has returned, and the core's `ContainerBuilder` registers its synthetic
+services after every package's `Services.*` was loaded. A compiler pass runs
+after all of that, so `hasDefinition(StatusRegistry::class)` — a definition only
+EXT:reports' own `Services.yaml` makes — is an order-independent "is reports
+active" check on both core versions. The pass is added with priority 500 in the
+before-optimization stage: Symfony's `ResolveInstanceofConditionalsPass` runs at
+priority 100 of that same stage, and a definition registered after it stays
+untagged even with `setAutoconfigured(true)`. The class is excluded from the
+`resource` load of `Services.yaml` for the same reason it needs the pass —
+the interface it implements does not exist without EXT:reports.
+
 ### Attributes are already in use
 
 Contrary to the note in `AGENTS.md` that these extensions do not use attributes,
@@ -104,11 +122,11 @@ they are used in production code across five packages:
 | `#[Autoconfigure]` | 9     | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`) |
 | `#[Autowire]`      | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`   |
 | `#[AsAlias]`       | 2     | `academic-persons/Classes/Service/RecordSynchronizer.php:21`              |
-| `#[Exclude]`       | 10    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph |
+| `#[Exclude]`       | 11    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph |
 | `#[AsCommand]`     | 1     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                 |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
-(`Symfony\Component\Console\Attribute\AsCommand`), not a DI one; the other two
+(`Symfony\Component\Console\Attribute\AsCommand`), not a DI one; the other three
 commands in `academic-persons` are still registered with `console.command` tags
 in YAML. `#[AsTaggedItem]`, `#[AsController]` and `#[AsEventListener]` have zero
 sites.
