@@ -269,6 +269,23 @@ export const nextFrame = () =>
     new Promise((resolve) => globalThis.requestAnimationFrame(() => resolve(undefined)));
 
 /**
+ * A keyboard event, which jsdom implements but does not put on "globalThis".
+ *
+ * The globals above are the ones the *sources* reach for; "KeyboardEvent" is
+ * only ever constructed by a test, so it is modelled here rather than added to
+ * that list. Built from the window's own constructor, so the event a handler
+ * receives is the same kind of object a browser dispatches.
+ */
+export const createKeyboardEvent = (type, { key = '', ctrlKey = false, metaKey = false } = {}) =>
+    new (installDom().window.KeyboardEvent)(type, {
+        key,
+        ctrlKey,
+        metaKey,
+        bubbles: true,
+        cancelable: true,
+    });
+
+/**
  * A drag event, which jsdom implements neither as "DragEvent" nor as
  * "DataTransfer" - and the document list is sorted by dragging.
  *

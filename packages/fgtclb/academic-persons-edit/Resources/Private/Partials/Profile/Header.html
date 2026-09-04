@@ -74,19 +74,26 @@
                     </div>
                 </form>
             </f:if>
-            <button
-                class="btn rounded-0 btn-outline-secondary btn-sm flex-shrink-0"
-                type="button"
-                data-academic-persons-profile-editing-edit-all-btn
-                data-pe-edit-all-label="{f:translate(key: 'profileEditing.btnEditAll', extensionName: 'academic_persons_edit')}"
-                data-pe-close-all-label="{f:translate(key: 'profileEditing.btnCloseAll', extensionName: 'academic_persons_edit')}"
-                aria-pressed="false">
-                <span data-pe-edit-all-button-label>
-                    <f:translate
-                        key="profileEditing.btnEditAll"
-                        extensionName="academic_persons_edit" />
-                </span>
-            </button>
+            <!--
+                No fields form, no toggle: the button would open nothing, and
+                the "aria-controls" it carries would be an empty IDREF list.
+            -->
+            <f:if condition="{fieldsFormIds}">
+                <button
+                    class="btn rounded-0 btn-outline-secondary btn-sm flex-shrink-0"
+                    type="button"
+                    data-academic-persons-profile-editing-edit-all-btn
+                    data-pe-edit-all-label="{f:translate(key: 'profileEditing.btnEditAll', extensionName: 'academic_persons_edit')}"
+                    data-pe-close-all-label="{f:translate(key: 'profileEditing.btnCloseAll', extensionName: 'academic_persons_edit')}"
+                    aria-controls="{fieldsFormIds}"
+                    aria-pressed="false">
+                    <span data-pe-edit-all-button-label>
+                        <f:translate
+                            key="profileEditing.btnEditAll"
+                            extensionName="academic_persons_edit" />
+                    </span>
+                </button>
+            </f:if>
         </div>
     </header>
 </html>

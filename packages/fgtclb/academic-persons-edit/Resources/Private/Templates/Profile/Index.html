@@ -157,9 +157,25 @@
                 </f:if>
             </div>
             <div>
+                <!--
+                    The forms full form editing governs, named so that the
+                    "edit all" toggle can point at them. A section the
+                    settings do not configure renders no form, so the list is
+                    built from the sections that are actually rendered rather
+                    than from both names unconditionally.
+                -->
+                <f:variable name="renderedFieldsFormIds"><f:if condition="{profileSections.information}">profile-editing-{profile.uid}-personal-form</f:if><f:if condition="{profileSections.aboutme}"> profile-editing-{profile.uid}-about-form</f:if></f:variable>
+                <f:variable
+                    name="fieldsFormIds"
+                    value="{renderedFieldsFormIds -> f:format.trim()}" />
                 <f:render
                     partial="Profile/Header"
-                    arguments="{profile: profile, title: specialFields.title, skipSync: specialFields.skipSync}" />
+                    arguments="{
+                        profile: profile,
+                        title: specialFields.title,
+                        skipSync: specialFields.skipSync,
+                        fieldsFormIds: fieldsFormIds
+                    }" />
                 <div class="container-fluid px-0">
                     <div class="row gx-lg-5 gy-5 align-items-stretch">
                         <div

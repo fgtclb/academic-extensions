@@ -29,7 +29,8 @@ academic-persons-edit-rich-text {
 //
 // The editor's elements toggle the `hidden` attribute on the regions they show
 // and hide - the image editor, the contact editors, a field message that has no
-// message - rather than adding and removing them, and Bootstrap's own
+// message, the form action bar of full form editing and the per-field action
+// groups it hides - rather than adding and removing them, and Bootstrap's own
 // `[hidden] { display: none !important }` is not enough for that: its display
 // utilities carry the same specificity, are `!important` as well and stand
 // later in the file, so a `hidden` `.d-flex` - which is what the image editor's

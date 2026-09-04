@@ -4,6 +4,7 @@ import {
   requestJson,
   showStatus,
   type EditableField,
+  type StatusRegion,
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
 import {
   toEditingContext,
@@ -46,7 +47,18 @@ const groupEditorSelector = "[data-pe-group-editor]";
 const groupEditButtonSelector = "[data-pe-group-edit]";
 const profileNameSelector = "[data-pe-profile-name]";
 const autosaveOnChangeSelector = "[data-pe-autosave-on-change]";
+const autosaveUndoSelector = "[data-pe-autosave-undo]";
 const fieldActionsSelector = "[data-pe-field-actions]";
+const groupActionsSelector = "[data-pe-group-actions]";
+const formActionsSelector = "[data-pe-form-actions]";
+const formApplySelector = "[data-pe-form-apply]";
+const formUndoSelector = "[data-pe-form-undo]";
+const formDiscardSelector = "[data-pe-form-discard]";
+// The editing view of CKEditor 5. Escape belongs to it while the caret is
+// inside one: it closes the balloon of a link or a list first, and discarding
+// the whole form from under an open balloon is not what the key was pressed
+// for.
+const richTextEditorScopeSelector = ".ck";
 
 const isFieldReadOnly = (field: EditableField): boolean =>
   field instanceof HTMLSelectElement ? false : field.readOnly;
@@ -104,6 +116,24 @@ const getFieldDisplayValue = (
       : "";
   }
   return String(value ?? "").trim();
+};
+
+/**
+ * Puts the caret in a field, through its rich text editor where it has one.
+ *
+ * A CKEditor instance replaces the textarea it is created on, so focusing the
+ * textarea would focus an element the visitor cannot type in. The editor is
+ * created if it does not exist yet, which is what makes this usable from the
+ * paths that open a field rather than only from the ones that react to one.
+ */
+const focusField = (context: EditingContext, field: EditableField): void => {
+  if (isRichTextField(field)) {
+    void ensureRichTextEditor(context, field)
+      .then((editor): void => editor?.editing.view.focus())
+      .catch((): void => field.focus());
+    return;
+  }
+  field.focus();
 };
 
 const getFieldPropertyName = (field: EditableField): string => {
@@ -205,6 +235,7 @@ const toggleEditGroup = (
   context: EditingContext,
   group: HTMLElement,
   state = true,
+  focus = true,
 ): void => {
   const editor = group.querySelector<HTMLElement>(groupEditorSelector);
   const preview = group.querySelector<HTMLElement>(groupPreviewSelector);
@@ -219,10 +250,14 @@ const toggleEditGroup = (
   preview?.classList.toggle("d-none", state);
   button?.setAttribute("aria-expanded", String(state));
   if (!state) {
-    button?.focus();
+    if (focus) {
+      button?.focus();
+    }
     return;
   }
-  fields[0]?.focus();
+  if (focus) {
+    fields[0]?.focus();
+  }
 };
 
 const setEditAllButtonState = (
@@ -346,6 +381,7 @@ const toggleEditField = (
   context: EditingContext,
   fieldId: string,
   state = true,
+  focus = true,
 ): void => {
   const field = getFieldById(context, fieldId);
   if (field === null || field.disabled || isFieldReadOnly(field)) {
@@ -353,7 +389,7 @@ const toggleEditField = (
   }
   const group = field.closest<HTMLElement>(fieldGroupSelector);
   if (group !== null) {
-    toggleEditGroup(context, group, state);
+    toggleEditGroup(context, group, state, focus);
     return;
   }
   getFieldEditElement(field).classList.toggle("d-none", !state);
@@ -367,14 +403,28 @@ const toggleEditField = (
       actions.classList.toggle("d-none", !state);
     });
   if (!state) {
-    getActivateButton(context, field)?.focus();
+    if (focus) {
+      getActivateButton(context, field)?.focus();
+    }
     return;
   }
+  // The editor is created even when the caret is not moved into it: opening
+  // every field at once must not leave the rich text ones as bare textareas.
   if (isRichTextField(field)) {
     void ensureRichTextEditor(context, field)
-      .then((editor): void => editor?.editing.view.focus())
-      .catch((): void => field.focus());
-  } else {
+      .then((editor): void => {
+        if (focus) {
+          editor?.editing.view.focus();
+        }
+      })
+      .catch((): void => {
+        if (focus) {
+          field.focus();
+        }
+      });
+    return;
+  }
+  if (focus) {
     field.focus();
   }
 };
@@ -382,6 +432,7 @@ const toggleEditField = (
 const closeFields = (
   context: EditingContext,
   fields: EditableField[],
+  focus = true,
 ): void => {
   const groups = new Set<HTMLElement>();
   fields.forEach((field): void => {
@@ -389,10 +440,10 @@ const closeFields = (
     if (group !== null) {
       groups.add(group);
     } else if (field.id !== "") {
-      toggleEditField(context, field.id, false);
+      toggleEditField(context, field.id, false, focus);
     }
   });
-  groups.forEach((group): void => toggleEditGroup(context, group, false));
+  groups.forEach((group): void => toggleEditGroup(context, group, false, focus));
 };
 
 const showValidationErrors = (
@@ -414,7 +465,10 @@ const showValidationErrors = (
     invalidFields.push(field);
     getFieldEditElement(field).classList.add("is-invalid");
     if (field.id !== "") {
-      toggleEditField(context, field.id, true);
+      // Opened, never focused: a rich text field focuses asynchronously through
+      // its editor promise, so a later one would steal the caret back from the
+      // first refused field below.
+      toggleEditField(context, field.id, true, false);
     }
     const feedback = field
       .closest<HTMLElement>(
@@ -429,13 +483,7 @@ const showValidationErrors = (
   });
   const firstInvalidField = invalidFields[0];
   if (firstInvalidField !== undefined) {
-    if (isRichTextField(firstInvalidField)) {
-      void ensureRichTextEditor(context, firstInvalidField)
-        .then((editor): void => editor?.editing.view.focus())
-        .catch((): void => firstInvalidField.focus());
-    } else {
-      firstInvalidField.focus();
-    }
+    focusField(context, firstInvalidField);
   }
 };
 
@@ -471,23 +519,86 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
     );
 
   const normalizedRichTextBaselines = new WeakSet<HTMLTextAreaElement>();
-  let editAllActive = false;
-  setEditAllButtonState(context, editAllActive);
 
-  const finishEditAllWhenClosed = (): void => {
-    if (!editAllActive) {
-      return;
-    }
-    const hasOpenField = fields.some(
-      (field): boolean =>
-        !field.disabled &&
-        !isFieldReadOnly(field) &&
-        !getFieldEditElement(field).classList.contains("d-none"),
+  /**
+   * Full form editing: every editable field of the profile open at once, with
+   * one set of controls for all of them and none of the per-field ones.
+   *
+   * The state is exclusive with single-field editing rather than a variant of
+   * it. Entering closes whatever one field was open, hides every per-field and
+   * per-group action group and shows the bar `Field/FormActions.html` renders
+   * at the end of each form; leaving does the reverse. Nothing is removed from
+   * the document for it, because single-field editing has to work again the
+   * moment the form is closed.
+   */
+  let formEditingActive = false;
+  /**
+   * Set before the first `await` of an apply, which `aria-busy` is not: the
+   * root is marked busy inside `saveFields()`, several microtasks after the
+   * click, so a second press in the same turn would reach the endpoint.
+   */
+  let formRequestPending = false;
+  const formActionBars = Array.from(
+    root.querySelectorAll<HTMLElement>(formActionsSelector),
+  );
+  setEditAllButtonState(context, formEditingActive);
+
+  /**
+   * A refusal of the whole form interrupts, a refusal of one field waits.
+   *
+   * Applying the form moves the caret to the first refused field in the same
+   * turn, and a polite region queued behind that focus change is routinely
+   * dropped by a screen reader. Beside a single field the message stands next
+   * to the control the visitor is already in, so it stays polite - which is
+   * also what keeps single-field editing unchanged.
+   */
+  const validationRegion = (): StatusRegion =>
+    formEditingActive ? "alert" : "status";
+
+  const editableFields = (): EditableField[] =>
+    fields.filter(
+      (field): boolean => !field.disabled && !isFieldReadOnly(field),
     );
-    if (!hasOpenField) {
-      editAllActive = false;
-      setEditAllButtonState(context, false);
-    }
+
+  /**
+   * Every control that acts on one field or one group, including the undo of
+   * an autosaving checkbox - which is a per-field control without being part
+   * of a `[data-pe-field-actions]` group. Scoped to the forms, so the controls
+   * of a document or contact editor are not touched: those keep their own
+   * buttons, and full form editing is about the profile fields only.
+   */
+  const perFieldActionGroups = (): HTMLElement[] =>
+    forms.flatMap((form): HTMLElement[] =>
+      Array.from(
+        form.querySelectorAll<HTMLElement>(
+          `${fieldActionsSelector}, ${groupActionsSelector}, ${autosaveUndoSelector}`,
+        ),
+      ),
+    );
+
+  /**
+   * Takes the baseline of a rich text field from the editor rather than from
+   * the markup, once per field.
+   *
+   * CKEditor normalises what it is given - `<p>a</p>` and `a` are the same
+   * document to it - so the rendered value and the value the editor hands back
+   * differ for the same content. Comparing against the rendered one would make
+   * every rich text field look changed on the first save, and, since undo
+   * writes the baseline back, would put the un-normalised source into the
+   * editor and post it as a change on the next apply.
+   */
+  const normalizeRichTextBaselines = (candidates: EditableField[]): void => {
+    candidates.filter(isRichTextField).forEach((field): void => {
+      if (normalizedRichTextBaselines.has(field)) {
+        return;
+      }
+      const initialValue = getRichTextInitialValue(field);
+      if (initialValue === undefined) {
+        return;
+      }
+      persistedValues.set(field, initialValue);
+      normalizedRichTextBaselines.add(field);
+    });
   };
 
   const resetFields = (fieldsToReset: EditableField[]): void => {
@@ -509,15 +620,7 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
     } catch {
       return false;
     }
-    richTextFields.forEach((field): void => {
-      if (!normalizedRichTextBaselines.has(field)) {
-        const initialValue = getRichTextInitialValue(field);
-        if (initialValue !== undefined) {
-          persistedValues.set(field, initialValue);
-        }
-        normalizedRichTextBaselines.add(field);
-      }
-    });
+    normalizeRichTextBaselines(richTextFields);
     clearValidationErrors(fieldsToSave);
     const changedFields = fieldsToSave.filter(
       (field): boolean =>
@@ -528,7 +631,6 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
     );
     if (changedFields.length === 0) {
       closeFields(context, fieldsToSave);
-      finishEditAllWhenClosed();
       showStatus(context, "info", context.messages.unchanged ?? null);
       return true;
     }
@@ -544,7 +646,12 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
       } else {
         invalidField.reportValidity();
       }
-      showStatus(context, "warning", context.messages.validation ?? null);
+      showStatus(
+        context,
+        "warning",
+        context.messages.validation ?? null,
+        validationRegion(),
+      );
       return false;
     }
     const profileUid = context.profileUid;
@@ -581,21 +688,138 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
         renderActivateButton(context, field, value);
       });
       renderProfileName(context);
-      closeFields(context, changedFields);
-      finishEditAllWhenClosed();
+      // In form editing the caret goes to the toggle when the form closes, so
+      // the per-field activate buttons must not be focused on the way there.
+      closeFields(context, changedFields, !formEditingActive);
       showStatus(context, "success");
       return true;
     } catch (error) {
       const result = (error as RequestError).result;
       if (result?.errors !== undefined) {
         showValidationErrors(context, fields, result.errors);
-        showStatus(context, "warning", context.messages.validation ?? null);
+        showStatus(
+          context,
+          "warning",
+          context.messages.validation ?? null,
+          validationRegion(),
+        );
       } else {
         showStatus(context, "danger", result?.message ?? null);
       }
       return false;
     } finally {
       root.setAttribute("aria-busy", "false");
+    }
+  };
+
+  const renderEveryPreview = (): void => {
+    root
+      .querySelectorAll<HTMLElement>(fieldGroupSelector)
+      .forEach((group): void => renderFieldGroupPreview(context, group));
+    fields
+      .filter((field): boolean => field.closest(fieldGroupSelector) === null)
+      .forEach((field): void =>
+        renderActivateButton(context, field, getFieldValue(field)),
+      );
+    renderProfileName(context);
+  };
+
+  const setFormEditingState = (active: boolean): void => {
+    formEditingActive = active;
+    perFieldActionGroups().forEach((group): void => {
+      group.hidden = active;
+    });
+    formActionBars.forEach((bar): void => {
+      bar.hidden = !active;
+    });
+    setEditAllButtonState(context, active);
+  };
+
+  const enterFormEditing = (): void => {
+    // A field that is already open is not closed first: every editable field
+    // opens anyway, and the state it is left in - editor shown, per-field group
+    // hidden - is the same one it would be reopened into. What does change is
+    // the caret, which goes to the first field of the form rather than staying
+    // where the visitor happened to be.
+    setFormEditingState(true);
+    root
+      .querySelectorAll<HTMLElement>(fieldGroupSelector)
+      .forEach((group): void => {
+        toggleEditGroup(context, group, true, false);
+      });
+    root
+      .querySelectorAll<HTMLElement>(editButtonSelector)
+      .forEach((editButton): void => {
+        const fieldId = hooks(editButton).peFor;
+        if (fieldId !== undefined) {
+          toggleEditField(context, fieldId, true, false);
+        }
+      });
+    const firstField = editableFields()[0];
+    if (firstField !== undefined) {
+      focusField(context, firstField);
+    }
+  };
+
+  const leaveFormEditing = (): void => {
+    setFormEditingState(false);
+    closeFields(context, fields, false);
+    root.querySelector<HTMLButtonElement>(editAllButtonSelector)?.focus();
+  };
+
+  /**
+   * Back to what is stored, for every field at once.
+   *
+   * `persistedValues` is the baseline the module keeps anyway: seeded from the
+   * rendered values at start-up and rewritten after every successful save. Undo
+   * here means the same thing it means beside a single field, and no history is
+   * kept for it.
+   */
+  const revertForm = (): void => {
+    // The editors are created when the form opens, so their normalised values
+    // are available by now - and the baseline has to be corrected before it is
+    // written back, or undo puts the rendered source into the editor and the
+    // next apply posts it as a change nobody made.
+    normalizeRichTextBaselines(editableFields());
+    resetFields(editableFields());
+    renderEveryPreview();
+  };
+
+  const discardForm = (): void => {
+    revertForm();
+    leaveFormEditing();
+  };
+
+  /**
+   * Whether a transition may run at all.
+   *
+   * Undo, discard and the toggle stay pressable while an apply is on its way to
+   * the server, and reverting under it is not a cosmetic race: the request is
+   * already being persisted, and the response handler would then write the
+   * reverted values into `persistedValues` for every property the endpoint does
+   * not echo. The baseline would say "unchanged" for a value the database does
+   * not hold, so the next apply would not resend it - the discarded value would
+   * stay stored, with nothing on screen saying so. The request is therefore
+   * allowed to finish and the transition is refused, rather than the request
+   * being abandoned: nothing here can un-persist it.
+   */
+  const formTransitionAllowed = (): boolean => !formRequestPending;
+
+  const applyForm = async (): Promise<void> => {
+    if (formRequestPending || root.getAttribute("aria-busy") === "true") {
+      return;
+    }
+    formRequestPending = true;
+    try {
+      // One request for everything that changed. `updateAction()` validates the
+      // whole map before it writes anything, so a refusal leaves the profile
+      // untouched and there is no partial result to undo.
+      const applied = await saveFields(editableFields());
+      if (applied) {
+        leaveFormEditing();
+      }
+    } finally {
+      formRequestPending = false;
     }
   };
 
@@ -637,7 +861,6 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
         resetFields(groupFields);
         renderFieldGroupPreview(context, group);
         toggleEditGroup(context, group, false);
-        finishEditAllWhenClosed();
       }
       return;
     }
@@ -649,23 +872,46 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
       }
       return;
     }
+    if (button.matches(formApplySelector)) {
+      event.preventDefault();
+      void applyForm();
+      return;
+    }
+    if (button.matches(formUndoSelector)) {
+      event.preventDefault();
+      if (!formTransitionAllowed()) {
+        return;
+      }
+      revertForm();
+      showStatus(
+        context,
+        "info",
+        hooks(button.closest<HTMLElement>(formActionsSelector) ?? button)
+          .peFormRevertedMessage ?? null,
+      );
+      return;
+    }
+    if (button.matches(formDiscardSelector)) {
+      event.preventDefault();
+      if (formTransitionAllowed()) {
+        discardForm();
+      }
+      return;
+    }
     if (button.matches(editAllButtonSelector)) {
       event.preventDefault();
-      editAllActive = !editAllActive;
-      if (editAllActive) {
-        root.querySelectorAll<HTMLElement>(fieldGroupSelector).forEach((group): void => {
-          toggleEditGroup(context, group, true);
-        });
-        root.querySelectorAll<HTMLElement>(editButtonSelector).forEach((editButton): void => {
-          const fieldId = hooks(editButton).peFor;
-          if (fieldId !== undefined) {
-            toggleEditField(context, fieldId, true);
-          }
-        });
-      } else {
-        closeFields(context, fields);
+      // The toggle is the way in and one of the two ways out. Closing the form
+      // is discarding it: a value left in a control the visitor cannot see any
+      // more would contradict the preview beside it and would be sent by the
+      // next apply without ever having been looked at again.
+      if (!formTransitionAllowed()) {
+        return;
       }
-      setEditAllButtonState(context, editAllActive);
+      if (formEditingActive) {
+        discardForm();
+      } else {
+        enterFormEditing();
+      }
       return;
     }
     if (button.matches(editButtonSelector)) {
@@ -693,7 +939,6 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
         setFieldValue(field, persistedValues.get(field) ?? "");
         clearValidationErrors([field]);
         toggleEditField(context, field.id, false);
-        finishEditAllWhenClosed();
       }
       return;
     }
@@ -710,6 +955,12 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
     if (!isEditableField(field) || !field.matches(autosaveOnChangeSelector)) {
       return;
     }
+    if (formEditingActive) {
+      // While the whole form is open the checkbox is applied with everything
+      // else. Writing on change here would put a value in the database that
+      // abort promises to take back and could not.
+      return;
+    }
     // A checkbox saves on change, without an explicit save button, so a failed
     // request has to put the control back where it was: otherwise it shows a
     // state the database does not have, and nothing on screen says so. This is
@@ -722,7 +973,42 @@ export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
     });
   });
   forms.forEach((form): void => {
-    form.addEventListener("submit", (event): void => event.preventDefault());
+    // Escape discards and Ctrl/Cmd + Enter applies, both only while the form is
+    // open and only for a key pressed inside it. The listener sits on the form
+    // rather than on the plugin root because a document, contact or image
+    // editor may be open at the same time - those panels are outside every
+    // `data-pe-fields-form`, they keep their own handling of both keys, and
+    // full form editing does not touch them.
+    form.addEventListener("keydown", (event): void => {
+      if (!formEditingActive || !formTransitionAllowed()) {
+        return;
+      }
+      const target = event.target;
+      if (event.key === "Escape") {
+        if (
+          target instanceof Element &&
+          target.closest(richTextEditorScopeSelector) !== null
+        ) {
+          return;
+        }
+        event.preventDefault();
+        discardForm();
+        return;
+      }
+      if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        void applyForm();
+      }
+    });
+    form.addEventListener("submit", (event): void => {
+      // The form has no action and never navigates. Enter in a text field
+      // submits it, and while the whole form is open that is the same
+      // intention as pressing apply.
+      event.preventDefault();
+      if (formEditingActive) {
+        void applyForm();
+      }
+    });
     form.addEventListener("reset", (event): void => event.preventDefault());
   });
 };

@@ -479,6 +479,38 @@
         <source>Field actions</source>
         <target>Feldaktionen</target>
       </trans-unit>
+      <trans-unit id="profileEditing.actions.formGroup" resname="profileEditing.actions.formGroup">
+        <source>Form actions</source>
+        <target>Formularaktionen</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.apply" resname="profileEditing.form.apply">
+        <source>Apply</source>
+        <target>Übernehmen</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.apply.title" resname="profileEditing.form.apply.title">
+        <source>Save every changed field of this profile</source>
+        <target>Alle geänderten Felder dieses Profils speichern</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.undo" resname="profileEditing.form.undo">
+        <source>Undo</source>
+        <target>Rückgängig</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.undo.title" resname="profileEditing.form.undo.title">
+        <source>Restore every field to the saved value and continue editing</source>
+        <target>Alle Felder auf den gespeicherten Wert zurücksetzen und weiter bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.discard" resname="profileEditing.form.discard">
+        <source>Discard</source>
+        <target>Verwerfen</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.discard.title" resname="profileEditing.form.discard.title">
+        <source>Restore every field to the saved value and close the form</source>
+        <target>Alle Felder auf den gespeicherten Wert zurücksetzen und das Formular schließen</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.status.formReverted" resname="profileEditing.status.formReverted">
+        <source>All fields were restored to the saved values.</source>
+        <target>Alle Felder wurden auf die gespeicherten Werte zurückgesetzt.</target>
+      </trans-unit>
       <trans-unit id="profileEditing.content.empty">
         <source>No content</source>
         <target>Kein Inhalt</target>

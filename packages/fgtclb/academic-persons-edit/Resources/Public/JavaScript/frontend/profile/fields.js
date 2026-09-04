@@ -32,7 +32,14 @@ const groupEditorSelector = "[data-pe-group-editor]";
 const groupEditButtonSelector = "[data-pe-group-edit]";
 const profileNameSelector = "[data-pe-profile-name]";
 const autosaveOnChangeSelector = "[data-pe-autosave-on-change]";
+const autosaveUndoSelector = "[data-pe-autosave-undo]";
 const fieldActionsSelector = "[data-pe-field-actions]";
+const groupActionsSelector = "[data-pe-group-actions]";
+const formActionsSelector = "[data-pe-form-actions]";
+const formApplySelector = "[data-pe-form-apply]";
+const formUndoSelector = "[data-pe-form-undo]";
+const formDiscardSelector = "[data-pe-form-discard]";
+const richTextEditorScopeSelector = ".ck";
 const isFieldReadOnly = (field) => field instanceof HTMLSelectElement ? false : field.readOnly;
 const getFieldEditElement = (field) => {
   var _a;
@@ -68,6 +75,13 @@ const getFieldDisplayValue = (field, value) => {
     return (selectedOption == null ? void 0 : selectedOption.value) ? (selectedOption.textContent ?? "").trim() : "";
   }
   return String(value ?? "").trim();
+};
+const focusField = (context, field) => {
+  if (isRichTextField(field)) {
+    void ensureRichTextEditor(context, field).then((editor) => editor == null ? void 0 : editor.editing.view.focus()).catch(() => field.focus());
+    return;
+  }
+  field.focus();
 };
 const getFieldPropertyName = (field) => {
   var _a;
@@ -124,7 +138,7 @@ const renderFieldGroupPreview = (context, group) => {
   content.classList.toggle("text-body-secondary", value === "");
   content.textContent = value || content.dataset.emptyLabel || "";
 };
-const toggleEditGroup = (context, group, state = true) => {
+const toggleEditGroup = (context, group, state = true, focus = true) => {
   var _a;
   const editor = group.querySelector(groupEditorSelector);
   const preview = group.querySelector(groupPreviewSelector);
@@ -139,10 +153,14 @@ const toggleEditGroup = (context, group, state = true) => {
   preview == null ? void 0 : preview.classList.toggle("d-none", state);
   button == null ? void 0 : button.setAttribute("aria-expanded", String(state));
   if (!state) {
-    button == null ? void 0 : button.focus();
+    if (focus) {
+      button == null ? void 0 : button.focus();
+    }
     return;
   }
-  (_a = fields[0]) == null ? void 0 : _a.focus();
+  if (focus) {
+    (_a = fields[0]) == null ? void 0 : _a.focus();
+  }
 };
 const setEditAllButtonState = (context, active) => {
   const button = context.root.querySelector(
@@ -233,7 +251,7 @@ const renderActivateButton = (context, field, fieldValue) => {
   content.classList.toggle("text-body-secondary", displayValue === "");
   content.textContent = displayValue || (preview == null ? void 0 : preview.dataset.emptyLabel) || "";
 };
-const toggleEditField = (context, fieldId, state = true) => {
+const toggleEditField = (context, fieldId, state = true, focus = true) => {
   var _a, _b, _c;
   const field = getFieldById(context, fieldId);
   if (field === null || field.disabled || isFieldReadOnly(field)) {
@@ -241,7 +259,7 @@ const toggleEditField = (context, fieldId, state = true) => {
   }
   const group = field.closest(fieldGroupSelector);
   if (group !== null) {
-    toggleEditGroup(context, group, state);
+    toggleEditGroup(context, group, state, focus);
     return;
   }
   getFieldEditElement(field).classList.toggle("d-none", !state);
@@ -253,26 +271,38 @@ const toggleEditField = (context, fieldId, state = true) => {
     actions.classList.toggle("d-none", !state);
   });
   if (!state) {
-    (_c = getActivateButton(context, field)) == null ? void 0 : _c.focus();
+    if (focus) {
+      (_c = getActivateButton(context, field)) == null ? void 0 : _c.focus();
+    }
     return;
   }
   if (isRichTextField(field)) {
-    void ensureRichTextEditor(context, field).then((editor) => editor == null ? void 0 : editor.editing.view.focus()).catch(() => field.focus());
-  } else {
+    void ensureRichTextEditor(context, field).then((editor) => {
+      if (focus) {
+        editor == null ? void 0 : editor.editing.view.focus();
+      }
+    }).catch(() => {
+      if (focus) {
+        field.focus();
+      }
+    });
+    return;
+  }
+  if (focus) {
     field.focus();
   }
 };
-const closeFields = (context, fields) => {
+const closeFields = (context, fields, focus = true) => {
   const groups = /* @__PURE__ */ new Set();
   fields.forEach((field) => {
     const group = field.closest(fieldGroupSelector);
     if (group !== null) {
       groups.add(group);
     } else if (field.id !== "") {
-      toggleEditField(context, field.id, false);
+      toggleEditField(context, field.id, false, focus);
     }
   });
-  groups.forEach((group) => toggleEditGroup(context, group, false));
+  groups.forEach((group) => toggleEditGroup(context, group, false, focus));
 };
 const showValidationErrors = (context, fields, errors) => {
   const invalidFields = [];
@@ -290,7 +320,7 @@ const showValidationErrors = (context, fields, errors) => {
     invalidFields.push(field);
     getFieldEditElement(field).classList.add("is-invalid");
     if (field.id !== "") {
-      toggleEditField(context, field.id, true);
+      toggleEditField(context, field.id, true, false);
     }
     const feedback = (_a = field.closest(
       "[data-pe-field-wrapper], [data-pe-group-control], .form-check"
@@ -301,11 +331,7 @@ const showValidationErrors = (context, fields, errors) => {
   });
   const firstInvalidField = invalidFields[0];
   if (firstInvalidField !== void 0) {
-    if (isRichTextField(firstInvalidField)) {
-      void ensureRichTextEditor(context, firstInvalidField).then((editor) => editor == null ? void 0 : editor.editing.view.focus()).catch(() => firstInvalidField.focus());
-    } else {
-      firstInvalidField.focus();
-    }
+    focusField(context, firstInvalidField);
   }
 };
 const initializeFieldEditing = (editingTarget) => {
@@ -336,19 +362,35 @@ const initializeFieldEditing = (editingTarget) => {
     (field) => renderActivateButton(context, field, getFieldValue(field))
   );
   const normalizedRichTextBaselines = /* @__PURE__ */ new WeakSet();
-  let editAllActive = false;
-  setEditAllButtonState(context, editAllActive);
-  const finishEditAllWhenClosed = () => {
-    if (!editAllActive) {
-      return;
-    }
-    const hasOpenField = fields.some(
-      (field) => !field.disabled && !isFieldReadOnly(field) && !getFieldEditElement(field).classList.contains("d-none")
-    );
-    if (!hasOpenField) {
-      editAllActive = false;
-      setEditAllButtonState(context, false);
-    }
+  let formEditingActive = false;
+  let formRequestPending = false;
+  const formActionBars = Array.from(
+    root.querySelectorAll(formActionsSelector)
+  );
+  setEditAllButtonState(context, formEditingActive);
+  const validationRegion = () => formEditingActive ? "alert" : "status";
+  const editableFields = () => fields.filter(
+    (field) => !field.disabled && !isFieldReadOnly(field)
+  );
+  const perFieldActionGroups = () => forms.flatMap(
+    (form) => Array.from(
+      form.querySelectorAll(
+        `${fieldActionsSelector}, ${groupActionsSelector}, ${autosaveUndoSelector}`
+      )
+    )
+  );
+  const normalizeRichTextBaselines = (candidates) => {
+    candidates.filter(isRichTextField).forEach((field) => {
+      if (normalizedRichTextBaselines.has(field)) {
+        return;
+      }
+      const initialValue = getRichTextInitialValue(field);
+      if (initialValue === void 0) {
+        return;
+      }
+      persistedValues.set(field, initialValue);
+      normalizedRichTextBaselines.add(field);
+    });
   };
   const resetFields = (fieldsToReset) => {
     fieldsToReset.forEach((field) => {
@@ -368,22 +410,13 @@ const initializeFieldEditing = (editingTarget) => {
     } catch {
       return false;
     }
-    richTextFields.forEach((field) => {
-      if (!normalizedRichTextBaselines.has(field)) {
-        const initialValue = getRichTextInitialValue(field);
-        if (initialValue !== void 0) {
-          persistedValues.set(field, initialValue);
-        }
-        normalizedRichTextBaselines.add(field);
-      }
-    });
+    normalizeRichTextBaselines(richTextFields);
     clearValidationErrors(fieldsToSave);
     const changedFields = fieldsToSave.filter(
       (field) => getFieldPropertyName(field) !== "" && !field.disabled && !isFieldReadOnly(field) && persistedValues.get(field) !== getFieldValue(field)
     );
     if (changedFields.length === 0) {
       closeFields(context, fieldsToSave);
-      finishEditAllWhenClosed();
       showStatus(context, "info", context.messages.unchanged ?? null);
       return true;
     }
@@ -399,7 +432,12 @@ const initializeFieldEditing = (editingTarget) => {
       } else {
         invalidField.reportValidity();
       }
-      showStatus(context, "warning", context.messages.validation ?? null);
+      showStatus(
+        context,
+        "warning",
+        context.messages.validation ?? null,
+        validationRegion()
+      );
       return false;
     }
     const profileUid = context.profileUid;
@@ -431,21 +469,88 @@ const initializeFieldEditing = (editingTarget) => {
         renderActivateButton(context, field, value);
       });
       renderProfileName(context);
-      closeFields(context, changedFields);
-      finishEditAllWhenClosed();
+      closeFields(context, changedFields, !formEditingActive);
       showStatus(context, "success");
       return true;
     } catch (error) {
       const result = error.result;
       if ((result == null ? void 0 : result.errors) !== void 0) {
         showValidationErrors(context, fields, result.errors);
-        showStatus(context, "warning", context.messages.validation ?? null);
+        showStatus(
+          context,
+          "warning",
+          context.messages.validation ?? null,
+          validationRegion()
+        );
       } else {
         showStatus(context, "danger", (result == null ? void 0 : result.message) ?? null);
       }
       return false;
     } finally {
       root.setAttribute("aria-busy", "false");
+    }
+  };
+  const renderEveryPreview = () => {
+    root.querySelectorAll(fieldGroupSelector).forEach((group) => renderFieldGroupPreview(context, group));
+    fields.filter((field) => field.closest(fieldGroupSelector) === null).forEach(
+      (field) => renderActivateButton(context, field, getFieldValue(field))
+    );
+    renderProfileName(context);
+  };
+  const setFormEditingState = (active) => {
+    formEditingActive = active;
+    perFieldActionGroups().forEach((group) => {
+      group.hidden = active;
+    });
+    formActionBars.forEach((bar) => {
+      bar.hidden = !active;
+    });
+    setEditAllButtonState(context, active);
+  };
+  const enterFormEditing = () => {
+    setFormEditingState(true);
+    root.querySelectorAll(fieldGroupSelector).forEach((group) => {
+      toggleEditGroup(context, group, true, false);
+    });
+    root.querySelectorAll(editButtonSelector).forEach((editButton) => {
+      const fieldId = hooks(editButton).peFor;
+      if (fieldId !== void 0) {
+        toggleEditField(context, fieldId, true, false);
+      }
+    });
+    const firstField = editableFields()[0];
+    if (firstField !== void 0) {
+      focusField(context, firstField);
+    }
+  };
+  const leaveFormEditing = () => {
+    var _a;
+    setFormEditingState(false);
+    closeFields(context, fields, false);
+    (_a = root.querySelector(editAllButtonSelector)) == null ? void 0 : _a.focus();
+  };
+  const revertForm = () => {
+    normalizeRichTextBaselines(editableFields());
+    resetFields(editableFields());
+    renderEveryPreview();
+  };
+  const discardForm = () => {
+    revertForm();
+    leaveFormEditing();
+  };
+  const formTransitionAllowed = () => !formRequestPending;
+  const applyForm = async () => {
+    if (formRequestPending || root.getAttribute("aria-busy") === "true") {
+      return;
+    }
+    formRequestPending = true;
+    try {
+      const applied = await saveFields(editableFields());
+      if (applied) {
+        leaveFormEditing();
+      }
+    } finally {
+      formRequestPending = false;
     }
   };
   root.addEventListener("click", (event) => {
@@ -486,7 +591,6 @@ const initializeFieldEditing = (editingTarget) => {
         resetFields(groupFields);
         renderFieldGroupPreview(context, group);
         toggleEditGroup(context, group, false);
-        finishEditAllWhenClosed();
       }
       return;
     }
@@ -498,23 +602,41 @@ const initializeFieldEditing = (editingTarget) => {
       }
       return;
     }
+    if (button.matches(formApplySelector)) {
+      event.preventDefault();
+      void applyForm();
+      return;
+    }
+    if (button.matches(formUndoSelector)) {
+      event.preventDefault();
+      if (!formTransitionAllowed()) {
+        return;
+      }
+      revertForm();
+      showStatus(
+        context,
+        "info",
+        hooks(button.closest(formActionsSelector) ?? button).peFormRevertedMessage ?? null
+      );
+      return;
+    }
+    if (button.matches(formDiscardSelector)) {
+      event.preventDefault();
+      if (formTransitionAllowed()) {
+        discardForm();
+      }
+      return;
+    }
     if (button.matches(editAllButtonSelector)) {
       event.preventDefault();
-      editAllActive = !editAllActive;
-      if (editAllActive) {
-        root.querySelectorAll(fieldGroupSelector).forEach((group) => {
-          toggleEditGroup(context, group, true);
-        });
-        root.querySelectorAll(editButtonSelector).forEach((editButton) => {
-          const fieldId = hooks(editButton).peFor;
-          if (fieldId !== void 0) {
-            toggleEditField(context, fieldId, true);
-          }
-        });
-      } else {
-        closeFields(context, fields);
+      if (!formTransitionAllowed()) {
+        return;
       }
-      setEditAllButtonState(context, editAllActive);
+      if (formEditingActive) {
+        discardForm();
+      } else {
+        enterFormEditing();
+      }
       return;
     }
     if (button.matches(editButtonSelector)) {
@@ -542,7 +664,6 @@ const initializeFieldEditing = (editingTarget) => {
         setFieldValue(field, persistedValues.get(field) ?? "");
         clearValidationErrors([field]);
         toggleEditField(context, field.id, false);
-        finishEditAllWhenClosed();
       }
       return;
     }
@@ -559,6 +680,9 @@ const initializeFieldEditing = (editingTarget) => {
     if (!isEditableField(field) || !field.matches(autosaveOnChangeSelector)) {
       return;
     }
+    if (formEditingActive) {
+      return;
+    }
     const previousValue = persistedValues.get(field);
     void saveFields([field]).then((saved) => {
       if (!saved && previousValue !== void 0) {
@@ -567,7 +691,30 @@ const initializeFieldEditing = (editingTarget) => {
     });
   });
   forms.forEach((form) => {
-    form.addEventListener("submit", (event) => event.preventDefault());
+    form.addEventListener("keydown", (event) => {
+      if (!formEditingActive || !formTransitionAllowed()) {
+        return;
+      }
+      const target = event.target;
+      if (event.key === "Escape") {
+        if (target instanceof Element && target.closest(richTextEditorScopeSelector) !== null) {
+          return;
+        }
+        event.preventDefault();
+        discardForm();
+        return;
+      }
+      if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        void applyForm();
+      }
+    });
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (formEditingActive) {
+        void applyForm();
+      }
+    });
     form.addEventListener("reset", (event) => event.preventDefault());
   });
 };

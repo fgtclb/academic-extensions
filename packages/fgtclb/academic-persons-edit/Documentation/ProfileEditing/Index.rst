@@ -281,6 +281,100 @@ and save actions as text fields. The synchronization switch in
           additionally turns the textarea into the TYPO3 CKEditor 5 when the
           field is opened.
 
+..  _profile-editing-full-form:
+
+Two editing modes
+=================
+
+The profile fields have two mutually exclusive editing modes, and the controls
+say which one is active.
+
+**Single field.** The pencil beside a value opens that field — or, for a group,
+that group — and the three buttons of :file:`Field/Actions.html` act on it:
+clear empties the control and keeps it open, undo restores the saved value and
+closes it, save posts what changed. This is the mode described everywhere else
+on this page, and the editors of the document and contract panels behave the
+same way.
+
+**Full form.** :guilabel:`Edit all` opens every editable field of the profile
+at once. While it is open, every per-field and per-group button group is hidden
+— including the undo beside an autosaving checkbox — and one bar governs the
+whole form. :file:`Field/FormActions.html` renders it at the end of every
+``data-pe-fields-form``, and the shipped template has two of those (personal
+data and about me); each bar acts on all of them.
+
+..  list-table::
+    :header-rows: 1
+
+    *   - Control
+        - Behavior
+    *   - :guilabel:`Apply`
+        - Posts every changed field in one request to the generic field update
+          endpoint below. On success the stored values are written back into
+          the controls, the previews and the name heading, the form closes and
+          the focus returns to :guilabel:`Edit all`.
+    *   - :guilabel:`Undo`
+        - Restores every field to the value that is stored and keeps the form
+          open. Announced in the polite live region.
+    *   - :guilabel:`Discard`
+        - Restores every field and closes the form. Pressing
+          :guilabel:`Edit all` again does the same.
+
+``updateAction()`` validates the complete field map before it persists anything,
+so an apply either stores all of it or none of it. A refusal reverts nothing:
+the entered values stay where they were entered, each refused field is marked
+and described by its own message, the caret goes to the first of them, and the
+refusal is announced once rather than once per field.
+
+While an apply is on its way to the server, :guilabel:`Undo`,
+:guilabel:`Discard`, :guilabel:`Edit all` and :kbd:`Escape` do nothing. The
+request cannot be taken back, and reverting under it would leave the stored
+profile and the editor's own baseline disagreeing without anything on screen
+saying so.
+
+A checkbox that saves on change does not save while the form is open — it is
+applied with everything else. Without that it would reach the database while the
+visitor is still deciding and :guilabel:`Discard` could not take it back. The
+synchronization switch of :file:`Header.html` is outside the field forms and
+keeps saving immediately.
+
+Keyboard and assistive technology
+---------------------------------
+
+*   Opening the form puts the caret in the first editable field.
+*   The bar stands after the fields in document order, so tabbing on from the
+    last field reaches :guilabel:`Apply`, :guilabel:`Undo`,
+    :guilabel:`Discard`.
+*   :kbd:`Escape` discards the form, unless the caret is inside a CKEditor
+    instance, where the key closes the editor's own balloon first.
+*   :kbd:`Ctrl` + :kbd:`Enter` applies it, and so does :kbd:`Enter` in a text
+    field: the form is submitted and the submission is turned into an apply
+    rather than into a page load.
+*   Both keys are handled by the field form itself, so a document, contract or
+    image editor that is open at the same time keeps its own handling of them.
+*   The bar is a ``role="group"`` with its own accessible name.
+    :guilabel:`Edit all` carries ``aria-pressed`` and names the forms it
+    controls in ``aria-controls``. Results are announced in the two live
+    regions the editor already has. The restored notice and a success are
+    polite; a failure and a refusal of the form are assertive, because the caret
+    has just been moved to the first refused field and a polite message queued
+    behind that is routinely dropped. A refusal beside a *single* field stays
+    polite — it stands next to the control the visitor is already in.
+
+What an override has to keep
+----------------------------
+
+:file:`Profile/Fields.html` renders :file:`Profile/Field/FormActions` at its
+end; an override of it that drops the line leaves the profile with no way to
+apply the form. An override of the bar itself keeps the
+``data-pe-form-actions`` element, its ``data-pe-form-reverted-message`` and the
+three buttons marked ``data-pe-form-apply``, ``data-pe-form-undo`` and
+``data-pe-form-discard``. Everything else about it — the tags, the classes, the
+labels, the order — is Fluid, and none of it is spelled in JavaScript. The
+optional ``sectionLabel`` argument names the button group after the section it
+stands in, so a page with two field forms does not offer two groups of the same
+name.
+
 Generic field update
 ====================
 

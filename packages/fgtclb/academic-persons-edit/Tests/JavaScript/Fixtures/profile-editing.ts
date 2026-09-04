@@ -88,6 +88,7 @@ export const messages = {
   contractContactEmpty: "No contacts yet.",
   placeholderAlt: "No profile image",
   empty: "Not specified",
+  formReverted: "All fields were restored to the saved values.",
 } as const;
 
 /** The mode labels of `Index.html:109-114`, read by `getModeLabel()`. */
@@ -409,6 +410,7 @@ export const profileHeader = ({
     data-academic-persons-profile-editing-edit-all-btn
     data-pe-edit-all-label="Edit all"
     data-pe-close-all-label="Close all"
+    aria-controls="profile-editing-${profileUid}-personal-form"
     aria-pressed="false">
     <span data-pe-edit-all-button-label>Edit all</span>
   </button>
@@ -491,12 +493,15 @@ export const richTextField = ({
   value = "",
   propertyName,
   characterLimit,
+  editorValue,
 }: {
   identifier: string;
   profileUid?: number;
   value?: string;
   propertyName?: string;
   characterLimit?: number;
+  /** What the editor makes of `value`; see the CKEditor stub. */
+  editorValue?: string;
 }): string => {
   const elementId = `profile-editing-${profileUid}-${identifier}`;
 
@@ -525,7 +530,7 @@ export const richTextField = ({
         <textarea name="${propertyName ?? identifier}" id="${elementId}" rows="5"
           class="form-control form-control-sm academic-persons-profile-editing__field"
           aria-describedby="${elementId}-error" aria-invalid="false"
-          data-pe-rich-text="true"${characterLimit === undefined ? "" : ` data-pe-character-limit="${characterLimit}"`}>${value}</textarea>
+          data-pe-rich-text="true"${characterLimit === undefined ? "" : ` data-pe-character-limit="${characterLimit}"`}${editorValue === undefined ? "" : ` data-test-ckeditor-initial="${editorValue}"`}>${value}</textarea>
         ${
           characterLimit === undefined
             ? ""
@@ -661,11 +666,33 @@ export const fieldGroup = ({
 </div>`;
 };
 
-/** `Partials/Profile/Profile/Personal.html:15-28` - the form the fields sit in. */
-export const fieldsForm = (fields: string): string => `
-<form class="academic-persons-profile-editing__form" data-pe-fields-form>
+/**
+ * `Partials/Profile/Field/FormActions.html` - the controls of full form
+ * editing, rendered at the end of every fields form and delivered `hidden`.
+ * The three buttons stand in tab order: apply, undo, abort.
+ */
+export const formActions = (sectionLabel = "Personal data"): string => `
+<div class="col-12 d-flex justify-content-end align-items-center gap-2 pt-3 border-top"
+  data-pe-form-actions data-pe-form-reverted-message="${messages.formReverted}"
+  role="group" aria-label="Form actions: ${sectionLabel}" hidden>
+  <button class="btn rounded-0 btn-success" data-pe-form-apply type="button" title="Save every changed field of this profile">Apply</button>
+  <button class="btn rounded-0 btn-outline-secondary" data-pe-form-undo type="button" title="Restore every field to the saved value and continue editing">Undo</button>
+  <button class="btn rounded-0 btn-outline-danger" data-pe-form-discard type="button" title="Restore every field to the saved value and close the form">Discard</button>
+</div>`;
+
+/**
+ * `Partials/Profile/Profile/Personal.html:15-31` with
+ * `Profile/Fields.html` rendered into it - the form the fields sit in, and the
+ * form action bar the field partial renders at its end.
+ */
+export const fieldsForm = (
+  fields: string,
+  formId = "personal",
+  sectionLabel = "Personal data",
+): string => `
+<form id="profile-editing-1-${formId}-form" class="academic-persons-profile-editing__form" data-pe-fields-form>
   <fieldset class="border-0 p-0 m-0">
-    <div class="row g-3">${fields}</div>
+    <div class="row g-3">${fields}${formActions(sectionLabel)}</div>
   </fieldset>
 </form>`;
 

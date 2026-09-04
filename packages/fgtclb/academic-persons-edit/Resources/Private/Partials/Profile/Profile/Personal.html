@@ -12,7 +12,10 @@
                 key="profileEditing.section.personal"
                 extensionName="academic_persons_edit" />
         </h2>
-        <form class="academic-persons-profile-editing__form" data-pe-fields-form>
+        <form
+            id="profile-editing-{profile.uid}-personal-form"
+            class="academic-persons-profile-editing__form"
+            data-pe-fields-form>
             <fieldset class="border-0 p-0 m-0">
                 <legend class="visually-hidden">
                     <f:translate
@@ -22,7 +25,12 @@
                 <div class="row g-3">
                     <f:render
                         partial="Profile/Profile/Fields"
-                        arguments="{profile: profile, items: section.items, fieldOptions: fieldOptions}" />
+                        arguments="{
+                            profile: profile,
+                            items: section.items,
+                            fieldOptions: fieldOptions,
+                            sectionLabel: '{f:translate(key: \'profileEditing.section.personal\', extensionName: \'academic_persons_edit\')}'
+                        }" />
                 </div>
             </fieldset>
         </form>

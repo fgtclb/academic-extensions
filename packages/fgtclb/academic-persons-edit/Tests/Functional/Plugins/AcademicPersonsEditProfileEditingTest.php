@@ -1453,6 +1453,219 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertSame('Max', $storedValue);
     }
 
+    /**
+     * Full form editing is one form with one set of controls.
+     *
+     * The bar is rendered by Fluid at the end of every `data-pe-fields-form`
+     * and is delivered `hidden`; nothing but the field editing module ever
+     * shows it, and no label of it is spelled in JavaScript. The per-field
+     * groups stay in the markup - they are hidden while the form is open, not
+     * removed, because single-field editing has to work again afterwards.
+     */
+    #[Test]
+    public function everyFieldsFormRendersOneHiddenFormActionBar(): void
+    {
+        $this->setUpProfileEditingTestCase();
+        $content = $this->renderProfileEditingPage();
+        $document = new \DOMDocument();
+        $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
+        $xpath = new \DOMXPath($document);
+        $forms = $xpath->query('//form[@data-pe-fields-form]');
+        $bars = $xpath->query('//*[@data-pe-form-actions]');
+        $this->assertNotFalse($forms);
+        $this->assertNotFalse($bars);
+        $this->assertGreaterThan(0, $forms->length);
+        $this->assertSame($forms->length, $bars->length);
+        $groupNames = [];
+        foreach ($bars as $bar) {
+            $this->assertInstanceOf(\DOMElement::class, $bar);
+            $this->assertTrue($bar->hasAttribute('hidden'));
+            $this->assertSame('group', $bar->getAttribute('role'));
+            // Two groups with the same accessible name are two useless entries
+            // in a screen reader's group list, so each is named after its
+            // section.
+            $this->assertStringStartsWith('Form actions: ', $bar->getAttribute('aria-label'));
+            $groupNames[] = $bar->getAttribute('aria-label');
+            $this->assertSame(
+                'All fields were restored to the saved values.',
+                $bar->getAttribute('data-pe-form-reverted-message'),
+            );
+            $labels = [];
+            foreach (['data-pe-form-apply', 'data-pe-form-undo', 'data-pe-form-discard'] as $hook) {
+                $buttons = $xpath->query(sprintf('.//button[@%s]', $hook), $bar);
+                $this->assertNotFalse($buttons);
+                $this->assertSame(1, $buttons->length, $hook);
+                $button = $buttons->item(0);
+                $this->assertInstanceOf(\DOMElement::class, $button);
+                $this->assertSame('button', $button->getAttribute('type'));
+                $this->assertNotSame('', $button->getAttribute('title'));
+                $labels[] = trim($button->textContent);
+            }
+            // The order the bar is tabbed through from the last field.
+            $this->assertSame(['Apply', 'Undo', 'Discard'], $labels);
+        }
+        $this->assertSame($groupNames, array_unique($groupNames));
+        $toggles = $xpath->query('//*[@data-academic-persons-profile-editing-edit-all-btn]');
+        $this->assertNotFalse($toggles);
+        $this->assertSame(1, $toggles->length);
+        $toggle = $toggles->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $toggle);
+        $controlled = preg_split('@\s+@', trim($toggle->getAttribute('aria-controls'))) ?: [];
+        $this->assertSame($forms->length, count($controlled));
+        foreach ($controlled as $formId) {
+            $controlledForms = $xpath->query(sprintf('//form[@id="%s"][@data-pe-fields-form]', $formId));
+            $this->assertNotFalse($controlledForms);
+            $this->assertSame(1, $controlledForms->length, $formId);
+        }
+    }
+
+    /**
+     * The jsdom suite drives the modules against a hand written transcription
+     * of this bar, and nothing in that suite can notice a hook or a label that
+     * was renamed here - a fixture is the test's own input. This is the
+     * fixture-provenance rule of `docs/testing/javascript-tests.md` applied to
+     * it: every hook the rendered bar carries, every label it shows and the
+     * message it hands to JavaScript has to appear in the fixture, so a rename
+     * in the partial is a failure here rather than 362 cases staying green
+     * against markup no visitor receives.
+     */
+    #[Test]
+    public function theJavaScriptFixtureTranscribesTheRenderedFormActionBar(): void
+    {
+        $this->setUpProfileEditingTestCase();
+        $content = $this->renderProfileEditingPage();
+        $document = new \DOMDocument();
+        $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
+        $xpath = new \DOMXPath($document);
+        $bars = $xpath->query('//*[@data-pe-form-actions]');
+        $this->assertNotFalse($bars);
+        $bar = $bars->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $bar);
+        $expected = [$bar->getAttribute('data-pe-form-reverted-message')];
+        foreach ($bar->attributes ?? [] as $attribute) {
+            if (str_starts_with($attribute->nodeName, 'data-pe-')) {
+                $expected[] = $attribute->nodeName;
+            }
+        }
+        $buttons = $xpath->query('.//button', $bar);
+        $this->assertNotFalse($buttons);
+        foreach ($buttons as $button) {
+            $this->assertInstanceOf(\DOMElement::class, $button);
+            foreach ($button->attributes ?? [] as $attribute) {
+                if (str_starts_with($attribute->nodeName, 'data-pe-')) {
+                    $expected[] = $attribute->nodeName;
+                }
+            }
+            $expected[] = trim($button->textContent);
+            $expected[] = $button->getAttribute('title');
+        }
+        $fixture = file_get_contents(__DIR__ . '/../../JavaScript/Fixtures/profile-editing.ts');
+        $this->assertIsString($fixture);
+        foreach (array_unique($expected) as $token) {
+            $this->assertNotSame('', $token);
+            $this->assertStringContainsString(
+                $token,
+                $fixture,
+                sprintf('The JavaScript fixture does not transcribe "%s".', $token),
+            );
+        }
+    }
+
+    /**
+     * Apply is one request, and `updateAction()` validates the whole field map
+     * before it writes anything. One refused property therefore leaves every
+     * other submitted property unwritten as well - which is what makes a form
+     * that applies at once safe to offer in the first place.
+     */
+    #[Test]
+    public function oneRefusedPropertyLeavesEveryOtherSubmittedValueUnwritten(): void
+    {
+        $this->setUpProfileEditingTestCase();
+        $connection = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile');
+        $connection->update(
+            'tx_academicpersons_domain_model_profile',
+            ['gender' => 'ms'],
+            ['uid' => self::PROFILE_ID],
+        );
+        $updateUrl = $this->extractDataUrl($this->renderProfileEditingPage(), 'data-update-url');
+        $response = $this->postJson(
+            $updateUrl,
+            [
+                'profile' => self::PROFILE_ID,
+                'data' => ['title' => 'Prof. Dr.', 'gender' => ''],
+            ],
+        );
+        $this->assertSame(422, $response->getStatusCode(), (string)$response->getBody());
+        $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertIsArray($body);
+        $this->assertSame('validation_failed', $body['error']);
+        $this->assertNotEmpty($body['errors']['gender'] ?? []);
+        $stored = $connection
+            ->executeQuery(
+                'SELECT title, gender FROM tx_academicpersons_domain_model_profile WHERE uid = ?',
+                [self::PROFILE_ID],
+            )
+            ->fetchAssociative();
+        $this->assertIsArray($stored);
+        $this->assertSame('', $stored['title']);
+        $this->assertSame('ms', $stored['gender']);
+    }
+
+    #[Test]
+    public function fullFormEditingLabelsAreShippedInBothLanguages(): void
+    {
+        $expectedEnglish = [
+            'profileEditing.actions.formGroup' => 'Form actions',
+            'profileEditing.form.apply' => 'Apply',
+            'profileEditing.form.apply.title' => 'Save every changed field of this profile',
+            'profileEditing.form.undo' => 'Undo',
+            'profileEditing.form.undo.title' =>
+                'Restore every field to the saved value and continue editing',
+            'profileEditing.form.discard' => 'Discard',
+            'profileEditing.form.discard.title' =>
+                'Restore every field to the saved value and close the form',
+            'profileEditing.status.formReverted' => 'All fields were restored to the saved values.',
+        ];
+        $expectedGerman = [
+            'profileEditing.actions.formGroup' => 'Formularaktionen',
+            'profileEditing.form.apply' => 'Übernehmen',
+            'profileEditing.form.apply.title' => 'Alle geänderten Felder dieses Profils speichern',
+            'profileEditing.form.undo' => 'Rückgängig',
+            'profileEditing.form.undo.title' =>
+                'Alle Felder auf den gespeicherten Wert zurücksetzen und weiter bearbeiten',
+            'profileEditing.form.discard' => 'Verwerfen',
+            'profileEditing.form.discard.title' =>
+                'Alle Felder auf den gespeicherten Wert zurücksetzen und das Formular schließen',
+            'profileEditing.status.formReverted' =>
+                'Alle Felder wurden auf die gespeicherten Werte zurückgesetzt.',
+        ];
+        $languageService = $this->get(LanguageServiceFactory::class)->create('default');
+        foreach ($expectedEnglish as $key => $translation) {
+            $this->assertSame(
+                $translation,
+                $languageService->sL(
+                    'LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang.xlf:' . $key,
+                ),
+            );
+        }
+        $document = new \DOMDocument();
+        $this->assertTrue(
+            $document->load(__DIR__ . '/../../../Resources/Private/Language/de.locallang.xlf'),
+        );
+        $germanTranslations = [];
+        foreach ($document->getElementsByTagName('trans-unit') as $unit) {
+            $target = $unit->getElementsByTagName('target')->item(0);
+            if ($target !== null) {
+                $germanTranslations[(string)$unit->getAttribute('id')] = trim($target->textContent);
+            }
+        }
+        foreach ($expectedGerman as $key => $translation) {
+            $this->assertArrayHasKey($key, $germanTranslations, $key);
+            $this->assertSame($translation, $germanTranslations[$key], $key);
+        }
+    }
+
     #[Test]
     public function profileUpdatePropagatesSectionValidationErrorsWithStatus422(): void
     {

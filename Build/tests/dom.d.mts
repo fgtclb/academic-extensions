@@ -35,6 +35,15 @@ export declare const settle: (turns?: number) => Promise<void>;
 export declare const nextFrame: () => Promise<void>;
 
 /**
+ * A keyboard event. jsdom implements "KeyboardEvent" but does not put it on
+ * "globalThis", because no shipped module constructs one - only a test does.
+ */
+export declare const createKeyboardEvent: (
+  type: string,
+  init?: { key?: string; ctrlKey?: boolean; metaKey?: boolean },
+) => KeyboardEvent;
+
+/**
  * A drag event with a modelled data transfer, for the handlers of the document
  * list - jsdom implements neither "DragEvent" nor "DataTransfer".
  */

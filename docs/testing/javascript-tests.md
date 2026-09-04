@@ -188,6 +188,15 @@ The CKEditor and CropperJS stubs report through the DOM —
 the textarea, `data-test-cropper` on the cropper's container — so a test asserts
 on the element it already has and imports nothing from the harness.
 
+Two things about the CKEditor stub are read *from* the markup rather than
+reported into it. `data-test-ckeditor-initial` on the textarea is what the
+editor makes of the rendered source — the real one normalises, so the value it
+hands back is not always the value the template wrote, and the baseline the
+field editing compares against depends on the difference. And its
+`editing.view.focus()` focuses the textarea: jsdom has no contenteditable view,
+so the textarea stands in for it, and `document.activeElement === textarea` is
+the only way a focus that goes through the editor can be observed at all.
+
 What this buys is the lifecycle: which editor is created, on which field, when
 it is destroyed, and in which order. What it does not buy is anything about the
 libraries themselves. Their integration is proven by a manual check per core
@@ -219,7 +228,9 @@ cannot be set cross origin without a preflight.
 
 ## What jsdom does not have, and what stands in for it
 
-Modelled in `dom.mjs`, each because a shipped module reaches for it:
+Modelled in `dom.mjs`. Each is there because a shipped module reaches for it,
+with one exception that is marked: `KeyboardEvent` exists in jsdom and is simply
+not on `globalThis`, and nothing but a test constructs one.
 
 | Name                              | Modelled as                                                                          |
 |-----------------------------------|--------------------------------------------------------------------------------------|
@@ -228,6 +239,7 @@ Modelled in `dom.mjs`, each because a shipped module reaches for it:
 | `scrollIntoView`                  | Records the alignment as `data-test-scrolled-into-view` on the element.              |
 | `URL.createObjectURL` / `revoke…` | A register per object, so `isObjectUrlAlive()` can prove a preview url was released. |
 | `DragEvent`, `DataTransfer`       | `createDragEvent()`, with the pointer position and a recording data transfer.        |
+| `KeyboardEvent` (not a global)    | `createKeyboardEvent()`, from the window's own constructor — only a test raises one. |
 | `getBoundingClientRect`           | `setBoundingRect()`, per element and per test.                                       |
 | `clientWidth` / `clientHeight`    | `setClientSize()`, shadowed on the instance because both are prototype getters.      |
 

@@ -3,6 +3,7 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     data-namespace-typo3-fluid="true">
     <form
+        id="profile-editing-{profile.uid}-about-form"
         class="academic-persons-profile-editing__form mt-5 pt-lg-3"
         data-pe-fields-form>
         <section
@@ -18,7 +19,12 @@
             <div class="row g-3">
                 <f:render
                     partial="Profile/Profile/Fields"
-                    arguments="{profile: profile, items: section.items, fieldOptions: fieldOptions}" />
+                    arguments="{
+                        profile: profile,
+                        items: section.items,
+                        fieldOptions: fieldOptions,
+                        sectionLabel: '{f:translate(key: \'profileEditing.section.about\', extensionName: \'academic_persons_edit\')}'
+                    }" />
             </div>
         </section>
     </form>

@@ -33,9 +33,27 @@ class StubEditor {
 
     constructor(element, config) {
         this.#element = element;
-        this.#data = element.value ?? '';
+        // Real CKEditor normalises what it is handed - bare text becomes a
+        // paragraph - so the value it reports back is not always the value the
+        // template rendered. A test that is about that difference says what the
+        // editor makes of the source with "data-test-ckeditor-initial"; every
+        // other test gets the source unchanged, which is the simpler model and
+        // the one the rest of the suite is written against.
+        this.#data = element.getAttribute('data-test-ckeditor-initial') ?? element.value ?? '';
         this.config = config;
-        this.editing = { view: { focus: () => { this.focused = true; } } };
+        // The real editor replaces the textarea with a contenteditable and
+        // puts the caret there. jsdom has no such view, so the textarea stands
+        // in for it: "document.activeElement === textarea" is how a test says
+        // "the caret is in this field's editor", which is the only way a focus
+        // that goes through the editor can be observed at all.
+        this.editing = {
+            view: {
+                focus: () => {
+                    this.focused = true;
+                    element.focus();
+                },
+            },
+        };
         this.focused = false;
         this.model = {
             document: {

@@ -116,6 +116,86 @@ partial stops emitting, is a failure of
 `AcademicPersonsEditProfileEditingPrototypesTest`, which asserts the inventory
 and the keys against the rendered partial.
 
+## Two editing states, and one control set each
+
+The profile fields have exactly two states and they are exclusive.
+
+**Single field.** One field, or one group of fields, is opened by its own
+control and carries the three buttons of
+[`Partials/Profile/Field/Actions.html`](../../packages/fgtclb/academic-persons-edit/Resources/Private/Partials/Profile/Field/Actions.html):
+clear, undo, save. Every document and contact editor works the same way and is
+not affected by anything below.
+
+**Full form.** `Edit all` opens every editable field at once. For as long as it
+is open, every `[data-pe-field-actions]`, every `[data-pe-group-actions]` and
+every `[data-pe-autosave-undo]` **inside a `[data-pe-fields-form]`** carries
+`hidden`, and the bar of
+[`Partials/Profile/Field/FormActions.html`](../../packages/fgtclb/academic-persons-edit/Resources/Private/Partials/Profile/Field/FormActions.html)
+loses it. The bar is rendered once per fields form, by
+`Partials/Profile/Profile/Fields.html`, and each of them governs the whole
+profile: the two forms of the shipped template — personal data and about me —
+are one form as far as this state is concerned.
+
+| Hook                            | On                  | Meaning                                                                        |
+|---------------------------------|---------------------|--------------------------------------------------------------------------------|
+| `data-pe-form-actions`          | the bar             | Shown while the form is open, `hidden` otherwise.                              |
+| `data-pe-form-reverted-message` | the bar             | The polite status text of `undo` — the only label the bar hands to JavaScript. |
+| `data-pe-form-apply`            | a button in the bar | One request with every changed field.                                          |
+| `data-pe-form-undo`             | a button in the bar | Back to the persisted values, form stays open.                                 |
+| `data-pe-form-discard`          | a button in the bar | Back to the persisted values, form closes.                                     |
+
+The qualification matters: the bar's own three labels are Fluid and never
+travel, but the editor as a whole *does* hand labels to JavaScript elsewhere —
+`data-pe-edit-all-label` and `data-pe-close-all-label` on the toggle,
+`data-pe-checked-label` and `data-pe-unchecked-label` on a checkbox, and every
+status text in `context.messages`.
+
+Nothing is removed from the document for the state change — single-field editing
+has to work again the moment the form closes — and nothing is added to it
+either: the bar is server rendered like everything else, so its three labels,
+its `role`, its accessible name and its classes are Fluid and are overridable
+with it.
+
+**Apply is one request.** `updateAction()` takes an arbitrary partial field map,
+validates all of it and persists once, so a refusal leaves the profile untouched
+and there is no partial result to undo. That is why nothing on screen is
+reverted on a refusal: the entered values stay, the refused fields are marked,
+and the message is announced once rather than once per field.
+
+**A transition is refused while an apply is in flight.** Undo, discard, the
+toggle and `Escape` all check the same flag `applyForm()` sets before its first
+`await`. The request cannot be un-persisted, so reverting under it would let the
+response write the reverted values into `persistedValues` for every property the
+endpoint does not echo — the baseline would then say "unchanged" for a value the
+database does not hold, and the next apply would not resend it.
+
+**`Escape` and `Ctrl`/`Cmd`+`Enter` are bound to each `[data-pe-fields-form]`,
+never to the root.** A document, contact or image editor may be open at the same
+time, those panels are outside every fields form, and they keep their own
+handling of both keys. Inside the form, `Escape` is still left to CKEditor while
+the caret is in one (`event.target.closest(".ck")`).
+
+**A refusal of the form interrupts.** `showStatus()` normally picks the region
+from the severity — only `danger` is assertive — and it takes an explicit region
+for the case where the severity is the wrong answer. Applying the form moves the
+caret to the first refused field in the same turn, and a polite region queued
+behind that focus change is routinely dropped, so the form's validation message
+goes to `[data-pe-status-toast="alert"]`. Beside a single field the message
+stands next to the control the visitor is already in and stays polite, which is
+also what keeps single-field editing unchanged.
+
+**The rich text baseline comes from the editor, not from the markup.** CKEditor
+normalises what it is handed, so the rendered value and the value it hands back
+differ for the same content. The correction runs on the save path *and* on the
+revert path: undo would otherwise put the un-normalised source into the editor
+and the next apply would post it as a change nobody made.
+
+**Autosave is suppressed while the form is open.** A `[data-pe-autosave-on-change]`
+checkbox participates in apply instead of writing on change — otherwise it would
+reach the database while the visitor is still deciding, and abort could not take
+it back. The synchronisation switch of `Header.html` sits *outside*
+`[data-pe-fields-form]` and keeps its immediate save.
+
 ## The sixteen prototypes
 
 | Prototype                                                                                      | Rendered by                            |

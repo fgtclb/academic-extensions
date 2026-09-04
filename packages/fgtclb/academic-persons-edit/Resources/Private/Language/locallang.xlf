@@ -368,6 +368,30 @@
       <trans-unit id="profileEditing.actions.group">
         <source>Field actions</source>
       </trans-unit>
+      <trans-unit id="profileEditing.actions.formGroup" resname="profileEditing.actions.formGroup">
+        <source>Form actions</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.apply" resname="profileEditing.form.apply">
+        <source>Apply</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.apply.title" resname="profileEditing.form.apply.title">
+        <source>Save every changed field of this profile</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.undo" resname="profileEditing.form.undo">
+        <source>Undo</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.undo.title" resname="profileEditing.form.undo.title">
+        <source>Restore every field to the saved value and continue editing</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.discard" resname="profileEditing.form.discard">
+        <source>Discard</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.form.discard.title" resname="profileEditing.form.discard.title">
+        <source>Restore every field to the saved value and close the form</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.status.formReverted" resname="profileEditing.status.formReverted">
+        <source>All fields were restored to the saved values.</source>
+      </trans-unit>
       <trans-unit id="profileEditing.content.empty">
         <source>No content</source>
       </trans-unit>

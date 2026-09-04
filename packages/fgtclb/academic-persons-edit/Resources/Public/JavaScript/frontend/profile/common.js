@@ -38,7 +38,7 @@ const initializePopover = (scope = document) => {
     (trigger) => new Popover(trigger)
   );
 };
-const showStatus = (editingTarget, type, message = null) => {
+const showStatus = (editingTarget, type, message = null, region = null) => {
   var _a, _b;
   const context = toEditingContext(editingTarget);
   const messages = context.messages;
@@ -65,8 +65,9 @@ const showStatus = (editingTarget, type, message = null) => {
     }
   };
   const status = statusValues[type];
+  const statusRegion = region ?? (type === "danger" ? "alert" : "status");
   const statusToast = context.root.querySelector(
-    `[data-pe-status-toast='${type === "danger" ? "alert" : "status"}']`
+    `[data-pe-status-toast='${statusRegion}']`
   );
   if (statusToast === null) {
     return;

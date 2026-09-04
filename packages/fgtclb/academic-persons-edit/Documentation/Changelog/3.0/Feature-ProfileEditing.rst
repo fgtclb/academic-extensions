@@ -28,11 +28,14 @@ Each field carries an edit control. Activating it turns the rendered value into
 an input, saving posts only what changed, and the answer is written back into
 the page - no reload, no lost scroll position. A group of fields that belong
 together (the name parts, a link and its title) is edited and saved as one.
-:guilabel:`Edit all` opens every field of the page at once.
 
 An unsaved field can be restored to the value that is stored, and a checkbox
 saves on change and reverts itself when the request fails, so what is on screen
 is what is in the database.
+
+:guilabel:`Edit all` opens every field of the page at once and gives the form
+its own controls; see
+:ref:`feature-full-form-editing-applies-as-one-form`.
 
 Structured sections
 -------------------

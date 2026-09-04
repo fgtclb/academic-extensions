@@ -41,6 +41,7 @@ export type ProfileEditingHooks = {
   peDocumentWasDisabled?: string;
   peEditAllLabel?: string;
   peFieldIds?: string;
+  peFormRevertedMessage?: string;
   peFor?: string;
   peProfileNameFieldIds?: string;
   peUncheckedLabel?: string;
@@ -54,6 +55,16 @@ export type EditableField =
   | HTMLSelectElement
   | HTMLTextAreaElement;
 export type StatusType = "danger" | "success" | "info" | "warning";
+/**
+ * Which of the two live regions a message is written to.
+ *
+ * The severity decides it by default - only a failure interrupts. A caller may
+ * override it where the severity alone is the wrong answer: a refusal of the
+ * whole profile form moves the caret to the first refused field in the same
+ * turn, and a polite region queued behind that focus change is routinely
+ * dropped.
+ */
+export type StatusRegion = "alert" | "status";
 export type JsonResult = Record<string, unknown> & { success: true };
 
 interface BootstrapPopoverConstructor {
@@ -131,6 +142,7 @@ export const showStatus = (
   editingTarget: EditingTarget,
   type: StatusType,
   message: string | null = null,
+  region: StatusRegion | null = null,
 ): void => {
   const context: EditingContext = toEditingContext(editingTarget);
   const messages = context.messages;
@@ -162,9 +174,12 @@ export const showStatus = (
   };
   const status = statusValues[type];
   // A failure interrupts (role="alert"), everything else waits for a pause
-  // (role="status"). The two regions exist side by side in the markup.
+  // (role="status"). The two regions exist side by side in the markup, and a
+  // caller may name one instead of letting the severity decide.
+  const statusRegion: StatusRegion =
+    region ?? (type === "danger" ? "alert" : "status");
   const statusToast = context.root.querySelector<HTMLElement>(
-    `[data-pe-status-toast='${type === "danger" ? "alert" : "status"}']`,
+    `[data-pe-status-toast='${statusRegion}']`,
   );
   if (statusToast === null) {
     return;
