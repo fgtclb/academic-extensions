@@ -11,12 +11,28 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersons\Hook;
 
+use FGTCLB\AcademicPersons\Service\ProfileImageMetadataService;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
+/**
+ * DataHandler hooks of the profile table, registered in `ext_localconf.php`. The
+ * class is a public, constructor-injected service and holds no state of its own.
+ */
 final class DataHandlerHooks
 {
+    private const PROFILE_TABLE = 'tx_academicpersons_domain_model_profile';
+
+    /**
+     * The profile columns the image metadata is composed from.
+     */
+    private const NAME_COLUMNS = ['title', 'first_name', 'middle_name', 'last_name'];
+
+    public function __construct(
+        private readonly ProfileImageMetadataService $profileImageMetadataService,
+    ) {}
+
     public function processDatamap_beforeStart(DataHandler $dataHandler): void
     {
         $this->setAlphaValuesForProfile($dataHandler);
@@ -32,14 +48,29 @@ final class DataHandlerHooks
         array $fieldArray,
         DataHandler $dataHandler
     ): void {
-        if ($table !== 'tx_academicpersons_domain_model_profile' || $status !== 'update') {
+        if ($table !== self::PROFILE_TABLE || !in_array($status, ['new', 'update'], true)) {
             return;
         }
 
+        $profileUid = (int)($dataHandler->substNEWwithIDs[$id] ?? $id);
+        if ($profileUid <= 0) {
+            // A `NEW…` id that was never substituted: there is no record to flush a
+            // cache tag for, and `profile_detail_view_0` is not a tag anything holds.
+            return;
+        }
+        // The image reference metadata follows the name - of a created, updated or
+        // localized profile, and of the translations `DataMapProcessor` added to the
+        // map while propagating an exclude column. A record whose relation is still on
+        // the remap stack gets this hook *deferred* by the DataHandler until the stack
+        // ran (`hook_processDatamap_afterDatabaseOperations()`), which is why the
+        // reference of a profile that is new in the run is already wired to it here.
+        if (array_intersect(self::NAME_COLUMNS, array_keys($fieldArray)) !== []) {
+            $this->profileImageMetadataService->updateForProfileUid($profileUid);
+        }
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $cacheManager->flushCachesByTags([
             'profile_list_view',
-            sprintf('profile_detail_view_%d', $id),
+            sprintf('profile_detail_view_%d', $profileUid),
         ]);
     }
 
