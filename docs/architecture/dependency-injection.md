@@ -186,9 +186,10 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     ) {}
 ```
 
-The three event listeners follow the same shape — a single `__invoke()` and
-promoted `private readonly` dependencies:
+The four event listeners follow the same shape — a single `__invoke()` and
+promoted `private readonly` dependencies (or a `readonly class`):
 `academic-jobs/Classes/EventListener/GenerateJobSlug.php`,
+`academic-persons/Classes/EventListener/UpdateProfileImageMetadata.php`,
 `academic-persons-edit/Classes/EventListener/GenerateSlugForProfile.php` and
 `.../SyncChangesToTranslations.php`.
 
