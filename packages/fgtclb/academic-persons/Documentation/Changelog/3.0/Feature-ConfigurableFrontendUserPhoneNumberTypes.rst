@@ -24,11 +24,15 @@ Impact
 ======
 
 New imports use the configured types. Existing legacy telephone records with
-``phone:fe_users:<uid>`` are reused and normalized during
-synchronisation. This avoids duplicate records. If both legacy and
+``phone:fe_users:<uid>`` are reused and normalized during synchronisation, so
+skipping the upgrade wizard does not create duplicates. If both legacy and
 canonical records exist on one contract, the canonical record wins and the
 legacy record is left untouched.
 
-Fax numbers remain phone-number records attached to the profile contract.
+Run the :guilabel:`Migrate imported frontend-user phone number types` upgrade
+wizard to migrate existing records in bulk. The wizard includes hidden and
+deleted records, preserves valid editor-selected types, and does not merge or
+delete identifier collisions. Fax numbers remain phone-number records attached
+to the profile contract.
 
 .. index:: Backend, CLI, ext:academic_persons
