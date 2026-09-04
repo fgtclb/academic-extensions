@@ -104,7 +104,7 @@ they are used in production code across five packages:
 | `#[Autoconfigure]` | 9     | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`) |
 | `#[Autowire]`      | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`   |
 | `#[AsAlias]`       | 2     | `academic-persons/Classes/Service/RecordSynchronizer.php:21`              |
-| `#[Exclude]`       | 3     | `academic-base/Classes/Settings/Validation.php:17` and two siblings       |
+| `#[Exclude]`       | 10    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph |
 | `#[AsCommand]`     | 1     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                 |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
