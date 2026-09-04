@@ -103,6 +103,19 @@ final class ValidationNormalizerTest extends UnitTestCase
                 inputType: 'number',
             ),
         ];
+        yield 'date: input type only, the TCA column keeps its own type' => [
+            'flags' => ['date'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: false,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => false, 'required' => false],
+                inputType: 'date',
+            ),
+        ];
         yield 'required email: both validators, in flag order' => [
             'flags' => ['email', 'required'],
             'expected' => new Validation(

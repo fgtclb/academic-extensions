@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Seven such fixture extensions exist, in five of the twelve extensions. That is
+Eight such fixture extensions exist, in five of the twelve extensions. That is
 the whole population — this is a mechanism used sparingly and only where nothing
 smaller works.
 
@@ -19,6 +19,7 @@ They sit next to the tests that use them, under
 |----------------------------------|----------------------------------------|------------------------|-------------------------------------------------------------------------|
 | `test_base_dependency_injection` | `tests/base-test-dependency-injection` | `academic-base`        | Two services to resolve through the container, plus `Services.yaml`.    |
 | `test_bitejobs_stub`             | `tests/test-bitejobs-stub`             | `academic-bite-jobs`   | An `ext_localconf.php` replacing the Guzzle handler stack.              |
+| `test_current_color_icons`       | `tests/current-color-icons`            | `academic-base`        | Icons registered through the `currentColor` icon provider.              |
 | `test_jobcontact_schema`         | `tests/test-jobcontact-schema`         | `academic-jobs`        | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates. |
 | `test_language_files`            | `tests/language-files`                 | `academic-persons`     | An XLF pair with awkward label keys (dots, dashes).                     |
 | `test_messy_profile_factory`     | `tests/test-messy-profile-factory`     | `academic-persons`     | A deliberately misbehaving profile factory and two event listeners.     |
@@ -27,8 +28,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Four of the seven have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
-other three are pure resources.
+Four of the eight have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
+other four are pure resources.
 
 A minimal one, complete:
 
@@ -177,18 +178,18 @@ protected array $testExtensionsToLoad = [
 ```
 — [`ProfileTitleProviderTest.php:27`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L27)
 
-**The package name is not derivable from the extension key.** All seven use the
+**The package name is not derivable from the extension key.** All eight use the
 `tests/` vendor, but the second segment follows no rule: `test_plugin_templates`
 is `tests/plugin-templates` (prefix dropped), `test_bitejobs_stub` is
 `tests/test-bitejobs-stub` (prefix kept), and `test_base_dependency_injection`
 is `tests/base-test-dependency-injection` (words reordered). Read the package
 name out of the fixture's `composer.json` rather than guessing it. New fixtures
 should prefer the mechanical form — the key with underscores turned into
-hyphens — but the existing seven are not going to be renamed for cosmetics.
+hyphens — but the existing eight are not going to be renamed for cosmetics.
 
 ## What a fixture extension is for, and what it is not
 
-The seven existing ones show the cases that justify one:
+The eight existing ones show the cases that justify one:
 
 - **Bootstrap-time configuration.** `test_bitejobs_stub` replaces
   `$GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler']` in `ext_localconf.php` so no
@@ -205,7 +206,8 @@ The seven existing ones show the cases that justify one:
   real extension path.
 - **Registered configuration.** `test_category_types_group` ships a
   `Configuration/CategoryTypes.yaml` so the registry is filled the way an
-  installing extension fills it.
+  installing extension fills it, and `test_current_color_icons` registers icons
+  with the `currentColor` icon provider the same way.
 
 Anything that does *not* need one should not have one. Records go into a CSV
 fixture and are imported with `importCSVDataSet()`; TypoScript that is only read

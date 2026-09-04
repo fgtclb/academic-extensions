@@ -59,6 +59,7 @@ The recognised flags, all matched case-insensitively
 | `readonly` | Field is shown but not writable. Cancels `required`                     |
 | `email`    | Adds `EmailAddressValidator`, TCA `type` and input type `email`         |
 | `number`   | TCA `type` and input type `number` — no validator today                 |
+| `date`     | Input type `date` only — the TCA column keeps its own `datetime` config |
 
 Anything else in the list is ignored. There is no `url` flag yet; the source
 carries a `@todo` for it.
@@ -221,6 +222,7 @@ rules match — but nothing else does, and the two systems share no code.
 | `disabled` / `readonly` | supported                                         | **understood by none of the three readers**           |
 | `url`                   | not understood                                    | validator only, no TCA                                |
 | `number`                | TCA and input type, no validator                  | TCA and input type, no validator                      |
+| `date`                  | input type only, TCA untouched                    | not understood                                        |
 
 Two of those deserve emphasis because they are traps rather than gaps:
 
@@ -267,9 +269,8 @@ Still open, in the YAML files themselves rather than in the manuals:
 - The persons header calls it "Validation configuration for
   EXT:academic_persons_edit or custom implementation" — it omits the backend,
   which is half the point.
-- Its inline flag list documents `required`, `email`, `disabled` and `readonly`
-  but **not** `number`, which the file itself uses for `streetNumber`, `zip` and
-  `year`.
+- Its inline flag list documents `required`, `email`, `number`, `date`,
+  `disabled` and `readonly`; the frontend forms map every one of them.
 - `@internal … will change until 2.1.0 release` is stale; the branch is
   `3.0.0-dev`.
 - The jobs file's copied comment block is wrong for that extension, as above.

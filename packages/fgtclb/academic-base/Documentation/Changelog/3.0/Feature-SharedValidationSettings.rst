@@ -28,7 +28,9 @@ The classes, all in the namespace :php:`FGTCLB\AcademicBase\Settings`:
         -   The validations of one record type, keyed by property name.
     *   -   :php:`ValidationNormalizer`
         -   Turns the ``required`` / ``readonly`` / ``disabled`` / ``email`` /
-            ``number`` flag lists of a settings file into those objects.
+            ``number`` / ``date`` flag lists of a settings file into those
+            objects. ``date`` sets the frontend input type only and leaves
+            the TCA type of the column alone.
     *   -   :php:`SettingsFileLoader`
         -   Reads one settings file from every active package, merges them on
             the top level (the last package wins per key) and caches the

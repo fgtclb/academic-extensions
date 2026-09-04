@@ -82,6 +82,11 @@ final class ValidationNormalizer
             $tcaConfig['type'] = 'number';
             $inputType = 'number';
         }
+        if (in_array('date', $flags, true)) {
+            // The input type only: the TCA column declares its own datetime type,
+            // format and dbType, which a flag list has no business overriding.
+            $inputType = 'date';
+        }
         // @todo url validation ?
         return new Validation(
             identifier: $identifier,
