@@ -210,9 +210,9 @@ the development seed and rewrites
 the import produced. Run it after any change to the seed, once per core version,
 and commit the result — see [Seed verification](docs/testing/seed-verification.md).
 
-The seven node suites — `buildJs`, `checkJsBuildClean`, `cleanJs`,
-`lintMarkdown`, `lintTypescript`, `npm` and `typecheckJs` — are **core version
-independent**. They look at the sources and the committed artifacts, never at
+The eight node suites — `buildJs`, `checkJsBuildClean`, `cleanJs`,
+`lintMarkdown`, `lintTypescript`, `npm`, `testJs` and `typecheckJs` — are **core
+version independent**. They look at the sources and the committed artifacts, never at
 the installed core, so `-t` changes nothing for them and they need no
 `composerUpdate`. That makes them the only suites safe to run while the other
 core version's dependency set is installed.
@@ -222,6 +222,13 @@ core version's dependency set is installed.
 trailing whitespace, a `## See also` on every `docs/` page. Like `cgl` it fixes
 by default and only reports with `-n`. It needs no node dependency, so it is
 the one node suite that runs without an `npm ci`.
+
+`testJs` is the third test suite: `node --test` with jsdom over
+`packages/*/*/Tests/JavaScript/`, executing the frontend TypeScript sources.
+It is the only suite that runs JavaScript, and the reason the shipped modules
+must stay free of `enum`, `namespace`, parameter properties and decorators —
+node strips types, it does not transform them. See
+[JavaScript tests](docs/testing/javascript-tests.md).
 
 Test discovery: phpunit globs `packages/*/*/Tests/Unit/`,
 `packages/*/*/Tests/Functional/` **and** `packages-dev/*/Tests/{Unit,Functional}/`

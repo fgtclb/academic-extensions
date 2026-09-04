@@ -8,31 +8,27 @@ compiled by the repository build into committed JavaScript under
 
 This page says how it is verified, and — more importantly — how it is **not**.
 
-## There is no JavaScript test runner
+## The behavioural tests
 
-Nothing in this repository executes the modules. There is no Jest, no Vitest and
-no jsdom environment, in this extension or in any other. The former
-`Resources/Public/Development/` tree of this extension was removed when the
-frontend moved to the repository-wide toolchain; do not recreate test
-infrastructure below `Resources/Public/`, which holds distributable artifacts.
+There is a JavaScript suite now: `node --test` with jsdom, described in
+[JavaScript tests](javascript-tests.md), and this extension is the one it was
+built for.
 
-That is a gap, and it is named rather than papered over. A behavioural harness
-is the first task of the Lit port (ACE-509), because the port rewrites exactly
-the sequencing — open, close, focus return, scroll restore — that nothing
-currently checks.
+```bash
+Build/Scripts/runTests.sh -s testJs
+```
 
-One defect this gap has already let through, kept here as the concrete case a
-harness has to be able to reproduce: the document editor closes through Vue's
-`after-leave` hook, which runs *after* the leaving element has been removed from
-the document. Handing the plugin root to `destroyRichTextEditors()` there
-therefore destroyed no editor of the closing view — its textareas were no longer
-below the root — while it did destroy every permanently rendered profile-field
-CKEditor, because `Partials/Profile/Field/Control.html` puts a
-`data-pe-rich-text` textarea under the root for each of them. Nothing in this
-repository can observe that: it takes a DOM, a Vue transition and a live editor
-instance, and none of the three exists in either PHP suite. The fix is verified
-by reading Vue's `BaseTransition` and by the argument the hook is called with,
-not by a test.
+The first test file,
+[`Tests/JavaScript/rich-text-editor-scope.test.ts`](../../packages/fgtclb/academic-persons-edit/Tests/JavaScript/rich-text-editor-scope.test.ts),
+pins the defect that motivated the harness. The document editor closes through a
+transition hook that runs *after* the leaving element has been removed from the
+document, and is handed that element. Handing the plugin root to
+`destroyRichTextEditors()` there destroys no editor of the closing view — its
+textareas are no longer below the root — while it does destroy every permanently
+rendered profile-field editor, because `Partials/Profile/Field/Control.html`
+puts a `data-pe-rich-text` textarea under the root for each of them. That took a
+DOM, a transition and a live editor instance to observe, which is why neither
+PHP suite ever could.
 
 A second defect of the same class, and the one that says most about what the
 harness has to reach: the templates emit their hooks as `data-pe-*`, and the
@@ -66,16 +62,27 @@ Two things came out of that, and only one of them is coverage:
   module in a DOM. Those thirteen readers are the concrete case it has to be
   able to fail on.
 
-**Do not close the gap with assertions on source text.** The previous attempt
-did: a unit test compared the `.ts` files against literal strings, down to the
-whitespace between two statements and the number of `requestAnimationFrame(`
-calls in a module. Tests of that shape cannot fail for a behavioural regression
-and fail for every refactor, so they were removed with the editing rewrite
-(ACE-262) rather than carried.
+Coverage is a beginning, not a state: one file, four tests, the close path only.
+Everything else the modules do — the requests, the optimistic updates, the focus
+management, the image cropper, and the thirteen hook readers above — is still
+covered by nothing that executes it. Do not read the existence of the suite as
+the gap being closed.
+
+**Do not close the rest of it with assertions on source text.** The previous
+attempt did: a unit test compared the `.ts` files against literal strings, down
+to the whitespace between two statements and the number of
+`requestAnimationFrame(` calls in a module. Tests of that shape cannot fail for
+a behavioural regression and fail for every refactor, so they were removed with
+the editing rewrite (ACE-262) rather than carried. They are not to come back in
+TypeScript either.
+
+Do not put test infrastructure below `Resources/Public/`, which holds
+distributable artifacts — the former `Resources/Public/Development/` tree of this
+extension was removed when the frontend moved to the repository-wide toolchain.
 
 ## Repository gates
 
-Run them from the repository root. All four are core-version independent and
+Run them from the repository root. All five are core-version independent and
 need no `composerUpdate`; they use the pinned Node.js container, so no
 package-local `npm install` is needed either.
 
@@ -84,6 +91,7 @@ Build/Scripts/runTests.sh -s buildJs
 Build/Scripts/runTests.sh -s checkJsBuildClean
 Build/Scripts/runTests.sh -s lintTypescript -n
 Build/Scripts/runTests.sh -s typecheckJs
+Build/Scripts/runTests.sh -s testJs
 ```
 
 | Suite               | What it establishes                                                                 |
@@ -92,6 +100,7 @@ Build/Scripts/runTests.sh -s typecheckJs
 | `checkJsBuildClean` | Rebuilds only the generated outputs and fails when the result differs from the tree |
 | `lintTypescript -n` | Checks the TypeScript without modifying it                                          |
 | `typecheckJs`       | Runs the type checker — esbuild strips types, it does not validate them             |
+| `testJs`            | Runs the modules against a DOM, which is the only gate that executes them           |
 
 `typecheckJs` only checks the real modules because `Build/tsconfig.json` maps
 `@fgtclb/academic-persons-edit/frontend/*` onto the TypeScript sources. Without
@@ -135,6 +144,8 @@ group mechanism.
 
 ## See also
 
+- [JavaScript tests](javascript-tests.md) — the harness, the stubs, and what
+  they deliberately do not cover.
 - [Frontend assets](../development/frontend-assets.md) — the build, the
   committed artifacts and the vendored-library rule.
 - [Functional tests](functional-tests.md) — the harness these plugin tests use,

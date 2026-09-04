@@ -1,0 +1,31 @@
+// The type check of the behavioural JavaScript tests, run by "typecheckJs"
+// alongside "tsconfig.json".
+//
+// A project of its own for one reason: these files run in node, the sources
+// they exercise run in a browser, and "types" is a property of the whole
+// program. Adding "node" to the browser project would let a shipped module
+// reach for "process" or "Buffer" and still type check.
+//
+// The production sources are not listed. TypeScript pulls in whatever the test
+// files import, so exactly the modules under test are checked here — with the
+// ambient declarations of "_dependencies.d.ts", which have to be named because
+// nothing imports them.
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": [
+            "node"
+        ],
+
+        // Node runs these files by stripping the type annotations out. It does
+        // not transform, so a construct that needs emitted JavaScript — an
+        // "enum", a "namespace", a constructor parameter property — is a
+        // runtime error rather than a type error, in a test *or* in a module a
+        // test imports. This turns it into a type error instead.
+        "erasableSyntaxOnly": true
+    },
+    "include": [
+        "../packages/*/*/Tests/JavaScript/**/*.ts",
+        "../packages/*/*/Resources/Private/TypeScript/**/*.d.ts"
+    ]
+}
