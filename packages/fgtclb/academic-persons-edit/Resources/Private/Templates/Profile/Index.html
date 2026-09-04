@@ -120,7 +120,9 @@
             data-label-document-delete="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
             data-label-document-save="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}"
             data-label-document-close="{f:translate(key: 'actions.cancel', extensionName: 'academic_persons_edit')}"
-            data-label-document-empty="{f:translate(key: 'profileEditing.field.empty', extensionName: 'academic_persons_edit')}">
+            data-label-document-empty="{f:translate(key: 'profileEditing.field.empty', extensionName: 'academic_persons_edit')}"
+            data-label-sort-up="{f:translate(key: 'actions.sortUp', extensionName: 'academic_persons_edit')}"
+            data-label-sort-down="{f:translate(key: 'actions.sortDown', extensionName: 'academic_persons_edit')}">
             <!--
                 The image editor is rendered here, where it is shown. Vue moved
                 it into this container with a "Teleport"; Fluid renders it in
@@ -193,13 +195,49 @@
                 uses for the two button templates. Copying the markup into
                 TypeScript would fork the icon set at the first change.
 
-                One entry per icon a browser rendered editor draws. The list
-                grows with the editors that move: the document editor needs the
-                help icon, and the contract contacts follow.
+                One entry per icon a browser rendered editor draws: the help
+                of a field, and the six controls of the contact list of a
+                contract.
             -->
             <template data-pe-icon="help">
                 <core:icon
                     identifier="academic-persons-edit-help"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
+            </template>
+            <template data-pe-icon="add">
+                <core:icon
+                    identifier="academic-persons-edit-add"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
+            </template>
+            <template data-pe-icon="view">
+                <core:icon
+                    identifier="academic-persons-edit-view"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
+            </template>
+            <template data-pe-icon="edit">
+                <core:icon
+                    identifier="academic-persons-edit-edit"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
+            </template>
+            <template data-pe-icon="delete">
+                <core:icon
+                    identifier="academic-persons-edit-delete"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
+            </template>
+            <template data-pe-icon="move-up">
+                <core:icon
+                    identifier="academic-persons-edit-move-up"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
+            </template>
+            <template data-pe-icon="move-down">
+                <core:icon
+                    identifier="academic-persons-edit-move-down"
                     size="small"
                     alternativeMarkupIdentifier="inline" />
             </template>

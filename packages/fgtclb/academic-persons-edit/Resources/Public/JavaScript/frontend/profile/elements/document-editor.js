@@ -7,7 +7,14 @@ import { repeat } from "lit/directives/repeat.js";
 import {
   ownerEditingContext
 } from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
-import { profileDocumentEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+import { editingIcon } from "@fgtclb/academic-persons-edit/frontend/profile/elements/icons.js";
+import {
+  profileContractContactsElementName,
+  profileDocumentEditorElementName
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+import {
+  emptyContractContactEditor
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/contract-contacts.js";
 import { createElementTransition } from "@fgtclb/academic-persons-edit/frontend/profile/elements/transition.js";
 import { parseRichTextPreview } from "@fgtclb/academic-persons-edit/frontend/profile/rich-text.js";
 const documentEditorCloseEvent = "pe:document-close";
@@ -34,6 +41,7 @@ const richTextFragment = (value) => {
 };
 class ProfileDocumentEditorElement extends LitElement {
   static properties = {
+    contactEditor: { attribute: false },
     contactEmptyMessage: { attribute: false },
     contactSections: { attribute: false },
     context: { attribute: false },
@@ -53,6 +61,7 @@ class ProfileDocumentEditorElement extends LitElement {
   #transitioned = false;
   constructor() {
     super();
+    this.contactEditor = emptyContractContactEditor;
     this.contactEmptyMessage = "";
     this.contactSections = [];
     this.context = null;
@@ -71,6 +80,25 @@ class ProfileDocumentEditorElement extends LitElement {
   /** Light DOM. See the six reasons at the top of this file. */
   createRenderRoot() {
     return this;
+  }
+  /**
+   * Resolves once the contract contacts below have rendered as well.
+   *
+   * `updateComplete` is per element, and the contacts are a `LitElement` of
+   * their own: this element assigns their properties while it renders, which
+   * schedules *their* update for a later microtask. A caller that awaits this
+   * element and then queries for the contact editor - which is what
+   * `openContractContact()` does before it focuses the first control - would
+   * otherwise look at the document before the list is in it. Lit documents the
+   * override for exactly this, and it composes: the child exists by the time
+   * `super.getUpdateComplete()` resolves, because it was created during the
+   * render that promise reports.
+   */
+  async getUpdateComplete() {
+    const completed = await super.getUpdateComplete();
+    const contacts = this.querySelector(profileContractContactsElementName);
+    await (contacts == null ? void 0 : contacts.updateComplete);
+    return completed;
   }
   connectedCallback() {
     this.context ??= ownerEditingContext(this);
@@ -162,15 +190,15 @@ class ProfileDocumentEditorElement extends LitElement {
     </dl>`;
   }
   /**
-   * The contacts of a contract.
+   * The contacts of a contract, rendered by
+   * `<academic-persons-edit-contract-contacts>`.
    *
-   * The element is created here and defined by the next commit of ACE-509,
-   * which moves `Partials/Profile/Documents/ContractContacts.html` and its
-   * editor into `elements/contract-contacts.ts`. Until it is defined the tag is
-   * an inert unknown element, so a contract's contact list is not rendered
-   * between the two commits - the one seam of this port, and it is here rather
-   * than spread over both because the properties the list needs are exactly the
-   * ones this element already holds.
+   * A second element rather than a block of this template, because the contacts
+   * are a list of their own with an editor of their own: they are answered by
+   * the contract's `documentForm` response, they are written against five
+   * endpoints this editor never calls, and they are shown in exactly one of the
+   * four modes this element renders. Everything it needs is a property this
+   * element already holds, so the whole coupling is the five bindings below.
    */
   #renderContactSections() {
     return html`<academic-persons-edit-contract-contacts
@@ -178,6 +206,7 @@ class ProfileDocumentEditorElement extends LitElement {
       .contract=${this.record}
       .sections=${this.contactSections}
       .emptyMessage=${this.contactEmptyMessage}
+      .editor=${this.contactEditor}
     ></academic-persons-edit-contract-contacts>`;
   }
   /** One editable field: its label, its help, its control and its error. */
@@ -227,7 +256,7 @@ class ProfileDocumentEditorElement extends LitElement {
       data-bs-content=${field.helptext}
       aria-label=${`${field.label}: ${field.helptext}`}
     >
-      ${guard([this.context], () => this.#icon("help"))}
+      ${guard([this.context], () => editingIcon(this.context, "help"))}
     </button>`;
   }
   #renderControl(field, id, errorId) {
@@ -354,22 +383,6 @@ class ProfileDocumentEditorElement extends LitElement {
         >
       </button>
     </div>`;
-  }
-  /**
-   * One icon, cloned from the `<template data-pe-icon="...">` block of
-   * `Templates/Profile/Index.html`.
-   *
-   * The icons stay Fluid's. `<core:icon>` resolves an identifier through the
-   * icon registry, which knows about the icon set the extension registers and
-   * about what a site overrode - none of which a browser can ask. Copying the
-   * markup into TypeScript would fork the icon set at the first change.
-   */
-  #icon(name) {
-    var _a;
-    const template = (_a = this.context) == null ? void 0 : _a.root.querySelector(
-      `template[data-pe-icon="${CSS.escape(name)}"]`
-    );
-    return template === null || template === void 0 ? nothing : document.importNode(template.content, true);
   }
   #onClose = () => {
     this.dispatchEvent(new CustomEvent(documentEditorCloseEvent, { bubbles: true }));

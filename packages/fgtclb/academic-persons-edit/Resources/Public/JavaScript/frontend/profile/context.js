@@ -22,7 +22,9 @@ const readEditingContext = (root) => {
       documentEdit: contract.labelDocumentEdit,
       documentEmpty: contract.labelDocumentEmpty,
       documentSave: contract.labelDocumentSave,
-      documentView: contract.labelDocumentView
+      documentView: contract.labelDocumentView,
+      sortDown: contract.labelSortDown,
+      sortUp: contract.labelSortUp
     }),
     messages: Object.freeze({
       contractContactDeleteConfirm: contract.messageContractContactDeleteConfirm,

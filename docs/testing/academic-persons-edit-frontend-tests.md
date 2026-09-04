@@ -77,7 +77,7 @@ Fluid partials it is rendered from:
 | `rich-text-preview.test.ts` | The sanitiser's allow-list, the link schemes, the preview, and the character limit.                                                                                              |
 | `document-rows.test.ts`     | The list a section renders: numbering, the arrow at each end, the empty state, sorting by arrow and by drag, and the rollback of both.                                           |
 | `document-editor.test.ts`   | The open and close cycle, the collapse target, the focus, the created editors, the three save modes, and the values a row is written with.                                       |
-| `contract-contacts.test.ts` | The contacts of a contract: their endpoints, their editor, and what a save does to the list.                                                                                     |
+| `contract-contacts.test.ts` | The contacts of a contract: their endpoints, their editor, and what a save does to the list the element is handed.                                                               |
 | `image-editing.test.ts`     | Choosing, uploading and deleting the image, the previews, and the object urls that are released.                                                                                 |
 | `sticky-image.test.ts`      | The offset below a fixed page header, and its teardown.                                                                                                                          |
 | `editing-context.test.ts`   | The root's `data-*` contract: every key of a complete root, what a minimal one reads as, the four coercions, and that the result is frozen.                                      |
@@ -108,6 +108,14 @@ Vue directives of `Partials/Profile/Documents/Editor.html`:
 | `document-editor-element.test.ts`         | What the element renders in each of the four modes, the shape of every control, the errors, the busy state, the icons it clones, the four events it reports, the collapse transition, and that a re-render leaves a live CKEditor alone. |
 | `document-editor-element-upgrade.test.ts` | That an editor renders in both orders: properties assigned before the definition ran, and an element created after it.                                                                                                                   |
 | `rich-text-element.test.ts`               | One textarea and one editor per element, created on connect and destroyed on disconnect, exactly once each, and a move that does not race its own teardown.                                                                              |
+
+The contacts of a contract added two more, for the 106 directives of
+`Partials/Profile/Documents/ContractContacts.html` and its editor:
+
+| File                                        | What it pins                                                                                                                                                                                                                                                                                                     |
+|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `contract-contacts-element.test.ts`         | The sections and rows the property renders, the empty message, where the editor stands for each mode, its controls and messages, that a replaced list leaves an open editor alone — and, driven through the real controls in the page, the payload of every contact endpoint and a refusal that changes nothing. |
+| `contract-contacts-element-upgrade.test.ts` | That the list renders in both orders: properties assigned before the definition ran, and an element created after it.                                                                                                                                                                                            |
 
 That is the coverage the thirteen hook readers needed: a test file fails if a
 `data-pe-*` attribute is queried under a name the templates do not emit.

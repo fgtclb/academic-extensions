@@ -68,7 +68,15 @@ import {
   ownerEditingContext,
   type EditingContext,
 } from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
-import { profileDocumentEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+import { editingIcon } from "@fgtclb/academic-persons-edit/frontend/profile/elements/icons.js";
+import {
+  profileContractContactsElementName,
+  profileDocumentEditorElementName,
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+import {
+  emptyContractContactEditor,
+  type ProfileContractContactEditorState,
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/contract-contacts.js";
 import { createElementTransition } from "@fgtclb/academic-persons-edit/frontend/profile/elements/transition.js";
 import type { ProfileRichTextConfiguration } from "@fgtclb/academic-persons-edit/frontend/profile/elements/rich-text.js";
 import { parseRichTextPreview } from "@fgtclb/academic-persons-edit/frontend/profile/rich-text.js";
@@ -158,6 +166,7 @@ const richTextFragment = (value: string): DocumentFragment => {
  */
 export class ProfileDocumentEditorElement extends LitElement {
   static override properties = {
+    contactEditor: { attribute: false },
     contactEmptyMessage: { attribute: false },
     contactSections: { attribute: false },
     context: { attribute: false },
@@ -174,6 +183,7 @@ export class ProfileDocumentEditorElement extends LitElement {
     values: { attribute: false },
   };
 
+  declare contactEditor: ProfileContractContactEditorState;
   declare contactEmptyMessage: string;
   declare contactSections: ContractContactSection[];
   declare context: EditingContext | null;
@@ -194,6 +204,7 @@ export class ProfileDocumentEditorElement extends LitElement {
 
   constructor() {
     super();
+    this.contactEditor = emptyContractContactEditor;
     this.contactEmptyMessage = "";
     this.contactSections = [];
     this.context = null;
@@ -213,6 +224,32 @@ export class ProfileDocumentEditorElement extends LitElement {
   /** Light DOM. See the six reasons at the top of this file. */
   override createRenderRoot(): HTMLElement {
     return this;
+  }
+
+  /**
+   * Resolves once the contract contacts below have rendered as well.
+   *
+   * `updateComplete` is per element, and the contacts are a `LitElement` of
+   * their own: this element assigns their properties while it renders, which
+   * schedules *their* update for a later microtask. A caller that awaits this
+   * element and then queries for the contact editor - which is what
+   * `openContractContact()` does before it focuses the first control - would
+   * otherwise look at the document before the list is in it. Lit documents the
+   * override for exactly this, and it composes: the child exists by the time
+   * `super.getUpdateComplete()` resolves, because it was created during the
+   * render that promise reports.
+   */
+  override async getUpdateComplete(): Promise<boolean> {
+    const completed = await super.getUpdateComplete();
+    // Read through the tag name and a structural type rather than through the
+    // class: importing the element here would make the module graph a cycle for
+    // nothing, and "updateComplete" is the whole contract that is needed.
+    const contacts = this.querySelector(profileContractContactsElementName) as
+      | (Element & { updateComplete?: Promise<unknown> })
+      | null;
+    await contacts?.updateComplete;
+
+    return completed;
   }
 
   override connectedCallback(): void {
@@ -322,15 +359,15 @@ export class ProfileDocumentEditorElement extends LitElement {
   }
 
   /**
-   * The contacts of a contract.
+   * The contacts of a contract, rendered by
+   * `<academic-persons-edit-contract-contacts>`.
    *
-   * The element is created here and defined by the next commit of ACE-509,
-   * which moves `Partials/Profile/Documents/ContractContacts.html` and its
-   * editor into `elements/contract-contacts.ts`. Until it is defined the tag is
-   * an inert unknown element, so a contract's contact list is not rendered
-   * between the two commits - the one seam of this port, and it is here rather
-   * than spread over both because the properties the list needs are exactly the
-   * ones this element already holds.
+   * A second element rather than a block of this template, because the contacts
+   * are a list of their own with an editor of their own: they are answered by
+   * the contract's `documentForm` response, they are written against five
+   * endpoints this editor never calls, and they are shown in exactly one of the
+   * four modes this element renders. Everything it needs is a property this
+   * element already holds, so the whole coupling is the five bindings below.
    */
   #renderContactSections(): TemplateResult {
     return html`<academic-persons-edit-contract-contacts
@@ -338,6 +375,7 @@ export class ProfileDocumentEditorElement extends LitElement {
       .contract=${this.record}
       .sections=${this.contactSections}
       .emptyMessage=${this.contactEmptyMessage}
+      .editor=${this.contactEditor}
     ></academic-persons-edit-contract-contacts>`;
   }
 
@@ -401,7 +439,7 @@ export class ProfileDocumentEditorElement extends LitElement {
       data-bs-content=${field.helptext}
       aria-label=${`${field.label}: ${field.helptext}`}
     >
-      ${guard([this.context], (): Node | typeof nothing => this.#icon("help"))}
+      ${guard([this.context], (): Node | typeof nothing => editingIcon(this.context, "help"))}
     </button>`;
   }
 
@@ -552,25 +590,6 @@ export class ProfileDocumentEditorElement extends LitElement {
         >
       </button>
     </div>`;
-  }
-
-  /**
-   * One icon, cloned from the `<template data-pe-icon="...">` block of
-   * `Templates/Profile/Index.html`.
-   *
-   * The icons stay Fluid's. `<core:icon>` resolves an identifier through the
-   * icon registry, which knows about the icon set the extension registers and
-   * about what a site overrode - none of which a browser can ask. Copying the
-   * markup into TypeScript would fork the icon set at the first change.
-   */
-  #icon(name: string): Node | typeof nothing {
-    const template = this.context?.root.querySelector<HTMLTemplateElement>(
-      `template[data-pe-icon="${CSS.escape(name)}"]`,
-    );
-
-    return template === null || template === undefined
-      ? nothing
-      : document.importNode(template.content, true);
   }
 
   #onClose = (): void => {

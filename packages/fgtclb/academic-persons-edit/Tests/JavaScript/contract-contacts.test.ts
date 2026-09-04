@@ -8,7 +8,6 @@ import {
   type DocumentEditingController,
 } from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
 import {
-  contractContactsView,
   documentRow,
   documentSection,
   endpoints,
@@ -24,11 +23,10 @@ import {
  * contract being open: the requests carry its record, and without one there is
  * nothing to attach a contact to.
  *
- * The list itself is rendered by Vue from `document.contactSections` today
- * (`Partials/Profile/Documents/ContractContacts.html`), so what a save does to
- * that list is asserted on the state the template binds to - it becomes the
- * property of the contacts component after the port, and the sections it
- * describes are what a visitor sees.
+ * The list is rendered by `<academic-persons-edit-contract-contacts>` from
+ * `document.contactSections`, which is the property it is handed - so what a
+ * save does to that list is still asserted on the state, and what the element
+ * makes of it is asserted in `contract-contacts-element.test.ts`.
  */
 describe("the contacts of a contract", () => {
   let fetch: FetchDouble;
@@ -81,15 +79,16 @@ describe("the contacts of a contract", () => {
   };
 
   /**
-   * The markup Vue renders for an open contact editor, placed by hand for the
-   * same reason as the document editor's - see `document-editor.test.ts`.
+   * The add control of the section, which the contacts element renders inside
+   * the open contract.
+   *
+   * It used to be a hand placed transcription of what Vue made of
+   * `Partials/Profile/Documents/ContractContacts.html`; that partial is gone
+   * and the element renders the real control, so the arrangement is a query.
+   * Nothing this file asserts changed with it.
    */
-  const placeContactsView = (): HTMLButtonElement => {
-    select(root, '[data-item-uid="5"] [data-pe-document-item-collapse-target]', HTMLElement)
-      .innerHTML = contractContactsView({ section: "addresses" });
-
-    return select(root, "[data-pe-contract-contact-add]", HTMLButtonElement);
-  };
+  const addButton = (): HTMLButtonElement =>
+    select(root, "[data-pe-contract-contact-add]", HTMLButtonElement);
 
   /** The event shape the template hands the handler: the button as its target. */
   const eventFrom = (button: HTMLElement): Event => {
@@ -126,7 +125,7 @@ describe("the contacts of a contract", () => {
 
   it("asks the contact form endpoint for the contract, section and mode", async () => {
     await openContract();
-    const add = placeContactsView();
+    const add = addButton();
     fetch.respond({ success: true, fields: [], record: null, title: "Address" });
 
     await controller.openContractContact("add", "addresses", eventFrom(add));
@@ -143,7 +142,7 @@ describe("the contacts of a contract", () => {
 
   it("brings the editor into view and puts the caret in its first control", async () => {
     await openContract();
-    const add = placeContactsView();
+    const add = addButton();
     fetch.respond({
       success: true,
       fields: [{ name: "city", label: "City", type: "text", value: "" }],
@@ -158,7 +157,7 @@ describe("the contacts of a contract", () => {
     assert.equal(editor.getAttribute("data-test-scrolled-into-view"), "nearest");
     assert.equal(
       document.activeElement,
-      select(root, "#profile-editing-contract-contact-field-city", HTMLInputElement),
+      select(root, "#profile-editing-contract-contact-field-0-city", HTMLInputElement),
     );
     assert.equal(controller.contractContact.open, true);
     assert.equal(controller.contractContact.title, "Add: Address");
@@ -166,7 +165,7 @@ describe("the contacts of a contract", () => {
 
   it("closes again when the same control is pressed a second time", async () => {
     await openContract();
-    const add = placeContactsView();
+    const add = addButton();
     fetch.respond({ success: true, fields: [], record: null, title: "Address" });
     await controller.openContractContact("add", "addresses", eventFrom(add));
     await settle(20);
@@ -180,7 +179,7 @@ describe("the contacts of a contract", () => {
 
   it("returns the caret to the control that opened it", async () => {
     await openContract();
-    const add = placeContactsView();
+    const add = addButton();
     fetch.respond({ success: true, fields: [], record: null, title: "Address" });
     await controller.openContractContact("add", "addresses", eventFrom(add));
     await settle(20);
@@ -193,7 +192,7 @@ describe("the contacts of a contract", () => {
 
   it("creates a contact and adds it to the list of its section", async () => {
     await openContract();
-    const add = placeContactsView();
+    const add = addButton();
     fetch.respond({
       success: true,
       fields: [{ name: "city", label: "City", type: "text", value: "Nottingham" }],
@@ -227,7 +226,7 @@ describe("the contacts of a contract", () => {
 
   it("updates a contact and replaces it in the list", async () => {
     await openContract();
-    const add = placeContactsView();
+    const add = addButton();
     fetch.respond({
       success: true,
       fields: [{ name: "city", label: "City", type: "text", value: "Torino" }],
@@ -261,7 +260,7 @@ describe("the contacts of a contract", () => {
 
   it("deletes a contact, sends no values and drops it from the list", async () => {
     await openContract();
-    const add = placeContactsView();
+    const add = addButton();
     fetch.respond({ success: true, fields: [], record: 21, title: "Address" });
     await controller.openContractContact("delete", "addresses", eventFrom(add), 21);
     await settle(20);
@@ -283,7 +282,7 @@ describe("the contacts of a contract", () => {
 
   it("keeps the editor open and the messages when a contact is refused", async () => {
     await openContract();
-    const add = placeContactsView();
+    const add = addButton();
     fetch.respond({
       success: true,
       fields: [{ name: "city", label: "City", type: "text", value: "" }],

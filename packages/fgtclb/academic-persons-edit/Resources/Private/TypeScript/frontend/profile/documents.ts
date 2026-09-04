@@ -1,6 +1,7 @@
 import {
   hooks,
   initializePopover,
+  isEditableField,
   requestJson,
   showStatus,
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
@@ -18,6 +19,7 @@ import {
   type ProfileDocumentEditorElement,
   type ProfileDocumentEditorInputDetail,
 } from "@fgtclb/academic-persons-edit/frontend/profile/elements/document-editor.js";
+import { registerProfileContractContactsElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/contract-contacts.js";
 import { profileDocumentEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
 import { registerProfileRichTextElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/rich-text.js";
 import {
@@ -256,6 +258,27 @@ const getResponseContactSections = (value: unknown): ContractContactSection[] =>
         }];
       })
     : [];
+
+/**
+ * The sections with the items of one of them replaced, as new objects.
+ *
+ * Every write to a contact list goes through here, because none of them may be
+ * a write *into* the list: `documentState.contactSections` is handed to
+ * `<academic-persons-edit-contract-contacts>` as a property, and Lit compares a
+ * property by identity - an array that was mutated in place is the same array
+ * and renders nothing. The section that is not touched keeps its object, so
+ * `repeat()` keyed by identifier moves no node it does not have to.
+ */
+const replaceContactItems = (
+  sections: ContractContactSection[],
+  identifier: string,
+  items: (current: ContractContactItem[]) => ContractContactItem[],
+): ContractContactSection[] =>
+  sections.map((section): ContractContactSection =>
+    section.identifier === identifier
+      ? { ...section, items: items(section.items) }
+      : section,
+  );
 
 const getSectionHeading = (section: HTMLElement): string =>
   section.querySelector("h2")?.textContent?.trim() ?? "";
@@ -733,6 +756,11 @@ export const createDocumentEditing = (
     if (element === null) {
       return;
     }
+    // A fresh object every time, and that is the mechanism rather than a copy
+    // for its own sake: Lit re-renders on the assignment of a property and
+    // never on a write inside the object it already holds, and every method
+    // below writes this state field by field.
+    element.contactEditor = { ...contractContactState };
     element.contactEmptyMessage = documentState.contactEmptyMessage;
     element.contactSections = documentState.contactSections;
     element.deleteConfirmation = documentState.deleteConfirmation;
@@ -765,6 +793,7 @@ export const createDocumentEditing = (
   const createDocumentEditor = (target: HTMLElement): void => {
     registerProfileDocumentEditorElement();
     registerProfileRichTextElement();
+    registerProfileContractContactsElement();
     const element = document.createElement(
       profileDocumentEditorElementName,
     ) as ProfileDocumentEditorElement;
@@ -1086,7 +1115,11 @@ export const createDocumentEditing = (
     if (modeValue !== "add" && (!Number.isInteger(record) || record <= 0)) {
       return;
     }
-    const button = event.currentTarget instanceof HTMLElement
+    // "HTMLButtonElement" and not "HTMLElement", exactly as "openDocument()"
+    // reads it: the listener is delegated on the plugin root now, so
+    // "currentTarget" is that root during the dispatch and a wider test would
+    // make the whole editor the control focus returns to.
+    const button = event.currentTarget instanceof HTMLButtonElement
       ? event.currentTarget
       : event.target instanceof Element
         ? event.target.closest<HTMLElement>("button")
@@ -1131,6 +1164,13 @@ export const createDocumentEditing = (
       );
       contractContactTrigger = button;
       contractContactState.open = true;
+      // Before the render, and that is the whole reason the line is here: the
+      // controls are disabled while a request runs, and the focus below looks
+      // for the first one that is not. Vue re-rendered on the write in the
+      // "finally" below and the editor came up enabled but unfocused; Lit
+      // renders when this function says so, so it says so once - with the
+      // request over.
+      contractContactState.pending = false;
       renderDocumentEditor();
       await editorElement?.updateComplete;
       const editor = root.querySelector<HTMLElement>(
@@ -1151,6 +1191,7 @@ export const createDocumentEditing = (
       showStatus(context, "danger", (error as RequestError).result?.message ?? null);
     } finally {
       contractContactState.pending = false;
+      renderDocumentEditor();
     }
   };
 
@@ -1203,33 +1244,38 @@ export const createDocumentEditing = (
     contractContactState.pending = true;
     contractContactState.error = "";
     contractContactState.errors = {};
+    renderDocumentEditor();
     showStatus(context, "info", context.messages.saving ?? null);
     try {
       const response = await requestDocument(context, endpoint, data);
-      const section = documentState.contactSections.find(
-        (candidate): boolean =>
-          candidate.identifier === contractContactState.section,
-      );
       const item = asContractContactItem(response.item);
-      if (section !== undefined) {
-        if (contractContactState.mode === "add" && item !== null) {
-          section.items.push(item);
-        } else if (contractContactState.mode === "edit" && item !== null) {
-          const index = section.items.findIndex(
-            (candidate): boolean => candidate.uid === contractContactState.record,
-          );
-          if (index >= 0) {
-            section.items.splice(index, 1, item);
+      const record = contractContactState.record;
+      const mode = contractContactState.mode;
+      // Reassigned rather than spliced. The list is a property of the contacts
+      // element, and Lit compares a property by identity: a "push()" into the
+      // array it already holds changes what a visitor would see and nothing
+      // that would make it render.
+      documentState.contactSections = replaceContactItems(
+        documentState.contactSections,
+        contractContactState.section,
+        (items): ContractContactItem[] => {
+          if (mode === "add" && item !== null) {
+            return [...items, item];
           }
-        } else if (contractContactState.mode === "delete") {
-          const index = section.items.findIndex(
-            (candidate): boolean => candidate.uid === contractContactState.record,
-          );
-          if (index >= 0) {
-            section.items.splice(index, 1);
+          if (mode === "edit" && item !== null) {
+            return items.map((candidate): ContractContactItem =>
+              candidate.uid === record ? item : candidate,
+            );
           }
-        }
-      }
+          if (mode === "delete") {
+            return items.filter(
+              (candidate): boolean => candidate.uid !== record,
+            );
+          }
+
+          return items;
+        },
+      );
       contractContactState.pending = false;
       contractContactState.open = false;
       renderDocumentEditor();
@@ -1256,6 +1302,7 @@ export const createDocumentEditing = (
       );
     } finally {
       contractContactState.pending = false;
+      renderDocumentEditor();
     }
   };
 
@@ -1278,6 +1325,7 @@ export const createDocumentEditing = (
       return;
     }
     contractContactState.pending = true;
+    renderDocumentEditor();
     try {
       const response = await requestDocument(
         context,
@@ -1300,10 +1348,19 @@ export const createDocumentEditing = (
         return item === undefined ? [] : [item];
       });
       if (sortedItems.length === section.items.length) {
-        sortedItems.forEach((item, index): void => {
-          item.sorting = (index + 1) * 10;
-        });
-        section.items.splice(0, section.items.length, ...sortedItems);
+        // A new item object per position rather than a write into the one that
+        // moved, for the same reason as above and one more: `repeat()` keys the
+        // rows by uid, so the objects it holds are compared by identity when it
+        // decides which node moves where.
+        documentState.contactSections = replaceContactItems(
+          documentState.contactSections,
+          sectionIdentifier,
+          (): ContractContactItem[] =>
+            sortedItems.map((item, index): ContractContactItem => ({
+              ...item,
+              sorting: (index + 1) * 10,
+            })),
+        );
       }
       renderDocumentEditor();
       showStatus(context, "success", context.messages.documentSorted ?? null);
@@ -1311,7 +1368,89 @@ export const createDocumentEditing = (
       showStatus(context, "danger", (error as RequestError).result?.message ?? null);
     } finally {
       contractContactState.pending = false;
+      renderDocumentEditor();
     }
+  };
+
+  /**
+   * The controls of the contact list, which
+   * `<academic-persons-edit-contract-contacts>` renders.
+   *
+   * Delegated on the plugin root rather than bound on the element, and both
+   * halves of that are deliberate. The element is created by the document
+   * editor's *template*, so this controller never holds it and has nothing to
+   * bind to; and `openContractContact()` reads the pressed button off the
+   * event, because that is where focus returns to when the editor closes - a
+   * custom event of the element would have to carry the button back anyway. It
+   * is the same mechanism the document list itself uses, and the two selectors
+   * are disjoint, so the two listeners never see each other's buttons.
+   */
+  const onContractContactClick = (event: Event): void => {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target?.closest<HTMLButtonElement>(
+      "[data-pe-contract-contact-add], [data-pe-contract-contact-view], " +
+        "[data-pe-contract-contact-edit], [data-pe-contract-contact-delete], " +
+        "[data-pe-contract-contact-sort], [data-pe-contract-contact-cancel], " +
+        "[data-pe-contract-contact-save]",
+    );
+    if (button === null || button === undefined || button.disabled) {
+      return;
+    }
+    if (button.matches("[data-pe-contract-contact-cancel]")) {
+      closeContractContact();
+      return;
+    }
+    if (button.matches("[data-pe-contract-contact-save]")) {
+      void submitContractContact();
+      return;
+    }
+    const sectionElement = button.closest<HTMLElement>(
+      "[data-pe-contract-contact-section]",
+    );
+    const itemElement = button.closest<HTMLElement>("[data-pe-contract-contact-item]");
+    const section =
+      sectionElement === null ? "" : (hooks(sectionElement).peContractContactSection ?? "");
+    const record = Number(
+      itemElement === null ? 0 : (hooks(itemElement).peContractContactItem ?? 0),
+    );
+    const direction = hooks(button).peContractContactSort;
+    if (direction !== undefined) {
+      void sortContractContact(direction, section, record);
+      return;
+    }
+    const mode = button.matches("[data-pe-contract-contact-add]")
+      ? "add"
+      : button.matches("[data-pe-contract-contact-view]")
+        ? "view"
+        : button.matches("[data-pe-contract-contact-edit]")
+          ? "edit"
+          : "delete";
+    void openContractContact(mode, section, event, record);
+  };
+
+  /**
+   * What the visitor typed into a contact field.
+   *
+   * Written without a render, exactly as the document editor's own input is:
+   * the control already shows the value, and re-rendering the form on every
+   * keystroke is what a controlled input does not have to do. The `live()`
+   * bindings of the element realign the controls with this object the next time
+   * something else does cause a render.
+   */
+  const onContractContactInput = (event: Event): void => {
+    const control = event.target;
+    if (!isEditableField(control)) {
+      return;
+    }
+    const name = hooks(control).peContractContactField;
+    if (name === undefined) {
+      return;
+    }
+    const value =
+      control instanceof HTMLInputElement && control.type === "checkbox"
+        ? control.checked
+        : control.value;
+    contractContactState.values = { ...contractContactState.values, [name]: value };
   };
 
   // One drag per editor, and the listeners are the editor's for as long as it
@@ -1319,6 +1458,11 @@ export const createDocumentEditing = (
   // which is what freed the module of the `WeakMap`s that used to pair a root
   // element with the controller and the drag in progress belonging to it.
   initializeDocumentDragAndDrop(context);
+  root.addEventListener("click", onContractContactClick);
+  // Both, because a select reports a "change" and a text field an "input", and
+  // the contact forms carry either.
+  root.addEventListener("input", onContractContactInput);
+  root.addEventListener("change", onContractContactInput);
   root.addEventListener("click", (event): void => {
     const target = event.target instanceof Element ? event.target : null;
     const button = target?.closest<HTMLButtonElement>(

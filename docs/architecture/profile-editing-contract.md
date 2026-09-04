@@ -14,7 +14,7 @@ as `data-*` attributes on one element, the plugin root of
 | Profile   | 2     | `data-profile-uid`, `data-editor-language`                    |
 | Image     | 5     | `data-has-image`, `data-image-cropper-ratio`                  |
 | Messages  | 20    | `data-message-saving`, `data-message-document-delete-confirm` |
-| Labels    | 7     | `data-label-document-add`, `data-label-document-empty`        |
+| Labels    | 9     | `data-label-document-add`, `data-label-sort-up`               |
 
 The per-element hooks below the root — `data-pe-field-ids`, `data-pe-for`,
 `data-pe-document-sort` and the rest — are a different vocabulary, read of
@@ -197,6 +197,49 @@ three transitive packages, so the behavioural suite runs the Lit the browser
 will and the type check checks against it. It is never bundled: the TypeScript
 build emits one module per source and leaves every import as written.
 
+## The element that renders the contacts of a contract
+
+`<academic-persons-edit-contract-contacts>`
+([`profile/elements/contract-contacts.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/contract-contacts.ts))
+is the second `LitElement`, and it replaces two partials at once:
+`Partials/Profile/Documents/ContractContacts.html` and
+`…/ContractContactEditor.html`, 315 lines of Fluid with 106 Vue directives.
+Neither could be server rendered — the sections, the rows and the fields of the
+editor all come from the `documentForm` and `contractContactForm` responses —
+and both were rendering the same editor state, once below the section heading
+for an addition and once inside the row for everything else.
+
+The document editor's template creates it and hands it five properties. It
+calls no endpoint: `profile/documents.ts` keeps `openContractContact()`,
+`closeContractContact()`, `submitContractContact()` and `sortContractContact()`
+and stays drivable without a custom element registry, which is what makes those
+four testable.
+
+| Member                                      | Contract                                                                                          |
+|---------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `<academic-persons-edit-contract-contacts>` | The tag name. It observes no attributes and dispatches no events.                                 |
+| `context`                                   | The `EditingContext`, assignable; resolved from the element above it when it is not.              |
+| `contract`                                  | The record the contacts belong to.                                                                |
+| `sections`                                  | The `contactSections` of the contract's own response: one list per address, phone number or mail. |
+| `emptyMessage`                              | What a section with no contacts says.                                                             |
+| `editor`                                    | The open editor as one frozen object: mode, record, section, fields, values, errors and pending.  |
+
+**It reports presses as native clicks, not as custom events.** The controls
+carry `data-pe-contract-contact-add`, `-view`, `-edit`, `-delete`, `-sort`,
+`-cancel` and `-save`, and the controller delegates on the plugin root — the
+same mechanism the document list uses. Lit creates this element inside another
+element's template, so the controller never holds it and has nothing to bind a
+listener to, and `openContractContact()` reads the pressed button off the event
+because that is where focus returns when the editor closes.
+
+**A write to the list is a reassignment, never a splice.** Lit compares a
+property by identity, so `replaceContactItems()` in `profile/documents.ts` is
+the one path a save, a change, a deletion and a sort take: the section that
+changed gets a new object with a new items array, the others keep theirs, and
+`repeat()` keyed by uid moves no node it does not have to. The same holds for
+`pending` — Vue re-rendered on the write, and every place that sets it now says
+when the editor is rendered.
+
 ## The element that owns a rich text field
 
 `<academic-persons-edit-rich-text>`
@@ -235,7 +278,12 @@ neither. So `Templates/Profile/Index.html` renders one
 `<template data-pe-icon="…">` per icon a browser rendered editor draws, and the
 element clones what it needs from there — the same idiom
 `Partials/Profile/ButtonTemplates.html` already uses for its two button
-templates. The list grows with the editors that move.
+templates. The list grows with the editors that move; it is `help` for the
+document editor and `add`, `view`, `edit`, `delete`, `move-up` and `move-down`
+for the contact list. `editingIcon()`
+([`profile/elements/icons.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/icons.ts))
+is the one lookup, wrapped in `guard()` by both callers so that a re-render does
+not replace an icon that has not changed.
 
 ## The transition the editors open and close with
 

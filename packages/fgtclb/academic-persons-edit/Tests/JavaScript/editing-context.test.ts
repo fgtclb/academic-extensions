@@ -109,6 +109,8 @@ describe("the profile editing contract", () => {
           documentEmpty: messages.empty,
           documentSave: labels.save,
           documentView: labels.view,
+          sortDown: labels.sortDown,
+          sortUp: labels.sortUp,
         },
       );
     });
@@ -174,7 +176,7 @@ describe("the profile editing contract", () => {
       );
       assert.deepEqual(
         Object.values({ ...context.labels }),
-        new Array(7).fill(undefined),
+        new Array(9).fill(undefined),
       );
     });
 

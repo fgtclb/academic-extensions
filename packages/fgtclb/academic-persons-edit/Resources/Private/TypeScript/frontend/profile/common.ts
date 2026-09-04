@@ -29,6 +29,10 @@ export type ProfileEditingHooks = {
   peCharacterLimit?: string;
   peCheckedLabel?: string;
   peCloseAllLabel?: string;
+  peContractContactField?: string;
+  peContractContactItem?: string;
+  peContractContactSection?: string;
+  peContractContactSort?: string;
   peDisplayFieldIds?: string;
   peDisplayMode?: string;
   peDocumentSort?: string;

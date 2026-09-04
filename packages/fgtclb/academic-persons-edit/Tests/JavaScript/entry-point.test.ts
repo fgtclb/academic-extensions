@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import "@fgtclb/academic-persons-edit/frontend/profile.js";
 import {
+  profileContractContactsElementName,
   profileDocumentEditorElementName,
   profileEditingElementName,
   profileImageEditorElementName,
@@ -25,5 +26,6 @@ describe("the profile editing entry point", () => {
     assert.notEqual(customElements.get(profileImageEditorElementName), undefined);
     assert.notEqual(customElements.get(profileDocumentEditorElementName), undefined);
     assert.notEqual(customElements.get(profileRichTextElementName), undefined);
+    assert.notEqual(customElements.get(profileContractContactsElementName), undefined);
   });
 });

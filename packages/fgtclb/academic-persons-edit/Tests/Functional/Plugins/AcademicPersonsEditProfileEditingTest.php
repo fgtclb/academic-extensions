@@ -185,6 +185,27 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
     }
 
     /**
+     * The contacts of a contract are rendered by
+     * "<academic-persons-edit-contract-contacts>" from the "contactSections" of
+     * the "documentForm" response, so the two partials that used to render them
+     * have nothing left to carry and are gone. A file that is not there is what
+     * a test can assert about a removed override point.
+     */
+    #[Test]
+    public function contractContactPartialsAreRemoved(): void
+    {
+        foreach (['ContractContacts', 'ContractContactEditor'] as $partial) {
+            $this->assertFileDoesNotExist(
+                __DIR__ . '/../../../Resources/Private/Partials/Profile/Documents/' . $partial . '.html',
+            );
+        }
+        $this->assertStringNotContainsString(
+            'Profile/Documents/ContractContact',
+            $this->getProfileEditingFluidSources(),
+        );
+    }
+
+    /**
      * The buttons of the list are handled by the delegated click listener of
      * "profile/documents.ts" and no longer by a "v-on:click.stop" that stopped
      * that very listener from ever seeing them.
@@ -1590,9 +1611,16 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertStringContainsString('data-pe-document-add-collapse-target', $content);
         $this->assertStringContainsString('data-pe-document-item-collapse-target', $content);
         $this->assertStringNotContainsString('data-pe-document-view-container', $content);
-        // The icons that editor draws travel as templates, because the icon
-        // registry is only reachable from the server.
-        $this->assertStringContainsString('data-pe-icon="help"', $content);
+        // The icons the browser rendered editors draw travel as templates,
+        // because the icon registry is only reachable from the server.
+        foreach (['help', 'add', 'view', 'edit', 'delete', 'move-up', 'move-down'] as $icon) {
+            $this->assertStringContainsString('data-pe-icon="' . $icon . '"', $content);
+        }
+        // The two labels the contact list needs and the document list resolves
+        // in Fluid. They are on the root because the list that draws them is
+        // TypeScript now.
+        $this->assertStringContainsString('data-label-sort-up="', $content);
+        $this->assertStringContainsString('data-label-sort-down="', $content);
         $this->assertStringContainsString('Save', $content);
         $this->assertStringNotContainsString('data-add-label', $content);
         $this->assertStringNotContainsString('data-replace-label', $content);

@@ -69,6 +69,8 @@ type ProfileEditingContract = {
   labelDocumentEmpty?: string;
   labelDocumentSave?: string;
   labelDocumentView?: string;
+  labelSortDown?: string;
+  labelSortUp?: string;
   messageContractContactDeleteConfirm?: string;
   messageContractContactEmpty?: string;
   messageDocumentDeleteConfirm?: string;
@@ -162,13 +164,12 @@ export interface EditingMessages {
 }
 
 /**
- * The action labels of a document editor.
+ * The action labels of the editors that are rendered in the browser.
  *
- * `documentSave`, `documentClose` and `documentEmpty` are carried by the root
- * today and read by nothing: the Fluid partials that need them resolve their
- * own `f:translate`. They are named here because they are part of the contract
- * the template emits, and because the templates that resolve them are the ones
- * the Lit port turns into TypeScript.
+ * `sortUp` and `sortDown` are the only two the root did not carry before: the
+ * document list resolves its own `actions.sortUp` and `actions.sortDown` in
+ * Fluid, and the contact list that used to do the same is TypeScript now. Every
+ * other label was already here.
  */
 export interface EditingLabels {
   readonly documentAdd: string | undefined;
@@ -178,6 +179,8 @@ export interface EditingLabels {
   readonly documentEmpty: string | undefined;
   readonly documentSave: string | undefined;
   readonly documentView: string | undefined;
+  readonly sortDown: string | undefined;
+  readonly sortUp: string | undefined;
 }
 
 /**
@@ -242,6 +245,8 @@ export const readEditingContext = (root: HTMLElement): EditingContext => {
       documentEmpty: contract.labelDocumentEmpty,
       documentSave: contract.labelDocumentSave,
       documentView: contract.labelDocumentView,
+      sortDown: contract.labelSortDown,
+      sortUp: contract.labelSortUp,
     }),
     messages: Object.freeze({
       contractContactDeleteConfirm: contract.messageContractContactDeleteConfirm,

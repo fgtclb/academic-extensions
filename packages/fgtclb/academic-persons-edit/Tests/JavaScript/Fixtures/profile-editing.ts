@@ -92,6 +92,8 @@ export const labels = {
   delete: "Delete",
   save: "Save",
   close: "Cancel",
+  sortUp: "Move up",
+  sortDown: "Move down",
 } as const;
 
 export interface RootOptions {
@@ -168,7 +170,9 @@ export const profileEditingRoot = ({
   data-label-document-delete="${labels.delete}"
   data-label-document-save="${labels.save}"
   data-label-document-close="${labels.close}"
-  data-label-document-empty="${messages.empty}">
+  data-label-document-empty="${messages.empty}"
+  data-label-sort-up="${labels.sortUp}"
+  data-label-sort-down="${labels.sortDown}">
   <div id="profile-editing-${profileUid}-image-editor-target" data-pe-image-editor-target>${target}</div>
   ${content}
   ${iconTemplates()}
@@ -199,7 +203,9 @@ export const profileEditingElement = (options: RootOptions = {}): string => `
  * clones it - and a clone of a marker proves the cloning as well as a clone of
  * an SVG would.
  */
-export const iconTemplates = (names: string[] = ["help"]): string =>
+export const iconTemplates = (
+  names: string[] = ["help", "add", "view", "edit", "delete", "move-up", "move-down"],
+): string =>
   names
     .map(
       (name): string =>
@@ -666,38 +672,6 @@ export const documentEditorView = ({
   </form>
 </section>`;
 };
-
-/**
- * `Partials/Profile/Documents/ContractContacts.html:6-100` in the state Vue
- * renders it in while one contact editor is open: the section, its add button
- * and the editor the controller queries for the control to focus.
- */
-export const contractContactsView = ({
-  section = "addresses",
-  fields = [{ name: "city" }],
-}: {
-  section?: string;
-  fields?: { name: string; disabled?: boolean }[];
-} = {}): string => `
-<section class="pt-4 mt-4" data-pe-contract-contact-section="${section}">
-  <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
-    <h3 class="h4 mb-0">${section}</h3>
-    <button type="button" class="btn rounded-0 btn-sm btn-link p-2"
-      aria-controls="profile-editing-contract-contact-editor-${section}" aria-expanded="false"
-      data-pe-contract-contact-add></button>
-  </div>
-  <section id="profile-editing-contract-contact-editor-${section}" class="border bg-body-tertiary p-3 mb-3"
-    data-pe-contract-contact-editor data-pe-contract-contact-form>
-    <h4 tabindex="-1" data-pe-contract-contact-heading></h4>
-    ${fields
-      .map(
-        (field): string =>
-          `<input class="form-control" type="text" name="${field.name}"
-      id="profile-editing-contract-contact-field-${field.name}"${field.disabled === true ? " disabled" : ""} />`,
-      )
-      .join("\n    ")}
-  </section>
-</section>`;
 
 /**
  * `Partials/Profile/Image/Card.html:15-102` - the preview the upload and the

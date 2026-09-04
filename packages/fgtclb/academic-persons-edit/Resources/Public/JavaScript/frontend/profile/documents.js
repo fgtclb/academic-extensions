@@ -2,6 +2,7 @@
 import {
   hooks,
   initializePopover,
+  isEditableField,
   requestJson,
   showStatus
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
@@ -15,6 +16,7 @@ import {
   documentEditorSubmitEvent,
   registerProfileDocumentEditorElement
 } from "@fgtclb/academic-persons-edit/frontend/profile/elements/document-editor.js";
+import { registerProfileContractContactsElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/contract-contacts.js";
 import { profileDocumentEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
 import { registerProfileRichTextElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/rich-text.js";
 import {
@@ -107,6 +109,9 @@ const getResponseContactSections = (value) => Array.isArray(value) ? value.flatM
     singularLabel: String(section.singularLabel ?? section.label ?? identifier)
   }];
 }) : [];
+const replaceContactItems = (sections, identifier, items) => sections.map(
+  (section) => section.identifier === identifier ? { ...section, items: items(section.items) } : section
+);
 const getSectionHeading = (section) => {
   var _a, _b;
   return ((_b = (_a = section.querySelector("h2")) == null ? void 0 : _a.textContent) == null ? void 0 : _b.trim()) ?? "";
@@ -478,6 +483,7 @@ const createDocumentEditing = (editingTarget) => {
     if (element === null) {
       return;
     }
+    element.contactEditor = { ...contractContactState };
     element.contactEmptyMessage = documentState.contactEmptyMessage;
     element.contactSections = documentState.contactSections;
     element.deleteConfirmation = documentState.deleteConfirmation;
@@ -495,6 +501,7 @@ const createDocumentEditing = (editingTarget) => {
   const createDocumentEditor = (target) => {
     registerProfileDocumentEditorElement();
     registerProfileRichTextElement();
+    registerProfileContractContactsElement();
     const element = document.createElement(
       profileDocumentEditorElementName
     );
@@ -749,7 +756,7 @@ const createDocumentEditing = (editingTarget) => {
     if (modeValue !== "add" && (!Number.isInteger(record) || record <= 0)) {
       return;
     }
-    const button = event.currentTarget instanceof HTMLElement ? event.currentTarget : event.target instanceof Element ? event.target.closest("button") : null;
+    const button = event.currentTarget instanceof HTMLButtonElement ? event.currentTarget : event.target instanceof Element ? event.target.closest("button") : null;
     if (contractContactState.open && contractContactState.mode === modeValue && contractContactState.section === section && contractContactState.record === normalizedRecord) {
       closeContractContact();
       return;
@@ -782,6 +789,7 @@ const createDocumentEditing = (editingTarget) => {
       );
       contractContactTrigger = button;
       contractContactState.open = true;
+      contractContactState.pending = false;
       renderDocumentEditor();
       await (editorElement == null ? void 0 : editorElement.updateComplete);
       const editor = root.querySelector(
@@ -799,6 +807,7 @@ const createDocumentEditing = (editingTarget) => {
       showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
     } finally {
       contractContactState.pending = false;
+      renderDocumentEditor();
     }
   };
   const closeContractContact = () => {
@@ -836,32 +845,33 @@ const createDocumentEditing = (editingTarget) => {
     contractContactState.pending = true;
     contractContactState.error = "";
     contractContactState.errors = {};
+    renderDocumentEditor();
     showStatus(context, "info", context.messages.saving ?? null);
     try {
       const response = await requestDocument(context, endpoint, data);
-      const section = documentState.contactSections.find(
-        (candidate) => candidate.identifier === contractContactState.section
-      );
       const item = asContractContactItem(response.item);
-      if (section !== void 0) {
-        if (contractContactState.mode === "add" && item !== null) {
-          section.items.push(item);
-        } else if (contractContactState.mode === "edit" && item !== null) {
-          const index = section.items.findIndex(
-            (candidate) => candidate.uid === contractContactState.record
-          );
-          if (index >= 0) {
-            section.items.splice(index, 1, item);
+      const record = contractContactState.record;
+      const mode = contractContactState.mode;
+      documentState.contactSections = replaceContactItems(
+        documentState.contactSections,
+        contractContactState.section,
+        (items) => {
+          if (mode === "add" && item !== null) {
+            return [...items, item];
           }
-        } else if (contractContactState.mode === "delete") {
-          const index = section.items.findIndex(
-            (candidate) => candidate.uid === contractContactState.record
-          );
-          if (index >= 0) {
-            section.items.splice(index, 1);
+          if (mode === "edit" && item !== null) {
+            return items.map(
+              (candidate) => candidate.uid === record ? item : candidate
+            );
           }
+          if (mode === "delete") {
+            return items.filter(
+              (candidate) => candidate.uid !== record
+            );
+          }
+          return items;
         }
-      }
+      );
       contractContactState.pending = false;
       contractContactState.open = false;
       renderDocumentEditor();
@@ -883,6 +893,7 @@ const createDocumentEditing = (editingTarget) => {
       );
     } finally {
       contractContactState.pending = false;
+      renderDocumentEditor();
     }
   };
   const sortContractContact = async (direction, sectionIdentifier, record) => {
@@ -897,6 +908,7 @@ const createDocumentEditing = (editingTarget) => {
       return;
     }
     contractContactState.pending = true;
+    renderDocumentEditor();
     try {
       const response = await requestDocument(
         context,
@@ -917,10 +929,14 @@ const createDocumentEditing = (editingTarget) => {
         return item === void 0 ? [] : [item];
       });
       if (sortedItems.length === section.items.length) {
-        sortedItems.forEach((item, index) => {
-          item.sorting = (index + 1) * 10;
-        });
-        section.items.splice(0, section.items.length, ...sortedItems);
+        documentState.contactSections = replaceContactItems(
+          documentState.contactSections,
+          sectionIdentifier,
+          () => sortedItems.map((item, index) => ({
+            ...item,
+            sorting: (index + 1) * 10
+          }))
+        );
       }
       renderDocumentEditor();
       showStatus(context, "success", context.messages.documentSorted ?? null);
@@ -928,9 +944,57 @@ const createDocumentEditing = (editingTarget) => {
       showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
     } finally {
       contractContactState.pending = false;
+      renderDocumentEditor();
     }
   };
+  const onContractContactClick = (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target == null ? void 0 : target.closest(
+      "[data-pe-contract-contact-add], [data-pe-contract-contact-view], [data-pe-contract-contact-edit], [data-pe-contract-contact-delete], [data-pe-contract-contact-sort], [data-pe-contract-contact-cancel], [data-pe-contract-contact-save]"
+    );
+    if (button === null || button === void 0 || button.disabled) {
+      return;
+    }
+    if (button.matches("[data-pe-contract-contact-cancel]")) {
+      closeContractContact();
+      return;
+    }
+    if (button.matches("[data-pe-contract-contact-save]")) {
+      void submitContractContact();
+      return;
+    }
+    const sectionElement = button.closest(
+      "[data-pe-contract-contact-section]"
+    );
+    const itemElement = button.closest("[data-pe-contract-contact-item]");
+    const section = sectionElement === null ? "" : hooks(sectionElement).peContractContactSection ?? "";
+    const record = Number(
+      itemElement === null ? 0 : hooks(itemElement).peContractContactItem ?? 0
+    );
+    const direction = hooks(button).peContractContactSort;
+    if (direction !== void 0) {
+      void sortContractContact(direction, section, record);
+      return;
+    }
+    const mode = button.matches("[data-pe-contract-contact-add]") ? "add" : button.matches("[data-pe-contract-contact-view]") ? "view" : button.matches("[data-pe-contract-contact-edit]") ? "edit" : "delete";
+    void openContractContact(mode, section, event, record);
+  };
+  const onContractContactInput = (event) => {
+    const control = event.target;
+    if (!isEditableField(control)) {
+      return;
+    }
+    const name = hooks(control).peContractContactField;
+    if (name === void 0) {
+      return;
+    }
+    const value = control instanceof HTMLInputElement && control.type === "checkbox" ? control.checked : control.value;
+    contractContactState.values = { ...contractContactState.values, [name]: value };
+  };
   initializeDocumentDragAndDrop(context);
+  root.addEventListener("click", onContractContactClick);
+  root.addEventListener("input", onContractContactInput);
+  root.addEventListener("change", onContractContactInput);
   root.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target : null;
     const button = target == null ? void 0 : target.closest(

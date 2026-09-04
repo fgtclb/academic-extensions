@@ -35,3 +35,6 @@ export const profileDocumentEditorElementName = `${profileEditingElementPrefix}d
 
 /** One rich text field and the CKEditor on it: `elements/rich-text.ts`. */
 export const profileRichTextElementName = `${profileEditingElementPrefix}rich-text`;
+
+/** The contacts of one contract: `elements/contract-contacts.ts`. */
+export const profileContractContactsElementName = `${profileEditingElementPrefix}contract-contacts`;
