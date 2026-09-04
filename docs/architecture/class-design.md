@@ -180,10 +180,13 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Three sites:
-  `academic-base/Classes/Settings/Validation.php:17`,
-  `academic-base/Classes/Settings/ValidationSet.php:15` and
-  `academic-persons/Classes/Settings/ProfileInformationType.php:12`.
+  sit under an excluded path. Ten sites, all settings value objects:
+  `academic-base/Classes/Settings/Validation.php:23`,
+  `academic-base/Classes/Settings/ValidationSet.php:15` and the eight classes
+  of the persons settings graph under `academic-persons/Classes/Settings/`
+  (`ProfileSection`, `ProfileField`, `SpecialField`, `ContractField`,
+  `ContractContactSection`, `ContractContactField`, `DocumentSection`,
+  `PublicProfileSettings`).
 
 The `Settings/` classes show why the attribute is needed: they are immutable
 data objects that happen to live outside `Domain/Model/`, so the package's

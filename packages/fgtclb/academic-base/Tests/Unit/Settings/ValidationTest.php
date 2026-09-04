@@ -31,6 +31,8 @@ final class ValidationTest extends UnitTestCase
             validatorClassNames: [NotEmptyValidator::class, StringLengthValidator::class],
             tcaConfig: ['type' => 'input', 'max' => 60, 'eval' => 'trim'],
             inputType: 'text',
+            flags: ['required', 'readonly', 'html'],
+            characterLimit: 100,
         );
 
         $restored = eval('return ' . var_export($subject, true) . ';');
@@ -48,13 +50,18 @@ final class ValidationTest extends UnitTestCase
         );
         $this->assertSame(['type' => 'input', 'max' => 60, 'eval' => 'trim'], $restored->tcaConfig);
         $this->assertSame('text', $restored->inputType);
+        $this->assertSame(['required', 'readonly', 'html'], $restored->flags);
+        $this->assertSame(100, $restored->characterLimit);
+        $this->assertTrue($restored->isRichText());
     }
 
     /**
-     * `inputType` is the only constructor argument with a default, and `__set_state()`
-     * reads it as a required array key. That holds as long as the array comes from
-     * `var_export()` of a real instance - this pins that it does, because a validation
-     * built without an `inputType` is the common case.
+     * `inputType`, `flags` and `characterLimit` are the constructor arguments with a
+     * default. `__set_state()` reads the first as a required array key and the other
+     * two with a fallback, so an entry cached before they existed still restores.
+     * That holds as long as the array comes from `var_export()` of a real instance -
+     * this pins that it does, because a validation built without them is the common
+     * case.
      */
     #[Test]
     public function aDefaultedInputTypeIsStillExportedAndRestored(): void
@@ -73,5 +80,31 @@ final class ValidationTest extends UnitTestCase
 
         $this->assertInstanceOf(Validation::class, $restored);
         $this->assertSame('', $restored->inputType);
+        $this->assertSame([], $restored->flags);
+        $this->assertSame(0, $restored->characterLimit);
+        $this->assertFalse($restored->isRichText());
+    }
+
+    /**
+     * The rich text question is answered from the flag list and from nothing else -
+     * not from the input type, which a `textarea` flag sets to the same value.
+     */
+    #[Test]
+    public function onlyTheHtmlFlagMakesAValidationRichText(): void
+    {
+        $arguments = [
+            'identifier' => 'miscellaneous',
+            'fieldName' => 'miscellaneous',
+            'required' => false,
+            'disabled' => false,
+            'readOnly' => false,
+            'validatorClassNames' => [],
+            'tcaConfig' => [],
+            'inputType' => 'textarea',
+        ];
+
+        $this->assertTrue((new Validation(...[...$arguments, 'flags' => ['html']]))->isRichText());
+        $this->assertFalse((new Validation(...[...$arguments, 'flags' => ['textarea']]))->isRichText());
+        $this->assertFalse((new Validation(...$arguments))->isRichText());
     }
 }
