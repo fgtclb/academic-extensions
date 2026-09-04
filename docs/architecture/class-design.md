@@ -44,12 +44,21 @@ this and is the pattern to copy:
 * @final not marked as final for functional testing reasons (for now). Class should not be extended otherwise.
 ```
 
-## `readonly` on properties, not on classes
+## `readonly` on properties, and on stateless service classes
 
-**There is not a single `readonly class` declaration in this repository.**
-`readonly` is used heavily, but always on individual properties: 161 modifiers,
+`readonly` is used heavily, mostly on individual properties: 161 modifiers,
 of which 160 are constructor-promoted. The one non-promoted declaration is
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
+
+`final readonly class` is the shape of a **stateless service that extends
+nothing** — seven so far: the three `RegisterAcademicPageDoktype` listeners
+(partners, programs, projects), and in `academic-persons`
+`ProfileImageRelationWriter`, `ProfileImageMetadataService` and the
+`UpdateProfileImageMetadata` listener, plus the
+`RepairLocalizedProfileImagesUpgradeWizard` of `academic-persons-edit`
+(ACE-506). The class-level modifier says the same thing as `private readonly`
+on every property, once, and the compiler enforces it for properties added
+later.
 
 The split by visibility says what each is for:
 
@@ -63,12 +72,12 @@ Use `private readonly` for every constructor-injected dependency. It states that
 the service does not rebind it, which is the property half of the stateless rule
 in [Dependency injection](dependency-injection.md#services-are-stateless).
 
-`readonly class` is not used, and adopting it is not a small change: a
-`readonly` class cannot extend a non-`readonly` one and vice versa, so the whole
-hierarchy has to agree. With Extbase base classes in the picture that decision
-is not available for models, repositories, controllers or validators. Property
-level `readonly` gives the same guarantee where it matters without that
-constraint.
+`readonly class` is not a general rule, because adopting it is not a small
+change where a hierarchy exists: a `readonly` class cannot extend a
+non-`readonly` one and vice versa, so the whole hierarchy has to agree. With
+Extbase base classes in the picture that decision is not available for models,
+repositories, controllers or validators, and property level `readonly` gives
+the same guarantee there without that constraint.
 
 Extbase domain models use mutable `protected` properties with getters and
 setters throughout, because the data mapper assigns by reflection. That is
