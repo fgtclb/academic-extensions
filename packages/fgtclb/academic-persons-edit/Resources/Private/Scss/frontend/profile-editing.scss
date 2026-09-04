@@ -9,8 +9,8 @@
 // The rules are deliberately Bootstrap flavoured: the plugin renders Bootstrap
 // utility classes and the site brings Bootstrap along. Everything here either
 // styles a state the JavaScript toggles (`is-dragging`, `is-drop-before`, the
-// Vue transition classes) or corrects a theme rule that the editor's sticky and
-// overflowing layout collides with.
+// enter and leave classes of the two editors) or corrects a theme rule that the
+// editor's sticky and overflowing layout collides with.
 
 // The custom element that owns the editor (`<academic-persons-edit-profile-editing>`,
 // `TypeScript/frontend/profile/elements/root.ts`). An unknown element is
@@ -20,6 +20,19 @@
 // instead of the container it wraps.
 academic-persons-edit-profile-editing {
     display: block;
+}
+
+// "hidden" has to actually hide.
+//
+// The editor's elements toggle the `hidden` attribute on what the Vue
+// directives used to add to and remove from the document, and Bootstrap's own
+// `[hidden] { display: none !important }` is not enough for that: its display
+// utilities carry the same specificity, are `!important` as well and stand
+// later in the file, so a `hidden` `.d-flex` - which is what the image editor's
+// delete actions are - stays visible. The ancestor puts this above both of
+// them, and above the `display: grid` of the editor further down.
+.academic-persons-profile-editing [hidden] {
+    display: none !important;
 }
 
 body:has(.academic-persons-profile-editing) .section {

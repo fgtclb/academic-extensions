@@ -37,10 +37,11 @@
  *
  * ## What Vue still does here
  *
- * Both editors - the image editor and the document editor - are still rendered
- * by Vue while ACE-509 replaces them one at a time, so this element still
- * creates the application and mounts it on the root. That is also why the four
- * initialisers below run from `onMounted()` and not from `connectedCallback()`:
+ * The document editor is still rendered by Vue while ACE-509 replaces the
+ * editors one at a time, so this element still creates the application and
+ * mounts it on the root. The image editor has left it and owns itself, in
+ * `elements/image-editor.ts`. The mount is also why the four initialisers
+ * below run from `onMounted()` and not from `connectedCallback()`:
  * `mount()` assigns the container's `innerHTML` as the template and then clears
  * the container (`vue.esm-browser.prod.js`: `i.template=r.innerHTML` followed by
  * `r.textContent=""`), so every element reference taken before the mount is
@@ -67,7 +68,6 @@ import {
   initializeDocumentSections,
 } from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
 import { initializeFieldEditing } from "@fgtclb/academic-persons-edit/frontend/profile/fields.js";
-import { createImageEditing } from "@fgtclb/academic-persons-edit/frontend/profile/image.js";
 import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
 import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
 
@@ -119,7 +119,6 @@ const createProfileEditingApp = (context: EditingContext): App => {
   const application = createApp({
     setup(): Record<string, unknown> {
       const documentController = createDocumentEditing(context);
-      const imageController = createImageEditing(context);
       const syncController = createSkipSync(context);
 
       onMounted((): void => {
@@ -131,7 +130,6 @@ const createProfileEditingApp = (context: EditingContext): App => {
 
       return {
         ...documentController,
-        ...imageController,
         ...syncController,
       };
     },

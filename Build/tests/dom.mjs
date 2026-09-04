@@ -35,6 +35,7 @@ const browserGlobals = [
     'FormData',
     'HTMLButtonElement',
     'HTMLElement',
+    'HTMLFieldSetElement',
     'HTMLFormElement',
     'HTMLImageElement',
     'HTMLInputElement',
@@ -287,6 +288,19 @@ export const createDragEvent = (type, { clientX = 0, clientY = 0 } = {}) => {
     });
 
     return event;
+};
+
+/**
+ * Gives an element a client size, for the same reason as "setBoundingRect()"
+ * and with a different mechanism: "clientWidth" and "clientHeight" are getters
+ * on the prototype rather than a method, so they are shadowed on the instance.
+ *
+ * The cropper measures the canvas it sits in through them and refuses to place
+ * a selection in a box of zero, which is what jsdom reports for everything.
+ */
+export const setClientSize = (element, { width = 0, height = 0 }) => {
+    Object.defineProperty(element, 'clientWidth', { value: width, configurable: true });
+    Object.defineProperty(element, 'clientHeight', { value: height, configurable: true });
 };
 
 /**

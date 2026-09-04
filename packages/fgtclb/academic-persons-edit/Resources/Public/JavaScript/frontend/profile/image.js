@@ -2,11 +2,6 @@
 import Cropper, {
 } from "@fgtclb/academic-persons-edit/cropper";
 import {
-  nextTick,
-  reactive,
-  ref
-} from "@fgtclb/academic-persons-edit/frontend/vue.js";
-import {
   requestJson,
   showStatus
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
@@ -16,6 +11,8 @@ import {
 const maximumCroppedImageWidth = 2400;
 const imageClosingClass = "is-image-closing";
 const imageEditorTargetSelector = "[data-pe-image-editor-target]";
+const cropperStageSelector = "[data-pe-image-cropper-stage]";
+const cropperSourceSelector = "[data-pe-image-cropper-source]";
 const imagePreviewColumnSelector = "[data-pe-image-preview-column]";
 const profileFieldsColumnSelector = ".academic-persons-profile-editing__profile-fields-column";
 const supportedOutputMimeTypes = /* @__PURE__ */ new Set([
@@ -23,6 +20,16 @@ const supportedOutputMimeTypes = /* @__PURE__ */ new Set([
   "image/png",
   "image/webp"
 ]);
+const observeState = (state, onChange) => new Proxy(state, {
+  set(target, property, value) {
+    const previous = Reflect.get(target, property);
+    const written = Reflect.set(target, property, value);
+    if (written && !Object.is(previous, value)) {
+      onChange();
+    }
+    return written;
+  }
+});
 const parseImageRatio = (value) => {
   const normalized = String(value ?? "").trim();
   const ratioMatch = /^(\d+(?:\.\d+)?)\s*(?:x|:|\/)\s*(\d+(?:\.\d+)?)$/i.exec(
@@ -141,15 +148,12 @@ const createCroppedImageFile = async (cropper, file) => {
     }
   );
 };
-const createImageEditing = (editingTarget) => {
+const createImageEditing = (editingTarget, onChange = () => void 0) => {
   const context = toEditingContext(editingTarget);
   const root = context.root;
-  const cropperSource = ref(null);
-  const cropperStage = ref(null);
-  const fileInput = ref(null);
   const cropperRequested = context.image.renderType === "cropper";
   const cropperRatio = parseImageRatio(context.image.cropperRatio);
-  const image = reactive({
+  const image = observeState({
     closing: false,
     confirmingDelete: false,
     cropperEnabled: cropperRequested && cropperRatio !== null,
@@ -162,16 +166,18 @@ const createImageEditing = (editingTarget) => {
     pending: false,
     previewUrl: "",
     selectedName: ""
-  });
+  }, () => onChange());
   let cropper = null;
   let selectedFile = null;
   let selectedPreviewUrl = null;
   let persistedPreviewUrl = null;
   let persistedAlternative = "";
   let persistedTitle = "";
-  const getFileInput = () => fileInput.value ?? root.querySelector(
+  const getFileInput = () => root.querySelector(
     '[data-pe-image-view-container] input[type="file"]'
   );
+  const getCropperStage = () => root.querySelector(cropperStageSelector);
+  const getCropperSource = () => root.querySelector(cropperSourceSelector);
   const releaseUrl = (url) => {
     if (url !== null && url.startsWith("blob:")) {
       URL.revokeObjectURL(url);
@@ -187,13 +193,15 @@ const createImageEditing = (editingTarget) => {
     if (!image.cropperRequested || !image.hasSelection || image.previewUrl === "") {
       return;
     }
-    if (!image.cropperEnabled || cropperRatio === null || cropperSource.value === null || cropperStage.value === null) {
+    const cropperSource = getCropperSource();
+    const cropperStage = getCropperStage();
+    if (!image.cropperEnabled || cropperRatio === null || cropperSource === null || cropperStage === null) {
       image.error = context.messages.errorMessage ?? "";
       return;
     }
     try {
-      cropper = new Cropper(cropperSource.value, {
-        container: cropperStage.value
+      cropper = new Cropper(cropperSource, {
+        container: cropperStage
       });
       const selection = cropper.getCropperSelection();
       const cropperImage = cropper.getCropperImage();
@@ -257,7 +265,6 @@ const createImageEditing = (editingTarget) => {
     root.classList.remove(imageClosingClass);
     image.closing = false;
     image.editing = true;
-    await nextTick();
     (_a = root.querySelector(imageEditorTargetSelector)) == null ? void 0 : _a.scrollIntoView({
       behavior: globalThis.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
       block: "start"
@@ -292,16 +299,14 @@ const createImageEditing = (editingTarget) => {
       return;
     }
     image.closing = false;
-    void nextTick().then(() => {
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          var _a;
-          root.classList.remove(imageClosingClass);
-          if (image.editing) {
-            return;
-          }
-          (_a = root.querySelector("[data-pe-open-image-view]")) == null ? void 0 : _a.focus({ preventScroll: true });
-        });
+        var _a;
+        root.classList.remove(imageClosingClass);
+        if (image.editing) {
+          return;
+        }
+        (_a = root.querySelector("[data-pe-open-image-view]")) == null ? void 0 : _a.focus({ preventScroll: true });
       });
     });
   };
@@ -324,7 +329,6 @@ const createImageEditing = (editingTarget) => {
       selectedPreviewUrl = URL.createObjectURL(selectedFile);
       image.previewUrl = selectedPreviewUrl;
     }
-    await nextTick();
     await initializeCropper();
   };
   const commitUploadedPreview = (file, previewUrl, alternative, title) => {
@@ -473,9 +477,6 @@ const createImageEditing = (editingTarget) => {
     { once: true }
   );
   return {
-    cropperSource,
-    cropperStage,
-    fileInput,
     image,
     openImage,
     closeImage,

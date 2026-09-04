@@ -16,7 +16,6 @@ import {
   initializeDocumentSections
 } from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
 import { initializeFieldEditing } from "@fgtclb/academic-persons-edit/frontend/profile/fields.js";
-import { createImageEditing } from "@fgtclb/academic-persons-edit/frontend/profile/image.js";
 import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
 import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
 const profileEditingElementPrefix = "academic-persons-edit-";
@@ -29,7 +28,6 @@ const createProfileEditingApp = (context) => {
   const application = createApp({
     setup() {
       const documentController = createDocumentEditing(context);
-      const imageController = createImageEditing(context);
       const syncController = createSkipSync(context);
       onMounted(() => {
         initializeStickyImageOffset(context.root);
@@ -39,7 +37,6 @@ const createProfileEditingApp = (context) => {
       });
       return {
         ...documentController,
-        ...imageController,
         ...syncController
       };
     }

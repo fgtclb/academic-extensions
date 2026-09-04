@@ -49,6 +49,16 @@ export declare const createDragEvent: (
 };
 
 /**
+ * Gives an element a client size. "clientWidth" and "clientHeight" are getters
+ * on the prototype, so they are shadowed on the instance rather than assigned -
+ * and the cropper refuses to place a selection in a box of zero.
+ */
+export declare const setClientSize: (
+  element: Element,
+  size: { width?: number; height?: number },
+) => void;
+
+/**
  * Places a rectangle on an element. jsdom lays nothing out and reports zero for
  * every "getBoundingClientRect()", so the geometry a test is about is injected.
  */

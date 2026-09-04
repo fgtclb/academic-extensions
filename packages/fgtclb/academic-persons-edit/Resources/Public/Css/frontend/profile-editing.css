@@ -3,6 +3,9 @@
 academic-persons-edit-profile-editing {
   display: block;
 }
+.academic-persons-profile-editing [hidden] {
+  display: none !important;
+}
 body:has(.academic-persons-profile-editing) .section {
   overflow: unset !important;
 }

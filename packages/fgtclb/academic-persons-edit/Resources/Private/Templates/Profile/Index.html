@@ -121,9 +121,23 @@
             data-label-document-save="{f:translate(key: 'actions.save', extensionName: 'academic_persons_edit')}"
             data-label-document-close="{f:translate(key: 'actions.cancel', extensionName: 'academic_persons_edit')}"
             data-label-document-empty="{f:translate(key: 'profileEditing.field.empty', extensionName: 'academic_persons_edit')}">
+            <!--
+                The image editor is rendered here, where it is shown. Vue moved
+                it into this container with a "Teleport"; Fluid renders it in
+                the container, which is the same position with nothing to move -
+                and keeps the height the container contributes correct from the
+                first paint. The close path measures exactly that height to
+                restore the scroll position.
+            -->
             <div
                 id="profile-editing-{profile.uid}-image-editor-target"
-                data-pe-image-editor-target></div>
+                data-pe-image-editor-target>
+                <f:if condition="{specialFields.image.writable}">
+                    <f:render
+                        partial="Profile/Image/Editor"
+                        arguments="{profile: profile, image: specialFields.image, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
+                </f:if>
+            </div>
             <div data-pe-profile-view>
                 <f:render
                     partial="Profile/Header"
@@ -131,9 +145,7 @@
                 <div class="container-fluid px-0">
                     <div class="row gx-lg-5 gy-5 align-items-stretch">
                         <div
-                            class="col-12 academic-persons-profile-editing__image-preview-column"
-                            v-bind:class="{ 'col-lg-4': !image.editing && !image.closing }"
-                            v-show="!image.editing && !image.closing"
+                            class="col-12 col-lg-4 academic-persons-profile-editing__image-preview-column"
                             data-pe-image-preview-column>
                             <div class="sticky-top" data-pe-sticky-image>
                                 <f:if condition="{specialFields.image}">
@@ -144,8 +156,7 @@
                             </div>
                         </div>
                         <div
-                            class="col-12 academic-persons-profile-editing__profile-fields-column"
-                            v-bind:class="(image.editing || image.closing) ? 'col-lg-12' : 'col-lg-8'">
+                            class="col-12 col-lg-8 academic-persons-profile-editing__profile-fields-column">
                             <f:if condition="{profileSections.information}">
                                 <f:render
                                     partial="Profile/Profile/Personal"
@@ -170,11 +181,6 @@
                 </div>
             </div>
 
-            <f:if condition="{specialFields.image.writable}">
-                <f:render
-                    partial="Profile/Image/Editor"
-                    arguments="{profile: profile, image: specialFields.image, imageAllowedMimeTypes: imageAllowedMimeTypes}" />
-            </f:if>
             <f:render partial="Profile/Documents/Editor" />
             <f:render partial="Profile/StatusToast" />
             <f:render partial="Profile/ButtonTemplates" />

@@ -2,12 +2,6 @@ import Cropper, {
   type CropperSelectionElement,
 } from "@fgtclb/academic-persons-edit/cropper";
 import {
-  nextTick,
-  reactive,
-  ref,
-  type Ref,
-} from "@fgtclb/academic-persons-edit/frontend/vue.js";
-import {
   requestJson,
   showStatus,
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
@@ -15,7 +9,14 @@ import {
   toEditingContext,
   type EditingTarget,
 } from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
-interface ImageState {
+/**
+ * Everything the editor's markup is derived from.
+ *
+ * It was a Vue `reactive()` object and is a plain one now, wrapped in the proxy
+ * of `observeState()` so that the element is told when one of the fields the
+ * template used to bind to has changed.
+ */
+export interface ImageState {
   closing: boolean;
   confirmingDelete: boolean;
   cropperEnabled: boolean;
@@ -37,11 +38,17 @@ interface RequestError extends Error {
   };
 }
 
+/**
+ * What `<academic-persons-edit-image-editor>` drives, and what the behavioural
+ * suite drives directly.
+ *
+ * `image` is the render input: the element reads it after every change and
+ * writes everything the Fluid partial used to derive from it with `v-if`,
+ * `v-show` and `v-bind`. Nothing here renders markup - the upload form is a
+ * server rendered `f:form` and has to stay one.
+ */
 export interface ImageEditingController {
-  cropperSource: Ref<HTMLImageElement | null>;
-  cropperStage: Ref<HTMLElement | null>;
-  fileInput: Ref<HTMLInputElement | null>;
-  image: ImageState;
+  readonly image: ImageState;
   openImage(): Promise<void>;
   closeImage(): void;
   requestDeleteImage(): void;
@@ -55,6 +62,8 @@ export interface ImageEditingController {
 const maximumCroppedImageWidth = 2400;
 const imageClosingClass = "is-image-closing";
 const imageEditorTargetSelector = "[data-pe-image-editor-target]";
+const cropperStageSelector = "[data-pe-image-cropper-stage]";
+const cropperSourceSelector = "[data-pe-image-cropper-source]";
 const imagePreviewColumnSelector = "[data-pe-image-preview-column]";
 const profileFieldsColumnSelector =
   ".academic-persons-profile-editing__profile-fields-column";
@@ -63,6 +72,31 @@ const supportedOutputMimeTypes = new Set([
   "image/png",
   "image/webp",
 ]);
+
+/**
+ * A state object that reports every change it accepts.
+ *
+ * Vue's `reactive()` existed to re-render a template; the element that replaces
+ * that template updates the DOM itself, and all it needs is to be told when to.
+ * A proxy keeps the change detection out of the forty-odd assignments below,
+ * which would otherwise each have to remember to call back - and it keeps
+ * reading the state exactly as cheap as it was.
+ *
+ * A write of the value that is already there notifies nobody, so a `render()`
+ * is a change and not a heartbeat.
+ */
+const observeState = <T extends object>(state: T, onChange: () => void): T =>
+  new Proxy(state, {
+    set(target: T, property: string | symbol, value: unknown): boolean {
+      const previous: unknown = Reflect.get(target, property);
+      const written = Reflect.set(target, property, value);
+      if (written && !Object.is(previous, value)) {
+        onChange();
+      }
+
+      return written;
+    },
+  });
 
 const parseImageRatio = (value: unknown): number | null => {
   const normalized = String(value ?? "").trim();
@@ -232,17 +266,21 @@ const createCroppedImageFile = async (
   );
 };
 
+/**
+ * @param onChange runs after every accepted change of the state, so that the
+ *   element around the server rendered markup can update what it derives from
+ *   it. A caller that only drives the controller - the behavioural suite - hands
+ *   nothing over and no rendering happens.
+ */
 export const createImageEditing = (
   editingTarget: EditingTarget,
+  onChange: () => void = (): void => undefined,
 ): ImageEditingController => {
   const context = toEditingContext(editingTarget);
   const root = context.root;
-  const cropperSource = ref<HTMLImageElement | null>(null);
-  const cropperStage = ref<HTMLElement | null>(null);
-  const fileInput = ref<HTMLInputElement | null>(null);
   const cropperRequested = context.image.renderType === "cropper";
   const cropperRatio = parseImageRatio(context.image.cropperRatio);
-  const image = reactive<ImageState>({
+  const image = observeState<ImageState>({
     closing: false,
     confirmingDelete: false,
     cropperEnabled: cropperRequested && cropperRatio !== null,
@@ -255,7 +293,7 @@ export const createImageEditing = (
     pending: false,
     previewUrl: "",
     selectedName: "",
-  });
+  }, (): void => onChange());
   let cropper: Cropper | null = null;
   let selectedFile: File | null = null;
   let selectedPreviewUrl: string | null = null;
@@ -264,10 +302,18 @@ export const createImageEditing = (
   let persistedTitle = "";
 
   const getFileInput = (): HTMLInputElement | null =>
-    fileInput.value ??
     root.querySelector<HTMLInputElement>(
       '[data-pe-image-view-container] input[type="file"]',
     );
+
+  // The cropper's stage and the image it crops were Vue template refs. They are
+  // queried now, like every other element this module reaches for, which is
+  // what makes the cropping path reachable without a rendering framework.
+  const getCropperStage = (): HTMLElement | null =>
+    root.querySelector<HTMLElement>(cropperStageSelector);
+
+  const getCropperSource = (): HTMLImageElement | null =>
+    root.querySelector<HTMLImageElement>(cropperSourceSelector);
 
   const releaseUrl = (url: string | null): void => {
     if (url !== null && url.startsWith("blob:")) {
@@ -290,18 +336,20 @@ export const createImageEditing = (
     ) {
       return;
     }
+    const cropperSource = getCropperSource();
+    const cropperStage = getCropperStage();
     if (
       !image.cropperEnabled ||
       cropperRatio === null ||
-      cropperSource.value === null ||
-      cropperStage.value === null
+      cropperSource === null ||
+      cropperStage === null
     ) {
       image.error = context.messages.errorMessage ?? "";
       return;
     }
     try {
-      cropper = new Cropper(cropperSource.value, {
-        container: cropperStage.value,
+      cropper = new Cropper(cropperSource, {
+        container: cropperStage,
       });
       const selection = cropper.getCropperSelection();
       const cropperImage = cropper.getCropperImage();
@@ -375,7 +423,6 @@ export const createImageEditing = (
     root.classList.remove(imageClosingClass);
     image.closing = false;
     image.editing = true;
-    await nextTick();
     root.querySelector<HTMLElement>(imageEditorTargetSelector)?.scrollIntoView({
       behavior: globalThis.matchMedia("(prefers-reduced-motion: reduce)").matches
         ? "auto"
@@ -417,17 +464,21 @@ export const createImageEditing = (
       return;
     }
     image.closing = false;
-    void nextTick().then((): void => {
+    // The "nextTick()" that used to stand here waited for Vue to apply the
+    // state change; the element applies it synchronously, so only the two
+    // frames remain - and they are what the class is really waiting for. It
+    // suppresses the browser's scroll anchoring while the editor collapses, and
+    // dropping it before the collapsed layout has been painted lets the page
+    // jump by exactly the height that was removed.
+    requestAnimationFrame((): void => {
       requestAnimationFrame((): void => {
-        requestAnimationFrame((): void => {
-          root.classList.remove(imageClosingClass);
-          if (image.editing) {
-            return;
-          }
-          root
-            .querySelector<HTMLButtonElement>("[data-pe-open-image-view]")
-            ?.focus({ preventScroll: true });
-        });
+        root.classList.remove(imageClosingClass);
+        if (image.editing) {
+          return;
+        }
+        root
+          .querySelector<HTMLButtonElement>("[data-pe-open-image-view]")
+          ?.focus({ preventScroll: true });
       });
     });
   };
@@ -450,7 +501,6 @@ export const createImageEditing = (
       selectedPreviewUrl = URL.createObjectURL(selectedFile);
       image.previewUrl = selectedPreviewUrl;
     }
-    await nextTick();
     await initializeCropper();
   };
 
@@ -630,9 +680,6 @@ export const createImageEditing = (
   );
 
   return {
-    cropperSource,
-    cropperStage,
-    fileInput,
     image,
     openImage,
     closeImage,

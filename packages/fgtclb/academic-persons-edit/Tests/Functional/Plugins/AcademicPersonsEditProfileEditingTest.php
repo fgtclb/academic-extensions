@@ -119,7 +119,7 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertSame(5, substr_count($template, '<button'));
         $this->assertStringContainsString('data-pe-cancel-delete-image', $template);
         $this->assertStringContainsString('data-pe-confirm-delete-image', $template);
-        $this->assertStringContainsString('v-on:click="requestDeleteImage"', $template);
+        $this->assertStringContainsString('data-pe-image-delete-actions', $template);
         $this->assertStringContainsString('key="profileEditing.image.editor.deleteConfirm"', $template);
         $this->assertStringContainsString('key="actions.save"', $template);
         $this->assertStringNotContainsString('key="actions.add"', $template);
@@ -128,6 +128,41 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertStringNotContainsString('data-replace-label', $template);
         $this->assertStringNotContainsString('<dialog', $template);
         $this->assertStringNotContainsString('f:form.validationResults', $template);
+    }
+
+    /**
+     * The editor is driven by "<academic-persons-edit-image-editor>" and no
+     * longer by a rendering framework, so the hooks it queries are as much part
+     * of the contract as the endpoints are - and only this test sees the
+     * partial. The behavioural suite drives a transcription of it.
+     */
+    #[Test]
+    public function imageEditorTemplateIsDrivenByItsElement(): void
+    {
+        $template = $this->getProfileEditingPartial('Image/Editor');
+        $this->assertStringContainsString('<academic-persons-edit-image-editor>', $template);
+        foreach (
+            [
+                'data-pe-image-delete-actions',
+                'data-pe-delete-image-confirm-question',
+                'data-pe-image-fieldset',
+                'data-pe-image-cropper-stage',
+                'data-pe-image-cropper-source',
+                'data-pe-image-selected-preview',
+                'data-pe-image-upload-spinner',
+            ] as $hook
+        ) {
+            $this->assertStringContainsString($hook, $template);
+        }
+        // The upload form is the one thing that cannot move into the browser:
+        // the property mapper validates against "__trustedProperties", and only
+        // the server can sign it.
+        $this->assertStringContainsString('<f:form', $template);
+        $this->assertStringContainsString('<f:form.upload', $template);
+        // Nothing Vue understands is left in it.
+        foreach (['v-if', 'v-else', 'v-show', 'v-bind', 'v-on:', 'v-text', 'v-model', '<Teleport', '<Transition', 'ref="'] as $directive) {
+            $this->assertStringNotContainsString($directive, $template);
+        }
     }
 
     #[Test]
@@ -1467,6 +1502,16 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertStringContainsString('data-pe-open-image-view', $content);
         $this->assertStringContainsString('data-pe-image-view-container', $content);
         $this->assertStringContainsString('data-pe-image-editor-target', $content);
+        // The image editor is rendered where it is shown, inside its target and
+        // wrapped in the element that drives it. Vue moved it there with a
+        // "<Teleport>"; Fluid renders it there.
+        $imageEditors = (new \DOMXPath($document))->query(
+            '//*[@data-pe-image-editor-target]'
+                . '/academic-persons-edit-image-editor'
+                . '/*[@data-pe-image-view-container]',
+        );
+        $this->assertNotFalse($imageEditors);
+        $this->assertCount(1, $imageEditors);
         $this->assertStringContainsString('data-image-render-type="cropper"', $content);
         $this->assertStringContainsString('data-has-image="0"', $content);
         $configuredRatio = $this->get(AcademicPersonsSettingsFactory::class)

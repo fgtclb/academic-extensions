@@ -97,6 +97,56 @@ stripping, which erases annotations but does not transform them, so a decorator
 would not run — `Build/tsconfig.tests.json` sets `erasableSyntaxOnly` to make
 that a type error instead of a runtime one.
 
+## The element that owns the image editor
+
+`<academic-persons-edit-image-editor>`
+([`profile/elements/image-editor.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/image-editor.ts))
+is the first of the editor's components, and it deliberately renders nothing
+either. The editor it drives is an Extbase `<f:form>`: it carries the
+`__trustedProperties` signature the property mapper validates the upload
+against, and nothing in a browser can recompute it. A component that rendered
+that form would have to reproduce a signature only the server can make, so the
+form stays server rendered and the element is a controller over it.
+
+The state, the cropper and every request stay in `profile/image.ts`, which is
+driven and pinned without a registry. The element creates one controller, is
+called back on every change it accepts, and writes what the twenty-seven Vue
+directives of `Partials/Profile/Image/Editor.html` used to derive.
+
+| Member                                 | Contract                                                                             |
+|----------------------------------------|--------------------------------------------------------------------------------------|
+| `<academic-persons-edit-image-editor>` | The tag name. It observes no attributes and dispatches no events.                    |
+| `context`                              | The `EditingContext`, assignable; resolved from the element above it when it is not. |
+| `controller`                           | The image editing it drives, or `null` until it is connected.                        |
+| `render()`                             | Writes everything derived from the state. Called on every change and on connection.  |
+
+Two consequences worth knowing before the next component is written:
+
+- **A child never reads the root's attributes.** It is handed the contract as a
+  property, or it takes it from the `<academic-persons-edit-profile-editing>`
+  above it — which is the path an element Fluid rendered has to take, because
+  there is no creating caller to assign it.
+- **It reports a status through `profile/common.ts`, not through `pe:status`.**
+  The controller holds the context, so it needs no address; the event exists for
+  a component that has none.
+
+## The transition the editors open and close with
+
+`<Transition>` applied Vue's `-enter-from` / `-enter-active` / `-leave-active` /
+`-leave-to` classes and called back when the animation was over. The classes are
+kept — the declarations that select them are unchanged — and
+`runElementTransition()` applies them instead.
+
+It is a function rather than a `transitionend` listener because the callback is
+where the close path hangs: the focus returns to the trigger there and the
+collapsed layout is restored there. `transitionend` does not fire for an element
+that is `display: none`, for a property that does not change, or for one that is
+removed halfway, and a transition that never ends is therefore a silent,
+intermittent defect rather than a missing animation. So it ends on the event, on
+a timeout past the computed duration, or at once when the computed duration is
+zero — which is what `prefers-reduced-motion` produces — and it can be cancelled
+when the editor is reopened while it closes.
+
 ## The seam for a caller that has only the element
 
 The entry points take `EditingTarget`, which is `HTMLElement | EditingContext`.

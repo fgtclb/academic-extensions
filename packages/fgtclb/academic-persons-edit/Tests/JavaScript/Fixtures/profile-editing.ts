@@ -97,6 +97,11 @@ export const labels = {
 export interface RootOptions {
   /** The markup below the root, in the order `Index.html:116-172` renders it. */
   content?: string;
+  /**
+   * The markup inside the image editor target, which is the first child of the
+   * root and is where `Index.html` renders the image editor.
+   */
+  target?: string;
   hasImage?: boolean;
   imageRenderType?: string;
   imageCropperRatio?: string;
@@ -109,6 +114,7 @@ export interface RootOptions {
  */
 export const profileEditingRoot = ({
   content = "",
+  target = "",
   hasImage = true,
   imageRenderType = "",
   imageCropperRatio = "",
@@ -163,7 +169,7 @@ export const profileEditingRoot = ({
   data-label-document-save="${labels.save}"
   data-label-document-close="${labels.close}"
   data-label-document-empty="${messages.empty}">
-  <div id="profile-editing-${profileUid}-image-editor-target" data-pe-image-editor-target></div>
+  <div id="profile-editing-${profileUid}-image-editor-target" data-pe-image-editor-target>${target}</div>
   ${content}
   ${statusToast()}
 </div>`;
@@ -688,7 +694,7 @@ export const imageCard = ({
   alt?: string;
   title?: string;
 } = {}): string => `
-<div class="col-12 academic-persons-profile-editing__image-preview-column" data-pe-image-preview-column>
+<div class="col-12 col-lg-4 academic-persons-profile-editing__image-preview-column" data-pe-image-preview-column>
   <div class="sticky-top" data-pe-sticky-image>
     <section aria-labelledby="profile-editing-${profileUid}-image-heading">
       <div data-pe-image-preview>
@@ -707,38 +713,86 @@ export const imageCard = ({
 </div>`;
 
 /**
- * `Partials/Profile/Image/Editor.html:115-273` in the state Vue renders it in
- * while the editor is open: the upload form, the preview inside it, and the
- * cropper stage.
+ * `Templates/Profile/Index.html:146-154` - the column beside the image card,
+ * which widens to the full row while the editor is open.
+ */
+export const profileFieldsColumn = (content = ""): string => `
+<div class="col-12 col-lg-8 academic-persons-profile-editing__profile-fields-column">${content}</div>`;
+
+/**
+ * `Partials/Profile/Image/Editor.html` - the upload form, its preview, the
+ * cropper stage and the delete actions, in the state a page is delivered in:
+ * closed, idle, without an error.
+ *
+ * The `<f:form>` is transcribed with its hidden fields. They are not decoration:
+ * the property mapper validates the upload against the `__trustedProperties`
+ * signature, nothing in a browser can recompute it, and it is the reason the
+ * editor stays server rendered. A test asserts that they leave with the request.
  */
 export const imageEditorView = ({
   profileUid = 1,
   action = endpoints.uploadImage,
 }: { profileUid?: number; action?: string } = {}): string => `
 <section id="profile-editing-${profileUid}-image-view"
-  class="academic-persons-profile-editing__image-editor border p-3 mb-5" data-pe-image-view-container>
-  <form action="${action}" method="post" enctype="multipart/form-data"
-    class="academic-persons-profile-editing__image-form">
-    <fieldset>
-      <div class="mb-3" data-pe-image-view-preview>
-        <div class="academic-persons-profile-editing__image-cropper">
-          <img src="" alt="" />
-        </div>
-        <img class="img-fluid" src="" alt="" />
-      </div>
-      <label class="form-label" for="profile-editing-${profileUid}-image">Image</label>
+  class="academic-persons-profile-editing__image-editor border p-3 p-lg-4 mb-5" aria-busy="false" hidden="hidden"
+  data-pe-image-view-container>
+  <div class="academic-persons-profile-editing__image-editor-content">
+    <form action="${action}" method="post" enctype="multipart/form-data"
+      class="academic-persons-profile-editing__image-form">
       <div>
-        <input class="form-control form-control-sm" type="file" name="tx_academicpersonsedit_profile[profile][image]"
-          id="profile-editing-${profileUid}-image" accept="image/jpeg,image/png"
-          aria-describedby="profile-editing-${profileUid}-image-error" aria-invalid="false" required />
+        <input type="hidden" name="tx_academicpersonsedit_profile[__referrer][@extension]" value="AcademicPersonsEdit" />
+        <input type="hidden" name="tx_academicpersonsedit_profile[__referrer][@controller]" value="Profile" />
+        <input type="hidden" name="tx_academicpersonsedit_profile[__referrer][@action]" value="edit" />
+        <input type="hidden" name="tx_academicpersonsedit_profile[__referrer][arguments]" value="YTowOnt9ecf6f1" />
+        <input type="hidden" name="tx_academicpersonsedit_profile[__trustedProperties]"
+          value="a:1:{s:7:&quot;profile&quot;;a:1:{s:5:&quot;image&quot;;i:1;}}5f3c2a" />
       </div>
-    </fieldset>
-    <div class="d-flex justify-content-end gap-2 mt-4">
-      <button class="btn rounded-0 btn-outline-secondary" type="button" data-pe-close-image-view></button>
-      <button class="btn rounded-0 btn-primary" type="submit" data-pe-upload-image></button>
-    </div>
-  </form>
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+        <h2 class="display-6 fw-normal mb-0" tabindex="-1" data-pe-image-editor-heading>Profile image</h2>
+        <div class="d-flex align-items-center gap-2" data-pe-image-delete-actions>
+          <button class="btn rounded-0 btn-danger" type="button" data-pe-delete-image title="Delete the image">Delete</button>
+          <span class="text-danger" hidden="hidden" data-pe-delete-image-confirm-question>Delete this image?</span>
+          <button class="btn rounded-0 btn-outline-secondary" type="button" hidden="hidden"
+            data-pe-cancel-delete-image>Cancel</button>
+          <button class="btn rounded-0 btn-danger" type="button" hidden="hidden" data-pe-confirm-delete-image
+            title="Delete the image">Delete</button>
+        </div>
+      </div>
+      <fieldset data-pe-image-fieldset>
+        <div class="mb-3" data-pe-image-view-preview>
+          <div class="academic-persons-profile-editing__image-cropper" hidden="hidden" data-pe-image-cropper-stage>
+            <img alt="" data-pe-image-cropper-source />
+          </div>
+          <img class="img-fluid" alt="" hidden="hidden" data-pe-image-selected-preview />
+        </div>
+        <label class="form-label" for="profile-editing-${profileUid}-image">Image</label>
+        <div>
+          <input class="form-control form-control-sm" type="file" name="tx_academicpersonsedit_profile[profile][image]"
+            id="profile-editing-${profileUid}-image" accept="image/jpeg,image/png"
+            aria-describedby="profile-editing-${profileUid}-image-error" aria-invalid="false" required />
+        </div>
+      </fieldset>
+      <div id="profile-editing-${profileUid}-image-error" class="alert alert-danger mt-3 mb-0" role="alert"
+        hidden="hidden" data-pe-image-error></div>
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button class="btn rounded-0 btn-outline-secondary" type="button" data-pe-close-image-view>Cancel</button>
+        <button class="btn rounded-0 btn-primary" type="submit" disabled data-pe-upload-image>
+          <span class="spinner-border spinner-border-sm me-1" aria-hidden="true" hidden="hidden"
+            data-pe-image-upload-spinner></span>Save</button>
+      </div>
+    </form>
+  </div>
 </section>`;
+
+/**
+ * The same partial with the element that drives it, which is how
+ * `Templates/Profile/Index.html` renders it: inside the image editor target,
+ * so pass it as `target` rather than as `content`.
+ */
+export const imageEditor = (
+  options: { profileUid?: number; action?: string } = {},
+): string => `
+<academic-persons-edit-image-editor>${imageEditorView(options)}</academic-persons-edit-image-editor>`;
 
 /**
  * The one query helper every test file needs: a `querySelector` that fails with

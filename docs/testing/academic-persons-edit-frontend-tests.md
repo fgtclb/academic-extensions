@@ -91,8 +91,24 @@ scan:
 | `profile-editing-element.test.ts`         | One context per element, the initialisers it runs, that a move in the document starts nothing twice, both status regions, and the tags Vue is told to leave alone. |
 | `profile-editing-element-upgrade.test.ts` | That an editor starts in both orders: markup before the module, which is what a deferred module always sees, and markup after it.                                  |
 
+The image editor added three more with the component that replaced its
+directives:
+
+| File                                   | What it pins                                                                                                                                               |
+|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `image-editor-element.test.ts`         | What the element derives from the state, that the `<f:form>` and its hidden fields are untouched, the cropping path, and the transition helper on its own. |
+| `image-editor-element-upgrade.test.ts` | That the image editor starts in both orders, and that the root element is defined first because its mount replaces the markup below it.                    |
+| `entry-point.test.ts`                  | That `frontend/profile.js` defines every element of the editor. A file of its own, because importing it *is* the subject and the import registers.         |
+
 That is the coverage the thirteen hook readers needed: a test file fails if a
 `data-pe-*` attribute is queried under a name the templates do not emit.
+
+It does not run the other way. A hook renamed in a Fluid partial *and* in the
+fixture that transcribes it leaves every test green, because the fixture is a
+transcription and not the partial. The guard for that direction is the PHP
+functional suite, which reads the partial itself — see
+`AcademicPersonsEditProfileEditingTest::imageEditorTemplateIsDrivenByItsElement()`
+for the shape a new component's hooks are asserted in.
 
 It is still not everything. The CSS transitions, the real CKEditor and the real
 CropperJS — including the whole cropping path, whose stage and source are Vue

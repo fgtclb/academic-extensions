@@ -148,7 +148,8 @@ mounted exactly once, and which tags Vue is told are custom elements.
 
 The same applies to layout and animation. jsdom computes no transitions and
 every `getBoundingClientRect()` is zero, so scroll and drop-position arithmetic
-is tested with injected rectangles (`setBoundingRect()`), not with real
+is tested with injected rectangles (`setBoundingRect()`) and a box the cropper
+can measure with an injected client size (`setClientSize()`), not with real
 geometry.
 
 ## The requests
