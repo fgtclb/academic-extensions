@@ -1,4 +1,7 @@
 /* Generated from Resources/Private/TypeScript — do not edit. */
+import {
+  toEditingContext
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 const rootSelector = "[data-academic-persons-profile-editing]";
 const hooks = (element) => element.dataset;
 let activeRequestCount = 0;
@@ -20,10 +23,6 @@ const setRequestBusy = (busy) => {
 };
 const getBootstrap = () => globalThis.bootstrap;
 const isEditableField = (element) => element instanceof HTMLInputElement || element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement;
-const getProfileUid = (root) => {
-  const profileUid = Number.parseInt(root.dataset.profileUid ?? "", 10);
-  return Number.isInteger(profileUid) && profileUid > 0 ? profileUid : null;
-};
 const initializePopover = (scope = document) => {
   var _a;
   const Popover = (_a = getBootstrap()) == null ? void 0 : _a.Popover;
@@ -35,32 +34,34 @@ const initializePopover = (scope = document) => {
     (trigger) => new Popover(trigger)
   );
 };
-const showStatus = (root, type, message = null) => {
+const showStatus = (editingTarget, type, message = null) => {
   var _a, _b;
+  const context = toEditingContext(editingTarget);
+  const messages = context.messages;
   const statusValues = {
     danger: {
-      title: root.dataset.messageErrorTitle ?? "",
-      message: root.dataset.messageErrorMessage ?? "",
+      title: messages.errorTitle ?? "",
+      message: messages.errorMessage ?? "",
       className: "bg-danger"
     },
     success: {
-      title: root.dataset.messageSuccessTitle ?? "",
-      message: root.dataset.messageSuccessMessage ?? "",
+      title: messages.successTitle ?? "",
+      message: messages.successMessage ?? "",
       className: "bg-success"
     },
     info: {
-      title: root.dataset.messageInfoTitle ?? "",
-      message: root.dataset.messageInfoMessage ?? "",
+      title: messages.infoTitle ?? "",
+      message: messages.infoMessage ?? "",
       className: "bg-info"
     },
     warning: {
-      title: root.dataset.messageWarningTitle ?? "",
-      message: root.dataset.messageValidation ?? "",
+      title: messages.warningTitle ?? "",
+      message: messages.validation ?? "",
       className: "bg-warning"
     }
   };
   const status = statusValues[type];
-  const statusToast = root.querySelector(
+  const statusToast = context.root.querySelector(
     `[data-pe-status-toast='${type === "danger" ? "alert" : "status"}']`
   );
   if (statusToast === null) {
@@ -112,7 +113,6 @@ const requestJson = async (url, options = {}) => {
   }
 };
 export {
-  getProfileUid,
   hooks,
   initializePopover,
   isEditableField,

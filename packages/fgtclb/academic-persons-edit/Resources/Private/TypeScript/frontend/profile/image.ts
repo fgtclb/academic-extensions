@@ -8,10 +8,13 @@ import {
   type Ref,
 } from "@fgtclb/academic-persons-edit/frontend/vue.js";
 import {
-  getProfileUid,
   requestJson,
   showStatus,
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
+import {
+  toEditingContext,
+  type EditingTarget,
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 interface ImageState {
   closing: boolean;
   confirmingDelete: boolean;
@@ -230,14 +233,15 @@ const createCroppedImageFile = async (
 };
 
 export const createImageEditing = (
-  root: HTMLElement,
+  editingTarget: EditingTarget,
 ): ImageEditingController => {
+  const context = toEditingContext(editingTarget);
+  const root = context.root;
   const cropperSource = ref<HTMLImageElement | null>(null);
   const cropperStage = ref<HTMLElement | null>(null);
   const fileInput = ref<HTMLInputElement | null>(null);
-  const cropperRequested =
-    (root.dataset.imageRenderType ?? "").toLowerCase() === "cropper";
-  const cropperRatio = parseImageRatio(root.dataset.imageCropperRatio);
+  const cropperRequested = context.image.renderType === "cropper";
+  const cropperRatio = parseImageRatio(context.image.cropperRatio);
   const image = reactive<ImageState>({
     closing: false,
     confirmingDelete: false,
@@ -246,7 +250,7 @@ export const createImageEditing = (
     cropperRequested,
     editing: false,
     error: "",
-    hasImage: root.dataset.hasImage === "1",
+    hasImage: context.image.hasImage,
     hasSelection: false,
     pending: false,
     previewUrl: "",
@@ -292,7 +296,7 @@ export const createImageEditing = (
       cropperSource.value === null ||
       cropperStage.value === null
     ) {
-      image.error = root.dataset.messageErrorMessage ?? "";
+      image.error = context.messages.errorMessage ?? "";
       return;
     }
     try {
@@ -316,11 +320,11 @@ export const createImageEditing = (
       }
       image.cropperReady = setInitialCropperSelection(selection, cropperRatio);
       if (!image.cropperReady) {
-        image.error = root.dataset.messageErrorMessage ?? "";
+        image.error = context.messages.errorMessage ?? "";
       }
     } catch {
       destroyCropper();
-      image.error = root.dataset.messageErrorMessage ?? "";
+      image.error = context.messages.errorMessage ?? "";
     }
   };
 
@@ -490,16 +494,16 @@ export const createImageEditing = (
     }
     const file = selectedFile;
     if (!image.hasSelection || file === null) {
-      image.error = root.dataset.messageValidation ?? "";
+      image.error = context.messages.validation ?? "";
       return;
     }
     if (!form.reportValidity()) {
-      image.error = root.dataset.messageValidation ?? "";
+      image.error = context.messages.validation ?? "";
       return;
     }
     image.pending = true;
     image.error = "";
-    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    showStatus(context, "info", context.messages.saving ?? null);
     let uploadPreviewUrl: string | null = selectedPreviewUrl;
     try {
       const uploadFile = image.cropperRequested
@@ -520,7 +524,7 @@ export const createImageEditing = (
       });
       if (result.hasImage !== true || uploadPreviewUrl === null) {
         const error = new Error("The upload returned no profile image.") as RequestError;
-        error.result = { message: root.dataset.messageImageUploadMissing ?? "" };
+        error.result = { message: context.messages.imageUploadMissing ?? "" };
         throw error;
       }
       commitUploadedPreview(
@@ -534,7 +538,7 @@ export const createImageEditing = (
       setImageState(root, true);
       image.pending = false;
       closeImage();
-      showStatus(root, "success", root.dataset.messageImageUploaded ?? null);
+      showStatus(context, "success", context.messages.imageUploaded ?? null);
     } catch (error) {
       if (uploadPreviewUrl !== null && uploadPreviewUrl !== selectedPreviewUrl) {
         releaseUrl(uploadPreviewUrl);
@@ -542,8 +546,8 @@ export const createImageEditing = (
       const result = (error as RequestError).result;
       image.error =
         result?.error === "image_upload_missing"
-          ? (root.dataset.messageImageUploadMissing ?? "")
-          : (result?.message ?? root.dataset.messageErrorMessage ?? "");
+          ? (context.messages.imageUploadMissing ?? "")
+          : (result?.message ?? context.messages.errorMessage ?? "");
     } finally {
       image.pending = false;
     }
@@ -564,8 +568,8 @@ export const createImageEditing = (
   };
 
   const deleteImage = async (): Promise<void> => {
-    const profile = getProfileUid(root);
-    const endpoint = root.dataset.deleteImageUrl;
+    const profile = context.profileUid;
+    const endpoint = context.urls.deleteImage;
     if (
       image.pending
       || !image.hasImage
@@ -578,14 +582,14 @@ export const createImageEditing = (
     image.confirmingDelete = false;
     image.pending = true;
     image.error = "";
-    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    showStatus(context, "info", context.messages.saving ?? null);
     try {
       await requestJson(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profile, data: {} }),
       });
-      const placeholderUrl = root.dataset.placeholderImageUrl;
+      const placeholderUrl = context.image.placeholderUrl;
       if (placeholderUrl !== undefined) {
         releaseUrl(selectedPreviewUrl);
         releaseUrl(persistedPreviewUrl);
@@ -596,7 +600,7 @@ export const createImageEditing = (
           setImagePreviewUrl(
             preview,
             placeholderUrl,
-            root.dataset.placeholderImageAlt ?? "",
+            context.image.placeholderAlt ?? "",
           );
         });
       }
@@ -604,11 +608,11 @@ export const createImageEditing = (
       setImageState(root, false);
       image.pending = false;
       closeImage();
-      showStatus(root, "success", root.dataset.messageImageDeleted ?? null);
+      showStatus(context, "success", context.messages.imageDeleted ?? null);
     } catch (error) {
       image.error =
         (error as RequestError).result?.message ??
-        root.dataset.messageErrorMessage ??
+        context.messages.errorMessage ??
         "";
     } finally {
       image.pending = false;

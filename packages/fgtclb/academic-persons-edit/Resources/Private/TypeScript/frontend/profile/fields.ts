@@ -1,11 +1,15 @@
 import {
-  getProfileUid,
   hooks,
   isEditableField,
   requestJson,
   showStatus,
   type EditableField,
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
+import {
+  toEditingContext,
+  type EditingContext,
+  type EditingTarget,
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 import {
   ensureRichTextEditor,
   getPlainText,
@@ -108,7 +112,7 @@ const getFieldPropertyName = (field: EditableField): string => {
 };
 
 const getFieldById = (
-  root: HTMLElement,
+  context: EditingContext,
   fieldId: string | undefined,
 ): EditableField | null => {
   if (fieldId === undefined || fieldId === "") {
@@ -116,31 +120,31 @@ const getFieldById = (
   }
   const normalizedFieldId = fieldId.startsWith("profile-editing-")
     ? fieldId
-    : `profile-editing-${root.dataset.profileUid ?? ""}-${fieldId}`;
-  const field = root.querySelector(`#${CSS.escape(normalizedFieldId)}`);
+    : `profile-editing-${context.profileUidValue}-${fieldId}`;
+  const field = context.root.querySelector(`#${CSS.escape(normalizedFieldId)}`);
   return isEditableField(field) ? field : null;
 };
 
 const getActivateButton = (
-  root: HTMLElement,
+  context: EditingContext,
   field: EditableField,
 ): HTMLButtonElement | null => {
   if (field.id === "") {
     return null;
   }
-  return root.querySelector<HTMLButtonElement>(
+  return context.root.querySelector<HTMLButtonElement>(
     `${editButtonSelector}[data-pe-for="${CSS.escape(field.id)}"]`,
   );
 };
 
 const getFieldPreview = (
-  root: HTMLElement,
+  context: EditingContext,
   field: EditableField,
 ): HTMLElement | null => {
   if (field.id === "") {
     return null;
   }
-  return root.querySelector<HTMLElement>(
+  return context.root.querySelector<HTMLElement>(
     `${fieldPreviewSelector}[data-pe-for="${CSS.escape(field.id)}"]`,
   );
 };
@@ -149,25 +153,25 @@ const parseFieldIds = (value: string | undefined): string[] =>
   (value ?? "").split(/\s+/).filter((fieldId): boolean => fieldId !== "");
 
 const getFieldsByIds = (
-  root: HTMLElement,
+  context: EditingContext,
   value: string | undefined,
 ): EditableField[] =>
   parseFieldIds(value)
-    .map((fieldId): EditableField | null => getFieldById(root, fieldId))
+    .map((fieldId): EditableField | null => getFieldById(context, fieldId))
     .filter((field): field is EditableField => field !== null);
 
 const getGroupFields = (
-  root: HTMLElement,
+  context: EditingContext,
   group: HTMLElement,
-): EditableField[] => getFieldsByIds(root, hooks(group).peFieldIds);
+): EditableField[] => getFieldsByIds(context, hooks(group).peFieldIds);
 
-const renderProfileName = (root: HTMLElement): void => {
-  const heading = root.querySelector<HTMLElement>(profileNameSelector);
+const renderProfileName = (context: EditingContext): void => {
+  const heading = context.root.querySelector<HTMLElement>(profileNameSelector);
   if (heading === null) {
     return;
   }
   heading.textContent = getFieldsByIds(
-    root,
+    context,
     hooks(heading).peProfileNameFieldIds,
   )
     .map((field): string => getFieldDisplayValue(field, getFieldValue(field)))
@@ -176,7 +180,7 @@ const renderProfileName = (root: HTMLElement): void => {
 };
 
 const renderFieldGroupPreview = (
-  root: HTMLElement,
+  context: EditingContext,
   group: HTMLElement,
 ): void => {
   const content = group.querySelector<HTMLElement>(groupPreviewContentSelector);
@@ -184,7 +188,7 @@ const renderFieldGroupPreview = (
     return;
   }
   const values = getFieldsByIds(
-    root,
+    context,
     hooks(group).peDisplayFieldIds ?? hooks(group).peFieldIds,
   )
     .map((field): string => getFieldDisplayValue(field, getFieldValue(field)))
@@ -198,14 +202,14 @@ const renderFieldGroupPreview = (
 };
 
 const toggleEditGroup = (
-  root: HTMLElement,
+  context: EditingContext,
   group: HTMLElement,
   state = true,
 ): void => {
   const editor = group.querySelector<HTMLElement>(groupEditorSelector);
   const preview = group.querySelector<HTMLElement>(groupPreviewSelector);
   const button = group.querySelector<HTMLButtonElement>(groupEditButtonSelector);
-  const fields = getGroupFields(root, group).filter(
+  const fields = getGroupFields(context, group).filter(
     (field): boolean => !field.disabled && !isFieldReadOnly(field),
   );
   if (editor === null || fields.length === 0) {
@@ -222,10 +226,12 @@ const toggleEditGroup = (
 };
 
 const setEditAllButtonState = (
-  root: HTMLElement,
+  context: EditingContext,
   active: boolean,
 ): void => {
-  const button = root.querySelector<HTMLButtonElement>(editAllButtonSelector);
+  const button = context.root.querySelector<HTMLButtonElement>(
+    editAllButtonSelector,
+  );
   if (button === null) {
     return;
   }
@@ -264,12 +270,12 @@ const getTemplateButton = (
     : null;
 
 const createActivateButton = (
-  root: HTMLElement,
+  context: EditingContext,
   field: EditableField,
   fieldValue: unknown,
 ): HTMLButtonElement | null => {
   const displayValue = getFieldDisplayValue(field, fieldValue);
-  const template = root.querySelector(
+  const template = context.root.querySelector(
     displayValue === ""
       ? "[data-pe-new-button-template]"
       : "[data-pe-edit-button-template]",
@@ -293,7 +299,7 @@ const createActivateButton = (
 };
 
 const renderActivateButton = (
-  root: HTMLElement,
+  context: EditingContext,
   field: EditableField,
   fieldValue: unknown,
 ): void => {
@@ -301,19 +307,19 @@ const renderActivateButton = (
     return;
   }
   if (isRichTextField(field)) {
-    renderRichTextPreview(root, field, fieldValue);
+    renderRichTextPreview(context.root, field, fieldValue);
     return;
   }
   const group = field.closest<HTMLElement>(fieldGroupSelector);
   if (group !== null) {
-    renderFieldGroupPreview(root, group);
+    renderFieldGroupPreview(context, group);
     return;
   }
-  const preview = getFieldPreview(root, field);
+  const preview = getFieldPreview(context, field);
   const content = preview?.querySelector<HTMLElement>("[data-pe-field-preview-content]");
   if (content === null || content === undefined) {
-    const currentButton = getActivateButton(root, field);
-    const replacementButton = createActivateButton(root, field, fieldValue);
+    const currentButton = getActivateButton(context, field);
+    const replacementButton = createActivateButton(context, field, fieldValue);
     if (replacementButton === null) {
       return;
     }
@@ -337,23 +343,23 @@ const renderActivateButton = (
 };
 
 const toggleEditField = (
-  root: HTMLElement,
+  context: EditingContext,
   fieldId: string,
   state = true,
 ): void => {
-  const field = getFieldById(root, fieldId);
+  const field = getFieldById(context, fieldId);
   if (field === null || field.disabled || isFieldReadOnly(field)) {
     return;
   }
   const group = field.closest<HTMLElement>(fieldGroupSelector);
   if (group !== null) {
-    toggleEditGroup(root, group, state);
+    toggleEditGroup(context, group, state);
     return;
   }
   getFieldEditElement(field).classList.toggle("d-none", !state);
-  getFieldPreview(root, field)?.classList.toggle("d-none", state);
-  getActivateButton(root, field)?.setAttribute("aria-expanded", String(state));
-  root
+  getFieldPreview(context, field)?.classList.toggle("d-none", state);
+  getActivateButton(context, field)?.setAttribute("aria-expanded", String(state));
+  context.root
     .querySelectorAll<HTMLElement>(
       `${fieldActionsSelector}[data-pe-for="${CSS.escape(field.id)}"]`,
     )
@@ -361,11 +367,11 @@ const toggleEditField = (
       actions.classList.toggle("d-none", !state);
     });
   if (!state) {
-    getActivateButton(root, field)?.focus();
+    getActivateButton(context, field)?.focus();
     return;
   }
   if (isRichTextField(field)) {
-    void ensureRichTextEditor(root, field)
+    void ensureRichTextEditor(context, field)
       .then((editor): void => editor?.editing.view.focus())
       .catch((): void => field.focus());
   } else {
@@ -374,7 +380,7 @@ const toggleEditField = (
 };
 
 const closeFields = (
-  root: HTMLElement,
+  context: EditingContext,
   fields: EditableField[],
 ): void => {
   const groups = new Set<HTMLElement>();
@@ -383,14 +389,14 @@ const closeFields = (
     if (group !== null) {
       groups.add(group);
     } else if (field.id !== "") {
-      toggleEditField(root, field.id, false);
+      toggleEditField(context, field.id, false);
     }
   });
-  groups.forEach((group): void => toggleEditGroup(root, group, false));
+  groups.forEach((group): void => toggleEditGroup(context, group, false));
 };
 
 const showValidationErrors = (
-  root: HTMLElement,
+  context: EditingContext,
   fields: EditableField[],
   errors: ValidationErrors,
 ): void => {
@@ -408,7 +414,7 @@ const showValidationErrors = (
     invalidFields.push(field);
     getFieldEditElement(field).classList.add("is-invalid");
     if (field.id !== "") {
-      toggleEditField(root, field.id, true);
+      toggleEditField(context, field.id, true);
     }
     const feedback = field
       .closest<HTMLElement>(
@@ -424,7 +430,7 @@ const showValidationErrors = (
   const firstInvalidField = invalidFields[0];
   if (firstInvalidField !== undefined) {
     if (isRichTextField(firstInvalidField)) {
-      void ensureRichTextEditor(root, firstInvalidField)
+      void ensureRichTextEditor(context, firstInvalidField)
         .then((editor): void => editor?.editing.view.focus())
         .catch((): void => firstInvalidField.focus());
     } else {
@@ -433,7 +439,9 @@ const showValidationErrors = (
   }
 };
 
-export const initializeFieldEditing = (root: HTMLElement): void => {
+export const initializeFieldEditing = (editingTarget: EditingTarget): void => {
+  const context = toEditingContext(editingTarget);
+  const root = context.root;
   const forms = Array.from(
     root.querySelectorAll<HTMLFormElement>(fieldsFormSelector),
   );
@@ -446,10 +454,10 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
   const persistedValues = new Map<EditableField, FieldValue>(
     fields.map((field): [EditableField, FieldValue] => [field, getFieldValue(field)]),
   );
-  renderProfileName(root);
+  renderProfileName(context);
   root.querySelectorAll<HTMLElement>(fieldGroupSelector).forEach((group): void => {
-    renderFieldGroupPreview(root, group);
-    const hasEditableField = getGroupFields(root, group).some(
+    renderFieldGroupPreview(context, group);
+    const hasEditableField = getGroupFields(context, group).some(
       (field): boolean => !field.disabled && !isFieldReadOnly(field),
     );
     group
@@ -458,11 +466,13 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
   });
   fields
     .filter((field): boolean => field.closest(fieldGroupSelector) === null)
-    .forEach((field): void => renderActivateButton(root, field, getFieldValue(field)));
+    .forEach((field): void =>
+      renderActivateButton(context, field, getFieldValue(field)),
+    );
 
   const normalizedRichTextBaselines = new WeakSet<HTMLTextAreaElement>();
   let editAllActive = false;
-  setEditAllButtonState(root, editAllActive);
+  setEditAllButtonState(context, editAllActive);
 
   const finishEditAllWhenClosed = (): void => {
     if (!editAllActive) {
@@ -476,7 +486,7 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
     );
     if (!hasOpenField) {
       editAllActive = false;
-      setEditAllButtonState(root, false);
+      setEditAllButtonState(context, false);
     }
   };
 
@@ -494,7 +504,7 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
     const richTextFields = fieldsToSave.filter(isRichTextField);
     try {
       await Promise.all(
-        richTextFields.map((field) => ensureRichTextEditor(root, field)),
+        richTextFields.map((field) => ensureRichTextEditor(context, field)),
       );
     } catch {
       return false;
@@ -517,9 +527,9 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
         persistedValues.get(field) !== getFieldValue(field),
     );
     if (changedFields.length === 0) {
-      closeFields(root, fieldsToSave);
+      closeFields(context, fieldsToSave);
       finishEditAllWhenClosed();
-      showStatus(root, "info", root.dataset.messageUnchanged ?? null);
+      showStatus(context, "info", context.messages.unchanged ?? null);
       return true;
     }
     const invalidField = changedFields.find(
@@ -530,17 +540,17 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
       invalidField.setAttribute("aria-invalid", "true");
       getFieldEditElement(invalidField).classList.add("is-invalid");
       if (isRichTextField(invalidField)) {
-        toggleEditField(root, invalidField.id, true);
+        toggleEditField(context, invalidField.id, true);
       } else {
         invalidField.reportValidity();
       }
-      showStatus(root, "warning", root.dataset.messageValidation ?? null);
+      showStatus(context, "warning", context.messages.validation ?? null);
       return false;
     }
-    const profileUid = getProfileUid(root);
-    const updateUrl = root.dataset.updateUrl;
+    const profileUid = context.profileUid;
+    const updateUrl = context.urls.update;
     if (profileUid === null || updateUrl === undefined) {
-      showStatus(root, "danger");
+      showStatus(context, "danger");
       return false;
     }
     const data = Object.fromEntries(
@@ -550,7 +560,7 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
       ]),
     );
     root.setAttribute("aria-busy", "true");
-    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    showStatus(context, "info", context.messages.saving ?? null);
     try {
       const result = await requestJson(updateUrl, {
         method: "POST",
@@ -568,20 +578,20 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
           : getFieldValue(field);
         setFieldValue(field, value);
         persistedValues.set(field, getFieldValue(field));
-        renderActivateButton(root, field, value);
+        renderActivateButton(context, field, value);
       });
-      renderProfileName(root);
-      closeFields(root, changedFields);
+      renderProfileName(context);
+      closeFields(context, changedFields);
       finishEditAllWhenClosed();
-      showStatus(root, "success");
+      showStatus(context, "success");
       return true;
     } catch (error) {
       const result = (error as RequestError).result;
       if (result?.errors !== undefined) {
-        showValidationErrors(root, fields, result.errors);
-        showStatus(root, "warning", root.dataset.messageValidation ?? null);
+        showValidationErrors(context, fields, result.errors);
+        showStatus(context, "warning", context.messages.validation ?? null);
       } else {
-        showStatus(root, "danger", result?.message ?? null);
+        showStatus(context, "danger", result?.message ?? null);
       }
       return false;
     } finally {
@@ -602,7 +612,7 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
       event.preventDefault();
       const group = button.closest<HTMLElement>(fieldGroupSelector);
       if (group !== null) {
-        toggleEditGroup(root, group, true);
+        toggleEditGroup(context, group, true);
       }
       return;
     }
@@ -610,12 +620,12 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
       event.preventDefault();
       const group = button.closest<HTMLElement>(fieldGroupSelector);
       if (group !== null) {
-        const groupFields = getGroupFields(root, group).filter(
+        const groupFields = getGroupFields(context, group).filter(
           (field): boolean => !field.disabled && !isFieldReadOnly(field),
         );
         groupFields.forEach((field): void => setFieldValue(field, ""));
         clearValidationErrors(groupFields);
-        toggleEditGroup(root, group, true);
+        toggleEditGroup(context, group, true);
       }
       return;
     }
@@ -623,10 +633,10 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
       event.preventDefault();
       const group = button.closest<HTMLElement>(fieldGroupSelector);
       if (group !== null) {
-        const groupFields = getGroupFields(root, group);
+        const groupFields = getGroupFields(context, group);
         resetFields(groupFields);
-        renderFieldGroupPreview(root, group);
-        toggleEditGroup(root, group, false);
+        renderFieldGroupPreview(context, group);
+        toggleEditGroup(context, group, false);
         finishEditAllWhenClosed();
       }
       return;
@@ -635,7 +645,7 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
       event.preventDefault();
       const group = button.closest<HTMLElement>(fieldGroupSelector);
       if (group !== null) {
-        void saveFields(getGroupFields(root, group));
+        void saveFields(getGroupFields(context, group));
       }
       return;
     }
@@ -644,52 +654,52 @@ export const initializeFieldEditing = (root: HTMLElement): void => {
       editAllActive = !editAllActive;
       if (editAllActive) {
         root.querySelectorAll<HTMLElement>(fieldGroupSelector).forEach((group): void => {
-          toggleEditGroup(root, group, true);
+          toggleEditGroup(context, group, true);
         });
         root.querySelectorAll<HTMLElement>(editButtonSelector).forEach((editButton): void => {
           const fieldId = hooks(editButton).peFor;
           if (fieldId !== undefined) {
-            toggleEditField(root, fieldId, true);
+            toggleEditField(context, fieldId, true);
           }
         });
       } else {
-        closeFields(root, fields);
+        closeFields(context, fields);
       }
-      setEditAllButtonState(root, editAllActive);
+      setEditAllButtonState(context, editAllActive);
       return;
     }
     if (button.matches(editButtonSelector)) {
       event.preventDefault();
       const fieldId = hooks(button).peFor;
       if (fieldId !== undefined) {
-        toggleEditField(root, fieldId, true);
+        toggleEditField(context, fieldId, true);
       }
       return;
     }
     if (button.matches("[data-pe-dismiss]")) {
       event.preventDefault();
-      const field = getFieldById(root, hooks(button).peFor);
+      const field = getFieldById(context, hooks(button).peFor);
       if (field !== null) {
         setFieldValue(field, "");
         clearValidationErrors([field]);
-        toggleEditField(root, field.id, true);
+        toggleEditField(context, field.id, true);
       }
       return;
     }
     if (button.matches("[data-pe-cancel]")) {
       event.preventDefault();
-      const field = getFieldById(root, hooks(button).peFor);
+      const field = getFieldById(context, hooks(button).peFor);
       if (field !== null) {
         setFieldValue(field, persistedValues.get(field) ?? "");
         clearValidationErrors([field]);
-        toggleEditField(root, field.id, false);
+        toggleEditField(context, field.id, false);
         finishEditAllWhenClosed();
       }
       return;
     }
     if (button.matches("[data-pe-save]")) {
       event.preventDefault();
-      const field = getFieldById(root, hooks(button).peFor);
+      const field = getFieldById(context, hooks(button).peFor);
       if (field !== null) {
         void saveFields([field]);
       }

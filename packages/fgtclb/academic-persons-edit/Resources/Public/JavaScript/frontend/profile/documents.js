@@ -1,12 +1,14 @@
 /* Generated from Resources/Private/TypeScript — do not edit. */
 import { nextTick, reactive } from "@fgtclb/academic-persons-edit/frontend/vue.js";
 import {
-  getProfileUid,
   hooks,
   initializePopover,
   requestJson,
   showStatus
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
+import {
+  toEditingContext
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 import {
   destroyRichTextEditors,
   ensureRichTextEditor,
@@ -109,12 +111,12 @@ const getDocumentSubject = (section, fields) => {
   const title = [titleField == null ? void 0 : titleField.displayValue, titleField == null ? void 0 : titleField.value].map((value) => String(value ?? "").trim()).find((value) => value !== "");
   return title ?? getSectionHeading(section);
 };
-const getModeLabel = (root, mode) => {
+const getModeLabel = (context, mode) => {
   const labels = {
-    add: root.dataset.labelDocumentAdd,
-    view: root.dataset.labelDocumentView,
-    edit: root.dataset.labelDocumentEdit,
-    delete: root.dataset.labelDocumentDelete
+    add: context.labels.documentAdd,
+    view: context.labels.documentView,
+    edit: context.labels.documentEdit,
+    delete: context.labels.documentDelete
   };
   return labels[mode] ?? "";
 };
@@ -134,8 +136,8 @@ const getDocumentCollapseTargetSelector = (target) => {
   }
   return `#${CSS.escape(target.id)}`;
 };
-const requestDocument = (root, url, data) => {
-  const profile = getProfileUid(root);
+const requestDocument = (context, url, data) => {
+  const profile = context.profileUid;
   if (url === void 0 || profile === null) {
     return Promise.reject(new Error("The document endpoint is unavailable."));
   }
@@ -293,19 +295,19 @@ const setSectionPending = (section, pending) => {
     }
   });
 };
-const persistDocumentOrder = async (root, section, order, previousOrder) => {
+const persistDocumentOrder = async (context, section, order, previousOrder) => {
   var _a;
   setSectionPending(section, true);
   try {
-    const response = await requestDocument(root, root.dataset.sortDocumentUrl, {
+    const response = await requestDocument(context, context.urls.sortDocument, {
       section: section.dataset.sectionKey,
       order
     });
     applyDocumentOrder(section, Array.isArray(response.order) ? response.order.map(Number) : order);
-    showStatus(root, "success", root.dataset.messageDocumentSorted ?? null);
+    showStatus(context, "success", context.messages.documentSorted ?? null);
   } catch (error) {
     applyDocumentOrder(section, previousOrder);
-    showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+    showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
   } finally {
     setSectionPending(section, false);
     refreshDocumentRows(section);
@@ -353,7 +355,8 @@ const clearDragState = (root) => {
   state.row.classList.remove("is-dragging");
   dragStates.delete(root);
 };
-const initializeDocumentDragAndDrop = (root) => {
+const initializeDocumentDragAndDrop = (context) => {
+  const root = context.root;
   root.addEventListener("dragstart", (event) => {
     const target = event.target instanceof Element ? event.target : null;
     const handle = target == null ? void 0 : target.closest("[data-pe-document-drag]");
@@ -421,16 +424,18 @@ const initializeDocumentDragAndDrop = (root) => {
     clearDragState(root);
     refreshDocumentRows(section);
     if (changed) {
-      void persistDocumentOrder(root, section, order, previousOrder);
+      void persistDocumentOrder(context, section, order, previousOrder);
     }
   });
   root.addEventListener("dragend", () => clearDragState(root));
 };
-const createDocumentEditing = (root) => {
+const createDocumentEditing = (editingTarget) => {
+  const context = toEditingContext(editingTarget);
+  const root = context.root;
   const documentState = reactive({
-    contactEmptyMessage: root.dataset.messageContractContactEmpty ?? "",
+    contactEmptyMessage: context.messages.contractContactEmpty ?? "",
     contactSections: [],
-    deleteConfirmation: root.dataset.messageDocumentDeleteConfirm ?? "",
+    deleteConfirmation: context.messages.documentDeleteConfirm ?? "",
     error: "",
     errors: {},
     fields: [],
@@ -445,7 +450,7 @@ const createDocumentEditing = (root) => {
     values: {}
   });
   const contractContactState = reactive({
-    deleteConfirmation: root.dataset.messageContractContactDeleteConfirm ?? "",
+    deleteConfirmation: context.messages.contractContactDeleteConfirm ?? "",
     error: "",
     errors: {},
     fields: [],
@@ -473,12 +478,12 @@ const createDocumentEditing = (root) => {
     await Promise.all(
       Array.from(
         view.querySelectorAll("textarea[data-pe-rich-text]")
-      ).map((field) => ensureRichTextEditor(root, field))
+      ).map((field) => ensureRichTextEditor(context, field))
     );
     if (documentState.mode === "add" || documentState.mode === "edit") {
       const firstField = view.querySelector("[data-pe-document-field]:not([disabled])");
       if (firstField instanceof HTMLTextAreaElement && firstField.matches("[data-pe-rich-text]")) {
-        const editor = await ensureRichTextEditor(root, firstField);
+        const editor = await ensureRichTextEditor(context, firstField);
         editor == null ? void 0 : editor.editing.view.focus();
       } else {
         firstField == null ? void 0 : firstField.focus();
@@ -518,7 +523,7 @@ const createDocumentEditing = (root) => {
     documentState.error = "";
     documentState.errors = {};
     try {
-      const response = await requestDocument(root, root.dataset.documentFormUrl, {
+      const response = await requestDocument(context, context.urls.documentForm, {
         section: section.dataset.sectionKey,
         record: record ?? 0,
         mode: modeValue
@@ -534,7 +539,7 @@ const createDocumentEditing = (root) => {
       documentState.record = typeof response.record === "number" ? response.record : record;
       documentState.section = section.dataset.sectionKey ?? "";
       documentState.title = [
-        getModeLabel(root, modeValue),
+        getModeLabel(context, modeValue),
         getDocumentSubject(section, fields)
       ].filter(Boolean).join(": ");
       documentState.values = Object.fromEntries(
@@ -549,7 +554,7 @@ const createDocumentEditing = (root) => {
       documentState.pending = false;
       await initializeDocumentEditors();
     } catch (error) {
-      showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+      showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
     } finally {
       documentState.pending = false;
     }
@@ -605,7 +610,7 @@ const createDocumentEditing = (root) => {
     if (documentState.mode !== "delete" && form !== null && !form.reportValidity()) {
       return;
     }
-    const endpoint = documentState.mode === "add" ? root.dataset.createDocumentUrl : documentState.mode === "edit" ? root.dataset.updateDocumentUrl : root.dataset.deleteDocumentUrl;
+    const endpoint = documentState.mode === "add" ? context.urls.createDocument : documentState.mode === "edit" ? context.urls.updateDocument : context.urls.deleteDocument;
     const data = { section: documentState.section };
     if (documentState.mode !== "add") {
       data.record = documentState.record;
@@ -616,9 +621,9 @@ const createDocumentEditing = (root) => {
     documentState.pending = true;
     documentState.error = "";
     documentState.errors = {};
-    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    showStatus(context, "info", context.messages.saving ?? null);
     try {
-      const response = await requestDocument(root, endpoint, data);
+      const response = await requestDocument(context, endpoint, data);
       const item = response.item;
       if (documentState.mode === "add" && item !== void 0) {
         insertDocumentRow(activeSection, item);
@@ -636,13 +641,13 @@ const createDocumentEditing = (root) => {
         );
         sectionPendingRefresh = activeSection;
       }
-      const successMessage = documentState.mode === "delete" ? root.dataset.messageDocumentDeleted : root.dataset.messageDocumentSaved;
+      const successMessage = documentState.mode === "delete" ? context.messages.documentDeleted : context.messages.documentSaved;
       documentState.pending = false;
       closeDocument();
-      showStatus(root, "success", successMessage ?? null);
+      showStatus(context, "success", successMessage ?? null);
     } catch (error) {
       const result = error.result;
-      documentState.error = (result == null ? void 0 : result.message) ?? root.dataset.messageErrorMessage ?? "";
+      documentState.error = (result == null ? void 0 : result.message) ?? context.messages.errorMessage ?? "";
       documentState.errors = Object.fromEntries(
         Object.entries((result == null ? void 0 : result.errors) ?? {}).map(([name, messages]) => [
           name,
@@ -663,7 +668,7 @@ const createDocumentEditing = (root) => {
     }
     setSectionPending(section, true);
     try {
-      const response = await requestDocument(root, root.dataset.sortDocumentUrl, {
+      const response = await requestDocument(context, context.urls.sortDocument, {
         section: section.dataset.sectionKey,
         record,
         direction
@@ -672,9 +677,9 @@ const createDocumentEditing = (root) => {
         section,
         Array.isArray(response.order) ? response.order.map(Number) : []
       );
-      showStatus(root, "success", root.dataset.messageDocumentSorted ?? null);
+      showStatus(context, "success", context.messages.documentSorted ?? null);
     } catch (error) {
-      showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+      showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
     } finally {
       setSectionPending(section, false);
       refreshDocumentRows(section);
@@ -699,8 +704,8 @@ const createDocumentEditing = (root) => {
     contractContactState.errors = {};
     try {
       const response = await requestDocument(
-        root,
-        root.dataset.contractContactFormUrl,
+        context,
+        context.urls.contractContactForm,
         {
           contract: documentState.record,
           section,
@@ -714,7 +719,7 @@ const createDocumentEditing = (root) => {
       contractContactState.record = typeof response.record === "number" ? response.record : normalizedRecord;
       contractContactState.section = section;
       contractContactState.title = [
-        getModeLabel(root, modeValue),
+        getModeLabel(context, modeValue),
         String(response.title ?? "")
       ].filter(Boolean).join(": ");
       contractContactState.values = Object.fromEntries(
@@ -735,7 +740,7 @@ const createDocumentEditing = (root) => {
         focusTarget == null ? void 0 : focusTarget.focus({ preventScroll: true });
       }
     } catch (error) {
-      showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+      showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
     } finally {
       contractContactState.pending = false;
     }
@@ -760,7 +765,7 @@ const createDocumentEditing = (root) => {
     if (contractContactState.mode !== "delete" && form !== null && !form.reportValidity()) {
       return;
     }
-    const endpoint = contractContactState.mode === "add" ? root.dataset.createContractContactUrl : contractContactState.mode === "edit" ? root.dataset.updateContractContactUrl : root.dataset.deleteContractContactUrl;
+    const endpoint = contractContactState.mode === "add" ? context.urls.createContractContact : contractContactState.mode === "edit" ? context.urls.updateContractContact : context.urls.deleteContractContact;
     const data = {
       contract: documentState.record,
       section: contractContactState.section
@@ -774,9 +779,9 @@ const createDocumentEditing = (root) => {
     contractContactState.pending = true;
     contractContactState.error = "";
     contractContactState.errors = {};
-    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    showStatus(context, "info", context.messages.saving ?? null);
     try {
-      const response = await requestDocument(root, endpoint, data);
+      const response = await requestDocument(context, endpoint, data);
       const section = documentState.contactSections.find(
         (candidate) => candidate.identifier === contractContactState.section
       );
@@ -805,11 +810,11 @@ const createDocumentEditing = (root) => {
       showStatus(
         root,
         "success",
-        contractContactState.mode === "delete" ? root.dataset.messageDocumentDeleted ?? null : root.dataset.messageDocumentSaved ?? null
+        contractContactState.mode === "delete" ? context.messages.documentDeleted ?? null : context.messages.documentSaved ?? null
       );
     } catch (error) {
       const result = error.result;
-      contractContactState.error = (result == null ? void 0 : result.message) ?? root.dataset.messageErrorMessage ?? "";
+      contractContactState.error = (result == null ? void 0 : result.message) ?? context.messages.errorMessage ?? "";
       contractContactState.errors = Object.fromEntries(
         Object.entries((result == null ? void 0 : result.errors) ?? {}).map(
           ([name, messages]) => [
@@ -836,8 +841,8 @@ const createDocumentEditing = (root) => {
     contractContactState.pending = true;
     try {
       const response = await requestDocument(
-        root,
-        root.dataset.sortContractContactUrl,
+        context,
+        context.urls.sortContractContact,
         {
           contract: documentState.record,
           section: sectionIdentifier,
@@ -859,9 +864,9 @@ const createDocumentEditing = (root) => {
         });
         section.items.splice(0, section.items.length, ...sortedItems);
       }
-      showStatus(root, "success", root.dataset.messageDocumentSorted ?? null);
+      showStatus(context, "success", context.messages.documentSorted ?? null);
     } catch (error) {
-      showStatus(root, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
+      showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
     } finally {
       contractContactState.pending = false;
     }
@@ -890,13 +895,15 @@ const createDocumentEditing = (root) => {
   controllers.set(root, controller);
   return controller;
 };
-const initializeDocumentSections = (root) => {
+const initializeDocumentSections = (editingTarget) => {
+  const context = toEditingContext(editingTarget);
+  const root = context.root;
   root.querySelectorAll(sectionSelector).forEach(refreshDocumentRows);
   if (initializedRoots.has(root)) {
     return;
   }
   initializedRoots.add(root);
-  initializeDocumentDragAndDrop(root);
+  initializeDocumentDragAndDrop(context);
   root.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target : null;
     const button = target == null ? void 0 : target.closest(

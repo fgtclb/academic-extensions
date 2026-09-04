@@ -8,6 +8,10 @@ import {
   rootSelector,
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
 import {
+  readEditingContext,
+  type EditingContext,
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
+import {
   createDocumentEditing,
   initializeDocumentSections,
 } from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
@@ -18,18 +22,21 @@ import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/s
 
 const mountedRoots = new WeakSet<HTMLElement>();
 
-const createProfileEditingApp = (root: HTMLElement): App =>
+// The root carries the whole configuration of an editor as "data-*"
+// attributes. It is read here, once, and handed to every controller: no module
+// below this point looks at "root.dataset" again.
+const createProfileEditingApp = (context: EditingContext): App =>
   createApp({
     setup(): Record<string, unknown> {
-      const documentController = createDocumentEditing(root);
-      const imageController = createImageEditing(root);
-      const syncController = createSkipSync(root);
+      const documentController = createDocumentEditing(context);
+      const imageController = createImageEditing(context);
+      const syncController = createSkipSync(context);
 
       onMounted((): void => {
-        initializeStickyImageOffset(root);
-        initializeFieldEditing(root);
-        initializeDocumentSections(root);
-        initializePopover(root);
+        initializeStickyImageOffset(context.root);
+        initializeFieldEditing(context);
+        initializeDocumentSections(context);
+        initializePopover(context.root);
       });
 
       return {
@@ -47,7 +54,7 @@ export const initializeProfileEditors = (scope: ParentNode = document): App[] =>
       return;
     }
     mountedRoots.add(candidate);
-    const application = createProfileEditingApp(candidate);
+    const application = createProfileEditingApp(readEditingContext(candidate));
     application.mount(candidate);
     applications.push(application);
   });

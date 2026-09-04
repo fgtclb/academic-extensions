@@ -11,6 +11,9 @@ import {
   hooks,
   showStatus
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
+import {
+  toEditingContext
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 const richTextFieldSelector = "[data-pe-rich-text]";
 const richTextPreviewSelector = "[data-pe-rich-text-preview]";
 const richTextPreviewContentSelector = "[data-pe-rich-text-preview-content]";
@@ -51,7 +54,6 @@ const loadEditorLanguage = (language) => {
   loadedEditorLanguages.set(language, request);
   return request;
 };
-const getEditorLanguage = (root) => (root.dataset.editorLanguage ?? "").trim().toLowerCase();
 const richTextEditorConfig = {
   licenseKey: "GPL",
   plugins: [Essentials, Paragraph, Bold, Italic, List, Link],
@@ -205,7 +207,7 @@ const destroyRichTextEditors = async (scope) => {
     })
   );
 };
-const ensureRichTextEditor = (root, field) => {
+const ensureRichTextEditor = (editingTarget, field) => {
   if (!isRichTextField(field) || field.disabled || field.readOnly) {
     return Promise.resolve(null);
   }
@@ -217,7 +219,9 @@ const ensureRichTextEditor = (root, field) => {
   if (pendingEditor !== void 0) {
     return pendingEditor;
   }
-  const language = getEditorLanguage(root);
+  const context = toEditingContext(editingTarget);
+  const root = context.root;
+  const language = context.editorLanguage;
   const editorPromise = loadEditorLanguage(language).then(
     () => ClassicEditor.create(field, {
       ...richTextEditorConfig,
@@ -250,7 +254,7 @@ const ensureRichTextEditor = (root, field) => {
     });
     return createdEditor;
   }).catch((error) => {
-    showStatus(root, "danger", root.dataset.messageEditorError ?? null);
+    showStatus(context, "danger", context.messages.editorError ?? null);
     throw error;
   }).finally(() => {
     richTextEditorPromises.delete(field);

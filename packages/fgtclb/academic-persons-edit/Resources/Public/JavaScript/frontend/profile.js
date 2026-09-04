@@ -8,6 +8,9 @@ import {
   rootSelector
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
 import {
+  readEditingContext
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
+import {
   createDocumentEditing,
   initializeDocumentSections
 } from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
@@ -16,16 +19,16 @@ import { createImageEditing } from "@fgtclb/academic-persons-edit/frontend/profi
 import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
 import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
 const mountedRoots = /* @__PURE__ */ new WeakSet();
-const createProfileEditingApp = (root) => createApp({
+const createProfileEditingApp = (context) => createApp({
   setup() {
-    const documentController = createDocumentEditing(root);
-    const imageController = createImageEditing(root);
-    const syncController = createSkipSync(root);
+    const documentController = createDocumentEditing(context);
+    const imageController = createImageEditing(context);
+    const syncController = createSkipSync(context);
     onMounted(() => {
-      initializeStickyImageOffset(root);
-      initializeFieldEditing(root);
-      initializeDocumentSections(root);
-      initializePopover(root);
+      initializeStickyImageOffset(context.root);
+      initializeFieldEditing(context);
+      initializeDocumentSections(context);
+      initializePopover(context.root);
     });
     return {
       ...documentController,
@@ -41,7 +44,7 @@ const initializeProfileEditors = (scope = document) => {
       return;
     }
     mountedRoots.add(candidate);
-    const application = createProfileEditingApp(candidate);
+    const application = createProfileEditingApp(readEditingContext(candidate));
     application.mount(candidate);
     applications.push(application);
   });

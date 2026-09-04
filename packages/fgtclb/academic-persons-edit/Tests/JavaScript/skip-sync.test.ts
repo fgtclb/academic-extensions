@@ -125,7 +125,11 @@ describe("the synchronisation switch", () => {
   });
 
   it("refuses to send anything when the endpoint is not configured", async () => {
+    // The controller reads the root's contract when it is built, so a root
+    // that carries no endpoint has to be built from before that, not mutated
+    // afterwards.
     root.removeAttribute("data-skip-sync-url");
+    updateSkipSync = createSkipSync(root).updateSkipSync;
 
     await dispatch(true);
 

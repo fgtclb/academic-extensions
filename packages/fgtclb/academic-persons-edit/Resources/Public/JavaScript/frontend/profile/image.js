@@ -7,10 +7,12 @@ import {
   ref
 } from "@fgtclb/academic-persons-edit/frontend/vue.js";
 import {
-  getProfileUid,
   requestJson,
   showStatus
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
+import {
+  toEditingContext
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 const maximumCroppedImageWidth = 2400;
 const imageClosingClass = "is-image-closing";
 const imageEditorTargetSelector = "[data-pe-image-editor-target]";
@@ -139,12 +141,14 @@ const createCroppedImageFile = async (cropper, file) => {
     }
   );
 };
-const createImageEditing = (root) => {
+const createImageEditing = (editingTarget) => {
+  const context = toEditingContext(editingTarget);
+  const root = context.root;
   const cropperSource = ref(null);
   const cropperStage = ref(null);
   const fileInput = ref(null);
-  const cropperRequested = (root.dataset.imageRenderType ?? "").toLowerCase() === "cropper";
-  const cropperRatio = parseImageRatio(root.dataset.imageCropperRatio);
+  const cropperRequested = context.image.renderType === "cropper";
+  const cropperRatio = parseImageRatio(context.image.cropperRatio);
   const image = reactive({
     closing: false,
     confirmingDelete: false,
@@ -153,7 +157,7 @@ const createImageEditing = (root) => {
     cropperRequested,
     editing: false,
     error: "",
-    hasImage: root.dataset.hasImage === "1",
+    hasImage: context.image.hasImage,
     hasSelection: false,
     pending: false,
     previewUrl: "",
@@ -184,7 +188,7 @@ const createImageEditing = (root) => {
       return;
     }
     if (!image.cropperEnabled || cropperRatio === null || cropperSource.value === null || cropperStage.value === null) {
-      image.error = root.dataset.messageErrorMessage ?? "";
+      image.error = context.messages.errorMessage ?? "";
       return;
     }
     try {
@@ -204,11 +208,11 @@ const createImageEditing = (root) => {
       }
       image.cropperReady = setInitialCropperSelection(selection, cropperRatio);
       if (!image.cropperReady) {
-        image.error = root.dataset.messageErrorMessage ?? "";
+        image.error = context.messages.errorMessage ?? "";
       }
     } catch {
       destroyCropper();
-      image.error = root.dataset.messageErrorMessage ?? "";
+      image.error = context.messages.errorMessage ?? "";
     }
   };
   const readPersistedPreview = () => {
@@ -353,16 +357,16 @@ const createImageEditing = (root) => {
     }
     const file = selectedFile;
     if (!image.hasSelection || file === null) {
-      image.error = root.dataset.messageValidation ?? "";
+      image.error = context.messages.validation ?? "";
       return;
     }
     if (!form.reportValidity()) {
-      image.error = root.dataset.messageValidation ?? "";
+      image.error = context.messages.validation ?? "";
       return;
     }
     image.pending = true;
     image.error = "";
-    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    showStatus(context, "info", context.messages.saving ?? null);
     let uploadPreviewUrl = selectedPreviewUrl;
     try {
       const uploadFile = image.cropperRequested ? await createCroppedImageFile(image.cropperEnabled ? cropper : null, file) : file;
@@ -381,7 +385,7 @@ const createImageEditing = (root) => {
       });
       if (result.hasImage !== true || uploadPreviewUrl === null) {
         const error = new Error("The upload returned no profile image.");
-        error.result = { message: root.dataset.messageImageUploadMissing ?? "" };
+        error.result = { message: context.messages.imageUploadMissing ?? "" };
         throw error;
       }
       commitUploadedPreview(
@@ -395,13 +399,13 @@ const createImageEditing = (root) => {
       setImageState(root, true);
       image.pending = false;
       closeImage();
-      showStatus(root, "success", root.dataset.messageImageUploaded ?? null);
+      showStatus(context, "success", context.messages.imageUploaded ?? null);
     } catch (error) {
       if (uploadPreviewUrl !== null && uploadPreviewUrl !== selectedPreviewUrl) {
         releaseUrl(uploadPreviewUrl);
       }
       const result = error.result;
-      image.error = (result == null ? void 0 : result.error) === "image_upload_missing" ? root.dataset.messageImageUploadMissing ?? "" : (result == null ? void 0 : result.message) ?? root.dataset.messageErrorMessage ?? "";
+      image.error = (result == null ? void 0 : result.error) === "image_upload_missing" ? context.messages.imageUploadMissing ?? "" : (result == null ? void 0 : result.message) ?? context.messages.errorMessage ?? "";
     } finally {
       image.pending = false;
     }
@@ -418,22 +422,22 @@ const createImageEditing = (root) => {
   };
   const deleteImage = async () => {
     var _a;
-    const profile = getProfileUid(root);
-    const endpoint = root.dataset.deleteImageUrl;
+    const profile = context.profileUid;
+    const endpoint = context.urls.deleteImage;
     if (image.pending || !image.hasImage || !image.confirmingDelete || profile === null || endpoint === void 0) {
       return;
     }
     image.confirmingDelete = false;
     image.pending = true;
     image.error = "";
-    showStatus(root, "info", root.dataset.messageSaving ?? null);
+    showStatus(context, "info", context.messages.saving ?? null);
     try {
       await requestJson(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profile, data: {} })
       });
-      const placeholderUrl = root.dataset.placeholderImageUrl;
+      const placeholderUrl = context.image.placeholderUrl;
       if (placeholderUrl !== void 0) {
         releaseUrl(selectedPreviewUrl);
         releaseUrl(persistedPreviewUrl);
@@ -444,7 +448,7 @@ const createImageEditing = (root) => {
           setImagePreviewUrl(
             preview,
             placeholderUrl,
-            root.dataset.placeholderImageAlt ?? ""
+            context.image.placeholderAlt ?? ""
           );
         });
       }
@@ -452,9 +456,9 @@ const createImageEditing = (root) => {
       setImageState(root, false);
       image.pending = false;
       closeImage();
-      showStatus(root, "success", root.dataset.messageImageDeleted ?? null);
+      showStatus(context, "success", context.messages.imageDeleted ?? null);
     } catch (error) {
-      image.error = ((_a = error.result) == null ? void 0 : _a.message) ?? root.dataset.messageErrorMessage ?? "";
+      image.error = ((_a = error.result) == null ? void 0 : _a.message) ?? context.messages.errorMessage ?? "";
     } finally {
       image.pending = false;
     }

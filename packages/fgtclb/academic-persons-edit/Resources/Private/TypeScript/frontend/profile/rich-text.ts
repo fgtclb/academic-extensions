@@ -11,6 +11,10 @@ import {
   hooks,
   showStatus,
 } from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
+import {
+  toEditingContext,
+  type EditingTarget,
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 
 const richTextFieldSelector = "[data-pe-rich-text]";
 const richTextPreviewSelector = "[data-pe-rich-text-preview]";
@@ -64,9 +68,6 @@ const loadEditorLanguage = (language: string): Promise<void> => {
   loadedEditorLanguages.set(language, request);
   return request;
 };
-
-const getEditorLanguage = (root: HTMLElement): string =>
-  (root.dataset.editorLanguage ?? "").trim().toLowerCase();
 
 const richTextEditorConfig: Record<string, unknown> = {
   licenseKey: "GPL",
@@ -269,7 +270,7 @@ export const destroyRichTextEditors = async (scope: ParentNode): Promise<void> =
 };
 
 export const ensureRichTextEditor = (
-  root: HTMLElement,
+  editingTarget: EditingTarget,
   field: HTMLTextAreaElement,
 ): Promise<ClassicEditorInstance | null> => {
   if (!isRichTextField(field) || field.disabled || field.readOnly) {
@@ -283,7 +284,9 @@ export const ensureRichTextEditor = (
   if (pendingEditor !== undefined) {
     return pendingEditor;
   }
-  const language = getEditorLanguage(root);
+  const context = toEditingContext(editingTarget);
+  const root = context.root;
+  const language = context.editorLanguage;
   const editorPromise = loadEditorLanguage(language)
     .then(
       (): Promise<ClassicEditorInstance> =>
@@ -320,7 +323,7 @@ export const ensureRichTextEditor = (
       return createdEditor;
     })
     .catch((error: unknown): never => {
-      showStatus(root, "danger", root.dataset.messageEditorError ?? null);
+      showStatus(context, "danger", context.messages.editorError ?? null);
       throw error;
     })
     .finally((): void => {

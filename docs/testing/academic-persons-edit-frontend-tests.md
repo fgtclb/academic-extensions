@@ -1,7 +1,7 @@
 # Frontend verification for `academic-persons-edit`
 
 The profile editing frontend is the largest piece of TypeScript in this
-repository — one entry point and seven modules under
+repository — one entry point and eight modules under
 [`Resources/Private/TypeScript/frontend/`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/),
 compiled by the repository build into committed JavaScript under
 [`Resources/Public/JavaScript/`](../../packages/fgtclb/academic-persons-edit/Resources/Public/JavaScript/).
@@ -53,7 +53,9 @@ Two things came out of that, and only one of them is coverage:
 - `profile/common.ts` declares the hook set as a type and reads and writes it
   through `hooks(element)`. An unknown key is a `typecheckJs` failure now, so a
   prefix rename cannot half-apply *inside* the TypeScript again. That is a
-  compile-time guard, not a test.
+  compile-time guard, not a test. `profile/context.ts` applies the same
+  mechanism to the root's own `data-*` contract, which it reads once — see
+  [Profile editing contract](../architecture/profile-editing-contract.md).
 - The other direction — an attribute renamed in a template and nowhere else, or
   a `querySelector` whose selector no element matches — is still uncovered, and
   a grep of one source tree against the other is exactly the source-text test
@@ -62,7 +64,7 @@ Two things came out of that, and only one of them is coverage:
   module in a DOM. Those thirteen readers are the concrete case it has to be
   able to fail on.
 
-Nine more files were added with the Lit port (ACE-509), before a line of Vue was
+Ten more files were added with the Lit port (ACE-509), before a line of Vue was
 removed, so that the port is a refactor under a green suite rather than a
 rewrite with a hope. Each drives the shipped module against the markup of the
 Fluid partials it is rendered from:
@@ -78,6 +80,7 @@ Fluid partials it is rendered from:
 | `contract-contacts.test.ts` | The contacts of a contract: their endpoints, their editor, and what a save does to the list.                                                                                     |
 | `image-editing.test.ts`     | Choosing, uploading and deleting the image, the previews, and the object urls that are released.                                                                                 |
 | `sticky-image.test.ts`      | The offset below a fixed page header, and its teardown.                                                                                                                          |
+| `editing-context.test.ts`   | The root's `data-*` contract: every key of a complete root, what a minimal one reads as, the four coercions, and that the result is frozen.                                      |
 
 That is the coverage the thirteen hook readers needed: a test file fails if a
 `data-pe-*` attribute is queried under a name the templates do not emit.
