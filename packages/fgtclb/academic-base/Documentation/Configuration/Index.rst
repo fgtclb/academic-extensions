@@ -119,3 +119,88 @@ For this extension both mechanisms assign the same two values, so combining
 them is harmless. For the academic extensions that also ship TypoScript it is
 not — see the :guilabel:`Configuration` chapter of the extension in question.
 Use one mechanism per site.
+
+..  _configuration-icon-provider:
+
+Icons that follow the text colour
+=================================
+
+This extension ships an icon provider for the other academic extensions and
+for site packages:
+:php:`\FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`.
+It inlines the SVG file as the icon markup, in the default markup as well as
+in the `inline` alternative markup, so an icon drawn in `currentColor` takes
+the colour of the text around it - the backend colour scheme, or the theme of
+the frontend.
+
+The core provider :php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`
+renders the default markup as an `<img>` tag. An image is opaque to CSS, so
+such an icon keeps the colours of its file. That is right for a record or a
+brand icon drawn in fixed colours, and wrong for an action icon that should
+match the text next to it.
+
+..  _configuration-icon-provider-opt-in:
+
+Opting in
+---------
+
+Register the icon in :file:`Configuration/Icons.php` of the extension that
+ships it, with this provider instead of the core one:
+
+..  code-block:: php
+    :caption: EXT:my_extension/Configuration/Icons.php
+
+    return [
+        'my-extension-add' => [
+            'provider' => \FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider::class,
+            'source' => 'EXT:my_extension/Resources/Public/Icons/add.svg',
+        ],
+    ];
+
+Nothing else changes: the icon is rendered as before, with the
+:html:`<core:icon identifier="my-extension-add" />` ViewHelper, with
+:php:`IconFactory::getIcon()`, or as a `typeicon_classes` entry of a TCA
+table. Whether the `inline` alternative markup is requested or not, the
+markup is the inlined file.
+
+..  _configuration-icon-provider-svg:
+
+What the SVG file must look like
+--------------------------------
+
+The file is inlined into the HTML of the page, possibly several times, so it
+has to be drawn for that:
+
+*   A `viewBox` attribute on the root element; without it the element cannot
+    scale.
+*   `width="1em"` and `height="1em"` for an icon used in the frontend. Both
+    core versions keep the two attributes, and with them the icon follows the
+    font size of the text around it. The backend needs neither: its CSS sizes
+    every icon through the wrapper.
+*   `fill="currentColor"` or `stroke="currentColor"` on every drawable
+    element, and no hardcoded colour anywhere - not as an attribute and not
+    in a `<style>` element. A hardcoded colour is exactly what this provider
+    exists to avoid.
+*   No `id` attributes. The markup may appear more than once in one
+    document, and a duplicated `id` is invalid HTML.
+*   No `<script>` element and no event handler attributes. TYPO3 v14 sanitises
+    the file before inlining it; TYPO3 v13 strips `<script>` elements only. The
+    provider inlines files an extension ships and registers itself, never
+    uploads - the same trust boundary as the `inline` markup of the core
+    provider.
+*   A comment is kept on TYPO3 v13 and removed on TYPO3 v14, where the core
+    sanitises the file before inlining it. A licence attribution the icon set
+    requires can stay inside the file for the source, but the rendered page
+    does not carry it on v14 - give it in the documentation or a credits line
+    where the licence requires attribution in the output.
+
+..  code-block:: xml
+    :caption: EXT:my_extension/Resources/Public/Icons/add.svg
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+        <!-- Attribution of the icon set, when its licence requires one -->
+        <path fill="currentColor" d="M7 2h2v5h5v2H9v5H7V9H2V7h5z"/>
+    </svg>
+
+A file that does not exist renders empty markup rather than a broken image,
+so check a new registration once in the backend or with a rendering test.

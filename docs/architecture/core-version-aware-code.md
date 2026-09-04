@@ -17,21 +17,24 @@ currently resolved **inside** the file that has it.
 Four mechanisms are in use, and they differ by *where* the difference sits —
 not by preference:
 
-| Mechanism                                  | Used in                                    | Count              |
-|--------------------------------------------|--------------------------------------------|--------------------|
-| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`               | 1 file, 2 switches |
-| Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`         | 12 files           |
-| Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/` | 3 files            |
-| Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`      | 2 files            |
+| Mechanism                                  | Used in                                    | Count               |
+|--------------------------------------------|--------------------------------------------|---------------------|
+| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`               | 2 files, 3 switches |
+| Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`         | 12 files            |
+| Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/` | 3 files             |
+| Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`      | 2 files             |
 
 All of them switch on `(new Typo3Version())->getMajorVersion()`.
 
 ### A switch inside a class
 
-Exactly one class under any `Classes/` directory carries a version switch:
-[`packages/fgtclb/academic-base/Classes/TcaManipulator.php`](../../packages/fgtclb/academic-base/Classes/TcaManipulator.php).
-It has two, and both exist because the two core versions want incompatible
-input for the same job.
+Two classes under a `Classes/` directory carry a version switch, both in
+`academic-base`:
+[`Classes/TcaManipulator.php`](../../packages/fgtclb/academic-base/Classes/TcaManipulator.php)
+with two, and
+[`Classes/Imaging/IconProvider/CurrentColorSvgIconProvider.php`](../../packages/fgtclb/academic-base/Classes/Imaging/IconProvider/CurrentColorSvgIconProvider.php)
+with one. The two in `TcaManipulator` exist because the two core versions want
+incompatible input for the same job.
 
 **`addContentElementPlugin()` — line 137.** The signature of
 `ExtensionManagementUtility::addPlugin()` changed. On v13 it takes
@@ -77,6 +80,25 @@ out (the reasoning is recorded in the method's own docblock, lines 145–158):
 A wrong guess in this one place is therefore not caught by "the backend still
 loads". Both directions are covered by tests, see
 [Core version aware tests](#core-version-aware-tests).
+
+**`CurrentColorSvgIconProvider::generateInlineMarkup()` — line 76.** The
+parent `AbstractSvgIconProvider::getInlineSvg()` reads the file straight from
+disk on v13 and needs an absolute path; on v14 it resolves an `EXT:` path
+itself through `SystemResourceFactory`. The provider therefore resolves the
+path with `GeneralUtility::getFileAbsFileName()` on v13 only and hands v14 the
+path unchanged, so its resource resolution is not bypassed:
+
+```php
+if ((new Typo3Version())->getMajorVersion() < 14
+    && (PathUtility::isExtensionPath($source) || !PathUtility::isAbsolutePath($source))
+) {
+    $source = GeneralUtility::getFileAbsFileName($source);
+}
+```
+
+One condition applied to one value, with a `@todo` naming the v13 support end
+as its exit — the shape the rule below asks for. What it guards is measured in
+[Icons](icons.md#how-the-provider-is-wired-per-core-version).
 
 ### A switch inside a configuration file
 
