@@ -362,9 +362,10 @@ export class ProfileImageEditorElement extends HTMLElement {
 /**
  * Defines the element, idempotently.
  *
- * Called by the entry point, after the root element: the root reads the
- * contract and mounts the application that renders this element's markup, so
- * defining this one first would upgrade a copy that is about to be replaced.
+ * Called by the entry point, after the root element. The order no longer
+ * decides anything - it did while the root still mounted an application that
+ * replaced the markup this element wraps - but it is the one the page starts
+ * in: the owner, then what it owns.
  */
 export const registerProfileImageEditorElement = (): void => {
   if (customElements.get(profileImageEditorElementName) !== undefined) {

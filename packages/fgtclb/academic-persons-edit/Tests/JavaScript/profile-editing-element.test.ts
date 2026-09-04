@@ -6,9 +6,7 @@ import {
   settle,
 } from "../../../../../Build/tests/dom.mjs";
 import { installFetch, type FetchDouble } from "../../../../../Build/tests/fetch.mjs";
-import { createdApps, resetVue } from "../../../../../Build/tests/stubs/vue.mjs";
 import {
-  isProfileEditingElementTag,
   profileEditingElementName,
   ProfileEditingElement,
   profileEditingStatusEvent,
@@ -39,9 +37,7 @@ import {
  * - one context per element, read once and kept across a move in the document;
  * - the initialisers run, and run for one element exactly once;
  * - the two live regions are written by severity, whether the caller is the
- *   element's own method or a `pe:status` event from a descendant;
- * - the tags Vue is told to leave alone, for as long as it still compiles a
- *   part of the editor.
+ *   element's own method or a `pe:status` event from a descendant.
  *
  * `initializePopover()` is deliberately not asserted: it does nothing without
  * Bootstrap's JavaScript, which the harness does not load. What the other three
@@ -96,7 +92,6 @@ describe("the profile editing element", () => {
 
   beforeEach(() => {
     registerProfileEditingElement();
-    resetVue();
     resetBody("");
     fetch = installFetch();
   });
@@ -175,18 +170,30 @@ describe("the profile editing element", () => {
     const elements = selectAll(body, profileEditingElementName, HTMLElement);
 
     assert.equal(elements.length, 2);
-    assert.equal(createdApps.length, 2);
     assert.equal((elements[0] as ProfileEditingElement).context?.profileUid, 1);
     assert.equal((elements[1] as ProfileEditingElement).context?.profileUid, 2);
+    // And both were started, not only read: the heading each of them renders
+    // from its own name fields replaced the "stale" it was rendered with.
+    for (const element of elements) {
+      assert.equal(
+        select(
+          rootOf(element as ProfileEditingElement),
+          "[data-pe-profile-name]",
+          HTMLElement,
+        ).textContent,
+        "Ada Lovelace",
+      );
+    }
   });
 
   /**
    * A move in the document disconnects and reconnects the element. The editor
    * behind it is the same one - its listeners, its controllers and the markup
-   * they hold are untouched by a move - so the second connection must not read
-   * the contract again or mount a second application over the first.
+   * they hold are untouched by a move - so the second connection must neither
+   * read the contract again nor build a second set of controllers over the
+   * first.
    */
-  it("keeps its editor when it is moved in the document", () => {
+  it("keeps its editor when it is moved in the document", async () => {
     const element = render(editorMarkup());
     const context = element.context;
 
@@ -194,7 +201,14 @@ describe("the profile editing element", () => {
     document.body.append(element);
 
     assert.equal(element.context, context);
-    assert.equal(createdApps.length, 1);
+    // One controller, and that is what a second delegated click listener on the
+    // same root would show: the button below it would open two editors and send
+    // two requests for one press.
+    fetch.respond({ success: true, fields: [], values: {} });
+    select(rootOf(element), "[data-pe-document-add]", HTMLButtonElement).click();
+    await settle();
+
+    assert.equal(fetch.calls.length, 1);
   });
 
   it("starts nothing for an element that carries no editor root", () => {
@@ -203,7 +217,11 @@ describe("the profile editing element", () => {
     );
 
     assert.equal(element.context, null);
-    assert.equal(createdApps.length, 0);
+    // Not an error either: an element whose markup has not arrived yet is
+    // connected all the same, and asking it for a status has to stay a no-op
+    // rather than reach a controller that was never built.
+    element.showStatus("danger", "ignored");
+    assert.equal(fetch.calls.length, 0);
   });
 
   it("writes the assertive region for a failure and the polite one otherwise", () => {
@@ -300,27 +318,5 @@ describe("the profile editing element", () => {
     );
 
     assert.equal(title.textContent, messages.successTitle);
-  });
-
-  /**
-   * Vue still compiles the part of the editor it renders, and its runtime
-   * compiler resolves an unknown tag as a component - one
-   * "Failed to resolve component" warning per element of the following commits.
-   * The shim leaves with the runtime.
-   */
-  it("tells Vue which tags are its own elements", () => {
-    render(editorMarkup());
-
-    assert.equal(
-      createdApps[0]?.config.compilerOptions.isCustomElement,
-      isProfileEditingElementTag,
-    );
-    assert.equal(isProfileEditingElementTag(profileEditingElementName), true);
-    assert.equal(
-      isProfileEditingElementTag("academic-persons-edit-image-editor"),
-      true,
-    );
-    assert.equal(isProfileEditingElementTag("academic-profile-editing"), false);
-    assert.equal(isProfileEditingElementTag("div"), false);
   });
 });

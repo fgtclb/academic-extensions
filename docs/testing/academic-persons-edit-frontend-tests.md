@@ -72,7 +72,7 @@ Fluid partials it is rendered from:
 | File                        | What it pins                                                                                                                                                                     |
 |-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `request-layer.test.ts`     | `requestJson()`: the headers including the `X-Requested-With` guard, the failure shapes, the wait cursor, and which status region a severity writes.                             |
-| `skip-sync.test.ts`         | The synchronisation switch: its payload, and the revert of a control that saves without a button.                                                                                |
+| `skip-sync.test.ts`         | The synchronisation switch: its payload, the revert of a control that saves without a button, and the two listeners that reach it.                                               |
 | `field-editing.test.ts`     | Per-field edit, clear, undo and save; only changed fields travel; the validation messages; the visibility switch; the field groups and their preview modes; the edit-all toggle. |
 | `rich-text-preview.test.ts` | The sanitiser's allow-list, the link schemes, the preview, and the character limit.                                                                                              |
 | `document-rows.test.ts`     | The list a section renders: numbering, the arrow at each end, the empty state, sorting by arrow and by drag, and the rollback of both.                                           |
@@ -86,10 +86,10 @@ Two more came with the port itself and cover
 `<academic-persons-edit-profile-editing>`, the element that replaced the start-up
 scan:
 
-| File                                      | What it pins                                                                                                                                                       |
-|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `profile-editing-element.test.ts`         | One context per element, the initialisers it runs, that a move in the document starts nothing twice, both status regions, and the tags Vue is told to leave alone. |
-| `profile-editing-element-upgrade.test.ts` | That an editor starts in both orders: markup before the module, which is what a deferred module always sees, and markup after it.                                  |
+| File                                      | What it pins                                                                                                                      |
+|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `profile-editing-element.test.ts`         | One context per element, the initialisers it runs, that a move in the document starts nothing twice, and both status regions.     |
+| `profile-editing-element-upgrade.test.ts` | That an editor starts in both orders: markup before the module, which is what a deferred module always sees, and markup after it. |
 
 The image editor added three more with the component that replaced its
 directives:
@@ -97,7 +97,7 @@ directives:
 | File                                   | What it pins                                                                                                                                               |
 |----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `image-editor-element.test.ts`         | What the element derives from the state, that the `<f:form>` and its hidden fields are untouched, the cropping path, and the transition helper on its own. |
-| `image-editor-element-upgrade.test.ts` | That the image editor starts in both orders, and that the root element is defined first because its mount replaces the markup below it.                    |
+| `image-editor-element-upgrade.test.ts` | That the image editor starts in both orders, whichever of the two elements the registry saw first.                                                         |
 | `entry-point.test.ts`                  | That `frontend/profile.js` defines every element of the editor. A file of its own, because importing it *is* the subject and the import registers.         |
 
 The document editor added three more with the components that replaced the 114

@@ -23,20 +23,19 @@ import {
  *
  * ## What can and cannot be observed here
  *
- * The editor's own markup is rendered by Vue today, and the Vue runtime is
- * stubbed (`Build/tests/stubs/vue.mjs`) - it is what ACE-509 removes, and a
- * test net that bound to its reactivity would have to be rewritten by the port
- * it exists to protect. So the DOM the controller *reads* is put in place by
- * the test, in the shape `Partials/Profile/Documents/Editor.html` renders it
- * in, and what is asserted is everything the controller does around it: the
- * request it sends, the trigger it marks, the collapse target it addresses,
- * the editors it creates, the field it focuses, the row it inserts, updates or
- * removes, and the focus it returns.
+ * This file drives the controller without a custom element registry, which is
+ * what it was written to do while Vue still rendered the editor and is why it
+ * survived the port unchanged: the DOM the controller *reads* is put in place
+ * by the test, and what is asserted is everything the controller does around
+ * it - the request it sends, the trigger it marks, the collapse target it
+ * addresses, the editors it creates, the field it focuses, the row it inserts,
+ * updates or removes, and the focus it returns.
  *
  * Where a value has no observable effect of its own - the title of the editor,
- * the per-field error messages - the state the template binds to is asserted
- * instead, and said so at the assertion. Those become the properties of the
- * component after the port, so the assertion outlives the runtime.
+ * the per-field error messages - the state handed to the element is asserted
+ * instead, and said so at the assertion. What renders that state is
+ * `<academic-persons-edit-document-editor>` and is covered by
+ * `document-editor-element.test.ts`.
  */
 const fieldResponse = (
   overrides: Record<string, unknown> = {},
@@ -76,10 +75,11 @@ describe("opening a document editor", () => {
   };
 
   /**
-   * Stands in for what Vue renders into the collapse target once the state
-   * says the editor is open. It is placed before the click because the stubbed
-   * `nextTick()` resolves immediately, so the controller looks for the view in
-   * the same turn.
+   * Stands in for what `<academic-persons-edit-document-editor>` renders into
+   * the collapse target once the state says the editor is open - this file does
+   * not register the element, so the controller's `updateComplete` resolves at
+   * once and it looks for the view in the same turn. It is placed before the
+   * click for that reason.
    */
   const placeEditorView = (target: string, view: string): void => {
     select(root, target, HTMLElement).innerHTML = view;

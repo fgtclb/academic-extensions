@@ -123,8 +123,7 @@ describe("the document editor element", () => {
   it("takes its editing context from the profile editor it stands in", async () => {
     // The lookup is by tag name and reads the owner's documented "context"
     // property, so a stand-in with that property is the whole contract - and
-    // this test needs neither the root element module nor the Vue runtime
-    // behind it.
+    // this test needs neither the root element module nor anything it does.
     const owner = document.createElement(profileEditingElementName) as HTMLElement & {
       context?: EditingContext;
     };

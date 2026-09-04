@@ -210,6 +210,46 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
      * "profile/documents.ts" and no longer by a "v-on:click.stop" that stopped
      * that very listener from ever seeing them.
      */
+    /**
+     * The last two directives of the view were the ones on the synchronisation
+     * form of the header. With them the rendering framework is gone, so the
+     * assertion is over every Fluid file of the view rather than over the two
+     * partials that carried them: a directive that comes back is markup nothing
+     * in the browser reads, and it fails silently - the attribute is simply
+     * inert.
+     */
+    #[Test]
+    public function noFluidSourceOfTheEditingViewCarriesARenderingDirective(): void
+    {
+        $sources = $this->getProfileEditingFluidSources();
+        foreach (
+            [
+                'v-on:',
+                'v-if',
+                'v-else',
+                'v-show',
+                'v-bind',
+                'v-text',
+                'v-html',
+                'v-model',
+                'v-for',
+                'v-cloak',
+                '<Teleport',
+                '<Transition',
+                ':key=',
+                '@click=',
+            ] as $directive
+        ) {
+            $this->assertStringNotContainsString($directive, $sources);
+        }
+        // The switch it drove is still there and still carries the hook the
+        // delegated listener matches on.
+        $this->assertStringContainsString(
+            'data-pe-sync-form',
+            $this->getProfileEditingPartial('Header'),
+        );
+    }
+
     #[Test]
     public function documentListButtonsAreHandledByDelegation(): void
     {

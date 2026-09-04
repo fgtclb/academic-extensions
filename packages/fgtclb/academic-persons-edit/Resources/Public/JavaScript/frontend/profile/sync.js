@@ -7,6 +7,7 @@ import {
   toEditingContext
 } from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 const syncCheckboxSelector = ".academic-persons-profile-editing__sync-checkbox";
+const syncFormSelector = "[data-pe-sync-form]";
 const createSkipSync = (editingTarget) => {
   const context = toEditingContext(editingTarget);
   const root = context.root;
@@ -52,6 +53,16 @@ const createSkipSync = (editingTarget) => {
       form == null ? void 0 : form.setAttribute("aria-busy", "false");
     }
   };
+  root.addEventListener("submit", (event) => {
+    if (event.target instanceof Element && event.target.closest(syncFormSelector) !== null) {
+      event.preventDefault();
+    }
+  });
+  root.addEventListener("change", (event) => {
+    if (event.target instanceof Element && event.target.closest(syncFormSelector) !== null) {
+      void updateSkipSync(event);
+    }
+  });
   return { updateSkipSync };
 };
 export {

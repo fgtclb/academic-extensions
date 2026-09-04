@@ -25,11 +25,11 @@ import {
  * `type="module"`, the document is parsed before the entry point runs, and both
  * elements are already in it when they are defined.
  *
- * The registration order of the two elements is the part with a decision in it,
- * and it is asserted here rather than described: the root has to be defined
- * first, because it mounts the application that still renders the markup this
- * element wraps, and an element upgraded before that mount would be upgraded on
- * a copy that is about to be replaced.
+ * Both elements are registered here, in the order the entry point registers
+ * them. That order used to be a decision - the root mounted an application that
+ * replaced the markup this element wraps, so an element upgraded before the
+ * mount was upgraded on a copy about to be thrown away - and it stopped being
+ * one when the runtime left. It is kept as the order the page really starts in.
  */
 describe("upgrading the image editor element", () => {
   const editorMarkup = (profileUid = 1): string =>

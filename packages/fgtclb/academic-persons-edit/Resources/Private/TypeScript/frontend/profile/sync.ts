@@ -20,7 +20,25 @@ interface SkipSyncController {
 }
 
 const syncCheckboxSelector = ".academic-persons-profile-editing__sync-checkbox";
+const syncFormSelector = "[data-pe-sync-form]";
 
+/**
+ * The switch of `Partials/Profile/Header.html`, and the listeners that drive it.
+ *
+ * The two listeners are what `v-on:change="updateSkipSync"` and
+ * `v-on:submit.prevent` on that form were. They are delegated on the plugin
+ * root rather than bound to the form, which is the mechanism every other
+ * control of the editor uses since the Lit port: the root is the one node that
+ * is certainly there, and a handler that reads its target off the event needs
+ * no reference to the markup it serves.
+ *
+ * `submit` is prevented and nothing else is done with it, which is exactly what
+ * the `.prevent` modifier did. The form ships without a submit button, so
+ * nothing in the editor submits it; what the guard covers is a submission the
+ * markup did not ask for - an integrator's override that adds a button, or a
+ * browser's implicit submission - which would navigate away from the editor
+ * with a `GET` to the page itself and lose whatever else is open.
+ */
 export const createSkipSync = (
   editingTarget: EditingTarget,
 ): SkipSyncController => {
@@ -69,6 +87,23 @@ export const createSkipSync = (
       form?.setAttribute("aria-busy", "false");
     }
   };
+
+  root.addEventListener("submit", (event: Event): void => {
+    if (
+      event.target instanceof Element &&
+      event.target.closest(syncFormSelector) !== null
+    ) {
+      event.preventDefault();
+    }
+  });
+  root.addEventListener("change", (event: Event): void => {
+    if (
+      event.target instanceof Element &&
+      event.target.closest(syncFormSelector) !== null
+    ) {
+      void updateSkipSync(event);
+    }
+  });
 
   return { updateSkipSync };
 };

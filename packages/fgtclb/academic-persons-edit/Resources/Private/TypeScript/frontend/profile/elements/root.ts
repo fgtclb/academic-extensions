@@ -13,14 +13,15 @@
  * ajax, or by a second occurrence of the plugin - starts by itself.
  *
  * It also gives the editor an object to *be*. `EditingContext`, the status
- * regions and, from the next commits on, the child elements all need one owner
- * that outlives a single function call; module level `WeakMap`s keyed by the
- * root element were the workaround for not having one.
+ * regions and the child elements all need one owner that outlives a single
+ * function call; module level `WeakMap`s keyed by the root element were the
+ * workaround for not having one.
  *
  * ## It renders nothing
  *
- * Fluid renders the whole editor and the element wraps that markup as light DOM
- * children. Nothing here is a `LitElement` and nothing here has a shadow root:
+ * Fluid renders the editor's frame and the element wraps that markup as light
+ * DOM children; the two `LitElement`s below it render into the light DOM as
+ * well. Nothing here is a `LitElement` and nothing anywhere has a shadow root:
  * the theme's Bootstrap stylesheet has to reach the controls, Bootstrap's own
  * popover and toast JavaScript positions against `document`, and CKEditor 5
  * does not run inside a shadow root. See
@@ -33,26 +34,19 @@
  * `Build/tsconfig.tests.json` sets `erasableSyntaxOnly` to make that a type
  * error rather than a runtime one. A `@customElement` decorator would therefore
  * not run. Registration is a plain `customElements.define()`, and the elements
- * of the following commits declare `static properties` instead of `@property`.
+ * below declare `static properties` instead of `@property`.
  *
- * ## What Vue still does here
+ * ## It starts the editor on connection
  *
- * The document editor is still rendered by Vue while ACE-509 replaces the
- * editors one at a time, so this element still creates the application and
- * mounts it on the root. The image editor has left it and owns itself, in
- * `elements/image-editor.ts`. The mount is also why the four initialisers
- * below run from `onMounted()` and not from `connectedCallback()`:
- * `mount()` assigns the container's `innerHTML` as the template and then clears
- * the container (`vue.esm-browser.prod.js`: `i.template=r.innerHTML` followed by
- * `r.textContent=""`), so every element reference taken before the mount is
- * detached from the document. When the last Vue rendered editor is gone, the
- * mount goes with it and the initialisers move into `connectedCallback()`.
+ * `connectedCallback()` builds the controllers and runs the four initialisers,
+ * in that order and in one pass. Until ACE-509 removed the runtime they ran
+ * from Vue's `onMounted()` instead, and that was not a preference: `mount()`
+ * assigned the container's `innerHTML` as the template and then cleared the
+ * container, so every element reference taken before the mount pointed at a
+ * detached node. Nothing rewrites the markup any more - Fluid renders it, the
+ * elements below drive it - so the references a controller takes on connection
+ * are the ones the visitor sees.
  */
-import {
-  createApp,
-  onMounted,
-  type App,
-} from "@fgtclb/academic-persons-edit/frontend/vue.js";
 import {
   initializePopover,
   rootSelector,
@@ -99,40 +93,22 @@ const isStatusType = (value: unknown): value is StatusType =>
   typeof value === "string" && statusTypes.includes(value);
 
 /**
- * Whether a tag name belongs to this extension's element family.
+ * Builds the editor of one root: the controllers first, the initialisers after.
  *
- * Handed to Vue as `compilerOptions.isCustomElement` for as long as Vue still
- * compiles a part of the editor: its runtime compiler resolves an unknown tag
- * as a component and warns "Failed to resolve component" for every one it does
- * not know, and the elements of the following commits are rendered inside the
- * mounted root. The predicate is exported rather than inlined so that what the
- * shim covers can be asserted without a Vue application.
+ * That is the order Vue's `setup()`/`onMounted()` pair produced, and it is kept
+ * rather than defended. Every listener the two controllers register is
+ * delegated on the root and every initialiser writes DOM below it, so the six
+ * calls are independent of each other as they stand today - but that is a
+ * property of the current implementations and not something either side
+ * promises, and reordering them buys nothing.
  */
-export const isProfileEditingElementTag = (tag: string): boolean =>
-  tag.startsWith(profileEditingElementPrefix);
-
-const createProfileEditingApp = (context: EditingContext): App => {
-  const application = createApp({
-    setup(): Record<string, unknown> {
-      const documentController = createDocumentEditing(context);
-      const syncController = createSkipSync(context);
-
-      onMounted((): void => {
-        initializeStickyImageOffset(context.root);
-        initializeFieldEditing(context);
-        initializeDocumentSections(context);
-        initializePopover(context.root);
-      });
-
-      return {
-        ...documentController,
-        ...syncController,
-      };
-    },
-  });
-  application.config.compilerOptions.isCustomElement = isProfileEditingElementTag;
-
-  return application;
+const startProfileEditing = (context: EditingContext): void => {
+  createDocumentEditing(context);
+  createSkipSync(context);
+  initializeStickyImageOffset(context.root);
+  initializeFieldEditing(context);
+  initializeDocumentSections(context);
+  initializePopover(context.root);
 };
 
 /**
@@ -180,7 +156,7 @@ export class ProfileEditingElement extends HTMLElement {
       return;
     }
     this.#context = readEditingContext(root);
-    createProfileEditingApp(this.#context).mount(root);
+    startProfileEditing(this.#context);
   }
 
   disconnectedCallback(): void {

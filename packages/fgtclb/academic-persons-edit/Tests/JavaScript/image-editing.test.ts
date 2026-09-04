@@ -24,26 +24,25 @@ import {
  *
  * ## What is and is not covered
  *
- * The editor's own markup is rendered by Vue, which is stubbed - the same
+ * This file drives the controller without a custom element registry - the same
  * situation as the document editor, see `document-editor.test.ts`. The upload
- * form itself is server rendered (`f:form` inside
+ * form is server rendered (`f:form` inside
  * `Partials/Profile/Image/Editor.html`), so it is real markup here, and the
  * request that goes out of it is asserted in full.
  *
  * Two things are deliberately not covered and are named rather than papered
  * over:
  *
- * - The cropping path. CropperJS is stubbed (`Build/tests/stubs/cropper.mjs`)
- *   because it measures a layout and rasterises through a canvas, and jsdom has
- *   neither. It reaches its own error branch here rather than a crop, because
- *   the cropper's stage and source are Vue template refs that nothing fills
- *   when Vue is stubbed - so a "cropper is ready" assertion would be a
- *   statement about the stub, and would have to be rewritten by the port that
- *   replaces the refs with a query. It waits for the component.
- * - The states that only exist for the template to render - `confirmingDelete`,
- *   `error`, `hasSelection` - are asserted as state, and said so. They are the
- *   render input the template binds to, and they become the properties of the
- *   component.
+ * - The cropping path. It reaches its own error branch here rather than a crop:
+ *   the stage and the source it needs are queried out of the editor's markup,
+ *   and this file renders the root without the editor element that carries it.
+ *   `image-editor-element.test.ts` renders that element and covers the cropper
+ *   there, against the stub of `Build/tests/stubs/cropper.mjs` - CropperJS
+ *   measures a layout and rasterises through a canvas, and jsdom has neither.
+ * - The states that only exist to be rendered - `confirmingDelete`, `error`,
+ *   `hasSelection` - are asserted as state, and said so. They are what the
+ *   element reads on every change, and what it makes of them is asserted
+ *   there.
  */
 describe("the profile image", () => {
   let fetch: FetchDouble;

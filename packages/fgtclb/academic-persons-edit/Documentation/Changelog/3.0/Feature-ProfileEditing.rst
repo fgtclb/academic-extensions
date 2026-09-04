@@ -105,21 +105,22 @@ editor returns the focus to the control that opened it.
 Bundled libraries
 -----------------
 
-Three third-party sets are shipped with the extension, each with its licence
-file next to it:
+Two third-party sets are shipped with the extension, each with its licence file
+next to it:
 
-*   Vue 3.5.42 (MIT), :file:`Resources/Public/JavaScript/vendor/vue/3.5.42/`,
-    which renders the document and contact editors.
 *   Cropper.js 2.2.0 (MIT),
     :file:`Resources/Public/JavaScript/vendor/cropperjs/2.2.0/`, the image
-    cropper.
+    cropper. The ``cropperjs`` entry TYPO3 maps itself is version 1.6.1, an
+    incompatible API, so this one is vendored.
 *   Bootstrap Icons (MIT), the thirteen control icons of this view, as SVG
     files under :file:`Resources/Public/Icons/` with
     :file:`LICENSE-bootstrap-icons.txt` beside them.
 
-CKEditor 5 is not bundled - it is loaded from the system extension
-``rte_ckeditor``, see *Important: New dependencies `cms-rte-ckeditor` and
-`html-sanitizer`*.
+Nothing else is bundled. The view is rendered by web components written against
+Lit, which TYPO3 delivers through the import map of ``EXT:core``, and CKEditor 5
+is loaded from the system extension ``rte_ckeditor`` - see *Important: New
+dependencies `cms-rte-ckeditor` and `html-sanitizer`* and
+:ref:`breaking-profile-editing-rendered-by-web-components`.
 
 Impact
 ======

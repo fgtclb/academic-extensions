@@ -20,11 +20,11 @@ import { registerProfileDocumentEditorElement } from "@fgtclb/academic-persons-e
 import { registerProfileImageEditorElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/image-editor.js";
 import { registerProfileRichTextElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/rich-text.js";
 
-// The root first, and the order is not cosmetic: it reads the contract and
-// mounts the Vue application that still renders the rest of the editor, and
-// that mount replaces the markup below it - including the image editor. An
-// element defined before the mount would be upgraded on a copy that is about to
-// be thrown away. The order stops mattering when the runtime leaves.
+// The root first. The order no longer decides anything - it did while Vue's
+// "mount()" still replaced the markup below the root, so an element defined
+// before it was upgraded on a copy that was about to be thrown away - but it is
+// the order the page starts in and it reads that way: the owner, then what it
+// owns.
 registerProfileEditingElement();
 registerProfileImageEditorElement();
 // The document editor, the rich text field it renders and the contract

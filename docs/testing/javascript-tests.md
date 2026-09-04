@@ -61,8 +61,8 @@ is safe where nothing is emitted.
 
 Fixtures carry the markup the modules are driven against, and it is **extracted
 from the Fluid partials rather than invented**, with the partial and its lines
-named at each block: `f:translate` becomes the text it resolves to, `core:icon`
-becomes nothing, and the Vue directives are dropped. Everything a module queries
+named at each block: `f:translate` becomes the text it resolves to and
+`core:icon` becomes nothing. Everything a module queries
 — the `data-pe-*` hooks, the ids, the toggled class names, the structure the
 `closest()` calls walk — is kept verbatim, so a template that drops one of them
 turns the tests red.
@@ -127,13 +127,14 @@ stub would test nothing.
 
 ## The stubs, and what they cost
 
-Three libraries are replaced today: the six `@ckeditor/ckeditor5-*` bundles, the
-vendored CropperJS and the Vue runtime. All three are browser-only, none is
-ours, and the Vue module additionally imports its runtime through a path that
-only exists in the *output* tree.
+Two libraries are replaced today: the six `@ckeditor/ckeditor5-*` bundles and
+the vendored CropperJS. Both are browser-only and neither is ours.
 
 A stub is a liability, so the list stays short on purpose and every entry is a
-library this repository does not own.
+library this repository does not own. It was three until ACE-509: the Vue
+runtime was stubbed as well, and removing the runtime removed the stub with
+it — which is the shape a stub should have, tied to a dependency rather than to
+a test.
 
 The CKEditor and CropperJS stubs report through the DOM —
 `data-test-ckeditor="live"` / `"destroyed"` and `data-test-ckeditor-destroys` on
@@ -144,18 +145,6 @@ What this buys is the lifecycle: which editor is created, on which field, when
 it is destroyed, and in which order. What it does not buy is anything about the
 libraries themselves. Their integration is proven by a manual check per core
 version, and that is a real gap, named rather than papered over.
-
-The Vue stub is the one that models more than a lifecycle, because the root
-element depends on an ordering: `createApp().mount()` calls `setup()` first and
-the callbacks `onMounted()` collected during it afterwards. It knowingly differs
-from Vue in one point — Vue's own `mount()` takes the container's `innerHTML` as
-its template and then empties the container, and the stub leaves the container
-alone. The fixtures *are* the rendered markup, transcribed from what the Fluid
-partials produce, and re-rendering them is what the port removes. A test using
-the stub therefore proves nothing about rendering; it proves which handler runs,
-with which argument, in which order. The applications it created are readable as
-`createdApps` for the two facts that have no DOM of their own: that an editor is
-mounted exactly once, and which tags Vue is told are custom elements.
 
 The same applies to layout and animation. jsdom computes no transitions and
 every `getBoundingClientRect()` is zero, so scroll and drop-position arithmetic

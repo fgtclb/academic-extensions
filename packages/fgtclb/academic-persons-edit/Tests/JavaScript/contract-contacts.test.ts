@@ -66,7 +66,7 @@ describe("the contacts of a contract", () => {
     initializeDocumentSections(root);
   };
 
-  /** Opens the contract the contacts belong to, with the list Vue would render. */
+  /** Opens the contract the contacts belong to, with the contact list of its response. */
   const openContract = async (): Promise<void> => {
     fetch.respond({
       success: true,

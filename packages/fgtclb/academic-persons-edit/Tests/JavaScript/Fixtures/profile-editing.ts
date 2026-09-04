@@ -11,9 +11,10 @@
  *
  * - `<f:translate>` is replaced by the English text it resolves to, and
  *   `<core:icon>` by nothing at all. Neither is read by the JavaScript.
- * - The Vue directives (`v-on:*`, `v-if`, `v-bind:*`) are dropped. They are
- *   what ACE-509 removes, the handlers they bind are called directly by the
- *   tests, and a `v-` attribute is inert in a browser that has no Vue.
+ * - What a `LitElement` renders is not transcribed: the mount points are, and
+ *   the element renders into them here exactly as it does in a browser. The
+ *   blocks that predate ACE-509 additionally dropped the Vue directives of the
+ *   partials they were transcribed from, and there are none left to drop.
  *
  * What is kept verbatim is everything a module queries: the `data-pe-*` hooks,
  * the element ids, the class names it toggles, the `data-*` configuration of
@@ -624,13 +625,15 @@ export const documentSection = ({
 </section>`;
 
 /**
- * `Partials/Profile/Documents/Editor.html:10-263` in the state Vue renders it
- * in for `mode: "add"` or `"edit"`: the view container the controller queries
- * for its rich text fields and for the field to focus.
+ * What `<academic-persons-edit-document-editor>` renders for `mode: "add"` or
+ * `"edit"`: the view container the controller queries for its rich text fields
+ * and for the field to focus.
  *
- * The controls carry the ids and the `data-pe-document-field` hooks the
- * template builds from the response's `fields`, so the same response drives the
- * markup here and the markup a component renders after the port.
+ * It is a fixture rather than the element itself because the files that use it
+ * drive the controller without a registry. The controls carry the ids and the
+ * `data-pe-document-field` hooks the element builds from the response's
+ * `fields`, so the same response drives the markup here and the markup the
+ * element renders in `document-editor-element.test.ts`.
  */
 export const documentEditorView = ({
   fields,

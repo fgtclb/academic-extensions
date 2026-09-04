@@ -26,7 +26,8 @@ import {
  *
  * The sanitiser is exercised through its own function rather than through the
  * DOM, because the shape of its output is the contract: `documents.ts` reads
- * `parseRichTextPreview(value).body.innerHTML` and hands the string to Vue.
+ * `parseRichTextPreview(value).body.innerHTML` and hands the string to the
+ * element that renders the preview.
  */
 describe("the rich text preview sanitiser", () => {
   const sanitise = (value: string): string =>

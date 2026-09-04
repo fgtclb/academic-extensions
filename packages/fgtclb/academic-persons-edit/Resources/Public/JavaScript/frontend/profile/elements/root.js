@@ -1,9 +1,5 @@
 /* Generated from Resources/Private/TypeScript — do not edit. */
 import {
-  createApp,
-  onMounted
-} from "@fgtclb/academic-persons-edit/frontend/vue.js";
-import {
   initializePopover,
   rootSelector,
   showStatus
@@ -25,26 +21,13 @@ import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/s
 const profileEditingStatusEvent = "pe:status";
 const statusTypes = ["danger", "info", "success", "warning"];
 const isStatusType = (value) => typeof value === "string" && statusTypes.includes(value);
-const isProfileEditingElementTag = (tag) => tag.startsWith(profileEditingElementPrefix);
-const createProfileEditingApp = (context) => {
-  const application = createApp({
-    setup() {
-      const documentController = createDocumentEditing(context);
-      const syncController = createSkipSync(context);
-      onMounted(() => {
-        initializeStickyImageOffset(context.root);
-        initializeFieldEditing(context);
-        initializeDocumentSections(context);
-        initializePopover(context.root);
-      });
-      return {
-        ...documentController,
-        ...syncController
-      };
-    }
-  });
-  application.config.compilerOptions.isCustomElement = isProfileEditingElementTag;
-  return application;
+const startProfileEditing = (context) => {
+  createDocumentEditing(context);
+  createSkipSync(context);
+  initializeStickyImageOffset(context.root);
+  initializeFieldEditing(context);
+  initializeDocumentSections(context);
+  initializePopover(context.root);
 };
 class ProfileEditingElement extends HTMLElement {
   #context = null;
@@ -73,7 +56,7 @@ class ProfileEditingElement extends HTMLElement {
       return;
     }
     this.#context = readEditingContext(root);
-    createProfileEditingApp(this.#context).mount(root);
+    startProfileEditing(this.#context);
   }
   disconnectedCallback() {
     this.removeEventListener(profileEditingStatusEvent, this.#handleStatus);
@@ -102,7 +85,6 @@ const registerProfileEditingElement = () => {
 };
 export {
   ProfileEditingElement,
-  isProfileEditingElementTag,
   profileEditingElementName,
   profileEditingElementPrefix,
   profileEditingStatusEvent,

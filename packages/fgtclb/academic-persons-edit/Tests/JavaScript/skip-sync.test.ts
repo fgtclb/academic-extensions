@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
-import { resetBody } from "../../../../../Build/tests/dom.mjs";
+import { resetBody, settle } from "../../../../../Build/tests/dom.mjs";
 import { installFetch, type FetchDouble } from "../../../../../Build/tests/fetch.mjs";
 import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
 import {
@@ -18,6 +18,12 @@ import {
  * checkbox that stays where the visitor put it while the database says
  * something else shows a state that does not exist, and nothing on screen says
  * so.
+ *
+ * The last two cases are about how the handler is reached. It was reached by
+ * `v-on:change="updateSkipSync"` and `v-on:submit.prevent` on the form until
+ * ACE-509 removed the runtime that read those attributes; it is reached by two
+ * listeners delegated on the plugin root since, and a control that saves on
+ * change and is no longer wired to anything is a defect nothing else notices.
  */
 describe("the synchronisation switch", () => {
   let fetch: FetchDouble;
@@ -122,6 +128,36 @@ describe("the synchronisation switch", () => {
     await dispatch(false);
 
     assert.equal(checkbox.checked, true);
+  });
+
+  /**
+   * Driven through a real event this time, not by calling the handler: what is
+   * asserted is the wiring the Fluid directive used to be.
+   */
+  it("saves when the control the visitor toggled reports a change", async () => {
+    fetch.respond({ success: true, skipSync: true });
+
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new CustomEvent("change", { bubbles: true }));
+    await settle();
+
+    assert.equal(fetch.calls.length, 1);
+    assert.deepEqual(fetch.calls[0]?.body, { profile: 1, data: { skipSync: true } });
+    assert.equal(checkbox.checked, true);
+  });
+
+  /**
+   * The form has no submit button and posts nothing; a submission it did not
+   * ask for would navigate away from the editor, so it is prevented and left at
+   * that.
+   */
+  it("swallows a submission of the form it sits in", () => {
+    const event = new CustomEvent("submit", { bubbles: true, cancelable: true });
+
+    form.dispatchEvent(event);
+
+    assert.equal(event.defaultPrevented, true);
+    assert.equal(fetch.calls.length, 0);
   });
 
   it("refuses to send anything when the endpoint is not configured", async () => {

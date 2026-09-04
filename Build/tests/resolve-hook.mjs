@@ -30,15 +30,14 @@ let byPrefix = new Map();
 /**
  * Specifiers that must never reach their real implementation.
  *
- * CKEditor 5 and CropperJS are delivered by TYPO3 and by the extension's own
- * vendor tree, are browser-only and pull in a rendering engine each; the Vue
- * runtime is a compiled browser bundle that the source imports through a path
- * that only exists in the *output* tree. What the tests are about is the code
- * of this repository around them, so each is replaced by a stub that records
- * what was asked of it.
+ * CKEditor 5 is delivered by TYPO3 and CropperJS by the extension's own vendor
+ * tree; both are browser-only and pull in a rendering engine each. What the
+ * tests are about is the code of this repository around them, so each is
+ * replaced by a stub that records what was asked of it.
  *
  * A stub is a liability, so the list is kept short on purpose and every entry
- * is a library this repository does not own.
+ * is a library this repository does not own. Lit is deliberately not one of
+ * them - see "relocated" below.
  */
 const stubs = new Map([
     ['@ckeditor/ckeditor5-basic-styles', 'stubs/ckeditor.mjs'],
@@ -48,7 +47,6 @@ const stubs = new Map([
     ['@ckeditor/ckeditor5-list', 'stubs/ckeditor.mjs'],
     ['@ckeditor/ckeditor5-paragraph', 'stubs/ckeditor.mjs'],
     ['@fgtclb/academic-persons-edit/cropper', 'stubs/cropper.mjs'],
-    ['@fgtclb/academic-persons-edit/frontend/vue.js', 'stubs/vue.mjs'],
 ]);
 
 /**

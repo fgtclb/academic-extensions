@@ -311,6 +311,29 @@ and tearing the tree out from inside Lit's `updated()` is how a reactive element
 ends up patching detached nodes. Vue's `after-leave` was a frame away for the
 same reason.
 
+## Nothing else ships with it
+
+The editor loaded a vendored Vue 3.5.42 — 172 KB of runtime and its template
+compiler — on every page that carried it, and ACE-509 removed the last import of
+it. What renders now is five custom elements: the root and the image editor are
+plain `HTMLElement` controllers over server rendered markup, and the document
+editor, the contract contacts and the rich text field are `LitElement`s over
+markup only the browser can build. Lit is delivered by `EXT:core` and is not
+vendored.
+
+`Resources/Public/JavaScript/vendor/` therefore holds exactly one library:
+CropperJS 2.2.0, with its licence. Core maps a `cropperjs` specifier of its own,
+but it is **1.6.1** on both 13.4.34 and 14.3.6 — the API before CropperJS became
+a set of custom elements — so it is not a replacement, and the vendored copy
+stays. See [Frontend assets](../development/frontend-assets.md#vendored-libraries).
+
+The five names, the `pe:*` events, the `data-pe-*` hooks and the root's `data-*`
+attributes are the whole contract an integrator has instead of the partials the
+elements replaced. They are light DOM throughout, so a project's CSS reaches
+every control the elements render — see *Breaking: Profile editing is rendered
+by web components* in the extension's changelog for the override points that
+disappeared.
+
 ## The seam for a caller that has only the element
 
 The entry points take `EditingTarget`, which is `HTMLElement | EditingContext`.

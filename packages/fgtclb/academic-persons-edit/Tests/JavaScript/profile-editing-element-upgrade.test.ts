@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { resetBody } from "../../../../../Build/tests/dom.mjs";
-import { createdApps, resetVue } from "../../../../../Build/tests/stubs/vue.mjs";
 import {
   profileEditingElementName,
   ProfileEditingElement,
@@ -46,24 +45,21 @@ describe("upgrading the profile editing element", () => {
     const body = resetBody(profileEditingElement());
     const element = select(body, profileEditingElementName, HTMLElement);
     assert.equal(element instanceof ProfileEditingElement, false);
-    assert.equal(createdApps.length, 0);
+    assert.equal((element as { context?: unknown }).context, undefined);
 
     registerProfileEditingElement();
 
     assert.ok(element instanceof ProfileEditingElement);
     assert.equal(element.context?.profileUid, 1);
-    assert.equal(createdApps.length, 1);
   });
 
   it("starts an editor that arrives after the module loaded", () => {
     const body = resetBody("");
-    resetVue();
 
     body.innerHTML = profileEditingElement({ profileUid: 4 });
 
     const element = select(body, profileEditingElementName, HTMLElement);
     assert.ok(element instanceof ProfileEditingElement);
     assert.equal(element.context?.profileUid, 4);
-    assert.equal(createdApps.length, 1);
   });
 });

@@ -6,7 +6,6 @@ import {
   settle,
 } from "../../../../../Build/tests/dom.mjs";
 import { installFetch, type FetchDouble } from "../../../../../Build/tests/fetch.mjs";
-import { resetVue } from "../../../../../Build/tests/stubs/vue.mjs";
 import {
   profileEditingElementName,
   ProfileEditingElement,
@@ -98,7 +97,6 @@ describe("the profile image editor element", () => {
   beforeEach(() => {
     registerProfileEditingElement();
     registerProfileImageEditorElement();
-    resetVue();
     resetBody("");
     fetch = installFetch();
   });
@@ -425,11 +423,11 @@ describe("the profile image editor element", () => {
 /**
  * The cropping path.
  *
- * It was not reachable before this commit: the cropper's stage and the image it
- * crops were Vue template refs, and nothing filled them while Vue was stubbed,
- * so `initializeCropper()` reached its own error branch and stopped. They are
- * queried out of the server rendered markup now, which is what makes this
- * testable at all - and `parseImageRatio()` is only reached through here.
+ * It was not reachable while Vue rendered the editor: the cropper's stage and
+ * the image it crops were Vue template refs, and nothing filled them outside a
+ * browser, so `initializeCropper()` reached its own error branch and stopped.
+ * They are queried out of the server rendered markup now, which is what makes
+ * this testable at all - and `parseImageRatio()` is only reached through here.
  *
  * CropperJS itself is the stub of `Build/tests/stubs/cropper.mjs`: the real one
  * measures a layout and rasterises through a canvas, and jsdom has neither.
@@ -485,7 +483,6 @@ describe("the profile image cropper", () => {
   beforeEach(() => {
     registerProfileEditingElement();
     registerProfileImageEditorElement();
-    resetVue();
     resetBody("");
     fetch = installFetch();
   });
