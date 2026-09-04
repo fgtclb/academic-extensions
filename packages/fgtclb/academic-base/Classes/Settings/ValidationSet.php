@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicPersons\Settings;
+namespace FGTCLB\AcademicBase\Settings;
 
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 
 /**
- * @internal and not part of public API.
- * @todo Move this to `EXT:academic_base`.
+ * The validations of one record type, keyed by the property name they were
+ * registered under.
+ *
+ * @internal not part of public API.
  */
 #[Exclude]
 final class ValidationSet
