@@ -27,16 +27,17 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 
 ## [Architecture](architecture/Index.md)
 
-| Page                                                                       | Contents                                                                                                                      |
-|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| [Core version aware code](architecture/core-version-aware-code.md)         | Version switches, when to split a class per core version, and the APIs that block a v15 migration.                            |
-| [Dependency injection](architecture/dependency-injection.md)               | Service configuration, stateless services, the TYPO3 attributes that are safe on both core versions.                          |
-| [Class design](architecture/class-design.md)                               | What the code base actually does with `final`, `readonly`, injection and data objects.                                        |
-| [Database queries](architecture/database-queries.md)                       | The two query builder rules that were learned from released defects.                                                          |
-| [Validation settings](architecture/validation-settings.md)                 | The one YAML driving both the backend FormEngine and the frontend edit form, and how it is overridden.                        |
-| [Form data transformation](architecture/form-data-transformation.md)       | When a submitted value reaches the domain model, and why the shipped `profile` defaults lock the name fields.                 |
-| [TypoScript and site sets](architecture/typoscript-and-site-sets.md)       | One physical copy of every TypoScript and page TSconfig file, delivered as a site set and as a static template.               |
-| [Translation synchronization](architecture/translation-synchronization.md) | Why the profile translation sync goes through the DataHandler, its event chain, workspace rules and the contact4pages policy. |
+| Page                                                                         | Contents                                                                                                                      |
+|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [Core version aware code](architecture/core-version-aware-code.md)           | Version switches, when to split a class per core version, and the APIs that block a v15 migration.                            |
+| [Dependency injection](architecture/dependency-injection.md)                 | Service configuration, stateless services, the TYPO3 attributes that are safe on both core versions.                          |
+| [Class design](architecture/class-design.md)                                 | What the code base actually does with `final`, `readonly`, injection and data objects.                                        |
+| [Database queries](architecture/database-queries.md)                         | The two query builder rules that were learned from released defects.                                                          |
+| [Frontend-user contact import](architecture/frontend-user-contact-import.md) | How imported telephone and fax records keep stable identities and migrate legacy data.                                        |
+| [Validation settings](architecture/validation-settings.md)                   | The one YAML driving both the backend FormEngine and the frontend edit form, and how it is overridden.                        |
+| [Form data transformation](architecture/form-data-transformation.md)         | When a submitted value reaches the domain model, and why the shipped `profile` defaults lock the name fields.                 |
+| [TypoScript and site sets](architecture/typoscript-and-site-sets.md)         | One physical copy of every TypoScript and page TSconfig file, delivered as a site set and as a static template.               |
+| [Translation synchronization](architecture/translation-synchronization.md)   | Why the profile translation sync goes through the DataHandler, its event chain, workspace rules and the contact4pages policy. |
 
 ## [Testing](testing/Index.md)
 
