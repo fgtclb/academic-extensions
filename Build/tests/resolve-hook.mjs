@@ -47,6 +47,7 @@ const stubs = new Map([
     ['@ckeditor/ckeditor5-link', 'stubs/ckeditor.mjs'],
     ['@ckeditor/ckeditor5-list', 'stubs/ckeditor.mjs'],
     ['@ckeditor/ckeditor5-paragraph', 'stubs/ckeditor.mjs'],
+    ['@fgtclb/academic-persons-edit/cropper', 'stubs/cropper.mjs'],
     ['@fgtclb/academic-persons-edit/frontend/vue.js', 'stubs/vue.mjs'],
 ]);
 

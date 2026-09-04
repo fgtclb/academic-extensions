@@ -42,14 +42,30 @@ it does not belong.
 
 ## Layout
 
-| Path                                      | Contents                                                                         |
-|-------------------------------------------|----------------------------------------------------------------------------------|
-| `packages/*/*/Tests/JavaScript/*.test.ts` | The tests, next to the extension, mirroring `Tests/Unit` and `Tests/Functional`. |
-| `Build/tests/register.mjs`                | The `--import` entry: installs the resolve hook and the DOM.                     |
-| `Build/tests/resolve-hook.mjs`            | Models the TYPO3 import map for node.                                            |
-| `Build/tests/dom.mjs`, `dom.d.mts`        | The jsdom window, the browser globals, `resetBody()` and `settle()`.             |
-| `Build/tests/stubs/*.mjs`                 | The libraries this repository does not own.                                      |
-| `Build/tsconfig.tests.json`               | The type check of the tests, a project of its own.                               |
+| Path                                       | Contents                                                                         |
+|--------------------------------------------|----------------------------------------------------------------------------------|
+| `packages/*/*/Tests/JavaScript/*.test.ts`  | The tests, next to the extension, mirroring `Tests/Unit` and `Tests/Functional`. |
+| `packages/*/*/Tests/JavaScript/Fixtures/*` | The markup the tests drive, extracted from the extension's own Fluid partials.   |
+| `Build/tests/register.mjs`                 | The `--import` entry: installs the resolve hook and the DOM.                     |
+| `Build/tests/resolve-hook.mjs`             | Models the TYPO3 import map for node.                                            |
+| `Build/tests/dom.mjs`, `dom.d.mts`         | The jsdom window, the browser globals and the DOM helpers.                       |
+| `Build/tests/fetch.mjs`, `fetch.d.mts`     | The recording request double.                                                    |
+| `Build/tests/stubs/*.mjs`                  | The libraries this repository does not own.                                      |
+| `Build/tsconfig.tests.json`                | The type check of the tests, a project of its own.                               |
+
+A fixture is imported by its real file name — `./Fixtures/profile-editing.ts` —
+because node's type stripping rewrites no relative specifier, and only the bare
+specifiers of the shipped modules go through the resolve hook.
+`Build/tsconfig.tests.json` therefore sets `allowImportingTsExtensions`, which
+is safe where nothing is emitted.
+
+Fixtures carry the markup the modules are driven against, and it is **extracted
+from the Fluid partials rather than invented**, with the partial and its lines
+named at each block: `f:translate` becomes the text it resolves to, `core:icon`
+becomes nothing, and the Vue directives are dropped. Everything a module queries
+— the `data-pe-*` hooks, the ids, the toggled class names, the structure the
+`closest()` calls walk — is kept verbatim, so a template that drops one of them
+turns the tests red.
 
 The tests live under `Tests/` and not below `Resources/Private/TypeScript/`
 because [the build](../development/frontend-assets.md) walks only the latter for
@@ -100,18 +116,18 @@ behind it raises an error naming both, rather than falling through to node's
 
 ## The stubs, and what they cost
 
-Two libraries are replaced today: the six `@ckeditor/ckeditor5-*` bundles and
-the Vue runtime. Both are browser-only, neither is ours, and the Vue module
-additionally imports its runtime through a path that only exists in the *output*
-tree. The vendored CropperJS will need the same treatment when the image editor
-gets its tests.
+Three libraries are replaced today: the six `@ckeditor/ckeditor5-*` bundles, the
+vendored CropperJS and the Vue runtime. All three are browser-only, none is
+ours, and the Vue module additionally imports its runtime through a path that
+only exists in the *output* tree.
 
 A stub is a liability, so the list stays short on purpose and every entry is a
 library this repository does not own.
 
-The CKEditor stub reports through the DOM — `data-test-ckeditor="live"` /
-`"destroyed"` and `data-test-ckeditor-destroys` on the textarea — so a test
-asserts on the element it already has and imports nothing from the harness.
+The CKEditor and CropperJS stubs report through the DOM —
+`data-test-ckeditor="live"` / `"destroyed"` and `data-test-ckeditor-destroys` on
+the textarea, `data-test-cropper` on the cropper's container — so a test asserts
+on the element it already has and imports nothing from the harness.
 
 What this buys is the lifecycle: which editor is created, on which field, when
 it is destroyed, and in which order. What it does not buy is anything about the
@@ -120,7 +136,44 @@ version, and that is a real gap, named rather than papered over.
 
 The same applies to layout and animation. jsdom computes no transitions and
 every `getBoundingClientRect()` is zero, so scroll and drop-position arithmetic
-is tested with injected rectangles, not with real geometry.
+is tested with injected rectangles (`setBoundingRect()`), not with real
+geometry.
+
+## The requests
+
+`installFetch()` replaces `globalThis.fetch` with a queue of prepared responses
+and a log of the calls that took them. The responses are real `Response`
+objects, so `ok`, `status` and `json()` behave as they do in a browser,
+including the rejection on a body that is not JSON.
+
+A request that nobody queued a response for is rejected with a message naming
+its url rather than being answered with a default, and `respondLater()` queues
+one the test settles by hand — a prepared response otherwise resolves in the
+same microtask as the call that takes it, so two "overlapping" requests would in
+truth run one after the other.
+
+What a test asserts on a recorded call is the method, the url, the headers and
+the decoded body. The `X-Requested-With` header is asserted everywhere it is
+sent: it is the guard every writing endpoint checks, because a custom header
+cannot be set cross origin without a preflight.
+
+## What jsdom does not have, and what stands in for it
+
+Modelled in `dom.mjs`, each because a shipped module reaches for it:
+
+| Name                              | Modelled as                                                                          |
+|-----------------------------------|--------------------------------------------------------------------------------------|
+| `CSS.escape`                      | The CSSOM algorithm, transcribed rather than approximated.                           |
+| `matchMedia`                      | Nothing matches, which is what a browser answers for a reduced-motion query.         |
+| `scrollIntoView`                  | Records the alignment as `data-test-scrolled-into-view` on the element.              |
+| `URL.createObjectURL` / `revoke…` | A register per object, so `isObjectUrlAlive()` can prove a preview url was released. |
+| `DragEvent`, `DataTransfer`       | `createDragEvent()`, with the pointer position and a recording data transfer.        |
+| `getBoundingClientRect`           | `setBoundingRect()`, per element and per test.                                       |
+
+The object urls are modelled rather than delegated because the two realms
+disagree: node's `URL.createObjectURL` takes only a node `Blob`, jsdom's
+`FormData` takes only a jsdom one, and a browser has one realm and no such
+split. `Blob` and `File` on `globalThis` are therefore jsdom's.
 
 ## Two constraints the harness imposes
 

@@ -17,6 +17,15 @@
             "node"
         ],
 
+        // A test imports a shared fixture of its own extension by its real
+        // file name, "./Fixtures/x.ts". Node's type stripping does not rewrite
+        // a relative ".js" specifier to ".ts" - only the bare specifiers of the
+        // shipped modules are rewritten, by the resolve hook that models the
+        // TYPO3 import map - so the extension has to be the real one, and
+        // TypeScript has to be told that it may be. Nothing is emitted, so
+        // there is no output whose imports could be wrong.
+        "allowImportingTsExtensions": true,
+
         // Node runs these files by stripping the type annotations out. It does
         // not transform, so a construct that needs emitted JavaScript — an
         // "enum", a "namespace", a constructor parameter property — is a

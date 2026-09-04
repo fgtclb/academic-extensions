@@ -27,3 +27,39 @@ export declare const resetBody: (html?: string) => HTMLElement;
  * without handing it back to the caller.
  */
 export declare const settle: (turns?: number) => Promise<void>;
+
+/**
+ * A drag event with a modelled data transfer, for the handlers of the document
+ * list - jsdom implements neither "DragEvent" nor "DataTransfer".
+ */
+export declare const createDragEvent: (
+  type: string,
+  init?: { clientX?: number; clientY?: number },
+) => Event & {
+  readonly clientX: number;
+  readonly clientY: number;
+  readonly dataTransfer: {
+    dropEffect: string;
+    effectAllowed: string;
+    dragImage: { element: Element; x: number; y: number } | null;
+    setData: (format: string, value: string) => void;
+    getData: (format: string) => string;
+    setDragImage: (element: Element, x: number, y: number) => void;
+  };
+};
+
+/**
+ * Places a rectangle on an element. jsdom lays nothing out and reports zero for
+ * every "getBoundingClientRect()", so the geometry a test is about is injected.
+ */
+export declare const setBoundingRect: (
+  element: Element,
+  rect: { top?: number; left?: number; width?: number; height?: number },
+) => void;
+
+/**
+ * Whether an object url created by the page is still registered. The image
+ * editor has to revoke every preview url it creates, and nothing but the
+ * register can observe that it did.
+ */
+export declare const isObjectUrlAlive: (url: string) => boolean;

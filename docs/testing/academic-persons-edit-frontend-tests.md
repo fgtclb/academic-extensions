@@ -62,11 +62,30 @@ Two things came out of that, and only one of them is coverage:
   module in a DOM. Those thirteen readers are the concrete case it has to be
   able to fail on.
 
-Coverage is a beginning, not a state: one file, four tests, the close path only.
-Everything else the modules do — the requests, the optimistic updates, the focus
-management, the image cropper, and the thirteen hook readers above — is still
-covered by nothing that executes it. Do not read the existence of the suite as
-the gap being closed.
+Nine more files were added with the Lit port (ACE-509), before a line of Vue was
+removed, so that the port is a refactor under a green suite rather than a
+rewrite with a hope. Each drives the shipped module against the markup of the
+Fluid partials it is rendered from:
+
+| File                        | What it pins                                                                                                                                                                     |
+|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `request-layer.test.ts`     | `requestJson()`: the headers including the `X-Requested-With` guard, the failure shapes, the wait cursor, and which status region a severity writes.                             |
+| `skip-sync.test.ts`         | The synchronisation switch: its payload, and the revert of a control that saves without a button.                                                                                |
+| `field-editing.test.ts`     | Per-field edit, clear, undo and save; only changed fields travel; the validation messages; the visibility switch; the field groups and their preview modes; the edit-all toggle. |
+| `rich-text-preview.test.ts` | The sanitiser's allow-list, the link schemes, the preview, and the character limit.                                                                                              |
+| `document-rows.test.ts`     | The list a section renders: numbering, the arrow at each end, the empty state, sorting by arrow and by drag, and the rollback of both.                                           |
+| `document-editor.test.ts`   | The open and close cycle, the collapse target, the focus, the created editors, the three save modes, and the values a row is written with.                                       |
+| `contract-contacts.test.ts` | The contacts of a contract: their endpoints, their editor, and what a save does to the list.                                                                                     |
+| `image-editing.test.ts`     | Choosing, uploading and deleting the image, the previews, and the object urls that are released.                                                                                 |
+| `sticky-image.test.ts`      | The offset below a fixed page header, and its teardown.                                                                                                                          |
+
+That is the coverage the thirteen hook readers needed: a test file fails if a
+`data-pe-*` attribute is queried under a name the templates do not emit.
+
+It is still not everything. The CSS transitions, the real CKEditor and the real
+CropperJS — including the whole cropping path, whose stage and source are Vue
+template refs today — are covered by nothing that executes them, and are named
+in [JavaScript tests](javascript-tests.md) rather than papered over.
 
 **Do not close the rest of it with assertions on source text.** The previous
 attempt did: a unit test compared the `.ts` files against literal strings, down
