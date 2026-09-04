@@ -1,7 +1,8 @@
 # Frontend verification for `academic-persons-edit`
 
 The profile editing frontend is the largest piece of TypeScript in this
-repository — one entry point and eight modules under
+repository — one entry point, eight feature modules and eight element modules
+under
 [`Resources/Private/TypeScript/frontend/`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/),
 compiled by the repository build into committed JavaScript under
 [`Resources/Public/JavaScript/`](../../packages/fgtclb/academic-persons-edit/Resources/Public/JavaScript/).

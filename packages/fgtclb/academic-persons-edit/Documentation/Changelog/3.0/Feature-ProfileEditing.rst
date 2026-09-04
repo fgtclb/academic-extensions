@@ -116,9 +116,10 @@ next to it:
     files under :file:`Resources/Public/Icons/` with
     :file:`LICENSE-bootstrap-icons.txt` beside them.
 
-Nothing else is bundled. The view is rendered by web components written against
-Lit, which TYPO3 delivers through the import map of ``EXT:core``, and CKEditor 5
-is loaded from the system extension ``rte_ckeditor`` - see *Important: New
+Nothing else is bundled. The view is rendered by five web components, two of
+them written against Lit, which TYPO3 delivers through the import map of
+``EXT:core``, and CKEditor 5 is loaded from the system extension
+``rte_ckeditor`` - see *Important: New
 dependencies `cms-rte-ckeditor` and `html-sanitizer`* and
 :ref:`breaking-profile-editing-rendered-by-web-components`.
 

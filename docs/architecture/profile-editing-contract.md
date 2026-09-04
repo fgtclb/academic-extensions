@@ -58,6 +58,49 @@ changed afterwards is not seen. Nothing in the rendered page changes one — Flu
 writes them once — but a test that wants a root without an endpoint has to build
 the controller *after* removing it, not before.
 
+## The five elements, and the two that are Lit
+
+Everything below the root is one of five custom elements. Which base class an
+element has is decided by one question — can the server render its markup? Three
+of them drive markup Fluid rendered and therefore render nothing themselves;
+only the two whose content comes out of a response build markup, and those two
+are `LitElement`s.
+
+| Element                                     | Base          | Renders                                                    |
+|---------------------------------------------|---------------|------------------------------------------------------------|
+| `<academic-persons-edit-profile-editing>`   | `HTMLElement` | Nothing. Wraps the plugin root and starts the editor.      |
+| `<academic-persons-edit-image-editor>`      | `HTMLElement` | Nothing. Controller over the server rendered upload form.  |
+| `<academic-persons-edit-document-editor>`   | `LitElement`  | One open document or contract editor, from `documentForm`. |
+| `<academic-persons-edit-contract-contacts>` | `LitElement`  | The contacts of one contract, and the editor of one.       |
+| `<academic-persons-edit-rich-text>`         | `HTMLElement` | Nothing. Owns one textarea and the CKEditor 5 on it.       |
+
+`<academic-persons-edit-rich-text>` is the one that looks like it belongs in the
+other group and does not: Lit *creates and removes* it, but never renders into
+it, because `ClassicEditor.create()` owns everything below the textarea. That is
+why it is an `HTMLElement` and not a `LitElement` — see its own section below.
+
+Five events cross the element boundary. Four are dispatched by the document
+editor and consumed by `profile/documents.ts`, which created it; the fifth is
+listened for on the root so that a descendant which holds no context can still
+have a status written. All of them bubble; none is `composed`, because there is
+no shadow boundary anywhere for one to cross.
+
+| Event                | Dispatched by       | Detail               |
+|----------------------|---------------------|----------------------|
+| `pe:status`          | nothing shipped yet | `{ type, message? }` |
+| `pe:document-close`  | document editor     | —                    |
+| `pe:document-submit` | document editor     | —                    |
+| `pe:document-input`  | document editor     | `{ name, value }`    |
+| `pe:document-closed` | document editor     | —                    |
+
+The two libraries sit outside that picture and are reached the same way from
+either group: **CKEditor 5** comes from `EXT:rte_ckeditor` through the import
+map and is created and destroyed by `<academic-persons-edit-rich-text>` for a
+document field, and by `profile/rich-text.ts` directly for a permanently
+rendered profile field. **CropperJS 2.2.0** is vendored under
+`Resources/Public/JavaScript/vendor/` and is driven by `profile/image.ts`, never
+by an element — the element only says which panel is shown.
+
 ## The element that owns the root
 
 The template wraps the plugin root in
@@ -103,10 +146,11 @@ that a type error instead of a runtime one.
 ([`profile/elements/image-editor.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/image-editor.ts))
 is the first of the editor's components, and it deliberately renders nothing
 either. The editor it drives is an Extbase `<f:form>`: it carries the
-`__trustedProperties` signature the property mapper validates the upload
-against, and nothing in a browser can recompute it. A component that rendered
-that form would have to reproduce a signature only the server can make, so the
-form stays server rendered and the element is a controller over it.
+`__trustedProperties` HMAC — signed with the installation's encryption key —
+that the property mapper validates the upload against, and nothing in a browser
+can recompute it. A component that rendered that form would have to reproduce a
+signature only the server can make, so the form stays server rendered and the
+element is a controller over it.
 
 The state, the cropper and every request stay in `profile/image.ts`, which is
 driven and pinned without a registry. The element creates one controller, is
@@ -315,11 +359,11 @@ same reason.
 
 The editor loaded a vendored Vue 3.5.42 — 172 KB of runtime and its template
 compiler — on every page that carried it, and ACE-509 removed the last import of
-it. What renders now is five custom elements: the root and the image editor are
-plain `HTMLElement` controllers over server rendered markup, and the document
-editor, the contract contacts and the rich text field are `LitElement`s over
-markup only the browser can build. Lit is delivered by `EXT:core` and is not
-vendored.
+it. What renders now is five custom elements, and only two of them are
+`LitElement`s — the document editor and the contract contacts, whose markup
+comes out of a response. The root, the image editor and the rich text field are
+plain `HTMLElement` controllers over markup Fluid rendered. Lit is delivered by
+`EXT:core` and is not vendored.
 
 `Resources/Public/JavaScript/vendor/` therefore holds exactly one library:
 CropperJS 2.2.0, with its licence. Core maps a `cropperjs` specifier of its own,

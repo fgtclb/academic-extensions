@@ -11,9 +11,10 @@ The profile editing view of :ref:`profile-editing` was rendered by a Vue 3
 runtime bundled with the extension: Fluid emitted the markup of every editor
 with ``v-if``, ``v-for``, ``v-model`` and ``v-on:`` attributes in it, and the
 runtime compiled that markup in the browser and re-rendered it on every change.
-The runtime is removed. What renders the same view now is five custom elements
-written against `Lit <https://lit.dev>`__, which TYPO3 delivers through the
-import map of ``EXT:core``; nothing is bundled with the extension for it.
+The runtime is removed. What renders the same view now is five custom elements.
+Two of them build their markup with `Lit <https://lit.dev>`__, which TYPO3
+delivers through the import map of ``EXT:core``; the other three render nothing
+and drive markup Fluid rendered. Nothing is bundled with the extension for it.
 
 The consequence for an integrator is not the framework. It is that markup which
 used to be written in Fluid - and could therefore be overridden - is now built

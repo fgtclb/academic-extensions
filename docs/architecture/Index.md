@@ -32,6 +32,10 @@ describing an intention as if it were the state.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
+- The profile editor is five custom elements over Fluid's markup, and only the
+  two whose content comes out of a response build markup themselves. All of
+  them render into the **light DOM**: a project's stylesheet reaches every
+  control they draw, and there is no `::part()` to declare.
 
 ## Pages
 
@@ -46,7 +50,7 @@ describing an intention as if it were the state.
 | [TypoScript and site sets](typoscript-and-site-sets.md)       | The layout that serves site sets and static templates from one physical copy, hide-by-default, and the `clear = 3` trap.                              |
 | [Translation synchronization](translation-synchronization.md) | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.            |
 | [Icons](icons.md)                                             | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.         |
-| [Profile editing contract](profile-editing-contract.md)       | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the two rules that look like details.            |
+| [Profile editing contract](profile-editing-contract.md)       | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that render the view.   |
 
 ## See also
 
