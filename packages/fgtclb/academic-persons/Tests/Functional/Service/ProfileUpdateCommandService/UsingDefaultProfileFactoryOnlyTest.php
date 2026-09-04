@@ -855,6 +855,64 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
         $this->assertSame([], $skippedProfileContracts, 'The skip_sync profile received a contract from the user data.');
     }
 
+    #[Test]
+    public function executeKeepsAndCreatesContractsWhenTelephoneIsTheirOnlyData(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/DataSets/telephone-only-contracts.csv');
+
+        $profileUpdateCommandService = GeneralUtility::makeInstance(ProfileUpdateCommandService::class);
+        $profileUpdateCommandService->execute(new ProfileUpdateCommandDto(includePids: [100], excludePids: []));
+
+        $contractQueryBuilder = $this->getConnectionPool()
+            ->getQueryBuilderForTable('tx_academicpersons_domain_model_contract');
+        $contractQueryBuilder->getRestrictions()->removeAll();
+        $contracts = $contractQueryBuilder
+            ->select('profile', 'import_identifier', 'deleted')
+            ->from('tx_academicpersons_domain_model_contract')
+            ->where(
+                $contractQueryBuilder->expr()->in(
+                    'profile',
+                    $contractQueryBuilder->quoteArrayBasedValueListToIntegerList([30, 31]),
+                ),
+            )
+            ->orderBy('profile')
+            ->executeQuery()
+            ->fetchAllAssociative();
+        $this->assertSame(
+            [
+                ['profile' => 30, 'import_identifier' => 'fe_users:30', 'deleted' => 0],
+                ['profile' => 31, 'import_identifier' => 'fe_users:31', 'deleted' => 0],
+            ],
+            $contracts,
+        );
+
+        $phoneNumberQueryBuilder = $this->getConnectionPool()
+            ->getQueryBuilderForTable('tx_academicpersons_domain_model_phone_number');
+        $phoneNumberQueryBuilder->getRestrictions()->removeAll();
+        $phoneNumbers = $phoneNumberQueryBuilder
+            ->select('phone_number')
+            ->from('tx_academicpersons_domain_model_phone_number')
+            ->where(
+                $phoneNumberQueryBuilder->expr()->in(
+                    'phone_number',
+                    $phoneNumberQueryBuilder->quoteArrayBasedValueListToStringList([
+                        '+49 711 123456',
+                        '+49 711 654321',
+                    ]),
+                ),
+            )
+            ->orderBy('phone_number')
+            ->executeQuery()
+            ->fetchAllAssociative();
+        $this->assertSame(
+            [
+                ['phone_number' => '+49 711 123456'],
+                ['phone_number' => '+49 711 654321'],
+            ],
+            $phoneNumbers,
+        );
+    }
+
     /**
      * Registers a capturing listener for {@see AfterProfileUpdateEvent} and returns a
      * closure yielding the sorted profile uids of the captured events.

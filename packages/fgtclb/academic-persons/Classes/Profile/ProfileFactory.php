@@ -98,7 +98,7 @@ final class ProfileFactory extends AbstractProfileFactory
             && empty($frontendUserData['city'])
             && empty($frontendUserData['country'])
             && empty($frontendUserData['email'])
-            && empty($frontendUserData['phone'])
+            && empty($frontendUserData['telephone'])
             && empty($frontendUserData['fax'])
         ) {
             // No contract data, remove previous attached contract.
@@ -114,7 +114,7 @@ final class ProfileFactory extends AbstractProfileFactory
             && empty($frontendUserData['city'])
             && empty($frontendUserData['country'])
             && empty($frontendUserData['email'])
-            && empty($frontendUserData['phone'])
+            && empty($frontendUserData['telephone'])
             && empty($frontendUserData['fax'])
         ) {
             // No contract and no contract data, nothing to do.

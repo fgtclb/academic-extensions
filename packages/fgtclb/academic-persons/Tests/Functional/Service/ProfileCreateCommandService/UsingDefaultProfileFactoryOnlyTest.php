@@ -800,6 +800,51 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
         );
     }
 
+    #[Test]
+    public function executeCreatesContractWhenTelephoneIsItsOnlyData(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/telephone-only-frontend-user.csv');
+        $profileCreateCommandService = GeneralUtility::makeInstance(ProfileCreateCommandService::class);
+
+        $profileCreateCommandService->execute(new ProfileCreateCommandDto(includePids: [100], excludePids: []));
+
+        $profile = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile')
+            ->select(
+                ['uid'],
+                'tx_academicpersons_domain_model_profile',
+                ['import_identifier' => 'fe_users:30'],
+            )
+            ->fetchAssociative();
+        $this->assertIsArray($profile);
+        $contract = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_contract')
+            ->select(
+                ['uid', 'import_identifier'],
+                'tx_academicpersons_domain_model_contract',
+                ['profile' => (int)$profile['uid']],
+            )
+            ->fetchAssociative();
+        $this->assertIsArray($contract);
+        $this->assertSame('fe_users:30', $contract['import_identifier']);
+        $phoneNumbers = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_phone_number')
+            ->select(
+                ['type', 'phone_number', 'import_identifier'],
+                'tx_academicpersons_domain_model_phone_number',
+                ['contract' => (int)$contract['uid']],
+            )
+            ->fetchAllAssociative();
+        $this->assertSame(
+            [[
+                'type' => 'phone',
+                'phone_number' => '+49 711 123456',
+                'import_identifier' => 'phone:fe_users:30',
+            ]],
+            $phoneNumbers,
+        );
+    }
+
     /**
      * Counts profile records ignoring all enable field restrictions, so hidden profiles are
      * counted as well.
