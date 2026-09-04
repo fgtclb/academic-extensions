@@ -31,12 +31,13 @@
             }"
         />
 
+        <f:variable name="itemDateFormat" value="{f:if(condition: profileInformation.yearOnly, then: 'Y', else: 'd.m.Y')}" />
         <table class="table table-striped">
             <f:for
                 each="{
-                    0: 'year',
-                    1: 'yearStart',
-                    2: 'yearEnd',
+                    0: 'date',
+                    1: 'dateStart',
+                    2: 'dateEnd',
                     3: 'title',
                     4: 'link',
                     5: 'bodytext',
@@ -55,6 +56,21 @@
                             <td>{profileInformation.{field} -> f:format.html()}</td>
                         </tr>
                     </f:then>
+                    <f:else if="{field} == 'date' || {field} == 'dateStart' || {field} == 'dateEnd'">
+                        <tr>
+                            <th>
+                                {f:translate(
+                                    key: 'profileInformation.{field}.label',
+                                    extensionName: 'academic_persons_edit'
+                                )}:
+                            </th>
+                            <td>
+                                <f:if condition="{profileInformation.{field}}">
+                                    {profileInformation.{field} -> f:format.date(format: itemDateFormat)}
+                                </f:if>
+                            </td>
+                        </tr>
+                    </f:else>
                     <f:else>
                         <tr>
                             <th>

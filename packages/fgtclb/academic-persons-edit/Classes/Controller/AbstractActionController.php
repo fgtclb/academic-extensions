@@ -59,6 +59,11 @@ abstract class AbstractActionController extends ActionController
             'validFrom' => 'd.m.Y',
             'validTo' => 'd.m.Y',
         ],
+        'profileInformationFormData' => [
+            'date' => 'd.m.Y',
+            'dateStart' => 'd.m.Y',
+            'dateEnd' => 'd.m.Y',
+        ],
     ];
 
     protected ListSortingService $listSortingService;

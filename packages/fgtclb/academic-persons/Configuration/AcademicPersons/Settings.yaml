@@ -58,6 +58,7 @@ validations:
   #      - required   # must not be empty; adds the "required" flag to the TCA column
   #      - email      # must be an email address; renders an email input
   #      - number     # renders a number input; adds no further validation
+  #      - date       # renders a date input; the TCA column keeps its own type
   #      - disabled   # must not be edited; implies "readonly" and cancels "required"
   #      - readonly   # shown but not writable; cancels "required"
   #
@@ -100,9 +101,9 @@ validations:
     lastName:
       - disabled
   profileInformation:
-    year:
+    date:
       - required
-      - number
+      - date
     title:
       - required
 #-----------------------------------------------------------------------------------------------------------------------

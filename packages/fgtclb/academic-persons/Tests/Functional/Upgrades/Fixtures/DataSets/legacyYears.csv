@@ -1,0 +1,30 @@
+"pages",
+,"uid","pid","sorting","doktype","title","slug","is_siteroot","sys_language_uid","hidden","deleted",
+,1,0,2,1,"Site Root (EN)","/",1,0,0,0,
+,20,1,2,254,"Profile Storage","/profile-storage",0,0,0,0,
+"tx_academicpersons_domain_model_profile",
+,"uid","pid","sys_language_uid","l10n_parent","hidden","deleted","first_name","last_name",
+,1,20,0,0,0,0,"Anna","Abel",
+"tx_academicpersons_domain_model_profile_information",
+,"uid","pid","sys_language_uid","l10n_parent","hidden","deleted","profile","type","title","year","year_start","year_end","date","date_start","date_end","year_only",
+# A single year.
+,1,20,0,0,0,0,1,"publication","Single year",2019,\NULL,\NULL,\NULL,\NULL,\NULL,0,
+# A start and an end year.
+,2,20,0,0,0,0,1,"curriculum_vitae","Start and end year",\NULL,2015,2018,\NULL,\NULL,\NULL,0,
+# No year at all: nothing to migrate, the flag stays off.
+,3,20,0,0,0,0,1,"membership","No year",\NULL,\NULL,\NULL,\NULL,\NULL,\NULL,0,
+# A stored 0 was "no year" too.
+,4,20,0,0,0,0,1,"membership","Zero year",0,0,0,\NULL,\NULL,\NULL,0,
+# A date an editor already set next to a leftover year is never overwritten.
+,5,20,0,0,0,0,1,"publication","Already dated",2020,\NULL,\NULL,"2020-05-06",\NULL,\NULL,0,
+# An editor already dated one column in 3.0: the other year is converted, the flag stays as the editor left it.
+,6,20,0,0,0,0,1,"curriculum_vitae","Half dated",\NULL,2011,2013,\NULL,"2011-01-01",\NULL,0,
+# Deleted and hidden records are migrated as well, they can be restored.
+,7,20,0,0,1,0,1,"lecture","Hidden",2001,\NULL,\NULL,\NULL,\NULL,\NULL,0,
+,8,20,0,0,0,1,1,"lecture","Deleted",2002,\NULL,\NULL,\NULL,\NULL,\NULL,0,
+# A translation carries the excluded columns of its default record and is migrated on its own.
+,9,20,1,1,0,0,1,"publication","Single year (DE)",2019,\NULL,\NULL,\NULL,\NULL,\NULL,0,
+# An editor set a complete date and left the flag off; the pending start year must not flip it.
+,10,20,0,0,0,0,1,"cooperation","Editor dated",2020,2015,\NULL,"2020-05-06",\NULL,\NULL,0,
+# A value the old TCA never allowed: not a year, never selected, so it cannot keep the wizard pending.
+,11,20,0,0,0,0,1,"membership","Five digits",12345,\NULL,\NULL,\NULL,\NULL,\NULL,0,

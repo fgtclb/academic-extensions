@@ -11,16 +11,24 @@ use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
 use PHPUnit\Framework\Attributes\Test;
 
 /**
- * Profile information is the only form of the package with nullable integer properties
- * (`year`, `yearStart`, `yearEnd`), and `null` there is a meaningful stored value rather than
+ * Profile information is the only form of the package with nullable date properties
+ * (`date`, `dateStart`, `dateEnd`), and `null` there is a meaningful stored value rather than
  * an "empty" one. That makes it the place to pin two things the string based forms cannot show:
  *
- * - an empty year field that *was* submitted has to reach the record as `NULL`, and
- * - the override type check is `is_int()`, so `null` - the only value that could express
- *   "clear this year" - is the one value an override cannot carry.
+ * - an empty date field that *was* submitted has to reach the record as `NULL`, and
+ * - the override type check is `instanceof \DateTime`, so `null` - the only value that could
+ *   express "clear this date" - is the one value an override cannot carry.
+ *
+ * The submitted values use the `d.m.Y` format `AbstractActionController::DATETIME_ARGUMENTS`
+ * configures for this argument; the stored columns are native SQL DATE columns.
  */
 final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
 {
+    /**
+     * @var array<non-empty-string, string>
+     */
+    private const DATE_FORMATS = ['date' => 'd.m.Y', 'dateStart' => 'd.m.Y', 'dateEnd' => 'd.m.Y'];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -28,8 +36,8 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
     }
 
     /**
-     * The two year properties that were not submitted stay `NULL` on a new record rather than
-     * being written as `0`, which is what the nullable column and the nullable property are for.
+     * The two date properties that were not submitted stay `NULL` on a new record rather than
+     * being written as an empty date, which is what the nullable column and property are for.
      */
     #[Test]
     public function createFromFormDataBuildsRecordFromSubmittedValuesAndParentProfile(): void
@@ -44,12 +52,13 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
                     'title' => 'New Title',
                     'bodytext' => 'New bodytext',
                     'link' => 'https://new.example.com',
-                    'year' => '2020',
+                    'date' => '01.01.2020',
                 ],
             ],
+            self::DATE_FORMATS,
         );
-        $this->assertSame(2020, $formData->getYear());
-        $this->assertNull($formData->getYearStart());
+        $this->assertSame('2020-01-01', $formData->getDate()?->format('Y-m-d'));
+        $this->assertNull($formData->getDateStart());
         $profile = $this->persistenceManager()->getObjectByIdentifier(1, Profile::class);
         $this->assertInstanceOf(Profile::class, $profile);
 
@@ -69,11 +78,11 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
     }
 
     /**
-     * All three year properties are absent from the request. Their form data default is `null`,
-     * so writing them unconditionally would silently drop three stored years at once.
+     * All three date properties are absent from the request. Their form data default is `null`,
+     * so writing them unconditionally would silently drop three stored dates at once.
      */
     #[Test]
-    public function updateKeepsStoredYearsThatWereNotSubmitted(): void
+    public function updateKeepsStoredDatesThatWereNotSubmitted(): void
     {
         $this->updateProfileInformationWith(['title' => 'New Title']);
 
@@ -81,62 +90,62 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
     }
 
     /**
-     * An emptied year input is submitted as an empty string, which the property mapper turns
-     * into `null` - and that `null` must be written, because clearing a year is a thing an
+     * An emptied date input is submitted as an empty string, which `DateTimeConverter` turns
+     * into `null` - and that `null` must be written, because clearing a date is a thing an
      * editor is allowed to do.
      */
     #[Test]
-    public function updateAppliesSubmittedEmptyYearAsNull(): void
+    public function updateAppliesSubmittedEmptyDateAsNull(): void
     {
-        $formData = $this->mapFormDataForUpdate(['title' => 'New Title', 'year' => '']);
-        $this->assertNull($formData->getYear());
-        $this->assertTrue($formData->wasPropertySentInRequest('year'));
+        $formData = $this->mapFormDataForUpdate(['title' => 'New Title', 'date' => '']);
+        $this->assertNull($formData->getDate());
+        $this->assertTrue($formData->wasPropertySentInRequest('date'));
 
         $this->applyAndPersist($formData);
 
-        $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndClearedYear.csv');
+        $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndClearedDate.csv');
     }
 
     #[Test]
-    public function updateAppliesIntegerOverrideForYearThatWasNotSubmitted(): void
+    public function updateAppliesDateOverrideForDateThatWasNotSubmitted(): void
     {
-        $this->updateProfileInformationWith(['title' => 'New Title'], ['year' => 2021]);
+        $this->updateProfileInformationWith(['title' => 'New Title'], ['date' => new \DateTime('2021-01-01')]);
 
-        $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndOverriddenYear.csv');
+        $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndOverriddenDate.csv');
     }
 
     /**
-     * Documents current behaviour, and it is the shape of a defect: `setYear()` applies the
-     * override only when it `is_int()`, so an override of `null` - the only way to say "clear
-     * the year" - falls through to the submitted value instead. A listener meaning to clear the
-     * year silently keeps whatever the editor sent.
+     * Documents current behaviour, and it is the shape of a defect: `setDate()` applies the
+     * override only when it is a `\DateTime`, so an override of `null` - the only way to say
+     * "clear the date" - falls through to the submitted value instead. A listener meaning to
+     * clear the date silently keeps whatever the editor sent.
      *
-     * @see ProfileInformationFactory::setYear()
+     * @see ProfileInformationFactory::setDate()
      */
     #[Test]
-    public function nullOverrideCannotClearAYearAndFallsBackToTheSubmittedValue(): void
+    public function nullOverrideCannotClearADateAndFallsBackToTheSubmittedValue(): void
     {
         $this->updateProfileInformationWith(
-            ['title' => 'New Title', 'year' => '2022'],
-            ['year' => null],
+            ['title' => 'New Title', 'date' => '01.01.2022'],
+            ['date' => null],
         );
 
-        $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndSubmittedYear.csv');
+        $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndSubmittedDate.csv');
     }
 
     /**
-     * The same trap with the stakes raised: the year was not submitted, so the fallback is the
-     * form data default `null`, and a `null` override wipes the stored year although the type
+     * The same trap with the stakes raised: the date was not submitted, so the fallback is the
+     * form data default `null`, and a `null` override wipes the stored date although the type
      * check was supposed to reject the value.
      *
-     * @see ProfileInformationFactory::setYear()
+     * @see ProfileInformationFactory::setDate()
      */
     #[Test]
-    public function nullOverrideWipesAStoredYearThatWasNotSubmitted(): void
+    public function nullOverrideWipesAStoredDateThatWasNotSubmitted(): void
     {
-        $this->updateProfileInformationWith(['title' => 'New Title'], ['year' => null]);
+        $this->updateProfileInformationWith(['title' => 'New Title'], ['date' => null]);
 
-        $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndClearedYear.csv');
+        $this->assertCSVDataSet(__DIR__ . '/Fixtures/ProfileInformationFactoryTest/updatedTitleAndClearedDate.csv');
     }
 
     #[Test]
@@ -179,6 +188,7 @@ final class ProfileInformationFactoryTest extends AbstractFactoryTestCase
                 'profileInformation' => '1',
                 'profileInformationFormData' => $submitted,
             ],
+            self::DATE_FORMATS,
         );
     }
 
