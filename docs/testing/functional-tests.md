@@ -211,19 +211,69 @@ is what builds the instance.
 
 ## Worked examples
 
-| Test                                                                                                                                                                               | What it demonstrates                                                                                     |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
-| [`academic-base/Tests/Functional/ExtensionLoadedTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php)                                           | The smallest possible functional test: a trait plus a list of identifiers.                               |
-| [`academic-persons/Tests/Functional/Tca/PluginFlexFormTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Tca/PluginFlexFormTest.php)                               | Compiling a piece of FormEngine data without a backend user or a page tree.                              |
-| [`academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php) | Full frontend rendering: site configuration, three languages, TypoScript, a real request.                |
-| [`academic-jobs/Tests/Functional/Upgrades/ContactTcaUpgradeWizardTest.php`](../../packages/fgtclb/academic-jobs/Tests/Functional/Upgrades/ContactTcaUpgradeWizardTest.php)         | An upgrade wizard against a table renamed for the test, using a fixture extension for the legacy schema. |
-| [`academic-base/Tests/Functional/Tca/TableConfigurationTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Tca/TableConfigurationTest.php)                             | Mutating `$GLOBALS['TCA']` safely, via `TcaHelperMethodsTrait`.                                          |
+| Test                                                                                                                                                                                                                                   | What it demonstrates                                                                                     |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| [`academic-base/Tests/Functional/ExtensionLoadedTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/ExtensionLoadedTest.php)                                                                                               | The smallest possible functional test: a trait plus a list of identifiers.                               |
+| [`academic-persons/Tests/Functional/Tca/PluginFlexFormTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Tca/PluginFlexFormTest.php)                                                                                   | Compiling a piece of FormEngine data without a backend user or a page tree.                              |
+| [`academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Plugins/AcademicPersonsListPluginTest.php)                                                     | Full frontend rendering: site configuration, three languages, TypoScript, a real request.                |
+| [`academic-jobs/Tests/Functional/Upgrades/ContactTcaUpgradeWizardTest.php`](../../packages/fgtclb/academic-jobs/Tests/Functional/Upgrades/ContactTcaUpgradeWizardTest.php)                                                             | An upgrade wizard against a table renamed for the test, using a fixture extension for the legacy schema. |
+| [`academic-base/Tests/Functional/Tca/TableConfigurationTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Tca/TableConfigurationTest.php)                                                                                 | Mutating `$GLOBALS['TCA']` safely, via `TcaHelperMethodsTrait`.                                          |
+| [`academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileEditingAuthorizationTest.php`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileEditingAuthorizationTest.php) | Driving a JSON API through the plugin, and asserting every way a request is refused.                     |
 
 Records come from CSV fixtures next to the test, imported with
-`importCSVDataSet()` (used in 55 files) and, where the test writes, asserted back
-with `assertCSVDataSet()` (14 call sites). Fixtures of a plugin test live in a
+`importCSVDataSet()` (used in 132 files) and, where the test writes, asserted
+back with `assertCSVDataSet()` (61 call sites). Fixtures of a plugin test live in a
 `Fixtures/<TestClassName>/` folder beside it, one file per scenario, which keeps
 a fixture from being quietly reused by a test it was not written for.
+
+## Testing a JSON endpoint
+
+`academic-persons-edit` answers thirteen actions as JSON, and they are tested
+through the real plugin rather than by calling the controller: the gate that
+refuses a request lives partly in `initializeAction()` and partly in a service,
+and only a real request exercises both.
+
+The pattern is a helper on the test class. The one below is composed from
+`AcademicPersonsEditProfileEditingTest` and shortened for the page; read the
+class for the shipped form:
+
+```php
+private function postJson(string $url, array $payload): ResponseInterface
+{
+    $body = new Stream('php://temp', 'rw');
+    $body->write(json_encode($payload, JSON_THROW_ON_ERROR));
+    $body->rewind();
+    return $this->requestAsFrontendUser(
+        (new InternalRequest($url))
+            ->withMethod('POST')
+            ->withAddedHeader('Content-Type', 'application/json')
+            ->withAddedHeader('X-Requested-With', 'XMLHttpRequest')
+            ->withBody($body),
+    );
+}
+```
+
+Three things about it are not obvious:
+
+- **The URL comes from the rendered page**, read out of the `data-*-url`
+  attribute the template wrote, never assembled by hand. The URL carries the
+  page type and the request's own `cHash`, and an assembled one is a different
+  request than the browser makes.
+- **The `X-Requested-With` header is required.** Every writing endpoint refuses a
+  request without it with `400 invalid_request`; a test that omits it is testing
+  the refusal, not the endpoint.
+- **A refusal is asserted on the status *and* the error code, and on the
+  database.** `assertSame(['status' => 403, 'error' => 'profile_not_editable'], …)`
+  plus a query showing the record is unchanged. A status alone passes for the
+  wrong reason more often than it fails.
+
+The anonymous case is the one that needs care: `requestAsFrontendUser()` adds
+the session cookie, so an unauthenticated request is sent through
+`requestFrontendPage()` with the same request object instead.
+
+[`AcademicPersonsEditProfileEditingAuthorizationTest`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileEditingAuthorizationTest.php)
+is the worked example: one data provider naming an endpoint per family, and one
+test per way a request is refused, so a new endpoint family is one line.
 
 ## Version-gated tests
 
@@ -271,3 +321,4 @@ and skipping the rest.
 - [Unit tests](unit-tests.md)
 - [Fixture extensions](fixture-extensions.md)
 - [Testing helper](testing-helper.md)
+- [Frontend verification for `academic-persons-edit`](academic-persons-edit-frontend-tests.md)

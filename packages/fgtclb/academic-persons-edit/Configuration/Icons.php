@@ -11,14 +11,15 @@ use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
  */
 
 /*
- * The action icons of the profile editing frontend are Bootstrap Icons (MIT, see
- * Resources/Public/Icons/LICENSE-bootstrap-icons.txt) drawn in `currentColor` and
- * registered with the provider of EXT:academic_base, which inlines the file in both
- * markups instead of rendering an <img>. That is what lets a button's own colour reach
- * its glyph - in the frontend as much as in a dark backend colour scheme.
+ * The thirteen action icons of the profile editing frontend are Bootstrap Icons
+ * (MIT, see Resources/Public/Icons/LICENSE-bootstrap-icons.txt) drawn in
+ * `currentColor` and registered with the provider of EXT:academic_base, which
+ * inlines the file in both markups instead of rendering an <img>. That is what
+ * lets a button's own colour reach its glyph - in the frontend as much as in a
+ * dark backend colour scheme.
  *
- * Identifier and file name are the action, never the glyph: a later icon set changes the
- * drawing, not the API the templates address.
+ * Identifier and file name are the action, never the glyph: a later icon set
+ * changes the drawing, not the API the templates address.
  */
 return [
     'persons_edit_icon' => [
@@ -76,33 +77,5 @@ return [
     'academic-persons-edit-view' => [
         'provider' => CurrentColorSvgIconProvider::class,
         'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/view.svg',
-    ],
-    /*
-     * The registrations below belong to the editing templates the new editor replaces.
-     * They keep the core provider and their own files until those templates go.
-     */
-    'academic-persons-edit-add-image' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/add-image-icon.svg',
-    ],
-    'academic-persons-edit-replace-image' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/replace-image-icon.svg',
-    ],
-    'academic-persons-edit-add-item' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/add-item-icon.svg',
-    ],
-    'academic-persons-edit-cancel' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/cancel-icon.svg',
-    ],
-    'academic-persons-edit-sort' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/sort-icon.svg',
-    ],
-    'academic-persons-edit-to-top' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/sort-vertical-icon.svg',
     ],
 ];

@@ -9,25 +9,30 @@ reproduced with the commands quoted next to them.
 
 ```bash
 grep -c "'provider'" packages/fgtclb/*/Configuration/Icons.php
-grep -rh "'provider' =>" packages/fgtclb/*/Configuration/Icons.php | sort | uniq -c
+grep -rh "'provider' =>" packages/fgtclb/*/Configuration/Icons.php \
+  | sed "s/.*=> *//" | sort | uniq -c
 ```
 
-Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **70
-registrations in total: 51 with the core `SvgIconProvider`, and 19 with
-`CurrentColorSvgIconProvider` — the six control icons of the public profile of
-`academic-persons` and the thirteen action icons of the profile editing frontend
-of `academic-persons-edit`**:
+Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **64
+registrations in total: 45 with the core `SvgIconProvider` and 19 with
+`CurrentColorSvgIconProvider`** — the six control icons of the public profile of
+`academic-persons` and the thirteen of the profile editing view of
+`academic-persons-edit`:
 
-| Package                  | Registrations |
-|--------------------------|---------------|
-| `academic-jobs`          | 18            |
-| `academic-persons-edit`  | 20            |
-| `academic-persons`       | 16            |
-| `academic-study-plan`    | 7             |
-| `academic-contact4pages` | 4             |
-| `academic-partners`      | 3             |
-| `academic-bite-jobs`     | 1             |
-| `academic-programs`      | 1             |
+| Package                  | Registrations | `CurrentColorSvgIconProvider` |
+|--------------------------|---------------|-------------------------------|
+| `academic-jobs`          | 18            | –                             |
+| `academic-persons`       | 16            | 6                             |
+| `academic-persons-edit`  | 14            | 13                            |
+| `academic-study-plan`    | 7             | –                             |
+| `academic-contact4pages` | 4             | –                             |
+| `academic-partners`      | 3             | –                             |
+| `academic-bite-jobs`     | 1             | –                             |
+| `academic-programs`      | 1             | –                             |
+
+Seven of the 45 core-provider registrations spell the class out as an FQCN
+rather than importing it (`academic-study-plan`), which is why the second
+command above normalises the value before counting.
 
 `academic-base`, `academic-projects`, `academic-persons-sync` and the three
 `packages-dev/` packages register nothing.
@@ -59,13 +64,20 @@ the ViewHelper needs no `xmlns` declaration in a frontend template. The
 ViewHelper is byte identical on 13.4.34 and 14.3.6. Which markup a template
 gets depends on one argument, and the templates on `main` are split on it:
 
+A `<core:icon>` is regularly written across several lines, so the argument has
+to be counted per tag rather than per line:
+
 ```bash
-grep -rn "core:icon" packages/fgtclb/*/Resources/Private --include=*.html | grep -v Backend
+grep -rl "<core:icon" packages/fgtclb/*/Resources/Private --include=*.html \
+  | grep -v /Backend/ \
+  | xargs perl -0777 -ne 'while (/<core:icon\b[^>]*>/gs) {
+      print /alternativeMarkupIdentifier="inline"/ ? "inline\t$ARGV\n" : "default\t$ARGV\n" }' \
+  | sort | uniq -c
 ```
 
 | Extension               | `alternativeMarkupIdentifier="inline"`   | Without (default markup)                                           |
 |-------------------------|------------------------------------------|--------------------------------------------------------------------|
-| `academic-persons-edit` | 65 sites in 17 files                     | —                                                                  |
+| `academic-persons-edit` | 29 sites in 13 files                     | —                                                                  |
 | `academic-persons`      | 6 sites in 2 files, `academic-persons-*` | —                                                                  |
 | `academic-study-plan`   | 3 sites, its `plus`/`minus`/`close`      | —                                                                  |
 | `academic-jobs`         | 2 sites, core `phone`/`mail`             | `Job/Item.html`, `Job/Information.html`                            |
@@ -99,15 +111,14 @@ sizes both shapes the same.
 
 - A **record, page type, content element or brand icon** — anything drawn in
   fixed colours, meant to look the same on every background — stays with the
-  core `SvgIconProvider`. That is 51 of the 70 registrations today.
+  core `SvgIconProvider`. That is 45 of the 64 registrations today.
 - An **action or control icon** — an arrow, a pencil, a bin, a fold-out chevron —
   is drawn in `currentColor` and registered with `CurrentColorSvgIconProvider`.
   Then it follows the text colour in the backend *and* in the frontend, with
-  or without the `inline` argument. The six `academic-persons-*` icons of the
-  public profile — envelope, phone, address, room and the plus and minus of
-  the fold-out entries — and the thirteen `academic-persons-edit-*` action
-  icons of the profile editing frontend, all Bootstrap Icons, are the
-  registrations of that kind today.
+  or without the `inline` argument. That is 19 registrations, all Bootstrap
+  Icons: the six `academic-persons-*` icons of the public profile — envelope,
+  phone, address, room and the plus and minus of the fold-out entries — and the
+  thirteen `academic-persons-edit-*` controls of the profile editing view.
 - A frontend template that already asks for `inline` gets the same markup from
   both providers. Switching such an icon's provider changes nothing in the
   frontend; it changes its default markup, i.e. how it looks in the backend
@@ -222,8 +233,7 @@ plugin or content element rendering test that renders icons should carry both;
 `profileRendersOnlyResolvableIcons()`, does so for the six icons of the public
 profile.
 
-An icon set that is registered before the templates that render it has no page to
-be asserted against, and is pinned through the registry instead:
+The registry is asserted on its own beside that:
 [`academic-persons-edit/Tests/Functional/Imaging/ProfileEditingIconsTest.php`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Imaging/ProfileEditingIconsTest.php)
 asks the `IconFactory` for each of the thirteen action identifiers and asserts
 that the answer is that identifier and not `default-not-found`, and that its

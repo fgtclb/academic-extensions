@@ -289,7 +289,7 @@ moved. The repository has documented exactly this repeatedly:
   (and the same entry in `academic-persons`, `academic-programs`,
   `academic-partners`, `academic-projects`)
 * `academic-persons-edit/Documentation/Changelog/2.4/Important-AdaptedProfileImagePartial.rst`
-* `academic-persons-edit/Documentation/Changelog/3.0/Breaking-AdaptedFrontendEditingFluidFiles.rst`
+* `academic-persons-edit/Documentation/Changelog/3.0/Breaking-ReplacedProfileEditingPlugin.rst`
 
 **A changed asset path is user facing** for the same reason: a project may
 reference the file from its own TypoScript, its own template or its build.

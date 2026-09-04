@@ -34,9 +34,26 @@ We suggest that you use a sitepackage extension. Learn how to
         view {
             templateRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Templates/
             partialRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Partials/
-            layoutRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Layouts/
         }
     }
+
+Profile editing template
+------------------------
+
+Profile editing renders from :file:`Resources/Private/Templates/Profile/Index.html`
+and thirty partials below :file:`Resources/Private/Partials/Profile/`, in four
+directories: :file:`Field/` for the controls, :file:`Documents/` for the
+structured sections and their two editors, :file:`Image/` for the image card and
+the image editor, and :file:`Profile/` for the field sections. Any of them can be
+overridden on its own.
+
+Two of them carry more than markup. :file:`Profile/Field/Control.html` is the one
+place a form control is spelled - every field, of every section and of both
+editors, is that partial - and :file:`Profile/Prototypes.html` holds the
+``<template data-pe-proto>`` blocks the custom elements clone for everything they
+draw in the browser. When overriding while keeping the shipped JavaScript,
+preserve the form data attributes, the field class and the slot names of those
+blocks. The complete contract is documented in :ref:`profile-editing`.
 
 ..  index:: Templates; Icons
 ..  _templates-override-icons:
