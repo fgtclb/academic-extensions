@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Extbase\Validation\Validator\EmailAddressValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator;
+use TYPO3\CMS\Extbase\Validation\Validator\UrlValidator;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
@@ -36,6 +37,7 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [],
                 tcaConfig: ['readOnly' => false, 'required' => false],
                 inputType: 'text',
+                flags: [],
             ),
         ];
         yield 'required: NotEmptyValidator, and required plus minitems in TCA' => [
@@ -49,6 +51,7 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [NotEmptyValidator::class],
                 tcaConfig: ['readOnly' => false, 'required' => true, 'minitems' => 1],
                 inputType: 'text',
+                flags: ['required'],
             ),
         ];
         yield 'readonly cancels required: no validator, TCA readOnly' => [
@@ -62,6 +65,7 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [],
                 tcaConfig: ['readOnly' => true, 'required' => false],
                 inputType: 'text',
+                flags: ['required', 'readonly'],
             ),
         ];
         yield 'disabled cancels required and is expressed to TCA as readOnly' => [
@@ -75,6 +79,7 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [],
                 tcaConfig: ['readOnly' => true, 'required' => false],
                 inputType: 'text',
+                flags: ['disabled', 'required'],
             ),
         ];
         yield 'email: EmailAddressValidator, TCA type and input type' => [
@@ -88,6 +93,7 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [EmailAddressValidator::class],
                 tcaConfig: ['readOnly' => false, 'required' => false, 'type' => 'email'],
                 inputType: 'email',
+                flags: ['email'],
             ),
         ];
         yield 'number: TCA type and input type, no validator' => [
@@ -101,6 +107,7 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [],
                 tcaConfig: ['readOnly' => false, 'required' => false, 'type' => 'number'],
                 inputType: 'number',
+                flags: ['number'],
             ),
         ];
         yield 'date: input type only, the TCA column keeps its own type' => [
@@ -114,6 +121,7 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [],
                 tcaConfig: ['readOnly' => false, 'required' => false],
                 inputType: 'date',
+                flags: ['date'],
             ),
         ];
         yield 'required email: both validators, in flag order' => [
@@ -127,6 +135,7 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [NotEmptyValidator::class, EmailAddressValidator::class],
                 tcaConfig: ['readOnly' => false, 'required' => true, 'minitems' => 1, 'type' => 'email'],
                 inputType: 'email',
+                flags: ['email', 'required'],
             ),
         ];
         yield 'flags are matched case-insensitively' => [
@@ -140,10 +149,67 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [NotEmptyValidator::class, EmailAddressValidator::class],
                 tcaConfig: ['readOnly' => false, 'required' => true, 'minitems' => 1, 'type' => 'email'],
                 inputType: 'email',
+                flags: ['required', 'email'],
             ),
         ];
-        yield 'an unknown flag is ignored' => [
+        yield 'url: UrlValidator and input type, the TCA column keeps its own type' => [
             'flags' => ['url'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: false,
+                validatorClassNames: [UrlValidator::class],
+                tcaConfig: ['readOnly' => false, 'required' => false],
+                inputType: 'url',
+                flags: ['url'],
+            ),
+        ];
+        yield 'tel: input type only, no validator, the TCA column keeps its own type' => [
+            'flags' => ['tel'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: false,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => false, 'required' => false],
+                inputType: 'tel',
+                flags: ['tel'],
+            ),
+        ];
+        yield 'textarea: input type only, the TCA column keeps its own type' => [
+            'flags' => ['textarea'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: false,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => false, 'required' => false],
+                inputType: 'textarea',
+                flags: ['textarea'],
+            ),
+        ];
+        yield 'html: input type textarea and the rich text marker, the TCA column keeps its own type' => [
+            'flags' => ['html'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: false,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => false, 'required' => false],
+                inputType: 'textarea',
+                flags: ['html'],
+            ),
+        ];
+        yield 'an unknown flag is kept in the list and has no other effect' => [
+            'flags' => ['whatever'],
             'expected' => new Validation(
                 identifier: 'firstName',
                 fieldName: 'first_name',
@@ -153,6 +219,21 @@ final class ValidationNormalizerTest extends UnitTestCase
                 validatorClassNames: [],
                 tcaConfig: ['readOnly' => false, 'required' => false],
                 inputType: 'text',
+                flags: ['whatever'],
+            ),
+        ];
+        yield 'flags are trimmed, de-duplicated and kept in configured order' => [
+            'flags' => [' required ', 'REQUIRED', 'email', '', 'required'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: true,
+                disabled: false,
+                readOnly: false,
+                validatorClassNames: [NotEmptyValidator::class, EmailAddressValidator::class],
+                tcaConfig: ['readOnly' => false, 'required' => true, 'minitems' => 1, 'type' => 'email'],
+                inputType: 'email',
+                flags: ['required', 'email'],
             ),
         ];
     }
@@ -165,6 +246,93 @@ final class ValidationNormalizerTest extends UnitTestCase
     public function theFlagsOfAFieldAreNormalized(array $flags, Validation $expected): void
     {
         $this->assertEquals($expected, (new ValidationNormalizer())->normalizeValidation('firstName', $flags));
+    }
+
+    /**
+     * A render type names the frontend control and therefore the input type the flags
+     * start from. A flag that implies a type still wins - `email` on a `text` control
+     * is an email input - and the render type never reaches the TCA fragment.
+     *
+     * @return \Generator<string, array{renderType: string, flags: list<string>, expectedInputType: string}>
+     */
+    public static function renderTypeDataSets(): \Generator
+    {
+        yield 'select' => ['renderType' => 'select', 'flags' => [], 'expectedInputType' => 'select'];
+        yield 'checkbox' => ['renderType' => 'checkbox', 'flags' => [], 'expectedInputType' => 'checkbox'];
+        yield 'phone is a tel input' => ['renderType' => 'phone', 'flags' => [], 'expectedInputType' => 'tel'];
+        yield 'email' => ['renderType' => 'email', 'flags' => [], 'expectedInputType' => 'email'];
+        yield 'number' => ['renderType' => 'number', 'flags' => [], 'expectedInputType' => 'number'];
+        yield 'date' => ['renderType' => 'date', 'flags' => [], 'expectedInputType' => 'date'];
+        yield 'combinedLink is a url input' => ['renderType' => 'combinedLink', 'flags' => [], 'expectedInputType' => 'url'];
+        yield 'ckeditor is a textarea' => ['renderType' => 'ckeditor', 'flags' => [], 'expectedInputType' => 'textarea'];
+        yield 'text' => ['renderType' => 'text', 'flags' => [], 'expectedInputType' => 'text'];
+        yield 'an unknown render type is a text input' => ['renderType' => 'cropper', 'flags' => [], 'expectedInputType' => 'text'];
+        yield 'a flag implying a type wins over the render type' => ['renderType' => 'text', 'flags' => ['email'], 'expectedInputType' => 'email'];
+        yield 'required does not change the render type input' => ['renderType' => 'select', 'flags' => ['required'], 'expectedInputType' => 'select'];
+    }
+
+    /**
+     * @param list<string> $flags
+     */
+    #[DataProvider('renderTypeDataSets')]
+    #[Test]
+    public function theRenderTypeDecidesTheInputTypeTheFlagsStartFrom(
+        string $renderType,
+        array $flags,
+        string $expectedInputType,
+    ): void {
+        $validation = (new ValidationNormalizer())->normalizeValidation('firstName', $flags, renderType: $renderType);
+
+        $this->assertSame($expectedInputType, $validation->inputType);
+        $this->assertArrayNotHasKey('renderType', $validation->tcaConfig);
+    }
+
+    /**
+     * A settings file may name the column explicitly, for the one case the property
+     * and the column do not share a name. It is metadata only: the TCA fragment is the
+     * same either way.
+     */
+    #[Test]
+    public function anExplicitFieldNameIsKeptInsteadOfTheDerivedOne(): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation('emailAddress', ['required'], fieldName: 'email');
+
+        $this->assertSame('emailAddress', $validation->identifier);
+        $this->assertSame('email', $validation->fieldName);
+        $this->assertSame(['readOnly' => false, 'required' => true, 'minitems' => 1], $validation->tcaConfig);
+    }
+
+    /**
+     * The character limit is what a rich text counter and the server side check read.
+     * It stays out of the TCA on purpose - FormEngine's `max` counts markup, the limit
+     * counts readable text - and a negative value means "no limit", like zero.
+     */
+    #[Test]
+    public function theCharacterLimitIsCarriedAsMetadataAndNeverReachesTheTca(): void
+    {
+        $normalizer = new ValidationNormalizer();
+
+        $limited = $normalizer->normalizeValidation('miscellaneous', ['html'], renderType: 'ckeditor', characterLimit: 1000);
+        $unlimited = $normalizer->normalizeValidation('miscellaneous', ['html'], renderType: 'ckeditor');
+        $negative = $normalizer->normalizeValidation('miscellaneous', ['html'], renderType: 'ckeditor', characterLimit: -5);
+
+        $this->assertSame(1000, $limited->characterLimit);
+        $this->assertTrue($limited->isRichText());
+        $this->assertArrayNotHasKey('max', $limited->tcaConfig);
+        $this->assertSame(0, $unlimited->characterLimit);
+        $this->assertSame(0, $negative->characterLimit);
+    }
+
+    /**
+     * A flag list read from YAML can carry anything; only its strings are flags.
+     */
+    #[Test]
+    public function nonStringEntriesOfAFlagListAreDropped(): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation('firstName', ['required', 1, null, ['email'], true]);
+
+        $this->assertSame(['required'], $validation->flags);
+        $this->assertSame([NotEmptyValidator::class], $validation->validatorClassNames);
     }
 
     /**
