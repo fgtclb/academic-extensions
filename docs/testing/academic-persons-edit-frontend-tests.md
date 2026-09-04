@@ -100,6 +100,15 @@ directives:
 | `image-editor-element-upgrade.test.ts` | That the image editor starts in both orders, and that the root element is defined first because its mount replaces the markup below it.                    |
 | `entry-point.test.ts`                  | That `frontend/profile.js` defines every element of the editor. A file of its own, because importing it *is* the subject and the import registers.         |
 
+The document editor added three more with the components that replaced the 114
+Vue directives of `Partials/Profile/Documents/Editor.html`:
+
+| File                                      | What it pins                                                                                                                                                                                                                             |
+|-------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `document-editor-element.test.ts`         | What the element renders in each of the four modes, the shape of every control, the errors, the busy state, the icons it clones, the four events it reports, the collapse transition, and that a re-render leaves a live CKEditor alone. |
+| `document-editor-element-upgrade.test.ts` | That an editor renders in both orders: properties assigned before the definition ran, and an element created after it.                                                                                                                   |
+| `rich-text-element.test.ts`               | One textarea and one editor per element, created on connect and destroyed on disconnect, exactly once each, and a move that does not race its own teardown.                                                                              |
+
 That is the coverage the thirteen hook readers needed: a test file fails if a
 `data-pe-*` attribute is queried under a name the templates do not emit.
 
@@ -108,11 +117,11 @@ fixture that transcribes it leaves every test green, because the fixture is a
 transcription and not the partial. The guard for that direction is the PHP
 functional suite, which reads the partial itself — see
 `AcademicPersonsEditProfileEditingTest::imageEditorTemplateIsDrivenByItsElement()`
-for the shape a new component's hooks are asserted in.
+and `::documentEditorPartialIsOnlyAMountPoint()` for the shape a new component's
+hooks — and the absence of the markup it took over — are asserted in.
 
 It is still not everything. The CSS transitions, the real CKEditor and the real
-CropperJS — including the whole cropping path, whose stage and source are Vue
-template refs today — are covered by nothing that executes them, and are named
+CropperJS are covered by nothing that executes them, and are named
 in [JavaScript tests](javascript-tests.md) rather than papered over.
 
 **Do not close the rest of it with assertions on source text.** The previous

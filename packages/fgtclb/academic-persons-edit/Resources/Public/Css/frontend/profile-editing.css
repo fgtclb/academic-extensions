@@ -1,6 +1,8 @@
 /* Generated from Resources/Private/Scss — do not edit. */
 /* packages/fgtclb/academic-persons-edit/Resources/Private/Scss/frontend/profile-editing.scss */
-academic-persons-edit-profile-editing {
+academic-persons-edit-profile-editing,
+academic-persons-edit-document-editor,
+academic-persons-edit-rich-text {
   display: block;
 }
 .academic-persons-profile-editing [hidden] {

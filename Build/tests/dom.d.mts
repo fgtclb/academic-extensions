@@ -29,6 +29,12 @@ export declare const resetBody: (html?: string) => HTMLElement;
 export declare const settle: (turns?: number) => Promise<void>;
 
 /**
+ * Waits for the next animation frame. "settle()" only drains microtasks, and
+ * the document editor reports its close a frame after the leave transition.
+ */
+export declare const nextFrame: () => Promise<void>;
+
+/**
  * A drag event with a modelled data transfer, for the handlers of the document
  * list - jsdom implements neither "DragEvent" nor "DataTransfer".
  */

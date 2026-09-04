@@ -35,136 +35,25 @@ import {
   type ImageEditingController,
   type ImageState,
 } from "@fgtclb/academic-persons-edit/frontend/profile/image.js";
+import { profileImageEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+import { createElementTransition } from "@fgtclb/academic-persons-edit/frontend/profile/elements/transition.js";
 import {
-  profileEditingElementName,
-  profileEditingElementPrefix,
-  ProfileEditingElement,
-} from "@fgtclb/academic-persons-edit/frontend/profile/elements/root.js";
-import type { EditingContext } from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
+  ownerEditingContext,
+  type EditingContext,
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 
 /** The tag name of this element. Public API from the moment it ships. */
-export const profileImageEditorElementName = `${profileEditingElementPrefix}image-editor`;
+export { profileImageEditorElementName };
 
 /**
- * The transition the editor opens and closes with.
- *
- * The class names are Vue's - `<Transition name="…">` derives them - and they
- * are kept, because the declarations they select are unchanged and a class an
- * integrator may have overridden is not renamed by a commit that does not have
- * to. What changes is who applies them.
+ * The transition the editor opens and closes with, and the class name prefix
+ * `<Transition name="...">` derived its classes from. The mechanism is shared
+ * with the document editor and lives in `elements/transition.ts`; only the
+ * prefix is this editor's own.
  */
-const transitionPrefix = "academic-persons-profile-editing-image-editor";
-
-/** How long after the computed duration a transition is given up on. */
-const transitionTimeoutSlack = 50;
-
-const toMilliseconds = (value: string): number => {
-  const amount = Number.parseFloat(value);
-  if (!Number.isFinite(amount)) {
-    return 0;
-  }
-
-  return value.trim().endsWith("ms") ? amount : amount * 1000;
-};
-
-const transitionDuration = (element: HTMLElement): number =>
-  Math.max(
-    0,
-    ...globalThis
-      .getComputedStyle(element)
-      .transitionDuration.split(",")
-      .map(toMilliseconds),
-  );
-
-/**
- * Runs one enter or leave transition on an element and calls back when it is
- * over, whether it ran or not.
- *
- * `<Transition>` used to do this. Three things it did that a bare
- * `transitionend` listener does not, and all three are the reason this is a
- * function rather than one line:
- *
- * - **It ends even when the transition never starts.** `transitionend` does not
- *   fire for an element that is `display: none`, for a property that does not
- *   actually change, or for one that is removed halfway. The editor's close
- *   path hangs off the callback - the focus returns to the open button there
- *   and the collapsed layout is restored there - so a transition that never
- *   ends is a silent, intermittent defect rather than a missing animation.
- * - **It ends at once when there is nothing to animate.** The stylesheet turns
- *   the transition off under `prefers-reduced-motion`, and a visitor who asked
- *   for that must not wait out a timeout.
- * - **It can be cancelled.** Reopening the editor while it closes has to drop
- *   the pending leave, its classes and its callback.
- *
- * @returns the cancellation of the transition it started.
- */
-export const runElementTransition = (
-  element: HTMLElement,
-  kind: "enter" | "leave",
-  done: () => void,
-): (() => void) => {
-  const active = `${transitionPrefix}-${kind}-active`;
-  // The stylesheet declares the two ends of the animation as "-enter-from" and
-  // "-leave-to"; "-enter-to" and "-leave-from" are Vue's names for the resting
-  // state and carry no declarations, so they are not applied.
-  const offset = kind === "enter" ? `${transitionPrefix}-enter-from` : `${transitionPrefix}-leave-to`;
-
-  element.classList.add(active);
-  if (kind === "enter") {
-    element.classList.add(offset);
-  }
-
-  const duration = transitionDuration(element);
-  const clear = (): void => {
-    element.classList.remove(active, offset);
-  };
-  if (duration === 0) {
-    clear();
-    done();
-
-    return (): void => undefined;
-  }
-
-  const finish = (): void => {
-    cancel();
-    clear();
-    done();
-  };
-  const onTransitionEnd = (event: Event): void => {
-    if (event.target === element) {
-      finish();
-    }
-  };
-  // Reads "timeout" and "frame" below it. Neither can be read before it is
-  // written: nothing calls this until the browser has been given the chance to
-  // run one of the two, and both are handed out by then.
-  const cancel = (): void => {
-    globalThis.cancelAnimationFrame(frame);
-    globalThis.clearTimeout(timeout);
-    element.removeEventListener("transitionend", onTransitionEnd);
-  };
-
-  element.addEventListener("transitionend", onTransitionEnd);
-  const timeout = globalThis.setTimeout(finish, duration + transitionTimeoutSlack);
-  // Two frames, as Vue's own "nextFrame()" uses: a single one can be flushed
-  // together with the style that was just written, and the browser then never
-  // sees the state the animation starts from - so nothing animates and the
-  // timeout below is what ends the transition.
-  let frame = globalThis.requestAnimationFrame((): void => {
-    frame = globalThis.requestAnimationFrame((): void => {
-      if (kind === "enter") {
-        element.classList.remove(offset);
-      } else {
-        element.classList.add(offset);
-      }
-    });
-  });
-
-  return (): void => {
-    cancel();
-    clear();
-  };
-};
+export const runElementTransition = createElementTransition(
+  "academic-persons-profile-editing-image-editor",
+);
 
 const setHidden = (element: Element | null, hidden: boolean): void => {
   if (element instanceof HTMLElement) {
@@ -287,11 +176,7 @@ export class ProfileImageEditorElement extends HTMLElement {
   }
 
   connectedCallback(): void {
-    if (this.#context === null) {
-      const owner = this.closest(profileEditingElementName);
-      this.#context =
-        owner instanceof ProfileEditingElement ? owner.context : null;
-    }
+    this.#context ??= ownerEditingContext(this);
     const context = this.#context;
     if (context === null) {
       // Not an error: an editor whose owner has not read its contract yet is

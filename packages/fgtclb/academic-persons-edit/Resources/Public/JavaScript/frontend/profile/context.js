@@ -1,4 +1,5 @@
 /* Generated from Resources/Private/TypeScript — do not edit. */
+import { profileEditingElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
 const parseProfileUid = (value) => {
   const profileUid = Number.parseInt(value ?? "", 10);
   return Number.isInteger(profileUid) && profileUid > 0 ? profileUid : null;
@@ -66,7 +67,12 @@ const readEditingContext = (root) => {
   });
 };
 const toEditingContext = (target) => target instanceof HTMLElement ? readEditingContext(target) : target;
+const ownerEditingContext = (element) => {
+  const owner = element.closest(profileEditingElementName);
+  return (owner == null ? void 0 : owner.context) ?? null;
+};
 export {
+  ownerEditingContext,
   readEditingContext,
   toEditingContext
 };

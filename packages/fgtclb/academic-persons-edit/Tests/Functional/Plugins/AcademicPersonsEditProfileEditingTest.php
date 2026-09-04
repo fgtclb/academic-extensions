@@ -165,6 +165,39 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         }
     }
 
+    /**
+     * The document editor is rendered by "<academic-persons-edit-document-editor>"
+     * from the fields of the "documentForm" response, so this partial has no
+     * markup left to override - and saying so is the only thing a test can
+     * assert about a file that renders nothing.
+     */
+    #[Test]
+    public function documentEditorPartialIsOnlyAMountPoint(): void
+    {
+        $template = $this->getProfileEditingPartial('Documents/Editor');
+        $this->assertStringContainsString('academic-persons-edit-document-editor', $template);
+        $this->assertStringNotContainsString('<section', $template);
+        $this->assertStringNotContainsString('<form', $template);
+        $this->assertStringNotContainsString('f:translate', $template);
+        foreach (['v-if', 'v-else', 'v-show', 'v-bind', 'v-on:', 'v-text', 'v-model', '<Teleport', '<Transition'] as $directive) {
+            $this->assertStringNotContainsString($directive, $template);
+        }
+    }
+
+    /**
+     * The buttons of the list are handled by the delegated click listener of
+     * "profile/documents.ts" and no longer by a "v-on:click.stop" that stopped
+     * that very listener from ever seeing them.
+     */
+    #[Test]
+    public function documentListButtonsAreHandledByDelegation(): void
+    {
+        foreach (['Documents/Actions', 'Documents/Sections'] as $partial) {
+            $template = $this->getProfileEditingPartial($partial);
+            $this->assertStringNotContainsString('v-on:', $template);
+        }
+    }
+
     #[Test]
     public function imageCardExposesAccessibleEditHook(): void
     {
@@ -1549,11 +1582,17 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertStringContainsString('[action]=updateContractContact', $decodedContent);
         $this->assertStringContainsString('[action]=deleteContractContact', $decodedContent);
         $this->assertStringContainsString('[action]=sortContractContact', $decodedContent);
-        $this->assertStringContainsString('data-pe-document-view-container', $content);
+        // The collapse targets the document editor is created into. The editor
+        // itself is no longer in the rendered page: it is built in the browser
+        // from the "documentForm" response by
+        // "<academic-persons-edit-document-editor>", so the markup that used to
+        // stand here is asserted by the behavioural suite instead.
         $this->assertStringContainsString('data-pe-document-add-collapse-target', $content);
         $this->assertStringContainsString('data-pe-document-item-collapse-target', $content);
-        $this->assertStringContainsString('data-pe-contract-contact-section', $content);
-        $this->assertStringContainsString('data-pe-contract-contact-editor', $content);
+        $this->assertStringNotContainsString('data-pe-document-view-container', $content);
+        // The icons that editor draws travel as templates, because the icon
+        // registry is only reachable from the server.
+        $this->assertStringContainsString('data-pe-icon="help"', $content);
         $this->assertStringContainsString('Save', $content);
         $this->assertStringNotContainsString('data-add-label', $content);
         $this->assertStringNotContainsString('data-replace-label', $content);

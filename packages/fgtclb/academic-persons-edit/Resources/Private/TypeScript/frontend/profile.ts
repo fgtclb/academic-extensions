@@ -15,7 +15,9 @@
  * inserted afterwards.
  */
 import { registerProfileEditingElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/root.js";
+import { registerProfileDocumentEditorElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/document-editor.js";
 import { registerProfileImageEditorElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/image-editor.js";
+import { registerProfileRichTextElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/rich-text.js";
 
 // The root first, and the order is not cosmetic: it reads the contract and
 // mounts the Vue application that still renders the rest of the editor, and
@@ -24,3 +26,10 @@ import { registerProfileImageEditorElement } from "@fgtclb/academic-persons-edit
 // be thrown away. The order stops mattering when the runtime leaves.
 registerProfileEditingElement();
 registerProfileImageEditorElement();
+// The document editor and the rich text field it renders are created by
+// "profile/documents.ts" rather than by Fluid, and that module registers them
+// itself for the same reason - it cannot depend on an entry point having run.
+// Both registrations are idempotent, and this one is the page's: an editor is
+// registered whether or not one is ever opened.
+registerProfileDocumentEditorElement();
+registerProfileRichTextElement();

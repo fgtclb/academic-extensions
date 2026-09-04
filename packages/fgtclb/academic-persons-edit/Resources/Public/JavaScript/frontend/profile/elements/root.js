@@ -15,11 +15,13 @@ import {
   createDocumentEditing,
   initializeDocumentSections
 } from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
+import {
+  profileEditingElementName,
+  profileEditingElementPrefix
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
 import { initializeFieldEditing } from "@fgtclb/academic-persons-edit/frontend/profile/fields.js";
 import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
 import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
-const profileEditingElementPrefix = "academic-persons-edit-";
-const profileEditingElementName = `${profileEditingElementPrefix}profile-editing`;
 const profileEditingStatusEvent = "pe:status";
 const statusTypes = ["danger", "info", "success", "warning"];
 const isStatusType = (value) => typeof value === "string" && statusTypes.includes(value);

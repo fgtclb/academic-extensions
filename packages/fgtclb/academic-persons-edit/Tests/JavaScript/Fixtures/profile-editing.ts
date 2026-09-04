@@ -171,6 +171,7 @@ export const profileEditingRoot = ({
   data-label-document-empty="${messages.empty}">
   <div id="profile-editing-${profileUid}-image-editor-target" data-pe-image-editor-target>${target}</div>
   ${content}
+  ${iconTemplates()}
   ${statusToast()}
 </div>`;
 
@@ -186,6 +187,25 @@ export const profileEditingRoot = ({
  */
 export const profileEditingElement = (options: RootOptions = {}): string => `
 <academic-persons-edit-profile-editing>${profileEditingRoot(options)}</academic-persons-edit-profile-editing>`;
+
+/**
+ * `Templates/Profile/Index.html:184-206` - one `<template>` per icon a browser
+ * rendered editor draws.
+ *
+ * `<core:icon>` fills each of them on the server, because the icon registry is
+ * the only thing that knows the identifiers and the site's overrides. The
+ * content is reduced to a marker element here for the same reason a
+ * `<f:translate>` is reduced to its English text: no module reads the icon, it
+ * clones it - and a clone of a marker proves the cloning as well as a clone of
+ * an SVG would.
+ */
+export const iconTemplates = (names: string[] = ["help"]): string =>
+  names
+    .map(
+      (name): string =>
+        `<template data-pe-icon="${name}"><span data-test-icon="${name}"></span></template>`,
+    )
+    .join("");
 
 /**
  * `Partials/Profile/StatusToast.html:185-218` - the two live regions

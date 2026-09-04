@@ -2,72 +2,14 @@
 import {
   createImageEditing
 } from "@fgtclb/academic-persons-edit/frontend/profile/image.js";
+import { profileImageEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+import { createElementTransition } from "@fgtclb/academic-persons-edit/frontend/profile/elements/transition.js";
 import {
-  profileEditingElementName,
-  profileEditingElementPrefix,
-  ProfileEditingElement
-} from "@fgtclb/academic-persons-edit/frontend/profile/elements/root.js";
-const profileImageEditorElementName = `${profileEditingElementPrefix}image-editor`;
-const transitionPrefix = "academic-persons-profile-editing-image-editor";
-const transitionTimeoutSlack = 50;
-const toMilliseconds = (value) => {
-  const amount = Number.parseFloat(value);
-  if (!Number.isFinite(amount)) {
-    return 0;
-  }
-  return value.trim().endsWith("ms") ? amount : amount * 1e3;
-};
-const transitionDuration = (element) => Math.max(
-  0,
-  ...globalThis.getComputedStyle(element).transitionDuration.split(",").map(toMilliseconds)
+  ownerEditingContext
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
+const runElementTransition = createElementTransition(
+  "academic-persons-profile-editing-image-editor"
 );
-const runElementTransition = (element, kind, done) => {
-  const active = `${transitionPrefix}-${kind}-active`;
-  const offset = kind === "enter" ? `${transitionPrefix}-enter-from` : `${transitionPrefix}-leave-to`;
-  element.classList.add(active);
-  if (kind === "enter") {
-    element.classList.add(offset);
-  }
-  const duration = transitionDuration(element);
-  const clear = () => {
-    element.classList.remove(active, offset);
-  };
-  if (duration === 0) {
-    clear();
-    done();
-    return () => void 0;
-  }
-  const finish = () => {
-    cancel();
-    clear();
-    done();
-  };
-  const onTransitionEnd = (event) => {
-    if (event.target === element) {
-      finish();
-    }
-  };
-  const cancel = () => {
-    globalThis.cancelAnimationFrame(frame);
-    globalThis.clearTimeout(timeout);
-    element.removeEventListener("transitionend", onTransitionEnd);
-  };
-  element.addEventListener("transitionend", onTransitionEnd);
-  const timeout = globalThis.setTimeout(finish, duration + transitionTimeoutSlack);
-  let frame = globalThis.requestAnimationFrame(() => {
-    frame = globalThis.requestAnimationFrame(() => {
-      if (kind === "enter") {
-        element.classList.remove(offset);
-      } else {
-        element.classList.add(offset);
-      }
-    });
-  });
-  return () => {
-    cancel();
-    clear();
-  };
-};
 const setHidden = (element, hidden) => {
   if (element instanceof HTMLElement) {
     element.hidden = hidden;
@@ -149,10 +91,7 @@ class ProfileImageEditorElement extends HTMLElement {
     return this.#controller;
   }
   connectedCallback() {
-    if (this.#context === null) {
-      const owner = this.closest(profileEditingElementName);
-      this.#context = owner instanceof ProfileEditingElement ? owner.context : null;
-    }
+    this.#context ??= ownerEditingContext(this);
     const context = this.#context;
     if (context === null) {
       return;

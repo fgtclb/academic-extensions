@@ -1,4 +1,3 @@
-import { nextTick, reactive } from "@fgtclb/academic-persons-edit/frontend/vue.js";
 import {
   hooks,
   initializePopover,
@@ -11,6 +10,17 @@ import {
   type EditingTarget,
 } from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
 import {
+  documentEditorClosedEvent,
+  documentEditorCloseEvent,
+  documentEditorInputEvent,
+  documentEditorSubmitEvent,
+  registerProfileDocumentEditorElement,
+  type ProfileDocumentEditorElement,
+  type ProfileDocumentEditorInputDetail,
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/document-editor.js";
+import { profileDocumentEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+import { registerProfileRichTextElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/rich-text.js";
+import {
   destroyRichTextEditors,
   ensureRichTextEditor,
   getPlainText,
@@ -19,15 +29,15 @@ import {
   parseRichTextPreview,
 } from "@fgtclb/academic-persons-edit/frontend/profile/rich-text.js";
 
-type DocumentMode = "add" | "view" | "edit" | "delete";
-type DocumentValue = string | boolean | number | null;
+export type DocumentMode = "add" | "view" | "edit" | "delete";
+export type DocumentValue = string | boolean | number | null;
 
-interface DocumentOption {
+export interface DocumentOption {
   label: string;
   value: DocumentValue;
 }
 
-interface DocumentField {
+export interface DocumentField {
   autocomplete?: string;
   characterLimit?: number;
   columnClass?: string;
@@ -52,18 +62,18 @@ interface DocumentItem {
   values?: Record<string, unknown>;
 }
 
-interface ContractContactSummary {
+export interface ContractContactSummary {
   label: string;
   value: string;
 }
 
-interface ContractContactItem extends DocumentItem {
+export interface ContractContactItem extends DocumentItem {
   hidden: boolean;
   summary: ContractContactSummary[];
   uid: number;
 }
 
-interface ContractContactSection {
+export interface ContractContactSection {
   identifier: string;
   items: ContractContactItem[];
   label: string;
@@ -126,7 +136,6 @@ export interface DocumentEditingController {
   submitContractContact(): Promise<void>;
   sortContractContact(direction: string, section: string, record: number): Promise<void>;
   sortDocument(direction: string, event: Event): Promise<void>;
-  documentFieldHtml(field: unknown): string;
 }
 
 interface DragState {
@@ -148,9 +157,6 @@ const listHeaderSelector = "[data-pe-document-list-header]";
 const documentViewSelector = "[data-pe-document-view-container]";
 const addCollapseTargetSelector = "[data-pe-document-add-collapse-target]";
 const itemCollapseTargetSelector = "[data-pe-document-item-collapse-target]";
-const controllers = new WeakMap<HTMLElement, DocumentEditingController>();
-const initializedRoots = new WeakSet<HTMLElement>();
-const dragStates = new WeakMap<HTMLElement, DragState>();
 let collapseTargetSequence = 0;
 
 const isDocumentMode = (value: string): value is DocumentMode =>
@@ -550,19 +556,29 @@ const updateDocumentDropPosition = (
   }
 };
 
-const clearDragState = (root: HTMLElement): void => {
-  const state = dragStates.get(root);
-  if (state === undefined) {
-    return;
-  }
-  clearDocumentDropPosition(state);
-  state.items.classList.remove("is-drag-active");
-  state.row.classList.remove("is-dragging");
-  dragStates.delete(root);
-};
-
+/**
+ * Sorting a list by dragging one of its rows.
+ *
+ * The drag is delegated on the plugin root and the state of the one drag in
+ * progress is a variable of this call. It used to be a module level `WeakMap`
+ * keyed by the root, which is what a function without an owner has to do to
+ * hold per editor state; the owner exists now, and it is the closure of the
+ * document editing this belongs to. Called exactly once per editor.
+ */
 const initializeDocumentDragAndDrop = (context: EditingContext): void => {
   const root = context.root;
+  let dragState: DragState | null = null;
+
+  const clearDragState = (): void => {
+    if (dragState === null) {
+      return;
+    }
+    clearDocumentDropPosition(dragState);
+    dragState.items.classList.remove("is-drag-active");
+    dragState.row.classList.remove("is-dragging");
+    dragState = null;
+  };
+
   root.addEventListener("dragstart", (event): void => {
     const target = event.target instanceof Element ? event.target : null;
     const handle = target?.closest<HTMLButtonElement>("[data-pe-document-drag]");
@@ -583,7 +599,7 @@ const initializeDocumentDragAndDrop = (context: EditingContext): void => {
     ) {
       return;
     }
-    dragStates.set(root, {
+    dragState = {
       section,
       items,
       row,
@@ -591,7 +607,7 @@ const initializeDocumentDragAndDrop = (context: EditingContext): void => {
       order: getDocumentOrder(section),
       dropRow: null,
       dropPosition: null,
-    });
+    };
     items.classList.add("is-drag-active");
     row.classList.add("is-dragging");
     if (event.dataTransfer !== null) {
@@ -604,9 +620,9 @@ const initializeDocumentDragAndDrop = (context: EditingContext): void => {
     }
   });
   root.addEventListener("dragover", (event): void => {
-    const state = dragStates.get(root);
+    const state = dragState;
     const target = event.target instanceof Element ? event.target : null;
-    if (state === undefined || target === null) {
+    if (state === null || target === null) {
       return;
     }
     if (target.closest(sectionSelector) !== state.section) {
@@ -620,9 +636,9 @@ const initializeDocumentDragAndDrop = (context: EditingContext): void => {
     }
   });
   root.addEventListener("drop", (event): void => {
-    const state = dragStates.get(root);
+    const state = dragState;
     const target = event.target instanceof Element ? event.target : null;
-    if (state === undefined || target?.closest(sectionSelector) !== state.section) {
+    if (state === null || target?.closest(sectionSelector) !== state.section) {
       return;
     }
     event.preventDefault();
@@ -640,21 +656,41 @@ const initializeDocumentDragAndDrop = (context: EditingContext): void => {
       order.length === previousOrder.length &&
       order.some((uid, index): boolean => uid !== previousOrder[index]);
     const section = state.section;
-    clearDragState(root);
+    clearDragState();
     refreshDocumentRows(section);
     if (changed) {
       void persistDocumentOrder(context, section, order, previousOrder);
     }
   });
-  root.addEventListener("dragend", (): void => clearDragState(root));
+  root.addEventListener("dragend", (): void => clearDragState());
 };
 
+/**
+ * The state of the open document editor, the requests behind it, and the
+ * element that renders it.
+ *
+ * ## Why the state is a plain object again
+ *
+ * It was a Vue `reactive()` proxy, and a template bound to it re-rendered when
+ * one of its properties was written - including a property nested two levels
+ * down, which is what a deep proxy buys. Lit does not have that and does not
+ * need it: the element below re-renders when a *property of the element* is
+ * assigned, so this object is the controller's own bookkeeping and
+ * `renderDocumentEditor()` is the one place it is handed over. Two things
+ * follow, and both are improvements:
+ *
+ * - What causes a render is a single call site rather than every assignment
+ *   anywhere in this file.
+ * - The controller stays testable without a custom element registry. The
+ *   behavioural suite drives these methods and asserts on this state, which is
+ *   what it asserted on before the port.
+ */
 export const createDocumentEditing = (
   editingTarget: EditingTarget,
 ): DocumentEditingController => {
   const context = toEditingContext(editingTarget);
   const root = context.root;
-  const documentState = reactive<DocumentState>({
+  const documentState: DocumentState = {
     contactEmptyMessage: context.messages.contractContactEmpty ?? "",
     contactSections: [],
     deleteConfirmation: context.messages.documentDeleteConfirm ?? "",
@@ -670,8 +706,8 @@ export const createDocumentEditing = (
     target: "",
     title: "",
     values: {},
-  });
-  const contractContactState = reactive<ContractContactState>({
+  };
+  const contractContactState: ContractContactState = {
     deleteConfirmation: context.messages.contractContactDeleteConfirm ?? "",
     error: "",
     errors: {},
@@ -683,15 +719,84 @@ export const createDocumentEditing = (
     section: "",
     title: "",
     values: {},
-  });
+  };
   let activeSection: HTMLElement | null = null;
   let trigger: HTMLElement | null = null;
   let contractContactTrigger: HTMLElement | null = null;
   let rowPendingRemoval: HTMLElement | null = null;
   let sectionPendingRefresh: HTMLElement | null = null;
+  let editorElement: ProfileDocumentEditorElement | null = null;
+
+  /** Hands the state to the element. The one place a render is caused. */
+  const renderDocumentEditor = (): void => {
+    const element = editorElement;
+    if (element === null) {
+      return;
+    }
+    element.contactEmptyMessage = documentState.contactEmptyMessage;
+    element.contactSections = documentState.contactSections;
+    element.deleteConfirmation = documentState.deleteConfirmation;
+    element.error = documentState.error;
+    element.errors = documentState.errors;
+    element.fields = documentState.fields;
+    element.heading = documentState.title;
+    element.kind = documentState.kind;
+    element.mode = documentState.mode;
+    element.pending = documentState.pending;
+    element.record = documentState.record;
+    element.values = documentState.values;
+    // Last, because it is the one that starts a transition: the element has to
+    // know what it is showing before it is told to show it.
+    element.open = documentState.open;
+  };
+
+  /**
+   * Creates the editor inside the collapse target of the row or of the section.
+   *
+   * This is what replaced `<Teleport to="#…">`. Vue rendered the editor where
+   * the template stood and moved it to the target afterwards, which is why the
+   * target needed a generated id in the first place; the element is created
+   * where it belongs instead. The id stays, because the trigger's
+   * `aria-controls` needs one.
+   *
+   * Nothing is ever *moved*: a move disconnects and reconnects the element,
+   * which would destroy and recreate the CKEditor instances below it.
+   */
+  const createDocumentEditor = (target: HTMLElement): void => {
+    registerProfileDocumentEditorElement();
+    registerProfileRichTextElement();
+    const element = document.createElement(
+      profileDocumentEditorElementName,
+    ) as ProfileDocumentEditorElement;
+    element.context = context;
+    element.addEventListener(documentEditorCloseEvent, (): void => closeDocument());
+    element.addEventListener(documentEditorSubmitEvent, (): void => {
+      void submitDocument();
+    });
+    element.addEventListener(documentEditorInputEvent, (event: Event): void => {
+      const detail = (event as CustomEvent<ProfileDocumentEditorInputDetail>).detail;
+      // Written without a render on purpose: the control the visitor is typing
+      // in already shows the value, and re-rendering the form on every
+      // keystroke is what a controlled input does not have to do. The `live()`
+      // bindings of the element realign the controls with this object the next
+      // time something else does cause a render.
+      documentState.values = { ...documentState.values, [detail.name]: detail.value };
+    });
+    element.addEventListener(documentEditorClosedEvent, (): void => {
+      const closing = editorElement;
+      editorElement = null;
+      finishDocumentClose(closing ?? root);
+      closing?.remove();
+    });
+    editorElement = element;
+    renderDocumentEditor();
+    target.replaceChildren(element);
+  };
 
   const initializeDocumentEditors = async (): Promise<void> => {
-    await nextTick();
+    // The markup exists once the element has rendered, which is Lit's own
+    // promise and what `nextTick()` used to be.
+    await editorElement?.updateComplete;
     const view = root.querySelector<HTMLElement>(documentViewSelector);
     if (view === null) {
       return;
@@ -724,6 +829,7 @@ export const createDocumentEditing = (
     contractContactState.open = false;
     documentState.open = false;
     trigger?.setAttribute("aria-expanded", "false");
+    renderDocumentEditor();
   };
 
   const openDocument = async (modeValue: string, event: Event): Promise<void> => {
@@ -792,11 +898,13 @@ export const createDocumentEditing = (
       button.setAttribute("aria-expanded", "true");
       documentState.open = true;
       documentState.pending = false;
+      createDocumentEditor(collapseTarget);
       await initializeDocumentEditors();
     } catch (error) {
       showStatus(context, "danger", (error as RequestError).result?.message ?? null);
     } finally {
       documentState.pending = false;
+      renderDocumentEditor();
     }
   };
 
@@ -809,12 +917,17 @@ export const createDocumentEditing = (
 
   const finishDocumentClose = (element: Element): void => {
     const focusTarget = trigger;
-    // Vue removes the leaving element before it calls `after-leave`, and hands
-    // the hook that element. Its own subtree travels with it, so the editors to
-    // destroy are found there and nowhere else - a CKEditor that is dropped
-    // without being destroyed keeps its window and document listeners until it
-    // is collected. Passing the plugin root instead would match no textarea of
-    // the closing view and every permanently rendered profile field textarea.
+    // The scope is the subtree that is going away, never the plugin root. The
+    // profile fields render a permanent `[data-pe-rich-text]` textarea each,
+    // and a query that started at the root would destroy a field editor the
+    // visitor still has open - while destroying none of the closing view once
+    // it has been detached. A CKEditor that is dropped without being destroyed
+    // keeps its window and document listeners until it is collected.
+    //
+    // The rich text elements of the closing subtree destroy their own editors
+    // when they are disconnected, so this and that are two paths to the same
+    // end. Both are idempotent: `destroyRichTextEditors()` forgets an editor
+    // before it awaits its `destroy()`, so whichever runs second finds none.
     void destroyRichTextEditors(element);
     rowPendingRemoval?.remove();
     if (sectionPendingRefresh !== null) {
@@ -876,6 +989,7 @@ export const createDocumentEditing = (
     documentState.pending = true;
     documentState.error = "";
     documentState.errors = {};
+    renderDocumentEditor();
     showStatus(context, "info", context.messages.saving ?? null);
     try {
       const response = await requestDocument(context, endpoint, data);
@@ -914,6 +1028,7 @@ export const createDocumentEditing = (
       );
     } finally {
       documentState.pending = false;
+      renderDocumentEditor();
     }
   };
 
@@ -1016,7 +1131,8 @@ export const createDocumentEditing = (
       );
       contractContactTrigger = button;
       contractContactState.open = true;
-      await nextTick();
+      renderDocumentEditor();
+      await editorElement?.updateComplete;
       const editor = root.querySelector<HTMLElement>(
         "[data-pe-contract-contact-editor]",
       );
@@ -1043,7 +1159,8 @@ export const createDocumentEditing = (
       contractContactState.open = false;
       const focusTarget = contractContactTrigger;
       contractContactTrigger = null;
-      void nextTick().then((): void => {
+      renderDocumentEditor();
+      void Promise.resolve(editorElement?.updateComplete).then((): void => {
         if (focusTarget?.isConnected === true) {
           focusTarget.focus({ preventScroll: true });
         }
@@ -1115,8 +1232,9 @@ export const createDocumentEditing = (
       }
       contractContactState.pending = false;
       contractContactState.open = false;
+      renderDocumentEditor();
       showStatus(
-        root,
+        context,
         "success",
         contractContactState.mode === "delete"
           ? context.messages.documentDeleted ?? null
@@ -1187,6 +1305,7 @@ export const createDocumentEditing = (
         });
         section.items.splice(0, section.items.length, ...sortedItems);
       }
+      renderDocumentEditor();
       showStatus(context, "success", context.messages.documentSorted ?? null);
     } catch (error) {
       showStatus(context, "danger", (error as RequestError).result?.message ?? null);
@@ -1195,15 +1314,36 @@ export const createDocumentEditing = (
     }
   };
 
-  const documentFieldHtml = (fieldValue: unknown): string => {
-    const field = asDocumentField(fieldValue);
-    if (field === null || !field.richText) {
-      return "";
+  // One drag per editor, and the listeners are the editor's for as long as it
+  // lives. Registered here rather than in `initializeDocumentSections()`,
+  // which is what freed the module of the `WeakMap`s that used to pair a root
+  // element with the controller and the drag in progress belonging to it.
+  initializeDocumentDragAndDrop(context);
+  root.addEventListener("click", (event): void => {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target?.closest<HTMLButtonElement>(
+      "[data-pe-document-add], [data-pe-document-view], [data-pe-document-edit], " +
+        "[data-pe-document-delete], [data-pe-document-sort]",
+    );
+    if (button === null || button === undefined || button.disabled) {
+      return;
     }
-    return parseRichTextPreview(field.displayValue ?? "").body.innerHTML;
-  };
+    const direction = hooks(button).peDocumentSort;
+    if (direction !== undefined) {
+      void sortDocument(direction, event);
+      return;
+    }
+    const mode = button.matches("[data-pe-document-add]")
+      ? "add"
+      : button.matches("[data-pe-document-view]")
+        ? "view"
+        : button.matches("[data-pe-document-edit]")
+          ? "edit"
+          : "delete";
+    void openDocument(mode, event);
+  });
 
-  const controller: DocumentEditingController = {
+  return {
     contractContact: contractContactState,
     document: documentState,
     openDocument,
@@ -1215,48 +1355,23 @@ export const createDocumentEditing = (
     submitContractContact,
     sortContractContact,
     sortDocument,
-    documentFieldHtml,
   };
-  controllers.set(root, controller);
-  return controller;
 };
 
+/**
+ * The row bookkeeping of every section: the position labels, the disabled ends
+ * of the sort buttons, the striping, the drag handles and the empty state.
+ *
+ * Called after the markup of the editor is in the document. It no longer
+ * registers anything - the delegated click and the drag and drop belong to the
+ * controller of `createDocumentEditing()` - so calling it again is a refresh
+ * and not a second wiring, and there is nothing left to remember which roots
+ * have already been seen.
+ */
 export const initializeDocumentSections = (
   editingTarget: EditingTarget,
 ): void => {
-  const context = toEditingContext(editingTarget);
-  const root = context.root;
-  root.querySelectorAll<HTMLElement>(sectionSelector).forEach(refreshDocumentRows);
-  if (initializedRoots.has(root)) {
-    return;
-  }
-  initializedRoots.add(root);
-  initializeDocumentDragAndDrop(context);
-  root.addEventListener("click", (event): void => {
-    const target = event.target instanceof Element ? event.target : null;
-    const button = target?.closest<HTMLButtonElement>(
-      "[data-pe-document-add], [data-pe-document-view], [data-pe-document-edit], " +
-        "[data-pe-document-delete], [data-pe-document-sort]",
-    );
-    if (button === null || button === undefined || button.disabled) {
-      return;
-    }
-    const controller = controllers.get(root);
-    if (controller === undefined) {
-      return;
-    }
-    const direction = hooks(button).peDocumentSort;
-    if (direction !== undefined) {
-      void controller.sortDocument(direction, event);
-      return;
-    }
-    const mode = button.matches("[data-pe-document-add]")
-      ? "add"
-      : button.matches("[data-pe-document-view]")
-        ? "view"
-        : button.matches("[data-pe-document-edit]")
-          ? "edit"
-          : "delete";
-    void controller.openDocument(mode, event);
-  });
+  toEditingContext(editingTarget)
+    .root.querySelectorAll<HTMLElement>(sectionSelector)
+    .forEach(refreshDocumentRows);
 };

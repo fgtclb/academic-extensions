@@ -39,6 +39,7 @@ const browserGlobals = [
     'HTMLFormElement',
     'HTMLImageElement',
     'HTMLInputElement',
+    'HTMLLabelElement',
     'HTMLSelectElement',
     'HTMLSourceElement',
     'HTMLTemplateElement',
@@ -253,6 +254,19 @@ export const settle = async (turns = 3) => {
         await Promise.resolve();
     }
 };
+
+/**
+ * Waits for the next animation frame.
+ *
+ * "settle()" drains microtasks and never reaches a timer, which is exactly what
+ * makes it useful - but the close of the document editor is reported a frame
+ * after the transition ends, deliberately, so that the owner does not tear the
+ * element out of the document from inside Lit's own update cycle. A test that
+ * is about the close therefore has to wait for a frame rather than for a
+ * microtask.
+ */
+export const nextFrame = () =>
+    new Promise((resolve) => globalThis.requestAnimationFrame(() => resolve(undefined)));
 
 /**
  * A drag event, which jsdom implements neither as "DragEvent" nor as

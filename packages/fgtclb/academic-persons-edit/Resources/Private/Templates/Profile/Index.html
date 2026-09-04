@@ -181,6 +181,29 @@
                 </div>
             </div>
 
+            <!--
+                The icons of the editors that are rendered in the browser.
+
+                The core:icon view helper resolves an identifier through the
+                icon registry, which knows the set this extension registers and
+                whatever a site overrode - and a browser can ask neither. So
+                Fluid renders each icon once into a template element and
+                "elements/document-editor.ts" clones what it needs from there,
+                the same idiom "Partials/Profile/ButtonTemplates.html" already
+                uses for the two button templates. Copying the markup into
+                TypeScript would fork the icon set at the first change.
+
+                One entry per icon a browser rendered editor draws. The list
+                grows with the editors that move: the document editor needs the
+                help icon, and the contract contacts follow.
+            -->
+            <template data-pe-icon="help">
+                <core:icon
+                    identifier="academic-persons-edit-help"
+                    size="small"
+                    alternativeMarkupIdentifier="inline" />
+            </template>
+
             <f:render partial="Profile/Documents/Editor" />
             <f:render partial="Profile/StatusToast" />
             <f:render partial="Profile/ButtonTemplates" />

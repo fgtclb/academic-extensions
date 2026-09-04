@@ -67,26 +67,22 @@ import {
   createDocumentEditing,
   initializeDocumentSections,
 } from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
+import {
+  profileEditingElementName,
+  profileEditingElementPrefix,
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
 import { initializeFieldEditing } from "@fgtclb/academic-persons-edit/frontend/profile/fields.js";
 import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
 import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
 
 /**
- * The prefix of every custom element this extension defines.
- *
- * It is the extension key with its underscores replaced, which is the same
- * token the icon identifiers (`academic-persons-edit-add`) and the import map
- * specifier (`@fgtclb/academic-persons-edit/`) already use. A custom element
- * name is a global name with no scoping mechanism of any kind, so the prefix
- * has to be one this extension provably owns - and the extension key is the
- * only such token, because TER and packagist enforce its uniqueness. A shorter
- * `academic-profile-` would read better and would be a name `academic_persons`,
- * which ships frontend JavaScript of its own, could claim just as well.
+ * The prefix and the tag name, re-exported from `elements/names.ts` where they
+ * are declared. They were introduced here and are read from here by everything
+ * that already knows this module, so the export stays; what moved is the
+ * declaration, because three modules now need a name and importing an element
+ * to spell one is what builds an import cycle.
  */
-export const profileEditingElementPrefix = "academic-persons-edit-";
-
-/** The tag name of this element. Public API from the moment it ships. */
-export const profileEditingElementName = `${profileEditingElementPrefix}profile-editing`;
+export { profileEditingElementName, profileEditingElementPrefix };
 
 /** The event a descendant dispatches to have the editor report a status. */
 export const profileEditingStatusEvent = "pe:status";

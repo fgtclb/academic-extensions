@@ -51,6 +51,23 @@ const stubs = new Map([
     ['@fgtclb/academic-persons-edit/frontend/vue.js', 'stubs/vue.mjs'],
 ]);
 
+/**
+ * Libraries that are resolved for real, but not from where the importer stands.
+ *
+ * "lit" is delivered by TYPO3 core through the import map — EXT:core maps
+ * "lit", "lit/", "lit-element" and "lit-html" with no tag and no dependency, so
+ * a frontend module of this extension resolves it in a browser without any
+ * configuration of its own. Node resolves a bare specifier from the importing
+ * file upwards instead, and the sources live in "packages/", where there is no
+ * "node_modules" at all. So the resolution is retried from the harness, whose
+ * "Build/package.json" pins the exact versions core ships (3.2.0 / 4.1.0 /
+ * 2.0.4) — the tests run the same Lit the browser will, or the pin is wrong.
+ *
+ * Only a real dependency belongs here, never a stub: Lit is what the elements
+ * are written in, and stubbing it would test nothing.
+ */
+const relocated = ['lit'];
+
 export const initialize = (data) => {
     harnessRoot = data.harnessRoot;
     byPrefix = new Map(
@@ -67,6 +84,10 @@ export const resolve = (specifier, context, nextResolve) => {
     const stub = stubs.get(specifier);
     if (stub !== undefined) {
         return { url: new URL(stub, harnessRoot).href, shortCircuit: true };
+    }
+
+    if (relocated.some((name) => specifier === name || specifier.startsWith(`${name}/`))) {
+        return nextResolve(specifier, { ...context, parentURL: harnessRoot });
     }
 
     for (const [prefix, sourceRoot] of byPrefix) {

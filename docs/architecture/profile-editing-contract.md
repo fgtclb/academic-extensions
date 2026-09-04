@@ -130,12 +130,122 @@ Two consequences worth knowing before the next component is written:
   The controller holds the context, so it needs no address; the event exists for
   a component that has none.
 
+## The element that renders the document editor
+
+`<academic-persons-edit-document-editor>`
+([`profile/elements/document-editor.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/document-editor.ts))
+is the first component that is a `LitElement`, and it is one because its markup
+cannot be server rendered at all: the fields, their labels, their options and
+their display values come from the `documentForm` response.
+`Partials/Profile/Documents/Editor.html` was 266 lines of Fluid with 114 Vue
+directives in them and is now a mount point that renders nothing.
+
+`profile/documents.ts` creates one element per open, **inside the collapse
+target of the row or of the section**, hands it the state as properties and
+removes it when the close transition reports back. Nothing is ever moved: a move
+disconnects the element, and a disconnect destroys the CKEditor instances below
+it. That also replaced `<Teleport to="#…">`, which was the only reason the
+collapse target needed a generated id; the id stays for `aria-controls`.
+
+| Member                                    | Contract                                                                                       |
+|-------------------------------------------|------------------------------------------------------------------------------------------------|
+| `<academic-persons-edit-document-editor>` | The tag name. It observes no attributes — every input is a property.                           |
+| `context`                                 | The `EditingContext`, assignable; resolved from the element above it when it is not.           |
+| `open`                                    | Runs the enter transition when it becomes true and the leave transition when it becomes false. |
+| `mode`, `kind`, `heading`, `record`       | Which of the four views is rendered, for a document or a contract, and under which heading.    |
+| `fields`, `values`, `errors`, `error`     | The `documentForm` response, what the visitor typed, and what the server refused.              |
+| `pending`, `deleteConfirmation`           | The busy state, and the question a deletion asks.                                              |
+| `contactSections`, `contactEmptyMessage`  | Handed on to the contract contacts of a contract in view mode.                                 |
+| `pe:document-close`                       | The cancel button was pressed.                                                                 |
+| `pe:document-submit`                      | The form was submitted; the browser's own submit is prevented.                                 |
+| `pe:document-input`                       | A control changed: `{ name, value }`.                                                          |
+| `pe:document-closed`                      | The leave transition is over and the owner may remove the element.                             |
+
+The property is called `heading` and not `title` for a reason that is easy to
+step on: `title` is a property of every `HTMLElement`, and a reactive property
+of that name would shadow it.
+
+### Light DOM, and why there is no choice
+
+`createRenderRoot()` returns `this`. Six independent reasons, any one of which
+decides it: the theme's Bootstrap stylesheet has to reach the controls;
+CKEditor 5 does not support a classic editor inside a shadow root; Bootstrap's
+own popover JavaScript positions against `document`; the class names are the
+integrator contract; the SCSS pipeline emits one stylesheet per extension; and
+jsdom implements neither `adoptedStyleSheets` nor `CSSStyleSheet.replaceSync`,
+so the behavioural suite could not render the element outside a browser.
+
+The consequence is stated rather than hidden: the element provides no style
+encapsulation, and the three partials it replaces cease to be Fluid override
+points.
+
+### Where `lit` comes from
+
+`import { LitElement, html } from "lit"` — a bare specifier, resolved by TYPO3
+core's import map. `EXT:core/Configuration/JavaScriptModules.php` maps `lit`,
+`lit/`, `lit-element` and `lit-html` with **no tag and no dependency**, unlike
+`EXT:rte_ckeditor`, and `academic_persons_edit` already declares
+`'dependencies' => ['core']`, so the frontend import map carries them. Nothing
+is added to the extension's own `JavaScriptModules.php`: an own mapping would
+pin a copy that diverges from the core the site runs.
+
+Both supported cores ship the same release — lit-html 3.2.0, lit-element 4.1.0
+and `@lit/reactive-element` 2.0.4, which is `lit` 3.2.0 — verified in the
+version markers of the files themselves on 13.4.34 and 14.3.6. `Build/package.json`
+pins exactly those as a development dependency, with npm `overrides` on the
+three transitive packages, so the behavioural suite runs the Lit the browser
+will and the type check checks against it. It is never bundled: the TypeScript
+build emits one module per source and leaves every import as written.
+
+## The element that owns a rich text field
+
+`<academic-persons-edit-rich-text>`
+([`profile/elements/rich-text.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/rich-text.ts))
+owns one `<textarea>` and the one CKEditor 5 on it. It exists because
+`ClassicEditor.create(textarea)` replaces the textarea in the document with its
+own container and owns everything below that point — so a `lit-html` template
+containing the textarea would patch nodes it does not own on the next re-render,
+and a re-render is exactly what a validation error causes.
+
+Lit therefore creates and removes the *element* and never renders into it. The
+editor is created in `connectedCallback()` and destroyed in
+`disconnectedCallback()`, which is what makes the destroy structural rather than
+a call in one close path.
+
+| Member                              | Contract                                                                       |
+|-------------------------------------|--------------------------------------------------------------------------------|
+| `<academic-persons-edit-rich-text>` | The tag name. It observes no attributes.                                       |
+| `context`                           | The `EditingContext`, assignable; resolved from the element above it when not. |
+| `configuration`                     | Everything the textarea needs, in one object, so no partial state is rendered. |
+| `value`                             | Read through the textarea, so a live editor is the source of it.               |
+| `field`                             | The textarea, or `null` before the first connection.                           |
+
+The close path destroys the editors of the closing subtree as well, and the two
+are idempotent by construction: `destroyRichTextEditors()` forgets an editor
+before it awaits its `destroy()`, so whichever runs second finds none. The scope
+is the subtree that is going away and never the plugin root — the profile fields
+render a permanent rich text textarea each, and a query from the root would take
+a field the visitor still has open off screen.
+
+## Where the icons come from
+
+`<core:icon>` resolves an identifier through the icon registry, which knows the
+set the extension registers and whatever a site overrode, and a browser can ask
+neither. So `Templates/Profile/Index.html` renders one
+`<template data-pe-icon="…">` per icon a browser rendered editor draws, and the
+element clones what it needs from there — the same idiom
+`Partials/Profile/ButtonTemplates.html` already uses for its two button
+templates. The list grows with the editors that move.
+
 ## The transition the editors open and close with
 
 `<Transition>` applied Vue's `-enter-from` / `-enter-active` / `-leave-active` /
 `-leave-to` classes and called back when the animation was over. The classes are
-kept — the declarations that select them are unchanged — and
-`runElementTransition()` applies them instead.
+kept — the declarations that select them are unchanged — and the runner built by
+`createElementTransition()`
+([`profile/elements/transition.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/transition.ts))
+applies them instead. One runner per editor, because the two differ only in the
+class name prefix `<Transition name="…">` derived its classes from.
 
 It is a function rather than a `transitionend` listener because the callback is
 where the close path hangs: the focus returns to the trigger there and the
@@ -146,6 +256,12 @@ intermittent defect rather than a missing animation. So it ends on the event, on
 a timeout past the computed duration, or at once when the computed duration is
 zero — which is what `prefers-reduced-motion` produces — and it can be cancelled
 when the editor is reopened while it closes.
+
+The document editor reports its finished close **one frame later**, never inside
+the update that started it: the owner removes the element when it hears that,
+and tearing the tree out from inside Lit's `updated()` is how a reactive element
+ends up patching detached nodes. Vue's `after-leave` was a frame away for the
+same reason.
 
 ## The seam for a caller that has only the element
 

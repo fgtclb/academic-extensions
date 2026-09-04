@@ -37,6 +37,8 @@
  * Only the values with a single, unambiguous reading are coerced: the profile
  * uid, the editor language, the image render type and `data-has-image`.
  */
+import { profileEditingElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+
 
 /**
  * The root's `data-*` contract, spelled as the `dataset` keys the attributes
@@ -286,3 +288,23 @@ export const readEditingContext = (root: HTMLElement): EditingContext => {
 
 export const toEditingContext = (target: EditingTarget): EditingContext =>
   target instanceof HTMLElement ? readEditingContext(target) : target;
+
+/**
+ * The contract of the profile editor an element stands in, or `null` for one
+ * that stands in none.
+ *
+ * The context is read once, by the root element, and handed down as a property
+ * - so this is only the fallback for an element that no caller assigned one to,
+ * which is every element Fluid renders. It reads the owner's documented
+ * `context` property through the tag name rather than through an `instanceof`
+ * on purpose: the element modules would otherwise have to import the root
+ * element module, which imports the document editing that creates two of them,
+ * and the cycle buys nothing the tag name does not already guarantee.
+ */
+export const ownerEditingContext = (element: Element): EditingContext | null => {
+  const owner = element.closest(profileEditingElementName) as
+    | (Element & { context?: EditingContext | null })
+    | null;
+
+  return owner?.context ?? null;
+};

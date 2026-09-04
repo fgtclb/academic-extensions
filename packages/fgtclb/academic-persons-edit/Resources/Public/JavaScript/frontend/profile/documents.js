@@ -1,5 +1,4 @@
 /* Generated from Resources/Private/TypeScript — do not edit. */
-import { nextTick, reactive } from "@fgtclb/academic-persons-edit/frontend/vue.js";
 import {
   hooks,
   initializePopover,
@@ -9,6 +8,15 @@ import {
 import {
   toEditingContext
 } from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
+import {
+  documentEditorClosedEvent,
+  documentEditorCloseEvent,
+  documentEditorInputEvent,
+  documentEditorSubmitEvent,
+  registerProfileDocumentEditorElement
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/document-editor.js";
+import { profileDocumentEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
+import { registerProfileRichTextElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/rich-text.js";
 import {
   destroyRichTextEditors,
   ensureRichTextEditor,
@@ -26,9 +34,6 @@ const listHeaderSelector = "[data-pe-document-list-header]";
 const documentViewSelector = "[data-pe-document-view-container]";
 const addCollapseTargetSelector = "[data-pe-document-add-collapse-target]";
 const itemCollapseTargetSelector = "[data-pe-document-item-collapse-target]";
-const controllers = /* @__PURE__ */ new WeakMap();
-const initializedRoots = /* @__PURE__ */ new WeakSet();
-const dragStates = /* @__PURE__ */ new WeakMap();
 let collapseTargetSequence = 0;
 const isDocumentMode = (value) => ["add", "view", "edit", "delete"].includes(value);
 const getDocumentRows = (section) => {
@@ -345,18 +350,18 @@ const updateDocumentDropPosition = (state, target, clientY) => {
     state.dropPosition = "end";
   }
 };
-const clearDragState = (root) => {
-  const state = dragStates.get(root);
-  if (state === void 0) {
-    return;
-  }
-  clearDocumentDropPosition(state);
-  state.items.classList.remove("is-drag-active");
-  state.row.classList.remove("is-dragging");
-  dragStates.delete(root);
-};
 const initializeDocumentDragAndDrop = (context) => {
   const root = context.root;
+  let dragState = null;
+  const clearDragState = () => {
+    if (dragState === null) {
+      return;
+    }
+    clearDocumentDropPosition(dragState);
+    dragState.items.classList.remove("is-drag-active");
+    dragState.row.classList.remove("is-dragging");
+    dragState = null;
+  };
   root.addEventListener("dragstart", (event) => {
     const target = event.target instanceof Element ? event.target : null;
     const handle = target == null ? void 0 : target.closest("[data-pe-document-drag]");
@@ -366,7 +371,7 @@ const initializeDocumentDragAndDrop = (context) => {
     if (handle === null || handle === void 0 || handle.disabled || row === null || row === void 0 || section === null || section === void 0 || items === null || items === void 0 || section.dataset.sectionSortable !== "1") {
       return;
     }
-    dragStates.set(root, {
+    dragState = {
       section,
       items,
       row,
@@ -374,7 +379,7 @@ const initializeDocumentDragAndDrop = (context) => {
       order: getDocumentOrder(section),
       dropRow: null,
       dropPosition: null
-    });
+    };
     items.classList.add("is-drag-active");
     row.classList.add("is-dragging");
     if (event.dataTransfer !== null) {
@@ -387,9 +392,9 @@ const initializeDocumentDragAndDrop = (context) => {
     }
   });
   root.addEventListener("dragover", (event) => {
-    const state = dragStates.get(root);
+    const state = dragState;
     const target = event.target instanceof Element ? event.target : null;
-    if (state === void 0 || target === null) {
+    if (state === null || target === null) {
       return;
     }
     if (target.closest(sectionSelector) !== state.section) {
@@ -403,9 +408,9 @@ const initializeDocumentDragAndDrop = (context) => {
     }
   });
   root.addEventListener("drop", (event) => {
-    const state = dragStates.get(root);
+    const state = dragState;
     const target = event.target instanceof Element ? event.target : null;
-    if (state === void 0 || (target == null ? void 0 : target.closest(sectionSelector)) !== state.section) {
+    if (state === null || (target == null ? void 0 : target.closest(sectionSelector)) !== state.section) {
       return;
     }
     event.preventDefault();
@@ -421,18 +426,18 @@ const initializeDocumentDragAndDrop = (context) => {
     const order = getDocumentOrder(state.section);
     const changed = order.length === previousOrder.length && order.some((uid, index) => uid !== previousOrder[index]);
     const section = state.section;
-    clearDragState(root);
+    clearDragState();
     refreshDocumentRows(section);
     if (changed) {
       void persistDocumentOrder(context, section, order, previousOrder);
     }
   });
-  root.addEventListener("dragend", () => clearDragState(root));
+  root.addEventListener("dragend", () => clearDragState());
 };
 const createDocumentEditing = (editingTarget) => {
   const context = toEditingContext(editingTarget);
   const root = context.root;
-  const documentState = reactive({
+  const documentState = {
     contactEmptyMessage: context.messages.contractContactEmpty ?? "",
     contactSections: [],
     deleteConfirmation: context.messages.documentDeleteConfirm ?? "",
@@ -448,8 +453,8 @@ const createDocumentEditing = (editingTarget) => {
     target: "",
     title: "",
     values: {}
-  });
-  const contractContactState = reactive({
+  };
+  const contractContactState = {
     deleteConfirmation: context.messages.contractContactDeleteConfirm ?? "",
     error: "",
     errors: {},
@@ -461,15 +466,60 @@ const createDocumentEditing = (editingTarget) => {
     section: "",
     title: "",
     values: {}
-  });
+  };
   let activeSection = null;
   let trigger = null;
   let contractContactTrigger = null;
   let rowPendingRemoval = null;
   let sectionPendingRefresh = null;
+  let editorElement = null;
+  const renderDocumentEditor = () => {
+    const element = editorElement;
+    if (element === null) {
+      return;
+    }
+    element.contactEmptyMessage = documentState.contactEmptyMessage;
+    element.contactSections = documentState.contactSections;
+    element.deleteConfirmation = documentState.deleteConfirmation;
+    element.error = documentState.error;
+    element.errors = documentState.errors;
+    element.fields = documentState.fields;
+    element.heading = documentState.title;
+    element.kind = documentState.kind;
+    element.mode = documentState.mode;
+    element.pending = documentState.pending;
+    element.record = documentState.record;
+    element.values = documentState.values;
+    element.open = documentState.open;
+  };
+  const createDocumentEditor = (target) => {
+    registerProfileDocumentEditorElement();
+    registerProfileRichTextElement();
+    const element = document.createElement(
+      profileDocumentEditorElementName
+    );
+    element.context = context;
+    element.addEventListener(documentEditorCloseEvent, () => closeDocument());
+    element.addEventListener(documentEditorSubmitEvent, () => {
+      void submitDocument();
+    });
+    element.addEventListener(documentEditorInputEvent, (event) => {
+      const detail = event.detail;
+      documentState.values = { ...documentState.values, [detail.name]: detail.value };
+    });
+    element.addEventListener(documentEditorClosedEvent, () => {
+      const closing = editorElement;
+      editorElement = null;
+      finishDocumentClose(closing ?? root);
+      closing == null ? void 0 : closing.remove();
+    });
+    editorElement = element;
+    renderDocumentEditor();
+    target.replaceChildren(element);
+  };
   const initializeDocumentEditors = async () => {
     var _a;
-    await nextTick();
+    await (editorElement == null ? void 0 : editorElement.updateComplete);
     const view = root.querySelector(documentViewSelector);
     if (view === null) {
       return;
@@ -496,6 +546,7 @@ const createDocumentEditing = (editingTarget) => {
     contractContactState.open = false;
     documentState.open = false;
     trigger == null ? void 0 : trigger.setAttribute("aria-expanded", "false");
+    renderDocumentEditor();
   };
   const openDocument = async (modeValue, event) => {
     var _a;
@@ -552,11 +603,13 @@ const createDocumentEditing = (editingTarget) => {
       button.setAttribute("aria-expanded", "true");
       documentState.open = true;
       documentState.pending = false;
+      createDocumentEditor(collapseTarget);
       await initializeDocumentEditors();
     } catch (error) {
       showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
     } finally {
       documentState.pending = false;
+      renderDocumentEditor();
     }
   };
   const closeDocument = () => {
@@ -621,6 +674,7 @@ const createDocumentEditing = (editingTarget) => {
     documentState.pending = true;
     documentState.error = "";
     documentState.errors = {};
+    renderDocumentEditor();
     showStatus(context, "info", context.messages.saving ?? null);
     try {
       const response = await requestDocument(context, endpoint, data);
@@ -656,6 +710,7 @@ const createDocumentEditing = (editingTarget) => {
       );
     } finally {
       documentState.pending = false;
+      renderDocumentEditor();
     }
   };
   const sortDocument = async (direction, event) => {
@@ -727,7 +782,8 @@ const createDocumentEditing = (editingTarget) => {
       );
       contractContactTrigger = button;
       contractContactState.open = true;
-      await nextTick();
+      renderDocumentEditor();
+      await (editorElement == null ? void 0 : editorElement.updateComplete);
       const editor = root.querySelector(
         "[data-pe-contract-contact-editor]"
       );
@@ -750,7 +806,8 @@ const createDocumentEditing = (editingTarget) => {
       contractContactState.open = false;
       const focusTarget = contractContactTrigger;
       contractContactTrigger = null;
-      void nextTick().then(() => {
+      renderDocumentEditor();
+      void Promise.resolve(editorElement == null ? void 0 : editorElement.updateComplete).then(() => {
         if ((focusTarget == null ? void 0 : focusTarget.isConnected) === true) {
           focusTarget.focus({ preventScroll: true });
         }
@@ -807,8 +864,9 @@ const createDocumentEditing = (editingTarget) => {
       }
       contractContactState.pending = false;
       contractContactState.open = false;
+      renderDocumentEditor();
       showStatus(
-        root,
+        context,
         "success",
         contractContactState.mode === "delete" ? context.messages.documentDeleted ?? null : context.messages.documentSaved ?? null
       );
@@ -864,6 +922,7 @@ const createDocumentEditing = (editingTarget) => {
         });
         section.items.splice(0, section.items.length, ...sortedItems);
       }
+      renderDocumentEditor();
       showStatus(context, "success", context.messages.documentSorted ?? null);
     } catch (error) {
       showStatus(context, "danger", ((_a = error.result) == null ? void 0 : _a.message) ?? null);
@@ -871,14 +930,24 @@ const createDocumentEditing = (editingTarget) => {
       contractContactState.pending = false;
     }
   };
-  const documentFieldHtml = (fieldValue) => {
-    const field = asDocumentField(fieldValue);
-    if (field === null || !field.richText) {
-      return "";
+  initializeDocumentDragAndDrop(context);
+  root.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target == null ? void 0 : target.closest(
+      "[data-pe-document-add], [data-pe-document-view], [data-pe-document-edit], [data-pe-document-delete], [data-pe-document-sort]"
+    );
+    if (button === null || button === void 0 || button.disabled) {
+      return;
     }
-    return parseRichTextPreview(field.displayValue ?? "").body.innerHTML;
-  };
-  const controller = {
+    const direction = hooks(button).peDocumentSort;
+    if (direction !== void 0) {
+      void sortDocument(direction, event);
+      return;
+    }
+    const mode = button.matches("[data-pe-document-add]") ? "add" : button.matches("[data-pe-document-view]") ? "view" : button.matches("[data-pe-document-edit]") ? "edit" : "delete";
+    void openDocument(mode, event);
+  });
+  return {
     contractContact: contractContactState,
     document: documentState,
     openDocument,
@@ -889,41 +958,11 @@ const createDocumentEditing = (editingTarget) => {
     closeContractContact,
     submitContractContact,
     sortContractContact,
-    sortDocument,
-    documentFieldHtml
+    sortDocument
   };
-  controllers.set(root, controller);
-  return controller;
 };
 const initializeDocumentSections = (editingTarget) => {
-  const context = toEditingContext(editingTarget);
-  const root = context.root;
-  root.querySelectorAll(sectionSelector).forEach(refreshDocumentRows);
-  if (initializedRoots.has(root)) {
-    return;
-  }
-  initializedRoots.add(root);
-  initializeDocumentDragAndDrop(context);
-  root.addEventListener("click", (event) => {
-    const target = event.target instanceof Element ? event.target : null;
-    const button = target == null ? void 0 : target.closest(
-      "[data-pe-document-add], [data-pe-document-view], [data-pe-document-edit], [data-pe-document-delete], [data-pe-document-sort]"
-    );
-    if (button === null || button === void 0 || button.disabled) {
-      return;
-    }
-    const controller = controllers.get(root);
-    if (controller === void 0) {
-      return;
-    }
-    const direction = hooks(button).peDocumentSort;
-    if (direction !== void 0) {
-      void controller.sortDocument(direction, event);
-      return;
-    }
-    const mode = button.matches("[data-pe-document-add]") ? "add" : button.matches("[data-pe-document-view]") ? "view" : button.matches("[data-pe-document-edit]") ? "edit" : "delete";
-    void controller.openDocument(mode, event);
-  });
+  toEditingContext(editingTarget).root.querySelectorAll(sectionSelector).forEach(refreshDocumentRows);
 };
 export {
   createDocumentEditing,

@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import "@fgtclb/academic-persons-edit/frontend/profile.js";
-import { profileEditingElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/root.js";
-import { profileImageEditorElementName } from "@fgtclb/academic-persons-edit/frontend/profile/elements/image-editor.js";
+import {
+  profileDocumentEditorElementName,
+  profileEditingElementName,
+  profileImageEditorElementName,
+  profileRichTextElementName,
+} from "@fgtclb/academic-persons-edit/frontend/profile/elements/names.js";
 
 /**
  * `frontend/profile.js` is what `<f:asset.module>` loads, and all it does is
@@ -19,5 +23,7 @@ describe("the profile editing entry point", () => {
   it("defines every element of the editor", () => {
     assert.notEqual(customElements.get(profileEditingElementName), undefined);
     assert.notEqual(customElements.get(profileImageEditorElementName), undefined);
+    assert.notEqual(customElements.get(profileDocumentEditorElementName), undefined);
+    assert.notEqual(customElements.get(profileRichTextElementName), undefined);
   });
 });

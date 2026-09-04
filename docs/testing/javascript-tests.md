@@ -114,6 +114,17 @@ A specifier that looks like one of this repository's modules and has no source
 behind it raises an error naming both, rather than falling through to node's
 "cannot find package".
 
+`lit` is the one library that is resolved for real and not from where the
+importing file stands. TYPO3 core delivers it through the import map — `EXT:core`
+maps `lit`, `lit/`, `lit-element` and `lit-html` with no tag and no dependency —
+while node resolves a bare specifier from the importer upwards, and the sources
+live in `packages/`, where there is no `node_modules` at all. The hook therefore
+retries the resolution from `Build/`, whose `package.json` pins the exact
+versions both supported cores ship (lit 3.2.0, lit-html 3.2.0, lit-element 4.1.0
+and `@lit/reactive-element` 2.0.4, the last three through npm `overrides`). It
+is a real dependency and never a stub: the elements are written in Lit, and a
+stub would test nothing.
+
 ## The stubs, and what they cost
 
 Three libraries are replaced today: the six `@ckeditor/ckeditor5-*` bundles, the
@@ -182,6 +193,13 @@ Modelled in `dom.mjs`, each because a shipped module reaches for it:
 | `URL.createObjectURL` / `revoke…` | A register per object, so `isObjectUrlAlive()` can prove a preview url was released. |
 | `DragEvent`, `DataTransfer`       | `createDragEvent()`, with the pointer position and a recording data transfer.        |
 | `getBoundingClientRect`           | `setBoundingRect()`, per element and per test.                                       |
+| `clientWidth` / `clientHeight`    | `setClientSize()`, shadowed on the instance because both are prototype getters.      |
+
+`settle()` drains microtasks and never reaches a timer, which is what makes it
+useful — but the document editor reports its finished close one animation frame
+after the leave transition, deliberately, so that its owner does not tear it out
+of the document from inside Lit's own update cycle. A test that is about a close
+therefore waits with `nextFrame()`.
 
 The object urls are modelled rather than delegated because the two realms
 disagree: node's `URL.createObjectURL` takes only a node `Blob`, jsdom's
@@ -197,7 +215,12 @@ split. `Blob` and `File` on `globalThis` are therefore jsdom's.
    imports rather than a runtime surprise. It also means the Lit components of
    ACE-509 use `static properties = { … }` and a bare `customElements.define()`
    instead of the `@customElement` / `@property` decorators — which keeps the
-   esbuild output plain as well.
+   esbuild output plain as well. It has a second consequence that is easy to
+   step on: `target` is ES2022, so `useDefineForClassFields` is on, and a class
+   *field* would define an own property that shadows the accessor Lit installs
+   on the prototype. The reactive properties are therefore declared with
+   `declare` and given their value in the constructor, which is erasable and
+   which the element would render exactly once without.
 2. **One window per process, not per test.** The shipped modules keep
    module-level state — WeakMaps of live editors, a request counter — and node's
    module cache hands every test in a file the same instance, so a fresh window

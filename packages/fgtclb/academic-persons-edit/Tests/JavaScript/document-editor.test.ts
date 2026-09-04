@@ -442,10 +442,17 @@ describe("saving a document", () => {
     );
   });
 
+  /**
+   * The field is deliberately not `required`: the editor renders the
+   * constraint the response declares, so a required control left empty is
+   * refused by the browser and never reaches the server at all. What is under
+   * test here is what the editor does with a refusal that only the server can
+   * make, and that needs a form the browser lets through.
+   */
   it("keeps the editor open and keeps the messages of the refused fields", async () => {
     await open(
       select(root, "[data-pe-document-add]", HTMLButtonElement),
-      [fieldResponse({ value: "" })],
+      [fieldResponse({ value: "", required: false })],
       null,
     );
     fetch.respondWithError(
