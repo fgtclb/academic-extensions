@@ -30,8 +30,9 @@ plain :sql:`YYYY-MM-DD` value on TYPO3 v13 and v14 alike.
 A fourth column, :sql:`year_only` (:php:`isYearOnly()` / :php:`setYearOnly()`),
 controls the presentation of a record: when it is set, every date of that
 record is rendered as its four-digit year while the complete date stays stored.
-The shipped :file:`Detail.html` honours the flag. Records default to the
-complete date.
+The shipped public profile honours the flag, in
+:file:`Partials/Profile/PublicProfile/TimelineItem.html`. Records default to
+the complete date.
 
 The validation flag of the profile information form changes with it: the
 shipped :file:`Configuration/AcademicPersons/Settings.yaml` now lists

@@ -12,14 +12,16 @@ grep -c "'provider'" packages/fgtclb/*/Configuration/Icons.php
 grep -rh "'provider' =>" packages/fgtclb/*/Configuration/Icons.php | sort | uniq -c
 ```
 
-Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **56
-registrations in total, every one of them with the core `SvgIconProvider`**:
+Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **62
+registrations in total: 56 with the core `SvgIconProvider`, and the six control
+icons of the public profile of `academic-persons` with
+`CurrentColorSvgIconProvider`**:
 
 | Package                  | Registrations |
 |--------------------------|---------------|
 | `academic-jobs`          | 18            |
 | `academic-persons-edit`  | 12            |
-| `academic-persons`       | 10            |
+| `academic-persons`       | 16            |
 | `academic-study-plan`    | 7             |
 | `academic-contact4pages` | 4             |
 | `academic-partners`      | 3             |
@@ -60,14 +62,15 @@ gets depends on one argument, and the templates on `main` are split on it:
 grep -rn "core:icon" packages/fgtclb/*/Resources/Private --include=*.html | grep -v Backend
 ```
 
-| Extension               | `alternativeMarkupIdentifier="inline"` | Without (default markup)                                           |
-|-------------------------|----------------------------------------|--------------------------------------------------------------------|
-| `academic-persons-edit` | 65 sites in 17 files                   | —                                                                  |
-| `academic-study-plan`   | 3 sites, its `plus`/`minus`/`close`    | —                                                                  |
-| `academic-jobs`         | 2 sites, core `phone`/`mail`           | `Job/Item.html`, `Job/Information.html`                            |
-| `academic-partners`     | —                                      | 4 files, `category_types.*` and `academic-partners`                |
-| `academic-programs`     | —                                      | `Program/Categories.html`, `Program/Item.html`, `category_types.*` |
-| `academic-projects`     | —                                      | `AcademicProject.html`, `Project/Item.html`                        |
+| Extension               | `alternativeMarkupIdentifier="inline"`   | Without (default markup)                                           |
+|-------------------------|------------------------------------------|--------------------------------------------------------------------|
+| `academic-persons-edit` | 65 sites in 17 files                     | —                                                                  |
+| `academic-persons`      | 6 sites in 2 files, `academic-persons-*` | —                                                                  |
+| `academic-study-plan`   | 3 sites, its `plus`/`minus`/`close`      | —                                                                  |
+| `academic-jobs`         | 2 sites, core `phone`/`mail`             | `Job/Item.html`, `Job/Information.html`                            |
+| `academic-partners`     | —                                        | 4 files, `category_types.*` and `academic-partners`                |
+| `academic-programs`     | —                                        | `Program/Categories.html`, `Program/Item.html`, `category_types.*` |
+| `academic-projects`     | —                                        | `AcademicProject.html`, `Project/Item.html`                        |
 
 ## The two markups, and which provider produces what
 
@@ -95,11 +98,14 @@ sizes both shapes the same.
 
 - A **record, page type, content element or brand icon** — anything drawn in
   fixed colours, meant to look the same on every background — stays with the
-  core `SvgIconProvider`. That is every one of the 56 registrations today.
+  core `SvgIconProvider`. That is 56 of the 62 registrations today.
 - An **action or control icon** — an arrow, a pencil, a bin, a fold-out chevron —
   is drawn in `currentColor` and registered with `CurrentColorSvgIconProvider`.
   Then it follows the text colour in the backend *and* in the frontend, with
-  or without the `inline` argument.
+  or without the `inline` argument. The six `academic-persons-*` icons of the
+  public profile — envelope, phone, address, room and the plus and minus of
+  the fold-out entries, all Bootstrap Icons — are the first registrations of
+  that kind.
 - A frontend template that already asks for `inline` gets the same markup from
   both providers. Switching such an icon's provider changes nothing in the
   frontend; it changes its default markup, i.e. how it looks in the backend
@@ -209,7 +215,10 @@ Two assertions per template, for two different mistakes: the first catches an
 identifier that no longer resolves, the second catches a rename in
 `Configuration/Icons.php` that the template did not follow — which the first
 alone would also pass, since the placeholder replaces the identifier. Every
-plugin or content element rendering test that renders icons should carry both.
+plugin or content element rendering test that renders icons should carry both;
+`academic-persons/Tests/Functional/Plugins/AcademicPersonsPublicProfilePluginTest.php`,
+`profileRendersOnlyResolvableIcons()`, does so for the six icons of the public
+profile.
 
 The provider itself is covered the same way it is used:
 [`academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php)
