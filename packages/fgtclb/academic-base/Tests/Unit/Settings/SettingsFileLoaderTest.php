@@ -86,6 +86,32 @@ final class SettingsFileLoaderTest extends UnitTestCase
         );
     }
 
+    /**
+     * The per-package view is what the merge folds: one array per package that ships
+     * the file, keyed by package key, in loading order, packages without the file or
+     * with an empty one left out. A migration report needs the attribution the merged
+     * array has lost.
+     */
+    #[Test]
+    public function thePackageArraysAreKeyedByPackageInLoadingOrder(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['second', 'without', 'empty', 'first']),
+        );
+
+        $this->assertSame(
+            [
+                'second' => ['validations' => ['profile' => ['lastName' => ['readonly']]]],
+                'first' => [
+                    'validations' => ['profile' => ['firstName' => ['required']]],
+                    'types' => ['first' => 1],
+                ],
+            ],
+            $subject->loadPackageArrays('Configuration/Test/Settings.yaml'),
+        );
+    }
+
     #[Test]
     public function noPackageShippingTheFileProducesAnEmptyArray(): void
     {
@@ -192,6 +218,7 @@ final class SettingsFileLoaderTest extends UnitTestCase
         foreach ($fixturePackages as $fixturePackage) {
             $package = $this->createMock(PackageInterface::class);
             $package->method('getPackagePath')->willReturn(__DIR__ . '/Fixtures/Packages/' . $fixturePackage . '/');
+            $package->method('getPackageKey')->willReturn($fixturePackage);
             $packages[] = $package;
         }
         $packageManager = $this->createMock(PackageManager::class);

@@ -451,8 +451,9 @@ runs on v14 only. Examples:
 Note: the DI style here is **not** what a fresh extension would use. Eleven of
 the twelve extensions configure services in `Configuration/Services.yaml`; only
 `academic-persons` also has a `Configuration/Services.php`, and that file holds
-nothing but `registerForAutoconfiguration()` calls. Attributes are already in use
-in production code alongside it, so the two styles coexist.
+nothing but `registerForAutoconfiguration()` calls and one compiler pass for a
+service that must only exist when EXT:reports is active. Attributes are already
+in use in production code alongside it, so the two styles coexist.
 
 Keep the two vendors apart when you use them. `#[Autoconfigure]`, `#[Autowire]`,
 `#[AsAlias]` and `#[Exclude]` are **Symfony's**, from

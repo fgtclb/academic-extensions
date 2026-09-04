@@ -48,12 +48,58 @@ profile:
 
 The previous shape — a `profileInformationsTypes` map generating the seven
 inline columns of the profile TCA, and a `validations` map with one flag list
-per record type — is not read any more. The seven relations are now declared by
-`tx_academicpersons_domain_model_profile.php` itself (an override that dropped
-an entry used to lose a backend column), and the flags sit on the field they
-apply to. The Breaking entry `Breaking-SectionBasedAcademicPersonsSettings.rst`
-of `academic-persons` documents the migration; the runtime overlay for a
-site package still shipping the old shape is ACE-504.
+per record type — is not read as such any more. The seven relations are now
+declared by `tx_academicpersons_domain_model_profile.php` itself (an override
+that dropped an entry used to lose a backend column), and the flags sit on the
+field they apply to. The Breaking entry
+`Breaking-SectionBasedAcademicPersonsSettings.rst` of `academic-persons`
+documents the migration.
+
+### The legacy overlay (ACE-504, transitional)
+
+A site package that still ships the old shape is not ignored:
+`AcademicPersonsSettingsFactory::get()` hands the merged array to
+`LegacySettingsMigrator::migrate()` before `normalize()` builds the graph. The
+migrator maps `validations.<set>.<property>` onto the `validators` of the field
+with that key or `propertyName` in the set's target map, and the
+`profileInformation` set onto the `validators` map of every timeline section;
+`profileInformationsTypes.<id>` refines `label`, `type` and `fieldName` of the
+document section with that key. The rule is *overlay, not replace*: a legacy set
+decides the five flags the old shape knew (`required`, `readonly`, `disabled`,
+`email`, `number`) for every field of its target — an unlisted field loses them,
+exactly as it was unconfigured before, which is what made the 2.x manual's
+example unlock the name fields by not listing them — and the flags it could not
+express (`url`, `date`, `tel`, `textarea`, `html`) stay as shipped. Two things
+are lossy and end up in the migration's `notes`: the `number` flag of the former
+integer year properties is dropped (they are date columns since ACE-502), and
+an eighth type under `profileInformationsTypes` is reported, not created — it
+would need a profile relation and a TCA column. The legacy keys never reach
+`raw`.
+
+Attribution is per package: the factory walks
+`SettingsFileLoader::loadPackageArrays()` — the per-package view the loader
+gained for this, keyed by package key in loading order — and the migrator logs
+**one `LogLevel::WARNING` per package and legacy key** through
+`LoggerAwareInterface`, on the cache miss that builds the graph. It is never an
+`E_USER_DEPRECATED`: both phpunit suites run with `failOnDeprecation`, so a
+fixture shipping the old shape would turn every functional test red. The
+console command `academic:persons:settings:migrate` (`MigrateSettingsCommand`)
+prints the migrated four maps per legacy package and exits with 1 when one
+exists; it deliberately has no `--write` — the file belongs to a version
+controlled site package. `Report\LegacySettingsStatus` names the packages in
+EXT:reports; it is registered by a compiler pass in `Services.php` only when
+that extension is active, because `ExtensionManagementUtility::isLoaded()` is
+not usable while the container is built. Its test asks `StatusRegistry`
+directly: the class aggregating the providers differs between the core
+versions (`Report\Status\Status` on v13, `Service\StatusService` on v14),
+while the registry, the interface and `Status` itself are identical. The
+whole layer — migrator, command, status, the overlay call and the loader
+method — is removed in 4.0.
+
+`LegacySettingsMigratorTest` covers the mapping against the shipped file,
+`LegacySettingsOverlayTest` pins that a legacy `readonly` state reaches the TCA
+`readOnly`, and `MigrateSettingsCommandTest` that the printed YAML parses to the
+array the graph was built from.
 
 The recognised flags, all matched case-insensitively
 (`ValidationNormalizer::normalizeValidation()` in `academic_base`):
@@ -79,14 +125,14 @@ Everything that has no persons knowledge lives in
 `packages/fgtclb/academic-base/Classes/Settings/`, namespace
 `FGTCLB\AcademicBase\Settings`, and is `@internal`:
 
-| Class                                    | Role                                                                                               |
-|------------------------------------------|----------------------------------------------------------------------------------------------------|
-| `Validation`, `ValidationSet`            | The value objects. `#[Exclude]`d from the container, `__set_state()` for the cache                 |
-| `ValidationNormalizer`                   | Flag list → `Validation`; `normalizeValidationSets()` for a whole map of flat sets                 |
-| `SettingsFileLoader`                     | The package walk, the top-level `array_merge()` and the `cache.core` round trip                    |
-| `TcaValidationMerger`                    | `toTcaTableConfig()` builds the `columns.<field>.config` fragment, `merge()` applies it to a table |
-| `Exception\UnknownValidatorException`    | Raised by a validation engine for a class name that is not an Extbase validator                    |
-| `Exception\UnsuitableValidatorException` | Raised by a validator handed a subject it is not built for                                         |
+| Class                                    | Role                                                                                                                           |
+|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| `Validation`, `ValidationSet`            | The value objects. `#[Exclude]`d from the container, `__set_state()` for the cache                                             |
+| `ValidationNormalizer`                   | Flag list → `Validation`; `normalizeValidationSets()` for a whole map of flat sets                                             |
+| `SettingsFileLoader`                     | The package walk, the top-level `array_merge()` and the `cache.core` round trip; `loadPackageArrays()` is the per-package view |
+| `TcaValidationMerger`                    | `toTcaTableConfig()` builds the `columns.<field>.config` fragment, `merge()` applies it to a table                             |
+| `Exception\UnknownValidatorException`    | Raised by a validation engine for a class name that is not an Extbase validator                                                |
+| `Exception\UnsuitableValidatorException` | Raised by a validator handed a subject it is not built for                                                                     |
 
 The ViewHelper `FGTCLB\AcademicBase\ViewHelpers\ValidationEnsureViewHelper`
 sits next to them, declared in a template as
@@ -159,10 +205,12 @@ what each accepts.
 
 **Everything a consumer needs is on the graph** — every help text, the image's
 crop ratio, the row fields and actions — so nothing reads the raw array to
-render a form. `raw` keeps the merged array on the settings object for ACE-504,
-which reports the legacy keys of a site package override from it; a consumer
-reaching for `raw[...]` for anything else is a value object missing a property,
-and the property is the fix.
+render a form. `raw` keeps the merged array on the settings object, after the
+legacy overlay and therefore without the legacy keys: ACE-504 reports and
+prints a site package override from it, and `MigrateSettingsCommandTest`
+compares it with what the command prints. A consumer reaching for `raw[...]`
+for anything else is a value object missing a property, and the property is
+the fix.
 
 ## Normalisation
 

@@ -115,10 +115,14 @@ Impact
 ======
 
 **Every site package that overrides the file has to be migrated.** The old
-maps are not read any more: a file that still declares :yaml:`validations` or
-:yaml:`profileInformationsTypes` contributes nothing, and the installation runs
-on the shipped defaults - locked name fields, the required contact fields, and
-the seven shipped timeline sections.
+maps are not read as such any more. A file that still declares
+:yaml:`validations` or :yaml:`profileInformationsTypes` is mapped onto the
+section maps at runtime with a logged warning, until 4.0 - see the Feature
+entry on the legacy settings overlay and the migration command, and the
+:ref:`migration section <configuration-validations-migration>` of the
+validation settings page. Without that mapping the installation would run on
+the shipped defaults: locked name fields, the required contact fields, and the
+seven shipped timeline sections.
 
 An eighth timeline entry type that an override declared under
 :yaml:`profileInformationsTypes` used to get a backend inline column for free.
