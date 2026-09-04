@@ -47,6 +47,10 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
                         'profile' => [
                             'autoCreateProfiles' => 1,
                             'createProfileForUserGroups' => '',
+                            'fe_users' => [
+                                'faxNumberType' => 'business',
+                                'telephoneNumberType' => 'business',
+                            ],
                         ],
                         'demand' => [
                             'allowedGroupByValues' => 'firstNameAlpha=LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.groupBy.items.first_name,lastNameAlpha=LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.groupBy.items.last_name',
@@ -837,9 +841,9 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
             ->fetchAllAssociative();
         $this->assertSame(
             [[
-                'type' => 'phone',
+                'type' => 'business',
                 'phone_number' => '+49 711 123456',
-                'import_identifier' => 'phone:fe_users:30',
+                'import_identifier' => 'telephone:fe_users:30',
             ]],
             $phoneNumbers,
         );

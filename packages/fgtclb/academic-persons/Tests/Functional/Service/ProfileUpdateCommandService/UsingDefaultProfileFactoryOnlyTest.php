@@ -49,6 +49,10 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
                         'profile' => [
                             'autoCreateProfiles' => 1,
                             'createProfileForUserGroups' => '',
+                            'fe_users' => [
+                                'faxNumberType' => 'business',
+                                'telephoneNumberType' => 'business',
+                            ],
                         ],
                         'demand' => [
                             'allowedGroupByValues' => 'firstNameAlpha=LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.groupBy.items.first_name,lastNameAlpha=LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:flexform.el.groupBy.items.last_name',
@@ -910,6 +914,117 @@ final class UsingDefaultProfileFactoryOnlyTest extends AbstractAcademicPersonsTe
                 ['phone_number' => '+49 711 654321'],
             ],
             $phoneNumbers,
+        );
+    }
+
+    #[Test]
+    public function executeSynchronisesConfiguredAndLegacyPhoneNumberImportsWithoutDuplicates(): void
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['academic_persons']['profile']['fe_users'] = [
+            'faxNumberType' => 'private',
+            'telephoneNumberType' => 'mobile',
+        ];
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/DataSets/phone-number-import-behaviour.csv');
+
+        $profileUpdateCommandService = GeneralUtility::makeInstance(ProfileUpdateCommandService::class);
+        $profileUpdateCommandService->execute(new ProfileUpdateCommandDto(includePids: [100], excludePids: []));
+
+        $queryBuilder = $this->getConnectionPool()
+            ->getQueryBuilderForTable('tx_academicpersons_domain_model_phone_number');
+        $queryBuilder->getRestrictions()->removeAll();
+        $rows = $queryBuilder
+            ->select('contract', 'type', 'phone_number', 'import_identifier')
+            ->from('tx_academicpersons_domain_model_phone_number')
+            ->where(
+                $queryBuilder->expr()->in(
+                    'contract',
+                    $queryBuilder->quoteArrayBasedValueListToIntegerList([40, 41, 42]),
+                ),
+            )
+            ->orderBy('contract')
+            ->addOrderBy('import_identifier')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $this->assertSame(
+            [
+                [
+                    'contract' => 40,
+                    'type' => 'business',
+                    'phone_number' => 'Fax valid updated',
+                    'import_identifier' => 'fax:fe_users:40',
+                ],
+                [
+                    'contract' => 40,
+                    'type' => 'phone',
+                    'phone_number' => 'Legacy collision',
+                    'import_identifier' => 'phone:fe_users:40',
+                ],
+                [
+                    'contract' => 40,
+                    'type' => 'private',
+                    'phone_number' => 'Canonical updated',
+                    'import_identifier' => 'telephone:fe_users:40',
+                ],
+                [
+                    'contract' => 41,
+                    'type' => 'private',
+                    'phone_number' => 'Fax migrated',
+                    'import_identifier' => 'fax:fe_users:41',
+                ],
+                [
+                    'contract' => 41,
+                    'type' => 'mobile',
+                    'phone_number' => 'Legacy updated',
+                    'import_identifier' => 'telephone:fe_users:41',
+                ],
+                [
+                    'contract' => 42,
+                    'type' => 'private',
+                    'phone_number' => 'New fax',
+                    'import_identifier' => 'fax:fe_users:42',
+                ],
+                [
+                    'contract' => 42,
+                    'type' => 'mobile',
+                    'phone_number' => 'New telephone',
+                    'import_identifier' => 'telephone:fe_users:42',
+                ],
+            ],
+            $rows,
+        );
+    }
+
+    #[Test]
+    public function executePreservesLegacyTypeValuesWhenTheyAreSelectable(): void
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['academic_persons']['types']['phoneNumberTypes'] =
+            'business=Business,phone=Phone,fax=Fax';
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/DataSets/phone-number-import-behaviour.csv');
+
+        $profileUpdateCommandService = GeneralUtility::makeInstance(ProfileUpdateCommandService::class);
+        $profileUpdateCommandService->execute(new ProfileUpdateCommandDto(includePids: [100], excludePids: []));
+
+        $connection = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_phone_number');
+        $telephone = $connection->select(
+            ['type', 'import_identifier'],
+            'tx_academicpersons_domain_model_phone_number',
+            ['uid' => 43],
+        )->fetchAssociative();
+        $fax = $connection->select(
+            ['type', 'import_identifier'],
+            'tx_academicpersons_domain_model_phone_number',
+            ['uid' => 44],
+        )->fetchAssociative();
+
+        $this->assertSame(
+            ['type' => 'phone', 'import_identifier' => 'telephone:fe_users:41'],
+            $telephone,
+        );
+        $this->assertSame(
+            ['type' => 'fax', 'import_identifier' => 'fax:fe_users:41'],
+            $fax,
         );
     }
 
