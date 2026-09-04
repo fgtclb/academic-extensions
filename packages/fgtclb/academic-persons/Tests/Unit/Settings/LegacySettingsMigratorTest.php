@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersons\Tests\Unit\Settings;
 
 use FGTCLB\AcademicBase\Settings\SettingsFileLoader;
+use FGTCLB\AcademicBase\Settings\Validation;
 use FGTCLB\AcademicBase\Settings\ValidationNormalizer;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettingsFactory;
@@ -34,6 +35,18 @@ final class LegacySettingsMigratorTest extends UnitTestCase
      * their listed flags, and the flags the old shape could not express -
      * `url` on the website, `email` stays because it is listed - are kept.
      */
+    /**
+     * The validations of the document section a record type belongs to.
+     *
+     * @return array<string, Validation>
+     */
+    private function documentValidations(AcademicPersonsSettings $settings, string $type): array
+    {
+        $section = $settings->getDocumentSectionByType($type);
+        $this->assertNotNull($section, sprintf('No document section for record type "%s".', $type));
+        return $section->validationSet->validations;
+    }
+
     #[Test]
     public function legacyValidationsAreOverlaidOnTheShippedGraph(): void
     {
@@ -83,7 +96,7 @@ final class LegacySettingsMigratorTest extends UnitTestCase
         $this->assertSame('date', $validFrom->validation->inputType);
 
         foreach (['cooperation', 'lecture', 'publication', 'curriculum_vitae'] as $type) {
-            $validations = $settings->getDocumentValidationSetByType($type)->validations;
+            $validations = $this->documentValidations($settings, $type);
             $this->assertTrue($validations['title']->required, $type);
             $this->assertFalse($validations['date']->required, $type . ': the year was not listed');
             $this->assertSame('date', $validations['date']->inputType, $type);
@@ -92,7 +105,7 @@ final class LegacySettingsMigratorTest extends UnitTestCase
         }
         $this->assertSame(
             [UrlValidator::class],
-            $settings->getDocumentValidationSetByType('lecture')->validations['link']->validatorClassNames,
+            $this->documentValidations($settings, 'lecture')['link']->validatorClassNames,
         );
         $this->assertTrue($settings->getDocumentValidationSet('contracts')->validations['position']->required);
     }
@@ -118,7 +131,7 @@ final class LegacySettingsMigratorTest extends UnitTestCase
         ]));
         $settings = $this->normalize($migration->settings);
 
-        $validations = $settings->getDocumentValidationSetByType('cooperation')->validations;
+        $validations = $this->documentValidations($settings, 'cooperation');
         $this->assertSame([NotEmptyValidator::class], $validations['date']->validatorClassNames);
         $this->assertSame('date', $validations['date']->inputType);
         $this->assertArrayNotHasKey('type', $validations['date']->tcaConfig);
@@ -245,7 +258,7 @@ final class LegacySettingsMigratorTest extends UnitTestCase
         $addressType = $settings->getContractContactSection('physicalAddresses')?->getField('physicalAddressType');
         $this->assertNotNull($addressType);
         $this->assertTrue($addressType->validation->required);
-        $description = $settings->getDocumentValidationSetByType('publication')->validations['bodytext'];
+        $description = $this->documentValidations($settings, 'publication')['bodytext'];
         $this->assertTrue($description->required);
         $this->assertTrue($description->isRichText());
         $this->assertSame(500, $description->characterLimit);

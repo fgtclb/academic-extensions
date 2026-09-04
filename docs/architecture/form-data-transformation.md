@@ -1,20 +1,41 @@
 # Form data transformation
 
 How `EXT:academic_persons_edit` decides whether a submitted value reaches the
-domain model. The rules are small; the reason to write them down is that two of
-them look like defects when you meet them for the first time, and both have
-already been misread once.
+domain model. The rules are small; the reason to write them down is that the
+mechanism is not the Extbase one it looks like, and the shipped configuration
+locks three properties in a way that reads as a defect the first time you meet
+it.
 
 The code is `packages/fgtclb/academic-persons-edit/Classes/Domain/Factory/` —
 six factories, one private setter per property — plus
-`Classes/Domain/Model/Dto/AbstractFormData.php`.
+`Classes/Domain/Model/Dto/AbstractFormData.php` and, for the profile itself,
+`Classes/Service/ProfileUpdateValidationService.php`.
+
+## Where the values come from
+
+There is no Extbase form. The editing frontend posts JSON to the actions of
+`ProfileController`, and the payload carries only what changed:
+
+```json
+{ "profile": 123, "data": { "website": "https://example.org", "websiteTitle": "" } }
+```
+
+`ProfileUpdatePayloadParser` turns that into a `ProfileUpdatePayload`,
+`ProfileUpdateRequestService::validate()` checks method, content type, the
+`X-Requested-With` header, the login and the ownership of the profile, and
+`ProfileUpdateValidationService` then builds the `*FormData` object from the
+**persisted** record and registers exactly the keys of `data` on it as
+*property overrides*.
+
+That last step is the whole mechanism: an override is the record that a
+property was submitted.
 
 ## The decision, in order
 
 Every factory setter is guarded by the same private helper, `mayApplyProperty()`,
-identical in all six (`ProfileFactory.php:63`, `ContractFactory.php:56`,
-`AddressFactory.php:58`, `ProfileInformationFactory.php:49`,
-`EmailFactory.php:39`, `PhoneNumberFactory.php:39`):
+identical in all six (`ProfileFactory.php`, `ContractFactory.php`,
+`AddressFactory.php`, `ProfileInformationFactory.php`, `EmailFactory.php`,
+`PhoneNumberFactory.php`):
 
 ```php
 private function mayApplyProperty(ValidationSet $validationSet, ProfileFormData $form, string $propertyName): bool
@@ -31,130 +52,95 @@ private function mayApplyProperty(ValidationSet $validationSet, ProfileFormData 
 So a value is written only when **both** hold:
 
 1. the property is not configured `readOnly` or `disabled`, and
-2. it was either sent in the request, or registered as an override —
-   `shouldApplyProperty()` is `wasPropertySentInRequest() || hasPropertyOverride()`.
+2. an override was registered for it — `shouldApplyProperty()` is
+   `hasPropertyOverride()`, nothing else.
 
 The order matters and is deliberate: the validation configuration wins over
-everything, including an override. A listener cannot write a property the
-configuration locks.
+everything, including an override. A PSR-14 listener that replaces an override
+before the transformation runs cannot write a property the configuration locks.
 
 ## Rule 1 — `disabled` and `readOnly` protect persisted data
 
-This is not a validation rule that leaked into the wrong layer. It is the
-server-side half of a policy whose client-side half is the rendered form.
+This is not a validation rule that leaked into the wrong layer. It is the last
+of three places that refuse a locked property, and the only one that cannot be
+bypassed by a hand-built request:
 
-The guard arrived with `dfabb2943` (`[TASK] ACE-33: Refactor configuration
-handling`), whose comment states the motive directly: *ignore value to prevent
-empty existing persisted data*. `63609482d` later hoisted it into
-`mayApplyProperty()` and added the request detection of rule 2, keeping the
-precedence explicit — *"readOnly/disabled validation configuration keeps
-precedence to protect persisted data"*.
+| Layer                               | What it does                                                                 |
+|-------------------------------------|------------------------------------------------------------------------------|
+| The rendered control                | A locked field renders as text, without an edit button                       |
+| `ProfileUpdateValidationService`    | Whitelists the payload keys against the settings graph, dropping locked ones |
+| `mayApplyProperty()` in the factory | Refuses the write even when an override was registered anyway                |
 
-### What the browser does, and where the guard is actually load-bearing
+A request that posts a locked property is answered `422` with the error code
+`invalid_profile_data` and the message `Unknown profile property "…"` — a
+locked property is not part of the editable set, so it is refused the way an
+invented property name is. It never reaches the factory. The guard is what
+makes that a policy rather than a coincidence of the caller.
 
-All five form partials under `Resources/Private/Partials/Profile/Forms/` render
-the flags onto the control, e.g. `Textfield.html:36-38`:
+## Rule 2 — only what the payload carried
 
-```html
-disabled="{validation.disabled ? 'disabled' : ''}"
-required="{validation.required ? 'required' : ''}"
-readonly="{validation.readOnly ? 'readonly' : ''}"
-```
-
-The empty branch is safe: Fluid drops a registered tag attribute whose value is
-`''`, so `disabled=""` — which *would* disable the control — never reaches the
-HTML.
-
-What the server then receives differs per control type, and this is the part
-worth knowing:
-
-| Control                               | Marked `disabled`                        | Marked `readOnly`                              |
-|---------------------------------------|------------------------------------------|------------------------------------------------|
-| `f:form.textfield`, `f:form.textarea` | Not submitted at all — the key is absent | Submitted, with the value it was rendered with |
-| `f:form.select`, `f:form.checkbox`    | **Submitted as `''`** — see below        | Submitted, with the value it was rendered with |
-
-The select and checkbox case is the one that bites. Both view helpers emit a
-companion hidden field so that an empty selection still reaches the server, and
-that hidden field is **not** disabled — see
-`renderHiddenFieldForEmptyValue()` in
-`cms-fluid/Classes/ViewHelpers/Form/AbstractFormFieldViewHelper.php`, whose last
-statement is:
+`AbstractFormData::shouldApplyProperty()` is one line:
 
 ```php
-return '<input type="hidden" name="' . htmlspecialchars($fieldName) . '" value="" />';
+final public function shouldApplyProperty(string $propertyName): bool
+{
+    return $this->hasPropertyOverride($propertyName);
+}
 ```
 
-So for a disabled select or checkbox the property *does* arrive, with an empty
-value, and `wasPropertySentInRequest()` returns `true`. Without rule 1 the stored
-value would be overwritten with `''` on every save. **That is the data loss the
-guard exists to prevent**, and no amount of request-level detection would catch
-it, because as far as the request is concerned the field was submitted.
+Before the editing rewrite (ACE-262) it also asked the *request* whether the
+property had been submitted, through `wasPropertySentInRequest()` and the
+argument name that `AbstractFormDataConverter` put on the object. Both are gone
+with the Extbase form flow they served: the JSON endpoints know exactly which
+keys arrived, so the object no longer has to re-derive it from the request, and
+a form data object built for rendering carries no overrides at all and therefore
+writes nothing when it is handed to a factory by mistake.
 
-For a disabled text field the guard is belt-and-braces: a browser omits the key,
-so rule 2 would already skip it. It still matters, because a hand-built or
-forged POST can carry the key anyway.
-
-## Rule 2 — only what the request carried
-
-`AbstractFormData::wasPropertySentInRequest()` (`AbstractFormData.php:81-93`)
-reads exactly one source:
-
-```php
-$arguments = $this->getActionRequestArguments();   // $request->getAttribute('extbase')->getArguments()
-$argumentName = $this->getArgumentName();          // set by AbstractFormDataConverter
-...
-return array_key_exists($propertyName, $namespacedArguments);
-```
-
-Never `getParsedBody()`. The arguments come from `RequestBuilder`, already
-stripped of the plugin namespace and keyed by action argument name, and the
-argument name is `$argument->getName()`, configured onto the type converter by
-`AbstractActionController::initializeAction()`.
-
-This exists because before `63609482d` the factories wrote **every** property on
-every request, so a field that was not part of a form was overwritten with the
-empty DTO default. See
-`packages/fgtclb/academic-persons-edit/Documentation/Changelog/2.4/Important-FormDataTransformationOnlyMapsSubmittedFields.rst`.
+What the rule prevents is unchanged, and it is why it exists: the `*FormData`
+objects have empty-string defaults, so a factory that wrote every property would
+clear every field the request did not mention. See
+`packages/fgtclb/academic-persons-edit/Documentation/Changelog/2.4/Important-FormDataTransformationOnlyMapsSubmittedFields.rst`
+for the entry that introduced it.
 
 ## The shipped defaults, and the trap they set
 
-`packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml:80-87`
-is the only place the `profile` set is defined:
+`packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml`
+is the only place the profile validations are defined, and it locks the three
+name fields:
 
 ```yaml
-  profile:
-    firstName:
+  firstName:
+    validators:
       - disabled
       - required
-    middleName:
+  middleName:
+    validators:
       - disabled
-    lastName:
+  lastName:
+    validators:
       - disabled
 ```
 
-**The three name fields are locked on purpose.** The commit that did it,
-`7c9ae9a0c`, says so: *"the name fields of the profile were set not only to
-required, but also to disabled as the fields should not be overwritten in the
-frontend."* They are typically owned elsewhere — an Active Directory or LDAP
-backed `fe_user`, synchronised into the profile — which is also why
-`skipSync` exists.
+**They are locked on purpose.** The commit that did it, `7c9ae9a0c`, says so:
+*"the name fields of the profile were set not only to required, but also to
+disabled as the fields should not be overwritten in the frontend."* They are
+typically owned elsewhere — an Active Directory or LDAP backed `fe_user`,
+synchronised into the profile — which is also why `skipSync` exists.
 
-> **The trap.** A test, a script or a `curl` that posts `profileFormData[firstName]`
-> and then asserts the record changed will find it unchanged, and it is very easy
-> to read that as "the form is broken" or "the request detection does not work".
-> It is neither. No browser sends that key, because the input is rendered
-> `disabled`; the value only arrives because it was posted by hand, and rule 1
-> then discards it exactly as intended. This has already been misdiagnosed once,
-> while writing
-> `packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileFormSubmissionTest.php`
-> — whose first version asserted on the name fields for this reason. **When a
+> **The trap.** A test, a script or a `curl` that posts
+> `{"data": {"firstName": "…"}}` and then asserts the record changed will find
+> it unchanged, and it is very easy to read that as "the endpoint is broken".
+> It is neither: the field renders read-only, the payload key is refused by the
+> whitelist with `invalid_profile_data`, and rule 1 would discard it even if it
+> got through. **When a
 > transformation test needs an editable property, use one that the shipped set
-> does not lock** — `website` and `websiteTitle` are the ones that test settled on.
+> does not lock** — `website` and `websiteTitle` are the ones the factory tests
+> settled on.
 
 ### `- required` on `firstName` is inert
 
 `ValidationNormalizer::normalizeValidation()` in `academic-base` (which
-`AcademicPersonsSettingsFactory::normalizeValidations()` delegates to) computes:
+`AcademicPersonsSettingsFactory` delegates to) computes:
 
 ```php
 $required = !$disabled && !$readOnly && in_array('required', $flags, true);
@@ -175,18 +161,16 @@ which is correct — a field the user cannot edit cannot be required of them. Th
 produces, so the `||` in rule 1 only distinguishes the two for a `Validation`
 built by hand.
 
-**The same configuration also drives the TYPO3 backend**, deliberately: all six
-TCA tables merge their set in through `TcaValidationMerger::merge()`, so a
-locked field is read
-only in the record editor as well. That coupling — and the reason the settings
-ship in `academic_persons` rather than in the edit extension — is documented in
-[Validation settings](validation-settings.md).
+**The same configuration also drives the TYPO3 backend**, deliberately: the TCA
+files merge the set of their own section in through `TcaValidationMerger`, so a
+locked field is read-only in the record editor as well. That coupling — and the
+reason the settings ship in `academic_persons` rather than in the edit
+extension — is documented in [Validation settings](validation-settings.md).
 
 ## Overriding the set in an instance
 
-An installation that wants the names editable ships its own `Settings.yaml`. The
-mechanism has sharp edges — a shallow merge that replaces all six sets at once —
-and is described in
+An installation that wants the names editable ships its own `Settings.yaml`.
+The mechanism is described in
 [Validation settings](validation-settings.md#overriding-the-settings-in-an-installation).
 Note that it changes the backend record editor at the same time.
 
@@ -199,9 +183,9 @@ Note that it changes the backend record editor at the same time.
   form data objects follow.
 - [Dependency injection](dependency-injection.md) — how the factories and the
   settings service are wired.
-- [Functional tests](../testing/functional-tests.md) — running the plugin
-  rendering tests that exercise this path end to end.
-- `packages/fgtclb/academic-persons-edit/Documentation/Changelog/2.4/Important-FormDataTransformationOnlyMapsSubmittedFields.rst`
-  — the integrator-facing entry for rule 2.
+- [Functional tests](../testing/functional-tests.md) — the JSON endpoint test
+  pattern that exercises this path end to end.
+- `packages/fgtclb/academic-persons-edit/Documentation/ProfileEditing/Index.rst`
+  — the integrator-facing description of the endpoints and their payloads.
 - `packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml`
   — the shipped sets, and the only file that defines them.

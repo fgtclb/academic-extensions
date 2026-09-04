@@ -17,15 +17,15 @@ use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * `Controller\ProfileInformationController` instantiates this class through the
- * configurable `$profileInformationFormDataClassName`, not through a hard coded name, so
- * both static factories have to honour late static binding. It is the only form data
- * object with a second factory for the "new record" case and with nullable properties.
+ * Profile editing instantiates this class through the configurable
+ * `$profileInformationFormDataClassName`, not through a hard coded name, so both
+ * static factories have to honour late static binding. It is the only form data
+ * object with a second factory for the "new record" case and nullable properties.
  */
 final class ProfileInformationFormDataTest extends UnitTestCase
 {
     /**
-     * The `newAction()` case. The type is what decides which fields the template renders
+     * The new-record case. The type is what decides which fields the template renders
      * and under which type the record is stored, so it is the one value that must survive;
      * everything else has to arrive as its default so the form comes up empty.
      */
@@ -43,9 +43,9 @@ final class ProfileInformationFormDataTest extends UnitTestCase
     }
 
     /**
-     * `ProfileInformationController::newAction()` resolves an unknown type to an empty
-     * string rather than raising. The factory must not turn that into something else -
-     * the validator downstream is what rejects it.
+     * The request handling resolves an unknown type to an empty string rather than
+     * raising. The factory must not turn that into something else - the validator
+     * downstream is what rejects it.
      */
     #[Test]
     public function anUnresolvedTypeIsKeptAsAnEmptyString(): void
@@ -54,9 +54,10 @@ final class ProfileInformationFormDataTest extends UnitTestCase
     }
 
     /**
-     * Four strings, three nullable dates and a flag, with `date`, `dateStart` and `dateEnd`
+     * Four strings, three nullable dates and one presentation flag, with
+     * `date`, `dateStart` and `dateEnd`
      * being interchangeable at the type level: a swapped assignment is only visible when
-     * all eight are asserted at once against distinct values.
+     * all eight values are asserted at once against distinct values.
      */
     #[Test]
     public function everyPersistedPropertyOfAProfileInformationReachesTheFormData(): void
@@ -66,12 +67,9 @@ final class ProfileInformationFormDataTest extends UnitTestCase
         $profileInformation->setTitle('Research assistant');
         $profileInformation->setBodytext('Worked on distributed systems.');
         $profileInformation->setLink('https://example.org/vita');
-        $date = new \DateTime('2021-06-15');
-        $dateStart = new \DateTime('2018-10-01');
-        $dateEnd = new \DateTime('2024-03-31');
-        $profileInformation->setDate($date);
-        $profileInformation->setDateStart($dateStart);
-        $profileInformation->setDateEnd($dateEnd);
+        $profileInformation->setDate(new \DateTime('2021-05-12'));
+        $profileInformation->setDateStart(new \DateTime('2018-02-03'));
+        $profileInformation->setDateEnd(new \DateTime('2024-11-30'));
         $profileInformation->setYearOnly(true);
 
         $formData = ProfileInformationFormData::createFromProfileInformation($profileInformation);
@@ -82,9 +80,9 @@ final class ProfileInformationFormDataTest extends UnitTestCase
                 'title' => 'Research assistant',
                 'bodytext' => 'Worked on distributed systems.',
                 'link' => 'https://example.org/vita',
-                'date' => $date,
-                'dateStart' => $dateStart,
-                'dateEnd' => $dateEnd,
+                'date' => '2021-05-12',
+                'dateStart' => '2018-02-03',
+                'dateEnd' => '2024-11-30',
                 'yearOnly' => true,
             ],
             [
@@ -92,28 +90,27 @@ final class ProfileInformationFormDataTest extends UnitTestCase
                 'title' => $formData->getTitle(),
                 'bodytext' => $formData->getBodytext(),
                 'link' => $formData->getLink(),
-                'date' => $formData->getDate(),
-                'dateStart' => $formData->getDateStart(),
-                'dateEnd' => $formData->getDateEnd(),
+                'date' => $formData->getDate()?->format('Y-m-d'),
+                'dateStart' => $formData->getDateStart()?->format('Y-m-d'),
+                'dateEnd' => $formData->getDateEnd()?->format('Y-m-d'),
                 'yearOnly' => $formData->isYearOnly(),
             ],
         );
     }
 
     /**
-     * A vita entry without an end date is an ongoing one. `null` is a stored value of its
-     * own for the template and for the database, so the mapping may not substitute one.
+     * A vita entry without an end date is an ongoing one. ``null`` and a real
+     * calendar date mean different things, so the mapping may not synthesize a value.
      */
     #[Test]
-    public function unsetDatesStayNull(): void
+    public function unsetDatesStayNullInsteadOfBecomingEmpty(): void
     {
         $profileInformation = new ProfileInformation();
-        $dateStart = new \DateTime('2018-01-01');
-        $profileInformation->setDateStart($dateStart);
+        $profileInformation->setDateStart(new \DateTime('2018-06-15'));
 
         $formData = ProfileInformationFormData::createFromProfileInformation($profileInformation);
 
-        $this->assertSame($dateStart, $formData->getDateStart());
+        $this->assertSame('2018-06-15', $formData->getDateStart()?->format('Y-m-d'));
         $this->assertNull($formData->getDate());
         $this->assertNull($formData->getDateEnd());
     }
@@ -133,8 +130,8 @@ final class ProfileInformationFormDataTest extends UnitTestCase
     }
 
     /**
-     * Both factories produce display objects: nothing is bound to a request and nothing is
-     * overridden, so `ProfileInformationFactory` may not write any of it back.
+     * Both factories produce display objects without explicit property overrides, so
+     * `ProfileInformationFactory` may not write any of it back.
      */
     #[Test]
     public function neitherFactoryProducesAnApplicableProperty(): void
@@ -143,7 +140,6 @@ final class ProfileInformationFormDataTest extends UnitTestCase
             ProfileInformationFormData::createEmptyForType('vita'),
             ProfileInformationFormData::createFromProfileInformation(new ProfileInformation()),
         ] as $formData) {
-            $this->assertNull($formData->getArgumentName());
             $this->assertFalse($formData->shouldApplyProperty('type'));
             $this->assertFalse($formData->shouldApplyProperty('title'));
             $this->assertFalse($formData->shouldApplyProperty('date'));

@@ -2,26 +2,35 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 234 PHP files declaring 211
-classes, 9 interfaces, 10 traits and 4 enums do not follow one style yet.
+rather than describing an intention as a rule — 258 PHP files declaring 234
+classes, 10 interfaces, 10 traits and 4 enums do not follow one style yet.
+
+The counts on this page are measured over `packages/fgtclb/*/Classes/` and
+`packages-dev/*/Classes/` together, unless a section says otherwise:
+
+```bash
+find packages/fgtclb/*/Classes packages-dev/*/Classes -name '*.php' | wc -l
+grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
+  packages/fgtclb/*/Classes packages-dev/*/Classes | sort | uniq -c
+```
 
 ## `final` by default, and where it is impossible
 
-89 of the 211 classes are `final` (42 %). The distribution is not random: it
+117 of the 234 classes are `final` (50 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
-| Directory                                  | final  | plain   | abstract | % final  |
-|--------------------------------------------|--------|---------|----------|----------|
-| `Classes/Upgrades/`                        | 9      | 0       | 0        | 100 %    |
-| `Classes/Service/` and `Classes/Services/` | 9      | 3       | 0        | 75 %     |
-| `Classes/EventListener/`                   | 2      | 1       | 0        | 67 %     |
-| `Classes/Controller/`                      | 9      | 5       | 1        | 60 %     |
-| `Classes/Domain/Model/Dto/`                | 5      | 10      | 1        | 31 %     |
-| `Classes/ViewHelpers/`                     | 2      | 8       | 0        | 20 %     |
-| `Classes/Domain/Model/` (excluding `Dto/`) | 0      | 23      | 0        | 0 %      |
-| `Classes/Domain/Repository/`               | 0      | 16      | 0        | 0 %      |
-| Everything else                            | 53     | 50      | 4        | 49 %     |
-| **Total**                                  | **89** | **116** | **6**    | **42 %** |
+| Directory                                  | final   | plain   | abstract | % final  |
+|--------------------------------------------|---------|---------|----------|----------|
+| `Classes/Upgrades/`                        | 11      | 0       | 0        | 100 %    |
+| `Classes/Service/` and `Classes/Services/` | 21      | 2       | 0        | 91 %     |
+| `Classes/EventListener/`                   | 6       | 1       | 0        | 86 %     |
+| `Classes/Controller/`                      | 4       | 5       | 0        | 44 %     |
+| `Classes/Domain/Model/Dto/`                | 7       | 10      | 1        | 39 %     |
+| `Classes/ViewHelpers/`                     | 2       | 8       | 0        | 20 %     |
+| `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
+| `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
+| Everything else                            | 66      | 47      | 4        | 56 %     |
+| **Total**                                  | **117** | **112** | **5**    | **50 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -46,27 +55,32 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 161 modifiers,
-of which 160 are constructor-promoted. The one non-promoted declaration is
+`readonly` is used heavily, mostly on individual properties: 256 modifiers, of
+which 248 are constructor-promoted. The eight non-promoted declarations are the
+seven documented fields of
+`academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing** — seven so far: the three `RegisterAcademicPageDoktype` listeners
-(partners, programs, projects), and in `academic-persons`
+nothing** — fifteen so far: the three `RegisterAcademicPageDoktype` listeners
+(partners, programs, projects); in `academic-persons`
 `ProfileImageRelationWriter`, `ProfileImageMetadataService` and the
-`UpdateProfileImageMetadata` listener, plus the
-`RepairLocalizedProfileImagesUpgradeWizard` of `academic-persons-edit`
-(ACE-506). The class-level modifier says the same thing as `private readonly`
-on every property, once, and the compiler enforces it for properties added
-later.
+`UpdateProfileImageMetadata` listener; and in `academic-persons-edit` the two
+payload data objects `ProfileUpdatePayload` and `ProfileUpdateRequestResult`,
+the six services `LocalizedProfileUidResolver`, `ProfileFieldOptionsService`,
+`ProfileRichTextSanitizer`, `ProfileSectionProvider`,
+`ProfileUpdateRequestService` and `ProfileUpdateValidationService`, and the
+`RepairLocalizedProfileImagesUpgradeWizard`. The class-level modifier says the
+same thing as `private readonly` on every property, once, and the compiler
+enforces it for properties added later.
 
 The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 99    | An injected collaborator                          |
-| `public readonly`    | 41    | A field of an immutable data object               |
-| `protected readonly` | 21    | Either, in classes with subclasses or older style |
+| `private readonly`   | 131   | An injected collaborator                          |
+| `public readonly`    | 103   | A field of an immutable data object               |
+| `protected readonly` | 22    | Either, in classes with subclasses or older style |
 
 Use `private readonly` for every constructor-injected dependency. It states that
 the service does not rebind it, which is the property half of the stateless rule
@@ -85,13 +99,14 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 64 files declare
-159 promoted `readonly` parameters. The fullest example is
-`academic-persons-edit/Classes/Controller/ContractController.php` lines 35–44 —
-eight promoted `private readonly` dependencies and an empty constructor body.
+Constructor injection with promoted properties is the default: 74 files declare
+248 promoted `readonly` parameters. The fullest example by a wide margin is
+`academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
+`private readonly` dependencies and an empty constructor body. That number is a
+known problem rather than a model: splitting the controller is ACE-507.
 
 **Method injection is used where a constructor is not available to take
-dependencies.** There are 21 `inject*()` methods across 9 files and **zero**
+dependencies.** There are 12 `inject*()` methods across 7 files and **zero**
 `@inject` annotations — the annotation form is not used at all, which is worth
 keeping true.
 
@@ -110,20 +125,19 @@ public function injectContext(Context $context): void
 }
 ```
 
-`academic-persons-edit/Classes/Controller/AbstractActionController.php` lines
-62–100 does this six times, which is what lets its six `final` subclasses each
-declare their own constructor.
+`academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php`
+does it once, for the settings graph an Extbase validator cannot take through a
+constructor.
 
-The 6 abstract classes and what each is for:
+The 5 abstract classes and what each is for:
 
-| Class                                                                             | Purpose                                                   |
-|-----------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `academic-persons/Classes/Types/AbstractTypes.php:17`                             | Type lists loaded from extension configuration            |
-| `academic-persons/Classes/DemandValues/AbstractDemandValues.php:17`               | The same pattern for demand and filter value lists        |
-| `academic-persons/Classes/Profile/AbstractProfileFactory.php:28`                  | Shared profile factory state and collaborators            |
-| `academic-persons-edit/Classes/Controller/AbstractActionController.php:46`        | Shared services for the six edit controllers, `@internal` |
-| `academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php:17` | Extbase validator base pulling `AcademicPersonsSettings`  |
-| `academic-persons-edit/Classes/Domain/Model/Dto/AbstractFormData.php:13`          | Base for the form-data DTOs                               |
+| Class                                                                             | Purpose                                                  |
+|-----------------------------------------------------------------------------------|----------------------------------------------------------|
+| `academic-persons/Classes/Types/AbstractTypes.php:17`                             | Type lists loaded from extension configuration           |
+| `academic-persons/Classes/DemandValues/AbstractDemandValues.php:17`               | The same pattern for demand and filter value lists       |
+| `academic-persons/Classes/Profile/AbstractProfileFactory.php:28`                  | Shared profile factory state and collaborators           |
+| `academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php:21` | Extbase validator base pulling `AcademicPersonsSettings` |
+| `academic-persons-edit/Classes/Domain/Model/Dto/AbstractFormData.php:10`          | Base for the form-data DTOs                              |
 
 Method injection on a **concrete** class does not have this justification.
 `academic-persons-edit/Classes/Service/ListSortingService.php` line 29 is
@@ -134,18 +148,19 @@ because its injected property is nullable and therefore mutable state.
 other example, with three `inject*()` methods and no constructor; the moment
 it needed a fourth collaborator, the four became a constructor with promoted
 `private readonly` properties — an Extbase `ActionController` has no
-constructor of its own, so nothing has to be forwarded.
+constructor of its own, so nothing has to be forwarded. The `ProfileController`
+of `academic-persons-edit` is built the same way, with 36 of them.
 
 ### `GeneralUtility::makeInstance()`
 
-91 call sites across the `Classes/` directories. Some are unavoidable: TCA and
+106 call sites across the `Classes/` directories. Some are unavoidable: TCA and
 FormEngine code under `Classes/Backend/` and `Classes/Tca/` (22 sites) runs
 where no container-injected instance is available, and a `DeletedRestriction` or
 similar throwaway object is not a service at all.
 
 The rest are not unavoidable. `makeInstance()` appears inside domain models
 (9 sites, for example `academic-partners/Classes/Domain/Model/Partner.php` lines
-121 and 184), repositories (7) and controllers (15) — all places that can take a
+121 and 184), repositories (12) and controllers (8) — all places that can take a
 constructor argument instead. Prefer injection; reach for `makeInstance()` when
 there is genuinely no container, and not as a shortcut around editing a
 constructor.
@@ -173,11 +188,12 @@ final class SynchronizerContext
 ```
 
 Others: `academic-base/Classes/Tca/TableConfiguration.php` (13 fields, and a
-**private** constructor behind the named constructor
+**private** constructor at line 21 behind the named constructor
 `TableConfiguration::create()` at line 37 — the shape to use when construction
-needs validation), the two `academic-persons/Classes/Settings/` classes, and
-`Validation` and `ValidationSet` in `academic-base/Classes/Settings/`, the
-shared value objects those settings are built from.
+needs validation), the nine value objects of the
+`academic-persons/Classes/Settings/` graph, and `Validation` and `ValidationSet`
+in `academic-base/Classes/Settings/`, the shared value objects those settings
+are built from.
 
 Not everything under `Domain/Model/Dto/` is immutable, and that is deliberate:
 the `*Demand` and `*FormData` classes are mapping targets that Extbase property
@@ -192,13 +208,17 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Ten sites, all settings value objects:
+  sit under an excluded path. Eleven sites
+  (`grep -rn '#\[Exclude\]' --include='*.php' packages/fgtclb/*/Classes`):
   `academic-base/Classes/Settings/Validation.php:23`,
-  `academic-base/Classes/Settings/ValidationSet.php:15` and the eight classes
-  of the persons settings graph under `academic-persons/Classes/Settings/`
+  `academic-base/Classes/Settings/ValidationSet.php:15` and nine classes under
+  `academic-persons/Classes/Settings/` — the eight of the settings graph
   (`ProfileSection`, `ProfileField`, `SpecialField`, `ContractField`,
   `ContractContactSection`, `ContractContactField`, `DocumentSection`,
-  `PublicProfileSettings`).
+  `PublicProfileSettings`) plus `LegacySettingsMigration`. The last one is not
+  a settings value object but the result of the legacy settings overlay; it is
+  excluded for the same reason — it is data the factory produces, not a service
+  the container builds.
 
 The `Settings/` classes show why the attribute is needed: they are immutable
 data objects that happen to live outside `Domain/Model/`, so the package's
@@ -255,8 +275,8 @@ alt="{profile.image.originalResource.alternative}"
 title="{profile.image.originalResource.title}"
 ```
 
-`academic-persons-edit/Resources/Private/Partials/Profile/Show/Image.html` lines
-50, 51, 56 and 57 is the only place in the repository that accesses file
+`academic-persons-edit/Resources/Private/Partials/Profile/Image/Card.html` lines
+56, 58, 61 and 63 is the only place in the repository that accesses file
 reference metadata, and it is the only place using `originalResource`.
 Everywhere else the Extbase `FileReference` is passed straight to `<f:image>` or
 `<f:uri.image>`, which resolves it internally — no property access, no trap.
@@ -270,7 +290,8 @@ on a field that may not be set.
 
 ## Strict types
 
-228 of the 235 files declare `strict_types=1`. New files must. Measured with
+244 of the 251 files declare `strict_types=1` — here counted over
+`packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
 `packages-dev/` and `Tests/` are not counted. The 7 that do not are worth

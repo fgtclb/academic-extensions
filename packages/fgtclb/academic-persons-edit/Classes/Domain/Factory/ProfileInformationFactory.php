@@ -11,7 +11,7 @@ use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
 
 /**
  * @todo Class naming (factory) and usage does not make much sense. Reconsider and adopt before making this API.
- * @internal to be used only in `EXT:academic_person_edit` and not part of public API. May change at any time.
+ * @internal to be used only in `EXT:academic_persons_edit` and not part of public API. May change at any time.
  */
 class ProfileInformationFactory
 {
