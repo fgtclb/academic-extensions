@@ -117,12 +117,15 @@ The 6 abstract classes and what each is for:
 | `academic-persons-edit/Classes/Domain/Model/Dto/AbstractFormData.php:13`          | Base for the form-data DTOs                               |
 
 Method injection on a **concrete** class does not have this justification.
-`academic-persons/Classes/Controller/ProfileController.php` (three `inject*()`
-methods, no constructor) and
-`academic-persons-edit/Classes/Service/ListSortingService.php` line 29 are
-existing code, not templates for new code — the latter is also cited in
+`academic-persons-edit/Classes/Service/ListSortingService.php` line 29 is
+existing code, not a template for new code — it is also cited in
 [Dependency injection](dependency-injection.md#where-the-codebase-does-not-comply)
 because its injected property is nullable and therefore mutable state.
+`academic-persons/Classes/Controller/ProfileController.php` used to be the
+other example, with three `inject*()` methods and no constructor; the moment
+it needed a fourth collaborator, the four became a constructor with promoted
+`private readonly` properties — an Extbase `ActionController` has no
+constructor of its own, so nothing has to be forwarded.
 
 ### `GeneralUtility::makeInstance()`
 
