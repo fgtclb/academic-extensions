@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicPersons\Tests\Unit\Settings;
+namespace FGTCLB\AcademicBase\Tests\Unit\Settings;
 
-use FGTCLB\AcademicPersons\Settings\Validation;
+use FGTCLB\AcademicBase\Settings\Validation;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\StringLengthValidator;
@@ -13,7 +13,7 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 /**
  * `Validation` carries no behaviour beyond `__set_state()` - it is a readonly data
  * object whose properties are read directly. That one method is not decoration though:
- * `AcademicPersonsSettingsFactory` caches the settings as `return <var_export>;` and
+ * `SettingsFileLoader` caches the settings as `return <var_export>;` and
  * restores them with `require`, so a constructor property that `__set_state()` does not
  * pass on is lost on every request but the first, where nothing points at it.
  */
