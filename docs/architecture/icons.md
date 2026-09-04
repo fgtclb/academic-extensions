@@ -12,15 +12,16 @@ grep -c "'provider'" packages/fgtclb/*/Configuration/Icons.php
 grep -rh "'provider' =>" packages/fgtclb/*/Configuration/Icons.php | sort | uniq -c
 ```
 
-Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **62
-registrations in total: 56 with the core `SvgIconProvider`, and the six control
-icons of the public profile of `academic-persons` with
-`CurrentColorSvgIconProvider`**:
+Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **70
+registrations in total: 51 with the core `SvgIconProvider`, and 19 with
+`CurrentColorSvgIconProvider` — the six control icons of the public profile of
+`academic-persons` and the thirteen action icons of the profile editing frontend
+of `academic-persons-edit`**:
 
 | Package                  | Registrations |
 |--------------------------|---------------|
 | `academic-jobs`          | 18            |
-| `academic-persons-edit`  | 12            |
+| `academic-persons-edit`  | 20            |
 | `academic-persons`       | 16            |
 | `academic-study-plan`    | 7             |
 | `academic-contact4pages` | 4             |
@@ -98,14 +99,15 @@ sizes both shapes the same.
 
 - A **record, page type, content element or brand icon** — anything drawn in
   fixed colours, meant to look the same on every background — stays with the
-  core `SvgIconProvider`. That is 56 of the 62 registrations today.
+  core `SvgIconProvider`. That is 51 of the 70 registrations today.
 - An **action or control icon** — an arrow, a pencil, a bin, a fold-out chevron —
   is drawn in `currentColor` and registered with `CurrentColorSvgIconProvider`.
   Then it follows the text colour in the backend *and* in the frontend, with
   or without the `inline` argument. The six `academic-persons-*` icons of the
   public profile — envelope, phone, address, room and the plus and minus of
-  the fold-out entries, all Bootstrap Icons — are the first registrations of
-  that kind.
+  the fold-out entries — and the thirteen `academic-persons-edit-*` action
+  icons of the profile editing frontend, all Bootstrap Icons, are the
+  registrations of that kind today.
 - A frontend template that already asks for `inline` gets the same markup from
   both providers. Switching such an icon's provider changes nothing in the
   frontend; it changes its default markup, i.e. how it looks in the backend
@@ -219,6 +221,15 @@ plugin or content element rendering test that renders icons should carry both;
 `academic-persons/Tests/Functional/Plugins/AcademicPersonsPublicProfilePluginTest.php`,
 `profileRendersOnlyResolvableIcons()`, does so for the six icons of the public
 profile.
+
+An icon set that is registered before the templates that render it has no page to
+be asserted against, and is pinned through the registry instead:
+[`academic-persons-edit/Tests/Functional/Imaging/ProfileEditingIconsTest.php`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Imaging/ProfileEditingIconsTest.php)
+asks the `IconFactory` for each of the thirteen action identifiers and asserts
+that the answer is that identifier and not `default-not-found`, and that its
+default markup is the inlined file. The identifiers are spelled out in the test
+rather than read back out of `Configuration/Icons.php`, so a rename has to be
+made twice instead of silently agreeing with itself.
 
 The provider itself is covered the same way it is used:
 [`academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php)
