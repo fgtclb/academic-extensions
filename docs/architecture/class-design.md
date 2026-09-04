@@ -163,8 +163,9 @@ final class SynchronizerContext
 Others: `academic-base/Classes/Tca/TableConfiguration.php` (13 fields, and a
 **private** constructor behind the named constructor
 `TableConfiguration::create()` at line 37 — the shape to use when construction
-needs validation), and the four
-`academic-persons/Classes/Settings/` classes.
+needs validation), the two `academic-persons/Classes/Settings/` classes, and
+`Validation` and `ValidationSet` in `academic-base/Classes/Settings/`, the
+shared value objects those settings are built from.
 
 Not everything under `Domain/Model/Dto/` is immutable, and that is deliberate:
 the `*Demand` and `*FormData` classes are mapping targets that Extbase property
@@ -179,9 +180,10 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Three sites, all in
-  `academic-persons/Classes/Settings/`: `Validation.php:12`,
-  `ValidationSet.php:13`, `ProfileInformationType.php:12`.
+  sit under an excluded path. Three sites:
+  `academic-base/Classes/Settings/Validation.php:17`,
+  `academic-base/Classes/Settings/ValidationSet.php:15` and
+  `academic-persons/Classes/Settings/ProfileInformationType.php:12`.
 
 The `Settings/` classes show why the attribute is needed: they are immutable
 data objects that happen to live outside `Domain/Model/`, so the package's
@@ -253,8 +255,11 @@ on a field that may not be set.
 
 ## Strict types
 
-226 of the 234 files declare `strict_types=1`. New files must. The 8 that do not
-are worth knowing so they are fixed rather than copied:
+228 of the 235 files declare `strict_types=1`. New files must. Measured with
+`find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
+`grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
+`packages-dev/` and `Tests/` are not counted. The 7 that do not are worth
+knowing so they are fixed rather than copied:
 
 | File                                                                  |
 |-----------------------------------------------------------------------|
@@ -264,10 +269,9 @@ are worth knowing so they are fixed rather than copied:
 | `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`   |
 | `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`      |
 | `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`     |
-| `academic-persons/Classes/Settings/Validation.php`                    |
 | `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php`  |
 
-Four of the eight are `DataProcessing/` classes, which suggests one origin
+Four of the seven are `DataProcessing/` classes, which suggests one origin
 rather than eight independent omissions.
 
 ## Static analysis

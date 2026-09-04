@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicPersons\ViewHelpers;
+namespace FGTCLB\AcademicBase\ViewHelpers;
 
-use FGTCLB\AcademicPersons\Settings\Validation;
+use FGTCLB\AcademicBase\Settings\Validation;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
@@ -15,7 +15,8 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  * from provided `$validations` array. In case validation for `$identifier` is
  * not found, default (empty) validation set is returned with default values.
  *
- * Usages:
+ * Usages, with the namespace declared as
+ * `xmlns:p="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`:
  *
  * ::
  *
