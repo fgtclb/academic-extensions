@@ -13,17 +13,21 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
  * Drives the JSON endpoints of the `academicpersonsedit_profileediting` plugin and
  * asserts they trigger the translation synchronisation (ACE-485).
  *
- * Profile editing persists without a form round trip: every action answers JSON and writes through
- * `ProfileController::persistAndDispatchProfileUpdate()`, which is the single
- * place the `AfterProfileUpdateEvent` is raised. `SyncChangesToTranslationsDispatchSurfaceTest`
+ * Profile editing persists without a form round trip: every action answers JSON, and
+ * raises the `AfterProfileUpdateEvent` once the change is written - through
+ * `ProfileController::persistAndDispatchProfileUpdate()` for everything that goes
+ * through the Extbase persistence, and directly for the two image endpoints, which
+ * write through the DataHandler. `SyncChangesToTranslationsDispatchSurfaceTest`
  * pins that structurally, by scanning the source; this test pins it where it is
  * observable, by the translated row a real request produces.
  *
- * Two of the endpoints are driven rather than all of them: `update`, which writes the
- * profile record itself, and `sortDocument`, whose step-wise branch reaches the
- * database through `ListSortingService` instead of a repository and is therefore the
- * one that most easily loses its dispatch. The depth of what a synchronisation writes
- * is covered by the synchroniser's own tests in `EXT:academic_persons`.
+ * Three of the endpoints are driven rather than all of them: `update`, which writes
+ * the profile record itself, `sortDocument`, whose step-wise branch reaches the
+ * database through `ListSortingService` instead of a repository, and `deleteImage`,
+ * which writes through the DataHandler and had lost its dispatch altogether
+ * (ACE-518) - the three that most easily lose it. The depth of what a
+ * synchronisation writes is covered by the synchroniser's own tests in
+ * `EXT:academic_persons`.
  */
 final class AcademicPersonsEditProfileEditingTranslationSyncTest extends AbstractFrontendProfilePluginTestCase
 {
@@ -163,5 +167,72 @@ final class AcademicPersonsEditProfileEditingTranslationSyncTest extends Abstrac
         $this->assertCount(2, $rows, 'The reordering announces the change, so the profile is synchronised.');
         $this->assertSame(1, (int)$rows[1]['sys_language_uid']);
         $this->assertSame(self::PROFILE_ID, (int)$rows[1]['l10n_parent']);
+    }
+
+    #[Test]
+    public function imageRemovalCreatesTheConfiguredTranslation(): void
+    {
+        $this->setUpTranslationSyncTestCase();
+        $this->seedProfileImage();
+        $deleteImageUrl = $this->extractDataUrl($this->renderProfileEditingPage(), 'data-delete-image-url');
+        $this->assertCount(1, $this->getProfileRows(), 'Precondition: only the default language profile exists.');
+
+        $response = $this->postJson($deleteImageUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [],
+        ]);
+        $this->assertSame(200, $response->getStatusCode(), (string)$response->getBody());
+
+        $rows = $this->getProfileRows();
+        $this->assertCount(2, $rows, 'Removing the image announces the change, so the profile is synchronised.');
+        $this->assertSame(1, (int)$rows[1]['sys_language_uid']);
+        $this->assertSame(self::PROFILE_ID, (int)$rows[1]['l10n_parent']);
+        $this->assertSame([], $this->getActiveProfileImageReferences(), 'No language keeps a reference to the removed image.');
+    }
+
+    #[Test]
+    public function imageRemovalRegeneratesTheProfileSlug(): void
+    {
+        $this->setUpTranslationSyncTestCase();
+        $this->seedProfileImage();
+        $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile')
+            ->update('tx_academicpersons_domain_model_profile', ['slug' => ''], ['uid' => self::PROFILE_ID]);
+        $deleteImageUrl = $this->extractDataUrl($this->renderProfileEditingPage(), 'data-delete-image-url');
+
+        $response = $this->postJson($deleteImageUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [],
+        ]);
+        $this->assertSame(200, $response->getStatusCode(), (string)$response->getBody());
+
+        $this->assertSame('max-muellermann', $this->getProfileSlug(self::PROFILE_ID));
+    }
+
+    private function getProfileSlug(int $profileUid): string
+    {
+        return (string)$this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile')
+            ->select(['slug'], 'tx_academicpersons_domain_model_profile', ['uid' => $profileUid])
+            ->fetchOne();
+    }
+
+    /**
+     * @return list<array<string, int>>
+     */
+    private function getActiveProfileImageReferences(): array
+    {
+        $rows = $this->getConnectionPool()
+            ->getConnectionForTable('sys_file_reference')
+            ->executeQuery(
+                'SELECT uid, uid_local, uid_foreign, sys_language_uid FROM sys_file_reference'
+                . ' WHERE deleted = 0 AND tablenames = ? AND fieldname = ? ORDER BY uid',
+                ['tx_academicpersons_domain_model_profile', 'image'],
+            )
+            ->fetchAllAssociative();
+        return array_map(
+            static fn(array $row): array => array_map(intval(...), $row),
+            $rows,
+        );
     }
 }
