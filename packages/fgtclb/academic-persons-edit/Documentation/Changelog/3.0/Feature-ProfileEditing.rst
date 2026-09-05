@@ -1,0 +1,83 @@
+..  _feature-profile-editing:
+
+=========================================
+Feature: JSON based profile editor
+=========================================
+
+Description
+===========
+
+The :guilabel:`Profile editing` content element now ships a responsive
+Fluid form and an ES module that persists profile changes without reloading the
+page. Only properties changed in the browser are included in the JSON request.
+The frontend module discovers editable fields across the complete component
+root and supports separate field forms in responsive grid sections. Editor,
+toast and button-template elements remain scoped to the same editor instance.
+
+The endpoint validates the request method and JSON structure, requires an
+authenticated frontend user, verifies that the requested profile is assigned
+to that user and applies the configured profile validators. Expected failures
+are returned as JSON with an appropriate HTTP status code. Field-specific
+validation errors are rendered next to the corresponding control.
+
+Gender values are restricted to the options configured for the profile gender
+field in TCA. The empty string passes payload normalization so a configuration
+without ``required`` can clear an existing selection; the shipped profile
+section marks gender as required and therefore rejects that value during
+section validation. Option checks read the raw TCA values independently from
+the translated value-to-label map used to render the Fluid select.
+
+The synchronization checkbox has a dedicated JSON endpoint and is persisted
+immediately without submitting unrelated fields. Clicking the profile image or
+its placeholder opens an inline Vue editor without inline styles. The image
+flow exposes only :guilabel:`Delete`, :guilabel:`Cancel` and
+:guilabel:`Save`: selecting a file immediately changes the crop preview,
+whereas the page preview changes only after a successful upload. Failures stay
+inside the open editor. The active action shows a Bootstrap spinner and
+duplicate requests are prevented.
+
+Image uploads use Extbase file handling and the configured MIME type, maximum
+size and target-folder settings. Profile ownership is checked before a file is
+mapped or stored. Deleting or replacing an image removes the physical file only
+when no other record references it.
+
+The content element starts with an assigned-profile overview. Editing is opened
+only after selecting a row, and the requested profile UID is verified against
+the authenticated user's assignments. The row's public view action links to the
+``academic_persons`` Detail plugin on the page configured through
+``plugin.tx_academicpersons.detailPid``.
+
+The main editor template is composed from focused partials for image UI, settings,
+forms, sections, field preview/control/actions, status output and button
+templates. The responsive grid and JavaScript data hooks remain unchanged.
+
+Profile fields configured with ``renderType: ckeditor`` use TYPO3's bundled
+CKEditor 5. Editor instances are initialized only when a field is opened and
+expose a deliberately small formatting toolbar. The existing JSON update
+endpoint remains the only persistence path. Rich-text input is sanitized
+server-side with an explicit allowlist before validation and persistence, and
+the response returns the normalized markup used to update the editor state.
+
+Rich-text read mode renders the formatted value directly with a compact edit
+control. In edit mode every field has separate delete, cancel and save actions.
+Delete clears the local draft without closing or saving, cancel restores the
+last persisted value and closes the field, and save uses the JSON AJAX
+endpoint. Bootstrap sizing and alignment utilities keep the action group from
+stretching to the editor height without additional CSS or inline styles. The
+former bulk footer actions are no longer rendered. The complete name,
+synchronization switch and header toggle share one row above the image and
+personal-data columns. The image column is headed :guilabel:`Profile image`;
+the personal form retains its :guilabel:`Personal data` heading. The header toggle opens all
+editors and changes from :guilabel:`Edit all` to :guilabel:`Close all`; closing
+them retains browser-side drafts and performs no request.
+
+Impact
+======
+
+Installations using the shipped template receive the profile editor in their
+existing ProfileEditing content elements. Projects overriding the former
+template should compare their markup with the new template and preserve the
+JavaScript hooks described in
+:ref:`profile-editing`.
+
+..  index:: AJAX, CKEditor, Fluid, Frontend, JSON, Profile image, Rich text

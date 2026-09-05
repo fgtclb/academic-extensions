@@ -31,6 +31,8 @@ final class ValidationTest extends UnitTestCase
             validatorClassNames: [NotEmptyValidator::class, StringLengthValidator::class],
             tcaConfig: ['type' => 'input', 'max' => 60, 'eval' => 'trim'],
             inputType: 'text',
+            flags: ['required', 'readonly'],
+            characterLimit: 100,
         );
 
         $restored = eval('return ' . var_export($subject, true) . ';');
@@ -48,13 +50,12 @@ final class ValidationTest extends UnitTestCase
         );
         $this->assertSame(['type' => 'input', 'max' => 60, 'eval' => 'trim'], $restored->tcaConfig);
         $this->assertSame('text', $restored->inputType);
+        $this->assertSame(['required', 'readonly'], $restored->flags);
+        $this->assertSame(100, $restored->characterLimit);
     }
 
     /**
-     * `inputType` is the only constructor argument with a default, and `__set_state()`
-     * reads it as a required array key. That holds as long as the array comes from
-     * `var_export()` of a real instance - this pins that it does, because a validation
-     * built without an `inputType` is the common case.
+     * Defaulted constructor metadata must also survive the exported cache payload.
      */
     #[Test]
     public function aDefaultedInputTypeIsStillExportedAndRestored(): void
@@ -73,5 +74,7 @@ final class ValidationTest extends UnitTestCase
 
         $this->assertInstanceOf(Validation::class, $restored);
         $this->assertSame('', $restored->inputType);
+        $this->assertSame([], $restored->flags);
+        $this->assertSame(0, $restored->characterLimit);
     }
 }

@@ -14,48 +14,56 @@ return [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/persons_edit_icon.svg',
     ],
-    'academic-persons-edit-edit' => [
+    'academic-persons-inline-edit-clear' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/edit-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-clear.svg',
     ],
-    'academic-persons-edit-view' => [
+    'academic-persons-inline-edit-undo' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/view-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-undo.svg',
     ],
-    'academic-persons-edit-add-image' => [
+    'academic-persons-inline-edit-save' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/add-image-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-save.svg',
     ],
-    'academic-persons-edit-replace-image' => [
+    'academic-persons-inline-edit-pencil' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/replace-image-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-edit.svg',
     ],
-    'academic-persons-edit-add-item' => [
+    'academic-persons-inline-edit-add' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/add-item-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-add.svg',
     ],
-    'academic-persons-edit-delete' => [
+    'academic-persons-inline-edit-open' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/delete-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-eye.svg',
     ],
-    'academic-persons-edit-save' => [
+    'academic-persons-inline-edit-up' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/save-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-up.svg',
     ],
-    'academic-persons-edit-cancel' => [
+    'academic-persons-inline-edit-down' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/cancel-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-down.svg',
     ],
-    'academic-persons-edit-back' => [
+    'academic-persons-inline-edit-delete' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/back-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-bin.svg',
     ],
-    'academic-persons-edit-sort' => [
+    'academic-persons-inline-edit-grip' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/sort-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-griplines.svg',
     ],
-    'academic-persons-edit-to-top' => [
+    'academic-persons-inline-edit-back' => [
         'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/sort-vertical-icon.svg',
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-left.svg',
+    ],
+    'academic-persons-inline-edit-camera' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-camera.svg',
+    ],
+    'academic-persons-inline-edit-info' => [
+        'provider' => SvgIconProvider::class,
+        'source' => 'EXT:academic_persons_edit/Resources/Public/Icons/fa-info.svg',
     ],
 ];

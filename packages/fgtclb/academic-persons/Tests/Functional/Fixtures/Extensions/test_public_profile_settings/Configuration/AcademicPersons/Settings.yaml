@@ -1,0 +1,12 @@
+profile:
+  structure:
+    left: []
+    right:
+      - profileEntries
+      - headline
+  details:
+    profileEntries:
+      - miscellaneous
+    headline:
+      - lastName
+      - firstName

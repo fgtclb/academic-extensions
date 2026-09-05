@@ -7,7 +7,7 @@ namespace FGTCLB\AcademicPersonsEdit\Domain\Model\Dto;
 use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
 
 /**
- * @internal to be used only in `EXT:academic_person_edit` and not part of public API. May change at any time.
+ * @internal to be used only in `EXT:academic_persons_edit` and not part of public API. May change at any time.
  */
 class ProfileInformationFormData extends AbstractFormData
 {
@@ -15,18 +15,20 @@ class ProfileInformationFormData extends AbstractFormData
     protected string $title = '';
     protected string $bodytext = '';
     protected string $link = '';
-    protected ?int $year = null;
-    protected ?int $yearStart = null;
-    protected ?int $yearEnd = null;
+    protected ?\DateTime $year = null;
+    protected ?\DateTime $yearStart = null;
+    protected ?\DateTime $yearEnd = null;
+    protected bool $yearOnly = false;
 
     public function __construct(
         string $type = '',
         string $title = '',
         string $bodytext = '',
         string $link = '',
-        ?int $year = null,
-        ?int $yearStart = null,
-        ?int $yearEnd = null
+        ?\DateTime $year = null,
+        ?\DateTime $yearStart = null,
+        ?\DateTime $yearEnd = null,
+        bool $yearOnly = false
     ) {
         $this->type = $type;
         $this->title = $title;
@@ -35,6 +37,7 @@ class ProfileInformationFormData extends AbstractFormData
         $this->year = $year;
         $this->yearStart = $yearStart;
         $this->yearEnd = $yearEnd;
+        $this->yearOnly = $yearOnly;
     }
 
     public static function createEmptyForType(string $type): self
@@ -54,6 +57,7 @@ class ProfileInformationFormData extends AbstractFormData
         $instance->year = $profileInformation->getYear();
         $instance->yearStart = $profileInformation->getYearStart();
         $instance->yearEnd = $profileInformation->getYearEnd();
+        $instance->yearOnly = $profileInformation->isYearOnly();
         return $instance;
     }
 
@@ -77,18 +81,23 @@ class ProfileInformationFormData extends AbstractFormData
         return $this->link;
     }
 
-    public function getYear(): ?int
+    public function getYear(): ?\DateTime
     {
         return $this->year;
     }
 
-    public function getYearStart(): ?int
+    public function getYearStart(): ?\DateTime
     {
         return $this->yearStart;
     }
 
-    public function getYearEnd(): ?int
+    public function getYearEnd(): ?\DateTime
     {
         return $this->yearEnd;
+    }
+
+    public function isYearOnly(): bool
+    {
+        return $this->yearOnly;
     }
 }

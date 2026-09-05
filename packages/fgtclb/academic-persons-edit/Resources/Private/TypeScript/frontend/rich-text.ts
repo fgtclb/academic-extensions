@@ -18,47 +18,55 @@
  * key does not help: the pattern allows a query string explicitly.
  */
 interface CkEditorStatic {
-    replace(elementId: string, config: Record<string, unknown>): void;
+  replace(elementId: string, config: Record<string, unknown>): void;
 }
 
-const editorConfig: Record<string, unknown> = {
-    language: 'en',
-    height: 200,
-    versionCheck: false,
-    format_tags: 'p',
-    toolbarGroups: [
-        { name: 'basicstyles', groups: ['basicstyles'] },
-        { name: 'paragraph', groups: ['list'] },
-        { name: 'clipboard', groups: ['cleanup'] },
-    ],
-    customConfig: '',
-    removeButtons: [
-        'Strike',
-        'Subscript',
-        'Superscript',
-    ],
+export const editorConfig: Record<string, unknown> = {
+  language: "en",
+  height: 200,
+  versionCheck: false,
+  format_tags: "p",
+  toolbarGroups: [
+    { name: "basicstyles", groups: ["basicstyles"] },
+    { name: "paragraph", groups: ["list"] },
+    { name: "clipboard", groups: ["cleanup"] },
+  ],
+  customConfig: "",
+  removeButtons: ["Strike", "Subscript", "Superscript"],
 };
 
-const editor = (): CkEditorStatic | undefined =>
-    (window as unknown as { CKEDITOR?: CkEditorStatic }).CKEDITOR;
+export const getEditor = (): CkEditorStatic | undefined =>
+  (window as unknown as { CKEDITOR?: CkEditorStatic }).CKEDITOR;
+
+export const initializeEditors = (
+  scope: ParentNode = document,
+  ckeditor: CkEditorStatic | undefined = getEditor(),
+): boolean => {
+  if (ckeditor === undefined) {
+    return false;
+  }
+  scope
+    .querySelectorAll<HTMLTextAreaElement>(".rich-text")
+    .forEach((textarea): void => {
+      const identifier = textarea.getAttribute("id");
+      // The original passed the attribute through unchecked. CKEditor needs an
+      // element id to replace, so a textarea without one was never going to
+      // work; skipping it keeps the remaining fields from being lost with it.
+      if (identifier !== null) {
+        ckeditor.replace(identifier, editorConfig);
+      }
+    });
+  return true;
+};
 
 const waitForEditor = window.setInterval((): void => {
-    const ckeditor = editor();
-    if (ckeditor === undefined) {
-        return;
-    }
-
-    window.clearInterval(waitForEditor);
-
-    document.querySelectorAll<HTMLTextAreaElement>('.rich-text').forEach((textarea): void => {
-        const identifier = textarea.getAttribute('id');
-        // The original passed the attribute through unchecked. CKEditor needs an
-        // element id to replace, so a textarea without one was never going to
-        // work; skipping it keeps the remaining fields from being lost with it.
-        if (identifier !== null) {
-            ckeditor.replace(identifier, editorConfig);
-        }
-    });
+  pollForEditor();
 }, 100);
 
-export {};
+export const pollForEditor = (): void => {
+  const ckeditor = getEditor();
+  if (!initializeEditors(document, ckeditor)) {
+    return;
+  }
+  window.clearInterval(waitForEditor);
+};

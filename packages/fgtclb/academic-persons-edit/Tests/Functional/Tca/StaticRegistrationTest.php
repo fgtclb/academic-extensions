@@ -118,4 +118,26 @@ final class StaticRegistrationTest extends AbstractAcademicPersonsEditTestCase
             sprintf('The file registered as "%s" does not exist.', $label),
         );
     }
+
+    #[Test]
+    public function removedInlineProfileConfigurationIsNotOffered(): void
+    {
+        $staticTemplateValues = array_column(
+            $GLOBALS['TCA']['sys_template']['columns']['include_static_file']['config']['items'] ?? [],
+            'value',
+        );
+        $this->assertNotContains(
+            'EXT:academic_persons_edit/Configuration/TypoScript/InlineProfile',
+            $staticTemplateValues,
+        );
+
+        $pageTsConfigValues = array_column(
+            $GLOBALS['TCA']['pages']['columns']['tsconfig_includes']['config']['items'] ?? [],
+            'value',
+        );
+        $this->assertNotContains(
+            'EXT:academic_persons_edit/Configuration/TSconfig/InlineProfile/page.tsconfig',
+            $pageTsConfigValues,
+        );
+    }
 }

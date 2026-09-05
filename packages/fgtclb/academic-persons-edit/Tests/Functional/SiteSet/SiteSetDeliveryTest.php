@@ -40,7 +40,8 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
     ];
 
     private const AGGREGATE_SET = 'fgtclb/academic-persons-edit';
-    private const COMPONENT_SET = 'fgtclb/academic-persons-edit-profile-editing';
+    private const PROFILE_EDITING_COMPONENT_SET = 'fgtclb/academic-persons-edit-profile-editing';
+    private const REMOVED_INLINE_COMPONENT_SET = 'fgtclb/academic-persons-edit-inline-profile';
 
     protected function setUp(): void
     {
@@ -149,12 +150,17 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
             $pageTsConfig['mod.']['wizards.']['newContentElement.']['wizardItems.']['academic.']['elements.'] ?? [],
             'The site set did not deliver the new content element wizard entry.',
         );
+        $this->assertArrayNotHasKey(
+            'academicpersonsedit_inlineprofile.',
+            $pageTsConfig['mod.']['wizards.']['newContentElement.']['wizardItems.']['academic.']['elements.'] ?? [],
+        );
     }
 
     /**
      * Pins the two strings the tests above depend on, and the files they point at. The
      * aggregate carries no payload of its own on purpose: it delivers through the
-     * component set, and a `typoscript:` of its own would parse the same files twice.
+     * ProfileEditing component set, and a `typoscript:` of its own would parse the
+     * same files twice.
      */
     #[Test]
     public function setDefinitionsPointAtTheFilesTheStaticRegistrationUses(): void
@@ -162,18 +168,35 @@ final class SiteSetDeliveryTest extends AbstractAcademicPersonsEditTestCase
         $setRegistry = $this->get(SetRegistry::class);
         $this->assertInstanceOf(SetRegistry::class, $setRegistry);
 
-        $component = $setRegistry->getSet(self::COMPONENT_SET);
+        $profileEditingComponent = $setRegistry->getSet(self::PROFILE_EDITING_COMPONENT_SET);
         $aggregate = $setRegistry->getSet(self::AGGREGATE_SET);
 
-        $this->assertNotNull($component, sprintf('The set "%s" is not registered.', self::COMPONENT_SET));
+        $this->assertNull(
+            $setRegistry->getSet(self::REMOVED_INLINE_COMPONENT_SET),
+            sprintf(
+                'The removed inline set "%s" must not be registered.',
+                self::REMOVED_INLINE_COMPONENT_SET,
+            ),
+        );
+        $this->assertNotNull(
+            $profileEditingComponent,
+            sprintf('The set "%s" is not registered.', self::PROFILE_EDITING_COMPONENT_SET),
+        );
         $this->assertNotNull($aggregate, sprintf('The set "%s" is not registered.', self::AGGREGATE_SET));
 
-        $this->assertSame('EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing/', $component->typoscript);
-        $this->assertSame('EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig', $component->pagets);
-        $this->assertDirectoryExists(GeneralUtility::getFileAbsFileName((string)$component->typoscript));
-        $this->assertFileExists(GeneralUtility::getFileAbsFileName((string)$component->pagets));
+        $this->assertSame(
+            'EXT:academic_persons_edit/Configuration/TypoScript/ProfileEditing/',
+            $profileEditingComponent->typoscript,
+        );
+        $this->assertSame(
+            'EXT:academic_persons_edit/Configuration/TSconfig/ProfileEditing/page.tsconfig',
+            $profileEditingComponent->pagets,
+        );
+        $this->assertDirectoryExists(GeneralUtility::getFileAbsFileName((string)$profileEditingComponent->typoscript));
+        $this->assertFileExists(GeneralUtility::getFileAbsFileName((string)$profileEditingComponent->pagets));
 
-        $this->assertContains(self::COMPONENT_SET, $aggregate->dependencies);
+        $this->assertNotContains(self::REMOVED_INLINE_COMPONENT_SET, $aggregate->dependencies);
+        $this->assertContains(self::PROFILE_EDITING_COMPONENT_SET, $aggregate->dependencies);
         $this->assertSetCarriesNoPayload($aggregate);
     }
 

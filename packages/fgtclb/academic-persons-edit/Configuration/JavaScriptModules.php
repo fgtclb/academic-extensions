@@ -16,8 +16,10 @@ declare(strict_types=1);
 return [
     'dependencies' => [
         'core',
+        'rte_ckeditor',
     ],
     'imports' => [
         '@fgtclb/academic-persons-edit/frontend/' => 'EXT:academic_persons_edit/Resources/Public/JavaScript/frontend/',
+        '@fgtclb/academic-persons-edit/cropper' => 'EXT:academic_persons_edit/Resources/Public/JavaScript/vendor/cropperjs/2.2.0/cropper.esm.min.js',
     ],
 ];

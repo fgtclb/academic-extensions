@@ -154,12 +154,6 @@ $tcaConfiguration = [
     ],
 ];
 
-// @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
-ArrayUtility::mergeRecursiveWithOverrule(
-    $tcaConfiguration,
-    GeneralUtility::makeInstance(AcademicPersonsSettings::class)->getValidationTcaTableConfig('phoneNumber'),
-);
-
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);
 // v14 makes suitable field types searchable by default. Keep the explicit
 // inclusion list on v13, which still evaluates 'searchFields'.
@@ -167,5 +161,14 @@ ArrayUtility::mergeRecursiveWithOverrule(
 if ((new \TYPO3\CMS\Core\Information\Typo3Version())->getMajorVersion() < 14) {
     $tcaConfiguration['ctrl']['searchFields'] = 'phone_number';
 }
+
+$settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
+ArrayUtility::mergeRecursiveWithOverrule(
+    $tcaConfiguration,
+    $settings->getContractContactValidationTcaTableConfig(
+        ['phoneNumber', 'phoneNumberType'],
+        'phoneNumbers',
+    ),
+);
 
 return $tcaConfiguration;

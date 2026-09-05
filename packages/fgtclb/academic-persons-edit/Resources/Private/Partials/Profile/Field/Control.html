@@ -1,0 +1,65 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <f:if condition="{textarea}">
+        <f:then>
+            <div class="flex-grow-1 w-100" data-ie-editor-container>
+                <f:if condition="{richText}">
+                    <f:then>
+                        <f:form.textarea
+                            name="{field.propertyName}"
+                            id="{elementId}"
+                            value="{profile.{field.propertyName}}"
+                            class="form-control form-control-sm academic-persons-inline-edit__field"
+                            rows="{rows}"
+                            disabled="{field.validation.disabled ? 'disabled' : ''}"
+                            required="{field.validation.required ? 'required' : ''}"
+                            readonly="{field.validation.readOnly ? 'readonly' : ''}"
+                            aria-describedby="{elementId}-error"
+                            aria-invalid="false"
+                            data-ie-rich-text="true"
+                            data-ie-character-limit="{field.validation.characterLimit}" />
+                        <f:if condition="{field.validation.characterLimit}">
+                            <div
+                                id="{elementId}-character-counter"
+                                class="form-text text-end"
+                                aria-live="polite"
+                                data-ie-character-counter
+                                data-ie-for="{elementId}">
+                                0 / {field.validation.characterLimit}
+                            </div>
+                        </f:if>
+                    </f:then>
+                    <f:else>
+                        <f:form.textarea
+                            name="{field.propertyName}"
+                            id="{elementId}"
+                            value="{profile.{field.propertyName}}"
+                            class="form-control form-control-sm academic-persons-inline-edit__field"
+                            rows="{rows}"
+                            disabled="{field.validation.disabled ? 'disabled' : ''}"
+                            required="{field.validation.required ? 'required' : ''}"
+                            readonly="{field.validation.readOnly ? 'readonly' : ''}"
+                            aria-describedby="{elementId}-error"
+                            aria-invalid="false" />
+                    </f:else>
+                </f:if>
+            </div>
+        </f:then>
+        <f:else>
+            <f:form.textfield
+                name="{field.propertyName}"
+                id="{elementId}"
+                value="{profile.{field.propertyName}}"
+                type="{field.validation.inputType}"
+                class="flex-grow-1 w-100 form-control form-control-sm academic-persons-inline-edit__field"
+                disabled="{field.validation.disabled ? 'disabled' : ''}"
+                required="{field.validation.required ? 'required' : ''}"
+                readonly="{field.validation.readOnly ? 'readonly' : ''}"
+                aria-describedby="{elementId}-error"
+                aria-invalid="false"
+                autocomplete="{field.autocomplete}" />
+        </f:else>
+    </f:if>
+</html>

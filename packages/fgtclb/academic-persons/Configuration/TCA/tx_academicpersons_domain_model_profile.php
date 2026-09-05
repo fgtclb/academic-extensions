@@ -249,12 +249,13 @@ $tcaConfiguration = [
         ],
         'image' => [
             'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.image.label',
-            'l10n_mode' => 'exclude',
-            'l10n_display' => 'defaultAsReadonly',
             'config' => [
                 'type' => 'file',
                 'maxitems' => 1,
                 'allowed' => 'common-image-types',
+                'behaviour' => [
+                    'allowLanguageSynchronization' => true,
+                ],
             ],
         ],
         'contracts' => [
@@ -507,64 +508,70 @@ $tcaConfiguration = [
     ],
 ];
 
-// @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
-$settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
-if ($settings->profileInformationTypes !== []) {
-    foreach ($settings->profileInformationTypes as $type => $typeSettings) {
-        $columnIdentifier = $typeSettings->fieldName;
-        $tcaConfiguration['columns'][$columnIdentifier] = [
-            'label' => $typeSettings->label ?: $columnIdentifier,
-            'exclude' => true,
-            'config' => [
-                'type' => 'inline',
-                'appearance' => [
-                    'collapseAll' => true,
-                    'expandSingle' => false,
-                    'showNewRecordLink' => true,
-                    'newRecordLinkAddTitle' => true,
-                    'levelLinksPosition' => 'top',
-                    'useCombination' => false,
-                    'suppressCombinationWarning' => false,
-                    'useSortable' => true,
-                    'showPossibleLocalizationRecords' => true,
-                    'showAllLocalizationLink' => true,
-                    'showSynchronizationLink' => true,
-                    'enabledControls' => [
-                        'info' => true,
-                        'new' => true,
-                        'dragdrop' => true,
-                        'sort' => false,
-                        'hide' => true,
-                        'delete' => true,
-                        'localize' => true,
-                    ],
-                    'showPossibleRecordsSelector' => false,
-                    'elementBrowserEnabled' => false,
+// These relations are part of the Academic Persons domain model and are
+// configured from the shared Academic Persons settings.
+$profileInformationRelations = [
+    'scientific_research' => 'scientific_research',
+    'vita' => 'curriculum_vitae',
+    'memberships' => 'membership',
+    'cooperation' => 'cooperation',
+    'publications' => 'publication',
+    'lectures' => 'lecture',
+    'press_media' => 'press_media',
+];
+foreach ($profileInformationRelations as $columnIdentifier => $recordType) {
+    $tcaConfiguration['columns'][$columnIdentifier] = [
+        'label' => sprintf(
+            'LLL:EXT:academic_persons/Resources/Private/Language/'
+                . 'locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.%s.label',
+            $columnIdentifier,
+        ),
+        'exclude' => true,
+        'config' => [
+            'type' => 'inline',
+            'appearance' => [
+                'collapseAll' => true,
+                'expandSingle' => false,
+                'showNewRecordLink' => true,
+                'newRecordLinkAddTitle' => true,
+                'levelLinksPosition' => 'top',
+                'useCombination' => false,
+                'suppressCombinationWarning' => false,
+                'useSortable' => true,
+                'showPossibleLocalizationRecords' => true,
+                'showAllLocalizationLink' => true,
+                'showSynchronizationLink' => true,
+                'enabledControls' => [
+                    'info' => true,
+                    'new' => true,
+                    'dragdrop' => true,
+                    'sort' => false,
+                    'hide' => true,
+                    'delete' => true,
+                    'localize' => true,
                 ],
-                'enableCascadingDelete' => true,
-                'foreign_field' => 'profile',
-                'foreign_sortby' => 'sorting',
-                'foreign_table' => 'tx_academicpersons_domain_model_profile_information',
-                'foreign_match_fields' => [
-                    'type' => $typeSettings->type,
-                ],
-                'overrideChildTca' => [
-                    'columns' => [
-                        'type' => [
-                            'config' => [
-                                'default' => $typeSettings->type ?: '',
-                            ],
+                'showPossibleRecordsSelector' => false,
+                'elementBrowserEnabled' => false,
+            ],
+            'enableCascadingDelete' => true,
+            'foreign_field' => 'profile',
+            'foreign_sortby' => 'sorting',
+            'foreign_table' => 'tx_academicpersons_domain_model_profile_information',
+            'foreign_match_fields' => [
+                'type' => $recordType,
+            ],
+            'overrideChildTca' => [
+                'columns' => [
+                    'type' => [
+                        'config' => [
+                            'default' => $recordType,
                         ],
                     ],
                 ],
             ],
-        ];
-    }
+        ],
+    ];
 }
-ArrayUtility::mergeRecursiveWithOverrule(
-    $tcaConfiguration,
-    $settings->getValidationTcaTableConfig('profile'),
-);
 
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);
 // v14 makes suitable field types searchable by default. Keep the explicit
@@ -573,5 +580,11 @@ ArrayUtility::mergeRecursiveWithOverrule(
 if ((new \TYPO3\CMS\Core\Information\Typo3Version())->getMajorVersion() < 14) {
     $tcaConfiguration['ctrl']['searchFields'] = 'first_name,middle_name,last_name';
 }
+
+$settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
+ArrayUtility::mergeRecursiveWithOverrule(
+    $tcaConfiguration,
+    $settings->getProfileUpdateValidationTcaTableConfig(),
+);
 
 return $tcaConfiguration;

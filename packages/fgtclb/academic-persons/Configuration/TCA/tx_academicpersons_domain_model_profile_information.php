@@ -121,14 +121,17 @@ $tcaConfiguration = [
                 'max' => 2048,
             ],
         ],
+        // TYPO3 v13 and v14 both use the TCA datetime type for date-only fields.
+        // FormEngine renders the date picker via format=date, while dbType=date
+        // keeps native SQL DATE storage without a time or timezone conversion.
         'year' => [
             'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year.label',
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'min' => 0,
-                'max' => 9999,
+                'type' => 'datetime',
+                'format' => 'date',
+                'dbType' => 'date',
                 'nullable' => true,
             ],
         ],
@@ -137,9 +140,9 @@ $tcaConfiguration = [
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'min' => 0,
-                'max' => 9999,
+                'type' => 'datetime',
+                'format' => 'date',
+                'dbType' => 'date',
                 'nullable' => true,
             ],
         ],
@@ -148,9 +151,20 @@ $tcaConfiguration = [
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'min' => 0,
-                'max' => 9999,
+                'type' => 'datetime',
+                'format' => 'date',
+                'dbType' => 'date',
+                'nullable' => true,
+            ],
+        ],
+        'year_only' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year_only.label',
+            'l10n_mode' => 'exclude',
+            'l10n_display' => 'defaultAsReadonly',
+            'config' => [
+                'type' => 'check',
+                'renderType' => 'checkboxToggle',
+                'default' => 0,
             ],
         ],
         'sorting' => [
@@ -165,9 +179,10 @@ $tcaConfiguration = [
             'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.palette.date',
             'showitem' => implode(',', [
                 'year',
-                '--linebreak--',
                 'year_start',
                 'year_end',
+                '--linebreak--',
+                'year_only',
             ]),
         ],
         'language' => [
@@ -288,12 +303,6 @@ $tcaConfiguration = [
     ],
 ];
 
-// @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
-ArrayUtility::mergeRecursiveWithOverrule(
-    $tcaConfiguration,
-    GeneralUtility::makeInstance(AcademicPersonsSettings::class)->getValidationTcaTableConfig('profileInformation'),
-);
-
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);
 // v14 makes suitable field types searchable by default. Keep the explicit
 // inclusion list on v13, which still evaluates 'searchFields'.
@@ -301,5 +310,11 @@ ArrayUtility::mergeRecursiveWithOverrule(
 if ((new \TYPO3\CMS\Core\Information\Typo3Version())->getMajorVersion() < 14) {
     $tcaConfiguration['ctrl']['searchFields'] = 'title,description';
 }
+
+$settings = GeneralUtility::makeInstance(AcademicPersonsSettings::class);
+ArrayUtility::mergeRecursiveWithOverrule(
+    $tcaConfiguration,
+    $settings->getDocumentValidationTcaTypesConfig(),
+);
 
 return $tcaConfiguration;

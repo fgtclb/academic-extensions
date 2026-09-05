@@ -49,6 +49,7 @@ final class RecordingValidator extends AbstractValidator
             is_bool($value) => 'bool(' . ($value ? 'true' : 'false') . ')',
             is_int($value) => 'int(' . $value . ')',
             is_string($value) => 'string(' . $value . ')',
+            $value instanceof \DateTimeInterface => 'datetime(' . $value->format('Y-m-d') . ')',
             default => get_debug_type($value),
         };
     }

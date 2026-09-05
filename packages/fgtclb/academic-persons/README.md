@@ -49,7 +49,7 @@ The following profile data is available to users after installation:
     * Miscellaneous information
 * Profile timeline entries
     * All timeline entries allow the chronological presentation of content, usually
-      with a start and/or end year, a title, a short description and a link
+      with a start and/or end date, a title, a short description and a link
     * Research projects
     * Academic career
     * Memberships/committee activities
@@ -60,6 +60,19 @@ The following profile data is available to users after installation:
 
 The extension also provides some plugins to display the persons in the frontend
 as a list view and detail view for each person.
+
+The complete profile configuration is defined in
+`Configuration/AcademicPersons/Settings.yaml`. Its single `profile` section
+contains the public detail layout as well as the fields, render types and
+validators used by frontend editing, inline editing and backend TCA. The
+`special`, `contracts` and `documentSections` maps in the same file
+describe the remaining inline components and related records. Ordered Contract
+fields live below `contracts.fields`; email, telephone and address fields are
+grouped below `contracts.contactSections` and stored as contact records owned
+by an employment contract.
+Profile-information dates use native SQL `DATE` storage on TYPO3 13 and 14; a
+per-record `Show year only` switch can reduce their display to the four-digit
+year without changing the stored calendar date.
 
 > [!NOTE]
 > This extension is currently in beta state - please notice that there might be changes to the structure

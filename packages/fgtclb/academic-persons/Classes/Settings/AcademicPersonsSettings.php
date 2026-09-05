@@ -10,68 +10,371 @@ namespace FGTCLB\AcademicPersons\Settings;
  */
 final class AcademicPersonsSettings
 {
+    /** @var array<string, ProfileSection> */
+    public readonly array $profileSections;
+    /** @var array<string, SpecialField> */
+    public readonly array $specialFields;
+    /** @var array<string, ContractField> */
+    public readonly array $contractFields;
+    /** @var array<string, ContractContactSection> */
+    public readonly array $contractContactSections;
+    /** @var array<string, DocumentSection> */
+    public readonly array $documentSections;
+    public readonly PublicProfileSettings $publicProfile;
+    /** @var array<string, mixed> */
+    public readonly array $raw;
+
     /**
-     * @param array<string, ProfileInformationType> $profileInformationTypes
-     * @param array<string, ValidationSet> $validations
+     * @param array<string, ProfileSection> $profileSections
+     * @param array<string, SpecialField> $specialFields
+     * @param array<string, ContractField> $contractFields
+     * @param array<string, ContractContactSection> $contractContactSections
+     * @param array<string, DocumentSection> $documentSections
      * @param array<string, mixed> $raw
      */
     public function __construct(
-        public readonly array $profileInformationTypes,
-        public readonly array $validations,
-        public readonly array $raw,
-    ) {}
+        array $profileSections = [],
+        array $specialFields = [],
+        array $contractFields = [],
+        array $contractContactSections = [],
+        array $documentSections = [],
+        ?PublicProfileSettings $publicProfile = null,
+        array $raw = [],
+    ) {
+        $this->profileSections = $profileSections;
+        $this->specialFields = $specialFields;
+        $this->contractFields = $contractFields;
+        $this->contractContactSections = $contractContactSections;
+        $this->documentSections = $documentSections;
+        $this->publicProfile = $publicProfile ?? new PublicProfileSettings();
+        $this->raw = $raw;
+    }
 
     /**
      * @param array{
-     *     profileInformationTypes: array<string, ProfileInformationType>,
-     *     validations: array<string, ValidationSet>,
-     *     raw: array<string, mixed>,
+     *     profileSections?: array<string, ProfileSection>,
+     *     specialFields?: array<string, SpecialField>,
+     *     contractFields?: array<string, ContractField>,
+     *     contractContactSections?: array<string, ContractContactSection>,
+     *     documentSections?: array<string, DocumentSection>,
+     *     publicProfile?: PublicProfileSettings,
+     *     raw?: array<string, mixed>,
      * } $array
-     * @return self
      */
     public static function __set_state(array $array): self
     {
         return new self(
-            profileInformationTypes: $array['profileInformationTypes'],
-            validations: $array['validations'],
-            raw: $array['raw'],
+            profileSections: $array['profileSections'] ?? [],
+            specialFields: $array['specialFields'] ?? [],
+            contractFields: $array['contractFields'] ?? [],
+            contractContactSections: $array['contractContactSections'] ?? [],
+            documentSections: $array['documentSections'] ?? [],
+            publicProfile: $array['publicProfile'] ?? null,
+            raw: $array['raw'] ?? [],
         );
     }
 
-    public function getProfileInformationType(string $identifier): ?ProfileInformationType
+    public function getPublicProfile(): PublicProfileSettings
     {
-        return $this->profileInformationTypes[$identifier] ?? null;
+        return $this->publicProfile;
     }
 
-    public function getValidationSet(string $identifier): ?ValidationSet
+    public function getProfileSection(string $identifier): ?ProfileSection
     {
-        return $this->validations[$identifier] ?? null;
+        return $this->profileSections[$identifier] ?? null;
+    }
+
+    public function getProfileSectionOrEmpty(string $identifier): ProfileSection
+    {
+        return $this->getProfileSection($identifier) ?? new ProfileSection(
+            identifier: $identifier,
+            fields: [],
+            validationSet: new ValidationSet(identifier: $identifier, validations: []),
+            position: count($this->profileSections),
+        );
+    }
+
+    public function getProfileField(string $identifier): ?ProfileField
+    {
+        foreach ($this->profileSections as $section) {
+            $field = $section->getField($identifier);
+            if ($field !== null) {
+                return $field;
+            }
+            foreach ($section->fields as $candidate) {
+                if ($candidate->propertyName === $identifier) {
+                    return $candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    public function getSpecialField(string $identifier): ?SpecialField
+    {
+        return $this->specialFields[$identifier] ?? null;
+    }
+
+    public function getContractField(string $identifier): ?ContractField
+    {
+        $field = $this->contractFields[$identifier] ?? null;
+        if ($field !== null) {
+            return $field;
+        }
+        foreach ($this->contractFields as $candidate) {
+            if ($candidate->propertyName === $identifier) {
+                return $candidate;
+            }
+        }
+        return null;
+    }
+
+    public function getContractContactSection(string $identifier): ?ContractContactSection
+    {
+        return $this->contractContactSections[$identifier] ?? null;
+    }
+
+    public function getContractContactField(string $identifier): ?ContractContactField
+    {
+        foreach ($this->contractContactSections as $section) {
+            $field = $section->getField($identifier);
+            if ($field !== null) {
+                return $field;
+            }
+            foreach ($section->fields as $candidate) {
+                if ($candidate->propertyName === $identifier) {
+                    return $candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    public function getDocumentSection(string $identifier): ?DocumentSection
+    {
+        return $this->documentSections[$identifier] ?? null;
+    }
+
+    public function getDocumentSectionByType(string $type): ?DocumentSection
+    {
+        foreach ($this->documentSections as $section) {
+            if ($section->type === $type) {
+                return $section;
+            }
+        }
+        return null;
+    }
+
+    public function getProfileValidationSet(?string $sectionIdentifier = null): ValidationSet
+    {
+        $identifier = $sectionIdentifier ?? 'profile';
+        if ($sectionIdentifier !== null) {
+            return $this->getProfileSection($sectionIdentifier)?->validationSet
+                ?? new ValidationSet(identifier: $identifier, validations: []);
+        }
+        $validations = [];
+        foreach ($this->profileSections as $section) {
+            $validations = array_replace($validations, $section->validationSet->validations);
+        }
+        return new ValidationSet(identifier: 'profile', validations: $validations);
     }
 
     /**
-     * Returns empty validation set in case `$identifier` is not registered,
-     * otherwise returns registered and configured validation set.
+     * Returns every validation that may participate in the inline Profile JSON
+     * update, including direct special properties such as `skipSync`.
      */
-    public function getValidationSetWithFallback(string $identifier): ValidationSet
+    public function getProfileUpdateValidationSet(): ValidationSet
     {
-        return $this->getValidationSet($identifier)
-            ?? new ValidationSet(
-                identifier: $identifier,
-                validations: [],
-            );
+        $validations = $this->getProfileValidationSet()->validations;
+        foreach ($this->specialFields as $field) {
+            if ($field->hasDirectProfileProperty()) {
+                $validations[$field->identifier] = $field->validation;
+            }
+        }
+        return new ValidationSet(identifier: 'profileUpdate', validations: $validations);
+    }
+
+    /**
+     * @param list<string> $fieldIdentifiers
+     */
+    public function getProfileValidationSetForFields(array $fieldIdentifiers, string $sectionIdentifier): ValidationSet
+    {
+        $section = $this->getProfileSection($sectionIdentifier);
+        return new ValidationSet(
+            identifier: $sectionIdentifier,
+            validations: $section === null
+                ? []
+                : $this->collectProfileValidations($fieldIdentifiers, $section),
+        );
+    }
+
+    public function getContractContactValidationSet(string $sectionIdentifier): ValidationSet
+    {
+        return $this->getContractContactSection($sectionIdentifier)?->validationSet
+            ?? new ValidationSet(identifier: $sectionIdentifier, validations: []);
+    }
+
+    /**
+     * @param list<string> $fieldIdentifiers
+     */
+    public function getContractContactValidationSetForFields(
+        array $fieldIdentifiers,
+        string $sectionIdentifier,
+    ): ValidationSet {
+        $section = $this->getContractContactSection($sectionIdentifier);
+        return new ValidationSet(
+            identifier: $sectionIdentifier,
+            validations: $section === null
+                ? []
+                : $this->collectContractContactValidations($fieldIdentifiers, $section),
+        );
+    }
+
+    public function getDocumentValidationSet(string $sectionIdentifier): ValidationSet
+    {
+        return $this->getDocumentSection($sectionIdentifier)?->validationSet
+            ?? new ValidationSet(identifier: $sectionIdentifier, validations: []);
+    }
+
+    public function getDocumentValidationSetByType(string $type): ValidationSet
+    {
+        return $this->getDocumentSectionByType($type)?->validationSet
+            ?? new ValidationSet(identifier: $type, validations: []);
+    }
+
+    /**
+     * @param list<string> $fieldIdentifiers
+     * @param non-empty-string|null $sectionIdentifier
+     * @return array<string, mixed>
+     */
+    public function getProfileValidationTcaTableConfig(
+        array $fieldIdentifiers = [],
+        ?string $sectionIdentifier = null,
+    ): array {
+        $validationSet = match (true) {
+            $fieldIdentifiers === [] => $this->getProfileValidationSet($sectionIdentifier),
+            $sectionIdentifier !== null => $this->getProfileValidationSetForFields(
+                $fieldIdentifiers,
+                $sectionIdentifier,
+            ),
+            default => new ValidationSet(
+                identifier: 'profile',
+                validations: $this->collectProfileValidations($fieldIdentifiers),
+            ),
+        };
+        return $this->buildValidationTcaTableConfig($validationSet);
     }
 
     /**
      * @return array<string, mixed>
-     * @todo TCA Array should be handed over as argument and changes directly made, returning the array.
-     * @todo Should be called in TCA Override files OR as part of an event listener and not in main TCA files.
      */
-    public function getValidationTcaTableConfig(string $identifier): array
+    public function getProfileUpdateValidationTcaTableConfig(): array
     {
-        $validationSet = $this->validations[$identifier] ?? null;
-        if (! $validationSet instanceof ValidationSet) {
-            return [];
+        return $this->buildValidationTcaTableConfig($this->getProfileUpdateValidationSet());
+    }
+
+    /**
+     * @param list<string> $fieldIdentifiers
+     * @return array<string, mixed>
+     */
+    public function getContractContactValidationTcaTableConfig(
+        array $fieldIdentifiers,
+        string $sectionIdentifier,
+    ): array {
+        return $this->buildValidationTcaTableConfig(
+            $this->getContractContactValidationSetForFields($fieldIdentifiers, $sectionIdentifier),
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDocumentValidationTcaTypesConfig(): array
+    {
+        $configuration = [];
+        foreach ($this->documentSections as $section) {
+            if ($section->isContractSection()) {
+                continue;
+            }
+            foreach ($section->validationSet->validations as $validation) {
+                if ($validation->tcaConfig !== []) {
+                    $configuration['types'][$section->type]['columnsOverrides'][$validation->fieldName]['config']
+                        = $validation->tcaConfig;
+                }
+            }
         }
+        return $configuration;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getDocumentValidationTcaTableConfig(string $sectionIdentifier): array
+    {
+        return $this->buildValidationTcaTableConfig($this->getDocumentValidationSet($sectionIdentifier));
+    }
+
+    /**
+     * @param list<string> $fieldIdentifiers
+     * @return array<string, Validation>
+     */
+    private function collectProfileValidations(
+        array $fieldIdentifiers,
+        ?ProfileSection $section = null,
+    ): array {
+        $validations = [];
+        $sections = $section === null ? $this->profileSections : [$section];
+        foreach ($fieldIdentifiers as $fieldIdentifier) {
+            foreach ($sections as $candidateSection) {
+                $field = $candidateSection->getField($fieldIdentifier);
+                if ($field === null) {
+                    foreach ($candidateSection->fields as $candidate) {
+                        if ($candidate->propertyName === $fieldIdentifier) {
+                            $field = $candidate;
+                            break;
+                        }
+                    }
+                }
+                if ($field !== null) {
+                    $validations[$field->propertyName] = $field->validation;
+                    break;
+                }
+            }
+        }
+        return $validations;
+    }
+
+    /**
+     * @param list<string> $fieldIdentifiers
+     * @return array<string, Validation>
+     */
+    private function collectContractContactValidations(
+        array $fieldIdentifiers,
+        ContractContactSection $section,
+    ): array {
+        $validations = [];
+        foreach ($fieldIdentifiers as $fieldIdentifier) {
+            $field = $section->getField($fieldIdentifier);
+            if ($field === null) {
+                foreach ($section->fields as $candidate) {
+                    if ($candidate->propertyName === $fieldIdentifier) {
+                        $field = $candidate;
+                        break;
+                    }
+                }
+            }
+            if ($field !== null) {
+                $validations[$field->propertyName] = $field->validation;
+            }
+        }
+        return $validations;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildValidationTcaTableConfig(ValidationSet $validationSet): array
+    {
         $tableTca = [];
         foreach ($validationSet->validations as $validation) {
             if ($validation->tcaConfig !== []) {

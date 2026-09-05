@@ -65,6 +65,23 @@ final class ProfileInformationTest extends UnitTestCase
     }
 
     #[Test]
+    public function completeDatesAndYearOnlyFlagRoundTripWithoutTimeConversion(): void
+    {
+        $year = new \DateTime('2026-04-17');
+        $yearStart = new \DateTime('2024-02-29');
+        $yearEnd = new \DateTime('2028-12-31');
+        $subject = (new ProfileInformation())
+            ->setYear($year)
+            ->setYearStart($yearStart)
+            ->setYearEnd($yearEnd)
+            ->setYearOnly(true);
+        $this->assertSame($year, $subject->getYear());
+        $this->assertSame($yearStart, $subject->getYearStart());
+        $this->assertSame($yearEnd, $subject->getYearEnd());
+        $this->assertTrue($subject->isYearOnly());
+    }
+
+    #[Test]
     public function getSortingReturnsIntegerZeroForNewModel(): void
     {
         $this->assertSame(0, (new ProfileInformation())->getSorting());

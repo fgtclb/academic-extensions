@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FGTCLB\AcademicPersons\Settings;
 
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
@@ -16,6 +18,7 @@ final class Validation
      * @param string $identifier
      * @param class-string<ValidatorInterface>[] $validatorClassNames
      * @param array<string, mixed> $tcaConfig
+     * @param list<string> $flags
      */
     public function __construct(
         public readonly string $identifier,
@@ -26,6 +29,8 @@ final class Validation
         public readonly array $validatorClassNames,
         public readonly array $tcaConfig,
         public readonly string $inputType = '',
+        public readonly array $flags = [],
+        public readonly int $characterLimit = 0,
     ) {}
 
     /**
@@ -38,6 +43,8 @@ final class Validation
      *     validatorClassNames: class-string<ValidatorInterface>[],
      *     tcaConfig: array<string, mixed>,
      *     inputType: string,
+     *     flags?: list<string>,
+     *     characterLimit?: int,
      * } $array
      * @return self
      */
@@ -52,6 +59,13 @@ final class Validation
             validatorClassNames: $array['validatorClassNames'],
             tcaConfig: $array['tcaConfig'],
             inputType: $array['inputType'],
+            flags: $array['flags'] ?? [],
+            characterLimit: $array['characterLimit'] ?? 0,
         );
+    }
+
+    public function isRichText(): bool
+    {
+        return in_array('html', $this->flags, true);
     }
 }

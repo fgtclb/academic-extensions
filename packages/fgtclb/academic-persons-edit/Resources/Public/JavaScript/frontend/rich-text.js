@@ -10,23 +10,34 @@ const editorConfig = {
     { name: "clipboard", groups: ["cleanup"] }
   ],
   customConfig: "",
-  removeButtons: [
-    "Strike",
-    "Subscript",
-    "Superscript"
-  ]
+  removeButtons: ["Strike", "Subscript", "Superscript"]
 };
-const editor = () => window.CKEDITOR;
-const waitForEditor = window.setInterval(() => {
-  const ckeditor = editor();
+const getEditor = () => window.CKEDITOR;
+const initializeEditors = (scope = document, ckeditor = getEditor()) => {
   if (ckeditor === void 0) {
-    return;
+    return false;
   }
-  window.clearInterval(waitForEditor);
-  document.querySelectorAll(".rich-text").forEach((textarea) => {
+  scope.querySelectorAll(".rich-text").forEach((textarea) => {
     const identifier = textarea.getAttribute("id");
     if (identifier !== null) {
       ckeditor.replace(identifier, editorConfig);
     }
   });
+  return true;
+};
+const waitForEditor = window.setInterval(() => {
+  pollForEditor();
 }, 100);
+const pollForEditor = () => {
+  const ckeditor = getEditor();
+  if (!initializeEditors(document, ckeditor)) {
+    return;
+  }
+  window.clearInterval(waitForEditor);
+};
+export {
+  editorConfig,
+  getEditor,
+  initializeEditors,
+  pollForEditor
+};

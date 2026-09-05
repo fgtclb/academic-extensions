@@ -11,7 +11,7 @@ use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
 
 /**
  * @todo Class naming (factory) and usage does not make much sense. Reconsider and adopt before making this API.
- * @internal to be used only in `EXT:academic_person_edit` and not part of public API. May change at any time.
+ * @internal to be used only in `EXT:academic_persons_edit` and not part of public API. May change at any time.
  */
 class ProfileInformationFactory
 {
@@ -26,6 +26,7 @@ class ProfileInformationFactory
         $profileInformation = $this->setYear($validationSet, $profileInformation, $form);
         $profileInformation = $this->setYearStart($validationSet, $profileInformation, $form);
         $profileInformation = $this->setYearEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setYearOnly($validationSet, $profileInformation, $form);
         return $profileInformation;
     }
 
@@ -38,13 +39,14 @@ class ProfileInformationFactory
         $profileInformation = $this->setYear($validationSet, $profileInformation, $form);
         $profileInformation = $this->setYearStart($validationSet, $profileInformation, $form);
         $profileInformation = $this->setYearEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setYearOnly($validationSet, $profileInformation, $form);
         return $profileInformation;
     }
 
     /**
      * A value is applied to the domain model only when the property may be written
-     * (not readOnly / disabled by validation configuration) and has been sent within
-     * the current request or registered as override on the form data object.
+     * (not readOnly / disabled by validation configuration) and was explicitly
+     * registered as an override by the JSON request handler.
      */
     private function mayApplyProperty(ValidationSet $validationSet, ProfileInformationFormData $form, string $propertyName): bool
     {
@@ -53,8 +55,8 @@ class ProfileInformationFactory
             // ReadOnly or disabled: keep existing persisted data and ignore the submitted value.
             return false;
         }
-        // Only apply values sent within the current request or registered as override
-        // (e.g. filled up by a PSR-14 event from another source before transformation).
+        // Only apply explicitly registered overrides. A PSR-14 listener may replace
+        // such an override before the transformation runs.
         return $form->shouldApplyProperty($propertyName);
     }
 
@@ -105,7 +107,7 @@ class ProfileInformationFactory
     {
         if ($this->mayApplyProperty($validationSet, $form, 'year')) {
             $override = $form->getPropertyOverride('year');
-            $model->setYear(is_int($override) ? $override : $form->getYear());
+            $model->setYear($override instanceof \DateTime ? $override : $form->getYear());
         }
         return $model;
     }
@@ -114,7 +116,7 @@ class ProfileInformationFactory
     {
         if ($this->mayApplyProperty($validationSet, $form, 'yearStart')) {
             $override = $form->getPropertyOverride('yearStart');
-            $model->setYearStart(is_int($override) ? $override : $form->getYearStart());
+            $model->setYearStart($override instanceof \DateTime ? $override : $form->getYearStart());
         }
         return $model;
     }
@@ -123,7 +125,16 @@ class ProfileInformationFactory
     {
         if ($this->mayApplyProperty($validationSet, $form, 'yearEnd')) {
             $override = $form->getPropertyOverride('yearEnd');
-            $model->setYearEnd(is_int($override) ? $override : $form->getYearEnd());
+            $model->setYearEnd($override instanceof \DateTime ? $override : $form->getYearEnd());
+        }
+        return $model;
+    }
+
+    private function setYearOnly(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    {
+        if ($this->mayApplyProperty($validationSet, $form, 'yearOnly')) {
+            $override = $form->getPropertyOverride('yearOnly');
+            $model->setYearOnly(is_bool($override) ? $override : $form->isYearOnly());
         }
         return $model;
     }

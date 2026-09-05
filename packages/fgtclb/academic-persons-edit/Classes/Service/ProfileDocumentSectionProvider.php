@@ -1,0 +1,164 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the "academic_persons_edit" Extension for TYPO3 CMS.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
+namespace FGTCLB\AcademicPersonsEdit\Service;
+
+use FGTCLB\AcademicPersons\Domain\Model\Contract;
+use FGTCLB\AcademicPersons\Domain\Model\Profile;
+use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
+use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
+use FGTCLB\AcademicPersons\Settings\DocumentSection;
+use FGTCLB\AcademicPersons\Settings\Validation;
+use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
+
+/**
+ * Builds the inline view model in the exact order of documentSections.
+ */
+final class ProfileDocumentSectionProvider
+{
+    private const HELPTEXT_FIELD_ALIASES = [
+        'yearStart' => 'from',
+        'yearEnd' => 'to',
+        'validFrom' => 'from',
+        'validTo' => 'to',
+        'bodytext' => 'description',
+    ];
+
+    public function __construct(
+        private readonly AcademicPersonsSettings $academicPersonsSettings,
+    ) {}
+
+    /**
+     * @return list<array{
+     *     identifier: string,
+     *     fieldName: string,
+     *     type: string,
+     *     label: string,
+     *     kind: 'contract'|'profileInformation',
+     *     dateMode: 'date'|'range'|'year'|'start',
+     *     readOnly: bool,
+     *     rowFields: list<string>,
+     *     actions: list<string>,
+     *     canCreate: bool,
+     *     sortable: bool,
+     *     validations: array<string, Validation>,
+     *     position: int,
+     *     items: list<Contract|ProfileInformation>
+     * }>
+     */
+    public function getSections(Profile $profile): array
+    {
+        $sections = [];
+        foreach ($this->academicPersonsSettings->documentSections as $section) {
+            $contractSection = $section->isContractSection();
+            $sections[] = [
+                'identifier' => $section->identifier,
+                'fieldName' => $section->fieldName,
+                'type' => $section->type,
+                'label' => $section->label,
+                'kind' => $contractSection ? 'contract' : 'profileInformation',
+                'dateMode' => $contractSection ? 'date' : $this->getDateMode($section),
+                'readOnly' => $section->readOnly,
+                'rowFields' => $section->rowFields,
+                'actions' => $section->getAllowedActions(),
+                'canCreate' => $section->allowsCreate(),
+                'sortable' => $section->allowsDragSorting(),
+                'validations' => $section->validationSet->validations,
+                'position' => $section->position,
+                'items' => $contractSection
+                    ? $this->getContractItems($profile)
+                    : $this->getProfileInformationItems($profile, $section),
+            ];
+        }
+        return $sections;
+    }
+
+    /**
+     * @return list<Contract>
+     */
+    private function getContractItems(Profile $profile): array
+    {
+        return array_values(array_filter(
+            $profile->getContracts()->toArray(),
+            static fn(mixed $item): bool => $item instanceof Contract,
+        ));
+    }
+
+    /**
+     * @return list<ProfileInformation>
+     */
+    private function getProfileInformationItems(Profile $profile, DocumentSection $section): array
+    {
+        $getter = 'get' . str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $section->fieldName)));
+        if (!is_callable([$profile, $getter])) {
+            return [];
+        }
+        $items = $profile->{$getter}();
+        if (!$items instanceof ObjectStorage) {
+            return [];
+        }
+        return array_values(array_filter(
+            $items->toArray(),
+            static fn(mixed $item): bool => $item instanceof ProfileInformation,
+        ));
+    }
+
+    /**
+     * @return 'range'|'year'|'start'
+     */
+    private function getDateMode(DocumentSection $section): string
+    {
+        return match ($section->type) {
+            'cooperation', 'membership', 'scientific_research' => 'range',
+            'curriculum_vitae' => 'start',
+            default => 'year',
+        };
+    }
+
+    /**
+     * @return string
+     */
+    public function getFieldHelptext(DocumentSection $section, string $fieldName): string
+    {
+        if ($section->isContractSection()) {
+            $contractField = $this->academicPersonsSettings->getContractField($fieldName);
+            if ($contractField !== null) {
+                return $contractField->helptext;
+            }
+        }
+        $sectionSettings = $this->academicPersonsSettings->raw['documentSections'][$section->identifier] ?? null;
+        if (!is_array($sectionSettings)) {
+            return '';
+        }
+        $sectionType = $sectionSettings['type'] ?? null;
+        $referencedSettings = is_string($sectionType)
+            ? ($this->academicPersonsSettings->raw[$sectionType] ?? null)
+            : null;
+        if (is_array($referencedSettings)) {
+            $sectionSettings = array_replace($referencedSettings, $sectionSettings);
+        }
+        $fields = $sectionSettings['fields'] ?? null;
+        if (is_array($fields)) {
+            $fieldSettings = $fields[$fieldName] ?? null;
+            if (is_array($fieldSettings)) {
+                $helptext = $fieldSettings['helptext'] ?? '';
+                return is_string($helptext) ? $helptext : '';
+            }
+        }
+        $helptexts = $sectionSettings['helptext'] ?? null;
+        if (!is_array($helptexts)) {
+            return '';
+        }
+        $configurationFieldName = self::HELPTEXT_FIELD_ALIASES[$fieldName] ?? $fieldName;
+        $helptext = $helptexts[$configurationFieldName] ?? '';
+        return is_string($helptext) ? $helptext : '';
+    }
+}

@@ -11,12 +11,17 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersons\Hook;
 
+use FGTCLB\AcademicPersons\Service\ProfileImageMetadataService;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class DataHandlerHooks
 {
+    public function __construct(
+        private readonly ProfileImageMetadataService $profileImageMetadataService,
+    ) {}
+
     public function processDatamap_beforeStart(DataHandler $dataHandler): void
     {
         $this->setAlphaValuesForProfile($dataHandler);
@@ -32,14 +37,20 @@ final class DataHandlerHooks
         array $fieldArray,
         DataHandler $dataHandler
     ): void {
-        if ($table !== 'tx_academicpersons_domain_model_profile' || $status !== 'update') {
+        if ($table !== 'tx_academicpersons_domain_model_profile'
+            || !in_array($status, ['new', 'update'], true)
+        ) {
             return;
         }
 
+        $profileUid = (int)($dataHandler->substNEWwithIDs[$id] ?? $id);
+        if (array_intersect(['title', 'first_name', 'middle_name', 'last_name'], array_keys($fieldArray)) !== []) {
+            $this->profileImageMetadataService->updateForProfileUid($profileUid);
+        }
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $cacheManager->flushCachesByTags([
             'profile_list_view',
-            sprintf('profile_detail_view_%d', $id),
+            sprintf('profile_detail_view_%d', $profileUid),
         ]);
     }
 

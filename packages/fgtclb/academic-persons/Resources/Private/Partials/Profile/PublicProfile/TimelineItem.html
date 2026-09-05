@@ -1,0 +1,57 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<article class="academic-persons-detail__timeline-item">
+    <f:variable
+        name="dateFormat"
+        value="{f:if(condition: item.yearOnly, then: 'Y', else: 'd.m.Y')}" />
+    <f:if condition="{item.year} || {item.yearStart} || {item.yearEnd}">
+        <p class="academic-persons-detail__timeline-date">
+            <f:if condition="{item.year}">
+                <f:then><f:format.date format="{dateFormat}">{item.year}</f:format.date></f:then>
+                <f:else>
+                    <f:if condition="{item.yearStart}">
+                        <f:then>
+                            <f:if condition="{item.yearEnd}">
+                                <f:then>
+                                    <f:format.date format="{dateFormat}">{item.yearStart}</f:format.date>
+                                    –<f:format.date format="{dateFormat}">{item.yearEnd}</f:format.date>
+                                </f:then>
+                                <f:else>
+                                    <f:translate key="detail.since" extensionName="academic_persons" />
+                                    <f:format.date format="{dateFormat}">{item.yearStart}</f:format.date>
+                                </f:else>
+                            </f:if>
+                        </f:then>
+                        <f:else if="{item.yearEnd}">
+                            <f:translate key="detail.till" extensionName="academic_persons" />
+                            <f:format.date format="{dateFormat}">{item.yearEnd}</f:format.date>
+                        </f:else>
+                    </f:if>
+                </f:else>
+            </f:if>
+        </p>
+    </f:if>
+    <f:if condition="{item.title}">
+        <h3 class="academic-persons-detail__timeline-title">
+            <f:if condition="{item.link}">
+                <f:then>
+                    <f:link.typolink
+                        parameter="{item.link}"
+                        class="academic-persons-detail__timeline-link"
+                    >{item.title}</f:link.typolink>
+                </f:then>
+                <f:else>{item.title}</f:else>
+            </f:if>
+        </h3>
+    </f:if>
+    <f:if condition="{item.bodytext}">
+        <div class="academic-persons-detail__timeline-copy">
+            {item.bodytext -> f:format.html()}
+        </div>
+    </f:if>
+</article>
+
+</html>

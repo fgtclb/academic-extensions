@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Domain\Validator;
 
+use FGTCLB\AcademicPersons\Settings\ValidationSet;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileFormData;
 use FGTCLB\AcademicPersonsEdit\Exception\UnsuitableValidatorException;
 
 /**
- * @internal to be used only in `EXT:academic_person_edit` and not part of public API. May change at any time.
+ * @internal to be used only in `EXT:academic_persons_edit` and not part of public API. May change at any time.
  */
 final class ProfileFormDataValidator extends AbstractFormDataValidator
 {
@@ -25,6 +26,34 @@ final class ProfileFormDataValidator extends AbstractFormDataValidator
             );
         }
 
-        $this->processValidations($profileFormData, 'profile');
+        foreach ($this->getAcademicPersonsSettings()->profileSections as $section) {
+            $validations = array_filter(
+                $section->validationSet->validations,
+                static fn(mixed $validation, string $property): bool => $profileFormData->_hasProperty($property)
+                    && $profileFormData->shouldApplyProperty($property),
+                ARRAY_FILTER_USE_BOTH,
+            );
+            $this->processValidationSet(
+                $profileFormData,
+                new ValidationSet(
+                    identifier: $section->identifier,
+                    validations: $validations,
+                ),
+            );
+        }
+        $specialValidations = [];
+        foreach ($this->getAcademicPersonsSettings()->specialFields as $field) {
+            if (
+                $field->hasDirectProfileProperty()
+                && $profileFormData->_hasProperty($field->identifier)
+                && $profileFormData->shouldApplyProperty($field->identifier)
+            ) {
+                $specialValidations[$field->identifier] = $field->validation;
+            }
+        }
+        $this->processValidationSet(
+            $profileFormData,
+            new ValidationSet(identifier: 'special', validations: $specialValidations),
+        );
     }
 }

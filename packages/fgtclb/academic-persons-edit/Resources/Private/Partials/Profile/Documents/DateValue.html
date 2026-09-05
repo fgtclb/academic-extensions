@@ -1,0 +1,17 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <f:variable
+        name="dateFormat"
+        value="{f:if(condition: yearOnly, then: 'Y', else: 'd.m.Y')}" />
+    <f:if condition="{value}">
+        <f:then><f:format.date format="{dateFormat}">{value}</f:format.date></f:then>
+        <f:else>
+            <f:if condition="{fallback}">
+                <f:then><f:format.date format="{dateFormat}">{fallback}</f:format.date></f:then>
+                <f:else>—</f:else>
+            </f:if>
+        </f:else>
+    </f:if>
+</html>
