@@ -7,7 +7,7 @@ namespace FGTCLB\AcademicPersonsEdit\Domain\Model\Dto;
 use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation;
 
 /**
- * @internal to be used only in `EXT:academic_person_edit` and not part of public API. May change at any time.
+ * @internal to be used only in `EXT:academic_persons_edit` and not part of public API. May change at any time.
  */
 class ProfileInformationFormData extends AbstractFormData
 {
@@ -15,26 +15,29 @@ class ProfileInformationFormData extends AbstractFormData
     protected string $title = '';
     protected string $bodytext = '';
     protected string $link = '';
-    protected ?int $year = null;
-    protected ?int $yearStart = null;
-    protected ?int $yearEnd = null;
+    protected ?\DateTime $date = null;
+    protected ?\DateTime $dateStart = null;
+    protected ?\DateTime $dateEnd = null;
+    protected bool $yearOnly = false;
 
     public function __construct(
         string $type = '',
         string $title = '',
         string $bodytext = '',
         string $link = '',
-        ?int $year = null,
-        ?int $yearStart = null,
-        ?int $yearEnd = null
+        ?\DateTime $date = null,
+        ?\DateTime $dateStart = null,
+        ?\DateTime $dateEnd = null,
+        bool $yearOnly = false
     ) {
         $this->type = $type;
         $this->title = $title;
         $this->bodytext = $bodytext;
         $this->link = $link;
-        $this->year = $year;
-        $this->yearStart = $yearStart;
-        $this->yearEnd = $yearEnd;
+        $this->date = $date;
+        $this->dateStart = $dateStart;
+        $this->dateEnd = $dateEnd;
+        $this->yearOnly = $yearOnly;
     }
 
     public static function createEmptyForType(string $type): self
@@ -51,9 +54,10 @@ class ProfileInformationFormData extends AbstractFormData
         $instance->title = $profileInformation->getTitle();
         $instance->bodytext = $profileInformation->getBodytext();
         $instance->link = $profileInformation->getLink();
-        $instance->year = $profileInformation->getYear();
-        $instance->yearStart = $profileInformation->getYearStart();
-        $instance->yearEnd = $profileInformation->getYearEnd();
+        $instance->date = $profileInformation->getDate();
+        $instance->dateStart = $profileInformation->getDateStart();
+        $instance->dateEnd = $profileInformation->getDateEnd();
+        $instance->yearOnly = $profileInformation->isYearOnly();
         return $instance;
     }
 
@@ -77,18 +81,23 @@ class ProfileInformationFormData extends AbstractFormData
         return $this->link;
     }
 
-    public function getYear(): ?int
+    public function getDate(): ?\DateTime
     {
-        return $this->year;
+        return $this->date;
     }
 
-    public function getYearStart(): ?int
+    public function getDateStart(): ?\DateTime
     {
-        return $this->yearStart;
+        return $this->dateStart;
     }
 
-    public function getYearEnd(): ?int
+    public function getDateEnd(): ?\DateTime
     {
-        return $this->yearEnd;
+        return $this->dateEnd;
+    }
+
+    public function isYearOnly(): bool
+    {
+        return $this->yearOnly;
     }
 }

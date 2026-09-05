@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Domain\Factory;
 
+use FGTCLB\AcademicBase\Settings\ValidationSet;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
 use FGTCLB\AcademicPersons\Domain\Model\ProfileInformation as ProfileInformationModel;
-use FGTCLB\AcademicPersons\Settings\ValidationSet;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ProfileInformationFormData;
 
 /**
  * @todo Class naming (factory) and usage does not make much sense. Reconsider and adopt before making this API.
- * @internal to be used only in `EXT:academic_person_edit` and not part of public API. May change at any time.
+ * @internal to be used only in `EXT:academic_persons_edit` and not part of public API. May change at any time.
  */
 class ProfileInformationFactory
 {
@@ -23,9 +23,10 @@ class ProfileInformationFactory
         $profileInformation = $this->setTitle($validationSet, $profileInformation, $form);
         $profileInformation = $this->setBodytext($validationSet, $profileInformation, $form);
         $profileInformation = $this->setLink($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYear($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYearStart($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYearEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDate($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDateStart($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDateEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setYearOnly($validationSet, $profileInformation, $form);
         return $profileInformation;
     }
 
@@ -35,9 +36,10 @@ class ProfileInformationFactory
         $profileInformation = $this->setTitle($validationSet, $profileInformation, $form);
         $profileInformation = $this->setBodytext($validationSet, $profileInformation, $form);
         $profileInformation = $this->setLink($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYear($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYearStart($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYearEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDate($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDateStart($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDateEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setYearOnly($validationSet, $profileInformation, $form);
         return $profileInformation;
     }
 
@@ -101,29 +103,38 @@ class ProfileInformationFactory
         return $model;
     }
 
-    private function setYear(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    private function setDate(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
     {
-        if ($this->mayApplyProperty($validationSet, $form, 'year')) {
-            $override = $form->getPropertyOverride('year');
-            $model->setYear(is_int($override) ? $override : $form->getYear());
+        if ($this->mayApplyProperty($validationSet, $form, 'date')) {
+            $override = $form->getPropertyOverride('date');
+            $model->setDate($override instanceof \DateTime ? $override : $form->getDate());
         }
         return $model;
     }
 
-    private function setYearStart(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    private function setDateStart(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
     {
-        if ($this->mayApplyProperty($validationSet, $form, 'yearStart')) {
-            $override = $form->getPropertyOverride('yearStart');
-            $model->setYearStart(is_int($override) ? $override : $form->getYearStart());
+        if ($this->mayApplyProperty($validationSet, $form, 'dateStart')) {
+            $override = $form->getPropertyOverride('dateStart');
+            $model->setDateStart($override instanceof \DateTime ? $override : $form->getDateStart());
         }
         return $model;
     }
 
-    private function setYearEnd(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    private function setDateEnd(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
     {
-        if ($this->mayApplyProperty($validationSet, $form, 'yearEnd')) {
-            $override = $form->getPropertyOverride('yearEnd');
-            $model->setYearEnd(is_int($override) ? $override : $form->getYearEnd());
+        if ($this->mayApplyProperty($validationSet, $form, 'dateEnd')) {
+            $override = $form->getPropertyOverride('dateEnd');
+            $model->setDateEnd($override instanceof \DateTime ? $override : $form->getDateEnd());
+        }
+        return $model;
+    }
+
+    private function setYearOnly(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    {
+        if ($this->mayApplyProperty($validationSet, $form, 'yearOnly')) {
+            $override = $form->getPropertyOverride('yearOnly');
+            $model->setYearOnly(is_bool($override) ? $override : $form->isYearOnly());
         }
         return $model;
     }

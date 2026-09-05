@@ -68,15 +68,15 @@ carries one thing: the **persisted default-language profile**. Listeners read
 the database, not the object, so a dispatch is only meaningful after
 `persistAll()`, with a real uid, and never for a translation overlay.
 
-| Dispatch site                                                                | Context                                                                                                 | Notes                                                               |
-|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
-| `AbstractProfileFactory::createProfileForUser()` (persons)                   | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | The only in-repo dispatch between 2.0 and 3.0                       |
-| `AbstractProfileFactory::updateProfileForUser()` (persons)                   | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | Dispatches per profile the update ran through (ACE-490)             |
-| `AbstractActionController::persistAndDispatchProfileUpdate()` (persons_edit) | Every frontend editing action that persists a change to the profile aggregate, in all six controllers   | Restored with ACE-485 — the 2.x restructuring had lost the dispatch |
-| Project-side `DataHandler` hooks                                             | Backend edits, in installations that wire it up themselves                                              | Outside this repository; the main production path                   |
+| Dispatch site                                                         | Context                                                                                                 | Notes                                                                         |
+|-----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| `AbstractProfileFactory::createProfileForUser()` (persons)            | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | The only in-repo dispatch between 2.0 and 3.0                                 |
+| `AbstractProfileFactory::updateProfileForUser()` (persons)            | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | Dispatches per profile the update ran through (ACE-490)                       |
+| `ProfileController::persistAndDispatchProfileUpdate()` (persons_edit) | Every JSON endpoint of the profile editing frontend that persists a change to the profile aggregate     | Restored with ACE-485; the six controllers it covered became one with ACE-262 |
+| Project-side `DataHandler` hooks                                      | Backend edits, in installations that wire it up themselves                                              | Outside this repository; the main production path                             |
 
-The helper in `AbstractActionController`
-(`packages/fgtclb/academic-persons-edit/Classes/Controller/AbstractActionController.php`)
+The helper in `ProfileController`
+(`packages/fgtclb/academic-persons-edit/Classes/Controller/ProfileController.php`)
 enforces the contract in one place: it calls `persistAll()` first, then skips
 the dispatch for a `null` profile, an unpersisted one, or a translation
 overlay. `GenerateSlugForProfile` listens to the same event and has no
@@ -134,6 +134,34 @@ languages of the context and issues DataHandler work per language:
   added to the default record after the translation was created — including
   their own children.
 
+  The same datamap pass is what keeps the **profile image** in sync, and the
+  synchronizer has no code for it. Since ACE-506 the `image` column is
+  `allowLanguageSynchronization` rather than `l10n_mode=exclude`, so every
+  translation carries a localization state for it in `l10n_state`:
+  `parent` — the default, and what every pre-3.0 translation is in — means the
+  translation follows the default-language image, and `DataMapProcessor`
+  localizes a reference the default record gained and re-derives the
+  translation's counter whenever the default record is part of a datamap
+  (`populateTranslationItem()` walks the parent-scoped fields of every
+  dependent translation next to the exclude ones); `custom` means the
+  translation owns its image and the pass leaves it alone. Removal is the
+  DataHandler's *delete* cascade, not the datamap: deleting the
+  default-language reference through it deletes the localizations too
+  (`deleteL10nOverlayRecords()`), while a row soft-deleted around the
+  DataHandler leaves the translation's localized row attached with a counter
+  of 0 — `synchronizeReferences()` returns before its removals when the
+  default record has no children left. That is why the relation is written by
+  exactly one class, `ProfileImageRelationWriter` (persons, `@internal`), and
+  always through the DataHandler: state, counter, cascade and reference index
+  stay the core's. Its lookups are restricted to live rows and its writes
+  address live uids — both tables are `versioningWS`, so a version row would
+  otherwise be returned beside the live one — which is the same model the
+  synchronizer follows. Its callers at this point are the repair wizard of
+  `academic_persons_edit` and, for the reference metadata,
+  `ProfileImageMetadataService`; the frontend profile editing adopts it with
+  the editor replacement (ACE-262). All of it is pinned in
+  `RecordSynchronizerTest` and `ProfileImageRelationWriterTest`.
+
 Two implementation choices worth their comments:
 
 - **Propagatable columns are filtered by TCA type.** The types `inline`,
@@ -148,7 +176,10 @@ Two implementation choices worth their comments:
   `synchronizeDirectRelations()`). A file reference or MM relation added to
   the default record after its translation exists is therefore carried over
   by the update path too — probed and pinned for ACE-487, which had recorded
-  the opposite, design-inferred claim.
+  the opposite, design-inferred claim. No shipped column is an exclude `file`
+  column any more, so that pin lives on a column the fixture extension
+  `test_exclude_file_column` adds to the profile table
+  (`RecordSynchronizerExcludeFileColumnTest`).
 - **One DataHandler instance per command.** A cmdmap is keyed
   `[table][uid][command]`, so it can hold only *one* command per record uid —
   `localize` per language and `inlineLocalizeSynchronize` per inline column
@@ -303,6 +334,8 @@ Stated so they are decisions, not surprises:
   first.
 - [Class design](class-design.md) — `SynchronizerContext` is one of the
   `final readonly` data objects, and the services in this chain are stateless.
+- [Fixture extensions](../testing/fixture-extensions.md) — why the ACE-487
+  file-column pin needs `test_exclude_file_column`.
 - [Core version aware code](core-version-aware-code.md) — the
   `method_exists()` gate in `hasTranslation()` is one of the version switches
   counted there.
@@ -310,6 +343,7 @@ Stated so they are decisions, not surprises:
   same surface documented for extension users rather than maintainers.
 - The changelog entries of the round:
   `academic-persons/Documentation/Changelog/3.0/Important-TranslationSyncRoutedThroughDataHandler.rst`,
+  `academic-persons/Documentation/Changelog/3.0/Breaking-ProfileImageIsTranslatable.rst`,
   `academic-contact4pages/Documentation/Changelog/3.0/Important-ContactsOfUntranslatedPagesAreNotLocalized.rst`
   and
   `academic-persons-edit/Documentation/Changelog/3.0/Feature-FrontendEditsSynchronizeTranslations.rst`.

@@ -18,7 +18,11 @@ packages/fgtclb/<extension>/
 
 The same applies to `packages-dev/*`. Nothing is required to exist: an extension
 without those directories contributes nothing to the build, and adding one is
-picked up without touching any configuration.
+picked up without touching any configuration. Five extensions carry sources
+today: `academic-jobs` and `academic-persons-edit` ship TypeScript,
+`academic-partners`, `academic-study-plan` and `academic-persons` ship both —
+the latter the public profile's `frontend/profile.ts` and
+`frontend/profile-detail.scss`, loaded by `Templates/Profile/Detail.html`.
 
 The `backend/` and `frontend/` split is a convention rather than a mechanism —
 the build mirrors whatever directory structure it finds. Keeping the two apart
@@ -123,6 +127,43 @@ Verified present on TYPO3 13.4.34 and 14.3.6: the `f:asset.module` ViewHelper,
 `AssetCollector::addJavaScriptModule()`, and `ImportMap` reading
 `Configuration/JavaScriptModules.php` from every package.
 
+## Vendored libraries
+
+A library that is not written here and is not shipped by the TYPO3 core is
+*vendored*: the built file is committed under
+`Resources/Public/JavaScript/vendor/<library>/<version>/`, with its licence file
+next to it. `academic_persons_edit` vendors Vue 3.5.42 and CropperJS 2.2.0 that
+way; `academic_partners` vendors a mapping library and its plugin.
+
+The rules, all of them learned from the two extensions that do it:
+
+- **The directory carries the version.** `vendor/vue/3.5.42/` rather than
+  `vendor/vue/`. An upgrade is a new directory plus one edit in the module that
+  names it, so a page can never mix a cached old file with a new consumer, and
+  the `?bust=` cache key of the import map is not needed for it.
+- **A licence file sits beside it**, verbatim, under the name the project ships
+  it as (`LICENSE`). It is what makes the redistribution lawful, and it is
+  reviewed when the version changes.
+- **One module names the file, relatively.** `TypeScript/frontend/vue.ts` is the
+  only place `../vendor/vue/3.5.42/vue.esm-browser.prod.js` appears; every other
+  module imports the wrapper through the import map. A relative import is
+  correct here precisely because the path is versioned - the objection to
+  relative imports below is about a *stale cached dependency*, which a versioned
+  path cannot produce.
+- **The wrapper declares the surface.** The vendored file has no type
+  declarations, so the wrapper casts it once to a hand written interface holding
+  what this repository actually calls. That interface is the contract an upgrade
+  is checked against.
+- **A library the core already ships is not vendored.** CKEditor 5 comes from
+  `EXT:rte_ckeditor` and is mapped from there; Lit comes from `EXT:core`.
+- **Vendored files are outside the build gate by construction**: they have no
+  source under `Resources/Private/`, so `checkJsBuildClean` neither writes nor
+  deletes them.
+
+Vendoring is a cost - 172 KB of Vue reach every profile editing page - and it is
+paid deliberately, per library, with the alternative named in the commit that
+adds it.
+
 ## Artifacts are committed, and that makes a gate mandatory
 
 `Resources/Public/JavaScript/**` and `Resources/Public/Css/**` are tracked files.
@@ -171,6 +212,14 @@ in `git status`.
   it is empty.
 - **npm packages ship PHP.** `flatted` carries a PHP port of itself, so
   `Build/node_modules` is excluded from `lintPhp`.
+- **A bare specifier only type-checks when `Build/tsconfig.json` maps it.**
+  Without a `paths` entry TypeScript cannot resolve
+  `@fgtclb/<extension>/frontend/x.js` and falls back to whatever ambient
+  `declare module` it finds. `academic_persons_edit` shipped such a declaration
+  for each of its own modules for a while, so `typecheckJs` checked a
+  hand-written copy of the exports that had already drifted from the real ones.
+  Ambient declarations are for vendor specifiers only; an extension whose
+  modules import each other gets a `paths` entry.
 
 ## See also
 

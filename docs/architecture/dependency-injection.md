@@ -78,8 +78,10 @@ pointing at the model rather than at the code that referenced it.
 
 [`packages/fgtclb/academic-persons/Configuration/Services.php`](../../packages/fgtclb/academic-persons/Configuration/Services.php)
 is not the boilerplate `defaults()` + `load()` file the preference implies. It
-exists for the one thing YAML cannot express — registering autoconfiguration
-for an interface — and it does only that (lines 20–26):
+exists for the things YAML cannot express: registering autoconfiguration for an
+interface, and — since ACE-504 — a compiler pass that registers
+`Report\LegacySettingsStatus` only when EXT:reports is active. The
+autoconfiguration part:
 
 ```php
 return static function (ContainerConfigurator $container, ContainerBuilder $containerBuilder): void {
@@ -94,24 +96,52 @@ return static function (ContainerConfigurator $container, ContainerBuilder $cont
 The registration of the classes themselves still happens in that package's
 `Services.yaml`. TYPO3 loads both files when both are present.
 
+The compiler pass is there because of a timing fact worth knowing: a
+`Services.php` runs while the container is being built, and at that point
+neither `ExtensionManagementUtility::isLoaded()` nor the `PackageManager`
+service is available — `Bootstrap` hands the package manager to
+`ExtensionManagementUtility` only after `createDependencyInjectionContainer()`
+has returned, and the core's `ContainerBuilder` registers its synthetic
+services after every package's `Services.*` was loaded. A compiler pass runs
+after all of that, so `hasDefinition(StatusRegistry::class)` — a definition only
+EXT:reports' own `Services.yaml` makes — is an order-independent "is reports
+active" check on both core versions. The pass is added with priority 500 in the
+before-optimization stage: Symfony's `ResolveInstanceofConditionalsPass` runs at
+priority 100 of that same stage, and a definition registered after it stays
+untagged even with `setAutoconfigured(true)`. The class is excluded from the
+`resource` load of `Services.yaml` for the same reason it needs the pass —
+the interface it implements does not exist without EXT:reports.
+
 ### Attributes are already in use
 
 Contrary to the note in `AGENTS.md` that these extensions do not use attributes,
-they are used in production code across five packages:
+they are used in production code across nine of the twelve packages
+(`academic-base`, `academic-jobs`, `academic-partners`, `academic-persons`,
+`academic-persons-edit`, `academic-programs`, `academic-projects`,
+`academic-study-plan` and `typo3-category-types`):
 
-| Attribute          | Sites | Examples                                                                  |
-|--------------------|-------|---------------------------------------------------------------------------|
-| `#[Autoconfigure]` | 9     | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`) |
-| `#[Autowire]`      | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`   |
-| `#[AsAlias]`       | 2     | `academic-persons/Classes/Service/RecordSynchronizer.php:21`              |
-| `#[Exclude]`       | 3     | `academic-persons/Classes/Settings/Validation.php:12` and two siblings    |
-| `#[AsCommand]`     | 1     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                 |
+Measured with
+`grep -rhoP '#\[<name>[(\]]' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes | wc -l`:
+
+| Attribute            | Sites | Examples                                                                     |
+|----------------------|-------|------------------------------------------------------------------------------|
+| `#[Autoconfigure]`   | 10    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
+| `#[Autowire]`        | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
+| `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:21`                 |
+| `#[Exclude]`         | 11    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
+| `#[AsEventListener]` | 3     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
+| `#[AsCommand]`       | 1     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
 (`Symfony\Component\Console\Attribute\AsCommand`), not a DI one; the other two
 commands in `academic-persons` are still registered with `console.command` tags
-in YAML. `#[AsTaggedItem]`, `#[AsController]` and `#[AsEventListener]` have zero
-sites.
+in YAML. The `#[AsEventListener]` sites are TYPO3's attribute (see below), one
+per `RegisterAcademicPageDoktype` listener in `academic-partners`,
+`academic-programs` and `academic-projects`. `#[AsTaggedItem]` and
+`#[AsController]` have zero sites.
+
+For the eleven `#[Exclude]` sites and why `LegacySettingsMigration` is among
+them, see [Class design](class-design.md#keep-data-objects-out-of-the-container).
 
 The `#[Autowire]` example is the clearest illustration of the two styles working
 together: `academic-base/Configuration/Services.yaml` lines 13–15 define a
@@ -168,11 +198,14 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     ) {}
 ```
 
-The three event listeners follow the same shape — a single `__invoke()` and
-promoted `private readonly` dependencies:
-`academic-jobs/Classes/EventListener/GenerateJobSlug.php`,
+The seven event listeners follow the same shape — a single `__invoke()` and
+promoted `private readonly` dependencies (or a `readonly class`). Four are
+registered by YAML tag: `academic-jobs/Classes/EventListener/GenerateJobSlug.php`,
+`academic-persons/Classes/EventListener/UpdateProfileImageMetadata.php`,
 `academic-persons-edit/Classes/EventListener/GenerateSlugForProfile.php` and
-`.../SyncChangesToTranslations.php`.
+`.../SyncChangesToTranslations.php`. Three are registered by attribute — the
+`RegisterAcademicPageDoktype` of `academic-partners`, `academic-programs` and
+`academic-projects`.
 
 ### Where the codebase does not comply
 
@@ -240,7 +273,7 @@ versions diverge:
 | `TYPO3\CMS\Backend\Attribute\AsAvatarProvider`, `AsSidebarComponent` | **no**   | yes             | no                             |
 
 `TYPO3\CMS\Extbase\Attribute\*` does not exist on v13 at all. The
-`Install\Attribute\UpgradeWizard` row is the one the nine upgrade wizards use:
+`Install\Attribute\UpgradeWizard` row is the one all eleven upgrade wizards use:
 on v14 it survives as a deprecated subclass shim in
 `cms-core/DeprecatedClasses/ext-install/`, so it still works, but its
 replacement `Core\Attribute\UpgradeWizard` is absent on v13. See
@@ -279,13 +312,17 @@ Always set `identifier` explicitly — it is what `before`/`after` ordering in
 other extensions refers to, and an auto-derived one changes when the class is
 renamed.
 
-All three production listeners here are currently registered by YAML tag rather
-than by attribute (`academic-jobs/Configuration/Services.yaml` lines 11–15 and
-`academic-persons-edit/Configuration/Services.yaml` lines 10–20), which is
-equivalent — the attribute is only a shorter spelling of the same tag. New
-listeners should prefer the attribute. Note that `academic-persons`' own user
-manual already documents the TYPO3 attribute as the way integrators register a
-listener against its events, in
+Both spellings are in use here: four listeners are registered by YAML tag
+(`academic-jobs/Configuration/Services.yaml`,
+`academic-persons/Configuration/Services.yaml` and
+`academic-persons-edit/Configuration/Services.yaml`, which carries two), and the
+three `RegisterAcademicPageDoktype` listeners of `academic-partners`,
+`academic-programs` and `academic-projects` carry
+`#[AsEventListener(identifier: '…/register-page-doktype')]` on the class. The
+two are equivalent — the attribute is only a shorter spelling of the same tag —
+and new listeners should prefer the attribute. Note that `academic-persons`' own
+user manual already documents the TYPO3 attribute as the way integrators register
+a listener against its events, in
 `packages/fgtclb/academic-persons/Documentation/Changelog/2.4/Feature-DispatchModifyTcaSelectFieldItemsEventInItemsProcFunc.rst`
 lines 41–43.
 

@@ -22,9 +22,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
             'type',
             'sorting',
             'title',
-            'year',
-            'year_start',
-            'year_end',
+            'date',
+            'date_start',
+            'date_end',
         ];
         $expected = [
             [
@@ -33,9 +33,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
                 'type' => 'type_1',
                 'sorting' => 1,
                 'title' => 'Type 1 - UID 1 Pos #1',
-                'year' => 2020,
-                'year_start' => null,
-                'year_end' => null,
+                'date' => '2020-01-01',
+                'date_start' => null,
+                'date_end' => null,
             ],
             [
                 'uid' => 4,
@@ -43,9 +43,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
                 'type' => 'type_1',
                 'sorting' => 2,
                 'title' => 'Type 1 - UID 3 Pos #2',
-                'year' => 2020,
-                'year_start' => null,
-                'year_end' => null,
+                'date' => '2020-01-01',
+                'date_start' => null,
+                'date_end' => null,
             ],
             [
                 'uid' => 3,
@@ -53,9 +53,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
                 'type' => 'type_1',
                 'sorting' => 3,
                 'title' => 'Type 1 - UID 2 Pos #3',
-                'year' => 2020,
-                'year_start' => null,
-                'year_end' => null,
+                'date' => '2020-01-01',
+                'date_start' => null,
+                'date_end' => null,
             ],
         ];
         $profileRepository = GeneralUtility::makeInstance(ProfileRepository::class);
@@ -80,9 +80,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
                 'sorting' => $profileInformation->getSorting(),
                 'type' => $profileInformation->getType(),
                 'title' => $profileInformation->getTitle(),
-                'year' => $profileInformation->getYear(),
-                'year_start' => $profileInformation->getYearStart(),
-                'year_end' => $profileInformation->getYearEnd(),
+                'date' => $profileInformation->getDate()?->format('Y-m-d'),
+                'date_start' => $profileInformation->getDateStart()?->format('Y-m-d'),
+                'date_end' => $profileInformation->getDateEnd()?->format('Y-m-d'),
             ];
         }
         $tableName = 'tx_academicpersons_domain_model_profile_information';

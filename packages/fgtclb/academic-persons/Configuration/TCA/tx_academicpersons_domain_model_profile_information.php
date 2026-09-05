@@ -121,36 +121,52 @@ $tcaConfiguration = [
                 'max' => 2048,
             ],
         ],
-        'year' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year.label',
+        // Calendar dates without a time: `format=date` renders the backend date
+        // picker, `dbType=date` stores a native SQL DATE so no timestamp and no
+        // time zone conversion is involved (TYPO3 v13 and v14 alike).
+        'date' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.date.label',
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'min' => 0,
-                'max' => 9999,
+                'type' => 'datetime',
+                'format' => 'date',
+                'dbType' => 'date',
                 'nullable' => true,
             ],
         ],
-        'year_start' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year_start.label',
+        'date_start' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.date_start.label',
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'min' => 0,
-                'max' => 9999,
+                'type' => 'datetime',
+                'format' => 'date',
+                'dbType' => 'date',
                 'nullable' => true,
             ],
         ],
-        'year_end' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year_end.label',
+        'date_end' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.date_end.label',
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'min' => 0,
-                'max' => 9999,
+                'type' => 'datetime',
+                'format' => 'date',
+                'dbType' => 'date',
+                'nullable' => true,
+            ],
+        ],
+        // Presentation only: a set flag renders every date of the record as its
+        // four-digit year while the complete date stays stored.
+        'year_only' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year_only.label',
+            'l10n_mode' => 'exclude',
+            'l10n_display' => 'defaultAsReadonly',
+            'config' => [
+                'type' => 'check',
+                'renderType' => 'checkboxToggle',
+                'default' => 0,
             ],
         ],
         'sorting' => [
@@ -164,10 +180,11 @@ $tcaConfiguration = [
         'date' => [
             'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.palette.date',
             'showitem' => implode(',', [
-                'year',
+                'date',
+                'date_start',
+                'date_end',
                 '--linebreak--',
-                'year_start',
-                'year_end',
+                'year_only',
             ]),
         ],
         'language' => [
@@ -289,9 +306,11 @@ $tcaConfiguration = [
 ];
 
 // @todo MAIN TCA Files should be kept without dynamic calls, and following should be done in override files.
+// Each document section of Settings.yaml validates the records of its own type only, so
+// the fragments land in `types.<type>.columnsOverrides` rather than on the columns.
 ArrayUtility::mergeRecursiveWithOverrule(
     $tcaConfiguration,
-    GeneralUtility::makeInstance(AcademicPersonsSettings::class)->getValidationTcaTableConfig('profileInformation'),
+    GeneralUtility::makeInstance(AcademicPersonsSettings::class)->getDocumentValidationTcaTypesConfig(),
 );
 
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);

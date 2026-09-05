@@ -1,0 +1,223 @@
+..  _breaking-replaced-profile-editing-plugin:
+
+===========================================
+Breaking: Replaced the profile editing view
+===========================================
+
+Description
+===========
+
+The :guilabel:`Profile editing` content element used to be a set of Extbase
+forms: one page per record, a form submission per change, a redirect after
+every save. It is replaced by a single view that edits the profile in place
+and writes through JSON endpoints of the same plugin - see
+:ref:`profile-editing` for what it does and
+:ref:`important-profile-editing-replaced-in-place` for why nothing has to be
+migrated in the page tree.
+
+The plugin identity is unchanged: the content type stays
+``academicpersonsedit_profileediting``, the plugin stays
+``AcademicPersonsEdit`` / ``ProfileEditing``, the request namespace stays
+``tx_academicpersonsedit_profileediting``, the site sets keep their names and
+the default action stays ``list``. Everything below the plugin is new.
+
+Removed controllers and actions
+-------------------------------
+
+Five of the six controllers are removed. ``ProfileController`` is the only one
+the plugin registers, and its action list is new:
+
+..  list-table::
+    :header-rows: 1
+
+    *   - Removed
+        - Replacement
+    *   - :php:`ContractController`, :php:`ProfileInformationController`,
+          :php:`PhysicalAddressController`, :php:`EmailAddressController`,
+          :php:`PhoneNumberController`, each with ``list``, ``show``, ``new``,
+          ``create``, ``edit``, ``update``, ``confirmDelete``, ``delete``,
+          ``sort`` and partly ``toggleVisibility``
+        - The ``documentForm``/``createDocument``/``updateDocument``/
+          ``deleteDocument``/``sortDocument`` and
+          ``contractContactForm``/``createContractContact``/
+          ``updateContractContact``/``deleteContractContact``/
+          ``sortContractContact`` JSON actions of
+          :php:`ProfileController`
+    *   - :php:`ProfileController::showAction()`,
+          :php:`editAction()`, :php:`editImageAction()`,
+          :php:`addImageAction()`, :php:`removeImageAction()`,
+          :php:`toggleSkipSyncAction()`
+        - :php:`indexAction()` for the view, and the ``update``,
+          ``uploadImage``, ``deleteImage`` and ``updateSkipSync`` actions
+    *   - :php:`AbstractActionController`,
+          :php:`Property\TypeConverter\AbstractFormDataConverter`,
+          :php:`Service\UserSessionService`,
+          :php:`Exception\AccessDeniedException`
+        - :php:`Service\ProfileUpdateRequestService`,
+          :php:`Domain\Parser\ProfileUpdatePayloadParser` and
+          :php:`Service\ProfileUpdateValidationService`
+    *   - :php:`Domain\Validator\AddressFormDataValidator`,
+          :php:`ContractFormDataValidator`, :php:`EmailFormDataValidator`,
+          :php:`PhoneNumberFormDataValidator`,
+          :php:`ProfileInformationFormDataValidator`
+        - The validation set of the section a record belongs to, resolved from
+          the settings graph - see :ref:`configuration-editor-settings`
+    *   - :php:`Domain\Model\Dto\ProfileFormData::createFromProfile()`,
+          deprecated since 2.3 and announced for removal in 3.0
+        - :php:`Domain\Factory\ProfileFormDataFactory::createFromProfile()`
+
+An installation that links to one of the removed actions - a
+``f:link.action`` in an override, a hand written URL, a bookmark - gets the
+plugin's ``list`` view instead.
+
+Removed templates, layouts and partials
+---------------------------------------
+
+Every Fluid file of the form flow is removed. An override of one of them is
+dead: the file is no longer rendered, and the project keeps a copy of a view
+that no longer exists.
+
+*   :file:`Resources/Private/Layouts/ProfileEdit.html`
+*   :file:`Resources/Private/Templates/Profile/Edit.html`,
+    :file:`Profile/EditImage.html`, :file:`Profile/Show.html`
+*   :file:`Resources/Private/Templates/Contract/{Edit,New,Show}.html` and the
+    same three files for :file:`EmailAddress/`, :file:`PhoneNumber/`,
+    :file:`PhysicalAddress/` and :file:`ProfileInformation/`
+*   :file:`Resources/Private/Partials/Profile/Buttons/{DeleteCancel,SaveExitCancel}.html`
+*   :file:`Resources/Private/Partials/Profile/Forms/{Checkbox,DateTime,Errors,FieldWrapper,Select,Textarea,Textfield}.html`
+*   :file:`Resources/Private/Partials/Profile/List/{Contracts,EmailAddresses,PhoneNumbers,PhysicalAddresses,ProfileInformation}.html`
+*   :file:`Resources/Private/Partials/Profile/Properties/{Contract,EmailAddress,PhoneNumber,PhysicalAddress,Profile,ProfileInformation}.html`
+*   :file:`Resources/Private/Partials/Profile/Show/{Image,Personal}.html`
+
+The plugin renders without a Fluid layout since, so the TypoScript constant
+:typoscript:`plugin.tx_academicpersonsedit.view.layoutRootPath` and the
+:typoscript:`view.layoutRootPaths` block it filled are removed as well. A site
+package that still sets the constant sets something nothing reads.
+
+:file:`Resources/Private/Templates/Profile/List.html` is kept and rewritten,
+and :file:`Resources/Private/Templates/Profile/Index.html` with the partials
+below :file:`Partials/Profile/{Documents,Field,Image,Profile}/` is the new
+tree. :ref:`templates-override` describes what may be overridden.
+
+Removed icons
+-------------
+
+The eleven action icons of the form flow are removed, and with them their
+identifiers:
+
+:file:`add-image-icon.svg`, :file:`add-item-icon.svg`, :file:`back-icon.svg`,
+:file:`cancel-icon.svg`, :file:`delete-icon.svg`, :file:`edit-icon.svg`,
+:file:`replace-image-icon.svg`, :file:`save-icon.svg`, :file:`sort-icon.svg`,
+:file:`sort-vertical-icon.svg`, :file:`view-icon.svg`.
+
+Thirteen icons replace them, registered under the identifiers listed in
+:ref:`profile-editing-icons`. They are Bootstrap Icons (MIT) drawn in
+``currentColor`` and rendered inline, so they take the colour of the control
+they sit in.
+
+Removed labels
+--------------
+
+:file:`Resources/Private/Language/locallang.xlf` goes from 208 to 131
+trans-units: **149 are removed and 72 are new**, 59 survive unchanged. The
+German :file:`de.locallang.xlf` follows one to one. That is not a list worth
+printing - the authoritative one is the diff of the file for this release -
+but the shape of it is:
+
+*   Everything the removed Extbase form flow needed goes with it: every
+    ``*.create.success`` / ``*.update.success`` / ``*.delete.success`` /
+    ``*.sort.success`` message, every ``*.placeholder``, all ``list.no*Found``
+    entries, the ``actions.hide`` / ``show`` / ``translate`` / ``saveAndExit``
+    / ``setToTop`` / ``setToBottom`` / ``replace`` actions, ``back``,
+    ``list.hidden.badge``, ``list.contract.position``, the ``profile.*``
+    section headings and every ``*FormData.*.error.*`` unit.
+*   ``contract.published.label`` and ``emailAddress.emailAddress.label`` were
+    stale duplicates of ``contract.publish.label`` and
+    ``emailAddress.email.label`` and are removed with them.
+*   The date fields of a timeline entry are addressed under their real property
+    names now, so ``profileInformation.year.label``,
+    ``profileInformation.yearStart.label`` and
+    ``profileInformation.yearEnd.label`` are replaced by
+    ``profileInformation.date.label``, ``profileInformation.dateStart.label``
+    and ``profileInformation.dateEnd.label``, joined by
+    ``profileInformation.yearOnly.label``.
+*   The new view brings its own vocabulary under the ``profileEditing.*``
+    prefix - status messages, empty states, the image editor and the document
+    section labels.
+
+All of them are overridable through :typoscript:`locallangXMLOverride`, so an
+installation that translated or reworded one of the 149 removed units loses
+that override silently: the key is simply not read any more. Compare the
+overrides against the shipped file after the update.
+
+Removed extension configuration
+-------------------------------
+
+``profile.autoCreateProfiles`` and ``profile.createProfileForUserGroups`` are
+removed from :file:`ext_conf_template.txt`. Neither is read by any code path of
+this extension. Their stored values are not lost by the removal - the extension
+configuration merges the current values over the template and prunes nothing -
+and they are still the source the
+``academicPersons_MigrateProfileAutoCreateExtensionsConfiguration`` upgrade
+wizard of `EXT:academic_persons` reads to carry both settings over.
+``profile.allowedLanguages`` is unchanged.
+
+New page type
+-------------
+
+The JSON endpoints are reached through a :typoscript:`PAGE` object with
+:typoscript:`typeNum = 1733735`, delivered by the site set and by the static
+template. A project with a ``PageType`` route enhancer, a web application
+firewall or a reverse proxy in front of TYPO3 has to let that page type and
+the ``X-Requested-With`` header through - see :ref:`profile-editing-page-type`.
+
+Impact
+======
+
+*   Overrides of any removed Fluid file stop having an effect. The editing
+    view renders from the shipped templates.
+*   Links to the removed actions render the profile overview instead.
+*   Templates and PHP code referring to the removed icon identifiers,
+    labels or controller classes fail: an unknown icon identifier renders
+    TYPO3's ``default-not-found`` placeholder, an unknown label renders its
+    own key, and an unknown class is a fatal error.
+*   A form posting ``profileInformationFormData[year]``,
+    ``contractFormData[...]``, ``addressFormData[...]``,
+    ``emailFormData[...]`` or ``phoneNumberFormData[...]`` to one of the
+    removed actions is not processed. The editor posts JSON, and the
+    property names of a timeline entry are ``date``, ``dateStart`` and
+    ``dateEnd`` - see
+    the *Breaking: Profile
+    information years use native dates* entry of `EXT:academic_persons` for
+    the schema change behind that.
+*   The two removed extension configuration options disappear from the
+    Settings module. A stored value is ignored.
+
+Affected Installations
+======================
+
+All installations using the :guilabel:`Profile editing` content element of
+`EXT:academic_persons_edit`, and in particular every installation that
+overrides one of its Fluid files or links to one of its actions.
+
+Migration
+=========
+
+#.  Remove the overrides of the deleted Fluid files, and re-apply the project
+    specific changes on top of the new template tree where they are still
+    wanted. :ref:`templates-override` names the files that carry the hooks the
+    JavaScript binds to; changing those breaks the editor rather than the
+    layout.
+#.  Replace links to the removed actions with a link to the ``index`` action
+    and the ``profileUid`` argument, or with the profile overview.
+#.  Replace the removed icon identifiers with the ones of
+    :ref:`profile-editing-icons`.
+#.  Let page type ``1733735`` and the ``X-Requested-With`` header pass through
+    route enhancers and firewalls.
+#.  Drop ``profile.autoCreateProfiles`` and
+    ``profile.createProfileForUserGroups`` from the deployment configuration -
+    but only after the
+    ``academicPersons_MigrateProfileAutoCreateExtensionsConfiguration`` upgrade
+    wizard has run, because that wizard reads them.
+
+..  index:: Backend, Fluid, Frontend, JavaScript, TypoScript, ext:academic_persons_edit, NotScanned

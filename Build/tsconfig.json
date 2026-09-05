@@ -45,7 +45,14 @@
         // No "baseUrl": with "moduleResolution": "bundler" the targets resolve
         // relative to this file, and a "baseUrl" would additionally make every
         // directory below it importable as a bare specifier.
-        "paths": {}
+        "paths": {
+            "@fgtclb/academic-persons/frontend/*": [
+                "../packages/fgtclb/academic-persons/Resources/Private/TypeScript/frontend/*"
+            ],
+            "@fgtclb/academic-persons-edit/frontend/*": [
+                "../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/*"
+            ]
+        }
     },
     "include": [
         "../packages/*/*/Resources/Private/TypeScript/**/*.ts",

@@ -352,14 +352,17 @@
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.label">
         <source>Type</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year.label">
-        <source>Year</source>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date.label">
+        <source>Date</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_end.label">
-        <source>End Year</source>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date_end.label">
+        <source>End date</source>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_start.label">
-        <source>Start Year</source>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date_start.label">
+        <source>Start date</source>
+      </trans-unit>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_only.label">
+        <source>Show year only</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.ctrl.label">
         <source>Profile information</source>

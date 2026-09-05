@@ -1,0 +1,6 @@
+validations:
+  profile:
+    firstName:
+      - required
+types:
+  first: 1

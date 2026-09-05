@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Domain\Factory;
 
+use FGTCLB\AcademicBase\Settings\ValidationSet;
 use FGTCLB\AcademicPersons\Domain\Model\Contract as ContractModel;
 use FGTCLB\AcademicPersons\Domain\Model\FunctionType;
 use FGTCLB\AcademicPersons\Domain\Model\Location;
 use FGTCLB\AcademicPersons\Domain\Model\OrganisationalUnit;
 use FGTCLB\AcademicPersons\Domain\Model\Profile;
-use FGTCLB\AcademicPersons\Settings\ValidationSet;
 use FGTCLB\AcademicPersonsEdit\Domain\Model\Dto\ContractFormData;
 
 /**
  * @todo Class naming (factory) and usage does not make much sense. Reconsider and adopt before making this API.
- * @internal to be used only in `EXT:academic_person_edit` and not part of public API. May change at any time.
+ * @internal to be used only in `EXT:academic_persons_edit` and not part of public API. May change at any time.
  */
 class ContractFactory
 {
@@ -50,8 +50,8 @@ class ContractFactory
 
     /**
      * A value is applied to the domain model only when the property may be written
-     * (not readOnly / disabled by validation configuration) and has been sent within
-     * the current request or registered as override on the form data object.
+     * (not readOnly / disabled by validation configuration) and was explicitly
+     * registered as an override by the JSON request handler.
      */
     private function mayApplyProperty(ValidationSet $validationSet, ContractFormData $form, string $propertyName): bool
     {
@@ -60,8 +60,8 @@ class ContractFactory
             // ReadOnly or disabled: keep existing persisted data and ignore the submitted value.
             return false;
         }
-        // Only apply values sent within the current request or registered as override
-        // (e.g. filled up by a PSR-14 event from another source before transformation).
+        // Only apply explicitly registered overrides. A PSR-14 listener may replace
+        // such an override before the transformation runs.
         return $form->shouldApplyProperty($propertyName);
     }
 
