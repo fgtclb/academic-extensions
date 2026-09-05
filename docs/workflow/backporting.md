@@ -56,7 +56,7 @@ runtime, which no amount of "it merged without conflicts" will reveal.
 The mistake in the other direction is more common and more expensive: assuming
 the branches differ and rewriting a patch that did not need it. In practice a
 large share of the files are **byte-identical** across the two branches. A
-survey of `packages/fgtclb/academic-jobs/Classes/` finds 16 of 19 files
+survey of `packages/fgtclb/academic-jobs/Classes/` finds 15 of 19 files
 identical between `origin/2` and `origin/main`.
 
 So the first step is always measurement, and it takes three commands. None of
@@ -121,15 +121,15 @@ unchanged".
 | `COMPOSER_ROOT_VERSION`  | `3.0.0-dev`                      | `2.4.0-dev`                      |
 | PHPStan configurations   | `Build/phpstan/Core13`, `Core14` | `Build/phpstan/Core12`, `Core13` |
 | XLF indentation          | two spaces                       | tabs                             |
-| Test-helper traits       | 7                                | 3                                |
+| Test-helper traits       | 7                                | 4                                |
 | phpunit group names      | `not-core-13`, `not-core-14`     | `not-core-12`, `not-core-13`     |
 | Changelog directory      | `Documentation/Changelog/3.0/`   | `Documentation/Changelog/2.4/`   |
 
 ### XLF indentation
 
 Language files are indented with **tabs on branch `2`** and with **two spaces on
-`main`**. This is uniform: of the 50 `.xlf` files on each branch, all 50 on
-`origin/2` are tab-indented and none on `origin/main` is.
+`main`**. This is uniform: all 50 `.xlf` files of `origin/2` are tab-indented
+and none of the 52 on `main` is.
 
 ```xml
 <!-- origin/main -->
@@ -158,18 +158,19 @@ on `main` and was not backported wholesale:
 | `TcaHelperMethodsTrait`                | yes    | yes |
 | `DeprecatedCoreLabelsTrait`            | yes    | no  |
 | `EnsureTtContentListTypeColumnTrait`   | yes    | no  |
-| `FrontendPluginRenderingTrait`         | yes    | no  |
+| `FrontendPluginRenderingTrait`         | yes    | yes |
 | `PluginFlexFormDataStructureTrait`     | yes    | no  |
 
 All seven live in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/` on `main`; branch `2`
-has the first three.
+has four of them.
 
-The consequence is concrete: a fix on `main` that comes with a frontend plugin
-rendering test has **no home on branch `2`**. The whole
-`packages/fgtclb/academic-jobs/Tests/Functional/Plugins/` tree exists only on
-`main`. Backporting such a change means one of three things, and the choice is
-worth stating in the pull request:
+The consequence is concrete for the three that are missing, and it is worth
+checking per change rather than assumed: the whole
+`packages/fgtclb/academic-jobs/Tests/Functional/Plugins/` tree, for instance,
+exists only on `main`, although the trait it uses is on both branches now.
+Backporting a change whose test has no home means one of three things, and the
+choice is worth stating in the pull request:
 
 1. backport the production fix without the test,
 2. backport the trait first, as its own change, then the fix with its test,
@@ -192,8 +193,8 @@ version of each branch is not the same version:
 A `#[Group('not-core-13')]` copied unchanged from `main` to `2` therefore flips
 its meaning from "v14 only" to "v12 only" — the test still runs, still passes or
 fails plausibly, and tests the opposite of what was intended. Both attributes
-are in active use: `main` carries seven `not-core-13` and one `not-core-14`,
-branch `2` four of each of its own two.
+are in active use: `main` carries eleven `not-core-13` and six `not-core-14`,
+branch `2` eighteen `not-core-12` and four `not-core-13`.
 
 Translate the intent, not the string: "the newer core version of this branch" is
 `not-core-13` on `main` and `not-core-12` on `2`.
@@ -203,14 +204,14 @@ Translate the intent, not the string: "the newer core version of this branch" is
 `main` has no `Core13/`/`Core14/` class folders at all; its two version
 differences are inline switches on
 `(new Typo3Version())->getMajorVersion()` in
-`packages/fgtclb/academic-base/Classes/TcaManipulator.php:137` and `:168`.
+`packages/fgtclb/academic-base/Classes/TcaManipulator.php:137` and `:179`.
 Branch `2` does use the folder split, under
 `packages/fgtclb/academic-base/Classes/` as `Core12/Environment/` and
 `Core13/Environment/`.
 
 The same file can therefore need a different mechanism on each branch.
 `TcaManipulator.php` exists on both and is nearly 100 lines longer on `main`
-(282 lines versus 185), almost entirely because of the v14 handling — a change
+(296 lines versus 185), almost entirely because of the v14 handling — a change
 to it is never a straight copy.
 
 ### The changelog entry moves

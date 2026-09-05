@@ -290,19 +290,20 @@ Options:
             - phpstan: phpstan tests
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
             - seedManifest: regenerate the committed manifest of the development seed from a real import
+            - testJs: behavioural tests of the frontend TypeScript, node's own test runner with jsdom
             - typecheckJs: "tsc --noEmit" over the TypeScript sources, which the build does not do
             - unit: PHP unit tests
             - unitRandom: PHP unit tests in random order, "-o <number>" to use a specific seed
             - update: update the typo3/core-testing-* images, same as "-u"
             - help: show this help, the default when "-s" is not given
 
-        The node suites - buildJs, checkJsBuildClean, lintMarkdown, lintTypescript, npm
-        and typecheckJs - run in a node container, and cleanJs runs on the host. All seven
-        are core version independent: they look at the sources and the committed artifacts
-        and never at the installed core, so "-t" does not change what they do. They also
-        need no composerUpdate, which makes them the only suites that are safe to run while
-        the other core version's dependency set is installed. lintMarkdown needs no node
-        dependency either, so it runs without an "npm ci" first.
+        The node suites - buildJs, checkJsBuildClean, lintMarkdown, lintTypescript, npm,
+        testJs and typecheckJs - run in a node container, and cleanJs runs on the host. All
+        eight are core version independent: they look at the sources and the committed
+        artifacts and never at the installed core, so "-t" does not change what they do.
+        They also need no composerUpdate, which makes them the only suites that are safe to
+        run while the other core version's dependency set is installed. lintMarkdown needs
+        no node dependency either, so it runs without an "npm ci" first.
 
     -b <docker|podman>
         Container environment:
@@ -437,6 +438,9 @@ Examples:
 
     # Prove the committed artifacts still match their sources, as CI does
     ./Build/Scripts/runTests.sh -s checkJsBuildClean
+
+    # Run the behavioural tests of the frontend TypeScript
+    ./Build/Scripts/runTests.sh -s testJs
 
     # Add or update a node dependency, arguments after "--"
     ./Build/Scripts/runTests.sh -s npm -- install --save-dev sass@latest
@@ -982,6 +986,22 @@ case ${TEST_SUITE} in
         # The working directory is overridden to Build/, where package.json lives.
         COMMAND=(npm "$@")
         ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} -w ${ROOT_DIR}/Build --name npm-${SUFFIX} -e npm_config_cache=${ROOT_DIR}/.cache/npm ${IMAGE_NODEJS} "${COMMAND[@]}"
+        SUITE_EXIT_CODE=$?
+        ;;
+    testJs)
+        # The behavioural net under the frontend TypeScript: node's own test
+        # runner, a jsdom window, and the sources imported by the very module
+        # specifiers the TYPO3 import map resolves in a browser.
+        #
+        # No runner dependency and no browser image. Node 24 ships the test
+        # runner and strips the types on load, so the only thing installed for
+        # this is the DOM - see "docs/testing/javascript-tests.md" for what that
+        # buys and what it costs.
+        #
+        # Core version independent like every other node suite: it executes the
+        # sources of this repository, never the installed core.
+        COMMAND="cd Build && npm ci --no-audit --no-fund && npm run test"
+        ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name test-js-${SUFFIX} -e npm_config_cache=${ROOT_DIR}/.cache/npm ${IMAGE_NODEJS} /bin/sh -c "${COMMAND}"
         SUITE_EXIT_CODE=$?
         ;;
     typecheckJs)

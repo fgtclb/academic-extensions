@@ -439,17 +439,21 @@
         <source>Type</source>
         <target>Typ</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year.label">
-        <source>Year</source>
-        <target>Jahr</target>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date.label">
+        <source>Date</source>
+        <target>Datum</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_end.label">
-        <source>End Year</source>
-        <target>Endjahr</target>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date_end.label">
+        <source>End date</source>
+        <target>Enddatum</target>
       </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_start.label">
-        <source>Start Year</source>
-        <target>Startjahr</target>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date_start.label">
+        <source>Start date</source>
+        <target>Startdatum</target>
+      </trans-unit>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_only.label">
+        <source>Show year only</source>
+        <target>Nur Jahr anzeigen</target>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.ctrl.label">
         <source>Profile information</source>

@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+namespace FGTCLB\AcademicPersonsEdit\Tests\Functional\Tca;
+
+use FGTCLB\AcademicPersonsEdit\Tests\Functional\AbstractAcademicPersonsEditTestCase;
+use PHPUnit\Framework\Attributes\Test;
+
+final class SettingsValidationOverridesTest extends AbstractAcademicPersonsEditTestCase
+{
+    #[Test]
+    public function documentDateTcaKeepsNativeDateConfigurationWithSharedOverrides(): void
+    {
+        $columns = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']['columns'];
+        foreach (['date', 'date_start', 'date_end'] as $fieldName) {
+            $this->assertSame('datetime', $columns[$fieldName]['config']['type']);
+            $this->assertSame('date', $columns[$fieldName]['config']['format']);
+            $this->assertSame('date', $columns[$fieldName]['config']['dbType']);
+            $this->assertTrue($columns[$fieldName]['config']['nullable']);
+        }
+        $this->assertArrayHasKey('columnsOverrides', $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']['types']['cooperation']);
+    }
+
+    #[Test]
+    public function sectionSpecificRequiredStateCreatesBackendColumnsOverrides(): void
+    {
+        $type = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']
+            ['types']['cooperation'];
+        $this->assertTrue($type['columnsOverrides']['title']['config']['required']);
+        $this->assertTrue($type['columnsOverrides']['date']['config']['required']);
+        $this->assertFalse($type['columnsOverrides']['date_start']['config']['required']);
+        $this->assertFalse($type['columnsOverrides']['date_end']['config']['required']);
+    }
+
+    #[Test]
+    public function profileAndContactTcaUsesTheSharedFieldTypesAndRequiredState(): void
+    {
+        $profileColumns = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile']['columns'];
+        $this->assertSame('select', $profileColumns['gender']['config']['type']);
+        $this->assertTrue($profileColumns['gender']['config']['required']);
+        $this->assertTrue($profileColumns['first_name']['config']['readOnly']);
+        $this->assertFalse($profileColumns['first_name']['config']['required']);
+        $emailColumns = $GLOBALS['TCA']['tx_academicpersons_domain_model_email']['columns'];
+        $this->assertSame('email', $emailColumns['email']['config']['type']);
+        $this->assertTrue($emailColumns['email']['config']['required']);
+        $phoneColumns = $GLOBALS['TCA']['tx_academicpersons_domain_model_phone_number']['columns'];
+        $this->assertSame('input', $phoneColumns['phone_number']['config']['type']);
+        $this->assertTrue($phoneColumns['phone_number']['config']['required']);
+    }
+}

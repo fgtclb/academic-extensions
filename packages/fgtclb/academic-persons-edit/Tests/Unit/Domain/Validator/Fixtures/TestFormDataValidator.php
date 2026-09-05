@@ -11,20 +11,16 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Domain\Validator\Fixtures;
 
+use FGTCLB\AcademicBase\Settings\Exception\UnsuitableValidatorException;
 use FGTCLB\AcademicPersonsEdit\Domain\Validator\AbstractFormDataValidator;
-use FGTCLB\AcademicPersonsEdit\Exception\UnsuitableValidatorException;
 
 /**
- * The minimal concrete validator, shaped exactly like the six shipped ones: a type
- * guard, then `processValidations()` with a validation set identifier.
- * `processValidations()` is public but writes into `$this->result`,
- * which only `AbstractValidator::validate()` initializes, so the shared machinery
- * can only be exercised through a subclass.
+ * Minimal concrete validator selecting the validation set of one profile section.
  */
 final class TestFormDataValidator extends AbstractFormDataValidator
 {
     public function __construct(
-        private readonly string $validationsIdentifier = 'testSet'
+        private readonly string $sectionIdentifier = 'testSet'
     ) {}
 
     protected function isValid(mixed $value): void
@@ -32,6 +28,9 @@ final class TestFormDataValidator extends AbstractFormDataValidator
         if (!$value instanceof TestFormData) {
             throw new UnsuitableValidatorException('Not a valid test form data object.', 1755350003);
         }
-        $this->processValidations($value, $this->validationsIdentifier);
+        $this->processValidationSet(
+            $value,
+            $this->getAcademicPersonsSettings()->getProfileValidationSet($this->sectionIdentifier),
+        );
     }
 }

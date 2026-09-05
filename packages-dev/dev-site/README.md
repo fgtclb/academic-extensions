@@ -49,7 +49,7 @@ globally unique across the active packages, and discovery finds the set wherever
 the extension shipping it is installed — which is what resolves inside DDEV and
 on a host stack alike.
 
-Three rules the set follows, all of which matter when changing it:
+Four rules the set follows, all of which matter when changing it:
 
 - **It declares uids.** The committed site configurations point at
   `rootPageId: 1` and the plugins name their pages and records by uid. A

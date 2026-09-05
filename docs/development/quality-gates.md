@@ -28,6 +28,7 @@ Build/Scripts/runTests.sh -t 14 -p 8.2 -s composerUpdate
 | `functional`                                      | PHPUnit              | `Build/phpunit/FunctionalTests.xml`              | through the excluded group  |
 | `checkRstRenderingAll`, `checkRstRenderingSingle` | render-guides        | each extension's own `Documentation/`            | no                          |
 | `lintMarkdown`                                    | `Build/markdown.mjs` | none, the conventions are the specification      | no                          |
+| `testJs`                                          | `node --test`, jsdom | `Build/tsconfig.tests.json`, `Build/tests/`      | no                          |
 
 ## Coding guidelines — `cgl`
 
@@ -37,23 +38,26 @@ The `cgl` arm of `runTests.sh` runs php-cs-fixer with
 only reports, which is the form CI uses in its `cgl` job.
 
 The rule set is `@PER-CS1.0` plus `@DoctrineAnnotation` and some fifty
-individual rules (`Build/php-cs-fixer/config.php:64-133`), risky rules allowed.
+individual rules (`Build/php-cs-fixer/config.php:70-139`), risky rules allowed.
 It is TYPO3 Core's set, with the same `@todo` markers for the rules that can be
 dropped once `@PER-CS2.0` is adopted.
 
 What it scans matters more than the rules, because it is narrower than the
-repository (`Build/php-cs-fixer/config.php:49-62`):
+repository (`Build/php-cs-fixer/config.php:49-68`):
 
-| Finder call              | Value                                       |
-|--------------------------|---------------------------------------------|
-| `in()`                   | `packages/fgtclb/`, `Build`                 |
-| `exclude()`              | `.Build/`, `Build/`, `var/`, `node_modules` |
-| `ignoreVCSIgnored(true)` | anything git ignores is skipped             |
+| Finder call              | Value                                        |
+|--------------------------|----------------------------------------------|
+| `in()`                   | `packages/fgtclb/`, `packages-dev/`, `Build` |
+| `exclude()`              | `.Build/`, `Build/`, `var/`, `node_modules`  |
+| `ignoreVCSIgnored(true)` | anything git ignores is skipped              |
 
-So `packages-dev/`, `bin/`, `core-13/`, `core-14/` and the PHP files at the
-repository root are **not** covered by this gate at all. A file placed there is
-never reformatted and never reported — which is worth knowing before concluding
-from a green run that the whole repository is formatted.
+So `bin/`, `core-13/`, `core-14/` and the PHP files at the repository root are
+**not** covered by this gate at all. A file placed there is never reformatted
+and never reported — which is worth knowing before concluding from a green run
+that the whole repository is formatted. `packages-dev/` *is* covered: the seed
+definition of `packages-dev/dev-site` carries PHP and tests of its own, and a
+formatting standard that stops at a directory boundary is one nobody
+remembers.
 
 `ignoreVCSIgnored(true)` is what keeps generated trees out even when they sit
 inside a scanned directory, so the gate does not depend on the `exclude()` list
@@ -128,7 +132,7 @@ part sits next to them:
 |-------------------------|--------------------------------------------|------------------------------------------|
 | `phpstan.neon`          | identical                                  | identical                                |
 | `phpstan-constants.php` | `#[Cascade]` constants as `['value' => …]` | `#[Cascade]` constants as a plain string |
-| `phpstan-baseline.neon` | its own findings, 216 lines                | its own findings, 231 lines              |
+| `phpstan-baseline.neon` | its own findings, 216 lines                | its own findings, 226 lines              |
 
 `phpstan-constants.php` is loaded as a `bootstrapFile` and mirrors
 `packages/fgtclb/academic-persons/EXT_CONSTANTS.php`, which resolves the
@@ -224,14 +228,17 @@ fail before it is accepted as proof.
 
 ```xml
 <directory>../../packages/*/*/Tests/Unit/</directory>
-<directory>../../packages/*/*/Tests/Functional/</directory>
+<directory>../../packages-dev/*/Tests/Unit/</directory>
 ```
 
-(`Build/phpunit/UnitTests.xml:42`, `Build/phpunit/FunctionalTests.xml:42`.)
+(`Build/phpunit/UnitTests.xml:42` and `:49`; `FunctionalTests.xml` carries the
+two `Tests/Functional/` globs on the same lines.)
 
-The glob is `packages/*/*`, so it picks up the tests of **every** extension in
-the mono repository in one run — twelve of them under `packages/fgtclb/` today
-— and would pick up another vendor directory as well.
+The first glob is `packages/*/*`, so it picks up the tests of **every**
+extension in the mono repository in one run — twelve of them under
+`packages/fgtclb/` today — and would pick up another vendor directory as well.
+The second collects `packages-dev/`, where the seed definition of
+`packages-dev/dev-site` carries tests of its own.
 
 **There is no per-extension PHPUnit configuration**, and adding one would be a
 step backwards: the extensions depend on each other, and a test suite that only
@@ -282,10 +289,10 @@ Two shapes are in use, and the choice follows the size of the difference:
   attribute goes on the class:
   `packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormUploadTest.php:32`
   and
-  `packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileImageUploadTest.php:29`.
+  `packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileImageUploadTest.php:27`.
 * **Single method**, when a class differs in one behaviour only:
-  `packages/fgtclb/academic-base/Tests/Unit/TcaManipulatorTest.php:565` is
-  `not-core-14`, and `:584` is `not-core-13` — the two halves of the same
+  `packages/fgtclb/academic-base/Tests/Unit/TcaManipulatorTest.php:568` is
+  `not-core-14`, and `:592` is `not-core-13` — the two halves of the same
   assertion about a signature that changed between the versions.
 
 The `Tests/Unit/Core13/` and `Tests/Unit/Core14/` folder split is the other

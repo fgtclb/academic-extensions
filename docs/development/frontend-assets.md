@@ -18,7 +18,17 @@ packages/fgtclb/<extension>/
 
 The same applies to `packages-dev/*`. Nothing is required to exist: an extension
 without those directories contributes nothing to the build, and adding one is
-picked up without touching any configuration.
+picked up without touching any configuration. Five extensions carry sources
+today: `academic-jobs` ships TypeScript only, and `academic-partners`,
+`academic-persons`, `academic-persons-edit` and `academic-study-plan` ship
+TypeScript and SCSS. `academic-persons` carries the public profile's
+`frontend/profile.ts` and `frontend/profile-detail.scss`, loaded by
+`Templates/Profile/Detail.html`, plus the `frontend/sticky-offset.ts` the
+editing view of `academic-persons-edit` shares with it through the import map.
+`academic-persons-edit` is the largest by a wide margin — nineteen TypeScript
+modules, one `_dependencies.d.ts` type declaration and
+`frontend/profile-editing.scss`. Count them with
+`find packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript -name '*.ts' ! -name '*.d.ts' | wc -l`.
 
 The `backend/` and `frontend/` split is a convention rather than a mechanism —
 the build mirrors whatever directory structure it finds. Keeping the two apart
@@ -33,24 +43,26 @@ convention, and the build applies it to TypeScript as well.
 
 One script, `Build/esbuild.mjs`, driven by npm scripts and run in a container:
 
-| Suite               | Runs                                                      | Purpose                                                                                  |
-|---------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------|
-| `buildJs`           | `npm ci && npm run build`                                 | Compiles every extension's sources. Run after a source change, and commit the result.    |
-| `checkJsBuildClean` | delete the outputs, rebuild, assert `git status` is empty | The gate that makes committed artifacts trustworthy. Runs in CI.                         |
-| `lintTypescript`    | `npm run lint:fix`, or `lint` with `-n`                   | eslint 9 with typescript-eslint. Mirrors `cgl`: fixes by default, checks only with `-n`. |
-| `typecheckJs`       | `npm run typecheck`                                       | `tsc --noEmit`, which the build does not do.                                             |
-| `npm`               | `npm "$@"` with the working directory set to `Build/`     | Escape hatch, mirroring the `composer` suite.                                            |
-| `cleanJs`           | `rm -rf Build/node_modules`                               | Intermediates only. It never removes a compiled artifact — those are committed files.    |
+| Suite               | Runs                                                      | Purpose                                                                                        |
+|---------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `buildJs`           | `npm ci && npm run build`                                 | Compiles every extension's sources. Run after a source change, and commit the result.          |
+| `checkJsBuildClean` | delete the outputs, rebuild, assert `git status` is empty | The gate that makes committed artifacts trustworthy. Runs in CI.                               |
+| `lintTypescript`    | `npm run lint:fix`, or `lint` with `-n`                   | eslint 9 with typescript-eslint. Mirrors `cgl`: fixes by default, checks only with `-n`.       |
+| `typecheckJs`       | `npm run typecheck`                                       | `tsc --noEmit`, which the build does not do.                                                   |
+| `testJs`            | `npm run test`                                            | The behavioural tests of the sources — see [JavaScript tests](../testing/javascript-tests.md). |
+| `npm`               | `npm "$@"` with the working directory set to `Build/`     | Escape hatch, mirroring the `composer` suite.                                                  |
+| `cleanJs`           | `rm -rf Build/node_modules`                               | Intermediates only. It never removes a compiled artifact — those are committed files.          |
 
 ```bash
 Build/Scripts/runTests.sh -s buildJs
 Build/Scripts/runTests.sh -s checkJsBuildClean
 Build/Scripts/runTests.sh -s lintTypescript -n
 Build/Scripts/runTests.sh -s typecheckJs
+Build/Scripts/runTests.sh -s testJs
 Build/Scripts/runTests.sh -s npm -- install --save-dev sass@latest
 ```
 
-All six are **core version independent**. They look at the sources and the
+All seven are **core version independent**. They look at the sources and the
 committed artifacts and never at the installed core, so `-t` does not change
 what they do and no `composerUpdate` is needed. That makes them the only suites
 that are safe to run while the other core version's dependency set is installed.
@@ -123,6 +135,51 @@ Verified present on TYPO3 13.4.34 and 14.3.6: the `f:asset.module` ViewHelper,
 `AssetCollector::addJavaScriptModule()`, and `ImportMap` reading
 `Configuration/JavaScriptModules.php` from every package.
 
+## Vendored libraries
+
+A library that is not written here and is not shipped by the TYPO3 core is
+*vendored*: the built file is committed under
+`Resources/Public/JavaScript/vendor/<library>/<version>/`, with its licence file
+next to it. `academic_persons_edit` vendors CropperJS 2.2.0 that way, and it is
+the only library in this repository that follows the rule in full;
+`academic_partners` ships a mapping library and its plugin straight in
+`Resources/Public/JavaScript/` and predates it.
+
+The rules:
+
+- **The directory carries the version.** `vendor/cropperjs/2.2.0/` rather than
+  `vendor/cropperjs/`. An upgrade is a new directory plus one edit in the file
+  that names it, so a page can never mix a cached old file with a new consumer.
+- **A licence file sits beside it**, verbatim, under the name the project ships
+  it as (`LICENSE`). It is what makes the redistribution lawful, and it is
+  reviewed when the version changes.
+- **One place names the file**, and it is the extension's
+  `Configuration/JavaScriptModules.php`: it publishes the versioned path under a
+  bare specifier of its own — `@fgtclb/academic-persons-edit/cropper` — and
+  every module imports that. Nothing imports a vendored path relatively.
+- **The specifier is declared, not inferred.** A vendored build has no type
+  declarations, so `Resources/Private/TypeScript/frontend/_dependencies.d.ts`
+  declares the module with the surface this repository actually calls. That
+  declaration is the contract an upgrade is checked against, and
+  `Build/tests/resolve-hook.mjs` stubs the same specifier for the behavioural
+  suite.
+- **A library the core already ships is not vendored.** CKEditor 5 comes from
+  `EXT:rte_ckeditor` and is mapped from there; Lit comes from `EXT:core`.
+- **A version the core ships is not automatically the right one.** TYPO3 13.4.34
+  and 14.3.6 both map `cropperjs`, and both map **1.6.1** — the API before
+  CropperJS became a set of custom elements. The image editor is written against
+  2.2.0, so the core entry is not usable and the vendored copy stays. Check the
+  version, not the presence of a mapping.
+- **Vendored files are outside the build gate by construction**: they have no
+  source under `Resources/Private/`, so `checkJsBuildClean` neither writes nor
+  deletes them.
+
+Vendoring is a cost — 44 KB of CropperJS reach every profile editing page — and
+it is paid deliberately, per library, with the alternative named in the commit
+that adds it. It stays exactly one library: the profile editor's elements are
+built on the Lit `EXT:core` maps, its rich text fields on the CKEditor 5 of
+`EXT:rte_ckeditor`, and neither is a file of this repository.
+
 ## Artifacts are committed, and that makes a gate mandatory
 
 `Resources/Public/JavaScript/**` and `Resources/Public/Css/**` are tracked files.
@@ -171,6 +228,14 @@ in `git status`.
   it is empty.
 - **npm packages ship PHP.** `flatted` carries a PHP port of itself, so
   `Build/node_modules` is excluded from `lintPhp`.
+- **A bare specifier only type-checks when `Build/tsconfig.json` maps it.**
+  Without a `paths` entry TypeScript cannot resolve
+  `@fgtclb/<extension>/frontend/x.js` and falls back to whatever ambient
+  `declare module` it finds. `academic_persons_edit` shipped such a declaration
+  for each of its own modules for a while, so `typecheckJs` checked a
+  hand-written copy of the exports that had already drifted from the real ones.
+  Ambient declarations are for vendor specifiers only; an extension whose
+  modules import each other gets a `paths` entry.
 
 ## See also
 

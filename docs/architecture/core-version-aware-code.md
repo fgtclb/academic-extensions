@@ -17,21 +17,24 @@ currently resolved **inside** the file that has it.
 Four mechanisms are in use, and they differ by *where* the difference sits —
 not by preference:
 
-| Mechanism                                  | Used in                                    | Count              |
-|--------------------------------------------|--------------------------------------------|--------------------|
-| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`               | 1 file, 2 switches |
-| Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`         | 12 files           |
-| Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/` | 3 files            |
-| Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`      | 2 files            |
+| Mechanism                                  | Used in                                    | Count               |
+|--------------------------------------------|--------------------------------------------|---------------------|
+| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`               | 2 files, 3 switches |
+| Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`         | 12 files            |
+| Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/` | 3 files             |
+| Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`      | 2 files             |
 
 All of them switch on `(new Typo3Version())->getMajorVersion()`.
 
 ### A switch inside a class
 
-Exactly one class under any `Classes/` directory carries a version switch:
-[`packages/fgtclb/academic-base/Classes/TcaManipulator.php`](../../packages/fgtclb/academic-base/Classes/TcaManipulator.php).
-It has two, and both exist because the two core versions want incompatible
-input for the same job.
+Two classes under a `Classes/` directory carry a version switch, both in
+`academic-base`:
+[`Classes/TcaManipulator.php`](../../packages/fgtclb/academic-base/Classes/TcaManipulator.php)
+with two, and
+[`Classes/Imaging/IconProvider/CurrentColorSvgIconProvider.php`](../../packages/fgtclb/academic-base/Classes/Imaging/IconProvider/CurrentColorSvgIconProvider.php)
+with one. The two in `TcaManipulator` exist because the two core versions want
+incompatible input for the same job.
 
 **`addContentElementPlugin()` — line 137.** The signature of
 `ExtensionManagementUtility::addPlugin()` changed. On v13 it takes
@@ -52,7 +55,7 @@ if ((new Typo3Version())->getMajorVersion() < 14) {
 ExtensionManagementUtility::addPlugin(...$arguments);
 ```
 
-**`addContentElementPluginFlexForm()` — line 168.** The FlexForm `ds` shape
+**`addContentElementPluginFlexForm()` — line 179.** The FlexForm `ds` shape
 differs, and **neither version tolerates the other's**:
 
 ```php
@@ -63,7 +66,7 @@ $GLOBALS['TCA']['tt_content']['types'][$cType]['columnsOverrides']['pi_flexform'
 ```
 
 The two failure modes are not symmetric, which is why this is worth spelling
-out (the reasoning is recorded in the method's own docblock, lines 145–158):
+out (the reasoning is recorded in the method's own docblock, lines 144–176):
 
 - **v13 given a string** resolves `ds` through `ds_pointerField` and requires
   an array. It throws from `FlexFormTools` (code 1463826960) and the content
@@ -78,6 +81,25 @@ A wrong guess in this one place is therefore not caught by "the backend still
 loads". Both directions are covered by tests, see
 [Core version aware tests](#core-version-aware-tests).
 
+**`CurrentColorSvgIconProvider::generateInlineMarkup()` — line 76.** The
+parent `AbstractSvgIconProvider::getInlineSvg()` reads the file straight from
+disk on v13 and needs an absolute path; on v14 it resolves an `EXT:` path
+itself through `SystemResourceFactory`. The provider therefore resolves the
+path with `GeneralUtility::getFileAbsFileName()` on v13 only and hands v14 the
+path unchanged, so its resource resolution is not bypassed:
+
+```php
+if ((new Typo3Version())->getMajorVersion() < 14
+    && (PathUtility::isExtensionPath($source) || !PathUtility::isAbsolutePath($source))
+) {
+    $source = GeneralUtility::getFileAbsFileName($source);
+}
+```
+
+One condition applied to one value, with a `@todo` naming the v13 support end
+as its exit — the shape the rule below asks for. What it guards is measured in
+[Icons](icons.md#how-the-provider-is-wired-per-core-version).
+
 ### A switch inside a configuration file
 
 TCA, TypoScript and `ext_localconf.php` are loaded by TYPO3 from a fixed path
@@ -86,7 +108,7 @@ in the file. 12 files under `packages/fgtclb/*/Configuration/` do this, and
 they follow a consistent shape: build the array, adjust it at the end, return
 it. For example
 [`packages/fgtclb/academic-jobs/Configuration/TCA/tx_academicjobs_domain_model_job.php`](../../packages/fgtclb/academic-jobs/Configuration/TCA/tx_academicjobs_domain_model_job.php)
-lines 386–394:
+lines 392–398:
 
 ```php
 // The 'searchFields' TCA ctrl option was removed in TYPO3 v14 (Breaking #106972);
@@ -273,7 +295,7 @@ directories is:
 | File                    | Difference                                                             |
 |-------------------------|------------------------------------------------------------------------|
 | `phpstan.neon`          | none — identical, `paths` is `../../../packages` in both               |
-| `phpstan-baseline.neon` | separate baselines (216 lines on Core13, 231 on Core14)                |
+| `phpstan-baseline.neon` | separate baselines (216 lines on Core13, 226 on Core14)                |
 | `phpstan-constants.php` | the `#[Cascade]` constant: array form on Core13, string form on Core14 |
 
 Because `paths` points at `packages` as a whole rather than at named
@@ -302,12 +324,13 @@ tracked as **ACE-294** (epic) with ACE-295, ACE-296 and ACE-297.
 Static analysis and IDE inspections will keep offering the replacements. Ignore
 them here: a "helpful" import rewrite is a fatal error on v13.
 
-**What could be verified.** The test vendor tree at `.Build/vendor/typo3/` is
-currently installed at **TYPO3 v13.4.34**
-(`.Build/vendor/typo3/cms-core/Classes/Information/Typo3Version.php` line 22),
-so only the v13 half of each claim is verifiable there. The v14 column below
-was checked against the development instance `core-14/vendor/`, which its
-tracked `composer.lock` pins to **v14.3.6**.
+**What could be verified.** The test vendor tree at `.Build/vendor/typo3/`
+carries whichever version the last `composerUpdate -t 13|14` installed
+(`.Build/vendor/typo3/cms-core/Classes/Information/Typo3Version.php`, the
+`VERSION` constant), so only one half of each claim is verifiable at a time.
+The other half is checked against the development instances `core-13/vendor/`
+and `core-14/vendor/`, which their tracked `composer.lock` pins to **v13.4.34**
+and **v14.3.6** — the two versions the table below names.
 
 In all three cases the old name still works on v14 — deprecated, not removed —
 so the code compiles and runs on both versions today. What blocks the migration
@@ -350,7 +373,7 @@ Details, so each row can be re-checked rather than trusted:
   (line 298); on v13 the class exists without it. One call site:
   `packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php`
   lines 11 and 33.
-- **Upgrade wizards** — mechanism 2. 9 wizards in 5 extensions import
+- **Upgrade wizards** — mechanism 2. 11 wizards in 5 extensions import
   `TYPO3\CMS\Install\Attribute\UpgradeWizard`,
   `TYPO3\CMS\Install\Updates\UpgradeWizardInterface` and
   `TYPO3\CMS\Install\Updates\DatabaseUpdatedPrerequisite`. On v14 these classes
@@ -383,7 +406,15 @@ build will raise it.
 
 There are two ways out of the epic, and the choice belongs to it rather than to
 an individual change: drop v13 support first (expected), or introduce the
-folder split above — disproportionate for roughly 19 call sites.
+folder split above — disproportionate for 22 call sites (10 `Extbase\Annotation`
+uses in 6 files, 11 upgrade wizards, 1 `FlexFormService`), measured with:
+
+```bash
+grep -rc 'Extbase\\Annotation' --include='*.php' packages/fgtclb/*/Classes
+grep -rl 'TYPO3\\CMS\\Install\\Updates\|TYPO3\\CMS\\Install\\Attribute' \
+  --include='*.php' packages/fgtclb/*/Classes
+grep -rl 'Core\\Service\\FlexFormService' --include='*.php' packages/fgtclb/*/Classes
+```
 
 **Not on this list:** references to core labels marked `x-unused-since="14.0"`.
 They look similar, but they are labels on this repository's *own* TCA, so
@@ -393,7 +424,7 @@ shipping its own text resolves them today on both core versions (**ACE-298**).
 
 `Build/Scripts/runTests.sh` always passes
 `--exclude-group not-core-${CORE_VERSION}` for the selected core version —
-lines 659 (functional), 751 (unit) and 757
+lines 863 (functional), 1043 (unit) and 1049
 (`unitRandom`). A test tagged `not-core-13` therefore runs on v14 only, and
 vice versa. Nothing else has to be wired up.
 
@@ -410,7 +441,7 @@ final class AcademicJobsNewJobFormUploadTest extends AbstractAcademicJobsTestCas
 [`packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormUploadTest.php`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormUploadTest.php)
 line 32, and
 [`packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileImageUploadTest.php`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileImageUploadTest.php)
-line 29. Both carry a docblock naming the core behaviour that forces the
+line 27. Both carry a docblock naming the core behaviour that forces the
 exclusion and a `@todo` to drop the group when v13 support ends.
 
 **A single method, or a class that only differs in fixtures**, carries the
@@ -418,9 +449,10 @@ group on the method. This is the shape to use when both versions need
 asserting, because the two methods then sit next to each other and neither can
 be forgotten:
 [`packages/fgtclb/academic-base/Tests/Unit/TcaManipulatorTest.php`](../../packages/fgtclb/academic-base/Tests/Unit/TcaManipulatorTest.php)
-lines 565 and 584 pin exactly the FlexForm `ds` shapes described above —
-`pluginFlexFormIsAssignedAsArrayOnCoreV13()` with `#[Group('not-core-14')]` and
-`pluginFlexFormIsAssignedAsStringOnCoreV14()` with `#[Group('not-core-13')]`.
+lines 570 and 594 pin exactly the FlexForm `ds` shapes described above —
+`pluginFlexFormIsAssignedToTheGlobalColumnOnCoreV13()` with
+`#[Group('not-core-14')]` and `pluginFlexFormIsAssignedAsStringOnCoreV14()`
+with `#[Group('not-core-13')]`.
 
 The `not-core-13` group also appears on four `DeprecatedCoreLabelsTest` classes
 (`academic-partners`, `academic-persons`, `academic-contact4pages`,
@@ -434,7 +466,7 @@ practice: no such directory exists yet, and the class-level group above is what
 is actually used.
 
 Note that `--exclude-group` composes with the DBMS exclusion on functional runs
-(`--exclude-group not-${DBMS}`, same line 659), so a test can be restricted
+(`--exclude-group not-${DBMS}`, same line 863), so a test can be restricted
 along both axes independently.
 
 ## See also
