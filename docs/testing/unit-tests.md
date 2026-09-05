@@ -5,9 +5,11 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 30 unit test classes across the twelve extensions, 12 of which are the
-one-line version compatibility test every extension carries (see
-[below](#the-version-compatibility-test)).
+There are 84 unit test classes across the twelve extensions and two more in
+`packages-dev/dev-site`, 12 of which are the one-line version compatibility
+test every extension carries (see
+[below](#the-version-compatibility-test)). Measured with
+`find packages/fgtclb/*/Tests/Unit packages-dev/*/Tests/Unit -name '*Test.php' | wc -l`.
 
 ## Running them
 
@@ -49,32 +51,31 @@ between tests are exactly the kind of defect a fixed order hides.
 
 ## Discovery
 
-There is no per-extension PHPUnit configuration. One glob in
-[`Build/phpunit/UnitTests.xml:36-44`](../../Build/phpunit/UnitTests.xml#L36-L44)
-collects every extension's unit tests into a single suite:
+There is no per-extension PHPUnit configuration. Two globs in
+[`Build/phpunit/UnitTests.xml:36-50`](../../Build/phpunit/UnitTests.xml#L36-L50)
+collect every extension's unit tests into a single suite:
 
 ```xml
 <testsuites>
     <testsuite name="Unit tests">
-        <!--
-            This path either needs an adaption in extensions, or an extension's
-            test location path needs to be given to phpunit.
-        -->
         <directory>../../packages/*/*/Tests/Unit/</directory>
+        <directory>../../packages-dev/*/Tests/Unit/</directory>
     </testsuite>
 </testsuites>
 ```
 
-Three things follow from that single line.
+Three things follow from those two lines.
 
 **A new extension needs no configuration change.** Drop it under
 `packages/<vendor>/<dir>/` with a `Tests/Unit/` folder and it is in the suite.
 
-**`packages-dev/` is not covered.** The glob starts at `packages/`, so all three
-packages there — including
-[`packages-dev/testing-helper/`](../../packages-dev/testing-helper) — have no
-tests of their own. Its traits are exercised only through the extensions that
-use them.
+**`packages-dev/` is covered too**, and the second glob is why: the seed
+definition of [`packages-dev/dev-site/`](../../packages-dev/dev-site) carries
+tests of its own, and a suite that does not collect them reports the seed as
+green because it never looked at it.
+[`packages-dev/testing-helper/`](../../packages-dev/testing-helper) has no tests
+of its own all the same — its traits are exercised only through the extensions
+that use them.
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -85,7 +86,7 @@ reports nothing rather than an error.
 
 ## Conventions
 
-These are read off the existing classes, not prescribed from outside. All 30 of
+These are read off the existing classes, not prescribed from outside. All of
 them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
@@ -183,12 +184,13 @@ FlexForm data structure:
 
 ```php
 /**
- * TYPO3 v13 resolves `ds` through `ds_pointerField` and requires an array;
- * a string makes the content element unopenable in the backend.
+ * A plugin content element has no `list_type`, so `*,<CType>` is the key.
+ * Assigning it to the record type instead is what left the backend showing
+ * core's own default data structure.
  */
 #[Group('not-core-14')]
 #[Test]
-public function pluginFlexFormIsAssignedAsArrayOnCoreV13(): void
+public function pluginFlexFormIsAssignedToTheGlobalColumnOnCoreV13(): void
 
 /**
  * TYPO3 v14 resolves the data structure through the record type of the TCA

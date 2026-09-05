@@ -41,11 +41,13 @@ Profile editing template
 ------------------------
 
 Profile editing renders from :file:`Resources/Private/Templates/Profile/Index.html`
-and thirty partials below :file:`Resources/Private/Partials/Profile/`, in four
-directories: :file:`Field/` for the controls, :file:`Documents/` for the
-structured sections and their two editors, :file:`Image/` for the image card and
-the image editor, and :file:`Profile/` for the field sections. Any of them can be
-overridden on its own.
+and thirty-one partials below :file:`Resources/Private/Partials/Profile/`. Four
+of them sit directly in that directory - the header, the status toast, the
+button templates and the prototypes - and the rest in four subdirectories:
+:file:`Field/` for the controls and the two action bars, :file:`Documents/` for
+the structured sections and their two editors, :file:`Image/` for the image card
+and the image editor, and :file:`Profile/` for the field sections. Any of them
+can be overridden on its own.
 
 Two of them carry more than markup. :file:`Profile/Field/Control.html` is the one
 place a form control is spelled - every field, of every section and of both

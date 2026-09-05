@@ -329,12 +329,18 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
      * One toggle in the header, and no global footer actions anywhere.
      *
      * The editor this one replaced had a footer bar with a "save all" and a
-     * "cancel all" button; every editor now owns its own actions, and the only
-     * global control left is the toggle. Its two labels are read by
-     * `frontend/profile/edit-all.ts` from the attributes asserted here.
+     * "cancel all" button. The only global control left is the "edit all"
+     * toggle, which opens full form editing; the bar that governs that state
+     * is rendered inside each fields form and is asserted by
+     * {@see self::everyFieldsFormRendersOneHiddenFormActionBar()}. The two
+     * labels of the toggle are read by `frontend/profile/fields.ts` from the
+     * attributes asserted here.
+     *
+     * The name says what is asserted and no more: nothing here toggles
+     * anything, because no JavaScript runs in this suite.
      */
     #[Test]
-    public function editAllTogglesAllEditorsWithoutGlobalFooterActions(): void
+    public function theEditAllToggleCarriesBothLabelsAndNoFooterActionsRemain(): void
     {
         $this->assertFileDoesNotExist(
             __DIR__ . '/../../../Resources/Private/Partials/Profile/Profile/FooterActions.html',

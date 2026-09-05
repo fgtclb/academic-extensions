@@ -464,8 +464,10 @@ in use in production code alongside it, so the two styles coexist.
 
 Keep the two vendors apart when you use them. `#[Autoconfigure]`, `#[Autowire]`,
 `#[AsAlias]` and `#[Exclude]` are **Symfony's**, from
-`Symfony\Component\DependencyInjection\Attribute`. The only **TYPO3** attribute
-in use here is `Install\Attribute\UpgradeWizard`. That distinction is what the
+`Symfony\Component\DependencyInjection\Attribute`. Two **TYPO3** attributes are
+in use here: `Core\Attribute\AsEventListener` on the three
+`RegisterAcademicPageDoktype` listeners, and `Install\Attribute\UpgradeWizard`
+on the eleven upgrade wizards. That distinction is what the
 `#[AsEventListener]` rule above turns on — TYPO3 ships its own, Symfony's must
 never stand in for it, and Symfony's fails silently rather than loudly: it
 registers nothing, so the listener simply never fires.
@@ -480,11 +482,11 @@ Three APIs on `main` are deprecated in TYPO3 v14 and removed in v15. **None of
 them can be migrated while the branch still supports TYPO3 v13**, because the
 replacement does not exist there. Verified against both vendor trees:
 
-| API                                                    | Replacement                                       | Present on v13.4.33?                                                                  | Call sites                |
-|--------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------|
-| `Extbase\Annotation\*`                                 | `Extbase\Attribute\*`                             | no — `cms-extbase/Classes/Attribute/` absent                                          | 10 in 6 files             |
-| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent                                              | 8 wizards in 5 extensions |
-| `Core\Service\FlexFormService`                         | `Core\Configuration\FlexForm\FlexFormTools`       | class exists on v13, but without `convertFlexFormContentToArray()` on `FlexFormTools` | 1 file                    |
+| API                                                    | Replacement                                       | Present on v13.4.34?                                                                  | Call sites                 |
+|--------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------------|----------------------------|
+| `Extbase\Annotation\*`                                 | `Extbase\Attribute\*`                             | no — `cms-extbase/Classes/Attribute/` absent                                          | 10 in 6 files              |
+| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent                                              | 11 wizards in 5 extensions |
+| `Core\Service\FlexFormService`                         | `Core\Configuration\FlexForm\FlexFormTools`       | class exists on v13, but without `convertFlexFormContentToArray()` on `FlexFormTools` | 1 file                     |
 
 They are tracked as **ACE-294** (epic) with ACE-295, ACE-296 and ACE-297.
 Static analysis and IDE inspections will keep suggesting the replacements —
@@ -492,7 +494,7 @@ ignore them here. A "helpful" import rewrite is a fatal error on v13.
 
 Two ways out, and the choice belongs to the epic, not to an individual change:
 drop v13 support first (expected), or introduce the `Core13/Core14` split
-described above — disproportionate for ~19 call sites.
+described above — disproportionate for 22 call sites.
 
 **Not on this list:** references to core labels marked `x-unused-since="14.0"`.
 They look the same — the replacements are v14-only XLIFF 2.0 files — but they

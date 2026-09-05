@@ -669,7 +669,7 @@ export const fieldGroup = ({
 /**
  * `Partials/Profile/Field/FormActions.html` - the controls of full form
  * editing, rendered at the end of every fields form and delivered `hidden`.
- * The three buttons stand in tab order: apply, undo, abort.
+ * The three buttons stand in tab order: apply, undo, discard.
  */
 export const formActions = (sectionLabel = "Personal data"): string => `
 <div class="col-12 d-flex justify-content-end align-items-center gap-2 pt-3 border-top"

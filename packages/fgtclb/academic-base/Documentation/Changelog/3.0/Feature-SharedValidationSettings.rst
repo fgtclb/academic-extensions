@@ -31,8 +31,8 @@ The classes, all in the namespace :php:`FGTCLB\AcademicBase\Settings`:
             ``number`` / ``date`` flag lists of a settings file into those
             objects. ``date`` sets the frontend input type only and leaves
             the TCA type of the column alone. The same release adds
-            ``url``, ``tel``, ``textarea`` and ``html`` - see *Feature:
-            Validation flags and character limits*.
+            ``url``, ``tel``, ``textarea`` and ``html`` - see
+            :ref:`feature-validation-character-limit-metadata`.
     *   -   :php:`SettingsFileLoader`
         -   Reads one settings file from every active package, merges them on
             the top level (the last package wins per key) and caches the

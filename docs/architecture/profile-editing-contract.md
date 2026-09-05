@@ -97,16 +97,45 @@ contract and the rows of a document section - is a `:nth-child` rule.
 
 **No element and no filler writes markup**: every tag, every `class` attribute
 and every label of the two editors is authored in Fluid. That is not the same as
-"JavaScript never names a class". The feature modules below the elements toggle
-*state* classes on markup that already exists — `d-none`, `is-invalid`,
-`text-danger`, `text-body-secondary`, `active`, the four
-`bg-*` severities of the toast, the five `is-drag-*`/`is-drop-*` classes of the
-drag sort, `is-image-closing`, the three `col-lg-*` widths of the image column,
-the transition classes derived from a prefix — and they select by
-`.status-title`, `.status-message`, `.alert[role="alert"]`, `.spinner-border`
-and `.academic-persons-profile-editing__profile-fields-column`. An override that
-renames one of those breaks the editor silently, so they are documented as part
-of the contract in the extension's manual.
+"JavaScript never names a class", and the difference is worth stating exactly,
+because an override that renames one of these breaks the editor silently. They
+are part of the contract and are listed in the extension's manual as well.
+
+The feature modules below the elements toggle *state* classes on markup that
+already exists — `d-none`, `d-md-flex`, `is-invalid`, `text-danger`,
+`text-body-secondary`, `active`, the four `bg-*` severities of the toast, the
+five `is-drag-*`/`is-drop-*` classes of the drag sort, `is-image-closing`, the
+three `col-lg-*` widths of the image column, and the transition classes derived
+from a prefix — and they select nodes by class in eleven places:
+
+| Selector                                                   | Read by                                  |
+|------------------------------------------------------------|------------------------------------------|
+| `.academic-persons-profile-editing__field`                 | `fields.ts`, every editable control      |
+| `.academic-persons-profile-editing__sync-checkbox`         | `sync.ts`                                |
+| `.academic-persons-profile-editing__profile-fields-column` | `image.ts`, `elements/image-editor.ts`   |
+| `.status-title`, `.status-message`                         | `common.ts`, the toast                   |
+| `.invalid-feedback`, `.form-check`, `.mb-3`                | `fields.ts`, the validation message      |
+| `.ck`                                                      | `fields.ts`, the CKEditor `Escape` guard |
+| `.alert[role="alert"]`, `.spinner-border`                  | the two editor elements                  |
+
+`sticky-image.ts` adds `#page-header.navbar-fixed-top`, which belongs to the
+site's theme rather than to this extension.
+
+Three nodes carrying markup are built in JavaScript rather than cloned from a
+prototype, all of them outside the two editors and each a leaf:
+`profile/documents.ts` writes a document row's title as an `<a>` or a `<span>`
+depending on whether the record carries an allowed link, and puts an em dash
+where the value is empty — the same placeholder Fluid spells as
+`prependOptionLabel`; and `profile/rich-text.ts` writes the empty-state label of
+a rich text preview as `<span class="text-body-secondary">`. The remaining
+`document.createElement()` calls make a custom element host, which carries no
+markup of its own until it is filled from a prototype, or the detached render
+root of `elements/base.ts`. Anything larger than a leaf is a prototype.
+
+```bash
+grep -rnoP 'classList\.\w+\([^)]*\)|document\.createElement' \
+  packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend
+```
 
 The keys are a closed type. `PrototypeSlots` and `PrototypeLists` name them
 exactly as `ProfileEditingHooks` names the hooks, so a key an element fills that
@@ -218,6 +247,13 @@ before, two of them already drifted; a functional test now asserts that a
 prototype control and the live control of the same type carry the same tag, the
 same classes and the same attributes, with no exception list.
 
+`profile/elements/field-clone.ts` is the TypeScript half of the same
+consolidation: one builder turns a `documentForm` or `contractContactForm`
+field descriptor into DOM by cloning those prototypes, and the document editor
+and the contact editor differ in two arguments — the id prefix and which of the
+two field hooks the control carries. It is where the drifted checkbox came
+from, so it is deliberately one function and not two.
+
 ## The five elements
 
 | Element                                     | Renders | Responsibility                                                         |
@@ -300,7 +336,8 @@ integrator contract; and the SCSS pipeline emits one stylesheet per extension.
 import map. `EXT:core/Configuration/JavaScriptModules.php` maps `lit`, `lit/`,
 `lit-element` and `lit-html` with **no tag and no dependency**, unlike
 `EXT:rte_ckeditor`, and `academic_persons_edit` already declares
-`'dependencies' => ['core']`, so the frontend import map carries them. Nothing
+`'dependencies' => ['core', 'academic_persons']`, so the frontend import map
+carries them. Nothing
 is added to the extension's own `JavaScriptModules.php`: an own mapping would
 pin a copy that diverges from the core the site runs.
 
@@ -414,19 +451,19 @@ platform disconnects everything it removes, so every rich text element of the
 previous panel is destroyed by its own `disconnectedCallback()`. Scoping the
 teardown by hand is what once destroyed the *profile* field editors instead.
 
-| Member                                    | Contract                                                                                       |
-|-------------------------------------------|------------------------------------------------------------------------------------------------|
-| `<academic-persons-edit-document-editor>` | The tag name. It observes no attributes — every input is a property.                           |
-| `context`                                 | The `EditingContext`, assignable; resolved from the element above it when it is not.           |
-| `open`                                    | Runs the enter transition when it becomes true and the leave transition when it becomes false. |
-| `mode`, `kind`, `heading`, `record`       | Which of the four views is rendered, for a document or a contract, and under which heading.    |
-| `fields`, `values`, `errors`, `error`     | The `documentForm` response, what the visitor typed, and what the server refused.              |
-| `pending`, `deleteConfirmation`           | The busy state, and the question a deletion asks.                                              |
-| `contactSections`, `contactEmptyMessage`  | Handed on to the contract contacts of a contract in view mode.                                 |
-| `pe:document-close`                       | The cancel button was pressed.                                                                 |
-| `pe:document-submit`                      | The form was submitted; the browser's own submit is prevented.                                 |
-| `pe:document-input`                       | A control changed: `{ name, value }`.                                                          |
-| `pe:document-closed`                      | The leave transition is over and the owner may remove the element.                             |
+| Member                                                    | Contract                                                                                          |
+|-----------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `<academic-persons-edit-document-editor>`                 | The tag name. It observes no attributes — every input is a property.                              |
+| `context`                                                 | The `EditingContext`, assignable; resolved from the element above it when it is not.              |
+| `open`                                                    | Runs the enter transition when it becomes true and the leave transition when it becomes false.    |
+| `mode`, `kind`, `heading`, `record`                       | Which of the four views is rendered, for a document or a contract, and under which heading.       |
+| `fields`, `values`, `errors`, `error`                     | The `documentForm` response, what the visitor typed, and what the server refused.                 |
+| `pending`, `deleteConfirmation`                           | The busy state, and the question a deletion asks.                                                 |
+| `contactSections`, `contactEmptyMessage`, `contactEditor` | Handed on to the contract contacts of a contract in view mode: the two lists and the open editor. |
+| `pe:document-close`                                       | The cancel button was pressed.                                                                    |
+| `pe:document-submit`                                      | The form was submitted; the browser's own submit is prevented.                                    |
+| `pe:document-input`                                       | A control changed: `{ name, value }`.                                                             |
+| `pe:document-closed`                                      | The leave transition is over and the owner may remove the element.                                |
 
 The property is called `heading` and not `title` for a reason that is easy to
 step on: `title` is a property of every `HTMLElement`, and a reactive property
@@ -559,9 +596,10 @@ and CKEditor 5 are delivered by the core and are not vendored. See
 [Frontend assets](../development/frontend-assets.md#vendored-libraries).
 
 The five element names, the `pe:*` events, the `data-pe-*` hooks, the root's
-`data-*` attributes and the four prototype verbs are the whole contract between
-Fluid and the JavaScript. Everything else — every tag, class and label of the
-editor — is in a Fluid partial an integrator overrides.
+`data-*` attributes, the four prototype verbs and the state classes and
+selectors listed above are the whole contract between Fluid and the JavaScript.
+Everything else — every tag, class and label of the editor — is in a Fluid
+partial an integrator overrides.
 
 ## The seam for a caller that has only the element
 

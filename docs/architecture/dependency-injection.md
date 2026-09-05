@@ -127,7 +127,7 @@ Measured with
 |----------------------|-------|------------------------------------------------------------------------------|
 | `#[Autoconfigure]`   | 10    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
 | `#[Autowire]`        | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
-| `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:21`                 |
+| `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
 | `#[Exclude]`         | 11    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
 | `#[AsEventListener]` | 3     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 1     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
@@ -186,7 +186,7 @@ collaborators through the constructor and keep them `private readonly`.
 ### What compliant code looks like
 
 [`packages/fgtclb/academic-persons/Classes/Service/RecordSynchronizer.php`](../../packages/fgtclb/academic-persons/Classes/Service/RecordSynchronizer.php)
-lines 21–27: two attributes, one injected collaborator, no instance state.
+lines 49–71: two attributes, two injected collaborators, no instance state.
 
 ```php
 #[AsAlias(id: RecordSynchronizerInterface::class, public: true)]
@@ -194,7 +194,8 @@ lines 21–27: two attributes, one injected collaborator, no instance state.
 class RecordSynchronizer implements RecordSynchronizerInterface
 {
     public function __construct(
-        private readonly ConnectionPool $connectionPool,
+        private readonly DataHandlerExecutionContext $executionContext,
+        private readonly LoggerInterface $logger,
     ) {}
 ```
 
@@ -241,9 +242,11 @@ No service in this repository is declared that way today.
 
 Not every attribute exists in every supported version, so an attribute has to be
 checked against **both** before it is used. The following was verified by
-listing the attribute directories of both installed trees: `.Build/vendor/`
-(TYPO3 v13.4.34, the tree the test suite runs against) and `core-14/vendor/`
-(TYPO3 v14.3.6, the development instance).
+listing the attribute directories of both installed trees — `.Build/vendor/`
+carries whichever version the last `composerUpdate -t 13|14` installed, and
+`core-13/vendor/` and `core-14/vendor/` carry the two development instances, so
+the check is `composerUpdate` for one version, list, `composerUpdate` for the
+other, list again. The versions listed below are 13.4.34 and 14.3.6.
 
 **Symfony `Symfony\Component\DependencyInjection\Attribute\*` — identical on
 both trees** (21 attributes each), so all of these are safe:

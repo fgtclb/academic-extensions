@@ -28,10 +28,9 @@ guard covers every use rather than only the first.
 Impact
 ======
 
-`CategoryViewHelper` and `AbstractSelectViewHelper` (and its subclasses, for
-example the select and filter select view helpers of this extension) return
-`''` instead of raising a fatal error when rendered without a rendering
-context.
+`CategoryViewHelper` and `AbstractSelectViewHelper` - and its one subclass,
+`Form\FilterSelectViewHelper` - return `''` instead of raising a fatal error
+when rendered without a rendering context.
 
 Affected Installations
 ======================

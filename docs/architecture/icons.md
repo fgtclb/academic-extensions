@@ -1,9 +1,10 @@
 # Icons
 
 How icons are registered and consumed across the extensions, which provider to
-register an icon with, and how a template's icons are kept resolvable. The
-counts on this page were measured on `main` at the time of writing and can be
-reproduced with the commands quoted next to them.
+register an icon with, and how a template's icons are kept resolvable. Every
+count on this page is the output of the command quoted next to it, run over the
+repository at the commit that last touched this page. Re-run them rather than
+adjusting a number by hand.
 
 ## Registration today
 
@@ -11,6 +12,8 @@ reproduced with the commands quoted next to them.
 grep -c "'provider'" packages/fgtclb/*/Configuration/Icons.php
 grep -rh "'provider' =>" packages/fgtclb/*/Configuration/Icons.php \
   | sed "s/.*=> *//" | sort | uniq -c
+grep -c "'provider' => CurrentColorSvgIconProvider" \
+  packages/fgtclb/*/Configuration/Icons.php
 ```
 
 Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **64

@@ -22,7 +22,7 @@ The TypoScript setting names are unchanged.
 :typoscript:`settings.editForm.profileImage.validation.allowedMimeTypes` keep
 their names and are mapped onto the core :php:`FileSizeValidator` and
 :php:`MimeTypeValidator`. What a *blank* value means changed - see
-*Breaking: Profile image upload validation always applies*.
+:ref:`breaking-profile-image-upload-validation-always-applies`.
 
 Impact
 ======

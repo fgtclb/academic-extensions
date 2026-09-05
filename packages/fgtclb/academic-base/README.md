@@ -36,7 +36,7 @@ Install with your flavour:
 We prefer composer installation:
 
 ```bash
-composer require 'fgtclb/academic-persons':'^2'
+composer require 'fgtclb/academic-base':'^2'
 ```
 
 > [!IMPORTANT]
@@ -60,7 +60,7 @@ and installed with:
 
 ```shell
 composer require \
-  'fgtclb/academic-persons':'3.*.*@dev'
+  'fgtclb/academic-base':'3.*.*@dev'
 ```
 
 ## Credits

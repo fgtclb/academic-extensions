@@ -37,6 +37,8 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | [Form data transformation](architecture/form-data-transformation.md)       | When a value of a JSON payload reaches the domain model, and why the shipped `profile` defaults lock the name fields.         |
 | [TypoScript and site sets](architecture/typoscript-and-site-sets.md)       | One physical copy of every TypoScript and page TSconfig file, delivered as a site set and as a static template.               |
 | [Translation synchronization](architecture/translation-synchronization.md) | Why the profile translation sync goes through the DataHandler, its event chain, workspace rules and the contact4pages policy. |
+| [Icons](architecture/icons.md)                                             | Which provider to register an icon with, the two markups, and how a template's icons stay resolvable.                         |
+| [The profile editing contract](architecture/profile-editing-contract.md)   | The `data-*` contract between the Fluid-rendered profile editor and the five custom elements that drive it.                   |
 
 ## [Testing](testing/Index.md)
 

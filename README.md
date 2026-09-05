@@ -86,8 +86,9 @@ Legend:
 
 The `<3>` marker documents the upcoming major `3.x` line, which targets TYPO3
 **v13 + v14** (see the branch support matrix above). Both core versions are
-implemented and verified for every extension above by the `TYPO3 v13` and
-`TYPO3 v14` CI workflows. The `3.x` line itself is still in development
+implemented and verified for every extension above by the `ci.yml` workflow,
+which carries the core version as a matrix dimension rather than as a workflow
+of its own. The `3.x` line itself is still in development
 (`3.0.0-dev`) and not released yet.
 
 ## List of TYPO3 extension and the split repositories (READ ONLY)

@@ -6,23 +6,32 @@ through the same code paths production uses. It is the only suite here that
 sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
-It is also by far the larger suite: 118 functional test classes against 30 unit
-test classes, and 222 CSV fixtures.
+It is also by far the larger suite: 228 functional test classes against 84 unit
+test classes, and 367 CSV fixtures. Measured with
+
+```bash
+find packages/fgtclb/*/Tests/Functional -name '*Test.php' | wc -l
+find packages/fgtclb/*/Tests/Unit -name '*Test.php' | wc -l
+find packages -path '*Tests*' -name '*.csv' | wc -l
+```
 
 | Extension                | Functional | Unit |
 |--------------------------|------------|------|
-| `academic-base`          | 8          | 2    |
-| `academic-bite-jobs`     | 4          | 1    |
-| `academic-contact4pages` | 8          | 2    |
-| `academic-jobs`          | 13         | 1    |
-| `academic-partners`      | 9          | 1    |
-| `academic-persons`       | 26         | 6    |
-| `academic-persons-edit`  | 13         | 3    |
+| `academic-base`          | 11         | 11   |
+| `academic-bite-jobs`     | 8          | 1    |
+| `academic-contact4pages` | 16         | 2    |
+| `academic-jobs`          | 19         | 2    |
+| `academic-partners`      | 19         | 5    |
+| `academic-persons`       | 58         | 19   |
+| `academic-persons-edit`  | 37         | 23   |
 | `academic-persons-sync`  | 2          | 1    |
-| `academic-programs`      | 8          | 1    |
-| `academic-projects`      | 11         | 1    |
-| `academic-study-plan`    | 5          | 1    |
-| `typo3-category-types`   | 11         | 10   |
+| `academic-programs`      | 18         | 3    |
+| `academic-projects`      | 19         | 4    |
+| `academic-study-plan`    | 9          | 1    |
+| `typo3-category-types`   | 12         | 12   |
+
+`packages-dev/dev-site` adds four functional and two unit classes on top; both
+suites collect it, see [Unit tests](unit-tests.md#discovery).
 
 ## Running them
 
@@ -228,7 +237,9 @@ a fixture from being quietly reused by a test it was not written for.
 
 ## Testing a JSON endpoint
 
-`academic-persons-edit` answers thirteen actions as JSON, and they are tested
+`academic-persons-edit` answers fourteen actions as JSON — the thirteen of
+`ProfileController::JSON_ACTIONS` plus the multipart `uploadImage` — and they
+are tested
 through the real plugin rather than by calling the controller: the gate that
 refuses a request lives partly in `initializeAction()` and partly in a service,
 and only a real request exercises both.

@@ -33,9 +33,12 @@ of a read-only section is answered with ``403`` and the error code
 whether or not the button that would trigger it was rendered.
 
 The rendered form itself changed with it: every control carries a label, its
-``aria-describedby`` help text and its validation state, the compact lists are
-tables with real headers, and the sortable lists offer keyboard controls next
-to the drag handle. :ref:`profile-editing` describes the result.
+``aria-describedby`` help text and its validation state; the compact lists put
+a column heading row above the rows on wide viewports and repeat each column's
+label beside its value on narrow ones; and the sortable lists offer keyboard
+controls next to the drag handle. The lists are Bootstrap grid rows rather than
+tables - a row is one record and its cells reflow into a block on a phone.
+:ref:`profile-editing` describes the result.
 
 Impact
 ======

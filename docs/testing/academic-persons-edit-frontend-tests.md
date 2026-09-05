@@ -60,20 +60,22 @@ Three things answer it, and only one of them is coverage:
 - What neither of them reaches is the behaviour between the two, and that is
   this suite.
 
-| File                        | What it pins                                                                                                                                                  |
-|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `request-layer.test.ts`     | `requestJson()`: the headers including the `X-Requested-With` guard, the failure shapes, the wait cursor, and which status region a severity writes.          |
-| `skip-sync.test.ts`         | The synchronisation switch: its payload, the revert of a control that saves without a button, and the two listeners that reach it.                            |
-| `field-editing.test.ts`     | Per-field edit, clear, undo and save; only changed fields travel; the validation messages; the visibility switch; the field groups and their preview modes.   |
-| `rich-text-preview.test.ts` | The sanitiser's allow-list, the link schemes, the preview, and the character limit.                                                                           |
-| `document-rows.test.ts`     | The list a section renders: numbering, the arrow at each end, the empty state, sorting by arrow and by drag, and the rollback of both.                        |
-| `document-editor.test.ts`   | The open and close cycle, the collapse target, the focus, the created editors, the three save modes, and the values a row is written with.                    |
-| `contract-contacts.test.ts` | The contacts of a contract: their endpoints, their editor, and what a save does to the list the element is handed.                                            |
-| `image-editing.test.ts`     | Choosing, uploading and deleting the image, the previews, and the object urls that are released.                                                              |
-| `sticky-image.test.ts`      | The offset below a fixed page header, and its teardown.                                                                                                       |
-| `editing-context.test.ts`   | The root's `data-*` contract: every key of a complete root, what a minimal one reads as, the four coercions, and that the result is frozen.                   |
-| `prototypes.test.ts`        | The four verbs of the filler, a value that contains markup, an unknown slot, an unknown list, and a prototype the page does not render.                       |
-| `lit-lifecycle.test.ts`     | The base class: that lit-html reaches no child of an element, whatever `render()` returns, and that the reactive plumbing the base class is kept for is live. |
+| File                             | What it pins                                                                                                                                                  |
+|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `request-layer.test.ts`          | `requestJson()`: the headers including the `X-Requested-With` guard, the failure shapes, the wait cursor, and which status region a severity writes.          |
+| `skip-sync.test.ts`              | The synchronisation switch: its payload, the revert of a control that saves without a button, and the two listeners that reach it.                            |
+| `field-editing.test.ts`          | Per-field edit, clear, undo and save; only changed fields travel; the validation messages; the visibility switch; the field groups and their preview modes.   |
+| `full-form-editing.test.ts`      | The other editing state: what entering hides and opens, apply as one request, undo, discard, the keyboard, and autosave suppressed while the form is open.    |
+| `rich-text-preview.test.ts`      | The sanitiser's allow-list, the link schemes, the preview, and the character limit.                                                                           |
+| `rich-text-editor-scope.test.ts` | The teardown scope of the rich text editors — the defect the harness was built for, described above.                                                          |
+| `document-rows.test.ts`          | The list a section renders: numbering, the arrow at each end, the empty state, sorting by arrow and by drag, and the rollback of both.                        |
+| `document-editor.test.ts`        | The open and close cycle, the collapse target, the focus, the created editors, the three save modes, and the values a row is written with.                    |
+| `contract-contacts.test.ts`      | The contacts of a contract: their endpoints, their editor, and what a save does to the list the element is handed.                                            |
+| `image-editing.test.ts`          | Choosing, uploading and deleting the image, the previews, and the object urls that are released.                                                              |
+| `sticky-image.test.ts`           | The offset below a fixed page header, and its teardown.                                                                                                       |
+| `editing-context.test.ts`        | The root's `data-*` contract: every key of a complete root, what a minimal one reads as, the four coercions, and that the result is frozen.                   |
+| `prototypes.test.ts`             | The four verbs of the filler, a value that contains markup, an unknown slot, an unknown list, and a prototype the page does not render.                       |
+| `lit-lifecycle.test.ts`          | The base class: that lit-html reaches no child of an element, whatever `render()` returns, and that the reactive plumbing the base class is kept for is live. |
 
 The elements add one file each for what they do with the markup they are handed,
 and one for the order they may be defined in:
@@ -87,6 +89,15 @@ and one for the order they may be defined in:
 | `rich-text-element.test.ts`              | That it wraps the textarea its prototype carries, one editor per element, created on connect and destroyed on disconnect, exactly once each.                                                                                                                                          |
 | `entry-point.test.ts`                    | That `frontend/profile.js` defines every element of the editor.                                                                                                                                                                                                                       |
 | `*-element-upgrade.test.ts` (four files) | That an element works in both orders: properties assigned before the definition ran, and an element created after it.                                                                                                                                                                 |
+
+With the four harness self-tests under `Tests/JavaScript/Harness/` that is
+**380 cases in 62 suites**, across 28 files. Take the figure from the runner
+rather than from a `grep` over the sources: `prototypes.test.ts` generates one
+case per prototype, so the 365 cases written there are 380 executed ones.
+
+```bash
+Build/Scripts/runTests.sh -s testJs   # the "tests" and "suites" lines it ends with
+```
 
 The fixture is a transcription of the Fluid prototypes and not the partial, so
 nothing in this suite would notice a hook renamed in the partial. Two tests hold

@@ -19,10 +19,14 @@ packages/fgtclb/<extension>/
 The same applies to `packages-dev/*`. Nothing is required to exist: an extension
 without those directories contributes nothing to the build, and adding one is
 picked up without touching any configuration. Five extensions carry sources
-today: `academic-jobs` and `academic-persons-edit` ship TypeScript,
-`academic-partners`, `academic-study-plan` and `academic-persons` ship both —
-the latter the public profile's `frontend/profile.ts` and
-`frontend/profile-detail.scss`, loaded by `Templates/Profile/Detail.html`.
+today: `academic-jobs` ships TypeScript only, and `academic-partners`,
+`academic-persons`, `academic-persons-edit` and `academic-study-plan` ship
+TypeScript and SCSS. `academic-persons` carries the public profile's
+`frontend/profile.ts` and `frontend/profile-detail.scss`, loaded by
+`Templates/Profile/Detail.html`, plus the `frontend/sticky-offset.ts` the
+editing view of `academic-persons-edit` shares with it through the import map.
+`academic-persons-edit` is the largest by a wide margin — twenty TypeScript
+modules and `frontend/profile-editing.scss`.
 
 The `backend/` and `frontend/` split is a convention rather than a mechanism —
 the build mirrors whatever directory structure it finds. Keeping the two apart

@@ -32,10 +32,11 @@ describing an intention as if it were the state.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
-- The profile editor is five custom elements over Fluid's markup, and only the
-  two whose content comes out of a response build markup themselves. All of
-  them render into the **light DOM**: a project's stylesheet reaches every
-  control they draw, and there is no `::part()` to declare.
+- The profile editor is five custom elements over Fluid's markup, and **none of
+  them renders any**: the two whose content comes out of a response clone
+  `<template>` prototypes Fluid emitted. No element opens a shadow root and
+  none lets lit-html reach its children, so a project's stylesheet reaches
+  every control and there is no `::part()` to declare.
 
 ## Pages
 

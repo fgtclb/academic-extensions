@@ -16,8 +16,8 @@ and ``0``, so an entry written before they existed still restores.
 
 :php:`ValidationNormalizer::normalizeValidation()` understands four more
 flags than the ``required`` / ``readonly`` / ``disabled`` / ``email`` /
-``number`` / ``date`` set of *Feature: Shared validation settings*, and takes
-three optional arguments:
+``number`` / ``date`` set of :ref:`feature-shared-validation-settings`, and
+takes three optional arguments:
 
 ..  list-table::
     :header-rows: 1

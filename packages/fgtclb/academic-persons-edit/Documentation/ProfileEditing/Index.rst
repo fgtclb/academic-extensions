@@ -1310,6 +1310,9 @@ one of them breaks the editor silently, because nothing throws when a
     *   - ``d-none``
         - Everything that is shown and hidden by the field editing: a preview,
           an editor, a per-field action group, an empty section, the toast.
+    *   - ``d-md-flex``
+        - The header row of a structured document list, which is shown only
+          while the list has rows.
     *   - ``is-invalid``
         - A control the server refused, on a profile field and on the
           synchronisation switch.
@@ -1338,6 +1341,20 @@ one of them breaks the editor silently, because nothing throws when a
         - The message and the busy indicator of an open document or contact
           panel, written onto the panel that is already there rather than by
           rebuilding it.
+    *   - ``.invalid-feedback``, ``.form-check`` and ``.mb-3``
+        - The message element of a refused field, and the two wrappers it is
+          looked up from when the field carries no ``data-pe-field-wrapper``
+          or ``data-pe-group-control``.
+    *   - ``.academic-persons-profile-editing__field``
+        - Every editable control of the profile fields. This is the class the
+          field editing enumerates by, so an override that drops it leaves the
+          field unreachable.
+    *   - ``.academic-persons-profile-editing__sync-checkbox``
+        - The synchronisation switch of :file:`Partials/Profile/Header.html`.
+    *   - ``.ck``
+        - CKEditor's own root, read to decide whether :kbd:`Escape` belongs to
+          the editor or to the form. It is the library's class, not this
+          extension's, and is the one entry here an override cannot change.
     *   - ``…-enter-from``, ``…-enter-active``, ``…-leave-active``,
           ``…-leave-to``
         - The collapse transitions, derived from the prefix of the editor that

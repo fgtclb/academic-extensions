@@ -17,12 +17,12 @@ this repository, never the installed core, so it needs neither `-t` nor a
 
 Because a whole class of defect in this repository is invisible to everything
 else. The one it was built for: a rewrite of the profile editing frontend
-shipped twelve dead `dataset.ie*` reads — property names that no longer matched
-the attributes the templates render — through thirty-five green CI jobs. Every
-gate passed. `lintTypescript` had nothing to say about a valid property access,
-`typecheckJs` types `dataset` as an index signature, the build compiled it, and
-the PHP suites asserted on rendered markup that was correct. Nothing executed
-the module.
+shipped thirteen dead `dataset.ie*` keys — property names that no longer
+matched the attributes the templates render, read at twenty-five sites —
+through thirty-five green CI jobs. Every gate passed. `lintTypescript` had
+nothing to say about a valid property access, `typecheckJs` types `dataset` as
+an index signature, the build compiled it, and the PHP suites asserted on
+rendered markup that was correct. Nothing executed the module.
 
 A second one, from the same rewrite, is the shape this suite is really about:
 the document editor closes through a transition hook that runs *after* the

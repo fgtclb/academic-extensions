@@ -16,9 +16,11 @@ that holds for the two regions whose content only exists at runtime as well.
 Those two regions are the editor of one document or contract and the contacts of
 one contract: their fields, labels, options and display values come from the
 ``documentForm`` and ``contractContactForm`` responses, which answer field
-descriptors and never HTML. Fluid renders their *shapes* into
-:file:`Resources/Private/Partials/Profile/Prototypes.html` as
-``<template data-pe-proto="…">`` blocks, and the elements clone one and fill it.
+descriptors and never HTML. Fluid renders their *shapes* as
+``<template data-pe-proto="…">`` blocks - eleven of them in
+:file:`Resources/Private/Partials/Profile/Prototypes.html` and five more in the
+three :file:`Documents/` partials it renders - and the elements clone one and
+fill it.
 
 The four verbs
 --------------
@@ -52,11 +54,14 @@ One place spells a control
 --------------------------
 
 :file:`Resources/Private/Partials/Profile/Field/Control.html` is the only place
-a form control of this editor is spelled - a text input, a textarea, a rich text
-field, a select and a checkbox. It is rendered inline for the permanent profile
-fields, once per type into the prototypes, and through those for every field of
-a document or contact editor. Overriding that one file changes every control of
-the editor at once.
+a **field** control of this editor is spelled - a text input, a textarea, a rich
+text field, a select and a checkbox. It is rendered inline for the permanent
+profile fields, once per type into the prototypes, and through those for every
+field of a document or contact editor. Overriding that one file changes every
+field control of the editor at once. Two controls stand outside it because they
+are not profile fields: the synchronisation switch of :file:`Header.html` and
+the :html:`f:form.upload` of :file:`Image/Editor.html`, which belongs to the
+Extbase form that carries the upload signature.
 
 The five elements
 -----------------

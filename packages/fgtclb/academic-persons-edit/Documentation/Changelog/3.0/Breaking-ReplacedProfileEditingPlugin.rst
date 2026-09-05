@@ -67,8 +67,13 @@ the plugin registers, and its action list is new:
         - :php:`Domain\Factory\ProfileFormDataFactory::createFromProfile()`
 
 An installation that links to one of the removed actions - a
-``f:link.action`` in an override, a hand written URL, a bookmark - gets the
-plugin's ``list`` view instead.
+``f:link.action`` in an override, a hand written URL, a bookmark - gets a
+**500**, not a fallback view. Extbase throws
+:php:`InvalidControllerNameException` (1313855173) for a removed controller and
+:php:`InvalidActionNameException` (1313855175) for a removed action; the
+fallback to the default action only happens where
+:typoscript:`config.tx_extbase.mvc.callDefaultActionIfActionCantBeResolved` is
+set, and this extension does not set it.
 
 Removed templates, layouts and partials
 ---------------------------------------
@@ -95,9 +100,12 @@ The plugin renders without a Fluid layout since, so the TypoScript constant
 package that still sets the constant sets something nothing reads.
 
 :file:`Resources/Private/Templates/Profile/List.html` is kept and rewritten,
-and :file:`Resources/Private/Templates/Profile/Index.html` with the partials
-below :file:`Partials/Profile/{Documents,Field,Image,Profile}/` is the new
-tree. :ref:`templates-override` describes what may be overridden.
+and :file:`Resources/Private/Templates/Profile/Index.html` with the
+thirty-one partials below :file:`Partials/Profile/` is the new tree: four of
+them - :file:`Header.html`, :file:`StatusToast.html`,
+:file:`ButtonTemplates.html` and :file:`Prototypes.html` - directly in that
+directory and the rest in :file:`{Documents,Field,Image,Profile}/`.
+:ref:`templates-override` describes what may be overridden.
 
 The JavaScript module of the removed form flow goes with it:
 :file:`Resources/Public/JavaScript/frontend/rich-text.js`, addressed by the bare
@@ -110,38 +118,56 @@ that still loads that specifier loads nothing. Rich text is CKEditor 5 from
 Removed icons
 -------------
 
-The eleven action icons of the form flow are removed, and with them their
-identifiers:
+The ten icon files 2.4 shipped for the form flow are deleted:
 
 :file:`add-image-icon.svg`, :file:`add-item-icon.svg`, :file:`back-icon.svg`,
 :file:`cancel-icon.svg`, :file:`delete-icon.svg`, :file:`edit-icon.svg`,
-:file:`replace-image-icon.svg`, :file:`save-icon.svg`, :file:`sort-icon.svg`,
-:file:`sort-vertical-icon.svg`, :file:`view-icon.svg`.
+:file:`save-icon.svg`, :file:`sort-icon.svg`, :file:`sort-vertical-icon.svg`,
+:file:`view-icon.svg`.
 
-Thirteen icons replace them, registered under the identifiers listed in
-:ref:`profile-editing-icons`. They are Bootstrap Icons (MIT) drawn in
-``currentColor`` and rendered inline, so they take the colour of the control
-they sit in.
+Five of the ten identifiers they were registered under go with them:
+``academic-persons-edit-add-image``, ``-add-item``, ``-cancel``, ``-sort`` and
+``-to-top``. The other five - ``academic-persons-edit-edit``, ``-view``,
+``-delete``, ``-save`` and ``-back`` - stay and now resolve to the new artwork.
+
+They also resolve through a different icon provider:
+:php:`FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`
+inlines the ``<svg>`` where TYPO3's own :php:`SvgIconProvider` emitted an
+``<img>``. A site package styling the editor's icons through a rule such as
+``.t3js-icon img`` therefore stops matching, and styles the ``<svg>`` instead;
+the *Feature: Icon provider for icons that follow the text colour* entry of
+`EXT:academic_base` describes the provider.
+
+Thirteen action icons are registered, under the identifiers listed in
+:ref:`profile-editing-icons`; the extension icon ``persons_edit_icon`` is the
+fourteenth entry of :file:`Configuration/Icons.php` and is unchanged. They are
+Bootstrap Icons (MIT) drawn in ``currentColor`` and rendered inline, so they
+take the colour of the control they sit in - see
+:ref:`feature-profile-editing-icon-set`.
 
 Removed labels
 --------------
 
-:file:`Resources/Private/Language/locallang.xlf` goes from 208 to 132
-trans-units: **149 are removed and 73 are new**, 59 survive unchanged. The
+:file:`Resources/Private/Language/locallang.xlf` goes from 208 to 140
+trans-units: **149 are removed and 81 are new**. 59 survive, 58 of them
+byte-identical - :code:`profile.skipSync.label` is reworded. The
 German :file:`de.locallang.xlf` follows one to one. That is not a list worth
 printing - the authoritative one is the diff of the file for this release -
 but the shape of it is:
 
 *   Everything the removed Extbase form flow needed goes with it: every
     ``*.create.success`` / ``*.update.success`` / ``*.delete.success`` /
-    ``*.sort.success`` message, every ``*.placeholder``, all ``list.no*Found``
-    entries, the ``actions.hide`` / ``show`` / ``translate`` / ``saveAndExit``
+    ``*.sort.success`` message, every ``*.placeholder``, every
+    ``list.no*Found`` entry except ``list.noProfilesFound``, which the profile
+    overview still renders, the ``actions.hide`` / ``show`` / ``translate``
+    / ``saveAndExit``
     / ``setToTop`` / ``setToBottom`` / ``replace`` actions, ``back``,
     ``list.hidden.badge``, ``list.contract.position``, the ``profile.*``
     section headings and every ``*FormData.*.error.*`` unit.
-*   ``contract.published.label`` and ``emailAddress.emailAddress.label`` were
-    stale duplicates of ``contract.publish.label`` and
-    ``emailAddress.email.label`` and are removed with them.
+*   ``contract.published.label`` was a stale duplicate of
+    ``contract.publish.label``, which stays, and is removed;
+    ``emailAddress.emailAddress.label`` is replaced by the shorter
+    ``emailAddress.email.label``, which is new in this release.
 *   The date fields of a timeline entry are addressed under their real property
     names now, so ``profileInformation.year.label``,
     ``profileInformation.yearStart.label`` and
@@ -150,8 +176,9 @@ but the shape of it is:
     and ``profileInformation.dateEnd.label``, joined by
     ``profileInformation.yearOnly.label``.
 *   The new view brings its own vocabulary under the ``profileEditing.*``
-    prefix - status messages, empty states, the image editor and the document
-    section labels.
+    prefix - status messages, empty states, the image editor, the document
+    section labels and the controls of full form editing
+    (:ref:`feature-full-form-editing-applies-as-one-form`).
 
 All of them are overridable through :typoscript:`locallangXMLOverride`, so an
 installation that translated or reworded one of the 149 removed units loses
@@ -198,8 +225,8 @@ Impact
 
 *   Overrides of any removed Fluid file stop having an effect. The editing
     view renders from the shipped templates.
-*   Links to the removed actions render the profile overview instead.
-*   Templates and PHP code referring to the removed icon identifiers,
+*   Links to the removed actions are a 500 rather than a fallback view.
+*   Templates and PHP code referring to the five removed icon identifiers,
     labels or controller classes fail: an unknown icon identifier renders
     TYPO3's ``default-not-found`` placeholder, an unknown label renders its
     own key, and an unknown class is a fatal error.
@@ -232,8 +259,9 @@ Migration
     layout.
 #.  Replace links to the removed actions with a link to the ``index`` action
     and the ``profileUid`` argument, or with the profile overview.
-#.  Replace the removed icon identifiers with the ones of
-    :ref:`profile-editing-icons`.
+#.  Replace the five removed icon identifiers with the ones of
+    :ref:`profile-editing-icons`, and re-point CSS that selected the icons as
+    an ``<img>``.
 #.  Confirm that the site actually delivers page type ``1733735``. Include the
     site set ``fgtclb/academic-persons-edit-profile-editing`` or the static
     template of this extension; a site package that maintains a copy of the

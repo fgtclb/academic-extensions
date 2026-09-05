@@ -46,7 +46,7 @@ fields. The same applies to the 16 repositories, none of which is `final`.
 There is no `AbstractValueObject` subclass anywhere in the repository.
 
 When `final` has to be dropped for a reason that is not structural, record the
-reason. `academic-persons/Classes/Service/RecordSynchronizer.php` line 19 does
+reason. `academic-persons/Classes/Service/RecordSynchronizer.php` line 47 does
 this and is the pattern to copy:
 
 ```php
@@ -55,19 +55,30 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 256 modifiers, of
-which 248 are constructor-promoted. The eight non-promoted declarations are the
-seven documented fields of
+`readonly` is used heavily, mostly on individual properties: 255 modifiers, of
+which 247 are constructor-promoted, across 73 files. The eight non-promoted
+declarations are the seven documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
 
+```bash
+grep -rhoP '\b(private|public|protected) readonly\b' --include='*.php' \
+  packages/fgtclb/*/Classes packages-dev/*/Classes | sort | uniq -c
+grep -rP '\b(private|public|protected) readonly\b' --include='*.php' -n \
+  packages/fgtclb/*/Classes packages-dev/*/Classes | grep -vP ';\s*$' | wc -l
+```
+
+The second command counts the promoted ones: a promoted parameter never ends
+the line with a semicolon and a declared property always does.
+
 `final readonly class` is the shape of a **stateless service that extends
-nothing** — fifteen so far: the three `RegisterAcademicPageDoktype` listeners
+nothing** — sixteen so far: the three `RegisterAcademicPageDoktype` listeners
 (partners, programs, projects); in `academic-persons`
 `ProfileImageRelationWriter`, `ProfileImageMetadataService` and the
 `UpdateProfileImageMetadata` listener; and in `academic-persons-edit` the two
 payload data objects `ProfileUpdatePayload` and `ProfileUpdateRequestResult`,
-the six services `LocalizedProfileUidResolver`, `ProfileFieldOptionsService`,
+the seven services `LocalizedProfileUidResolver`,
+`ProfileDocumentSectionProvider`, `ProfileFieldOptionsService`,
 `ProfileRichTextSanitizer`, `ProfileSectionProvider`,
 `ProfileUpdateRequestService` and `ProfileUpdateValidationService`, and the
 `RepairLocalizedProfileImagesUpgradeWizard`. The class-level modifier says the
@@ -78,7 +89,7 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 131   | An injected collaborator                          |
+| `private readonly`   | 130   | An injected collaborator                          |
 | `public readonly`    | 103   | A field of an immutable data object               |
 | `protected readonly` | 22    | Either, in classes with subclasses or older style |
 
@@ -99,8 +110,8 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 74 files declare
-248 promoted `readonly` parameters. The fullest example by a wide margin is
+Constructor injection with promoted properties is the default: 73 files declare
+247 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.
@@ -152,6 +163,11 @@ constructor of its own, so nothing has to be forwarded. The `ProfileController`
 of `academic-persons-edit` is built the same way, with 36 of them.
 
 ### `GeneralUtility::makeInstance()`
+
+```bash
+grep -rho 'GeneralUtility::makeInstance(' --include='*.php' \
+  packages/fgtclb/*/Classes packages-dev/*/Classes | wc -l
+```
 
 106 call sites across the `Classes/` directories. Some are unavoidable: TCA and
 FormEngine code under `Classes/Backend/` and `Classes/Tca/` (22 sites) runs
@@ -245,7 +261,7 @@ written into TCA — a pure enum cannot survive any of those round trips.
 
 ## The Extbase `FileReference` trap
 
-Verified against the installed TYPO3 v13.4.34 tree:
+Verified against the installed TYPO3 v14.3.6 tree:
 `.Build/vendor/typo3/cms-extbase/Classes/Domain/Model/FileReference.php` is 52
 lines and declares **two** public methods:
 
@@ -283,14 +299,16 @@ Everywhere else the Extbase `FileReference` is passed straight to `<f:image>` or
 
 One further step down: on the **core** `FileReference`, `getProperty()` throws
 `\InvalidArgumentException` (code 1314226805) when the property is missing —
-verified at `.Build/vendor/typo3/cms-core/Classes/Resource/FileReference.php`
-lines 112–119. For an optional field use `getProperties()` (line 141) and index
-into it, or guard with `hasProperty()` (line 101). Do not call `getProperty()`
-on a field that may not be set.
+verified in
+`.Build/vendor/typo3/cms-core/Classes/Resource/FileReference.php`. For an
+optional field use `getProperties()` and index into it, or guard with
+`hasProperty()`. Do not call `getProperty()` on a field that may not be set.
+No line numbers here: that file is core's and its line numbers differ between
+the two supported versions, so a reader has to grep for the method anyway.
 
 ## Strict types
 
-244 of the 251 files declare `strict_types=1` — here counted over
+244 of the 251 files declare `strict_types=1` (97 %) — here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;

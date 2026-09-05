@@ -166,10 +166,10 @@ There are four kinds, distinguished by the file name prefix:
 
 | File pattern        | Use for                                                       | Entries today |
 |---------------------|---------------------------------------------------------------|---------------|
-| `Breaking-*.rst`    | Changes requiring action from users of the extension          | 49            |
+| `Breaking-*.rst`    | Changes requiring action from users of the extension          | 69            |
 | `Deprecation-*.rst` | Functionality marked for removal, together with the migration | 1             |
-| `Feature-*.rst`     | New functionality                                             | 30            |
-| `Important-*.rst`   | Notable changes that are none of the above                    | 43            |
+| `Feature-*.rst`     | New functionality                                             | 40            |
+| `Important-*.rst`   | Notable changes that are none of the above                    | 86            |
 
 Templates for all four live in `Build/Documentation/Templates/`
 (`Changelog-Breaking.rst`, `Changelog-Deprecation.rst`, `Changelog-Feature.rst`,
