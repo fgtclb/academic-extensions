@@ -19,10 +19,16 @@ packages/fgtclb/<extension>/
 The same applies to `packages-dev/*`. Nothing is required to exist: an extension
 without those directories contributes nothing to the build, and adding one is
 picked up without touching any configuration. Five extensions carry sources
-today: `academic-jobs` and `academic-persons-edit` ship TypeScript,
-`academic-partners`, `academic-study-plan` and `academic-persons` ship both —
-the latter the public profile's `frontend/profile.ts` and
-`frontend/profile-detail.scss`, loaded by `Templates/Profile/Detail.html`.
+today: `academic-jobs` ships TypeScript only, and `academic-partners`,
+`academic-persons`, `academic-persons-edit` and `academic-study-plan` ship
+TypeScript and SCSS. `academic-persons` carries the public profile's
+`frontend/profile.ts` and `frontend/profile-detail.scss`, loaded by
+`Templates/Profile/Detail.html`, plus the `frontend/sticky-offset.ts` the
+editing view of `academic-persons-edit` shares with it through the import map.
+`academic-persons-edit` is the largest by a wide margin — nineteen TypeScript
+modules, one `_dependencies.d.ts` type declaration and
+`frontend/profile-editing.scss`. Count them with
+`find packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript -name '*.ts' ! -name '*.d.ts' | wc -l`.
 
 The `backend/` and `frontend/` split is a convention rather than a mechanism —
 the build mirrors whatever directory structure it finds. Keeping the two apart
@@ -37,24 +43,26 @@ convention, and the build applies it to TypeScript as well.
 
 One script, `Build/esbuild.mjs`, driven by npm scripts and run in a container:
 
-| Suite               | Runs                                                      | Purpose                                                                                  |
-|---------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------|
-| `buildJs`           | `npm ci && npm run build`                                 | Compiles every extension's sources. Run after a source change, and commit the result.    |
-| `checkJsBuildClean` | delete the outputs, rebuild, assert `git status` is empty | The gate that makes committed artifacts trustworthy. Runs in CI.                         |
-| `lintTypescript`    | `npm run lint:fix`, or `lint` with `-n`                   | eslint 9 with typescript-eslint. Mirrors `cgl`: fixes by default, checks only with `-n`. |
-| `typecheckJs`       | `npm run typecheck`                                       | `tsc --noEmit`, which the build does not do.                                             |
-| `npm`               | `npm "$@"` with the working directory set to `Build/`     | Escape hatch, mirroring the `composer` suite.                                            |
-| `cleanJs`           | `rm -rf Build/node_modules`                               | Intermediates only. It never removes a compiled artifact — those are committed files.    |
+| Suite               | Runs                                                      | Purpose                                                                                        |
+|---------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `buildJs`           | `npm ci && npm run build`                                 | Compiles every extension's sources. Run after a source change, and commit the result.          |
+| `checkJsBuildClean` | delete the outputs, rebuild, assert `git status` is empty | The gate that makes committed artifacts trustworthy. Runs in CI.                               |
+| `lintTypescript`    | `npm run lint:fix`, or `lint` with `-n`                   | eslint 9 with typescript-eslint. Mirrors `cgl`: fixes by default, checks only with `-n`.       |
+| `typecheckJs`       | `npm run typecheck`                                       | `tsc --noEmit`, which the build does not do.                                                   |
+| `testJs`            | `npm run test`                                            | The behavioural tests of the sources — see [JavaScript tests](../testing/javascript-tests.md). |
+| `npm`               | `npm "$@"` with the working directory set to `Build/`     | Escape hatch, mirroring the `composer` suite.                                                  |
+| `cleanJs`           | `rm -rf Build/node_modules`                               | Intermediates only. It never removes a compiled artifact — those are committed files.          |
 
 ```bash
 Build/Scripts/runTests.sh -s buildJs
 Build/Scripts/runTests.sh -s checkJsBuildClean
 Build/Scripts/runTests.sh -s lintTypescript -n
 Build/Scripts/runTests.sh -s typecheckJs
+Build/Scripts/runTests.sh -s testJs
 Build/Scripts/runTests.sh -s npm -- install --save-dev sass@latest
 ```
 
-All six are **core version independent**. They look at the sources and the
+All seven are **core version independent**. They look at the sources and the
 committed artifacts and never at the installed core, so `-t` does not change
 what they do and no `composerUpdate` is needed. That makes them the only suites
 that are safe to run while the other core version's dependency set is installed.
@@ -127,6 +135,64 @@ Verified present on TYPO3 13.4.34 and 14.3.6: the `f:asset.module` ViewHelper,
 `AssetCollector::addJavaScriptModule()`, and `ImportMap` reading
 `Configuration/JavaScriptModules.php` from every package.
 
+## Libraries come from the core
+
+No library in this repository's frontend code is vendored, and the rule that
+gets there is short: **before shipping a library, ask what the core already
+ships, and what version it is.** TYPO3 delivers a set of JavaScript libraries
+through import maps of its own, and a specifier that resolves through the core's
+map costs the page nothing, is cached across every extension that uses it, and
+is upgraded by a core update rather than by a commit here.
+
+The two the profile editor uses both come from there:
+
+| Library    | Version    | Package            | Specifier               |
+|------------|------------|--------------------|-------------------------|
+| CKEditor 5 | as shipped | `EXT:rte_ckeditor` | `@ckeditor/ckeditor5-*` |
+| CropperJS  | 1.6.1      | `EXT:core`         | `cropperjs`             |
+
+CropperJS is the instructive one. The core maps it for the backend's image
+manipulation, and it is **1.6.1** on 13.4.34 and 14.3.6 — the same file on both,
+verified byte for byte. That is the API before CropperJS became a set of custom
+elements, so the profile image editor is written against 1.6: an options bag, a
+`ready` callback, `getData()`, `getCroppedCanvas()`. Writing against the newer
+API would have meant shipping the newer library, which is 44 KB reaching every
+profile editing page for an interface the older one also has.
+
+What follows from taking a library from the core:
+
+- **The extension's `Configuration/JavaScriptModules.php` declares the package
+  that maps it**, and maps nothing itself. `academic_persons_edit` declares
+  `core`, which is what makes `cropperjs` resolvable on the page.
+  `EXT:rte_ckeditor` is the exception the same file explains: its own dependency
+  chain would expand several hundred backend entries into the inline import map,
+  so its six bundles and their closure are mapped one by one.
+- **The specifier is declared, not inferred.** The core's builds carry no type
+  declarations, so `Resources/Private/TypeScript/frontend/_dependencies.d.ts`
+  declares each module with the surface this repository actually calls, and no
+  more. That declaration is the contract a core upgrade is checked against, and
+  `Build/tests/resolve-hook.mjs` stubs the same specifier for the behavioural
+  suite.
+- **A stylesheet is not part of the deal.** The core delivers CropperJS's
+  JavaScript to any page, and its CSS only inside the backend's own bundle. The
+  cropper's appearance is therefore written in
+  `packages/fgtclb/academic-persons-edit/Resources/Private/Scss/frontend/profile-editing.scss`,
+  scoped to the editor's stage so it cannot reach a `cropper-` class another
+  extension brought along. Check for the stylesheet as well as for the module.
+- **A version the core ships is not automatically the right one** — but it is
+  the first candidate, and the API difference has to be a real obstacle before
+  a copy is shipped instead. Check the version, not the presence of a mapping.
+
+Should a library ever have to be shipped after all, it is committed under
+`Resources/Public/JavaScript/vendor/<library>/<version>/` with its licence file
+beside it, published under a bare specifier by the extension's
+`Configuration/JavaScriptModules.php`, and never imported by path.
+`academic_partners` ships a mapping library and its plugin straight in
+`Resources/Public/JavaScript/` and predates all of this. Files below
+`Resources/Public/` that have no source under `Resources/Private/` are outside
+the build gate by construction: `checkJsBuildClean` neither writes nor deletes
+them.
+
 ## Artifacts are committed, and that makes a gate mandatory
 
 `Resources/Public/JavaScript/**` and `Resources/Public/Css/**` are tracked files.
@@ -175,6 +241,14 @@ in `git status`.
   it is empty.
 - **npm packages ship PHP.** `flatted` carries a PHP port of itself, so
   `Build/node_modules` is excluded from `lintPhp`.
+- **A bare specifier only type-checks when `Build/tsconfig.json` maps it.**
+  Without a `paths` entry TypeScript cannot resolve
+  `@fgtclb/<extension>/frontend/x.js` and falls back to whatever ambient
+  `declare module` it finds. `academic_persons_edit` shipped such a declaration
+  for each of its own modules for a while, so `typecheckJs` checked a
+  hand-written copy of the exports that had already drifted from the real ones.
+  Ambient declarations are for vendor specifiers only; an extension whose
+  modules import each other gets a `paths` entry.
 
 ## See also
 

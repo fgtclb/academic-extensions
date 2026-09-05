@@ -210,6 +210,7 @@ help text is prose and can drift, see below.
 | `phpstan`                 | PHPStan with `Build/phpstan/Core<13\|14>/phpstan.neon`.                                                       |
 | `phpstanGenerateBaseline` | Rewrites `Build/phpstan/Core<13\|14>/phpstan-baseline.neon`.                                                  |
 | `seedManifest`            | Rewrites `packages-dev/dev-site/Tests/Functional/Fixtures/SeedManifest-core<13\|14>.json` from a real import. |
+| `testJs`                  | `node --test` with jsdom over `packages/*/*/Tests/JavaScript/`, in the node container.                        |
 | `unit`                    | PHPUnit with `Build/phpunit/UnitTests.xml`.                                                                   |
 | `unitRandom`              | The same, with `--order-by=random` and the seed from `-o`.                                                    |
 | `update`                  | Pulls newer `ghcr.io/typo3/core-testing-*` images and removes dangling ones. Also reached via `-u`.           |

@@ -66,9 +66,9 @@ rather than code, and how that content is applied is described in
 - `Build/Scripts/runTests.sh` — the containerized harness every check runs
   through.
 - `Build/phpunit/` — `UnitTests.xml` and `FunctionalTests.xml`. Test discovery
-  is repository-wide: the suites glob `../../packages/*/*/Tests/Unit/`
-  (`Build/phpunit/UnitTests.xml:42`) and `../../packages/*/*/Tests/Functional/`
-  (`Build/phpunit/FunctionalTests.xml:42`). There is no per-extension phpunit
+  is repository-wide: each suite carries two globs, `../../packages/*/*/Tests/…`
+  on line 42 and `../../packages-dev/*/Tests/…` on line 49, so the tests of the
+  development seed are collected as well. There is no per-extension phpunit
   configuration; a run always covers all extensions unless it is restricted by
   a trailing path argument.
 - `Build/phpstan/Core13/` and `Build/phpstan/Core14/` — one configuration and

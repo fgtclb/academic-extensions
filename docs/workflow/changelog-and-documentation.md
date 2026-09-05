@@ -37,6 +37,12 @@ Every package under `packages/fgtclb/` ships the same skeleton
 | `Introduction/`, `Installation/`, `KnownProblems/` | The narrative sections                                               |
 | `Sitemap.rst`                                      | Generated sitemap page                                               |
 
+Extensions add chapters of their own on top of that skeleton: `Configuration/`
+and `Templates/` in most of them, `ProfileEditing/` in `academic-persons-edit`,
+and `Upgrade/` in `academic-persons`, which carries the ordered 2.4 → 3.0.0
+upgrade for both extensions rather than leaving the sequence implicit across
+eight changelog entries.
+
 `guides.xml` carries the version too, as `<project title="…" release="3.0.0"/>`
 (`packages/fgtclb/academic-base/Documentation/guides.xml:16`). It is written by
 `tailor set-version`, which `bin/set-version` runs for every package that has a
@@ -166,10 +172,10 @@ There are four kinds, distinguished by the file name prefix:
 
 | File pattern        | Use for                                                       | Entries today |
 |---------------------|---------------------------------------------------------------|---------------|
-| `Breaking-*.rst`    | Changes requiring action from users of the extension          | 49            |
+| `Breaking-*.rst`    | Changes requiring action from users of the extension          | 69            |
 | `Deprecation-*.rst` | Functionality marked for removal, together with the migration | 1             |
-| `Feature-*.rst`     | New functionality                                             | 30            |
-| `Important-*.rst`   | Notable changes that are none of the above                    | 43            |
+| `Feature-*.rst`     | New functionality                                             | 40            |
+| `Important-*.rst`   | Notable changes that are none of the above                    | 86            |
 
 Templates for all four live in `Build/Documentation/Templates/`
 (`Changelog-Breaking.rst`, `Changelog-Deprecation.rst`, `Changelog-Feature.rst`,
@@ -289,7 +295,7 @@ moved. The repository has documented exactly this repeatedly:
   (and the same entry in `academic-persons`, `academic-programs`,
   `academic-partners`, `academic-projects`)
 * `academic-persons-edit/Documentation/Changelog/2.4/Important-AdaptedProfileImagePartial.rst`
-* `academic-persons-edit/Documentation/Changelog/3.0/Breaking-AdaptedFrontendEditingFluidFiles.rst`
+* `academic-persons-edit/Documentation/Changelog/3.0/Breaking-ReplacedProfileEditingPlugin.rst`
 
 **A changed asset path is user facing** for the same reason: a project may
 reference the file from its own TypoScript, its own template or its build.

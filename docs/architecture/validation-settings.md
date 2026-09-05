@@ -81,6 +81,21 @@ frontend alone and leave the backend column and the editor addressing different
 record types; `migrateProfileInformationTypes()` keeps the values that match
 the TCA. The legacy keys never reach `raw`.
 
+`type` and `fieldName` are deliberately **not** overlaid, and that is the second
+lossy case. Since ACE-503 the seven profile relations, and the record type each
+of them selects, are declared by
+`Configuration/TCA/tx_academicpersons_domain_model_profile.php` rather than
+generated from the settings, so applying a legacy rename would move the editing
+frontend alone and leave the backend column and the editor addressing different
+record types. `migrateProfileInformationTypes()` therefore keeps the values that
+match the TCA and reports the divergent one per key in `notes`, next to the
+eighth-type note. A `type` or `fieldName` written directly
+into the new `documentSections` map *is* read — the settings graph has no TCA to
+compare it against, so that divergence is the integrator's, and the manual says
+so in `Configuration/Sections/Index.rst`,
+`Configuration/Validations/Index.rst` and the `Upgrade/` chapter of
+`academic-persons`.
+
 Attribution is per package: the factory walks
 `SettingsFileLoader::loadPackageArrays()` — the per-package view the loader
 gained for this, keyed by package key in loading order — and the migrator logs
@@ -124,6 +139,14 @@ The recognised flags, all matched case-insensitively
 
 An unknown flag is kept in `Validation::$flags` and has no other effect.
 
+"Input type" is what the *settings graph* calls a field, not what the browser
+gets. The profile editor maps `date` to a plain text control, because the
+native `<input type="date">` follows the locale of the browser rather than the
+one of the site and a date picker is deliberately not shipped yet — see
+[The two contract dates are a text control](profile-editing-contract.md#the-two-contract-dates-are-a-text-control).
+Nothing about that reaches this normalizer: the flag stays `date`, and so does
+the input type it derives.
+
 ## The shared classes in `academic_base`
 
 Everything that has no persons knowledge lives in
@@ -142,6 +165,13 @@ Everything that has no persons knowledge lives in
 The ViewHelper `FGTCLB\AcademicBase\ViewHelpers\ValidationEnsureViewHelper`
 sits next to them, declared in a template as
 `xmlns:p="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`.
+
+**Nothing in this repository consumes it any more.** Its only callers were the
+`Partials/Profile/Forms/` templates of `academic_persons_edit`, which the
+editing rewrite of 3.0 deleted; no template here declares that namespace and no
+test references the class. It is kept for site packages that overrode one of
+those partials and repointed the namespace, and it is `@internal` — do not build
+new code on it without deciding first whether it is public API.
 
 `Validation` carries, beyond the flags' effects, the normalised `flags` list
 itself and a `characterLimit` (ACE-503). `normalizeValidation()` takes the
@@ -255,14 +285,15 @@ is what lets one entry address the Extbase property and the TCA column.
 `AcademicPersonsSettings` answers validation questions per section, and never
 falls back from one to another:
 
-| Accessor                                                                 | Returns                                                                                |
-|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| `getProfileValidationSet(?$section)`                                     | One section's set, or all sections folded (a later section wins per property)          |
-| `getProfileUpdateValidationSet()`                                        | All sections plus the direct special fields (`skipSync`) — what the profile TCA merges |
-| `getProfileValidationSetForFields($ids, $section)`                       | The named fields of one section, keyed by property                                     |
-| `getContractContactValidationSet($section)`, `…ForFields()`              | One contact section's set                                                              |
-| `getDocumentValidationSet($id)`, `getDocumentValidationSetByType($type)` | One document section's set, by settings key or by record type                          |
-| `getDocumentValidationTcaTypesConfig()`                                  | `types.<type>.columnsOverrides` for the profile information table, contracts excluded  |
+| Accessor                                                    | Returns                                                                                |
+|-------------------------------------------------------------|----------------------------------------------------------------------------------------|
+| `getProfileValidationSet(?$section)`                        | One section's set, or all sections folded (a later section wins per property)          |
+| `getProfileUpdateValidationSet()`                           | All sections plus the direct special fields (`skipSync`) — what the profile TCA merges |
+| `getProfileValidationSetForFields($ids, $section)`          | The named fields of one section, keyed by property                                     |
+| `getContractContactValidationSet($section)`, `…ForFields()` | One contact section's set                                                              |
+| `getDocumentValidationSet($id)`                             | One document section's validation set, by settings key                                 |
+| `getDocumentSectionByType($type)`                           | One document section, by the record type its rows carry                                |
+| `getDocumentValidationTcaTypesConfig()`                     | `types.<type>.columnsOverrides` for the profile information table, contracts excluded  |
 
 Every one of them returns an empty `ValidationSet` carrying the requested
 identifier for an unknown section.
@@ -307,24 +338,26 @@ versus `Configuration/TCA/Overrides/` — not a doubt about the coupling itself.
 
 `EXT:academic_persons_edit` reads the typed sets in three places:
 
-1. **Rendering.** The form partials under
-   `Resources/Private/Partials/Profile/Forms/` map the flags straight onto the
-   control through `p:validationEnsure`: `disabled`, `readonly` and `required`
-   attributes. The controllers assign the `validations` of the section's set.
+1. **Rendering.** `ProfileSectionProvider` and `ProfileDocumentSectionProvider`
+   turn the typed graph into the view model the partials below
+   `Resources/Private/Partials/Profile/` render, and the `Validation` object of
+   a field travels with it: `readOnly` and `disabled` decide whether an edit
+   control is rendered at all, `required` renders the marker and the
+   `required` attribute. The document and contact forms carry the same flags in
+   the JSON their form endpoints answer with.
 2. **Validation.** `AbstractFormDataValidator::processValidationSet($subject,
    $set)` runs the `validatorClassNames` of every property of the set. Each
    concrete validator resolves its section: the contact validators their
    contact section, the contract validator `getDocumentValidationSet('contracts')`,
    the profile validator `getProfileUpdateValidationSet()`, and the profile
-   information validator `getDocumentValidationSetByType()` with the record
-   type the form data carries — so a publication is never validated by the
+   information validator the set of the section its record type belongs to — so a publication is never validated by the
    lecture section.
 3. **Transformation.** `disabled` and `readOnly` properties are never written to
    the model, whatever the request contains — see
    [Form data transformation](form-data-transformation.md), which is where that
    rule and the traps around it are documented.
 
-`ProfileInformationController::newAction()` maps the settings key of a section
+`ProfileDocumentSectionProvider` maps the settings key of a section
 (`pressMedia`) to the record type (`press_media`) through
 `getDocumentSection($key)->type`, which is what the removed
 `ProfileInformationType` did before.
