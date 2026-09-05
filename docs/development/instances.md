@@ -77,11 +77,14 @@ at the end of a rebuild, so what stays is the hash committed in the repository.
 
 ### Frontend
 
-The seed set creates one frontend user, and it exists for a reason: **`EXT:academic_persons_edit`
-cannot be looked at without it.** Its controller refuses every action when no
-frontend user is logged in, and it finds the profile to edit through the
-`frontend_users` relation of the profile record rather than through a storage
-page — so a login *and* a connected profile are both required.
+The seed set creates four frontend users in two groups, and the first of them
+exists for a reason: **`EXT:academic_persons_edit` cannot be looked at without
+it.** Its controller refuses every action when no frontend user is logged in,
+and it finds the profile to edit through the `frontend_users` relation of the
+profile record rather than through a storage page — so a login *and* a connected
+profile are both required. `jane.doe` is that user; `erik.mustermann`,
+`liam.rhodes` and `sam.tester` carry the same password and exist so that a
+second profile, a second group and an unconnected account can be looked at.
 
 |          |                                                             |
 |----------|-------------------------------------------------------------|

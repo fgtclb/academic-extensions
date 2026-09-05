@@ -13,8 +13,10 @@ pieces fit.
 ## Why the DataHandler, not queries
 
 Three facts about the core decide the design. All three were verified against
-the installed vendor trees — TYPO3 v13.4.34 in `.Build/vendor/`, v14.3.6 in
-`core-14/vendor/` — not recalled.
+the two development instances, which their tracked `composer.lock` pins —
+TYPO3 v13.4.34 in `core-13/vendor/` and v14.3.6 in `core-14/vendor/` — not
+recalled. The line numbers below are keyed to those, not to `.Build/vendor/`,
+which carries whichever version the last `composerUpdate -t 13|14` installed.
 
 **Nothing on the read path honours `l10n_mode=exclude`.** The persons TCA uses
 it heavily: an excluded column is hidden in translation forms and is *supposed*
@@ -68,15 +70,15 @@ carries one thing: the **persisted default-language profile**. Listeners read
 the database, not the object, so a dispatch is only meaningful after
 `persistAll()`, with a real uid, and never for a translation overlay.
 
-| Dispatch site                                                                | Context                                                                                                 | Notes                                                               |
-|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
-| `AbstractProfileFactory::createProfileForUser()` (persons)                   | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | The only in-repo dispatch between 2.0 and 3.0                       |
-| `AbstractProfileFactory::updateProfileForUser()` (persons)                   | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | Dispatches per profile the update ran through (ACE-490)             |
-| `AbstractActionController::persistAndDispatchProfileUpdate()` (persons_edit) | Every frontend editing action that persists a change to the profile aggregate, in all six controllers   | Restored with ACE-485 — the 2.x restructuring had lost the dispatch |
-| Project-side `DataHandler` hooks                                             | Backend edits, in installations that wire it up themselves                                              | Outside this repository; the main production path                   |
+| Dispatch site                                                         | Context                                                                                                 | Notes                                                                         |
+|-----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| `AbstractProfileFactory::createProfileForUser()` (persons)            | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | The only in-repo dispatch between 2.0 and 3.0                                 |
+| `AbstractProfileFactory::updateProfileForUser()` (persons)            | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | Dispatches per profile the update ran through (ACE-490)                       |
+| `ProfileController::persistAndDispatchProfileUpdate()` (persons_edit) | Every JSON endpoint of the profile editing frontend that persists a change to the profile aggregate     | Restored with ACE-485; the six controllers it covered became one with ACE-262 |
+| Project-side `DataHandler` hooks                                      | Backend edits, in installations that wire it up themselves                                              | Outside this repository; the main production path                             |
 
-The helper in `AbstractActionController`
-(`packages/fgtclb/academic-persons-edit/Classes/Controller/AbstractActionController.php`)
+The helper in `ProfileController`
+(`packages/fgtclb/academic-persons-edit/Classes/Controller/ProfileController.php`)
 enforces the contract in one place: it calls `persistAll()` first, then skips
 the dispatch for a `null` profile, an unpersisted one, or a translation
 overlay. `GenerateSlugForProfile` listens to the same event and has no

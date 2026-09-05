@@ -163,10 +163,13 @@ the shared test class next to its counterpart. The clearest example is
 FlexForm data structure assignment differs between the majors and neither
 version tolerates the other's shape:
 
-- `:565` — `#[Group('not-core-14')]` on
-  `pluginFlexFormIsAssignedAsArrayOnCoreV13()`
-- `:584` — `#[Group('not-core-13')]` on
+- `:568` — `#[Group('not-core-14')]` on
+  `pluginFlexFormIsAssignedToTheGlobalColumnOnCoreV13()`
+- `:592` — `#[Group('not-core-13')]` on
   `pluginFlexFormIsAssignedAsStringOnCoreV14()`
+
+Re-derive both with
+`grep -n "Group('not-core" packages/fgtclb/academic-base/Tests/Unit/TcaManipulatorTest.php`.
 
 Both methods sit in the same class, so the two expectations are readable side
 by side. That is the whole argument for this shape: the difference is the
@@ -181,7 +184,7 @@ class:
   — `#[Group('not-core-13')]`, with a class comment explaining that TYPO3 v13
   calls `is_uploaded_file()` unconditionally, which can never be true in a CLI
   test run.
-- `packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileImageUploadTest.php:29`
+- `packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileImageUploadTest.php:27`
   — same group, same reason.
 - `packages/fgtclb/academic-partners/Tests/Functional/Tca/DeprecatedCoreLabelsTest.php:19`,
   and the identical files in `academic-persons`, `academic-contact4pages` and
@@ -194,7 +197,10 @@ package uses that folder split yet** — the class-level cases above all live in
 their regular folders. The phpunit suites glob
 `packages/*/*/Tests/Unit/` and `packages/*/*/Tests/Functional/` recursively
 (`Build/phpunit/UnitTests.xml:42`, `Build/phpunit/FunctionalTests.xml:42`), so
-such a subfolder would be discovered without any configuration change.
+such a subfolder would be discovered without any configuration change. The
+same two files add `packages-dev/*/Tests/Unit/` and
+`packages-dev/*/Tests/Functional/` on line 49, for the tests of the development
+seed.
 
 Whichever shape is used, add a comment saying **why** the test is limited and,
 where the limitation ends with v13 support, a `@todo` to drop the group. The

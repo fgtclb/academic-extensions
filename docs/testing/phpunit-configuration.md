@@ -6,9 +6,9 @@ of every other tool:
 
 | File                                                                                             | Lines | Role                                           |
 |--------------------------------------------------------------------------------------------------|-------|------------------------------------------------|
-| [`Build/phpunit/UnitTests.xml`](../../Build/phpunit/UnitTests.xml)                               | 49    | PHPUnit configuration of the unit suite.       |
+| [`Build/phpunit/UnitTests.xml`](../../Build/phpunit/UnitTests.xml)                               | 56    | PHPUnit configuration of the unit suite.       |
 | [`Build/phpunit/UnitTestsBootstrap.php`](../../Build/phpunit/UnitTestsBootstrap.php)             | 101   | Bootstrap referenced by `UnitTests.xml`.       |
-| [`Build/phpunit/FunctionalTests.xml`](../../Build/phpunit/FunctionalTests.xml)                   | 49    | PHPUnit configuration of the functional suite. |
+| [`Build/phpunit/FunctionalTests.xml`](../../Build/phpunit/FunctionalTests.xml)                   | 56    | PHPUnit configuration of the functional suite. |
 | [`Build/phpunit/FunctionalTestsBootstrap.php`](../../Build/phpunit/FunctionalTestsBootstrap.php) | 60    | Bootstrap referenced by `FunctionalTests.xml`. |
 
 Nothing selects them implicitly.

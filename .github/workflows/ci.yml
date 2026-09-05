@@ -340,6 +340,14 @@ jobs:
       - name: "Type check"
         run: "Build/Scripts/runTests.sh -b docker -s typecheckJs"
 
+      # In this job rather than next to the PHP suites: it runs in the same node
+      # container as the two steps above, needs no "composerUpdate" and no core
+      # version, and reuses the npm cache this job already restored. Putting it
+      # in the "unit" matrix would install PHP dependencies for it and run it
+      # four times over sources that cannot differ between those runs.
+      - name: "Test the frontend TypeScript"
+        run: "Build/Scripts/runTests.sh -b docker -s testJs"
+
       # Last, and the one that matters most: the compiled assets are committed,
       # because neither composer nor a TER upload runs a node build. That makes
       # it possible to change a source and forget to rebuild, which nothing else
