@@ -1098,10 +1098,14 @@ carries the configuration of *this* profile — thirteen endpoint URLs, the
 profile uid and the editor language, five image settings, twenty messages and
 seven labels. It is read **once**, when the element above it starts the editor,
 and an attribute changed afterwards is not seen. Every control below the root
-carries a ``data-pe-*`` hook, and the controls an element renders carry the same
-hooks the removed partials did.
+carries a ``data-pe-*`` hook, including the controls an element clones out of a
+prototype: those carry the same hooks the removed partials did.
 
-Keep the following contracts when reusing the shipped JavaScript:
+Keep the following contracts when reusing the shipped JavaScript. A hook that
+sits in a prototype is authored in Fluid like any other, so an override may
+retag, restyle and relabel it; what an override may not do is rename the hook,
+and what it cannot do is change the order the element inserts things in or
+which slot carries which value.
 
 ..  list-table::
     :header-rows: 1
@@ -1191,19 +1195,30 @@ Keep the following contracts when reusing the shipped JavaScript:
     *   - ``data-pe-document-sort``
         - Up/down row action persisted through the shared sort endpoint.
     *   - ``data-pe-document-view-container``, ``data-pe-document-form``,
-          ``data-pe-document-heading`` and ``data-pe-document-field``
-        - The collapse, the form, the heading and the controls used for add,
-          view, edit and delete. They are rendered by the document editor
-          element, not by a partial, and are listed because CSS and site
-          JavaScript select them.
-    *   - ``data-pe-contract-contact-section``, ``-item``, ``-heading``,
-          ``-form``, ``-fields``, ``-field``, ``-editor``, ``-actions``,
-          ``-add``, ``-view``, ``-edit``, ``-delete``, ``-sort``, ``-cancel``
-          and ``-save``
+          ``data-pe-document-heading``, ``data-pe-document-fields`` and
+          ``data-pe-document-field``
+        - The collapse, the form, the heading, the field region used for add,
+          view, edit and delete, and one control inside it. Fluid renders all
+          of them: the first four in the ``document-panel`` prototype of
+          :file:`Partials/Profile/Documents/Editor.html`, the last through
+          :file:`Partials/Profile/Field/Control.html`, which carries the field
+          name as its value. ``<academic-persons-edit-document-editor>`` clones
+          the prototype and fills its slots.
+    *   - ``data-pe-contract-contact-section``, ``-item``, ``-hidden``,
+          ``-heading``, ``-form``, ``-fields``, ``-field``, ``-editor``,
+          ``-actions``, ``-add``, ``-view``, ``-edit``, ``-delete``, ``-sort``,
+          ``-cancel`` and ``-save``
         - The contact sections of a contract, their rows, the editor and its
-          controls. Rendered by
-          ``<academic-persons-edit-contract-contacts>``; the presses are
-          delegated on the plugin root like the document ones.
+          controls. Fluid renders them too: the section, the row and one
+          summary cell in the ``contact-section``, ``contact-row`` and
+          ``contact-summary-cell`` prototypes of
+          :file:`Partials/Profile/Documents/ContractContacts.html`, the editor
+          in the ``contact-editor-panel`` prototype of
+          :file:`Partials/Profile/Documents/ContractContactEditor.html`, and
+          ``-field`` again through :file:`Partials/Profile/Field/Control.html`.
+          ``<academic-persons-edit-contract-contacts>`` clones and fills them;
+          the presses are delegated on the plugin root like the document ones.
+          ``-hidden`` marks a hidden contact row and is a styling anchor only.
     *   - ``data-pe-field-group``, ``data-pe-field-ids`` and
           ``data-pe-display-field-ids``
         - Grouped preview/editor and the controls participating in it.
@@ -1220,8 +1235,11 @@ Keep the following contracts when reusing the shipped JavaScript:
           sending another request. Select fields use the regular clear, undo
           and save action group.
     *   - ``data-academic-persons-profile-editing-edit-all-btn``
-        - Toggles all editable single fields and grouped rows between open and
-          collapsed states.
+        - Enters and leaves full form editing: it opens every editable field
+          and grouped row at once, hides the per-field action groups and shows
+          the form bars. Pressed again it discards the form, exactly as
+          :guilabel:`Discard` does. It carries ``aria-pressed`` and names the
+          field forms it controls in ``aria-controls``.
     *   - ``data-pe-edit-all-label``, ``data-pe-close-all-label`` and
           ``data-pe-edit-all-button-label``
         - Localized labels and replaceable label container for the edit-all
@@ -1445,7 +1463,42 @@ the static template of this extension, it is not cached, and it sets
 ``Content-Type: application/json`` on the page - TYPO3 v13 drops the headers a
 plugin response carries, so the page has to declare it.
 
-Two things in a project's infrastructure have to know about that number:
+Three things in a project's infrastructure have to know about that number:
+
+*   **The TypoScript of the site itself.** The object exists where the
+    TypoScript of this extension is *included* - through the site set
+    ``fgtclb/academic-persons-edit-profile-editing`` or the static template
+    :guilabel:`Academic Persons Edit: Profile editing`. There was no such page
+    type before version 3.0, because the previous editor was a server-rendered
+    form flow, so a site package that **copied** the extension's TypoScript
+    into its own instead of including it has no
+    :typoscript:`academicPersonsProfileEditingAjax` object. The editor then
+    renders, and every save is answered with the HTML of the page instead of
+    JSON - a failure that happens in the browser, with nothing in the TYPO3 log
+    to look at. Include the delivered TypoScript, or copy the object into the
+    site package:
+
+    ..  code-block:: typoscript
+        :caption: EXT:my_sitepackage/Configuration/TypoScript/setup.typoscript
+
+        academicPersonsProfileEditingAjax = PAGE
+        academicPersonsProfileEditingAjax {
+          typeNum = 1733735
+
+          10 < tt_content.academicpersonsedit_profileediting.20
+
+          config {
+            disableAllHeaderCode = 1
+            admPanel = 0
+            debug = 0
+            disablePrefixComment = 1
+            no_cache = 1
+            additionalHeaders.10 {
+              header = Content-Type: application/json
+              replace = 1
+            }
+          }
+        }
 
 *   **Route enhancers.** A ``PageTypeDecorator`` that maps page types onto URL
     suffixes has to list ``1733735``, or the editor's request URLs are not

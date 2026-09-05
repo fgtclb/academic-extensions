@@ -37,6 +37,12 @@ Every package under `packages/fgtclb/` ships the same skeleton
 | `Introduction/`, `Installation/`, `KnownProblems/` | The narrative sections                                               |
 | `Sitemap.rst`                                      | Generated sitemap page                                               |
 
+Extensions add chapters of their own on top of that skeleton: `Configuration/`
+and `Templates/` in most of them, `ProfileEditing/` in `academic-persons-edit`,
+and `Upgrade/` in `academic-persons`, which carries the ordered 2.4 → 3.0.0
+upgrade for both extensions rather than leaving the sequence implicit across
+eight changelog entries.
+
 `guides.xml` carries the version too, as `<project title="…" release="3.0.0"/>`
 (`packages/fgtclb/academic-base/Documentation/guides.xml:16`). It is written by
 `tailor set-version`, which `bin/set-version` runs for every package that has a

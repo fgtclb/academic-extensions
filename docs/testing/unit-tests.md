@@ -52,7 +52,7 @@ between tests are exactly the kind of defect a fixed order hides.
 ## Discovery
 
 There is no per-extension PHPUnit configuration. Two globs in
-[`Build/phpunit/UnitTests.xml:36-50`](../../Build/phpunit/UnitTests.xml#L36-L50)
+[`Build/phpunit/UnitTests.xml:36-51`](../../Build/phpunit/UnitTests.xml#L36-L51)
 collect every extension's unit tests into a single suite:
 
 ```xml

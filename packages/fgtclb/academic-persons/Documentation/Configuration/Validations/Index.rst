@@ -383,6 +383,15 @@ profile names by not listing them. The flags the old shape could not express
 - :yaml:`url`, :yaml:`date`, :yaml:`tel`, :yaml:`textarea`, :yaml:`html` -
 stay as the section maps declare them.
 
+..  warning::
+    The mapped :yaml:`type` and :yaml:`fieldName` reach the editing frontend
+    only. The seven profile relations and the record type each of them selects
+    are declared by the TCA of the profile table since 3.0.0, so a legacy entry
+    that renamed either leaves a backend column and a frontend editor writing
+    different record types - and the records of one are invisible in the other.
+    See :ref:`configuration-sections-documents` and the
+    :ref:`upgrade` page.
+
 Two things are not mapped and are reported by the command and in the log:
 
 *   The :yaml:`number` flag of :yaml:`year`, :yaml:`yearStart` and

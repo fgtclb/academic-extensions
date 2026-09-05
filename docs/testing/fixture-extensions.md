@@ -131,7 +131,7 @@ hour here.
 ## How the test suite picks them up
 
 The functional bootstrap
-([`Build/phpunit/FunctionalTestsBootstrap.php:35-54`](../../Build/phpunit/FunctionalTestsBootstrap.php#L35-L54))
+([`Build/phpunit/FunctionalTestsBootstrap.php:29-54`](../../Build/phpunit/FunctionalTestsBootstrap.php#L29-L54))
 hands the generated data file to `SBUERK\AvailableFixturePackages` and calls
 `adoptFixtureExtensions()`, which registers each fixture package with the
 testing framework's `ComposerPackageManager`. Its own docblock states the

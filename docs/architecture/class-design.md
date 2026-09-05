@@ -261,9 +261,16 @@ written into TCA — a pure enum cannot survive any of those round trips.
 
 ## The Extbase `FileReference` trap
 
-Verified against the installed TYPO3 v14.3.6 tree:
-`.Build/vendor/typo3/cms-extbase/Classes/Domain/Model/FileReference.php` is 52
-lines and declares **two** public methods:
+Verified on both trees and identical on both — `.Build/vendor/` carries
+whichever version the last `composerUpdate -t 13|14` installed, and
+`core-13/vendor/` and `core-14/vendor/` are pinned by their `composer.lock`:
+`typo3/cms-extbase/Classes/Domain/Model/FileReference.php` is 52 lines and
+declares **two** public methods:
+
+```bash
+grep -n "public function" \
+  .Build/vendor/typo3/cms-extbase/Classes/Domain/Model/FileReference.php
+```
 
 ```php
 public function setOriginalResource(\TYPO3\CMS\Core\Resource\FileReference $originalResource): void   // line 37

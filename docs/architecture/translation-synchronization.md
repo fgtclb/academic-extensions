@@ -13,8 +13,10 @@ pieces fit.
 ## Why the DataHandler, not queries
 
 Three facts about the core decide the design. All three were verified against
-the installed vendor trees — TYPO3 v13.4.34 in `.Build/vendor/`, v14.3.6 in
-`core-14/vendor/` — not recalled.
+the two development instances, which their tracked `composer.lock` pins —
+TYPO3 v13.4.34 in `core-13/vendor/` and v14.3.6 in `core-14/vendor/` — not
+recalled. The line numbers below are keyed to those, not to `.Build/vendor/`,
+which carries whichever version the last `composerUpdate -t 13|14` installed.
 
 **Nothing on the read path honours `l10n_mode=exclude`.** The persons TCA uses
 it heavily: an excluded column is hidden in translation forms and is *supposed*

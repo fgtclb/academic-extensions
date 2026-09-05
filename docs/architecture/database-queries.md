@@ -20,20 +20,21 @@ $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_category');
 ```
 
 It is declared in
-`.Build/vendor/typo3/cms-core/Classes/Database/Query/QueryBuilder.php:66` and
-describes itself as "a facade to the Doctrine DBAL QueryBuilder that implements
-PHP7 type hinting and automatic quoting of table and column names"
-(class docblock, lines 50-65). Its expression builder is
-`TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder`
-(`.Build/vendor/typo3/cms-core/Classes/Database/Query/Expression/ExpressionBuilder.php:39`),
-which extends the Doctrine one.
+`typo3/cms-core/Classes/Database/Query/QueryBuilder.php` — line 66 in
+`core-13/vendor/`, line 67 in `core-14/vendor/` — and describes itself as "a
+facade to the Doctrine DBAL QueryBuilder that implements PHP7 type hinting and
+automatic quoting of table and column names" (class docblock). Its expression
+builder is `TYPO3\CMS\Core\Database\Query\Expression\ExpressionBuilder`
+(`typo3/cms-core/Classes/Database/Query/Expression/ExpressionBuilder.php:39` on
+both), which extends the Doctrine one.
 
 It is **not** the Extbase query object. `TYPO3\CMS\Extbase\Persistence\Generic\Query`
-(`.Build/vendor/typo3/cms-extbase/Classes/Persistence/Generic/Query.php:16`)
-also offers an `in()` method (line 503), but that one takes a plain PHP array
+(`typo3/cms-extbase/Classes/Persistence/Generic/Query.php:42` in `core-13/vendor/`,
+`:47` in `core-14/vendor/`) also offers an `in()` method (`:503` and `:574`
+respectively), but that one takes a plain PHP array
 by design and builds an object-level constraint, not SQL. Extbase repository
 code such as
-`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:198`
+`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:214`
 (`$query->matching($query->in('uid', $profileUidArray))`) is therefore outside
 the scope of the first two rules below — rule 3 applies to **both** query
 objects. Check which object is in the variable before applying a rule to a
@@ -54,19 +55,26 @@ $queryBuilder->expr()->in('CType', $queryBuilder->quoteArrayBasedValueListToStri
 Use the integer variant for uid-like lists and the string variant for
 identifier lists such as `CType` values or category type keys.
 
-### Why this works — verified in the installed core
+### Why this works — verified in the pinned core trees
 
-The installed core in `.Build/vendor/` is **TYPO3 v13.4.34** with
-`doctrine/dbal` 4.4.4. The development instance in `core-14/vendor/` carries
-**TYPO3 v14.3.6** with the same DBAL version, and was used to confirm the same
-behaviour on v14.
+Verified against the two development instances, which their tracked
+`composer.lock` pins: `core-13/vendor/` carries **TYPO3 v13.4.34** and
+`core-14/vendor/` **v14.3.6**, both with `doctrine/dbal` 4.4.4. The line
+numbers below are keyed to those two trees rather than to `.Build/vendor/`,
+which carries whichever version the last `composerUpdate -t 13|14` installed.
+
+```bash
+grep -n "protected const VERSION" \
+  core-13/vendor/typo3/cms-core/Classes/Information/Typo3Version.php \
+  core-14/vendor/typo3/cms-core/Classes/Information/Typo3Version.php
+```
 
 Both helpers live on the query builder itself and start with the same guard:
 
-| Method                                    | v13.4.34 (`.Build/vendor/`) | v14.3.6 (`core-14/vendor/`) |
-|-------------------------------------------|-----------------------------|-----------------------------|
-| `quoteArrayBasedValueListToIntegerList()` | `QueryBuilder.php:1145`     | `QueryBuilder.php:1148`     |
-| `quoteArrayBasedValueListToStringList()`  | `QueryBuilder.php:1176`     | `QueryBuilder.php:1179`     |
+| Method                                    | v13.4.34 (`core-13/vendor/`) | v14.3.6 (`core-14/vendor/`) |
+|-------------------------------------------|------------------------------|-----------------------------|
+| `quoteArrayBasedValueListToIntegerList()` | `QueryBuilder.php:1145`      | `QueryBuilder.php:1148`     |
+| `quoteArrayBasedValueListToStringList()`  | `QueryBuilder.php:1176`      | `QueryBuilder.php:1179`     |
 
 The integer variant reads (v13.4.34, `QueryBuilder.php:1145-1158`):
 
@@ -128,7 +136,8 @@ public function in(string $fieldName, $value): string
 ```
 
 `notIn()` carries the same guard with code `1701857904`
-(`ExpressionBuilder.php:255-262`); the empty-string variants are `1701857903`
+(`ExpressionBuilder.php:255-262` on v13.4.34, `:251-258` on v14.3.6); the
+empty-string variants are `1701857903`
 and `1701857905`.
 
 **What could not be verified from this checkout:** no TYPO3 v12 vendor tree
@@ -158,7 +167,7 @@ $queryBuilder->expr()->in(
 ```
 
 That is the form used in
-`packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:317-320`.
+`packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:337-340`.
 Doctrine expands an array parameter when the statement is prepared, and an
 empty one becomes the literal `NULL`
 (`.Build/vendor/doctrine/dbal/src/ExpandArrayParameters.php:99-103`):
@@ -219,26 +228,40 @@ $queryBuilder->expr()->in('sys_category.sys_language_uid', [0, -1]),
 
 That form appears five times in
 `packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`
-(lines 69, 111, 155, 207 and 250) and three times in
+(lines 69, 117, 165, 221 and 270, all of them the same
+`sys_language_uid IN (0, -1)`) and three times in
 `packages/fgtclb/academic-study-plan/Classes/Service/StudyPlanService.php`
-(lines 222, 239 and 258), and is correct as written. The rule targets lists
-whose length comes from outside the function — request data, a repository
-result, a configuration value.
+(line 267 for `[0, -1]`, lines 284 and 303 for `[0, 1]`), and is correct as
+written. The rule targets lists whose length comes from outside the function —
+request data, a repository result, a configuration value.
+
+Re-derive both:
+
+```bash
+grep -rn "expr()->\(not\)\?[iI]n(.*\[[^]]*\])" --include='*.php' packages/fgtclb/*/Classes/
+```
 
 ### Call sites to copy from
 
-Eight classes under `packages/fgtclb/*/Classes/` use the quoting helpers, 16
-call sites in total. A representative selection, all paths relative to
-`packages/fgtclb/`:
+Nine classes under `packages/fgtclb/*/Classes/` use the quoting helpers, 17
+call sites in total:
 
-| File                                                                       | Line    | Form                                              |
-|----------------------------------------------------------------------------|---------|---------------------------------------------------|
-| `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`    | 156-159 | `...ToIntegerList()` with `in()`, the ACE-349 fix |
-| `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`    | 317-320 | `createNamedParameter()` array parameter          |
-| `academic-persons/Classes/Provider/FrontendUserProvider.php`               | 86-89   | `...ToIntegerList()` with `notIn()`               |
-| `academic-contact4pages/Classes/Backend/FormEngine/AddressRecordItems.php` | 158-161 | `...ToIntegerList()` on a literal list            |
-| `academic-projects/Classes/Upgrades/FlexFormUpgradeWizard.php`             | 51-54   | `...ToStringList()` with `in()`                   |
-| `academic-jobs/Classes/Upgrades/PluginUpgradeWizard.php`                   | 69-72   | `...ToStringList()` with `in()`                   |
+```bash
+grep -rln "quoteArrayBasedValueListTo" packages/fgtclb/*/Classes/ | wc -l
+grep -rn  "quoteArrayBasedValueListTo" packages/fgtclb/*/Classes/ | wc -l
+```
+
+A representative selection, all paths relative to `packages/fgtclb/`:
+
+| File                                                                                   | Line    | Form                                              |
+|----------------------------------------------------------------------------------------|---------|---------------------------------------------------|
+| `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`                | 166-169 | `...ToIntegerList()` with `in()`, the ACE-349 fix |
+| `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`                | 337-340 | `createNamedParameter()` array parameter          |
+| `academic-persons/Classes/Provider/FrontendUserProvider.php`                           | 86-89   | `...ToIntegerList()` with `notIn()`               |
+| `academic-contact4pages/Classes/Backend/FormEngine/AddressRecordItems.php`             | 158-161 | `...ToIntegerList()` on a literal list            |
+| `academic-projects/Classes/Upgrades/FlexFormUpgradeWizard.php`                         | 51-54   | `...ToStringList()` with `in()`                   |
+| `academic-jobs/Classes/Upgrades/PluginUpgradeWizard.php`                               | 69-72   | `...ToStringList()` with `in()`                   |
+| `academic-persons-edit/Classes/Upgrades/RepairLocalizedProfileImagesUpgradeWizard.php` | 326-329 | `...ToIntegerList()` with `in()`                  |
 
 The fourth row quotes the constant `[-1, 0]`, which the previous section marks
 as not strictly needing it. That is harmless and arguably preferable: it keeps
@@ -246,7 +269,7 @@ one shape for every value list in the class, so the reader never has to decide
 whether a given list can be empty.
 
 The canonical one is the ACE-349 fix itself
-(`typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:156-159`):
+(`typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:166-169`):
 
 ```php
 $queryBuilder->expr()->in(

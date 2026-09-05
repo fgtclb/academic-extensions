@@ -76,6 +76,17 @@ an eighth type under `profileInformationsTypes` is reported, not created — it
 would need a profile relation and a TCA column. The legacy keys never reach
 `raw`.
 
+`type` and `fieldName` are the one overlaid value an integrator has to check by
+hand. Since ACE-503 the seven profile relations, and the record type each of
+them selects, are declared by
+`Configuration/TCA/tx_academicpersons_domain_model_profile.php` rather than
+generated from the settings, so a legacy entry that renamed either reaches the
+editing frontend and not the TCA: the backend column and the editor then
+address different record types, and the records created in one are invisible in
+the other. The manual states it where an integrator meets it —
+`Configuration/Sections/Index.rst`, `Configuration/Validations/Index.rst` and
+the `Upgrade/` chapter of `academic-persons`.
+
 Attribution is per package: the factory walks
 `SettingsFileLoader::loadPackageArrays()` — the per-package view the loader
 gained for this, keyed by package key in loading order — and the migrator logs

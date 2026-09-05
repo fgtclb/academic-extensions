@@ -201,6 +201,48 @@ stylesheet touches nothing outside that element.
             overflow: unset;
         }
 
+..  _configuration-sections-detail-override:
+
+What an override of the detail template loses
+---------------------------------------------
+
+Until 2.4 :file:`Templates/Profile/Detail.html` was the view: it rendered the
+image, the contact data and every timeline section itself. Since 3.0.0 it is a
+dispatcher over the :yaml:`structure` map, and the eleven partials below
+:file:`Partials/Profile/PublicProfile/` are what renders.
+
+**A project that overrides the template keeps rendering its own copy.** Nothing
+looks broken, and three things are silently gone:
+
+*   **The configurable layout.** :yaml:`profile.structure` and
+    :yaml:`profile.details` are handed to the template as ``publicProfile`` and
+    are read by the new partials only, so changing them has no effect at all
+    while the old template renders.
+*   **Every date of a timeline entry.** The properties the old template printed
+    - ``{item.year}``, ``{item.yearStart}`` and ``{item.yearEnd}`` - do not
+    exist any more, and Fluid renders a missing property as an empty string.
+    The replacements are :php:`\DateTime` objects and have to be formatted;
+    printing one unformatted fails with
+    ``Object of class DateTime could not be converted to string``:
+
+    ..  code-block:: html
+
+        <f:variable name="format" value="{f:if(condition: item.yearOnly, then: 'Y', else: 'd.m.Y')}" />
+        {item.date -> f:format.date(format: format)}
+
+*   **Three partials the detail view no longer renders.**
+    :file:`Partials/Profile/Header.html` and
+    :file:`Partials/Profile/SectionHeader.html` are still shipped and still
+    rendered - by the list and card views, and by the profile editing view of
+    :guilabel:`academic_persons_edit` - so an override of one of them made for
+    the *detail* view no longer reaches it.
+    :file:`Partials/Profile/DataHeader.html` had the detail view as its only
+    renderer and is rendered by nothing since.
+
+Adopt the new template instead, and move the project's changes into the partial
+of the element they belong to: they are one file per element, and overriding one
+of them is what :ref:`configuration-sections-profile-rendering` describes.
+
 ..  _configuration-sections-fields:
 
 The fields
@@ -423,6 +465,19 @@ Each key is a stable section identifier; the map order is the display order.
             :yaml:`contracts.fields` instead.
     *   -   :yaml:`helptext`
         -   A map from field to label reference.
+
+..  warning::
+    :yaml:`type` and :yaml:`fieldName` describe the editing frontend. The seven
+    profile relations, and the record type each of them selects, are declared
+    by the TCA of the profile table since 3.0.0 and are **not** generated from
+    this file any more. Renaming either of them for one of the seven shipped
+    sections therefore leaves a backend inline column that stores one record
+    type and a frontend editor that writes another - the records created in one
+    context are invisible in the other. A section of an own record type needs
+    its own column in a TCA override of the profile table; the loop over the
+    seven relations in
+    :file:`Configuration/TCA/tx_academicpersons_domain_model_profile.php` is the
+    template for it.
 
 The validators of a timeline section address the record type of that section
 only: a required title of publications does not make the title of a lecture

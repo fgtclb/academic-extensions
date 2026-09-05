@@ -298,8 +298,9 @@ if (class_exists(TcaSchemaFactory::class)) {
 ```
 
 but `TYPO3\CMS\Core\Schema\TcaSchemaFactory` **also exists on TYPO3 v13.4** —
-verified against the installed `typo3/cms-core` v13.4.34, which ships
-`Classes/Schema/TcaSchemaFactory.php` with both `all()` and `load()`. The branch
+verified against `core-13/vendor/typo3/cms-core` (v13.4.34 by its tracked
+`composer.lock`), which ships `Classes/Schema/TcaSchemaFactory.php` with both
+`all()` and `load()`. The branch
 is therefore taken on both core versions of this branch, and the key is set in
 both cases. That is fine for what the trait does, but **do not read this
 construct as a v14 gate and do not reuse it as one.** A genuine gate is

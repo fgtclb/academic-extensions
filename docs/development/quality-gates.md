@@ -228,14 +228,17 @@ fail before it is accepted as proof.
 
 ```xml
 <directory>../../packages/*/*/Tests/Unit/</directory>
-<directory>../../packages/*/*/Tests/Functional/</directory>
+<directory>../../packages-dev/*/Tests/Unit/</directory>
 ```
 
-(`Build/phpunit/UnitTests.xml:42`, `Build/phpunit/FunctionalTests.xml:42`.)
+(`Build/phpunit/UnitTests.xml:42` and `:49`; `FunctionalTests.xml` carries the
+two `Tests/Functional/` globs on the same lines.)
 
-The glob is `packages/*/*`, so it picks up the tests of **every** extension in
-the mono repository in one run — twelve of them under `packages/fgtclb/` today
-— and would pick up another vendor directory as well.
+The first glob is `packages/*/*`, so it picks up the tests of **every**
+extension in the mono repository in one run — twelve of them under
+`packages/fgtclb/` today — and would pick up another vendor directory as well.
+The second collects `packages-dev/`, where the seed definition of
+`packages-dev/dev-site` carries tests of its own.
 
 **There is no per-extension PHPUnit configuration**, and adding one would be a
 step backwards: the extensions depend on each other, and a test suite that only

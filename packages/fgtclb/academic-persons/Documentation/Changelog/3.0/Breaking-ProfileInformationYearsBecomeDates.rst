@@ -4,6 +4,9 @@
 Breaking: Profile information years become dates
 ================================================
 
+..  seealso::
+    :ref:`upgrade` is the order in which the 3.0 changes have to be applied.
+
 Description
 ===========
 
@@ -140,7 +143,7 @@ Migration
     extensions has to run before the TYPO3 v14 update and is *not* repeatable.
     On v14 a bare run asks it whether it has work to do, is told "no" because
     :sql:`tt_content.list_type` is gone, and records it as done although it
-    migrated nothing.
+    migrated nothing. :ref:`upgrade` has the whole order and the recovery.
 #.  Drop :sql:`year`, :sql:`year_start` and :sql:`year_end` through the
     database analyzer's *unused* section once the wizard has run. Until then
     they stay in place, so a migration can be verified before the old values

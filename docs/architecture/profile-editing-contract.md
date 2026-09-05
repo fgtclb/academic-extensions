@@ -221,8 +221,8 @@ and the next apply would post it as a change nobody made.
 
 **Autosave is suppressed while the form is open.** A `[data-pe-autosave-on-change]`
 checkbox participates in apply instead of writing on change — otherwise it would
-reach the database while the visitor is still deciding, and abort could not take
-it back. The synchronisation switch of `Header.html` sits *outside*
+reach the database while the visitor is still deciding, and discard could not
+take it back. The synchronisation switch of `Header.html` sits *outside*
 `[data-pe-fields-form]` and keeps its immediate save.
 
 ## The sixteen prototypes
