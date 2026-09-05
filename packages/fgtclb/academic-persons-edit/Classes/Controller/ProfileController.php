@@ -2757,6 +2757,14 @@ final class ProfileController extends ActionController
      * The image relation is cleared before the file is removed so that stale references
      * do not remain on the profile record and other usages can be checked correctly.
      *
+     * The removal is announced the same way the upload announces itself, and for the
+     * same reason: the write goes through the DataHandler, not through the Extbase
+     * persistence, so there is nothing to flush - only the {@see AfterProfileUpdateEvent}
+     * the translation synchronisation and the slug generation listen to. It is dispatched
+     * last, once the relation is gone and the file cleanup has run, so a synchronisation
+     * never carries a reference that is about to be deleted into a translation. A request
+     * that removed nothing changed nothing and announces nothing.
+     *
      * @param Profile $profile The profile whose image should be deleted.
      * @return bool True if an image was deleted, otherwise false if no image was assigned.
      */
@@ -2768,6 +2776,9 @@ final class ProfileController extends ActionController
             return false;
         }
         $this->deleteUnreferencedFiles($removedFileUids);
+        if (!$profile->getIsTranslation()) {
+            $this->eventDispatcher->dispatch(new AfterProfileUpdateEvent($profile));
+        }
         return true;
     }
 
