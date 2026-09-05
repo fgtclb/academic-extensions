@@ -16,12 +16,13 @@ translations, and the profile slug was not regenerated either.
 
 These actions dispatch the event once after the change is persisted: the
 generic field update of the profile form, the ``skip_sync`` toggle, the profile
-image upload — which is also a replacement — and the create, update, delete and
-sort actions of a document section and of the contacts of a contract. The event
-always carries the persisted default language profile; child records resolve
-their owning profile through the contract, and an edit of a profile fetched as
-translation overlay does not dispatch (synchronisation runs from the default
-language record only).
+image upload — which is also a replacement — the removal of the profile image,
+and the create, update, delete and sort actions of a document section and of
+the contacts of a contract. The event always carries the persisted default
+language profile; child records resolve their owning profile through the
+contract, and an edit of a profile fetched as translation overlay does not
+dispatch (synchronisation runs from the default language record only). A
+removal that found no image to remove changed nothing and announces nothing.
 
 Impact
 ======
