@@ -49,7 +49,7 @@ We prefer composer installation:
 
 ```bash
 composer require \
-  'fgtclbfgtclb/academic-bite-jobs':'^2'
+  'fgtclb/academic-bite-jobs':'^2'
 ```
 
 > [!IMPORTANT]

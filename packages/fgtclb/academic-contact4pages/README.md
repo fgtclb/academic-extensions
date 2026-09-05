@@ -54,7 +54,7 @@ and installed with:
 ```shell
 composer require \
   'fgtclb/academic-persons':'3.*.*@dev' \
-  'fgtclb/academic-bite-jobs':'3.*.*@dev'
+  'fgtclb/academic-contacts4pages':'3.*.*@dev'
 ```
 
 ## Upgrade
