@@ -23,8 +23,8 @@ paragraphs with a blank line.
 ```
 
 The issue reference sits **inside the subject**, directly after the tag and
-before the description, separated by a colon. It is not a footer here. 83 of the
-last 100 commits carry an `ACE-NNN` key in that position. The 17 that do not are
+before the description, separated by a colon. It is not a footer here. 90 of the
+last 100 commits carry an `ACE-NNN` key in that position. The 10 that do not are
 documentation fixes and the TYPO3 v14 support series, which was carried out as a
 sequence of steps rather than per issue. Release commits carry no reference
 either.
@@ -39,10 +39,10 @@ either.
 | First word      | Capitalized                                     |
 | Trailing period | None                                            |
 
-What the repository actually does: 95 of the last 100 subjects are within 52
-characters. The five that are not run to 53–63 characters. Older history is
-looser — across the last 600 commits only 330 stay within 52, and the longest
-subject on record is 83 characters, from March 2026. The 52 character target is
+What the repository actually does: 85 of the last 100 subjects are within 52
+characters. The fifteen that are not run to 53–59 characters. Older history is
+looser — across the last 600 commits only 339 stay within 52, and the longest
+subject on record is 138 characters, from February 2024. The 52 character target is
 the current standard; the drift is history, not licence.
 
 The budget is tighter than it looks. `[BUGFIX] ACE-358: ` alone is 18
@@ -72,19 +72,25 @@ this repository consistently contain four things:
 
 ## Tags
 
-Taken from the last 600 commits rather than from a generic list. The counts are
-what is in use; a tag that does not appear here is not established practice in
-this repository.
+Taken from the last 600 commits rather than from a generic list, with
+
+```bash
+git log -600 --format='%s' | grep -oP '^(\[!!!\])?\[[A-Z]+\]' | sort | uniq -c
+```
+
+The counts are what is in use; a tag that does not appear here is not
+established practice in this repository. They are a moving window, so re-run
+the command rather than trusting the table after a long series of commits.
 
 | Tag              | Count | Use                                             | Example commit                                                        |
 |------------------|-------|-------------------------------------------------|-----------------------------------------------------------------------|
-| `[TASK]`         | 175   | Refactoring, tests, CI, dependencies, tooling   | `94c7aedc5` `[TASK] ACE-382: Cache only composer's dist archives`     |
-| `[BUGFIX]`       | 95    | Fixes incorrect behaviour                       | `8b5557037` `[BUGFIX] ACE-358: Drop the defaults on TEXT columns`     |
-| `[DOCS]`         | 74    | Documentation only, shipped or developer facing | `7d139a44f` `[DOCS] ACE-294: Record the TYPO3 v15 blockers`           |
-| `[FEATURE]`      | 22    | New, user-facing functionality                  | `4264cfe4b` `[FEATURE] ACE-236: Select the displayed address records` |
-| `[!!!][TASK]`    | 18    | Breaking change, marker first                   | `63fd7b099` `[!!!][TASK] ACE-306: Remove the profile switcher`        |
-| `[RELEASE]`      | 9     | Release commits, maintainers only               | `1f5334422` `[RELEASE] 2.3.4`                                         |
-| `[!!!][FEATURE]` | 5     | Breaking new functionality                      | `[!!!][FEATURE] ACE-304: Replace a profile image`                     |
+| `[TASK]`         | 304   | Refactoring, tests, CI, dependencies, tooling   | `94c7aedc5` `[TASK] ACE-382: Cache only composer's dist archives`     |
+| `[BUGFIX]`       | 130   | Fixes incorrect behaviour                       | `8b5557037` `[BUGFIX] ACE-358: Drop the defaults on TEXT columns`     |
+| `[DOCS]`         | 83    | Documentation only, shipped or developer facing | `7d139a44f` `[DOCS] ACE-294: Record the TYPO3 v15 blockers`           |
+| `[FEATURE]`      | 31    | New, user-facing functionality                  | `4264cfe4b` `[FEATURE] ACE-236: Select the displayed address records` |
+| `[!!!][TASK]`    | 29    | Breaking change, marker first                   | `63fd7b099` `[!!!][TASK] ACE-306: Remove the profile switcher`        |
+| `[RELEASE]`      | 11    | Release commits, maintainers only               | `1f5334422` `[RELEASE] 2.3.4`                                         |
+| `[!!!][FEATURE]` | 10    | Breaking new functionality                      | `[!!!][FEATURE] ACE-304: Replace a profile image`                     |
 
 The `[!!!]` marker always comes first and is combined with the tag that
 describes the nature of the change, never used alone.

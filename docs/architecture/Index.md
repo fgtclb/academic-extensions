@@ -29,6 +29,15 @@ describing an intention as if it were the state.
   is drawn in `currentColor` and registered with the `academic_base` provider
   that inlines it, so it follows the text colour in the backend and the
   frontend.
+- The profile editor's configuration crosses the Fluid boundary as `data-*`
+  attributes on one element, and is **read once** into a frozen object that is
+  handed down. No module reads `root.dataset` a second time.
+- The profile editor is five custom elements over Fluid's markup, and **none of
+  them renders any**: the two whose content comes out of a response clone
+  `<template>` prototypes Fluid emitted. They are plain custom elements with
+  no framework below them, no element opens a shadow root and nothing but the
+  element itself ever writes below one, so a project's stylesheet reaches every
+  control and there is no `::part()` to declare.
 
 ## Pages
 
@@ -39,10 +48,11 @@ describing an intention as if it were the state.
 | [Class design](class-design.md)                               | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                              |
 | [Database queries](database-queries.md)                       | Quoting value lists, and keeping a constraint on the builder that executes it.                                                                        |
 | [Validation settings](validation-settings.md)                 | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                     |
-| [Form data transformation](form-data-transformation.md)       | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                          |
+| [Form data transformation](form-data-transformation.md)       | How a value of a JSON payload reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                  |
 | [TypoScript and site sets](typoscript-and-site-sets.md)       | The layout that serves site sets and static templates from one physical copy, hide-by-default, and the `clear = 3` trap.                              |
 | [Translation synchronization](translation-synchronization.md) | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.            |
 | [Icons](icons.md)                                             | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.         |
+| [The profile editing contract](profile-editing-contract.md)   | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.          |
 
 ## See also
 

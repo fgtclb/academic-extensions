@@ -14,11 +14,18 @@
  * The source list comes from the build itself, so the two cannot disagree about
  * what counts as a source.
  *
+ * Two projects are checked, not one: "tsconfig.json" for the shipped modules,
+ * which run in a browser, and "tsconfig.tests.json" for the behavioural tests,
+ * which run in node. They differ in "types", and that is a property of a whole
+ * program - see "docs/testing/javascript-tests.md".
+ *
  * See "docs/development/frontend-assets.md".
  */
+import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { dirname, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { extensions } from './extensions.mjs';
 
 const buildRoot = dirname(fileURLToPath(import.meta.url));
 
@@ -39,9 +46,18 @@ if (scripts.length === 0) {
     process.exit(0);
 }
 
-const result = spawnSync(resolve(buildRoot, 'node_modules/.bin/tsc'), ['--noEmit'], {
-    cwd: buildRoot,
-    stdio: 'inherit',
-});
+const check = (project) => {
+    const result = spawnSync(resolve(buildRoot, 'node_modules/.bin/tsc'), ['--noEmit', '--project', project], {
+        cwd: buildRoot,
+        stdio: 'inherit',
+    });
 
-process.exit(result.status ?? 1);
+    return result.status ?? 1;
+};
+
+// The tests are optional in the same way the sources are: an extension without
+// a "Tests/JavaScript/" is fine, and "tsc" would abort on the empty project
+// with the same TS18003 the guard above exists for.
+const hasTests = extensions().some((extension) => existsSync(join(extension.path, 'Tests/JavaScript')));
+
+process.exit(check('tsconfig.json') || (hasTests ? check('tsconfig.tests.json') : 0));
