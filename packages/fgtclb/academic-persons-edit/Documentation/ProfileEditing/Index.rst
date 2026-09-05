@@ -1116,6 +1116,14 @@ which slot carries which value.
         - Root component and scope for all queries. Everything below is read
           from it, and the ``<academic-persons-edit-profile-editing>`` element
           that wraps it is what starts the editor.
+    *   - ``data-pe-missing-ajax-page-type``
+        - The ``role="alert"`` message :file:`Templates/Profile/Index.html`
+          renders **above** the plugin root when the site delivers no
+          :typoscript:`PAGE` object with :typoscript:`typeNum = 1733735`, which
+          is the one configuration error the editor cannot survive: every save
+          would be answered with the site's error page instead of JSON. The
+          same request logs the cause and names the site set to include. It is
+          absent on a correctly configured site.
     *   - ``data-profile-uid`` and ``data-editor-language``
         - Positive profile identifier, and the language code CKEditor is
           initialized with.
@@ -1475,8 +1483,12 @@ Three things in a project's infrastructure have to know about that number:
     :typoscript:`academicPersonsProfileEditingAjax` object. The editor then
     renders, and every save is answered with the HTML of the page instead of
     JSON - a failure that happens in the browser, with nothing in the TYPO3 log
-    to look at. Include the delivered TypoScript, or copy the object into the
-    site package:
+    to look at. The editor therefore checks the TypoScript setup of the request
+    for a :typoscript:`PAGE` object with that :typoscript:`typeNum`, and where
+    there is none it renders a ``role="alert"`` message
+    (``data-pe-missing-ajax-page-type``) instead of the silent failure, and
+    logs the cause at error level. Include the delivered TypoScript, or copy
+    the object into the site package:
 
     ..  code-block:: typoscript
         :caption: EXT:my_sitepackage/Configuration/TypoScript/setup.typoscript

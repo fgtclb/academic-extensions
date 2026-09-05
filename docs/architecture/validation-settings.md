@@ -63,8 +63,8 @@ A site package that still ships the old shape is not ignored:
 migrator maps `validations.<set>.<property>` onto the `validators` of the field
 with that key or `propertyName` in the set's target map, and the
 `profileInformation` set onto the `validators` map of every timeline section;
-`profileInformationsTypes.<id>` refines `label`, `type` and `fieldName` of the
-document section with that key. The rule is *overlay, not replace*: a legacy set
+`profileInformationsTypes.<id>` refines the `label` of the document section
+with that key. The rule is *overlay, not replace*: a legacy set
 decides the five flags the old shape knew (`required`, `readonly`, `disabled`,
 `email`, `number`) for every field of its target — an unlisted field loses them,
 exactly as it was unconfigured before, which is what made the 2.x manual's
@@ -76,16 +76,20 @@ an eighth type under `profileInformationsTypes` is reported, not created — it
 would need a profile relation and a TCA column. The legacy keys never reach
 `raw`.
 
-`type` and `fieldName` are the one overlaid value an integrator has to check by
-hand. Since ACE-503 the seven profile relations, and the record type each of
-them selects, are declared by
+`type` and `fieldName` are deliberately **not** overlaid, and that is the third
+lossy case. Since ACE-503 the seven profile relations, and the record type each
+of them selects, are declared by
 `Configuration/TCA/tx_academicpersons_domain_model_profile.php` rather than
-generated from the settings, so a legacy entry that renamed either reaches the
-editing frontend and not the TCA: the backend column and the editor then
-address different record types, and the records created in one are invisible in
-the other. The manual states it where an integrator meets it —
-`Configuration/Sections/Index.rst`, `Configuration/Validations/Index.rst` and
-the `Upgrade/` chapter of `academic-persons`.
+generated from the settings, so applying a legacy rename would move the editing
+frontend alone and leave the backend column and the editor addressing different
+record types. `migrateProfileInformationTypes()` therefore keeps the values that
+match the TCA and reports the divergent one per key in `notes`, next to the
+`number`-flag and eighth-type notes. A `type` or `fieldName` written directly
+into the new `documentSections` map *is* read — the settings graph has no TCA to
+compare it against, so that divergence is the integrator's, and the manual says
+so in `Configuration/Sections/Index.rst`,
+`Configuration/Validations/Index.rst` and the `Upgrade/` chapter of
+`academic-persons`.
 
 Attribution is per package: the factory walks
 `SettingsFileLoader::loadPackageArrays()` — the per-package view the loader

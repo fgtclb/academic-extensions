@@ -264,16 +264,20 @@ exists, so a deployment pipeline can gate on it. Paste the printed maps into the
 site package, review them, and flush all caches.
 
 ..  warning::
-    Check a renamed :yaml:`type` or :yaml:`fieldName` by hand. The overlay
-    carries both from a legacy :yaml:`profileInformationsTypes` entry onto the
-    document section of the same name, but since 3.0.0 they configure the
-    **editing frontend only**: the seven profile relations and the record type
-    each of them selects are declared by the TCA of the profile table and are
-    no longer generated from the settings. An override that renamed either ends
-    up with a backend column storing one record type and a frontend editor
-    writing another, and the records created in one context are invisible in
-    the other. Drop such a rename, or declare the relation in a TCA override of
-    the profile table - see :ref:`configuration-sections-documents`.
+    Read the notes the command prints. A renamed :yaml:`type` or
+    :yaml:`fieldName` of a legacy :yaml:`profileInformationsTypes` entry is
+    **not applied**, and is reported instead: since 3.0.0 the seven profile
+    relations and the record type each of them selects are declared by the TCA
+    of the profile table, and applying such a rename would move the editing
+    frontend alone, leaving the backend column and the editor writing
+    different record types. The section keeps the values that match the TCA,
+    so the installation is consistent - but the intention of the override is
+    silently not honoured. A timeline type of your own needs its own column in
+    a TCA override of the profile table, and its section under
+    :yaml:`documentSections` - see :ref:`configuration-sections-documents`.
+    The same applies to a :yaml:`type` or :yaml:`fieldName` written directly
+    into the new :yaml:`documentSections` map: that one *is* read, and it is
+    the shape that diverges from the TCA.
 
 :ref:`configuration-validations-migration` has the complete key mapping and what
 is deliberately not mapped;
@@ -297,9 +301,11 @@ copy**, so nothing looks broken - and it loses the configurable layout
 completely, together with every timeline date, because ``{item.year}``,
 ``{item.yearStart}`` and ``{item.yearEnd}`` no longer exist and Fluid renders a
 missing property as an empty string. Two of the partials the old detail
-template rendered are now only used by the list and card views, and one is no
-longer rendered at all. :ref:`configuration-sections-detail-override` lists
-what an override has to take over.
+template rendered are now only used by the list and card views, and the third,
+:file:`Partials/Profile/DataHeader.html`, is deleted - a project template that
+still renders it fails at render time. See
+:ref:`configuration-sections-detail-override` and
+:ref:`breaking-public-profile-detail-partials`.
 
 The profile editing view
 ------------------------
@@ -340,10 +346,12 @@ in 2.4, because the old editor was a server-rendered form flow.
 
 **Check that the site really includes one of the two.** A site package that
 copied the extension's TypoScript into its own instead of including it renders
-the new editor and answers every save with the page's HTML instead of JSON; the
-failure is client side, and the editor reports a generic error at best. Such a
-site package has to add the :typoscript:`academicPersonsProfileEditingAjax`
-object by hand, or include the delivered TypoScript.
+the new editor and would answer every save with the page's HTML instead of
+JSON. The editor detects that case: where the request carries no such
+:typoscript:`PAGE` object it renders a ``role="alert"`` message above itself
+and logs the cause, naming the site set. Such a site package has to add the
+:typoscript:`academicPersonsProfileEditingAjax` object by hand, or include the
+delivered TypoScript.
 
 A ``PageType`` route enhancer has to map the page type, and a web application
 firewall or reverse proxy has to let it and the ``X-Requested-With`` header
@@ -379,8 +387,9 @@ Verifying the result
 
 #.  A timeline entry of a profile shows its date in the frontend and in the
     backend record editor, and an entry that showed a year still shows a year.
-#.  The profile editing plugin loads, a field can be saved, and the browser
-    console shows no failed request to the page type ``1733735``.
+#.  The profile editing plugin loads without the "cannot be saved" alert above
+    it, a field can be saved, and the browser console shows no failed request
+    to the page type ``1733735``.
 #.  A profile image is shown in every language of a translated profile, and
     uploading a new one in one language does not change the other.
 #.  :bash:`vendor/bin/typo3 academic:persons:settings:migrate` exits with

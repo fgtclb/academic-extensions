@@ -369,8 +369,8 @@ How the legacy keys map:
             and :yaml:`bodytext` onto :yaml:`date`, :yaml:`from`, :yaml:`to`
             and :yaml:`description`
     *   -   :yaml:`profileInformationsTypes.<section>`
-        -   :yaml:`label`, :yaml:`type` and :yaml:`fieldName` of
-            :yaml:`documentSections.<section>`
+        -   the :yaml:`label` of :yaml:`documentSections.<section>`; its
+            :yaml:`type` and :yaml:`fieldName` are reported, not applied
 
 A field is matched by its key or by the property it names, so
 :yaml:`emailAddress.email` reaches the :yaml:`emailAddress` field whose
@@ -383,16 +383,7 @@ profile names by not listing them. The flags the old shape could not express
 - :yaml:`url`, :yaml:`date`, :yaml:`tel`, :yaml:`textarea`, :yaml:`html` -
 stay as the section maps declare them.
 
-..  warning::
-    The mapped :yaml:`type` and :yaml:`fieldName` reach the editing frontend
-    only. The seven profile relations and the record type each of them selects
-    are declared by the TCA of the profile table since 3.0.0, so a legacy entry
-    that renamed either leaves a backend column and a frontend editor writing
-    different record types - and the records of one are invisible in the other.
-    See :ref:`configuration-sections-documents` and the
-    :ref:`upgrade` page.
-
-Two things are not mapped and are reported by the command and in the log:
+Three things are not mapped and are reported by the command and in the log:
 
 *   The :yaml:`number` flag of :yaml:`year`, :yaml:`yearStart` and
     :yaml:`yearEnd` is dropped. They are date fields since 3.0, and a date
@@ -403,3 +394,15 @@ Two things are not mapped and are reported by the command and in the log:
     type needs a profile relation and a TCA column the settings never
     created; the Breaking entry on the section based settings describes how
     to keep one.
+*   The :yaml:`type` and :yaml:`fieldName` of a timeline entry type are not
+    applied. Until 2.4 the two generated the inline column of the profile
+    table, so overriding one moved the backend relation and the frontend
+    selection together; since 3.0.0 the seven relations are declared by the
+    TCA of the profile table, and applying the override would move the
+    frontend half alone - records created in the editing frontend would be
+    invisible in the backend, and the other way round. The section keeps the
+    record type and the relation field that match the TCA, and the value the
+    override named is printed as a note. Act on that note: a timeline type of
+    your own needs its own column in a TCA override of the profile table, as
+    :ref:`configuration-sections-documents` and the :ref:`upgrade` page
+    describe.

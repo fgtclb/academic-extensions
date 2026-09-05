@@ -237,7 +237,9 @@ looks broken, and three things are silently gone:
     :guilabel:`academic_persons_edit` - so an override of one of them made for
     the *detail* view no longer reaches it.
     :file:`Partials/Profile/DataHeader.html` had the detail view as its only
-    renderer and is rendered by nothing since.
+    caller and is **deleted**: a project template that still renders
+    ``Profile/DataHeader`` fails at render time rather than rendering nothing.
+    :ref:`breaking-public-profile-detail-partials` has the migration.
 
 Adopt the new template instead, and move the project's changes into the partial
 of the element they belong to: they are one file per element, and overriding one
