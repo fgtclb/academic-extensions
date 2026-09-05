@@ -1,3 +1,9 @@
+import {
+  toEditingContext,
+  type EditingContext,
+  type EditingTarget,
+} from "@fgtclb/academic-persons-edit/frontend/profile/context.js";
+
 export const rootSelector = "[data-academic-persons-profile-editing]";
 
 /**
@@ -14,11 +20,19 @@ export const rootSelector = "[data-academic-persons-profile-editing]";
  * and nowhere else stays invisible here. That one waits for the behavioural
  * harness of ACE-509 - see
  * `docs/testing/academic-persons-edit-frontend-tests.md`.
+ *
+ * The root's own contract - the urls, the messages and the labels of
+ * `Templates/Profile/Index.html` - is a vocabulary of its own and is read by
+ * `readEditingContext()` of `profile/context.ts`, through the same mechanism.
  */
 export type ProfileEditingHooks = {
   peCharacterLimit?: string;
   peCheckedLabel?: string;
   peCloseAllLabel?: string;
+  peContractContactField?: string;
+  peContractContactItem?: string;
+  peContractContactSection?: string;
+  peContractContactSort?: string;
   peDisplayFieldIds?: string;
   peDisplayMode?: string;
   peDocumentSort?: string;
@@ -88,11 +102,6 @@ export const isEditableField = (element: unknown): element is EditableField =>
   element instanceof HTMLSelectElement ||
   element instanceof HTMLTextAreaElement;
 
-export const getProfileUid = (root: HTMLElement): number | null => {
-  const profileUid = Number.parseInt(root.dataset.profileUid ?? "", 10);
-  return Number.isInteger(profileUid) && profileUid > 0 ? profileUid : null;
-};
-
 export const initializePopover = (scope: ParentNode = document): unknown[] => {
   const Popover = getBootstrap()?.Popover;
   if (Popover === undefined) {
@@ -105,40 +114,42 @@ export const initializePopover = (scope: ParentNode = document): unknown[] => {
 };
 
 export const showStatus = (
-  root: HTMLElement,
+  editingTarget: EditingTarget,
   type: StatusType,
   message: string | null = null,
 ): void => {
+  const context: EditingContext = toEditingContext(editingTarget);
+  const messages = context.messages;
   const statusValues: Record<StatusType, {
     title: string;
     message: string;
     className: string;
   }> = {
     danger: {
-      title: root.dataset.messageErrorTitle ?? "",
-      message: root.dataset.messageErrorMessage ?? "",
+      title: messages.errorTitle ?? "",
+      message: messages.errorMessage ?? "",
       className: "bg-danger",
     },
     success: {
-      title: root.dataset.messageSuccessTitle ?? "",
-      message: root.dataset.messageSuccessMessage ?? "",
+      title: messages.successTitle ?? "",
+      message: messages.successMessage ?? "",
       className: "bg-success",
     },
     info: {
-      title: root.dataset.messageInfoTitle ?? "",
-      message: root.dataset.messageInfoMessage ?? "",
+      title: messages.infoTitle ?? "",
+      message: messages.infoMessage ?? "",
       className: "bg-info",
     },
     warning: {
-      title: root.dataset.messageWarningTitle ?? "",
-      message: root.dataset.messageValidation ?? "",
+      title: messages.warningTitle ?? "",
+      message: messages.validation ?? "",
       className: "bg-warning",
     },
   };
   const status = statusValues[type];
   // A failure interrupts (role="alert"), everything else waits for a pause
   // (role="status"). The two regions exist side by side in the markup.
-  const statusToast = root.querySelector<HTMLElement>(
+  const statusToast = context.root.querySelector<HTMLElement>(
     `[data-pe-status-toast='${type === "danger" ? "alert" : "status"}']`,
   );
   if (statusToast === null) {

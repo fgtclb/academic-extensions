@@ -1,38 +1,35 @@
 # Frontend verification for `academic-persons-edit`
 
 The profile editing frontend is the largest piece of TypeScript in this
-repository — one entry point and seven modules under
+repository — one entry point, eight feature modules and eight element modules
+under
 [`Resources/Private/TypeScript/frontend/`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/),
 compiled by the repository build into committed JavaScript under
 [`Resources/Public/JavaScript/`](../../packages/fgtclb/academic-persons-edit/Resources/Public/JavaScript/).
 
 This page says how it is verified, and — more importantly — how it is **not**.
 
-## There is no JavaScript test runner
+## The behavioural tests
 
-Nothing in this repository executes the modules. There is no Jest, no Vitest and
-no jsdom environment, in this extension or in any other. The former
-`Resources/Public/Development/` tree of this extension was removed when the
-frontend moved to the repository-wide toolchain; do not recreate test
-infrastructure below `Resources/Public/`, which holds distributable artifacts.
+There is a JavaScript suite now: `node --test` with jsdom, described in
+[JavaScript tests](javascript-tests.md), and this extension is the one it was
+built for.
 
-That is a gap, and it is named rather than papered over. A behavioural harness
-is the first task of the Lit port (ACE-509), because the port rewrites exactly
-the sequencing — open, close, focus return, scroll restore — that nothing
-currently checks.
+```bash
+Build/Scripts/runTests.sh -s testJs
+```
 
-One defect this gap has already let through, kept here as the concrete case a
-harness has to be able to reproduce: the document editor closes through Vue's
-`after-leave` hook, which runs *after* the leaving element has been removed from
-the document. Handing the plugin root to `destroyRichTextEditors()` there
-therefore destroyed no editor of the closing view — its textareas were no longer
-below the root — while it did destroy every permanently rendered profile-field
-CKEditor, because `Partials/Profile/Field/Control.html` puts a
-`data-pe-rich-text` textarea under the root for each of them. Nothing in this
-repository can observe that: it takes a DOM, a Vue transition and a live editor
-instance, and none of the three exists in either PHP suite. The fix is verified
-by reading Vue's `BaseTransition` and by the argument the hook is called with,
-not by a test.
+The first test file,
+[`Tests/JavaScript/rich-text-editor-scope.test.ts`](../../packages/fgtclb/academic-persons-edit/Tests/JavaScript/rich-text-editor-scope.test.ts),
+pins the defect that motivated the harness. The document editor closes through a
+transition hook that runs *after* the leaving element has been removed from the
+document, and is handed that element. Handing the plugin root to
+`destroyRichTextEditors()` there destroys no editor of the closing view — its
+textareas are no longer below the root — while it does destroy every permanently
+rendered profile-field editor, because `Partials/Profile/Field/Control.html`
+puts a `data-pe-rich-text` textarea under the root for each of them. That took a
+DOM, a transition and a live editor instance to observe, which is why neither
+PHP suite ever could.
 
 A second defect of the same class, and the one that says most about what the
 harness has to reach: the templates emit their hooks as `data-pe-*`, and the
@@ -57,7 +54,9 @@ Two things came out of that, and only one of them is coverage:
 - `profile/common.ts` declares the hook set as a type and reads and writes it
   through `hooks(element)`. An unknown key is a `typecheckJs` failure now, so a
   prefix rename cannot half-apply *inside* the TypeScript again. That is a
-  compile-time guard, not a test.
+  compile-time guard, not a test. `profile/context.ts` applies the same
+  mechanism to the root's own `data-*` contract, which it reads once — see
+  [Profile editing contract](../architecture/profile-editing-contract.md).
 - The other direction — an attribute renamed in a template and nowhere else, or
   a `querySelector` whose selector no element matches — is still uncovered, and
   a grep of one source tree against the other is exactly the source-text test
@@ -66,16 +65,89 @@ Two things came out of that, and only one of them is coverage:
   module in a DOM. Those thirteen readers are the concrete case it has to be
   able to fail on.
 
-**Do not close the gap with assertions on source text.** The previous attempt
-did: a unit test compared the `.ts` files against literal strings, down to the
-whitespace between two statements and the number of `requestAnimationFrame(`
-calls in a module. Tests of that shape cannot fail for a behavioural regression
-and fail for every refactor, so they were removed with the editing rewrite
-(ACE-262) rather than carried.
+Ten more files were added with the Lit port (ACE-509), before a line of Vue was
+removed, so that the port is a refactor under a green suite rather than a
+rewrite with a hope. Each drives the shipped module against the markup of the
+Fluid partials it is rendered from:
+
+| File                        | What it pins                                                                                                                                                                     |
+|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `request-layer.test.ts`     | `requestJson()`: the headers including the `X-Requested-With` guard, the failure shapes, the wait cursor, and which status region a severity writes.                             |
+| `skip-sync.test.ts`         | The synchronisation switch: its payload, the revert of a control that saves without a button, and the two listeners that reach it.                                               |
+| `field-editing.test.ts`     | Per-field edit, clear, undo and save; only changed fields travel; the validation messages; the visibility switch; the field groups and their preview modes; the edit-all toggle. |
+| `rich-text-preview.test.ts` | The sanitiser's allow-list, the link schemes, the preview, and the character limit.                                                                                              |
+| `document-rows.test.ts`     | The list a section renders: numbering, the arrow at each end, the empty state, sorting by arrow and by drag, and the rollback of both.                                           |
+| `document-editor.test.ts`   | The open and close cycle, the collapse target, the focus, the created editors, the three save modes, and the values a row is written with.                                       |
+| `contract-contacts.test.ts` | The contacts of a contract: their endpoints, their editor, and what a save does to the list the element is handed.                                                               |
+| `image-editing.test.ts`     | Choosing, uploading and deleting the image, the previews, and the object urls that are released.                                                                                 |
+| `sticky-image.test.ts`      | The offset below a fixed page header, and its teardown.                                                                                                                          |
+| `editing-context.test.ts`   | The root's `data-*` contract: every key of a complete root, what a minimal one reads as, the four coercions, and that the result is frozen.                                      |
+
+Two more came with the port itself and cover
+`<academic-persons-edit-profile-editing>`, the element that replaced the start-up
+scan:
+
+| File                                      | What it pins                                                                                                                      |
+|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `profile-editing-element.test.ts`         | One context per element, the initialisers it runs, that a move in the document starts nothing twice, and both status regions.     |
+| `profile-editing-element-upgrade.test.ts` | That an editor starts in both orders: markup before the module, which is what a deferred module always sees, and markup after it. |
+
+The image editor added three more with the component that replaced its
+directives:
+
+| File                                   | What it pins                                                                                                                                               |
+|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `image-editor-element.test.ts`         | What the element derives from the state, that the `<f:form>` and its hidden fields are untouched, the cropping path, and the transition helper on its own. |
+| `image-editor-element-upgrade.test.ts` | That the image editor starts in both orders, whichever of the two elements the registry saw first.                                                         |
+| `entry-point.test.ts`                  | That `frontend/profile.js` defines every element of the editor. A file of its own, because importing it *is* the subject and the import registers.         |
+
+The document editor added three more with the components that replaced the 114
+Vue directives of `Partials/Profile/Documents/Editor.html`:
+
+| File                                      | What it pins                                                                                                                                                                                                                             |
+|-------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `document-editor-element.test.ts`         | What the element renders in each of the four modes, the shape of every control, the errors, the busy state, the icons it clones, the four events it reports, the collapse transition, and that a re-render leaves a live CKEditor alone. |
+| `document-editor-element-upgrade.test.ts` | That an editor renders in both orders: properties assigned before the definition ran, and an element created after it.                                                                                                                   |
+| `rich-text-element.test.ts`               | One textarea and one editor per element, created on connect and destroyed on disconnect, exactly once each, and a move that does not race its own teardown.                                                                              |
+
+The contacts of a contract added two more, for the 106 directives of
+`Partials/Profile/Documents/ContractContacts.html` and its editor:
+
+| File                                        | What it pins                                                                                                                                                                                                                                                                                                     |
+|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `contract-contacts-element.test.ts`         | The sections and rows the property renders, the empty message, where the editor stands for each mode, its controls and messages, that a replaced list leaves an open editor alone — and, driven through the real controls in the page, the payload of every contact endpoint and a refusal that changes nothing. |
+| `contract-contacts-element-upgrade.test.ts` | That the list renders in both orders: properties assigned before the definition ran, and an element created after it.                                                                                                                                                                                            |
+
+That is the coverage the thirteen hook readers needed: a test file fails if a
+`data-pe-*` attribute is queried under a name the templates do not emit.
+
+It does not run the other way. A hook renamed in a Fluid partial *and* in the
+fixture that transcribes it leaves every test green, because the fixture is a
+transcription and not the partial. The guard for that direction is the PHP
+functional suite, which reads the partial itself — see
+`AcademicPersonsEditProfileEditingTest::imageEditorTemplateIsDrivenByItsElement()`
+and `::documentEditorPartialIsOnlyAMountPoint()` for the shape a new component's
+hooks — and the absence of the markup it took over — are asserted in.
+
+It is still not everything. The CSS transitions, the real CKEditor and the real
+CropperJS are covered by nothing that executes them, and are named
+in [JavaScript tests](javascript-tests.md) rather than papered over.
+
+**Do not close the rest of it with assertions on source text.** The previous
+attempt did: a unit test compared the `.ts` files against literal strings, down
+to the whitespace between two statements and the number of
+`requestAnimationFrame(` calls in a module. Tests of that shape cannot fail for
+a behavioural regression and fail for every refactor, so they were removed with
+the editing rewrite (ACE-262) rather than carried. They are not to come back in
+TypeScript either.
+
+Do not put test infrastructure below `Resources/Public/`, which holds
+distributable artifacts — the former `Resources/Public/Development/` tree of this
+extension was removed when the frontend moved to the repository-wide toolchain.
 
 ## Repository gates
 
-Run them from the repository root. All four are core-version independent and
+Run them from the repository root. All five are core-version independent and
 need no `composerUpdate`; they use the pinned Node.js container, so no
 package-local `npm install` is needed either.
 
@@ -84,6 +156,7 @@ Build/Scripts/runTests.sh -s buildJs
 Build/Scripts/runTests.sh -s checkJsBuildClean
 Build/Scripts/runTests.sh -s lintTypescript -n
 Build/Scripts/runTests.sh -s typecheckJs
+Build/Scripts/runTests.sh -s testJs
 ```
 
 | Suite               | What it establishes                                                                 |
@@ -92,6 +165,7 @@ Build/Scripts/runTests.sh -s typecheckJs
 | `checkJsBuildClean` | Rebuilds only the generated outputs and fails when the result differs from the tree |
 | `lintTypescript -n` | Checks the TypeScript without modifying it                                          |
 | `typecheckJs`       | Runs the type checker — esbuild strips types, it does not validate them             |
+| `testJs`            | Runs the modules against a DOM, which is the only gate that executes them           |
 
 `typecheckJs` only checks the real modules because `Build/tsconfig.json` maps
 `@fgtclb/academic-persons-edit/frontend/*` onto the TypeScript sources. Without
@@ -135,6 +209,8 @@ group mechanism.
 
 ## See also
 
+- [JavaScript tests](javascript-tests.md) — the harness, the stubs, and what
+  they deliberately do not cover.
 - [Frontend assets](../development/frontend-assets.md) — the build, the
   committed artifacts and the vendored-library rule.
 - [Functional tests](functional-tests.md) — the harness these plugin tests use,

@@ -37,24 +37,26 @@ convention, and the build applies it to TypeScript as well.
 
 One script, `Build/esbuild.mjs`, driven by npm scripts and run in a container:
 
-| Suite               | Runs                                                      | Purpose                                                                                  |
-|---------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------|
-| `buildJs`           | `npm ci && npm run build`                                 | Compiles every extension's sources. Run after a source change, and commit the result.    |
-| `checkJsBuildClean` | delete the outputs, rebuild, assert `git status` is empty | The gate that makes committed artifacts trustworthy. Runs in CI.                         |
-| `lintTypescript`    | `npm run lint:fix`, or `lint` with `-n`                   | eslint 9 with typescript-eslint. Mirrors `cgl`: fixes by default, checks only with `-n`. |
-| `typecheckJs`       | `npm run typecheck`                                       | `tsc --noEmit`, which the build does not do.                                             |
-| `npm`               | `npm "$@"` with the working directory set to `Build/`     | Escape hatch, mirroring the `composer` suite.                                            |
-| `cleanJs`           | `rm -rf Build/node_modules`                               | Intermediates only. It never removes a compiled artifact — those are committed files.    |
+| Suite               | Runs                                                      | Purpose                                                                                        |
+|---------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `buildJs`           | `npm ci && npm run build`                                 | Compiles every extension's sources. Run after a source change, and commit the result.          |
+| `checkJsBuildClean` | delete the outputs, rebuild, assert `git status` is empty | The gate that makes committed artifacts trustworthy. Runs in CI.                               |
+| `lintTypescript`    | `npm run lint:fix`, or `lint` with `-n`                   | eslint 9 with typescript-eslint. Mirrors `cgl`: fixes by default, checks only with `-n`.       |
+| `typecheckJs`       | `npm run typecheck`                                       | `tsc --noEmit`, which the build does not do.                                                   |
+| `testJs`            | `npm run test`                                            | The behavioural tests of the sources — see [JavaScript tests](../testing/javascript-tests.md). |
+| `npm`               | `npm "$@"` with the working directory set to `Build/`     | Escape hatch, mirroring the `composer` suite.                                                  |
+| `cleanJs`           | `rm -rf Build/node_modules`                               | Intermediates only. It never removes a compiled artifact — those are committed files.          |
 
 ```bash
 Build/Scripts/runTests.sh -s buildJs
 Build/Scripts/runTests.sh -s checkJsBuildClean
 Build/Scripts/runTests.sh -s lintTypescript -n
 Build/Scripts/runTests.sh -s typecheckJs
+Build/Scripts/runTests.sh -s testJs
 Build/Scripts/runTests.sh -s npm -- install --save-dev sass@latest
 ```
 
-All six are **core version independent**. They look at the sources and the
+All seven are **core version independent**. They look at the sources and the
 committed artifacts and never at the installed core, so `-t` does not change
 what they do and no `composerUpdate` is needed. That makes them the only suites
 that are safe to run while the other core version's dependency set is installed.
@@ -132,37 +134,45 @@ Verified present on TYPO3 13.4.34 and 14.3.6: the `f:asset.module` ViewHelper,
 A library that is not written here and is not shipped by the TYPO3 core is
 *vendored*: the built file is committed under
 `Resources/Public/JavaScript/vendor/<library>/<version>/`, with its licence file
-next to it. `academic_persons_edit` vendors Vue 3.5.42 and CropperJS 2.2.0 that
-way; `academic_partners` vendors a mapping library and its plugin.
+next to it. `academic_persons_edit` vendors CropperJS 2.2.0 that way, and it is
+the only library in this repository that follows the rule in full;
+`academic_partners` ships a mapping library and its plugin straight in
+`Resources/Public/JavaScript/` and predates it.
 
-The rules, all of them learned from the two extensions that do it:
+The rules:
 
-- **The directory carries the version.** `vendor/vue/3.5.42/` rather than
-  `vendor/vue/`. An upgrade is a new directory plus one edit in the module that
-  names it, so a page can never mix a cached old file with a new consumer, and
-  the `?bust=` cache key of the import map is not needed for it.
+- **The directory carries the version.** `vendor/cropperjs/2.2.0/` rather than
+  `vendor/cropperjs/`. An upgrade is a new directory plus one edit in the file
+  that names it, so a page can never mix a cached old file with a new consumer.
 - **A licence file sits beside it**, verbatim, under the name the project ships
   it as (`LICENSE`). It is what makes the redistribution lawful, and it is
   reviewed when the version changes.
-- **One module names the file, relatively.** `TypeScript/frontend/vue.ts` is the
-  only place `../vendor/vue/3.5.42/vue.esm-browser.prod.js` appears; every other
-  module imports the wrapper through the import map. A relative import is
-  correct here precisely because the path is versioned - the objection to
-  relative imports below is about a *stale cached dependency*, which a versioned
-  path cannot produce.
-- **The wrapper declares the surface.** The vendored file has no type
-  declarations, so the wrapper casts it once to a hand written interface holding
-  what this repository actually calls. That interface is the contract an upgrade
-  is checked against.
+- **One place names the file**, and it is the extension's
+  `Configuration/JavaScriptModules.php`: it publishes the versioned path under a
+  bare specifier of its own — `@fgtclb/academic-persons-edit/cropper` — and
+  every module imports that. Nothing imports a vendored path relatively.
+- **The specifier is declared, not inferred.** A vendored build has no type
+  declarations, so `Resources/Private/TypeScript/frontend/_dependencies.d.ts`
+  declares the module with the surface this repository actually calls. That
+  declaration is the contract an upgrade is checked against, and
+  `Build/tests/resolve-hook.mjs` stubs the same specifier for the behavioural
+  suite.
 - **A library the core already ships is not vendored.** CKEditor 5 comes from
   `EXT:rte_ckeditor` and is mapped from there; Lit comes from `EXT:core`.
+- **A version the core ships is not automatically the right one.** TYPO3 13.4.34
+  and 14.3.6 both map `cropperjs`, and both map **1.6.1** — the API before
+  CropperJS became a set of custom elements. The image editor is written against
+  2.2.0, so the core entry is not usable and the vendored copy stays. Check the
+  version, not the presence of a mapping.
 - **Vendored files are outside the build gate by construction**: they have no
   source under `Resources/Private/`, so `checkJsBuildClean` neither writes nor
   deletes them.
 
-Vendoring is a cost - 172 KB of Vue reach every profile editing page - and it is
-paid deliberately, per library, with the alternative named in the commit that
-adds it.
+Vendoring is a cost — 44 KB of CropperJS reach every profile editing page — and
+it is paid deliberately, per library, with the alternative named in the commit
+that adds it. It is also reversible: `academic_persons_edit` vendored Vue 3.5.42
+until the profile editor was ported to Lit (ACE-509), and that removed 172 KB
+per page in favour of a library the core delivers.
 
 ## Artifacts are committed, and that makes a gate mandatory
 

@@ -9,8 +9,34 @@
 // The rules are deliberately Bootstrap flavoured: the plugin renders Bootstrap
 // utility classes and the site brings Bootstrap along. Everything here either
 // styles a state the JavaScript toggles (`is-dragging`, `is-drop-before`, the
-// Vue transition classes) or corrects a theme rule that the editor's sticky and
-// overflowing layout collides with.
+// enter and leave classes of the two editors) or corrects a theme rule that the
+// editor's sticky and overflowing layout collides with.
+
+// The custom elements of the editor. An unknown element is `display: inline` in
+// every browser, and each of these wraps block level content - the plugin root,
+// the document editor's collapse panel and a rich text field's textarea. Without
+// this rule they would be laid out as inline boxes, a flex or grid parent in the
+// site's theme would take the wrapper as its item instead of the container it
+// wraps, and the `grid-template-rows` the collapse animates would be applied
+// inside an inline box.
+academic-persons-edit-profile-editing,
+academic-persons-edit-document-editor,
+academic-persons-edit-rich-text {
+    display: block;
+}
+
+// "hidden" has to actually hide.
+//
+// The editor's elements toggle the `hidden` attribute on what the Vue
+// directives used to add to and remove from the document, and Bootstrap's own
+// `[hidden] { display: none !important }` is not enough for that: its display
+// utilities carry the same specificity, are `!important` as well and stand
+// later in the file, so a `hidden` `.d-flex` - which is what the image editor's
+// delete actions are - stays visible. The ancestor puts this above both of
+// them, and above the `display: grid` of the editor further down.
+.academic-persons-profile-editing [hidden] {
+    display: none !important;
+}
 
 body:has(.academic-persons-profile-editing) .section {
     overflow: unset !important;

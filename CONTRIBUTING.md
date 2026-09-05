@@ -100,6 +100,7 @@ Build/Scripts/runTests.sh -s buildJs             # compile, then commit the resu
 Build/Scripts/runTests.sh -s checkJsBuildClean   # prove the artifacts match, as CI does
 Build/Scripts/runTests.sh -s lintTypescript -n   # eslint, omit "-n" to fix
 Build/Scripts/runTests.sh -s typecheckJs         # tsc --noEmit
+Build/Scripts/runTests.sh -s testJs              # node --test with jsdom
 ```
 
 The compiled files are **committed**, because neither composer nor a TER upload

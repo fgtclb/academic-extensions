@@ -119,7 +119,7 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertSame(5, substr_count($template, '<button'));
         $this->assertStringContainsString('data-pe-cancel-delete-image', $template);
         $this->assertStringContainsString('data-pe-confirm-delete-image', $template);
-        $this->assertStringContainsString('v-on:click="requestDeleteImage"', $template);
+        $this->assertStringContainsString('data-pe-image-delete-actions', $template);
         $this->assertStringContainsString('key="profileEditing.image.editor.deleteConfirm"', $template);
         $this->assertStringContainsString('key="actions.save"', $template);
         $this->assertStringNotContainsString('key="actions.add"', $template);
@@ -128,6 +128,135 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertStringNotContainsString('data-replace-label', $template);
         $this->assertStringNotContainsString('<dialog', $template);
         $this->assertStringNotContainsString('f:form.validationResults', $template);
+    }
+
+    /**
+     * The editor is driven by "<academic-persons-edit-image-editor>" and no
+     * longer by a rendering framework, so the hooks it queries are as much part
+     * of the contract as the endpoints are - and only this test sees the
+     * partial. The behavioural suite drives a transcription of it.
+     */
+    #[Test]
+    public function imageEditorTemplateIsDrivenByItsElement(): void
+    {
+        $template = $this->getProfileEditingPartial('Image/Editor');
+        $this->assertStringContainsString('<academic-persons-edit-image-editor>', $template);
+        foreach (
+            [
+                'data-pe-image-delete-actions',
+                'data-pe-delete-image-confirm-question',
+                'data-pe-image-fieldset',
+                'data-pe-image-cropper-stage',
+                'data-pe-image-cropper-source',
+                'data-pe-image-selected-preview',
+                'data-pe-image-upload-spinner',
+            ] as $hook
+        ) {
+            $this->assertStringContainsString($hook, $template);
+        }
+        // The upload form is the one thing that cannot move into the browser:
+        // the property mapper validates against "__trustedProperties", and only
+        // the server can sign it.
+        $this->assertStringContainsString('<f:form', $template);
+        $this->assertStringContainsString('<f:form.upload', $template);
+        // Nothing Vue understands is left in it.
+        foreach (['v-if', 'v-else', 'v-show', 'v-bind', 'v-on:', 'v-text', 'v-model', '<Teleport', '<Transition', 'ref="'] as $directive) {
+            $this->assertStringNotContainsString($directive, $template);
+        }
+    }
+
+    /**
+     * The document editor is rendered by "<academic-persons-edit-document-editor>"
+     * from the fields of the "documentForm" response, so this partial has no
+     * markup left to override - and saying so is the only thing a test can
+     * assert about a file that renders nothing.
+     */
+    #[Test]
+    public function documentEditorPartialIsOnlyAMountPoint(): void
+    {
+        $template = $this->getProfileEditingPartial('Documents/Editor');
+        $this->assertStringContainsString('academic-persons-edit-document-editor', $template);
+        $this->assertStringNotContainsString('<section', $template);
+        $this->assertStringNotContainsString('<form', $template);
+        $this->assertStringNotContainsString('f:translate', $template);
+        foreach (['v-if', 'v-else', 'v-show', 'v-bind', 'v-on:', 'v-text', 'v-model', '<Teleport', '<Transition'] as $directive) {
+            $this->assertStringNotContainsString($directive, $template);
+        }
+    }
+
+    /**
+     * The contacts of a contract are rendered by
+     * "<academic-persons-edit-contract-contacts>" from the "contactSections" of
+     * the "documentForm" response, so the two partials that used to render them
+     * have nothing left to carry and are gone. A file that is not there is what
+     * a test can assert about a removed override point.
+     */
+    #[Test]
+    public function contractContactPartialsAreRemoved(): void
+    {
+        foreach (['ContractContacts', 'ContractContactEditor'] as $partial) {
+            $this->assertFileDoesNotExist(
+                __DIR__ . '/../../../Resources/Private/Partials/Profile/Documents/' . $partial . '.html',
+            );
+        }
+        $this->assertStringNotContainsString(
+            'Profile/Documents/ContractContact',
+            $this->getProfileEditingFluidSources(),
+        );
+    }
+
+    /**
+     * The buttons of the list are handled by the delegated click listener of
+     * "profile/documents.ts" and no longer by a "v-on:click.stop" that stopped
+     * that very listener from ever seeing them.
+     */
+    /**
+     * The last two directives of the view were the ones on the synchronisation
+     * form of the header. With them the rendering framework is gone, so the
+     * assertion is over every Fluid file of the view rather than over the two
+     * partials that carried them: a directive that comes back is markup nothing
+     * in the browser reads, and it fails silently - the attribute is simply
+     * inert.
+     */
+    #[Test]
+    public function noFluidSourceOfTheEditingViewCarriesARenderingDirective(): void
+    {
+        $sources = $this->getProfileEditingFluidSources();
+        foreach (
+            [
+                'v-on:',
+                'v-if',
+                'v-else',
+                'v-show',
+                'v-bind',
+                'v-text',
+                'v-html',
+                'v-model',
+                'v-for',
+                'v-cloak',
+                '<Teleport',
+                '<Transition',
+                ':key=',
+                '@click=',
+            ] as $directive
+        ) {
+            $this->assertStringNotContainsString($directive, $sources);
+        }
+        // The switch it drove is still there and still carries the hook the
+        // delegated listener matches on.
+        $this->assertStringContainsString(
+            'data-pe-sync-form',
+            $this->getProfileEditingPartial('Header'),
+        );
+    }
+
+    #[Test]
+    public function documentListButtonsAreHandledByDelegation(): void
+    {
+        foreach (['Documents/Actions', 'Documents/Sections'] as $partial) {
+            $template = $this->getProfileEditingPartial($partial);
+            $this->assertStringNotContainsString('v-on:', $template);
+        }
     }
 
     #[Test]
@@ -1452,11 +1581,31 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $content = $this->renderProfileEditingPage();
         $decodedContent = urldecode(html_entity_decode($content));
         $this->assertStringContainsString('data-academic-persons-profile-editing', $content);
+        // The custom element that starts the editor wraps the root the contract
+        // is carried by, so that the JavaScript has an owner and the attributes
+        // stay where every reader expects them.
+        $document = new \DOMDocument();
+        $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
+        $wrappedRoots = (new \DOMXPath($document))->query(
+            '//academic-persons-edit-profile-editing/*[@data-academic-persons-profile-editing]',
+        );
+        $this->assertNotFalse($wrappedRoots);
+        $this->assertCount(1, $wrappedRoots);
         $this->assertStringContainsString('data-profile-uid="1"', $content);
         $this->assertStringNotContainsString('data-user="', $content);
         $this->assertStringContainsString('data-pe-open-image-view', $content);
         $this->assertStringContainsString('data-pe-image-view-container', $content);
         $this->assertStringContainsString('data-pe-image-editor-target', $content);
+        // The image editor is rendered where it is shown, inside its target and
+        // wrapped in the element that drives it. Vue moved it there with a
+        // "<Teleport>"; Fluid renders it there.
+        $imageEditors = (new \DOMXPath($document))->query(
+            '//*[@data-pe-image-editor-target]'
+                . '/academic-persons-edit-image-editor'
+                . '/*[@data-pe-image-view-container]',
+        );
+        $this->assertNotFalse($imageEditors);
+        $this->assertCount(1, $imageEditors);
         $this->assertStringContainsString('data-image-render-type="cropper"', $content);
         $this->assertStringContainsString('data-has-image="0"', $content);
         $configuredRatio = $this->get(AcademicPersonsSettingsFactory::class)
@@ -1494,11 +1643,24 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertStringContainsString('[action]=updateContractContact', $decodedContent);
         $this->assertStringContainsString('[action]=deleteContractContact', $decodedContent);
         $this->assertStringContainsString('[action]=sortContractContact', $decodedContent);
-        $this->assertStringContainsString('data-pe-document-view-container', $content);
+        // The collapse targets the document editor is created into. The editor
+        // itself is no longer in the rendered page: it is built in the browser
+        // from the "documentForm" response by
+        // "<academic-persons-edit-document-editor>", so the markup that used to
+        // stand here is asserted by the behavioural suite instead.
         $this->assertStringContainsString('data-pe-document-add-collapse-target', $content);
         $this->assertStringContainsString('data-pe-document-item-collapse-target', $content);
-        $this->assertStringContainsString('data-pe-contract-contact-section', $content);
-        $this->assertStringContainsString('data-pe-contract-contact-editor', $content);
+        $this->assertStringNotContainsString('data-pe-document-view-container', $content);
+        // The icons the browser rendered editors draw travel as templates,
+        // because the icon registry is only reachable from the server.
+        foreach (['help', 'add', 'view', 'edit', 'delete', 'move-up', 'move-down'] as $icon) {
+            $this->assertStringContainsString('data-pe-icon="' . $icon . '"', $content);
+        }
+        // The two labels the contact list needs and the document list resolves
+        // in Fluid. They are on the root because the list that draws them is
+        // TypeScript now.
+        $this->assertStringContainsString('data-label-sort-up="', $content);
+        $this->assertStringContainsString('data-label-sort-down="', $content);
         $this->assertStringContainsString('Save', $content);
         $this->assertStringNotContainsString('data-add-label', $content);
         $this->assertStringNotContainsString('data-replace-label', $content);

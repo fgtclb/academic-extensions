@@ -45,7 +45,20 @@
         // No "baseUrl": with "moduleResolution": "bundler" the targets resolve
         // relative to this file, and a "baseUrl" would additionally make every
         // directory below it importable as a bare specifier.
+        // "lit" is not one of this repository's modules: TYPO3 core delivers it
+        // through the import map (EXT:core maps "lit", "lit/", "lit-element"
+        // and "lit-html" untagged, so a frontend module of an extension that
+        // depends on "core" resolves it without any mapping of its own). It is
+        // pinned in "Build/package.json" as a development dependency for its
+        // *types* and for the test harness, at the exact versions both
+        // supported cores ship, and it is never bundled or emitted.
         "paths": {
+            "lit": [
+                "./node_modules/lit"
+            ],
+            "lit/*": [
+                "./node_modules/lit/*"
+            ],
             "@fgtclb/academic-persons/frontend/*": [
                 "../packages/fgtclb/academic-persons/Resources/Private/TypeScript/frontend/*"
             ],

@@ -30,7 +30,6 @@
                         title="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.view', extensionName: 'academic_persons_edit')}"
                         aria-expanded="false"
-                        v-on:click.stop="openDocument('view', $event)"
                         data-pe-document-view>
                         <core:icon
                             identifier="academic-persons-edit-view"
@@ -44,7 +43,6 @@
                         class="btn rounded-0 btn-sm btn-link text-body p-2"
                         title="{f:translate(key: 'actions.sortDown', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.sortDown', extensionName: 'academic_persons_edit')}"
-                        v-on:click.stop="sortDocument('down', $event)"
                         data-pe-document-sort="down">
                         <core:icon
                             identifier="academic-persons-edit-move-down"
@@ -58,7 +56,6 @@
                         class="btn rounded-0 btn-sm btn-link text-body p-2"
                         title="{f:translate(key: 'actions.sortUp', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.sortUp', extensionName: 'academic_persons_edit')}"
-                        v-on:click.stop="sortDocument('up', $event)"
                         data-pe-document-sort="up">
                         <core:icon
                             identifier="academic-persons-edit-move-up"
@@ -73,7 +70,6 @@
                         title="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.delete', extensionName: 'academic_persons_edit')}"
                         aria-expanded="false"
-                        v-on:click.stop="openDocument('delete', $event)"
                         data-pe-document-delete>
                         <core:icon
                             identifier="academic-persons-edit-delete"
@@ -88,7 +84,6 @@
                         title="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
                         aria-label="{f:translate(key: 'actions.edit', extensionName: 'academic_persons_edit')}"
                         aria-expanded="false"
-                        v-on:click.stop="openDocument('edit', $event)"
                         data-pe-document-edit>
                         <core:icon
                             identifier="academic-persons-edit-edit"

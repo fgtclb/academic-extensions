@@ -29,9 +29,7 @@
                     value="profile-editing-{profile.uid}-skipSync" />
                 <form
                     class="academic-persons-profile-editing__sync-form flex-shrink-0"
-                    data-pe-sync-form
-                    v-on:submit.prevent
-                    v-on:change="updateSkipSync">
+                    data-pe-sync-form>
                     <div
                         class="form-check form-switch form-check-lg mb-0 d-flex flex-row align-items-center">
                         <f:if condition="{skipSync.validation.readOnly}">

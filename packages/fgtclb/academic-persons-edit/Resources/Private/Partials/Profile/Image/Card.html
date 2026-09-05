@@ -86,8 +86,7 @@
                     class="btn rounded-0 btn-outline-secondary btn-sm w-100 d-inline-flex align-items-center justify-content-center mt-2"
                     type="button"
                     data-pe-open-image-view
-                    v-on:click="openImage"
-                    v-bind:aria-expanded="image.editing ? 'true' : 'false'"
+                    aria-expanded="false"
                     aria-controls="profile-editing-{profile.uid}-image-view"
                     title="{f:translate(key: 'profileEditing.image.edit', extensionName: 'academic_persons_edit')}"
                     aria-label="{f:translate(key: 'profileEditing.image.edit', extensionName: 'academic_persons_edit')}">

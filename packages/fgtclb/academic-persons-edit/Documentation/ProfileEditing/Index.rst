@@ -11,25 +11,41 @@ the public ``academic_persons`` Detail plugin on the page configured through
 ``plugin.tx_academicpersons.detailPid``. This is the same target setting used
 by the Academic Persons list views. The shipped
 :file:`Resources/Private/Templates/Profile/Index.html` editor template
-contains three independently persisted areas:
+contains four independently persisted areas:
 
 *   profile fields using the generic JSON update endpoint,
-*   the synchronization checkbox using its own JSON endpoint, and
+*   the synchronization checkbox using its own JSON endpoint,
 *   the expanding profile-image editor using dedicated upload and delete
-    endpoints.
+    endpoints, and
+*   the structured document sections — contracts, their contacts and the
+    profile-information collections — each with their own form, create, update,
+    delete and sort endpoints.
 
-The Vue 3 Composition API entry is maintained as TypeScript in
-:file:`Resources/Private/TypeScript/frontend/profile.ts`; the frontend build
-generates :file:`Resources/Public/JavaScript/frontend/profile.js`. It mounts
-one application on every ``data-academic-persons-profile-editing`` component.
-Typed feature modules below :file:`Resources/Private/TypeScript/frontend/profile/`
-separately own common requests/status output, field editing, documents, rich
-text, synchronization, image editing and sticky positioning. All changes are
-saved through AJAX without reloading the page. Editable fields are discovered
-across the complete component root, even when the responsive page layout
-places them in separate ``data-pe-fields-form`` elements. Reactive inline
-views, the toast and compatibility-template elements live in the same
-component scope.
+Fluid renders the markup of that view, and five custom elements own its
+behavior. The entry point is maintained as TypeScript in
+:file:`Resources/Private/TypeScript/frontend/profile.ts`, from which the
+frontend build generates
+:file:`Resources/Public/JavaScript/frontend/profile.js`; it defines those
+elements and does nothing else. Every editor on the page is an
+``<academic-persons-edit-profile-editing>`` element that starts itself when the
+browser upgrades it, so a second plugin on the page — or one that is loaded
+into the page later — needs no start-up scan and cannot be started twice.
+
+Typed feature modules below
+:file:`Resources/Private/TypeScript/frontend/profile/` separately own common
+requests and status output, field editing, documents, rich text,
+synchronization, image editing and sticky positioning; the elements below
+:file:`…/profile/elements/` drive them. Two of the five are written against
+`Lit <https://lit.dev>`__, which TYPO3 delivers through the import map of
+``EXT:core``. No framework is bundled with the extension.
+
+All changes are saved through AJAX without reloading the page. Editable fields
+are discovered across the complete component root, even when the responsive
+page layout places them in separate ``data-pe-fields-form`` elements. Every
+element renders into the light DOM — none of them has a shadow root — so a
+project's stylesheet reaches every control they render, exactly as it reaches
+the Fluid-rendered ones. The inline collapse targets, the two status regions
+and the client-side templates live in the same component scope.
 
 Assigned profile overview
 =========================
@@ -88,6 +104,10 @@ The controller assigns the following variables to the Fluid template:
     *   - ``{imageAllowedMimeTypes}``
         - Comma-separated MIME types accepted by the image input. The server
           validates the configured values independently.
+    *   - ``{editorLanguage}``
+        - The language code of the current site language, lower-cased and
+          without its region. CKEditor is initialized with it; an empty string
+          when the request carries no site language.
     *   - ``{data}`` and ``{record}``
         - Current content element data and its record object.
 
@@ -114,14 +134,21 @@ The template is intentionally a composition root. The main partial groups are:
           ``Field/Group.html``
         - ``renderType``-driven controls, previews, grouped values and
           persistence actions.
-    *   - ``Documents/Sections.html`` and ``Documents/*``
-        - Structured document rows and their shared Vue-driven inline collapse.
+    *   - ``Documents/Sections.html``, ``Documents/Contract.html``,
+          ``Documents/ProfileInformation.html`` and their ``*Row.html``
+        - Structured document sections, their rows, the row actions and the
+          hidden row prototype that is cloned after a create.
+    *   - ``Documents/Editor.html``
+        - The mount point of the document editor. It renders nothing; see
+          :ref:`profile-editing-document-editor`.
     *   - ``Field.html``, ``Field/Group.html`` and shared ``Field/*``
         - Preview, control, grouped fields and per-field actions.
     *   - ``Header.html`` and ``StatusToast.html``
         - Complete profile-name heading with synchronization/edit-all controls,
-          and scoped status output. The personal form renders its own
-          :guilabel:`Personal data` heading.
+          and scoped status output. The status output is two live regions, one
+          assertive and one polite, because a region's politeness cannot be
+          changed reliably once it is in the accessibility tree. The personal
+          form renders its own :guilabel:`Personal data` heading.
           ``ButtonTemplates.html`` remains a compatibility fallback for
           existing template overrides; the shipped read view does not use its
           button-shaped value controls.
@@ -130,12 +157,16 @@ Layout and responsive behavior
 ==============================
 
 The view uses Bootstrap 5 grid, spacing, typography, background, positioning
-and form utilities. The small :file:`Resources/Public/Css/frontend/profile-editing.css`
-compatibility layer only releases a surrounding ``.section`` overflow,
-normalizes one frame spacing variable and keeps the sticky card below the page
-header; the Fluid templates contain no inline style declarations.
-All Bootstrap button controls of the shipped editor
-carry ``rounded-0`` so their corners remain square.
+and form utilities; the Fluid templates contain no inline style declarations.
+:file:`Resources/Public/Css/frontend/profile-editing.css` is generated from
+:file:`Resources/Private/Scss/frontend/profile-editing.scss` by the repository
+build and holds only what Bootstrap cannot express: the ``display: block`` the
+custom elements need, a ``[hidden]`` rule that outranks Bootstrap's display
+utilities, three corrections to a surrounding theme (a ``.section`` overflow,
+one frame spacing variable, the stacking of the sticky card), the drag states
+of a sortable list and the enter/leave classes of the two editor transitions.
+All Bootstrap button controls of the shipped editor carry ``rounded-0`` so
+their corners remain square.
 
 Above the grid, the complete profile name and the synchronization/edit-all
 controls share one responsive header row. The controls wrap below the name on
@@ -149,7 +180,9 @@ never overlaps the sticky column.
 At runtime ``initializeStickyImageOffset()`` reads the visible outer height of
 ``#page-header.navbar-fixed-top`` through ``getBoundingClientRect().height``,
 adds a 10-pixel visual gap and assigns the result to the ``top`` property of
-``data-pe-sticky-image``. A
+``data-pe-sticky-image``. The measurement itself is
+``observePageHeaderOffset()`` of ``academic_persons``, which the public detail
+view uses for its own sticky navigation — one implementation, two callers. A
 ``ResizeObserver`` watches the header's ``border-box`` and keeps the offset
 synchronized whenever the navbar changes height, including height or padding
 changes caused by a scroll-dependent header state. Environments without it use
@@ -435,39 +468,61 @@ on the profile-information record and changes the compact row, read view and pub
 profile to render ``Y`` instead of the complete date. The underlying native
 :sql:`DATE` values are not modified.
 
-Why Vue creates controls in the document editor
------------------------------------------------
+..  _profile-editing-document-editor:
 
-Fluid renders one reusable collapse shell with Vue directives for fields,
-buttons, errors and pending state. The reactive document controller teleports
-this shell below the selected section heading for add actions and into the
-selected record row for view, edit and delete actions. Exactly one document
-collapse is open at a time, while the complete profile view remains visible.
-When an action is opened, the
-permission-checked endpoint returns JSON containing the selected record,
-localized labels, values, select options and normalized validation metadata.
-Vue turns that runtime schema into controls through ``v-for`` and ``v-model``
-and manages the CKEditor lifecycle. This avoids pre-rendering one hidden form
-per section and record while keeping static structure in Fluid and mapping
-validation errors directly back to the returned field names.
+How the document editor is rendered
+-----------------------------------
 
-Activating the same add or view trigger a second time closes its collapse with
-the same cleanup as :guilabel:`Cancel`. A hidden ordinary DOM container supplies
-the Fluid-rendered row prototype used after creation. It deliberately is not an
-HTML ``template`` element: Vue consumes such template content while mounting,
-which would leave no row to clone after a successful create response.
+The editor of a document row is rendered in the browser, and cannot be
+rendered anywhere else: its fields, their labels, their select options and
+their display values all come from the ``documentForm`` response, which the
+permission-checked endpoint decides per section, per record and per mode.
+:file:`Partials/Profile/Documents/Editor.html` is therefore a mount point that
+renders nothing at all. What renders the editor is the custom element
+``<academic-persons-edit-document-editor>``, created by
+:file:`TypeScript/frontend/profile/documents.ts` **inside** the collapse target
+below the selected section heading for add actions, and inside the selected
+record row for view, edit and delete actions. The element is handed the
+response as properties and is removed again when its close transition reports
+back. This avoids pre-rendering one hidden form per section and record while
+keeping the static structure in Fluid and mapping validation errors directly
+back to the returned field names.
 
-``contract`` is retained as a separate reactive document kind. It uses the
-generic collapse renderer for its configured fields and appends three
-contract-specific contact sections in the read view: physical addresses,
-email addresses and phone numbers. Their field schemas and validation flags
-come from ``contracts.contactSections.<section>.fields`` in the shared settings
-graph. The Contract form itself follows the order and metadata in
+Exactly one document collapse is open at a time, while the complete profile
+view remains visible. Activating the same add or view trigger a second time
+closes its collapse with the same cleanup as :guilabel:`Cancel`. The element is
+created where it is shown and is never moved: moving it would disconnect it,
+and a disconnect destroys the CKEditor instances below it. The collapse target
+keeps the unique ID the controller assigns it when it is first opened, now
+for ``aria-controls`` alone.
+
+A hidden ordinary DOM container supplies the Fluid-rendered row prototype used
+after creation (``data-pe-document-item-template``). It is a plain container
+rather than an HTML ``template`` element, and the successful create response is
+rendered by cloning the row inside it.
+
+The icons of a browser-rendered editor cannot be resolved in the browser:
+``core:icon`` asks the icon registry, which knows the set this extension
+registers and whatever a site overrode.
+:file:`Templates/Profile/Index.html` therefore renders one
+``<template data-pe-icon="…">`` per icon such an editor draws — ``help`` for a
+field, and ``add``, ``view``, ``edit``, ``delete``, ``move-up`` and
+``move-down`` for the contact list of a contract — and the elements clone what
+they need out of that block. Removing it renders those editors without icons.
+
+``contract`` is retained as a separate document kind. It uses the same editor
+for its configured fields and appends three contract-specific contact sections
+in the read view: physical addresses, email addresses and phone numbers. Their
+field schemas and validation flags come from
+``contracts.contactSections.<section>.fields`` in the shared settings graph.
+The Contract form itself follows the order and metadata in
 ``contracts.fields``.
-The shared contact-editor partial is rendered below the contact-section heading
-for add actions and directly inside the selected contact row for view, edit and
-delete actions. The two placements use explicit Vue conditions and do not nest
-another teleport inside the document editor.
+Those sections, their rows and the editor of one contact are rendered by a
+second custom element, ``<academic-persons-edit-contract-contacts>``, which the
+document editor creates in its own template. The contact editor stands below
+the contact-section heading for add actions and directly inside the selected
+contact row for view, edit and delete actions — the two placements the removed
+:file:`Documents/ContractContactEditor.html` rendered with conditions.
 
 Every writable section heading has an :guilabel:`Add` action. Record controls
 are rendered in the exact order of the configured ``actions`` list. The first
@@ -479,7 +534,7 @@ collection, alternating background, sort controls and empty placeholder without
 reloading the page. The drag handle is hidden below Bootstrap's ``md``
 breakpoint; the explicit up/down controls remain available on mobile.
 
-The add, view, edit and delete workflows share one inline Vue collapse. Its field
+The add, view, edit and delete workflows share one inline collapse. Its field
 schema and current values are loaded through ``documentFormAction()``. Contract
 fields include the current organisational-unit, function-type and location
 options. Profile-information fields use the section's validation metadata. In
@@ -487,9 +542,13 @@ every mode the view heading uses the non-empty ``title`` field of the current
 record. New records, contracts and records without a title fall back to the
 translated section heading; the mode label remains as its prefix.
 A field carrying the ``html`` flag is rendered as a full-width CKEditor 5
-control; ordinary textareas are full width as well. Rich-text values are
-sanitized before persistence and parsed into the row or read-only view through
-the frontend sanitizer before Vue receives the HTML.
+control; ordinary textareas are full width as well. Such a field is an
+``<academic-persons-edit-rich-text>`` element of its own, which creates the
+editor when it is connected and destroys it when it is disconnected, so a
+re-render of the editor around it — which every validation error causes — never
+reaches into the subtree CKEditor owns. Rich-text values are sanitized before
+persistence and parsed through the frontend sanitizer before the row or the
+read-only view receives the HTML.
 When that field's ``editor.limit`` is a positive integer, the textarea carries
 the normalized limit and the view renders an accessible live character
 counter below CKEditor. The count uses normalized visible text rather than the
@@ -501,11 +560,13 @@ the database schema; the shared required, readonly and field-type metadata does.
 The document pending state is released before CKEditor is initialized, because
 CKEditor deliberately skips disabled controls.
 Every JSON request increments one shared busy counter. While at least one
-request is active, the document body exposes ``aria-busy="true"`` and the wait
-cursor; the final request restores the previous cursor and sets
-``aria-busy="false"`` in a ``finally`` path. Document, contact and image editor
-containers mirror that state locally. This keeps failures and concurrent
-requests from leaving a stale loading state.
+request is active the document shows the wait cursor, and the final request
+restores the previous cursor in a ``finally`` path. ``aria-busy`` is set on the
+region that is actually waiting — the plugin root while a profile field is
+saved, the section while its rows are sorted, the open document or contact
+editor, the image editor, the synchronization form — and never on ``<body>``,
+which would make a screen reader stop reporting the rest of the page as well. This
+keeps failures and concurrent requests from leaving a stale loading state.
 
 Opening a different document replaces only the in-memory editor schema and
 values after the new form has loaded. It never calls the submit action: document
@@ -521,9 +582,8 @@ IDs referenced through ``aria-describedby`` and update ``aria-invalid``;
 dynamic editor headings and expanded controls expose their relationships via
 ``aria-controls`` and ``aria-expanded``. The field editors do not trap focus
 dialogs and deliberately do not trap focus.
-When the view enters delete mode, its submit control removes ``btn-primary``
-and ``btn-success`` and uses ``btn-danger``. All other writable modes restore
-``btn-primary``.
+When the view enters delete mode, its submit control is rendered with
+``btn-danger``. Every other mode renders it with ``btn-primary``.
 
 ``createDocumentAction()``, ``updateDocumentAction()``,
 ``deleteDocumentAction()`` and ``sortDocumentAction()`` complete the document
@@ -554,11 +614,12 @@ or non-cacheable action map.
 
 Section order is centralized and every section emits ``data-section-key`` and
 ``data-section-position`` together with the configured
-``data-section-field-name`` and ``data-section-record-type``. Records
-additionally emit ``data-item-uid``, ``data-item-sorting`` and
-``data-item-position``. ``data-section-sortable`` exposes whether both sorting
-directions are available. The explicit up/down controls and drag handle persist
-the same record order.
+``data-section-field-name``, ``data-section-record-type``,
+``data-section-kind``, ``data-section-date-mode`` and
+``data-section-readonly``. Records additionally emit ``data-item-uid``,
+``data-item-sorting`` and ``data-item-position``. ``data-section-sortable``
+exposes whether both sorting directions are available. The explicit up/down
+controls and drag handle persist the same record order.
 
 The presentation uses Bootstrap rows with one shared desktop column heading,
 compact flat records, separating borders and alternating
@@ -622,30 +683,42 @@ Expanding profile image editor
 ==============================
 
 Clicking the compact edit button below the current profile image or its
-placeholder keeps the profile view active. Vue's ``Teleport`` renders
-:file:`Partials/Profile/Image/Editor.html` into a dedicated full-width
-target above the profile header. The header, profile fields and structured
-sections remain in the same profile flow below the cropper; no
-separate view or overlay is involved. While the editor is open, the
-complete image-preview column is hidden and the profile-fields column animates
-from ``col-lg-8`` to ``col-lg-12``. The editor itself uses a bordered, padded
-surface. Closing it scrolls the restored image-preview column into view and
-focuses its edit action without causing a second browser scroll. The scroll is
-started only after Vue has completed the leave transition and two animation
-frames have applied the final page layout. A ``1.5rem`` scroll margin keeps the
+placeholder keeps the profile view active.
+:file:`Partials/Profile/Image/Editor.html` is rendered by Fluid into a
+dedicated full-width target above the profile header,
+``data-pe-image-editor-target``, which is where it is shown: it is hidden until
+the editor is opened rather than inserted then, so the container contributes
+its final width and height from the first paint and the cropper can initialize
+with the complete available width.
+The header, profile fields and structured sections remain in the same profile
+flow below the cropper; no separate view or overlay is involved. While the
+editor is open, the complete image-preview column is hidden and the
+profile-fields column changes from ``col-lg-8`` to ``col-lg-12``. The editor
+itself uses a bordered, padded surface. Closing it scrolls the restored
+image-preview column into view and focuses its edit action without causing a
+second browser scroll. The focus is restored only after two animation frames
+have applied the collapsed layout. A ``1.5rem`` scroll margin keeps the
 restored preview clear of the viewport edge.
 
-Vue's ``Transition`` animates the teleported editor with a short vertical move
-and fade. Its explicit CSS grid row also expands and collapses the editor height,
-padding, margin and border instead of removing the complete block in one layout
-step. Because the target already has its final width when it is inserted, the
-cropper can initialize immediately with the complete available width. The open
-scroll leaves ``2rem`` above the editor. Closing the editor removes the
-teleported content and restores focus to the image edit action. The return
-scroll starts together with the collapse and uses the preview's calculated
-final position. Native scroll anchoring is disabled only during this phase, so
-it cannot introduce a competing correction. Environments requesting reduced
-motion skip the transition.
+``<academic-persons-edit-image-editor>`` is the element that drives that
+partial. It renders nothing of its own — the ``<f:form>`` carries the
+``__trustedProperties`` signature the property mapper validates the upload
+against, and only the server can produce that — so it is a controller over
+Fluid's markup: it binds the events and writes everything the shipped view
+derives from the editing state, including the two column widths of
+:file:`Templates/Profile/Index.html`.
+
+Opening and closing is animated with a short vertical move and fade, driven by
+the ``…-image-editor-enter-active`` / ``-enter-from`` / ``-leave-active`` /
+``-leave-to`` classes of the extension's stylesheet. An explicit CSS grid row
+expands and collapses the editor height, padding, margin and border instead of
+removing the complete block in one layout step. The open scroll leaves ``2rem``
+above the editor. The return scroll starts together with the collapse and uses
+the preview's calculated final position; native scroll anchoring is disabled
+only during that phase, so it cannot introduce a competing correction.
+Environments requesting reduced motion skip the transition, and the close then
+completes in the same frame rather than waiting for an animation that never
+runs.
 
 The full-width ``btn-sm`` edit action sits directly below the preview. Its
 visible label and image upload icon are complemented by localized ``title`` and
@@ -807,10 +880,105 @@ Customizing the view
 Override :file:`Resources/Private/Templates/Profile/Index.html` and the partials below
 :file:`Resources/Private/Partials/Profile/` through the regular template
 and partial root paths. The index keeps URL/data setup, the responsive main
-grid and composition. The ``Profile``, ``Documents``, ``Image`` and ``Field``
-directories group the corresponding UI responsibilities; the status toast and
-client-side button templates remain shared at the root. Keep the following
-contracts when reusing the shipped JavaScript:
+grid, the icon templates and the composition. The ``Profile``, ``Documents``,
+``Image`` and ``Field`` directories group the corresponding UI
+responsibilities; the status regions and client-side button templates remain
+shared at the root.
+
+Not every file in that tree is still an override point. What a browser
+renders from a response — the document editor and the contacts of a contract —
+is rendered by custom elements, and the partials that used to carry that markup
+are gone or empty:
+
+..  list-table::
+    :header-rows: 1
+
+    *   - File
+        - State
+    *   - :file:`Partials/Profile/Documents/ContractContacts.html`,
+          :file:`Partials/Profile/Documents/ContractContactEditor.html`
+        - Removed. An override of either has no effect; nothing renders them.
+    *   - :file:`Partials/Profile/Documents/Editor.html`
+        - A mount point. Markup put into it is replaced by what the element
+          renders.
+    *   - :file:`Partials/Profile/Image/Editor.html`
+        - Still rendered and still overridable. Its ``<f:form>`` and hidden
+          fields must stay, and so must its ``data-pe-*`` hooks; what used to be
+          derived in the template is written by the element.
+    *   - :file:`Templates/Profile/Index.html`
+        - Still rendered. Its ``<template data-pe-icon="…">`` block must stay,
+          or the browser-rendered editors have no icons.
+
+A project that had overridden one of the two removed partials, or the markup
+inside :file:`Documents/Editor.html`, has to re-apply what that override
+changed as CSS against the rendered markup. That is possible because the
+elements render into the light DOM and keep the class names and hooks the
+partials used — see the entry
+:ref:`breaking-profile-editing-rendered-by-web-components` in the changelog.
+
+..  _profile-editing-elements:
+
+The custom elements and their events
+------------------------------------
+
+Five element names are part of the public contract of this extension from
+version 3.0 on. The prefix is the extension key with its underscores replaced,
+because a custom element name is global and has no scoping mechanism.
+
+..  list-table::
+    :header-rows: 1
+
+    *   - Element
+        - What it owns
+    *   - ``<academic-persons-edit-profile-editing>``
+        - One editor. It wraps the plugin root, reads its ``data-*`` contract
+          once and starts everything below it. It renders nothing.
+    *   - ``<academic-persons-edit-image-editor>``
+        - The profile image editor, as a controller over the server-rendered
+          upload form. It renders nothing.
+    *   - ``<academic-persons-edit-document-editor>``
+        - One open document or contract editor, in ``add``, ``view``, ``edit``
+          or ``delete`` mode. Rendered from the ``documentForm`` response.
+    *   - ``<academic-persons-edit-contract-contacts>``
+        - The contacts of one contract and the editor of one contact.
+    *   - ``<academic-persons-edit-rich-text>``
+        - One rich text field of a document editor and the CKEditor 5 instance
+          on it. The rich text fields of the profile itself stay Fluid-rendered
+          textareas and are not wrapped in it.
+
+Four events report what an open document editor did; the root element listens
+for a fifth, so that a descendant which does not hold the editing context can
+still have a status shown. All of them bubble, and none of them crosses a
+shadow boundary because there is none:
+
+..  list-table::
+    :header-rows: 1
+
+    *   - Event
+        - Meaning
+    *   - ``pe:status``
+        - Asks the root element to write one of the two live regions; detail
+          ``{ type, message? }``. Listened for on the root, dispatched by
+          nothing the extension ships.
+    *   - ``pe:document-close``
+        - The cancel button of an open editor was pressed.
+    *   - ``pe:document-submit``
+        - Its form was submitted; the browser's own submission is prevented.
+    *   - ``pe:document-input``
+        - A control changed; detail ``{ name, value }``.
+    *   - ``pe:document-closed``
+        - The close transition is over and the element may be removed.
+
+Two vocabularies carry the rest, and both are unchanged in meaning by the move
+to custom elements. The plugin root of :file:`Templates/Profile/Index.html`
+carries the configuration of *this* profile — thirteen endpoint URLs, the
+profile uid and the editor language, five image settings, twenty messages and
+nine labels. It is read **once**, when the element above it starts the editor,
+and an attribute changed afterwards is not seen. Every control below the root
+carries a ``data-pe-*`` hook, and the controls an element renders carry the same
+hooks the removed partials did.
+
+Keep the following contracts when reusing the shipped JavaScript:
 
 ..  list-table::
     :header-rows: 1
@@ -818,15 +986,34 @@ contracts when reusing the shipped JavaScript:
     *   - Selector or attribute
         - Purpose
     *   - ``data-academic-persons-profile-editing``
-        - Root component and scope for all queries.
-    *   - ``data-profile-uid``
-        - Positive profile identifier.
+        - Root component and scope for all queries. Everything below is read
+          from it, and the ``<academic-persons-edit-profile-editing>`` element
+          that wraps it is what starts the editor.
+    *   - ``data-profile-uid`` and ``data-editor-language``
+        - Positive profile identifier, and the language code CKEditor is
+          initialized with.
     *   - ``data-update-url``
         - Generic field update endpoint.
     *   - ``data-skip-sync-url``
         - Synchronization endpoint.
     *   - ``data-delete-image-url``
         - Image deletion endpoint.
+    *   - ``data-document-form-url``, ``data-create-document-url``,
+          ``data-update-document-url``, ``data-delete-document-url`` and
+          ``data-sort-document-url``
+        - The five document endpoints.
+    *   - ``data-contract-contact-form-url``,
+          ``data-create-contract-contact-url``,
+          ``data-update-contract-contact-url``,
+          ``data-delete-contract-contact-url`` and
+          ``data-sort-contract-contact-url``
+        - The five contract-contact endpoints.
+    *   - ``data-message-*`` and ``data-label-*``
+        - The localized texts a browser-rendered control needs. They are on the
+          root because a template cannot be reached from the browser.
+    *   - ``data-pe-icon``
+        - One ``<template>`` per icon a browser-rendered editor draws. The
+          elements clone from it, because ``core:icon`` cannot be called there.
     *   - ``data-pe-fields-form`` and
           ``academic-persons-profile-editing__field``
         - Generic field forms and controls. Separate forms preserve valid markup
@@ -852,9 +1039,12 @@ contracts when reusing the shipped JavaScript:
           controls.
     *   - ``data-section-key`` and ``data-section-position``
         - Stable section identity and current zero-based presentation position.
-    *   - ``data-section-field-name`` and ``data-section-record-type``
-        - Field and relation type taken from the shared settings graph for
-          section-specific persistence.
+    *   - ``data-section-field-name``, ``data-section-record-type``,
+          ``data-section-kind``, ``data-section-date-mode`` and
+          ``data-section-readonly``
+        - Field, relation type, record kind, date handling and write state,
+          taken from the shared settings graph for section-specific
+          persistence.
     *   - ``data-pe-document-items`` and ``data-pe-document-item``
         - Mutable item collection and record boundaries inside a section.
     *   - ``data-pe-document-item-template``
@@ -862,9 +1052,10 @@ contracts when reusing the shipped JavaScript:
           cloned after a successful create response.
     *   - ``data-pe-document-add-collapse-target`` and
           ``data-pe-document-item-collapse-target``
-        - Teleport destinations below a section heading and inside an individual
-          record row. The document controller assigns a unique ID when a target
-          is first opened.
+        - Where the ``<academic-persons-edit-document-editor>`` element is
+          created: below a section heading for an addition, inside an individual
+          record row for everything else. The document controller assigns a
+          unique ID when a target is first opened, for ``aria-controls``.
     *   - ``data-item-uid``, ``data-item-sorting`` and ``data-item-position``
         - Persisted record identity, domain sorting value and current zero-based
           presentation position.
@@ -875,8 +1066,20 @@ contracts when reusing the shipped JavaScript:
         - Section creation and in-place row actions.
     *   - ``data-pe-document-sort``
         - Up/down row action persisted through the shared sort endpoint.
-    *   - ``data-pe-document-view-container`` and ``data-pe-document-form``
-        - Scoped reactive collapse and form used for add, view, edit and delete.
+    *   - ``data-pe-document-view-container``, ``data-pe-document-form``,
+          ``data-pe-document-heading`` and ``data-pe-document-field``
+        - The collapse, the form, the heading and the controls used for add,
+          view, edit and delete. They are rendered by the document editor
+          element, not by a partial, and are listed because CSS and site
+          JavaScript select them.
+    *   - ``data-pe-contract-contact-section``, ``-item``, ``-heading``,
+          ``-form``, ``-fields``, ``-field``, ``-editor``, ``-actions``,
+          ``-add``, ``-view``, ``-edit``, ``-delete``, ``-sort``, ``-cancel``
+          and ``-save``
+        - The contact sections of a contract, their rows, the editor and its
+          controls. Rendered by
+          ``<academic-persons-edit-contract-contacts>``; the presses are
+          delegated on the plugin root like the document ones.
     *   - ``data-pe-field-group``, ``data-pe-field-ids`` and
           ``data-pe-display-field-ids``
         - Grouped preview/editor and the controls participating in it.
@@ -911,31 +1114,43 @@ contracts when reusing the shipped JavaScript:
         - Synchronization control.
     *   - ``academic-persons-profile-editing__image-form`` and
           ``data-pe-image-view-container``
-        - AJAX-only multipart upload form and its teleported Vue editor.
+        - AJAX-only multipart upload form and the editor panel around it. The
+          form is server rendered and stays that way: it carries the
+          ``__trustedProperties`` signature the property mapper validates the
+          upload against, which only the server can produce.
     *   - ``data-pe-image-editor-target``
-        - Profile-specific full-width destination for the Vue ``Teleport``.
+        - Profile-specific full-width container Fluid renders the image editor
+          into, above the profile header.
     *   - ``data-pe-image-preview`` and
           ``data-pe-image-view-preview``
         - Image locations updated after upload or deletion.
     *   - ``data-image-render-type`` and ``data-image-cropper-ratio``
         - Render type and ratio consumed by the local CropperJS host in the
           image editor.
-    *   - ``data-pe-status-toast``
-        - Scoped status feedback for the component.
+    *   - ``data-pe-status-toast="status"`` and
+          ``data-pe-status-toast="alert"``
+        - The two scoped status regions of the component: the polite one for
+          saving, success and information, the assertive one for a failure. Both
+          must exist — a region's politeness cannot be changed reliably once it
+          is in the accessibility tree.
 
 Every editable field needs one ``invalid-feedback`` element in its closest
 ``data-pe-field-wrapper``, ``data-pe-group-control`` or ``.form-check`` wrapper.
-Inline collapse targets, views, toast and compatibility-template elements must
-remain inside the
-component root. All DOM lookups are scoped to that root, so multiple components
-remain independent.
+Inline collapse targets, views, status regions, icon templates and
+compatibility-template elements must remain inside the component root. All DOM
+lookups are scoped to that root, so multiple components remain independent.
+
+An override that still carries ``v-if``, ``v-for``, ``v-model``, ``v-on:``,
+``<Teleport>`` or ``<Transition>`` fails **silently**: nothing reads those
+attributes any more, so the control simply does nothing when it is used.
 
 Frontend build
 ==============
 
 The package has no separate development toolchain below
-:file:`Resources/Public/`. TypeScript sources and committed JavaScript output
-use the repository-wide frontend suites from the repository root:
+:file:`Resources/Public/`. TypeScript sources, SCSS sources and the committed
+JavaScript and CSS output use the repository-wide frontend suites from the
+repository root:
 
 ..  code-block:: bash
 
@@ -943,6 +1158,12 @@ use the repository-wide frontend suites from the repository root:
     Build/Scripts/runTests.sh -s checkJsBuildClean
     Build/Scripts/runTests.sh -s lintTypescript -n
     Build/Scripts/runTests.sh -s typecheckJs
+    Build/Scripts/runTests.sh -s testJs
+
+Nothing is bundled: the build emits one module per source file and leaves every
+import as it was written. ``lit`` is a bare specifier resolved through the
+import map of ``EXT:core``, and the only library committed under
+:file:`Resources/Public/JavaScript/vendor/` is CropperJS 2.2.0 with its licence.
 
 Tests
 =====
@@ -953,10 +1174,18 @@ allowed editor markup and rejection of scripts, event attributes, styles,
 unknown tags and unsafe link schemes. Validation-service unit tests verify that
 sanitization happens before a value is registered for persistence.
 
-Functional plugin tests render the Vue inline-collapse targets and image view,
-verify the
+A JavaScript suite runs the shipped modules and elements against a DOM
+(``Build/Scripts/runTests.sh -s testJs``). It drives the rendered markup of the
+Fluid partials through the modules that read it, which is the only place the
+event handling, the optimistic list updates, the transitions and the focus
+management are executed at all.
+
+Functional plugin tests render the inline-collapse targets, the mount points
+and the image view, verify the
 decomposed Fluid contracts, AJAX-only controls, direct rich-text previews and
-the separate delete, cancel and save actions. The section-provider unit test
+the separate delete, cancel and save actions. They also assert that the Fluid
+files of the view carry no rendering directive of a template framework, because
+such an attribute is inert rather than an error. The section-provider unit test
 verifies that order, identifiers, field names, relation types and labels come
 from the shared settings graph while row fields, action capabilities,
 presentation modes and typed records are preserved. Functional fixtures cover

@@ -1,57 +1,38 @@
-import {
-  createApp,
-  onMounted,
-  type App,
-} from "@fgtclb/academic-persons-edit/frontend/vue.js";
-import {
-  initializePopover,
-  rootSelector,
-} from "@fgtclb/academic-persons-edit/frontend/profile/common.js";
-import {
-  createDocumentEditing,
-  initializeDocumentSections,
-} from "@fgtclb/academic-persons-edit/frontend/profile/documents.js";
-import { initializeFieldEditing } from "@fgtclb/academic-persons-edit/frontend/profile/fields.js";
-import { createImageEditing } from "@fgtclb/academic-persons-edit/frontend/profile/image.js";
-import { initializeStickyImageOffset } from "@fgtclb/academic-persons-edit/frontend/profile/sticky-image.js";
-import { createSkipSync } from "@fgtclb/academic-persons-edit/frontend/profile/sync.js";
+/**
+ * The entry point of the profile editor, loaded by
+ * `Templates/Profile/Index.html` through `<f:asset.module>`.
+ *
+ * It defines the custom elements and does nothing else. Every editor on the page
+ * is a `<academic-persons-edit-profile-editing>` element that starts itself when
+ * the browser upgrades it, which is what replaced the start-up scan for
+ * `[data-academic-persons-profile-editing]` and the `WeakSet` of roots that had
+ * already been mounted.
+ *
+ * `<f:asset.module>` renders `type="module"`, so this file is evaluated after
+ * the document has been parsed and the elements are upgraded rather than
+ * constructed. Neither order matters to the element: a custom element is
+ * upgraded whether it was already in the document when it was defined or is
+ * inserted afterwards.
+ */
+import { registerProfileEditingElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/root.js";
+import { registerProfileContractContactsElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/contract-contacts.js";
+import { registerProfileDocumentEditorElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/document-editor.js";
+import { registerProfileImageEditorElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/image-editor.js";
+import { registerProfileRichTextElement } from "@fgtclb/academic-persons-edit/frontend/profile/elements/rich-text.js";
 
-const mountedRoots = new WeakSet<HTMLElement>();
-
-const createProfileEditingApp = (root: HTMLElement): App =>
-  createApp({
-    setup(): Record<string, unknown> {
-      const documentController = createDocumentEditing(root);
-      const imageController = createImageEditing(root);
-      const syncController = createSkipSync(root);
-
-      onMounted((): void => {
-        initializeStickyImageOffset(root);
-        initializeFieldEditing(root);
-        initializeDocumentSections(root);
-        initializePopover(root);
-      });
-
-      return {
-        ...documentController,
-        ...imageController,
-        ...syncController,
-      };
-    },
-  });
-
-export const initializeProfileEditors = (scope: ParentNode = document): App[] => {
-  const applications: App[] = [];
-  scope.querySelectorAll(rootSelector).forEach((candidate): void => {
-    if (!(candidate instanceof HTMLElement) || mountedRoots.has(candidate)) {
-      return;
-    }
-    mountedRoots.add(candidate);
-    const application = createProfileEditingApp(candidate);
-    application.mount(candidate);
-    applications.push(application);
-  });
-  return applications;
-};
-
-initializeProfileEditors();
+// The root first. The order no longer decides anything - it did while Vue's
+// "mount()" still replaced the markup below the root, so an element defined
+// before it was upgraded on a copy that was about to be thrown away - but it is
+// the order the page starts in and it reads that way: the owner, then what it
+// owns.
+registerProfileEditingElement();
+registerProfileImageEditorElement();
+// The document editor, the rich text field it renders and the contract
+// contacts it renders are created by "profile/documents.ts" and by each other
+// rather than by Fluid, and that module registers them itself for the same
+// reason - it cannot depend on an entry point having run. Every registration is
+// idempotent, and this one is the page's: an editor is registered whether or
+// not one is ever opened.
+registerProfileDocumentEditorElement();
+registerProfileRichTextElement();
+registerProfileContractContactsElement();

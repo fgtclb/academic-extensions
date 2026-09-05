@@ -28,6 +28,7 @@ Build/Scripts/runTests.sh -t 14 -p 8.2 -s composerUpdate
 | `functional`                                      | PHPUnit              | `Build/phpunit/FunctionalTests.xml`              | through the excluded group  |
 | `checkRstRenderingAll`, `checkRstRenderingSingle` | render-guides        | each extension's own `Documentation/`            | no                          |
 | `lintMarkdown`                                    | `Build/markdown.mjs` | none, the conventions are the specification      | no                          |
+| `testJs`                                          | `node --test`, jsdom | `Build/tsconfig.tests.json`, `Build/tests/`      | no                          |
 
 ## Coding guidelines — `cgl`
 

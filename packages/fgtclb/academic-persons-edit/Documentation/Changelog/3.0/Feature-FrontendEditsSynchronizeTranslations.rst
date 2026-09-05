@@ -22,7 +22,8 @@ information forms — dispatches the event once after the change is persisted.
 The event always carries the persisted default language profile; child records
 resolve their owning profile through the contract, and an edit of a profile
 fetched as translation overlay does not dispatch (synchronisation runs from the
-default language record only).
+default language record only). A removal that found no image to remove changed
+nothing and announces nothing.
 
 Impact
 ======
