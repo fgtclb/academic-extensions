@@ -20,7 +20,9 @@ $tcaConfiguration = [
         'enablecolumns' => [
             'disabled' => 'hidden',
         ],
-        'iconfile' => 'EXT:academic_study_plan/Resources/Public/Icons/module.svg',
+        'typeicon_classes' => [
+            'default' => 'academic-study-plan-module',
+        ],
         'hideTable' => true,
         'security' => [
             'ignorePageTypeRestriction' => true,

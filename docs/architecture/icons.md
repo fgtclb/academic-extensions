@@ -1,10 +1,11 @@
 # Icons
 
 How icons are registered and consumed across the extensions, which provider to
-register an icon with, and how a template's icons are kept resolvable. Every
-count on this page is the output of the command quoted next to it, run over the
-repository at the commit that last touched this page. Re-run them rather than
-adjusting a number by hand.
+register an icon with, and how a template's icons are kept resolvable. Where a
+count is quoted with a command next to it, that count is the output of the
+command, run over the repository at the commit that last touched this page —
+re-run it rather than adjusting the number by hand. The counts without a command
+were read off the files named beside them.
 
 ## Registration today
 
@@ -16,46 +17,60 @@ grep -c "'provider' => CurrentColorSvgIconProvider" \
   packages/fgtclb/*/Configuration/Icons.php
 ```
 
-Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **65
-registrations in total: 45 with the core `SvgIconProvider` and 20 with
-`CurrentColorSvgIconProvider`** — the six control icons of the public profile of
-`academic-persons` and the fourteen of the profile editing view of
-`academic-persons-edit`:
+Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **66
+registrations in total: 27 with the core `SvgIconProvider` and 39 with
+`CurrentColorSvgIconProvider`**:
 
 | Package                  | Registrations | `CurrentColorSvgIconProvider` |
 |--------------------------|---------------|-------------------------------|
-| `academic-jobs`          | 18            | –                             |
-| `academic-persons`       | 16            | 6                             |
+| `academic-jobs`          | 19            | 1                             |
+| `academic-persons`       | 16            | 15                            |
 | `academic-persons-edit`  | 15            | 14                            |
-| `academic-study-plan`    | 7             | –                             |
-| `academic-contact4pages` | 4             | –                             |
-| `academic-partners`      | 3             | –                             |
+| `academic-study-plan`    | 7             | 3                             |
+| `academic-contact4pages` | 4             | 2                             |
+| `academic-partners`      | 3             | 3                             |
 | `academic-bite-jobs`     | 1             | –                             |
-| `academic-programs`      | 1             | –                             |
+| `academic-programs`      | 1             | 1                             |
 
-Seven of the 45 core-provider registrations spell the class out as an FQCN
-rather than importing it (`academic-study-plan`), which is why the second
-command above normalises the value before counting.
+The 39 are of two kinds. Twenty are control icons — the six of the public
+profile of `academic-persons` and the fourteen of the profile editing view of
+`academic-persons-edit`, all Bootstrap Icons. The other nineteen are **record
+icons**: every identifier a TCA record type resolves through
+`ctrl.typeicon_classes`, including the two page type icons `academic-partners`
+and `academic-programs` (ACE-523).
 
 `academic-base`, `academic-projects`, `academic-persons-sync` and the three
 `packages-dev/` packages register nothing.
 
 One registration is programmatic: `typo3-category-types` registers
-`category_types.<type>.<x>` per configured category type on `BootCompletedEvent`
+`category_types.<group>.<type>` per configured category type on
+`BootCompletedEvent`
 ([`Classes/ServiceProvider.php`](../../packages/fgtclb/typo3-category-types/Classes/ServiceProvider.php),
-`addIcons()`), and asks `IconRegistry::detectIconProvider()` for the provider.
-That method knows bitmap versus SVG by file extension and nothing else, so a
-category type icon always gets the core provider — a different provider for
-those would be a change to the registrar, not to a configuration file.
+`addIcons()`). It asks `IconRegistry::detectIconProvider()`, which knows bitmap
+versus SVG by file extension and nothing else. Those icons are `sys_category`
+record icons, so the same rule applies to them as to the rest — but the set of
+them is whatever the *loaded* extensions declare in their
+`Configuration/CategoryTypes.yaml`, site packages this repository never sees
+included, and inlining a file is not a decision the registrar may take for them:
+an inlined SVG is part of the document, so its `id` attributes and its `<style>`
+rules are global and collide with every other inlined icon on the page. The type
+therefore asks for it, with `inlineIcon: true` next to its `icon:`, and only then
+does the SVG get `CurrentColorSvgIconProvider` instead of the core one. A bitmap
+keeps what core detected either way. Twenty icons ship with the flag set today,
+from `academic-partners` (4), `academic-programs` (12) and `academic-projects`
+(4) — every category type of this repository.
 
 ### Where the identifiers are consumed
 
-The backend consumes identifiers through `typeicon_classes` in 17 files under
+The backend consumes identifiers through `typeicon_classes` in 21 files under
 `packages/fgtclb/*/Configuration/TCA/` plus
 [`academic-base/Classes/TcaManipulator.php`](../../packages/fgtclb/academic-base/Classes/TcaManipulator.php)
 for select items, through the `icon` key of every content element registration
-in `Configuration/TCA/Overrides/tt_content.php` — `academic-programs` passes an
-`EXT:` path there instead of an identifier, which TYPO3 accepts — and through
+in `Configuration/TCA/Overrides/tt_content.php` — that key has to be a registered
+identifier: `addPlugin()` and `TcaManipulator::addRecordType()` write it verbatim
+into `ctrl.typeicon_classes`, `IconRegistry::registerTCAIcons()` registers
+`ctrl.iconfile` and nothing else, and an unregistered value is silently replaced
+by `default-not-found` — and through
 `<core:icon>` in the three page layout partials
 `Resources/Private/Backend/Partials/PageLayout/Doktype*.html` of
 `academic-programs`, `academic-projects` and `academic-partners`.
@@ -86,7 +101,7 @@ grep -rl "<core:icon" packages/fgtclb/*/Resources/Private --include=*.html \
 | `academic-persons`      | 6 sites in 2 files, `academic-persons-*` | —                                                                  |
 | `academic-study-plan`   | 3 sites, its `plus`/`minus`/`close`      | —                                                                  |
 | `academic-jobs`         | 2 sites, core `phone`/`mail`             | `Job/Item.html`, `Job/Information.html`                            |
-| `academic-partners`     | —                                        | 4 files, `category_types.*` and `academic-partners`                |
+| `academic-partners`     | —                                        | 4 files, `category_types.partners.*` only                          |
 | `academic-programs`     | —                                        | `Program/Categories.html`, `Program/Item.html`, `category_types.*` |
 | `academic-projects`     | —                                        | `AcademicProject.html`, `Project/Item.html`                        |
 
@@ -114,20 +129,45 @@ sizes both shapes the same.
 
 **Which provider when:**
 
-- A **record, page type, content element or brand icon** — anything drawn in
-  fixed colours, meant to look the same on every background — stays with the
-  core `SvgIconProvider`. That is 45 of the 65 registrations today.
+- A **record or page type icon** — anything a TCA `ctrl.typeicon_classes` entry
+  resolves — is drawn in `currentColor` and registered with
+  `CurrentColorSvgIconProvider`. The record list, the page tree and FormEngine
+  all take the *default* markup, so an `<img>` there keeps the ink of its file
+  on the dark cards of a dark backend colour scheme. That is 19 of the 39
+  registrations today, plus the 20 programmatic `category_types.*` ones that ask
+  for it with `inlineIcon: true` (ACE-523).
 - An **action or control icon** — an arrow, a pencil, a bin, a fold-out chevron —
-  is drawn in `currentColor` and registered with `CurrentColorSvgIconProvider`.
-  Then it follows the text colour in the backend *and* in the frontend, with
-  or without the `inline` argument. That is 20 registrations, all Bootstrap
-  Icons: the six `academic-persons-*` icons of the public profile — envelope,
-  phone, address, room and the plus and minus of the fold-out entries — and the
-  fourteen `academic-persons-edit-*` controls of the profile editing view.
+  is registered the same way, for the same reason: it follows the text colour in
+  the backend *and* in the frontend, with or without the `inline` argument. That
+  is the other 20 registrations, all Bootstrap Icons: the six
+  `academic-persons-*` icons of the public profile — envelope, phone, address,
+  room and the plus and minus of the fold-out entries — and the fourteen
+  `academic-persons-edit-*` controls of the profile editing view.
+- Everything else stays with the core `SvgIconProvider` — 27 registrations: the
+  seventeen `academic_jobs-*` icons of the job detail fields, the three frontend
+  controls of `academic-study-plan` (asked for with
+  `alternativeMarkupIdentifier="inline"`, so they get the same markup either
+  way), six **brand icons** — the plugin and extension marks
+  `academic_jobs_icon`, `persons_icon`, `persons_edit_icon`, `bitejobs_list`,
+  `academic_contacts4pages` and `academic-study-plan`, drawn in fixed colours
+  and meant to look the same on every background — and one orphan,
+  `tx_academiccontacts4pages_domain_model_contract`, which names a table that
+  does not exist.
 - A frontend template that already asks for `inline` gets the same markup from
   both providers. Switching such an icon's provider changes nothing in the
   frontend; it changes its default markup, i.e. how it looks in the backend
-  and in a template that forgot the argument.
+  and in a template that forgot the argument. The `category_types.*` icons are
+  the exception in the other direction: every template renders them *without*
+  the argument, so switching them changed the frontend too — from an `<img>` of
+  fixed size to an inlined `<svg width="1em" height="1em">` that follows the
+  font size and the text colour.
+- `width="1em" height="1em"` is the rule for an icon a *frontend* template
+  renders, and only for those. Both pipelines keep the two attributes, and inside
+  `.icon` the backend overrides them anyway
+  (`.icon img, .icon svg { width: 100%; height: 100% }`), so carrying them costs
+  a backend-only icon nothing while omitting them costs a frontend icon its
+  sizing. The category type icons carry them; the record icons of the tables,
+  which no frontend template renders, do not.
 
 The provider inlines in both markups on purpose. The alternative — the default
 markup as `<svg><use xlink:href="…/file.svg"/></svg>`, the shape core's
@@ -144,6 +184,26 @@ attributes (a duplicated `id` is invalid HTML), no `<script>` and no event
 handler attributes. The shipped `academic-study-plan`
 `plus.svg`/`minus.svg`/`close.svg` are the reference shape.
 
+**Converting an existing drawing.** Most of the record icons here were not drawn
+for inlining, and three shapes recur. An Adobe Illustrator export carries
+`id="Ebene_1"`, a `<style>` block of `.stN` classes, `enable-background`,
+`xml:space`, `x`, `y` and `version`, and a `<defs><clipPath><use/></clipPath>`
+pair whose rectangle is the artwork's own bounding box — a no-op that only
+exists because the export clips to the artboard. The class declarations become
+presentation attributes, every colour becomes `currentColor`, and the rest goes.
+Keep a `clip-path` only where it genuinely clips something, and then it needs an
+`id`, which is exactly what must not be there: the same icon can appear many
+times in one document. Measure before assuming — compare the clip rectangle
+against the true bounding box of every shape it applies to, stroke width
+included.
+
+A multi-colour illustration necessarily becomes monochrome. A shape that only
+existed as a lighter fill on top of a coloured body has to be re-expressed —
+usually the body becomes `fill="none"` with a `stroke="currentColor"` and the
+shapes on top become `fill="currentColor"`. That loses whatever the palette
+distinguished, so two icons that differed only in colour end up looking alike;
+that is a cost of the change, not an accident.
+
 **Sizing.** In the backend, `backend.css` sizes the inlined element through
 `.icon img, .icon svg { width: 100%; height: 100% }` on both cores. A frontend
 page has such a rule only if the site or the extension ships one, and an
@@ -153,28 +213,72 @@ pipelines keep `width` and `height` — v14's `toInlineMarkup()` drops only
 `width="1em" height="1em"`, which follows the font size the way the text
 around it does.
 
-**Trust boundary.** The sanitisation differs per core, and neither is a reason
-to inline a file from anywhere else. v14 runs the full `enshrined/svg-sanitize`
-pass. v13 strips `<script>` elements with a regular expression and
-re-serialises through `simplexml` — event handler attributes, `javascript:`
-hrefs and `<foreignObject>` pass through, and with this provider they land in
-the default markup the backend renders everywhere. The sources are files an
-extension ships and registers in its own `Configuration/Icons.php`, never
-editor uploads; that is the same trust boundary the core provider's `inline`
-markup has always had, and it is the boundary to keep.
+**Trust boundary.** Core's own sanitisation differs per core. v14 runs the full
+`enshrined/svg-sanitize` pass through `SvgDocumentFactory`. v13 strips `<script>`
+elements with a regular expression and re-serialises through `simplexml`, and
+that is all: an `onload` or `onclick` attribute, a `javascript:` href and a
+`<foreignObject>` pass through untouched. Rendering the file as an `<img>`, which
+is what the core provider does for its default markup, made that harmless;
+inlining does not, and with this provider the content lands in the default markup
+the backend renders everywhere. `CurrentColorSvgIconProvider` therefore runs
+`SvgSanitizer::sanitizeContent()` itself on v13 — the identical library pass, from
+a class that exists with the same signature on 13.4.34 and 14.3.6, both backed by
+`enshrined/svg-sanitize` 0.22.0. Both cores now produce sanitised markup.
 
-**A comment in the file does not reach the markup on v14.** The two pipelines
-differ (below), and this was measured rather than assumed: v13 re-serialises
-the file with `simplexml` and keeps comments; v14 sanitises it through
-`enshrined/svg-sanitize` 0.22.0, whose `Sanitizer::cleanUnsafeNodes()` removes
-every node that is neither an element nor text — comments included. A licence
-attribution the icon set requires (Font Awesome Free is CC BY 4.0, for
-example) therefore stays in the source file for whoever reads the repository,
-but the rendered page carries it on v13 only. Where the licence requires
+That closes a hole, it does not move the boundary. The sanitiser is a filter, not
+a guarantee, and it does nothing at all about the two ways an inlined file
+interferes with the page around it: a duplicated `id`, and a `<style>` block,
+which is document-global CSS once inlined. Two Adobe Illustrator exports collide
+by construction — the defaults are literally `id="SVGID_1_"` and `.st0`/`.st1` —
+and the observable result is one icon painted in the other's colour, or clipped by
+the other's `clipPath`. So the sources stay what they were: files an extension
+ships and registers in its own `Configuration/Icons.php`, drawn for inlining, and
+for a category type the extension has to say `inlineIcon: true` as well.
+
+**A file the provider cannot inline yields no markup, and never an error.** The
+guarantee holds for every reason a source can be unusable — missing,
+unreadable, empty, not XML, or XML whose root element is not an `<svg>` — and
+the last one had to be added rather than found: `enshrined/svg-sanitize` throws
+a plain `\LogicException` with code 1570870568 out of
+`XPath::handleDefaultNamespace()` when the document does not carry exactly one
+`<svg>` root, and nothing below the provider catches it. A `<symbol>` fragment
+or an `<html>` document saved under an `.svg` name is well-formed XML, passes
+every parse guard, and would take the whole response with it — a record list or
+a page tree answering 500 instead of showing one icon less. The provider
+catches it in both branches. **TYPO3 v14 core has the same hole on its own
+inline path**: `AbstractSvgIconProvider::getInlineSvg()` catches
+`InvalidSvgException` only, while `SvgDocumentFactory::fromStringAndSanitize()`
+runs the sanitiser that throws, so core's `SvgIconProvider` still fails that way
+for an inline render. Fixing that belongs upstream, not here. Both cases are
+covered by `fileWithoutAnSvgRootRendersEmptyMarkup()` in the unit and the
+functional `CurrentColorSvgIconProviderTest`.
+
+**A comment in the file does not reach the markup.** This was measured rather
+than assumed: `Sanitizer::cleanUnsafeNodes()` removes every node that is neither
+an element nor text, comments included. That has always been true on v14, and it
+is true on v13 as well since the provider sanitises there too — before that, v13's
+`simplexml` round trip kept comments, and the two cores rendered different markup
+for the same file. A licence attribution the icon set requires (Font Awesome Free
+is CC BY 4.0, for example) therefore stays in the source file for whoever reads
+the repository and never reaches the rendered page. Where the licence requires
 attribution in the delivered output, it has to be given elsewhere — in the
 extension's documentation or a visible credits line — not through the file
-comment. The same applies to the core `SvgIconProvider`'s inline markup, which
-runs through the same pipeline.
+comment. Core's own `SvgIconProvider` inline markup keeps the comment on v13,
+because it does not take this detour.
+
+**An unregistered file under `Resources/Public/Icons/` is covered by nothing.**
+Neither the per-extension `RecordIconsTest` list nor the TCA derived assertion
+next to it can see a file no `Configuration/Icons.php` and no
+`Configuration/CategoryTypes.yaml` names — both walk registrations, and an
+orphan is not one. Three such files survive in
+`academic-programs/Resources/Public/Icons/CategoryTypes/`:
+`JobProfile.svg`, `PerformanceScope.svg` and `Prerequisites.svg`. They are
+still the untouched Adobe Illustrator exports, with the `id`, the `<style>`
+block and the fixed colours the section above says have to go. They are
+deliberately left as they are, because converting a drawing nothing renders is
+work with no way to check it. The trap is the day one of them is registered:
+the registration compiles, the icon appears, and it appears in the wrong
+colour on a dark card. Convert the file in the same change that registers it.
 
 ### How the provider is wired, per core version
 
@@ -196,20 +300,35 @@ on v14 tags every `IconProviderInterface` as `icon.provider` and a
 provider through `$container->has()` and gets the instance with the setters
 called. Excluded from the `resource` load of `academic-base`'s `Services.yaml`,
 the provider would be created with `new` instead and the first inline render
-on v14 would fail on an uninitialised property. On v13 there is no such tag,
-the unreferenced private service is dropped at compile time, `IconFactory`
-falls back to `GeneralUtility::makeInstance()`, and the bare instance needs
-nothing — `getInlineSvg()` there is `file_get_contents`, a `<script>` strip and
-a `simplexml` re-serialisation.
+on v14 would fail on an uninitialised property. `IconFactory` prefers the
+container on both versions — `$this->container->has($provider) ?
+$this->container->get(…) : GeneralUtility::makeInstance(…)`, v13.4.34
+`IconFactory:82-84` and v14 `IconFactory:67-69` — but v13's
+`cms-core/Configuration/Services.php` has no `icon.provider` tag and no
+`PublicServicePass` for one, so the unreferenced private service is dropped at
+compile time, `has()` answers `false` and the bare instance is what renders. It
+needs nothing, because on v13 the provider does not call the parent's
+`getInlineSvg()` at all — see the next section.
 
-**One version switch.** The v13 `getInlineSvg()` expects an absolute path; the
-v14 one resolves an `EXT:` path itself through `SystemResourceFactory` and
-sanitises the content through `SvgDocumentFactory` (which also drops the
-`xmlns` and synthesises a missing `viewBox`). `generateInlineMarkup()` therefore
-resolves the path with `GeneralUtility::getFileAbsFileName()` on v13 only —
-not through the `_assets` symlink, so it also works outside composer mode —
-and hands v14 the path unchanged. The switch carries a `@todo` for the v13
-support end, like the two `TcaManipulator` switches it is listed next to in
+**One version switch.** The v14 `getInlineSvg()` resolves an `EXT:` path itself
+through `SystemResourceFactory` and sanitises the content through
+`SvgDocumentFactory` (which also drops the `xmlns` and synthesises a missing
+`viewBox`), so v14 is handed the path unchanged and needs nothing else. The v13
+one expects an absolute path and sanitises next to nothing, so
+`generateInlineMarkup()` takes the whole v13 branch itself: it resolves the path
+with `GeneralUtility::getFileAbsFileName()` — not through the `_assets` symlink,
+so it also works outside composer mode — then reads the file, runs
+`SvgSanitizer::sanitizeContent()` over it and re-serialises the document element
+to drop the XML declaration the sanitiser writes. The parent's v13
+`getInlineSvg()` — `file_get_contents`, a regular expression that strips
+`<script>` and a `simplexml` round trip — is therefore never reached from this
+provider; it is what the *core* `SvgIconProvider` still runs there, and the
+reason a `javascript:` href and an `onload` survive on v13 without this
+branch. That last step is what the
+parent's `simplexml` round trip does on v13, and re-serialising through
+`DOMDocument` instead was measured to produce the identical string for all 99
+SVG files under `packages/`. The switch carries a `@todo` for the v13 support
+end, like the two `TcaManipulator` switches it is listed next to in
 [Core version aware code](core-version-aware-code.md).
 
 ## Keeping a template's icons resolvable
@@ -245,17 +364,54 @@ default markup is the inlined file. The identifiers are spelled out in the test
 rather than read back out of `Configuration/Icons.php`, so a rename has to be
 made twice instead of silently agreeing with itself.
 
+The record icons are covered by one `Tests/Functional/Imaging/RecordIconsTest.php`
+per extension that ships them — `academic-contact4pages`, `academic-jobs`,
+`academic-partners`, `academic-persons`, `academic-programs`, `academic-projects`
+and `academic-study-plan`. Each asserts, per identifier, that it is registered
+with `CurrentColorSvgIconProvider`, that both markups are the inlined file, that
+the markup carries `currentColor` and neither a hardcoded colour nor an `id`, and
+that the rendered icon carries its own identifier rather than
+`default-not-found`. The assertions live in
+[`ColourSchemeAwareIconsTrait`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/ColourSchemeAwareIconsTrait.php)
+of the testing helper; the identifiers are spelled out per extension.
+
+A hand written list cannot catch what is *missing* from it, so each of those
+seven tests carries one more assertion that is derived from the TCA instead:
+`assertEveryRecordTypeIconIsColourSchemeAware()` walks the `ctrl` of every table,
+keeps what it can attribute to the extension by the source path of the registered
+icon, and requires three things — no `ctrl.iconfile` pointing into the extension,
+because that bypasses the registry; no file path in a `ctrl.typeicon_classes`
+value, because `registerTCAIcons()` registers `ctrl.iconfile` only and an
+unregistered value renders `default-not-found`; and the `currentColor` provider
+for every identifier it does resolve. `tt_content` is exempt from the last of the
+three: its entries are the content element brand marks, which keep the core
+provider on purpose. A new record table added without a converted icon fails this
+test without anyone remembering to extend a list.
+
+The programmatic registration is covered separately, in
+[`typo3-category-types/Tests/Functional/Imaging/CategoryTypeIconsTest.php`](../../packages/fgtclb/typo3-category-types/Tests/Functional/Imaging/CategoryTypeIconsTest.php),
+against the `test_category_types_icons` fixture extension, which ships all four
+branches of the registrar: an SVG type with `inlineIcon: true` reaches the
+`currentColor` provider; an SVG type without it keeps the core provider, and the
+fixture file carries `id="SVGID_1_"`, a `.st0` fill and a `clip-path` so the test
+can assert that none of it enters the document; a bitmap type asks for inlining
+and keeps `BitmapIconProvider` all the same; and a type naming a file that does
+not exist renders empty markup rather than throwing. All four are needed — the
+first alone would pass for a registrar that inlines everything, which is the
+defect the opt-in exists for.
+
 The provider itself is covered the same way it is used:
 [`academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php)
 registers four icons in the fixture extension `tests/current-color-icons` and
 renders them through the container's `IconFactory` on both cores — inlined
-default markup, identical inline markup, the comment kept on v13 and dropped on
-v14 (two tests, one per `not-core-*` group), a stripped `<script>`, empty
-markup for a missing file, and the core provider's `<img>` for the same file
-as the contrast. The unit test next to it covers the
-provider's own `source` guards on both cores and the v13 pipeline on a bare
-instance; the v14 pipeline cannot be built without the container and is
-measured functionally only.
+default markup, identical inline markup, the comment dropped on both cores,
+stripped active content (a `<script>` element, an `onload`, an `onclick` and a
+`javascript:` href, all in one fixture file, because pinning only the `<script>`
+is what let the v13 hole through review), empty markup for a missing file, and
+the core provider's `<img>` for the same file as the contrast. The unit test next
+to it covers the provider's own `source` guards on both cores and the v13
+pipeline on a bare instance; the v14 pipeline cannot be built without the
+container and is measured functionally only.
 
 ## See also
 

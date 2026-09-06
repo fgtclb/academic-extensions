@@ -25,10 +25,12 @@ describing an intention as if it were the state.
 - TypoScript and page TSconfig exist **once** on disk and are delivered twice:
   a site set points at the very files the static template registration points
   at. Content elements are hidden globally and re-enabled per component.
-- A record or brand icon stays with the core `SvgIconProvider`; an action icon
-  is drawn in `currentColor` and registered with the `academic_base` provider
-  that inlines it, so it follows the text colour in the backend and the
-  frontend.
+- A **brand** icon — an extension or plugin mark — stays with the core
+  `SvgIconProvider` and keeps the colours of its file. A record, category or
+  action icon is drawn in `currentColor` and registered with the
+  `academic_base` provider that inlines it, so it follows the text colour in
+  the backend and the frontend, on the dark cards of a dark colour scheme
+  included.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.

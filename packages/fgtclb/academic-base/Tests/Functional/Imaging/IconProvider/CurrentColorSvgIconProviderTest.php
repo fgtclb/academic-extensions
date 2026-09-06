@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicBase\Tests\Functional\Imaging\IconProvider;
 
 use FGTCLB\AcademicBase\Tests\Functional\AbstractAcademicBaseTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
@@ -58,25 +57,14 @@ final class CurrentColorSvgIconProviderTest extends AbstractAcademicBaseTestCase
     }
 
     /**
-     * The two cores differ here, and both outcomes are pinned. TYPO3 v13 re-serialises
-     * the file with `simplexml` and keeps the comment. TYPO3 v14 sanitises it through
-     * `enshrined/svg-sanitize`, whose `Sanitizer::cleanUnsafeNodes()` removes every node
-     * that is neither an element nor text - a comment goes with them, so a licence
-     * attribution inside the file does not reach the markup there.
+     * Both cores sanitise now, and `Sanitizer::cleanUnsafeNodes()` removes every node that
+     * is neither an element nor text - a comment goes with them. A licence attribution
+     * inside the file therefore does not reach the rendered page on either core; it stays
+     * in the source for whoever reads the repository and has to be given elsewhere where
+     * the licence wants it in the output.
      */
     #[Test]
-    #[Group('not-core-14')]
-    public function licenceCommentSurvivesInliningOnCore13(): void
-    {
-        $markup = $this->getIcon('test-current-color-arrow')->getMarkup();
-
-        $this->assertStringStartsWith('<svg', $markup);
-        $this->assertStringContainsString('<!-- Test Icons v1.0 - https://example.com/icons - License: CC BY 4.0 -->', $markup);
-    }
-
-    #[Test]
-    #[Group('not-core-13')]
-    public function licenceCommentIsDroppedBySanitizerOnCore14(): void
+    public function licenceCommentIsDroppedBySanitizer(): void
     {
         $markup = $this->getIcon('test-current-color-arrow')->getMarkup();
 
@@ -85,14 +73,43 @@ final class CurrentColorSvgIconProviderTest extends AbstractAcademicBaseTestCase
         $this->assertStringContainsString('<path fill="currentColor"', $markup);
     }
 
+    /**
+     * TYPO3 v13's `getInlineSvg()` removes `<script>` elements and nothing else - an
+     * `onload`, an `onclick` and a `javascript:` href all reach the markup there. That was
+     * harmless while the default markup was an `<img>`; this provider inlines the file into
+     * the document, so the provider runs the sanitiser itself on v13. All three have to be
+     * gone on both cores, and the drawing has to survive.
+     */
     #[Test]
-    public function scriptElementIsStripped(): void
+    public function activeContentIsStripped(): void
     {
         $markup = $this->getIcon('test-current-color-scripted')->getMarkup();
 
         $this->assertStringNotContainsString('<script', $markup);
         $this->assertStringNotContainsString('alert(', $markup);
+        $this->assertStringNotContainsString('onload', $markup);
+        $this->assertStringNotContainsString('onclick', $markup);
+        $this->assertStringNotContainsString('javascript:', $markup);
         $this->assertStringContainsString('<path fill="currentColor"', $markup);
+    }
+
+    /**
+     * `enshrined/svg-sanitize` throws `\LogicException` 1570870568 out of
+     * `XPath::handleDefaultNamespace()` for a document that does not carry exactly one
+     * `<svg>` root. Nothing below the provider catches it on either core: TYPO3 v13 runs the
+     * sanitiser through `SvgSanitizer` here, and on TYPO3 v14
+     * `AbstractSvgIconProvider::getInlineSvg()` catches `InvalidSvgException` only while
+     * `SvgDocumentFactory::fromStringAndSanitize()` runs the same sanitiser. Without the
+     * provider's guard the exception leaves `IconFactory::getIcon()`, so a record list or a
+     * page tree carrying such an icon answers 500 rather than rendering one icon less.
+     */
+    #[Test]
+    public function fileWithoutAnSvgRootRendersEmptyMarkup(): void
+    {
+        $icon = $this->getIcon('test-current-color-wrong-root');
+
+        $this->assertSame('', $icon->getMarkup());
+        $this->assertSame('', $icon->getAlternativeMarkup(AbstractSvgIconProvider::MARKUP_IDENTIFIER_INLINE));
     }
 
     #[Test]

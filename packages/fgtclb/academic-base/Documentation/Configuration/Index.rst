@@ -135,9 +135,19 @@ the frontend.
 
 The core provider :php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`
 renders the default markup as an `<img>` tag. An image is opaque to CSS, so
-such an icon keeps the colours of its file. That is right for a record or a
-brand icon drawn in fixed colours, and wrong for an action icon that should
-match the text next to it.
+such an icon keeps the colours of its file. That is right for a brand icon
+drawn in fixed colours and meant to look the same on every background, and
+wrong for anything that should match the text next to it - a record icon in
+the record list as much as an action icon in a button.
+
+Two groups of icons of the academic extensions use it. The control icons of the
+public profile and of the profile editing view, which sit inside buttons whose
+colour has to reach the glyph. And every icon a TCA record type resolves -
+the record icons of the extensions, the two academic page type icons, and the
+category type icons of the extensions that ship category types, which are
+registered programmatically by :php:`EXT:category_types` and ask for it with
+`inlineIcon: true` in their :file:`Configuration/CategoryTypes.yaml`. Brand
+icons stay with the core provider.
 
 ..  _configuration-icon-provider-opt-in:
 
@@ -181,18 +191,23 @@ has to be drawn for that:
     element, and no hardcoded colour anywhere - not as an attribute and not
     in a `<style>` element. A hardcoded colour is exactly what this provider
     exists to avoid.
-*   No `id` attributes. The markup may appear more than once in one
-    document, and a duplicated `id` is invalid HTML.
-*   No `<script>` element and no event handler attributes. TYPO3 v14 sanitises
-    the file before inlining it; TYPO3 v13 strips `<script>` elements only. The
-    provider inlines files an extension ships and registers itself, never
-    uploads - the same trust boundary as the `inline` markup of the core
-    provider.
-*   A comment is kept on TYPO3 v13 and removed on TYPO3 v14, where the core
-    sanitises the file before inlining it. A licence attribution the icon set
-    requires can stay inside the file for the source, but the rendered page
-    does not carry it on v14 - give it in the documentation or a credits line
-    where the licence requires attribution in the output.
+*   No `id` attributes and no `<style>` element. The markup may appear more
+    than once in one document, and once inlined an `id` and a style rule are
+    global: two files that both carry Adobe Illustrator's defaults
+    (`id="SVGID_1_"`, `.st0`) will paint each other's shapes and resolve each
+    other's `clip-path`.
+*   No `<script>` element and no event handler attributes. The provider
+    sanitises the content on both core versions - TYPO3 v14 does it itself, and
+    on TYPO3 v13, whose `getInlineSvg()` removes `<script>` elements and nothing
+    else, the provider runs
+    :php:`\TYPO3\CMS\Core\Resource\Security\SvgSanitizer` before inlining.
+    That is a filter, not a licence: the provider is still meant for files an
+    extension ships and registers itself, never uploads.
+*   A comment does not survive the sanitiser on either core version. A licence
+    attribution the icon set requires can stay inside the file for whoever reads
+    the repository, but the rendered page never carries it - give it in the
+    documentation or a credits line where the licence requires attribution in
+    the output.
 
 ..  code-block:: xml
     :caption: EXT:my_extension/Resources/Public/Icons/add.svg

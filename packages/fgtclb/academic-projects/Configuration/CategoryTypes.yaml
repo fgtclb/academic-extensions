@@ -7,15 +7,19 @@ types:
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.competence_field'
     group: projects
     icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/CompetenceField.svg'
+    inlineIcon: true
   - identifier: cooperation
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.cooperation'
     group: projects
     icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Cooperation.svg'
+    inlineIcon: true
   - identifier: funding_partner
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.funding_partner'
     group: projects
     icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/FundingPartner.svg'
+    inlineIcon: true
   - identifier: department
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.department'
     group: projects
     icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Department.svg'
+    inlineIcon: true
