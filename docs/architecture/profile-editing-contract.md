@@ -715,6 +715,134 @@ the update that started it: the owner removes the element when it hears that,
 and tearing the tree out from inside its own `updated()` is how an element ends
 up writing into detached nodes.
 
+## The focus ring the editor draws itself
+
+The stylesheet takes exactly one appearance away from the surrounding theme: the
+focus ring of the controls and the buttons. Bootstrap draws that ring with
+`box-shadow`, and `bk2k/bootstrap-package` layers two opaque rings behind
+Bootstrap's translucent one — `0 0 0 2px #ffffff` and `0 0 0 4px #000000` on
+`:focus-visible` of `.form-control`, `.form-select`, `.form-check-input`,
+`.form-group input[type=file]` and, in a second rule, of `.btn`. Shadows paint in
+the order they are written, so the black one covers all four pixels while the
+white one covers the inner two, and the accent ring on top is translucent: the
+outer half of the ring reads as a hard black rectangle tight around the control
+(ACE-521). Rendered and read back pixel by pixel, that band is `#161e18` on the
+theme's light body background.
+
+Three things are wrong with drawing a focus ring that way, and only the first is
+cosmetic.
+
+**A shadow is painted outside the border box, and two of the editor's panels clip
+exactly there.** `__document-collapse-content` and `__image-editor-content` carry
+`overflow: hidden` for the `grid-template-rows` collapse. The `.row` inside them
+pulls itself out with `margin: -1rem -0.5rem 0` and every `.row > *` puts the
+gutter back as padding, so a full width control lands with its left and its right
+border edge *on* the clipping rectangle — and on all four edges when it is the
+only row. Everything painted outside the border box there is cut away: a
+`box-shadow`, and an `outline` with a positive `outline-offset` just the same.
+Measured in Chrome against the real theme stylesheet, a focused field of a
+document panel and the file input of the image editor — the one `image.ts`
+focuses on every open — carried no ring pixel at all on either side, only
+Bootstrap's `#abbbb0` border at about 2:1 on white.
+
+**Forced colours drops shadows.** The rules that draw a ring that way also set
+`outline: 0`, so what a high contrast user saw was not the site's indicator but
+whatever the browser put in its place. Chromium re-instates its own default focus
+ring there and ignores the author's `outline: 0`; not every engine does. An
+`outline` is kept and recoloured by all of them.
+
+**It is not the extension's to draw.** The theme's rule is `:focus-visible` only.
+Bootstrap's own `:focus` rules for a control draw a soft `border-color` and a
+translucent glow and never showed the black rectangle, so a pointer click on a
+checkbox or a switch — the two that do not match `:focus-visible` in Chrome —
+was never affected by the defect. A pointer click on a text input or a select
+does match it and was.
+
+The editor therefore draws its own ring, as a real `outline`, inside the border
+box:
+
+```css
+.academic-persons-profile-editing.academic-persons-profile-editing.academic-persons-profile-editing
+    :is(input, select, textarea, button):focus-visible {
+    outline: 0.125rem solid currentcolor;
+    outline-offset: -0.25rem;
+    box-shadow: none;
+}
+```
+
+Five decisions in it are worth keeping:
+
+- **The outline is sunk into the control.** A negative `outline-offset` puts the
+  indicator inside the border box, where no ancestor `overflow: hidden` reaches
+  it. Two pixels deeper than the ring is wide, so that the control's own outer
+  two pixels still show: flush with the border box the white `currentcolor` of a
+  focused `.btn-success` sat directly against the white page and the button read
+  as two pixels smaller rather than as focused, and the red border of a control
+  marked `is-invalid` disappeared under the ring.
+- **`box-shadow: none`, not another shadow.** One declaration replaces the whole
+  stack — the black ring, the white ring, the `var(--bs-box-shadow-inset)` of
+  Bootstrap's `:focus` rule and Bootstrap's own glow. Anything left there would
+  be decoration: it is clipped in the panels and dropped in forced colours, so
+  it cannot be the indicator.
+- **The colour is `currentcolor`.** It is the colour the control draws its own
+  text in, so it contrasts with the control by construction, in any palette and
+  in either colour mode — a colour that did not would make the control
+  unreadable first. `.form-check-input` is the exception and the reasoning does
+  not carry there: Bootstrap paints the tick and the switch knob as a
+  background image with a hardcoded `#ffffff` rather than in `currentcolor`, so
+  the ring takes the inherited body colour. Measured against the shipped theme,
+  `#212121` on the `#577760` of a checked control is 3.23:1 — over the 3:1 of
+  WCAG 2.1 SC 1.4.11 and not by much, and a darker `$primary` drops below it. A
+  Bootstrap custom property does not manage even that much:
+  `--bs-primary-text-emphasis` is dark by design and measures 1.6:1 against the
+  green of a focused `.btn-success`. It is also why there is no
+  `prefers-color-scheme` block: that media query reports the operating system
+  setting while Bootstrap's colour mode is the `data-bs-theme` attribute, and
+  the two disagree in two of their four combinations.
+- **`:focus-visible`, not `:focus`.** It is the pseudo-class the theme's two
+  rules use, so it is exactly where the defect is, and it is what Bootstrap
+  itself uses for buttons. Pointer focus on a checkbox or a switch then keeps
+  the soft glow Bootstrap has always drawn for it rather than gaining a hard
+  ring it never had — measured in Chrome, a click on those two does not match
+  `:focus-visible`, a click on a text input or a select does.
+- **The plugin root stands three times for specificity, not for scope.** One is
+  not enough: at two class selectors and a pseudo-class the rule ties
+  `.form-control.is-invalid:focus` and loses outright to
+  `.form-group input[type=file]:focus-visible`, which is what the theme's compat
+  layer `@extend`s `.form-control` into. Three puts it at four class selectors
+  and a tag name, above every rule of `bootstrap5-theme.css` that can match
+  markup these templates produce.
+
+It reaches `input`, `select`, `textarea` and `button` rather than a list of
+Bootstrap classes, because those four tags are every control and every button
+the templates render and an override can strip an element of a class but not of
+its tag name.
+[`AcademicPersonsEditProfileEditingFocusRingTest`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileEditingFocusRingTest.php)
+asserts the other direction — that the view renders no focusable widget outside
+those four, and that every control and button still carries the Bootstrap class
+that gives it the border the inset ring sits on.
+
+Plain links are deliberately outside it. The back link of
+`Templates/Profile/Index.html` is the only anchor the view renders, no theme
+rule sets `outline: 0` on it, it never showed the doubled ring, and an inset
+outline on an inline-flex link would be drawn across its own text. The three
+`tabindex="-1"` headings the editors move focus to are outside it for the same
+reason: they are announcement targets, not controls.
+
+CKEditor 5 is half inside it, deliberately. `ClassicEditor.create()` puts its
+container, its toolbar and its editable where the rich text textarea was, so
+all of it sits below the plugin root. The editable is a `div`, so it is outside
+the rule and keeps the library's `--ck-color-focus-border`. The toolbar is made
+of `button` elements and is inside it: a toolbar button focused from the
+keyboard takes this ring rather than the library's, and the `box-shadow` reset
+takes the library's focus shadow off it.
+
+Excluding the subtree would mean `:not(.ck *)`, and a browser that does not
+parse a complex `:not()` drops the whole rule and leaves the view with no focus
+indicator anywhere — a worse failure than one appearance too many. The rule's
+own reason applies here as well: one focus appearance for everything the
+visitor can focus.
+
 ## Nothing else ships with it
 
 The editor vendors no library at all. Both of the two it uses are delivered by
