@@ -34,6 +34,7 @@ const browserGlobals = [
     'File',
     'FormData',
     'HTMLButtonElement',
+    'HTMLDialogElement',
     'HTMLElement',
     'HTMLFieldSetElement',
     'HTMLFormElement',
