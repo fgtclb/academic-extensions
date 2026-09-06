@@ -13,7 +13,7 @@ as `data-*` attributes on one element, the plugin root of
 | Endpoints | 14    | `data-update-url`, `data-toggle-contract-contact-visibility-url` |
 | Profile   | 2     | `data-profile-uid`, `data-editor-language`                       |
 | Image     | 5     | `data-has-image`, `data-image-cropper-ratio`                     |
-| Messages  | 22    | `data-message-saving`, `data-message-document-delete-confirm`    |
+| Messages  | 24    | `data-message-saving`, `data-message-document-delete-confirm`    |
 | Labels    | 6     | `data-label-document-add`, `data-label-document-empty`           |
 
 Only the labels a *value* is composed from travel this way — the heading of a
@@ -152,8 +152,80 @@ The profile fields have exactly two states and they are exclusive.
 **Single field.** One field, or one group of fields, is opened by its own
 control and carries the three buttons of
 [`Partials/Profile/Field/Actions.html`](../../packages/fgtclb/academic-persons-edit/Resources/Private/Partials/Profile/Field/Actions.html):
-clear, undo, save. Every document and contact editor works the same way and is
-not affected by anything below.
+clear, undo, save. Every document and contact editor works the same way, and
+all of them are one population to the rule that follows.
+
+**At most one editor of the profile is open**, whichever module drives it: a
+field, a group, the whole form, a document row, a contact of a contract. The
+modules share no state, so
+[`profile/editors.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/editors.ts)
+is where they meet. Each registers, once per root, an `OpenEditor` — `isOpen`,
+`isBusy`, `isDirty`, `save`, `discard` — and each calls `closeOtherEditors()`
+before it opens one. An editor that holds the values it was opened with is
+discarded on the spot, exactly as its own undo or cancel would close it. An
+editor with changes is not: `askUnsavedChanges()` clones the `unsaved-changes`
+template of
+[`Partials/Profile/UnsavedChanges.html`](../../packages/fgtclb/academic-persons-edit/Resources/Private/Partials/Profile/UnsavedChanges.html)
+— a `<dialog>`, `showModal()` where the browser has it and the `open`
+attribute where it does not, never `window.confirm()` — and the answer is one
+of three. `save` runs the open editor's `save()`, which stores exactly what its
+own save button would store and resolves `false` on a refusal, in which case
+the visitor stays in the refused editor and nothing opens; `discard` runs its
+`discard()`; `cancel`, and `Escape`, open nothing. The answer is synchronous
+for as long as it can be — only an editor with changes turns it into a
+promise — so a pencil pressed on a quiet page is as immediate as it was
+before the modules knew of each other. A busy editor, one with a request on
+its way, is neither saved nor discarded: the caller opens nothing and the
+polite region says `messages.saveInProgress`.
+
+The profile fields register one handle for their two states — the open field
+or group, or the whole form — whose `save()` is `saveFields()` of the open
+editor respectively `applyForm()`, and whose `discard()` is
+`discardOpenEditors()` respectively `discardForm()`. The document controller
+registers one handle for its panel; a dirty contact editor inside the panel
+makes the panel dirty, and its `save()` stores the contact first and the
+document after it, stopping at the first refusal. Switching between two
+contacts of the same contract asks the same question inside the controller,
+because the contact editor is a property of the panel rather than a second
+one. The image editor is deliberately not registered: it is an upload and crop
+wizard without a baseline to compare against, and its own delete already
+confirms in place.
+
+**A discard that threw a value away is announced**, politely, with
+`messages.discarded` — and only then: an editor closed with the value it was
+opened with says nothing. The undo beside a field keeps its silence because
+there the visitor asked for the discard; here they chose it in the dialog for
+something else they were about to do, and the row collapsing is the only
+other sign of it, which is no sign at all for a visitor who is not looking at
+it.
+
+**An edit stays open after it is saved.** The document panel and the contact
+editor keep an *edit* open with what they stored — the baseline the dirty
+check compares against is reset to the stored values, and the heading follows
+the title the row now shows — so the next change starts from the record
+rather than from a closed panel. A create and a delete close, as before: there
+is no record for the panel to stand in.
+
+**A pencil does nothing at all while the form is open.** Every editable field
+is already open there, so there is nothing for it to open, and it is silent
+about it: nothing is on its way to the server, and the bar is the way out. In
+the shipped markup that pencil cannot be reached — it sits inside the
+`[data-pe-field-preview]` that carries `d-none` while the editor is open — but
+that is a Bootstrap class in an overridable partial, and the rule does not rest
+on it.
+
+The open editors are read off the DOM — the `d-none` of the editor element —
+rather than tracked in a variable. Openness already has one source of truth, and
+it is written from more places than the two pencils: `closeFields()`,
+`performSave()` and `leaveFormEditing()` all close editors without one being
+pressed, so a second copy would be wrong the first time one of them was missed.
+
+That reading has one condition: it must not run while full form editing is
+active, where every editor is open and the whole profile would be thrown away.
+The condition is checked by the three call sites — the two pencils and
+`enterFormEditing()`, which runs before the state is entered — rather than
+inside `discardOpenEditors()`, because a pencil pressed in that state has to do
+nothing at all rather than merely skip the discard.
 
 **Full form.** `Edit all` opens every editable field at once. For as long as it
 is open, every `[data-pe-field-actions]`, every `[data-pe-group-actions]` and
@@ -191,12 +263,39 @@ and there is no partial result to undo. That is why nothing on screen is
 reverted on a refusal: the entered values stay, the refused fields are marked,
 and the message is announced once rather than once per field.
 
-**A transition is refused while an apply is in flight.** Undo, discard, the
-toggle and `Escape` all check the same flag `applyForm()` sets before its first
-`await`. The request cannot be un-persisted, so reverting under it would let the
-response write the reverted values into `persistedValues` for every property the
-endpoint does not echo — the baseline would then say "unchanged" for a value the
-database does not hold, and the next apply would not resend it.
+**A transition is refused while a request is in flight, and says so.** Undo,
+discard, `Escape` and the toggle in the closing direction check the same flag
+`applyForm()` sets before its first `await`. The request cannot be un-persisted,
+so reverting under it would let the response write the reverted values into
+`persistedValues` for every property the endpoint does not echo.
+`updateAction()` echoes every property it is sent, so what that costs today is a
+flicker — the values move and are moved back, with nothing saying why. The
+refusal is what keeps it to a flicker if an endpoint ever stops echoing: the
+baseline would then say "unchanged" for a value the database does not hold, and
+the next apply would not resend it.
+
+Opening an editor discards one, so a pencil asks the same question about a
+*single field* save, and so does the toggle in the opening direction — which is
+where it stops asking the same question as its closing direction. A
+single-field save sets no flag of its own: `aria-busy` is written several
+microtasks into the call and only for a save that reaches the endpoint.
+`saveFields()` therefore counts the saves that are on their way, incremented
+before the call returns to the handler that made it — a counter rather than a
+flag, because an autosaving checkbox writes on change and two saves can
+overlap. While one is counted, a pencil, `Edit all`, and the clear and undo
+beside a field or a group all do nothing at all, not even open the editor that
+was asked for.
+
+Every one of those refusals writes `messages.saveInProgress` into the polite
+region. `aria-busy` is not an answer to it: it is set after the refusal starts
+and it asks a screen reader to keep quiet rather than telling anyone anything,
+so without a message a refused control is one that does nothing and says
+nothing — which is what a broken control looks like.
+
+Waiting for the answer has a price, and it is paid by a request that is
+accepted and never answered: `requestJson()` has no timeout, so the editors of
+that profile stay refused until the page is reloaded. Where that becomes worth
+fixing, it is fixed in the request layer, not here.
 
 **`Escape` and `Ctrl`/`Cmd`+`Enter` are bound to each `[data-pe-fields-form]`,
 never to the root.** A document, contact or image editor may be open at the same
