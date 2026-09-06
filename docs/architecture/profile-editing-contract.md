@@ -14,7 +14,7 @@ as `data-*` attributes on one element, the plugin root of
 | Profile   | 2     | `data-profile-uid`, `data-editor-language`                       |
 | Image     | 5     | `data-has-image`, `data-image-cropper-ratio`                     |
 | Messages  | 22    | `data-message-saving`, `data-message-document-delete-confirm`    |
-| Labels    | 7     | `data-label-document-add`, `data-label-document-empty`           |
+| Labels    | 6     | `data-label-document-add`, `data-label-document-empty`           |
 
 Only the labels a *value* is composed from travel this way — the heading of a
 contact editor is `${documentAdd} ${section.singularLabel}`, an empty display
@@ -497,6 +497,63 @@ change — `pending`, `error`, `errors` — which is written onto the panel that
 there. A refusal arrives while the visitor is looking at what they typed, and
 rebuilding would replace every control and every live CKEditor with a fresh one.
 
+**Every control of a panel stands in one action bar below the form.** The panel
+header carries the heading and nothing else, in both partials. A second cancel
+in the header did the same as the one in the bar wherever there was a form to
+abandon, and in view mode — where there is none — it was the only control the
+panel had, labelled `Cancel` in a panel that discards nothing. The row control
+that opened a read view is what closes it, and it carries the `aria-expanded`
+that says so.
+
+**The eye of a row says it in a second way as well.** `aria-expanded` is the
+whole answer for a screen reader and was, for a while, the whole answer for
+everybody: an eye captioned `View` stood above a panel that was already open,
+and pressing it a second time looked like asking for the same thing twice. So
+the button carries **both** icons — `academic-persons-edit-view` and
+`academic-persons-edit-view-close` — each in its own wrapper, one of them
+`hidden`, and **both** labels, as `data-pe-label-collapsed` and
+`data-pe-label-expanded`. `setExpanded()` of `profile/common.ts` is the single
+writer: it sets `aria-expanded`, flips the two wrappers and rewrites
+`aria-label` and `title` from the two attributes. Fluid still owns every tag
+and every string; the browser owns one attribute on each of them. A control
+that carries neither the wrappers nor the labels — the pencil, the bin, the add
+control of a section — goes through the same function and gets nothing but its
+`aria-expanded`, so there is one code path and not two.
+
+**The action group of a row is drawn in one line.** A `.row` wraps, and a grid
+column's automatic minimum size is the widest word it holds, so a long title
+used to push the group — up to six buttons, in the lectures section — onto a
+line of its own below the text. Three things answer it together, and none of
+them is a width in a stylesheet: the fixed date columns are `col-md-2` rather
+than `col-md-3` in both the rows and the header above them, the text cells
+carry `text-break`, and the group carries `col-md-auto flex-shrink-0` with
+`justify-content-center` below `md` and `justify-content-md-end ms-md-auto`
+from `md` up — so it stacks centred under the text on a phone and stands at the
+right edge of the row on a desktop. The one part Bootstrap has no utility for is
+the automatic minimum size, and `profile-editing.scss` takes it away with a
+`min-width: 0` keyed on the three hooks the header, the document rows and the
+contact rows already carry.
+
+**With a keyboard that close path is `Shift`+`Tab` out of the panel.** The
+collapse target follows the row's action group directly — in
+`Documents/ContractRow.html`, in `Documents/ProfileInformationRow.html` and in
+the `contact-row` prototype — so the tab order walks back over at most the four
+row controls to the toggle that opened the panel. Nothing inside a panel closes
+it from the keyboard: the only `keydown` listener of the profile frontend is
+the one `fields.ts` binds on the per-field editor form, and no panel binds one
+of its own. The read view is not a dialog, does not trap focus and is scrolled
+into view rather than layered over the page, so the walk back is a convenience
+question rather than a way out of a trap.
+
+**An override that keeps the removed header degrades rather than breaks.**
+`fillPrototype()` throws on a *value* whose key the prototype does not declare,
+not on a `data-pe-when` no value fills: a leftover `data-pe-when="showClose"`
+reads `undefined`, is falsy, and the condition takes the stale button with it.
+An overridden `Editor.html` or `ContractContactEditor.html` therefore renders
+the panel without the header control instead of failing the element's update —
+which is the general promise both documentation pages make, stated here for the
+one removal an integrator is likely to have copied.
+
 The rebuild uses `replaceChildren()`, and that is the whole teardown story: the
 platform disconnects everything it removes, so every rich text element of the
 previous panel is destroyed by its own `disconnectedCallback()`. Scoping the
@@ -626,6 +683,12 @@ rendered by Fluid **inside the prototype that draws it** — the help button, th
 five row controls of a contact, the add control of a section — so it is part of
 the markup an override reaches, and no module ever looks one up. There is no
 icon registry, no icon module and no `<template data-pe-icon>` block.
+
+A control whose glyph depends on its state is drawn the same way, twice over:
+the view control renders both eyes, one of them `hidden`, and the browser flips
+the attribute rather than resolving a second identifier. That is why
+`academic-persons-edit-view-close` is a registration like any other and not a
+string any module knows.
 
 ## The transition the editors open and close with
 
