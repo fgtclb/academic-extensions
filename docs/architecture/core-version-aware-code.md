@@ -81,23 +81,38 @@ A wrong guess in this one place is therefore not caught by "the backend still
 loads". Both directions are covered by tests, see
 [Core version aware tests](#core-version-aware-tests).
 
-**`CurrentColorSvgIconProvider::generateInlineMarkup()` — line 76.** The
+**`CurrentColorSvgIconProvider::generateInlineMarkup()` — line 75.** The
 parent `AbstractSvgIconProvider::getInlineSvg()` reads the file straight from
-disk on v13 and needs an absolute path; on v14 it resolves an `EXT:` path
-itself through `SystemResourceFactory`. The provider therefore resolves the
-path with `GeneralUtility::getFileAbsFileName()` on v13 only and hands v14 the
-path unchanged, so its resource resolution is not bypassed:
+disk on v13, needs an absolute path and sanitises next to nothing; on v14 it
+resolves an `EXT:` path itself through `SystemResourceFactory` and runs the
+full `enshrined/svg-sanitize` pass. The switch is therefore not one condition
+on one value any more but an early return: v14 is handed the path unchanged so
+that its resource resolution is not bypassed, and v13 gets a pipeline of its
+own in `getSanitizedInlineSvg()` that adds the sanitising v14 already does.
 
 ```php
-if ((new Typo3Version())->getMajorVersion() < 14
-    && (PathUtility::isExtensionPath($source) || !PathUtility::isAbsolutePath($source))
-) {
+if ((new Typo3Version())->getMajorVersion() >= 14) {
+    try {
+        return $this->getInlineSvg($source);
+    } catch (\LogicException) {
+        return '';
+    }
+}
+if (PathUtility::isExtensionPath($source) || !PathUtility::isAbsolutePath($source)) {
     $source = GeneralUtility::getFileAbsFileName($source);
 }
+return $this->getSanitizedInlineSvg($source);
 ```
 
-One condition applied to one value, with a `@todo` naming the v13 support end
-as its exit — the shape the rule below asks for. What it guards is measured in
+The `catch` is not part of the version difference and is not version aware: the
+sanitiser throws `\LogicException` 1570870568 for a document without exactly
+one `<svg>` root on both cores, and neither core catches it — v14's own
+`getInlineSvg()` catches `InvalidSvgException` only. The provider degrades to
+no markup in both branches so that a broken icon file cannot fail the request
+that renders it.
+
+The whole method carries a `@todo` naming the v13 support end as its exit — the
+shape the rule below asks for. What it guards is measured in
 [Icons](icons.md#how-the-provider-is-wired-per-core-version).
 
 ### A switch inside a configuration file
