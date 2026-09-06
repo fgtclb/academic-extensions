@@ -23,7 +23,9 @@ $tcaConfiguration = [
         'enablecolumns' => [
             'disabled' => 'hidden',
         ],
-        'iconfile' => 'EXT:academic_study_plan/Resources/Public/Icons/category.svg',
+        'typeicon_classes' => [
+            'default' => 'academic-study-plan-category',
+        ],
         'security' => [
             'ignorePageTypeRestriction' => true,
         ],

@@ -9,6 +9,7 @@ return [
             'group' => 'projects',
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/CompetenceField.svg',
             'priority' => 0,
+            'inlineIcon' => true,
         ],
         1 =>  [
             'identifier' => 'cooperation',
@@ -17,6 +18,7 @@ return [
             'group' => 'projects',
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Cooperation.svg',
             'priority' => 0,
+            'inlineIcon' => true,
         ],
         2 =>  [
             'identifier' => 'funding_partner',
@@ -25,6 +27,7 @@ return [
             'group' => 'projects',
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/FundingPartner.svg',
             'priority' => 0,
+            'inlineIcon' => true,
         ],
         3 =>  [
             'identifier' => 'department',
@@ -33,6 +36,7 @@ return [
             'group' => 'projects',
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Department.svg',
             'priority' => 0,
+            'inlineIcon' => true,
         ],
     ],
 ];

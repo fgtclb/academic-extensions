@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but seven PHP traits — the parts of the test setup that were being copied
+but eight PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -15,6 +15,7 @@ necessary.
 | [`DeprecatedCoreLabelsTrait`](#deprecatedcorelabelstrait)                       | Guards TCA against core labels TYPO3 v14 retired.                   |
 | [`EnsureTtContentListTypeColumnTrait`](#ensurettcontentlisttypecolumntrait)     | Re-creates `tt_content.list_type` where v14 removed it.             |
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
+| [`ColourSchemeAwareIconsTrait`](#colourschemeawareiconstrait)                   | Asserts a record icon follows the backend colour scheme.            |
 
 ## How an extension gets access
 
@@ -484,6 +485,61 @@ pairing is reported as such.
 The class docblock carries a `@todo` proposing extraction into a dedicated
 public helper package with its own TYPO3 and testing-framework constraints. Not
 done; the trait is used by one test class today.
+
+## `ColourSchemeAwareIconsTrait`
+
+Four assertions for one icon identifier, plus one that derives the whole set
+from the TCA. Used by the `Tests/Functional/Imaging/RecordIconsTest.php` of every
+extension that ships record icons and by the category type registration test of
+`typo3-category-types`:
+
+```php
+use ColourSchemeAwareIconsTrait;
+
+#[Test]
+#[DataProvider('recordIconIdentifiers')]
+public function recordIconIsRegisteredWithTheColourSchemeAwareProvider(string $identifier): void
+{
+    $this->assertIconIsRegisteredWithCurrentColorProvider($identifier);
+}
+```
+
+— [`academic-persons/Tests/Functional/Imaging/RecordIconsTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Imaging/RecordIconsTest.php)
+
+| Method                                             | Asserts                                                                  |
+|----------------------------------------------------|--------------------------------------------------------------------------|
+| `assertIconIsRegisteredWithCurrentColorProvider()` | Registered, and with `CurrentColorSvgIconProvider` rather than core's.   |
+| `assertIconIsInlinedInBothMarkups()`               | Default markup is the inlined file, and equals the `inline` alternative. |
+| `assertIconMarkupFollowsTheTextColour()`           | `currentColor`, no hex colour, no `<style>`, no `id`.                    |
+| `assertRenderedIconCarriesItsIdentifier()`         | `data-identifier`, no `default-not-found`, no `<img>`.                   |
+| `assertEveryRecordTypeIconIsColourSchemeAware()`   | Same, for every record icon the TCA of one extension names.              |
+
+**The trap it exists for.** `IconFactory::getIcon()` answers an unknown
+identifier with the `default-not-found` placeholder instead of failing, so a
+registration that no longer resolves ships silently — which is why the first and
+the last method both check the identifier that came back. And the provider is
+not visible in the rendered page at all until the colour scheme is dark: a
+record icon left with the core `SvgIconProvider` renders as an `<img>`, keeps
+the ink of its file, and only then turns into a dark glyph on a dark card
+(ACE-523).
+
+**Why the fifth method exists.** The other four take an identifier, and the
+identifiers are spelled out per extension so a rename has to be made twice. A
+hand written list is good at catching a change to what is on it and structurally
+unable to catch what was never added, so
+`assertEveryRecordTypeIconIsColourSchemeAware('academic_persons')` derives the set
+instead: it walks `ctrl.iconfile` and `ctrl.typeicon_classes` of every TCA table,
+keeps what the source path of the registered icon attributes to that extension,
+and fails on a `ctrl.iconfile` (which bypasses the registry), on a file path where
+an identifier belongs (`registerTCAIcons()` registers `ctrl.iconfile` only, so the
+backend renders `default-not-found`) and on any identifier that is not registered
+with `CurrentColorSvgIconProvider`. `tt_content` is exempt from the last check,
+because its `typeicon_classes` entries are the content element brand marks. It
+also asserts that the walk found something, so it cannot pass by finding nothing.
+
+The identifiers are listed per extension rather than read out of
+`Configuration/Icons.php`, so a rename has to be made twice instead of silently
+agreeing with itself.
 
 ## See also
 

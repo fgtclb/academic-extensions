@@ -33,23 +33,45 @@ ships it:
 
 The file has to be drawn for inlining: a `viewBox`, `fill="currentColor"` or
 `stroke="currentColor"` on the shapes, no hardcoded colours, no `id`
-attributes - the markup may appear several times in one document - `width`
-and `height` of `1em` for frontend use, which both core versions keep, and no
-`<script>` element and no event handler attributes. TYPO3 v14 sanitises the
-file before inlining it; TYPO3 v13 strips `<script>` elements only - the
-sources are files an extension ships and registers itself, never uploads,
-which is the same trust boundary as the core provider's `inline` markup.
-A comment is kept on TYPO3 v13 and removed on TYPO3 v14, where the core
-sanitises the file before inlining it - a licence attribution inside the file
-reaches the rendered page on v13 only. A source file that does not exist
-renders empty markup, as it does with the core provider's `inline` markup.
+attributes and no `<style>` element - the markup may appear several times in
+one document, and both an `id` and a style rule are document global once
+inlined - and `width` and `height` of `1em` for frontend use, which both core
+versions keep.
+
+The content is sanitised on both core versions. TYPO3 v14 does that itself;
+TYPO3 v13 removes `<script>` elements and nothing else, so the provider runs
+:php:`\TYPO3\CMS\Core\Resource\Security\SvgSanitizer` there before inlining -
+an `onload` attribute, an `onclick` attribute and a `javascript:` href would
+otherwise reach the markup, which was harmless while the default markup was an
+`<img>` and is not once the file is part of the document. The sources are still
+meant to be files an extension ships and registers itself, never uploads: the
+sanitiser closes a hole, it does not make an arbitrary file safe to inline.
+
+A comment does not survive the sanitiser on either core, so a licence
+attribution inside the file stays in the source and never reaches the rendered
+page.
+
+A source the provider cannot inline renders empty markup rather than raising an
+error, on both core versions and whatever the reason: the file does not exist,
+cannot be read, is empty, is not XML, or is XML whose root element is not an
+`<svg>`. The last one is worth naming, because it is where the sanitiser throws
+rather than answering: a `<symbol>` fragment or an HTML document saved under an
+:file:`.svg` name is well-formed XML and passes every parse check, and a record
+list or a page tree carrying such an icon would answer with an error instead of
+rendering one icon less. An icon is decoration and must not be able to fail the
+request that renders it.
 
 The provider needs no configuration of its own and changes nothing until an
-icon is registered with it. This change registers none: the control icons of
-the public profile of `EXT:academic_persons` and of the profile editing view
-of `EXT:academic_persons_edit` are registered with it by the changes that
-introduce those views. Every other icon of the academic extensions stays with
-the core :php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`.
+icon is registered with it. Two groups of icons of this release are registered
+with it. Nineteen control icons: the six of the public profile of
+`EXT:academic_persons` and the thirteen of the profile editing view of
+`EXT:academic_persons_edit`. And every icon a TCA record type resolves - the
+record icons of the academic extensions, the two academic page type icons and
+the twenty category type icons of the three academic extensions that ship
+category types, which ask for it with `inlineIcon: true` in their
+:file:`Configuration/CategoryTypes.yaml`. Brand icons, which are drawn in fixed
+colours and are meant to look the same on every background, stay with the core
+:php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`.
 
 Impact
 ======
