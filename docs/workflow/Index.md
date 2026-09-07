@@ -20,7 +20,7 @@ How a change gets from a working copy into a release.
 | Page                                                          | Contents                                                                                                            |
 |---------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | [Commit messages](commit-messages.md)                         | The format, the tags in use, subject and body limits, and where the issue reference goes.                           |
-| [Pull requests](pull-requests.md)                             | Branch naming, the rebase merge model and what it implies, the pre-flight checklist, the repository rules.          |
+| [Pull requests](pull-requests.md)                             | Branch naming, the rebase merge model and what it implies, stacked pull requests, the pre-flight checklist, rules.  |
 | [Backporting](backporting.md)                                 | The maintained targets, and why a backport is analysed rather than cherry-picked — starting with a file-level diff. |
 | [Changelog and documentation](changelog-and-documentation.md) | The two audiences, rendering the manual, and the changelog entry kinds.                                             |
 | [Releasing](releasing.md)                                     | Versions across twelve packages, `bin/set-version` and `bin/release`, and the three-step publishing chain.          |

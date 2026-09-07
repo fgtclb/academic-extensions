@@ -309,6 +309,20 @@ maintained here as `packages/fgtclb/<package>/.github/workflows/publish.yml` and
 is split out with the package, so it is changed in this repository, never
 downstream. See the "Releasing (maintainers)" section of `README.md`.
 
+## Pull requests: one commit each, when it separates
+
+The repository merges by rebase only, so every commit of a pull request lands on
+the target branch on its own. A change that separates into self-contained
+commits may therefore be opened as a **stack**: one pull request per commit,
+each based on the branch of the one below it. It is the shape a TYPO3 Core
+change has on Gerrit, and it makes the gates report per commit rather than per
+branch, which is where a commit that is only green together with its successor
+is caught.
+
+It is **not** required, and a single pull request with several commits stays
+the established shape. What the recipe is, what `gh stack` does and what the
+branch rules mean for a stack: [Pull requests](docs/workflow/pull-requests.md#stacked-pull-requests).
+
 ## Quality gates
 
 Ensure to always install dependency for the core version to test about (`composerUpdate`)
