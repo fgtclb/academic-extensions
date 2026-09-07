@@ -282,6 +282,76 @@ too. Its consequence for anyone editing it: changes to `pr-comment.yml` only
 take effect once they are on the default branch, never within the pull request
 that changes them.
 
+## Stacked pull requests
+
+A change that is large but separable can be opened as a **stack**: one pull
+request per commit, each targeting the branch of the one below it, with the
+bottom one targeting `main`. GitHub recognizes a stack from the base branches
+alone — there is nothing to declare — and shows the layers in the merge box of
+every pull request of it.
+
+This is **optional**. A single pull request carrying several commits is the
+established shape here and stays perfectly acceptable. What follows is how to
+run a stack when one is wanted, and why it is sometimes worth the extra work.
+
+### Why one commit per pull request is worth considering
+
+The repository already requires every commit to stand on its own: rebase is the
+only merge method, so nothing is squashed and each commit lands on the target
+branch with its own message. A stack takes that one step further and gives each
+of those commits its own review thread and its own pipeline. The result is the
+shape a TYPO3 Core change has on Gerrit, where one change is one commit and is
+reviewed and verified alone.
+
+Two things follow that a single large pull request cannot offer:
+
+- **The gates run per commit.** A regression is attributed to the commit that
+  introduced it instead of to a branch of fifteen. A commit that is only green
+  together with the next one — the bisect trap [Rebase merges only](#rebase-merges-only)
+  warns about — is found before the branch is merged rather than months later.
+- **A review is bounded.** A reviewer reads one subject, one message and one
+  diff, and the discussion of a later commit does not block an earlier one from
+  merging.
+
+The cost is real and should be weighed: every layer needs its own description,
+every rebase of a lower layer rewrites all the layers above it, and the
+pipeline runs as many times as there are layers.
+
+### Running a stack with `gh stack`
+
+The GitHub CLI extension is the supported way to keep the branches, the base
+branches and the pull requests consistent:
+
+```bash
+gh extension install github/gh-stack   # once, needs gh 2.90.0 or newer
+gh stack init <branch> [<branch> …]    # adopts existing branches, bottom first
+gh stack view                          # the layers, their pull requests and their state
+gh stack submit                        # pushes every branch and creates or updates its pull request
+gh stack rebase --upstack              # after amending a lower layer: rebase everything above it
+gh stack sync                          # fetch, rebase onto the trunk, push, refresh the pull request state
+```
+
+Without the extension the same thing is done by hand: create one branch per
+commit, `gh pr create --base <branch below>`, and after every amendment of a
+lower layer `git rebase --onto <new lower head> <old lower head> <upper branch>`
+for each layer above it, bottom to top.
+
+### What the repository rules mean for a stack
+
+- **Only the bottom layer is checked against the ruleset of a protected
+  branch.** The intermediate branches are ordinary branches, so a pull request
+  between two of them needs no approval and no `all checks` — but each still
+  runs the full pipeline, and a red layer is a red layer.
+- **Merge bottom to top.** `delete_branch_on_merge` removes the branch a layer
+  was based on; GitHub retargets the layer above onto the merged base
+  automatically, and the next layer is then a pull request against `main`.
+- **Rebase is the only merge method here**, which is what makes the retargeting
+  clean: the commits keep their identity as one commit per layer.
+- **A layer that is rebased loses its approvals** (`dismiss_stale_reviews_on_push`),
+  so amending a lower layer costs a re-approval of every layer above it. That is
+  the main reason to keep the number of layers to what the change genuinely
+  separates into.
+
 ## Backport targets
 
 **The only maintained backport targets are `main` and `2`.**
