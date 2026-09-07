@@ -10,10 +10,10 @@ as `data-*` attributes on one element, the plugin root of
 
 | Group     | Count | Examples                                                         |
 |-----------|-------|------------------------------------------------------------------|
-| Endpoints | 14    | `data-update-url`, `data-toggle-contract-contact-visibility-url` |
+| Endpoints | 15    | `data-update-url`, `data-toggle-document-visibility-url`         |
 | Profile   | 2     | `data-profile-uid`, `data-editor-language`                       |
 | Image     | 5     | `data-has-image`, `data-image-cropper-ratio`                     |
-| Messages  | 24    | `data-message-saving`, `data-message-document-delete-confirm`    |
+| Messages  | 26    | `data-message-saving`, `data-message-document-delete-confirm`    |
 | Labels    | 6     | `data-label-document-add`, `data-label-document-empty`           |
 
 Only the labels a *value* is composed from travel this way — the heading of a
@@ -702,6 +702,16 @@ which dims it through the secondary text colour rather than `opacity` so that
 the controls and the tag keep their contrast, and renders that tag through
 `data-pe-when` — which is why the element fills it with a truthy string rather
 than the empty one.
+
+The document rows have the same switch as the `hide` action of their section,
+rendered by Fluid in `Partials/Profile/Documents/Actions.html` from the
+`hidden` of the record, and written by `updateDocumentRowVisibility()` of
+`profile/documents.ts` — `data-item-hidden` on the row, the tag, the label and
+the glyph of the toggle — from what `toggleDocumentVisibility` answers. The rows are not rebuilt, so
+the caret stays on the button. The editor lists hidden records through
+`ContractRepository::findByProfileIncludingHidden()` and
+`ProfileInformationRepository::findByProfileAndTypeIncludingHidden()`; the
+public views keep the relations, which respect the enable fields.
 
 The document editor creates it and hands it five properties. It calls no
 endpoint: `profile/documents.ts` keeps `openContractContact()`,
