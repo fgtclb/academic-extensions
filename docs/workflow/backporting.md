@@ -121,7 +121,7 @@ unchanged".
 | `COMPOSER_ROOT_VERSION`  | `3.0.0-dev`                      | `2.4.0-dev`                      |
 | PHPStan configurations   | `Build/phpstan/Core13`, `Core14` | `Build/phpstan/Core12`, `Core13` |
 | XLF indentation          | two spaces                       | tabs                             |
-| Test-helper traits       | 7                                | 4                                |
+| Test-helper traits       | 8                                | 4                                |
 | phpunit group names      | `not-core-13`, `not-core-14`     | `not-core-12`, `not-core-13`     |
 | Changelog directory      | `Documentation/Changelog/3.0/`   | `Documentation/Changelog/2.4/`   |
 
@@ -160,17 +160,16 @@ on `main` and was not backported wholesale:
 | `EnsureTtContentListTypeColumnTrait`   | yes    | no  |
 | `FrontendPluginRenderingTrait`         | yes    | yes |
 | `PluginFlexFormDataStructureTrait`     | yes    | no  |
+| `ColourSchemeAwareIconsTrait`          | yes    | no  |
 
-All seven live in
+All eight live in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/` on `main`; branch `2`
 has four of them.
 
-The consequence is concrete for the three that are missing, and it is worth
-checking per change rather than assumed: the whole
-`packages/fgtclb/academic-jobs/Tests/Functional/Plugins/` tree, for instance,
-exists only on `main`, although the trait it uses is on both branches now.
-Backporting a change whose test has no home means one of three things, and the
-choice is worth stating in the pull request:
+Count the directory rather than trusting this table, and check the individual
+extension too: a trait being on both branches does not mean the test directory
+that uses it is. Backporting a change whose test has no home means one of three
+things, and the choice is worth stating in the pull request:
 
 1. backport the production fix without the test,
 2. backport the trait first, as its own change, then the fix with its test,
