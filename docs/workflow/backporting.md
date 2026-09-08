@@ -139,7 +139,7 @@ unchanged".
 | `COMPOSER_ROOT_VERSION`    | `2.4.0-dev`                      | `3.0.0-dev`                      |
 | PHPStan configurations     | `Build/phpstan/Core12`, `Core13` | `Build/phpstan/Core13`, `Core14` |
 | XLF indentation            | tabs                             | two spaces                       |
-| Test-helper traits         | 3                                | 7                                |
+| Test-helper traits         | 4                                | 8                                |
 | phpunit group names        | `not-core-12`, `not-core-13`     | `not-core-13`, `not-core-14`     |
 | Core-version class folders | `Core12/`, `Core13/`             | none                             |
 | Changelog directory        | `Documentation/Changelog/2.4/`   | `Documentation/Changelog/3.0/`   |
@@ -168,26 +168,31 @@ surroundings; do not reformat the file.
 ### The test harness is not at parity
 
 `packages-dev/testing-helper/` — the shared functional-test traits — has grown
-on `main` and was not backported wholesale. This branch has three of the seven:
+on `main` and was not backported wholesale. This branch has four of the eight:
 
 | Trait                                  | `2` — this branch | `main` |
 |----------------------------------------|-------------------|--------|
 | `ExtensionCoreVersionCompatTestsTrait` | yes               | yes    |
 | `ExtensionsLoadedTestsTrait`           | yes               | yes    |
 | `TcaHelperMethodsTrait`                | yes               | yes    |
+| `FrontendPluginRenderingTrait`         | yes               | yes    |
+| `ColourSchemeAwareIconsTrait`          | no                | yes    |
 | `DeprecatedCoreLabelsTrait`            | no                | yes    |
 | `EnsureTtContentListTypeColumnTrait`   | no                | yes    |
-| `FrontendPluginRenderingTrait`         | no                | yes    |
 | `PluginFlexFormDataStructureTrait`     | no                | yes    |
 
 All of them live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`;
-here that directory holds exactly the first three files.
+here that directory holds the first four files. Count it rather than trusting
+this table — it has been wrong before.
 
-The consequence is concrete: a fix on `main` that comes with a frontend plugin
-rendering test has **no home here**. The whole
-`packages/fgtclb/academic-jobs/Tests/Functional/Plugins/` tree exists only on
-`main`. Backporting such a change means one of three things, and the choice is
-worth stating in the pull request:
+The consequence is narrower than the missing four suggest, and it is worth
+checking per change rather than assumed: a trait being on both branches does not
+mean the test directory that uses it is. Frontend plugin rendering tests do have
+a home here — `academic-persons`, `academic-persons-edit` and `academic-jobs`
+each carry a `Tests/Functional/Plugins/` tree — but an extension that has none
+yet needs its fixtures written as part of the backport. Where a test genuinely
+has no home, that means one of three things, and the choice is worth stating in
+the pull request:
 
 1. backport the production fix without the test,
 2. backport the trait first, as its own change, then the fix with its test,
