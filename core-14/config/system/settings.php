@@ -28,6 +28,10 @@ return [
             'profile' => [
                 'autoCreateProfiles' => '0',
                 'createProfileForUserGroups' => '',
+                'feuser' => [
+                    'faxNumberType' => 'business',
+                    'telephoneNumberType' => 'business',
+                ],
             ],
             'types' => [
                 'emailAddressTypes' => 'private=Private,business=Business',
