@@ -125,8 +125,8 @@ Three nodes carrying markup are built in JavaScript rather than cloned from a
 prototype, all of them outside the two editors and each a leaf:
 `profile/documents.ts` writes a document row's title as an `<a>` or a `<span>`
 depending on whether the record carries an allowed link, and puts an em dash
-where the value is empty — the same placeholder Fluid spells as
-`prependOptionLabel`; and `profile/rich-text.ts` writes the empty-state label of
+where the value is empty — the same placeholder the `contact-summary-cell`
+prototype carries; and `profile/rich-text.ts` writes the empty-state label of
 a rich text preview as `<span class="text-body-secondary">`. The remaining
 `document.createElement()` calls make a custom element host, which carries no
 markup of its own until it is filled from a prototype, or the detached render
@@ -136,6 +136,25 @@ root of `elements/base.ts`. Anything larger than a leaf is a prototype.
 grep -rnoP 'classList\.\w+\([^)]*\)|document\.createElement' \
   packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend
 ```
+
+Where markup carries a dash it carries the character, never a character
+reference. Fluid's parser does not decode one inside a ViewHelper argument: the
+argument is an ordinary string, and a ViewHelper that writes it through
+`TagBuilder` or `htmlspecialchars()` escapes it, so the reader is shown the
+reference rather than the character it stands for. In element content the same
+spelling works, because there it is the browser that decodes it — which is why
+one of the two spellings in this editor was wrong and the other was not. No
+profile editing template spells one now, and
+`AcademicPersonsEditProfileEditingTest` keeps it that way.
+
+The empty option a select opens on carries no label at all, and Fluid still
+renders it: `hasArgument()` asks whether the argument was given, not whether it
+is empty, so `prependOptionLabel=""` prepends an unlabelled
+`<option value="">`. The neighbouring `required=""` behaves the opposite way and
+disappears — `AbstractTagBasedViewHelper::initialize()` drops a registered tag
+attribute whose value is the empty string, which is what makes
+`required="{f:if(condition: …, then: 'required')}"` work at all. Same element,
+same spelling, opposite outcome.
 
 The keys are a closed type. `PrototypeSlots` and `PrototypeLists` name them
 exactly as `ProfileEditingHooks` names the hooks, so a key an element fills that
