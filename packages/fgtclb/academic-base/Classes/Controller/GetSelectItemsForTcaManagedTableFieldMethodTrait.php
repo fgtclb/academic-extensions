@@ -66,8 +66,9 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
         foreach ($items as $item) {
             $itemValue = (string)($item['value'] ?? '');
             if (in_array($itemValue, $removeItemByValue, true)) {
-                // Skip empty string values, handled with `<f:form.select prependOptionLabel="---" />`
-                // in the fluid template.
+                // Dropped on the caller's request. A form that needs an entry for
+                // "nothing chosen" prepends its own option for it, which is the
+                // template's decision rather than this one.
                 continue;
             }
             $labelIdentifier = (string)($item['label'] ?? '');
