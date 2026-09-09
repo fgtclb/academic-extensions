@@ -103,6 +103,57 @@ final class ProfileImageMetadataServiceWithFileMetadataTest extends AbstractAcad
     }
 
     /**
+     * A profile save rewrites the two name columns of the metadata record (ACE-559) and
+     * stops there: `copyright` is not a name, and the upload stays its only writer - a
+     * value an editor maintained on the file survives every later save of the profile.
+     */
+    #[Test]
+    public function theProfileSaveRewritesTheNameColumnsAndKeepsTheCopyright(): void
+    {
+        $this->getConnectionPool()->getConnectionForTable('sys_file_metadata')->insert('sys_file_metadata', [
+            'uid' => 1,
+            'pid' => 0,
+            'file' => 1,
+            'title' => 'Editor title',
+            'alternative' => 'Editor alternative',
+            'copyright' => 'Acme University',
+        ]);
+
+        $metadata = $this->get(ProfileImageMetadataService::class)->updateForProfileUid(1);
+
+        $this->assertSame(['title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau'], $metadata);
+        $this->assertSame(
+            [
+                'title' => 'Erika Musterfrau',
+                'alternative' => 'Erika Musterfrau',
+                'copyright' => 'Acme University',
+            ],
+            $this->fetchFileMetadata(),
+        );
+    }
+
+    /**
+     * The same the other way round: a save that has to create the metadata record
+     * writes the two name columns into it and leaves `copyright` empty, where the
+     * upload would have filled it.
+     */
+    #[Test]
+    public function theProfileSaveCreatesTheRecordWithoutACopyright(): void
+    {
+        $metadata = $this->get(ProfileImageMetadataService::class)->updateForProfileUid(1);
+
+        $this->assertSame(['title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau'], $metadata);
+        $this->assertSame(
+            [
+                'title' => 'Erika Musterfrau',
+                'alternative' => 'Erika Musterfrau',
+                'copyright' => '',
+            ],
+            $this->fetchFileMetadata(),
+        );
+    }
+
+    /**
      * @return array<string, string>
      */
     private function fetchFileMetadata(): array

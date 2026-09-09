@@ -126,14 +126,19 @@ It is dispatched for each of the two records that carry image metadata, and
         - Written when
         - Fields
     *   - :sql:`sys_file_metadata`
-        - a profile image is uploaded in the frontend, once, for the file that
-          upload created — and only for the fields that record has empty
-        - :sql:`title`, :sql:`alternative` and, with
-          :composer:`typo3/cms-filemetadata`, :sql:`copyright`
+        - the name of a profile record changes, from a backend save, a
+          localization or a frontend edit — and once more when a profile image
+          is uploaded in the frontend, for the file that upload created
+        - :sql:`title` and :sql:`alternative`; the upload additionally
+          :sql:`copyright`, with :composer:`typo3/cms-filemetadata`
     *   - :sql:`sys_file_reference`
         - the name of a profile record changes, from a backend save, a
           localization or a frontend edit
         - :sql:`title` and :sql:`alternative`
+
+A name change dispatches both, the metadata record of the file first and the
+relation row after it. The two are announced and written independently: a
+listener that empties the map of one has decided nothing about the other.
 
 **Both records are handed over, whichever of them is written.**
 :php:`getFile()` is the file — its own metadata record is
@@ -162,12 +167,26 @@ relation row has no equivalent.
     event writes metadata; repointing a relation or moving a record is the
     :php:`DataHandler`'s business.
 
-The two dispatches are not interchangeable. The metadata record of the file is
-written **once**, which makes it the place for a value that has to survive —
-the required attributes of :composer:`typo3/cms-filemetadata` or
-:composer:`fgtclb/file-required-attributes`, for instance. The reference row is
-rewritten on **every** save of the profile, so a listener that wants to own a
-field there has to set it on every dispatch.
+Both records are rewritten on **every** save of the profile, so a listener that
+wants to own a field on either of them has to set it on every dispatch. What
+differs is how an existing value is treated. The name change **overwrites**
+:sql:`title` and :sql:`alternative` of both records; the upload fills the file's
+metadata record only where it found it empty, and is the sole writer of
+:sql:`copyright`. Two consequences follow from that, and both are deliberate:
+
+*   The file is shared between the languages of a profile, so its metadata
+    record ends up carrying the name of whichever language was saved last. The
+    language-correct text sits on the relation row, and that is what the
+    frontend renders; the metadata record is the fallback for every other place
+    the file is used.
+*   A value a backend editor typed into the file's metadata record is replaced
+    on the next save of the profile. A listener on the :sql:`sys_file_metadata`
+    dispatch is the way to keep one — drop the field from the map, or set the
+    value the installation wants.
+
+A profile without a name leaves the file's metadata record untouched rather than
+blanking it, and a failed metadata write is logged and swallowed: it must not
+turn an otherwise successful save of the profile into an error.
 
 ..  code-block:: php
     :caption: EXT:my_extension/Classes/EventListener/AddImageRightOfUse.php
