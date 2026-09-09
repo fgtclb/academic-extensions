@@ -6,6 +6,7 @@ namespace FGTCLB\TestingHelper\FunctionalTestCase;
 
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaColumnsOverrides;
 use TYPO3\CMS\Backend\Form\FormDataProvider\TcaFlexPrepare;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -111,6 +112,110 @@ trait PluginFlexFormDataStructureTrait
                 ),
             );
         }
+    }
+
+    /**
+     * Asserts that every `valuePicker` of the plugin's FlexForm carries the item
+     * keys the running TYPO3 version actually reads.
+     *
+     * `config.valuePicker.items` is the one item list core never unified across
+     * the two supported versions:
+     *
+     * * TYPO3 v13 reads the positional pair `$item[0]` (label) and `$item[1]`
+     *   (value) in `InputTextElement` and has **no** `TcaMigration` for it.
+     *   Associative keys therefore raise `Undefined array key 1` and, because the
+     *   element declares strict types, a `TypeError` right after — the element
+     *   renders nothing and the record cannot be opened (ACE-560).
+     * * TYPO3 v14 reads `$item['label']` and `$item['value']` (feature #106092)
+     *   and migrates positional pairs on the fly, which makes
+     *   `FlexFormTools::migrateFlexField()` raise `E_USER_DEPRECATED` — a failure
+     *   in this suite, which runs with `failOnDeprecation`.
+     *
+     * So neither shape is valid on both versions. The assertion runs against the
+     * **parsed** data structure, after `FlexFormTools::migrateFlexField()`, and
+     * it is deliberately not symmetric:
+     *
+     * * On TYPO3 v13 this assertion **is** the guard. Nothing migrates the
+     *   associative shape, so it arrives here unchanged and fails loudly.
+     * * On TYPO3 v14 it cannot be. A positional list is rewritten to
+     *   `label`/`value` by `TcaMigration` before it reaches here, so this
+     *   assertion passes on a wrong file. That direction is caught by the
+     *   `E_USER_DEPRECATED` `migrateFlexField()` raises together with
+     *   `failOnDeprecation` in `Build/phpunit/FunctionalTests.xml`, and by the
+     *   per-extension unit test over the shipped XML - for `academic_persons`
+     *   that is `Tests/Unit/Configuration/FlexFormCoreVariantsTest.php`.
+     *
+     * `$expectedValuePickerCount` is not decoration: without it a value picker
+     * that silently disappears from the data structure would turn this guard into
+     * a no-op that passes.
+     */
+    private function assertPluginFlexFormValuePickerItemsMatchRunningCore(
+        string $cType,
+        int $expectedValuePickerCount,
+    ): void {
+        $dataStructure = $this->resolvePluginFlexFormDataStructure($cType);
+        $isLegacyItemShape = (new Typo3Version())->getMajorVersion() < 14;
+        $expectedKeys = $isLegacyItemShape ? [0, 1] : ['label', 'value'];
+
+        $seenValuePickers = 0;
+        foreach ($dataStructure['sheets'] ?? [] as $sheetName => $sheet) {
+            foreach ($sheet['ROOT']['el'] ?? [] as $fieldName => $field) {
+                $items = $field['config']['valuePicker']['items'] ?? null;
+                if (!is_array($items)) {
+                    continue;
+                }
+                $seenValuePickers++;
+                self::assertNotEmpty(
+                    $items,
+                    sprintf(
+                        'Value picker of "%s.%s" in content type "%s" has no items.',
+                        $sheetName,
+                        $fieldName,
+                        $cType,
+                    ),
+                );
+                foreach ($items as $itemIndex => $item) {
+                    self::assertIsArray(
+                        $item,
+                        sprintf(
+                            'Item %s of the value picker of "%s.%s" in content type "%s" is not an array.',
+                            (string)$itemIndex,
+                            $sheetName,
+                            $fieldName,
+                            $cType,
+                        ),
+                    );
+                    foreach ($expectedKeys as $expectedKey) {
+                        self::assertArrayHasKey(
+                            $expectedKey,
+                            $item,
+                            sprintf(
+                                'Item %s of the value picker of "%s.%s" in content type "%s" has keys "%s",'
+                                . ' but TYPO3 v%d reads "%s".',
+                                (string)$itemIndex,
+                                $sheetName,
+                                $fieldName,
+                                $cType,
+                                implode('", "', array_keys($item)),
+                                (new Typo3Version())->getMajorVersion(),
+                                implode('", "', $expectedKeys),
+                            ),
+                        );
+                    }
+                }
+            }
+        }
+
+        self::assertSame(
+            $expectedValuePickerCount,
+            $seenValuePickers,
+            sprintf(
+                'Expected %d value picker(s) in the FlexForm of content type "%s", found %d.',
+                $expectedValuePickerCount,
+                $cType,
+                $seenValuePickers,
+            ),
+        );
     }
 
     /**
