@@ -236,6 +236,55 @@ confusing pile of unrelated failures. See
 the content is identical. Every extension also carries the same test in its
 functional suite.
 
+## The shipped-configuration tests
+
+Three unit tests in `academic_base` do something the rest of the suite does not:
+they read the **files the extensions ship** rather than exercising a class. They
+all live in `academic-base/Tests/Unit/Configuration/`:
+
+| Test                                                                                                                                  | Reads                                    | Exists because                                                                                                     |
+|---------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| [`ShippedFlexFormsTest.php`](../../packages/fgtclb/academic-base/Tests/Unit/Configuration/ShippedFlexFormsTest.php)                   | every `Configuration/FlexForms/**/*.xml` | ACE-464, ACE-466, ACE-560, ACE-565                                                                                 |
+| [`ShippedYamlFilesTest.php`](../../packages/fgtclb/academic-base/Tests/Unit/Configuration/ShippedYamlFilesTest.php)                   | every shipped `*.yaml` / `*.yml`         | a shipped route file indented with tabs, which YAML forbids outright                                               |
+| [`ShippedFrontendAssetNamesTest.php`](../../packages/fgtclb/academic-base/Tests/Unit/Configuration/ShippedFrontendAssetNamesTest.php) | the names of the shipped frontend assets | ACE-392 / ACE-469, where a module named `ckeditor.js` silently disabled the rich text fields of the frontend forms |
+
+They exist because that content has no other reader. A FlexForm is parsed by
+TYPO3 at runtime, in the backend, for one plugin at a time — so a data structure
+that is wrong in a way TYPO3 tolerates silently (a dropped text node, a key core
+removed years ago, an item list in a spelling that is migrated rather than read)
+passes every other gate on both core versions. Four such defects shipped from
+this repository: ACE-464, ACE-466, ACE-560 and ACE-565 — plus ACE-467, which is
+branch `2`'s counterpart of the last one.
+
+`ShippedFlexFormsTest` makes five checks, one per defect of that kind:
+positional `items` in a select or check field (ACE-466), a `valuePicker` that is
+not split per core version and `valuePicker` items that do not match the
+`Core13`/`Core14` folder they sit in (both ACE-560), a `<TCEforms>` wrapper
+(ACE-565), and stray character data between elements (ACE-464). The failure
+messages carry `file:line`, so a failure names the entry rather than the file.
+
+Three things to know before changing them:
+
+- **They scan the whole `packages/` tree**, not the extension they live in.
+  `determineScanRoot()` makes one two-level hop up from the extension and uses
+  that directory when it is called `packages`, falling back to the extension
+  itself otherwise. Adding a new extension needs no change here.
+- **The fallback is defensive, not functional.** In the split-out read-only
+  repository of `academic_base` there is no `packages/` and the extension ships
+  no FlexForm of its own, so the scan would find nothing and the checks would
+  fail on their own "no FlexForm found" guard. It never bites because the split
+  repositories run no test suite.
+- **`ShippedFlexFormsTest` matches the FlexForm directory case-insensitively.**
+  Every extension on this branch spells it `Configuration/FlexForms/`, but
+  matching one spelling exactly is how the check once skipped an entire
+  extension on branch `2`, and with it four data structures that needed the fix
+  (ACE-467).
+
+Every check asserts that it actually looked at something — that a FlexForm was
+found at all, and, for the value picker shape, that at least one item was
+examined. A structural check that silently has nothing to scan is worse than no
+check, because it reports green.
+
 ## See also
 
 - [PHPUnit configuration](phpunit-configuration.md)

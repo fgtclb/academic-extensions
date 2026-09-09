@@ -369,13 +369,17 @@ relying on it.** On v13 this assertion is the guard: nothing migrates the
 associative shape, so it arrives unchanged and fails loudly. On v14 it cannot
 be, because `TcaMigration::migrateItemsOfValuePickerToAssociativeArray()`
 rewrites a positional list to `label`/`value` before the assertion can see it.
-The v14 direction is caught by two other things instead:
+The v14 direction is caught by three other things instead:
 
 - the `E_USER_DEPRECATED` that `FlexFormTools::migrateFlexField()` raises for
   that on-the-fly migration, turned into a failure by `failOnDeprecation="true"`
-  in `Build/phpunit/FunctionalTests.xml`, and
+  in `Build/phpunit/FunctionalTests.xml`,
 - the per-extension unit test over the shipped XML —
-  `academic-persons/Tests/Unit/Configuration/FlexFormCoreVariantsTest.php`.
+  `academic-persons/Tests/Unit/Configuration/FlexFormCoreVariantsTest.php`, and
+- the repository-wide sweep in
+  `academic-base/Tests/Unit/Configuration/ShippedFlexFormsTest.php`, which is
+  the only one of the three that sees a `valuePicker` newly added to a different
+  extension. See [Unit tests](unit-tests.md#the-shipped-configuration-tests).
 
 `$expectedValuePickerCount` is not decoration. Without it, a value picker that
 silently disappears from the data structure turns the guard into a no-op that
