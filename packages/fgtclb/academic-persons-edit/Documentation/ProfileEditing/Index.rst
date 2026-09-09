@@ -297,7 +297,10 @@ them. They appear after the corresponding field editor is opened. Document
 helptexts follow the same rule and are present in add/edit forms, but not in a
 document editor opened in view mode.
 
-``validation.inputType`` supplies the concrete HTML input type. Checkbox
+``validation.inputType`` is the field type, and
+``validation.controlInputType`` turns it into the concrete HTML input type of
+the rendered control. The two differ for a date only, where the control follows
+the field's granularity - see :ref:`profile-editing-dates`. Checkbox
 controls save immediately on change. Select controls use the same clear, undo
 and save actions as text fields. The synchronization switch in
 :file:`Header.html` is persisted through its own endpoint.
@@ -627,44 +630,90 @@ objects. Every other collection contains
 rows show the configured values, which are start date and position in the
 shipped settings. Profile-information rows render only the configured values in
 their declared order. The aliases ``from``, ``to`` and ``description`` map to
-``yearStart``, ``yearEnd`` and ``bodytext``. All sections remain visible when
+``dateStart``, ``dateEnd`` and ``bodytext``. All sections remain visible when
 empty and display a localized empty state.
 
-The three year properties ``year``, ``yearStart`` and ``yearEnd`` are four
-digit integers stored in nullable :sql:`int` columns. Their add/edit control is
-an ``<input type="number">`` carrying ``min="0"``, ``max="9999"`` and
-``step="1"`` - the bounds of the TCA ``range`` of the same columns, which the
-endpoint enforces again on every submission, so a client that ignores them is
-refused rather than clamped. Nothing about a year is formatted and nothing
-follows a locale.
+..  _profile-editing-dates:
 
-The three controls each use ``col-12 col-md-3`` and share one responsive row on
-medium and larger viewports. Their HTML and server-side required states come
-from the same validation set: only a field with the additional ``required``
-flag must be filled. In the shipped settings this applies to ``year`` but not
-to ``from`` or ``to``.
+Date fields
+-----------
 
-..  _profile-editing-contract-dates:
+The three timeline properties ``date``, ``dateStart`` and ``dateEnd`` are
+:php:`?\DateTime` values stored in nullable SQL :sql:`date` columns; the two
+Contract properties ``validFrom`` and ``validTo`` are :php:`?\DateTime` as
+well, in the :sql:`int` timestamp columns they always had. **Every date field
+of the editor is the browser's own control.** Which of the three it
+is follows the field's configured granularity, which the `date configuration
+<https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Configuration/Sections/Index.html#configuration-sections-dates>`__
+of :guilabel:`academic_persons` declares:
 
-The two Contract dates ``validFrom`` and ``validTo`` are the only date fields
-of the editor, and their control is a plain ``<input type="text">`` showing
-``d.m.Y`` behind the hint ``dd.mm.yyyy`` - the control the previous editor
-had. It is **not** an ``<input type="date">``: the native control follows the
-locale of the browser rather than the one of the site, it cannot be styled
-with the rest of the editor, and its calendar is not the date picker this
-editor is meant to get. **A date picker is deliberately not shipped yet.** It
-is a feature of its own, it will not be the browser's, and until it exists the
-date is typed.
+..  code-block:: text
 
-The endpoint accepts two formats for such a field. ``d.m.Y`` is what the
-control shows and submits. ``Y-m-d`` is what the endpoint answered and
-accepted while the control was a native one and stays accepted, so a client
-written against that shape keeps working. Both are read strictly - the parsed
-date is formatted back and has to match what came in, so ``32.01.2026`` is
-refused rather than read as the first of February - and anything that is
-neither format is refused with :guilabel:`The value must be a valid date.`
-The read view is unaffected: a stored date is rendered as the ``MEDIUMDATE``
-of the site language, the way the public profile renders it.
+    date    <input type="date">     submits  2019-03-14
+    month   <input type="month">    submits  2019-03
+    year    <input type="number">   submits  2019
+
+``date`` is the default and is what every shipped field asks for. A ``year``
+control is a number control because no browser has a year input, and it carries
+``min="1000"``, ``max="9999"`` and ``step="1"``. Those are not only browser
+hints: the endpoint checks the parsed year against the same bounds and refuses
+a value outside them with :guilabel:`The year must be between 1000 and 9999.`,
+so a browser that ignores them - and every client that is not a browser - meets
+the same refusal rather than a clamped value. The bounds belong to the ``year``
+granularity alone; the other two carry none and are checked against none. The
+TCA columns no longer declare a ``range`` of their own.
+
+The lower bound is the lowest four-digit year rather than the ``0`` the integer
+years allowed: a year is exchanged as ``Y`` and read back strictly, and a
+number control cannot emit the leading zeros a year below 1000 needs -
+advertising ``0`` would offer an editor values the endpoint then refuses. A
+field that has to carry an earlier year asks for the ``date`` granularity
+instead, whose control writes a full ``0800-01-01``.
+
+The display format of a native date control follows the locale of the browser
+or operating system and cannot be influenced by a page - no attribute, no
+stylesheet and no script changes it, and its DOM value is ``yyyy-mm-dd``
+regardless. What the site language governs is everything the server renders
+instead: the compact rows, the ``displayValue`` of the JSON responses and the
+field hints.
+
+..  note::
+    Desktop Firefox has never implemented ``<input type="month">`` and degrades
+    it to a plain text field. It submits the same ``2019-03`` and the server
+    validates it either way, so such a form stays usable there - it simply has
+    no calendar.
+
+A field may publish less than it asks for - the shipped timeline sections ask
+for a complete date and publish the year alone - and the editor is told so at
+the field, through the labels ``profileEditing.date.published.yearOnly``,
+``...yearAndMonth`` and ``...partial``. The hint is appended to the field's own
+helptext where it has one.
+
+The three timeline controls each use ``col-12 col-md-3`` and share one
+responsive row on medium and larger viewports. Their HTML and server-side
+required states come from the same validation set: only a field with the
+additional ``required`` flag must be filled. In the shipped settings this
+applies to ``date`` but not to ``from`` or ``to``.
+
+The two Contract dates ``validFrom`` and ``validTo`` declare no date
+configuration of their own, so they ask for a complete date and publish all of
+it. Until 3.0.0 they were a plain ``<input type="text">`` showing ``d.m.Y``
+behind the hint ``dd.mm.yyyy``, because a picker was still an open decision;
+that placeholder is gone, and so is the constant that held it.
+
+What the endpoint accepts is unchanged for a client written against the
+previous shape: the granularity's own format, the full ISO ``Y-m-d`` at
+**every** granularity, and the German ``d.m.Y`` at the full one. Every format
+is read strictly - the parsed date is formatted back and has to match what came
+in, so ``32.01.2026`` is refused
+rather than read as the first of February - and a value that is none of them is
+refused with :guilabel:`The value must be a valid date.` A ``month`` or
+``year`` value is completed to a full date by the two completion rules of the
+field before it is stored.
+
+The read view renders a stored date reduced to the parts its field publishes,
+formatted for the locale of the matched site language; a complete date keeps
+the ``MEDIUMDATE`` notation it had, the way the public profile renders it.
 
 ..  _profile-editing-document-editor:
 
@@ -892,7 +941,7 @@ controls and drag handle persist the same record order.
 The presentation uses Bootstrap rows with one shared desktop column heading,
 compact flat records, separating borders and alternating tertiary backgrounds
 within each document section, which are a ``:nth-child(odd)`` rule of the
-extension's stylesheet rather than a class on the row. The year columns
+extension's stylesheet rather than a class on the row. The date columns
 remain narrow while title and position columns consume the available width.
 On small viewports every record repeats its field labels instead of rendering
 the desktop heading. An empty section keeps its heading and add action,

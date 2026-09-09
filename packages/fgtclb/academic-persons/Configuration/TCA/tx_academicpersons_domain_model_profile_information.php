@@ -121,50 +121,43 @@ $tcaConfiguration = [
                 'max' => 2048,
             ],
         ],
-        // Four digit years. `type=number` reads its bounds from `range`, so
-        // `range.lower`/`range.upper` are what renders the HTML min/max, what
-        // DataHandler clamps against and what makes the derived column
-        // unsigned.
-        'year' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year.label',
+        // `dbType => 'date'` keeps a native SQL `DATE` column: the value is
+        // stored and read as `YYYY-MM-DD`, so no timestamp and no timezone
+        // conversion is involved. Identical on TYPO3 v13 and v14.
+        'date' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.date.label',
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'format' => 'integer',
-                'range' => [
-                    'lower' => 0,
-                    'upper' => 9999,
-                ],
+                'dbType' => 'date',
+                'type' => 'datetime',
+                'format' => 'date',
                 'nullable' => true,
+                'default' => null,
             ],
         ],
-        'year_start' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year_start.label',
+        'date_start' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.date_start.label',
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'format' => 'integer',
-                'range' => [
-                    'lower' => 0,
-                    'upper' => 9999,
-                ],
+                'dbType' => 'date',
+                'type' => 'datetime',
+                'format' => 'date',
                 'nullable' => true,
+                'default' => null,
             ],
         ],
-        'year_end' => [
-            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.year_end.label',
+        'date_end' => [
+            'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.columns.date_end.label',
             'l10n_mode' => 'exclude',
             'l10n_display' => 'defaultAsReadonly',
             'config' => [
-                'type' => 'number',
-                'format' => 'integer',
-                'range' => [
-                    'lower' => 0,
-                    'upper' => 9999,
-                ],
+                'dbType' => 'date',
+                'type' => 'datetime',
+                'format' => 'date',
                 'nullable' => true,
+                'default' => null,
             ],
         ],
         'sorting' => [
@@ -178,10 +171,10 @@ $tcaConfiguration = [
         'date' => [
             'label' => 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile_information.palette.date',
             'showitem' => implode(',', [
-                'year',
+                'date',
                 '--linebreak--',
-                'year_start',
-                'year_end',
+                'date_start',
+                'date_end',
             ]),
         ],
         'language' => [

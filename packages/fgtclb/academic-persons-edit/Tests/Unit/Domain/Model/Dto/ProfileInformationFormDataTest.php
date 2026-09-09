@@ -36,9 +36,9 @@ final class ProfileInformationFormDataTest extends UnitTestCase
 
         $this->assertSame('publications', $formData->getType());
         $this->assertSame(['', '', ''], [$formData->getTitle(), $formData->getBodytext(), $formData->getLink()]);
-        $this->assertNull($formData->getYear());
-        $this->assertNull($formData->getYearStart());
-        $this->assertNull($formData->getYearEnd());
+        $this->assertNull($formData->getDate());
+        $this->assertNull($formData->getDateStart());
+        $this->assertNull($formData->getDateEnd());
     }
 
     /**
@@ -53,9 +53,10 @@ final class ProfileInformationFormDataTest extends UnitTestCase
     }
 
     /**
-     * Four strings and three nullable integers, with `year`, `yearStart` and `yearEnd`
+     * Four strings and three nullable dates, with `date`, `dateStart` and `dateEnd`
      * being interchangeable at the type level: a swapped assignment is only visible when
-     * all seven are asserted at once against distinct values.
+     * all seven are asserted at once against distinct values. The dates are compared as
+     * `Y-m-d` because that is the granularity the column stores.
      */
     #[Test]
     public function everyPersistedPropertyOfAProfileInformationReachesTheFormData(): void
@@ -65,9 +66,9 @@ final class ProfileInformationFormDataTest extends UnitTestCase
         $profileInformation->setTitle('Research assistant');
         $profileInformation->setBodytext('Worked on distributed systems.');
         $profileInformation->setLink('https://example.org/vita');
-        $profileInformation->setYear(2021);
-        $profileInformation->setYearStart(2018);
-        $profileInformation->setYearEnd(2024);
+        $profileInformation->setDate(new \DateTime('2021-06-30'));
+        $profileInformation->setDateStart(new \DateTime('2018-01-01'));
+        $profileInformation->setDateEnd(new \DateTime('2024-12-31'));
 
         $formData = ProfileInformationFormData::createFromProfileInformation($profileInformation);
 
@@ -77,37 +78,38 @@ final class ProfileInformationFormDataTest extends UnitTestCase
                 'title' => 'Research assistant',
                 'bodytext' => 'Worked on distributed systems.',
                 'link' => 'https://example.org/vita',
-                'year' => 2021,
-                'yearStart' => 2018,
-                'yearEnd' => 2024,
+                'date' => '2021-06-30',
+                'dateStart' => '2018-01-01',
+                'dateEnd' => '2024-12-31',
             ],
             [
                 'type' => $formData->getType(),
                 'title' => $formData->getTitle(),
                 'bodytext' => $formData->getBodytext(),
                 'link' => $formData->getLink(),
-                'year' => $formData->getYear(),
-                'yearStart' => $formData->getYearStart(),
-                'yearEnd' => $formData->getYearEnd(),
+                'date' => $formData->getDate()?->format('Y-m-d'),
+                'dateStart' => $formData->getDateStart()?->format('Y-m-d'),
+                'dateEnd' => $formData->getDateEnd()?->format('Y-m-d'),
             ],
         );
     }
 
     /**
-     * A vita entry without an end year is an ongoing one. `null` and `0` mean different
-     * things to the template and to the database, so the mapping may not cast.
+     * A vita entry without an end date is an ongoing one. `null` and a zero date mean
+     * different things to the template and to the nullable `date` column, so the mapping
+     * may not substitute one for the other.
      */
     #[Test]
-    public function unsetYearsStayNullInsteadOfBecomingZero(): void
+    public function unsetDatesStayNullInsteadOfBecomingAZeroDate(): void
     {
         $profileInformation = new ProfileInformation();
-        $profileInformation->setYearStart(2018);
+        $profileInformation->setDateStart(new \DateTime('2018-01-01'));
 
         $formData = ProfileInformationFormData::createFromProfileInformation($profileInformation);
 
-        $this->assertSame(2018, $formData->getYearStart());
-        $this->assertNull($formData->getYear());
-        $this->assertNull($formData->getYearEnd());
+        $this->assertSame('2018-01-01', $formData->getDateStart()?->format('Y-m-d'));
+        $this->assertNull($formData->getDate());
+        $this->assertNull($formData->getDateEnd());
     }
 
     /**
@@ -137,7 +139,7 @@ final class ProfileInformationFormDataTest extends UnitTestCase
         ] as $formData) {
             $this->assertFalse($formData->shouldApplyProperty('type'));
             $this->assertFalse($formData->shouldApplyProperty('title'));
-            $this->assertFalse($formData->shouldApplyProperty('year'));
+            $this->assertFalse($formData->shouldApplyProperty('date'));
         }
     }
 }

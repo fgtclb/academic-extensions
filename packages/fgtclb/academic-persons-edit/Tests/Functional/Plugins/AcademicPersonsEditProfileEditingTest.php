@@ -9,9 +9,7 @@ use FGTCLB\AcademicPersonsEdit\Controller\ProfileController;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Http\Stream;
-use TYPO3\CMS\Core\Localization\DateFormatter;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
-use TYPO3\CMS\Core\Localization\Locale;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
@@ -773,12 +771,18 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
     }
 
     /**
-     * The years of a compact row are printed as they are stored. Nothing formats them,
-     * so nothing about them follows a locale, and a row whose own start year is empty
-     * falls back to the single year of the record.
+     * A compact row shows a date with the parts its section publishes, and the shipped
+     * timeline sections publish the year alone. A stored `2025-06-17` is therefore drawn
+     * as `2025` and never as the whole day, even though the editor entered one - and a
+     * row whose own start date is empty still falls back to the single date of the record.
+     *
+     * The fixture deliberately stores a day in the middle of the year: a record on the
+     * first of January cannot tell a year-only display apart from a whole date that
+     * happens to sit there, which is the very confusion the year-only display exists
+     * to avoid.
      */
     #[Test]
-    public function documentRowYearsAreRenderedAsStored(): void
+    public function documentRowDatesAreReducedToThePublishedParts(): void
     {
         $this->setUpProfileEditingTestCase();
         $this->seedStructuredDocumentSections();
@@ -788,15 +792,17 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $document = new \DOMDocument();
         $this->assertTrue($document->loadHTML($content, LIBXML_NOERROR | LIBXML_NOWARNING));
         $xpath = new \DOMXPath($document);
-        $yearValues = $xpath->query('//*[@data-pe-document-value="yearStart"]');
-        $this->assertNotFalse($yearValues);
-        $this->assertGreaterThan(0, $yearValues->length, 'No document row renders a start year.');
-        $renderedYears = [];
-        foreach ($yearValues as $yearValue) {
-            $renderedYears[] = trim((string)$yearValue->textContent);
+        $startValues = $xpath->query('//*[@data-pe-document-value="dateStart"]');
+        $this->assertNotFalse($startValues);
+        $this->assertGreaterThan(0, $startValues->length, 'No document row renders a start date.');
+        $renderedStarts = [];
+        foreach ($startValues as $startValue) {
+            $renderedStarts[] = trim((string)$startValue->textContent);
         }
-        $this->assertContains('2025', $renderedYears);
-        $this->assertNotContains('Jan 1, 2025', $renderedYears);
+        $this->assertContains('2025', $renderedStarts);
+        $this->assertNotContains('Jun 17, 2025', $renderedStarts);
+        $this->assertNotContains('2025-06-17', $renderedStarts);
+        $this->assertNotContains('Jun 2025', $renderedStarts);
     }
 
     #[Test]
@@ -874,8 +880,8 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
                             default => $field,
                         }
                     : match ($field) {
-                        'from' => 'yearStart',
-                        'to' => 'yearEnd',
+                        'from' => 'dateStart',
+                        'to' => 'dateEnd',
                         'description' => 'bodytext',
                         default => $field,
                     },
@@ -1049,7 +1055,7 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $titleCell = $title->parentNode;
         $this->assertContains('col-md', $this->renderedClassList($titleCell));
         $this->assertContains('text-break', $this->renderedClassList($titleCell));
-        foreach (['year', 'yearStart', 'yearEnd'] as $field) {
+        foreach (['date', 'dateStart', 'dateEnd'] as $field) {
             $value = $this->firstElement(
                 $xpath,
                 sprintf('.//*[@data-pe-document-value="%s"]', $field),
@@ -1152,22 +1158,30 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertTrue($formBody['success'] ?? null);
         $this->assertSame(1, $formBody['record'] ?? null);
         $this->assertSame(
-            ['title', 'link', 'year', 'yearStart', 'yearEnd', 'bodytext'],
+            ['title', 'link', 'date', 'dateStart', 'dateEnd', 'bodytext'],
             array_column($formBody['fields'] ?? [], 'name'),
         );
         $formFieldsByName = array_column($formBody['fields'] ?? [], null, 'name');
         $this->assertTrue($formFieldsByName['bodytext']['richText'] ?? false);
         $this->assertSame(500, $formFieldsByName['bodytext']['characterLimit'] ?? null);
-        $this->assertTrue($formFieldsByName['year']['required'] ?? false);
-        $this->assertFalse($formFieldsByName['yearStart']['required'] ?? true);
-        $this->assertFalse($formFieldsByName['yearEnd']['required'] ?? true);
-        // The three year fields are number controls and carry the bounds of the TCA
-        // range; nothing else does.
-        foreach (['year', 'yearStart', 'yearEnd'] as $yearField) {
-            $this->assertSame('number', $formFieldsByName[$yearField]['type'] ?? null, $yearField);
-            $this->assertSame(0, $formFieldsByName[$yearField]['min'] ?? null, $yearField);
-            $this->assertSame(9999, $formFieldsByName[$yearField]['max'] ?? null, $yearField);
-            $this->assertSame(1, $formFieldsByName[$yearField]['step'] ?? null, $yearField);
+        $this->assertTrue($formFieldsByName['date']['required'] ?? false);
+        $this->assertFalse($formFieldsByName['dateStart']['required'] ?? true);
+        $this->assertFalse($formFieldsByName['dateEnd']['required'] ?? true);
+        // The three timeline fields are date controls asking for a whole date, so they
+        // declare no bounds - those belong to the year granularity, which is a number
+        // control, and to nothing else.
+        foreach (['date', 'dateStart', 'dateEnd'] as $dateField) {
+            $this->assertSame('date', $formFieldsByName[$dateField]['type'] ?? null, $dateField);
+            $this->assertSame('date', $formFieldsByName[$dateField]['granularity'] ?? null, $dateField);
+            $this->assertSame('', $formFieldsByName[$dateField]['placeholder'] ?? null, $dateField);
+            $this->assertSame(
+                ['min' => null, 'max' => null, 'step' => null],
+                array_intersect_key(
+                    (array)($formFieldsByName[$dateField] ?? []),
+                    ['min' => null, 'max' => null, 'step' => null],
+                ),
+                $dateField,
+            );
         }
         $this->assertSame(
             ['min' => null, 'max' => null, 'step' => null],
@@ -1180,9 +1194,6 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $languageService = $this->get(LanguageServiceFactory::class)->create('default');
         foreach ([
             'title' => 'title',
-            'year' => 'year',
-            'yearStart' => 'from',
-            'yearEnd' => 'to',
             'bodytext' => 'description',
         ] as $helptextField => $translationKey) {
             $this->assertSame(
@@ -1194,52 +1205,47 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
                 sprintf('Missing translated helptext for document field "%s".', $helptextField),
             );
         }
+        // The three date fields publish less than they ask for, so the configured
+        // helptext of each of them is followed by the sentence that says so.
+        foreach ([
+            'date' => 'date',
+            'dateStart' => 'from',
+            'dateEnd' => 'to',
+        ] as $helptextField => $translationKey) {
+            $this->assertSame(
+                $languageService->sL(
+                    'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:'
+                        . 'helptext.documentSections.' . $translationKey,
+                ) . ' ' . $this->translate('profileEditing.date.published.yearOnly'),
+                $formFieldsByName[$helptextField]['helptext'] ?? null,
+                sprintf('Missing translated helptext for document field "%s".', $helptextField),
+            );
+        }
         $this->assertSame('', $formFieldsByName['link']['helptext'] ?? null);
-        $missingYearResponse = $this->postJson($createUrl, [
+        $missingDateResponse = $this->postJson($createUrl, [
             'profile' => self::PROFILE_ID,
             'data' => [
                 'section' => 'cooperation',
-                'fields' => ['title' => 'Missing required year'],
+                'fields' => ['title' => 'Missing required date'],
             ],
         ]);
-        $this->assertSame(422, $missingYearResponse->getStatusCode());
-        $missingYearBody = json_decode(
-            (string)$missingYearResponse->getBody(),
+        $this->assertSame(422, $missingDateResponse->getStatusCode());
+        $missingDateBody = json_decode(
+            (string)$missingDateResponse->getBody(),
             true,
             512,
             JSON_THROW_ON_ERROR,
         );
-        $this->assertArrayHasKey('year', $missingYearBody['errors'] ?? []);
-        $this->assertArrayNotHasKey('yearStart', $missingYearBody['errors'] ?? []);
-        $this->assertArrayNotHasKey('yearEnd', $missingYearBody['errors'] ?? []);
-        // The bounds of the number control are enforced on the server as well.
-        $outOfRangeResponse = $this->postJson($createUrl, [
-            'profile' => self::PROFILE_ID,
-            'data' => [
-                'section' => 'cooperation',
-                'fields' => ['title' => 'Year above the range', 'year' => '10000'],
-            ],
-        ]);
-        $this->assertSame(422, $outOfRangeResponse->getStatusCode());
-        $outOfRangeBody = json_decode(
-            (string)$outOfRangeResponse->getBody(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
-        // The refused value never lands in the normalized set, so the required
-        // check of the same request reports the field as missing as well.
-        $this->assertSame(
-            ['The value must be between 0 and 9999.', 'This field is required.'],
-            $outOfRangeBody['errors']['year'] ?? null,
-        );
+        $this->assertArrayHasKey('date', $missingDateBody['errors'] ?? []);
+        $this->assertArrayNotHasKey('dateStart', $missingDateBody['errors'] ?? []);
+        $this->assertArrayNotHasKey('dateEnd', $missingDateBody['errors'] ?? []);
         $overLimitResponse = $this->postJson($createUrl, [
             'profile' => self::PROFILE_ID,
             'data' => [
                 'section' => 'cooperation',
                 'fields' => [
                     'title' => 'Description over its configured limit',
-                    'year' => 2027,
+                    'date' => '2027-06-01',
                     'bodytext' => '<p><strong>' . str_repeat('a', 501) . '</strong></p>',
                 ],
             ],
@@ -1262,7 +1268,7 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
                 'fields' => [
                     'title' => 'AJAX cooperation',
                     'link' => 'https://example.com/ajax-cooperation',
-                    'year' => 2027,
+                    'date' => '2027-06-01',
                     'bodytext' => '<p><strong>Created inline</strong></p>',
                 ],
             ],
@@ -1275,7 +1281,7 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $storedCreatedRecord = $this->getConnectionPool()
             ->getConnectionForTable('tx_academicpersons_domain_model_profile_information')
             ->executeQuery(
-                'SELECT profile, type, title, year, year_start, year_end, sorting'
+                'SELECT profile, type, title, date, date_start, date_end, sorting'
                     . ' FROM tx_academicpersons_domain_model_profile_information'
                     . ' WHERE uid = ? AND deleted = 0',
                 [$createdUid],
@@ -1285,9 +1291,9 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertSame(self::PROFILE_ID, (int)$storedCreatedRecord['profile']);
         $this->assertSame('cooperation', $storedCreatedRecord['type']);
         $this->assertSame('AJAX cooperation', $storedCreatedRecord['title']);
-        $this->assertSame(2027, (int)$storedCreatedRecord['year']);
-        $this->assertNull($storedCreatedRecord['year_start']);
-        $this->assertNull($storedCreatedRecord['year_end']);
+        $this->assertSame('2027-06-01', $storedCreatedRecord['date']);
+        $this->assertNull($storedCreatedRecord['date_start']);
+        $this->assertNull($storedCreatedRecord['date_end']);
         $this->assertSame(30, (int)$storedCreatedRecord['sorting']);
         $updateResponse = $this->postJson($updateUrl, [
             'profile' => self::PROFILE_ID,
@@ -1296,7 +1302,7 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
                 'record' => $createdUid,
                 'fields' => [
                     'title' => 'AJAX cooperation updated',
-                    'year' => 2028,
+                    'date' => '2028-04-02',
                     'bodytext' => '<p><strong>Updated inline</strong><script>alert(1)</script></p>',
                 ],
             ],
@@ -1304,7 +1310,10 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertSame(200, $updateResponse->getStatusCode(), (string)$updateResponse->getBody());
         $updateBody = json_decode((string)$updateResponse->getBody(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame('AJAX cooperation updated', $updateBody['item']['display']['title'] ?? null);
-        $this->assertSame('2028', $updateBody['item']['display']['year'] ?? null);
+        // The section publishes the year alone, so the whole date the editor entered is
+        // exchanged with the control while only its year is what a visitor is shown.
+        $this->assertSame('2028-04-02', $updateBody['item']['values']['date'] ?? null);
+        $this->assertSame('2028', $updateBody['item']['display']['date'] ?? null);
         $this->assertStringContainsString('<strong>Updated inline</strong>', $updateBody['item']['display']['bodytext'] ?? '');
         $this->assertStringNotContainsString('<script', $updateBody['item']['display']['bodytext'] ?? '');
         $sortResponse = $this->postJson($sortUrl, [
@@ -1363,6 +1372,262 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertSame(0, $activeCount);
     }
 
+    /**
+     * The three helpers below are shared by the date tests that follow. They only
+     * spare each of them the four lines every JSON endpoint request needs.
+     */
+    private function documentEndpointUrl(string $attribute): string
+    {
+        $this->setUpProfileEditingTestCase();
+        $this->seedStructuredDocumentSections();
+
+        return $this->extractDataUrl($this->renderProfileEditingPage(), $attribute);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodedBody(ResponseInterface $response): array
+    {
+        $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertIsArray($body);
+
+        return $body;
+    }
+
+    /**
+     * The three stored dates of one timeline record, as the `DATE` columns hold them.
+     *
+     * @return array{date: ?string, date_start: ?string, date_end: ?string}
+     */
+    private function storedDocumentDates(int $uid): array
+    {
+        $row = $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile_information')
+            ->executeQuery(
+                'SELECT date, date_start, date_end'
+                    . ' FROM tx_academicpersons_domain_model_profile_information'
+                    . ' WHERE uid = ? AND deleted = 0',
+                [$uid],
+            )
+            ->fetchAssociative();
+        $this->assertIsArray($row);
+
+        /** @var array{date: ?string, date_start: ?string, date_end: ?string} $row */
+        return $row;
+    }
+
+    /**
+     * The descriptor of a timeline date field.
+     *
+     * A date field is exchanged at the granularity it asks for. The shipped timeline
+     * asks for a whole date, so the control is the browser's own date input, the
+     * value is that control's `Y-m-d` and there is no placeholder of ours: the format
+     * hint the text control used to carry is the browser's own now, in the notation
+     * of the visitor's locale rather than in ours.
+     *
+     * A field the record has no date for is the empty string an `<input type="date">`
+     * holds and submits, never a `null`.
+     */
+    #[Test]
+    public function aTimelineDateFieldIsANativeDateControlCarryingItsIsoValue(): void
+    {
+        $formUrl = $this->documentEndpointUrl('data-document-form-url');
+
+        $response = $this->postJson($formUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'cooperation', 'record' => 1, 'mode' => 'edit'],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode(), (string)$response->getBody());
+        $fields = array_column($this->decodedBody($response)['fields'] ?? [], null, 'name');
+        $this->assertSame('date', $fields['dateStart']['type'] ?? null);
+        $this->assertSame('date', $fields['dateStart']['granularity'] ?? null);
+        $this->assertSame('', $fields['dateStart']['placeholder'] ?? null);
+        $this->assertSame('2025-06-17', $fields['dateStart']['value'] ?? null);
+        $this->assertSame('', $fields['date']['value'] ?? null);
+        $this->assertSame('', $fields['date']['displayValue'] ?? null);
+    }
+
+    /**
+     * A whole date is stored as the day it names, and a day that does not exist is
+     * refused rather than rolled over into the next month.
+     *
+     * `\DateTimeImmutable::createFromFormat()` answers the third of March for a
+     * submitted `2019-02-31`, so a parser that only checks whether it got an object
+     * back stores a date the editor never entered. The refusal is the endpoint's
+     * usual one - `422 validation_failed` - and it leaves the section as it was.
+     */
+    #[Test]
+    public function aWholeDateIsStoredAsThatDayAndAnImpossibleOneIsRefused(): void
+    {
+        $createUrl = $this->documentEndpointUrl('data-create-document-url');
+        $countBefore = $this->countDocumentsOfType('cooperation');
+
+        $accepted = $this->postJson($createUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'fields' => ['title' => 'A real day', 'date' => '2019-03-14'],
+            ],
+        ]);
+
+        $this->assertSame(200, $accepted->getStatusCode(), (string)$accepted->getBody());
+        $createdUid = $this->decodedBody($accepted)['item']['uid'] ?? null;
+        $this->assertIsInt($createdUid);
+        $this->assertSame('2019-03-14', $this->storedDocumentDates($createdUid)['date']);
+
+        $refused = $this->postJson($createUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'fields' => ['title' => 'The thirty first of February', 'date' => '2019-02-31'],
+            ],
+        ]);
+
+        $this->assertSame(422, $refused->getStatusCode());
+        $refusedBody = $this->decodedBody($refused);
+        $this->assertSame('validation_failed', $refusedBody['error'] ?? null);
+        $this->assertIsArray($refusedBody['errors']['date'] ?? null);
+        $this->assertContains('The value must be a valid date.', $refusedBody['errors']['date']);
+        $this->assertSame(
+            $countBefore + 1,
+            $this->countDocumentsOfType('cooperation'),
+            'The refused request wrote a record.',
+        );
+    }
+
+    /**
+     * An emptied date control submits an empty string, and what that means depends on
+     * whether the field may be empty.
+     *
+     * `from` is optional, so the stored date is cleared - which is the only way an
+     * editor has to say "this entry has no start". `date` is required, so the same
+     * empty string is refused and the stored record is left alone.
+     */
+    #[Test]
+    public function anEmptyDateClearsAnOptionalFieldAndIsRefusedForARequiredOne(): void
+    {
+        $updateUrl = $this->documentEndpointUrl('data-update-document-url');
+        $this->assertSame('2025-06-17', $this->storedDocumentDates(1)['date_start']);
+
+        $cleared = $this->postJson($updateUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'record' => 1,
+                'fields' => ['dateStart' => ''],
+            ],
+        ]);
+
+        $this->assertSame(200, $cleared->getStatusCode(), (string)$cleared->getBody());
+        $this->assertSame('', $this->decodedBody($cleared)['item']['values']['dateStart'] ?? null);
+        $this->assertNull($this->storedDocumentDates(1)['date_start']);
+        $this->assertSame(
+            '2026-12-31',
+            $this->storedDocumentDates(1)['date_end'],
+            'Clearing one date may not touch the others.',
+        );
+
+        $refused = $this->postJson($updateUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => [
+                'section' => 'cooperation',
+                'record' => 2,
+                'fields' => ['date' => '', 'dateStart' => '2024-01-01'],
+            ],
+        ]);
+
+        $this->assertSame(422, $refused->getStatusCode());
+        $refusedBody = $this->decodedBody($refused);
+        $this->assertSame('validation_failed', $refusedBody['error'] ?? null);
+        $this->assertArrayHasKey('date', $refusedBody['errors'] ?? []);
+        $this->assertSame(
+            ['date' => null, 'date_start' => '2024-01-01', 'date_end' => '2025-12-31'],
+            $this->storedDocumentDates(2),
+            'The refused request wrote the record it was refused for.',
+        );
+    }
+
+    /**
+     * What a visitor is shown of a stored date, and what the editor is told about it.
+     *
+     * The seven shipped timeline sections publish the year alone while asking for a
+     * whole date, which is what the three dropped integer columns did. Their
+     * `displayValue` is therefore the bare year - never the day the editor entered -
+     * and their helptext carries the sentence that says so.
+     *
+     * A Contract date configures no `dates` block at all and therefore publishes
+     * everything it asks for: its `displayValue` is the `MEDIUMDATE` of the site
+     * language, which is what the public views render, and its helptext is the
+     * configured one alone.
+     *
+     * The other half of this - a *timeline* section that publishes all three parts -
+     * needs the shipped `documentSections` map replaced, which is a fixture extension
+     * and therefore a test class of its own:
+     * {@see AcademicPersonsEditDocumentDatePublishingTest}.
+     */
+    #[Test]
+    public function aDateIsShownAndExplainedWithThePartsItsSectionPublishes(): void
+    {
+        $formUrl = $this->documentEndpointUrl('data-document-form-url');
+        $languageService = $this->get(LanguageServiceFactory::class)->create('default');
+        $yearOnlyHint = $this->translate('profileEditing.date.published.yearOnly');
+
+        $timeline = $this->postJson($formUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'cooperation', 'record' => 1, 'mode' => 'edit'],
+        ]);
+        $this->assertSame(200, $timeline->getStatusCode(), (string)$timeline->getBody());
+        $timelineFields = array_column($this->decodedBody($timeline)['fields'] ?? [], null, 'name');
+        $this->assertSame('2025-06-17', $timelineFields['dateStart']['value'] ?? null);
+        // The whole day reaches the control, the year alone reaches a visitor - which
+        // a stored first of January could not tell apart.
+        $this->assertSame('2025', $timelineFields['dateStart']['displayValue'] ?? null);
+        $this->assertSame(
+            $languageService->sL(
+                'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:'
+                    . 'helptext.documentSections.from',
+            ) . ' ' . $yearOnlyHint,
+            $timelineFields['dateStart']['helptext'] ?? null,
+        );
+
+        $contract = $this->postJson($formUrl, [
+            'profile' => self::PROFILE_ID,
+            'data' => ['section' => 'contracts', 'record' => 1, 'mode' => 'edit'],
+        ]);
+        $this->assertSame(200, $contract->getStatusCode(), (string)$contract->getBody());
+        $contractFields = array_column($this->decodedBody($contract)['fields'] ?? [], null, 'name');
+        $this->assertSame('2030-08-31', $contractFields['validFrom']['value'] ?? null);
+        // The literal a visitor of an `en-US` site reads, not the same call the
+        // controller makes: an expectation computed with `MEDIUMDATE` pins that the
+        // code calls `MEDIUMDATE` and says nothing about what that produces.
+        $this->assertSame('Aug 31, 2030', $contractFields['validFrom']['displayValue'] ?? null);
+        $this->assertSame(
+            $languageService->sL(
+                'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:'
+                    . 'helptext.contracts.validFrom',
+            ),
+            $contractFields['validFrom']['helptext'] ?? null,
+        );
+        $this->assertStringNotContainsString(
+            $yearOnlyHint,
+            (string)($contractFields['validFrom']['helptext'] ?? ''),
+        );
+    }
+
+    private function countDocumentsOfType(string $type): int
+    {
+        return (int)$this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile_information')
+            ->executeQuery(
+                'SELECT COUNT(*) FROM tx_academicpersons_domain_model_profile_information'
+                    . ' WHERE type = ? AND deleted = 0',
+                [$type],
+            )
+            ->fetchOne();
+    }
+
     #[Test]
     public function contractDocumentAjaxActionsCoverFormCreateUpdateSortAndDelete(): void
     {
@@ -1413,19 +1678,29 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
             );
         }
         $this->assertTrue($contractFieldsByName['officeHours']['richText'] ?? false);
-        // The two contract dates. The descriptor type stays "date" - it is
-        // what the endpoint serializes, validates and displays a date by, and
-        // what a date picker will one day be mounted on - while the control
-        // itself is a plain text input carrying the format as its hint.
+        // The two contract dates are asked for as whole dates, so they are the
+        // browser's own date control: no placeholder of ours, no bounds, and the
+        // value in the format that control accepts and submits.
         foreach (['validFrom', 'validTo'] as $dateField) {
             $this->assertSame('date', $contractFieldsByName[$dateField]['type'] ?? null);
-            $this->assertSame('dd.mm.yyyy', $contractFieldsByName[$dateField]['placeholder'] ?? null);
+            $this->assertSame('date', $contractFieldsByName[$dateField]['granularity'] ?? null);
+            $this->assertSame('', $contractFieldsByName[$dateField]['placeholder'] ?? null);
         }
-        $this->assertMatchesRegularExpression(
-            '@^\d{2}\.\d{2}\.\d{4}$@',
-            (string)($contractFieldsByName['validFrom']['value'] ?? ''),
+        // A contract publishes the whole date it asks for, so nothing is added to
+        // the configured helptext - unlike the timeline fields, which are told that
+        // only their year reaches a visitor.
+        $this->assertStringNotContainsString(
+            $this->translate('profileEditing.date.published.yearOnly'),
+            (string)($contractFieldsByName['validFrom']['helptext'] ?? ''),
+        );
+        $this->assertSame(
+            '2030-08-31',
+            $contractFieldsByName['validFrom']['value'] ?? null,
             'The value of a contract date is serialized in the format its control shows.',
         );
+        // ... and the whole date is what a visitor sees, in the notation of the
+        // site language.
+        $this->assertSame('Aug 31, 2030', $contractFieldsByName['validFrom']['displayValue'] ?? null);
         $this->assertSame(
             ['physicalAddresses', 'emailAddresses', 'phoneNumbers'],
             array_column($formBody['contactSections'] ?? [], 'identifier'),
@@ -1506,11 +1781,11 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
      * The two formats a contract date is accepted in, and the one it is shown
      * in.
      *
-     * `d.m.Y` is what the control shows and submits. `Y-m-d` is what the
-     * endpoint answered and accepted while the control was an
-     * `<input type="date">`; it stays accepted, so a client written against
-     * that shape is not broken by the control changing. Anything else is
-     * refused with the error the endpoint always used.
+     * `Y-m-d` is what the browser's own date control shows and submits, and is
+     * what the descriptor carries. `d.m.Y` is the German notation an earlier
+     * text control submitted; it stays accepted at the full granularity, so a
+     * client written against that shape is not broken by the control changing.
+     * Anything else is refused with the error the endpoint always used.
      *
      * The read view is unaffected either way: both requests come back with the
      * same `MEDIUMDATE` of the site language, which is what the public views
@@ -1523,14 +1798,10 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->seedStructuredDocumentSections();
         $content = $this->renderProfileEditingPage();
         $createUrl = $this->extractDataUrl($content, 'data-create-document-url');
-        $expectedDisplay = (new DateFormatter())->format(
-            new \DateTime('2026-01-15 00:00:00'),
-            'MEDIUMDATE',
-            new Locale('en-US'),
-        );
+        $expectedDisplay = 'Jan 15, 2026';
         $created = [];
 
-        foreach (['iso' => '2026-01-15', 'control' => '15.01.2026'] as $shape => $submitted) {
+        foreach (['control' => '2026-01-15', 'german' => '15.01.2026'] as $shape => $submitted) {
             $response = $this->postJson($createUrl, [
                 'profile' => self::PROFILE_ID,
                 'data' => [
@@ -1544,7 +1815,7 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
                 sprintf('The %s format was refused: %s', $shape, (string)$response->getBody()),
             );
             $body = json_decode((string)$response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-            $this->assertSame('15.01.2026', $body['item']['values']['validFrom'] ?? null);
+            $this->assertSame('2026-01-15', $body['item']['values']['validFrom'] ?? null);
             $this->assertSame($expectedDisplay, $body['item']['display']['validFrom'] ?? null);
             $uid = $body['item']['uid'] ?? null;
             $this->assertIsInt($uid);
@@ -1558,8 +1829,8 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         }
 
         $this->assertSame(
-            $created['iso'],
             $created['control'],
+            $created['german'],
             'The two accepted formats have to store the same date.',
         );
 
@@ -2777,7 +3048,13 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
             'profileEditing.documents.start' => 'Start',
             'profileEditing.documents.from' => 'From',
             'profileEditing.documents.to' => 'To',
-            'profileEditing.documents.year' => 'Year',
+            'profileEditing.documents.date' => 'Date',
+            'profileEditing.date.published.yearOnly' =>
+            'Only the year of this date is shown on your profile.',
+            'profileEditing.date.published.yearAndMonth' =>
+            'Only the month and the year of this date are shown on your profile.',
+            'profileEditing.date.published.partial' =>
+            'Only a part of this date is shown on your profile.',
             'profileEditing.documents.title' => 'Title',
             'profileEditing.documents.position' => 'Position',
             'profileEditing.documents.actionsHeading' => 'Actions',
@@ -2822,7 +3099,11 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertSame('Profilbild', $germanTranslations['profileEditing.image.heading']);
         $this->assertSame('Von', $germanTranslations['profileEditing.documents.from']);
         $this->assertSame('Bis', $germanTranslations['profileEditing.documents.to']);
-        $this->assertSame('Jahr', $germanTranslations['profileEditing.documents.year']);
+        $this->assertSame('Datum', $germanTranslations['profileEditing.documents.date']);
+        $this->assertSame(
+            'Auf Ihrem Profil wird nur das Jahr dieses Datums angezeigt.',
+            $germanTranslations['profileEditing.date.published.yearOnly'],
+        );
         $this->assertSame('Aktionen', $germanTranslations['profileEditing.documents.actionsHeading']);
         $this->assertSame(
             'Es wurden noch keine Einträge hinterlegt.',

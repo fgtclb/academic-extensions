@@ -8,13 +8,13 @@ as `data-*` attributes on one element, the plugin root of
 
 ## What the root carries
 
-| Group     | Count | Examples                                                         |
-|-----------|-------|------------------------------------------------------------------|
-| Endpoints | 15    | `data-update-url`, `data-toggle-document-visibility-url`         |
-| Profile   | 2     | `data-profile-uid`, `data-editor-language`                       |
-| Image     | 5     | `data-has-image`, `data-image-cropper-ratio`                     |
-| Messages  | 26    | `data-message-saving`, `data-message-document-delete-confirm`    |
-| Labels    | 6     | `data-label-document-add`, `data-label-document-empty`           |
+| Group     | Count | Examples                                                      |
+|-----------|-------|---------------------------------------------------------------|
+| Endpoints | 15    | `data-update-url`, `data-toggle-document-visibility-url`      |
+| Profile   | 2     | `data-profile-uid`, `data-editor-language`                    |
+| Image     | 5     | `data-has-image`, `data-image-cropper-ratio`                  |
+| Messages  | 26    | `data-message-saving`, `data-message-document-delete-confirm` |
+| Labels    | 6     | `data-label-document-add`, `data-label-document-empty`        |
 
 Only the labels a *value* is composed from travel this way — the heading of a
 contact editor is `${documentAdd} ${section.singularLabel}`, an empty display
@@ -372,37 +372,51 @@ and the contact editor differ in two arguments — the id prefix and which of th
 two field hooks the control carries. It is where the drifted checkbox came
 from, so it is deliberately one function and not two.
 
-### The two contract dates are a text control
+### A date is the browser's own control
 
-`validFrom` and `validTo` are the only date fields the editor has, and they are
-**not** an `<input type="date">`. The native control was tried and reverted: it
-forces the locale of the browser rather than the one of the site, it cannot be
-styled with the rest of the editor, and its calendar is not the date picker
-this editor is meant to get. **A date picker is deliberately not shipped yet.**
-It is a feature of its own, and it will not be the browser's.
+Since ACE-552 every date field of the editor is the browser's own control — the
+three dates of a timeline entry and the two contract dates `validFrom` and
+`validTo` alike. The earlier decision, to render a text control until a picker
+of our own existed, is reversed: the browser's calendar is worth more than a
+matching notation, and the notation is recovered everywhere the server renders.
 
-The seam that carries the decision is the split between the *field* type and
-the *control* type:
+**The picker's own format follows the browser, not the site**, and no attribute,
+stylesheet or script changes that. What the site language governs is the
+compact rows, the `displayValue` of every response and the field hints. The
+whole reasoning, and the two browser facts it rests on, are in
+[Dates](dates.md).
+
+The seam between the *field* type and the *control* type is unchanged and is
+still what keeps the two halves honest:
 
 - The field descriptor keeps `"type": "date"`. That is what the endpoint
-  serializes, validates and formats a date by — and it is what a picker will
-  one day be mounted on, so it stays honest.
-- `field-clone.ts` maps that field type to the `type` attribute of the input,
-  and `date` maps to `text` — the same place, and the same kind of decision, as
-  the empty type that also maps to `text`.
-- The format hint is a `placeholder` on the descriptor, next to `autocomplete`,
-  `min`, `max` and `step`. Server side text, like every other label of a field,
-  so nothing in TypeScript spells it.
+  serializes, validates and formats a date by.
+- It carries a `granularity` next to it — `date`, `month` or `year` — and that
+  is what decides the control: `<input type="date">`, `<input type="month">`,
+  or an `<input type="number">` with `min`, `max` and `step`, because no
+  browser has a year input.
+- `field-clone.ts` maps the granularity to the `type` attribute, and
+  `Validation::getControlInputType()` does the same for the server-rendered
+  control. Two implementations, one per side of the Fluid boundary, that have
+  to be kept in step — nothing enforces that they agree.
+- `placeholder` is empty for a date field. The `dd.mm.yyyy` hint is gone with
+  the text control, and so is the constant that held it.
 
-The value the descriptor carries is therefore `d.m.Y`, which is what the
-control shows and submits. The endpoint accepts `Y-m-d` as well — that is what
-it answered and accepted while the control was a native one, and a client
-written against that shape is not broken by the control changing. Both formats
-have to round trip: `createFromFormat()` reads `32.01.2026` as the first of
-February, so the parsed date is formatted back and compared with what came in,
-and anything that does not match is refused. `displayValue` is untouched by all
-of it and stays the `MEDIUMDATE` of the site language, the way the public views
-render a contract date.
+The value the descriptor carries is the date in the granularity's own format —
+`2019-03-14`, `2019-03` or `2019` — which is exactly what the matching control
+accepts and submits; a browser silently discards anything else. The endpoint
+keeps accepting the full ISO format at every granularity and the German
+`d.m.Y` notation at the full one, so a client written against the earlier shape
+is not broken. Every format has to round trip: `createFromFormat()` reads
+`32.01.2026` as the first of February, so the parsed date is formatted back and
+compared with what came in, and anything that does not match is refused.
+
+`displayValue` shows the parts the field publishes, formatted for the locale of
+the matched site language — the bare year for the shipped timeline sections,
+the `MEDIUMDATE` for a field that publishes all three parts, the way the public
+views render it. A field that publishes less than it asks for appends a sentence
+saying so to its `helptext`, which is where the dropped `year_only` column's
+meaning ended up.
 
 ## The five elements
 

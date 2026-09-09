@@ -1,0 +1,5 @@
+"tx_academicpersons_domain_model_profile_information",
+,"uid","pid","profile","type","title","deleted","hidden","year","year_start","year_end","date","date_start","date_end",
+# Only records a default query would not see at all.
+,1,1,1,"type_1","Deleted year only",1,0,2019,\NULL,\NULL,\NULL,\NULL,\NULL,
+,2,1,1,"type_1","Hidden period",0,1,\NULL,2015,2019,\NULL,\NULL,\NULL,

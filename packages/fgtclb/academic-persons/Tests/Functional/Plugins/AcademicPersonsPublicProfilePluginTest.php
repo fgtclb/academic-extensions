@@ -248,12 +248,17 @@ final class AcademicPersonsPublicProfilePluginTest extends AbstractAcademicPerso
     }
 
     /**
-     * The years are printed as they are stored: a closed range, a single year, and the two open
-     * ranges with their "since" and "till" prefix. Nothing about them is locale dependent, so
-     * no formatting view helper is involved.
+     * The four shapes a timeline date takes: a closed range, a single date, and the two open
+     * ranges with their "since" and "till" prefix.
+     *
+     * Every one of them is stored as a full calendar date and every one of them publishes the
+     * year alone, because that is what the `dates` map of all seven shipped sections declares.
+     * The publication is the conclusive case - it is stored as the 14th of March 2024, so a
+     * bare `2024` can only be the configured narrowing and not the accident of a date that
+     * happens to sit on the first of January.
      */
     #[Test]
-    public function timelineYearsRenderAsStored(): void
+    public function timelineDatesPublishTheYearTheShippedSectionsConfigure(): void
     {
         $content = $this->renderShippedProfile();
         $normalized = (string)preg_replace('/\s+/', ' ', $content);
@@ -261,8 +266,49 @@ final class AcademicPersonsPublicProfilePluginTest extends AbstractAcademicPerso
         $this->assertStringContainsString('2015 – 2018', $normalized);
         $this->assertStringContainsString('__timeline-date"> 2024 </p>', $normalized);
         $this->assertStringContainsString('Since 2020', $normalized);
-        // The entry that carries an end year only takes the other branch.
+        // The entry that carries an end date only takes the other branch.
         $this->assertStringContainsString('Till 2019', $normalized);
+        // Neither the month nor the day of any of the four reaches the page.
+        $this->assertStringNotContainsString('2024-03-14', $normalized);
+        $this->assertStringNotContainsString('Mar 14, 2024', $normalized);
+        $this->assertStringNotContainsString('Jan 1, 2015', $normalized);
+        $this->assertStringNotContainsString('Dec 31, 2018', $normalized);
+    }
+
+    /**
+     * A timeline entry whose three date columns are all `NULL` renders no date at all: the
+     * whole paragraph is skipped, so there is neither a placeholder, nor a zero, nor - which
+     * is what an unguarded `f:format.date` would print - today.
+     */
+    #[Test]
+    public function aTimelineEntryWithoutAnyDateRendersNoDateAtAll(): void
+    {
+        $content = $this->renderShippedProfile();
+        $normalized = (string)preg_replace('/\s+/', ' ', $content);
+
+        $item = $this->timelineItemContaining($normalized, 'A lecture without dates');
+        $this->assertStringNotContainsString('__timeline-date', $item);
+        $this->assertStringNotContainsString((new \DateTimeImmutable())->format('Y'), $item);
+        $this->assertStringNotContainsString('1970', $item);
+        // The four entries that do carry a date still render one, so the assertion above is
+        // about this entry and not about a timeline that failed to render.
+        $this->assertSame(4, substr_count($normalized, '__timeline-date"'));
+    }
+
+    /**
+     * The rendered `<article>` of the timeline entry carrying $title, without the ones around
+     * it: an assertion about one entry must not be satisfied by its neighbour.
+     */
+    private function timelineItemContaining(string $normalizedContent, string $title): string
+    {
+        $items = explode('<article class="academic-persons-detail__timeline-item">', $normalizedContent);
+        $matching = array_values(array_filter(
+            $items,
+            static fn(string $item): bool => str_contains($item, $title),
+        ));
+        $this->assertCount(1, $matching, sprintf('Exactly one timeline entry renders "%s".', $title));
+
+        return substr($matching[0], 0, (int)strpos($matching[0], '</article>'));
     }
 
     /**

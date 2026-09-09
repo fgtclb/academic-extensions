@@ -21,9 +21,9 @@ use Symfony\Component\DependencyInjection\Attribute\Exclude;
 #[Exclude]
 final class DocumentSection
 {
-    public const SUPPORTED_ROW_FIELDS = ['from', 'to', 'year', 'title', 'description', 'position'];
+    public const SUPPORTED_ROW_FIELDS = ['from', 'to', 'date', 'title', 'description', 'position'];
     public const SUPPORTED_CONTRACT_ROW_FIELDS = ['from', 'to', 'position'];
-    public const SUPPORTED_PROFILE_INFORMATION_ROW_FIELDS = ['from', 'to', 'year', 'title', 'description'];
+    public const SUPPORTED_PROFILE_INFORMATION_ROW_FIELDS = ['from', 'to', 'date', 'title', 'description'];
     public const SUPPORTED_ACTIONS = ['hide', 'view', 'down', 'up', 'delete', 'edit'];
 
     /**

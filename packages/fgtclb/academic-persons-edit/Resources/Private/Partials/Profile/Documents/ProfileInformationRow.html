@@ -16,8 +16,8 @@
                         <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="profileEditing.documents.from" extensionName="academic_persons_edit" />
                         </div>
-                        <div data-pe-document-value="yearStart">
-                            <f:render partial="Profile/Documents/YearValue" arguments="{value: item.yearStart, fallback: item.year}" />
+                        <div data-pe-document-value="dateStart">
+                            <f:render partial="Profile/Documents/DateValue" arguments="{value: item.dateStart, fallback: item.date, type: item.type, field: 'dateStart', fallbackField: 'date'}" />
                         </div>
                     </div>
                 </f:case>
@@ -26,18 +26,18 @@
                         <div class="d-md-none fw-semibold mb-1">
                             <f:translate key="profileEditing.documents.to" extensionName="academic_persons_edit" />
                         </div>
-                        <div data-pe-document-value="yearEnd">
-                            <f:render partial="Profile/Documents/YearValue" arguments="{value: item.yearEnd}" />
+                        <div data-pe-document-value="dateEnd">
+                            <f:render partial="Profile/Documents/DateValue" arguments="{value: item.dateEnd, type: item.type, field: 'dateEnd', fallbackField: 'dateEnd'}" />
                         </div>
                     </div>
                 </f:case>
-                <f:case value="year">
+                <f:case value="date">
                     <div class="col-12 col-md-2 py-1 pe-md-3 text-break">
                         <div class="d-md-none fw-semibold mb-1">
-                            <f:translate key="profileEditing.documents.year" extensionName="academic_persons_edit" />
+                            <f:translate key="profileEditing.documents.date" extensionName="academic_persons_edit" />
                         </div>
-                        <div data-pe-document-value="year">
-                            <f:render partial="Profile/Documents/YearValue" arguments="{value: item.year, fallback: item.yearStart}" />
+                        <div data-pe-document-value="date">
+                            <f:render partial="Profile/Documents/DateValue" arguments="{value: item.date, fallback: item.dateStart, type: item.type, field: 'date', fallbackField: 'dateStart'}" />
                         </div>
                     </div>
                 </f:case>

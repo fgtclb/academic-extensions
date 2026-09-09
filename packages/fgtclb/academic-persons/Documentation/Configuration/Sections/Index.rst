@@ -154,10 +154,12 @@ the two keys as ``publicProfile`` and dispatches every identifier of
         -   One timeline section per identifier whose relation has records
 
 Overriding a partial changes how an element renders, overriding
-:yaml:`profile` changes what renders and where. The years of a timeline entry
-are printed as they are stored - a single year, a range, or an open range
-prefixed with a "since" or "till" label - and nothing about them is locale
-dependent.
+:yaml:`profile` changes what renders and where. The dates of a timeline entry
+are printed as a single date, a range, or an open range prefixed with a "since"
+or "till" label. How much of each of them a visitor sees is the
+:ref:`date configuration <configuration-sections-dates>` of the entry's own
+section, and the parts that are shown are formatted for the locale of the
+matched site language.
 
 Below the large breakpoint the elements of the :yaml:`left` column are
 rendered a second time, directly before the :yaml:`subline` element of the
@@ -271,6 +273,10 @@ Every other key is a field, and fields share one shape across
         -   Rich text fields (:yaml:`renderType: ckeditor`) only: the maximum
             number of readable characters. Checked on the server, never copied
             into the TCA.
+    *   -   :yaml:`date`
+        -   Date fields (:yaml:`renderType: date`) only: how much of a date the
+            editor is asked for and how much of it a visitor sees. See
+            :ref:`configuration-sections-dates`.
     *   -   :yaml:`helptext`
         -   A label reference or literal text rendered next to the control.
     *   -   :yaml:`autocomplete`
@@ -394,7 +400,7 @@ The document sections
         type: publication
         fieldName: publications
         rowFields:
-          - year
+          - date
           - title
         actions:
           - view
@@ -408,16 +414,22 @@ The document sections
           link:
             - url
           from:
-            - number
+            - date
           to:
-            - number
-          year:
+            - date
+          date:
             - required
-            - number
+            - date
           description:
             editor:
               limit: 500
               type: ckeditor
+        dates:
+          date:
+            display:
+              year: true
+              month: false
+              day: false
 
 Each key is a stable section identifier; the map order is the display order.
 
@@ -440,7 +452,7 @@ Each key is a stable section identifier; the map order is the display order.
             section still offers ``view``.
     *   -   :yaml:`rowFields`
         -   The values shown in a compact row, in order. Timeline entries
-            support ``from``, ``to``, ``year``, ``title`` and ``description``;
+            support ``from``, ``to``, ``date``, ``title`` and ``description``;
             contracts support ``from``, ``to`` and ``position``.
     *   -   :yaml:`actions`
         -   The actions offered per row, in order: ``view``, ``down``, ``up``,
@@ -453,6 +465,11 @@ Each key is a stable section identifier; the map order is the display order.
             readable-text :yaml:`limit`; :yaml:`editor.type: textarea` implies
             ``textarea``. The contract section validates against
             :yaml:`contracts.fields` instead.
+    *   -   :yaml:`dates`
+        -   A map from field to its :ref:`date configuration
+            <configuration-sections-dates>`. It sits next to :yaml:`validators`
+            rather than inside it, and a field that only this map names is
+            known to the section all the same.
     *   -   :yaml:`helptext`
         -   A map from field to label reference.
 
@@ -473,12 +490,179 @@ The validators of a timeline section address the record type of that section
 only: a required title of publications does not make the title of a lecture
 required, neither in the editing frontend nor in the backend, where the flags
 land in the ``columnsOverrides`` of that record type. The field keys ``from``,
-``to`` and ``description`` are aliases of the ``yearStart``, ``yearEnd`` and
-``bodytext`` properties (columns ``year_start``, ``year_end`` and
-``bodytext``); ``year`` addresses the ``year`` property and column.
+``to`` and ``description`` are aliases of the ``dateStart``, ``dateEnd`` and
+``bodytext`` properties (columns ``date_start``, ``date_end`` and
+``bodytext``); ``date`` addresses the ``date`` property and column. The
+:yaml:`validators`, :yaml:`dates` and :yaml:`helptext` maps are all keyed by
+the alias, not by the property.
 
 Unknown row fields and actions are discarded, as are duplicates; both lists
 are matched without regard to case.
+
+..  _configuration-sections-dates:
+
+Date fields
+===========
+
+A date field is refined by a :yaml:`date` block: how much of a date its editor
+is asked for, how the parts nobody was asked for are completed, and how much of
+the result a visitor is shown. Everything in it is optional and every
+unreadable value falls back to its own default, so a typo narrows nothing and
+publishes nothing by accident. A date field without the block asks for a
+complete date and shows all of it.
+
+**A non-empty block makes the field a date on its own.** The :yaml:`date`
+validator flag next to it says the same thing and stays worth writing, but the
+block does not wait for it: configuring how much of a date is published, or how
+much of it is asked for, states that the field is a date more plainly than the
+flag does, and a block that took effect only when the flag was remembered as
+well would be a trap rather than a shorthand.
+
+A :yaml:`profile` field or a :yaml:`contracts.fields` field carries the block on
+the field entry itself, next to its scalar :yaml:`helptext`:
+
+..  code-block:: yaml
+
+    contracts:
+      fields:
+        validFrom:
+          fieldType: input
+          renderType: date
+          validators:
+            - required
+            - date
+          date:
+            display:
+              year: true
+              month: true
+              day: true
+
+A document section names its fields in maps rather than in one entry per field,
+so it keeps the same blocks in a :yaml:`dates` map keyed by field identifier,
+next to :yaml:`validators` and :yaml:`helptext` - and *next to* is meant
+literally. :yaml:`dates` is not a refinement of :yaml:`validators`: a field
+that only :yaml:`dates` names is known to the section all the same and carries
+an empty flag list, the independence :yaml:`helptext` has always had, where a
+field never needed a :yaml:`validators` entry to be given a helptext either.
+:yaml:`validators` decides the order of the fields; anything only :yaml:`dates`
+knows follows it.
+
+..  code-block:: yaml
+
+    documentSections:
+      publications:
+        rowFields:
+          - date
+          - title
+        validators:
+          date:
+            - required
+            - date
+        dates:
+          date:
+            display:
+              year: true
+              month: false
+              day: false
+            input:
+              granularity: date
+              completeMonth: first
+              completeDay: first
+
+..  _configuration-sections-dates-display:
+
+What a visitor is shown
+-----------------------
+
+The three switches of :yaml:`display` are independent and each default to
+:yaml:`true`. The parts that are switched on are written the way the locale of
+the **matched site language** writes exactly those parts - not by cutting a
+longer format short - so the same entry reads differently on a German and on an
+English page without any per-language configuration, and the settings of the
+visitor's browser do not change it. For the 14th of March 2019:
+
+..  code-block:: text
+
+    year, month, day    de-DE  14.03.2019      en-US  Mar 14, 2019
+    year, month         de-DE  März 2019       en-US  Mar 2019
+    year                de-DE  2019            en-US  2019
+    month, day          de-DE  14. März        en-US  Mar 14
+
+A complete date keeps the notation TYPO3's ``MEDIUMDATE`` produces, which is
+what the contract rows and the editor already rendered. A month standing on its
+own is spelled out, a month next to another part abbreviated. An empty date
+renders nothing at all - no placeholder, no zero and no current date - and so
+does a field with all three switches off: it is stored and edited, and never
+shown.
+
+The public profile needs no format in a template for this. The ViewHelper
+:php:`\FGTCLB\AcademicPersons\ViewHelpers\Format\ProfileInformationDateViewHelper`
+resolves the section from the record type and the field from the property name:
+
+..  code-block:: html
+
+    <html xmlns:ap="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers">
+        <ap:format.profileInformationDate date="{item.dateStart}" type="{item.type}" field="dateStart"/>
+    </html>
+
+..  _configuration-sections-dates-input:
+
+What the editor is asked for
+----------------------------
+
+:yaml:`input.granularity` chooses the control the editing frontend renders, and
+the control decides what a browser offers and what it submits:
+
+..  code-block:: text
+
+    date    <input type="date">     submits  2019-03-14
+    month   <input type="month">    submits  2019-03
+    year    <input type="number">   submits  2019
+
+:yaml:`date` is the default. A year is a number control carrying
+``min="1000"``, ``max="9999"`` and ``step="1"``, because no browser has a year
+input. The editing frontend enforces those two bounds on the server as well and
+refuses a year outside them rather than clamping it; the other two
+granularities have no bounds.
+
+The lower bound is the lowest four-digit year: a year is exchanged as ``Y`` and
+read back strictly, and a number control cannot emit the leading zeros a year
+below 1000 needs. A record that reaches further back is configured for the
+:yaml:`date` granularity, whose control writes a full ``0800-01-01``.
+
+..  note::
+    Desktop Firefox has never implemented :html:`<input type="month">` and
+    degrades it to a plain text field. The value it submits is the same
+    ``2019-03`` and the server validates it either way, so the form stays
+    usable there - it simply has no calendar.
+
+:yaml:`input.completeMonth` and :yaml:`input.completeDay` fill the parts the
+editor was not asked for, and both default to :yaml:`first`. They are the four
+rules an integrator can name, on their two axes: a :yaml:`first` or
+:yaml:`last` month of the year, and a :yaml:`first` or :yaml:`last` day of the
+month. A last day is the last day of the *resulting* month, so a last day of a
+last month of 2019 is the 31st of December and a last day of February 2020 is
+the 29th. A part the editor did give is never completed over.
+
+Where a field publishes less than it asks for, the editing frontend tells the
+editor so at the field. The `profile editing chapter
+<https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/ProfileEditing/Index.html>`__
+of :guilabel:`academic_persons_edit` describes the control and the hint.
+
+..  _configuration-sections-dates-shipped:
+
+What is shipped
+---------------
+
+All three dates of all seven timeline sections declare :yaml:`year: true` with
+:yaml:`month` and :yaml:`day` switched off, and no :yaml:`input` block. The
+editor therefore enters a complete date and a visitor is shown the year alone,
+which is exactly what the integer years of 2.x showed. Switch :yaml:`month` and
+:yaml:`day` on to publish them, or add an :yaml:`input` block to ask for less
+than a complete date.
+
+The two contract dates :yaml:`validFrom` and :yaml:`validTo` carry no
+:yaml:`date` block, so they ask for a complete date and publish all of it.
 
 ..  _configuration-sections-override:
 

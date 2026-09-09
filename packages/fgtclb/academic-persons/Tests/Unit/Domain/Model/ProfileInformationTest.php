@@ -47,34 +47,46 @@ final class ProfileInformationTest extends UnitTestCase
     }
 
     #[Test]
-    public function getYearReturnsNullForNewModel(): void
+    public function getDateReturnsNullForNewModel(): void
     {
-        $this->assertNull((new ProfileInformation())->getYear());
+        $this->assertNull((new ProfileInformation())->getDate());
     }
 
     #[Test]
-    public function getYearStartReturnsNullForNewModel(): void
+    public function getDateStartReturnsNullForNewModel(): void
     {
-        $this->assertNull((new ProfileInformation())->getYearStart());
+        $this->assertNull((new ProfileInformation())->getDateStart());
     }
 
     #[Test]
-    public function getYearEndReturnsNullForNewModel(): void
+    public function getDateEndReturnsNullForNewModel(): void
     {
-        $this->assertNull((new ProfileInformation())->getYearEnd());
+        $this->assertNull((new ProfileInformation())->getDateEnd());
     }
 
+    /**
+     * The three columns are native SQL `DATE` values, so the model carries
+     * `\DateTime` objects rather than the four digit integers it used to hold.
+     * A date is kept as it is handed in - the model neither normalizes the
+     * time part nor applies a timezone.
+     */
     #[Test]
-    public function yearsRoundTripAsNullableIntegers(): void
+    public function datesRoundTripAsNullableDateTimeObjects(): void
     {
+        $date = new \DateTime('2026-03-14');
+        $dateStart = new \DateTime('2024-10-01');
+        $dateEnd = new \DateTime('2028-09-30');
         $subject = (new ProfileInformation())
-            ->setYear(2026)
-            ->setYearStart(2024)
-            ->setYearEnd(2028);
-        $this->assertSame(2026, $subject->getYear());
-        $this->assertSame(2024, $subject->getYearStart());
-        $this->assertSame(2028, $subject->getYearEnd());
-        $this->assertNull($subject->setYear(null)->getYear());
+            ->setDate($date)
+            ->setDateStart($dateStart)
+            ->setDateEnd($dateEnd);
+        $this->assertSame($date, $subject->getDate());
+        $this->assertSame($dateStart, $subject->getDateStart());
+        $this->assertSame($dateEnd, $subject->getDateEnd());
+        $this->assertSame('2026-03-14', $subject->getDate()->format('Y-m-d'));
+        $this->assertSame('2024-10-01', $subject->getDateStart()->format('Y-m-d'));
+        $this->assertSame('2028-09-30', $subject->getDateEnd()->format('Y-m-d'));
+        $this->assertNull($subject->setDate(null)->getDate());
     }
 
     #[Test]

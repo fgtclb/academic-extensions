@@ -18,8 +18,8 @@ final class EditSettingsIsolationTest extends AbstractAcademicPersonsTestCase
 {
     /**
      * A document section addresses the records of its type only, through
-     * `columnsOverrides`, and the range of the year columns stays untouched
-     * by it.
+     * `columnsOverrides`, and the native `DATE` declaration of the three date
+     * columns stays untouched by it.
      */
     #[Test]
     public function centralDocumentValidationIsAppliedToBackendTca(): void
@@ -29,14 +29,14 @@ final class EditSettingsIsolationTest extends AbstractAcademicPersonsTestCase
         $this->assertArrayHasKey('columnsOverrides', $table['types']['cooperation']);
         $overrides = $table['types']['cooperation']['columnsOverrides'];
         $this->assertTrue($overrides['title']['config']['required']);
-        $this->assertTrue($overrides['year']['config']['required']);
-        $this->assertFalse($overrides['year_start']['config']['required']);
-        $this->assertFalse($overrides['year_end']['config']['required']);
-        $this->assertArrayNotHasKey('required', $table['columns']['year']['config']);
-        $this->assertSame('number', $table['columns']['year']['config']['type']);
-        $this->assertSame('integer', $table['columns']['year']['config']['format']);
-        $this->assertSame(['lower' => 0, 'upper' => 9999], $table['columns']['year']['config']['range']);
-        $this->assertTrue($table['columns']['year']['config']['nullable']);
+        $this->assertTrue($overrides['date']['config']['required']);
+        $this->assertFalse($overrides['date_start']['config']['required']);
+        $this->assertFalse($overrides['date_end']['config']['required']);
+        $this->assertArrayNotHasKey('required', $table['columns']['date']['config']);
+        $this->assertSame('datetime', $table['columns']['date']['config']['type']);
+        $this->assertSame('date', $table['columns']['date']['config']['dbType']);
+        $this->assertSame('date', $table['columns']['date']['config']['format']);
+        $this->assertTrue($table['columns']['date']['config']['nullable']);
     }
 
     /**

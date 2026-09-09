@@ -134,9 +134,9 @@
 # non-negative `limit` is enforced server-side. `limit` is ignored for other
 # editor types. Document validation stays local to its containing section and
 # reaches the backend as `columnsOverrides` of that section's record type.
-# Supported ProfileInformation field keys are `title`, `link`, `year`, `from`,
+# Supported ProfileInformation field keys are `title`, `link`, `date`, `from`,
 # `to` and `description`. The aliases `from`, `to` and `description` are
-# mapped to `yearStart`, `yearEnd` and `bodytext`. Contract
+# mapped to `dateStart`, `dateEnd` and `bodytext`. Contract
 # validation is intentionally configured only below `contracts.fields`.
 #
 # Public profile
@@ -491,17 +491,45 @@ contracts:
 #   relations are plural; underscored names are converted to their getter.
 # - `readonly` disables all mutating frontend actions for the section.
 # - `rowFields` selects and orders the values rendered in each compact row.
-#   ProfileInformation supports `from`, `to`, `year`, `title` and
+#   ProfileInformation supports `from`, `to`, `date`, `title` and
 #   `description`; Contract supports `from`, `to` and `position`.
 # - `actions` selects and orders the available per-row actions. Supported
 #   values are `view`, `down`, `up`, `delete` and `edit`.
 # - `validators` belongs exclusively to ProfileInformation records of the
 #   containing section. Contract validators live on `contracts.fields`.
 # Profile-information validation aliases:
-# - `from` -> DTO `yearStart` -> integer field `year_start`
-# - `to` -> DTO `yearEnd` -> integer field `year_end`
-# - `year` -> DTO `year` -> integer field `year`
+# - `from` -> DTO `dateStart` -> date field `date_start`
+# - `to` -> DTO `dateEnd` -> date field `date_end`
+# - `date` -> DTO `date` -> date field `date`
 # - `description` -> DTO `bodytext` -> database field `bodytext`
+#
+# Dates
+# -----
+# A date field is refined by a `date` block on the field entry, and a document
+# section keeps the same blocks in a `dates` map keyed by field identifier,
+# next to `validators` and `helptext` - and next to them in the literal sense:
+# `dates` is not a refinement of `validators`. A field that only `dates` names
+# is known to the section all the same and carries an empty flag list, the
+# independence `helptext` has always had. A non-empty block also makes the
+# field a date on its own; the `date` flag next to it says the same thing and
+# stays worth writing, but the block does not wait for it.
+#
+#   date:
+#     display:          # what a visitor is shown, each part on its own
+#       year: true
+#       month: false
+#       day: false
+#     input:
+#       granularity: year     # `date` (the default), `month` or `year`
+#       completeMonth: first  # first or last month of the year
+#       completeDay: last     # first or last day of the month
+#
+# The shown parts are formatted for the locale of the matched site language,
+# never for the locale of the browser. The editor is asked for the granularity
+# and the parts it was not asked for are completed by the two edges; a field
+# that publishes less than it asks for shows the editor a hint saying so.
+# Everything is optional and an unreadable value falls back to its own
+# default, so a typo narrows nothing.
 documentSections:
   # Contracts use their own Contract model rather than ProfileInformation.
   # The relation is Profile::$contracts / Profile::getContracts(), whereas
@@ -529,28 +557,49 @@ documentSections:
       title:
         - required
       from:
-        - number
+        - date
       to:
-        - number
-      year:
+        - date
+      date:
         - required
-        - number
+        - date
       description:
         editor:
           limit: 500
           type: ckeditor
+    # The shipped timeline publishes the year alone, the way it did while these
+    # three fields were integers. The editor still enters a full date - the
+    # native control of the browser - and is told at the field that only the
+    # year of it reaches a visitor. Switch `month` and `day` on to publish
+    # them, or add an `input` block to ask for less than a full date.
+    dates:
+      date:
+        display:
+          year: true
+          month: false
+          day: false
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+      to:
+        display:
+          year: true
+          month: false
+          day: false
     helptext:
       title: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.title'
       from: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.from'
       to: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.to'
-      year: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.year'
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
       description: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.description'
   lectures:
     label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.lectures.label'
     type: lecture
     fieldName: lectures
     rowFields:
-      - year
+      - date
       - from
       - to
       - title
@@ -567,21 +616,37 @@ documentSections:
       link:
         - url
       from:
-        - number
+        - date
       to:
-        - number
-      year:
+        - date
+      date:
         - required
-        - number
+        - date
       description:
         editor:
           limit: 500
           type: ckeditor
+    dates:
+      date:
+        display:
+          year: true
+          month: false
+          day: false
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+      to:
+        display:
+          year: true
+          month: false
+          day: false
     helptext:
       title: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.title'
       from: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.from'
       to: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.to'
-      year: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.year'
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
       description: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.description'
   memberships:
     label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.memberships.label'
@@ -604,28 +669,44 @@ documentSections:
       link:
         - url
       from:
-        - number
+        - date
       to:
-        - number
-      year:
+        - date
+      date:
         - required
-        - number
+        - date
       description:
         editor:
           limit: 500
           type: ckeditor
+    dates:
+      date:
+        display:
+          year: true
+          month: false
+          day: false
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+      to:
+        display:
+          year: true
+          month: false
+          day: false
     helptext:
       title: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.title'
       from: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.from'
       to: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.to'
-      year: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.year'
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
       description: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.description'
   pressMedia:
     label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.press_media.label'
     type: press_media
     fieldName: press_media
     rowFields:
-      - year
+      - date
       - title
     actions:
       - hide
@@ -640,28 +721,44 @@ documentSections:
       link:
         - url
       from:
-        - number
+        - date
       to:
-        - number
-      year:
+        - date
+      date:
         - required
-        - number
+        - date
       description:
         editor:
           limit: 500
           type: ckeditor
+    dates:
+      date:
+        display:
+          year: true
+          month: false
+          day: false
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+      to:
+        display:
+          year: true
+          month: false
+          day: false
     helptext:
       title: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.title'
       from: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.from'
       to: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.to'
-      year: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.year'
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
       description: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.description'
   publications:
     label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.publications.label'
     type: publication
     fieldName: publications
     rowFields:
-      - year
+      - date
       - title
     actions:
       - hide
@@ -676,28 +773,44 @@ documentSections:
       link:
         - url
       from:
-        - number
+        - date
       to:
-        - number
-      year:
+        - date
+      date:
         - required
-        - number
+        - date
       description:
         editor:
           limit: 500
           type: ckeditor
+    dates:
+      date:
+        display:
+          year: true
+          month: false
+          day: false
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+      to:
+        display:
+          year: true
+          month: false
+          day: false
     helptext:
       title: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.title'
       from: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.from'
       to: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.to'
-      year: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.year'
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
       description: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.description'
   scientificResearch:
     label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.scientific_research.label'
     type: scientific_research
     fieldName: scientific_research
     rowFields:
-      - year
+      - date
       - title
     actions:
       - hide
@@ -712,21 +825,37 @@ documentSections:
       link:
         - url
       from:
-        - number
+        - date
       to:
-        - number
-      year:
+        - date
+      date:
         - required
-        - number
+        - date
       description:
         editor:
           limit: 500
           type: ckeditor
+    dates:
+      date:
+        display:
+          year: true
+          month: false
+          day: false
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+      to:
+        display:
+          year: true
+          month: false
+          day: false
     helptext:
       title: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.title'
       from: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.from'
       to: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.to'
-      year: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.year'
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
       description: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.description'
   vita:
     label: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:tx_academicpersons_domain_model_profile.columns.vita.label'
@@ -748,19 +877,35 @@ documentSections:
       link:
         - url
       from:
-        - number
+        - date
       to:
-        - number
-      year:
+        - date
+      date:
         - required
-        - number
+        - date
       description:
         editor:
           limit: 500
           type: ckeditor
+    dates:
+      date:
+        display:
+          year: true
+          month: false
+          day: false
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+      to:
+        display:
+          year: true
+          month: false
+          day: false
     helptext:
       title: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.title'
       from: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.from'
       to: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.to'
-      year: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.year'
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
       description: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.description'

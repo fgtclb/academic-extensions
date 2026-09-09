@@ -184,7 +184,7 @@ describe("opening a document editor", () => {
   it("starts the values from the fields the server answered with", async () => {
     fetch.respond({
       success: true,
-      fields: [fieldResponse(), fieldResponse({ name: "year", value: 1843 })],
+      fields: [fieldResponse(), fieldResponse({ name: "date", value: "1843" })],
       record: null,
     });
 
@@ -193,7 +193,7 @@ describe("opening a document editor", () => {
 
     assert.deepEqual(controller.document.values, {
       title: "Sample paper",
-      year: 1843,
+      date: "1843",
     });
   });
 
@@ -409,7 +409,7 @@ describe("saving a document", () => {
       item: {
         uid: 12,
         sorting: 20,
-        display: { title: "New paper", yearStart: "1843" },
+        display: { title: "New paper", dateStart: "1843" },
         values: {},
       },
     });
@@ -611,14 +611,14 @@ describe("the values of a row the JavaScript wrote", () => {
     const row = await insert({
       uid: 3,
       sorting: 10,
-      display: { title: "Paper", yearStart: "1843" },
+      display: { title: "Paper", dateStart: "1843" },
       values: {},
     });
 
     assert.equal(row.dataset.itemUid, "3");
     assert.equal(row.dataset.itemSorting, "10");
     assert.equal(
-      select(row, '[data-pe-document-value="yearStart"]', HTMLElement).textContent,
+      select(row, '[data-pe-document-value="dateStart"]', HTMLElement).textContent,
       "1843",
     );
   });
@@ -627,26 +627,26 @@ describe("the values of a row the JavaScript wrote", () => {
     const row = await insert({ uid: 3, sorting: 10, display: { title: "Paper" }, values: {} });
 
     assert.equal(
-      select(row, '[data-pe-document-value="yearStart"]', HTMLElement).textContent,
+      select(row, '[data-pe-document-value="dateStart"]', HTMLElement).textContent,
       "—",
     );
   });
 
   /**
-   * A section that shows one year and a section that shows a range are fed by
-   * the same record, so the single year stands in for the missing start year
+   * A section that shows one date and a section that shows a range are fed by
+   * the same record, so the single date stands in for the missing start date
    * and the other way round.
    */
-  it("stands the single year in for a missing start year", async () => {
+  it("stands the single date in for a missing start date", async () => {
     const row = await insert({
       uid: 3,
       sorting: 10,
-      display: { title: "Paper", year: "1843" },
+      display: { title: "Paper", date: "1843" },
       values: {},
     });
 
     assert.equal(
-      select(row, '[data-pe-document-value="yearStart"]', HTMLElement).textContent,
+      select(row, '[data-pe-document-value="dateStart"]', HTMLElement).textContent,
       "1843",
     );
   });

@@ -22,13 +22,13 @@ final class EditSettingsWithEditingExtensionTest extends AbstractAcademicPersons
         $table = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information'];
         $this->assertArrayHasKey('columnsOverrides', $table['types']['cooperation']);
         $overrides = $table['types']['cooperation']['columnsOverrides'];
-        $this->assertTrue($overrides['year']['config']['required']);
-        $this->assertFalse($overrides['year_start']['config']['required']);
-        $this->assertFalse($overrides['year_end']['config']['required']);
-        $this->assertSame('number', $table['columns']['year']['config']['type']);
-        $this->assertSame('integer', $table['columns']['year']['config']['format']);
-        $this->assertSame(['lower' => 0, 'upper' => 9999], $table['columns']['year']['config']['range']);
-        $this->assertTrue($table['columns']['year']['config']['nullable']);
+        $this->assertTrue($overrides['date']['config']['required']);
+        $this->assertFalse($overrides['date_start']['config']['required']);
+        $this->assertFalse($overrides['date_end']['config']['required']);
+        $this->assertSame('datetime', $table['columns']['date']['config']['type']);
+        $this->assertSame('date', $table['columns']['date']['config']['format']);
+        $this->assertSame('date', $table['columns']['date']['config']['dbType']);
+        $this->assertTrue($table['columns']['date']['config']['nullable']);
     }
 
     #[Test]

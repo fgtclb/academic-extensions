@@ -72,19 +72,23 @@
                 value="{profile.{field.propertyName}}" />
             <f:variable name="controlDescribedBy" value="{elementId}-error" />
             <f:comment>
-                A date is typed into a text control here as well. The field
-                type of the settings graph stays "date" - it is what the
-                endpoint validates and formats by - but the native
-                <input type="date"> is not used anywhere in this editor: it
-                follows the locale of the browser rather than the one of the
-                site, and its calendar is not the date picker this editor is
-                meant to get. No shipped profile field is a date; the mapping
-                is here so that one configured by an integrator renders the
-                same control as the two contract dates.
+                A date is the browser's own control since ACE-552, and which of
+                the three it is follows the field's configured granularity: a
+                full date and a month are native pickers, a year is a number
+                control because no browser has a year input. The field type of
+                the settings graph stays "date" - it is what the endpoint
+                validates and formats by - and `getControlInputType()` turns it
+                into the tag's `type` here. The prototype filler does the same
+                on the other side of the Fluid boundary, in `inputTypeOf()` of
+                `field-clone.ts`: two implementations that have to be kept in
+                step, because nothing enforces that they agree. No shipped
+                profile field is a date; the mapping is here so that one
+                configured by an integrator renders the same control as the
+                timeline and contract dates.
             </f:comment>
             <f:variable
                 name="controlType"
-                value="{f:if(condition: '{field.validation.inputType} == \'date\'', then: 'text', else: field.validation.inputType)}" />
+                value="{field.validation.controlInputType}" />
             <f:variable
                 name="controlAutocomplete"
                 value="{field.autocomplete}" />

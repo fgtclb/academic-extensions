@@ -31,6 +31,10 @@ describing an intention as if it were the state.
   `academic_base` provider that inlines it, so it follows the text colour in
   the backend and the frontend, on the dark cards of a dark colour scheme
   included.
+- A **date** is stored as a native SQL `DATE`, entered in the browser's own
+  control and displayed for the locale of the matched **site** language. The
+  picker's own notation follows the browser and cannot be influenced by a page,
+  so everything the server renders carries the site's notation instead.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
@@ -49,6 +53,7 @@ describing an intention as if it were the state.
 | [Dependency injection](dependency-injection.md)                 | How services are configured across the extensions, why they must be stateless, and which TYPO3 attributes are safe on both core versions.             |
 | [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                              |
 | [Database queries](database-queries.md)                         | Quoting value lists, and keeping a constraint on the builder that executes it.                                                                        |
+| [Dates](dates.md)                                               | Where a date is stored, which parts of it a visitor sees, and why a native picker never follows the site language.                                    |
 | [Frontend-user contact import](frontend-user-contact-import.md) | How telephone and fax data from `fe_users` is identified, typed, synchronized and migrated.                                                           |
 | [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                     |
 | [Form data transformation](form-data-transformation.md)         | How a value of a JSON payload reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                  |

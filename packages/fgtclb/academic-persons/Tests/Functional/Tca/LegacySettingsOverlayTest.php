@@ -75,11 +75,16 @@ final class LegacySettingsOverlayTest extends AbstractAcademicPersonsTestCase
         foreach (['cooperation', 'lecture', 'membership', 'press_media', 'publication', 'scientific_research', 'curriculum_vitae'] as $type) {
             $overrides = $information['types'][$type]['columnsOverrides'];
             $this->assertTrue($overrides['title']['config']['required'], $type);
-            // The legacy set does not list the year, so it loses the shipped
-            // `required` and `number` flags and overrides nothing at all.
-            $this->assertArrayNotHasKey('year', $overrides, $type . ': the year was not listed');
+            // The legacy set does not list the date, so it loses the shipped
+            // `required` flag - one of the five the old shape knew. The `date`
+            // flag next to it is not one of them and stays, which is why the
+            // field still has an override at all.
+            $this->assertFalse($overrides['date']['config']['required'], $type . ': the date was not listed');
+            $this->assertArrayNotHasKey('type', $overrides['date']['config'], $type);
         }
-        $this->assertSame('number', $information['columns']['year']['config']['type']);
-        $this->assertSame(['lower' => 0, 'upper' => 9999], $information['columns']['year']['config']['range']);
+        $this->assertSame('datetime', $information['columns']['date']['config']['type']);
+        $this->assertSame('date', $information['columns']['date']['config']['dbType']);
+        $this->assertSame('date', $information['columns']['date']['config']['format']);
+        $this->assertArrayNotHasKey('range', $information['columns']['date']['config']);
     }
 }

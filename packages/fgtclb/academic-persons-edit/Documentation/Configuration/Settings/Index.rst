@@ -77,12 +77,13 @@ Supported flags are:
     *   - ``url``
         - Adds ``UrlValidator`` and URL input metadata.
     *   - ``number``, ``tel`` and ``date``
-        - Select the matching frontend input type. ``date`` is the exception
-          to that: it selects the date *field* type, which the profile editor
-          renders as a plain text control showing ``d.m.Y``. A date picker is
-          deliberately not shipped yet, and the native
-          ``<input type="date">`` is not used - see
-          :ref:`the contract dates <profile-editing-contract-dates>`.
+        - Select the matching frontend input type. ``date`` selects the date
+          *field* type; which control the editor renders for it follows the
+          field's date configuration - a complete date and a month are the
+          browser's own controls, a year is a number control because no
+          browser has a year input. See :ref:`profile-editing-dates`.
+          ``number`` is not the flag of the three timeline dates any more:
+          they are date columns since 3.0.0.
     *   - ``textarea`` and ``html``
         - Select text-area input; ``html`` also activates sanitized rich text.
 
@@ -131,25 +132,25 @@ Document aliases map presentation names to DTO and database properties:
         - DTO property
         - Domain/database field
     *   - ``from``
-        - ``yearStart``
-        - ``year_start``
+        - ``dateStart``
+        - ``date_start``
     *   - ``to``
-        - ``yearEnd``
-        - ``year_end``
+        - ``dateEnd``
+        - ``date_end``
     *   - ``contracts.fields.validFrom``
         - ``validFrom``
         - ``valid_from``
     *   - ``contracts.fields.validTo``
         - ``validTo``
         - ``valid_to``
-    *   - ``year``
-        - ``year``
-        - ``year``
+    *   - ``date``
+        - ``date``
+        - ``date``
     *   - ``description``
         - ``bodytext``
         - ``bodytext``
 
-The shipped year rules are deliberately dynamic:
+The shipped date rules are deliberately dynamic:
 
 ..  code-block:: yaml
 
@@ -157,14 +158,14 @@ The shipped year rules are deliberately dynamic:
       cooperation:
         validators:
           from:
-            - number
+            - date
           to:
-            - number
-          year:
+            - date
+          date:
             - required
-            - number
+            - date
 
-Consequently ``year`` receives a required attribute and marker while ``from``
+Consequently ``date`` receives a required attribute and marker while ``from``
 and ``to`` remain optional. Removing or adding ``required`` in a site override
 changes the JSON metadata, the rendered controls, the Extbase validation and the corresponding
 backend TCA field state together; no field name is hard-coded as mandatory.
@@ -270,10 +271,15 @@ consistent between frontend validation, profile editing and FormEngine in
 TYPO3 13 and TYPO3 14. Character limits remain frontend/server-side metadata
 and do not change the database schema.
 
-Year row
-========
+Timeline date row
+=================
 
-``year``, ``yearStart`` and ``yearEnd`` each receive ``col-12 col-md-3``. They
+``date``, ``dateStart`` and ``dateEnd`` each receive ``col-12 col-md-3``. They
 therefore stack on small screens and share one row from the medium breakpoint.
-Each is an ``<input type="number">`` carrying the bounds of its TCA ``range``
-as ``min``, ``max`` and ``step``.
+Each is the browser's own control for the granularity its field declares: a
+complete date and a month are native pickers, and a year is an
+``<input type="number">`` carrying ``min="1000"``, ``max="9999"`` and
+``step="1"`` because no browser has a year input - a number control cannot emit
+the leading zeros a year below 1000 needs, so a field that has to carry one
+asks for the complete-date granularity instead. See
+:ref:`profile-editing-dates`.

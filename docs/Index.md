@@ -33,6 +33,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | [Dependency injection](architecture/dependency-injection.md)                 | Service configuration, stateless services, the TYPO3 attributes that are safe on both core versions.                          |
 | [Class design](architecture/class-design.md)                                 | What the code base actually does with `final`, `readonly`, injection and data objects.                                        |
 | [Database queries](architecture/database-queries.md)                         | The two query builder rules that were learned from released defects.                                                          |
+| [Dates](architecture/dates.md)                                               | Where a date is stored, which parts of it a visitor sees, and why a native picker never follows the site language.            |
 | [Frontend-user contact import](architecture/frontend-user-contact-import.md) | How imported telephone and fax records keep stable identities and migrate legacy data.                                        |
 | [Validation settings](architecture/validation-settings.md)                   | The one YAML driving both the backend FormEngine and the frontend edit form, and how it is overridden.                        |
 | [Form data transformation](architecture/form-data-transformation.md)         | When a value of a JSON payload reaches the domain model, and why the shipped `profile` defaults lock the name fields.         |

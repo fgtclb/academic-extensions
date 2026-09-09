@@ -12,30 +12,40 @@ use PHPUnit\Framework\Attributes\Test;
  * own the column types. `fieldType` and `renderType` of a settings entry
  * describe the frontend control, and the flags that do name a type - `email`,
  * `number` - are the only ones that reach the TCA. Everything else the TCA
- * files declare stays as declared.
+ * files declare stays as declared, the three native date columns included.
  */
 final class SettingsValidationOverridesTest extends AbstractAcademicPersonsTestCase
 {
+    /**
+     * The `date` flag of the three timeline date fields is the frontend control
+     * and nothing else: the columns keep the native `DATE` declaration of their
+     * TCA file, and no record type override restates any part of it.
+     */
     #[Test]
-    public function documentYearTcaKeepsItsRangeWithSharedOverrides(): void
+    public function documentDateTcaKeepsItsNativeDeclarationWithSharedOverrides(): void
     {
         $table = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information'];
-        foreach (['year', 'year_start', 'year_end'] as $fieldName) {
-            $this->assertSame('number', $table['columns'][$fieldName]['config']['type'], $fieldName);
-            $this->assertSame('integer', $table['columns'][$fieldName]['config']['format'], $fieldName);
-            $this->assertSame(['lower' => 0, 'upper' => 9999], $table['columns'][$fieldName]['config']['range'], $fieldName);
+        foreach (['date', 'date_start', 'date_end'] as $fieldName) {
+            $this->assertSame('datetime', $table['columns'][$fieldName]['config']['type'], $fieldName);
+            $this->assertSame('date', $table['columns'][$fieldName]['config']['dbType'], $fieldName);
+            $this->assertSame('date', $table['columns'][$fieldName]['config']['format'], $fieldName);
             $this->assertTrue($table['columns'][$fieldName]['config']['nullable'], $fieldName);
         }
         foreach (['cooperation', 'lecture', 'membership', 'press_media', 'publication', 'scientific_research', 'curriculum_vitae'] as $type) {
             $this->assertArrayHasKey('columnsOverrides', $table['types'][$type], $type);
-            $this->assertArrayNotHasKey('range', $table['types'][$type]['columnsOverrides']['year']['config'], $type);
+            foreach (['date', 'date_start', 'date_end'] as $fieldName) {
+                $override = $table['types'][$type]['columnsOverrides'][$fieldName]['config'];
+                $this->assertArrayNotHasKey('type', $override, $type . '.' . $fieldName);
+                $this->assertArrayNotHasKey('dbType', $override, $type . '.' . $fieldName);
+                $this->assertArrayNotHasKey('format', $override, $type . '.' . $fieldName);
+            }
         }
         $this->assertArrayNotHasKey('columnsOverrides', $table['types']['contracts'] ?? []);
     }
 
     /**
-     * The shipped sections require the title and the year of every profile
-     * information type and leave the start and end years optional; the
+     * The shipped sections require the title and the date of every profile
+     * information type and leave the start and end dates optional; the
      * override carries the state per type, and the `html` flag of the body
      * text does not reach the column.
      */
@@ -45,9 +55,9 @@ final class SettingsValidationOverridesTest extends AbstractAcademicPersonsTestC
         $type = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']['types']['cooperation'];
 
         $this->assertTrue($type['columnsOverrides']['title']['config']['required']);
-        $this->assertTrue($type['columnsOverrides']['year']['config']['required']);
-        $this->assertFalse($type['columnsOverrides']['year_start']['config']['required']);
-        $this->assertFalse($type['columnsOverrides']['year_end']['config']['required']);
+        $this->assertTrue($type['columnsOverrides']['date']['config']['required']);
+        $this->assertFalse($type['columnsOverrides']['date_start']['config']['required']);
+        $this->assertFalse($type['columnsOverrides']['date_end']['config']['required']);
         $this->assertArrayNotHasKey('link', $type['columnsOverrides'], 'cooperation ships without a link validator');
         $lecture = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']['types']['lecture'];
         $this->assertFalse($lecture['columnsOverrides']['link']['config']['required']);

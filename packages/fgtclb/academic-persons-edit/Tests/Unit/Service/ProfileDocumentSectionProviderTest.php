@@ -62,7 +62,7 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
                 'title' => 'help-title',
                 'from' => 'help-from',
                 'to' => 'help-to',
-                'year' => 'help-year',
+                'date' => 'help-date',
                 'description' => 'help-description',
             ],
         );
@@ -71,9 +71,9 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
         );
         $subject = $this->createProvider($settings);
         $this->assertSame('help-title', $subject->getFieldHelptext($section, 'title'));
-        $this->assertSame('help-from', $subject->getFieldHelptext($section, 'yearStart'));
-        $this->assertSame('help-to', $subject->getFieldHelptext($section, 'yearEnd'));
-        $this->assertSame('help-year', $subject->getFieldHelptext($section, 'year'));
+        $this->assertSame('help-from', $subject->getFieldHelptext($section, 'dateStart'));
+        $this->assertSame('help-to', $subject->getFieldHelptext($section, 'dateEnd'));
+        $this->assertSame('help-date', $subject->getFieldHelptext($section, 'date'));
         $this->assertSame('help-description', $subject->getFieldHelptext($section, 'bodytext'));
         $this->assertSame('', $subject->getFieldHelptext($section, 'link'));
     }
@@ -194,7 +194,7 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
                     readOnly: false,
                     validationSet: new ValidationSet(identifier: 'lectures', validations: []),
                     position: 2,
-                    rowFields: ['year', 'title'],
+                    rowFields: ['date', 'title'],
                     actions: ['view', 'down', 'up', 'delete', 'edit'],
                 ),
                 'cooperation' => new DocumentSection(
@@ -247,7 +247,7 @@ final class ProfileDocumentSectionProviderTest extends UnitTestCase
             [
                 ['from', 'position'],
                 ['from', 'title'],
-                ['year', 'title'],
+                ['date', 'title'],
                 ['from', 'to', 'title'],
             ],
             array_column($sections, 'rowFields'),

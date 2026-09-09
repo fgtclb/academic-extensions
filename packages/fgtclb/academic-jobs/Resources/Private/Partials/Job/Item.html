@@ -3,6 +3,7 @@
     data-namespace-typo3-fluid="true"
     xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
     xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:b="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
 >
 
 <div class="card flex-column-reverse academic-jobs-item">
@@ -52,7 +53,7 @@
                         <span>
                             <f:if condition="{item} == 'employmentStartDate' || {item} == 'endtime'">
                                 <f:then>
-                                    <f:format.date format="d.m.Y">{job.{item}}</f:format.date>
+                                    <b:format.localizedDate date="{job.{item}}"/>
                                 </f:then>
                                 <f:else if="{item} == 'employmentType' || {item} == 'type'">
                                     <f:translate key="jobs.{item}.{job.{item}}" />

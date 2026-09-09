@@ -12,6 +12,10 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPersonsEdit\Controller;
 
 use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
+use FGTCLB\AcademicBase\Date\DateFieldSettings;
+use FGTCLB\AcademicBase\Date\DateGranularity;
+use FGTCLB\AcademicBase\Date\DateValueParser;
+use FGTCLB\AcademicBase\Date\LocalizedDateFormatter;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicBase\Settings\Validation;
 use FGTCLB\AcademicPersons\Domain\Model\Address;
@@ -72,7 +76,6 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Country\CountryProvider;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Http\PropagateResponseException;
-use TYPO3\CMS\Core\Localization\DateFormatter;
 use TYPO3\CMS\Core\Localization\Locale;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
@@ -104,6 +107,7 @@ use TYPO3\CMS\Frontend\Controller\ErrorController;
  *      name: string,
  *      label: string,
  *      type: string,
+ *      granularity: string,
  *      required: bool,
  *      readOnly: bool,
  *      disabled: bool,
@@ -193,32 +197,36 @@ final class ProfileController extends ActionController
     private const AJAX_PAGE_TYPE = 1733735;
 
     /**
-     * The bounds of the three timeline year fields. They are the `range` of
-     * the TCA columns of `tx_academicpersons_domain_model_profile_information`
-     * and reach the browser as the `min` and `max` of the number control.
+     * The bounds of a date field an editor is asked for a year alone. No
+     * browser has a year input, so that one granularity is a number control,
+     * and these reach it as its `min` and `max`.
+     *
+     * The lower bound is the lowest four digit year rather than the `0` the
+     * integer columns allowed: a year is exchanged as `Y` and read back
+     * strictly, and a number control cannot emit the leading zeros that a year
+     * below 1000 needs. Advertising `0` would offer an editor values the
+     * endpoint then refuses. A record that needs an earlier year asks for a
+     * full date instead, where the browser's own control writes `0800-01-01`.
      */
-    private const YEAR_MIN = 0;
+    private const YEAR_MIN = 1000;
     private const YEAR_MAX = 9999;
 
     /**
-     * The two contract dates are plain text controls, not `<input type="date">`.
+     * Every date field of the editor is the browser's own date control since
+     * ACE-552 - the timeline dates and the two contract dates alike.
      *
-     * The native control was tried and reverted: it forces the locale of the
-     * browser rather than the one of the site, it cannot be styled with the
-     * rest of the editor, and its calendar is not the date picker this editor
-     * is meant to get. A picker is a feature of its own and is deliberately
-     * not shipped yet - until it is, the control is the one the previous
-     * editor had: a text input showing `d.m.Y` behind the hint below.
+     * Which of the three native controls it is follows the field's configured
+     * granularity ({@see DateGranularity}), and the value exchanged with it is
+     * that granularity's format. The endpoint keeps accepting the full ISO
+     * format at every granularity, and the German notation at the full one, so
+     * a client written against the endpoint before the control changed is not
+     * broken by it - {@see DateValueParser} is where that is spelled out.
      *
-     * `DOCUMENT_DATE_FORMAT` is what the control shows and what an editor
-     * types. `DOCUMENT_DATE_ISO_FORMAT` is what the endpoint answered and
-     * accepted while the control was a native one; it stays accepted, so a
-     * client written against that shape keeps working.
+     * The display format is the browser's own and cannot be influenced by a
+     * page; what the site language governs is everything rendered here - the
+     * display value of a row, and the hint that says which parts of a date
+     * reach a visitor.
      */
-    private const DOCUMENT_DATE_FORMAT = 'd.m.Y';
-    private const DOCUMENT_DATE_ISO_FORMAT = 'Y-m-d';
-    private const DOCUMENT_DATE_PLACEHOLDER = 'dd.mm.yyyy';
-
     public function __construct(
         private readonly Context $context,
         private readonly PersistenceManager $persistenceManager,
@@ -256,6 +264,8 @@ final class ProfileController extends ActionController
         private readonly OrganisationalUnitRepository $organisationalUnitRepository,
         private readonly LocationRepository $locationRepository,
         private readonly ProfileRichTextSanitizerInterface $profileRichTextSanitizer,
+        private readonly DateValueParser $dateValueParser,
+        private readonly LocalizedDateFormatter $localizedDateFormatter,
     ) {}
 
     /**
@@ -1820,10 +1830,26 @@ final class ProfileController extends ActionController
 
     private function getContractContactHelptext(ContractContactField $field): string
     {
-        if ($field->helptext === '') {
-            return '';
+        return $this->translateSettingsText($field->helptext);
+    }
+
+    /**
+     * Resolves a help text of the settings file.
+     *
+     * The file documents it as "an LLL key or literal text", and both have to
+     * survive. `LocalizationUtility::translate()` refuses a key that does not
+     * start with `LLL:` unless it is handed an extension name, and it raises an
+     * `InvalidArgumentException` rather than answering `null` - which turned a
+     * literal help text into a 500 from every form endpoint. So a literal is
+     * recognised as one and returned untouched, and only a reference is
+     * resolved.
+     */
+    private function translateSettingsText(string $value): string
+    {
+        if ($value === '' || !str_starts_with($value, 'LLL:')) {
+            return $value;
         }
-        return LocalizationUtility::translate($field->helptext) ?? $field->helptext;
+        return LocalizationUtility::translate($value) ?? $value;
     }
 
     /**
@@ -2195,20 +2221,90 @@ final class ProfileController extends ActionController
             $definition['richText'] = $definition['richText']
                 || ($validation?->isRichText() ?? false);
             $definition['characterLimit'] = $validation?->characterLimit ?? 0;
-            if ($validation?->inputType === 'date') {
-                $definition['type'] = 'date';
-                $definition['placeholder'] = $this->getDocumentFieldPlaceholder('date');
-            }
             $helptext = $this->profileDocumentSectionProvider->getFieldHelptext(
                 $section,
                 $definition['name'],
             );
-            $definition['helptext'] = $helptext === ''
-                ? ''
-                : (LocalizationUtility::translate($helptext) ?? $helptext);
+            $definition['helptext'] = $this->translateSettingsText($helptext);
+            if ($definition['type'] === 'date' || $validation?->inputType === 'date') {
+                // Keyed on the descriptor's own type first, and not on the flag
+                // list alone: the three timeline dates are dates whatever a
+                // section configures, and this is the only place that turns the
+                // stored date object into the string the control exchanges. A
+                // section that forgets the `date` flag would otherwise put a
+                // "\DateTime" into the JSON payload.
+                $definition = $this->applyDateFieldSettings(
+                    $definition,
+                    $validation?->dateSettings ?? DateFieldSettings::default(),
+                );
+            }
         }
         unset($definition);
         return $definitions;
+    }
+
+    /**
+     * Applies a date field's own configuration to its descriptor.
+     *
+     * This is the only place that knows all three at once: the stored date, the
+     * granularity it is exchanged at and how much of it a visitor sees. So it
+     * is the only place that formats either of the two values.
+     *
+     * `value` is the date in the format the control of that granularity
+     * accepts and submits - a browser silently discards anything else. A year
+     * is a number control, because no browser has a year input, and it carries
+     * the same bounds the timeline years always had. `displayValue` is the
+     * stored date reduced to the published parts and formatted for the locale
+     * of the matched site language.
+     *
+     * @param DocumentFieldDefinition $definition
+     * @return DocumentFieldDefinition
+     */
+    private function applyDateFieldSettings(array $definition, DateFieldSettings $dateSettings): array
+    {
+        $date = $definition['value'] instanceof \DateTimeInterface ? $definition['value'] : null;
+        $definition['type'] = 'date';
+        $definition['granularity'] = $dateSettings->granularity->value;
+        $definition['value'] = $date?->format($dateSettings->granularity->format()) ?? '';
+        $definition['displayValue'] = $date === null
+            ? ''
+            : $this->localizedDateFormatter->format(
+                $date,
+                $dateSettings->display,
+                $this->resolveSiteLocale(),
+            );
+        $isYearControl = $dateSettings->granularity === DateGranularity::YEAR;
+        $definition['min'] = $isYearControl ? self::YEAR_MIN : null;
+        $definition['max'] = $isYearControl ? self::YEAR_MAX : null;
+        $definition['step'] = $isYearControl ? 1 : null;
+        $hint = $this->getPublishedDatePartsHint($dateSettings);
+        if ($hint !== '') {
+            $definition['helptext'] = $definition['helptext'] === ''
+                ? $hint
+                : $definition['helptext'] . ' ' . $hint;
+        }
+        return $definition;
+    }
+
+    /**
+     * The sentence that tells an editor which parts of a date reach a visitor,
+     * or an empty string when everything entered is published.
+     */
+    private function getPublishedDatePartsHint(DateFieldSettings $dateSettings): string
+    {
+        if (!$dateSettings->publishesLessThanItAsks()) {
+            return '';
+        }
+        $display = $dateSettings->display;
+        $key = match (true) {
+            $display->year && !$display->month && !$display->day => 'yearOnly',
+            $display->year && $display->month && !$display->day => 'yearAndMonth',
+            default => 'partial',
+        };
+        return LocalizationUtility::translate(
+            'profileEditing.date.published.' . $key,
+            'academic_persons_edit',
+        ) ?? '';
     }
 
     /**
@@ -2282,7 +2378,9 @@ final class ProfileController extends ActionController
         }
         $value = $record->{$getter}();
         return match (true) {
-            $value instanceof \DateTimeInterface => $value->format(self::DOCUMENT_DATE_FORMAT),
+            // A date stays a date object here. Only the field definition knows
+            // the granularity it is exchanged at, so only it can format it.
+            $value instanceof \DateTimeInterface => $value,
             $value instanceof AbstractEntity => $value->getUid(),
             default => $value,
         };
@@ -2291,10 +2389,11 @@ final class ProfileController extends ActionController
     /**
      * Returns the form field definitions for a profile information record.
      *
-     * The three years are `<input type="number">` controls carrying the bounds
-     * of the TCA `range` as `min`, `max` and `step`, so the browser, the
-     * controller and `DataHandler` agree on what a year is. Nothing here is
-     * locale dependent.
+     * The three dates are handed over as date objects. The control they are
+     * rendered as, the format their value is exchanged in and how much of them
+     * a visitor sees are the field's own configuration, which
+     * {@see self::getDocumentFieldDefinitions()} applies - it is the one place
+     * that resolves a field's `Validation`.
      *
      * @param ProfileInformation|null $record The profile information record or null for a new entry.
      * @return list<DocumentFieldDefinition>
@@ -2306,33 +2405,24 @@ final class ProfileController extends ActionController
             $this->createDocumentField('profileInformation', 'link', 'url', $record?->getLink() ?? ''),
             $this->createDocumentField(
                 'profileInformation',
-                'year',
-                'number',
-                $record?->getYear(),
+                'date',
+                'date',
+                $record?->getDate(),
                 columnClass: 'col-12 col-md-3',
-                min: self::YEAR_MIN,
-                max: self::YEAR_MAX,
-                step: 1,
             ),
             $this->createDocumentField(
                 'profileInformation',
-                'yearStart',
-                'number',
-                $record?->getYearStart(),
+                'dateStart',
+                'date',
+                $record?->getDateStart(),
                 columnClass: 'col-12 col-md-3',
-                min: self::YEAR_MIN,
-                max: self::YEAR_MAX,
-                step: 1,
             ),
             $this->createDocumentField(
                 'profileInformation',
-                'yearEnd',
-                'number',
-                $record?->getYearEnd(),
+                'dateEnd',
+                'date',
+                $record?->getDateEnd(),
                 columnClass: 'col-12 col-md-3',
-                min: self::YEAR_MIN,
-                max: self::YEAR_MAX,
-                step: 1,
             ),
             $this->createDocumentField(
                 'profileInformation',
@@ -2379,13 +2469,14 @@ final class ProfileController extends ActionController
                 'academic_persons_edit',
             ) ?? $name,
             'type' => $type,
+            'granularity' => '',
             'required' => false,
             'readOnly' => false,
             'disabled' => false,
             'richText' => $richText,
             'characterLimit' => 0,
             'autocomplete' => '',
-            'placeholder' => $this->getDocumentFieldPlaceholder($type),
+            'placeholder' => '',
             'helptext' => '',
             'columnClass' => $columnClass,
             'compactCheckbox' => $compactCheckbox,
@@ -2427,53 +2518,6 @@ final class ProfileController extends ActionController
     }
 
     /**
-     * The hint a control shows while it is empty, or an empty string.
-     *
-     * Only the two contract dates have one, and it spells
-     * {@see self::DOCUMENT_DATE_FORMAT} so the two cannot drift apart. It is
-     * deliberately not translated: it is the shape of the value, not prose,
-     * and the previous editor spelled the same literal in Fluid.
-     *
-     * @param string $type The field type of the descriptor.
-     * @return string The placeholder, or an empty string for a field that has none.
-     */
-    private function getDocumentFieldPlaceholder(string $type): string
-    {
-        return $type === 'date' ? self::DOCUMENT_DATE_PLACEHOLDER : '';
-    }
-
-    /**
-     * Reads a date field value, in either of the two formats that are accepted.
-     *
-     * `d.m.Y` is what the control shows and what it submits.
-     * `Y-m-d` is what the endpoint answered and accepted while the control was
-     * an `<input type="date">`, and it keeps being accepted so that a client
-     * written against that shape is not broken by the control changing.
-     *
-     * A format is only accepted when it round trips: `createFromFormat()` is
-     * lenient enough to read `32.01.2026` as the first of February, so the
-     * parsed date is formatted back and compared with what came in.
-     *
-     * @param string $value The submitted or serialized value.
-     * @return \DateTime|null The date at midnight, or null when the value is neither format.
-     */
-    private function parseDocumentDate(string $value): ?\DateTime
-    {
-        foreach ([self::DOCUMENT_DATE_FORMAT, self::DOCUMENT_DATE_ISO_FORMAT] as $format) {
-            $date = \DateTime::createFromFormat('!' . $format, $value);
-            $errors = \DateTime::getLastErrors();
-            if (
-                $date instanceof \DateTime
-                && ($errors === false || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))
-                && $date->format($format) === $value
-            ) {
-                return $date;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Converts a raw field value into the display value shown in the UI.
      *
      * Handles date, select, checkbox and fallback string values. For select fields,
@@ -2501,19 +2545,10 @@ final class ProfileController extends ActionController
         if ($value === null || $value === '') {
             return '';
         }
-        if ($type === 'date' && is_string($value)) {
-            $date = $this->parseDocumentDate($value);
-            if (!$date instanceof \DateTime) {
-                return $value;
-            }
-            // The contract dates are the only date controls left. They are
-            // formatted for the locale of the requested site language, the way
-            // the public views render them.
-            return (new DateFormatter())->format(
-                $date,
-                'MEDIUMDATE',
-                $this->resolveSiteLocale(),
-            );
+        if ($value instanceof \DateTimeInterface) {
+            // Only the field definition knows how much of a date this field
+            // publishes, so it is the one that formats it for the site locale.
+            return '';
         }
         if ($type === 'select') {
             foreach ($options as $option) {
@@ -2571,6 +2606,7 @@ final class ProfileController extends ActionController
                     $definition['richText'],
                     $definition['min'],
                     $definition['max'],
+                    $section->validationSet->get($name)?->dateSettings,
                 );
             } catch (\UnexpectedValueException $exception) {
                 $errors[$name][] = $exception->getMessage();
@@ -2608,6 +2644,7 @@ final class ProfileController extends ActionController
      * @param bool $richText Whether the value should be sanitized as rich text.
      * @param int|null $min Lower bound of a number field, null for none.
      * @param int|null $max Upper bound of a number field, null for none.
+     * @param DateFieldSettings|null $dateSettings The date configuration of the field, null for one that is not a date.
      * @return mixed The normalized value for storage or validation.
      * @throws \UnexpectedValueException If the value does not match the expected format for the given type.
      */
@@ -2618,6 +2655,7 @@ final class ProfileController extends ActionController
         bool $richText,
         ?int $min = null,
         ?int $max = null,
+        ?DateFieldSettings $dateSettings = null,
     ): mixed {
         if ($type === 'checkbox') {
             if (!is_bool($value)) {
@@ -2657,11 +2695,28 @@ final class ProfileController extends ActionController
             if (!is_string($value)) {
                 throw new \UnexpectedValueException('The value must be a date.');
             }
-            $date = $this->parseDocumentDate($value);
-            if (!$date instanceof \DateTime) {
+            $dateSettings ??= DateFieldSettings::default();
+            $date = $this->dateValueParser->parse(
+                $value,
+                $dateSettings->granularity,
+                $dateSettings->completion,
+            );
+            if (!$date instanceof \DateTimeImmutable) {
                 throw new \UnexpectedValueException('The value must be a valid date.');
             }
-            return $date;
+            // A year control advertises its bounds to the browser, and the bounds
+            // are enforced again here: a browser that ignores them, and every
+            // client that is not one, reach the same refusal. The other two
+            // granularities carry no bounds and skip this.
+            $year = (int)$date->format('Y');
+            if (($min !== null && $year < $min) || ($max !== null && $year > $max)) {
+                throw new \UnexpectedValueException(sprintf(
+                    'The year must be between %d and %d.',
+                    $min ?? PHP_INT_MIN,
+                    $max ?? PHP_INT_MAX,
+                ));
+            }
+            return \DateTime::createFromImmutable($date);
         }
         if ($type === 'select') {
             if ($value === null || $value === '' || $value === 0) {

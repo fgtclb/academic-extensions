@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Tests\Unit\Settings;
 
+use FGTCLB\AcademicBase\Date\DateCompletionEdge;
+use FGTCLB\AcademicBase\Date\DateFieldSettings;
+use FGTCLB\AcademicBase\Date\DateGranularity;
 use FGTCLB\AcademicBase\Settings\Validation;
 use FGTCLB\AcademicBase\Settings\ValidationNormalizer;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -378,5 +381,138 @@ final class ValidationNormalizerTest extends UnitTestCase
     public function noSetsProduceNoSets(): void
     {
         $this->assertSame([], (new ValidationNormalizer())->normalizeValidationSets([]));
+    }
+
+    #[Test]
+    public function aFieldWithoutADateBlockCarriesTheNeutralDateSettings(): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation('year', ['date']);
+
+        $this->assertSame('date', $validation->inputType);
+        $this->assertEquals(new DateFieldSettings(), $validation->dateSettings);
+        $this->assertFalse($validation->dateSettings->publishesLessThanItAsks());
+    }
+
+    /**
+     * @return \Generator<string, array{0: array<string, mixed>}>
+     */
+    public static function implyingDateBlockDataSets(): \Generator
+    {
+        yield 'a display block alone' => [['display' => ['month' => false, 'day' => false]]];
+        yield 'an input block alone' => [['input' => ['granularity' => 'year']]];
+        yield 'a completion edge alone' => [['input' => ['completeDay' => 'last']]];
+        yield 'both blocks' => [[
+            'display' => ['day' => false],
+            'input' => ['granularity' => 'month'],
+        ]];
+    }
+
+    /**
+     * A non-empty `date` block says the field is a date on its own, without the
+     * flag next to it: configuring how much of a date is published, or how much of
+     * it is asked for, is a clearer statement than the flag, and a block that took
+     * effect only when the flag was remembered as well would be a trap rather than
+     * a shorthand.
+     *
+     * The flag list stays what it was configured as - the block is not written into
+     * it - so `flags` still answers what the settings file said.
+     *
+     * @param array<string, mixed> $dateConfiguration
+     */
+    #[DataProvider('implyingDateBlockDataSets')]
+    #[Test]
+    public function aNonEmptyDateBlockImpliesTheDateInputTypeWithoutTheFlag(array $dateConfiguration): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation(
+            'date',
+            ['required'],
+            dateConfiguration: $dateConfiguration,
+        );
+
+        $this->assertSame('date', $validation->inputType);
+        $this->assertSame(['required'], $validation->flags);
+        $this->assertTrue($validation->required);
+    }
+
+    /**
+     * An empty block implies nothing: a section that names a field below `dates`
+     * without configuring anything for it leaves the field the text control its
+     * render type and flags make it.
+     */
+    #[Test]
+    public function anEmptyDateBlockImpliesNothing(): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation('title', [], dateConfiguration: []);
+
+        $this->assertSame('text', $validation->inputType);
+    }
+
+    #[Test]
+    public function theDateBlockDecidesWhatIsShownAndWhatIsAskedFor(): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation(
+            'date',
+            ['date'],
+            dateConfiguration: [
+                'display' => ['year' => true, 'month' => false, 'day' => false],
+                'input' => ['granularity' => 'year', 'completeMonth' => 'last', 'completeDay' => 'last'],
+            ],
+        );
+
+        $this->assertTrue($validation->dateSettings->display->year);
+        $this->assertFalse($validation->dateSettings->display->month);
+        $this->assertFalse($validation->dateSettings->display->day);
+        $this->assertSame(DateGranularity::YEAR, $validation->dateSettings->granularity);
+        $this->assertSame(DateCompletionEdge::LAST, $validation->dateSettings->completion->month);
+        $this->assertSame(DateCompletionEdge::LAST, $validation->dateSettings->completion->day);
+        $this->assertFalse($validation->dateSettings->publishesLessThanItAsks());
+    }
+
+    #[Test]
+    public function aFullDatePublishedAsAYearAloneAsksToBeHinted(): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation(
+            'date',
+            ['date'],
+            dateConfiguration: ['display' => ['month' => false, 'day' => false]],
+        );
+
+        $this->assertSame(DateGranularity::DATE, $validation->dateSettings->granularity);
+        $this->assertTrue($validation->dateSettings->publishesLessThanItAsks());
+    }
+
+    /**
+     * An unreadable value narrows nothing and publishes nothing by accident:
+     * every part of the block falls back to its own default on its own.
+     */
+    #[Test]
+    public function anUnreadableDateBlockFallsBackPartByPart(): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation(
+            'date',
+            ['date'],
+            dateConfiguration: [
+                'display' => 'not a map',
+                'input' => ['granularity' => 'quarter', 'completeDay' => 'middle'],
+            ],
+        );
+
+        $this->assertTrue($validation->dateSettings->display->isComplete());
+        $this->assertSame(DateGranularity::DATE, $validation->dateSettings->granularity);
+        $this->assertSame(DateCompletionEdge::FIRST, $validation->dateSettings->completion->day);
+    }
+
+    #[Test]
+    public function theDateSettingsNeverReachTheTcaFragment(): void
+    {
+        $validation = (new ValidationNormalizer())->normalizeValidation(
+            'date',
+            ['date'],
+            dateConfiguration: ['input' => ['granularity' => 'month']],
+        );
+
+        $this->assertArrayNotHasKey('type', $validation->tcaConfig);
+        $this->assertArrayNotHasKey('format', $validation->tcaConfig);
+        $this->assertArrayNotHasKey('dbType', $validation->tcaConfig);
     }
 }

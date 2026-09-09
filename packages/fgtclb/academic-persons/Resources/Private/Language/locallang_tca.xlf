@@ -325,6 +325,15 @@
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.bodytext.label">
         <source>Text</source>
       </trans-unit>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date.label">
+        <source>Date</source>
+      </trans-unit>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date_end.label">
+        <source>End date</source>
+      </trans-unit>
+      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.date_start.label">
+        <source>Start date</source>
+      </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.link.label">
         <source>Link</source>
       </trans-unit>
@@ -351,15 +360,6 @@
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.type.label">
         <source>Type</source>
-      </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year.label">
-        <source>Year</source>
-      </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_end.label">
-        <source>End Year</source>
-      </trans-unit>
-      <trans-unit id="tx_academicpersons_domain_model_profile_information.columns.year_start.label">
-        <source>Start Year</source>
       </trans-unit>
       <trans-unit id="tx_academicpersons_domain_model_profile_information.ctrl.label">
         <source>Profile information</source>

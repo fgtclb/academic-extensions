@@ -3,6 +3,14 @@
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true">
+    <f:comment>
+        The settings file documents a help text as an LLL key or literal text,
+        so both have to survive. A short key that resolves to nothing falls back
+        to "default", which is the value itself - that is what carries a literal
+        through, and it is the Fluid half of the rule
+        `ProfileController::translateSettingsText()` applies to the descriptors
+        the form endpoints answer with.
+    </f:comment>
     <f:if condition="{helptext}">
         <button
             type="button"
@@ -14,8 +22,8 @@
             data-bs-placement="right"
             data-bs-custom-class="custom-popover"
             data-bs-title="{f:translate(key: labelKey, extensionName: 'academic_persons_edit')}"
-            data-bs-content="{f:translate(key: helptext)}"
-            aria-label="{f:translate(key: helptext)}">
+            data-bs-content="{f:translate(key: helptext, default: helptext)}"
+            aria-label="{f:translate(key: helptext, default: helptext)}">
             <core:icon
                 identifier="academic-persons-edit-help"
                 size="small"

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersonsEdit\Tests\Unit\Controller;
 
+use FGTCLB\AcademicBase\Date\DateValueParser;
+use FGTCLB\AcademicBase\Date\LocalizedDateFormatter;
 use FGTCLB\AcademicPersons\Domain\Repository\AddressRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\ContractRepository;
 use FGTCLB\AcademicPersons\Domain\Repository\EmailRepository;
@@ -448,6 +450,8 @@ final class ProfileControllerTest extends UnitTestCase
             $this->createStub(OrganisationalUnitRepository::class),
             $this->createStub(LocationRepository::class),
             $this->createStub(ProfileRichTextSanitizerInterface::class),
+            new DateValueParser(),
+            new LocalizedDateFormatter(),
         );
 
         $requestProperty = new \ReflectionProperty(

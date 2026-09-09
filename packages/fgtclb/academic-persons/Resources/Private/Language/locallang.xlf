@@ -227,13 +227,13 @@
         <source>Here you can enter a title.</source>
       </trans-unit>
       <trans-unit id="helptext.documentSections.from" resname="helptext.documentSections.from">
-        <source>Please enter a start year. You may also leave this field blank.</source>
+        <source>Please enter a start date. You may also leave this field blank.</source>
       </trans-unit>
       <trans-unit id="helptext.documentSections.to" resname="helptext.documentSections.to">
-        <source>Please enter an end year. You may also leave this field blank.</source>
+        <source>Please enter an end date. You may also leave this field blank.</source>
       </trans-unit>
-      <trans-unit id="helptext.documentSections.year" resname="helptext.documentSections.year">
-        <source>Please enter a year. This will be displayed to visitors to your profile.</source>
+      <trans-unit id="helptext.documentSections.date" resname="helptext.documentSections.date">
+        <source>Please enter a date. This will be displayed to visitors to your profile.</source>
       </trans-unit>
       <trans-unit id="helptext.documentSections.description" resname="helptext.documentSections.description">
         <source>You can enter free-form text here.</source>

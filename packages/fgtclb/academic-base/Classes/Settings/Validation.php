@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Settings;
 
+use FGTCLB\AcademicBase\Date\DateFieldSettings;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
 
@@ -17,6 +18,11 @@ use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
  * `isRichText()` is the one such question asked today. `characterLimit` is
  * the readable-text limit of a rich text field, 0 for no limit; it is
  * frontend and server side metadata only and is never copied into the TCA.
+ *
+ * `dateSettings` is the date configuration of the field - how much of a date
+ * its editor is asked for, how the parts nobody was asked for are completed,
+ * and how much of the result a visitor is shown. A field that is not a date
+ * carries the neutral default, so no consumer has to ask whether it exists.
  *
  * @internal not part of public API.
  */
@@ -40,6 +46,7 @@ final class Validation
         public readonly string $inputType = '',
         public readonly array $flags = [],
         public readonly int $characterLimit = 0,
+        public readonly DateFieldSettings $dateSettings = new DateFieldSettings(),
     ) {}
 
     /**
@@ -54,6 +61,7 @@ final class Validation
      *     inputType: string,
      *     flags?: list<string>,
      *     characterLimit?: int,
+     *     dateSettings?: DateFieldSettings,
      * } $array
      * @return self
      */
@@ -70,7 +78,23 @@ final class Validation
             inputType: $array['inputType'],
             flags: $array['flags'] ?? [],
             characterLimit: $array['characterLimit'] ?? 0,
+            dateSettings: $array['dateSettings'] ?? new DateFieldSettings(),
         );
+    }
+
+    /**
+     * The HTML input type the control of this field carries.
+     *
+     * It is the input type for everything but a date, whose control follows the
+     * field's granularity: a full date and a month are the browser's own
+     * controls, and a year is a number control because no browser has a year
+     * input.
+     */
+    public function getControlInputType(): string
+    {
+        return $this->inputType === 'date'
+            ? $this->dateSettings->granularity->inputType()
+            : $this->inputType;
     }
 
     public function isRichText(): bool

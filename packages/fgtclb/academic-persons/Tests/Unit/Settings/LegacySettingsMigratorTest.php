@@ -113,9 +113,15 @@ final class LegacySettingsMigratorTest extends UnitTestCase
     }
 
     /**
-     * The year properties keep their name and their `number` flag: `year` is
-     * the field key of the section map, and the two range years map onto its
+     * A site package written against the 2.x shape still names the three year
+     * properties. They are the fields that became dates, so `year` maps onto
+     * the `date` field key of the section map and the two range years onto its
      * `from` and `to` aliases.
+     *
+     * Its `number` flag is dropped on the way and reported: a 2.x file says it
+     * for what were integer columns, and overlaying it onto a date column
+     * would put a TCA type of `number` on it. Everything else it says is its
+     * own, which is what makes `required` still take effect.
      */
     #[Test]
     public function legacyProfileInformationYearFlagsReachTheSectionMap(): void
@@ -133,15 +139,22 @@ final class LegacySettingsMigratorTest extends UnitTestCase
         $settings = $this->normalize($migration->settings);
 
         $validations = $this->documentValidations($settings, 'cooperation');
-        $this->assertSame([NotEmptyValidator::class], $validations['year']->validatorClassNames);
-        $this->assertSame('number', $validations['year']->inputType);
-        $this->assertSame('number', $validations['year']->tcaConfig['type']);
-        $this->assertTrue($validations['year']->tcaConfig['required']);
-        $this->assertSame(['number'], $validations['yearStart']->flags);
-        $this->assertSame(['required', 'number'], $migration->settings['documentSections']['cooperation']['validators']['year']);
+        $this->assertSame([NotEmptyValidator::class], $validations['date']->validatorClassNames);
+        $this->assertSame('date', $validations['date']->inputType);
+        $this->assertArrayNotHasKey('type', $validations['date']->tcaConfig);
+        $this->assertTrue($validations['date']->tcaConfig['required']);
+        // Nothing of the legacy list survives for the start date, and the shipped
+        // `date` flag is one of the five the old shape cannot express, so it stays.
+        $this->assertSame(['date'], $validations['dateStart']->flags);
+        $this->assertSame(['date', 'required'], $migration->settings['documentSections']['cooperation']['validators']['date']);
         $this->assertContains(
             'validations.profileInformation.yearStart:'
             . ' mapped onto documentSections.<section>.validators.from',
+            $migration->notes,
+        );
+        $this->assertContains(
+            'validations.profileInformation.year: the flag "number" is dropped'
+            . ' - the timeline entry field "date" is a date since 3.0.0',
             $migration->notes,
         );
     }

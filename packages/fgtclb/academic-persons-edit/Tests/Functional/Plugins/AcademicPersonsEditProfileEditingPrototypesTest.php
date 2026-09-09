@@ -239,14 +239,15 @@ final class AcademicPersonsEditProfileEditingPrototypesTest extends AbstractFron
                         'data-pe-contract-contact-field',
                         'data-pe-document-field',
                         'disabled',
-                        // The bounds of a number control. Only the three
-                        // timeline year fields of a document editor declare
-                        // them, and no permanent profile field does.
+                        // The bounds of a number control. A date field asking
+                        // for a year alone is one - no browser has a year
+                        // input - and the shipped settings configure no such
+                        // field, so no live control declares them at all.
                         'max',
                         'min',
-                        // The hint of the two contract date controls. They
-                        // are document fields, so no permanent profile field
-                        // carries it either.
+                        // The hint of a text control. Every shipped date field
+                        // is a native date control now, which brings its own
+                        // format hint, so no live control carries this either.
                         'placeholder',
                         'readonly',
                         'required',
