@@ -228,6 +228,14 @@ make the DataHandler act in a workspace that does not exist. The synthetic
 user's workspace is therefore always set explicitly, from the `Context`
 workspace aspect.
 
+`EXT:academic_partners` carries a second, deliberately separate copy for its
+geocoding command,
+`packages/fgtclb/academic-partners/Classes/Service/GeocodeWriteContext.php`. It
+needs the CLI half of this only - a synthetic user acting live, the global swap
+and the `-99` workspace trap - and requiring `EXT:academic_persons` for one
+utility class would be a dependency edge with no other reason to exist. The two
+are expected to stay in step on those three points; nothing else is shared.
+
 One consequence is accepted rather than solved: DataHandler runs under the
 synthetic user write `sys_log` rows with `userid=0`. `enableLogging` stays on
 **by decision** (ACE-487): the rows are the audit trail of what the
