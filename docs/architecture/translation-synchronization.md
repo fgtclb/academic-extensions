@@ -84,7 +84,14 @@ the dispatch for a `null` profile, an unpersisted one, or a translation
 overlay. `GenerateSlugForProfile` listens to the same event and has no
 translation guard of its own, so dispatching an overlay would regenerate the
 default record's slug from the wrong context — the guards sit at the dispatch
-for that reason.
+for that reason. A translation overlay is skipped but not left alone: the
+helper refreshes the image metadata of that row directly, through
+`ProfileImageMetadataService::updateForProfileUid()` on the resolved localized
+uid, because nothing else would (ACE-547). The reference row carrying the name
+that just changed is the translation's own, and the Extbase persistence of the
+frontend editing never reaches the `DataHandler` hook that covers a backend
+save. A frontend request acting in a workspace, and a row that cannot be
+resolved, are skipped silently — the profile data is written by then.
 
 The `skip_sync` flag cuts across the two paths differently: in the frontend
 editing flow it has nothing to do with the dispatch — it gates only the

@@ -15,12 +15,16 @@ the field map that reaches the database; an empty map writes nothing.
 The event is dispatched for each of the two records that carry image metadata,
 and :php:`getTargetTable()` says which one is being written:
 
-*   :sql:`sys_file_metadata`, the record of the file itself, written once by
-    the frontend upload that created the file and only for the fields it found
-    empty — :sql:`title`, :sql:`alternative` and, where
-    :composer:`typo3/cms-filemetadata` adds it, :sql:`copyright`. This is the
-    record an installation requiring file attributes reads, which is why the
-    :php:`File` is handed over rather than only its uid.
+*   :sql:`sys_file_metadata`, the record of the file itself, written with
+    :sql:`title` and :sql:`alternative` whenever the name of the profile record
+    changes, and once more by the frontend upload that created the file, which
+    fills :sql:`copyright` as well where :composer:`typo3/cms-filemetadata`
+    adds it — and only the fields it found empty. This is the record an
+    installation requiring file attributes reads, which is why the :php:`File`
+    is handed over rather than only its uid. See the changelog entry
+    :ref:`Important: The file's own metadata follows the profile name
+    <important-profile-image-file-metadata-follows-the-name>` for what the
+    name change replaces there.
 
 *   :sql:`sys_file_reference`, the profile's own relation row, written whenever
     the name of the profile record changes — from a backend save, a
