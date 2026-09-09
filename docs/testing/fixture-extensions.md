@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Thirteen such fixture extensions exist, in six of the twelve extensions. That is
+Fourteen such fixture extensions exist, in seven of the twelve extensions. That is
 the whole population — this is a mechanism used sparingly and only where nothing
 smaller works. Measured with
 
@@ -32,6 +32,7 @@ They sit next to the tests that use them, under
 | `test_language_files`            | `tests/language-files`                 | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                     |
 | `test_legacy_settings`           | `tests/test-legacy-settings`           | `academic-persons`      | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.      |
 | `test_messy_profile_factory`     | `tests/test-messy-profile-factory`     | `academic-persons`      | A deliberately misbehaving profile factory and two event listeners.     |
+| `test_partners_stub`             | `tests/test-partners-stub`             | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.              |
 | `test_plugin_templates`          | `tests/plugin-templates`               | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.         |
 | `test_public_profile_settings`   | `tests/test-public-profile-settings`   | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                 |
 | `test_category_types_group`      | `tests/category-types-group`           | `typo3-category-types`  | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.     |
@@ -39,7 +40,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Four of the thirteen have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
+Five of the fourteen have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
 other nine are pure resources.
 
 A minimal one, complete:
@@ -189,7 +190,7 @@ protected array $testExtensionsToLoad = [
 ```
 — [`ProfileTitleProviderTest.php:27`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L27)
 
-**The package name is not derivable from the extension key.** All thirteen use
+**The package name is not derivable from the extension key.** All fourteen use
 the `tests/` vendor, but the second segment follows no rule: `test_plugin_templates`
 is `tests/plugin-templates` (prefix dropped), `test_bitejobs_stub` is
 `tests/test-bitejobs-stub` (prefix kept), and `test_base_dependency_injection`
@@ -202,7 +203,7 @@ renamed for cosmetics.
 
 ## What a fixture extension is for, and what it is not
 
-The thirteen existing ones show the cases that justify one:
+The fourteen existing ones show the cases that justify one:
 
 - **Bootstrap-time configuration.** `test_bitejobs_stub` replaces
   `$GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler']` in `ext_localconf.php` so no

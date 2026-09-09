@@ -276,7 +276,7 @@ versions diverge:
 | `TYPO3\CMS\Backend\Attribute\AsAvatarProvider`, `AsSidebarComponent` | **no**   | yes             | no                             |
 
 `TYPO3\CMS\Extbase\Attribute\*` does not exist on v13 at all. The
-`Install\Attribute\UpgradeWizard` row is the one all ten upgrade wizards use:
+`Install\Attribute\UpgradeWizard` row is the one all eleven upgrade wizards use:
 on v14 it survives as a deprecated subclass shim in
 `cms-core/DeprecatedClasses/ext-install/`, so it still works, but its
 replacement `Core\Attribute\UpgradeWizard` is absent on v13. See

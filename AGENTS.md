@@ -486,7 +486,7 @@ Keep the two vendors apart when you use them. `#[Autoconfigure]`, `#[Autowire]`,
 `Symfony\Component\DependencyInjection\Attribute`. Two **TYPO3** attributes are
 in use here: `Core\Attribute\AsEventListener` on the three
 `RegisterAcademicPageDoktype` listeners, and `Install\Attribute\UpgradeWizard`
-on the ten upgrade wizards. That distinction is what the
+on the eleven upgrade wizards. That distinction is what the
 `#[AsEventListener]` rule above turns on — TYPO3 ships its own, Symfony's must
 never stand in for it, and Symfony's fails silently rather than loudly: it
 registers nothing, so the listener simply never fires.
@@ -504,7 +504,7 @@ replacement does not exist there. Verified against both vendor trees:
 | API                                                    | Replacement                                       | Present on v13.4.34?                                                                  | Call sites                 |
 |--------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------------|----------------------------|
 | `Extbase\Annotation\*`                                 | `Extbase\Attribute\*`                             | no — `cms-extbase/Classes/Attribute/` absent                                          | 10 in 6 files              |
-| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent                                              | 10 wizards in 5 extensions |
+| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent                                              | 11 wizards in 6 extensions |
 | `Core\Service\FlexFormService`                         | `Core\Configuration\FlexForm\FlexFormTools`       | class exists on v13, but without `convertFlexFormContentToArray()` on `FlexFormTools` | 1 file                     |
 
 They are tracked as **ACE-294** (epic) with ACE-295, ACE-296 and ACE-297.

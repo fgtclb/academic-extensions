@@ -444,7 +444,7 @@ Details, so each row can be re-checked rather than trusted:
   (line 298); on v13 the class exists without it. One call site:
   `packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php`
   lines 11 and 33.
-- **Upgrade wizards** — mechanism 2. 10 wizards in 5 extensions import
+- **Upgrade wizards** — mechanism 2. 11 wizards in 6 extensions import
   `TYPO3\CMS\Install\Attribute\UpgradeWizard`,
   `TYPO3\CMS\Install\Updates\UpgradeWizardInterface` and
   `TYPO3\CMS\Install\Updates\DatabaseUpdatedPrerequisite`. On v14 these classes
