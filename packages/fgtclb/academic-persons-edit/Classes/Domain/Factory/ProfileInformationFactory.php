@@ -23,9 +23,9 @@ class ProfileInformationFactory
         $profileInformation = $this->setTitle($validationSet, $profileInformation, $form);
         $profileInformation = $this->setBodytext($validationSet, $profileInformation, $form);
         $profileInformation = $this->setLink($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYear($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYearStart($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYearEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDate($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDateStart($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDateEnd($validationSet, $profileInformation, $form);
         return $profileInformation;
     }
 
@@ -35,9 +35,9 @@ class ProfileInformationFactory
         $profileInformation = $this->setTitle($validationSet, $profileInformation, $form);
         $profileInformation = $this->setBodytext($validationSet, $profileInformation, $form);
         $profileInformation = $this->setLink($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYear($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYearStart($validationSet, $profileInformation, $form);
-        $profileInformation = $this->setYearEnd($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDate($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDateStart($validationSet, $profileInformation, $form);
+        $profileInformation = $this->setDateEnd($validationSet, $profileInformation, $form);
         return $profileInformation;
     }
 
@@ -101,43 +101,43 @@ class ProfileInformationFactory
         return $model;
     }
 
-    private function setYear(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    private function setDate(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
     {
-        if ($this->mayApplyProperty($validationSet, $form, 'year')) {
+        if ($this->mayApplyProperty($validationSet, $form, 'date')) {
             // The registered override *is* the submitted value, and `null` is the
-            // submitted "no year". Falling back to the form value for it would make
-            // an emptied year field restore what was stored.
-            $override = $form->getPropertyOverride('year');
-            $model->setYear(match (true) {
-                is_int($override) => $override,
+            // submitted "no date". Falling back to the form value for it would make
+            // an emptied date field restore what was stored.
+            $override = $form->getPropertyOverride('date');
+            $model->setDate(match (true) {
+                $override instanceof \DateTime => $override,
                 $override === null => null,
-                default => $form->getYear(),
+                default => $form->getDate(),
             });
         }
         return $model;
     }
 
-    private function setYearStart(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    private function setDateStart(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
     {
-        if ($this->mayApplyProperty($validationSet, $form, 'yearStart')) {
-            $override = $form->getPropertyOverride('yearStart');
-            $model->setYearStart(match (true) {
-                is_int($override) => $override,
+        if ($this->mayApplyProperty($validationSet, $form, 'dateStart')) {
+            $override = $form->getPropertyOverride('dateStart');
+            $model->setDateStart(match (true) {
+                $override instanceof \DateTime => $override,
                 $override === null => null,
-                default => $form->getYearStart(),
+                default => $form->getDateStart(),
             });
         }
         return $model;
     }
 
-    private function setYearEnd(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
+    private function setDateEnd(ValidationSet $validationSet, ProfileInformationModel $model, ProfileInformationFormData $form): ProfileInformationModel
     {
-        if ($this->mayApplyProperty($validationSet, $form, 'yearEnd')) {
-            $override = $form->getPropertyOverride('yearEnd');
-            $model->setYearEnd(match (true) {
-                is_int($override) => $override,
+        if ($this->mayApplyProperty($validationSet, $form, 'dateEnd')) {
+            $override = $form->getPropertyOverride('dateEnd');
+            $model->setDateEnd(match (true) {
+                $override instanceof \DateTime => $override,
                 $override === null => null,
-                default => $form->getYearEnd(),
+                default => $form->getDateEnd(),
             });
         }
         return $model;

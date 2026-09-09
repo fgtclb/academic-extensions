@@ -126,14 +126,14 @@
       <trans-unit id="profileInformation.link.label">
         <source>Link</source>
       </trans-unit>
-      <trans-unit id="profileInformation.year.label">
-        <source>Year</source>
+      <trans-unit id="profileInformation.date.label">
+        <source>Date</source>
       </trans-unit>
-      <trans-unit id="profileInformation.yearStart.label">
-        <source>Start year</source>
+      <trans-unit id="profileInformation.dateStart.label">
+        <source>Start date</source>
       </trans-unit>
-      <trans-unit id="profileInformation.yearEnd.label">
-        <source>End year</source>
+      <trans-unit id="profileInformation.dateEnd.label">
+        <source>End date</source>
       </trans-unit>
       <trans-unit id="profileInformation.bodytext.label">
         <source>Text</source>
@@ -242,8 +242,17 @@
       <trans-unit id="profileEditing.documents.to">
         <source>To</source>
       </trans-unit>
-      <trans-unit id="profileEditing.documents.year">
-        <source>Year</source>
+      <trans-unit id="profileEditing.documents.date">
+        <source>Date</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.date.published.yearOnly">
+        <source>Only the year of this date is shown on your profile.</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.date.published.yearAndMonth">
+        <source>Only the month and the year of this date are shown on your profile.</source>
+      </trans-unit>
+      <trans-unit id="profileEditing.date.published.partial">
+        <source>Only a part of this date is shown on your profile.</source>
       </trans-unit>
       <trans-unit id="profileEditing.documents.title">
         <source>Title</source>

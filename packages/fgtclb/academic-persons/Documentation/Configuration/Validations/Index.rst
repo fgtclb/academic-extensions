@@ -59,9 +59,9 @@ for a rich text field:
         validators:
           title:
             - required
-          year:
+          date:
             - required
-            - number
+            - date
           link:
             - url
           description:
@@ -102,10 +102,17 @@ the list and has no effect.
     *   -   :yaml:`number`
         -   The field is rendered as a number input and the TCA column becomes a
             ``number`` column. No additional server side validation is
-            performed.
+            performed. This is **not** the flag of the three timeline dates any
+            more: since 3.0.0 they are date columns, and a ``number`` on one of
+            them would put a ``number`` type on a date column.
     *   -   :yaml:`date`
-        -   The field is rendered as a date input. The TCA column keeps its own
-            ``datetime`` configuration.
+        -   The field is a date. The TCA column keeps its own ``datetime``
+            configuration, its ``format`` and its ``dbType``, which a flag list
+            has no business overriding. Which control the editing frontend
+            renders follows the field's :ref:`date configuration
+            <configuration-sections-dates>`: a complete date and a month are
+            the browser's own controls, a year is a number control because no
+            browser has a year input.
     *   -   :yaml:`tel`
         -   The field is rendered as a telephone input. No phone number format
             is enforced, and the TCA column is untouched.
@@ -365,9 +372,9 @@ How the legacy keys map:
             :yaml:`type` onto :yaml:`physicalAddressType`
     *   -   :yaml:`validations.profileInformation.<property>`
         -   :yaml:`documentSections.<section>.validators.<field>` of every
-            timeline section; :yaml:`yearStart`, :yaml:`yearEnd` and
-            :yaml:`bodytext` onto :yaml:`from`, :yaml:`to` and
-            :yaml:`description`
+            timeline section; :yaml:`year` onto :yaml:`date`,
+            :yaml:`yearStart` and :yaml:`yearEnd` onto :yaml:`from` and
+            :yaml:`to`, and :yaml:`bodytext` onto :yaml:`description`
     *   -   :yaml:`profileInformationsTypes.<section>`
         -   the :yaml:`label` of :yaml:`documentSections.<section>`; its
             :yaml:`type` and :yaml:`fieldName` are reported, not applied
@@ -382,6 +389,13 @@ unconfigured before, which is what made the 2.x example above unlock the
 profile names by not listing them. The flags the old shape could not express
 - :yaml:`url`, :yaml:`date`, :yaml:`tel`, :yaml:`textarea`, :yaml:`html` -
 stay as the section maps declare them.
+
+One flag is dropped rather than overlaid: a legacy :yaml:`number` on
+:yaml:`year`, :yaml:`yearStart` or :yaml:`yearEnd` is removed and reported,
+because the three fields are date columns since 3.0.0 and a ``number`` type on
+a date column is wrong. The :yaml:`date` block of a field is not part of the
+legacy shape at all and is therefore never overlaid; it stays as the section
+maps declare it.
 
 Two things are not mapped and are reported by the command and in the log:
 

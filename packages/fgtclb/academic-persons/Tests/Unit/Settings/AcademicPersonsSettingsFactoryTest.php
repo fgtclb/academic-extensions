@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicPersons\Tests\Unit\Settings;
 
+use FGTCLB\AcademicBase\Date\DateCompletionEdge;
+use FGTCLB\AcademicBase\Date\DateFieldSettings;
+use FGTCLB\AcademicBase\Date\DateGranularity;
 use FGTCLB\AcademicBase\Settings\SettingsFileLoader;
 use FGTCLB\AcademicBase\Settings\ValidationNormalizer;
 use FGTCLB\AcademicPersons\Settings\AcademicPersonsSettings;
@@ -237,13 +240,17 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
 
     /**
      * The seven document sections address the seven profile information types, and
-     * their `year` validator addresses the integer column of that name. `from` and
-     * `to` alias the start and end year and `description` the body text, so the
+     * their `date` validator addresses the date column of that name. `from` and
+     * `to` alias the start and end date and `description` the body text, so the
      * settings file speaks the editor's language. Cooperation is the one section
      * shipped without a `link` validator.
+     *
+     * The shipped sections publish the year alone, the way they did while the
+     * three columns were integers, while the editor is asked for a full date -
+     * which is what the field's hint tells the editor.
      */
     #[Test]
-    public function theShippedDocumentSectionsAddressTheProfileInformationTypesAndYearProperties(): void
+    public function theShippedDocumentSectionsAddressTheProfileInformationTypesAndDateProperties(): void
     {
         $settings = $this->normalize($this->getShippedConfiguration());
 
@@ -265,23 +272,32 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
             $this->assertSame(['hide', 'view', 'down', 'up', 'delete', 'edit'], $section->actions, $identifier);
             $this->assertSame(
                 $identifier === 'cooperation'
-                    ? ['title', 'yearStart', 'yearEnd', 'year', 'bodytext']
-                    : ['title', 'link', 'yearStart', 'yearEnd', 'year', 'bodytext'],
+                    ? ['title', 'dateStart', 'dateEnd', 'date', 'bodytext']
+                    : ['title', 'link', 'dateStart', 'dateEnd', 'date', 'bodytext'],
                 array_keys($section->validationSet->validations),
                 $identifier,
             );
-            $year = $section->validationSet->get('year');
-            $yearStart = $section->validationSet->get('yearStart');
+            $date = $section->validationSet->get('date');
+            $dateStart = $section->validationSet->get('dateStart');
             $bodytext = $section->validationSet->get('bodytext');
-            $this->assertNotNull($year, $identifier);
-            $this->assertNotNull($yearStart, $identifier);
+            $this->assertNotNull($date, $identifier);
+            $this->assertNotNull($dateStart, $identifier);
             $this->assertNotNull($bodytext, $identifier);
-            $this->assertSame('year', $year->fieldName, $identifier);
-            $this->assertSame('year_start', $yearStart->fieldName, $identifier);
-            $this->assertSame('year_end', $section->validationSet->get('yearEnd')?->fieldName, $identifier);
-            $this->assertTrue($year->required, $identifier);
-            $this->assertSame('number', $year->inputType, $identifier);
-            $this->assertFalse($yearStart->required, $identifier);
+            $this->assertSame('date', $date->fieldName, $identifier);
+            $this->assertSame('date_start', $dateStart->fieldName, $identifier);
+            $this->assertSame('date_end', $section->validationSet->get('dateEnd')?->fieldName, $identifier);
+            $this->assertTrue($date->required, $identifier);
+            $this->assertSame('date', $date->inputType, $identifier);
+            $this->assertFalse($dateStart->required, $identifier);
+            foreach (['date', 'dateStart', 'dateEnd'] as $property) {
+                $settingsOfField = $section->validationSet->get($property)?->dateSettings;
+                $this->assertNotNull($settingsOfField, $identifier . '.' . $property);
+                $this->assertTrue($settingsOfField->display->year, $identifier . '.' . $property);
+                $this->assertFalse($settingsOfField->display->month, $identifier . '.' . $property);
+                $this->assertFalse($settingsOfField->display->day, $identifier . '.' . $property);
+                $this->assertSame(DateGranularity::DATE, $settingsOfField->granularity, $identifier . '.' . $property);
+                $this->assertTrue($settingsOfField->publishesLessThanItAsks(), $identifier . '.' . $property);
+            }
             if ($identifier !== 'cooperation') {
                 $this->assertSame([UrlValidator::class], $section->validationSet->get('link')?->validatorClassNames, $identifier);
             }
@@ -289,8 +305,8 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
             $this->assertSame(500, $bodytext->characterLimit, $identifier);
         }
         $this->assertSame(['from', 'to', 'title'], $settings->getDocumentSection('cooperation')?->rowFields);
-        $this->assertSame(['year', 'from', 'to', 'title'], $settings->getDocumentSection('lectures')?->rowFields);
-        $this->assertSame(['year', 'title'], $settings->getDocumentSection('publications')?->rowFields);
+        $this->assertSame(['date', 'from', 'to', 'title'], $settings->getDocumentSection('lectures')?->rowFields);
+        $this->assertSame(['date', 'title'], $settings->getDocumentSection('publications')?->rowFields);
     }
 
     /**
@@ -318,12 +334,12 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
             $settings->getContractField('position')?->helptext,
         );
         $this->assertSame(
-            ['title', 'from', 'to', 'year', 'description'],
+            ['title', 'from', 'to', 'date', 'description'],
             array_keys($settings->getDocumentSection('publications')?->helptexts ?? []),
         );
         $this->assertSame(
-            'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.year',
-            $settings->getDocumentSection('publications')?->helptexts['year'] ?? null,
+            'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date',
+            $settings->getDocumentSection('publications')?->helptexts['date'] ?? null,
         );
         $this->assertSame([], $settings->getDocumentSection('contracts')?->helptexts);
         $this->assertSame(['ratio' => '3x4'], $settings->getSpecialField('image')?->settings);
@@ -607,26 +623,93 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
 
         $set = $settings->getDocumentValidationSet('publications');
         $bodytext = $set->get('bodytext');
-        $yearStart = $set->get('yearStart');
-        $yearEnd = $set->get('yearEnd');
+        $dateStart = $set->get('dateStart');
+        $dateEnd = $set->get('dateEnd');
         $link = $set->get('link');
         $this->assertNotNull($bodytext);
-        $this->assertNotNull($yearStart);
-        $this->assertNotNull($yearEnd);
+        $this->assertNotNull($dateStart);
+        $this->assertNotNull($dateEnd);
         $this->assertNotNull($link);
-        $this->assertSame(['title', 'bodytext', 'yearStart', 'yearEnd', 'link'], array_keys($set->validations));
+        $this->assertSame(['title', 'bodytext', 'dateStart', 'dateEnd', 'link'], array_keys($set->validations));
         $this->assertSame([NotEmptyValidator::class], $set->get('title')?->validatorClassNames);
         $this->assertSame(['html'], $bodytext->flags);
         $this->assertTrue($bodytext->isRichText());
         $this->assertSame(100, $bodytext->characterLimit);
         $this->assertArrayNotHasKey('max', $bodytext->tcaConfig);
-        $this->assertSame(['number', 'required'], $yearStart->flags);
-        $this->assertTrue($yearStart->required);
-        $this->assertSame('year_start', $yearStart->fieldName);
-        $this->assertSame(['number', 'textarea'], $yearEnd->flags);
-        $this->assertSame(0, $yearEnd->characterLimit);
+        $this->assertSame(['number', 'required'], $dateStart->flags);
+        $this->assertTrue($dateStart->required);
+        $this->assertSame('date_start', $dateStart->fieldName);
+        $this->assertSame(['number', 'textarea'], $dateEnd->flags);
+        $this->assertSame(0, $dateEnd->characterLimit);
         $this->assertSame(['url', 'html'], $link->flags);
         $this->assertSame(0, $link->characterLimit);
+    }
+
+    /**
+     * A section knows a field when either of its two maps names it. The `dates` map
+     * is not a refinement of `validators` - a section may say how much of a date it
+     * publishes without demanding anything of the field - so a field named only
+     * there reaches the graph with an empty flag list, exactly as `helptext` has
+     * always worked. Without that, a `dates` entry for a field the section makes no
+     * demands of would be read by nothing and the date would silently publish
+     * everything.
+     *
+     * `validators` decides the order and anything only `dates` knows follows, so an
+     * integrator can read the form order off the map that describes the form.
+     */
+    #[Test]
+    public function aFieldNamedOnlyBelowDatesReachesTheGraph(): void
+    {
+        $settings = $this->normalize([
+            'documentSections' => [
+                'publications' => [
+                    'label' => 'Publications',
+                    'type' => 'publication',
+                    'fieldName' => 'publications',
+                    'validators' => [
+                        'title' => ['required'],
+                        'to' => [],
+                    ],
+                    'dates' => [
+                        'from' => [
+                            'display' => ['month' => false, 'day' => false],
+                            'input' => ['granularity' => 'year', 'completeMonth' => 'last'],
+                        ],
+                        'to' => ['display' => ['day' => false]],
+                    ],
+                ],
+            ],
+        ]);
+
+        $set = $settings->getDocumentValidationSet('publications');
+        // `title` and `to` in the order `validators` names them, `from` afterwards
+        // because only `dates` knows it.
+        $this->assertSame(['title', 'dateEnd', 'dateStart'], array_keys($set->validations));
+        $dateStart = $set->get('dateStart');
+        $this->assertNotNull($dateStart);
+        $this->assertSame([], $dateStart->flags, 'A field named only below `dates` demands nothing.');
+        $this->assertFalse($dateStart->required);
+        $this->assertSame('date_start', $dateStart->fieldName);
+        // The block alone makes it a date, and the block is the one it was given.
+        $this->assertSame('date', $dateStart->inputType);
+        $this->assertSame('number', $dateStart->getControlInputType());
+        $this->assertSame(DateGranularity::YEAR, $dateStart->dateSettings->granularity);
+        $this->assertSame(DateCompletionEdge::LAST, $dateStart->dateSettings->completion->month);
+        $this->assertSame(DateCompletionEdge::FIRST, $dateStart->dateSettings->completion->day);
+        $this->assertTrue($dateStart->dateSettings->display->year);
+        $this->assertFalse($dateStart->dateSettings->display->month);
+        // A field both maps name keeps its flags and is refined by its block.
+        $dateEnd = $set->get('dateEnd');
+        $this->assertNotNull($dateEnd);
+        $this->assertSame('date', $dateEnd->inputType);
+        $this->assertSame(DateGranularity::DATE, $dateEnd->dateSettings->granularity);
+        $this->assertFalse($dateEnd->dateSettings->display->day);
+        // A field no `dates` entry names carries the neutral default and stays what
+        // its flags make it.
+        $title = $set->get('title');
+        $this->assertNotNull($title);
+        $this->assertSame('text', $title->inputType);
+        $this->assertEquals(new DateFieldSettings(), $title->dateSettings);
     }
 
     /**
@@ -690,7 +773,7 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
                     'type' => 'curriculum_vitae',
                     'fieldName' => 'vita',
                     'readonly' => true,
-                    'rowFields' => [' year ', 'position', 'title', 5],
+                    'rowFields' => [' date ', 'position', 'title', 5],
                     'actions' => ['view', 'down', 'up', 'delete', 'edit'],
                 ],
             ],
@@ -705,7 +788,7 @@ final class AcademicPersonsSettingsFactoryTest extends UnitTestCase
 
         $vita = $settings->getDocumentSection('vita');
         $this->assertNotNull($vita);
-        $this->assertSame(['year', 'title'], $vita->rowFields);
+        $this->assertSame(['date', 'title'], $vita->rowFields);
         $this->assertTrue($vita->readOnly);
         $this->assertSame(['view'], $vita->getAllowedActions());
         $this->assertFalse($vita->allowsCreate());

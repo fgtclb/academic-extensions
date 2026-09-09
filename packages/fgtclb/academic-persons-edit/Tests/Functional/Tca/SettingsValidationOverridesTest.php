@@ -9,14 +9,20 @@ use PHPUnit\Framework\Attributes\Test;
 
 final class SettingsValidationOverridesTest extends AbstractAcademicPersonsEditTestCase
 {
+    /**
+     * The `date` flag of the settings configures the frontend control only. The three
+     * timeline columns keep the native `DATE` declaration of their own TCA file, which
+     * a shared override may neither replace nor narrow.
+     */
     #[Test]
-    public function documentYearTcaKeepsItsRangeWithSharedOverrides(): void
+    public function documentDateTcaKeepsItsNativeDateTypeWithSharedOverrides(): void
     {
         $columns = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']['columns'];
-        foreach (['year', 'year_start', 'year_end'] as $fieldName) {
-            $this->assertSame('number', $columns[$fieldName]['config']['type']);
-            $this->assertSame('integer', $columns[$fieldName]['config']['format']);
-            $this->assertSame(['lower' => 0, 'upper' => 9999], $columns[$fieldName]['config']['range']);
+        foreach (['date', 'date_start', 'date_end'] as $fieldName) {
+            $this->assertSame('datetime', $columns[$fieldName]['config']['type']);
+            $this->assertSame('date', $columns[$fieldName]['config']['format']);
+            $this->assertSame('date', $columns[$fieldName]['config']['dbType']);
+            $this->assertArrayNotHasKey('range', $columns[$fieldName]['config']);
             $this->assertTrue($columns[$fieldName]['config']['nullable']);
         }
         $this->assertArrayHasKey('columnsOverrides', $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']['types']['cooperation']);
@@ -28,9 +34,9 @@ final class SettingsValidationOverridesTest extends AbstractAcademicPersonsEditT
         $type = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information']
             ['types']['cooperation'];
         $this->assertTrue($type['columnsOverrides']['title']['config']['required']);
-        $this->assertTrue($type['columnsOverrides']['year']['config']['required']);
-        $this->assertFalse($type['columnsOverrides']['year_start']['config']['required']);
-        $this->assertFalse($type['columnsOverrides']['year_end']['config']['required']);
+        $this->assertTrue($type['columnsOverrides']['date']['config']['required']);
+        $this->assertFalse($type['columnsOverrides']['date_start']['config']['required']);
+        $this->assertFalse($type['columnsOverrides']['date_end']['config']['required']);
     }
 
     #[Test]

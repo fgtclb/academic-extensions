@@ -62,8 +62,16 @@ final class MigrateSettingsCommandTest extends AbstractAcademicPersonsTestCase
         $this->assertArrayNotHasKey(
             'year',
             $printed['documentSections']['vita']['validators'],
-            'The legacy set does not list the year, so it loses the shipped required and number flags',
+            'The three date fields of a section are keyed by the names an editor sees',
         );
+        $this->assertSame(
+            ['date'],
+            $printed['documentSections']['vita']['validators']['date'],
+            'The legacy set does not list the date, so it loses the shipped required flag; '
+            . 'the date flag the old shape could not express is kept',
+        );
+        $this->assertSame(['date'], $printed['documentSections']['vita']['validators']['from']);
+        $this->assertSame(['date'], $printed['documentSections']['vita']['validators']['to']);
         $this->assertSame($this->get(AcademicPersonsSettings::class)->raw, $printed);
     }
 }

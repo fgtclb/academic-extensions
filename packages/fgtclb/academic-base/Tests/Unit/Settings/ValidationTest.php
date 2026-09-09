@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Tests\Unit\Settings;
 
+use FGTCLB\AcademicBase\Date\DateFieldSettings;
+use FGTCLB\AcademicBase\Date\DateGranularity;
 use FGTCLB\AcademicBase\Settings\Validation;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Extbase\Validation\Validator\NotEmptyValidator;
 use TYPO3\CMS\Extbase\Validation\Validator\StringLengthValidator;
@@ -106,5 +109,90 @@ final class ValidationTest extends UnitTestCase
         $this->assertTrue((new Validation(...[...$arguments, 'flags' => ['html']]))->isRichText());
         $this->assertFalse((new Validation(...[...$arguments, 'flags' => ['textarea']]))->isRichText());
         $this->assertFalse((new Validation(...$arguments))->isRichText());
+    }
+
+    /**
+     * @return \Generator<string, array{0: string, 1: DateFieldSettings, 2: string}>
+     */
+    public static function controlInputTypeDataSets(): \Generator
+    {
+        yield 'a text field is its own input type' => [
+            'text', new DateFieldSettings(), 'text',
+        ];
+        yield 'a textarea is its own input type' => [
+            'textarea', new DateFieldSettings(), 'textarea',
+        ];
+        yield 'a select is its own input type' => [
+            'select', new DateFieldSettings(), 'select',
+        ];
+        yield 'a field with no input type at all stays empty' => [
+            '', new DateFieldSettings(), '',
+        ];
+        yield 'a date asking for a whole date is the browser date control' => [
+            'date', new DateFieldSettings(granularity: DateGranularity::DATE), 'date',
+        ];
+        yield 'a date asking for a year and a month is the browser month control' => [
+            'date', new DateFieldSettings(granularity: DateGranularity::MONTH), 'month',
+        ];
+        yield 'a date asking for a year alone is a number control' => [
+            'date', new DateFieldSettings(granularity: DateGranularity::YEAR), 'number',
+        ];
+    }
+
+    /**
+     * The control an editor meets. It is the input type for everything but a date,
+     * whose control follows the granularity the field asks for - and a year is a
+     * `number` control, because no browser has a year input.
+     *
+     * The granularity of a field that is not a date is never consulted: a `text`
+     * field carrying the default `DateFieldSettings` would answer `date` if it were.
+     */
+    #[DataProvider('controlInputTypeDataSets')]
+    #[Test]
+    public function theControlInputTypeFollowsTheGranularityOfADateOnly(
+        string $inputType,
+        DateFieldSettings $dateSettings,
+        string $expected,
+    ): void {
+        $validation = new Validation(
+            identifier: 'date',
+            fieldName: 'date',
+            required: false,
+            disabled: false,
+            readOnly: false,
+            validatorClassNames: [],
+            tcaConfig: [],
+            inputType: $inputType,
+            dateSettings: $dateSettings,
+        );
+
+        $this->assertSame($expected, $validation->getControlInputType());
+    }
+
+    /**
+     * A granularity that is not the default survives the cache round trip and is
+     * still the one the control follows afterwards - which is the only way the
+     * request that rebuilds the settings differs from every later one.
+     */
+    #[Test]
+    public function theControlInputTypeSurvivesTheVarExportRoundTrip(): void
+    {
+        $subject = new Validation(
+            identifier: 'dateStart',
+            fieldName: 'date_start',
+            required: false,
+            disabled: false,
+            readOnly: false,
+            validatorClassNames: [],
+            tcaConfig: [],
+            inputType: 'date',
+            dateSettings: new DateFieldSettings(granularity: DateGranularity::YEAR),
+        );
+
+        $restored = eval('return ' . var_export($subject, true) . ';');
+
+        $this->assertInstanceOf(Validation::class, $restored);
+        $this->assertSame(DateGranularity::YEAR, $restored->dateSettings->granularity);
+        $this->assertSame('number', $restored->getControlInputType());
     }
 }

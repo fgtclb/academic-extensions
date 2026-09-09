@@ -1,34 +1,37 @@
 <html
     data-namespace-typo3-fluid="true"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:ap="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
 >
 
 <f:comment>
-    One timeline entry. `year`, `yearStart` and `yearEnd` are four digit integers (or null) and
-    are rendered as they are stored: a single year, a range "2018 – 2024", or an open range
-    prefixed with the "since" / "till" label. Nothing here is locale dependent, so no formatting
-    view helper is involved.
+    One timeline entry. `date`, `dateStart` and `dateEnd` are calendar dates (or null) and
+    are rendered as a single date, a range "2018 – 2024", or an open range prefixed with the
+    "since" / "till" label. How much of each date a visitor sees - the year alone, the year
+    and the month, or all of it - is the configuration of the entry's own section, and the
+    parts that are shown are formatted for the locale of the matched site language. The
+    ViewHelper resolves both from the record type, so this template names no format.
 </f:comment>
 
 <article class="academic-persons-detail__timeline-item">
-    <f:if condition="{item.year} || {item.yearStart} || {item.yearEnd}">
+    <f:if condition="{item.date} || {item.dateStart} || {item.dateEnd}">
         <p class="academic-persons-detail__timeline-date">
-            <f:if condition="{item.year}">
-                <f:then>{item.year}</f:then>
+            <f:if condition="{item.date}">
+                <f:then><ap:format.profileInformationDate date="{item.date}" type="{item.type}" field="date" /></f:then>
                 <f:else>
-                    <f:if condition="{item.yearStart}">
+                    <f:if condition="{item.dateStart}">
                         <f:then>
-                            <f:if condition="{item.yearEnd}">
-                                <f:then>{item.yearStart} – {item.yearEnd}</f:then>
+                            <f:if condition="{item.dateEnd}">
+                                <f:then><ap:format.profileInformationDate date="{item.dateStart}" type="{item.type}" field="dateStart" /> – <ap:format.profileInformationDate date="{item.dateEnd}" type="{item.type}" field="dateEnd" /></f:then>
                                 <f:else>
                                     <f:translate key="detail.since" extensionName="academic_persons" />
-                                    {item.yearStart}
+                                    <ap:format.profileInformationDate date="{item.dateStart}" type="{item.type}" field="dateStart" />
                                 </f:else>
                             </f:if>
                         </f:then>
                         <f:else>
                             <f:translate key="detail.till" extensionName="academic_persons" />
-                            {item.yearEnd}
+                            <ap:format.profileInformationDate date="{item.dateEnd}" type="{item.type}" field="dateEnd" />
                         </f:else>
                     </f:if>
                 </f:else>

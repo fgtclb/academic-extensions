@@ -26,8 +26,8 @@ use FGTCLB\AcademicPersons\Settings\DocumentSection;
 final readonly class ProfileDocumentSectionProvider
 {
     private const HELPTEXT_FIELD_ALIASES = [
-        'yearStart' => 'from',
-        'yearEnd' => 'to',
+        'dateStart' => 'from',
+        'dateEnd' => 'to',
         'validFrom' => 'from',
         'validTo' => 'to',
         'bodytext' => 'description',

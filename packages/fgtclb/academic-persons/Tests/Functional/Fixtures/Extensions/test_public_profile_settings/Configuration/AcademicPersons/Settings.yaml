@@ -1,17 +1,80 @@
 # A site package override of the public profile layout, reduced to what the
-# test asserts: no navigation column, two elements on the right in an order
+# tests assert: no navigation column, the elements on the right in an order
 # the shipped file does not use, and a headline that names the last name first.
 # The editable fields below `profile` are deliberately absent - the `profile`
 # map is replaced as a whole, so the editing frontend sees no field here.
+#
+# `documentSections` is replaced as a whole for the same reason, and declares
+# the two sections the timeline of this override renders: `publications`
+# publishes the whole date, `academicCareer` the year alone. That pair is what
+# makes the notation of the matched site language observable - a year is
+# written the same way in every locale, a complete date is not.
 profile:
   structure:
     left: []
     right:
       - profileEntries
       - headline
+      - menuSectionsDatas
   details:
     profileEntries:
       - miscellaneous
     headline:
       - lastName
       - firstName
+    menuSections:
+      - publications
+      - academicCareer
+    menuSectionsDatas:
+      publications: publications
+      academicCareer: vita
+documentSections:
+  publications:
+    label: 'Publications'
+    type: publication
+    fieldName: publications
+    rowFields:
+      - date
+      - title
+    actions:
+      - view
+    validators:
+      title:
+        - required
+      date:
+        - required
+        - date
+    dates:
+      date:
+        display:
+          year: true
+          month: true
+          day: true
+  academicCareer:
+    label: 'Academic career'
+    type: curriculum_vitae
+    fieldName: vita
+    rowFields:
+      - from
+      - to
+      - title
+    actions:
+      - view
+    validators:
+      title:
+        - required
+      from:
+        - date
+      to:
+        - date
+    dates:
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+      to:
+        display:
+          year: true
+          month: false
+          day: false

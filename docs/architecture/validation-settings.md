@@ -140,12 +140,33 @@ The recognised flags, all matched case-insensitively
 An unknown flag is kept in `Validation::$flags` and has no other effect.
 
 "Input type" is what the *settings graph* calls a field, not what the browser
-gets. The profile editor maps `date` to a plain text control, because the
-native `<input type="date">` follows the locale of the browser rather than the
-one of the site and a date picker is deliberately not shipped yet — see
-[The two contract dates are a text control](profile-editing-contract.md#the-two-contract-dates-are-a-text-control).
-Nothing about that reaches this normalizer: the flag stays `date`, and so does
-the input type it derives.
+gets — the two coincide for every type but `date`. A date field's control
+follows its **granularity**, which is configuration of its own: a full date and
+a month are the browser's native controls, and a year is a number control
+because no browser has a year input. `Validation::getControlInputType()` is the
+one place that translation happens, and
+[Dates](dates.md) is where the machinery below it is described.
+
+A date field refines the flag with a block of its own, read by this normalizer
+so that the vocabulary is spelled in one place:
+
+```yaml
+date:
+  display:                # what a visitor is shown, each part on its own
+    year: true
+    month: false
+    day: false
+  input:
+    granularity: year     # date (the default), month or year
+    completeMonth: first  # first or last month of the year
+    completeDay: last     # first or last day of the month
+```
+
+A document section keeps the same blocks in a `dates:` map keyed by field
+identifier, next to `validators` and `helptext`, because a section names its
+fields there rather than carrying one entry per field. Everything is optional
+and every unreadable value falls back to its own default, so a typo narrows
+nothing and publishes nothing by accident.
 
 ## The shared classes in `academic_base`
 
@@ -174,7 +195,9 @@ those partials and repointed the namespace, and it is `@internal` — do not bui
 new code on it without deciding first whether it is public API.
 
 `Validation` carries, beyond the flags' effects, the normalised `flags` list
-itself and a `characterLimit` (ACE-503). `normalizeValidation()` takes the
+itself, a `characterLimit` (ACE-503) and a `DateFieldSettings` (ACE-552) that is
+never null — a field that is not a date carries the neutral default, so no
+consumer has to ask whether it exists. `normalizeValidation()` takes the
 optional `fieldName` (the column, when it differs from the underscored
 identifier), `renderType` (the frontend control the flags start from — a
 `select` is a `select` input type without any flag saying so) and
@@ -214,11 +237,15 @@ Three details of the normalisation are easy to get wrong:
   the sections are keyed by the settings key. `getProfileField()`,
   `getContractField()` and `getContractContactField()` accept either.
 - **Document validators speak the editor's language.** `from`, `to` and
-  `description` are aliases of the `yearStart`, `yearEnd` and `bodytext`
-  properties (`DOCUMENT_PROPERTY_ALIASES`); `year` is the `year` property and
-  column. A document field accepts the plain flag list or a map with
-  `validators`, `<flag>: true` entries and an `editor` block — `type: ckeditor`
-  implies `html` and carries the `limit`, `type: textarea` implies `textarea`.
+  `description` are aliases of the `dateStart`, `dateEnd` and `bodytext`
+  properties (`DOCUMENT_PROPERTY_ALIASES`); `date` is the `date` property and
+  column. The three were `year`, `yearStart` and `yearEnd` until 3.0.0, and a
+  site package still shipping the 2.x shape is overlaid onto the new keys by
+  the legacy migrator, which drops the `number` flag it brings for them —
+  overlaying it would put a TCA `type` of `number` on a date column. A document
+  field accepts the plain flag list or a map with `validators`, `<flag>: true`
+  entries and an `editor` block — `type: ckeditor` implies `html` and carries
+  the `limit`, `type: textarea` implies `textarea`.
 - **The `contracts` document section is two lines.** It declares `type:
   contracts` and takes label, relation, row fields and actions from the
   top-level `contracts` map (`array_replace`), and its validation set is the
@@ -319,7 +346,7 @@ seven timeline types, so a section's flags land in the `columnsOverrides` of
 its record type and never on the column: a required title of publications does
 not make the title of a lecture required. `ProfileInformationTcaTest` and
 `EditSettingsIsolationTest` pin both halves — the override reaches the type,
-the `range` of the year columns is untouched.
+and the three date columns keep their own `dbType`, `format` and `nullable`.
 
 So marking a field `disabled` or `readonly` in the YAML makes it read only in the
 backend record editor as well — by design, and for every backend user.
@@ -405,7 +432,7 @@ rules match — but nothing else does, and the two systems share no code.
 | `disabled` / `readonly` | supported                                         | **understood by none of the three readers**           |
 | `url`                   | validator and input type, no TCA                  | validator only, no TCA                                |
 | `number`                | TCA and input type, no validator                  | TCA and input type, no validator                      |
-| `date`                  | input type only, TCA untouched                    | not understood                                        |
+| `date`                  | input type and a `dates` block, TCA untouched     | not understood                                        |
 
 Two of those deserve emphasis because they are traps rather than gaps:
 
@@ -450,6 +477,8 @@ above.
 
 ## See also
 
+- [Dates](dates.md) — what a date field's `display` and `input` blocks do, and
+  the browser facts they are shaped by.
 - [Form data transformation](form-data-transformation.md) — how the frontend edit
   form decides whether a submitted value reaches the model, and why a `disabled`
   property is discarded even when it was submitted.

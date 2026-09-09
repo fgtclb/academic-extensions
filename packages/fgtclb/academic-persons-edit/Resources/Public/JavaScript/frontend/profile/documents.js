@@ -70,6 +70,7 @@ const asDocumentField = (value) => {
     compactCheckbox: field.compactCheckbox,
     disabled: field.disabled === true,
     displayValue: String(field.displayValue ?? ""),
+    granularity: String(field.granularity ?? ""),
     helptext: String(field.helptext ?? ""),
     label: String(field.label ?? field.name),
     max: field.max ?? null,
@@ -179,11 +180,11 @@ const appendRichText = (container, value) => {
 };
 const getRowDisplayValue = (item, name) => {
   const display = item.display ?? {};
-  if (name === "yearStart" && !display.yearStart) {
-    return display.year ?? "";
+  if (name === "dateStart" && !display.dateStart) {
+    return display.date ?? "";
   }
-  if (name === "year" && !display.year) {
-    return display.yearStart ?? "";
+  if (name === "date" && !display.date) {
+    return display.dateStart ?? "";
   }
   return display[name] ?? "";
 };

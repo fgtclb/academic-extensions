@@ -156,7 +156,7 @@ describe("the document editor element", () => {
         heading: "View: Paper 7",
         fields: [
           field({ name: "title", label: "Title", displayValue: "Sample paper" }),
-          field({ name: "year", label: "Year", displayValue: "1843" }),
+          field({ name: "date", label: "Date", displayValue: "1843" }),
         ],
       });
 
@@ -166,7 +166,7 @@ describe("the document editor element", () => {
       );
       assert.deepEqual(
         selectAll(element, "dt", HTMLElement).map((term): string | null => term.textContent),
-        ["Title", "Year"],
+        ["Title", "Date"],
       );
       assert.deepEqual(
         selectAll(element, "dd", HTMLElement).map(
@@ -281,31 +281,39 @@ describe("the document editor element", () => {
     });
 
     /**
-     * The three timeline years are the only fields that declare bounds. They
-     * reach the control as `min`, `max` and `step`, so the browser refuses out
-     * of range input before the controller ever posts it - and a field that
-     * declares none carries none of the three, rather than an empty attribute.
+     * The date fields of a year granularity are the only ones that declare
+     * bounds. They reach the control as `min`, `max` and `step`, so the
+     * browser refuses out of range input before the controller ever posts it -
+     * and a field that declares none carries none of the three, rather than an
+     * empty attribute.
      */
-    it("puts the declared bounds of a number field on its control", async () => {
+    it("puts the declared bounds of a year field on its control", async () => {
       const element = await mount({
         mode: "add",
         fields: [
-          field({ name: "year", type: "number", min: 0, max: 9999, step: 1 }),
+          field({
+            name: "date",
+            type: "date",
+            granularity: "year",
+            min: 1000,
+            max: 9999,
+            step: 1,
+          }),
           field({ name: "title", type: "text" }),
         ],
-        values: { year: 2026, title: "Sample paper" },
+        values: { date: "2026", title: "Sample paper" },
       });
 
-      const year = select(
+      const date = select(
         element,
-        '[data-pe-document-field="year"]',
+        '[data-pe-document-field="date"]',
         HTMLInputElement,
       );
-      assert.equal(year.type, "number");
-      assert.equal(year.getAttribute("min"), "0");
-      assert.equal(year.getAttribute("max"), "9999");
-      assert.equal(year.getAttribute("step"), "1");
-      assert.equal(year.value, "2026");
+      assert.equal(date.type, "number");
+      assert.equal(date.getAttribute("min"), "1000");
+      assert.equal(date.getAttribute("max"), "9999");
+      assert.equal(date.getAttribute("step"), "1");
+      assert.equal(date.value, "2026");
 
       const title = select(
         element,
@@ -318,26 +326,19 @@ describe("the document editor element", () => {
     });
 
     /**
-     * The two contract dates are deliberately not an `<input type="date">`.
-     * The native control forces the locale of the browser rather than the one
-     * of the site and cannot be styled with the rest of the editor, and its
-     * calendar is not the date picker this editor is meant to get - that is a
-     * feature of its own and is not shipped yet. So the field type stays
-     * `date`, which is what the endpoint serializes and validates by, and the
-     * control it is rendered as is a text input showing the format as a hint.
+     * A date field is rendered as the native control of the granularity it
+     * publishes, not as one control for every date. The field type stays
+     * `date` - that is what the endpoint serializes, validates and formats by
+     * - and the granularity picks the control on top of it.
      */
-    it("renders a date field as a text control carrying its format hint", async () => {
+    it("renders a full date as a native date control", async () => {
       const element = await mount({
         mode: "add",
         fields: [
-          field({
-            name: "validFrom",
-            type: "date",
-            placeholder: "dd.mm.yyyy",
-          }),
+          field({ name: "validFrom", type: "date", granularity: "date" }),
           field({ name: "title", type: "text" }),
         ],
-        values: { validFrom: "15.01.2026", title: "Sample paper" },
+        values: { validFrom: "2019-03-14", title: "Sample paper" },
       });
 
       const validFrom = select(
@@ -345,11 +346,12 @@ describe("the document editor element", () => {
         '[data-pe-document-field="validFrom"]',
         HTMLInputElement,
       );
-      assert.equal(validFrom.getAttribute("type"), "text");
-      assert.equal(validFrom.getAttribute("placeholder"), "dd.mm.yyyy");
-      assert.equal(validFrom.value, "15.01.2026");
+      assert.equal(validFrom.getAttribute("type"), "date");
+      assert.equal(validFrom.value, "2019-03-14");
+      // The `dd.mm.yyyy` hint of the text control is gone with it, and an
+      // empty one is no attribute at all.
+      assert.equal(validFrom.hasAttribute("placeholder"), false);
 
-      // A field that declares no hint carries no empty attribute either.
       const title = select(
         element,
         '[data-pe-document-field="title"]',
@@ -357,6 +359,81 @@ describe("the document editor element", () => {
       );
       assert.equal(title.getAttribute("type"), "text");
       assert.equal(title.hasAttribute("placeholder"), false);
+    });
+
+    /**
+     * Desktop Firefox has no native month control and degrades this one to a
+     * text input. That is accepted rather than worked around: the value it
+     * reads and submits is the same `YYYY-MM` string either way.
+     */
+    it("renders a month granularity as a native month control", async () => {
+      const element = await mount({
+        mode: "add",
+        fields: [field({ name: "validFrom", type: "date", granularity: "month" })],
+        values: { validFrom: "2019-03" },
+      });
+
+      const validFrom = select(
+        element,
+        '[data-pe-document-field="validFrom"]',
+        HTMLInputElement,
+      );
+      assert.equal(validFrom.getAttribute("type"), "month");
+      assert.equal(validFrom.value, "2019-03");
+    });
+
+    /**
+     * No browser has a year input, so a year granularity is the one date that
+     * is a number control - with the bounds of a four digit year on it.
+     */
+    it("renders a year granularity as a bounded number control", async () => {
+      const element = await mount({
+        mode: "add",
+        fields: [
+          field({
+            name: "validFrom",
+            type: "date",
+            granularity: "year",
+            min: 1000,
+            max: 9999,
+            step: 1,
+          }),
+        ],
+        values: { validFrom: "2019" },
+      });
+
+      const validFrom = select(
+        element,
+        '[data-pe-document-field="validFrom"]',
+        HTMLInputElement,
+      );
+      assert.equal(validFrom.getAttribute("type"), "number");
+      assert.equal(validFrom.getAttribute("min"), "1000");
+      assert.equal(validFrom.getAttribute("max"), "9999");
+      assert.equal(validFrom.getAttribute("step"), "1");
+      assert.equal(validFrom.value, "2019");
+    });
+
+    /**
+     * A descriptor that carries no granularity at all - an older response, or
+     * a caller that only names the field type - is a full date rather than a
+     * text input.
+     */
+    it("falls back to a date control where no granularity is declared", async () => {
+      const element = await mount({
+        mode: "add",
+        fields: [field({ name: "validFrom", type: "date" })],
+        values: { validFrom: "2019-03-14" },
+      });
+
+      assert.equal(
+        select(
+          element,
+          '[data-pe-document-field="validFrom"]',
+          HTMLInputElement,
+        ).getAttribute("type"),
+        "date",
+      );
     });
 
     it("gives every control an id its label points at", async () => {
@@ -481,9 +558,9 @@ describe("the document editor element", () => {
     it("shows the message of the request and the message of each refused field", async () => {
       const element = await mount({
         mode: "add",
-        fields: [field({ name: "title" }), field({ name: "year" })],
+        fields: [field({ name: "title" }), field({ name: "date" })],
         error: "Please check.",
-        errors: { year: "Must be a year." },
+        errors: { date: "Must be a date." },
       });
 
       assert.equal(
@@ -492,18 +569,18 @@ describe("the document editor element", () => {
       );
       const control = select(
         element,
-        '[data-pe-document-field="year"]',
+        '[data-pe-document-field="date"]',
         HTMLInputElement,
       );
       assert.equal(control.getAttribute("aria-invalid"), "true");
       assert.equal(
         control.getAttribute("aria-describedby"),
-        "profile-editing-document-field-error-1-year",
+        "profile-editing-document-field-error-1-date",
       );
       assert.equal(
-        select(element, "#profile-editing-document-field-error-1-year", HTMLElement)
+        select(element, "#profile-editing-document-field-error-1-date", HTMLElement)
           .textContent?.trim(),
-        "Must be a year.",
+        "Must be a date.",
       );
       assert.equal(
         select(element, '[data-pe-document-field="title"]', HTMLInputElement)

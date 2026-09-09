@@ -12,8 +12,9 @@ profile editing frontend. Each of those changes carries its own changelog entry
 with the detail; this page is the **order** they have to be applied in.
 
 The order matters. One wizard reads a database column TYPO3 v14 no longer has,
-and one repairs relations the new editor then writes. Work through the steps
-from top to bottom, on a copy of the production database first.
+one needs both the old and the new timeline columns to be present, and one
+repairs relations the new editor then writes. Work through the steps from top
+to bottom, on a copy of the production database first.
 
 ..  _upgrade-overview:
 
@@ -34,21 +35,27 @@ The steps at a glance
         -   The content elements stop rendering on TYPO3 v14, where the column
             the wizards read no longer exists.
     *   -   3. Update the database schema
-        -   Applies the column changes of 3.0.0, among them the unsigned
-            timeline year columns and the workspace columns.
-        -   The wizard of step 4 finds no repaired schema and the editor
+        -   Applies the column changes of 3.0.0, among them the three timeline
+            date columns and the workspace columns.
+        -   The wizards of steps 4 and 5 find no repaired schema and the editor
             writes into columns the installation does not have.
-    *   -   4. Repair the profile image relations
+    *   -   4. Migrate the timeline years into the date columns
+        -   Fills :sql:`date`, :sql:`date_start` and :sql:`date_end` from the
+            integer years they replace, through a project's own subclass of the
+            shipped abstract wizard.
+        -   A timeline entry keeps its title, link and text and loses its year
+            as soon as the old columns are dropped.
+    *   -   5. Repair the profile image relations
         -   Reduces duplicate references, corrects relation counters and marks
             the translations that carry an image of their own.
         -   A translation loses its own image at the next synchronisation, and
             duplicate references keep rendering the wrong file.
-    *   -   5. Migrate the settings override
+    *   -   6. Migrate the settings override
         -   Replaces the pre-3.0 keys of a site package with the section maps.
         -   The installation runs on the legacy overlay, which is removed in
             4.0 - and a renamed ``type`` or ``fieldName`` stays silently
             broken.
-    *   -   6. Adapt templates, icons and TypoScript
+    *   -   7. Adapt templates, icons and TypoScript
         -   Re-applies project overrides to the new template tree and makes the
             JSON page type reachable.
         -   The editor cannot save, and an overridden detail view loses the
@@ -136,19 +143,73 @@ can be run on either core version.
     vendor/bin/typo3 extension:setup
 
 In the backend the same thing is :guilabel:`Admin Tools > Maintenance > Analyze
-Database Structure`. It applies every column change of 3.0.0. Nothing is
-converted here and no value is rewritten: the timeline keeps its
-:sql:`year`, :sql:`year_start` and :sql:`year_end` columns, which only turn
-unsigned because the corrected TCA declares a lower bound of ``0``.
+Database Structure`. It applies every column change of 3.0.0, among them the
+three date columns :sql:`date`, :sql:`date_start` and :sql:`date_end` the
+timeline gains. Nothing is converted here and no value is rewritten: the three
+integer columns :sql:`year`, :sql:`year_start` and :sql:`year_end` they replace
+are left in place and still hold every stored year, which is what step 4
+migrates.
 
 ..  note::
     The analyzer reports a column that left :file:`ext_tables.sql` as *unused*
     and never drops it on its own. Accepting such an offer is a decision of the
-    installation, not a step of this upgrade.
+    installation, not a step of this upgrade - and for the three year columns
+    it is the decision that loses what step 4 would have migrated.
+
+..  _upgrade-step-dates:
+
+4. Migrate the timeline years into the date columns
+===================================================
+
+Only relevant for an installation whose timeline entries carry years.
+
+3.0.0 replaced the integer columns :sql:`year`, :sql:`year_start` and
+:sql:`year_end` of :sql:`tx_academicpersons_domain_model_profile_information`
+with the date columns :sql:`date`, :sql:`date_start` and :sql:`date_end`. Step
+3 adds the three new ones and leaves the three old ones in place, so at this
+point the table carries both - which is exactly what the migration needs.
+
+An integer year has no month and no day, so this extension does **not** convert
+it: which day of which month a bare year becomes is a decision only the project
+can take, and a synthetic first of January that reaches a publication list is
+worse than an empty field. No upgrade wizard is registered, and nothing writes
+a date it was not given.
+
+What is shipped is the part every project would otherwise write again - the
+query, the completion rules and the guard that never overwrites a date that is
+already there.
+:php:`\FGTCLB\AcademicPersons\Upgrades\AbstractMigrateProfileInformationDatesUpgradeWizard`
+is :php:`abstract readonly` and carries no :php:`#[UpgradeWizard]` attribute, so
+it is registered nowhere. A project subclasses it, adds the attribute and
+chooses the two completion rules - a first or last month of the year, and a
+first or last day of the month - and then runs its own wizard:
+
+..  code-block:: bash
+
+    vendor/bin/typo3 upgrade:run mySitePackage_migrateProfileInformationDates
+
+:ref:`important-migrating-profile-information-years-to-dates` has the complete
+subclass and what each rule means;
+:ref:`breaking-profile-information-timeline-uses-dates` has the schema, the
+model and the configuration change behind it.
+
+The wizard writes only where the target date column is still empty, so it never
+overwrites a date somebody entered, and it is repeatable - a second run changes
+nothing. It asks the live schema which columns exist, so once the year columns
+are dropped it reports that there is nothing to do instead of failing.
+
+..  warning::
+    **Run this before the year columns are dropped.** They left
+    :file:`ext_tables.sql`, so the analyzer of step 3 reports them as *unused*
+    and offers them for removal; accepting that offer before this step loses
+    every stored year, and nothing then records what a timeline entry was
+    dated. Take a backup first. An installation whose years are not all worth
+    the same month and day is better served by an export, a spreadsheet and a
+    one-off import than by any wizard.
 
 ..  _upgrade-step-images:
 
-4. Repair the profile image relations
+5. Repair the profile image relations
 =====================================
 
 Only relevant where :guilabel:`academic_persons_edit` is installed, and only
@@ -180,7 +241,7 @@ academicPersonsEdit_repairLocalizedProfileImages` offers it again. See
 
 ..  _upgrade-step-settings:
 
-5. Migrate the settings override
+6. Migrate the settings override
 ================================
 
 Only relevant for an installation whose site package ships
@@ -224,7 +285,7 @@ is deliberately not mapped;
 
 ..  _upgrade-step-templates:
 
-6. Adapt templates, icons and TypoScript
+7. Adapt templates, icons and TypoScript
 ========================================
 
 The public detail view
@@ -237,8 +298,12 @@ layout, and every element is one partial below
 
 **An installation that overrides the detail template keeps rendering its own
 copy**, so nothing looks broken - and it loses the configurable layout
-completely. The timeline properties it reads are unchanged: ``{item.year}``,
-``{item.yearStart}`` and ``{item.yearEnd}`` are still there and still integers.
+completely. **The timeline properties it reads are gone**: ``{item.year}``,
+``{item.yearStart}`` and ``{item.yearEnd}`` render nothing, because the
+properties are ``{item.date}``, ``{item.dateStart}`` and ``{item.dateEnd}``
+now, and they are date objects rather than integers - so they are rendered
+through :php:`\FGTCLB\AcademicPersons\ViewHelpers\Format\ProfileInformationDateViewHelper`
+rather than printed, see :ref:`configuration-sections-dates`.
 Two of the partials the old detail
 template rendered are now only used by the list and card views, and the third,
 :file:`Partials/Profile/DataHeader.html`, is deleted - a project template that
@@ -302,8 +367,13 @@ through - see the `page type section
 Verifying the result
 ====================
 
-#.  A timeline entry of a profile shows its year in the frontend and in the
-    backend record editor, and the backend form rejects a year above ``9999``.
+#.  A timeline entry of a profile shows its date in the frontend and in the
+    backend record editor. As shipped, a visitor is shown the year of it - how
+    much of a date is published is :ref:`configuration
+    <configuration-sections-dates>` - and the backend renders the date control
+    of a ``datetime`` column.
+#.  The project's date migration reports that there is nothing left to do, and
+    no timeline entry carries a year while its date column is still empty.
 #.  The profile editing plugin loads without the "cannot be saved" alert above
     it, a field can be saved, and the browser console shows no failed request
     to the page type ``1733735``.

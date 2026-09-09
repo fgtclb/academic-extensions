@@ -161,17 +161,17 @@
         <source>Link</source>
         <target>Link</target>
       </trans-unit>
-      <trans-unit id="profileInformation.year.label">
-        <source>Year</source>
-        <target>Jahr</target>
+      <trans-unit id="profileInformation.date.label">
+        <source>Date</source>
+        <target>Datum</target>
       </trans-unit>
-      <trans-unit id="profileInformation.yearStart.label">
-        <source>Start year</source>
-        <target>Startjahr</target>
+      <trans-unit id="profileInformation.dateStart.label">
+        <source>Start date</source>
+        <target>Startdatum</target>
       </trans-unit>
-      <trans-unit id="profileInformation.yearEnd.label">
-        <source>End year</source>
-        <target>Endjahr</target>
+      <trans-unit id="profileInformation.dateEnd.label">
+        <source>End date</source>
+        <target>Enddatum</target>
       </trans-unit>
       <trans-unit id="profileInformation.bodytext.label">
         <source>Text</source>
@@ -311,9 +311,21 @@
         <source>To</source>
         <target>Bis</target>
       </trans-unit>
-      <trans-unit id="profileEditing.documents.year">
-        <source>Year</source>
-        <target>Jahr</target>
+      <trans-unit id="profileEditing.documents.date">
+        <source>Date</source>
+        <target>Datum</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.date.published.yearOnly">
+        <source>Only the year of this date is shown on your profile.</source>
+        <target>Auf Ihrem Profil wird nur das Jahr dieses Datums angezeigt.</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.date.published.yearAndMonth">
+        <source>Only the month and the year of this date are shown on your profile.</source>
+        <target>Auf Ihrem Profil werden nur der Monat und das Jahr dieses Datums angezeigt.</target>
+      </trans-unit>
+      <trans-unit id="profileEditing.date.published.partial">
+        <source>Only a part of this date is shown on your profile.</source>
+        <target>Auf Ihrem Profil wird nur ein Teil dieses Datums angezeigt.</target>
       </trans-unit>
       <trans-unit id="profileEditing.documents.title">
         <source>Title</source>

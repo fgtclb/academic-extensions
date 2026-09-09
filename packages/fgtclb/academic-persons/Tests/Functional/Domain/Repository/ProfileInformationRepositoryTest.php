@@ -13,6 +13,17 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTestCase
 {
+    /**
+     * The three date columns are native SQL `DATE` values, so the repository
+     * hands back `\DateTime` objects rather than the four digit integers the
+     * columns used to hold. They are compared as `Y-m-d` strings here, which
+     * is exactly what a `dbType => 'date'` column stores.
+     *
+     * The month and day the fixture picks - the first of January for a plain
+     * or starting year, the last of December for an ending one - are the
+     * fixture's own choice. The extension applies no such rule: a date column
+     * carries whatever day was written to it.
+     */
     #[Test]
     public function findByProfileAndTypeReturnsProfileInformationRespectingSortingFieldValues(): void
     {
@@ -22,9 +33,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
             'type',
             'sorting',
             'title',
-            'year',
-            'year_start',
-            'year_end',
+            'date',
+            'date_start',
+            'date_end',
         ];
         $expected = [
             [
@@ -33,9 +44,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
                 'type' => 'type_1',
                 'sorting' => 1,
                 'title' => 'Type 1 - UID 1 Pos #1',
-                'year' => 2020,
-                'year_start' => null,
-                'year_end' => null,
+                'date' => '2020-01-01',
+                'date_start' => null,
+                'date_end' => null,
             ],
             [
                 'uid' => 4,
@@ -43,9 +54,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
                 'type' => 'type_1',
                 'sorting' => 2,
                 'title' => 'Type 1 - UID 3 Pos #2',
-                'year' => 2020,
-                'year_start' => null,
-                'year_end' => null,
+                'date' => '2020-01-01',
+                'date_start' => null,
+                'date_end' => null,
             ],
             [
                 'uid' => 3,
@@ -53,9 +64,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
                 'type' => 'type_1',
                 'sorting' => 3,
                 'title' => 'Type 1 - UID 2 Pos #3',
-                'year' => 2020,
-                'year_start' => null,
-                'year_end' => null,
+                'date' => null,
+                'date_start' => '2019-09-01',
+                'date_end' => '2020-08-31',
             ],
         ];
         $profileRepository = GeneralUtility::makeInstance(ProfileRepository::class);
@@ -80,9 +91,9 @@ final class ProfileInformationRepositoryTest extends AbstractAcademicPersonsTest
                 'sorting' => $profileInformation->getSorting(),
                 'type' => $profileInformation->getType(),
                 'title' => $profileInformation->getTitle(),
-                'year' => $profileInformation->getYear(),
-                'year_start' => $profileInformation->getYearStart(),
-                'year_end' => $profileInformation->getYearEnd(),
+                'date' => $profileInformation->getDate()?->format('Y-m-d'),
+                'date_start' => $profileInformation->getDateStart()?->format('Y-m-d'),
+                'date_end' => $profileInformation->getDateEnd()?->format('Y-m-d'),
             ];
         }
         $tableName = 'tx_academicpersons_domain_model_profile_information';

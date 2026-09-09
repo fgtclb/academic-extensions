@@ -1,0 +1,11 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title"
+,1,0,1,0,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/home","Home (EN)"
+,100,1,254,0,0,0,0,0,"/sysfolder-records","Recordcollection"
+"tx_academicjobs_domain_model_job",
+,"uid","pid","sys_language_uid","hidden","deleted","starttime","endtime","type","employment_type","employment_start_date","title","slug","description","company_name","work_location","contact_name","contact_email","contact_phone"
+,1,100,0,0,0,0,0,1,1,"2026-10-01","Research Assistant Position","research-assistant-position","<p>Join our quantum optics group.</p>","Acme University","Munich","Dr. Ada Lovelace","ada@example.org","+49 89 1234"
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header"
+,1,2,0,0,0,0,"academicjobs_newjobform",""

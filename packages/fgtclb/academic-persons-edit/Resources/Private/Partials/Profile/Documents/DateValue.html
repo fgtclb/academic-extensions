@@ -1,0 +1,22 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:ap="http://typo3.org/ns/FGTCLB/AcademicPersons/ViewHelpers"
+    data-namespace-typo3-fluid="true">
+    <f:comment>
+        One date cell of a compact timeline row. The date is shown with the
+        parts its section publishes and in the notation of the matched site
+        language, which is what the public profile shows too - the ViewHelper
+        resolves both from the record type, so the two cannot drift apart.
+        `fallback` is the date the row shows when the cell's own one is empty.
+    </f:comment>
+    <f:if condition="{value}">
+        <f:then><ap:format.profileInformationDate date="{value}" type="{type}" field="{field}" /></f:then>
+        <f:else>
+            <f:if condition="{fallback}">
+                <f:then><ap:format.profileInformationDate date="{fallback}" type="{type}" field="{fallbackField}" /></f:then>
+                <f:else>—</f:else>
+            </f:if>
+        </f:else>
+    </f:if>
+</html>

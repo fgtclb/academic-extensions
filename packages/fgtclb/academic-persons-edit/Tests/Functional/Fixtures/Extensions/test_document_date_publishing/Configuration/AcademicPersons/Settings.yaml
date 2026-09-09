@@ -1,0 +1,173 @@
+# A site package that configures the published parts of a timeline section
+# differently from the shipped one, which publishes the year alone everywhere.
+#
+# `documentSections` is replaced as a whole, top-level merge, so this file is
+# the complete list of sections while the extension is loaded. Four sections
+# cover the combinations the shipped file has no example of:
+#
+# - `cooperation`: `date` asks for a whole date and publishes all three parts,
+#   while `from` and `to` ask for a year alone and publish exactly that.
+#   Neither of them publishes less than it asks for, and neither is told
+#   anything about published parts at its field.
+# - `lectures`: `date` asks for a whole date and publishes the year and the
+#   month, which is the second of the three sentences an editor can be shown.
+#   `from` and `to` ask for a year and a month - the browser's own month
+#   control - and publish the completed day as well, from opposite edges of
+#   the month.
+# - `memberships`: `date` publishes the month and the day but not the year,
+#   which is neither of the two named cases and therefore the third sentence.
+#   It carries no help text of its own, so the sentence stands alone.
+# - `vita`: `date` is only marked `required` and carries neither the `date`
+#   flag nor a `dates` block. It is a date all the same, because the field
+#   itself is one - a section cannot turn `date` into a text field by
+#   forgetting to say so, and a descriptor that did would carry a serialised
+#   date object into the JSON payload.
+documentSections:
+  cooperation:
+    label: 'Cooperation'
+    type: cooperation
+    fieldName: cooperation
+    rowFields:
+      - date
+      - from
+      - to
+      - title
+    actions:
+      - view
+      - edit
+    validators:
+      title:
+        - required
+      date:
+        - required
+        - date
+      from:
+        - date
+      to:
+        - date
+    dates:
+      date:
+        display:
+          year: true
+          month: true
+          day: true
+      from:
+        display:
+          year: true
+          month: false
+          day: false
+        input:
+          granularity: year
+          completeMonth: first
+          completeDay: first
+      to:
+        display:
+          year: true
+          month: false
+          day: false
+        input:
+          granularity: year
+          completeMonth: last
+          completeDay: last
+    # The shipped helptext keys, so that the assertions can compare against the
+    # translated label rather than against a literal of their own - except for
+    # `title`, which is deliberately a literal: the settings file documents both
+    # shapes and a literal used to reach `LocalizationUtility::translate()` as a
+    # short key, which raised rather than answered.
+    helptext:
+      title: 'Give the entry a name your visitors will recognise.'
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
+      from: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.from'
+      to: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.to'
+  lectures:
+    label: 'Lectures'
+    type: lecture
+    fieldName: lectures
+    rowFields:
+      - date
+      - from
+      - to
+      - title
+    actions:
+      - view
+      - edit
+    validators:
+      title:
+        - required
+      date:
+        - required
+        - date
+      from:
+        - date
+      to:
+        - date
+    dates:
+      # A whole date is asked for and the day of it is not published, which is
+      # the `yearAndMonth` sentence.
+      date:
+        display:
+          year: true
+          month: true
+          day: false
+      # The browser's own month control. The day nobody was asked for is
+      # completed from opposite edges and is published, so the two ends of the
+      # same submitted month are the first and the last day of it.
+      from:
+        display:
+          year: true
+          month: true
+          day: true
+        input:
+          granularity: month
+          completeDay: first
+      to:
+        display:
+          year: true
+          month: true
+          day: true
+        input:
+          granularity: month
+          completeDay: last
+    helptext:
+      date: 'LLL:EXT:academic_persons/Resources/Private/Language/locallang.xlf:helptext.documentSections.date'
+  memberships:
+    label: 'Memberships'
+    type: membership
+    fieldName: memberships
+    rowFields:
+      - date
+      - title
+    actions:
+      - view
+      - edit
+    validators:
+      title:
+        - required
+      date:
+        - required
+        - date
+    dates:
+      # Neither the year alone nor the year and the month: the third sentence.
+      # No help text is configured for it, so the sentence is the whole one.
+      date:
+        display:
+          year: false
+          month: true
+          day: true
+  vita:
+    label: 'Vita'
+    type: curriculum_vitae
+    fieldName: vita
+    rowFields:
+      - date
+      - title
+    actions:
+      - view
+      - edit
+    validators:
+      title:
+        - required
+      # Deliberately no `date` flag and no `dates` entry: the field is a date
+      # because it is one.
+      date:
+        - required

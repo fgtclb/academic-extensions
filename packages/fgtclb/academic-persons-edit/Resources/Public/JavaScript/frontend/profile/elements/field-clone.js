@@ -8,7 +8,21 @@ const fieldErrorId = (prefix, index, field) => `${prefix}-error-${index}-${field
 const text = (value) => value === null || value === void 0 ? "" : String(value);
 const flag = (value) => value === true ? true : void 0;
 const bound = (value) => typeof value === "number" ? value : void 0;
-const inputTypeOf = (type) => type === "" || type === "date" ? "text" : type;
+const inputTypeOf = (type, granularity) => {
+  if (type === "") {
+    return "text";
+  }
+  if (type !== "date") {
+    return type;
+  }
+  if (granularity === "month") {
+    return "month";
+  }
+  if (granularity === "year") {
+    return "number";
+  }
+  return "date";
+};
 const cloneControl = (options, controlId, errorId) => {
   const { field, hook, value } = options;
   const disabled = flag(field.disabled === true || options.pending);
@@ -86,13 +100,13 @@ const cloneControl = (options, controlId, errorId) => {
     ...shared,
     ...required,
     autocomplete: field.autocomplete === void 0 || field.autocomplete === "" ? void 0 : field.autocomplete,
-    inputType: inputTypeOf(field.type),
-    // The bounds of a number control. `undefined` takes the attribute off the
-    // clone, so a text input carries none of the three.
+    inputType: inputTypeOf(field.type, field.granularity),
+    // The bounds of a number control, a year among them. `undefined` takes the
+    // attribute off the clone, so a text input carries none of the three.
     max: bound(field.max),
     min: bound(field.min),
-    // The hint of a date control. Server side text, like every other label of
-    // a field, so nothing here spells it.
+    // Server side text, like every other label of a field, so nothing here
+    // spells it.
     placeholder: field.placeholder === void 0 || field.placeholder === "" ? void 0 : field.placeholder,
     readOnly: flag(field.readOnly),
     step: bound(field.step),

@@ -163,7 +163,7 @@ final class ValidationSettings
                     readOnly: $readOnly,
                     validationSet: new ValidationSet(identifier: $sectionIdentifier, validations: $validations),
                     position: 0,
-                    rowFields: $sectionIdentifier === 'contracts' ? ['from', 'position'] : ['year', 'title'],
+                    rowFields: $sectionIdentifier === 'contracts' ? ['from', 'position'] : ['date', 'title'],
                     actions: $readOnly ? ['view'] : ['view', 'down', 'up', 'delete', 'edit'],
                 ),
             ],

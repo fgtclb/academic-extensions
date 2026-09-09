@@ -54,6 +54,14 @@ export interface DocumentField {
   compactCheckbox?: boolean;
   disabled: boolean;
   displayValue?: string;
+  /**
+   * How much of a date a date field publishes: `date`, `month` or `year`.
+   *
+   * An empty string on every field that is not a date. It is what the control
+   * type of a date field follows - the field type itself stays `date`, which
+   * is what the endpoint serializes, validates and formats by.
+   */
+  granularity?: string;
   helptext?: string;
   label: string;
   max?: number | null;
@@ -211,6 +219,7 @@ const asDocumentField = (value: unknown): DocumentField | null => {
     compactCheckbox: field.compactCheckbox,
     disabled: field.disabled === true,
     displayValue: String(field.displayValue ?? ""),
+    granularity: String(field.granularity ?? ""),
     helptext: String(field.helptext ?? ""),
     label: String(field.label ?? field.name),
     max: field.max ?? null,
@@ -381,11 +390,11 @@ const appendRichText = (container: HTMLElement, value: string): void => {
 
 const getRowDisplayValue = (item: DocumentItem, name: string): unknown => {
   const display = item.display ?? {};
-  if (name === "yearStart" && !display.yearStart) {
-    return display.year ?? "";
+  if (name === "dateStart" && !display.dateStart) {
+    return display.date ?? "";
   }
-  if (name === "year" && !display.year) {
-    return display.yearStart ?? "";
+  if (name === "date" && !display.date) {
+    return display.dateStart ?? "";
   }
   return display[name] ?? "";
 };

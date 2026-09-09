@@ -10,37 +10,58 @@ use PHPUnit\Framework\Attributes\Test;
 final class ProfileInformationTcaTest extends AbstractAcademicPersonsTestCase
 {
     /**
-     * The three year columns are four digit integers. `type=number` reads its
-     * bounds from `range` alone - `min` and `max` are options of `type=input`
-     * and were silently ignored here - so the range is what renders the HTML
-     * bounds, what DataHandler clamps against and what makes the derived
-     * column unsigned.
+     * The three date columns are native SQL `DATE` columns: `dbType => 'date'`
+     * is what keeps the column a `DATE` and the stored value a `YYYY-MM-DD`
+     * string, so neither a timestamp nor a timezone conversion is involved.
+     * `type => 'datetime'` with `format => 'date'` is what renders the date
+     * only control, and `nullable` is what lets the column stay empty. All of
+     * it behaves identically on TYPO3 v13 and v14.
      *
-     * The `[required, number]` flag list of every document section of the
-     * shipped `Settings.yaml` reaches the table as a `columnsOverrides`
-     * fragment of that section's record type. It restates neither the range
-     * nor the format, so the bounds survive the merge, and a section's
-     * `required` stays with its type rather than landing on the column all
-     * seven types share.
+     * The columns carry no `range`: a four digit bound is a property of the
+     * integer years the columns used to be, and a date is not clamped here.
      */
     #[Test]
-    public function yearColumnsCarryTheirRangeAndNoIgnoredBounds(): void
+    public function dateColumnsAreNativeNullableDateColumns(): void
     {
         $table = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information'];
-        foreach (['year', 'year_start', 'year_end'] as $fieldName) {
+        foreach (['date', 'date_start', 'date_end'] as $fieldName) {
             $config = $table['columns'][$fieldName]['config'];
-            $this->assertSame('number', $config['type'], $fieldName);
-            $this->assertSame('integer', $config['format'], $fieldName);
-            $this->assertSame(['lower' => 0, 'upper' => 9999], $config['range'], $fieldName);
+            $this->assertSame('date', $config['dbType'], $fieldName);
+            $this->assertSame('datetime', $config['type'], $fieldName);
+            $this->assertSame('date', $config['format'], $fieldName);
             $this->assertTrue($config['nullable'], $fieldName);
-            $this->assertArrayNotHasKey('min', $config, $fieldName);
-            $this->assertArrayNotHasKey('max', $config, $fieldName);
+            $this->assertNull($config['default'], $fieldName);
+            $this->assertArrayNotHasKey('range', $config, $fieldName);
             $this->assertArrayNotHasKey('required', $config, $fieldName);
         }
-        $override = $table['types']['publication']['columnsOverrides']['year']['config'];
+    }
+
+    /**
+     * The `[required, date]` flag list of every document section of the shipped
+     * `Settings.yaml` reaches the table as a `columnsOverrides` fragment of
+     * that section's record type, keyed by the column the section's `date`
+     * field writes. So a section's `required` stays with its type rather than
+     * landing on the column all seven types share.
+     *
+     * The `date` flag itself chooses the frontend control and nothing else: it
+     * restates neither the column type, nor the `dbType` that keeps the column
+     * a native `DATE`, nor the format - all three stay what the TCA file above
+     * declares, which is what a `number` flag on a date column would break.
+     */
+    #[Test]
+    public function aSectionRequiredFlagLandsOnItsRecordTypeAndNotOnTheSharedColumns(): void
+    {
+        $table = $GLOBALS['TCA']['tx_academicpersons_domain_model_profile_information'];
+        $override = $table['types']['publication']['columnsOverrides']['date']['config'];
         $this->assertTrue($override['required'], 'the required flag of Settings.yaml reaches the record type');
-        $this->assertSame('number', $override['type'], 'the number flag keeps the column type');
-        $this->assertArrayNotHasKey('range', $override, 'the record type override does not restate the bounds');
+        $this->assertArrayNotHasKey('type', $override, 'the date flag does not restate the column type');
+        $this->assertArrayNotHasKey('dbType', $override, 'the date flag does not restate the dbType');
+        $this->assertArrayNotHasKey('format', $override, 'the date flag does not restate the format');
+        $this->assertFalse($table['types']['publication']['columnsOverrides']['date_start']['config']['required']);
+        $this->assertFalse($table['types']['publication']['columnsOverrides']['date_end']['config']['required']);
+        foreach (['date', 'date_start', 'date_end'] as $fieldName) {
+            $this->assertArrayNotHasKey('required', $table['columns'][$fieldName]['config'], $fieldName);
+        }
     }
 
     /**

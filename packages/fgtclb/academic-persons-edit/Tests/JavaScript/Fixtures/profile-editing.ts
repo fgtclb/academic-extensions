@@ -751,7 +751,7 @@ interface DocumentRowOptions {
   position?: number;
   title?: string;
   link?: string;
-  yearStart?: string;
+  dateStart?: string;
   bodytext?: string;
   actions?: string[];
   sortable?: boolean;
@@ -769,7 +769,7 @@ export const documentRow = ({
   position = 0,
   title = "",
   link = "",
-  yearStart = "",
+  dateStart = "",
   bodytext = "",
   actions = ["view", "down", "up", "delete", "edit"],
   sortable = true,
@@ -778,7 +778,7 @@ export const documentRow = ({
 <article class="row g-0 align-items-center border-bottom py-2" data-pe-document-item
   data-item-uid="${uid}" data-item-sorting="${sorting}" data-item-position="${position}"${hidden ? ' data-item-hidden="1"' : ""}>
   <div class="col-12 col-md-2 py-1 pe-md-3 text-break">
-    <div data-pe-document-value="yearStart">${yearStart}</div>
+    <div data-pe-document-value="dateStart">${dateStart}</div>
   </div>
   <div class="col-12 col-md py-1 pe-md-3 text-break">
     <div data-pe-document-title>${link === "" ? `<span>${title}</span>` : `<a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>`}</div>

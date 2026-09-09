@@ -34,8 +34,8 @@ class AcademicPersonsSettingsFactory
      * behind them differ for these three.
      */
     private const DOCUMENT_PROPERTY_ALIASES = [
-        'from' => 'yearStart',
-        'to' => 'yearEnd',
+        'from' => 'dateStart',
+        'to' => 'dateEnd',
         'description' => 'bodytext',
     ];
 
@@ -249,6 +249,7 @@ class AcademicPersonsSettingsFactory
                     fieldName: $fieldName,
                     renderType: $renderType,
                     characterLimit: $this->normalizeFieldCharacterLimit($options, $renderType),
+                    dateConfiguration: $this->dateConfiguration($options),
                 ),
                 position: count($groupedFields[$sectionIdentifier] ?? []),
                 helptext: trim((string)($options['helptext'] ?? '')),
@@ -348,6 +349,7 @@ class AcademicPersonsSettingsFactory
                     fieldName: $fieldName,
                     renderType: $renderType,
                     characterLimit: $this->normalizeFieldCharacterLimit($options, $renderType),
+                    dateConfiguration: $this->dateConfiguration($options),
                 ),
                 position: count($fields),
                 autocomplete: trim((string)($options['autocomplete'] ?? '')),
@@ -399,6 +401,7 @@ class AcademicPersonsSettingsFactory
                         flags: $this->flagList($options['validators'] ?? null),
                         fieldName: $fieldName,
                         renderType: $renderType,
+                        dateConfiguration: $this->dateConfiguration($options),
                     ),
                     position: count($fields),
                     autocomplete: trim((string)($options['autocomplete'] ?? '')),
@@ -460,6 +463,19 @@ class AcademicPersonsSettingsFactory
                 }
             } else {
                 $configuredValidations = is_array($options['validators'] ?? null) ? $options['validators'] : [];
+                $configuredDates = is_array($options['dates'] ?? null) ? $options['dates'] : [];
+                // A field is known to the section when either map names it. The
+                // `dates` map is not a refinement of `validators` - a section may
+                // configure how much of a date it publishes without demanding
+                // anything of it - so a field named only there gets a validation
+                // with an empty flag list, exactly as `helptext` has always
+                // worked. `validators` decides the order; anything only `dates`
+                // knows follows.
+                foreach (array_keys($configuredDates) as $fieldIdentifier) {
+                    if (!array_key_exists($fieldIdentifier, $configuredValidations)) {
+                        $configuredValidations[$fieldIdentifier] = [];
+                    }
+                }
                 foreach ($configuredValidations as $fieldIdentifier => $validationConfiguration) {
                     if (!is_array($validationConfiguration)) {
                         continue;
@@ -470,6 +486,9 @@ class AcademicPersonsSettingsFactory
                         identifier: $propertyName,
                         flags: $this->normalizeDocumentValidationFlags($validationConfiguration),
                         characterLimit: $this->normalizeDocumentCharacterLimit($validationConfiguration),
+                        dateConfiguration: is_array($configuredDates[$fieldIdentifier] ?? null)
+                            ? $configuredDates[$fieldIdentifier]
+                            : [],
                     );
                 }
             }
@@ -554,6 +573,25 @@ class AcademicPersonsSettingsFactory
             $flags[] = 'textarea';
         }
         return $flags;
+    }
+
+    /**
+     * The `date` block of a field entry. A document section keeps the same
+     * blocks in a `dates` map keyed by field identifier, next to `validators`
+     * and `helptext`, because a section names its fields there rather than
+     * carrying one entry per field.
+     *
+     * @param array<int|string, mixed> $configuration
+     * @return array<string, mixed>
+     */
+    private function dateConfiguration(array $configuration): array
+    {
+        $date = $configuration['date'] ?? null;
+        if (!is_array($date)) {
+            return [];
+        }
+        /** @var array<string, mixed> $date */
+        return $date;
     }
 
     /**

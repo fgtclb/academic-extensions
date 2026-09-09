@@ -67,8 +67,11 @@ final class LegacySettingsMigrator implements LoggerAwareInterface
      * the document validators address the fields an editor sees.
      */
     private const PROFILE_INFORMATION_ALIASES = [
+        'year' => 'date',
         'yearStart' => 'from',
         'yearEnd' => 'to',
+        'dateStart' => 'from',
+        'dateEnd' => 'to',
         'bodytext' => 'description',
     ];
 
@@ -79,7 +82,15 @@ final class LegacySettingsMigrator implements LoggerAwareInterface
      */
     private const RELATION_OPTIONS = ['type', 'fieldName'];
 
-    private const PROFILE_INFORMATION_FIELDS = ['title', 'link', 'year', 'from', 'to', 'description'];
+    private const PROFILE_INFORMATION_FIELDS = ['title', 'link', 'date', 'from', 'to', 'description'];
+
+    /**
+     * The three timeline fields that were integer years and are dates since
+     * 3.0.0. A legacy set naming them almost always says `number`, which
+     * would put a TCA `type` of `number` on a date column, so that one flag is
+     * dropped and reported rather than overlaid.
+     */
+    private const PROFILE_INFORMATION_DATE_FIELDS = ['date', 'from', 'to'];
 
     /**
      * @param array<string, mixed> $settings
@@ -201,6 +212,11 @@ final class LegacySettingsMigrator implements LoggerAwareInterface
             $flags = $this->normalizeFlags($flags);
             if ($field !== $property) {
                 $notes[] = $setPath . '.' . $property . ': mapped onto documentSections.<section>.validators.' . $field;
+            }
+            if (in_array($field, self::PROFILE_INFORMATION_DATE_FIELDS, true) && in_array('number', $flags, true)) {
+                $flags = array_values(array_filter($flags, static fn(string $flag): bool => $flag !== 'number'));
+                $notes[] = $setPath . '.' . $property . ': the flag "number" is dropped - the timeline entry field "'
+                    . $field . '" is a date since 3.0.0';
             }
             $legacyByField[$field] = $flags;
         }

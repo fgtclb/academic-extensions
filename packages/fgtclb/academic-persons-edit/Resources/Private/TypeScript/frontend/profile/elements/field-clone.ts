@@ -66,16 +66,36 @@ const bound = (value: number | null | undefined): number | undefined =>
  * The `type` attribute an input control of a field type carries.
  *
  * Every type is its own input type but two. An empty one is a text input, and
- * so is `date`: the two contract dates are deliberately *not* an
- * `<input type="date">`. The native control forces the locale of the browser
- * rather than the one of the site, it cannot be styled with the rest of the
- * editor, and its calendar is not the date picker this editor is meant to get
- * - that is a feature of its own and is not shipped yet. Until it is, the
- * control is a text input, the field type stays `date`, and it is the field
- * type a picker will be mounted on.
+ * a `date` follows the granularity the field publishes rather than its own
+ * name: `date` is an `<input type="date">`, `month` an `<input type="month">`
+ * and `year` an `<input type="number">`, because no browser has a year input.
+ * The field type stays `date` throughout - that is what the endpoint
+ * serializes, validates and formats by, and the control type is a rendering
+ * decision on top of it. A descriptor that carries no granularity is a full
+ * date.
+ *
+ * The value each of the three controls reads and submits is the string the
+ * endpoint sends for that granularity - `2019-03-14`, `2019-03`, `2019` - so
+ * a browser without a native `month` control, desktop Firefox among them,
+ * degrades it to a text input and submits the very same string.
  */
-const inputTypeOf = (type: string): string =>
-  type === "" || type === "date" ? "text" : type;
+const inputTypeOf = (type: string, granularity: string | undefined): string => {
+  if (type === "") {
+    return "text";
+  }
+  if (type !== "date") {
+    return type;
+  }
+
+  if (granularity === "month") {
+    return "month";
+  }
+  if (granularity === "year") {
+    return "number";
+  }
+
+  return "date";
+};
 
 /**
  * The control of one field, as its prototype plus the values that shape it.
@@ -178,13 +198,13 @@ const cloneControl = (options: FieldCloneOptions, controlId: string, errorId: st
       field.autocomplete === undefined || field.autocomplete === ""
         ? undefined
         : field.autocomplete,
-    inputType: inputTypeOf(field.type),
-    // The bounds of a number control. `undefined` takes the attribute off the
-    // clone, so a text input carries none of the three.
+    inputType: inputTypeOf(field.type, field.granularity),
+    // The bounds of a number control, a year among them. `undefined` takes the
+    // attribute off the clone, so a text input carries none of the three.
     max: bound(field.max),
     min: bound(field.min),
-    // The hint of a date control. Server side text, like every other label of
-    // a field, so nothing here spells it.
+    // Server side text, like every other label of a field, so nothing here
+    // spells it.
     placeholder:
       field.placeholder === undefined || field.placeholder === ""
         ? undefined
