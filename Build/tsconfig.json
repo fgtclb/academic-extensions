@@ -39,13 +39,17 @@
         // a stale cached dependency.
         //
         // TypeScript has to be told where those specifiers live. Add an entry
-        // here when an extension gains a module that is imported by another;
-        // an extension whose modules are standalone needs none.
+        // here when an extension gains a module that is imported by another,
+        // or by a behavioural test - "tsconfig.tests.json" inherits this map.
+        // An extension nothing imports from needs none.
         //
         // No "baseUrl": with "moduleResolution": "bundler" the targets resolve
         // relative to this file, and a "baseUrl" would additionally make every
         // directory below it importable as a bare specifier.
         "paths": {
+            "@fgtclb/academic-partners/frontend/*": [
+                "../packages/fgtclb/academic-partners/Resources/Private/TypeScript/frontend/*"
+            ],
             "@fgtclb/academic-persons/frontend/*": [
                 "../packages/fgtclb/academic-persons/Resources/Private/TypeScript/frontend/*"
             ],
