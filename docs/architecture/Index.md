@@ -29,15 +29,16 @@ This branch supports **TYPO3 v12 and v13**.
 
 ## Pages
 
-| Page                                                    | Contents                                                                                                                                         |
-|---------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Core version aware code](core-version-aware-code.md)   | The four mechanisms in use, the `Core12/`/`Core13/` split in `academic-base`, and how version specific tests are grouped.                        |
-| [Dependency injection](dependency-injection.md)         | How services are configured across the extensions, why they must be stateless, and which Symfony and TYPO3 attributes exist on both v12 and v13. |
-| [Class design](class-design.md)                         | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                         |
-| [Database queries](database-queries.md)                 | Quoting value lists, and keeping a constraint on the builder that executes it.                                                                   |
-| [Validation settings](validation-settings.md)           | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                |
-| [Form data transformation](form-data-transformation.md) | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                     |
-| [TypoScript and site sets](typoscript-and-site-sets.md) | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.       |
+| Page                                                            | Contents                                                                                                                                         |
+|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Core version aware code](core-version-aware-code.md)           | The four mechanisms in use, the `Core12/`/`Core13/` split in `academic-base`, and how version specific tests are grouped.                        |
+| [Dependency injection](dependency-injection.md)                 | How services are configured across the extensions, why they must be stateless, and which Symfony and TYPO3 attributes exist on both v12 and v13. |
+| [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                         |
+| [Database queries](database-queries.md)                         | Quoting value lists, and keeping a constraint on the builder that executes it.                                                                   |
+| [Frontend-user contact import](frontend-user-contact-import.md) | How telephone and fax data from `fe_users` is identified, typed and synchronized.                                                                |
+| [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                |
+| [Form data transformation](form-data-transformation.md)         | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                     |
+| [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.       |
 
 ## See also
 
