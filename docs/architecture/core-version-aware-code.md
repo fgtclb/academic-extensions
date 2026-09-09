@@ -269,7 +269,7 @@ $coreVersionedFlexFormPath = sprintf(
 );
 ```
 
-Two properties keep this from rotting, and both are tested:
+Three properties keep this from rotting, and all three are tested:
 
 - Only the structures that **really** differ are split. `SelectedProfiles.xml`
   and `SelectedContracts.xml` carry no `valuePicker` and stay shared, so the
@@ -278,6 +278,12 @@ Two properties keep this from rotting, and both are tested:
   `packages/fgtclb/academic-persons/Tests/Unit/Configuration/FlexFormCoreVariantsTest.php`
   compares them textually with the pickers masked out, which is the standing
   objection to any folder split — that the copies drift — turned into a test.
+- The rule holds for **every** extension, not just this one.
+  `academic-base/Tests/Unit/Configuration/ShippedFlexFormsTest.php` sweeps the
+  whole `packages/` tree and fails when a `valuePicker` appears outside a
+  `Core13`/`Core14` folder, or with the item shape of the other version. That is
+  the check that catches a *new* extension adding one, which the per-extension
+  test above cannot see. See [Unit tests](../testing/unit-tests.md#the-shipped-configuration-tests).
 
 The shape of the item list is asserted against the running core by
 `assertPluginFlexFormValuePickerItemsMatchRunningCore()` in
