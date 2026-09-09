@@ -410,7 +410,11 @@ not the Extbase one.
 
 ## Core-version-aware code (v13 vs v14)
 
-There is no `Core13/`/`Core14/` split in any academic extension yet. Every
+The only `Core13/`/`Core14/` split in any academic extension is
+`academic-persons/Configuration/FlexForms/Core13|Core14/{List,Detail}.xml` —
+FlexForm XML cannot hold a version switch, and the `valuePicker` items of
+`settings.pageTitleFormat` have no form both v13 and v14 accept (ACE-560). No
+PHP is split. Every other
 difference is resolved inside the file that has it, with a switch on
 `(new Typo3Version())->getMajorVersion()` — in a class, in a `Configuration/`
 file, or in an event listener. The most instructive one is
@@ -422,7 +426,8 @@ ACE-293). The counts per mechanism are measured in
 deliberately not repeated here.
 
 Keep it that way while the difference is a line or two. Reach for the folder
-split below only when a whole class has to differ — the technique can be looked
+split below only when a whole class has to differ, or when the file format
+cannot express a switch at all — the technique can be looked
 up in `web-vision/deepltranslate-core` or `fgtclb/environment-state-manager`.
 The generic principle is two additional class folders, one per supported core
 version of the branch:

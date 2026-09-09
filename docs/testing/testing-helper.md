@@ -307,7 +307,12 @@ both cases. That is fine for what the trait does, but **do not read this
 construct as a v14 gate and do not reuse it as one.** A genuine gate is
 `(new Typo3Version())->getMajorVersion()` or a `not-core-*` group.
 
-### The assertion
+### The assertions
+
+The trait carries two, for two different defects. Both run against the same
+resolved data structure.
+
+#### `assertPluginFlexFormIsResolved()`
 
 `assertPluginFlexFormIsResolved(string $cType, string $sheetName = 'sDEF')` makes
 **three** assertions, one per way this has already gone wrong:
@@ -347,6 +352,44 @@ registration on purpose — put the v14 assignment back on both branches of
 restore. Done while writing this: **15 data sets across the seven extensions**
 fail with *"resolved to the TYPO3 core default data structure instead of the one
 the extension registers"*.
+
+#### `assertPluginFlexFormValuePickerItemsMatchRunningCore()`
+
+`assertPluginFlexFormValuePickerItemsMatchRunningCore(string $cType, int $expectedValuePickerCount)`
+walks every `config.valuePicker.items` in the resolved structure and asserts the
+items carry the keys the running core actually reads: the positional `0`/`1`
+pair on TYPO3 v13, `label`/`value` on v14. It exists because of ACE-560, where
+the associative form shipped for both versions made `InputTextElement` raise
+`Undefined array key 1` and then a `TypeError` on v13 — four of the six
+`academic_persons` plugins could not be opened, and, once again, every gate
+stayed green.
+
+**It is deliberately one-sided, and that is the thing to understand before
+relying on it.** On v13 this assertion is the guard: nothing migrates the
+associative shape, so it arrives unchanged and fails loudly. On v14 it cannot
+be, because `TcaMigration::migrateItemsOfValuePickerToAssociativeArray()`
+rewrites a positional list to `label`/`value` before the assertion can see it.
+The v14 direction is caught by two other things instead:
+
+- the `E_USER_DEPRECATED` that `FlexFormTools::migrateFlexField()` raises for
+  that on-the-fly migration, turned into a failure by `failOnDeprecation="true"`
+  in `Build/phpunit/FunctionalTests.xml`, and
+- the per-extension unit test over the shipped XML —
+  `academic-persons/Tests/Unit/Configuration/FlexFormCoreVariantsTest.php`.
+
+`$expectedValuePickerCount` is not decoration. Without it, a value picker that
+silently disappears from the data structure turns the guard into a no-op that
+passes. `0` is a meaningful expectation: it pins that a structure genuinely has
+none, which is what lets `academic_persons` split only `List.xml` and
+`Detail.xml` and keep `SelectedProfiles.xml` and `SelectedContracts.xml` shared.
+
+**When to use it.** In the same `PluginFlexFormTest.php`, for any extension
+whose FlexForms carry a `valuePicker`. Only `academic_persons` does today; the
+other six extensions ship none, so they do not carry it.
+
+**Prove it can fail.** Copy the `Core14` variant of `List.xml` over the `Core13`
+one and run the v13 matrix. Done while writing this: **three data sets** fail
+with *"has keys "label", "value", but TYPO3 v13 reads "0", "1""*.
 
 ---
 

@@ -8,21 +8,29 @@ only the matching variant is used.
 This page documents what this repository does today, which is deliberately the
 smaller of those two options.
 
-## There is no `Core13/` / `Core14/` split here
+## One pair of split files, everywhere else a switch
 
-Verified across the whole repository: no `Core13/` or `Core14/` directory
-exists under `packages/` or `packages-dev/`. Every core version difference is
-currently resolved **inside** the file that has it.
+Verified across `packages/` and `packages-dev/`: the only `Core13/` and
+`Core14/` directories are
+`packages/fgtclb/academic-persons/Configuration/FlexForms/Core13/` and
+`.../Core14/`. They hold `List.xml` and `Detail.xml`, the two plugin data
+structures carrying a `valuePicker`, and they exist twice because FlexForm XML
+cannot express a version switch of its own (ACE-560, see below). No `Core13/` or
+`Core14/` directory in an extension holds PHP — the `Build/phpstan/Core13/` and
+`Build/phpstan/Core14/` pair does, and is static analysis configuration rather
+than shipped code. Every other core version difference is resolved **inside**
+the file that has it.
 
-Four mechanisms are in use, and they differ by *where* the difference sits —
+Five mechanisms are in use, and they differ by *where* the difference sits —
 not by preference:
 
-| Mechanism                                  | Used in                                    | Count               |
-|--------------------------------------------|--------------------------------------------|---------------------|
-| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`               | 2 files, 3 switches |
-| Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`         | 12 files            |
-| Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/` | 3 files             |
-| Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`      | 2 files             |
+| Mechanism                                  | Used in                                                           | Count               |
+|--------------------------------------------|-------------------------------------------------------------------|---------------------|
+| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`                                      | 2 files, 3 switches |
+| Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`                                | 13 files            |
+| Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/`                        | 3 files             |
+| Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`                             | 2 files             |
+| One file per version, selected by path     | `packages/fgtclb/academic-persons/Configuration/FlexForms/Core*/` | 2 data structures   |
 
 All of them switch on `(new Typo3Version())->getMajorVersion()`.
 
@@ -119,7 +127,7 @@ shape the rule below asks for. What it guards is measured in
 
 TCA, TypoScript and `ext_localconf.php` are loaded by TYPO3 from a fixed path
 and cannot be swapped per core version. A difference there has to be resolved
-in the file. 12 files under `packages/fgtclb/*/Configuration/` do this, and
+in the file. 13 files under `packages/fgtclb/*/Configuration/` do this, and
 they follow a consistent shape: build the array, adjust it at the end, return
 it. For example
 [`packages/fgtclb/academic-jobs/Configuration/TCA/tx_academicjobs_domain_model_job.php`](../../packages/fgtclb/academic-jobs/Configuration/TCA/tx_academicjobs_domain_model_job.php)
@@ -235,10 +243,52 @@ name. Both are excluded from PHPStan (`Build/phpstan/Core*/phpstan.neon` line
 because the constant's *type* differs per core version and static analysis has
 to be told which one it is looking at.
 
+### One file per version, when the format cannot switch at all
+
+A PHP configuration file can ask the running version. An XML data structure
+cannot, and that is the whole reason the one folder split in this repository
+exists.
+
+`settings.pageTitleFormat` of `academic_persons` is configured with a
+`valuePicker`, the single TCA item list core never made readable in both
+directions. TYPO3 v13 reads the positional pair `$item[0]` / `$item[1]` and has
+no `TcaMigration` for anything else; TYPO3 v14 reads `$item['label']` /
+`$item['value']` and migrates the positional pair on the fly, which makes
+`FlexFormTools::migrateFlexField()` raise `E_USER_DEPRECATED`. Given the wrong
+form, v13 raises `Undefined array key 1` and then a `TypeError` — the element
+renders nothing and the plugin cannot be opened at all (ACE-560).
+
+So neither form is valid on both versions, the file has to exist twice, and the
+switch moves to the only place that can hold one — the registration:
+
+```php
+// packages/fgtclb/academic-persons/Configuration/TCA/Overrides/tt_content.php
+$coreVersionedFlexFormPath = sprintf(
+    'FILE:EXT:academic_persons/Configuration/FlexForms/Core%d/%%s.xml',
+    (new Typo3Version())->getMajorVersion(),
+);
+```
+
+Two properties keep this from rotting, and both are tested:
+
+- Only the structures that **really** differ are split. `SelectedProfiles.xml`
+  and `SelectedContracts.xml` carry no `valuePicker` and stay shared, so the
+  folder split marks exactly where a real difference is.
+- The two variants may differ **only** in their value pickers.
+  `packages/fgtclb/academic-persons/Tests/Unit/Configuration/FlexFormCoreVariantsTest.php`
+  compares them textually with the pickers masked out, which is the standing
+  objection to any folder split — that the copies drift — turned into a test.
+
+The shape of the item list is asserted against the running core by
+`assertPluginFlexFormValuePickerItemsMatchRunningCore()` in
+`packages-dev/testing-helper/Classes/FunctionalTestCase/PluginFlexFormDataStructureTrait.php`,
+next to the ACE-293 assertion it sits beside.
+
 ## The rule
 
 **Keep a one- or two-line difference as a version switch. Reach for a folder
-split only when a whole class has to differ.**
+split only when a whole class has to differ, or when the file format cannot
+express a switch at all.**
 
 The switches above are each one condition applied to one value, next to a
 comment explaining the core behaviour and a `@todo` naming when it goes away.
@@ -252,7 +302,7 @@ has to exist twice.
 
 ## What a folder split would look like
 
-Not used in this repository — documented so the shape is agreed on before
+Not used for PHP in this repository — documented so the shape is agreed on before
 someone needs it. The technique can be looked up in
 `web-vision/deepltranslate-core` or `fgtclb/environment-state-manager`.
 
