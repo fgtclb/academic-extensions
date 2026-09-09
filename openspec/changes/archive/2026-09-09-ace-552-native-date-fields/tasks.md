@@ -106,12 +106,12 @@
 
 ## 10. Definition of done
 
-- [ ] 10.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 10.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
       `functional` green for core 13 and core 14 each.
-- [ ] 10.2 `lintTypescript`, `typecheckJs`, `testJs`, `checkJsBuildClean` and
+- [x] 10.2 `lintTypescript`, `typecheckJs`, `testJs`, `checkJsBuildClean` and
       `lintMarkdown -n` green.
-- [ ] 10.3 `checkRstRenderingAll` green.
-- [ ] 10.4 Every new behaviour has a test, and each was shown to fail without
+- [x] 10.3 `checkRstRenderingAll` green.
+- [x] 10.4 Every new behaviour has a test, and each was shown to fail without
       the change.
-- [ ] 10.5 Commit message in TYPO3 Core format with the verified `ACE-552`
+- [x] 10.5 Commit message in TYPO3 Core format with the verified `ACE-552`
       reference; the change archived as the last commit of the pull request.
