@@ -107,6 +107,22 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         return $this->renderFrontendPage('https://www.acme.com' . $uri);
     }
 
+    /**
+     * The icon wrapper carries the identifier, and the drawing sits inlined inside it: an
+     * `<img>` would keep the colour of its file instead of the text colour.
+     */
+    private function assertPropertyIconIsInlined(string $identifier, string $content): void
+    {
+        $this->assertMatchesRegularExpression(
+            sprintf(
+                '#data-identifier="%s"[^>]*>\s*<span class="icon-markup">\s*<svg[^>]*currentColor#',
+                preg_quote($identifier, '#'),
+            ),
+            $content,
+            sprintf('The icon "%s" is not rendered inline.', $identifier),
+        );
+    }
+
     #[Test]
     public function listPluginRendersAllVisibleJobs(): void
     {
@@ -147,6 +163,23 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         $this->assertStringContainsString('Full-Time', $content);
         $this->assertStringContainsString('Part-Time', $content);
         $this->assertStringNotContainsString('jobs.type.1', $content);
+    }
+
+    /**
+     * The glyph in front of each property is one of the shared icons of EXT:academic_base,
+     * inlined so it takes the text colour. The fixture jobs fill the organisation, the
+     * location, the job type and the working hours; the last two share one glyph.
+     */
+    #[Test]
+    public function listPluginRendersTheSharedIconOfEachProperty(): void
+    {
+        $this->setUpTestCase('jobPages');
+
+        $content = $this->renderListPage();
+        $this->assertPropertyIconIsInlined('tx-academicbase-info-company', $content);
+        $this->assertPropertyIconIsInlined('tx-academicbase-info-location', $content);
+        $this->assertPropertyIconIsInlined('tx-academicbase-info-employment', $content);
+        $this->assertStringNotContainsString('default-not-found', $content);
     }
 
     #[Test]
@@ -255,6 +288,33 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         $this->assertStringContainsString('Dr. Ada Lovelace', $content);
         $this->assertStringContainsString('href="tel:+49 89 1234"', $content);
         $this->assertStringContainsString('ada@example.org', $content);
+    }
+
+    #[Test]
+    public function detailPluginRendersTheSharedIconOfEachProperty(): void
+    {
+        $this->setUpTestCase('jobPages');
+
+        $content = $this->renderDetailPageOfJob($this->renderListPage(), 1);
+        $this->assertPropertyIconIsInlined('tx-academicbase-info-company', $content);
+        $this->assertPropertyIconIsInlined('tx-academicbase-info-location', $content);
+        $this->assertPropertyIconIsInlined('tx-academicbase-info-employment', $content);
+    }
+
+    /**
+     * The contact block asked for the identifiers `phone` and `mail`, which neither core
+     * version registers, so every job with a contact showed the "icon not found"
+     * placeholder next to the phone number and the e-mail address.
+     */
+    #[Test]
+    public function detailPluginRendersTheContactIcons(): void
+    {
+        $this->setUpTestCase('jobPages');
+
+        $content = $this->renderDetailPageOfJob($this->renderListPage(), 1);
+        $this->assertPropertyIconIsInlined('tx-academicbase-info-phone', $content);
+        $this->assertPropertyIconIsInlined('tx-academicbase-info-email', $content);
+        $this->assertStringNotContainsString('default-not-found', $content);
     }
 
     #[Test]

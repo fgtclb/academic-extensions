@@ -1,90 +1,28 @@
 <?php
 
-use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
-use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
+declare(strict_types=1);
 
+use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
+
+/*
+ * The icons of this extension: Font Awesome Free solid, drawn in `currentColor` and
+ * inlined by the provider of EXT:academic_base, so they take the colour of the
+ * surrounding text in both backend colour schemes. Licence and origin of every file:
+ * Resources/Public/Icons/LICENSE-font-awesome.txt.
+ *
+ * Identifiers follow `tx-<extkey>-<group>-<name>`, files `Icons/<group>/<name>.svg`:
+ * `plugin` for the content elements and the new content element wizard, `record` for
+ * the job table. Both show the same drawing. The glyphs in front of the job properties
+ * in the frontend are the shared `tx-academicbase-info-*` icons of EXT:academic_base,
+ * mapped in Resources/Private/Partials/Job/PropertyIcon.html.
+ */
 return [
-    /*
-     * The record icon of the job table. It is registered with the provider of
-     * EXT:academic_base, which inlines the file in both markups instead of rendering an
-     * <img>. An <img> is opaque to CSS and keeps the colours of its file, so a record
-     * icon drawn in a dark ink stays dark on the dark cards of the backend colour
-     * scheme. Inlined and drawn in `currentColor` it follows the text colour.
-     */
-    'tx_academicjobs_domain_model_job' => [
+    'tx-academicjobs-plugin-jobs' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/tx_academicjobs_domain_model_job.svg',
+        'source' => 'EXT:academic_jobs/Resources/Public/Icons/plugin/jobs.svg',
     ],
-    'academic_jobs_icon' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/jobs_icon.svg',
-    ],
-    'academic_jobs-starttime' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Calendar.svg',
-    ],
-    'academic_jobs-endtime' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Calendar.svg',
-    ],
-    'academic_jobs-companyName' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Company.svg',
-    ],
-    'academic_jobs-employmentType' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Work.svg',
-    ],
-    'academic_jobs-workLocation' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Location.svg',
-    ],
-    'academic_jobs-employmentStartDate' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Calendar.svg',
-    ],
-    'academic_jobs-sector' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Industry.svg',
-    ],
-    'academic_jobs-type' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/jobs_icon.svg',
-    ],
-    'academic_jobs-requiredDegree' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/School.svg',
-    ],
-    'academic_jobs-contractualRelationship' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Contract.svg',
-    ],
-    'academic_jobs-internationalsWelcome' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Public.svg',
-    ],
-    'academic_jobs-alumniRecommend' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Star.svg',
-    ],
-    'academic_jobs-link' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Link.svg',
-    ],
-    'academic_jobs-contactName' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Person.svg',
-    ],
-    'academic_jobs-contactEmail' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Email.svg',
-    ],
-    'academic_jobs-contactPhone' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Phone.svg',
-    ],
-    'academic_jobs-contactAdditionalInformation' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_jobs/Resources/Public/Icons/Info.svg',
+    'tx-academicjobs-record-job' => [
+        'provider' => CurrentColorSvgIconProvider::class,
+        'source' => 'EXT:academic_jobs/Resources/Public/Icons/plugin/jobs.svg',
     ],
 ];

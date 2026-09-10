@@ -28,11 +28,25 @@ final class RecordIconsTest extends AbstractAcademicJobsTestCase
     public static function recordIconIdentifiers(): \Generator
     {
         $identifiers = [
-            'tx_academicjobs_domain_model_job',
+            'tx-academicjobs-record-job',
         ];
         foreach ($identifiers as $identifier) {
             yield $identifier => [$identifier];
         }
+    }
+
+    /**
+     * The list below pins what is registered; this pins that the TCA actually names it. A
+     * registration nothing points at would pass every assertion below while the record list
+     * and the page tree still showed another icon for a job.
+     */
+    #[Test]
+    public function jobRecordTypeResolvesToTheRegisteredIcon(): void
+    {
+        $this->assertSame(
+            'tx-academicjobs-record-job',
+            $GLOBALS['TCA']['tx_academicjobs_domain_model_job']['ctrl']['typeicon_classes']['default'] ?? null,
+        );
     }
 
     #[Test]
