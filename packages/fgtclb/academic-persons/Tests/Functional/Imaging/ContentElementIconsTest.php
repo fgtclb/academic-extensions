@@ -136,4 +136,11 @@ final class ContentElementIconsTest extends AbstractAcademicPersonsTestCase
     {
         $this->assertRenderedIconCarriesItsIdentifier($identifier);
     }
+
+    #[Test]
+    #[DataProvider('pluginIconIdentifiers')]
+    public function pluginIconIsInTheHouseFormat(string $identifier): void
+    {
+        $this->assertIconIsInTheHouseFormat($identifier);
+    }
 }

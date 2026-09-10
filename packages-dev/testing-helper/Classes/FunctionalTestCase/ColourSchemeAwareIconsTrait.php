@@ -108,37 +108,70 @@ trait ColourSchemeAwareIconsTrait
 
     /**
      * The list based assertions above pin the icons that exist today. This one is derived
-     * from the TCA instead, so a record icon added later cannot slip past unconverted - the
-     * case a hand maintained list is structurally unable to catch.
+     * from the TCA instead, so a record type added later cannot slip past unconverted - the
+     * case a hand maintained list is structurally unable to catch - and neither can a content
+     * element or page type the test names.
      *
-     * It walks the `ctrl` of every TCA table and keeps what it can attribute to
-     * `$extensionKey`. Three things have to hold.
+     * It decides by *type* what belongs to the extension, never by what the icon identifier
+     * looks like: every type of a table `tx_<key without underscores>_*`, plus the content
+     * element types and page types the test names in `$contentTypes` and `$pageTypes`. Those
+     * two have to be named, because `tt_content` and `pages` are shared by every extension
+     * and a CType carries no reliable mark of its owner (`academic_study_plan` is one of
+     * them). For a page type, the `<doktype>-<variant>` entries (`-hideinmenu`, `-root`, ...)
+     * belong to it too. Every type the extension owns names an identifier - one of its own,
+     * `tx-<key without underscores>-...`, never a core or a foreign one - and that identifier
+     * is registered, not deprecated, and drawn for the colour scheme: registered with
+     * {@see CurrentColorSvgIconProvider}, inlined in both markups, in `currentColor`. An
+     * owned table without a `default` type icon, and a named CType or doktype without an
+     * entry at all - `TcaManipulator::addRecordType()` writes none for an empty `icon` -
+     * fail as well, because the backend then shows the icon of the table or
+     * `default-not-found`.
+     *
+     * A type the extension does not own is looked at only when its identifier is
+     * attributable to the extension anyway: by the prefix, or by a registered source below
+     * `EXT:<key>/`, which is how the category type icons of `sys_category` are covered.
+     * Such an identifier has to be registered with the colour scheme aware provider as
+     * well. A deprecated identifier on a type of somebody else is skipped before its
+     * configuration is read: reading it raises `E_USER_DEPRECATED`, which fails the suite,
+     * and it is not this extension's to fix.
      *
      * A `ctrl.iconfile` naming a file of this extension is a defect of its own: it bypasses
      * the icon registry, so the file gets whatever `IconRegistry::detectIconProvider()`
-     * answers and can never carry a provider of our choosing.
-     *
-     * A `ctrl.typeicon_classes` value is an icon *identifier*, never a file path. A path is
-     * silently accepted there - `ExtensionManagementUtility::addPlugin()` and
+     * answers and can never carry a provider of our choosing. A file path in
+     * `ctrl.typeicon_classes` is one as well: `ExtensionManagementUtility::addPlugin()` and
      * `TcaManipulator::addRecordType()` both write the `icon` key of a select item straight
-     * into it - and `IconRegistry::registerTCAIcons()` registers from `ctrl.iconfile` only,
-     * so `IconFactory::getIcon()` never finds it and answers with `default-not-found`
-     * (ACE-523).
+     * into it, `IconRegistry::registerTCAIcons()` registers from `ctrl.iconfile` only, and
+     * `IconFactory::getIcon()` answers such a value with `default-not-found` (ACE-523).
      *
-     * And the identifier uses the colour scheme aware provider, because `typeicon_classes`
-     * is read through the *default* markup everywhere it matters.
+     * What it cannot see is a content element or page type the test does not name, whose
+     * identifier carries neither the prefix nor a source of the extension, and two types
+     * that swapped their icons - which is why the tests also pin the identifier each type
+     * names.
      *
-     * `tt_content` is out of the last check on purpose. Its `typeicon_classes` entries are
-     * the content element icons, which are plugin brand marks drawn in fixed colours and
-     * meant to look the same on every background. The path check still applies to them.
+     * @param list<string> $contentTypes the `tt_content` CTypes the extension registers
+     * @param list<int|string> $pageTypes the `pages` doktypes the extension registers
      */
-    private function assertEveryRecordTypeIconIsColourSchemeAware(string $extensionKey): void
-    {
+    private function assertEveryRecordTypeIconIsColourSchemeAware(
+        string $extensionKey,
+        array $contentTypes = [],
+        array $pageTypes = [],
+    ): void {
         $iconRegistry = $this->get(IconRegistry::class);
         $sourcePrefix = 'EXT:' . $extensionKey . '/';
+        $identifierPrefix = 'tx-' . str_replace('_', '', $extensionKey) . '-';
+        $tablePrefix = 'tx_' . str_replace('_', '', $extensionKey) . '_';
         $checked = 0;
 
+        $ownedTypes = [];
+        foreach ($contentTypes as $contentType) {
+            $ownedTypes['tt_content'][(string)$contentType] = true;
+        }
+        foreach ($pageTypes as $pageType) {
+            $ownedTypes['pages'][(string)$pageType] = true;
+        }
+
         foreach ($GLOBALS['TCA'] ?? [] as $table => $tableConfiguration) {
+            $table = (string)$table;
             $iconFile = $tableConfiguration['ctrl']['iconfile'] ?? null;
             if (is_string($iconFile)) {
                 self::assertStringNotContainsString(
@@ -154,15 +187,47 @@ trait ColourSchemeAwareIconsTrait
                 );
             }
 
+            $isOwnedTable = str_starts_with($table, $tablePrefix);
             $typeIconClasses = $tableConfiguration['ctrl']['typeicon_classes'] ?? [];
             if (!is_array($typeIconClasses)) {
-                continue;
+                $typeIconClasses = [];
             }
+            if ($isOwnedTable) {
+                self::assertArrayHasKey(
+                    'default',
+                    $typeIconClasses,
+                    sprintf('%s.ctrl.typeicon_classes has no default, so the table has no icon of its own.', $table),
+                );
+            }
+            foreach (array_keys($ownedTypes[$table] ?? []) as $ownedType) {
+                self::assertArrayHasKey(
+                    $ownedType,
+                    $typeIconClasses,
+                    sprintf(
+                        '%s.ctrl.typeicon_classes has no entry for the type "%s" of EXT:%s, so the '
+                        . 'backend shows the default icon of the table for it.',
+                        $table,
+                        $ownedType,
+                        $extensionKey,
+                    ),
+                );
+            }
+
             foreach ($typeIconClasses as $type => $identifier) {
+                $type = (string)$type;
+                $where = sprintf('%s.ctrl.typeicon_classes.%s', $table, $type);
+                $isOwnedType = $isOwnedTable
+                    || isset($ownedTypes[$table][$type])
+                    || ($table === 'pages' && isset($ownedTypes[$table][explode('-', $type, 2)[0]]));
+                if ($isOwnedType) {
+                    $this->assertOwnedTypeIconIsColourSchemeAware($where, $identifier, $identifierPrefix);
+                    $checked++;
+                    continue;
+                }
+
                 if (!is_string($identifier) || $identifier === '') {
                     continue;
                 }
-                $where = sprintf('%s.ctrl.typeicon_classes.%s', $table, (string)$type);
                 if (str_contains($identifier, '/')) {
                     self::assertStringNotContainsString(
                         $sourcePrefix,
@@ -176,11 +241,28 @@ trait ColourSchemeAwareIconsTrait
                     );
                     continue;
                 }
-                if ($table === 'tt_content' || !$iconRegistry->isRegistered($identifier)) {
+                $hasPrefix = str_starts_with($identifier, $identifierPrefix);
+                if ($hasPrefix) {
+                    self::assertTrue(
+                        $iconRegistry->isRegistered($identifier),
+                        sprintf(
+                            '%s names "%s", which is not registered, so the backend renders the '
+                            . 'not-found placeholder for it.',
+                            $where,
+                            $identifier,
+                        ),
+                    );
+                    self::assertFalse(
+                        $iconRegistry->isDeprecated($identifier),
+                        sprintf('%s names "%s", which is deprecated.', $where, $identifier),
+                    );
+                } elseif (!$iconRegistry->isRegistered($identifier) || $iconRegistry->isDeprecated($identifier)) {
+                    // Not ours, and reading the configuration of a deprecated icon raises
+                    // E_USER_DEPRECATED.
                     continue;
                 }
                 $configuration = $iconRegistry->getIconConfigurationByIdentifier($identifier);
-                if (!str_starts_with((string)($configuration['options']['source'] ?? ''), $sourcePrefix)) {
+                if (!$hasPrefix && !str_starts_with((string)($configuration['options']['source'] ?? ''), $sourcePrefix)) {
                     continue;
                 }
                 $checked++;
@@ -204,6 +286,62 @@ trait ColourSchemeAwareIconsTrait
                 $extensionKey,
             ),
         );
+    }
+
+    /**
+     * The checks for the icon of a type the extension owns, see
+     * {@see self::assertEveryRecordTypeIconIsColourSchemeAware()}.
+     */
+    private function assertOwnedTypeIconIsColourSchemeAware(string $where, mixed $identifier, string $identifierPrefix): void
+    {
+        self::assertIsString($identifier, sprintf('%s is not an icon identifier.', $where));
+        self::assertNotSame('', $identifier, sprintf('%s is empty, so the type has no icon.', $where));
+        self::assertStringNotContainsString(
+            '/',
+            $identifier,
+            sprintf(
+                '%s names the file "%s" instead of a registered icon identifier, so the backend '
+                . 'renders the not-found placeholder for it.',
+                $where,
+                $identifier,
+            ),
+        );
+        self::assertStringStartsWith(
+            $identifierPrefix,
+            $identifier,
+            sprintf(
+                '%s names "%s". A type of this extension names an icon of its own, %s<group>-<name>, '
+                . 'never a core or a foreign one.',
+                $where,
+                $identifier,
+                $identifierPrefix,
+            ),
+        );
+        $iconRegistry = $this->get(IconRegistry::class);
+        self::assertTrue(
+            $iconRegistry->isRegistered($identifier),
+            sprintf(
+                '%s names "%s", which is not registered, so the backend renders the not-found '
+                . 'placeholder for it.',
+                $where,
+                $identifier,
+            ),
+        );
+        self::assertFalse(
+            $iconRegistry->isDeprecated($identifier),
+            sprintf('%s names "%s", which is deprecated.', $where, $identifier),
+        );
+        self::assertSame(
+            CurrentColorSvgIconProvider::class,
+            $iconRegistry->getIconConfigurationByIdentifier($identifier)['provider'] ?? null,
+            sprintf(
+                'The record icon "%s" of %s is not registered with the colour scheme aware provider.',
+                $identifier,
+                $where,
+            ),
+        );
+        $this->assertIconIsInlinedInBothMarkups($identifier);
+        $this->assertIconMarkupFollowsTheTextColour($identifier);
     }
 
     /**
@@ -251,8 +389,8 @@ trait ColourSchemeAwareIconsTrait
      *
      * The registry is flat and a duplicate registration silently wins, so the extension key
      * is the only token that keeps two extensions apart; it is written without underscores
-     * because a dashed key is ambiguous in this family (`academic_persons` + `edit-add` and
-     * `academic_persons_edit` + `add` would both read `academic-persons-edit-add`).
+     * because a dashed key is ambiguous in this family (`academic_persons` + `edit-print` and
+     * `academic_persons_edit` + `print` would both read `academic-persons-edit-print`).
      *
      * The identifiers are read out of the extension's `Configuration/Icons.php` rather than
      * the registry, because the registry cannot tell which extension registered what.

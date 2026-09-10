@@ -68,13 +68,19 @@ final class RecordIconsTest extends AbstractAcademicContacts4PagesTestCase
     }
 
     /**
-     * The identifiers above are hand maintained, so they cannot catch a record icon that is
-     * added later and never converted. This one is derived from the TCA and does.
+     * The identifiers above are hand maintained. This walks the TCA instead: every type of
+     * a table of this extension, and every content element type named here, has to name
+     * a registered, colour scheme aware identifier of this extension - not a core or a
+     * foreign one, and not none. A table added later is covered as it is; a content
+     * element added later has to be added to the list.
      */
     #[Test]
     public function everyRecordTypeIconOfThisExtensionIsColourSchemeAware(): void
     {
-        $this->assertEveryRecordTypeIconIsColourSchemeAware('academic_contacts4pages');
+        $this->assertEveryRecordTypeIconIsColourSchemeAware(
+            'academic_contacts4pages',
+            contentTypes: ['academiccontacts4pages_list'],
+        );
     }
 
     /**
@@ -121,5 +127,30 @@ final class RecordIconsTest extends AbstractAcademicContacts4PagesTestCase
             'tx-academiccontacts4pages-plugin-contacts',
             $elements['academiccontacts4pages_list.']['iconIdentifier'] ?? null,
         );
+    }
+
+    #[Test]
+    #[DataProvider('recordIconIdentifiers')]
+    public function recordIconIsInTheHouseFormat(string $identifier): void
+    {
+        $this->assertIconIsInTheHouseFormat($identifier);
+    }
+
+    #[Test]
+    public function identifiersFollowTheNamingScheme(): void
+    {
+        $this->assertIconIdentifiersFollowTheNamingScheme('academic_contacts4pages', ['plugin', 'record']);
+    }
+
+    #[Test]
+    public function everyIconFileIsTheSourceOfARegisteredIcon(): void
+    {
+        $this->assertEveryIconFileIsRegistered('academic_contacts4pages');
+    }
+
+    #[Test]
+    public function everyIconFileIsAttributedInTheLicenceNotice(): void
+    {
+        $this->assertEveryIconFileIsAttributedInTheNotice('academic_contacts4pages');
     }
 }

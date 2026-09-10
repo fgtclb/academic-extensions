@@ -535,12 +535,12 @@ done; the trait is used by one test class today.
 
 ## `ColourSchemeAwareIconsTrait`
 
-Five assertions for one icon identifier, one that derives the record icons
-from the TCA, and four that check a whole extension against the
-[icon rules](../architecture/icons.md). Used by the
-`Tests/Functional/Imaging/RecordIconsTest.php` of every extension that ships
-record icons, by the category type registration test of `typo3-category-types`
-and by `academic-base/Tests/Functional/Imaging/SharedIconsTest.php`:
+Five assertions for one icon identifier, one that derives the record and
+content element icons from the TCA, and four that check a whole extension
+against the [icon rules](../architecture/icons.md). Used by the
+`Tests/Functional/Imaging/` tests of every extension that ships icons, by the
+category type registration test of `typo3-category-types` and by
+`academic-base/Tests/Functional/Imaging/SharedIconsTest.php`:
 
 ```php
 use ColourSchemeAwareIconsTrait;
@@ -562,7 +562,7 @@ public function recordIconIsRegisteredWithTheColourSchemeAwareProvider(string $i
 | `assertIconMarkupFollowsTheTextColour()`           | `currentColor`, no hex colour, no `<style>`, no `id`.                    |
 | `assertRenderedIconCarriesItsIdentifier()`         | `data-identifier`, no `default-not-found`, no `<img>`.                   |
 | `assertIconIsInTheHouseFormat()`                   | Root element: 640 grid, `1em`, `fill="currentColor"`; no `style`.        |
-| `assertEveryRecordTypeIconIsColourSchemeAware()`   | Same, for every record icon the TCA of one extension names.              |
+| `assertEveryRecordTypeIconIsColourSchemeAware()`   | Every owned type names its own colour scheme aware icon; see below.      |
 
 **The trap it exists for.** `IconFactory::getIcon()` answers an unknown
 identifier with the `default-not-found` placeholder instead of failing, so a
@@ -574,23 +574,55 @@ the ink of its file, and only then turns into a dark glyph on a dark card
 (ACE-523).
 
 **Why `assertEveryRecordTypeIconIsColourSchemeAware()` exists.** The methods
-above it take an identifier, and the identifiers are spelled out per extension so a rename
-has to be made twice. A
-hand written list is good at catching a change to what is on it and structurally
-unable to catch what was never added, so
-`assertEveryRecordTypeIconIsColourSchemeAware('academic_persons')` derives the set
-instead: it walks `ctrl.iconfile` and `ctrl.typeicon_classes` of every TCA table,
-keeps what the source path of the registered icon attributes to that extension,
-and fails on a `ctrl.iconfile` (which bypasses the registry), on a file path where
-an identifier belongs (`registerTCAIcons()` registers `ctrl.iconfile` only, so the
-backend renders `default-not-found`) and on any identifier that is not registered
-with `CurrentColorSvgIconProvider`. `tt_content` is exempt from the last check,
-because its `typeicon_classes` entries are the content element brand marks. It
-also asserts that the walk found something, so it cannot pass by finding nothing.
+above it take an identifier, and the identifiers are spelled out per extension
+rather than read out of `Configuration/Icons.php`, so a rename has to be made
+twice instead of silently agreeing with itself. A hand written list is good at
+catching a change to what is on it and structurally unable to catch what was
+never added, so the walk derives the set from the TCA instead:
 
-The identifiers are listed per extension rather than read out of
-`Configuration/Icons.php`, so a rename has to be made twice instead of silently
-agreeing with itself.
+```php
+$this->assertEveryRecordTypeIconIsColourSchemeAware(
+    'academic_programs',
+    contentTypes: ['academicprograms_programlist', 'academicprograms_programdetails'],
+    pageTypes: [PageTypes::TYPE_ACADEMIC_PROGRAM],
+);
+```
+
+— [`academic-programs/Tests/Functional/Imaging/RecordIconsTest.php`](../../packages/fgtclb/academic-programs/Tests/Functional/Imaging/RecordIconsTest.php)
+
+It decides by **type** what belongs to the extension, never by what an icon
+identifier looks like: every `ctrl.typeicon_classes` entry of a table
+`tx_<key without underscores>_*`, plus the `tt_content` types in `$contentTypes`
+and the `pages` types in `$pageTypes` (with their `<doktype>-<variant>` entries).
+The two lists are passed in because `tt_content` and `pages` are shared by
+every extension and a CType carries no reliable mark of its owner —
+`academic_study_plan` is one. Both parameters default to `[]`, so a call with
+the extension key alone still works and covers the tables. For every owned
+type the entry exists and is not empty, is an identifier rather than a file
+path, carries the extension's prefix `tx-<key without underscores>-`, is
+registered and not deprecated, is registered with `CurrentColorSvgIconProvider`,
+and passes `assertIconIsInlinedInBothMarkups()` and
+`assertIconMarkupFollowsTheTextColour()`. So a core identifier such as
+`actions-user` on an owned type fails, a content element whose registration
+had an empty `icon` fails (`TcaManipulator::addRecordType()` and `addPlugin()`
+write no `typeicon_classes` entry for it), and so does a stale or misspelt
+identifier. An owned table also needs a `default` type icon.
+
+A type the extension does not own is checked only when its identifier is
+attributable to the extension anyway — by the prefix, or by a registered source
+below `EXT:<key>/`, which is how the category type icons of `sys_category` are
+covered — and then it has to be registered with `CurrentColorSvgIconProvider`
+too. A deprecated identifier on a type that is not ours is skipped before its
+configuration is read, because reading it raises `E_USER_DEPRECATED`, which the
+suite turns into a failure for a TCA entry the extension cannot fix. The walk
+also fails on a `ctrl.iconfile` of the extension (which bypasses the registry)
+and on a file path of the extension where an identifier belongs
+(`registerTCAIcons()` registers `ctrl.iconfile` only, so the backend renders
+`default-not-found`), and it asserts that it found something, so it cannot
+pass by finding nothing. What it cannot see is a content element or page type
+the test does not pass in whose identifier carries neither the prefix nor a
+source of the extension, and two types that swapped their icons — which is why
+the icon tests also pin the identifier each type names.
 
 **The extension-wide checks.** Each takes the extension key and derives the
 `tx-<key without underscores>-` prefix from it:
@@ -603,12 +635,18 @@ agreeing with itself.
 | `assertEveryIconFileIsAttributedInTheNotice($extensionKey, …)`       | Every SVG carries the Font Awesome comment and is listed in the notice file.               |
 
 `$exemptFiles` defaults to `['Extension.svg']`, and an exempt file has to exist.
+`academic-programs` and `academic-projects` exempt their `category-group/*.svg`
+from the orphan check: the `groups:` entry of `CategoryTypes.yaml` declares the file,
+but `EXT:category_types` does not read it yet (ACE-364), so nothing registers
+it.
 The naming check reads the extension's `Configuration/Icons.php`, because the
 registry cannot tell which extension registered an identifier; the orphan check
 asks the registry, because a shared file may be the source of an identifier
 another extension registers. The second check is for an extension whose icons
 share no file: a record icon that points at a shared glyph of `academic_base`
-is allowed and does not follow it, so such an extension leaves it out. The
+is allowed and does not follow it. Only `academic_base` calls it today; the
+extensions that share no file (`academic-bite-jobs`, `academic-persons-edit`,
+`academic-study-plan`) would pass it but do not call it. The
 trap the orphan check exists for: every other assertion walks registrations,
 and a file nothing registers is not one, so it is never looked at until the day
 it is registered.

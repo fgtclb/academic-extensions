@@ -74,13 +74,19 @@ final class RecordIconsTest extends AbstractAcademicProjectsTestCase
     }
 
     /**
-     * The identifiers above are hand maintained, so they cannot catch a record icon that is
-     * added later and never converted. This one is derived from the TCA and does.
+     * The identifiers above are hand maintained. This walks the TCA instead: every content
+     * element and page type named here has to name a registered, colour scheme aware
+     * identifier of this extension - not a core or a foreign one, and not none. A content
+     * element or page type added later has to be added to the list.
      */
     #[Test]
     public function everyRecordTypeIconOfThisExtensionIsColourSchemeAware(): void
     {
-        $this->assertEveryRecordTypeIconIsColourSchemeAware('academic_projects');
+        $this->assertEveryRecordTypeIconIsColourSchemeAware(
+            'academic_projects',
+            contentTypes: ['academicprojects_projectlist', 'academicprojects_projectlistsingle'],
+            pageTypes: [PageTypes::TYPE_ACEDEMIC_PROJECT],
+        );
     }
 
     /**
@@ -144,5 +150,35 @@ final class RecordIconsTest extends AbstractAcademicProjectsTestCase
             }
         }
         return null;
+    }
+
+    #[Test]
+    #[DataProvider('recordIconIdentifiers')]
+    public function recordIconIsInTheHouseFormat(string $identifier): void
+    {
+        $this->assertIconIsInTheHouseFormat($identifier);
+    }
+
+    #[Test]
+    public function identifiersFollowTheNamingScheme(): void
+    {
+        $this->assertIconIdentifiersFollowTheNamingScheme('academic_projects', ['doktype', 'plugin']);
+    }
+
+    /**
+     * The category group file is declared by the `groups:` entry of
+     * `Configuration/CategoryTypes.yaml`, which EXT:category_types does not read yet
+     * (ACE-364), so nothing registers it. It is exempt until the group icon is used.
+     */
+    #[Test]
+    public function everyIconFileIsTheSourceOfARegisteredIcon(): void
+    {
+        $this->assertEveryIconFileIsRegistered('academic_projects', ['Extension.svg', 'category-group/projects.svg']);
+    }
+
+    #[Test]
+    public function everyIconFileIsAttributedInTheLicenceNotice(): void
+    {
+        $this->assertEveryIconFileIsAttributedInTheNotice('academic_projects');
     }
 }

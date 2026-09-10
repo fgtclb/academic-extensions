@@ -9,11 +9,8 @@ use FGTCLB\AcademicPersonsEdit\Tests\Functional\AbstractAcademicPersonsEditTestC
 use FGTCLB\TestingHelper\FunctionalTestCase\ColourSchemeAwareIconsTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use TYPO3\CMS\Core\Imaging\Icon;
-use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\IconProvider\AbstractSvgIconProvider;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
-use TYPO3\CMS\Core\Imaging\IconSize;
 
 /**
  * Renders the icons of the profile editing plugin through the `IconFactory` of the container,
@@ -69,7 +66,7 @@ final class ProfileEditingIconsTest extends AbstractAcademicPersonsEditTestCase
     public function actionIconResolves(string $identifier): void
     {
         $this->assertTrue($this->get(IconRegistry::class)->isRegistered($identifier));
-        $this->assertSame($identifier, $this->getIcon($identifier)->getIdentifier());
+        $this->assertSame($identifier, $this->getColourSchemeAwareIcon($identifier)->getIdentifier());
     }
 
     /**
@@ -82,7 +79,7 @@ final class ProfileEditingIconsTest extends AbstractAcademicPersonsEditTestCase
     #[DataProvider('actionIconIdentifiers')]
     public function actionIconIsInlinedInBothMarkups(string $identifier): void
     {
-        $icon = $this->getIcon($identifier);
+        $icon = $this->getColourSchemeAwareIcon($identifier);
         $markup = $icon->getMarkup();
 
         $this->assertStringStartsWith('<svg', $markup);
@@ -95,7 +92,7 @@ final class ProfileEditingIconsTest extends AbstractAcademicPersonsEditTestCase
     #[DataProvider('actionIconIdentifiers')]
     public function renderedActionIconCarriesItsIdentifier(string $identifier): void
     {
-        $rendered = $this->getIcon($identifier)->render();
+        $rendered = $this->getColourSchemeAwareIcon($identifier)->render();
 
         $this->assertStringContainsString('data-identifier="' . $identifier . '"', $rendered);
         $this->assertStringNotContainsString('default-not-found', $rendered);
@@ -148,8 +145,42 @@ final class ProfileEditingIconsTest extends AbstractAcademicPersonsEditTestCase
         $this->assertSame([self::PLUGIN_ICON_IDENTIFIER], array_keys($registeredIcons));
     }
 
-    private function getIcon(string $identifier): Icon
+    #[Test]
+    public function pluginIconIsInTheHouseFormat(): void
     {
-        return $this->get(IconFactory::class)->getIcon($identifier, IconSize::SMALL);
+        $this->assertIconIsInTheHouseFormat(self::PLUGIN_ICON_IDENTIFIER);
+    }
+
+    /**
+     * The identifier above is spelled out. This walks the TCA instead: the content element
+     * type named here has to name a registered, colour scheme aware identifier of this
+     * extension - not a core or a foreign one, and not none. A content element added later
+     * has to be added to the list.
+     */
+    #[Test]
+    public function everyRecordTypeIconOfThisExtensionIsColourSchemeAware(): void
+    {
+        $this->assertEveryRecordTypeIconIsColourSchemeAware(
+            'academic_persons_edit',
+            contentTypes: [self::PROFILE_EDITING_CONTENT_TYPE],
+        );
+    }
+
+    #[Test]
+    public function identifiersFollowTheNamingScheme(): void
+    {
+        $this->assertIconIdentifiersFollowTheNamingScheme('academic_persons_edit', ['plugin']);
+    }
+
+    #[Test]
+    public function everyIconFileIsTheSourceOfARegisteredIcon(): void
+    {
+        $this->assertEveryIconFileIsRegistered('academic_persons_edit');
+    }
+
+    #[Test]
+    public function everyIconFileIsAttributedInTheLicenceNotice(): void
+    {
+        $this->assertEveryIconFileIsAttributedInTheNotice('academic_persons_edit');
     }
 }

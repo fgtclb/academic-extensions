@@ -422,6 +422,10 @@ not the Extbase one.
   format — never Pro, never another set — and every file is listed in the
   extension's `Resources/Public/Icons/LICENSE-font-awesome.txt`.
 - Always `CurrentColorSvgIconProvider`; a category type needs `inlineIcon: true`.
+- Every icon is `1em` × `1em` and the glyph is smaller than that box by design.
+  Never enlarge an icon box in a stylesheet to compensate.
+- A content element names one identifier in the CType item, `typeicon_classes`
+  and the wizard `iconIdentifier`.
 - 3.0 renames identifiers without deprecated aliases; the `Breaking-*.rst` of
   the extension carries the old → new table.
 - `@typo3/backend/icons.js` does not work in the frontend. Render the icon with

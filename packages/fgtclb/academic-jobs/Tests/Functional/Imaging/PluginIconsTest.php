@@ -79,4 +79,10 @@ final class PluginIconsTest extends AbstractAcademicJobsTestCase
     {
         $this->assertRenderedIconCarriesItsIdentifier(self::PLUGIN_ICON);
     }
+
+    #[Test]
+    public function pluginIconIsInTheHouseFormat(): void
+    {
+        $this->assertIconIsInTheHouseFormat(self::PLUGIN_ICON);
+    }
 }

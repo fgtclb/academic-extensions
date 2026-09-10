@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicPartners\Tests\Functional\Imaging;
 
 use FGTCLB\AcademicPartners\Backend\FormEngine\PartnerItems;
+use FGTCLB\AcademicPartners\Enumeration\PageTypes;
 use FGTCLB\AcademicPartners\Tests\Functional\AbstractAcademicPartnersTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\ColourSchemeAwareIconsTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -158,12 +159,49 @@ final class RecordIconsTest extends AbstractAcademicPartnersTestCase
     }
 
     /**
-     * The identifiers above are hand maintained, so they cannot catch a record icon that is
-     * added later and never converted. This one is derived from the TCA and does.
+     * The identifiers above are hand maintained. This walks the TCA instead: every type of
+     * a table of this extension, and every content element and page type named here, has
+     * to name a registered, colour scheme aware identifier of this extension - not a core
+     * or a foreign one, and not none. A table added later is covered as it is; a content
+     * element or page type added later has to be added to the list.
      */
     #[Test]
     public function everyRecordTypeIconOfThisExtensionIsColourSchemeAware(): void
     {
-        $this->assertEveryRecordTypeIconIsColourSchemeAware('academic_partners');
+        $this->assertEveryRecordTypeIconIsColourSchemeAware(
+            'academic_partners',
+            contentTypes: [
+                'academicpartners_list',
+                'academicpartners_map',
+                'academicpartners_partnershipslist',
+                'academicpartners_partnershipsteaser',
+            ],
+            pageTypes: [PageTypes::ACADEMIC_PARTNERS],
+        );
+    }
+
+    #[Test]
+    #[DataProvider('recordIconIdentifiers')]
+    public function recordIconIsInTheHouseFormat(string $identifier): void
+    {
+        $this->assertIconIsInTheHouseFormat($identifier);
+    }
+
+    #[Test]
+    public function identifiersFollowTheNamingScheme(): void
+    {
+        $this->assertIconIdentifiersFollowTheNamingScheme('academic_partners', ['doktype', 'plugin', 'record']);
+    }
+
+    #[Test]
+    public function everyIconFileIsTheSourceOfARegisteredIcon(): void
+    {
+        $this->assertEveryIconFileIsRegistered('academic_partners');
+    }
+
+    #[Test]
+    public function everyIconFileIsAttributedInTheLicenceNotice(): void
+    {
+        $this->assertEveryIconFileIsAttributedInTheNotice('academic_partners');
     }
 }

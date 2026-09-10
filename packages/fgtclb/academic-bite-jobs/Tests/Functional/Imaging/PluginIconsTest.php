@@ -57,4 +57,43 @@ final class PluginIconsTest extends AbstractAcademicBiteJobsTestCase
     {
         $this->assertRenderedIconCarriesItsIdentifier(self::PLUGIN_ICON);
     }
+
+    #[Test]
+    public function pluginIconIsInTheHouseFormat(): void
+    {
+        $this->assertIconIsInTheHouseFormat(self::PLUGIN_ICON);
+    }
+
+    /**
+     * The identifier above is spelled out. This walks the TCA instead: the content element
+     * type named here has to name a registered, colour scheme aware identifier of this
+     * extension - not a core or a foreign one, and not none. A content element added later
+     * has to be added to the list.
+     */
+    #[Test]
+    public function everyRecordTypeIconOfThisExtensionIsColourSchemeAware(): void
+    {
+        $this->assertEveryRecordTypeIconIsColourSchemeAware(
+            'academic_bite_jobs',
+            contentTypes: ['academicbitejobs_list'],
+        );
+    }
+
+    #[Test]
+    public function identifiersFollowTheNamingScheme(): void
+    {
+        $this->assertIconIdentifiersFollowTheNamingScheme('academic_bite_jobs', ['plugin']);
+    }
+
+    #[Test]
+    public function everyIconFileIsTheSourceOfARegisteredIcon(): void
+    {
+        $this->assertEveryIconFileIsRegistered('academic_bite_jobs');
+    }
+
+    #[Test]
+    public function everyIconFileIsAttributedInTheLicenceNotice(): void
+    {
+        $this->assertEveryIconFileIsAttributedInTheNotice('academic_bite_jobs');
+    }
 }

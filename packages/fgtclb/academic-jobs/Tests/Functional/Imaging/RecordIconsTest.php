@@ -78,12 +78,43 @@ final class RecordIconsTest extends AbstractAcademicJobsTestCase
     }
 
     /**
-     * The identifiers above are hand maintained, so they cannot catch a record icon that is
-     * added later and never converted. This one is derived from the TCA and does.
+     * The identifiers above are hand maintained. This walks the TCA instead: every type of
+     * a table of this extension, and every content element type named here, has to name
+     * a registered, colour scheme aware identifier of this extension - not a core or a
+     * foreign one, and not none. A table added later is covered as it is; a content
+     * element added later has to be added to the list.
      */
     #[Test]
     public function everyRecordTypeIconOfThisExtensionIsColourSchemeAware(): void
     {
-        $this->assertEveryRecordTypeIconIsColourSchemeAware('academic_jobs');
+        $this->assertEveryRecordTypeIconIsColourSchemeAware(
+            'academic_jobs',
+            contentTypes: ['academicjobs_newjobform', 'academicjobs_list', 'academicjobs_detail'],
+        );
+    }
+
+    #[Test]
+    #[DataProvider('recordIconIdentifiers')]
+    public function recordIconIsInTheHouseFormat(string $identifier): void
+    {
+        $this->assertIconIsInTheHouseFormat($identifier);
+    }
+
+    #[Test]
+    public function identifiersFollowTheNamingScheme(): void
+    {
+        $this->assertIconIdentifiersFollowTheNamingScheme('academic_jobs', ['plugin', 'record']);
+    }
+
+    #[Test]
+    public function everyIconFileIsTheSourceOfARegisteredIcon(): void
+    {
+        $this->assertEveryIconFileIsRegistered('academic_jobs');
+    }
+
+    #[Test]
+    public function everyIconFileIsAttributedInTheLicenceNotice(): void
+    {
+        $this->assertEveryIconFileIsAttributedInTheNotice('academic_jobs');
     }
 }

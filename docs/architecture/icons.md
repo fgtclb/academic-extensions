@@ -22,6 +22,10 @@ the command, run over the repository at the commit that last touched this page
   identifiers, and the extension documents old → new in one `Breaking-*.rst`.
 - A frontend template renders an icon with
   `<core:icon identifier="…" alternativeMarkupIdentifier="inline" />`.
+- An icon is `1em` × `1em`, everywhere. No stylesheet enlarges an icon box to
+  make up for the glyph being smaller than its box.
+- A content element names one identifier in its CType item, its
+  `typeicon_classes` entry and its wizard entry.
 - The backend JavaScript icon API does not work in the frontend. Frontend
   TypeScript clones icons Fluid rendered into a `<template>`.
 
@@ -55,8 +59,8 @@ that holds on both core versions:
 - **The key is written without underscores**, the way core derives the
   `tx_<key>` prefix of table names (`ExtensionManagementUtility::getCN()`).
   Written dashed it would be ambiguous in this family: `academic_persons` with
-  `edit-add` and `academic_persons_edit` with `add` would both read
-  `academic-persons-edit-add`. Without underscores the key is exactly the
+  `edit-print` and `academic_persons_edit` with `print` would both read
+  `academic-persons-edit-print`. Without underscores the key is exactly the
   second segment.
 - **`tx-` keeps us out of core's namespace.** Core names its icons
   `<category>-<name>` — `actions-`, `content-`, `apps-` and so on — and adds new
@@ -296,12 +300,59 @@ grep -ohE "^    '[^']+' =>" packages/fgtclb/*/Configuration/Icons.php \
 ```
 
 The first lists the registrations per package, the second the providers they
-use, the third counts the identifiers that do not follow the scheme.
+use, the third counts the identifiers that do not follow the scheme. Today they
+print 68 registrations in ten packages, all 68 with
+`CurrentColorSvgIconProvider`, and `0`. The groups per package:
 
-> **Transitional.** `academic_base` ships the shared set with ACE-584; the other
-> extensions move to the scheme and the shared set in the changes that follow
-> it (ACE-585 to ACE-593). Until each of them has, the commands above still
-> show its registrations of before 3.0.
+```bash
+grep -ohE "^    'tx-[a-z0-9]+-[a-z]+-" packages/fgtclb/*/Configuration/Icons.php | sort | uniq -c
+```
+
+| Package                  | Registrations | Groups                        | Drawn by a file of `academic_base` |
+|--------------------------|---------------|-------------------------------|------------------------------------|
+| `academic-base`          | 36            | 17 action, 2 state, 17 info   | all 36                             |
+| `academic-persons`       | 13            | 9 record, 4 plugin            | 5 record icons                     |
+| `academic-persons-edit`  | 1             | 1 plugin                      | —                                  |
+| `academic-jobs`          | 2             | 1 record, 1 plugin            | —                                  |
+| `academic-bite-jobs`     | 1             | 1 plugin                      | —                                  |
+| `academic-contact4pages` | 3             | 2 record, 1 plugin            | the role record icon               |
+| `academic-partners`      | 4             | 2 record, 1 plugin, 1 doktype | both record icons                  |
+| `academic-programs`      | 2             | 1 plugin, 1 doktype           | —                                  |
+| `academic-projects`      | 2             | 1 plugin, 1 doktype           | —                                  |
+| `academic-study-plan`    | 4             | 3 record, 1 plugin            | —                                  |
+
+```bash
+grep -c "'source' => 'EXT:academic_base/" packages/fgtclb/*/Configuration/Icons.php
+```
+
+The 68 registrations name 55 distinct files. Where two identifiers of one
+extension share a file, it is the content element and the record or page type
+it is about: `tx-academicjobs-record-job` and `-plugin-jobs`, the contact
+record and the content element of `academic-contact4pages`, and the page type
+and the content element of partners, programs and projects. The frontend
+glyphs of `academic-persons`, `academic-persons-edit`, `academic-jobs` and
+`academic-study-plan` are not registered by them at all: their templates render
+the shared `tx-academicbase-*` identifiers.
+
+### Content element and page type icons
+
+A content element names its icon in three places, and all three are the same
+identifier: the `icon` of its CType item in
+`Configuration/TCA/Overrides/tt_content.php`, the
+`tt_content.ctrl.typeicon_classes` entry that `addPlugin()` or
+`TcaManipulator::addContentElementPlugin()` derives from it, and the
+`iconIdentifier` of its new content element wizard entry in page TSconfig. The
+page module shows the second, the wizard the third, so an identifier that
+differs in one of them shows two icons for one element. A page type does the
+same with its `doktype` select item and `pages.ctrl.typeicon_classes`. Every
+extension with a content element asserts that its type icon and its wizard
+entry name the one identifier, and `academic-persons`, `academic-persons-edit`,
+`academic-partners`, `academic-programs` and `academic-projects` assert the
+CType item as well. The
+wizard assertion sits in `Tests/Functional/Imaging/`, or next to the wizard
+registration it checks: `SiteSet/SiteSetDeliveryTest.php` in
+`academic-partners` and `academic-persons-edit`,
+`TsConfig/NewContentElementWizardRegistrationTest.php` in `academic-bite-jobs`.
 
 ## Rendering
 
@@ -324,6 +375,46 @@ argument; it does not size an inlined SVG, see below.
 A stylesheet addresses an icon through the class `icon-<identifier>`, for
 example `.icon-tx-academicbase-action-expand`, or through
 `[data-identifier="…"]`.
+
+### Where the templates render icons
+
+```bash
+for d in packages/fgtclb/*/; do
+  printf '%s %s %s %s\n' "$(grep -rho --include='*.html' '<core:icon' "$d"Resources/Private | wc -l)" \
+    "$(grep -rl --include='*.html' '<core:icon' "$d"Resources/Private | wc -l)" \
+    "$(grep -rho --include='*.html' 'alternativeMarkupIdentifier="inline"' "$d"Resources/Private | wc -l)" "$d"
+done | grep -v '^0 '
+```
+
+It prints the `<core:icon>` sites, the files holding them and the sites that
+ask for `inline`, per package:
+
+| Package                 | Sites | Files | `inline` | What they render                                                                |
+|-------------------------|-------|-------|----------|---------------------------------------------------------------------------------|
+| `academic-persons-edit` | 35    | 13    | 35       | 16 shared `tx-academicbase-action-*` and `-state-*` identifiers                 |
+| `academic-persons`      | 6     | 2     | 6        | `tx-academicbase-info-{email,phone,location,room}`, `-action-{expand,collapse}` |
+| `academic-study-plan`   | 3     | 1     | 3        | `tx-academicbase-action-{expand,collapse,close}`                                |
+| `academic-jobs`         | 1     | 1     | 1        | the job property glyphs, `tx-academicbase-info-*`                               |
+| `academic-partners`     | 6     | 5     | 0        | `category_types.partners.*`, two of the sites in a backend partial              |
+| `academic-programs`     | 4     | 3     | 0        | `category_types.programs.*`, two of the sites in a backend partial              |
+| `academic-projects`     | 4     | 3     | 0        | `category_types.projects.*`, two of the sites in a backend partial              |
+
+The one site of `academic-jobs` is the partial
+`Resources/Private/Partials/Job/PropertyIcon.html`, which `Job/Item.html`,
+`Job/Information.html` and `Job/Contact.html` render for each property they
+show. It holds an explicit map from the Extbase property name to the identifier,
+and a property that is not in the map renders no icon at all. The identifiers
+were constructed from the property name before 3.0 (`<prefix>-{property}`),
+which made every property of an overridden list a lookup that could only fail
+silently.
+
+The category type sites of partners, programs and projects do without the
+`inline` argument. For a type with `inlineIcon: true` both markups are the
+inlined file, and a `category_types.*` identifier cannot be overridden through
+`Configuration/Icons.php` — see [Overriding an icon in a
+project](#overriding-an-icon-in-a-project) — so the argument would change
+nothing there. The backend page layout partials of the three page types also
+render the core `overlay-hidden` for a hidden category.
 
 ### The two markups
 
@@ -360,6 +451,29 @@ keep `width` and `height` — v14's `toInlineMarkup()` drops only `xmlns` and
 `version` — so every file carries `width="1em" height="1em"` and follows the font
 size the way the text around it does. Inside `.icon` the backend overrides the
 two attributes, so they cost a backend-only icon nothing.
+
+**One size: `1em`, everywhere, and no local compensation.** The fixed width
+grid centres every glyph in its 640 unit box. The larger extent of a glyph is
+typically 448 to 576 units — 512, 0.8 of the box, most often — and a wide
+glyph can use the full 640 of the width. A `1em` icon is therefore visibly
+smaller than a glyph that fills its box edge to edge, and that is intended: it is the same for every icon of the set, so a row of icons
+and a line of text line up. A stylesheet of an extension does not enlarge an
+icon box to make up for it. Where a layout sizes the box of an icon, it sizes it
+for the text it stands next to, as it would for any other icon.
+
+**Why the size has to be in the file.** An inline `<svg>` with a `viewBox` and
+no `width`/`height` has no intrinsic size. It fills its container, and a
+container that is sized by its content collapses it to 0 px: a flex item such
+as the semester header of the study plan accordion, or a shrink-to-fit
+`<button>` such as the close button of its dialog. That is how the study plan
+showed its fold-out and close controls 0 px wide before 3.0 — the files it
+shipped for them carried a `viewBox` only. The files of
+the set carry `width="1em" height="1em"`, and `academic-study-plan` in
+addition sizes `.academic-study-plan .icon svg` to `1em` × `1em` in its
+stylesheet. That rule is a guard for a project that overrides one of the
+shared identifiers with a file without a size, not an enlargement. Any other
+template that puts an inlined icon into a flex item or a button relies on the
+file carrying its size.
 
 ### JavaScript
 
@@ -484,11 +598,26 @@ The identifiers are spelled out per test rather than read back out of
 `Configuration/Icons.php`, so a rename has to be made twice instead of silently
 agreeing with itself.
 
-The record icons of each extension are covered by its
-`Tests/Functional/Imaging/RecordIconsTest.php` with the same trait, including
+Each of the nine other extensions that ship icons runs the same checks from its
+`Tests/Functional/Imaging/` tests: the per identifier ones, the house format,
+the naming scheme with the groups it uses, no orphaned file and every file in
+the notice. `academic-programs` and `academic-projects` exempt their
+`category-group/*.svg` from the orphan check, because `EXT:category_types` does
+not read the `groups:` icon yet (ACE-364). Each also runs
 `assertEveryRecordTypeIconIsColourSchemeAware()`, which walks the TCA instead of
-a list and so catches a record type added without a converted icon. The
-programmatic category type registration is covered by
+a list. It decides by type what the extension owns: every type of its
+`tx_<key without underscores>_*` tables, and the content element and page types
+the test passes in. Every owned type has to name an identifier of the
+extension's own `tx-<key>-` prefix — a core or a foreign identifier fails, and
+so does a missing one, which is what an empty `icon` of a content element
+registration leaves behind — and that identifier has to be registered, not
+deprecated, on `CurrentColorSvgIconProvider`, inlined in both markups and drawn
+in `currentColor`. A table added later is covered as it is; a content element or
+page type added later has to be added to the test's list, which is why the
+tests also pin the identifier each type names. The job property map is
+covered by
+[`academic-jobs/Tests/Functional/Templates/PropertyIconPartialTest.php`](../../packages/fgtclb/academic-jobs/Tests/Functional/Templates/PropertyIconPartialTest.php).
+The programmatic category type registration is covered by
 [`typo3-category-types/Tests/Functional/Imaging/CategoryTypeIconsTest.php`](../../packages/fgtclb/typo3-category-types/Tests/Functional/Imaging/CategoryTypeIconsTest.php)
 across the four branches of the registrar, and the provider itself by
 [`academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php)
