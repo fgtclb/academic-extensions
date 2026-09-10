@@ -19,10 +19,10 @@ They are now registered with
 which inlines the file in both markups, and the files themselves are drawn in
 `currentColor` with no colour of their own.
 
-That covers the three identifiers of this extension -
-:php:`academic-partners`, :php:`tx_academicpartners_domain_model_partnership`
-and :php:`tx_academicpartners_domain_model_role` - and its four category type
-icons, which :php:`EXT:category_types` registers as
+That covers the page type, content element and record icons of this
+extension - whose identifiers are renamed in the same version, see
+:ref:`breaking-partners-icons-use-the-shared-icon-set` - and its four category
+type icons, which :php:`EXT:category_types` registers as
 :php:`category_types.partners.*`. The four category types ask for it with
 `inlineIcon: true` in :file:`Configuration/CategoryTypes.yaml`; without that
 flag a category type icon keeps the core provider.
@@ -44,11 +44,9 @@ partnership plugins sees those icons resize and recolour.
 Site CSS or JavaScript that sized, coloured or addressed the :html:`<img>` has
 to address the :html:`<svg>` instead.
 
-In the backend, the academic partner page type icon, the two record icons and
-the four category type icons take the text colour around them, so they stay
-legible in a dark backend colour scheme. :php:`academic-partners` is also the
-icon of the four content elements of this extension, so those follow with it -
-the identifier is one icon, not two.
+In the backend, the academic partner page type icon, the content element icons,
+the two record icons and the four category type icons take the text colour
+around them, so they stay legible in a dark backend colour scheme.
 
 Affected Installations
 ======================
@@ -71,6 +69,8 @@ Replace an image selector with an element selector in the site CSS, for example
 
 The icon element keeps the surrounding
 :html:`<span class="t3js-icon icon" data-identifier="…">` wrapper, so a
-selector written against the wrapper needs no change.
+selector written against the wrapper of a category type icon needs no change;
+for the renamed page type, content element and record identifiers see
+:ref:`breaking-partners-icons-use-the-shared-icon-set`.
 
 .. index:: Backend, Frontend, ext:academic_partners
