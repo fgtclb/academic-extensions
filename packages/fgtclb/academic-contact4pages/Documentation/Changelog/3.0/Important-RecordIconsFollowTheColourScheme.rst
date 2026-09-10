@@ -19,8 +19,9 @@ They are now registered with
 which inlines the file in both markups, and the files themselves are drawn in
 `currentColor` with no colour of their own.
 
-The two identifiers are :php:`tx_academiccontacts4pages_domain_model_contact`
-and :php:`tx_academiccontacts4pages_domain_model_role`.
+The two identifiers are :php:`tx-academiccontacts4pages-record-contact`
+and :php:`tx-academiccontacts4pages-record-role`, see
+:ref:`breaking-contacts4pages-icons-replaced-by-font-awesome`.
 
 Impact
 ======
@@ -30,10 +31,10 @@ stay legible in a dark colour scheme. Their markup is now the inlined
 :html:`<svg>` rather than an :html:`<img>`, which matters to any CSS or test
 that addressed the image.
 
-The content element icon :php:`academic_contacts4pages` keeps the core
-provider, although it shares :file:`Extension.svg` with the contact record
-icon. That file now carries :html:`fill="currentColor"` instead of the implicit
-black, which renders identically inside an :html:`<img>`.
+The content element icon :php:`tx-academiccontacts4pages-plugin-contacts`
+shares its file with the contact record icon and is registered the same way,
+so the page module and the new content element wizard follow the colour scheme
+as well.
 
 Affected Installations
 ======================

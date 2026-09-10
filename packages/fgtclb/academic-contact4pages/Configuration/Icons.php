@@ -3,30 +3,30 @@
 declare(strict_types=1);
 
 use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
-use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 
 /*
- * The record icons of the two tables this extension ships are registered with the
- * provider of EXT:academic_base, which inlines the file in both markups instead of
- * rendering an <img>. An <img> is opaque to CSS and keeps the colours of its file,
- * so a record icon drawn in a dark ink stays dark on the dark cards of the backend
- * colour scheme. Inlined and drawn in `currentColor` it follows the text colour.
+ * The icons of this extension: Font Awesome Free solid, drawn in `currentColor` and
+ * inlined by the provider of EXT:academic_base, so they take the colour of the
+ * surrounding text in both backend colour schemes. Licence and origin of the file this
+ * extension ships: Resources/Public/Icons/LICENSE-font-awesome.txt.
+ *
+ * Identifiers follow `tx-<extkey>-<group>-<name>`, files `Icons/<group>/<name>.svg`:
+ * `plugin` for the content element (TCA and new content element wizard), `record` for
+ * the TCA record types. The content element and the contact record share one drawing;
+ * the role record uses the shared role glyph of EXT:academic_base. A project replaces
+ * one of them by registering the same identifier in its own Configuration/Icons.php.
  */
 return [
-    'academic_contacts4pages' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_contacts4pages/Resources/Public/Icons/Extension.svg',
-    ],
-    'tx_academiccontacts4pages_domain_model_contact' => [
+    'tx-academiccontacts4pages-plugin-contacts' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_contacts4pages/Resources/Public/Icons/Extension.svg',
+        'source' => 'EXT:academic_contacts4pages/Resources/Public/Icons/plugin/contacts.svg',
     ],
-    'tx_academiccontacts4pages_domain_model_role' => [
+    'tx-academiccontacts4pages-record-contact' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_contacts4pages/Resources/Public/Icons/Role.svg',
+        'source' => 'EXT:academic_contacts4pages/Resources/Public/Icons/plugin/contacts.svg',
     ],
-    'tx_academiccontacts4pages_domain_model_contract' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_contacts4pages/Resources/Public/Icons/Contract.svg',
+    'tx-academiccontacts4pages-record-role' => [
+        'provider' => CurrentColorSvgIconProvider::class,
+        'source' => 'EXT:academic_base/Resources/Public/Icons/info/role.svg',
     ],
 ];
