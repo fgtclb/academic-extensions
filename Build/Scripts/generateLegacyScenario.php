@@ -27,8 +27,8 @@ declare(strict_types=1);
  * The storage folders of "/data" are the one thing it does not mirror. Their
  * records are shared - every plugin of the mirror names the pids of the "/"
  * tree - so a mirrored folder would be an empty folder in the backend that
- * looks like it should hold something (ACE-460, S3-3). 65 pages of "/" become
- * 56 pages of "/legacy/".
+ * looks like it should hold something (ACE-460, S3-3). 66 pages of "/" become
+ * 57 pages of "/legacy/".
  *
  *   php Build/Scripts/generateLegacyScenario.php
  *   php Build/Scripts/generateLegacyScenario.php --check   # exit 1 if it would change
@@ -572,7 +572,7 @@ function fileHeader(): string
         #
         # The storage folders of "/data" are not mirrored at all. Mirroring a folder
         # whose records are shared leaves an empty folder in the backend that looks like
-        # it should hold something, so "/" has 65 pages and "/legacy/" has 56.
+        # it should hold something, so "/" has 66 pages and "/legacy/" has 57.
         #
         # UIDS
         #
@@ -590,8 +590,8 @@ function fileHeader(): string
         # page 1, becomes 1501, and 1501 is 1001 plus 500.
         #
         # A note on the ranges: the header of "Scenario.yaml" reserves "tt_content"
-        # 500-999 for this tree. It cannot have it - the German variants of the 63
-        # elements of the "/" tree occupy 501-563 under the plus-500 rule, and that rule
+        # 500-999 for this tree. It cannot have it - the German variants of the 64
+        # elements of the "/" tree occupy 501-564 under the plus-500 rule, and that rule
         # wins. This tree takes the 1000 block in "tt_content" as well, which is also
         # what makes the two tables read alike: the legacy tree is the 1000 block.
         #

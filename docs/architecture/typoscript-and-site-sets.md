@@ -239,8 +239,8 @@ would only find a difference somebody guessed at in advance.
 
 The mirror is the content pages only. The nine storage folders below `/data`
 are **not** mirrored: their records are shared, so a mirrored folder would be an
-empty folder in the backend that looks like it should hold something. `/` is 65
-pages, `/legacy/` is 56, and the `pages` table carries 242 rows once the German
+empty folder in the backend that looks like it should hold something. `/` is 66
+pages, `/legacy/` is 57, and the `pages` table carries 246 rows once the German
 variant of every one of them is counted.
 
 The two trees share their record storage. Roughly fifteen of the seeded tables
@@ -275,6 +275,18 @@ in both delivery forms and described in
 [its README](../../packages-dev/dev-site/README.md). The consequence to know
 about is visual only: `/legacy/` renders unstyled, and its pages'
 `backend_layout` values name layouts that tree does not define.
+
+One rendering definition of the seed package reaches both trees through neither
+mechanism: the content element of the icon overview page (ACE-594) is added in
+its `ext_localconf.php` with
+`ExtensionManagementUtility::addTypoScript(…, 'defaultContentRendering')`.
+That global is appended after the content rendering template of a
+`sys_template` record and in front of the sets of a site
+(`SysTemplateTreeBuilder::addContentRenderingFromGlobals()` on 13.4 and 14.3
+alike), so the `/` tree renders the page without naming anything of the seed
+package in its `dependencies:`. It is the right tool for a page that exists
+only in the development instances, and the wrong one for anything an extension
+ships: an integrator cannot opt out of it.
 
 This is also the first finding of the drift gate described in
 [Seed verification](../testing/seed-verification.md), and a good illustration of

@@ -643,9 +643,27 @@ placeholder replaces the identifier.
   `admin` on v14. Switch the colour scheme in the user menu to check light
   and dark; an icon that stays dark on a dark card is registered with the core
   provider or drawn with a colour of its own.
-- **Frontend:** a page of the development seed that renders every icon of the
-  academic extensions with `<core:icon … alternativeMarkupIdentifier="inline" />`
-  follows as ACE-594.
+- **Frontend:** the page `Icons` of the development seed (ACE-594) renders every
+  icon of the academic extensions with
+  `<core:icon … alternativeMarkupIdentifier="inline" />`, grouped by the
+  identifier prefix and group, with the category type icons in a section of
+  their own. Each identifier is printed next to its icon, and the icon is
+  rendered three times: at 1em inside a line of text, at 2rem, and in the text
+  colour of a dark ground — an icon that does not follow `currentColor` stays
+  dark in the third column. The list is read from the icon registry when the
+  page renders (`IconOverviewProcessor` of `packages-dev/dev-site`: identifiers
+  starting with `tx-academic` or `category_types.`), so a new or renamed icon is
+  on it without a change to the seed.
+
+The frontend page is in both trees of both instances, and its German variant is
+`/de/symbole`. The `/` tree shows it in the bootstrap_package theme, the
+`/legacy/` tree unstyled — see
+[Development instances](../development/instances.md#the-icon-overview-page).
+
+| Instance  | `/` tree                                      | `/legacy/` tree                                      |
+|-----------|-----------------------------------------------|------------------------------------------------------|
+| `core-13` | <https://core13-academics-v3.ddev.site/icons> | <https://core13-academics-v3.ddev.site/legacy/icons> |
+| `core-14` | <https://core14-academics-v3.ddev.site/icons> | <https://core14-academics-v3.ddev.site/legacy/icons> |
 
 ## See also
 
