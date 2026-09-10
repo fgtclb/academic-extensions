@@ -140,14 +140,11 @@ drawn in fixed colours and meant to look the same on every background, and
 wrong for anything that should match the text next to it - a record icon in
 the record list as much as an action icon in a button.
 
-Two groups of icons of the academic extensions use it. The control icons of the
-public profile and of the profile editing view, which sit inside buttons whose
-colour has to reach the glyph. And every icon a TCA record type resolves -
-the record icons of the extensions, the two academic page type icons, and the
-category type icons of the extensions that ship category types, which are
-registered programmatically by :php:`EXT:category_types` and ask for it with
-`inlineIcon: true` in their :file:`Configuration/CategoryTypes.yaml`. Brand
-icons stay with the core provider.
+The academic extensions register every icon they ship with it, starting with
+the shared icon set of this extension - see :ref:`Icons <icons>`. Category
+type icons are registered programmatically by `EXT:category_types` and
+ask for it with `inlineIcon: true` in the
+:file:`Configuration/CategoryTypes.yaml` that declares the type.
 
 ..  _configuration-icon-provider-opt-in:
 
@@ -161,14 +158,14 @@ ships it, with this provider instead of the core one:
     :caption: EXT:my_extension/Configuration/Icons.php
 
     return [
-        'my-extension-add' => [
+        'tx-myextension-action-add' => [
             'provider' => \FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider::class,
             'source' => 'EXT:my_extension/Resources/Public/Icons/add.svg',
         ],
     ];
 
 Nothing else changes: the icon is rendered as before, with the
-:html:`<core:icon identifier="my-extension-add" />` ViewHelper, with
+:html:`<core:icon identifier="tx-myextension-action-add" />` ViewHelper, with
 :php:`IconFactory::getIcon()`, or as a `typeicon_classes` entry of a TCA
 table. Whether the `inline` alternative markup is requested or not, the
 markup is the inlined file.

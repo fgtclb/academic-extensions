@@ -15,7 +15,7 @@ necessary.
 | [`DeprecatedCoreLabelsTrait`](#deprecatedcorelabelstrait)                       | Guards TCA against core labels TYPO3 v14 retired.                   |
 | [`EnsureTtContentListTypeColumnTrait`](#ensurettcontentlisttypecolumntrait)     | Re-creates `tt_content.list_type` where v14 removed it.             |
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
-| [`ColourSchemeAwareIconsTrait`](#colourschemeawareiconstrait)                   | Asserts a record icon follows the backend colour scheme.            |
+| [`ColourSchemeAwareIconsTrait`](#colourschemeawareiconstrait)                   | Asserts icons follow the colour scheme and the icon rules.          |
 
 ## How an extension gets access
 
@@ -535,10 +535,12 @@ done; the trait is used by one test class today.
 
 ## `ColourSchemeAwareIconsTrait`
 
-Four assertions for one icon identifier, plus one that derives the whole set
-from the TCA. Used by the `Tests/Functional/Imaging/RecordIconsTest.php` of every
-extension that ships record icons and by the category type registration test of
-`typo3-category-types`:
+Five assertions for one icon identifier, one that derives the record icons
+from the TCA, and four that check a whole extension against the
+[icon rules](../architecture/icons.md). Used by the
+`Tests/Functional/Imaging/RecordIconsTest.php` of every extension that ships
+record icons, by the category type registration test of `typo3-category-types`
+and by `academic-base/Tests/Functional/Imaging/SharedIconsTest.php`:
 
 ```php
 use ColourSchemeAwareIconsTrait;
@@ -559,6 +561,7 @@ public function recordIconIsRegisteredWithTheColourSchemeAwareProvider(string $i
 | `assertIconIsInlinedInBothMarkups()`               | Default markup is the inlined file, and equals the `inline` alternative. |
 | `assertIconMarkupFollowsTheTextColour()`           | `currentColor`, no hex colour, no `<style>`, no `id`.                    |
 | `assertRenderedIconCarriesItsIdentifier()`         | `data-identifier`, no `default-not-found`, no `<img>`.                   |
+| `assertIconIsInTheHouseFormat()`                   | Root element: 640 grid, `1em`, `fill="currentColor"`; no `style`.        |
 | `assertEveryRecordTypeIconIsColourSchemeAware()`   | Same, for every record icon the TCA of one extension names.              |
 
 **The trap it exists for.** `IconFactory::getIcon()` answers an unknown
@@ -570,8 +573,9 @@ record icon left with the core `SvgIconProvider` renders as an `<img>`, keeps
 the ink of its file, and only then turns into a dark glyph on a dark card
 (ACE-523).
 
-**Why the fifth method exists.** The other four take an identifier, and the
-identifiers are spelled out per extension so a rename has to be made twice. A
+**Why `assertEveryRecordTypeIconIsColourSchemeAware()` exists.** The methods
+above it take an identifier, and the identifiers are spelled out per extension so a rename
+has to be made twice. A
 hand written list is good at catching a change to what is on it and structurally
 unable to catch what was never added, so
 `assertEveryRecordTypeIconIsColourSchemeAware('academic_persons')` derives the set
@@ -587,6 +591,27 @@ also asserts that the walk found something, so it cannot pass by finding nothing
 The identifiers are listed per extension rather than read out of
 `Configuration/Icons.php`, so a rename has to be made twice instead of silently
 agreeing with itself.
+
+**The extension-wide checks.** Each takes the extension key and derives the
+`tx-<key without underscores>-` prefix from it:
+
+| Method                                                               | Asserts                                                                                    |
+|----------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `assertIconIdentifiersFollowTheNamingScheme($extensionKey, $groups)` | Each `Icons.php` entry: `tx-<key>-<group>-<name>`, the provider, a file in `Icons/<dir>/`. |
+| `assertIconFilesAreNamedAfterTheirIdentifiers($extensionKey)`        | The file of `tx-<key>-<group>-<name>` is `EXT:<key>/…/Icons/<group>/<name>.svg`.           |
+| `assertEveryIconFileIsRegistered($extensionKey, $exemptFiles)`       | Every SVG below `Resources/Public/Icons/` is the source of a registered icon.              |
+| `assertEveryIconFileIsAttributedInTheNotice($extensionKey, …)`       | Every SVG carries the Font Awesome comment and is listed in the notice file.               |
+
+`$exemptFiles` defaults to `['Extension.svg']`, and an exempt file has to exist.
+The naming check reads the extension's `Configuration/Icons.php`, because the
+registry cannot tell which extension registered an identifier; the orphan check
+asks the registry, because a shared file may be the source of an identifier
+another extension registers. The second check is for an extension whose icons
+share no file: a record icon that points at a shared glyph of `academic_base`
+is allowed and does not follow it, so such an extension leaves it out. The
+trap the orphan check exists for: every other assertion walks registrations,
+and a file nothing registers is not one, so it is never looked at until the day
+it is registered.
 
 ## See also
 

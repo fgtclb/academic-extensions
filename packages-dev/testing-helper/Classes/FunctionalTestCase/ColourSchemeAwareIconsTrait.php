@@ -10,6 +10,7 @@ use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\IconProvider\AbstractSvgIconProvider;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Imaging\IconSize;
+use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
  * Asserts that an icon identifier a TCA record type resolves is drawn for the backend
@@ -24,6 +25,12 @@ use TYPO3\CMS\Core\Imaging\IconSize;
  * `IconFactory::getIcon()` never fails on an unknown identifier: it answers with the
  * `default-not-found` placeholder. Asserting the identifier of the answer is therefore
  * part of the check, not decoration.
+ *
+ * `assertIconIsInTheHouseFormat()` adds the format of the shipped Font Awesome Free set to
+ * the per-identifier checks. The methods taking an extension key check a whole extension:
+ * the `tx-<key>-<group>-<name>` naming scheme, that no icon file is left unregistered, and
+ * that every file is attributed in the licence notice. docs/architecture/icons.md states
+ * the rules they enforce.
  */
 trait ColourSchemeAwareIconsTrait
 {
@@ -197,6 +204,236 @@ trait ColourSchemeAwareIconsTrait
                 $extensionKey,
             ),
         );
+    }
+
+    /**
+     * The house format of the Font Awesome Free icons the academic extensions ship, as
+     * it reaches the page: one 640 unit grid for every icon, so a row of icons does not
+     * jump in size; `fill="currentColor"` on the root element; no `style` attribute; and
+     * `width="1em" height="1em"`.
+     *
+     * The last two are what a frontend page needs. `.icon svg { width: 100%; height: 100% }`
+     * exists in the backend stylesheet only, so on a frontend page an inlined `<svg viewBox>`
+     * without its own size fills its container. Both core versions keep the two attributes,
+     * and the backend overrides them inside `.icon` anyway, so they cost a backend-only icon
+     * nothing.
+     */
+    private function assertIconIsInTheHouseFormat(string $identifier): void
+    {
+        $markup = $this->getColourSchemeAwareIcon($identifier)->getMarkup();
+        self::assertMatchesRegularExpression(
+            '/^<svg\b[^>]*>/',
+            $markup,
+            sprintf('Icon "%s" is not inlined.', $identifier),
+        );
+        preg_match('/^<svg\b[^>]*>/', $markup, $matches);
+        $rootElement = $matches[0];
+
+        foreach (['viewBox="0 0 640 640"', 'width="1em"', 'height="1em"', 'fill="currentColor"'] as $attribute) {
+            self::assertStringContainsString(
+                ' ' . $attribute,
+                $rootElement,
+                sprintf('The root element of icon "%s" does not carry %s: %s', $identifier, $attribute, $rootElement),
+            );
+        }
+        self::assertDoesNotMatchRegularExpression(
+            '/\sstyle="/',
+            $markup,
+            sprintf('Icon "%s" carries a style attribute.', $identifier),
+        );
+    }
+
+    /**
+     * Every identifier the extension registers in its `Configuration/Icons.php` follows
+     * `tx-<extension key without underscores>-<group>-<name>`, is registered with
+     * {@see CurrentColorSvgIconProvider}, and names an SVG file below
+     * `Resources/Public/Icons/<directory>/` of some extension, in lowercase kebab case.
+     *
+     * The registry is flat and a duplicate registration silently wins, so the extension key
+     * is the only token that keeps two extensions apart; it is written without underscores
+     * because a dashed key is ambiguous in this family (`academic_persons` + `edit-add` and
+     * `academic_persons_edit` + `add` would both read `academic-persons-edit-add`).
+     *
+     * The identifiers are read out of the extension's `Configuration/Icons.php` rather than
+     * the registry, because the registry cannot tell which extension registered what.
+     *
+     * @param list<string> $groups the identifier groups the extension may use
+     */
+    private function assertIconIdentifiersFollowTheNamingScheme(string $extensionKey, array $groups): void
+    {
+        $icons = $this->getIconsDeclaredByExtension($extensionKey);
+        self::assertNotSame([], $icons, sprintf('EXT:%s registers no icon - the check asserted nothing.', $extensionKey));
+
+        $identifierPattern = sprintf(
+            '/^tx-%s-(%s)-[a-z0-9]+(-[a-z0-9]+)*$/',
+            preg_quote(str_replace('_', '', $extensionKey), '/'),
+            implode('|', array_map(static fn(string $group): string => preg_quote($group, '/'), $groups)),
+        );
+        foreach ($icons as $identifier => $configuration) {
+            self::assertMatchesRegularExpression(
+                $identifierPattern,
+                $identifier,
+                sprintf('The icon identifier "%s" of EXT:%s does not follow the naming scheme.', $identifier, $extensionKey),
+            );
+            self::assertSame(
+                CurrentColorSvgIconProvider::class,
+                $configuration['provider'] ?? null,
+                sprintf('Icon "%s" is not registered with the colour scheme aware provider.', $identifier),
+            );
+            self::assertMatchesRegularExpression(
+                '#^EXT:[a-z0-9_]+/Resources/Public/Icons/[a-z0-9]+(-[a-z0-9]+)*/[a-z0-9]+(-[a-z0-9]+)*\.svg$#',
+                (string)($configuration['source'] ?? ''),
+                sprintf('The source of icon "%s" is not an SVG file below Icons/<group>/.', $identifier),
+            );
+        }
+    }
+
+    /**
+     * The stricter layout rule for an extension whose icons do not share files: the file of
+     * `tx-<key>-<group>-<name>` is `EXT:<key>/Resources/Public/Icons/<group>/<name>.svg`.
+     * An extension whose record icon reuses a shared glyph does not follow it, and does not
+     * call this.
+     */
+    private function assertIconFilesAreNamedAfterTheirIdentifiers(string $extensionKey): void
+    {
+        $icons = $this->getIconsDeclaredByExtension($extensionKey);
+        self::assertNotSame([], $icons, sprintf('EXT:%s registers no icon - the check asserted nothing.', $extensionKey));
+
+        $prefix = 'tx-' . str_replace('_', '', $extensionKey) . '-';
+        foreach ($icons as $identifier => $configuration) {
+            self::assertStringStartsWith($prefix, $identifier);
+            [$group, $name] = explode('-', substr($identifier, strlen($prefix)), 2) + [1 => ''];
+            self::assertSame(
+                sprintf('EXT:%s/Resources/Public/Icons/%s/%s.svg', $extensionKey, $group, $name),
+                $configuration['source'] ?? null,
+                sprintf('The file of icon "%s" is not named after the identifier.', $identifier),
+            );
+        }
+    }
+
+    /**
+     * An icon file nothing registers is covered by no other assertion: every other check
+     * walks registrations, and an orphan is not one. The day it gets registered it has
+     * never been looked at. So every SVG file below `Resources/Public/Icons/` of the
+     * extension has to be the source of at least one registered identifier - registered by
+     * any loaded extension, since a shared file may be used by another one.
+     *
+     * The exempt files have to exist: `Extension.svg` is the icon of the extension manager
+     * and the TER, which read the file rather than the registry.
+     *
+     * @param list<string> $exemptFiles paths relative to `Resources/Public/Icons/`
+     */
+    private function assertEveryIconFileIsRegistered(string $extensionKey, array $exemptFiles = ['Extension.svg']): void
+    {
+        $iconDirectory = $this->getIconDirectoryOfExtension($extensionKey);
+        foreach ($exemptFiles as $exemptFile) {
+            self::assertFileExists($iconDirectory . $exemptFile);
+        }
+
+        $sourcePrefix = 'EXT:' . $extensionKey . '/Resources/Public/Icons/';
+        $iconRegistry = $this->get(IconRegistry::class);
+        $registeredFiles = [];
+        foreach ($iconRegistry->getAllRegisteredIconIdentifiers() as $identifier) {
+            // Asking for the configuration of a deprecated icon raises E_USER_DEPRECATED.
+            if ($iconRegistry->isDeprecated($identifier)) {
+                continue;
+            }
+            $source = (string)($iconRegistry->getIconConfigurationByIdentifier($identifier)['options']['source'] ?? '');
+            if (str_starts_with($source, $sourcePrefix)) {
+                $registeredFiles[substr($source, strlen($sourcePrefix))] = true;
+            }
+        }
+
+        $files = $this->getSvgFilesBelow($iconDirectory);
+        self::assertNotSame([], $files, sprintf('EXT:%s ships no icon file - the check asserted nothing.', $extensionKey));
+        foreach ($files as $file) {
+            if (in_array($file, $exemptFiles, true)) {
+                continue;
+            }
+            self::assertArrayHasKey(
+                $file,
+                $registeredFiles,
+                sprintf('%s%s is the source of no registered icon. Register it or delete it.', $sourcePrefix, $file),
+            );
+        }
+    }
+
+    /**
+     * Font Awesome Free icons are CC BY 4.0, and the attribution comment in the file never
+     * reaches the page - the sanitiser removes comments. The attribution is the notice file
+     * next to the icons, which lists every file it covers, so a file added without being
+     * listed there ships without its licence. Every SVG file apart from the exempt ones
+     * carries the Font Awesome Free comment and is listed in the notice.
+     *
+     * @param list<string> $exemptFiles paths relative to `Resources/Public/Icons/`
+     */
+    private function assertEveryIconFileIsAttributedInTheNotice(
+        string $extensionKey,
+        array $exemptFiles = ['Extension.svg'],
+        string $noticeFile = 'LICENSE-font-awesome.txt',
+    ): void {
+        $iconDirectory = $this->getIconDirectoryOfExtension($extensionKey);
+        self::assertFileExists($iconDirectory . $noticeFile);
+        $notice = (string)file_get_contents($iconDirectory . $noticeFile);
+
+        $files = array_values(array_diff($this->getSvgFilesBelow($iconDirectory), $exemptFiles));
+        self::assertNotSame([], $files, sprintf('EXT:%s ships no icon file - the check asserted nothing.', $extensionKey));
+        foreach ($files as $file) {
+            self::assertMatchesRegularExpression(
+                '/^\s+' . preg_quote($file, '/') . '\s+[a-z0-9-]+$/m',
+                $notice,
+                sprintf('%s is not listed in %s.', $file, $noticeFile),
+            );
+            self::assertStringContainsString(
+                '<!--! Font Awesome Free ',
+                (string)file_get_contents($iconDirectory . $file),
+                sprintf('%s does not carry the Font Awesome Free attribution comment.', $file),
+            );
+        }
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function getIconsDeclaredByExtension(string $extensionKey): array
+    {
+        $packagePath = $this->get(PackageManager::class)->getPackage($extensionKey)->getPackagePath();
+        $iconsFile = $packagePath . 'Configuration/Icons.php';
+        if (!is_file($iconsFile)) {
+            return [];
+        }
+        $icons = require $iconsFile;
+        self::assertIsArray($icons, sprintf('EXT:%s/Configuration/Icons.php does not return an array.', $extensionKey));
+
+        return $icons;
+    }
+
+    private function getIconDirectoryOfExtension(string $extensionKey): string
+    {
+        $iconDirectory = $this->get(PackageManager::class)->getPackage($extensionKey)->getPackagePath()
+            . 'Resources/Public/Icons/';
+        self::assertDirectoryExists($iconDirectory);
+
+        return $iconDirectory;
+    }
+
+    /**
+     * @return list<string> paths relative to `$directory`, sorted
+     */
+    private function getSvgFilesBelow(string $directory): array
+    {
+        $files = [];
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
+        );
+        foreach ($iterator as $file) {
+            if ($file instanceof \SplFileInfo && $file->isFile() && strtolower($file->getExtension()) === 'svg') {
+                $files[] = substr($file->getPathname(), strlen($directory));
+            }
+        }
+        sort($files);
+
+        return $files;
     }
 
     private function getColourSchemeAwareIcon(string $identifier): Icon

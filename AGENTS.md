@@ -23,6 +23,7 @@ handful of things that are easy to get wrong and expensive to discover later.
 | Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)       |
 | `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                       |
 | **Quoting value lists and binding parameters**          | [Database queries](docs/architecture/database-queries.md)               |
+| Icon naming, the shared set, registration, licence      | [Icons](docs/architecture/icons.md)                                     |
 | Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                        |
 | The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                        |
 | Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                     |
@@ -407,6 +408,27 @@ execution on the same object.
 
 This is the **decorated TYPO3 `QueryBuilder`** (`TYPO3\CMS\Core\Database\Query`),
 not the Extbase one.
+
+## Icons
+
+- Identifiers are `tx-<extension key without underscores>-<group>-<name>`
+  (`action`, `state`, `info`, `record`, `plugin`, `doktype`), files
+  `Resources/Public/Icons/<group>/<name>.svg` unless it shares the file of
+  another identifier. Never `actions-*` (core's), never a dashed extension key:
+  the registry overwrites a duplicate silently.
+- Actions, states and information glyphs come from the shared set in
+  `academic_base` (`tx-academicbase-*`). Look there before adding an icon.
+- Font Awesome **Free, solid** only, from `svgs-full/solid/` in the house
+  format — never Pro, never another set — and every file is listed in the
+  extension's `Resources/Public/Icons/LICENSE-font-awesome.txt`.
+- Always `CurrentColorSvgIconProvider`; a category type needs `inlineIcon: true`.
+- 3.0 renames identifiers without deprecated aliases; the `Breaking-*.rst` of
+  the extension carries the old → new table.
+- `@typo3/backend/icons.js` does not work in the frontend. Render the icon with
+  `<core:icon … alternativeMarkupIdentifier="inline" />` into a `<template>` and
+  clone it (ACE-595 tracks a frontend API).
+
+→ [Icons](docs/architecture/icons.md)
 
 ## Core-version-aware code (v13 vs v14)
 

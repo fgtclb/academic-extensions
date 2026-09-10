@@ -1,0 +1,57 @@
+Font Awesome Free icons
+=======================
+
+The SVG files listed below are icons of Font Awesome Free 7.3.1
+by Fonticons, Inc. - https://fontawesome.com
+
+Copyright 2026 Fonticons, Inc.
+
+The icons are licensed under the Creative Commons Attribution 4.0
+International license (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+The license text includes the disclaimer of warranties that applies to them.
+Font Awesome Free license overview: https://fontawesome.com/license/free
+
+Modifications: each file is the solid style from the fixed-width set
+(`svgs-full/solid/`, viewBox 0 0 640 640). The `fill="currentColor"` of the
+path was moved to the root element, `width="1em" height="1em"` was added to
+it, and the file was renamed after its purpose in this extension. The drawing
+is unchanged and the original attribution comment is kept inside every file.
+
+File (below Resources/Public/Icons/)  Font Awesome icon (solid)
+  action/add.svg           plus
+  action/back.svg          arrow-left
+  action/clear.svg         eraser
+  action/close.svg         xmark
+  action/collapse.svg      minus
+  action/delete.svg        trash-can
+  action/drag.svg          grip-lines
+  action/edit.svg          pen
+  action/expand.svg        plus
+  action/help.svg          circle-question
+  action/move-down.svg     arrow-down
+  action/move-up.svg       arrow-up
+  action/save.svg          floppy-disk
+  action/undo.svg          rotate-left
+  action/upload-image.svg  camera
+  action/view.svg          eye
+  action/view-close.svg    eye-slash
+  info/calendar.svg        calendar-days
+  info/company.svg         building
+  info/contract.svg        file-contract
+  info/degree.svg          graduation-cap
+  info/department.svg      building-columns
+  info/email.svg           envelope
+  info/employment.svg      briefcase
+  info/information.svg     circle-info
+  info/international.svg   earth-europe
+  info/link.svg            link
+  info/location.svg        location-dot
+  info/partnership.svg     handshake
+  info/phone.svg           phone
+  info/recommendation.svg  star
+  info/role.svg            user-tag
+  info/room.svg            door-open
+  info/sector.svg          industry
+  state/hidden.svg         toggle-off
+  state/visible.svg        toggle-on
