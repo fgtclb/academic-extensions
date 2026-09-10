@@ -40,16 +40,16 @@ final class AcademicPersonsPublicProfilePluginTest extends AbstractAcademicPerso
     ];
 
     /**
-     * The identifiers the partials below `Profile/PublicProfile/` render, all registered in
-     * `Configuration/Icons.php`.
+     * The identifiers the partials below `Profile/PublicProfile/` render: shared glyphs,
+     * registered in `Configuration/Icons.php` of EXT:academic_base.
      */
     private const ICON_IDENTIFIERS = [
-        'academic-persons-envelope',
-        'academic-persons-phone',
-        'academic-persons-address',
-        'academic-persons-room',
-        'academic-persons-detail-plus',
-        'academic-persons-detail-minus',
+        'tx-academicbase-info-email',
+        'tx-academicbase-info-phone',
+        'tx-academicbase-info-location',
+        'tx-academicbase-info-room',
+        'tx-academicbase-action-expand',
+        'tx-academicbase-action-collapse',
     ];
 
     protected function setUp(): void
@@ -281,7 +281,7 @@ final class AcademicPersonsPublicProfilePluginTest extends AbstractAcademicPerso
             $this->assertStringContainsString('data-identifier="' . $identifier . '"', $content);
         }
         // Inlined, not an `<img>`: the markup is the SVG itself, so it follows the text colour.
-        $this->assertStringNotContainsString('Resources/Public/Icons/envelope.svg', $content);
+        $this->assertStringNotContainsString('Resources/Public/Icons/info/email.svg', $content);
         $this->assertStringContainsString('<svg', $content);
     }
 

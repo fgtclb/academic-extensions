@@ -43,13 +43,12 @@ headings start at ``<h2>`` for the headline and step down from there.
 The view ships its own stylesheet and a small ES module for the fold-out
 entries, the sticky navigation and the Bootstrap ScrollSpy, both loaded by the
 template through the asset collector. The six control icons of the view are
-registered in :file:`Configuration/Icons.php` as
-``academic-persons-envelope``, ``academic-persons-phone``,
-``academic-persons-address``, ``academic-persons-room``,
-``academic-persons-detail-plus`` and ``academic-persons-detail-minus``, drawn in
-``currentColor`` and inlined, so they take the text colour of the page. They
-are `Bootstrap Icons <https://icons.getbootstrap.com/>`__ and carry their MIT
-licence in :file:`Resources/Public/Icons/LICENSE-bootstrap-icons.txt`.
+the shared icons ``tx-academicbase-info-email``, ``tx-academicbase-info-phone``,
+``tx-academicbase-info-location``, ``tx-academicbase-info-room``,
+``tx-academicbase-action-expand`` and ``tx-academicbase-action-collapse`` of
+:guilabel:`academic_base`, drawn in ``currentColor`` and inlined, so they take
+the text colour of the page - see
+:ref:`breaking-persons-icons-use-the-shared-icon-set`.
 
 The colours of the view are custom properties declared on
 ``.academic-persons-detail`` and are the theming hook: redeclare them on that

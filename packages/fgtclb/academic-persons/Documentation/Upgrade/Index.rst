@@ -274,6 +274,14 @@ A template or PHP file addressing a removed identifier renders TYPO3's
 than emitted as ``<img>``, so they follow the text colour - and a site
 stylesheet that selects ``.t3js-icon img`` no longer matches them.
 
+The icons of this extension are renamed as well: the record and content element
+icons to ``tx-academicpersons-record-*`` and ``tx-academicpersons-plugin-*``,
+and the glyphs of the public profile to the shared ``tx-academicbase-*`` icons
+of :guilabel:`academic_base`. A site package that names an old identifier in a
+template, in TSconfig or in its :file:`Configuration/Icons.php` renders the
+placeholder or overrides nothing any more. The complete table is in
+:ref:`breaking-persons-icons-use-the-shared-icon-set`.
+
 TypoScript and the JSON page type
 ---------------------------------
 
