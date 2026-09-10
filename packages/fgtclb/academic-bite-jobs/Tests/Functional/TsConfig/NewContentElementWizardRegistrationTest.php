@@ -82,7 +82,7 @@ final class NewContentElementWizardRegistrationTest extends AbstractAcademicBite
             'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label',
             $elements['academicbitejobs_list.']['title'] ?? null,
         );
-        $this->assertSame('bitejobs_list', $elements['academicbitejobs_list.']['iconIdentifier'] ?? null);
+        $this->assertSame('tx-academicbitejobs-plugin-bite-jobs', $elements['academicbitejobs_list.']['iconIdentifier'] ?? null);
         $this->assertSame(
             ['CType' => 'academicbitejobs_list'],
             $elements['academicbitejobs_list.']['tt_content_defValues.'] ?? null,
