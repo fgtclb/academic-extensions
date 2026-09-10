@@ -6,8 +6,10 @@ namespace FGTCLB\AcademicStudyPlan\Tests\Functional\ContentElement;
 
 use FGTCLB\AcademicStudyPlan\Tests\Functional\AbstractAcademicStudyPlanTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Renders the `academic_study_plan` content element in the frontend.
@@ -174,9 +176,69 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertStringNotContainsString('default-not-found', $content);
         // The three identifiers the element actually asks for, so a rename in
         // `Configuration/Icons.php` without one in the template is caught here too.
-        $this->assertStringContainsString('data-identifier="academic-study-plan-plus"', $content);
-        $this->assertStringContainsString('data-identifier="academic-study-plan-minus"', $content);
-        $this->assertStringContainsString('data-identifier="academic-study-plan-close"', $content);
+        $this->assertStringContainsString('data-identifier="tx-academicbase-action-expand"', $content);
+        $this->assertStringContainsString('data-identifier="tx-academicbase-action-collapse"', $content);
+        $this->assertStringContainsString('data-identifier="tx-academicbase-action-close"', $content);
+    }
+
+    /**
+     * @return \Generator<string, array{0: string}>
+     */
+    public static function controlIconIdentifiers(): \Generator
+    {
+        yield 'accordion expand' => ['tx-academicbase-action-expand'];
+        yield 'accordion collapse' => ['tx-academicbase-action-collapse'];
+        yield 'dialog close' => ['tx-academicbase-action-close'];
+    }
+
+    /**
+     * The three controls used to be invisible: their files had a viewBox but no width or
+     * height, and an inline SVG without a size collapses to 0 px inside the flex header of
+     * a semester and inside the shrink-to-fit close button of the dialog. Asserted on the
+     * rendered markup: the icon is inlined, drawn in the text colour, and carries a size of
+     * its own. The stylesheet sizes it as well, see the test below.
+     *
+     * The class `icon-<identifier>` is asserted too, because the stylesheet toggles the
+     * accordion icons through it.
+     */
+    #[Test]
+    #[DataProvider('controlIconIdentifiers')]
+    public function contentElementRendersControlIconsInlineWithASize(string $identifier): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $content = $this->renderHomePage();
+
+        $pattern = '#<span class="[^"]*\bicon-' . preg_quote($identifier, '#') . '\b[^"]*" data-identifier="'
+            . preg_quote($identifier, '#') . '"[^>]*>\s*<span class="icon-markup">\s*(<svg\b[^>]*>)#';
+        $this->assertMatchesRegularExpression($pattern, $content, sprintf('Icon "%s" is not rendered as inline SVG.', $identifier));
+        preg_match($pattern, $content, $matches);
+        $svg = $matches[1] ?? '';
+        $this->assertStringContainsString('width="1em"', $svg);
+        $this->assertStringContainsString('height="1em"', $svg);
+        $this->assertStringContainsString('fill="currentColor"', $svg);
+    }
+
+    /**
+     * The stylesheet addresses the accordion icons by the class the icon markup derives from
+     * the identifier, so a renamed identifier leaves the stylesheet selecting nothing: both
+     * icons show, or neither. It also has to size the inlined icons itself, so a project
+     * that registers a drawing without a size does not bring the 0 px icons back.
+     */
+    #[Test]
+    public function stylesheetAddressesTheRenderedControlIcons(): void
+    {
+        $css = (string)file_get_contents(
+            GeneralUtility::getFileAbsFileName('EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css')
+        );
+
+        $this->assertStringContainsString('.col .icon-tx-academicbase-action-collapse {', $css);
+        $this->assertStringContainsString('.col.open .icon-tx-academicbase-action-expand {', $css);
+        $this->assertStringContainsString('.col.open .icon-tx-academicbase-action-collapse {', $css);
+        $this->assertMatchesRegularExpression(
+            '#\.academic-study-plan \.icon svg \{[^}]*\bwidth: 1em;[^}]*\bheight: 1em;#',
+            $css,
+        );
     }
 
     #[Test]
