@@ -26,7 +26,7 @@
                     draggable="true"
                     data-pe-document-drag>
                     <core:icon
-                        identifier="academic-persons-edit-sort-handle"
+                        identifier="tx-academicbase-action-drag"
                         size="small"
                         alternativeMarkupIdentifier="inline" />
                 </button>
@@ -44,13 +44,13 @@
                             data-pe-label-hidden="{f:translate(key: 'actions.show', extensionName: 'academic_persons_edit')}">
                             <span data-pe-visibility-icon="visible" {f:if(condition: hidden, then: 'hidden="hidden"')}>
                                 <core:icon
-                                    identifier="academic-persons-edit-visible"
+                                    identifier="tx-academicbase-state-visible"
                                     size="small"
                                     alternativeMarkupIdentifier="inline" />
                             </span>
                             <span data-pe-visibility-icon="hidden" {f:if(condition: hidden, else: 'hidden="hidden"')}>
                                 <core:icon
-                                    identifier="academic-persons-edit-hidden"
+                                    identifier="tx-academicbase-state-hidden"
                                     size="small"
                                     alternativeMarkupIdentifier="inline" />
                             </span>
@@ -68,13 +68,13 @@
                             data-pe-document-view>
                             <span data-pe-view-icon="collapsed">
                                 <core:icon
-                                    identifier="academic-persons-edit-view"
+                                    identifier="tx-academicbase-action-view"
                                     size="small"
                                     alternativeMarkupIdentifier="inline" />
                             </span>
                             <span data-pe-view-icon="expanded" hidden="hidden">
                                 <core:icon
-                                    identifier="academic-persons-edit-view-close"
+                                    identifier="tx-academicbase-action-view-close"
                                     size="small"
                                     alternativeMarkupIdentifier="inline" />
                             </span>
@@ -88,7 +88,7 @@
                             aria-label="{f:translate(key: 'actions.sortDown', extensionName: 'academic_persons_edit')}"
                             data-pe-document-sort="down">
                             <core:icon
-                                identifier="academic-persons-edit-move-down"
+                                identifier="tx-academicbase-action-move-down"
                                 size="small"
                                 alternativeMarkupIdentifier="inline" />
                         </button>
@@ -101,7 +101,7 @@
                             aria-label="{f:translate(key: 'actions.sortUp', extensionName: 'academic_persons_edit')}"
                             data-pe-document-sort="up">
                             <core:icon
-                                identifier="academic-persons-edit-move-up"
+                                identifier="tx-academicbase-action-move-up"
                                 size="small"
                                 alternativeMarkupIdentifier="inline" />
                         </button>
@@ -115,7 +115,7 @@
                             aria-expanded="false"
                             data-pe-document-delete>
                             <core:icon
-                                identifier="academic-persons-edit-delete"
+                                identifier="tx-academicbase-action-delete"
                                 size="small"
                                 alternativeMarkupIdentifier="inline" />
                         </button>
@@ -129,7 +129,7 @@
                             aria-expanded="false"
                             data-pe-document-edit>
                             <core:icon
-                                identifier="academic-persons-edit-edit"
+                                identifier="tx-academicbase-action-edit"
                                 size="small"
                                 alternativeMarkupIdentifier="inline" />
                         </button>
