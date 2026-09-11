@@ -1,11 +1,11 @@
 # EU-Konformitätserklärung
 
-**Produkt:** FGTCLB: Academic Contags for Pages
+**Produkt:** FGTCLB: Academic Contacts for Pages
 **Referenz:** DoC-academic_contacts4pages-2.4.0
 
 ## 1. Produktidentifikation
 
-- **Produktname:** FGTCLB: Academic Contags for Pages
+- **Produktname:** FGTCLB: Academic Contacts for Pages
 - **Typ:** TYPO3-Extension
 - **Extension Key / Package:** academic_contacts4pages (fgtclb/academic-contacts4pages)
 - **Version:** 2.4.0 (Erstausstellung dieser Erklärung)
@@ -26,7 +26,7 @@ EU-Konformitätserklärung trägt der Hersteller, web-vision GmbH.
 
 ## 4. Gegenstand der Erklärung
 
-FGTCLB: Academic Contags for Pages, Version 2.4.0, vertrieben über das
+FGTCLB: Academic Contacts for Pages, Version 2.4.0, vertrieben über das
 TYPO3 Extension Repository (TER) und Packagist.
 
 ## 5. Konformitätserklärung
@@ -60,7 +60,7 @@ Unterzeichnet für und im Namen von: web-vision GmbH
 ## Vereinfachte EU-Konformitätserklärung (Anhang VI)
 
 > Hiermit erklärt die web-vision GmbH, dass das Produkt mit digitalen
-> Elementen des Typs FGTCLB: Academic Contags for Pages der Verordnung (EU) 2024/2847 entspricht.
+> Elementen des Typs FGTCLB: Academic Contacts for Pages der Verordnung (EU) 2024/2847 entspricht.
 >
 > Der vollständige Text der EU-Konformitätserklärung ist unter der
 > folgenden Internetadresse verfügbar:
