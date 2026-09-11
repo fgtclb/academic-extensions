@@ -100,6 +100,13 @@ synchronisable profile.
 registered in that extension's `Services.yaml`) turns the event into a
 `SynchronizerContext`:
 
+- **Translation gate**: synchronisation runs from the default-language record
+  only, so the listener returns for a profile whose `getIsTranslation()` is
+  `true`. The model answers that from the language the record carries, not by
+  comparing its localized uid with its uid — that comparison read a profile
+  built in PHP and persisted, which is what `AbstractProfileFactory` announces,
+  as a translation of itself, so created profiles were never translated
+  (ACE-610).
 - **Language gate**: the target languages come from the extension
   configuration `academic_persons_edit` → `profile.allowedLanguages`, read on
   every call by `ProfileTranslator::getAllowedLanguageIds()` (deliberately

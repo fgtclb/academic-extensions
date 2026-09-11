@@ -35,32 +35,62 @@ unaffected. Branch `2` has the same code (`Profile.php:538-540`).
 
 ## Decisions
 
-### Guard against the unset localized uid in the model
+### Answer the flag from the language of the record
 
-`return $this->_localizedUid !== null && $this->_localizedUid !== $this->uid;`
-This is the same as one project's composer patch. An object Extbase never
-hydrated has no language overlay, so it cannot be a translation.
+```php
+if ($this->_isNew()) {
+    return false;
+}
+return $this->getLanguageUid() > 0;
+```
+
+The flag asks about language, so the model reads the language rather than
+deriving it from two uids. A record that was never persisted is a translation
+of nothing; a persisted one is a translation when the language it was read in
+is a translation language.
+
+`_isNew()` rather than a bare language check is deliberate: until the object
+is inserted, its `_languageUid` is not the language of any row.
+`Backend::insertObject()` writes `0` onto an object that carries no language,
+and leaves one that does although the row it writes does not get it — so an
+unpersisted object is answered from the fact that it has no record yet, not
+from a language no record has.
 
 Rejected: re-fetching the profile from the repository before the dispatch in
 `createProfileForUser()`. That fixes one caller, and the model keeps
 answering wrong for every other object built in PHP. Also rejected: setting
 `_localizedUid` in the factory, which every other creator of a profile would
-have to repeat. Also rejected: `_isNew()`, the first idea in the draft of
-ACE-610. It is already `false` after `persistAll()`, so it does not cover the
-path that fails.
+have to repeat. Also rejected: the null guard on the localized uid
+(`$this->_localizedUid !== null && $this->_localizedUid !== $this->uid`),
+which one project carries as a composer patch — see the decision below.
 
 ### No core version split
 
 The persistence internals quoted above are the same on v13 and v14. The fix
 is one line in a shared class.
 
-### Decided: the null guard, not `_isNew()`
+### Decided during the implementation: the language, not the null guard
 
-The fix is the null guard on the localized uid in the model, and the draft
-fix of ACE-610 is rewritten to match it. `_isNew()` is `uid === null`, and the
-uid is already set when the creation path dispatches, so it does not fire on
-the failing path. A re-fetch in the factory would fix one caller and leave the
-model answering wrong for every object that was never hydrated.
+The plan was the null guard on the localized uid, and the implementation
+replaced it. The guard repairs the comparison for one input and leaves the
+method answering a question about *language* from two uids, which is what
+makes `sys_language_uid = -1` wrong as well: a record kept in all languages is
+not a translation either, and `-1` passes a "differs from the default
+language" test.
+
+The concern that ruled `_isNew()` out while planning — it is already `false`
+after `persistAll()`, so on its own it does not cover the failing path — still
+holds and is why it is a guard in front of the language check rather than the
+answer. After `persistAll()` the created profile falls through to
+`getLanguageUid()`, which is `0`, so the path that failed is covered.
+
+| Record shape                         | before | null guard | implemented |
+|--------------------------------------|--------|------------|-------------|
+| never persisted                      | false  | false      | false       |
+| persisted in PHP, never mapped       | true   | false      | false       |
+| mapped, `sys_language_uid = 0`       | false  | false      | false       |
+| mapped language overlay              | true   | true       | true        |
+| mapped, `sys_language_uid = -1`      | true   | true       | false       |
 
 ## Risks / Trade-offs
 
