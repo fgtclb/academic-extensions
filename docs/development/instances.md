@@ -159,6 +159,14 @@ to look for. The rendering definition comes from the `ext_localconf.php` of the
 seed package rather than from a set, so it reaches both trees without a change
 to the site configurations.
 
+The page opens with a section "Frontend icon API" that demonstrates the
+frontend icon API of `academic_base` (ACE-595) with a module of the seed
+package, `Resources/Private/TypeScript/frontend/icon-demo.ts`: one list is
+filled from a JSON icon map on the page, the other from the icon endpoint in a
+single request, and the core icon `actions-add` in it is refused and shown as
+"not available". What to look for is in
+[Icons](../architecture/icons.md#looking-at-the-set).
+
 The backend counterpart needs no page: the styleguide module (Styles → Icons)
 lists every registered icon in the default markup, and the colour scheme is
 switched in the user menu. What to look for there, and why both views exist, is

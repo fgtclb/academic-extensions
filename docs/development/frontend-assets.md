@@ -24,7 +24,13 @@ today: `academic-base` and `academic-jobs` ship TypeScript only, and
 `academic-study-plan` ship TypeScript and SCSS. `academic-base` carries
 `frontend/icons.ts`, the frontend icon factory every extension and site package
 can import as `@fgtclb/academic-base/frontend/icons.js` — see
-[Icons](../architecture/icons.md#the-icon-factory). `academic-persons` carries the public profile's
+[Icons](../architecture/icons.md#the-icon-factory). Of the `packages-dev/`
+packages only `dev-site` carries a module, `frontend/icon-demo.ts`, the
+demonstration of that factory on the icon overview page of the seed. It is
+published by the package's own `Configuration/JavaScriptModules.php` as
+`@fgtclb/academics-dev-site/frontend/`, a prefix the build does not derive, so
+the JavaScript tests cannot import it; its markup is covered by a functional
+test of the package instead. `academic-persons` carries the public profile's
 `frontend/profile.ts` and `frontend/profile-detail.scss`, loaded by
 `Templates/Profile/Detail.html`, plus the `frontend/sticky-offset.ts` the
 editing view of `academic-persons-edit` shares with it through the import map.

@@ -1,4 +1,6 @@
-<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
+      data-namespace-typo3-fluid="true">
 <f:comment>
     Every icon the academic extensions register, as the registry lists it at
     render time - see IconOverviewProcessor. Each identifier is rendered three
@@ -8,6 +10,39 @@
     Style attributes only: the frontend Content Security Policy of both cores
     allows them and blocks an inline style element without a nonce.
 </f:comment>
+<f:comment>
+    The frontend icon API of academic_base (ACE-595), both of its paths. The
+    icons in the two lists below are not rendered here: the module
+    icon-demo.js of this package asks the icon factory of academic_base for
+    each identifier a slot names and puts the element it gets into the slot,
+    or "not available". The first list is answered from the JSON map rendered
+    next to it, without a request; the second one is not on the page and goes
+    to the endpoint the second map names - one request for all of them, the
+    core icon among them refused. data-icon-demo-state on each slot says what
+    happened, for a browser test.
+</f:comment>
+<section class="academics-dev-site-icon-demo">
+    <h2>Frontend icon API</h2>
+    <div data-icon-demo="map">
+        <h3>Through the JSON icon map</h3>
+        <ab:frontendIconMap identifiers="{0: 'tx-academicbase-state-visible', 1: 'tx-academicbase-state-hidden', 2: 'tx-academicbase-info-email', 3: 'tx-academicbase-info-phone', 4: 'tx-academicbase-info-location'}" />
+        <ul>
+            <f:for each="{0: 'tx-academicbase-state-visible', 1: 'tx-academicbase-state-hidden', 2: 'tx-academicbase-info-email', 3: 'tx-academicbase-info-phone', 4: 'tx-academicbase-info-location'}" as="identifier">
+                <li><span data-icon-demo-identifier="{identifier}" data-icon-demo-state="pending"></span> <code>{identifier}</code></li>
+            </f:for>
+        </ul>
+    </div>
+    <div data-icon-demo="endpoint">
+        <h3>Through the icon endpoint</h3>
+        <ab:frontendIconMap identifiers="{}" endpoint="1" />
+        <ul>
+            <f:for each="{0: 'tx-academicbase-action-add', 1: 'tx-academicbase-action-edit', 2: 'tx-academicbase-action-delete', 3: 'tx-academicbase-action-save', 4: 'tx-academicbase-action-undo', 5: 'actions-add'}" as="identifier">
+                <li><span data-icon-demo-identifier="{identifier}" data-icon-demo-state="pending"></span> <code>{identifier}</code></li>
+            </f:for>
+        </ul>
+    </div>
+    <f:asset.module identifier="@fgtclb/academics-dev-site/frontend/icon-demo.js" />
+</section>
 <div class="academics-dev-site-icon-overview">
     <f:for each="{iconSections}" as="section">
         <section>

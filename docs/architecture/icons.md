@@ -966,6 +966,15 @@ placeholder replaces the identifier.
   page renders (`IconOverviewProcessor` of `packages-dev/dev-site`: identifiers
   starting with `tx-academic` or `category_types.`), so a new or renamed icon is
   on it without a change to the seed.
+- **Frontend JavaScript:** the same page opens with a section "Frontend icon
+  API" (ACE-595) that exercises both paths of the [icon factory](#the-icon-factory)
+  in the browser. The module `icon-demo.js` of `packages-dev/dev-site` fills a
+  first list of five icons from the JSON map rendered next to it, without a
+  request, and a second list of five action icons plus the core `actions-add`
+  from the endpoint, in one request; each slot ends up with the icon or with
+  "not available", and says which in `data-icon-demo-state` (`rendered` or
+  `failed`). `actions-add` has to fail. The network panel shows exactly one
+  request to `_academic/icons.json`, answered `immutable`.
 
 The frontend page is in both trees of both instances, and its German variant is
 `/de/symbole`. The `/` tree shows it in the bootstrap_package theme, the
