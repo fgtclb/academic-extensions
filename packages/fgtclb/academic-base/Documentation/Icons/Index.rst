@@ -272,7 +272,8 @@ JavaScript therefore takes the markup of an icon from the server.
 ..  important::
 
     Everything in this section except the :html:`<template>` is **internal and
-    experimental**: the ViewHelper, the event and the PHP classes behind them.
+    experimental**: the ViewHelper, the icon endpoint, the event and the PHP
+    classes behind them.
     They may change, or go away, without a breaking change entry until a module
     outside the academic extensions uses them.
 
@@ -312,14 +313,75 @@ Arguments:
     class of the markup; the icons of the academic extensions size themselves
     by the font size.
 
+`endpoint` (bool, default `false`)
+    Adds `data-academic-icons-url` and
+    `data-academic-icons-version` to the element: the
+    :ref:`icon endpoint <icons-frontend-endpoint>` of the current site language
+    and the version token of the icon set.
+
+..  _icons-frontend-endpoint:
+
+The icon endpoint
+-----------------
+
+Where the JavaScript learns an identifier only after the page was rendered - from
+data it loads, or from a choice of the visitor - it asks the icon endpoint of
+the site:
+
+..  code-block:: text
+
+    GET https://example.com/_academic/icons.json?i=tx-academicbase-action-add,tx-academicbase-info-phone&s=small&v=<token>
+
+The answer is a JSON object in the same shape as the JSON map, for the
+identifiers that may be served, in the order asked for. The endpoint is
+available below the base of every site and site language, for example
+`https://example.com/de/_academic/icons.json`. Its parameters and its answer
+are internal and experimental like the rest of this section.
+
+`i` (required)
+    Up to 32 icon identifiers, separated by commas.
+
+`s` (optional, default `small`)
+    `default`, `small`, `medium`, `large` or `mega`.
+
+`v` (optional)
+    The version token of the icon set, as `data-academic-icons-version` of the
+    JSON map carries it. With the current token the answer may be cached for a
+    year (`Cache-Control: public, max-age=31536000, immutable`), otherwise for
+    five minutes. The answer carries an `ETag` and answers a matching
+    `If-None-Match` with `304 Not Modified`. The `ETag` only helps the
+    five-minute answers: an immutable one is never revalidated.
+
+A malformed identifier, more than 32 of them or an unknown size are answered
+with `400 Bad Request`, any method other than `GET` and `HEAD` with
+`405 Method Not Allowed`. The endpoint answers before the frontend user
+authentication: it never starts a session and never sets a cookie, so a proxy
+or a CDN can cache it like a file.
+
+The token changes when an icon registration or the modification time of an
+icon file changes, on a TYPO3 update and whenever :file:`composer.lock`
+changes. A change to the rendering code that arrives with none of these - a
+file edited in place on the server - is not seen; touch the SVG files of the
+affected icons then.
+
+..  important::
+
+    **Web server requirement.** The path ends in `.json`. A web server or CDN
+    rule that serves `*.json` as static files - in nginx for example a
+    :code:`location ~* \.(...|json)$` with :code:`try_files $uri =404` - answers
+    the endpoint with a `404` before TYPO3 sees it. Exclude
+    `_academic/icons.json` from such a rule, the way `sitemap.xml` is usually
+    excluded.
+
 ..  _icons-frontend-allow-list:
 
 Which icons are served
 ----------------------
 
-Only identifiers starting with `tx-academic` or `category_types.` are served,
-and of those only the ones that are registered, not deprecated and registered
-with a provider that inlines an SVG file: the
+The JSON map and the endpoint serve the same icons. Only identifiers starting
+with `tx-academic` or `category_types.` are served, and of those only the ones
+that are registered, not deprecated and registered with a provider that
+inlines an SVG file: the
 :php:`CurrentColorSvgIconProvider` of this extension or the core
 :php:`SvgIconProvider`. Any other identifier, an icon of the core icon set
 among them, is left out rather than answered with the placeholder of an

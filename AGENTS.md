@@ -430,10 +430,12 @@ not the Extbase one.
   the extension carries the old → new table.
 - `@typo3/backend/icons.js` does not work in the frontend. Frontend TypeScript
   takes markup the server rendered: a `<core:icon … alternativeMarkupIdentifier="inline" />`
-  in a `<template>` it clones, or the JSON map of `<ab:frontendIconMap>`
-  (`academic_base`, internal and experimental). The map serves only the
-  allow-listed prefixes — not the core icon set; a listener widening them owns
-  what it opens.
+  in a `<template>` it clones, the JSON map of `<ab:frontendIconMap>`, or the
+  endpoint `<site base>/_academic/icons.json` (both `academic_base`, internal
+  and experimental). Map and endpoint serve only the allow-listed prefixes —
+  not the core icon set; a listener widening them owns what it opens. The
+  endpoint middleware sits before the authenticators on purpose — never order
+  it after them or next to `base-redirect-resolver`.
 
 → [Icons](docs/architecture/icons.md)
 

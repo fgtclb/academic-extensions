@@ -11,6 +11,9 @@ use TYPO3\CMS\Core\Imaging\IconProvider\AbstractSvgIconProvider;
 use TYPO3\CMS\Core\Imaging\IconProvider\SvgSpriteIconProvider;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Imaging\IconSize;
+use TYPO3\CMS\Core\Information\Typo3Version;
+use TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Renders registered icons for a frontend page that composes its markup at runtime,
@@ -18,9 +21,10 @@ use TYPO3\CMS\Core\Imaging\IconSize;
  *
  * The backend icon API (`@typo3/backend/icons.js`) cannot be used in the frontend: it
  * fetches from a backend AJAX route that answers a logged-in backend user only. This
- * class is the server half of the frontend replacement, used by the JSON map of
- * {@see \FGTCLB\AcademicBase\ViewHelpers\FrontendIconMapViewHelper}, so everything
- * that hands icons to the frontend answers the same identifiers with the same markup.
+ * class is the server half of the frontend replacement, shared by the JSON map of
+ * {@see \FGTCLB\AcademicBase\ViewHelpers\FrontendIconMapViewHelper} and the endpoint
+ * below {@see self::ENDPOINT_PATH}, so both answer the same identifiers with the same
+ * markup.
  *
  * An identifier is served when all of these hold:
  *
@@ -52,6 +56,11 @@ use TYPO3\CMS\Core\Imaging\IconSize;
 final readonly class FrontendIconRenderer
 {
     /**
+     * The path of the endpoint, relative to the base of a site or a site language.
+     */
+    public const ENDPOINT_PATH = '_academic/icons.json';
+
+    /**
      * `\A` and `\z` rather than `^` and `$`: `$` also matches before a trailing line
      * feed. The TypeScript icon factory of this extension carries the same pattern.
      */
@@ -66,6 +75,7 @@ final readonly class FrontendIconRenderer
         private IconFactory $iconFactory,
         private IconRegistry $iconRegistry,
         private EventDispatcherInterface $eventDispatcher,
+        private PackageDependentCacheIdentifier $packageDependentCacheIdentifier,
     ) {}
 
     /**
@@ -98,6 +108,49 @@ final readonly class FrontendIconRenderer
     public function isServable(string $identifier): bool
     {
         return $this->isServableWith($this->allowedPrefixes(), $identifier);
+    }
+
+    /**
+     * A token that changes whenever the markup of a servable icon can have changed. The
+     * endpoint marks a response for the current token as immutable, so a page asks with
+     * the token it was rendered with and a new token misses every cache. An immutable
+     * response is never revalidated, so the `ETag` of the endpoint cannot make up for
+     * anything the token misses: it only helps the responses cached briefly for any
+     * other token.
+     *
+     * Built from the icon registry's public API, the modification time of each source
+     * file - stat only, the files themselves are not read - the TYPO3 version, and the
+     * package dependent cache identifier of core, which covers a changed provider class
+     * as far as it arrives with a new `composer.lock`. Not seen is rendering code
+     * changed in place without any of these.
+     */
+    public function getVersion(): string
+    {
+        $prefixes = $this->allowedPrefixes();
+        $identifiers = array_values(array_filter(
+            array_map('strval', $this->iconRegistry->getAllRegisteredIconIdentifiers()),
+            fn(string $identifier): bool => $this->isServableWith($prefixes, $identifier),
+        ));
+        sort($identifiers);
+
+        $fingerprint = [
+            (new Typo3Version())->getVersion(),
+            // @internal in TYPO3, like the AbstractSvgIconProvider this extension's
+            // provider extends. Identical on 13.4 and 14.3: TYPO3 version, project path
+            // and PackageManager::getCacheIdentifier() - a hash of composer.lock and the
+            // dev mode in composer mode, of PackageStates.php otherwise. Re-read the
+            // class on every core update, and replace it once core offers a public API.
+            $this->packageDependentCacheIdentifier->toString(),
+        ];
+        foreach ($identifiers as $identifier) {
+            $configuration = $this->iconRegistry->getIconConfigurationByIdentifier($identifier);
+            $source = $configuration['options']['source'] ?? '';
+            $path = is_string($source) ? GeneralUtility::getFileAbsFileName($source) : '';
+            $modified = $path !== '' && is_file($path) ? filemtime($path) : false;
+            $fingerprint[] = [$identifier, $configuration, $modified];
+        }
+
+        return hash('xxh3', serialize($fingerprint));
     }
 
     /**

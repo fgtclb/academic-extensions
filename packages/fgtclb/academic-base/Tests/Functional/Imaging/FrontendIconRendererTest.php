@@ -9,9 +9,11 @@ use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
 use FGTCLB\AcademicBase\Tests\Functional\AbstractAcademicBaseTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Imaging\IconSize;
+use TYPO3\CMS\Core\Package\Cache\PackageDependentCacheIdentifier;
 
 /**
  * Which icons may leave the server for a frontend page, and what markup they leave it
@@ -129,6 +131,89 @@ final class FrontendIconRendererTest extends AbstractAcademicBaseTestCase
         $this->assertSame(
             ['tx-academicbase-action-add'],
             array_keys($renderer->render([$identifier, 'tx-academicbase-action-add'])),
+        );
+    }
+
+    #[Test]
+    public function versionIsStable(): void
+    {
+        $renderer = $this->get(FrontendIconRenderer::class);
+
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{16}$/', $renderer->getVersion());
+        $this->assertSame($renderer->getVersion(), $renderer->getVersion());
+    }
+
+    #[Test]
+    public function versionChangesWhenARegistrationIsReplaced(): void
+    {
+        $renderer = $this->get(FrontendIconRenderer::class);
+        $before = $renderer->getVersion();
+
+        $this->get(IconRegistry::class)->registerIcon(
+            'tx-academicbase-info-phone',
+            CurrentColorSvgIconProvider::class,
+            ['source' => 'EXT:test_frontend_icons/Resources/Public/Icons/star.svg'],
+        );
+
+        $this->assertNotSame($before, $renderer->getVersion());
+    }
+
+    #[Test]
+    public function versionChangesWhenASourceFileChangesOnDisk(): void
+    {
+        $path = $this->instancePath . '/typo3temp/frontend-icon-renderer-test.svg';
+        file_put_contents($path, '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M0 0h1v1H0z"/></svg>');
+        touch($path, 1700000000);
+        clearstatcache(true, $path);
+        $this->get(IconRegistry::class)->registerIcon(
+            'tx-academictest-action-on-disk',
+            CurrentColorSvgIconProvider::class,
+            ['source' => $path],
+        );
+        $renderer = $this->get(FrontendIconRenderer::class);
+        $before = $renderer->getVersion();
+
+        touch($path, 1700000100);
+        clearstatcache(true, $path);
+
+        $this->assertNotSame($before, $renderer->getVersion());
+    }
+
+    #[Test]
+    public function versionIgnoresAnIconThatIsNotServed(): void
+    {
+        $renderer = $this->get(FrontendIconRenderer::class);
+        $before = $renderer->getVersion();
+
+        $this->get(IconRegistry::class)->registerIcon(
+            'tx-testforeign-action-other',
+            CurrentColorSvgIconProvider::class,
+            ['source' => 'EXT:test_frontend_icons/Resources/Public/Icons/star.svg'],
+        );
+
+        $this->assertSame($before, $renderer->getVersion());
+    }
+
+    /**
+     * The package dependent cache identifier changes with `composer.lock`, and so with
+     * an update that changes a provider class but no registration and no source file.
+     * A second renderer with a different identifier stands in for that deployment.
+     */
+    #[Test]
+    public function versionChangesWithThePackageDependentCacheIdentifier(): void
+    {
+        $identifier = $this->get(PackageDependentCacheIdentifier::class);
+        $rendererWith = fn(PackageDependentCacheIdentifier $identifier): FrontendIconRenderer => new FrontendIconRenderer(
+            $this->get(IconFactory::class),
+            $this->get(IconRegistry::class),
+            $this->get(EventDispatcherInterface::class),
+            $identifier,
+        );
+
+        $this->assertSame($this->get(FrontendIconRenderer::class)->getVersion(), $rendererWith($identifier)->getVersion());
+        $this->assertNotSame(
+            $rendererWith($identifier)->getVersion(),
+            $rendererWith($identifier->withAdditionalHashedIdentifier('another deployment'))->getVersion(),
         );
     }
 }

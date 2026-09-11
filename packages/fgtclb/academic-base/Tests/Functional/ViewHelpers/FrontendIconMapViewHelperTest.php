@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Tests\Functional\ViewHelpers;
 
+use FGTCLB\AcademicBase\Imaging\FrontendIconRenderer;
 use FGTCLB\AcademicBase\Tests\Functional\AbstractAcademicBaseTestCase;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ServerRequestInterface;
@@ -11,6 +12,7 @@ use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\IconSize;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
 
@@ -104,6 +106,59 @@ final class FrontendIconMapViewHelperTest extends AbstractAcademicBaseTestCase
         $this->expectExceptionCode(1789120001);
 
         $this->render('FrontendIconMapWithSize', ['identifiers' => ['tx-academicbase-action-add'], 'size' => 'overlay']);
+    }
+
+    #[Test]
+    public function namesNoEndpointUnlessAskedTo(): void
+    {
+        $element = $this->renderMap('FrontendIconMap', ['identifiers' => ['tx-academicbase-action-add']], $this->siteRequest());
+
+        $this->assertFalse($element->hasAttribute('data-academic-icons-url'));
+        $this->assertFalse($element->hasAttribute('data-academic-icons-version'));
+    }
+
+    #[Test]
+    public function namesTheEndpointBelowTheBaseOfTheSiteLanguage(): void
+    {
+        $element = $this->renderMap('FrontendIconMapWithEndpoint', ['identifiers' => ['tx-academicbase-action-add']], $this->siteRequest(1));
+
+        $this->assertSame('https://www.acme.com/sub/de/_academic/icons.json', $element->getAttribute('data-academic-icons-url'));
+        $this->assertSame($this->get(FrontendIconRenderer::class)->getVersion(), $element->getAttribute('data-academic-icons-version'));
+    }
+
+    #[Test]
+    public function namesTheEndpointBelowTheBaseOfTheSiteWithoutALanguage(): void
+    {
+        $request = $this->siteRequest()->withoutAttribute('language');
+
+        $element = $this->renderMap('FrontendIconMapWithEndpoint', ['identifiers' => []], $request);
+
+        $this->assertSame('https://www.acme.com/sub/_academic/icons.json', $element->getAttribute('data-academic-icons-url'));
+    }
+
+    #[Test]
+    public function namesNoEndpointOutsideASite(): void
+    {
+        $element = $this->renderMap('FrontendIconMapWithEndpoint', ['identifiers' => ['tx-academicbase-action-add']]);
+
+        $this->assertFalse($element->hasAttribute('data-academic-icons-url'));
+        $this->assertFalse($element->hasAttribute('data-academic-icons-version'));
+        $this->assertSame(['tx-academicbase-action-add'], array_keys($this->decode($element)));
+    }
+
+    private function siteRequest(int $languageId = 0): ServerRequestInterface
+    {
+        $site = new Site('acme', 1, [
+            'base' => 'https://www.acme.com/sub/',
+            'languages' => [
+                ['languageId' => 0, 'title' => 'English', 'locale' => 'en_US.UTF-8', 'base' => '/'],
+                ['languageId' => 1, 'title' => 'Deutsch', 'locale' => 'de_DE.UTF-8', 'base' => '/de/'],
+            ],
+        ]);
+
+        return $this->frontendRequest()
+            ->withAttribute('site', $site)
+            ->withAttribute('language', $site->getLanguageById($languageId));
     }
 
     private function frontendRequest(): ServerRequestInterface

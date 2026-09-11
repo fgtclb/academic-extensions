@@ -27,8 +27,9 @@ the command, run over the repository at the commit that last touched this page
 - A content element names one identifier in its CType item, its
   `typeicon_classes` entry and its wizard entry.
 - The backend JavaScript icon API does not work in the frontend. Frontend
-  TypeScript takes markup the server rendered: a `<template>` it clones, or the
-  JSON icon map of `<ab:frontendIconMap>`, which is internal and experimental
+  TypeScript takes markup the server rendered: a `<template>` it clones, the
+  JSON icon map of `<ab:frontendIconMap>`, or the icon endpoint
+  `<site base>/_academic/icons.json`, the last two internal and experimental
   — see [JavaScript](#javascript).
 
 ## Identifiers
@@ -490,12 +491,13 @@ request.
 
 Frontend TypeScript therefore never builds icon markup itself. It takes markup
 the server rendered, with the provider of the icon and with a project's
-override, in one of two ways:
+override, in one of three ways:
 
-| Way                                     | Request | Use it when                                                                                                        |
-|-----------------------------------------|---------|--------------------------------------------------------------------------------------------------------------------|
-| A `<template>` the module clones        | none    | the icon is part of a larger piece of markup the module stamps out — a prototype row with its buttons, a list item |
-| The JSON icon map, `ab:frontendIconMap` | none    | the module picks an icon by its identifier at runtime, out of a set the template can name in advance               |
+| Way                                       | Request     | Use it when                                                                                                                  |
+|-------------------------------------------|-------------|------------------------------------------------------------------------------------------------------------------------------|
+| A `<template>` the module clones          | none        | the icon is part of a larger piece of markup the module stamps out — a prototype row with its buttons, a list item           |
+| The JSON icon map, `ab:frontendIconMap`   | none        | the module picks an icon by its identifier at runtime, out of a set the template can name in advance                         |
+| The icon endpoint, `_academic/icons.json` | one per set | the identifier is not known when the page is rendered — it comes from data the module loads, or from a choice of the visitor |
 
 The `<template>` is the first choice wherever the markup around the icon is
 Fluid's anyway. Fluid renders the icon with
@@ -510,7 +512,8 @@ A control whose glyph depends on its state renders both icons and toggles
 marked `@internal` and may change without a `Breaking-*.rst` until a module
 outside the dev-site demonstration uses it; the changelog entry of
 `academic_base` is an `Important-*.rst` for that reason. That covers the
-ViewHelper, the renderer and the event.
+ViewHelper, the endpoint with its parameters and its answer, the renderer and
+the event.
 
 ### The JSON icon map
 
@@ -539,10 +542,102 @@ both quotes as `\u` escapes, so no markup in an icon can close the element
 early, and invalid UTF-8 is replaced rather than failing the content element.
 The module reads it with `JSON.parse(element.textContent)`.
 
+With `endpoint="1"` the element also carries `data-academic-icons-url`, the
+[icon endpoint](#the-icon-endpoint) of the current site language, and
+`data-academic-icons-version`, the [version token](#the-version-token) of the
+icon set. Outside a site both are left out.
+
 The ViewHelper and everything else that hands icons to the frontend go through
 [`FrontendIconRenderer`](../../packages/fgtclb/academic-base/Classes/Imaging/FrontendIconRenderer.php)
 of `academic_base`, a stateless service: `render(identifiers, size)` answers a
-map in the order asked for, and `isServable(identifier)` the decision below.
+map in the order asked for, `isServable(identifier)` the decision below, and
+`getVersion()` the [version token](#the-version-token).
+
+### The icon endpoint
+
+```text
+GET <site base>/_academic/icons.json?i=<id>,<id>,…&s=<size>&v=<token>
+```
+
+answers `{"<id>": "<markup>", …}` with exactly the markup of the JSON map, for
+the identifiers of `i` that may be served, in the order of the request. It is
+the PSR-15 middleware
+[`FrontendIconEndpoint`](../../packages/fgtclb/academic-base/Classes/Middleware/FrontendIconEndpoint.php)
+of `academic_base`, registered for the frontend in
+[`Configuration/RequestMiddlewares.php`](../../packages/fgtclb/academic-base/Configuration/RequestMiddlewares.php).
+The `<site base>` is the base of any site language, so
+`https://example.com/de/_academic/icons.json` and a subfolder installation's
+`https://example.com/sub/_academic/icons.json` both work; the middleware
+compares the route tail the site resolver leaves, not the path.
+
+| Request               | Answer                                                                                    |
+|-----------------------|-------------------------------------------------------------------------------------------|
+| `GET` or `HEAD`       | `200`, `application/json`; `HEAD` with the headers of `GET` and no body                   |
+| any other method      | `405` with `Allow: GET, HEAD`                                                             |
+| `i` missing or empty  | `400`                                                                                     |
+| more than 32 in `i`   | `400`                                                                                     |
+| a malformed `i` entry | `400` — every entry has to match `\A[a-z0-9_][a-z0-9_.-]{0,99}\z`                         |
+| `s` not a size        | `400` — `default`, `small` (the default when `s` is missing), `medium`, `large` or `mega` |
+| an identifier refused | left out of the object, which is `{}` when nothing may be served                          |
+
+A `400` or `405` carries `{"error": "…"}` and `Cache-Control: no-store`.
+
+**Caching.** When `v` is the current version token the answer is
+`Cache-Control: public, max-age=31536000, immutable`, for any other `v`, or
+none, `public, max-age=300`. The token only decides how long the answer may be
+kept — the body is the current markup either way. The `ETag` is a hash of the
+body, and an `If-None-Match` that names it (also as a weak validator, or `*`)
+is answered `304`. So a page that asks with the token it was rendered with gets
+an answer a browser and a proxy keep for a year, and a token that no longer
+matches — a page served from the page cache after the icons changed — misses
+every cache. There is no `Vary`: the answer depends on the URL alone.
+
+The `ETag` only helps the five-minute answers, which a cache revalidates once
+they are stale. An `immutable` answer is never revalidated, by a browser or by a
+CDN, so the `ETag` cannot catch a change the token does not see: whatever
+changes the markup of an icon has to change the token. What it covers, and what
+it does not, is under [The version token](#the-version-token).
+
+**The `.json` suffix.** The path ends in `.json` so that it reads as what it
+answers. A web server or CDN rule that serves `*.json` as a static file — an
+nginx `location ~* \.(…|json)$` with `try_files $uri =404` is a common one —
+answers the endpoint with a `404` before TYPO3 sees the request, the same trap
+`sitemap.xml` is known for. Such a rule has to pass `_academic/icons.json` on to
+`index.php`.
+
+**Its place in the middleware stack**, verified with core's
+`DependencyOrderingService` on both core versions:
+
+| After                                 | Because                                                                |
+|---------------------------------------|------------------------------------------------------------------------|
+| `typo3/cms-frontend/site`             | the `site`, `language` and `routing` attributes, and so the route tail |
+| `typo3/cms-frontend/maintenance-mode` | a site in maintenance answers `503` here as well                       |
+
+| Before                                           | Because                                                           |
+|--------------------------------------------------|-------------------------------------------------------------------|
+| `typo3/cms-frontend/backend-user-authentication` | no backend session is looked up                                   |
+| `typo3/cms-frontend/authentication`              | no frontend session, so never a `Set-Cookie` and always cacheable |
+| `typo3/cms-frontend/page-resolver`               | the path is not a page and would be answered `404`                |
+
+It lands between `maintenance-mode` and `request-token-middleware` on 13.4.34
+and 14.3.6 alike. It never names `typo3/cms-frontend/base-redirect-resolver` or
+`typo3/cms-frontend/static-route-resolver`: EXT:redirects puts its own
+middleware between the authenticators and those two, and "after
+`base-redirect-resolver`, before `authentication`" is a dependency cycle on
+both versions. Nor `typo3/cms-frontend/tsfe`, which exists on v13 only. The
+answer leaves the stack before the CSP, content length and output compression
+middlewares, none of which a JSON answer needs.
+
+**Security.** The endpoint is public and needs no authentication, because it
+hands out nothing a page does not render anyway: only allow-listed, registered,
+non-deprecated identifiers, rendered by the same provider as in a template.
+Apart from what the provider reads to render an icon it only stats files, for
+the version token, and never reads one — an identifier is looked up in the
+registry, never turned into a path. It touches no database, starts no session,
+is bounded to 32 icons per request, and every answer is publicly cacheable. The
+URL carries no version and the contract is internal and experimental: its
+parameters and its answer may change without a `Breaking-*.rst` until a module
+outside the dev-site demonstration uses it.
 
 ### Which icons may leave the server
 
@@ -592,6 +687,37 @@ same icon has, and a provider is chosen by an integrator in a
 `Configuration/Icons.php`, never by a visitor. The renderer does not refuse core's `SvgIconProvider` on v13 and
 does not sanitise a second time: either would make its markup differ from what
 the same icon renders in a template.
+
+### The version token
+
+`FrontendIconRenderer::getVersion()` hashes, over every servable identifier, its
+registration (`getIconConfigurationByIdentifier()`) and the modification time of
+its `source` file, plus the TYPO3 version and core's
+`PackageDependentCacheIdentifier`. It changes when a registration is added,
+removed or replaced, when a source file changes on disk, on a TYPO3 update, and
+with the package cache identifier: in composer mode a hash of `composer.lock`
+and the dev mode, so every update of a package and every change of the
+installed set; in classic mode the path, size and modification time of
+`PackageStates.php`; in both the project path, so a deployment into a new
+release directory as well. It does not read a single SVG.
+
+The package identifier is there for the provider classes. A change to what
+`CurrentColorSvgIconProvider` or core's sanitiser makes of a file changes no
+registration and no source file, and would otherwise keep the token — and with
+it an `immutable` answer in every browser for up to a year. It arrives with an
+update of a package, so it arrives with a new `composer.lock`.
+`PackageDependentCacheIdentifier` is `@internal` in core, like the
+`AbstractSvgIconProvider` the provider extends; the call is marked in the
+renderer and has to be re-read on every core update.
+
+What the token still cannot see is rendering code changed in place with none of
+those — a file of a provider edited on the server, a patch applied without a
+new `composer.lock`. Touching the source files of the affected icons changes
+the token then.
+
+The core's own `iconCacheIdentifier` is no substitute: it is derived from the
+TYPO3 version and the package list (`PackageDependentCacheIdentifier` again),
+and stays the same when an SVG or a `Configuration/Icons.php` is edited.
 
 ## The provider
 
@@ -722,12 +848,19 @@ and the unit test of the same name.
 What reaches frontend TypeScript is covered by the unit tests of the identifier
 pattern and of the event, by
 [`academic-base/Tests/Functional/Imaging/FrontendIconRendererTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/FrontendIconRendererTest.php)
-— each refusal on its own, the override of a project and the allow-list
-event — and by
+— each refusal on its own, the override of a project, the allow-list event and
+what changes the version token —, by
 [`academic-base/Tests/Functional/ViewHelpers/FrontendIconMapViewHelperTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/ViewHelpers/FrontendIconMapViewHelperTest.php),
-which renders the JSON map from fixture templates and parses it back. Their
-icons come from the fixture extension `test_frontend_icons`, one registration
-per reason to refuse.
+which renders the JSON map from fixture templates and parses it back, and by
+[`academic-base/Tests/Functional/Middleware/FrontendIconEndpointTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Middleware/FrontendIconEndpointTest.php),
+which requests the endpoint through the whole frontend middleware stack of the
+core version under test, below a site root, a `/de/` language and a subfolder
+base: every `400` and `405`, `HEAD`, the cache headers, `304` for either
+lifetime, pass-through for every other path, and no `Set-Cookie` for a request
+that makes the authenticator send one on a page;
+`FrontendIconEndpointMaintenanceTest` next to it asserts the `503` of a site in
+maintenance. Their icons come from the fixture extension `test_frontend_icons`,
+one registration per reason to refuse.
 
 **Keeping a template's icons resolvable.** `<core:icon>` never fails on an
 unknown identifier: `IconFactory` answers with the `default-not-found`
