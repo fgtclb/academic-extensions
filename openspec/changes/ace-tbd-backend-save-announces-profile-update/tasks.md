@@ -1,6 +1,6 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Verify `ace-tbd-fresh-profile-is-not-a-translation` is merged. A
+- [ ] 1.1 Verify `ace-610-fresh-profile-is-not-a-translation` is merged. A
   backend-created profile must not report itself as a translation.
 
 ## 2. Event and origin

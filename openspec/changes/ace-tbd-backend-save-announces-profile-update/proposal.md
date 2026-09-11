@@ -50,7 +50,7 @@ None.
   added. Existing listeners and dispatchers keep working.
 - Bulk imports through DataHandler synchronise every touched profile in the
   same request.
-- Depends on `ace-tbd-fresh-profile-is-not-a-translation`: without it, a
+- Depends on `ace-610-fresh-profile-is-not-a-translation`: without it, a
   profile created in the backend could be misreported as a translation.
 
 ## Non-goals
