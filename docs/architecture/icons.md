@@ -29,8 +29,9 @@ the command, run over the repository at the commit that last touched this page
 - The backend JavaScript icon API does not work in the frontend. Frontend
   TypeScript takes markup the server rendered: a `<template>` it clones, the
   JSON icon map of `<ab:frontendIconMap>`, or the icon endpoint
-  `<site base>/_academic/icons.json`, the last two internal and experimental
-  — see [JavaScript](#javascript).
+  `<site base>/_academic/icons.json`, the last two through the icon factory
+  `@fgtclb/academic-base/frontend/icons.js` and all three internal and
+  experimental — see [JavaScript](#javascript).
 
 ## Identifiers
 
@@ -493,11 +494,11 @@ Frontend TypeScript therefore never builds icon markup itself. It takes markup
 the server rendered, with the provider of the icon and with a project's
 override, in one of three ways:
 
-| Way                                       | Request     | Use it when                                                                                                                  |
-|-------------------------------------------|-------------|------------------------------------------------------------------------------------------------------------------------------|
-| A `<template>` the module clones          | none        | the icon is part of a larger piece of markup the module stamps out — a prototype row with its buttons, a list item           |
-| The JSON icon map, `ab:frontendIconMap`   | none        | the module picks an icon by its identifier at runtime, out of a set the template can name in advance                         |
-| The icon endpoint, `_academic/icons.json` | one per set | the identifier is not known when the page is rendered — it comes from data the module loads, or from a choice of the visitor |
+| Way                                       | Request     | Use it when                                                                                                                                            |
+|-------------------------------------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| A `<template>` the module clones          | none        | the icon is part of a larger piece of markup the module stamps out — a prototype row with its buttons, a list item                                     |
+| The JSON icon map, `ab:frontendIconMap`   | none        | the module picks an icon by its identifier at runtime, out of a set the template can name in advance                                                   |
+| The icon endpoint, `_academic/icons.json` | one per set | the identifier is not known when the page is rendered — it comes from data the module loads, or from a choice of the visitor; through the icon factory |
 
 The `<template>` is the first choice wherever the markup around the icon is
 Fluid's anyway. Fluid renders the icon with
@@ -512,8 +513,8 @@ A control whose glyph depends on its state renders both icons and toggles
 marked `@internal` and may change without a `Breaking-*.rst` until a module
 outside the dev-site demonstration uses it; the changelog entry of
 `academic_base` is an `Important-*.rst` for that reason. That covers the
-ViewHelper, the endpoint with its parameters and its answer, the renderer and
-the event.
+ViewHelper, the endpoint with its parameters and its answer, the renderer, the
+event and the TypeScript icon factory.
 
 ### The JSON icon map
 
@@ -638,6 +639,78 @@ is bounded to 32 icons per request, and every answer is publicly cacheable. The
 URL carries no version and the contract is internal and experimental: its
 parameters and its answer may change without a `Breaking-*.rst` until a module
 outside the dev-site demonstration uses it.
+
+### The icon factory
+
+`@fgtclb/academic-base/frontend/icons.js`
+([source](../../packages/fgtclb/academic-base/Resources/Private/TypeScript/frontend/icons.ts))
+reads both for a module, so that a module asks for an icon by its identifier
+and does not care where the markup comes from:
+
+```ts
+import { IconFactory, Sizes, endpointFrom } from '@fgtclb/academic-base/frontend/icons.js';
+
+const icons = new IconFactory(endpointFrom(root));
+button.append(await icons.getIconElement('tx-academicbase-action-add'));
+const markup = await icons.getIcon('tx-academicbase-info-phone', Sizes.medium);
+await icons.prefetch(['tx-academicbase-action-edit', 'tx-academicbase-action-delete']);
+```
+
+| Member                                     | What it does                                                                                  |
+|--------------------------------------------|-----------------------------------------------------------------------------------------------|
+| `Sizes`, `Size`                            | `default`, `small`, `medium`, `large`, `mega` — an `as const` object and its union, no `enum` |
+| `IDENTIFIER_PATTERN`                       | the identifier pattern of the server, for a module that filters its data first                |
+| `endpointFrom(root)`                       | the endpoint `root` or the first JSON map inside it names, `null` where there is none         |
+| `new IconFactory(endpoint = null)`         | a factory; without an endpoint it answers from the JSON maps of the page only                 |
+| `getIcon(identifier, size = small)`        | `Promise<string>`, the markup with its wrapper `<span>`                                       |
+| `getIconElement(identifier, size = small)` | `Promise<Element>`, a new element on every call                                               |
+| `prefetch(identifiers, size = small)`      | asks for all of them, resolves when each one is settled                                       |
+
+On a miss the factory first reads every JSON icon map of the document it has
+not read yet — also one that reached the page later — and only then asks the
+endpoint. The calls of one microtask are collected into one request per
+endpoint and size, split into requests of at most 32 identifiers, with the
+version token of the page. One promise per icon and size is kept for the
+lifetime of the page and shared by every factory on it, so an icon is asked for
+once. An identifier the endpoint leaves out rejects, and stays rejected; a
+failed request rejects and is asked again on the next call.
+
+An identifier that does not match the pattern of the server rejects at once
+and is never sent. The endpoint answers a request with one malformed entry with
+`400` as a whole, so without that check one bad identifier out of the data a
+module loads would fail every icon batched with it — and, since failures are
+retried, fail them again on the next render; a comma inside one would even turn
+into several entries. `IDENTIFIER_PATTERN` is the pattern of
+`FrontendIconRenderer::IDENTIFIER_PATTERN`, `\A…\z` there and `^…$` here,
+which is the same thing in JavaScript without the `m` flag. It is written down
+twice, and `icons.test.ts` reads the PHP constant out of the source and fails
+when the two differ; the same test holds the batch size against
+`FrontendIconEndpoint::MAX_IDENTIFIERS`.
+
+A request is sent with `credentials: 'omit'`: the answer does not depend on a
+session, and a cookie on the request would make many proxy and CDN setups pass
+it to the backend instead of answering from their cache. A request that has no
+answer within ten seconds is aborted and counts as failed, so its icons are
+asked for again on the next call instead of waiting for the life of the page.
+
+What it deliberately does not take over from `@typo3/backend/icons.js`:
+`localStorage` — with an immutable answer the browser cache already holds it,
+and web storage would be one more place injected script could plant markup
+for later pages; overlays, states and alternative markups, whose styles exist
+in the backend only; `DedupeAsyncTask` and the `enum`s, replaced by a `Map` of
+promises and `as const` objects, because the module has to stay erasable
+TypeScript for the [JavaScript tests](../testing/javascript-tests.md). It is a
+rewrite modelled on the backend module, not a copy. Like the rest it is
+`@internal`: its exports may change without a `Breaking-*.rst` for now.
+
+The module is in the import map of `academic_base`
+(`Configuration/JavaScriptModules.php`, prefix `@fgtclb/academic-base/frontend/`).
+The import map of a page carries only the prefixes of the packages the modules
+loaded on it declare, so a module of another extension that imports the factory
+names `academic_base` in the `dependencies` of its own
+`Configuration/JavaScriptModules.php`; without it the specifier does not
+resolve in the browser. Its behaviour is covered by
+[`academic-base/Tests/JavaScript/icons.test.ts`](../../packages/fgtclb/academic-base/Tests/JavaScript/icons.test.ts).
 
 ### Which icons may leave the server
 

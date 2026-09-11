@@ -67,6 +67,23 @@ modification time of their files and every change of :file:`composer.lock`. A
 web server or CDN rule that serves `*.json` as static files has to pass this
 path on to TYPO3, see :ref:`icons-frontend-endpoint`.
 
+The new JavaScript module `@fgtclb/academic-base/frontend/icons.js`, published
+in the import map of this extension, reads both: an :js:`IconFactory` answers
+:js:`getIcon()`, :js:`getIconElement()` and :js:`prefetch()` from the JSON maps
+of the page and asks the endpoint for the rest, one request for the icons asked
+for at the same time, and each icon once per page. A malformed identifier is
+rejected without a request, so it cannot fail the icons asked for with it. A
+package whose module imports it names `academic_base` in the `dependencies` of
+its :file:`Configuration/JavaScriptModules.php`. The module is experimental like
+the rest.
+
+..  code-block:: javascript
+
+    import { IconFactory, endpointFrom } from '@fgtclb/academic-base/frontend/icons.js';
+
+    const icons = new IconFactory(endpointFrom(root));
+    button.append(await icons.getIconElement('tx-academicbase-action-add'));
+
 The decision and the rendering are
 :php:`\FGTCLB\AcademicBase\Imaging\FrontendIconRenderer`.
 

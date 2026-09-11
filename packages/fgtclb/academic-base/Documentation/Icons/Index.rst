@@ -272,8 +272,8 @@ JavaScript therefore takes the markup of an icon from the server.
 ..  important::
 
     Everything in this section except the :html:`<template>` is **internal and
-    experimental**: the ViewHelper, the icon endpoint, the event and the PHP
-    classes behind them.
+    experimental**: the ViewHelper, the icon endpoint, the JavaScript icon
+    factory, the event and the PHP classes behind them.
     They may change, or go away, without a breaking change entry until a module
     outside the academic extensions uses them.
 
@@ -372,6 +372,65 @@ affected icons then.
     the endpoint with a `404` before TYPO3 sees it. Exclude
     `_academic/icons.json` from such a rule, the way `sitemap.xml` is usually
     excluded.
+
+..  _icons-frontend-factory:
+
+The icon factory
+----------------
+
+Both are read by the JavaScript module
+`@fgtclb/academic-base/frontend/icons.js`, which this extension publishes in
+its import map. Like the rest of this section it is internal and experimental.
+A module asks it for an icon by its identifier; the factory answers from the
+JSON maps of the page and asks the endpoint only for what the page does not
+carry, collecting the icons asked for at the same time into one request:
+
+..  code-block:: html
+    :caption: The template of the plugin
+
+    <div class="my-plugin" data-my-plugin>
+        <ab:frontendIconMap identifiers="{0: 'tx-academicbase-action-add'}" endpoint="1" />
+    </div>
+    <f:asset.module identifier="@my-vendor/my-sitepackage/frontend/my-plugin.js" />
+
+..  code-block:: javascript
+    :caption: The module of the plugin
+
+    import { IconFactory, Sizes, endpointFrom } from '@fgtclb/academic-base/frontend/icons.js';
+
+    const root = document.querySelector('[data-my-plugin]');
+    const icons = new IconFactory(endpointFrom(root));
+
+    // From the JSON map of the page, without a request.
+    button.append(await icons.getIconElement('tx-academicbase-action-add'));
+    // From the endpoint, in one request for both.
+    const [edit, remove] = await Promise.all([
+        icons.getIcon('tx-academicbase-action-edit', Sizes.medium),
+        icons.getIcon('tx-academicbase-action-delete', Sizes.medium),
+    ]);
+
+The extension or site package that ships the module has to name
+`academic_base` in the dependencies of its import map; a page only carries the
+import map entries of the packages its modules declare:
+
+..  code-block:: php
+    :caption: EXT:my_sitepackage/Configuration/JavaScriptModules.php
+
+    return [
+        'dependencies' => ['core', 'academic_base'],
+        'imports' => [
+            '@my-vendor/my-sitepackage/frontend/' => 'EXT:my_sitepackage/Resources/Public/JavaScript/frontend/',
+        ],
+    ];
+
+`getIcon()` answers the markup, `getIconElement()` a new element on every call,
+and `prefetch()` asks for several icons ahead of time. An identifier that is
+not served, or that is not an icon identifier at all, rejects the promise; a
+malformed one is never sent, so it cannot fail the icons asked for with it.
+Each icon is asked for once per page, without cookies; a request that fails or
+gets no answer within ten seconds rejects its icons, and the next call asks
+again. The browser keeps the answer of the endpoint as long as the icons do not
+change.
 
 ..  _icons-frontend-allow-list:
 

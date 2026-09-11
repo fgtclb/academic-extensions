@@ -431,11 +431,12 @@ not the Extbase one.
 - `@typo3/backend/icons.js` does not work in the frontend. Frontend TypeScript
   takes markup the server rendered: a `<core:icon … alternativeMarkupIdentifier="inline" />`
   in a `<template>` it clones, the JSON map of `<ab:frontendIconMap>`, or the
-  endpoint `<site base>/_academic/icons.json` (both `academic_base`, internal
-  and experimental). Map and endpoint serve only the allow-listed prefixes —
-  not the core icon set; a listener widening them owns what it opens. The
-  endpoint middleware sits before the authenticators on purpose — never order
-  it after them or next to `base-redirect-resolver`.
+  endpoint `<site base>/_academic/icons.json` (both `academic_base`), the last
+  two read by the icon factory `@fgtclb/academic-base/frontend/icons.js`; all
+  three internal and experimental. Map and endpoint serve only the allow-listed
+  prefixes — not the core icon set; a listener widening them owns what it
+  opens. The endpoint middleware sits before the authenticators on purpose —
+  never order it after them or next to `base-redirect-resolver`.
 
 → [Icons](docs/architecture/icons.md)
 

@@ -74,6 +74,7 @@ export const installFetch = () => {
             method: options.method ?? 'GET',
             headers,
             credentials: options.credentials,
+            signal: options.signal ?? null,
             body: decodeBody(options.body),
             rawBody: options.body ?? null,
         });
@@ -83,8 +84,21 @@ export const installFetch = () => {
             // is a test that does not describe what it is exercising.
             return Promise.reject(new Error(`No response was queued for the request to "${String(url)}".`));
         }
+        const signal = options.signal;
+        if (!signal) {
+            return response;
+        }
+        // A real fetch rejects with the reason of its signal once that aborts,
+        // however far the response has got. Together with respondLater() this
+        // is what makes a timeout testable.
+        if (signal.aborted) {
+            return Promise.reject(signal.reason);
+        }
 
-        return response;
+        return new Promise((resolve, reject) => {
+            signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+            response.then(resolve, reject);
+        });
     };
 
     return {
