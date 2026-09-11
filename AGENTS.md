@@ -428,9 +428,12 @@ not the Extbase one.
   and the wizard `iconIdentifier`.
 - 3.0 renames identifiers without deprecated aliases; the `Breaking-*.rst` of
   the extension carries the old → new table.
-- `@typo3/backend/icons.js` does not work in the frontend. Render the icon with
-  `<core:icon … alternativeMarkupIdentifier="inline" />` into a `<template>` and
-  clone it (ACE-595 tracks a frontend API).
+- `@typo3/backend/icons.js` does not work in the frontend. Frontend TypeScript
+  takes markup the server rendered: a `<core:icon … alternativeMarkupIdentifier="inline" />`
+  in a `<template>` it clones, or the JSON map of `<ab:frontendIconMap>`
+  (`academic_base`, internal and experimental). The map serves only the
+  allow-listed prefixes — not the core icon set; a listener widening them owns
+  what it opens.
 
 → [Icons](docs/architecture/icons.md)
 

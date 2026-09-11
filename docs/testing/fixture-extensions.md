@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Fourteen such fixture extensions exist, in seven of the twelve extensions. That is
+Fifteen such fixture extensions exist, in seven of the twelve extensions. That is
 the whole population — this is a mechanism used sparingly and only where nothing
 smaller works. Measured with
 
@@ -28,6 +28,7 @@ They sit next to the tests that use them, under
 | `test_contract_contact_actions`  | `tests/test-contract-contact-actions`  | `academic-persons-edit` | A `Settings.yaml` narrowing the actions of the contracts section.       |
 | `test_current_color_icons`       | `tests/current-color-icons`            | `academic-base`         | Icons registered through the `currentColor` icon provider.              |
 | `test_exclude_file_column`       | `tests/test-exclude-file-column`       | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.   |
+| `test_frontend_icons`            | `tests/frontend-icons`                 | `academic-base`         | Icons the frontend icon renderer serves or refuses, and a listener.     |
 | `test_jobcontact_schema`         | `tests/test-jobcontact-schema`         | `academic-jobs`         | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates. |
 | `test_language_files`            | `tests/language-files`                 | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                     |
 | `test_legacy_settings`           | `tests/test-legacy-settings`           | `academic-persons`      | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.      |
@@ -40,7 +41,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Five of the fourteen have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
+Six of the fifteen have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
 other nine are pure resources.
 
 A minimal one, complete:
@@ -108,7 +109,8 @@ Two globs, two jobs:
   `TESTS\TestBitejobsStub\Http\StubHttpHandler` resolvable at all. Verified in
   the generated `.Build/vendor/composer/autoload_psr4.php`, which maps
   `TESTS\TestMessyProfileFactory\`, `TESTS\TestBitejobsStub\`,
-  `TESTS\CategoryTypesGroup\` and `TESTS\BaseTestDependencyInjection\` to their
+  `TESTS\TestPartnersStub\`, `TESTS\CategoryTypesGroup\`,
+  `TESTS\BaseTestDependencyInjection\` and `TESTS\FrontendIcons\` to their
   `Classes/` folders.
 - The second merges the `autoload-dev` of every package, which is how each
   extension's own `FGTCLB\<Name>\Tests\` namespace reaches the root autoloader.
@@ -190,7 +192,7 @@ protected array $testExtensionsToLoad = [
 ```
 — [`ProfileTitleProviderTest.php:27`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L27)
 
-**The package name is not derivable from the extension key.** All fourteen use
+**The package name is not derivable from the extension key.** All fifteen use
 the `tests/` vendor, but the second segment follows no rule: `test_plugin_templates`
 is `tests/plugin-templates` (prefix dropped), `test_bitejobs_stub` is
 `tests/test-bitejobs-stub` (prefix kept), and `test_base_dependency_injection`
@@ -203,7 +205,7 @@ renamed for cosmetics.
 
 ## What a fixture extension is for, and what it is not
 
-The fourteen existing ones show the cases that justify one:
+The fifteen existing ones show the cases that justify one:
 
 - **Bootstrap-time configuration.** `test_bitejobs_stub` replaces
   `$GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler']` in `ext_localconf.php` so no
@@ -227,7 +229,9 @@ The fourteen existing ones show the cases that justify one:
 - **Registered configuration.** `test_category_types_group` ships a
   `Configuration/CategoryTypes.yaml` so the registry is filled the way an
   installing extension fills it, `test_current_color_icons` registers icons
-  with the `currentColor` icon provider the same way,
+  with the `currentColor` icon provider the same way, `test_frontend_icons`
+  registers one icon per reason the frontend icon renderer refuses one, next to
+  the override of a shared icon and a listener that widens the allow-list,
   `test_public_profile_settings` ships a `Configuration/AcademicPersons/Settings.yaml`
   that overrides the `profile` map exactly as a site package would,
   `test_contract_contact_actions` ships one that narrows the `actions` of the

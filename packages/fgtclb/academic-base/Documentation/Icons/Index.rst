@@ -260,6 +260,102 @@ The rendered icon carries the CSS class `icon-<identifier>`, for example
 `icon-tx-academicbase-info-phone`, and the attribute `data-identifier`. A
 stylesheet can address it through either.
 
+..  _icons-frontend-javascript:
+
+Icons in frontend JavaScript
+============================
+
+The backend JavaScript icon API of TYPO3 cannot be used on a frontend page: it
+asks a backend route that answers a logged-in backend user only. Frontend
+JavaScript therefore takes the markup of an icon from the server.
+
+..  important::
+
+    Everything in this section except the :html:`<template>` is **internal and
+    experimental**: the ViewHelper, the event and the PHP classes behind them.
+    They may change, or go away, without a breaking change entry until a module
+    outside the academic extensions uses them.
+
+Where the JavaScript stamps out a piece of markup anyway - a list item, a row
+with its buttons - render the icon with `<core:icon>` into a
+`<template>` element and clone it. Where it picks an icon by its
+identifier at runtime, hand it the icons it may need as a JSON map:
+
+..  code-block:: html
+
+    <html xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
+          data-namespace-typo3-fluid="true">
+
+    <ab:frontendIconMap identifiers="{0: 'tx-academicbase-action-add', 1: 'tx-academicbase-action-delete'}" />
+
+This renders a JSON data block that the browser neither executes nor checks
+against the Content Security Policy:
+
+..  code-block:: html
+
+    <script type="application/json" data-academic-icons data-academic-icons-size="small">
+        {"tx-academicbase-action-add": "<span class=\"t3js-icon icon ...\">...</span>", ...}
+    </script>
+
+Each value is the markup `<core:icon identifier="..."
+alternativeMarkupIdentifier="inline" />` renders, so a project's replacement of
+an icon arrives in the JavaScript as it does in a template.
+
+Arguments:
+
+`identifiers` (array, required)
+    The identifiers to render. One that may not be served is left out of the
+    map - see below.
+
+`size` (string, default `small`)
+    `default`, `small`, `medium`, `large` or `mega`. It sets the `icon-size-*`
+    class of the markup; the icons of the academic extensions size themselves
+    by the font size.
+
+..  _icons-frontend-allow-list:
+
+Which icons are served
+----------------------
+
+Only identifiers starting with `tx-academic` or `category_types.` are served,
+and of those only the ones that are registered, not deprecated and registered
+with a provider that inlines an SVG file: the
+:php:`CurrentColorSvgIconProvider` of this extension or the core
+:php:`SvgIconProvider`. Any other identifier, an icon of the core icon set
+among them, is left out rather than answered with the placeholder of an
+unknown icon.
+
+The markup is what the provider of the icon renders, sanitised as far as that
+provider sanitises. :php:`CurrentColorSvgIconProvider` sanitises on TYPO3 v13
+and v14; the inline markup of the core :php:`SvgIconProvider` is sanitised on
+TYPO3 v14 only. That is the same markup, with the same exposure, as the icon
+rendered inline by a template.
+
+A project serves the icons of its own extensions the same way by adding the
+prefix of their identifiers with a listener to
+:php:`\FGTCLB\AcademicBase\Event\ModifyFrontendIconAllowListEvent`. A
+prefix opens every identifier it matches: some system extensions register
+icons of their own with the core :php:`SvgIconProvider`, so a prefix such as
+`module-` also serves the icons of the install tool modules. Sprite, bitmap and
+font icons stay refused whatever the list holds.
+
+..  code-block:: php
+    :caption: EXT:my_sitepackage/Classes/EventListener/AllowFrontendIcons.php
+
+    namespace MyVendor\MySitepackage\EventListener;
+
+    use FGTCLB\AcademicBase\Event\ModifyFrontendIconAllowListEvent;
+    use TYPO3\CMS\Core\Attribute\AsEventListener;
+
+    #[AsEventListener(identifier: 'my-sitepackage/frontend-icons')]
+    final readonly class AllowFrontendIcons
+    {
+        public function __invoke(ModifyFrontendIconAllowListEvent $event): void
+        {
+            $event->addPrefix('tx-mysitepackage-');
+        }
+    }
+
 ..  _icons-override:
 
 Replacing an icon in a project

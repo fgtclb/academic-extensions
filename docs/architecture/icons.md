@@ -27,7 +27,9 @@ the command, run over the repository at the commit that last touched this page
 - A content element names one identifier in its CType item, its
   `typeicon_classes` entry and its wizard entry.
 - The backend JavaScript icon API does not work in the frontend. Frontend
-  TypeScript clones icons Fluid rendered into a `<template>`.
+  TypeScript takes markup the server rendered: a `<template>` it clones, or the
+  JSON icon map of `<ab:frontendIconMap>`, which is internal and experimental
+  — see [JavaScript](#javascript).
 
 ## Identifiers
 
@@ -486,16 +488,110 @@ public routes of `BackendUserAuthenticator` and answers only a logged-in backend
 user. The module itself resolves through the import map and fails at its first
 request.
 
-Frontend TypeScript therefore never builds icon markup. Fluid renders the icon
-with `<core:icon … alternativeMarkupIdentifier="inline" />` into a `<template>`
+Frontend TypeScript therefore never builds icon markup itself. It takes markup
+the server rendered, with the provider of the icon and with a project's
+override, in one of two ways:
+
+| Way                                     | Request | Use it when                                                                                                        |
+|-----------------------------------------|---------|--------------------------------------------------------------------------------------------------------------------|
+| A `<template>` the module clones        | none    | the icon is part of a larger piece of markup the module stamps out — a prototype row with its buttons, a list item |
+| The JSON icon map, `ab:frontendIconMap` | none    | the module picks an icon by its identifier at runtime, out of a set the template can name in advance               |
+
+The `<template>` is the first choice wherever the markup around the icon is
+Fluid's anyway. Fluid renders the icon with
+`<core:icon … alternativeMarkupIdentifier="inline" />` into the `<template>`
 element, and the module clones it — the prototypes of the profile editor in
 `academic_persons_edit` are the reference, see
 [Where the icons come from](profile-editing-contract.md#where-the-icons-come-from).
 A control whose glyph depends on its state renders both icons and toggles
-`hidden`. The icons stay sanitised, honour a project's override and need no
-request. A frontend icon API — an endpoint plus a TypeScript icon factory
-modelled on the backend one — is tracked as ACE-595 and waits for a module that
-composes an identifier at runtime; none does today.
+`hidden`.
+
+**Everything below the `<template>` is internal and experimental.** It is
+marked `@internal` and may change without a `Breaking-*.rst` until a module
+outside the dev-site demonstration uses it; the changelog entry of
+`academic_base` is an `Important-*.rst` for that reason. That covers the
+ViewHelper, the renderer and the event.
+
+### The JSON icon map
+
+```html
+<html xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers" data-namespace-typo3-fluid="true">
+<ab:frontendIconMap identifiers="{0: 'tx-academicbase-action-add', 1: 'tx-academicbase-action-delete'}" />
+```
+
+renders one data block:
+
+```html
+<script type="application/json" data-academic-icons data-academic-icons-size="small">{"tx-academicbase-action-add":"\u003Cspan class=\u0022t3js-icon …"}</script>
+```
+
+The values are exactly what `<core:icon … alternativeMarkupIdentifier="inline" />`
+renders for the identifier, the wrapper `<span>` included. `size` takes
+`default`, `small` (the default), `medium`, `large` or `mega`; `overlay` is
+core's size of an overlay icon and refused. It changes the `icon-size-*` class
+of the wrapper and nothing else — an inlined SVG sizes itself, see
+[Sizing](#sizing).
+
+A `<script>` with a JSON type is a data block: the browser neither executes it
+nor checks it against the page's Content Security Policy, so the element needs
+no nonce and the policy no change. The JSON is encoded with `<`, `>`, `&` and
+both quotes as `\u` escapes, so no markup in an icon can close the element
+early, and invalid UTF-8 is replaced rather than failing the content element.
+The module reads it with `JSON.parse(element.textContent)`.
+
+The ViewHelper and everything else that hands icons to the frontend go through
+[`FrontendIconRenderer`](../../packages/fgtclb/academic-base/Classes/Imaging/FrontendIconRenderer.php)
+of `academic_base`, a stateless service: `render(identifiers, size)` answers a
+map in the order asked for, and `isServable(identifier)` the decision below.
+
+### Which icons may leave the server
+
+An identifier is served when all four hold, and otherwise it is left out of the
+answer — never replaced by the `default-not-found` placeholder:
+
+1. **It matches `\A[a-z0-9_][a-z0-9_.-]{0,99}\z`.** `\A` and `\z`, because `$`
+   also matches before a trailing line feed.
+2. **It starts with an allowed prefix**: `tx-academic` and `category_types.` by
+   default. A project adds the prefix of its own identifiers with a listener
+   to `FGTCLB\AcademicBase\Event\ModifyFrontendIconAllowListEvent`
+   (`addPrefix()`, `setPrefixes()`, which refuses anything but strings), which
+   is dispatched every time the list is needed. The allow-list is a list of
+   identifier prefixes and not of source paths on purpose: a project that
+   overrides `tx-academicbase-info-phone` in its own `Configuration/Icons.php`
+   points it at a file of its own, and a path filter would refuse exactly the
+   override the project wants delivered.
+3. **It is registered and not deprecated.** `IconRegistry::isDeprecated()` is
+   asked before anything reads the registration, because
+   `getIconConfigurationByIdentifier()` raises the `E_USER_DEPRECATED` itself.
+   `isRegistered()` is asked first: it completes the registry's initialisation,
+   which `isDeprecated()` relies on without triggering it.
+4. **Its provider inlines an SVG file**: a subclass of core's
+   `AbstractSvgIconProvider`, which `CurrentColorSvgIconProvider` and core's
+   `SvgIconProvider` are. Refused are `SvgSpriteIconProvider`, which the icons
+   of the core icon set are registered with on both versions and which renders
+   an `<svg><use>` into a sprite without a size of its own, and
+   `BitmapIconProvider`, whose `<img>` needs a URL that cannot be built
+   correctly outside a page request.
+
+The icons of the core icon set are therefore refused twice — by their prefix
+and by their provider. That is not true of every icon a system extension
+registers: EXT:install, EXT:redirects and a few others register icons of their
+own with core's `SvgIconProvider`, which is inlined, so a listener adding a
+prefix such as `module-` serves `module-install-environment` and its siblings.
+They are public files and nothing secret, but the default list does not serve
+them, and a listener that widens the list is responsible for what it opens.
+Sprite, bitmap and font providers stay refused whatever the list holds.
+
+**Sanitising is the provider's.** The markup is what the registered provider
+renders, sanitised as far as that provider sanitises:
+`CurrentColorSvgIconProvider` runs core's SVG sanitiser on both core versions,
+core's `SvgIconProvider` sanitises its inline markup on v14 only — on v13 it
+strips `<script>` elements and nothing else. That is exactly the exposure a
+server-rendered `<core:icon … alternativeMarkupIdentifier="inline" />` of the
+same icon has, and a provider is chosen by an integrator in a
+`Configuration/Icons.php`, never by a visitor. The renderer does not refuse core's `SvgIconProvider` on v13 and
+does not sanitise a second time: either would make its markup differ from what
+the same icon renders in a template.
 
 ## The provider
 
@@ -622,6 +718,16 @@ The programmatic category type registration is covered by
 across the four branches of the registrar, and the provider itself by
 [`academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php)
 and the unit test of the same name.
+
+What reaches frontend TypeScript is covered by the unit tests of the identifier
+pattern and of the event, by
+[`academic-base/Tests/Functional/Imaging/FrontendIconRendererTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/FrontendIconRendererTest.php)
+— each refusal on its own, the override of a project and the allow-list
+event — and by
+[`academic-base/Tests/Functional/ViewHelpers/FrontendIconMapViewHelperTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/ViewHelpers/FrontendIconMapViewHelperTest.php),
+which renders the JSON map from fixture templates and parses it back. Their
+icons come from the fixture extension `test_frontend_icons`, one registration
+per reason to refuse.
 
 **Keeping a template's icons resolvable.** `<core:icon>` never fails on an
 unknown identifier: `IconFactory` answers with the `default-not-found`
