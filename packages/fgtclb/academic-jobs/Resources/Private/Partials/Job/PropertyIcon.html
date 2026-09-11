@@ -1,0 +1,38 @@
+<html
+    lang="en"
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+>
+
+<f:comment>
+    The glyph in front of a job property, by the name of the Extbase property.
+    One map for the list, the detail view and the contact block. A property
+    that is not in it renders no icon, so a property added to an overridden
+    list does not show the "icon not found" placeholder.
+
+    Override this partial to change the map; replace a glyph everywhere by
+    registering its identifier again in the Configuration/Icons.php of a site
+    package.
+</f:comment>
+<f:variable name="iconIdentifiers" value="{
+    employmentStartDate: 'tx-academicbase-info-calendar',
+    endtime: 'tx-academicbase-info-calendar',
+    companyName: 'tx-academicbase-info-company',
+    sector: 'tx-academicbase-info-sector',
+    type: 'tx-academicbase-info-employment',
+    employmentType: 'tx-academicbase-info-employment',
+    requiredDegree: 'tx-academicbase-info-degree',
+    contractualRelationship: 'tx-academicbase-info-contract',
+    workLocation: 'tx-academicbase-info-location',
+    internationalsWelcome: 'tx-academicbase-info-international',
+    alumniRecommend: 'tx-academicbase-info-recommendation',
+    link: 'tx-academicbase-info-link',
+    contactPhone: 'tx-academicbase-info-phone',
+    contactEmail: 'tx-academicbase-info-email'
+}" />
+<f:if condition="{iconIdentifiers.{property}}">
+    <core:icon identifier="{iconIdentifiers.{property}}" alternativeMarkupIdentifier="inline" />
+</f:if>
+
+</html>

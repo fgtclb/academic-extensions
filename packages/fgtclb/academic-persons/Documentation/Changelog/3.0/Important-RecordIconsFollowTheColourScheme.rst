@@ -21,7 +21,9 @@ which inlines the file in both markups, and the files themselves are drawn in
 
 That covers the record icons of all nine tables this extension ships, from
 :php:`tx_academicpersons_domain_model_address` to
-:php:`tx_academicpersons_domain_model_profile_information`.
+:php:`tx_academicpersons_domain_model_profile_information`. Their identifiers
+are renamed in the same release, see
+:ref:`breaking-persons-icons-use-the-shared-icon-set`.
 
 Impact
 ======
@@ -31,9 +33,10 @@ in a dark colour scheme. Their markup is now the inlined :html:`<svg>` rather
 than an :html:`<img>`, which matters to any CSS or test that addressed the
 image.
 
-The plugin icon :php:`persons_icon` is a brand mark and keeps the core
-provider. The six control icons of the public profile were already registered
-with the `currentColor` provider and are unchanged.
+The content element icons are drawn and registered the same way, and the
+control icons of the public profile are the shared glyphs of
+`EXT:academic_base` - see
+:ref:`breaking-persons-icons-use-the-shared-icon-set`.
 
 Affected Installations
 ======================

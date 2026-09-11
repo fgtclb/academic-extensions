@@ -54,6 +54,11 @@ extensions.
 
         Configure the extension and its site sets for your installation.
 
+    ..  card:: :ref:`Icons <icons>`
+
+        The icon set the academic extensions share, and how to replace an
+        icon in a project.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -71,6 +76,7 @@ extensions.
     Introduction/Index
     Installation/Index
     Configuration/Index
+    Icons/Index
     KnownProblems/Index
     Changelog/Changelog-3
     Changelog/Changelog-2

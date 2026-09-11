@@ -24,7 +24,7 @@ $tcaConfiguration = [
             'disabled' => 'hidden',
         ],
         'typeicon_classes' => [
-            'default' => 'academic-study-plan-category',
+            'default' => 'tx-academicstudyplan-record-category',
         ],
         'security' => [
             'ignorePageTypeRestriction' => true,

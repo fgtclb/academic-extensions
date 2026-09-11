@@ -72,7 +72,7 @@ defined('TYPO3') or die();
             'label' => 'LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:tt_content.CType.academic_study_plan.title',
             'description' => 'LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:tt_content.CType.academic_study_plan.description',
             'value' => 'academic_study_plan',
-            'icon' => 'academic-study-plan',
+            'icon' => 'tx-academicstudyplan-plugin-study-plan',
             'group' => 'academic',
         ],
         '

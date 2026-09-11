@@ -9,6 +9,7 @@ use FGTCLB\AcademicPersonsEdit\Controller\ProfileController;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Http\Stream;
+use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Localization\DateFormatter;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Localization\Locale;
@@ -30,6 +31,31 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
      * way to it.
      */
     private const LONG_LECTURE_TITLE = 'Interdisciplinary perspectives on community development, welfare policy and social work practice';
+
+    /**
+     * The icon identifiers the shipped templates ask for: the shared action and state set of
+     * EXT:academic_base, and nothing of this extension's own.
+     *
+     * @var list<string>
+     */
+    private const SHARED_EDITOR_ICON_IDENTIFIERS = [
+        'tx-academicbase-action-add',
+        'tx-academicbase-action-back',
+        'tx-academicbase-action-clear',
+        'tx-academicbase-action-delete',
+        'tx-academicbase-action-drag',
+        'tx-academicbase-action-edit',
+        'tx-academicbase-action-help',
+        'tx-academicbase-action-move-down',
+        'tx-academicbase-action-move-up',
+        'tx-academicbase-action-save',
+        'tx-academicbase-action-undo',
+        'tx-academicbase-action-upload-image',
+        'tx-academicbase-action-view',
+        'tx-academicbase-action-view-close',
+        'tx-academicbase-state-hidden',
+        'tx-academicbase-state-visible',
+    ];
 
     private function seedStructuredDocumentSections(): void
     {
@@ -324,7 +350,7 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertSame('', $target->item(0)?->attributes?->getNamedItem('data-pe-image-view-container')?->nodeValue);
 
         $icon = $xpath->query(
-            './/*[@data-identifier="academic-persons-edit-upload-image"]',
+            './/*[@data-identifier="tx-academicbase-action-upload-image"]',
             $button,
         );
         $this->assertNotFalse($icon);
@@ -907,17 +933,17 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $this->assertStringContainsString('data-pe-document-add', $documentsPartial);
         $actionsPartial = $this->getProfileEditingPartial('Documents/Actions');
         foreach ([
-            'academic-persons-edit-sort-handle',
-            'academic-persons-edit-view',
-            'academic-persons-edit-move-down',
-            'academic-persons-edit-move-up',
-            'academic-persons-edit-delete',
-            'academic-persons-edit-edit',
-            'academic-persons-edit-view-close',
-            'academic-persons-edit-visible',
-            'academic-persons-edit-hidden',
+            'tx-academicbase-action-drag',
+            'tx-academicbase-action-view',
+            'tx-academicbase-action-move-down',
+            'tx-academicbase-action-move-up',
+            'tx-academicbase-action-delete',
+            'tx-academicbase-action-edit',
+            'tx-academicbase-action-view-close',
+            'tx-academicbase-state-visible',
+            'tx-academicbase-state-hidden',
         ] as $iconIdentifier) {
-            $this->assertStringContainsString($iconIdentifier, $actionsPartial);
+            $this->assertStringContainsString('identifier="' . $iconIdentifier . '"', $actionsPartial);
         }
         $actionPositions = array_map(
             static fn(string $hook): int|false => strpos($actionsPartial, $hook),
@@ -1123,11 +1149,11 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
             $this->assertTrue($expanded->hasAttribute('hidden'));
             $this->assertSame(
                 1,
-                $this->nodeCount($xpath, './/*[@data-identifier="academic-persons-edit-view"]', $collapsed),
+                $this->nodeCount($xpath, './/*[@data-identifier="tx-academicbase-action-view"]', $collapsed),
             );
             $this->assertSame(
                 1,
-                $this->nodeCount($xpath, './/*[@data-identifier="academic-persons-edit-view-close"]', $expanded),
+                $this->nodeCount($xpath, './/*[@data-identifier="tx-academicbase-action-view-close"]', $expanded),
             );
         }
     }
@@ -2133,20 +2159,22 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
     }
 
     /**
-     * Every icon identifier a shipped partial asks for has to be registered, and every
-     * registered one has to be asked for by something.
+     * Every icon identifier a shipped partial asks for has to be registered, and the set
+     * the templates ask for is exactly the shared one.
      *
      * `<core:icon>` never fails on an unknown identifier: `IconFactory` answers with the
      * `default-not-found` placeholder and the identifier that was asked for is gone from
      * the markup. The Fluid scan catches the identifiers of a state the fixture does not
      * reach - a read-only section renders no save button - which is why it is a scan and
-     * not only an assertion on the rendered page.
+     * not only an assertion on the rendered page. The list it is compared with is spelled
+     * out, so an identifier that is renamed or dropped in EXT:academic_base, or a template
+     * that goes back to an icon of its own, fails here instead of agreeing with itself.
      */
     #[Test]
     public function everyIconIdentifierOfTheShippedTemplatesIsRegistered(): void
     {
-        $registeredIcons = require __DIR__ . '/../../../Configuration/Icons.php';
-        $this->assertIsArray($registeredIcons);
+        $iconRegistry = $this->get(IconRegistry::class);
+        $this->assertInstanceOf(IconRegistry::class, $iconRegistry);
         $fluidSources = $this->getProfileEditingFluidSources();
         $this->assertGreaterThan(
             0,
@@ -2160,26 +2188,23 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $usedIdentifiers = array_values(array_unique($matches[1]));
         sort($usedIdentifiers);
         foreach ($usedIdentifiers as $identifier) {
-            $this->assertArrayHasKey(
-                $identifier,
-                $registeredIcons,
+            $this->assertTrue(
+                $iconRegistry->isRegistered($identifier),
                 sprintf('The icon identifier "%s" is used but not registered.', $identifier),
             );
-            $source = (string)($registeredIcons[$identifier]['source'] ?? '');
+            $configuration = $iconRegistry->getIconConfigurationByIdentifier($identifier);
+            $source = (string)($configuration['options']['source'] ?? '');
             $this->assertFileExists(
                 GeneralUtility::getFileAbsFileName($source),
                 sprintf('The icon file of "%s" does not exist.', $identifier),
             );
         }
-        $registeredActionIcons = array_values(array_filter(
-            array_keys($registeredIcons),
-            static fn(string $identifier): bool => str_starts_with($identifier, 'academic-persons-edit-'),
-        ));
-        sort($registeredActionIcons);
+        $expectedIdentifiers = self::SHARED_EDITOR_ICON_IDENTIFIERS;
+        sort($expectedIdentifiers);
         $this->assertSame(
-            $registeredActionIcons,
+            $expectedIdentifiers,
             $usedIdentifiers,
-            'Registered editor icons and the icons the templates use have drifted apart.',
+            'The templates and the shared icon set they are meant to use have drifted apart.',
         );
     }
 
@@ -2197,20 +2222,23 @@ final class AcademicPersonsEditProfileEditingTest extends AbstractFrontendProfil
         $content = $this->renderProfileEditingPage();
 
         $this->assertStringNotContainsString('default-not-found', $content);
-        $this->assertStringNotContainsString('Resources/Public/Icons/edit.svg', $content);
+        $this->assertStringNotContainsString('Resources/Public/Icons/action/', $content);
+        $this->assertStringNotContainsString('Resources/Public/Icons/state/', $content);
+        $this->assertStringNotContainsString('data-identifier="academic-persons-edit-', $content);
         $this->assertStringContainsString('<svg', $content);
         foreach ([
-            'academic-persons-edit-add',
-            'academic-persons-edit-back',
-            'academic-persons-edit-delete',
-            'academic-persons-edit-edit',
-            'academic-persons-edit-help',
-            'academic-persons-edit-move-down',
-            'academic-persons-edit-move-up',
-            'academic-persons-edit-view',
-            'academic-persons-edit-view-close',
-            'academic-persons-edit-visible',
-            'academic-persons-edit-hidden',
+            'tx-academicbase-action-add',
+            'tx-academicbase-action-back',
+            'tx-academicbase-action-delete',
+            'tx-academicbase-action-drag',
+            'tx-academicbase-action-edit',
+            'tx-academicbase-action-help',
+            'tx-academicbase-action-move-down',
+            'tx-academicbase-action-move-up',
+            'tx-academicbase-action-view',
+            'tx-academicbase-action-view-close',
+            'tx-academicbase-state-visible',
+            'tx-academicbase-state-hidden',
         ] as $identifier) {
             $this->assertStringContainsString(
                 'data-identifier="' . $identifier . '"',

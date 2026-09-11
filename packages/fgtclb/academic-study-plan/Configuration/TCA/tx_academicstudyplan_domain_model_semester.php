@@ -21,7 +21,7 @@ $tcaConfiguration = [
             'disabled' => 'hidden',
         ],
         'typeicon_classes' => [
-            'default' => 'academic-study-plan-semester',
+            'default' => 'tx-academicstudyplan-record-semester',
         ],
         'hideTable' => true,
         'security' => [

@@ -31,7 +31,7 @@
 #
 # The storage folders of "/data" are not mirrored at all. Mirroring a folder
 # whose records are shared leaves an empty folder in the backend that looks like
-# it should hold something, so "/" has 65 pages and "/legacy/" has 56.
+# it should hold something, so "/" has 66 pages and "/legacy/" has 57.
 #
 # UIDS
 #
@@ -49,8 +49,8 @@
 # page 1, becomes 1501, and 1501 is 1001 plus 500.
 #
 # A note on the ranges: the header of "Scenario.yaml" reserves "tt_content"
-# 500-999 for this tree. It cannot have it - the German variants of the 63
-# elements of the "/" tree occupy 501-563 under the plus-500 rule, and that rule
+# 500-999 for this tree. It cannot have it - the German variants of the 64
+# elements of the "/" tree occupy 501-564 under the plus-500 rule, and that rule
 # wins. This tree takes the 1000 block in "tt_content" as well, which is also
 # what makes the two tables read alike: the legacy tree is the 1000 block.
 #
@@ -3967,3 +3967,25 @@ entities:
                         header: 'Für Mitglieder'
                         header_layout: 2
                         bodytext: '<p>Nur für die Gruppe <em>Website users</em> sichtbar.</p>'
+        - self:
+              id: 1290
+              title: 'Icons'
+              slug: '/icons'
+          languageVariants:
+            - self:
+                  id: 1790
+                  language: 1
+                  title: 'Symbole'
+                  slug: '/symbole'
+          entities:
+            content:
+              - self:
+                    id: 1064
+                    CType: 'academicsdevsite_icons'
+                    header: 'Icons of the academic extensions'
+                languageVariants:
+                  - self:
+                        id: 1564
+                        language: 1
+                        CType: 'academicsdevsite_icons'
+                        header: 'Symbole der Academic Extensions'

@@ -1,60 +1,61 @@
 ..  _feature-profile-editing-icon-set:
 
-=====================================
-Feature: The profile editing icon set
-=====================================
+==========================================
+Feature: Icons of the profile editing view
+==========================================
 
 Description
 ===========
 
-The profile editing frontend addresses its action icons through fourteen
-identifiers registered in :file:`Configuration/Icons.php`:
+The profile editing frontend addresses its action and state icons through
+identifiers, rendered with ``core:icon`` and inlined into the markup. They are
+the shared icons of `EXT:academic_base`, which every academic extension uses
+for the same action:
 
 ..  list-table::
     :header-rows: 1
 
     *   -   Identifier
         -   Action
-    *   -   ``academic-persons-edit-add``
+    *   -   ``tx-academicbase-action-add``
         -   Add an entry to a list
-    *   -   ``academic-persons-edit-back``
+    *   -   ``tx-academicbase-action-back``
         -   Leave the editor
-    *   -   ``academic-persons-edit-clear``
+    *   -   ``tx-academicbase-action-clear``
         -   Clear the value of a field
-    *   -   ``academic-persons-edit-delete``
+    *   -   ``tx-academicbase-action-delete``
         -   Delete an entry
-    *   -   ``academic-persons-edit-edit``
-        -   Start editing a field or an entry
-    *   -   ``academic-persons-edit-help``
-        -   Show the help text of a field
-    *   -   ``academic-persons-edit-move-down``
-        -   Move an entry down
-    *   -   ``academic-persons-edit-move-up``
-        -   Move an entry up
-    *   -   ``academic-persons-edit-save``
-        -   Apply an edit
-    *   -   ``academic-persons-edit-sort-handle``
+    *   -   ``tx-academicbase-action-drag``
         -   Drag handle of a sortable entry
-    *   -   ``academic-persons-edit-undo``
+    *   -   ``tx-academicbase-action-edit``
+        -   Start editing a field or an entry
+    *   -   ``tx-academicbase-action-help``
+        -   Show the help text of a field
+    *   -   ``tx-academicbase-action-move-down``
+        -   Move an entry down
+    *   -   ``tx-academicbase-action-move-up``
+        -   Move an entry up
+    *   -   ``tx-academicbase-action-save``
+        -   Apply an edit
+    *   -   ``tx-academicbase-action-undo``
         -   Undo an edit
-    *   -   ``academic-persons-edit-upload-image``
+    *   -   ``tx-academicbase-action-upload-image``
         -   Upload or replace the profile image
-    *   -   ``academic-persons-edit-view``
+    *   -   ``tx-academicbase-action-view``
         -   Open the public view of a record
-    *   -   ``academic-persons-edit-view-close``
+    *   -   ``tx-academicbase-action-view-close``
         -   Close the read view a row action opened
-    *   -   ``academic-persons-edit-visible``
-        -   The visibility toggle of a contact that is shown in the frontend
-    *   -   ``academic-persons-edit-hidden``
-        -   The visibility toggle of a contact that is hidden in the frontend
+    *   -   ``tx-academicbase-state-visible``
+        -   The visibility toggle of an entry that is shown in the frontend
+    *   -   ``tx-academicbase-state-hidden``
+        -   The visibility toggle of an entry that is hidden in the frontend
 
 Identifier and file name are the action, never the drawing: a later icon set
 changes the glyph, not the API the templates address.
 
-The files are `Bootstrap Icons <https://icons.getbootstrap.com/>`__ and carry
-their MIT licence in
-:file:`Resources/Public/Icons/LICENSE-bootstrap-icons.txt`. They are drawn in
-``currentColor`` and registered with
+The files are Font Awesome Free solid icons (CC BY 4.0, see
+:file:`EXT:academic_base/Resources/Public/Icons/LICENSE-font-awesome.txt`).
+They are drawn in ``currentColor`` and registered with
 :php:`\FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`,
 which inlines the file instead of rendering an :html:`<img>` - so a glyph takes
 the colour of the button it sits in, in the frontend as much as in a dark
@@ -67,13 +68,11 @@ The identifiers are public API. A site package that wants different artwork
 re-registers one of them in its own :file:`Configuration/Icons.php` with its
 own file and needs no template override; a file registered that way is drawn
 in ``currentColor`` as well, or it will not follow the surrounding text.
+Because the identifiers are shared, such a registration changes the icon in
+every academic extension that renders it.
 
-Five of the identifiers - ``academic-persons-edit-edit``,
-``academic-persons-edit-view``, ``academic-persons-edit-delete``,
-``academic-persons-edit-save`` and ``academic-persons-edit-back`` - existed
-before and now resolve to the new artwork and the new provider. An
-installation that renders them through the shipped templates sees a different
-glyph that follows the text colour instead of a fixed dark grey.
+The identifiers of the icons 2.x shipped are gone - see
+:ref:`breaking-profile-editing-uses-the-shared-icon-set`.
 
 Affected Installations
 ======================
@@ -84,8 +83,8 @@ with version 3.0.
 Migration
 =========
 
-No migration is required. An installation that re-registered one of the five
-existing identifiers in a site package keeps its own artwork, since a later
-registration wins.
+No migration is required for the feature itself. The renamed identifiers are
+migrated as described in
+:ref:`breaking-profile-editing-uses-the-shared-icon-set`.
 
 ..  index:: Frontend, Fluid, Template

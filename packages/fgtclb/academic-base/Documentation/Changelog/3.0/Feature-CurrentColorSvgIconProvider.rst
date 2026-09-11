@@ -25,7 +25,7 @@ ships it:
     :caption: EXT:my_extension/Configuration/Icons.php
 
     return [
-        'my-extension-add' => [
+        'tx-myextension-action-add' => [
             'provider' => \FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider::class,
             'source' => 'EXT:my_extension/Resources/Public/Icons/add.svg',
         ],
@@ -62,16 +62,13 @@ rendering one icon less. An icon is decoration and must not be able to fail the
 request that renders it.
 
 The provider needs no configuration of its own and changes nothing until an
-icon is registered with it. Two groups of icons of this release are registered
-with it. Nineteen control icons: the six of the public profile of
-`EXT:academic_persons` and the thirteen of the profile editing view of
-`EXT:academic_persons_edit`. And every icon a TCA record type resolves - the
-record icons of the academic extensions, the two academic page type icons and
-the twenty category type icons of the three academic extensions that ship
-category types, which ask for it with `inlineIcon: true` in their
-:file:`Configuration/CategoryTypes.yaml`. Brand icons, which are drawn in fixed
-colours and are meant to look the same on every background, stay with the core
-:php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`.
+icon is registered with it. In this release the academic extensions register
+every icon they ship with it: the shared icon set of this extension (see
+:ref:`feature-shared-icon-set`), their record, content element and page type
+icons, and the twenty category type icons of the three academic extensions that
+ship category types, which ask for it with `inlineIcon: true` in their
+:file:`Configuration/CategoryTypes.yaml`. The extension icons
+(:file:`Extension.svg`) are not registered as icon identifiers.
 
 Impact
 ======

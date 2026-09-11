@@ -264,15 +264,26 @@ Icons
 
 The icon set of the editor was replaced. Five identifiers of the form flow are
 gone - ``academic-persons-edit-add-image``, ``-add-item``, ``-cancel``,
-``-sort`` and ``-to-top`` - and the thirteen action icons of the new set are
-registered in :file:`Configuration/Icons.php` of
-:guilabel:`academic_persons_edit`, under the identifiers listed in the `icon
-table
-<https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/ProfileEditing/Index.html#profile-editing-icons>`__.
+``-sort`` and ``-to-top`` - and the remaining ones are renamed: the editor
+renders the shared ``tx-academicbase-*`` icons of :guilabel:`academic_base`,
+listed in the `icon table
+<https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/ProfileEditing/Index.html#profile-editing-icons>`__,
+and the content element icon is
+``tx-academicpersonsedit-plugin-profile-editing``. The old to new table is the
+`breaking change entry
+<https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/Changelog/3.0/Breaking-ProfileEditingUsesTheSharedIconSet.html>`__.
 A template or PHP file addressing a removed identifier renders TYPO3's
 ``default-not-found`` placeholder. The new icons are inlined as ``<svg>`` rather
 than emitted as ``<img>``, so they follow the text colour - and a site
 stylesheet that selects ``.t3js-icon img`` no longer matches them.
+
+The icons of this extension are renamed as well: the record and content element
+icons to ``tx-academicpersons-record-*`` and ``tx-academicpersons-plugin-*``,
+and the glyphs of the public profile to the shared ``tx-academicbase-*`` icons
+of :guilabel:`academic_base`. A site package that names an old identifier in a
+template, in TSconfig or in its :file:`Configuration/Icons.php` renders the
+placeholder or overrides nothing any more. The complete table is in
+:ref:`breaking-persons-icons-use-the-shared-icon-set`.
 
 TypoScript and the JSON page type
 ---------------------------------

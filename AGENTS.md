@@ -23,6 +23,7 @@ handful of things that are easy to get wrong and expensive to discover later.
 | Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)       |
 | `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                       |
 | **Quoting value lists and binding parameters**          | [Database queries](docs/architecture/database-queries.md)               |
+| Icon naming, the shared set, registration, licence      | [Icons](docs/architecture/icons.md)                                     |
 | Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                        |
 | The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                        |
 | Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                     |
@@ -149,7 +150,7 @@ together.
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Eight of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
-- `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed set `Configuration/DataFactory/academics-instance/` the DDEV instances are built from. Content, not code, apart from one page object it ships twice (as a static template and as a site set) because the `/legacy/` tree cannot be themed. Written into an empty instance with `ddev composer instance:seed`, which runs the `data-factory:import academics-instance` command of `sbuerk/data-factory`. `ScenarioLegacy.yaml` is **generated** by `Build/Scripts/generateLegacyScenario.php` from `Scenario.yaml` — change the generator, never the generated file, and `--check` reports a stale one. The seed is verified by tests of its own, see [Seed verification](docs/testing/seed-verification.md).
+- `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed set `Configuration/DataFactory/academics-instance/` the DDEV instances are built from. Content, not code, apart from one page object it ships twice (as a static template and as a site set) because the `/legacy/` tree cannot be themed, and the icon overview element of the `/icons` page (one data processor in `Classes/`, rendered from `ext_localconf.php` so it reaches both trees). Written into an empty instance with `ddev composer instance:seed`, which runs the `data-factory:import academics-instance` command of `sbuerk/data-factory`. `ScenarioLegacy.yaml` is **generated** by `Build/Scripts/generateLegacyScenario.php` from `Scenario.yaml` — change the generator, never the generated file, and `--check` reports a stale one. The seed is verified by tests of its own, see [Seed verification](docs/testing/seed-verification.md).
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
 - `core-13/`, `core-14/` — ready-to-start development instances, one per core version, both themed with `bk2k/bootstrap-package` — the `/` tree only: that extension delivers through site sets and nothing through a static template from its version 16 on, so the `/legacy/` tree is delivered by a minimal page object of `packages-dev/dev-site` instead. See [TypoScript and site sets](docs/architecture/typoscript-and-site-sets.md). SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`, and those templates are themselves produced by seeding an empty instance from `packages-dev/dev-site`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
@@ -407,6 +408,31 @@ execution on the same object.
 
 This is the **decorated TYPO3 `QueryBuilder`** (`TYPO3\CMS\Core\Database\Query`),
 not the Extbase one.
+
+## Icons
+
+- Identifiers are `tx-<extension key without underscores>-<group>-<name>`
+  (`action`, `state`, `info`, `record`, `plugin`, `doktype`), files
+  `Resources/Public/Icons/<group>/<name>.svg` unless it shares the file of
+  another identifier. Never `actions-*` (core's), never a dashed extension key:
+  the registry overwrites a duplicate silently.
+- Actions, states and information glyphs come from the shared set in
+  `academic_base` (`tx-academicbase-*`). Look there before adding an icon.
+- Font Awesome **Free, solid** only, from `svgs-full/solid/` in the house
+  format — never Pro, never another set — and every file is listed in the
+  extension's `Resources/Public/Icons/LICENSE-font-awesome.txt`.
+- Always `CurrentColorSvgIconProvider`; a category type needs `inlineIcon: true`.
+- Every icon is `1em` × `1em` and the glyph is smaller than that box by design.
+  Never enlarge an icon box in a stylesheet to compensate.
+- A content element names one identifier in the CType item, `typeicon_classes`
+  and the wizard `iconIdentifier`.
+- 3.0 renames identifiers without deprecated aliases; the `Breaking-*.rst` of
+  the extension carries the old → new table.
+- `@typo3/backend/icons.js` does not work in the frontend. Render the icon with
+  `<core:icon … alternativeMarkupIdentifier="inline" />` into a `<template>` and
+  clone it (ACE-595 tracks a frontend API).
+
+→ [Icons](docs/architecture/icons.md)
 
 ## Core-version-aware code (v13 vs v14)
 

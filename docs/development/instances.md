@@ -131,9 +131,38 @@ section per extension, one page per plugin:
 | `/academic-programs`    | the list plugin of `EXT:academic_programs`, and three program pages (`doktype: 20`), each carrying the details plugin                                                                       |
 | `/data-partners`        | storage folder: partner roles                                                                                                                                                               |
 | `/academic-partners/*`  | the four plugins of `EXT:academic_partners`, and two partner pages (`doktype: 40`)                                                                                                          |
+| `/icons`                | every icon the academic extensions register — see [below](#the-icon-overview-page)                                                                                                          |
 
 Changing that content is a change to the seed set, not a click path — see
 [Seeding an instance](environment.md#seeding-an-instance).
+
+### The icon overview page
+
+`/icons` (German `/de/symbole`, and both again below `/legacy/`) carries one
+content element of the seed package, `academicsdevsite_icons`, which lists every
+icon of the academic extensions as the icon registry holds it when the page
+renders — the `tx-academic*` identifiers by prefix and group, and the
+`category_types.*` identifiers of the category types by their group.
+Each one is shown with its identifier, at 1em in a line of text, at 2rem, and on
+a dark ground, in the markup a frontend template of the extensions renders
+(`<core:icon … alternativeMarkupIdentifier="inline" />`):
+
+| Instance  | Page                                          |
+|-----------|-----------------------------------------------|
+| `core-13` | <https://core13-academics-v3.ddev.site/icons> |
+| `core-14` | <https://core14-academics-v3.ddev.site/icons> |
+
+Nothing on it is configured. An icon an extension adds or renames is on the page
+after a cache flush, without a change to the seed; a row whose icon is the
+`default-not-found` placeholder, or stays dark on the dark ground, is the defect
+to look for. The rendering definition comes from the `ext_localconf.php` of the
+seed package rather than from a set, so it reaches both trees without a change
+to the site configurations.
+
+The backend counterpart needs no page: the styleguide module (Styles → Icons)
+lists every registered icon in the default markup, and the colour scheme is
+switched in the user menu. What to look for there, and why both views exist, is
+in [Icons](../architecture/icons.md#looking-at-the-set).
 
 The records the seed writes reference **files**, and those cannot live in the
 instance: `core-*/public/` is git-ignored. They are committed in the seed
@@ -182,5 +211,6 @@ with them: [Seed verification](../testing/seed-verification.md).
   package sit in the repository.
 - [Validation settings](../architecture/validation-settings.md) — why the name
   fields of a profile are read only in the editing form.
+- [Icons](../architecture/icons.md) — the rules the icons on `/icons` follow.
 - [Seed verification](../testing/seed-verification.md) — the checks that keep the
   seed definition, the committed snapshots and the manifest in agreement.
