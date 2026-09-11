@@ -205,10 +205,15 @@ one the test settles by hand — a prepared response otherwise resolves in the
 same microtask as the call that takes it, so two "overlapping" requests would in
 truth run one after the other.
 
-What a test asserts on a recorded call is the method, the url, the headers and
-the decoded body. The `X-Requested-With` header is asserted everywhere it is
-sent: it is the guard every writing endpoint checks, because a custom header
-cannot be set cross origin without a preflight.
+A request that passes an `AbortSignal` is rejected with the reason of the
+signal once it aborts, the way a real `fetch` is. A response queued with
+`respondLater()` and never settled, plus `mock.timers` of `node:test`, is how a
+request timeout is tested without waiting for it.
+
+What a test asserts on a recorded call is the method, the url, the headers, the
+`credentials` and the decoded body. The `X-Requested-With` header is asserted
+everywhere it is sent: it is the guard every writing endpoint checks, because a
+custom header cannot be set cross origin without a preflight.
 
 ## What jsdom does not have, and what stands in for it
 

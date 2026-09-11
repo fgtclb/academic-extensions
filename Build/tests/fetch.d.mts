@@ -14,6 +14,7 @@ export interface RecordedRequest {
   method: string;
   headers: Record<string, string>;
   credentials?: string;
+  signal: AbortSignal | null;
   body: unknown;
   rawBody: unknown;
 }

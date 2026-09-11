@@ -37,8 +37,10 @@ export const passes = [
  * its "paths".
  *
  * Only "packages/<vendor>/<name>" has a vendor level to derive a scope from.
- * The three "packages-dev/" packages are development tooling, publish no
- * frontend modules and are therefore not addressable.
+ * The three "packages-dev/" packages are development tooling and are not
+ * addressable here. The one module among them, the icon demonstration of
+ * "dev-site", is built like any other and published by that package's own
+ * "Configuration/JavaScriptModules.php"; nothing imports it.
  */
 const specifierFor = (path) => {
     const segments = relative(repositoryRoot, path).split(sep);

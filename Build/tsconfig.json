@@ -47,6 +47,9 @@
         // relative to this file, and a "baseUrl" would additionally make every
         // directory below it importable as a bare specifier.
         "paths": {
+            "@fgtclb/academic-base/frontend/*": [
+                "../packages/fgtclb/academic-base/Resources/Private/TypeScript/frontend/*"
+            ],
             "@fgtclb/academic-partners/frontend/*": [
                 "../packages/fgtclb/academic-partners/Resources/Private/TypeScript/frontend/*"
             ],

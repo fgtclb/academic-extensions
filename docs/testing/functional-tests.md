@@ -30,7 +30,7 @@ find packages -path '*Tests*' -name '*.csv' | wc -l
 | `academic-study-plan`    | 9          | 1    |
 | `typo3-category-types`   | 12         | 12   |
 
-`packages-dev/dev-site` adds six functional classes and one unit class; both
+`packages-dev/dev-site` adds seven functional classes and one unit class; both
 suites collect it, see [Unit tests](unit-tests.md#discovery).
 
 ## Running them

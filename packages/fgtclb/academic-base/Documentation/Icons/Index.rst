@@ -260,6 +260,223 @@ The rendered icon carries the CSS class `icon-<identifier>`, for example
 `icon-tx-academicbase-info-phone`, and the attribute `data-identifier`. A
 stylesheet can address it through either.
 
+..  _icons-frontend-javascript:
+
+Icons in frontend JavaScript
+============================
+
+The backend JavaScript icon API of TYPO3 cannot be used on a frontend page: it
+asks a backend route that answers a logged-in backend user only. Frontend
+JavaScript therefore takes the markup of an icon from the server.
+
+..  important::
+
+    Everything in this section except the :html:`<template>` is **internal and
+    experimental**: the ViewHelper, the icon endpoint, the JavaScript icon
+    factory, the event and the PHP classes behind them.
+    They may change, or go away, without a breaking change entry until a module
+    outside the academic extensions uses them.
+
+Where the JavaScript stamps out a piece of markup anyway - a list item, a row
+with its buttons - render the icon with `<core:icon>` into a
+`<template>` element and clone it. Where it picks an icon by its
+identifier at runtime, hand it the icons it may need as a JSON map:
+
+..  code-block:: html
+
+    <html xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
+          data-namespace-typo3-fluid="true">
+
+    <ab:frontendIconMap identifiers="{0: 'tx-academicbase-action-add', 1: 'tx-academicbase-action-delete'}" />
+
+This renders a JSON data block that the browser neither executes nor checks
+against the Content Security Policy:
+
+..  code-block:: html
+
+    <script type="application/json" data-academic-icons data-academic-icons-size="small">
+        {"tx-academicbase-action-add": "<span class=\"t3js-icon icon ...\">...</span>", ...}
+    </script>
+
+Each value is the markup `<core:icon identifier="..."
+alternativeMarkupIdentifier="inline" />` renders, so a project's replacement of
+an icon arrives in the JavaScript as it does in a template.
+
+Arguments:
+
+`identifiers` (array, required)
+    The identifiers to render. One that may not be served is left out of the
+    map - see below.
+
+`size` (string, default `small`)
+    `default`, `small`, `medium`, `large` or `mega`. It sets the `icon-size-*`
+    class of the markup; the icons of the academic extensions size themselves
+    by the font size.
+
+`endpoint` (bool, default `false`)
+    Adds `data-academic-icons-url` and
+    `data-academic-icons-version` to the element: the
+    :ref:`icon endpoint <icons-frontend-endpoint>` of the current site language
+    and the version token of the icon set.
+
+..  _icons-frontend-endpoint:
+
+The icon endpoint
+-----------------
+
+Where the JavaScript learns an identifier only after the page was rendered - from
+data it loads, or from a choice of the visitor - it asks the icon endpoint of
+the site:
+
+..  code-block:: text
+
+    GET https://example.com/_academic/icons.json?i=tx-academicbase-action-add,tx-academicbase-info-phone&s=small&v=<token>
+
+The answer is a JSON object in the same shape as the JSON map, for the
+identifiers that may be served, in the order asked for. The endpoint is
+available below the base of every site and site language, for example
+`https://example.com/de/_academic/icons.json`. Its parameters and its answer
+are internal and experimental like the rest of this section.
+
+`i` (required)
+    Up to 32 icon identifiers, separated by commas.
+
+`s` (optional, default `small`)
+    `default`, `small`, `medium`, `large` or `mega`.
+
+`v` (optional)
+    The version token of the icon set, as `data-academic-icons-version` of the
+    JSON map carries it. With the current token the answer may be cached for a
+    year (`Cache-Control: public, max-age=31536000, immutable`), otherwise for
+    five minutes. The answer carries an `ETag` and answers a matching
+    `If-None-Match` with `304 Not Modified`. The `ETag` only helps the
+    five-minute answers: an immutable one is never revalidated.
+
+A malformed identifier, more than 32 of them or an unknown size are answered
+with `400 Bad Request`, any method other than `GET` and `HEAD` with
+`405 Method Not Allowed`. The endpoint answers before the frontend user
+authentication: it never starts a session and never sets a cookie, so a proxy
+or a CDN can cache it like a file.
+
+The token changes when an icon registration or the modification time of an
+icon file changes, on a TYPO3 update and whenever :file:`composer.lock`
+changes. A change to the rendering code that arrives with none of these - a
+file edited in place on the server - is not seen; touch the SVG files of the
+affected icons then.
+
+..  important::
+
+    **Web server requirement.** The path ends in `.json`. A web server or CDN
+    rule that serves `*.json` as static files - in nginx for example a
+    :code:`location ~* \.(...|json)$` with :code:`try_files $uri =404` - answers
+    the endpoint with a `404` before TYPO3 sees it. Exclude
+    `_academic/icons.json` from such a rule, the way `sitemap.xml` is usually
+    excluded.
+
+..  _icons-frontend-factory:
+
+The icon factory
+----------------
+
+Both are read by the JavaScript module
+`@fgtclb/academic-base/frontend/icons.js`, which this extension publishes in
+its import map. Like the rest of this section it is internal and experimental.
+A module asks it for an icon by its identifier; the factory answers from the
+JSON maps of the page and asks the endpoint only for what the page does not
+carry, collecting the icons asked for at the same time into one request:
+
+..  code-block:: html
+    :caption: The template of the plugin
+
+    <div class="my-plugin" data-my-plugin>
+        <ab:frontendIconMap identifiers="{0: 'tx-academicbase-action-add'}" endpoint="1" />
+    </div>
+    <f:asset.module identifier="@my-vendor/my-sitepackage/frontend/my-plugin.js" />
+
+..  code-block:: javascript
+    :caption: The module of the plugin
+
+    import { IconFactory, Sizes, endpointFrom } from '@fgtclb/academic-base/frontend/icons.js';
+
+    const root = document.querySelector('[data-my-plugin]');
+    const icons = new IconFactory(endpointFrom(root));
+
+    // From the JSON map of the page, without a request.
+    button.append(await icons.getIconElement('tx-academicbase-action-add'));
+    // From the endpoint, in one request for both.
+    const [edit, remove] = await Promise.all([
+        icons.getIcon('tx-academicbase-action-edit', Sizes.medium),
+        icons.getIcon('tx-academicbase-action-delete', Sizes.medium),
+    ]);
+
+The extension or site package that ships the module has to name
+`academic_base` in the dependencies of its import map; a page only carries the
+import map entries of the packages its modules declare:
+
+..  code-block:: php
+    :caption: EXT:my_sitepackage/Configuration/JavaScriptModules.php
+
+    return [
+        'dependencies' => ['core', 'academic_base'],
+        'imports' => [
+            '@my-vendor/my-sitepackage/frontend/' => 'EXT:my_sitepackage/Resources/Public/JavaScript/frontend/',
+        ],
+    ];
+
+`getIcon()` answers the markup, `getIconElement()` a new element on every call,
+and `prefetch()` asks for several icons ahead of time. An identifier that is
+not served, or that is not an icon identifier at all, rejects the promise; a
+malformed one is never sent, so it cannot fail the icons asked for with it.
+Each icon is asked for once per page, without cookies; a request that fails or
+gets no answer within ten seconds rejects its icons, and the next call asks
+again. The browser keeps the answer of the endpoint as long as the icons do not
+change.
+
+..  _icons-frontend-allow-list:
+
+Which icons are served
+----------------------
+
+The JSON map and the endpoint serve the same icons. Only identifiers starting
+with `tx-academic` or `category_types.` are served, and of those only the ones
+that are registered, not deprecated and registered with a provider that
+inlines an SVG file: the
+:php:`CurrentColorSvgIconProvider` of this extension or the core
+:php:`SvgIconProvider`. Any other identifier, an icon of the core icon set
+among them, is left out rather than answered with the placeholder of an
+unknown icon.
+
+The markup is what the provider of the icon renders, sanitised as far as that
+provider sanitises. :php:`CurrentColorSvgIconProvider` sanitises on TYPO3 v13
+and v14; the inline markup of the core :php:`SvgIconProvider` is sanitised on
+TYPO3 v14 only. That is the same markup, with the same exposure, as the icon
+rendered inline by a template.
+
+A project serves the icons of its own extensions the same way by adding the
+prefix of their identifiers with a listener to
+:php:`\FGTCLB\AcademicBase\Event\ModifyFrontendIconAllowListEvent`. A
+prefix opens every identifier it matches: some system extensions register
+icons of their own with the core :php:`SvgIconProvider`, so a prefix such as
+`module-` also serves the icons of the install tool modules. Sprite, bitmap and
+font icons stay refused whatever the list holds.
+
+..  code-block:: php
+    :caption: EXT:my_sitepackage/Classes/EventListener/AllowFrontendIcons.php
+
+    namespace MyVendor\MySitepackage\EventListener;
+
+    use FGTCLB\AcademicBase\Event\ModifyFrontendIconAllowListEvent;
+    use TYPO3\CMS\Core\Attribute\AsEventListener;
+
+    #[AsEventListener(identifier: 'my-sitepackage/frontend-icons')]
+    final readonly class AllowFrontendIcons
+    {
+        public function __invoke(ModifyFrontendIconAllowListEvent $event): void
+        {
+            $event->addPrefix('tx-mysitepackage-');
+        }
+    }
+
 ..  _icons-override:
 
 Replacing an icon in a project
