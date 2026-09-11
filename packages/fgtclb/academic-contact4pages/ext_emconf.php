@@ -1,7 +1,7 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => 'FGTCLB: Academic Contags for Pages',
+    'title' => 'FGTCLB: Academic Contacts for Pages',
     'description' => 'Role based relations between profiles and pages',
     'version' => '3.0.0',
     'category' => 'fe',
