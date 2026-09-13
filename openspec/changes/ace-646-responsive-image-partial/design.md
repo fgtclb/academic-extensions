@@ -11,8 +11,16 @@ Verified on `main`:
 - `Profile/Item` is rendered by the persons `List`, `Card`,
   `SelectedProfiles` and `SelectedContracts` views, and by
   `academic-contact4pages/Resources/Private/Templates/Contacts/List.html`.
-  The contacts view registers the persons partials at `partialRootPaths.5`,
-  the persons_edit view at `partialRootPaths.0`.
+  The contacts view registers the persons partials at `partialRootPaths.5`
+  and renders `Profile/Item` with its own plugin settings.
+- The persons_edit view registers the persons partials at
+  `partialRootPaths.0`, but of those its templates render only
+  `Profile/Header`, which persons_edit overrides at `partialRootPaths.10`.
+  No persons_edit template reaches `Profile/Item` or the profile image
+  partial of the public profile (checked 2026-09-13).
+- `ArrayUtility::sortArrayWithIntegerKeys()`, which the Fluid
+  `TemplatePaths` apply to the root paths, sorts with `ksort()` when every key
+  is an integer; PHP turns a TypoScript key `-1` into the integer `-1`.
 - The persons view uses `partialRootPaths.0` for its own partials and `.1` for
   the project constant; contacts uses `.5` and `.10`.
 - The only upstream `<picture>` is
@@ -60,12 +68,28 @@ access is safe without EXT:filemetadata, while `getProperty()` throws.
 
 A partial root path with a higher key wins, and `Academic/Image.html` must
 stay overridable through each extension's project constant. The academic_base
-path therefore gets a key below the lowest existing key in the persons,
-contacts4pages and persons_edit views. With persons already at `0`, that means
-a negative key. Rejected: key `5` as first proposed; in the persons view it
+path therefore gets a key below the lowest existing key in the persons and
+contacts4pages views. With persons already at `0`, that means a negative key,
+and both views use `-1`. Rejected: key `5` as first proposed; in the persons view it
 sorts after the project constant at `1`, so the upstream partial would beat a
 project override. Rejected: renumbering the persons keys, which breaks every
 project that sets `partialRootPaths.1` directly.
+
+### Decided: persons_edit stays untouched
+
+The first draft registered the academic_base path in the persons_edit view as
+well, on the assumption that it renders the persons partials. It registers
+them, but renders none that shows an image, so the path would be dead
+configuration. A later change that renders `Academic/Image` from a
+persons_edit template adds the path together with that template.
+
+### The contacts view hands the placeholder on
+
+The contacts plugin renders `Profile/Item` with
+`plugin.tx_academiccontacts4pages.settings`, not with the persons settings.
+Its setup therefore maps `settings.image.placeholder.default` from the same
+persons constant, exactly as it already does for `detailPid`, so a contacts
+card and a persons card show the same placeholder.
 
 ### Decided: one placeholder key, owned by the image settings change
 
@@ -110,10 +134,12 @@ Guessed layout — a sketch, not a design:
   Task 1.4 verifies the order on v13 and v14 before any template uses the
   partial.
 - [An installation removed `webp` from `imagefile_ext`] → Task 1.3 records
-  what the processing does then, and the Important entry names the
+  what the processing does then, and the Breaking entry names the
   requirement.
-- [A project page object renders `Profile/Item` without the academic_base
-  path] → The Important entry names the path to add.
+- [A project view replaces the partial root paths, or a project page object
+  renders `Profile/Item`, without the academic_base path] → The rendering
+  fails on the missing partial; the Breaking entries of academic_persons and
+  academic_contacts4pages name the path and key to add.
 
 ## Open Questions
 

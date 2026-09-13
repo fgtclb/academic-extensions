@@ -63,4 +63,4 @@ Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-02`). Four of the six analysed projects carry their own code for
 this today. No YouTrack issue is filed yet; the change is renamed to
 `ace-<NNN>-image-partial-adoption` when the issue is filed after
-implementation. Depends on the change `ace-tbd-responsive-image-partial`.
+implementation. Depends on the change `ace-646-responsive-image-partial`.

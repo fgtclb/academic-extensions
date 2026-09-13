@@ -17,7 +17,7 @@ See `proposal.md` for the motivation. State on `main`:
   `Configuration/Sets/Full/settings.definitions.yaml`, which must carry the
   same defaults (the comment at the top of that file explains why).
 
-This change builds on three others: `ace-tbd-responsive-image-partial` ships
+This change builds on three others: `ace-646-responsive-image-partial` ships
 the partial with `image`, `cropVariant`, `preset` and `placeholder`
 arguments, `ace-tbd-named-crop-variants` adds the `square` and `portrait`
 crop variants to the profile image, and `ace-tbd-item-and-list-partials`
@@ -59,7 +59,7 @@ generic value becomes `image.placeholder.default`, and `mr`, `ms` and
 
 `image.placeholder.default` is the only generic placeholder setting, and its
 default is `EXT:academic_persons/Resources/Public/Images/ProfilePlaceholder.svg`.
-`ace-tbd-responsive-image-partial` lands first, introduces that key with that
+`ace-646-responsive-image-partial` lands first, introduces that key with that
 default and reads it; this change owns the `image.placeholder.*` family, adds
 `mr`, `ms` and `diverse`, and documents the group. An empty value renders no
 image.
@@ -83,7 +83,7 @@ and an override would need an XCLASS.
 
 There is no width site setting, neither for the list and card nor for the
 detail view. List and card images take their widths from the `card` preset
-of `ace-tbd-responsive-image-partial`, the detail image from its `detail`
+of `ace-646-responsive-image-partial`, the detail image from its `detail`
 preset, which keeps today's maximum of 1200 pixels. A project changes widths
 by overriding the preset section of that partial, which changes every
 plugin at once.
@@ -108,7 +108,7 @@ functional test catches before release. Skipping an unresolvable placeholder
 silently would need a ViewHelper, against the partial-only decision of the
 responsive partial. The earlier draft of this change accepted FAL
 identifiers as well; the accepted format is aligned with
-`ace-tbd-responsive-image-partial`.
+`ace-646-responsive-image-partial`.
 
 Rejected: a `sys_file` uid, which is not portable between instances.
 
@@ -128,13 +128,13 @@ uses `default` and `tablet`) only has to set the setting.
 - [Projects with their own crop TCA keep their variant names] → They set the
   setting; no migration is needed.
 - [The processed-file behaviour of the list and card changes] → That change
-  comes with `ace-tbd-responsive-image-partial` and its changelog, not with
+  comes with `ace-646-responsive-image-partial` and its changelog, not with
   this one.
 
 ## Migration Plan
 
 None for crop variants: their defaults reproduce today's output. Widths
-change with `ace-tbd-responsive-image-partial` and its changelog, not here.
+change with `ace-646-responsive-image-partial` and its changelog, not here.
 A profile without an image shows the neutral placeholder by default; an
 installation that wants no image sets `image.placeholder.default` to an empty
 value. Projects replace their image overrides with the settings after

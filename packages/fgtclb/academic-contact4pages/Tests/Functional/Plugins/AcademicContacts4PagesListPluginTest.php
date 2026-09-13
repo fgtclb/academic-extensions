@@ -8,6 +8,7 @@ use FGTCLB\AcademicContacts4pages\Tests\Functional\AbstractAcademicContacts4Page
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Renders the `academiccontacts4pages_list` plugin in the frontend.
@@ -82,6 +83,22 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->getConnectionPool()
             ->getConnectionForTable('tt_content')
             ->update('tt_content', ['header' => $header], ['uid' => 1]);
+    }
+
+    /**
+     * @return \DOMNodeList<\DOMNode>
+     */
+    private function nodes(\DOMXPath $xpath, string $query, ?\DOMNode $context = null): \DOMNodeList
+    {
+        $nodes = $xpath->query($query, $context);
+        $this->assertInstanceOf(\DOMNodeList::class, $nodes, sprintf('The query "%s" is invalid.', $query));
+
+        return $nodes;
+    }
+
+    private function countNodes(\DOMXPath $xpath, string $query, ?\DOMNode $context = null): int
+    {
+        return $this->nodes($xpath, $query, $context)->length;
     }
 
     /**
@@ -404,5 +421,37 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         // rather than fail.
         $this->assertStringContainsString('academic-contacts4pages', $content);
         $this->assertStringNotContainsString('academic-persons-item', $content);
+    }
+
+    /**
+     * The `Profile/Item` partial of EXT:academic_persons renders the image through the
+     * responsive image partial of EXT:academic_base, so the contacts view has to resolve that
+     * partial as well - and hand the placeholder setting of the persons plugins on.
+     */
+    #[Test]
+    public function listPluginRendersTheProfileImageAndThePlaceholderLikeTheProfileList(): void
+    {
+        $this->setUpTestCase('contactsListPage_profileImage');
+        $folder = $this->instancePath . '/fileadmin/images';
+        GeneralUtility::mkdir_deep($folder);
+        copy(__DIR__ . '/Fixtures/Files/portrait.jpg', $folder . '/portrait.jpg');
+
+        $document = new \DOMDocument();
+        $document->loadHTML($this->renderHomePage(), LIBXML_NOERROR);
+        $xpath = new \DOMXPath($document);
+        $cards = $this->nodes($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-persons-item ')]");
+        $this->assertSame(2, $cards->length);
+
+        $withImage = $cards->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $withImage);
+        $this->assertSame(1, $this->countNodes($xpath, './/picture', $withImage));
+        $this->assertSame('image/webp', $this->nodes($xpath, './/picture/source', $withImage)->item(0)?->attributes?->getNamedItem('type')?->nodeValue);
+
+        $withoutImage = $cards->item(1);
+        $this->assertInstanceOf(\DOMElement::class, $withoutImage);
+        $this->assertStringEndsWith(
+            'Images/ProfilePlaceholder.svg',
+            (string)$this->nodes($xpath, './/img', $withoutImage)->item(0)?->attributes?->getNamedItem('src')?->nodeValue,
+        );
     }
 }

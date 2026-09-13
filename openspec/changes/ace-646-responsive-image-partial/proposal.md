@@ -25,13 +25,18 @@ the version it copied.
   image; an integrator replaces or disables the placeholder through the
   setting `image.placeholder.default`, the one placeholder key the image
   settings change (`ace-tbd-profile-image-settings`) owns.
-- academic_contacts4pages (`packages/fgtclb/academic-contact4pages`) and
-  academic_persons_edit (`packages/fgtclb/academic-persons-edit`) render the
-  persons partials, so their views register the academic_base partials too.
+- academic_contacts4pages (`packages/fgtclb/academic-contact4pages`) renders
+  the persons item partial, so its view registers the academic_base partials
+  too and hands the placeholder setting to it.
+- academic_persons_edit is not touched. Of the persons partials it renders
+  only `Profile/Header`, and it ships its own copy of that one.
 - **BREAKING** (markup): card and detail images change from `<img>` to
   `<picture>`, and cards of profiles without an image show the placeholder.
-  Project CSS that selects the image directly may need an adjustment. This is
-  announced as an Important changelog entry.
+  Project CSS that selects the image directly may need an adjustment, and a
+  project view that replaces the partial root paths of the persons or contacts
+  plugin has to add the academic_base path, or the card fails on the missing
+  partial. This is announced as a Breaking changelog entry in both
+  extensions.
 - The behaviour is identical on TYPO3 v13 and v14.
 
 ## Capabilities
@@ -53,7 +58,7 @@ None.
   `Documentation/Templates` chapter; no new dependency.
 - academic_persons: the card and detail image partials, a new
   `Resources/Public/Images/` folder, its plugin TypoScript and constants.
-- academic_contacts4pages, academic_persons_edit: their plugin TypoScript.
+- academic_contacts4pages: its plugin TypoScript.
 - No database, TCA or PHP change.
 
 ## Non-goals
@@ -71,6 +76,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-01`). All six analysed projects carry their own code for this
-today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-responsive-image-partial` when the issue is filed after
+today. The issue is ACE-646, filed after the
 implementation.
