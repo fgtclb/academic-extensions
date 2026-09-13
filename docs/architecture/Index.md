@@ -25,12 +25,13 @@ describing an intention as if it were the state.
 - TypoScript and page TSconfig exist **once** on disk and are delivered twice:
   a site set points at the very files the static template registration points
   at. Content elements are hidden globally and re-enabled per component.
-- A **brand** icon — an extension or plugin mark — stays with the core
-  `SvgIconProvider` and keeps the colours of its file. A record, category or
-  action icon is drawn in `currentColor` and registered with the
-  `academic_base` provider that inlines it, so it follows the text colour in
-  the backend and the frontend, on the dark cards of a dark colour scheme
-  included.
+- Every icon is a **Font Awesome Free solid** icon (the `Extension.svg` of each
+  extension aside) drawn in `currentColor`, named
+  `tx-<extension key without underscores>-<group>-<name>` and registered with
+  the `academic_base` provider that inlines it, so it follows the text colour
+  in the backend and the frontend, on the dark cards of a dark colour scheme
+  included. Actions, states and information glyphs exist once, in
+  `academic_base`.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
@@ -54,7 +55,7 @@ describing an intention as if it were the state.
 | [Form data transformation](form-data-transformation.md)         | How a value of a JSON payload reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                                                       |
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and the `clear = 3` trap.                                                                   |
 | [Translation synchronization](translation-synchronization.md)   | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.                                                 |
-| [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
+| [Icons](icons.md)                                               | Naming scheme, file layout and the shared set, Font Awesome Free and its licence, registration and overrides, frontend rendering and JavaScript, and how the set is verified.              |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
 
 ## See also

@@ -175,13 +175,17 @@ The template loads the stylesheet
 The module toggles the fold-out entries, keeps the sticky navigation below a
 page header with the id ``page-header`` and, when the site loads Bootstrap,
 marks the section in view through its ScrollSpy. The icons of the contact rows
-and the fold-out entries are the identifiers ``academic-persons-envelope``,
-``academic-persons-phone``, ``academic-persons-address``,
-``academic-persons-room``, ``academic-persons-detail-plus`` and
-``academic-persons-detail-minus`` of :file:`Configuration/Icons.php`; a site
-package re-registers an identifier to replace the glyph. They are `Bootstrap
-Icons <https://icons.getbootstrap.com/>`__, and their MIT licence ships beside
-them in :file:`Resources/Public/Icons/LICENSE-bootstrap-icons.txt`.
+and the fold-out entries are the shared identifiers
+``tx-academicbase-info-email``, ``tx-academicbase-info-phone``,
+``tx-academicbase-info-location``, ``tx-academicbase-info-room``,
+``tx-academicbase-action-expand`` and ``tx-academicbase-action-collapse`` of
+`EXT:academic_base`. A site package that re-registers one of them replaces the
+glyph in every academic extension; to replace it on the profile only, override
+the partial and render an identifier of its own. They are `Font Awesome Free
+<https://fontawesome.com/>`__ icons under CC BY 4.0, listed with their origin
+in :file:`Resources/Public/Icons/LICENSE-font-awesome.txt` of
+`EXT:academic_base`; the record and content element icons of this extension
+are listed in the file of the same name here, see :ref:`third-party-icons`.
 
 The colours of the view are custom properties declared on the
 ``.academic-persons-detail`` root element - ``--academic-persons-detail-text``,

@@ -5,9 +5,10 @@
 
 <f:comment>
     The contact block of every contract: email addresses, phone numbers, postal addresses and
-    the location with its room. The icons are registered in `Configuration/Icons.php` with the
-    currentColor provider of EXT:academic_base and inlined here, so they follow the text colour
-    of the page; `core` is a global Fluid namespace, no declaration is needed for `core:icon`.
+    the location with its room. The icons are the shared `tx-academicbase-info-*` glyphs of
+    EXT:academic_base, registered with its currentColor provider and inlined here, so they follow
+    the text colour of the page; `core` is a global Fluid namespace, no declaration is needed for
+    `core:icon`.
 </f:comment>
 
 <f:switch expression="{publicProfile.details.contact.special}">
@@ -22,7 +23,7 @@
                         <f:if condition="{contract.emailAddresses}">
                             <div class="academic-persons-detail__contact-row">
                                 <span class="academic-persons-detail__contact-icon">
-                                    <core:icon identifier="academic-persons-envelope" alternativeMarkupIdentifier="inline" />
+                                    <core:icon identifier="tx-academicbase-info-email" alternativeMarkupIdentifier="inline" />
                                 </span>
                                 <div class="academic-persons-detail__contact-content">
                                     <f:for each="{contract.emailAddresses}" as="emailAddress">
@@ -39,7 +40,7 @@
                         <f:if condition="{contract.phoneNumbers}">
                             <div class="academic-persons-detail__contact-row">
                                 <span class="academic-persons-detail__contact-icon">
-                                    <core:icon identifier="academic-persons-phone" alternativeMarkupIdentifier="inline" />
+                                    <core:icon identifier="tx-academicbase-info-phone" alternativeMarkupIdentifier="inline" />
                                 </span>
                                 <div class="academic-persons-detail__contact-content">
                                     <f:for each="{contract.phoneNumbers}" as="phoneNumber">
@@ -63,7 +64,7 @@
                         <f:for each="{contract.physicalAddresses}" as="physicalAddress">
                             <div class="academic-persons-detail__contact-row">
                                 <span class="academic-persons-detail__contact-icon">
-                                    <core:icon identifier="academic-persons-address" alternativeMarkupIdentifier="inline" />
+                                    <core:icon identifier="tx-academicbase-info-location" alternativeMarkupIdentifier="inline" />
                                 </span>
                                 <address class="academic-persons-detail__contact-content">
                                     <f:if condition="{physicalAddress.type}">
@@ -95,7 +96,7 @@
                         <f:if condition="{contract.location} || {contract.room}">
                             <div class="academic-persons-detail__contact-row">
                                 <span class="academic-persons-detail__contact-icon">
-                                    <core:icon identifier="academic-persons-room" alternativeMarkupIdentifier="inline" />
+                                    <core:icon identifier="tx-academicbase-info-room" alternativeMarkupIdentifier="inline" />
                                 </span>
                                 <div class="academic-persons-detail__contact-content">
                                     <f:if condition="{contract.location}">

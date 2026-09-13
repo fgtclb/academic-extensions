@@ -6,6 +6,19 @@
 // script ("--category-color", "--highlight-color").
 
 .academic-study-plan {
+    // The icons are inlined SVG (`<core:icon … alternativeMarkupIdentifier="inline">`).
+    // The shipped files carry `width="1em" height="1em"`, and that is what sizes
+    // them. This rule is a guard for a project that overrides one of the icons with
+    // a file without a size: an inline SVG with a viewBox and no width or height has
+    // no intrinsic size and collapses to 0 px inside the flex header and the
+    // shrink-to-fit close button of the dialog, which is how the accordion toggles
+    // and the close button were invisible before 3.0.
+    .icon svg {
+        display: block;
+        width: 1em;
+        height: 1em;
+    }
+
     @media screen and (max-width: 767px) {
         &.highlighted {
             .col:not(.highlighted) {
@@ -60,16 +73,16 @@
         .col {
             padding: 0;
 
-            .icon-academic-study-plan-minus {
+            .icon-tx-academicbase-action-collapse {
                 display: none;
             }
 
             &.open {
-                .icon-academic-study-plan-plus {
+                .icon-tx-academicbase-action-expand {
                     display: none;
                 }
 
-                .icon-academic-study-plan-minus {
+                .icon-tx-academicbase-action-collapse {
                     display: block;
                 }
 

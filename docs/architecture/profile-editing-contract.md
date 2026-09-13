@@ -627,8 +627,8 @@ that says so.
 whole answer for a screen reader and was, for a while, the whole answer for
 everybody: an eye captioned `View` stood above a panel that was already open,
 and pressing it a second time looked like asking for the same thing twice. So
-the button carries **both** icons — `academic-persons-edit-view` and
-`academic-persons-edit-view-close` — each in its own wrapper, one of them
+the button carries **both** icons — `tx-academicbase-action-view` and
+`tx-academicbase-action-view-close` — each in its own wrapper, one of them
 `hidden`, and **both** labels, as `data-pe-label-collapsed` and
 `data-pe-label-expanded`. `setExpanded()` of `profile/common.ts` is the single
 writer: it sets `aria-expanded`, flips the two wrappers and rewrites
@@ -708,8 +708,8 @@ and the fields of the editor all come from the `documentForm` and
 `contractContactForm` responses.
 
 **The visibility toggle of a row names the press, and Fluid draws both of its
-states.** The button carries `academic-persons-edit-visible` and
-`academic-persons-edit-hidden` in two wrappers, one of them `hidden`, and both
+states.** The button carries `tx-academicbase-state-visible` and
+`tx-academicbase-state-hidden` in two wrappers, one of them `hidden`, and both
 labels as `data-pe-label-visible` and `data-pe-label-hidden`; `setHiddenState()`
 of `profile/common.ts` is the single writer of the wrappers and the label. It
 sets no `aria-pressed`: the label changes with the state ("Hide in frontend",
@@ -815,7 +815,7 @@ icon registry, no icon module and no `<template data-pe-icon>` block.
 A control whose glyph depends on its state is drawn the same way, twice over:
 the view control renders both eyes, one of them `hidden`, and the browser flips
 the attribute rather than resolving a second identifier. That is why
-`academic-persons-edit-view-close` is a registration like any other and not a
+`tx-academicbase-action-view-close` is a registration like any other and not a
 string any module knows.
 
 ## The transition the editors open and close with

@@ -115,6 +115,12 @@ PHPStan runs at **level 8** against `packages/`, excluding `ext_emconf.php`,
 included from the installed vendor tree: `bnf/phpstan-psr-container`,
 `friendsoftypo3/phpstan-typo3` and `phpstan/phpstan-phpunit`.
 
+`packages-dev/` is not analysed at all: neither the traits of the testing helper
+nor the one runtime class of the seed package,
+`packages-dev/dev-site/Classes/DataProcessing/IconOverviewProcessor.php` behind
+the icon overview page. Only `cgl` and the functional tests of the seed package
+look at that class.
+
 ### Why it is configured per core version
 
 `-t` selects `Build/phpstan/Core${CORE_VERSION}/phpstan.neon` in the `phpstan`

@@ -7,7 +7,7 @@ Extension key `academics_dev_site`, composer package
 
 This package carries the **seed sets** for the development instances of this
 mono repository, [`core-13/`](../../core-13) and [`core-14/`](../../core-14). It
-holds content, no code: the YAML files below `Configuration/DataFactory/`
+is mostly content: the YAML files below `Configuration/DataFactory/`
 describe the page tree, the records and the content elements a freshly set up
 instance is filled with, so that an instance can be rebuilt from nothing and
 still look the same on every machine.
@@ -108,6 +108,27 @@ therefore renders the `core-13` instance and renders nothing in `core-14`. The
 legacy tree gets this instead: the smallest page object that puts the content of
 a page on the page. The set form is what `LegacyDeliveryTest` puts in the place
 of the theme on the `/` side, so that both trees are rendered by the same text.
+
+## The icon overview page
+
+The seed puts a page `Icons` (`/icons`, German `/de/symbole`) into both trees.
+It carries the one content element this package defines,
+`academicsdevsite_icons`, and the only code it ships:
+
+| File                                               | Does                                                                                              |
+|----------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `Classes/DataProcessing/IconOverviewProcessor.php` | Reads the icon registry and keeps the `tx-academic*` and `category_types.*` identifiers, grouped. |
+| `Resources/Private/Templates/IconOverview.html`    | Renders each one with its identifier, at 1em in text, at 2rem and on a dark ground.               |
+| `ext_localconf.php`                                | The `FLUIDTEMPLATE` rendering definition, added after the content rendering definitions.          |
+| `Configuration/TCA/Overrides/tt_content.php`       | Registers the CType, with the fields of a header element.                                         |
+| `Configuration/Services.php`                       | Loads `Classes/`; the processor tags itself with `#[AutoconfigureTag]`.                           |
+
+The list is read when the page renders, so an icon an extension adds is on the
+page without a change here. The rendering definition is global rather than part
+of a set because the `/` tree is delivered through the site sets of the committed
+site configuration, which name nothing of this package. See
+[Icons](../../docs/architecture/icons.md#looking-at-the-set) for what to look
+for on the page.
 
 ## See also
 

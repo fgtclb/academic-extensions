@@ -565,8 +565,10 @@ The package carried a site set `fgtclb/academics-dev-site` for a while, which
 set the page template name for the two custom page types of
 `EXT:academic_programs` and `EXT:academic_partners`. That was a workaround for a
 defect of those extensions, not instance configuration, and it is gone: the
-extensions set the name themselves now (ACE-450). The package holds nothing but
-the seed set again.
+extensions set the name themselves now (ACE-450). Next to the seed set the
+package holds two things the seed needs to render: the page object of the
+`/legacy/` tree, and the content element of the icon overview page (ACE-594) —
+see [The icon overview page](instances.md#the-icon-overview-page).
 
 Adding a page, a plugin or a record is therefore a reviewable diff, and
 [rebuilding the instance](#rebuilding-an-instance-from-nothing) reproduces it

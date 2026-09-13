@@ -5,25 +5,34 @@ declare(strict_types=1);
 use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
 
 /*
- * Every identifier here ends up on a record: `academic-partners` is the icon of the
- * academic partner page type (and of the four content elements), the other two are
- * the record icons of the tables this extension ships. All three are registered with
- * the provider of EXT:academic_base, which inlines the file in both markups instead
- * of rendering an <img>. An <img> is opaque to CSS and keeps the colours of its file,
- * so an icon drawn in a dark ink stays dark on the dark cards of the backend colour
- * scheme. Inlined and drawn in `currentColor` it follows the text colour.
+ * The icons of this extension: Font Awesome Free solid, drawn in `currentColor` and
+ * inlined by the provider of EXT:academic_base in both markups, so they take the colour
+ * of the surrounding text in both backend colour schemes and in the frontend. Licence
+ * and origin of the own files: Resources/Public/Icons/LICENSE-font-awesome.txt; the two
+ * record icons use the shared `info` glyphs of EXT:academic_base.
+ *
+ * Identifiers follow `tx-<extkey>-<group>-<name>`: `plugin` for the four content
+ * elements, `doktype` for the academic partner page type, `record` for the tables of
+ * this extension. Page type and content elements share one drawing but not one
+ * identifier, so a project can replace either by registering it again in its own
+ * Configuration/Icons.php. The category type icons are registered by EXT:category_types
+ * from Configuration/CategoryTypes.yaml.
  */
 return [
-    'academic-partners' => [
+    'tx-academicpartners-doktype-partner' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_partners/Resources/Public/Icons/Extension.svg',
+        'source' => 'EXT:academic_partners/Resources/Public/Icons/plugin/partners.svg',
     ],
-    'tx_academicpartners_domain_model_partnership' => [
+    'tx-academicpartners-plugin-partners' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_partners/Resources/Public/Icons/Partnership.svg',
+        'source' => 'EXT:academic_partners/Resources/Public/Icons/plugin/partners.svg',
     ],
-    'tx_academicpartners_domain_model_role' => [
+    'tx-academicpartners-record-partnership' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_partners/Resources/Public/Icons/Role.svg',
+        'source' => 'EXT:academic_base/Resources/Public/Icons/info/partnership.svg',
+    ],
+    'tx-academicpartners-record-role' => [
+        'provider' => CurrentColorSvgIconProvider::class,
+        'source' => 'EXT:academic_base/Resources/Public/Icons/info/role.svg',
     ],
 ];

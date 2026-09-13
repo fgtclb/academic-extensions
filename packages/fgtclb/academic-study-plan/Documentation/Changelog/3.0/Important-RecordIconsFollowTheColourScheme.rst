@@ -13,17 +13,17 @@ altogether: the file gets the core provider, which renders the default markup as
 an :html:`<img>` tag. An image is opaque to CSS, so the icons kept the colours
 of their files whatever the backend colour scheme said.
 
-The tables now point at the identifiers :php:`academic-study-plan-category`,
-:php:`academic-study-plan-module` and :php:`academic-study-plan-semester`
-through :php:`ctrl.typeicon_classes`. Those identifiers were already registered
-in :file:`Configuration/Icons.php` and unused; they now carry
-:php:`\FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`.
+The tables now point at the identifiers
+:php:`tx-academicstudyplan-record-category`,
+:php:`tx-academicstudyplan-record-module` and
+:php:`tx-academicstudyplan-record-semester` through
+:php:`ctrl.typeicon_classes`, registered with
+:php:`\FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`
+- see :ref:`breaking-study-plan-icons-replaced-by-font-awesome`.
 
-The three files were three-colour illustrations and are redrawn in a single
-colour, which is what following the text colour means. The shapes are kept: the
-coloured body becomes an outline, the lighter shapes on it become solid. The
-module and the semester icon differed in colour and in size only, so they now
-look alike apart from their proportions.
+The three files were three-colour illustrations. They are replaced by
+single-colour Font Awesome Free drawings, which is what following the text
+colour means.
 
 Impact
 ======

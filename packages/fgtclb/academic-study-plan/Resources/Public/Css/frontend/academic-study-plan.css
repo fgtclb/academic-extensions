@@ -1,5 +1,10 @@
 /* Generated from Resources/Private/Scss — do not edit. */
 /* packages/fgtclb/academic-study-plan/Resources/Private/Scss/frontend/academic-study-plan.scss */
+.academic-study-plan .icon svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
 @media screen and (max-width: 767px) {
   .academic-study-plan.highlighted .col:not(.highlighted) {
     display: none;
@@ -48,13 +53,13 @@
 .academic-study-plan .semesters .col {
   padding: 0;
 }
-.academic-study-plan .semesters .col .icon-academic-study-plan-minus {
+.academic-study-plan .semesters .col .icon-tx-academicbase-action-collapse {
   display: none;
 }
-.academic-study-plan .semesters .col.open .icon-academic-study-plan-plus {
+.academic-study-plan .semesters .col.open .icon-tx-academicbase-action-expand {
   display: none;
 }
-.academic-study-plan .semesters .col.open .icon-academic-study-plan-minus {
+.academic-study-plan .semesters .col.open .icon-tx-academicbase-action-collapse {
   display: block;
 }
 .academic-study-plan .semesters .col.open ul {

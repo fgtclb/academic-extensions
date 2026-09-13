@@ -6464,6 +6464,35 @@ entities:
                         header: 'Für Mitglieder'
                         header_layout: 2
                         bodytext: '<p>Nur für die Gruppe <em>Website users</em> sichtbar.</p>'
+        # Every icon the academic extensions register, rendered the way their
+        # frontend templates render one - at 1em in text, at 2rem and on a dark
+        # ground (ACE-594). The element has nothing to configure: its list is
+        # read from the icon registry when it renders, so this page follows every
+        # icon an extension adds or renames without a change to the seed. It is
+        # delivered by "packages-dev/dev-site/ext_localconf.php" and therefore
+        # renders in both trees. See "docs/architecture/icons.md".
+        - self:
+              id: 290
+              title: 'Icons'
+              slug: '/icons'
+          languageVariants:
+            - self:
+                  id: 790
+                  language: 1
+                  title: 'Symbole'
+                  slug: '/symbole'
+          entities:
+            content:
+              - self:
+                    id: 64
+                    CType: 'academicsdevsite_icons'
+                    header: 'Icons of the academic extensions'
+                languageVariants:
+                  - self:
+                        id: 564
+                        language: 1
+                        CType: 'academicsdevsite_icons'
+                        header: 'Symbole der Academic Extensions'
 
   beGroup:
     #===========================================================================================================

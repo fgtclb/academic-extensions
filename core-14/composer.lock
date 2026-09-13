@@ -919,12 +919,13 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-base",
-                "reference": "ace4d224d1da7836d8e33b8d250cc6421990cf3b"
+                "reference": "684ff5d3d6878d552b58157e721d311d0f06758f"
             },
             "require": {
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "symfony/serializer": "^6.4.26 || ^7.3.4",
-                "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev"
+                "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev",
+                "typo3/cms-extbase": "~13.4.0@dev || ~14.3.6@dev"
             },
             "type": "typo3-cms-extension",
             "extra": {
@@ -1159,7 +1160,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-partners",
-                "reference": "40ca8da2ac5bd0d48267a7a954c4514ec31f6bf0"
+                "reference": "abd9b9d6fb00e245588f5fae9d86146488facbb0"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1168,7 +1169,8 @@
                 "typo3/cms-backend": "~13.4.0@dev || ~14.3.6@dev",
                 "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev",
                 "typo3/cms-extbase": "~13.4.0@dev || ~14.3.6@dev",
-                "typo3/cms-fluid": "~13.4.0@dev || ~14.3.6@dev"
+                "typo3/cms-fluid": "~13.4.0@dev || ~14.3.6@dev",
+                "typo3/cms-install": "~13.4.0@dev || ~14.3.6@dev"
             },
             "conflict": {
                 "fgtclb/category-types": "<2.0.0",
@@ -1234,7 +1236,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons",
-                "reference": "b7c04bf9b0bea618a78a6481148eb08658492f0e"
+                "reference": "c28ccee73928bc57c4aeecb4a100c5a2f70390f1"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
@@ -1251,7 +1253,8 @@
                 "georgringer/numbered-pagination": "<2.1.0 || >= 3.0.0"
             },
             "suggest": {
-                "georgringer/numbered-pagination": "Install to use numbered pagination. (~2.1)"
+                "georgringer/numbered-pagination": "Install to use numbered pagination. (~2.1)",
+                "typo3/cms-reports": "Install to see the status report naming site packages that still ship the pre-3.0 settings keys."
             },
             "type": "typo3-cms-extension",
             "extra": {
@@ -1307,14 +1310,16 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/fgtclb/academic-persons-edit",
-                "reference": "d118d4be70f30a69e8589587a3c46aeda209c0c1"
+                "reference": "13529b882c17bdb37d3c217e8a8e4599bd099daf"
             },
             "require": {
                 "fgtclb/academic-base": "~3.0.0@dev",
                 "fgtclb/academic-persons": "~3.0.0@dev",
                 "php": "^8.2 || ^8.3 || ^8.4",
                 "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev",
-                "typo3/cms-install": "~13.4.0@dev || ~14.3.6@dev"
+                "typo3/cms-install": "~13.4.0@dev || ~14.3.6@dev",
+                "typo3/cms-rte-ckeditor": "~13.4.0@dev || ~14.3.6@dev",
+                "typo3/html-sanitizer": "^2.3"
             },
             "require-dev": {
                 "fgtclb/environment-state-manager": "^2.0.1@dev"
@@ -1643,17 +1648,28 @@
             "dist": {
                 "type": "path",
                 "url": "../packages-dev/dev-site",
-                "reference": "0611f97f2e8e314954e6c36013a889288b38faf9"
+                "reference": "590ec711b5cf6abd98e46be44de671f69123610c"
             },
             "require": {
                 "php": "^8.2 || ^8.3 || ^8.4",
-                "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev"
+                "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev",
+                "typo3/cms-frontend": "~13.4.0@dev || ~14.3.6@dev"
             },
             "type": "typo3-cms-extension",
             "extra": {
                 "typo3/cms": {
                     "extension-key": "academics_dev_site",
                     "version": "3.0.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "FGTCLB\\AcademicsDevSite\\": "Classes/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "FGTCLB\\AcademicsDevSite\\Tests\\": "Tests/"
                 }
             },
             "license": [

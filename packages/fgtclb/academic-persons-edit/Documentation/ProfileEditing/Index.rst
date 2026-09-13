@@ -737,8 +737,8 @@ tables, exactly the switch the previous editor offered for these three record
 kinds - through the ``toggleContractContactVisibility`` endpoint, which is sent
 the target state rather than a "flip" so that a double press stores what the
 visitor saw. The button's label names the press - :guilabel:`Hide in frontend`
-or :guilabel:`Show in frontend` - and its glyph (``academic-persons-edit-visible``
-respectively ``academic-persons-edit-hidden``) shows the state; it carries no
+or :guilabel:`Show in frontend` - and its glyph (``tx-academicbase-state-visible``
+respectively ``tx-academicbase-state-hidden``) shows the state; it carries no
 ``aria-pressed``, because a label that changes with the state would announce
 the opposite of what a pressed button does. A hidden row is drawn in the
 secondary text colour, its controls at full contrast, and carries a
@@ -1759,65 +1759,73 @@ A project that talks to the endpoints from its own code has to send the header.
 Icon identifiers
 ================
 
-The action icons of the editor are registered in
-:file:`Configuration/Icons.php` and rendered through ``core:icon`` with
-``alternativeMarkupIdentifier="inline"``, so the SVG is inlined and follows the
-text colour of the button it sits in. The files are `Bootstrap Icons
-<https://icons.getbootstrap.com/>`__ (MIT, see
-:file:`Resources/Public/Icons/LICENSE-bootstrap-icons.txt`) drawn in
-``currentColor``.
+The action and state icons of the editor are the shared icons of
+`EXT:academic_base`, registered in its :file:`Configuration/Icons.php` and
+rendered through ``core:icon`` with ``alternativeMarkupIdentifier="inline"``,
+so the SVG is inlined and follows the text colour of the button it sits in.
+The files are Font Awesome Free solid icons (CC BY 4.0, see
+:file:`EXT:academic_base/Resources/Public/Icons/LICENSE-font-awesome.txt`)
+drawn in ``currentColor``. This extension registers only its content element
+icon, ``tx-academicpersonsedit-plugin-profile-editing``.
 
 Identifier and file name name the *action*, not the glyph: a project that
 replaces the icon set changes the drawing, not the identifiers its template
-overrides address.
+overrides address. Every academic extension renders the same identifier for
+the same action, so a replacement applies to all of them.
 
 ..  list-table::
     :header-rows: 1
 
     *   - Identifier
-        - File
+        - File in :file:`EXT:academic_base/Resources/Public/Icons/`
         - Used for
-    *   - ``academic-persons-edit-add``
-        - :file:`add.svg`
+    *   - ``tx-academicbase-action-add``
+        - :file:`action/add.svg`
         - Add a document, contract or contact row
-    *   - ``academic-persons-edit-back``
-        - :file:`back.svg`
+    *   - ``tx-academicbase-action-back``
+        - :file:`action/back.svg`
         - Back to the profile overview
-    *   - ``academic-persons-edit-clear``
-        - :file:`clear.svg`
+    *   - ``tx-academicbase-action-clear``
+        - :file:`action/clear.svg`
         - Clear the value of a field
-    *   - ``academic-persons-edit-delete``
-        - :file:`delete.svg`
+    *   - ``tx-academicbase-action-delete``
+        - :file:`action/delete.svg`
         - Delete a row or the profile image
-    *   - ``academic-persons-edit-edit``
-        - :file:`edit.svg`
-        - Open a field or a row for editing
-    *   - ``academic-persons-edit-help``
-        - :file:`help.svg`
-        - Help text popover
-    *   - ``academic-persons-edit-move-down``
-        - :file:`move-down.svg`
-        - Move a row down
-    *   - ``academic-persons-edit-move-up``
-        - :file:`move-up.svg`
-        - Move a row up
-    *   - ``academic-persons-edit-save``
-        - :file:`save.svg`
-        - Save a field or a row
-    *   - ``academic-persons-edit-sort-handle``
-        - :file:`sort-handle.svg`
+    *   - ``tx-academicbase-action-drag``
+        - :file:`action/drag.svg`
         - Drag handle of a sortable list
-    *   - ``academic-persons-edit-undo``
-        - :file:`undo.svg`
+    *   - ``tx-academicbase-action-edit``
+        - :file:`action/edit.svg`
+        - Open a field or a row for editing
+    *   - ``tx-academicbase-action-help``
+        - :file:`action/help.svg`
+        - Help text popover
+    *   - ``tx-academicbase-action-move-down``
+        - :file:`action/move-down.svg`
+        - Move a row down
+    *   - ``tx-academicbase-action-move-up``
+        - :file:`action/move-up.svg`
+        - Move a row up
+    *   - ``tx-academicbase-action-save``
+        - :file:`action/save.svg`
+        - Save a field or a row
+    *   - ``tx-academicbase-action-undo``
+        - :file:`action/undo.svg`
         - Restore the last saved value
-    *   - ``academic-persons-edit-upload-image``
-        - :file:`upload-image.svg`
+    *   - ``tx-academicbase-action-upload-image``
+        - :file:`action/upload-image.svg`
         - Open the profile image editor
-    *   - ``academic-persons-edit-view``
-        - :file:`view.svg`
+    *   - ``tx-academicbase-action-view``
+        - :file:`action/view.svg`
         - Open a row read-only, or the public profile
-    *   - ``academic-persons-edit-view-close``
-        - :file:`view-close.svg`
+    *   - ``tx-academicbase-action-view-close``
+        - :file:`action/view-close.svg`
         - Close the read view a row action opened
+    *   - ``tx-academicbase-state-visible``
+        - :file:`state/visible.svg`
+        - Visibility toggle of a row that is shown in the frontend
+    *   - ``tx-academicbase-state-hidden``
+        - :file:`state/hidden.svg`
+        - Visibility toggle of a row that is hidden in the frontend
 
 ..  index:: AJAX, CKEditor, Fluid, Frontend, JavaScript, JSON, Profile image, Rich text, NotScanned

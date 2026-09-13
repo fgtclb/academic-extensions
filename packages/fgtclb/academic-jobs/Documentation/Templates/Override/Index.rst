@@ -38,3 +38,33 @@ We suggest that you use a sitepackage extension. Learn how to
             layoutRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Layouts/
         }
     }
+
+..  index:: Templates; Icons
+..  _templates-override-icons:
+
+Icons
+-----
+
+The glyph in front of a job property in the list, the detail view and the
+contact block is chosen by the partial :file:`Job/PropertyIcon.html`. It maps
+the name of the property to one of the shared :php:`tx-academicbase-info-*`
+icons of EXT:academic_base; a property it does not map renders no icon. The
+partials :file:`Job/Information.html`, :file:`Job/Item.html` and
+:file:`Job/Contact.html` render it:
+
+..  code-block:: html
+
+    <f:render partial="Job/PropertyIcon" arguments="{property: item}" />
+
+Override :file:`Job/PropertyIcon.html` to change the glyph of a property of the
+job views only. To replace a shared glyph everywhere it appears, register its
+identifier again in the :file:`Configuration/Icons.php` of your site package.
+
+The icons are inlined and drawn in `currentColor`: they take the colour of the
+surrounding text and are as large as its font, so they need no CSS of their
+own.
+
+The content element icon and the job record icon share one Font Awesome Free
+drawing, licensed under CC BY 4.0. Its origin is listed in
+:file:`Resources/Public/Icons/LICENSE-font-awesome.txt`, see
+:ref:`third-party-icons`.

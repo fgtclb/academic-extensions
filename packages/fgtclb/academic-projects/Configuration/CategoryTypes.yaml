@@ -1,25 +1,25 @@
 groups:
   - identifier: projects
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.group'
-    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryGroups/Projects.svg'
+    icon: 'EXT:academic_projects/Resources/Public/Icons/category-group/projects.svg'
 types:
   - identifier: competence_field
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.competence_field'
     group: projects
-    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/CompetenceField.svg'
+    icon: 'EXT:academic_projects/Resources/Public/Icons/category-type/competence-field.svg'
     inlineIcon: true
   - identifier: cooperation
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.cooperation'
     group: projects
-    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Cooperation.svg'
+    icon: 'EXT:academic_base/Resources/Public/Icons/info/partnership.svg'
     inlineIcon: true
   - identifier: funding_partner
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.funding_partner'
     group: projects
-    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/FundingPartner.svg'
+    icon: 'EXT:academic_projects/Resources/Public/Icons/category-type/funding-partner.svg'
     inlineIcon: true
   - identifier: department
     title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.department'
     group: projects
-    icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Department.svg'
+    icon: 'EXT:academic_base/Resources/Public/Icons/info/department.svg'
     inlineIcon: true

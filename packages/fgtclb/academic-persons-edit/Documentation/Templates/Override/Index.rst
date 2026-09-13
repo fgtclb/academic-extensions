@@ -64,11 +64,12 @@ Replacing an icon
 -----------------
 
 The action icons of the profile editing frontend are addressed by identifier,
-not by file. They are registered in :file:`Configuration/Icons.php` of
-:file:`EXT:academic_persons_edit` as ``academic-persons-edit-add``,
-``-back``, ``-clear``, ``-delete``, ``-edit``, ``-help``, ``-move-down``,
-``-move-up``, ``-save``, ``-sort-handle``, ``-undo``, ``-upload-image`` and
-``-view``.
+not by file. They are the shared icons of `EXT:academic_base`, registered in
+its :file:`Configuration/Icons.php` as ``tx-academicbase-action-add``,
+``-back``, ``-clear``, ``-delete``, ``-drag``, ``-edit``, ``-help``,
+``-move-down``, ``-move-up``, ``-save``, ``-undo``, ``-upload-image``,
+``-view`` and ``-view-close``, and ``tx-academicbase-state-visible`` and
+``-hidden`` - see :ref:`profile-editing-icons`.
 
 To use different artwork, register the identifier again in the
 :file:`Configuration/Icons.php` of the sitepackage with the own file - a later
@@ -82,17 +83,20 @@ registration wins, and no template has to be overridden:
     use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
 
     return [
-        'academic-persons-edit-save' => [
+        'tx-academicbase-action-save' => [
             'provider' => CurrentColorSvgIconProvider::class,
             'source' => 'EXT:mysitepackage/Resources/Public/Icons/save.svg',
         ],
     ];
+
+The identifier is shared by every academic extension, so the replacement
+applies wherever the action appears, not only in the profile editor.
 
 That provider inlines the file rather than rendering an :html:`<img>`, so the
 glyph takes the colour of the button it sits in. A file registered with it
 carries a ``viewBox``, draws its shapes in ``currentColor`` and has no ``id``
 attribute - the markup is part of the document, possibly more than once.
 
-The shipped files are `Bootstrap Icons <https://icons.getbootstrap.com/>`__;
-their MIT licence ships beside them in
-:file:`Resources/Public/Icons/LICENSE-bootstrap-icons.txt`.
+The shipped files are Font Awesome Free solid icons; their licence (CC BY 4.0)
+ships beside them in
+:file:`EXT:academic_base/Resources/Public/Icons/LICENSE-font-awesome.txt`.

@@ -1,0 +1,41 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:comment>
+    Every icon the academic extensions register, as the registry lists it at
+    render time - see IconOverviewProcessor. Each identifier is rendered three
+    times with the markup a frontend template of the extensions uses: at 1em
+    inside a line of text, at 2rem, and in the text colour of a dark ground, so
+    an icon that is not drawn in currentColor stands out in the third column.
+    Style attributes only: the frontend Content Security Policy of both cores
+    allows them and blocks an inline style element without a nonce.
+</f:comment>
+<div class="academics-dev-site-icon-overview">
+    <f:for each="{iconSections}" as="section">
+        <section>
+            <h2>{section.title}</h2>
+            <f:for each="{section.groups}" as="identifiers" key="group">
+                <h3>{group}</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Identifier</th>
+                            <th scope="col">1em in text</th>
+                            <th scope="col">2rem</th>
+                            <th scope="col">Dark ground</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <f:for each="{identifiers}" as="identifier">
+                            <tr>
+                                <td><code>{identifier}</code></td>
+                                <td>Text <core:icon identifier="{identifier}" size="small" alternativeMarkupIdentifier="inline" /> text</td>
+                                <td style="font-size: 2rem"><core:icon identifier="{identifier}" size="large" alternativeMarkupIdentifier="inline" /></td>
+                                <td style="color: #f5f5f5; background-color: #1f1f1f; font-size: 2rem"><core:icon identifier="{identifier}" size="large" alternativeMarkupIdentifier="inline" /></td>
+                            </tr>
+                        </f:for>
+                    </tbody>
+                </table>
+            </f:for>
+        </section>
+    </f:for>
+</div>
+</html>

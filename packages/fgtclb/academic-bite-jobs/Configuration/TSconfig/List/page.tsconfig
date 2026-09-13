@@ -12,7 +12,7 @@ TCEFORM.tt_content.CType.removeItems := removeFromList(academicbitejobs_list)
 mod.wizards.newContentElement.wizardItems.academic {
   elements {
     academicbitejobs_list {
-      iconIdentifier = bitejobs_list
+      iconIdentifier = tx-academicbitejobs-plugin-bite-jobs
       title = LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label
       tt_content_defValues {
         CType = academicbitejobs_list

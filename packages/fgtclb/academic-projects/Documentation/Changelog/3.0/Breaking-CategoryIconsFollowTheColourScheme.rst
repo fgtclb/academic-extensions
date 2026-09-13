@@ -39,8 +39,9 @@ Site CSS or JavaScript that sized, coloured or addressed the :html:`<img>` has
 to address the :html:`<svg>` instead.
 
 In the backend, the four category type icons take the text colour around them,
-so they stay legible in a dark backend colour scheme. The academic project page
-type keeps the core icon :php:`actions-code-merge` and is unchanged.
+so they stay legible in a dark backend colour scheme. The icons of the academic
+project page type and of the two project content elements are replaced as well,
+see :ref:`breaking-projects-icons-use-the-shared-icon-set`.
 
 Affected Installations
 ======================

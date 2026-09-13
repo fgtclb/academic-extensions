@@ -2,7 +2,6 @@
     lang="en"
     data-namespace-typo3-fluid="true"
     xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
-    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
 >
 
 <ul>
@@ -25,7 +24,7 @@
     >
         <f:if condition="{job.{item}}">
             <li>
-                <core:icon identifier="academic_jobs-{item}"/>
+                <f:render partial="Job/PropertyIcon" arguments="{property: item}" />
 
                 <b>{f:translate(key: 'jobs.{item}', extensionName: 'academic_jobs')}:</b>
 

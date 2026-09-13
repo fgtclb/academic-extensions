@@ -13,7 +13,7 @@ defined('TYPO3') or die;
         [
             'label' => 'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label',
             'value' => 'academicbitejobs_list',
-            'icon' => 'bitejobs_list',
+            'icon' => 'tx-academicbitejobs-plugin-bite-jobs',
             'group' => 'academic',
         ],
         'academic_bite_jobs'

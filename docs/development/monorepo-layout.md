@@ -342,12 +342,15 @@ discovered in the `Configuration/DataFactory/` of the **active packages** of an
 installation, and a `library` is not an installed extension, so nothing would
 ever find it.
 
-Everything else about it is deliberately minimal. It carries no `Classes/` — the
-seed set, the files that set references in `Resources/Public/SeedFiles/`, one
-page object shipped twice (`Configuration/TypoScript/` and
-`Configuration/Sets/PageObject/`, because the `/legacy/` tree cannot be themed),
-the `Configuration/TCA/Overrides/sys_template.php` that registers the first of
-those, its own `Tests/` — see
+Everything else about it is deliberately minimal — the seed set, the files that
+set references in `Resources/Public/SeedFiles/`, one page object shipped twice
+(`Configuration/TypoScript/` and `Configuration/Sets/PageObject/`, because the
+`/legacy/` tree cannot be themed), the `Configuration/TCA/Overrides/sys_template.php`
+that registers the first of those, the one content element of the icon overview
+page (ACE-594: a data processor in `Classes/`, its template, its CType in
+`Configuration/TCA/Overrides/tt_content.php` and its rendering definition in
+`ext_localconf.php` — see
+[The icon overview page](instances.md#the-icon-overview-page)), its own `Tests/` — see
 [Seed verification](../testing/seed-verification.md) — plus a `composer.json`, a
 `VERSION` file, a `LICENSE` and a `README.md`. The files are committed because `core-*/public/` is
 git-ignored and a `sys_file` row without its file is a broken image; they are

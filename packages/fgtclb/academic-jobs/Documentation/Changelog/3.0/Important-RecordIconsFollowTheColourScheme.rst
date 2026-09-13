@@ -15,7 +15,7 @@ file whatever the backend colour scheme said, and the dark drawing stayed dark
 on the dark cards of the record list.
 
 The icon is now registered in :file:`Configuration/Icons.php` under the
-identifier :php:`tx_academicjobs_domain_model_job` with
+identifier :php:`tx-academicjobs-record-job` with
 :php:`\FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`,
 and the table points at that identifier through :php:`ctrl.typeicon_classes`.
 The file is drawn in `currentColor`.
@@ -25,11 +25,11 @@ Impact
 
 The job record icon takes the text colour of the backend, so it stays legible
 in a dark colour scheme. It is also addressable by identifier now, which it was
-not before - :html:`<core:icon identifier="tx_academicjobs_domain_model_job" />`
+not before - :html:`<core:icon identifier="tx-academicjobs-record-job" />`
 resolves.
 
-The seventeen :php:`academic_jobs-*` field icons of the job detail view keep the
-core provider and are unchanged.
+The identifier and the drawing are those of :ref:`breaking-jobs-shared-icon-set`,
+which also replaces the field icons of the job views.
 
 Affected Installations
 ======================

@@ -3,45 +3,35 @@
 declare(strict_types=1);
 
 use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
-use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 
+/*
+ * The icons of this extension: Font Awesome Free solid, drawn in `currentColor` and
+ * inlined by the provider of EXT:academic_base, so they take the colour of the
+ * surrounding text in both backend colour schemes. Licence and origin of the files:
+ * Resources/Public/Icons/LICENSE-font-awesome.txt.
+ *
+ * Identifiers follow `tx-<extkey>-<group>-<name>`, files `Icons/<group>/<name>.svg`:
+ * `plugin` for the content element (TCA and new content element wizard), `record` for
+ * the TCA record types. The frontend controls of the element - expand, collapse and
+ * close - are the shared action icons of EXT:academic_base and not registered here.
+ * A project replaces one of them by registering the same identifier in its own
+ * Configuration/Icons.php.
+ */
 return [
-    'academic-study-plan' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/Extension.svg',
-    ],
-    /*
-     * The record icons of the three tables this extension ships. They are registered
-     * with the provider of EXT:academic_base, which inlines the file in both markups
-     * instead of rendering an <img>. An <img> is opaque to CSS and keeps the colours
-     * of its file, so a record icon drawn in a dark ink stays dark on the dark cards
-     * of the backend colour scheme. Inlined and drawn in `currentColor` it follows the
-     * text colour.
-     */
-    'academic-study-plan-category' => [
+    'tx-academicstudyplan-plugin-study-plan' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/category.svg',
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/plugin/study-plan.svg',
     ],
-    'academic-study-plan-semester' => [
+    'tx-academicstudyplan-record-category' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/semester.svg',
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/record/category.svg',
     ],
-    'academic-study-plan-module' => [
+    'tx-academicstudyplan-record-semester' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/module.svg',
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/record/semester.svg',
     ],
-    // Frontend controls of the study plan element, unlike the record icons above:
-    // drawn in `currentColor` so they take the colour of the surrounding text.
-    'academic-study-plan-plus' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/plus.svg',
-    ],
-    'academic-study-plan-minus' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/minus.svg',
-    ],
-    'academic-study-plan-close' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/close.svg',
+    'tx-academicstudyplan-record-module' => [
+        'provider' => CurrentColorSvgIconProvider::class,
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/record/module.svg',
     ],
 ];
