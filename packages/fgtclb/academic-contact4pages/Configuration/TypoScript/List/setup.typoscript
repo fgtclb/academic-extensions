@@ -1,6 +1,9 @@
 plugin.tx_academiccontacts4pages {
   settings {
     detailPid = {$plugin.tx_academicpersons.detailPid}
+    # "Profile/Item" of EXT:academic_persons reads the placeholder from the plugin settings,
+    # which are the settings of this plugin here.
+    image.placeholder.default = {$plugin.tx_academicpersons.image.placeholder.default}
   }
   view {
     templateRootPaths {
@@ -8,6 +11,9 @@ plugin.tx_academiccontacts4pages {
     }
 
     partialRootPaths {
+      # The shared partials of EXT:academic_base, which "Profile/Item" renders the image
+      # through. The key sorts below every other one, so an override wins over them.
+      -1 = EXT:academic_base/Resources/Private/Partials/
       5 = EXT:academic_persons/Resources/Private/Partials/
       10 = {$plugin.tx_academiccontacts4pages.view.partialRootPath}
     }

@@ -17,7 +17,7 @@ variants in TCA has to override the templates as well.
     `plugin.tx_academicpersons.image.placeholder.mr`, `.ms` and `.diverse`,
     next to `plugin.tx_academicpersons.image.placeholder.default`.
 - There is one placeholder key family, `image.placeholder.*`, owned by this
-  change. `ace-tbd-responsive-image-partial` introduces its `default` key with
+  change. `ace-646-responsive-image-partial` introduces its `default` key with
   the neutral placeholder SVG it ships as the default value; this change adds
   the gender siblings and documents the group.
 - A profile without an image therefore shows the neutral placeholder unless
@@ -55,7 +55,7 @@ None.
   documentation and the 3.0 changelog.
 - `academic_base` (`packages/fgtclb/academic-base`): only as the provider of
   the responsive image partial; nothing changes there.
-- Depends on `ace-tbd-responsive-image-partial` (the partial, the
+- Depends on `ace-646-responsive-image-partial` (the partial, the
   placeholder SVG and the `image.placeholder.default` key),
   `ace-tbd-named-crop-variants` (the crop variant names) and
   `ace-tbd-item-and-list-partials` (the separate item image partial).
@@ -66,7 +66,7 @@ None.
 - Adding or changing crop variant TCA.
 - The markup of the responsive image partial.
 - A width setting per view; widths belong to the presets of
-  `ace-tbd-responsive-image-partial`.
+  `ace-646-responsive-image-partial`.
 - FAL identifiers as placeholder values.
 - Shipping gendered placeholder artwork.
 - Profile images rendered by `academic_contacts4pages`

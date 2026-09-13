@@ -1,0 +1,15 @@
+"sys_file_storage",
+,"uid","pid","name","driver","configuration","is_browsable","is_public","is_writable","is_online","is_default","processingfolder"
+,1,0,"fileadmin","Local","<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms><data><sheet index=""sDEF""><language index=""lDEF""><field index=""basePath""><value index=""vDEF"">fileadmin/</value></field><field index=""pathType""><value index=""vDEF"">relative</value></field><field index=""caseSensitive""><value index=""vDEF"">1</value></field></language></sheet></data></T3FlexForms>",1,1,1,1,1,""
+"sys_file",
+,"uid","pid","storage","type","mime_type","missing","extension","name","identifier","identifier_hash","folder_hash","sha1","size","creation_date","modification_date"
+,1,0,1,2,"image/jpeg",0,"jpg","landscape.jpg","/images/landscape.jpg","b4bab8a2c8ec5bcd1bd4cc8e4d3cba0c7ba1fe79","ca306f2df2823c083069873158fd3b91fd4ebe01","683fca5d5576daac0adc2fc288107af9de30c3c7",8491,1700000000,1700000000
+,2,0,1,2,"image/svg+xml",0,"svg","logo.svg","/images/logo.svg","9a1c5b7c2d4ab1d7e1f36e0de6f0e3f7c5b0d3a1","ca306f2df2823c083069873158fd3b91fd4ebe01","f943ac2eeeeac42d2f35fae11c6f319962db3481",138,1700000000,1700000000
+"sys_file_metadata",
+,"uid","pid","file","sys_language_uid","width","height"
+,1,0,1,0,800,600
+,2,0,2,0,120,40
+"sys_file_reference",
+,"uid","pid","deleted","hidden","sys_language_uid","uid_local","uid_foreign","tablenames","fieldname","sorting_foreign","description","alternative","crop"
+,1,0,0,0,0,1,1,"tt_content","image",1,"Two colours side by side","A landscape in two colours","{""default"":{""cropArea"":{""x"":0,""y"":0,""width"":0.75,""height"":1},""selectedRatio"":""NaN"",""focusArea"":null},""portrait"":{""cropArea"":{""x"":0.25,""y"":0,""width"":0.5,""height"":1},""selectedRatio"":""NaN"",""focusArea"":null}}"
+,2,0,0,0,0,2,1,"tt_content","image",2,"","A logo",""

@@ -1,0 +1,108 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<f:comment>
+    The responsive image of the academic extensions.
+
+    The arguments and the four presets are public API, documented in the
+    "Templates" chapter of academic_base:
+
+    - image          An Extbase or a core file reference. Empty renders the placeholder.
+    - preset         "card", "detail", "logo" or "teaser" - one "Preset-" section below each.
+    - cropVariant    Applied to every source and to the fallback image. Default: "default",
+                     which the core image view helpers apply to an empty value.
+    - placeholder    An "EXT:" path, rendered when there is no image. Empty renders nothing.
+    - alt            The alternative text. Default: the alternative text of the file.
+    - class          The class of the image element.
+    - showCaption    Renders the description of the file as a caption.
+    - showCopyright  Renders the copyright of the file, a field of EXT:filemetadata.
+
+    A project changes the breakpoints and widths of every academic plugin at once by
+    overriding this one file through the partial root path of each plugin.
+</f:comment>
+
+<f:if condition="{image}">
+    <f:then>
+        <f:comment>An Extbase file reference wraps the core one, which carries the metadata.</f:comment>
+        <f:variable name="resource" value="{f:if(condition: image.originalResource, then: image.originalResource, else: image)}" />
+        <f:comment>Array access, because getProperty() throws for a field that does not exist.</f:comment>
+        <f:variable name="caption" value="{f:if(condition: showCaption, then: resource.description)}" />
+        <f:variable name="copyright" value="{f:if(condition: showCopyright, then: resource.properties.copyright)}" />
+        <f:if condition="{caption} || {copyright}">
+            <f:then>
+                <figure class="academic-image">
+                    <f:render section="Image" arguments="{_all}" />
+                    <figcaption class="academic-image__caption">
+                        <f:if condition="{caption}">
+                            <span class="academic-image__description">{caption}</span>
+                        </f:if>
+                        <f:if condition="{copyright}">
+                            <small class="academic-image__copyright">© {copyright}</small>
+                        </f:if>
+                    </figcaption>
+                </figure>
+            </f:then>
+            <f:else>
+                <f:render section="Image" arguments="{_all}" />
+            </f:else>
+        </f:if>
+    </f:then>
+    <f:else if="{placeholder}">
+        <f:image src="{placeholder}" alt="{alt}" class="{class}" loading="lazy" />
+    </f:else>
+</f:if>
+
+<f:section name="Image">
+    <f:if condition="{resource.extension} == 'svg'">
+        <f:then>
+            <f:comment>A vector image needs neither processing nor sources.</f:comment>
+            <img
+                src="{resource.publicUrl}"
+                alt="{f:if(condition: alt, then: alt, else: resource.alternative)}"
+                class="{class}"
+                loading="lazy"
+            />
+        </f:then>
+        <f:else>
+            <picture>
+                <f:render section="Preset-{preset}" arguments="{_all}" />
+            </picture>
+        </f:else>
+    </f:if>
+</f:section>
+
+<f:section name="Preset-card">
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 390, fileExtension: 'webp')}" type="image/webp" media="(min-width: 992px)" />
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 370, fileExtension: 'webp')}" type="image/webp" media="(min-width: 768px)" />
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 690, fileExtension: 'webp')}" type="image/webp" media="(min-width: 576px)" />
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 535, fileExtension: 'webp')}" type="image/webp" />
+    <f:render section="Fallback" arguments="{image: image, cropVariant: cropVariant, maxWidth: 690, alt: alt, class: class}" />
+</f:section>
+
+<f:section name="Preset-detail">
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 1200, fileExtension: 'webp')}" type="image/webp" media="(min-width: 992px)" />
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 960, fileExtension: 'webp')}" type="image/webp" media="(min-width: 576px)" />
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 540, fileExtension: 'webp')}" type="image/webp" />
+    <f:render section="Fallback" arguments="{image: image, cropVariant: cropVariant, maxWidth: 1200, alt: alt, class: class}" />
+</f:section>
+
+<f:section name="Preset-logo">
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 320, fileExtension: 'webp')}" type="image/webp" media="(min-width: 768px)" />
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 240, fileExtension: 'webp')}" type="image/webp" />
+    <f:render section="Fallback" arguments="{image: image, cropVariant: cropVariant, maxWidth: 320, alt: alt, class: class}" />
+</f:section>
+
+<f:section name="Preset-teaser">
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 600, fileExtension: 'webp')}" type="image/webp" media="(min-width: 992px)" />
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 720, fileExtension: 'webp')}" type="image/webp" media="(min-width: 576px)" />
+    <source srcset="{f:uri.image(image: image, cropVariant: cropVariant, maxWidth: 540, fileExtension: 'webp')}" type="image/webp" />
+    <f:render section="Fallback" arguments="{image: image, cropVariant: cropVariant, maxWidth: 720, alt: alt, class: class}" />
+</f:section>
+
+<f:section name="Fallback">
+    <f:image image="{image}" cropVariant="{cropVariant}" maxWidth="{maxWidth}" alt="{alt}" class="{class}" loading="lazy" />
+</f:section>
+
+</html>

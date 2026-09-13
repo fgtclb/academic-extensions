@@ -25,6 +25,10 @@ describing an intention as if it were the state.
 - TypoScript and page TSconfig exist **once** on disk and are delivered twice:
   a site set points at the very files the static template registration points
   at. Content elements are hidden globally and re-enabled per component.
+- Markup that several extensions render lives **once**, as a partial of
+  `academic_base`, registered in each plugin view with the root path key `-1`
+  — below every key of the extension and of the project, so a project
+  override always wins.
 - A **brand** icon — an extension or plugin mark — stays with the core
   `SvgIconProvider` and keeps the colours of its file. A record, category or
   action icon is drawn in `currentColor` and registered with the
@@ -54,6 +58,7 @@ describing an intention as if it were the state.
 | [Form data transformation](form-data-transformation.md)         | How a value of a JSON payload reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                                                       |
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and the `clear = 3` trap.                                                                   |
 | [Translation synchronization](translation-synchronization.md)   | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.                                                 |
+| [Shared partials](shared-partials.md)                           | The Fluid partials `academic_base` ships for every extension, the root path key `-1` they are registered with, and which views register it.                                                |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
 
