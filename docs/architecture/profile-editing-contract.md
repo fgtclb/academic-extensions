@@ -416,7 +416,8 @@ render a contract date.
 
 All five extend `ProfileEditingElement`
 ([`profile/elements/base.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/base.ts)),
-which extends `HTMLElement` and adds one thing — see below.
+which extends `HTMLElement` and adds an update cycle and `whenParsed()` — see
+below.
 
 Five events cross the element boundary. Four are dispatched by the document
 editor and consumed by `profile/documents.ts`, which created it; the fifth is
@@ -440,7 +441,7 @@ The two libraries sit outside that picture. **CKEditor 5** comes from
 driven by `profile/image.ts`, never by an element — the element only says which
 panel is shown.
 
-## The base class, and the 136 lines of code in it
+## The base class, and the 159 lines of code in it
 
 `ProfileEditingElement` extends `HTMLElement` and adds an update cycle, because
 that — and not a render pipeline — is what the elements need. No element renders
@@ -465,6 +466,13 @@ What the base does, in full:
   contact list as well.
 - The first update is **deferred to the first connection**, so an element that
   is created, assigned and only then inserted writes its markup once.
+- `whenParsed(start)` runs `start` once the markup below the element has been
+  parsed — at once when the document is no longer loading, on
+  `DOMContentLoaded` otherwise — and only for an element that is still in the
+  document then. The two elements Fluid renders into the document start
+  through it; see
+  [The element that owns the root](#the-element-that-owns-the-root) for why a
+  connection alone does not guarantee their markup.
 - An assignment that changes nothing (`Object.is`) schedules nothing.
 - A property an owner assigned **before the element was upgraded** is an own
   data property that would shadow the accessor on the prototype. The
@@ -482,8 +490,8 @@ will use, and they are pinned so that an unused seam cannot rot.
 one of those — a keystroke must not rebuild a panel that holds a live CKEditor,
 and the changed-property map is what separates the structural change that
 rebuilds from the value change that patches. The contact list needs the
-batching. The other three extend the base for the two lifecycle callbacks alone
-and declare no properties.
+batching. The other three declare no properties and extend the base for the
+lifecycle callbacks, the root and the image editor also for `whenParsed()`.
 
 A reactive property is a plain accessor pair over a private field whose setter
 ends in `requestUpdate(name, previous)`. The name is typed against the element —
@@ -525,6 +533,28 @@ and a module level `WeakSet` of the roots that had already been mounted. The
 custom element registry does that bookkeeping itself, and does more of it: an
 editor rendered into the page later starts by itself, and an editor that is moved
 in the document is not started twice.
+
+**It starts once its markup has been parsed, not on connection.** TYPO3 renders
+`<f:asset.module>` as `<script type="module" async>`, which is not deferred:
+the entry point may run while the parser is still in the middle of the page.
+The parser then reaches the element with its definition in place, constructs it
+at its start tag and connects it before a single child exists. An element that
+read its root on connection found nothing, returned and was never asked again —
+the editor rendered completely and did nothing, without a message in the
+console (ACE-647). Whether the module wins that race depends on how the HTML
+arrives, so it showed as an editor that works after a few reloads, and more
+often in Firefox than in Chrome. The root element and
+`<academic-persons-edit-image-editor>` therefore start through `whenParsed()`
+of the base class: on connection when the document has been parsed, on
+`DOMContentLoaded` otherwise. The entry point defines the root first, and has
+to: the image editor takes its contract from the root. An upgrade starts the
+elements in the order they are defined, the end of a parse in the order their
+listeners were added — which for elements already parsed when the module runs
+is the order of definition again. `<academic-persons-edit-rich-text>` needs no
+such care — Fluid renders it inside a `<template>`, and it is only ever
+connected as part of a clone that is complete already.
+`Tests/JavaScript/profile-editing-element-parsing.test.ts` builds that parser
+order by hand, because jsdom does not construct elements while it parses.
 
 Its public surface is small and is API from the moment it ships:
 
@@ -570,8 +600,8 @@ state means: which panel is shown, what is disabled, which preview is visible.
 |----------------------------------------|--------------------------------------------------------------------------------------|
 | `<academic-persons-edit-image-editor>` | The tag name. It observes no attributes and dispatches no events.                    |
 | `context`                              | The `EditingContext`, assignable; resolved from the element above it when it is not. |
-| `controller`                           | The image editing it drives, or `null` until it is connected.                        |
-| `applyState()`                         | Writes everything derived from the state. Called on every change and on connection.  |
+| `controller`                           | The image editing it drives, or `null` until it has started.                         |
+| `applyState()`                         | Writes everything derived from the state. Called on every change and on start.       |
 
 Two consequences worth knowing before the next component is written:
 
