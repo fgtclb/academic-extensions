@@ -1043,14 +1043,27 @@ After persistence, the ordered non-empty values ``title``, ``firstName``,
 name is written to ``alternative`` and ``title`` of the profile's file-reference
 overlay, which is the language-correct place for it: a translation carries its
 own name there, and the file may be shared between the languages of a profile.
+Every save of the profile refreshes that overlay, an edit made in a translated
+language included: such an edit announces nothing else — the slug generation and
+the translation synchronisation both run from the default-language record — but
+the reference row whose text just went stale is its own.
 
-The metadata record of the uploaded file itself is written once, by the upload,
-and only where it is empty — the record :sql:`sys_file_metadata` carries is the
-backend editor's from then on, and no later change of the profile name touches
-it. It is written at all because nothing else fills it: ``alternative`` and
-``title`` are the fields an installation running :composer:`typo3/cms-filemetadata`
-or :composer:`fgtclb/file-required-attributes` reports as missing required
-attributes for a file uploaded in the frontend.
+The :sql:`sys_file_metadata` record of the uploaded file itself is filled by the
+upload where it is empty, ``copyright`` included where
+:composer:`typo3/cms-filemetadata` adds that column: these are the fields an
+installation running that extension or
+:composer:`fgtclb/file-required-attributes` reports as missing required
+attributes for a file uploaded in the frontend, and nothing else fills them.
+``title`` and ``alternative`` of that record are rewritten with the composed
+name on every later save of the profile as well, from the frontend editor and
+from the backend alike. Two things follow from that. The file is shared between
+the languages of a profile, so the record ends up carrying the name of the
+language that was saved last — the language-correct text is the one on the
+reference overlay, and that is what the frontend renders. And a value a backend
+editor typed into the file's metadata record does not survive the next save of
+the profile; a listener of
+:php:`\FGTCLB\AcademicPersons\Event\ModifyProfileImageMetadataEvent` is the
+way to keep one.
 
 The JSON response returns the composed name so the in-page preview immediately
 uses the persisted metadata.

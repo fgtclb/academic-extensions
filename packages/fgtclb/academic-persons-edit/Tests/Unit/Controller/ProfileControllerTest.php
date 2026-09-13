@@ -408,6 +408,7 @@ final class ProfileControllerTest extends UnitTestCase
                 $this->createStub(MetaDataRepository::class),
                 $resourceFactory,
                 new NoopEventDispatcher(),
+                $dataHandlerExecutionContext,
             ),
             new ProfileUpdateRequestService(
                 new Context(),

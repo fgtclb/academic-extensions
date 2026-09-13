@@ -42,11 +42,15 @@ final class ProfileImageMetadataServiceTest extends AbstractAcademicPersonsTestC
     /**
      * The translation's own reference gets the text composed from the translation
      * row - its translatable `title` included - while the default-language reference
-     * and the file metadata are left alone: the file is shared between the languages,
-     * its `sys_file_metadata` row belongs to the backend editor.
+     * is left alone: a reference row belongs to exactly one profile record.
+     *
+     * The `sys_file_metadata` row is not language bound and is rewritten by whichever
+     * language was saved last (ACE-559), so saving the translation replaces what the
+     * backend editor typed there. The language-correct text is the one on the
+     * reference, which is what the frontend renders.
      */
     #[Test]
-    public function updateWritesTheNameOfTheProfileRecordIntoItsOwnReferenceOnly(): void
+    public function updateWritesTheNameOfTheProfileRecordIntoItsOwnReferenceAndTheFileMetadata(): void
     {
         $this->insertRecord(self::TABLE_PROFILE, [
             'uid' => 501,
@@ -89,11 +93,130 @@ final class ProfileImageMetadataServiceTest extends AbstractAcademicPersonsTestC
             $this->fetchReferenceMetadata(),
         );
         $this->assertSame(
+            ['title' => 'Prof. Erika Beispiel', 'alternative' => 'Prof. Erika Beispiel'],
+            $this->fetchFileMetadata(1),
+        );
+    }
+
+    /**
+     * The crux of ACE-559, and the opposite of what
+     * {@see ProfileImageMetadataService::initializeFileMetadata()} does: a profile save
+     * rewrites the metadata record of its image, whatever that record carries. An
+     * upload fills only what is empty; a save owns the two name columns.
+     */
+    #[Test]
+    public function updateOverwritesTheNameColumnsTheFileMetadataRecordAlreadyCarries(): void
+    {
+        $this->insertRecord('sys_file_metadata', [
+            'uid' => 1,
+            'pid' => 0,
+            'file' => 1,
+            'title' => 'Editor title',
+            'alternative' => 'Editor alternative',
+            'description' => 'An editor description',
+        ]);
+
+        $metadata = $this->get(ProfileImageMetadataService::class)->updateForProfileUid(1);
+
+        $this->assertSame(['title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau'], $metadata);
+        $this->assertSame(
+            ['title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau'],
+            $this->fetchFileMetadata(1),
+        );
+        // Only the name columns are rewritten; the rest of the record stays the
+        // editor's.
+        $this->assertSame(
+            ['description' => 'An editor description'],
+            $this->fetchRow('sys_file_metadata', ['description'], ['file' => 1]),
+        );
+    }
+
+    /**
+     * Nothing ties a file to a single profile: one placeholder portrait can be the
+     * image of several profiles, and of a content element besides. Its single
+     * `sys_file_metadata` record therefore ends up carrying the name of whichever
+     * profile was saved last, and every usage that renders the file without a
+     * reference override shows that name.
+     *
+     * That is a deliberate consequence of ACE-559 and is documented as such in
+     * `Documentation/Changelog/3.0/Important-ProfileImageFileMetadataFollowsTheName.rst`.
+     * What keeps the two profiles apart is the per-reference override: each profile's
+     * own `sys_file_reference` row keeps its own name and is what the frontend renders
+     * for that profile.
+     */
+    #[Test]
+    public function aFileSharedByTwoProfilesIsDescribedByTheProfileSavedLast(): void
+    {
+        // A second, independent default-language profile - not a translation of the
+        // first - whose image reference points at the very same file.
+        $this->insertRecord(self::TABLE_PROFILE, [
+            'uid' => 502,
+            'pid' => 100,
+            'sys_language_uid' => 0,
+            'l10n_parent' => 0,
+            'l10n_source' => 0,
+            'first_name' => 'Max',
+            'last_name' => 'Mustermann',
+            'image' => 1,
+        ]);
+        $this->insertRecord(self::TABLE_REFERENCE, [
+            'uid' => 39,
+            'pid' => 100,
+            'sys_language_uid' => 0,
+            'l10n_parent' => 0,
+            'uid_local' => 1,
+            'uid_foreign' => 502,
+            'tablenames' => self::TABLE_PROFILE,
+            'fieldname' => 'image',
+            'sorting_foreign' => 1,
+        ]);
+
+        $subject = $this->get(ProfileImageMetadataService::class);
+        $subject->updateForProfileUid(1);
+        $subject->updateForProfileUid(502);
+
+        // The shared file record carries the name of the profile saved last.
+        $this->assertSame(
+            ['title' => 'Max Mustermann', 'alternative' => 'Max Mustermann'],
+            $this->fetchFileMetadata(1),
+        );
+        // Each profile keeps its own name on its own reference row - the override that
+        // makes the rendering of each profile correct despite the shared record.
+        $this->assertSame(
+            [
+                ['uid' => 1, 'title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau'],
+                ['uid' => 39, 'title' => 'Max Mustermann', 'alternative' => 'Max Mustermann'],
+            ],
+            $this->fetchReferenceMetadata(),
+        );
+    }
+
+    /**
+     * A profile that has no name to compose leaves the metadata record alone rather
+     * than blanking it: an empty `sys_file_metadata` row is worse than a stale one, and
+     * a required-attributes check would start reporting the file.
+     */
+    #[Test]
+    public function updateDoesNotBlankTheFileMetadataForAProfileWithoutAName(): void
+    {
+        $this->insertRecord('sys_file_metadata', [
+            'uid' => 1,
+            'pid' => 0,
+            'file' => 1,
+            'title' => 'Editor title',
+            'alternative' => 'Editor alternative',
+        ]);
+        $this->getConnectionPool()->getConnectionForTable(self::TABLE_PROFILE)->update(
+            self::TABLE_PROFILE,
+            ['title' => '', 'first_name' => '', 'middle_name' => '', 'last_name' => ''],
+            ['uid' => 1],
+        );
+
+        $this->get(ProfileImageMetadataService::class)->updateForProfileUid(1);
+
+        $this->assertSame(
             ['title' => 'Editor title', 'alternative' => 'Editor alternative'],
-            $this->getConnectionPool()
-                ->getConnectionForTable('sys_file_metadata')
-                ->select(['title', 'alternative'], 'sys_file_metadata', ['file' => 1])
-                ->fetchAssociative(),
+            $this->fetchFileMetadata(1),
         );
     }
 
@@ -194,12 +317,15 @@ final class ProfileImageMetadataServiceTest extends AbstractAcademicPersonsTestC
     }
 
     /**
-     * Both writes announce themselves, and a listener sees which record is about to be
+     * Every write announces itself, and a listener sees which record is about to be
      * written and gets both records either way: the file, whose own metadata record
      * hangs off it, and the image relation of the profile.
+     *
+     * A profile save is two of them - the metadata record first, the reference after -
+     * because the two records are announced and written independently.
      */
     #[Test]
-    public function bothWritesAnnounceThemselvesWithTheRecordTheyWrite(): void
+    public function everyWriteAnnouncesItselfWithTheRecordItWrites(): void
     {
         $seen = [];
         $this->addMetadataListener(static function (ModifyProfileImageMetadataEvent $event) use (&$seen): void {
@@ -218,6 +344,15 @@ final class ProfileImageMetadataServiceTest extends AbstractAcademicPersonsTestC
 
         $this->assertSame(
             [
+                // The upload.
+                [
+                    'table' => 'sys_file_metadata',
+                    'file' => 1,
+                    'reference' => 1,
+                    'profile' => 1,
+                    'metadata' => ['title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau'],
+                ],
+                // The profile save: the metadata record, then the reference.
                 [
                     'table' => 'sys_file_metadata',
                     'file' => 1,
@@ -239,7 +374,8 @@ final class ProfileImageMetadataServiceTest extends AbstractAcademicPersonsTestC
 
     /**
      * The request the write happens in is handed over where the caller has one, and is
-     * null where it has none - a command line run, for instance.
+     * null where it has none - a command line run, for instance. Both dispatches of a
+     * profile save carry it.
      */
     #[Test]
     public function theRequestOfTheWriteIsHandedOver(): void
@@ -255,7 +391,11 @@ final class ProfileImageMetadataServiceTest extends AbstractAcademicPersonsTestC
         $subject->updateForProfileUid(1, $request);
         $subject->updateForProfileUid(1);
 
-        $this->assertSame(['the request', 'the request', null], $seen);
+        $this->assertSame(
+            // The upload, then the two dispatches of each profile save.
+            ['the request', 'the request', 'the request', null, null],
+            $seen,
+        );
     }
 
     /**
@@ -368,6 +508,76 @@ final class ProfileImageMetadataServiceTest extends AbstractAcademicPersonsTestC
         $this->assertNull($subject->updateForProfileUid(1));
         $this->assertSame([], $this->fetchFileMetadata(1));
         $this->assertSame([['uid' => 1, 'title' => '', 'alternative' => '']], $this->fetchReferenceMetadata());
+    }
+
+    /**
+     * The refresh of the metadata record is announced on its own, so a listener can
+     * keep a value the backend editor maintained: emptying the field map of the
+     * `sys_file_metadata` dispatch stops that write alone, and the reference of the
+     * profile is written as always.
+     */
+    #[Test]
+    public function aListenerCanStopTheFileMetadataWriteOfAProfileSave(): void
+    {
+        $this->insertRecord('sys_file_metadata', [
+            'uid' => 1,
+            'pid' => 0,
+            'file' => 1,
+            'title' => 'Editor title',
+            'alternative' => 'Editor alternative',
+        ]);
+        $this->addMetadataListener(static function (ModifyProfileImageMetadataEvent $event): void {
+            if ($event->getTargetTable() === 'sys_file_metadata') {
+                $event->setMetadata([]);
+            }
+        });
+
+        $metadata = $this->get(ProfileImageMetadataService::class)->updateForProfileUid(1);
+
+        $this->assertSame(['title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau'], $metadata);
+        $this->assertSame(
+            ['title' => 'Editor title', 'alternative' => 'Editor alternative'],
+            $this->fetchFileMetadata(1),
+        );
+        $this->assertSame(
+            [['uid' => 1, 'title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau']],
+            $this->fetchReferenceMetadata(),
+        );
+    }
+
+    /**
+     * The same dispatch is where a project changes what the metadata record gets - and
+     * only that record: the two writes are announced separately, so a rewrite of one
+     * leaves the other with the composed name.
+     */
+    #[Test]
+    public function aListenerCanRewriteTheFileMetadataWriteOfAProfileSave(): void
+    {
+        $this->addMetadataListener(static function (ModifyProfileImageMetadataEvent $event): void {
+            if ($event->getTargetTable() !== 'sys_file_metadata') {
+                return;
+            }
+            $metadata = $event->getMetadata();
+            $metadata['title'] = 'Portrait of ' . $metadata['title'];
+            $metadata['description'] = 'Written by a listener';
+            $event->setMetadata($metadata);
+        });
+
+        $metadata = $this->get(ProfileImageMetadataService::class)->updateForProfileUid(1);
+
+        $this->assertSame(['title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau'], $metadata);
+        $this->assertSame(
+            [
+                'title' => 'Portrait of Erika Musterfrau',
+                'alternative' => 'Erika Musterfrau',
+                'description' => 'Written by a listener',
+            ],
+            $this->fetchRow('sys_file_metadata', ['title', 'alternative', 'description'], ['file' => 1]),
+        );
+        $this->assertSame(
+            [['uid' => 1, 'title' => 'Erika Musterfrau', 'alternative' => 'Erika Musterfrau']],
+            $this->fetchReferenceMetadata(),
+        );
     }
 
     /**

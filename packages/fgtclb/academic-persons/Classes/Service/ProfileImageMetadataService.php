@@ -29,18 +29,25 @@ use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
  * reference - localized or independent - gets the text composed from the translation
  * row, while the default-language reference gets the default-language name.
  *
- * Only the `sys_file_reference` row is written for that. It overrides the file
- * metadata for this reference alone, which is what makes the text language-correct
- * without touching `sys_file_metadata` - a file is shared between the languages of a
- * profile until one of them uploads its own, and its metadata row is the backend
- * editor's.
+ * The `sys_file_reference` row is what makes that text language-correct: it overrides
+ * the file metadata for this one reference, so each language of a profile describes
+ * its own image with its own name.
  *
- * The metadata record of a file the frontend editing just uploaded is the one
- * exception, and {@see initializeFileMetadata()} is it: that record is created empty
- * by the indexer and nothing else ever fills it, while `alternative`, `title` and
- * `copyright` are what an installation running `EXT:filemetadata` or
- * `fgtclb/file-required-attributes` reports as missing required attributes. It is
- * written once, for the file of that upload, and only where the record has nothing.
+ * The `sys_file_metadata` record of the file is rewritten alongside it, with the same
+ * text, on every save that reaches this service. Two consequences follow and are
+ * intended. A file is shared between the languages of a profile until one of them
+ * uploads its own, so that record ends up carrying the name of whichever language was
+ * saved last - the reference row is where the language-correct text lives, and it is
+ * what the frontend renders. And a value a backend editor typed there is replaced on
+ * the next save of the profile; a listener of `ModifyProfileImageMetadataEvent` is the
+ * way to keep one.
+ *
+ * {@see initializeFileMetadata()} is the separate, gentler write of that same record,
+ * for a file the frontend editing has just uploaded: the indexer creates it empty, and
+ * `alternative`, `title` and `copyright` are what an installation running
+ * `EXT:filemetadata` or `fgtclb/file-required-attributes` reports as missing required
+ * attributes. It fills only what the record has nothing in, and `copyright` is written
+ * there and nowhere else - it is not a name, so no later profile save touches it.
  *
  * Both writers of the profile name reach this service: the DataHandler hook for
  * backend saves and localizations, and the `AfterProfileUpdateEvent` listener for
@@ -117,6 +124,15 @@ final readonly class ProfileImageMetadataService
      */
     private const UPLOAD_METADATA_FIELDS = ['title', 'alternative', 'copyright'];
 
+    /**
+     * The `sys_file_metadata` columns that carry the composed name and are therefore
+     * rewritten on every profile save, not only by the upload. `copyright` is not one
+     * of them: it is not a name, and the upload stays its only writer.
+     *
+     * @var list<string>
+     */
+    private const NAME_METADATA_FIELDS = ['title', 'alternative'];
+
     public function __construct(
         private ConnectionPool $connectionPool,
         private ProfileImageRelationWriter $profileImageRelationWriter,
@@ -125,6 +141,7 @@ final readonly class ProfileImageMetadataService
         private MetaDataRepository $metaDataRepository,
         private ResourceFactory $resourceFactory,
         private EventDispatcherInterface $eventDispatcher,
+        private DataHandlerExecutionContext $dataHandlerExecutionContext,
     ) {}
 
     /**
@@ -152,6 +169,16 @@ final readonly class ProfileImageMetadataService
         if ($imageReference === null) {
             return null;
         }
+        // Announced and written on its own, before the reference: the two records are
+        // independent, and a listener that empties the field map of one must not
+        // decide anything about the other.
+        $this->refreshFileMetadata(
+            $imageReference['uid_local'],
+            $imageReference['uid'],
+            $profileUid,
+            $metadataText,
+            $request,
+        );
         $metadata = ['title' => $metadataText, 'alternative' => $metadataText];
         try {
             $metadata = $this->dispatchModification(
@@ -186,9 +213,14 @@ final readonly class ProfileImageMetadataService
      * nothing else in this extension writes it, and its `alternative`, `title` and
      * `copyright` are what an installation running `EXT:filemetadata` or
      * `fgtclb/file-required-attributes` reports as missing required attributes. A
-     * value the record already carries is kept - the metadata record is the backend
-     * editor's from then on, and a re-upload of a file that is already indexed must
-     * not silently rewrite it.
+     * value the record already carries is kept here.
+     *
+     * That last part decides `copyright` and nothing else in practice. The upload
+     * calls this first and {@see updateForProfileUid()} immediately after, and that
+     * one rewrites `title` and `alternative` whatever they hold - so for those two
+     * columns the "keep what is there" of this method is overwritten within the same
+     * request. `copyright` is the column it really protects: no later profile save
+     * touches it, so a value found here survives.
      *
      * The text is the one {@see updateForProfileUid()} writes on the reference: the
      * composed name of the profile that uploaded the file.
@@ -253,6 +285,75 @@ final readonly class ProfileImageMetadataService
             return null;
         }
         return $metadata;
+    }
+
+    /**
+     * Rewrites the `sys_file_metadata` record of the profile image with the composed
+     * name, on every save that reaches this service: a frontend edit, a backend save
+     * and a localization alike (ACE-559).
+     *
+     * This overwrites what the record carries, unlike {@see initializeFileMetadata()},
+     * which fills only the fields an upload found empty. Two consequences are
+     * deliberate. A file is shared between the languages of a profile, so the record
+     * ends up carrying the name of whichever language was saved last - the
+     * language-correct text is on the reference row, which is what the frontend
+     * renders. And a value a backend editor typed into the file record is replaced on
+     * the next save of the profile; a listener of
+     * {@see \FGTCLB\AcademicPersons\Event\ModifyProfileImageMetadataEvent} is the way
+     * to keep one.
+     *
+     * A profile without a name is skipped rather than blanking the record. Failures
+     * are logged and swallowed: the profile save itself has succeeded by now.
+     */
+    private function refreshFileMetadata(
+        int $fileUid,
+        ?int $fileReferenceUid,
+        int $profileUid,
+        string $metadataText,
+        ?ServerRequestInterface $request,
+    ): void {
+        if ($fileUid <= 0 || $metadataText === '') {
+            return;
+        }
+        // Unlike the reference row, this record is written through `MetaDataRepository`
+        // and never sees the DataHandler, so there is no workspace version of it: a
+        // frontend request previewing a workspace would change live data. It is
+        // refused here for the same reason the record synchronization refuses it
+        // (ACE-492). Backend and CLI act in the workspace of their own user.
+        if ($this->dataHandlerExecutionContext->isFrontendRequestInWorkspace()) {
+            return;
+        }
+        try {
+            $fileMetadata = $this->metaDataRepository->findByFileUid($fileUid);
+            $schema = $this->tcaSchemaFactory->get(self::TABLE_FILE_METADATA);
+            $metadata = [];
+            foreach (self::NAME_METADATA_FIELDS as $fieldName) {
+                if ($schema->hasField($fieldName)) {
+                    $metadata[$fieldName] = $metadataText;
+                }
+            }
+            $metadata = $this->dispatchModification(
+                self::TABLE_FILE_METADATA,
+                $fileUid,
+                $fileReferenceUid,
+                $profileUid,
+                $metadata,
+                $request,
+            );
+            if ($metadata === []) {
+                return;
+            }
+            if ($fileMetadata === []) {
+                $this->metaDataRepository->createMetaDataRecord($fileUid, $metadata);
+            } else {
+                $this->metaDataRepository->update($fileUid, $metadata, $fileMetadata);
+            }
+        } catch (\Throwable $exception) {
+            $this->logger->error(
+                'The file metadata of the image of profile {profileUid} could not be refreshed: {reason}',
+                ['profileUid' => $profileUid, 'reason' => $exception->getMessage()],
+            );
+        }
     }
 
     /**

@@ -27,8 +27,12 @@ different reasons:
     These are what an installation running that extension or
     :composer:`fgtclb/file-required-attributes` reports as missing required
     attributes, and nothing else fills them for a file that was never touched
-    in the backend. A value a backend editor maintained on the record is never
-    overwritten, and a later change of the profile name does not reach it.
+    in the backend. :sql:`title` and :sql:`alternative` of that record follow
+    every later change of the profile name as well — changelog entry
+    *Important: The file's own metadata follows the profile name* of
+    :composer:`fgtclb/academic-persons` — so a value a backend editor
+    maintained there is replaced on the next save of the profile.
+    :sql:`copyright` is the upload's alone and is never rewritten.
 
 The composed name is the ordered non-empty values of :sql:`title`,
 :sql:`first_name`, :sql:`middle_name` and :sql:`last_name`, joined with single
@@ -47,9 +51,10 @@ is used — not only where the profile's own reference is rendered.
 extension, so it carries the composed name in :sql:`title` and
 :sql:`alternative` and nothing else.
 
-Nothing has to be configured for it. An installation that maintains file
-metadata editorially keeps what it maintained: the upload fills empty fields
-only.
+Nothing has to be configured for it. An installation that maintains
+:sql:`title` or :sql:`alternative` of profile image files editorially keeps them
+with a listener on the :sql:`sys_file_metadata` dispatch of the event named
+below; the upload itself never overwrites what it finds.
 
 What is written can be changed, and columns an installation adds itself can be
 filled, through the event :php:`ModifyProfileImageMetadataEvent` of

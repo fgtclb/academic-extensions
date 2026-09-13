@@ -3310,14 +3310,45 @@ final class ProfileController extends ActionController
 
     /**
      * Persists all pending changes before announcing the updated profile aggregate.
+     *
+     * A record edited in its own translated language announces nothing: the slug
+     * generation and the translation synchronisation both run from the default
+     * language, and `SyncChangesToTranslations` refuses a translation anyway. Its
+     * image reference is a different matter - the reference row of that very record
+     * carries the name that just changed, and nothing else would rewrite it, because
+     * the Extbase persistence never reaches the DataHandler hook that covers backend
+     * saves. So the metadata is refreshed directly, addressing the resolved row the
+     * way the image endpoints address theirs, rather than through the event.
      */
     private function persistAndDispatchProfileUpdate(?Profile $profile): void
     {
         $this->persistenceManager->persistAll();
-        if ($profile === null || $profile->getUid() === null || $profile->getIsTranslation()) {
+        if ($profile === null || $profile->getUid() === null) {
+            return;
+        }
+        if ($profile->getIsTranslation()) {
+            $this->refreshTranslatedProfileImageMetadata($profile);
             return;
         }
         $this->eventDispatcher->dispatch(new AfterProfileUpdateEvent($profile));
+    }
+
+    /**
+     * Rewrites the image reference metadata of a profile edited in its own translated
+     * language. A row that cannot be resolved, and a frontend request acting in a
+     * workspace, are skipped rather than refused: the profile data itself is written
+     * by then, and a metadata refresh must not turn a successful save into an error.
+     */
+    private function refreshTranslatedProfileImageMetadata(Profile $profile): void
+    {
+        if ($this->dataHandlerExecutionContext->isFrontendRequestInWorkspace()) {
+            return;
+        }
+        $profileUid = $this->resolvePersistedProfileUid($profile);
+        if ($profileUid === null) {
+            return;
+        }
+        $this->profileImageMetadataService->updateForProfileUid($profileUid, $this->request);
     }
 
     /**
