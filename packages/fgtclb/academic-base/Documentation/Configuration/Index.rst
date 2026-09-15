@@ -56,6 +56,27 @@ content elements of the other academic extensions are hidden for the whole
 installation and brought back per component by the extension that ships them —
 see the :guilabel:`Configuration` chapter of that extension.
 
+..  _configuration-hidden-type-stays-selected:
+
+An existing content element keeps its hidden type
+=================================================
+
+A content element that already exists keeps its content type on a page where
+that type is not enabled — a site that does not include the component, or a
+page that restricts the content types with its own page TSconfig. The
+:guilabel:`Type` field shows the stored type as the selected option, followed
+by :guilabel:`(not enabled on this page)`, so saving the record leaves the type
+as it is.
+
+Choosing another type and saving changes it as usual; the hidden type is not
+offered again afterwards. A new content element is only offered the types
+enabled on its page.
+
+This covers every content element in the :guilabel:`Academic` group, without
+any configuration. Content types of other extensions keep the behaviour of
+TYPO3, which selects the first available option instead. See
+:ref:`important-1789465200`.
+
 ..  _site-set:
 
 Include the site set
