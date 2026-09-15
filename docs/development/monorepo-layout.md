@@ -42,6 +42,12 @@ The real extensions. Every subdirectory is a composer package of type
 file, `Tests/` folder and reST manual in `Documentation/`. All twelve carry
 version `3.0.0-dev` on `main`.
 
+Every extension is presented under one name in the TER, on Packagist and in
+the extension manager. The `ext_emconf.php` `title` starts with `FGTCLB: `, and
+the `composer.json` `description` is composed from the two `ext_emconf.php`
+values as `<title> - <description>` (ACE-657). A change to either value is
+therefore made in both files.
+
 ### `packages-dev/`
 
 Three packages that are never released as extensions and never shipped to an

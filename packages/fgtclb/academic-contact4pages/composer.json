@@ -1,6 +1,6 @@
 {
     "name": "fgtclb/academic-contacts4pages",
-    "description": "Role based relations between profiles and pages",
+    "description": "FGTCLB: Academic Contacts for Pages - Role based relations between profiles and pages",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
     "authors": [

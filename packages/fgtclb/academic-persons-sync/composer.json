@@ -1,6 +1,6 @@
 {
     "name": "fgtclb/academic-persons-sync",
-    "description": "Adds some configuration for external users providers like Active Directory",
+    "description": "FGTCLB: Academic Persons Sync - Adds some configuration for external users providers like Active Directory.",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
     "authors": [
