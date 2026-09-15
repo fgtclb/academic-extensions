@@ -1,7 +1,7 @@
 <?php
 
 $EM_CONF[$_EXTKEY] = [
-    'title' => 'Academic Study Plan',
+    'title' => 'FGTCLB: Academic Study Plan',
     'description' => 'TYPO3 extension for building and displaying academic study plans with semesters, modules, and categorization features.',
     'version' => '2.4.0',
     'category' => 'fe',

@@ -1,6 +1,6 @@
 {
     "name": "fgtclb/academic-base",
-    "description": "Base functionality accross academic extensions",
+    "description": "FGTCLB: Academic Base - Base functionality across academic extensions.",
     "type": "typo3-cms-extension",
     "homepage": "https://www.fgtclb.com/",
     "license": "GPL-2.0-or-later",

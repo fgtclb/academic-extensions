@@ -1,6 +1,6 @@
 {
     "name": "fgtclb/academic-projects",
-    "description": "Research project page for universities. Ships structured data preparation",
+    "description": "FGTCLB: Academic Projects - Academic project pages for TYPO3 with specific structured data and typed sys_categories",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
     "authors": [
