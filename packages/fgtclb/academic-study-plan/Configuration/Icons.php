@@ -3,9 +3,11 @@
 declare(strict_types=1);
 
 return [
+    // Icon of the study plan content element. A placeholder until a dedicated icon
+    // is drawn; the extension icon of the TER and the extension manager is Extension.svg.
     'academic-study-plan' => [
         'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/Extension.svg',
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/content-element.svg',
     ],
     'academic-study-plan-category' => [
         'provider' => \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
