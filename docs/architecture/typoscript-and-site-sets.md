@@ -196,6 +196,35 @@ The new content element wizard follows along on both supported core versions:
 `NewContentElementController` drops every item whose value appears in
 `TCEFORM.tt_content.CType.removeItems` before it renders.
 
+### An existing element keeps its hidden type
+
+Hiding a type takes it out of the *Type* field of every record on the page,
+including a record that already stores it. Core `TcaSelectItems` drops such a
+stored value from the row and, because `removeItems` or `keepItems` removed it,
+deliberately withholds its "invalid value" option. `SelectSingleElement` then
+renders the first option as selected, and a save rewrites the content type
+without a warning. That happens wherever the component is not enabled: a
+`sys_template` site without the page TSconfig entry, on v13 a page tree with a
+different site set, a page that narrows `keepItems`.
+
+academic_base closes it with the form data provider
+`Backend\FormDataProvider\KeepCurrentContentTypeSelectable`, registered in its
+`ext_localconf.php` right after `TcaSelectItems` and before
+`TcaSelectTreeItems`, its only direct dependent on v12 and v13. For an existing
+`tt_content` record whose stored type is missing from the items, belongs to the
+`academic` item group and is hidden by page TSconfig, it puts that one type back
+as the first, selected option, labelled "… (not enabled on this page)". New
+records, the wizard and types outside the group keep core behaviour. DataHandler
+needs nothing: it checks a select without `foreign_table` against neither the
+items nor page TSconfig, so the unchanged value is stored.
+
+The core code is identical on v12 and v13 (12.4.45 and 13.4.35 measured). The
+change came from `main`, where it additionally orders against a v14-only
+provider; that part does not exist here. The test compiles the complete
+`tcaDatabaseRecord` group against the fixture extension
+`test_hidden_content_types`:
+`academic-base/Tests/Functional/Backend/FormDataProvider/KeepCurrentContentTypeSelectableTest.php`.
+
 ### `mod.wizards…show` is not dead on v12
 
 `main` deletes `mod.wizards.newContentElement.wizardItems.<group>.show` as dead

@@ -13,6 +13,10 @@
 				<source>Academic</source>
 				<target>Academic</target>
 			</trans-unit>
+			<trans-unit id="content.ctype.notEnabledOnPage">
+				<source>%s (not enabled on this page)</source>
+				<target>%s (auf dieser Seite nicht aktiviert)</target>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

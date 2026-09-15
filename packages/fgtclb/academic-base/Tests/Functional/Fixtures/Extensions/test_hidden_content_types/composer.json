@@ -1,0 +1,15 @@
+{
+    "name": "tests/hidden-content-types",
+    "description": "Content types hidden by page TSconfig, one in the academic item group and one outside of it",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "typo3/cms-core": "^12.4.22 || ^13.4",
+        "fgtclb/academic-base": "~2.4.0@dev"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "test_hidden_content_types"
+        }
+    }
+}
