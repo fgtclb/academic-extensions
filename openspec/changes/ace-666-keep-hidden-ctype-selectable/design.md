@@ -41,9 +41,14 @@ no `ext_localconf.php` yet.
 `FGTCLB\AcademicBase\Backend\FormDataProvider\KeepCurrentContentTypeSelectable`,
 final and stateless, implements `FormDataProviderInterface`. It is registered
 in `packages/fgtclb/academic-base/ext_localconf.php` for the
-`tcaDatabaseRecord` group with `depends` on `TcaSelectItems`. Form data
-providers have no attribute registration, so this array entry is the only
-configuration it needs. It acts when all of these hold:
+`tcaDatabaseRecord` group with `depends` on `TcaSelectItems` and `before` on
+`TcaSelectTreeItems` and, on v14, `TcaTtContentCtypeItemsRestrictionByBackendLayout`
+(the ordering ignores the class on v13, where it does not exist). Running
+before the backend layout restriction matters: that provider returns early for
+an empty `CType` row value, so only a restored value gets core's own handling
+of a type the column disallows. Form data providers have no attribute
+registration, so this array entry is the only configuration it needs. It acts
+when all of these hold:
 
 - the table is `tt_content` and the command is `edit`;
 - `recordTypeValue` is not among the processed `CType` items;
@@ -51,8 +56,10 @@ configuration it needs. It acts when all of these hold:
 - the page TSconfig of the record hides it (`removeItems` lists it, or
   `keepItems` is set and does not).
 
-It then appends that item, with its translated label, the translated suffix
-and its icon, and sets `databaseRow['CType']` to the stored value.
+It then puts that item first, in the ungrouped `none` group where core puts
+its "invalid value" option, with its translated label (or `altLabels`), the
+translated suffix and its icon (or `altIcons`), and sets `databaseRow['CType']`
+to the stored value.
 
 Rejected: rewriting `TCEFORM.tt_content.CType.removeItems` in `pageTsConfig`
 before `TcaSelectItems` runs. It changes what TSconfig means for the whole

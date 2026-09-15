@@ -55,6 +55,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-06`). Three of the six analysed projects carry their own code
-for this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-keep-hidden-ctype-selectable` when the issue is filed after
-implementation.
+for this today. Filed as ACE-666 after the implementation, relates to
+ACE-458.
