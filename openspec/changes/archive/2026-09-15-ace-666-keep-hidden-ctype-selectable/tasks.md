@@ -47,4 +47,4 @@
 - [x] 4.3 Commit as `[BUGFIX] ACE-666: Keep hidden academic content types` in
       TYPO3 Core format, body written for this branch, footer `Resolves: ACE-666`
       and `Releases: 2`.
-- [ ] 4.4 Archive the change as the last commit of the pull request.
+- [x] 4.4 Archive the change as the last commit of the pull request.
