@@ -62,4 +62,4 @@
 - [x] 5.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.3 `docs/` and the academic_base `Documentation/` changelog updated in
       the same change.
-- [ ] 5.4 Archive the change as the last commit of the pull request.
+- [x] 5.4 Archive the change as the last commit of the pull request.
