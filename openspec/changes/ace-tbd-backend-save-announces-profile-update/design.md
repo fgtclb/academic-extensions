@@ -65,7 +65,7 @@ Implement `processDatamap_afterAllOperations(DataHandler $dataHandler)` in
 2. Keep the uids of live, default-language rows (`sys_language_uid = 0`,
    `BE_USER->workspace === 0`).
 3. Load each one ignoring every enable field, like the synchronisation lookup
-   of `ace-tbd-sync-lookups-ignore-time-window`. The candidate's
+   of `ace-667-sync-lookups-ignore-time-window`. The candidate's
    `findByUidIncludingHidden()` ignores only `disabled`, so it misses a
    profile whose end time has passed. That finder also serves the public
    detail view and must not be widened. Dispatch with `origin: Backend`, or

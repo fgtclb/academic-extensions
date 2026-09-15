@@ -55,7 +55,7 @@ None.
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-02`). One of the six analysed projects carries its own code
 for this today: two composer patches, one for the profile lookup and one for
-the frontend-user provider. No YouTrack issue is filed yet; the change is
-renamed to `ace-<NNN>-<slug>` when the issue is filed after implementation.
+the frontend-user provider. Filed after implementation as ACE-667, which
+covers `main` and the backport to `2`.
 
 Relates to ACE-242.
