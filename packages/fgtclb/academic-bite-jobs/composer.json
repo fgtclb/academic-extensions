@@ -1,7 +1,7 @@
 {
     "name": "fgtclb/academic-bite-jobs",
     "type": "typo3-cms-extension",
-    "description": "",
+    "description": "FGTCLB: Academic Bite Jobs - The Academic Bite Jobs extension shows jobs from the B-Ite Job Board.",
     "minimum-stability": "beta",
     "license": "GPL-2.0-or-later",
     "authors": [

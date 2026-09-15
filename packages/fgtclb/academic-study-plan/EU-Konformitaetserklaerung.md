@@ -1,11 +1,11 @@
 # EU-Konformitätserklärung
 
-**Produkt:** Academic Study Plan
+**Produkt:** FGTCLB: Academic Study Plan
 **Referenz:** DoC-academic_study_plan-2.4.0
 
 ## 1. Produktidentifikation
 
-- **Produktname:** Academic Study Plan
+- **Produktname:** FGTCLB: Academic Study Plan
 - **Typ:** TYPO3-Extension
 - **Extension Key / Package:** academic_study_plan (fgtclb/academic-study-plan)
 - **Version:** 2.4.0 (Erstausstellung dieser Erklärung)
@@ -26,7 +26,7 @@ EU-Konformitätserklärung trägt der Hersteller, web-vision GmbH.
 
 ## 4. Gegenstand der Erklärung
 
-Academic Study Plan, Version 2.4.0, vertrieben über das TYPO3 Extension
+FGTCLB: Academic Study Plan, Version 2.4.0, vertrieben über das TYPO3 Extension
 Repository (TER) und Packagist.
 
 ## 5. Konformitätserklärung
@@ -60,7 +60,7 @@ Unterzeichnet für und im Namen von: web-vision GmbH
 ## Vereinfachte EU-Konformitätserklärung (Anhang VI)
 
 > Hiermit erklärt die web-vision GmbH, dass das Produkt mit digitalen
-> Elementen des Typs Academic Study Plan der Verordnung (EU) 2024/2847 entspricht.
+> Elementen des Typs FGTCLB: Academic Study Plan der Verordnung (EU) 2024/2847 entspricht.
 >
 > Der vollständige Text der EU-Konformitätserklärung ist unter der
 > folgenden Internetadresse verfügbar:

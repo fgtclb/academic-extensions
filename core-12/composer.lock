@@ -997,7 +997,7 @@
             "license": [
                 "GPL-2.0-or-later"
             ],
-            "description": "Base functionality accross academic extensions",
+            "description": "FGTCLB: Academic Base - Base functionality across academic extensions.",
             "homepage": "https://www.fgtclb.com/",
             "transport-options": {
                 "relative": true
@@ -1050,6 +1050,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
+            "description": "FGTCLB: Academic Bite Jobs - The Academic Bite Jobs extension shows jobs from the B-Ite Job Board.",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1107,7 +1108,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "Role based relations between profiles and pages",
+            "description": "FGTCLB: Academic Contacts for Pages - Role based relations between profiles and pages",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1168,7 +1169,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "The Academic Jobs extension allows users to create and manage job postings.",
+            "description": "FGTCLB: Academic Jobs - The Academic Jobs extension allows users to create and manage job postings.",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1240,7 +1241,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "Extension for showing academic partners in list and map view",
+            "description": "FGTCLB: Academic Partners - Extension for showing academic partners in list and map view",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1307,7 +1308,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "Adds a person database to TYPO3 with plugins to show them in the frontend.",
+            "description": "FGTCLB: Academic Persons - Adds a person database to TYPO3 with plugins to show them in the frontend.",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1367,7 +1368,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "Adds the option to assign frontend users to academic persons and allow editing the profiles in frontend.",
+            "description": "FGTCLB: Academic Persons Edit - Provides the option to assign frontend users to academic persons and allow editing the profiles in frontend.",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1428,7 +1429,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "Adds some configuration for external users providers like Active Directory",
+            "description": "FGTCLB: Academic Persons Sync - Adds some configuration for external users providers like Active Directory.",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1500,7 +1501,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "Add structured data for academic programs to pages",
+            "description": "FGTCLB: Academic Programs - Educational Program page for TYPO3 with structured data based on sys_category",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1566,7 +1567,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "Research project page for universities. Ships structured data preparation",
+            "description": "FGTCLB: Academic Projects - Academic project pages for TYPO3 with specific structured data and typed sys_categories",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1628,7 +1629,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "TYPO3 extension for building and displaying academic study plans with semesters, modules, and categorization features.",
+            "description": "FGTCLB: Academic Study Plan - TYPO3 extension for building and displaying academic study plans with semesters, modules, and categorization features.",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
@@ -1808,7 +1809,7 @@
                     "email": "hello@fgtclb.com"
                 }
             ],
-            "description": "Base package for FGTCLB Academic packages",
+            "description": "FGTCLB: Basic Typed Categories - Basic extension for typed categories",
             "homepage": "https://www.fgtclb.com/",
             "support": {
                 "issues": "https://github.com/fgtclb/academic-extensions/issues",
