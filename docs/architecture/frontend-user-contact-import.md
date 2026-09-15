@@ -5,6 +5,31 @@
 fax values both become phone-number records on the imported profile contract;
 physical addresses and email addresses follow their existing, separate paths.
 
+## Visibility does not stop the synchronisation
+
+Both commands ignore the visibility of a record when they select it, and
+exclude only deleted records:
+
+| Record     | Ignored when selecting                       | Still excluded |
+|------------|----------------------------------------------|----------------|
+| `fe_users` | `disable`, `starttime`, `endtime`            | `deleted`      |
+| profile    | `hidden`, `starttime`, `endtime`, `fe_group` | `deleted`      |
+
+Visibility says when and to whom a record is shown, not whether the person
+behind it exists, and a command-line run has no frontend user group that a
+restricted profile could match. ACE-242 lifted the hidden flags; ACE-667 the
+start and end times and the frontend user group.
+
+The profile fields are not a fixed list. The lookup asks the TCA schema of the
+profile table which of the four it declares as enable columns, so an
+installation that removes one is not handed a field its table does not have,
+and an enable column added later stays in effect.
+
+Visibility is never written: a synchronised profile keeps all four values, and
+a profile outside its window stays invisible in the frontend. The display paths
+— the "show hidden records" option, the selected profiles and the detail view —
+share a different helper, which lifts the hidden flag only.
+
 ## Identity and presentation are separate
 
 The source field defines the import identity:

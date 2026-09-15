@@ -1,6 +1,6 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Verify `ace-tbd-sync-lookups-ignore-time-window` is merged.
+- [ ] 1.1 Verify `ace-667-sync-lookups-ignore-time-window` is merged.
 
 ## 2. Tests first
 

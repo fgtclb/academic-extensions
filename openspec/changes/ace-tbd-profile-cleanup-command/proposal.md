@@ -41,7 +41,7 @@ None.
 - A new console command, schedulable like the other two.
 - Deleting is destructive. The defaults and the dry run are named in the
   documentation, and deleted records stay restorable through the history.
-- Depends on `ace-tbd-sync-lookups-ignore-time-window`, so that the
+- Depends on `ace-667-sync-lookups-ignore-time-window`, so that the
   synchronisation and the cleanup agree on what "outside the time window"
   means.
 
