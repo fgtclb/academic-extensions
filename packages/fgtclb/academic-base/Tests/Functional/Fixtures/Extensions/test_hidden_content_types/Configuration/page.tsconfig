@@ -1,0 +1,3 @@
+# Hides both content types for the whole installation, the way every academic
+# extension hides its own ones in its always-loaded page TSconfig.
+TCEFORM.tt_content.CType.removeItems := addToList(testhidden_academic,testhidden_other)
