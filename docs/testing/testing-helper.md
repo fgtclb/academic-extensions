@@ -454,20 +454,51 @@ assembled at runtime are covered too.
 ALTER TABLE tt_content ADD COLUMN list_type VARCHAR(255) DEFAULT '' NOT NULL
 ```
 
+It then flushes the `database_schema` **and** the `runtime` cache, which is what
+makes the new column visible to the rest of the process — see below.
+
 On TYPO3 v13 the column already exists and the method returns early.
 
-**When to use it.** In the `setUp()` of an upgrade wizard test that migrates
-`list_type` to `CType`. Three tests do:
-[`academic-persons/…/ListTypeToCTypeUpgradeWizardTest.php:32`](../../packages/fgtclb/academic-persons/Tests/Functional/Upgrades/ListTypeToCTypeUpgradeWizardTest.php#L32),
-[`academic-jobs/…/PluginUpgradeWizardTest.php:22`](../../packages/fgtclb/academic-jobs/Tests/Functional/Upgrades/PluginUpgradeWizardTest.php#L22)
-and
-[`academic-persons-edit/…/PluginContentWizardTest.php:22`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Upgrades/PluginContentWizardTest.php#L22).
+**When to use it.** In an upgrade wizard test that migrates `list_type` to
+`CType`. Five call sites, in two shapes:
+
+From `setUp()`, before anything has read the `tt_content` schema:
+
+- [`academic-persons/…/ListTypeToCTypeUpgradeWizardTest.php:32`](../../packages/fgtclb/academic-persons/Tests/Functional/Upgrades/ListTypeToCTypeUpgradeWizardTest.php#L32)
+- [`academic-jobs/…/PluginUpgradeWizardTest.php:22`](../../packages/fgtclb/academic-jobs/Tests/Functional/Upgrades/PluginUpgradeWizardTest.php#L22)
+- [`academic-projects/…/PluginUpgradeWizardTest.php:22`](../../packages/fgtclb/academic-projects/Tests/Functional/Upgrades/PluginUpgradeWizardTest.php#L22)
+- [`academic-persons-edit/…/PluginContentWizardTest.php:22`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Upgrades/PluginContentWizardTest.php#L22)
+
+From two **test methods**, which is the shape that made the caching defect below
+visible:
+
+- [`academic-persons-edit/…/RemoveProfileSwitcherContentWizardTest.php:81`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Upgrades/RemoveProfileSwitcherContentWizardTest.php#L81)
+
+The last one is deliberate: that class seeds `CType` fixtures *without* the
+column on v14 and `list_type` fixtures *with* it, so it cannot add the column
+for every test in `setUp()`.
 
 **The trap it exists for.** TYPO3 v14 removed `tt_content.list_type` together
 with the plugin sub-type feature. An upgrade wizard that migrates away from
 `list_type` still has to be testable there — the wizard's entire purpose is to
 run on installations that still have the column and its data. Without the trait
 the v14 leg of those tests cannot even seed its fixture.
+
+**The second trap, and why the flush is there (ACE-670).** `ALTER TABLE`
+invalidates nothing, and `Connection::getSchemaInformation()` caches table
+information *twice*: in the `runtime` cache and in the persistent
+`database_schema` cache. A column added at runtime therefore stays invisible to
+everything reading through that API — and flushing only the persistent layer is
+not enough, because the level 1 entry sits in the `runtime` cache.
+
+It stayed harmless for as long as `typo3/testing-framework` resolved the column
+types of a data set through live schema introspection. Since **9.7.0** it takes
+them from the cached information, so importing a fixture that carries
+`list_type` ended in `Call to a member function getType() on null` rather than in
+a readable error, and the whole v14 functional suite went red. Only the class
+that calls the trait from its test methods was affected — by then the earlier
+tests of the same class have already read the `tt_content` schema, while a
+`setUp()` call happens before anything has.
 
 Note the column comparison is done on `strtolower($column->getName())`, which is
 what makes it reliable across the four supported DBMS.
