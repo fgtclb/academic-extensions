@@ -56,7 +56,15 @@ change the partner a record refers to.
   touching the partner field
 - **THEN** the record still refers to the same partner as before
 
-#### Scenario: Hidden and deleted partners stay out of the list
+#### Scenario: Deleted partners stay out of the list
 
-- **WHEN** an installation has hidden and deleted partner pages
-- **THEN** the select offers neither of them, exactly as before
+- **WHEN** an installation has deleted partner pages
+- **THEN** the select does not offer them, exactly as before
+
+#### Scenario: Hidden partners keep the visibility they had, per core version
+
+- **WHEN** an installation has hidden partner pages
+- **THEN** on TYPO3 v13 the select offers them, in their place in the
+  alphabetical order, and on TYPO3 v12 it does not offer them at all — in both
+  cases exactly as before, because this change does not revisit which partners
+  are offered
