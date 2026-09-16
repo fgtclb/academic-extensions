@@ -58,7 +58,14 @@ change the partner a record refers to.
   touching the partner field
 - **THEN** the record still refers to the same partner as before
 
-#### Scenario: Hidden and deleted partners stay out of the list
+#### Scenario: Deleted partners stay out of the list
 
-- **WHEN** an installation has hidden and deleted partner pages
-- **THEN** the select offers neither of them, exactly as before
+- **WHEN** an installation has deleted partner pages
+- **THEN** the select does not offer them, exactly as before
+
+#### Scenario: Hidden partners keep being offered
+
+- **WHEN** an installation has hidden partner pages
+- **THEN** the select offers them, in their place in the alphabetical order,
+  exactly as before — the backend deliberately shows an editor records that are
+  not publicly visible, and this change does not revisit that
