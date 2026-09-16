@@ -60,6 +60,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-18`). Two of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-ckeditor4-link-and-line-breaks` when the issue is filed after
-implementation.
+this today. Filed as ACE-668 and named after it. The implementation is the
+change of the same name on branch `2`.
