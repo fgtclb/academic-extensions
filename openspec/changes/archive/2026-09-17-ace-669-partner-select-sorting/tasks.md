@@ -50,6 +50,10 @@
 
 ## 5. Backport to branch `2`
 
+Tasks 5.3 and 5.4, and 6.7 below, are carried out on branch `2` and are tracked
+by the change of the same name there, which is archived in its own pull request.
+They stay unticked here because this branch cannot verify them.
+
 - [x] 5.1 Write the file level backport analysis
   (`docs/workflow/backporting.md`, the three measurement commands) into
   `.agent/reports/`, and state which files are byte-identical.
