@@ -22,6 +22,16 @@ Verified on this branch:
 - The partner field is a single select whose entries are produced by an item
   handler, one per partner page, with one empty placeholder entry and no order.
   The handler has no caller besides the form engine.
+- That select never offers deleted partner pages, and **offers hidden ones on
+  TYPO3 v13 but not on v12**. `Typo3QuerySettings::__construct()` turns
+  `ignoreEnableFields` on when the global request is a backend one, but on v12
+  only if the Extbase feature toggle `ignoreAllEnableFieldsInBe` is enabled —
+  deprecated there and off by default. TYPO3 v13 dropped the toggle and applies
+  the backend default unconditionally. The handler builds its settings through
+  `GeneralUtility::makeInstance()`, so it inherits whichever default applies,
+  and FormEngine always runs in a backend request. The soft delete clause is
+  applied independently of that flag, which is why deleted pages behave the same
+  on both. Measured on 12.4.45 and 13.4.35 by compiling the form.
 - The query behind it declares **no ordering at all** here, so the select is in
   whatever order the database returns. On PostgreSQL that is not stably the
   same order twice. On `main` the same query orders by the page tree sorting
@@ -89,6 +99,30 @@ so the assertion cannot be satisfied by the order the database happens to
 return. The existing fixture of the query on this branch has no sorting column
 at all — a reminder that the page tree order which `main` starts from does not
 exist here.
+
+### Hidden partners are offered, and stay that way
+
+This change's first draft assumed the select offered neither hidden nor deleted
+partner pages and asked for a single scenario pinning that. Deleted ones it does
+not offer, on either version. Hidden ones it offers on v13 and not on v12, for
+the feature toggle reason in Context — so there is no one answer to assert, and
+a test claiming either one for both versions would be wrong on the other.
+
+The complete order is therefore asserted once per core version, with this
+branch's `not-core-12` and `not-core-13` groups, and the hidden case is pinned
+from both sides so that a change to it is reported as itself rather than as a
+surprising order.
+
+`PartnerRepositoryFindAllTest` asserts that hidden partners are not returned and
+is right about what it measures: it sets no global request at all, so the
+backend default above does not apply. That condition does not occur in
+production for this query — its only caller runs below a backend request.
+
+The spec pins both counts as they are. Whether an editor should be offered
+hidden partners is a real question, and `PartnerItems` carries an open `@todo`
+for it, but answering it changes which partners are offered, which this change's
+proposal rules out. It belongs to an issue of its own. The `main` side of
+ACE-669 carries the same correction.
 
 ### The changelog entry names this branch's previous order
 
