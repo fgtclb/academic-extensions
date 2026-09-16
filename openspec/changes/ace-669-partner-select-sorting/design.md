@@ -9,6 +9,13 @@ See `proposal.md` for the motivation. Verified on `main` at `87b6d54bc`, and on
   no order.
 - That handler is used by the form engine only — it has no second caller, so
   ordering the rendered select is the whole job.
+- That select offers **hidden** partner pages and does not offer deleted ones.
+  `Typo3QuerySettings` turns `ignoreEnableFields` on whenever the global request
+  is a backend one — core states the reason in the class itself, that an editor
+  needs to see all records — and the handler builds its settings through the
+  container, so it inherits that default. FormEngine always runs in a backend
+  request. The soft delete clause is applied independently of that flag, which
+  is why the two differ.
 - `PartnerRepository::findAll()`, the query behind it, **differs between the
   branches**: on `main` it orders by the page tree `sorting` with `uid` as
   tiebreaker (ACE-491, documented in the 3.0 changelog), on `origin/2` it
@@ -74,6 +81,24 @@ The partner pages of the fixture get titles whose alphabetical order matches
 neither their `uid` order nor their page tree `sorting` order. Without that, a
 test can pass for the wrong reason on one branch and not the other, since the
 two branches start from those two different orders.
+
+### Hidden partners are offered, and stay that way
+
+Measured on this branch at `827ba0744` on TYPO3 v14 by compiling the form: the
+select offers hidden partner pages, in their alphabetical place, and does not
+offer deleted ones. This change's first draft assumed both were absent and asked
+for a scenario pinning that, which would have been a test asserting something
+the shipped code has never done.
+
+`PartnerRepositoryFindAllTest` asserts that hidden partners are not returned and
+is right about what it measures: it sets no global request at all, so the
+backend default above does not apply. That condition does not occur in
+production for this query — its only caller runs below a backend request.
+
+The spec now pins both counts as they are. Whether an editor should be offered
+hidden partners is a real question, and `PartnerItems` carries an open `@todo`
+for it, but answering it changes which partners are offered, and this change's
+proposal rules that out. It belongs to an issue of its own.
 
 ### The changelog entry goes to the 2.4 folder on both branches
 
