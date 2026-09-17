@@ -40,5 +40,5 @@
 - [x] 4.2 `-t 13 -p 8.2`: `composerUpdate`, `lintPhp`, `cgl -n`, `phpstan`,
   `unit` and `functional` all green.
 - [x] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 4.4 Commit in TYPO3 Core format with ACE-676, state the v12 requirement
+- [x] 4.4 Commit in TYPO3 Core format with ACE-676, state the v12 requirement
   on the issue, and archive the change as the last commit of the pull request.
