@@ -85,6 +85,20 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
         $this->assertStringNotContainsString('Hidden lab', $content);
     }
 
+    /**
+     * The short description is rich text and goes through the site's "lib.parseFunc_RTE",
+     * so the editor's link to a page reaches the visitor as the page's URL, not as "t3://".
+     */
+    #[Test]
+    public function projectListPluginResolvesAPageLinkInTheShortDescription(): void
+    {
+        $this->setUpTestCase('projectListPage');
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('<a href="/solar-fields">the farmland project</a>', $content);
+        $this->assertStringNotContainsString('t3://', $content);
+    }
+
     #[Test]
     public function projectListPluginRendersTheFilterAndSortingForm(): void
     {
