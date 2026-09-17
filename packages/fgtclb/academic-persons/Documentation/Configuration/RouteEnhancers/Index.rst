@@ -22,6 +22,7 @@ What the files enhance
     :yaml:`/{profile_name}`, for the :php:`detail` action, mapping the argument
     :yaml:`profile`. The path segment is resolved by a
     :yaml:`PersistedAliasMapper` on the table
+    :yaml:`limitToPages` the pages where routes should apply
     :sql:`tx_academicpersons_domain_model_profile` over the field
     :sql:`slug`.
 
@@ -174,3 +175,5 @@ Caveats
     and the alphabet filter of this extension are rendered as links, not as a
     form, so their own requests do carry the arguments in the URL and are
     enhanced.
+*   limitToPages should be set for routeEnhancers as routes will be caught on
+    every page without providing a 404
