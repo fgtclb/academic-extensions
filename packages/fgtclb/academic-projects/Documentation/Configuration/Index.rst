@@ -121,6 +121,16 @@ component sets it needs instead of the aggregate.
     this set and still uses the page type has to define
     :typoscript:`styles.content.getContent` itself.
 
+..  note::
+
+    The page type renders the short description and the funders of a project,
+    and the project list its short description, through
+    :html:`<f:format.html>` and therefore through the site's
+    :typoscript:`lib.parseFunc_RTE`. On TYPO3 v13 the core defines that path
+    for every site. On TYPO3 v12 the site has to provide it, as
+    :guilabel:`EXT:fluid_styled_content` and common site packages do, or these
+    pages fail with the core exception 1641989097.
+
 ..  _site-set:
 
 Include the site set
