@@ -45,4 +45,4 @@
   `functional` for TYPO3 v12 (PHP 8.1), all green.
 - [x] 4.2 The same for TYPO3 v13 (PHP 8.2).
 - [x] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 4.4 Archive the change as the last commit of the pull request.
+- [x] 4.4 Archive the change as the last commit of the pull request.
