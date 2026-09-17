@@ -22,6 +22,11 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
  * Remove those two lines from "Configuration/TypoScript/Page/AcademicProjects.typoscript" and the page
  * renders the site package's fallback template instead - which is what the second
  * assertion is for.
+ *
+ * The remaining tests pin what the template renders of the categories assigned to the
+ * page. That block read a property the model does not have until ACE-673, so it never
+ * appeared; asserting the rendered output rather than the property name is what keeps a
+ * rename from hiding it again.
  */
 final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTestCase
 {
@@ -83,5 +88,51 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $this->assertStringContainsString('academic-projects-detail', $content);
         $this->assertStringNotContainsString('site-package-default-template', $content);
+    }
+
+    /**
+     * The fixture assigns one category of type "competence_field" and one of type
+     * "department" to the page, so both type labels and both category titles have to reach
+     * the output.
+     */
+    #[Test]
+    public function projectPageListsItsCategoriesGroupedByType(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString('Competence field', $content);
+        $this->assertStringContainsString('Photonics', $content);
+        $this->assertStringContainsString('Department', $content);
+        $this->assertStringContainsString('Institute of Physics', $content);
+    }
+
+    /**
+     * "funding_partner" is a registered type and the fixture even holds a category of it,
+     * but that category is assigned to no page. Neither the type nor its category may show up.
+     */
+    #[Test]
+    public function projectPageOmitsACategoryTypeWithoutAnAssignedCategory(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringNotContainsString('Funding partner', $content);
+        $this->assertStringNotContainsString('Federal Research Ministry', $content);
+    }
+
+    #[Test]
+    public function projectPageWithoutCategoriesRendersNoCategoryList(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
+
+        $this->assertStringContainsString('academic-projects-detail', $content);
+        $this->assertStringNotContainsString('Competence field', $content);
+        $this->assertStringNotContainsString('Photonics', $content);
+        $this->assertStringNotContainsString('Institute of Physics', $content);
     }
 }

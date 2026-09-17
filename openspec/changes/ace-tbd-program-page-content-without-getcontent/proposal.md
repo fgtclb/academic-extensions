@@ -58,7 +58,7 @@ None.
 - The same call in the page templates of `academic_partners`
   (`packages/fgtclb/academic-partners`) and `academic_projects`
   (`packages/fgtclb/academic-projects`), and the removal of their
-  content-load sets; `ace-tbd-page-template-category-block` and
+  content-load sets; `ace-673-page-template-category-block` and
   `ace-tbd-page-templates-sections-subtitle` do that.
 - Rendering several columns or a backend layout aware content area.
 - A backport to branch `2`, where the override is always included.

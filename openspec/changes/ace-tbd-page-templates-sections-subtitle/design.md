@@ -119,7 +119,7 @@ with them the only definition of `styles.content.getContent` are removed in
 3.0, so a template that still renders the path throws. A site that
 customised `styles.content.getContent` for these pages (for example with
 `slide`) moves the customisation to `page.10.variables.partnerContent` or
-`projectContent`. `ace-tbd-page-template-category-block` changes the same
+`projectContent`. `ace-673-page-template-category-block` changes the same
 templates; whichever of the two lands first introduces the variable, and the
 other builds on it. The removal of the sets belongs to this change, see the
 next decision.
