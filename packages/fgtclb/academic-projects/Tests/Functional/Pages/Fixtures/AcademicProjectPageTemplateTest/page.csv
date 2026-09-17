@@ -1,4 +1,5 @@
 "pages",
-,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title","backend_layout","abstract"
-,1,0,1,0,0,0,0,0,"/","Site Root","",""
-,10,1,30,0,0,0,0,0,"/quantum-optics","Quantum Optics","pagets__AcademicProject","A research project."
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title","backend_layout","abstract","tx_academicprojects_short_description","tx_academicprojects_funders"
+,1,0,1,0,0,0,0,0,"/","Site Root","","","",""
+,10,1,30,0,0,0,0,0,"/quantum-optics","Quantum Optics","pagets__AcademicProject","A research project.","<p>Continues <a href=""t3://page?uid=11"">the dark matter project</a>.</p>","<p>Funded by <a href=""t3://page?uid=11"">the dark matter consortium</a>.</p>"
+,11,1,30,0,0,0,0,0,"/dark-matter","Dark Matter","pagets__AcademicProject","A project without rich text.","",""
