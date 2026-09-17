@@ -114,7 +114,7 @@ the program page independent of the set:
 
 The partner and project sets are removed by the changes that take their page
 templates off `styles.content.getContent`
-(`ace-tbd-page-template-category-block` and
+(`ace-673-page-template-category-block` and
 `ace-tbd-page-templates-sections-subtitle`), so no page template loses the
 object it still renders. `Partials/Program/Categories.html` is removed by
 `ace-tbd-program-facts-field-list`, which replaces its last callers.

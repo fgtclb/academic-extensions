@@ -20,9 +20,9 @@
         </f:for>
     </div>
 
-    <f:if condition="{project.categories.allCategoriesByType}">
+    <f:if condition="{project.attributes.allCategoriesByType}">
         <ul>
-            <f:for each="{project.categories.allCategoriesByType}" as="categories" key="type">
+            <f:for each="{project.attributes.allCategoriesByType}" as="categories" key="type">
                 <f:if condition="{categories}">
                     <li>
                         <core:icon identifier="category_types.projects.{type}"/>

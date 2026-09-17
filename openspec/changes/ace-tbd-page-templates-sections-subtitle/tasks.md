@@ -20,7 +20,7 @@
   translated page: assert HTTP 200, both records in order, no colPos 1
   record and the translated content. Record that it fails on the unchanged
   templates with the `f:cObject` exception. Skip it if
-  `ace-tbd-page-template-category-block` landed first with the same case.
+  `ace-673-page-template-category-block` landed first with the same case.
 - [ ] 1.6 In both extensions, change `Tests/Functional/SiteSet/SiteSetDeliveryTest.php`
   to assert that the content-load set is not registered and that a site on
   the aggregate set has no `styles.content.getContent` (replacing
@@ -37,7 +37,7 @@
 
 ## 2. Implementation
 
-- [ ] 2.1 Unless `ace-tbd-page-template-category-block` introduced them
+- [ ] 2.1 Unless `ace-673-page-template-category-block` introduced them
   already, add `page.10.variables.partnerContent` and `projectContent`
   (`CONTENT` on `tt_content`, colPos 0, `orderBy = sorting, uid`) inside the
   doktype conditions of `AcademicPartners.typoscript` and
@@ -84,7 +84,7 @@
   or overridden `styles.content.getContent` to
   `page.10.variables.partnerContent` / `projectContent`, or define
   `styles.content.getContent` in the site package when a site template keeps
-  rendering it). If `ace-tbd-page-template-category-block` already shipped a
+  rendering it). If `ace-673-page-template-category-block` already shipped a
   `Breaking-` entry for the template switch, link it instead of repeating
   it. Check the reST over/underline lengths and verify both `3.0` indexes
   list the entry.

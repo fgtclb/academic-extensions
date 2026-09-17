@@ -94,9 +94,9 @@ None.
 - Backporting to branch `2`, which serves TYPO3 v12.
 
 Depends on candidates `listings-01` (change
-`ace-tbd-page-template-category-block`) and `listings-03` (change
+`ace-673-page-template-category-block`) and `listings-03` (change
 `ace-tbd-project-rte-fields-parsefunc`), which change the same templates.
-`ace-tbd-page-template-category-block` carries the same removal of
+`ace-673-page-template-category-block` carries the same removal of
 `styles.content.getContent`; whichever lands first introduces the page
 variable, and the other builds on it.
 
