@@ -2,17 +2,17 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 250 PHP files declaring 225
-classes, 15 interfaces, 6 traits and 4 enums do not follow one style yet.
+rather than describing an intention as a rule — 255 PHP files declaring 228
+classes, 15 interfaces, 7 traits and 5 enums do not follow one style yet.
 
 ## `final` by default, and where it is impossible
 
-103 of the 225 classes are `final` (46 %). The distribution is not random: it
+106 of the 228 classes are `final` (46 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
 |--------------------------------------------|---------|---------|----------|----------|
-| `Classes/Upgrades/`                        | 9       | 0       | 0        | 100 %    |
+| `Classes/Upgrades/`                        | 10      | 0       | 0        | 100 %    |
 | `Classes/Core12/` and `Classes/Core13/`    | 6       | 0       | 0        | 100 %    |
 | `Classes/Service/` and `Classes/Services/` | 11      | 3       | 0        | 79 %     |
 | `Classes/EventListener/`                   | 2       | 1       | 0        | 67 %     |
@@ -21,8 +21,8 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 2       | 8       | 0        | 20 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 59      | 50      | 4        | 52 %     |
-| **Total**                                  | **103** | **116** | **6**    | **46 %** |
+| Everything else                            | 61      | 50      | 4        | 53 %     |
+| **Total**                                  | **106** | **116** | **6**    | **46 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -50,8 +50,8 @@ this and is the pattern to copy:
 ## `readonly` on properties, not on classes
 
 **There is not a single `readonly class` declaration in this repository.**
-`readonly` is used heavily, but always on individual properties: 182 modifiers
-carrying an explicit visibility, of which 181 are constructor-promoted. The one
+`readonly` is used heavily, but always on individual properties: 191 modifiers
+carrying an explicit visibility, of which 190 are constructor-promoted. The one
 non-promoted declaration is
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15, which is
 assigned once in the constructor body because its value is defaulted there.
@@ -60,8 +60,8 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 122   | An injected collaborator                          |
-| `public readonly`    | 40    | A field of an immutable data object               |
+| `private readonly`   | 128   | An injected collaborator                          |
+| `public readonly`    | 43    | A field of an immutable data object               |
 | `protected readonly` | 20    | Either, in classes with subclasses or older style |
 
 Use `private readonly` for every constructor-injected dependency. It states that
@@ -81,8 +81,8 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 74 files declare
-181 promoted `readonly` parameters. The fullest example of *injection* is
+Constructor injection with promoted properties is the default: 79 files declare
+190 promoted `readonly` parameters. The fullest example of *injection* is
 `academic-persons-edit/Classes/Controller/ContractController.php` lines 36–45 —
 eight promoted `private readonly` dependencies and an empty constructor body.
 `academic-base/Classes/Tca/TableConfiguration.php` has more promoted parameters
@@ -205,10 +205,11 @@ referenced it.
 
 ### Enums
 
-Four, all backed, none pure:
+Five, all backed, none pure:
 
 | Enum                                                              | Backing  |
 |-------------------------------------------------------------------|----------|
+| `academic-bite-jobs/Classes/Enumeration/ListView.php:10`          | `string` |
 | `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:7`   | `int`    |
 | `academic-persons/Classes/Profile/ProfileActionType.php:14`       | `string` |
 | `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12` | `string` |
@@ -272,22 +273,22 @@ be set.
 
 ## Strict types
 
-242 of the 249 files declare `strict_types=1` — here counted over
+244 of the 251 files declare `strict_types=1` — here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
 `packages-dev/` and `Tests/` are not counted. The 7 that do not are worth
 knowing so they are fixed rather than copied:
 
-| File                                                                  |
-|-----------------------------------------------------------------------|
-| `academic-partners/Classes/DataProcessing/PartnershipProcessor.php`   |
-| `academic-partners/Classes/DataProcessing/PartnerProcessor.php`       |
-| `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`   |
-| `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`      |
-| `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`     |
-| `academic-persons/Classes/Settings/Validation.php`                    |
-| `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php`  |
+| File                                                                 |
+|----------------------------------------------------------------------|
+| `academic-partners/Classes/DataProcessing/PartnershipProcessor.php`  |
+| `academic-partners/Classes/DataProcessing/PartnerProcessor.php`      |
+| `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`  |
+| `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`     |
+| `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`    |
+| `academic-persons/Classes/Settings/Validation.php`                   |
+| `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php` |
 
 Three of the seven are `DataProcessing/` classes, which suggests one origin
 rather than seven independent omissions. A fourth,

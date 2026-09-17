@@ -35,8 +35,8 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  *   verbatim instead of `HandlerStack::create()`. The handler answers from memory, and
  *   `backupGlobals` restores the setting after each test. Stubbing at handler level is the
  *   same technique the `test_bitejobs_stub` fixture extension uses, and for the same reason:
- *   `RequestFactory` and `GuzzleClientFactory` are `readonly` on TYPO3 v14 and plain classes
- *   on v13, so neither can be subclassed for both versions.
+ *   `RequestFactory` builds its client through `GuzzleClientFactory` rather than taking one,
+ *   and `BiteJobsService` is `final`, so neither can be replaced.
  * - The subject is built by hand rather than taken from the container, because the failure
  *   cases assert against the injected logger. `serviceIsResolvableFromTheDependencyInjectionContainer()`
  *   covers the wiring separately.
@@ -58,7 +58,7 @@ final class BiteJobsServiceTest extends AbstractAcademicBiteJobsTestCase
 {
     /**
      * A complete plugin configuration, as FormEngine writes it once every field of
-     * `Configuration/FlexForms/AcademicBiteJobsList.xml` has been touched.
+     * `Configuration/FlexForms/Core12|Core13/AcademicBiteJobsList.xml` has been touched.
      *
      * @var array<string, string>
      */

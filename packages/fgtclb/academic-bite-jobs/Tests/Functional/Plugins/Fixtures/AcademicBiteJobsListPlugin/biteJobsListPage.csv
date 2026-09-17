@@ -1,0 +1,7 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title"
+,1,0,1,0,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/home","Home (EN)"
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header","pi_flexform"
+,1,2,0,0,0,0,"academicbitejobs_list","","<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms><data><sheet index=""sDEF""><language index=""lDEF""><field index=""settings.jobs.jobListingKey""><value index=""vDEF"">test-key</value></field><field index=""settings.jobs.sortBy""><value index=""vDEF"">title</value></field><field index=""settings.jobs.sortingDirection""><value index=""vDEF"">asc</value></field><field index=""settings.jobs.view""><value index=""vDEF"">List</value></field><field index=""settings.jobs.limit""><value index=""vDEF"">10</value></field></language></sheet></data></T3FlexForms>"
