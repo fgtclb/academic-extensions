@@ -188,8 +188,9 @@ this table — it has been wrong before.
 The consequence is narrower than the missing four suggest, and it is worth
 checking per change rather than assumed: a trait being on both branches does not
 mean the test directory that uses it is. Frontend plugin rendering tests do have
-a home here — `academic-persons`, `academic-persons-edit` and `academic-jobs`
-each carry a `Tests/Functional/Plugins/` tree — but an extension that has none
+a home here — `academic-contact4pages`, `academic-jobs`, `academic-persons`,
+`academic-persons-edit` and `academic-projects` each carry a
+`Tests/Functional/Plugins/` tree — but an extension that has none
 yet needs its fixtures written as part of the backport. Where a test genuinely
 has no home, that means one of three things, and the choice is worth stating in
 the pull request:

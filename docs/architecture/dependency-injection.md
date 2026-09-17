@@ -121,12 +121,12 @@ In both packages the registration of the ordinary classes still happens in
 ### Attributes are already in use
 
 Contrary to the note in `AGENTS.md` that these extensions do not use attributes,
-they are used in production code across seven packages:
+they are used in production code across nine packages:
 
 | Attribute            | Sites   | Examples                                                                    |                                                |
 | -------------------- | ------- | --------------------------------------------------------------------------- |                                                |
 | `#[Exclude]`         | 12      | the eight `Classes/Core12                                                   | Core13/` types and `EnvironmentBuilderFactory` |
-| `#[Autoconfigure]`   | 9       | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)   |                                                |
+| `#[Autoconfigure]`   | 10      | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)   |                                                |
 | `#[Autowire]`        | 7       | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`     |                                                |
 | `#[AsAlias]`         | 2       | `academic-persons/Classes/Service/RecordSynchronizer.php:21`                |                                                |
 | `#[AsCommand]`       | 1       | `academic-partners/Classes/Command/GeocodeCommand.php:23`                   |                                                |
@@ -345,6 +345,46 @@ the way integrators register a listener against its events, in
 `packages/fgtclb/academic-persons/Documentation/Changelog/2.4/Feature-DispatchModifyTcaSelectFieldItemsEventInItemsProcFunc.rst`.
 That is aimed at a project, which knows its own core version; it is not a
 licence to use the attribute in these extensions.
+
+## A data processor with a collaborator has to be published
+
+TypoScript names a data processor by class name:
+
+```typoscript
+page.10.dataProcessing.400 = FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor
+```
+
+TYPO3 resolves that name in two steps
+(`ContentDataProcessor::getDataProcessor()`, identical on v12.4.45 and v13): if
+the container knows the name it returns **that service**, otherwise it falls
+back to `GeneralUtility::makeInstance()` on the class. A processor whose
+services are private therefore takes the second path and is constructed with
+no arguments — so a constructor dependency is only ever injected when the
+processor is published:
+
+```php
+#[Autoconfigure(public: true)]
+class ContactsProcessor implements DataProcessorInterface
+{
+    public function __construct(
+        private readonly PageContactsProvider $pageContactsProvider,
+    ) {}
+}
+```
+
+`#[Autoconfigure]` is Symfony's and exists on 6.4 and 7.4 alike, see the table
+above. This is the "TYPO3 API entry point" exception of the rule below, not a
+reason to publish services in general. Two consequences are worth knowing
+before reaching for it:
+
+- The processor stays **non-`final`**, because projects subclass it. A subclass
+  named in TypoScript is only constructed correctly when the project's own
+  `Services.yaml` autowires it; otherwise TYPO3 takes the `makeInstance` path
+  and the missing constructor argument is fatal.
+- `ContactsProcessor` shares `PageContactsProvider` with `ContactsController`,
+  which is the point of injecting it: the rule about which contacts a visitor
+  sees exists once, and the content element and the page template cannot drift
+  apart.
 
 ## Other rules
 
