@@ -40,13 +40,16 @@ The `cgl` arm of `runTests.sh` runs php-cs-fixer with
 `-n` it **rewrites files in place**; with `-n` it adds `--dry-run --diff` and
 only reports, which is the form CI uses in its `cgl` job.
 
-The rule set is `@PER-CS1.0` plus `@DoctrineAnnotation` and some fifty
-individual rules (`Build/php-cs-fixer/config.php:64-133`), risky rules allowed.
+The rule set is `@PER-CS1x0` plus `@DoctrineAnnotation` and some fifty
+individual rules (`Build/php-cs-fixer/config.php:70-139`), risky rules allowed.
 It is TYPO3 Core's set, with the same `@todo` markers for the rules that can be
-dropped once `@PER-CS2.0` is adopted.
+dropped once `@PER-CS2x0` is adopted. That spelling needs php-cs-fixer 3.88.0 or
+newer — below it the set is named `@PER-CS1.0` and the config aborts the run on
+an unknown rule set, so the floor in `composer.json` must not be relaxed past
+it.
 
 What it scans matters more than the rules, because it is narrower than the
-repository (`Build/php-cs-fixer/config.php:49-62`):
+repository (`Build/php-cs-fixer/config.php:49-68`):
 
 | Finder call              | Value                                       |
 |--------------------------|---------------------------------------------|

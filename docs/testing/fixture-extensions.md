@@ -80,7 +80,7 @@ neither the root nor the owning extension mentions them in `require` or
 `require-dev`. Adding one changes no `composer.json` other than its own.
 
 Instead, the composer plugin `sbuerk/fixture-packages` (required by the root as
-`>=0.1.1 <2.0.0` in `require-dev`) discovers them by glob. The root
+`^1.1.3` in `require-dev`) discovers them by glob. The root
 [`composer.json`](../../composer.json) declares:
 
 ```json
