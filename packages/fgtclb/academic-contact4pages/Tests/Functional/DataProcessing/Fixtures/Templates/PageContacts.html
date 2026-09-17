@@ -1,0 +1,18 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<div class="page-contacts">
+    <p>COUNT:{contacts -> f:count()}</p>
+
+    <f:for each="{roles}" as="role">
+        <p>ROLE:{role.name}</p>
+    </f:for>
+
+    <f:for each="{contacts}" as="contact">
+        <p>CONTACT:{contact.contract.profile.lastName}</p>
+    </f:for>
+</div>
+
+</html>

@@ -329,6 +329,45 @@ a listener against its events, in
 `packages/fgtclb/academic-persons/Documentation/Changelog/2.4/Feature-DispatchModifyTcaSelectFieldItemsEventInItemsProcFunc.rst`
 lines 41–43.
 
+## A data processor with a collaborator has to be published
+
+TypoScript names a data processor by class name:
+
+```typoscript
+page.10.dataProcessing.400 = FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor
+```
+
+TYPO3 resolves that name in two steps
+(`ContentDataProcessor::getDataProcessor()`, identical on v13 and v14): if the
+container knows the name it returns **that service**, otherwise it falls back to
+`GeneralUtility::makeInstance()` on the class. A processor whose services are
+private therefore takes the second path and is constructed with no arguments —
+so a constructor dependency is only ever injected when the processor is
+published:
+
+```php
+#[Autoconfigure(public: true)]
+class ContactsProcessor implements DataProcessorInterface
+{
+    public function __construct(
+        private readonly PageContactsProvider $pageContactsProvider,
+    ) {}
+}
+```
+
+This is the "TYPO3 API entry point" exception of the rule below, not a reason to
+publish services in general. Two consequences are worth knowing before reaching
+for it:
+
+- The processor stays **non-`final`**, because projects subclass it. A subclass
+  named in TypoScript is only constructed correctly when the project's own
+  `Services.yaml` autowires it; otherwise TYPO3 takes the `makeInstance` path
+  and the missing constructor argument is fatal.
+- `ContactsProcessor` shares `PageContactsProvider` with `ContactsController`,
+  which is the point of injecting it: the rule about which contacts a visitor
+  sees exists once, and the content element and the page template cannot drift
+  apart.
+
 ## Other rules
 
 - **Do not inject the container.** Inject the concrete collaborator, or a

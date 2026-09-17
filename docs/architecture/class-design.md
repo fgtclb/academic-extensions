@@ -315,25 +315,26 @@ the two supported versions, so a reader has to grep for the method anyway.
 
 ## Strict types
 
-244 of the 251 files declare `strict_types=1` (97 %) — here counted over
+251 of the 257 files declare `strict_types=1` (98 %) — here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
-`packages-dev/` and `Tests/` are not counted. The 7 that do not are worth
+`packages-dev/` and `Tests/` are not counted. The 6 that do not are worth
 knowing so they are fixed rather than copied:
 
 | File                                                                  |
 |-----------------------------------------------------------------------|
 | `academic-partners/Classes/DataProcessing/PartnershipProcessor.php`   |
 | `academic-partners/Classes/DataProcessing/PartnerProcessor.php`       |
-| `academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php` |
 | `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`   |
 | `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`      |
 | `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`     |
 | `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php`  |
 
-Four of the seven are `DataProcessing/` classes, which suggests one origin
-rather than eight independent omissions.
+Three of the six are `DataProcessing/` classes, which suggests one origin
+rather than six independent omissions. A fourth,
+`academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php`, was one
+of them until it gained a constructor (ACE-101) and was fixed on the way.
 
 ## Static analysis
 

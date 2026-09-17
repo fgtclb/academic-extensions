@@ -1,0 +1,15 @@
+# A minimal page object for the page contacts data processor.
+#
+# This file is included *before* the setup of the extension, so the shipped
+# "page.10.dataProcessing.400" registration is what attaches the processor here -
+# the test therefore covers the wiring an installation gets, not a copy of it.
+page = PAGE
+page {
+  10 = FLUIDTEMPLATE
+  10 {
+    templateName = PageContacts
+    templateRootPaths {
+      10 = EXT:academic_contacts4pages/Tests/Functional/DataProcessing/Fixtures/Templates/
+    }
+  }
+}
