@@ -274,7 +274,7 @@ result, a configuration value.
 
 ### Call sites to copy from
 
-Eight classes under `packages/fgtclb/*/Classes/` use the quoting helpers, 16
+Nine classes under `packages/fgtclb/*/Classes/` use the quoting helpers, 17
 call sites in total. A representative selection, all paths relative to
 `packages/fgtclb/`:
 

@@ -6,22 +6,22 @@ through the same code paths production uses. It is the only suite here that
 sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
-It is also by far the larger suite: 93 functional test classes against 31 unit
-test classes, and 165 CSV fixtures.
+It is also by far the larger suite: 180 functional test classes against 71 unit
+test classes, and 266 CSV fixtures.
 
 | Extension                | Functional | Unit |
 |--------------------------|------------|------|
-| `academic-base`          | 10         | 3    |
-| `academic-bite-jobs`     | 2          | 1    |
-| `academic-contact4pages` | 5          | 2    |
-| `academic-jobs`          | 8          | 1    |
-| `academic-partners`      | 6          | 1    |
-| `academic-persons`       | 22         | 6    |
-| `academic-persons-edit`  | 10         | 3    |
+| `academic-base`          | 13         | 6    |
+| `academic-bite-jobs`     | 9          | 2    |
+| `academic-contact4pages` | 13         | 2    |
+| `academic-jobs`          | 16         | 2    |
+| `academic-partners`      | 17         | 5    |
+| `academic-persons`       | 39         | 19   |
+| `academic-persons-edit`  | 23         | 16   |
 | `academic-persons-sync`  | 2          | 1    |
-| `academic-programs`      | 6          | 1    |
-| `academic-projects`      | 8          | 1    |
-| `academic-study-plan`    | 3          | 1    |
+| `academic-programs`      | 14         | 3    |
+| `academic-projects`      | 17         | 4    |
+| `academic-study-plan`    | 6          | 1    |
 | `typo3-category-types`   | 11         | 10   |
 
 ## Running them

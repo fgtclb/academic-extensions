@@ -6,9 +6,14 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Six such fixture extensions exist, in four of the twelve extensions. That is the
-whole population — this is a mechanism used sparingly and only where nothing
-smaller works.
+Eight such fixture extensions exist, in five of the twelve extensions, and the
+table above lists all of them. That is the whole population — this is a
+mechanism used sparingly and only where nothing smaller works. Count them with:
+
+```bash
+find packages/fgtclb/*/Tests/Functional/Fixtures/Extensions \
+  -mindepth 1 -maxdepth 1 -type d | sort
+```
 
 ## Where they live and what they are
 
@@ -18,16 +23,20 @@ They sit next to the tests that use them, under
 | Extension key                    | Composer package name                  | Owned by               | Provides                                                                |
 |----------------------------------|----------------------------------------|------------------------|-------------------------------------------------------------------------|
 | `test_base_dependency_injection` | `tests/base-test-dependency-injection` | `academic-base`        | Two services to resolve through the container, plus `Services.yaml`.    |
+| `test_bitejobs_stub`             | `tests/test-bitejobs-stub`             | `academic-bite-jobs`   | An `ext_localconf.php` replacing the Guzzle handler stack.              |
 | `test_jobcontact_schema`         | `tests/test-jobcontact-schema`         | `academic-jobs`        | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates. |
 | `test_language_files`            | `tests/language-files`                 | `academic-persons`     | An XLF pair with awkward label keys (dots, dashes).                     |
 | `test_messy_profile_factory`     | `tests/test-messy-profile-factory`     | `academic-persons`     | A deliberately misbehaving profile factory and two event listeners.     |
 | `test_plugin_templates`          | `tests/plugin-templates`               | `academic-persons`     | Simplified Fluid templates and the TypoScript pointing at them.         |
 | `test_category_types_group`      | `tests/category-types-group`           | `typo3-category-types` | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.     |
+| `test_hidden_content_types`      | `tests/hidden-content-types`           | `academic-base`        | Page TSconfig and TCA hiding content types, for the wizard tests.       |
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Three of the six have a `Classes/` folder with a `TESTS\…` PSR-4 root; the other
-three are pure resources. None of them ships an `ext_localconf.php`.
+Four of the eight have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
+other four are pure resources. Only `test_bitejobs_stub` ships an
+`ext_localconf.php`, which is how it replaces the Guzzle handler stack before
+any request is built.
 
 A minimal one, complete:
 
@@ -52,7 +61,7 @@ A minimal one, complete:
 }
 ```
 
-Note that none of the six declares `extra.typo3/cms.version`. They are not path
+Note that none of the eight declares `extra.typo3/cms.version`. They are not path
 repositories, so `sbuerk/extended-path-repository` never reads a version off
 them; only `ext_emconf.php` carries one.
 
@@ -95,9 +104,9 @@ Two globs, two jobs:
 - The first finds every fixture extension and merges **both** its `autoload` and
   `autoload-dev` sections into the root autoloader. That is what makes
   `TESTS\TestMessyProfileFactory\Persons\MessyProfileFactory` resolvable at all.
-  The three fixture extensions that ship classes declare
-  `TESTS\BaseTestDependencyInjection\`, `TESTS\TestMessyProfileFactory\` and
-  `TESTS\CategoryTypesGroup\`; each is mapped to its own `Classes/` folder in
+  The four fixture extensions that ship classes declare
+  `TESTS\BaseTestDependencyInjection\`, `TESTS\TestBitejobsStub\`,
+  `TESTS\TestMessyProfileFactory\` and `TESTS\CategoryTypesGroup\`; each is mapped to its own `Classes/` folder in
   the generated `.Build/vendor/composer/autoload_psr4.php`.
 - The second merges the `autoload-dev` of every package, which is how each
   extension's own `FGTCLB\<Name>\Tests\` namespace reaches the root autoloader.

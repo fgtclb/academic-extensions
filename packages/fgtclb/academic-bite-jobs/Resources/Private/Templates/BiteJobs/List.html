@@ -10,9 +10,9 @@
 
     <f:if condition="{jobs}">
         <f:then>
-            <f:if condition="{settings.jobs.groupBy} !== 'none'">
+            <f:if condition="{settings.jobs.groupBy} && {settings.jobs.groupBy} != 'none'">
                 <f:then>
-                    <f:groupedFor as="groupedJobs" groupBy="relationName" each="{jobs}">
+                    <f:groupedFor as="groupedJobs" groupBy="{settings.jobs.groupBy}" each="{jobs}">
                         <f:render
                             partial="BiteJobs/Header"
                             arguments="{
