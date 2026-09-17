@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 258 PHP files declaring 234
-classes, 10 interfaces, 10 traits and 4 enums do not follow one style yet.
+rather than describing an intention as a rule — 267 PHP files declaring 241
+classes, 10 interfaces, 11 traits and 5 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,21 +16,21 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-117 of the 234 classes are `final` (50 %). The distribution is not random: it
+124 of the 241 classes are `final` (51 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
 |--------------------------------------------|---------|---------|----------|----------|
-| `Classes/Upgrades/`                        | 11      | 0       | 0        | 100 %    |
-| `Classes/Service/` and `Classes/Services/` | 21      | 2       | 0        | 91 %     |
+| `Classes/Upgrades/`                        | 12      | 0       | 0        | 100 %    |
+| `Classes/Service/` and `Classes/Services/` | 24      | 2       | 0        | 92 %     |
 | `Classes/EventListener/`                   | 6       | 1       | 0        | 86 %     |
 | `Classes/Controller/`                      | 4       | 5       | 0        | 44 %     |
 | `Classes/Domain/Model/Dto/`                | 7       | 10      | 1        | 39 %     |
 | `Classes/ViewHelpers/`                     | 2       | 8       | 0        | 20 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 66      | 47      | 4        | 56 %     |
-| **Total**                                  | **117** | **112** | **5**    | **50 %** |
+| Everything else                            | 69      | 47      | 4        | 58 %     |
+| **Total**                                  | **124** | **112** | **5**    | **51 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 255 modifiers, of
-which 247 are constructor-promoted, across 73 files. The eight non-promoted
+`readonly` is used heavily, mostly on individual properties: 265 modifiers, of
+which 257 are constructor-promoted, across 80 files. The eight non-promoted
 declarations are the seven documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
@@ -110,8 +110,8 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 73 files declare
-247 promoted `readonly` parameters. The fullest example by a wide margin is
+Constructor injection with promoted properties is the default: 80 files declare
+257 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.
@@ -247,10 +247,11 @@ referenced it.
 
 ### Enums
 
-Four, all backed, none pure:
+Five, all backed, none pure:
 
 | Enum                                                              | Backing  |
 |-------------------------------------------------------------------|----------|
+| `academic-bite-jobs/Classes/Enumeration/ListView.php:10`          | `string` |
 | `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:7`   | `int`    |
 | `academic-persons/Classes/Profile/ProfileActionType.php:14`       | `string` |
 | `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12` | `string` |
@@ -315,7 +316,7 @@ the two supported versions, so a reader has to grep for the method anyway.
 
 ## Strict types
 
-251 of the 257 files declare `strict_types=1` (98 %) — here counted over
+253 of the 259 files declare `strict_types=1` (98 %) — here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;

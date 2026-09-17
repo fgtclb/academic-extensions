@@ -73,7 +73,7 @@ own. Their events are proposed for 3.0.0 as well, so the precondition that
 made closing them premature, a plugin without any event, is gone by the
 time this change lands. `ace-tbd-program-psr14-events` still lists making
 the program controller final as a non-goal for a later major version, and
-`ace-tbd-bite-jobs-list-grouping-and-views` describes `BiteJobsController`
+`ace-677-bite-jobs-list-grouping-and-views` describes `BiteJobsController`
 as not final; this change supersedes both statements for the controllers.
 
 ### `final` directly in 3.0.0, as a breaking change

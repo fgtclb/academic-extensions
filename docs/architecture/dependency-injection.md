@@ -276,10 +276,13 @@ versions diverge:
 | `TYPO3\CMS\Backend\Attribute\AsAvatarProvider`, `AsSidebarComponent` | **no**   | yes             | no                             |
 
 `TYPO3\CMS\Extbase\Attribute\*` does not exist on v13 at all. The
-`Install\Attribute\UpgradeWizard` row is the one all eleven upgrade wizards use:
+`Install\Attribute\UpgradeWizard` row is the one all twelve upgrade wizards use:
 on v14 it survives as a deprecated subclass shim in
 `cms-core/DeprecatedClasses/ext-install/`, so it still works, but its
-replacement `Core\Attribute\UpgradeWizard` is absent on v13. See
+replacement `Core\Attribute\UpgradeWizard` is absent on v13. The twelfth,
+`academic-bite-jobs/Classes/Upgrades/ListViewFlexFormUpgradeWizard.php`, is a
+deliberate exception to "do not add new uses": it repairs content elements a 2.1
+rename broke, and it is migrated together with the others under ACE-294. See
 [Core version aware code](core-version-aware-code.md#apis-that-cannot-be-modernised-yet)
 for both.
 

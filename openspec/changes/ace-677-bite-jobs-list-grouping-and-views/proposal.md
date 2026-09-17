@@ -18,7 +18,8 @@ template or keep a fork for it.
   for an empty or unknown value.
 - An upgrade wizard rewrites the stored view value of every job list content
   element to `List`, `Card` or `Table`, so the backend form shows what the
-  frontend renders. It is the one new upgrade wizard of 3.0 while TYPO3 v13
+  frontend renders, and removes the two settings version 2.1 removed from the
+  data structure but left in the stored FlexForms. It is the one new upgrade wizard of 3.0 while TYPO3 v13
   is supported, and it adds a call site to the v15 blocker set (ACE-294).
 
 The behaviour is identical on TYPO3 v13 and v14.

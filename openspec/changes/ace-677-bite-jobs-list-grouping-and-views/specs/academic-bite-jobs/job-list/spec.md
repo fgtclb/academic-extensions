@@ -47,10 +47,11 @@ value SHALL render the list view.
 
 The upgrade wizards of the installation SHALL offer a wizard that rewrites
 the stored view value of every job list content element to `List`, `Card` or
-`Table`, by the same rule the list applies when rendering. It SHALL leave
-content elements that already store one of these values, other content
-types and every other field of the element unchanged, and SHALL report
-nothing to do once no element needs migrating. This applies to TYPO3 v13 and
+`Table`, by the same rule the list applies when rendering, and SHALL remove
+the plugin settings that version 2.1 removed, including the grouping setting
+that would otherwise still group the list. It SHALL leave other content types
+and every other setting of the element unchanged, and SHALL report nothing to
+do once no element needs migrating. This applies to TYPO3 v13 and
 v14 alike.
 
 #### Scenario: Old and invalid values are migrated
@@ -60,8 +61,14 @@ v14 alike.
 - **THEN** they store `Card`, `List` and `List` afterwards, and the wizard
   reports nothing left to do
 
+#### Scenario: A grouping setting stored before 2.1 is removed
+
+- **WHEN** a job list content element stores the grouping setting version 2.1
+  removed
+- **THEN** it is gone after the wizard ran, and the list is no longer grouped
+
 #### Scenario: Current values and other content are untouched
 
 - **WHEN** a job list content element stores `Table` and another content
   type stores `ListView` in a field of the same name
-- **THEN** both are unchanged after the wizard ran
+- **THEN** every other setting of both is unchanged after the wizard ran
