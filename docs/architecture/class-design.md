@@ -2,19 +2,19 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 248 PHP files declaring 223
+rather than describing an intention as a rule — 250 PHP files declaring 225
 classes, 15 interfaces, 6 traits and 4 enums do not follow one style yet.
 
 ## `final` by default, and where it is impossible
 
-101 of the 223 classes are `final` (45 %). The distribution is not random: it
+103 of the 225 classes are `final` (46 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
 |--------------------------------------------|---------|---------|----------|----------|
 | `Classes/Upgrades/`                        | 9       | 0       | 0        | 100 %    |
 | `Classes/Core12/` and `Classes/Core13/`    | 6       | 0       | 0        | 100 %    |
-| `Classes/Service/` and `Classes/Services/` | 9       | 3       | 0        | 75 %     |
+| `Classes/Service/` and `Classes/Services/` | 11      | 3       | 0        | 79 %     |
 | `Classes/EventListener/`                   | 2       | 1       | 0        | 67 %     |
 | `Classes/Controller/`                      | 9       | 5       | 1        | 60 %     |
 | `Classes/Domain/Model/Dto/`                | 5       | 10      | 1        | 31 %     |
@@ -22,7 +22,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
 | Everything else                            | 59      | 50      | 4        | 52 %     |
-| **Total**                                  | **101** | **116** | **6**    | **45 %** |
+| **Total**                                  | **103** | **116** | **6**    | **46 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -272,22 +272,27 @@ be set.
 
 ## Strict types
 
-240 of the 248 files declare `strict_types=1`. New files must. The 8 that do not
-are worth knowing so they are fixed rather than copied:
+242 of the 249 files declare `strict_types=1` — here counted over
+`packages/fgtclb/` only. New files must. Measured with
+`find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
+`grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
+`packages-dev/` and `Tests/` are not counted. The 7 that do not are worth
+knowing so they are fixed rather than copied:
 
 | File                                                                  |
 |-----------------------------------------------------------------------|
 | `academic-partners/Classes/DataProcessing/PartnershipProcessor.php`   |
 | `academic-partners/Classes/DataProcessing/PartnerProcessor.php`       |
-| `academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php` |
 | `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`   |
 | `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`      |
 | `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`     |
 | `academic-persons/Classes/Settings/Validation.php`                    |
 | `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php`  |
 
-Four of the eight are `DataProcessing/` classes, which suggests one origin
-rather than eight independent omissions.
+Three of the seven are `DataProcessing/` classes, which suggests one origin
+rather than seven independent omissions. A fourth,
+`academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php`, was one
+of them until it gained a constructor (ACE-101) and was fixed on the way.
 
 ## Static analysis
 
