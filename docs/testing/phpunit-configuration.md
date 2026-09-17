@@ -17,7 +17,7 @@ Nothing selects them implicitly.
 `unit` and `unitRandom` arms.
 
 The installed PHPUnit is `phpunit/phpunit` 11.5.56, against
-`typo3/testing-framework` 9.6.1.
+`typo3/testing-framework` 9.7.0.
 
 ## Where the configuration comes from
 

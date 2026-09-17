@@ -78,6 +78,19 @@ The npm cache lands in `.cache/npm`, next to the composer cache and for the same
 reason: `composerUpdate` starts with `rm -rf .Build`, so a cache inside `.Build/`
 would be discarded on every dependency install.
 
+`Build/package.json` also lists a package nothing here imports: `js-yaml`. It
+is a transitive dependency of `eslint` itself, by way of `@eslint/eslintrc`, and
+a transitive version is stated nowhere but the committed lock. The direct
+`devDependencies` entry puts the minimum into the file that is reviewed, so a
+regenerated lock cannot lower it unnoticed.
+
+It is worth checking on an eslint raise, because the entry protects less than it
+looks like it does. Should `@eslint/eslintrc` move to a `js-yaml` major the root
+entry does not accept, npm installs a second, nested copy rather than failing:
+the pinned one then covers nothing and the one actually in use is unpinned
+again. The entry is useful for as long as its range and that of the dependent
+still overlap.
+
 ## What the build does
 
 **Scripts** are emitted one module per source module, unbundled, as ES modules.
