@@ -121,6 +121,16 @@ component sets it needs instead of the aggregate.
     this set and still uses the page type has to define
     :typoscript:`styles.content.getContent` itself.
 
+..  note::
+
+    The page type renders the short description and the funders of a project,
+    and the project list its short description, through
+    :html:`<f:format.html>` and therefore through the site's
+    :typoscript:`lib.parseFunc_RTE`. TYPO3 defines that path for every site, so
+    it needs no configuration; a site that refines it changes how links, allowed
+    tags and paragraphs of these fields are rendered, exactly as for every other
+    rich text field.
+
 ..  _site-set:
 
 Include the site set

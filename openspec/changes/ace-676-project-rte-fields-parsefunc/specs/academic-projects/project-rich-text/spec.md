@@ -23,16 +23,15 @@ standard rich text processing. This applies to TYPO3 v13 and v14 alike.
 - **WHEN** the funders field of a project contains a link to a page
 - **THEN** the project page renders the link with the page's URL
 
-### Requirement: The rich text processing configuration is required
+### Requirement: The site's rich text configuration applies
 
-A site that renders project pages or project lists SHALL provide the standard
-rich text processing configuration, as fluid_styled_content and common site
-packages do. Without it, rendering a project with rich text MUST fail
-visibly instead of emitting unprocessed HTML.
+The project page and the project list SHALL follow the site's rich text
+processing configuration. Where the site defines none of its own, the TYPO3
+default applies, so links resolve without any additional extension or
+TypoScript. This applies to TYPO3 v13 and v14 alike.
 
-#### Scenario: Site without rich text configuration
+#### Scenario: Site without fluid_styled_content
 
-- **WHEN** a site has no rich text processing configuration and a visitor
-  opens a project page
-- **THEN** rendering fails with the core error for a missing rich text
-  configuration
+- **WHEN** a site does not include fluid_styled_content and the short
+  description of a project links to a page
+- **THEN** the project page renders that link with the page's URL

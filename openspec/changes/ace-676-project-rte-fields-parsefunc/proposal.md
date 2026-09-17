@@ -11,9 +11,9 @@ to a page or a file in the rich text editor reaches the visitor as a literal
   site's rich text processing, as core renders every other rich text field.
 - The project list renders the short description the same way.
 - Links written in the editor to pages, files or records resolve to URLs.
-- A site without the standard rich text processing configuration can no
-  longer render the project page or list; the Important changelog entry
-  states the requirement.
+- The fields follow the site's `lib.parseFunc_RTE`. TYPO3 defines it for
+  every site, so no extension and no TypoScript has to be added; a site that
+  customised it gets its own rules applied.
 
 The behaviour is identical on TYPO3 v13 and v14.
 
@@ -36,7 +36,7 @@ None.
 - Markup of the two fields may change slightly, depending on the site's rich
   text configuration.
 - Functional tests of the page template and the list plugin; an `Important-`
-  changelog entry.
+  changelog entry naming the possible markup difference.
 
 ## Non-goals
 

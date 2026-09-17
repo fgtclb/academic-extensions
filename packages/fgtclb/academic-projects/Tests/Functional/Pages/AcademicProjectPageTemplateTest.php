@@ -27,6 +27,10 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
  * page. That block read a property the model does not have until ACE-673, so it never
  * appeared; asserting the rendered output rather than the property name is what keeps a
  * rename from hiding it again.
+ *
+ * The short description and the funders are rich text. They are rendered through the
+ * site's "lib.parseFunc_RTE", so a link the editor set to a page reaches the visitor as
+ * the page's URL. Printed raw, as before ACE-676, the "t3://" reference itself did.
  */
 final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTestCase
 {
@@ -50,25 +54,33 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         parent::tearDown();
     }
 
-    private function setUpTestCase(): void
+    /**
+     * @param bool $withFluidStyledContent false leaves out the TypoScript of fluid_styled_content,
+     *                                     so only the core default "lib.parseFunc_RTE" is defined
+     */
+    private function setUpTestCase(bool $withFluidStyledContent = true): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicProjectPageTemplateTest/page.csv');
+        $constants = [
+            'EXT:academic_projects/Configuration/TypoScript/constants.typoscript',
+        ];
+        $setup = [
+            // The site package first, the extension after it - see the fixture.
+            'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/SitePackage.typoscript',
+            'EXT:academic_projects/Configuration/TypoScript/setup.typoscript',
+            // The page template renders "styles.content.getContent", which only this component
+            // assigns - it is opt-in since the configuration was cut per component.
+            'EXT:academic_projects/Configuration/TypoScript/ContentLoad/setup.typoscript',
+        ];
+        if ($withFluidStyledContent) {
+            array_unshift($constants, 'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript');
+            array_unshift($setup, 'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript');
+        }
         $this->setUpFrontendRootPage(
             pageId: 1,
             typoScriptFiles: [
-                'constants' => [
-                    'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
-                    'EXT:academic_projects/Configuration/TypoScript/constants.typoscript',
-                ],
-                'setup' => [
-                    'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
-                    // The site package first, the extension after it - see the fixture.
-                    'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/SitePackage.typoscript',
-                    'EXT:academic_projects/Configuration/TypoScript/setup.typoscript',
-                    // The page template renders "styles.content.getContent", which only this component
-                    // assigns - it is opt-in since the configuration was cut per component.
-                    'EXT:academic_projects/Configuration/TypoScript/ContentLoad/setup.typoscript',
-                ],
+                'constants' => $constants,
+                'setup' => $setup,
             ],
         );
         $this->writeFrontendPluginTestSite([
@@ -134,5 +146,45 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         $this->assertStringNotContainsString('Competence field', $content);
         $this->assertStringNotContainsString('Photonics', $content);
         $this->assertStringNotContainsString('Institute of Physics', $content);
+    }
+
+    #[Test]
+    public function projectPageResolvesAPageLinkInTheShortDescription(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString('<a href="/dark-matter">the dark matter project</a>', $content);
+        $this->assertStringNotContainsString('t3://', $content);
+    }
+
+    #[Test]
+    public function projectPageResolvesAPageLinkInTheFunders(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString('<a href="/dark-matter">the dark matter consortium</a>', $content);
+        $this->assertStringNotContainsString('t3://', $content);
+    }
+
+    /**
+     * TYPO3 defines "lib.parseFunc_RTE" for every site in the default TypoScript of
+     * EXT:frontend, so the links resolve without fluid_styled_content and without any
+     * TypoScript of the site's own.
+     */
+    #[Test]
+    public function projectPageResolvesRichTextLinksWithoutFluidStyledContent(): void
+    {
+        $this->setUpTestCase(withFluidStyledContent: false);
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString('academic-projects-detail', $content);
+        $this->assertStringContainsString('<a href="/dark-matter">the dark matter project</a>', $content);
+        $this->assertStringContainsString('<a href="/dark-matter">the dark matter consortium</a>', $content);
+        $this->assertStringNotContainsString('t3://', $content);
     }
 }

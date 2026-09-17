@@ -13,8 +13,15 @@ See `proposal.md` for the motivation. Verified on `main`:
 - `academic_jobs` already renders its rich text description with
   `f:format.html` (`Templates/Job/Show.html:42`), so the extension family has
   the dependency today.
-- The page template and list plugin tests load fluid_styled_content, so
-  `lib.parseFunc_RTE` exists in the test sites.
+- `lib.parseFunc_RTE` exists on every site. `EXT:frontend/ext_localconf.php`
+  adds `lib.parseFunc` (with `tags.a` rendered through `typolink`) and
+  `lib.parseFunc_RTE < lib.parseFunc` via
+  `ExtensionManagementUtility::addTypoScriptSetup()`, whose
+  `$includeInSiteSets` defaults to `true`; `SysTemplateTreeBuilder` adds that
+  `siteSets` scope. Read in the installed 13.4.35 and 14.3.6 - identical on
+  both, for sys_template and site set based sites alike.
+- The page template and list plugin tests load fluid_styled_content, whose
+  stricter definition replaces the core one there.
 
 ## Goals / Non-Goals
 
@@ -45,10 +52,9 @@ exactly this.
 
 ### No set dependency on fluid_styled_content
 
-The requirement is documented, not enforced. A site running bootstrap_package
-or its own site package defines `lib.parseFunc_RTE` without
-fluid_styled_content, and a hard set dependency would force the extension's
-content rendering onto it.
+None is needed: core supplies `lib.parseFunc_RTE` to every site, and
+fluid_styled_content or a site package only refines it. A test renders the
+project page without fluid_styled_content's TypoScript to keep that true.
 
 ### Decided: backport to branch `2` as a change of its own
 
@@ -58,10 +64,10 @@ analysis. The same templates are verified on branch `2`, so projects on
 
 ## Risks / Trade-offs
 
-- [A site without `lib.parseFunc_RTE` now gets exception 1641989097 on project
-  pages and lists] → The `Important-` changelog entry states the requirement
-  and the exception code; before this change such a site already could not
-  resolve the links.
+- [A site that removed `lib.parseFunc_RTE` itself (`lib.parseFunc_RTE >`) now
+  gets exception 1641989097 on project pages and lists] → Such a site cannot
+  render any core rich text field either; this is no new failure mode and is
+  not documented as a requirement.
 - [parseFunc wraps loose text in `<p>`, depending on the configuration] →
   Named in the changelog entry; content written in the rich text editor
   already carries paragraphs.

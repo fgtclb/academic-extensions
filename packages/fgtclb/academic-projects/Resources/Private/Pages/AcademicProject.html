@@ -10,7 +10,7 @@
         <div>
             <h1>{f:if(condition: '{project.projectTitle}', then: '{project.projectTitle}', else: '{data.title}')}</h1>
 
-            <f:format.raw>{project.shortDescription}</f:format.raw>
+            <f:format.html>{project.shortDescription}</f:format.html>
         </div>
 
         <f:for each="{images}" as="image" iteration="i">
@@ -79,7 +79,7 @@
             <li>
                 <b>{f:translate(key: 'project.funders', extensionName: 'academic_projects')}:</b>
 
-                <f:format.raw>{project.funders}</f:format.raw>
+                <f:format.html>{project.funders}</f:format.html>
             </li>
         </f:if>
     </ul>

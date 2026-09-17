@@ -95,7 +95,7 @@ None.
 
 Depends on candidates `listings-01` (change
 `ace-673-page-template-category-block`) and `listings-03` (change
-`ace-tbd-project-rte-fields-parsefunc`), which change the same templates.
+`ace-676-project-rte-fields-parsefunc`), which change the same templates.
 `ace-673-page-template-category-block` carries the same removal of
 `styles.content.getContent`; whichever lands first introduces the page
 variable, and the other builds on it.
