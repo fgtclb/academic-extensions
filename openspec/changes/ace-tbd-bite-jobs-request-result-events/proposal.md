@@ -49,7 +49,7 @@ None.
 
 - FlexForm fields for a B-ITE custom field and its values.
 - The grouping in the template; that is candidate `listings-04` (change
-  `ace-tbd-bite-jobs-list-grouping-and-views`).
+  `ace-677-bite-jobs-list-grouping-and-views`).
 - A client for the B-ITE options API.
 - Deriving the locale from the site language by default; a listener can.
 

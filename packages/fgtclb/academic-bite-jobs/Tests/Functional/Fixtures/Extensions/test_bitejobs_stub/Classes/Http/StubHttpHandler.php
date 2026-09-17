@@ -13,6 +13,9 @@ use Psr\Http\Message\RequestInterface;
  * Guzzle handler answering every request with a canned b-ite API response, so functional
  * tests rendering the `academicbitejobs_list` plugin perform no outgoing HTTP request.
  *
+ * The response carries two postings with different values in `department`, so a list
+ * grouped by that field renders two groups.
+ *
  * Stubbing happens at handler level on purpose. Neither `RequestFactory` nor
  * `GuzzleClientFactory` can be subclassed for both supported core versions: TYPO3 v13
  * declares them as normal classes while v14 declares them `readonly`, and a readonly class
@@ -39,6 +42,12 @@ final class StubHttpHandler
                         [
                             'id' => 4711,
                             'title' => 'Stubbed job posting',
+                            'department' => 'Research',
+                        ],
+                        [
+                            'id' => 4712,
+                            'title' => 'Second stubbed job posting',
+                            'department' => 'Teaching',
                         ],
                     ],
                 ]),

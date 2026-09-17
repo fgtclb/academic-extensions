@@ -95,8 +95,13 @@ FlexForm wizard of `academic_projects`:
   `quoteArrayBasedValueListToStringList()` and ordered by `uid`;
 - maps `settings.jobs.view` through the enum and writes the FlexForm back only
   when the value changes, each update on its own query builder;
-- `updateNecessary()` is true while any such row stores a value that is not
-  exactly `List`, `Card` or `Table`, including an empty or missing one.
+- removes `settings.jobs.groupBy` and `settings.jobs.custom.zuordnung`, the two
+  settings version 2.1 removed from the data structure. A stored `groupBy` is
+  still merged into the plugin settings, so without this the grouped branch
+  would come back for exactly the content elements this change repairs;
+- `updateNecessary()` is true while any such row stores a view value that is not
+  exactly `List`, `Card` or `Table`, including an empty or missing one, or one
+  of the removed settings.
 
 Other FlexForm fields of the row are left as they are.
 
