@@ -53,7 +53,7 @@ None.
 - Backporting to branch `2`.
 
 Depends on candidate `listings-02` (change
-`ace-tbd-contacts-skip-unresolved-profiles`).
+`ace-101-contacts-skip-unresolved-profiles`).
 
 ## Source
 

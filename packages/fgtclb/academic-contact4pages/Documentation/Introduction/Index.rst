@@ -53,6 +53,13 @@ adds the contacts and their roles to the page rendering. Both display the person
 through the :file:`Profile/Item` partial of `EXT:academic_persons`, so contacts
 look like the profiles rendered by that extension.
 
+A contact is only shown while the person behind it is visible in the frontend.
+A contact whose contract is hidden, or whose profile is hidden, outside its
+start and end time or restricted to a frontend user group the visitor is not in,
+is left out of both — together with its role, if it is the only contact holding
+it. Hiding a profile therefore removes the person from every page it is a
+contact of, without editing a single contact record.
+
 ..  _introduction-page-translations:
 
 Contacts and page translations

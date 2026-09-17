@@ -283,6 +283,61 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
     }
 
     /**
+     * The `contactsListPage_unresolvedProfiles` fixture holds four contacts of one page:
+     * one with a visible profile, one whose profile is hidden, one whose contract is
+     * hidden and one whose profile has expired. The card count is what is asserted rather
+     * than the absence of the three names: a contact whose relation does not resolve
+     * renders an *empty* card, so its name is missing either way and an assertion on the
+     * name alone would pass without the fix.
+     *
+     * Contacts 1 and 3 share the role "Dean's Office", so that heading survives while
+     * "Student Advisors" - held only by the contact with the hidden profile - must not.
+     */
+    #[Test]
+    public function listPluginSkipsContactsWhoseContractOrProfileIsNotVisible(): void
+    {
+        $this->setUpTestCase('contactsListPage_unresolvedProfiles');
+
+        $content = $this->renderHomePage();
+        $this->assertRendersProfileName($content, 'Max', 'Müllermann');
+        $this->assertSame(1, $this->countProfileCards($content), 'Only the resolvable contact renders a card.');
+        $this->assertStringContainsString('Dean&#039;s Office', $content);
+        $this->assertStringNotContainsString('Student Advisors', $content);
+    }
+
+    /**
+     * "Show hidden records" is about contact rows, not about the people behind them: the
+     * hidden contact row of the fixture points at a visible profile and renders, while the
+     * visible contact row pointing at a hidden profile still does not.
+     */
+    #[Test]
+    public function listPluginKeepsSkippingUnresolvedContactsWithHiddenRecordsShown(): void
+    {
+        $this->setUpTestCase('contactsListPage_unresolvedProfilesShowHidden');
+
+        $content = $this->renderHomePage();
+        $this->assertRendersProfileName($content, 'Max', 'Müllermann');
+        $this->assertRendersProfileName($content, 'Paula', 'Prüfer');
+        $this->assertSame(2, $this->countProfileCards($content), 'The hidden contact row renders, the unresolved ones do not.');
+        $this->assertStringNotContainsString('Student Advisors', $content);
+    }
+
+    /**
+     * One card per rendered contact, counted through the class the `Profile/Item` partial
+     * of `EXT:academic_persons` wraps every contact in.
+     */
+    private function countProfileCards(string $content): int
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML($content, LIBXML_NOERROR);
+
+        return $this->countNodes(
+            new \DOMXPath($document),
+            "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-persons-item ')]",
+        );
+    }
+
+    /**
      * The `contactsListPage_addressRecords` fixture gives each of its four contacts an own
      * contract with two email addresses, two phone numbers and two physical addresses, and
      * a different dedicated address record selection. Every profile of the fixture carries

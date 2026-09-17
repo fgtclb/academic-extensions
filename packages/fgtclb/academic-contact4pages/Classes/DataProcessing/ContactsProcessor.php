@@ -1,14 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FGTCLB\AcademicContacts4pages\DataProcessing;
 
-use FGTCLB\AcademicContacts4pages\Domain\Repository\ContactRepository;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use FGTCLB\AcademicContacts4pages\Service\PageContactsProvider;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\ContentObject\DataProcessorInterface;
 
+/**
+ * Assigns the contacts of the current page, and the roles they carry, to the page
+ * rendering.
+ *
+ * Which contacts those are is decided by `PageContactsProvider`, the very service the
+ * contacts content element asks - so a contact without a visible person is left out here
+ * exactly as it is there.
+ *
+ * The service is published (`public: true`) because TypoScript references this processor
+ * by class name in `page.10.dataProcessing.400`: TYPO3 takes such an entry from the
+ * service container when it knows the name and instantiates the class itself otherwise,
+ * and only the container way passes the provider to the constructor.
+ */
+#[Autoconfigure(public: true)]
 class ContactsProcessor implements DataProcessorInterface
 {
+    public function __construct(
+        private readonly PageContactsProvider $pageContactsProvider,
+    ) {}
+
     /**
      * Make project data accessable in Fluid
      *
@@ -29,19 +49,10 @@ class ContactsProcessor implements DataProcessorInterface
             return $processedData;
         }
 
-        $contactRepository = GeneralUtility::makeInstance(ContactRepository::class);
-        $contacts = $contactRepository->findByPid((int)$currentRecordUid);
+        $pageContacts = $this->pageContactsProvider->get((int)$currentRecordUid);
 
-        $processedData['contacts'] = $contacts;
-
-        $roles = [];
-        foreach ($contacts as $contact) {
-            $role = $contact->getRole();
-            if ($role !== null) {
-                $roles[$role->getUid()] = $role;
-            }
-        }
-        $processedData['roles'] = $roles;
+        $processedData['contacts'] = $pageContacts->contacts;
+        $processedData['roles'] = $pageContacts->roles;
 
         return $processedData;
     }
