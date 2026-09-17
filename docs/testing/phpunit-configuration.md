@@ -17,7 +17,7 @@ Nothing selects them implicitly.
 `unit` and `unitRandom` arms.
 
 The root [`composer.json`](../../composer.json) requires
-`phpunit/phpunit` `^10.5.45` and `typo3/testing-framework` `^8.2.7` as
+`phpunit/phpunit` `^10.5.64` and `typo3/testing-framework` `^8.3.3` as
 development dependencies. Which patch releases those resolve to depends on the
 core version `composerUpdate` was last run for, so check
 `.Build/vendor/composer/installed.json` rather than assuming.
@@ -45,23 +45,26 @@ originals is the only thing that reveals a new upstream default.
 ## The deliberate deviations
 
 The copies differ from the upstream template in these points. The "Here" column
-is read off the files in this repository; the "Template" column was recorded
-against a `typo3/testing-framework` vendor tree and is **not re-verified for
-this branch** — diff the four files against
-`.Build/vendor/typo3/testing-framework/Resources/Core/Build/` after a
-`composerUpdate` before relying on it:
+is read off the files in this repository; the "Template" column was read off
+the `typo3/testing-framework` 8.3.3 tree. Both move: diff the four files
+against `.Build/vendor/typo3/testing-framework/Resources/Core/Build/` after a
+`composerUpdate` whenever that dependency is raised:
 
-| File                           | Template                                                                     | Here                                                                              | Why                                                                                                                              |
-|--------------------------------|------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| both `.xml`                    | `<directory>../../../../../../typo3/sysext/*/Tests/Unit/</directory>`        | `<directory>../../packages/*/*/Tests/Unit/</directory>`                           | The template points into a TYPO3 Core checkout. Here the tests live in the mono repository's package tree.                       |
-| both `.xml`                    | `xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.2/phpunit.xsd"` | `xsi:noNamespaceSchemaLocation="../../.Build/vendor/phpunit/phpunit/phpunit.xsd"` | The schema of the *installed* PHPUnit, not a pinned remote one. No network access, and it cannot drift from the running version. |
-| both `.xml`                    | attribute absent                                                             | `beStrictAboutTestsThatDoNotTestAnything="false"`                                 | See [the strictness policy](#strictness-policy) below.                                                                           |
-| `UnitTestsBootstrap.php`       | fully qualified class names inline                                           | `use` imports                                                                     | Cosmetic; the file is linted and CGL-checked like every other PHP file here.                                                     |
-| `FunctionalTestsBootstrap.php` | plain `Testbase` setup                                                       | additional fixture package adoption block                                         | See [the functional bootstrap](#the-functional-bootstrap) below.                                                                 |
+| File                           | Template                                                                     | Here                                                                                            | Why                                                                                                                                                                                                                                                  |
+|--------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| both `.xml`                    | `<directory>../../../../../../typo3/sysext/*/Tests/Unit/</directory>`        | `<directory>../../packages/*/*/Tests/Unit/</directory>` plus `../../packages-dev/*/Tests/Unit/` | The template points into a TYPO3 Core checkout. Here the tests live in the mono repository's package tree — in **both** of them: the seed definition of `packages-dev/dev-site` has tests of its own, see [Seed verification](seed-verification.md). |
+| both `.xml`                    | `xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.1/phpunit.xsd"` | `xsi:noNamespaceSchemaLocation="../../.Build/vendor/phpunit/phpunit/phpunit.xsd"`               | The schema of the *installed* PHPUnit, not a pinned remote one. No network access, and it cannot drift from the running version.                                                                                                                     |
+| `UnitTestsBootstrap.php`       | fully qualified class names inline                                           | `use` imports                                                                                   | Cosmetic; the file is linted and CGL-checked like every other PHP file here.                                                                                                                                                                         |
+| `FunctionalTestsBootstrap.php` | plain `Testbase` setup                                                       | additional fixture package adoption block                                                       | See [the functional bootstrap](#the-functional-bootstrap) below.                                                                                                                                                                                     |
 
-The `phpunit v10.1 compatible version.` line in both XML headers comes from the
-upstream template. On this branch it is not misleading: the required PHPUnit is
-`^10.5.45`, so the files really are read by a PHPUnit 10.
+`beStrictAboutTestsThatDoNotTestAnything="false"` is **not** in that list on
+this branch: the 8.3.3 template already sets it, so the copies only inherit it.
+What it means either way is [the strictness policy](#strictness-policy) below.
+
+The `phpunit v10.1 compatible version.` line in both XML headers is a local
+addition, not a template line — the 8.x tree does not carry it. On this branch
+it happens not to mislead, the required PHPUnit being `^10.5.64`, but it is a
+leftover rather than a constraint.
 
 ## Strictness policy
 
@@ -177,11 +180,10 @@ The block carries a documented workaround: `AvailableFixturePackages::$dataFile`
 holds a path that is missing a slash between vendor name and data file, so the
 generated `.Build/vendor/sbuerk/fixture-packages.php` is never read. The
 bootstrap sets the private property to the correct path by reflection
-(lines 43-51) and marks the end of the workaround with a comment. The root
-requires `sbuerk/fixture-packages` as `>=0.1.1 <2.0.0`, so the resolved release
-varies; delete the block only after checking that the release actually installed
-builds the path correctly. Without it every fixture extension becomes
-unresolvable at once.
+(lines 43-51) and marks the end of the workaround with a comment. Delete the
+block only after checking that the released `sbuerk/fixture-packages` — the
+root requires `^1.1.3` — builds the path correctly; without it every fixture
+extension becomes unresolvable at once.
 
 The `class_exists()` guard around the whole block means the suite still boots
 when `sbuerk/fixture-packages` is not installed. Tests that load a fixture
