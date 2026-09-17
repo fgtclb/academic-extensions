@@ -1,5 +1,15 @@
 "pages",
-,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title","backend_layout","abstract","tx_academicprojects_short_description","tx_academicprojects_funders"
-,1,0,1,0,0,0,0,0,"/","Site Root","","","",""
-,10,1,30,0,0,0,0,0,"/quantum-optics","Quantum Optics","pagets__AcademicProject","A research project.","<p>Continues <a href=""t3://page?uid=11"">the dark matter project</a>.</p>","<p>Funded by <a href=""t3://page?uid=11"">the dark matter consortium</a>.</p>"
-,11,1,30,0,0,0,0,0,"/dark-matter","Dark Matter","pagets__AcademicProject","A project without rich text.","",""
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title","backend_layout","abstract","categories","tx_academicprojects_short_description","tx_academicprojects_funders"
+,1,0,1,0,0,0,0,0,"/","Site Root","","",0,"",""
+,5,1,254,0,0,0,0,0,"/categories","Categories","","",0,"",""
+,10,1,30,0,0,0,0,0,"/quantum-optics","Quantum Optics","pagets__AcademicProject","A research project.",2,"<p>Continues <a href=""t3://page?uid=11"">the dark matter project</a>.</p>","<p>Funded by <a href=""t3://page?uid=11"">the dark matter consortium</a>.</p>"
+,11,1,30,0,0,0,0,0,"/dark-matter","Dark Matter","pagets__AcademicProject","A project without categories.",0,"",""
+"sys_category",
+,"uid","pid","deleted","hidden","parent","type","title","sys_language_uid","l10n_parent"
+,1,5,0,0,0,"competence_field","Photonics",0,0
+,2,5,0,0,0,"department","Institute of Physics",0,0
+,3,5,0,0,0,"funding_partner","Federal Research Ministry",0,0
+"sys_category_record_mm",
+,"uid_local","uid_foreign","tablenames","fieldname","sorting","sorting_foreign"
+,1,10,"pages","categories",0,1
+,2,10,"pages","categories",0,2
