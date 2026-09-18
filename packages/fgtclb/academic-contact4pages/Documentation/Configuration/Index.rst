@@ -45,7 +45,12 @@ extensions sort their elements into.
     The setup of this extension reads
     :typoscript:`{$plugin.tx_academicpersons.detailPid}` — a constant this
     extension does not declare and that belongs to
-    :guilabel:`EXT:academic_persons`.
+    :guilabel:`EXT:academic_persons`. Two further constants of that extension
+    are mapped the same way, because the partials rendering a contact read
+    them: the image placeholder
+    :typoscript:`{$plugin.tx_academicpersons.image.placeholder.default}` and
+    the phone link prefix
+    :typoscript:`{$plugin.tx_academicpersons.phoneNumbers.telPrefix}`.
 
     Nothing has to be done about it. The component names that extension's
     TypoScript in its own :file:`include_static_file.txt`, and both delivery

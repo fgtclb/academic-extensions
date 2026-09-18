@@ -45,18 +45,24 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         parent::tearDown();
     }
 
-    private function setUpTestCase(string $dataSet): void
+    /**
+     * @param list<string> $additionalConstantFiles Constants loaded after the shipped ones.
+     */
+    private function setUpTestCase(string $dataSet, array $additionalConstantFiles = []): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicContacts4PagesListPlugin/' . $dataSet . '.csv');
         $this->setUpFrontendRootPage(
             pageId: 1,
             typoScriptFiles: [
-                'constants' => [
-                    'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
-                    'EXT:academic_persons/Configuration/TypoScript/Default/constants.typoscript',
-                    'EXT:academic_contacts4pages/Configuration/TypoScript/List/constants.typoscript',
-                    'EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/PluginConfiguration.typoscript',
-                ],
+                'constants' => array_merge(
+                    [
+                        'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
+                        'EXT:academic_persons/Configuration/TypoScript/Default/constants.typoscript',
+                        'EXT:academic_contacts4pages/Configuration/TypoScript/List/constants.typoscript',
+                        'EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/PluginConfiguration.typoscript',
+                    ],
+                    $additionalConstantFiles,
+                ),
                 'setup' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
                     'EXT:academic_persons/Configuration/TypoScript/Default/setup.typoscript',
@@ -508,5 +514,25 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
             'Images/ProfilePlaceholder.svg',
             (string)$this->nodes($xpath, './/img', $withoutImage)->item(0)?->attributes?->getNamedItem('src')?->nodeValue,
         );
+    }
+
+    /**
+     * The contract rows come from the `Profile/Contract/Field` partial of
+     * EXT:academic_persons, and the phone link target it builds reads a setting of the
+     * persons plugin. This plugin maps that setting into its own settings block, exactly as
+     * it maps the detail page and the image placeholder, so a contact rendered here gets the
+     * same target as a profile rendered there.
+     */
+    #[Test]
+    public function listPluginBuildsThePhoneLinkTargetLikeTheProfilePlugins(): void
+    {
+        $this->setUpTestCase(
+            'contactsListPage_phoneNumber',
+            ['EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/PhoneLinkPrefix.typoscript'],
+        );
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('href="tel:+496241509123"', $content);
+        $this->assertStringContainsString('>123</a>', $content);
     }
 }
