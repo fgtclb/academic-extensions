@@ -45,4 +45,4 @@
 - [x] 5.4 `docs/` updated as in group 3; `README.md` and `CONTRIBUTING.md`
   still only summarise.
 - [x] 5.5 Anything left out is named in the pull request, with the reason.
-- [ ] 5.6 Archive the change as the last commit of the pull request.
+- [x] 5.6 Archive the change as the last commit of the pull request.
