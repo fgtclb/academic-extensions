@@ -36,9 +36,9 @@ See `proposal.md` — *Why*. What matters for the approach:
 
 **Strip the spaces in the template, not in the model.**
 The stored value is what an editor typed and what the form redisplays; the
-model's getter is also read by the new-job form and by the mail templates,
-where the spelling with spaces is the wanted one. Deriving the target where it
-is used keeps one value with one meaning.
+model's getter is also read by the new-job form, where the spelling with spaces
+is the wanted one. Deriving the target where it is used keeps one value with
+one meaning.
 *Rejected:* a `getContactPhoneLinkTarget()` accessor on the model — it puts a
 presentation concern into the domain object and would have to be kept in step
 with the visible property. *Rejected:* normalising on save — it would rewrite
