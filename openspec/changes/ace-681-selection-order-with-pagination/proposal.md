@@ -50,7 +50,6 @@ None.
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
-`persons-display-03`). Found while verifying the analysis on main. No YouTrack
-issue is filed yet; the change is renamed to
-`ace-<NNN>-selection-order-with-pagination` when the issue is filed after
-implementation.
+`persons-display-03`). Found while verifying the analysis on main. Filed as
+**ACE-681** after the implementation was green, which is when the change was
+renamed from `ace-tbd-selection-order-with-pagination`.
