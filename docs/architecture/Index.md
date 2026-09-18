@@ -39,8 +39,8 @@ describing an intention as if it were the state.
   `category_types`** and three four-line listeners on
   `ModifyPageLayoutContentEvent`. It shipped three times as a partial before,
   registered as an override of a core backend partial that no core template
-  renders — it worked as a full template override until it was converted to
-  that partial in March 2023, and has rendered nothing since.
+  renders — only `academic_programs` ever showed it, and a rename in March 2023
+  ended that.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
