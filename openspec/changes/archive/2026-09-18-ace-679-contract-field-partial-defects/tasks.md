@@ -73,20 +73,20 @@
 
 ## 6. File the issue
 
-- [ ] 6.1 After implementation, file the ACE issue in YouTrack, verify its key
+- [x] 6.1 After implementation, file the ACE issue in YouTrack, verify its key
   and rename the change to `ace-<NNN>-contract-field-partial-defects`.
-- [ ] 6.2 Commit the corrections as
+- [x] 6.2 Commit the corrections as
   `[BUGFIX] ACE-<NNN>: Render contract unit and tel: targets` and the
   setting as `[FEATURE] ACE-<NNN>: Add a prefix for phone link targets`, in
   TYPO3 Core format, so the bugfix commit can be backported on its own.
 
 ## 7. Definition of done
 
-- [ ] 7.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 7.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 13`.
-- [ ] 7.2 `composerUpdate`, then the same suites green with `-t 14`.
-- [ ] 7.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 7.4 `docs/` and the `Documentation/` changelog updated as in group 4;
+- [x] 7.2 `composerUpdate`, then the same suites green with `-t 14`.
+- [x] 7.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 7.4 `docs/` and the `Documentation/` changelog updated as in group 4;
   `README.md` and `CONTRIBUTING.md` still only summarise.
-- [ ] 7.5 Anything left out is named in the pull request, with the reason.
-- [ ] 7.6 Archive the change as the last commit of the pull request.
+- [x] 7.5 Anything left out is named in the pull request, with the reason.
+- [x] 7.6 Archive the change as the last commit of the pull request.
