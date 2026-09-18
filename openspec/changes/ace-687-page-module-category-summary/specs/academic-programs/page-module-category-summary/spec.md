@@ -45,12 +45,3 @@ other type.
 #### Scenario: Standard page
 - **WHEN** an editor opens a standard page carrying categories
 - **THEN** no program category summary is shown
-
-### Requirement: Integrators can override the summary template
-The summary template SHALL be replaceable through page TSconfig without
-replacing any core backend template.
-
-#### Scenario: Template override
-- **WHEN** an integrator registers a template override for the summary in
-  page TSconfig
-- **THEN** the page module renders the summary with the integrator's template
