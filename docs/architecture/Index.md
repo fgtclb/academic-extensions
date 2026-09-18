@@ -35,6 +35,12 @@ describing an intention as if it were the state.
   `academic_base` provider that inlines it, so it follows the text colour in
   the backend and the frontend, on the dark cards of a dark colour scheme
   included.
+- The category summary of the page module is **one implementation in
+  `category_types`** and three four-line listeners on
+  `ModifyPageLayoutContentEvent`. It shipped three times as a partial before,
+  registered as an override of a core backend partial that no core template
+  renders — it worked as a full template override until it was converted to
+  that partial in March 2023, and has rendered nothing since.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
@@ -60,6 +66,7 @@ describing an intention as if it were the state.
 | [Translation synchronization](translation-synchronization.md)   | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.                                                 |
 | [Shared partials](shared-partials.md)                           | The Fluid partials `academic_base` ships for every extension, the root path key `-1` they are registered with, and which views register it.                                                |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
+| [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
 
 ## See also

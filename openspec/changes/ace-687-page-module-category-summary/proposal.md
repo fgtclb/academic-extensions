@@ -27,6 +27,9 @@ Behaviour is identical on TYPO3 v13 and v14.
 
 ### New Capabilities
 
+- `typo3-category-types/page-module-category-summary`: an extension that owns
+  a page type can have the page module show that page's categories, labelled
+  from the registered types and overridable through page TSconfig.
 - `academic-programs/page-module-category-summary`: the page module shows
   the categories of a program page.
 - `academic-partners/page-module-category-summary`: the page module shows
