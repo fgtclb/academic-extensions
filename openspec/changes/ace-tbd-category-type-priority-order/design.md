@@ -12,8 +12,14 @@ See `proposal.md` for the motivation. Verified on `main` at `6bea855a6`:
   `CategoryCollection::setTypeIdentifiers()`, and
   `CategoryCollection::getAllCategoriesByType()` builds its result in that
   order. The programs templates `Partials/Program/Categories.html`,
-  `Partials/Program/DemandCategories.html`, `Partials/Program/Item.html` and
-  `Backend/Partials/PageLayout/Doktype20.html` all iterate that result.
+  `Partials/Program/DemandCategories.html` and `Partials/Program/Item.html`
+  all iterate that result.
+- The page module category summary is the one consumer that does **not**.
+  `Backend\PageCategorySummaryRenderer::rows()` takes its row order from
+  `CategoryTypeRegistry::getGroupedCategoryTypes()[<group>]` and uses
+  `getAllCategoriesByType()` only for the categories inside a row. Making the
+  summary priority aware is therefore a change to the registry order, not to
+  the collection.
 - `CategoryTypeLoader::loadUncached()` keys the loaded types by
   `<group>.<identifier>`. A `useExisting` override `array_merge()`s onto the
   existing entry and assigns it to the same key, so the type keeps its
