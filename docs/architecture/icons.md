@@ -71,9 +71,9 @@ identifier: `addPlugin()` and `TcaManipulator::addRecordType()` write it verbati
 into `ctrl.typeicon_classes`, `IconRegistry::registerTCAIcons()` registers
 `ctrl.iconfile` and nothing else, and an unregistered value is silently replaced
 by `default-not-found` — and through
-`<core:icon>` in the three page layout partials
-`Resources/Private/Backend/Partials/PageLayout/Doktype*.html` of
-`academic-programs`, `academic-projects` and `academic-partners`.
+`<core:icon>` in the page module category summary,
+`category-types/Resources/Private/Templates/PageCategorySummary.html`, which
+draws both the category type icon and the core `overlay-hidden` overlay.
 
 The frontend consumes them through `<core:icon>` as well. `core` is a global
 Fluid namespace on both core versions — through `SYS.fluid.namespaces` of
