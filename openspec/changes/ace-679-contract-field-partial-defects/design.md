@@ -23,8 +23,11 @@ Branch `2` carries the same `Field.html`.
 **Goals:**
 
 - Render every item `showFields` offers; none of them may produce an empty row.
-- Keep the partial's arguments (`fieldName`, `contract`) unchanged, so project
-  overrides of the callers keep working.
+- Keep the partial's existing arguments (`fieldName`, `contract`) unchanged, so
+  project overrides of the callers keep working. The prefix is handed in as one
+  further, optional argument: a partial sees only what its caller passes, and a
+  project copy of `Contract/Item.html` that passes the two existing arguments
+  renders as it does today, without the prefix.
 
 **Non-Goals:**
 
@@ -85,10 +88,19 @@ integrator. Rejected as well: leaving the prefix to project overrides of the
 two partials, which is the copy this change wants to remove.
 
 `academic_contacts4pages` renders `Contract/Field.html` with the settings of
-its own plugin block, which today receives only `detailPid` from the persons
-constants (`academic-contact4pages/Configuration/TypoScript/List/setup.typoscript`).
+its own plugin block, which today receives `detailPid` and the image
+placeholder from the persons constants
+(`academic-contact4pages/Configuration/TypoScript/List/setup.typoscript`).
 Its setup maps the prefix the same way, so the contacts for pages output
 uses the same targets.
+
+Its *data processor* is a different path and is deliberately left out. It
+assigns the contacts of the current page to whatever `page.10` renders, and
+that page object belongs to the installation: the extension registers
+`page.10.dataProcessing.400` and nothing else, so there is no `settings` block
+of its own to map the prefix into, and an installation that renders
+`Profile/Item` there already has to add the persons partial root path itself.
+An installation on that path configures the prefix on its own page object.
 
 ## Risks / Trade-offs
 

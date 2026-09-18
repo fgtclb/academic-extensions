@@ -61,6 +61,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-02`). Two of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-contract-field-partial-defects` when the issue is filed after
-implementation.
+this today. Filed as ACE-679 after the implementation was green, which is what
+the change is named after.
