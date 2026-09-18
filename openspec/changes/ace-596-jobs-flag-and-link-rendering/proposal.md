@@ -51,7 +51,6 @@ None.
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-05`). Two of the six analysed projects carry their own code for this
 today. The change is carried by ACE-596, whose scope grows by the link
-rendering; it is renamed to `ace-596-jobs-flag-and-link-rendering` once the
-key is verified.
+rendering.
 
 Implements ACE-596. ACE-371 is closed as its duplicate. Relates to ACE-368.
