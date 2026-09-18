@@ -1,0 +1,4 @@
+# The phone link prefix of `EXT:academic_persons`. This plugin maps it into its own
+# settings, so a contact rendered here gets the same link target as a profile rendered by
+# that extension.
+plugin.tx_academicpersons.phoneNumbers.telPrefix = +49 6241 509
