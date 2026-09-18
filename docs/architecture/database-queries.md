@@ -35,7 +35,7 @@ It is **not** the Extbase query object. `TYPO3\CMS\Extbase\Persistence\Generic\Q
 also offers an `in()` method (line 503 on v13.4.34, line 512 on v12.4.45), but
 that one takes a plain PHP array by design and builds an object-level
 constraint, not SQL. Extbase repository code such as
-`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:198`
+`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:233`
 (`$query->matching($query->in('uid', $profileUidArray))`) is therefore outside
 the scope of both rules below — ten such call sites exist across five
 repositories. Check which object is in the variable before applying either rule
@@ -409,6 +409,35 @@ which `executeStatement()` does not treat as an error.
 
 **Run a suspected parameter defect on PostgreSQL first.** It is the fastest
 route from "this does nothing" to "this is comparing the wrong two things".
+
+## An order the database cannot give: a manual selection
+
+A manual selection — the uid list a `profileList` FlexForm field carries — is
+ordered by the editor, and `IN (...)` reproduces that order on no supported
+database. The order is therefore restored in PHP, after the query, by
+`ProfileController::sortBySelectionOrder()`.
+
+**Sort before anything slices the list.** A paginator built from the query
+result pages the *database* order: the sorted list is assigned to a different
+view variable, so the restored order never reaches the template, and the
+paginated statement runs `LIMIT`/`OFFSET` without an `ORDER BY`, which lets two
+pages overlap or skip a record on PostgreSQL. Sort first and paginate the sorted
+array with `TYPO3\CMS\Core\Pagination\ArrayPaginator` instead (ACE-681):
+
+```php
+$paginator = $manualSelection
+    ? new ArrayPaginator($profiles, $demand->getCurrentPage(), $resultsPerPage)
+    : new QueryResultPaginator($profiles, $demand->getCurrentPage(), $resultsPerPage);
+```
+
+Both paginators satisfy `PaginatorInterface` and expose `paginatedItems`, so the
+template does not change, and `ArrayPaginator` exists on TYPO3 v12 and v13 alike
+(v12.4.45 and v13.4.34 were checked).
+
+Ordering the selection *query* on top of that is a separate question, and this
+branch answers it nowhere: no repository here declares a fallback ordering, so a
+single ordered branch would read as an accident rather than a decision. ACE-431
+covers it.
 
 ## Testing this class of defect
 
