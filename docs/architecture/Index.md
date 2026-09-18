@@ -22,6 +22,13 @@ This branch supports **TYPO3 v12 and v13**.
 - In the frontend edit forms, a `disabled` or `readOnly` property is **never**
   written, whatever the request carries. The shipped `profile` set locks the
   three name fields that way, which is intended and regularly misread.
+- The category summary of the page module is **one implementation in
+  `category_types`** and three four-line listeners on
+  `ModifyPageLayoutContentEvent`, registered with the `event.listener` tag
+  because `#[AsEventListener]` does not exist on v12. It shipped three times as
+  a partial before, registered as an override of a core backend partial that no
+  core template renders — only `academic_programs` ever showed it, and a rename
+  in March 2023 ended that.
 - TypoScript and page TSconfig exist **once** on disk and are delivered twice:
   a site set points at the very files the static template registration points
   at. Content elements are hidden globally and re-enabled per component. Site
@@ -38,6 +45,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Frontend-user contact import](frontend-user-contact-import.md) | How telephone and fax data from `fe_users` is identified, typed and synchronized.                                                                |
 | [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                |
 | [Form data transformation](form-data-transformation.md)         | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                     |
+| [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.  |
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.       |
 
 ## See also
