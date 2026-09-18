@@ -34,7 +34,7 @@ It is **not** the Extbase query object. `TYPO3\CMS\Extbase\Persistence\Generic\Q
 respectively), but that one takes a plain PHP array
 by design and builds an object-level constraint, not SQL. Extbase repository
 code such as
-`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:214`
+`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:267`
 (`$query->matching($query->in('uid', $profileUidArray))`) is therefore outside
 the scope of the first two rules below — rule 3 applies to **both** query
 objects. Check which object is in the variable before applying a rule to a
@@ -417,6 +417,40 @@ What to order by, learned from the ACE-482/ACE-491 sweeps:
 - **Everything else** orders by `uid` ascending. That is the order every
   supported database returned in practice, so no installation sees its lists
   change — the order becomes guaranteed rather than coincidental.
+
+### An order the database cannot give: a manual selection
+
+A manual selection — the uid list a `profileList` FlexForm field carries — is
+ordered by the editor, and `IN (...)` reproduces that order on no supported
+database. The order is therefore restored in PHP, after the query, by
+`ProfileController::sortBySelectionOrder()`. Two things follow, both learned
+from ACE-681.
+
+**Sort before anything slices the list.** A paginator built from the query
+result pages the *database* order: the sorted list is assigned to a different
+view variable, so the restored order never reaches the template, and the
+paginated statement runs `LIMIT`/`OFFSET` without an `ORDER BY` — which is
+rule 3 again, and lets two pages overlap or skip a record on PostgreSQL. Sort
+first and paginate the sorted array with
+`TYPO3\CMS\Core\Pagination\ArrayPaginator` instead:
+
+```php
+$paginator = $manualSelection
+    ? new ArrayPaginator($profiles, $demand->getCurrentPage(), $resultsPerPage)
+    : new QueryResultPaginator($profiles, $demand->getCurrentPage(), $resultsPerPage);
+```
+
+Both paginators satisfy `PaginatorInterface` and expose `paginatedItems`, so
+the template does not change, and `ArrayPaginator` exists on every core version
+any branch here supports.
+
+**Order the query anyway.** That the controller sorts is not a reason to leave
+the query unordered: the result is handed to a PSR-14 listener
+(`ModifyListProfilesEvent`) before the sort, and a listener that renders or
+counts it must see the same list twice. The selection branch of
+`ProfileRepository::applyDemandForQuery()` therefore ends with the same
+`uid` fallback ordering as every other branch, even though the visible order is
+produced afterwards in PHP.
 
 ### Testing an ordering
 
