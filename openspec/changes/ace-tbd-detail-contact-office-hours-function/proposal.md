@@ -41,7 +41,7 @@ None.
   changelog.
 - Plugins `detail` and `listanddetail`, and `list`, `listanddetail` and
   `card` for the "fields to show" item.
-- The function type item depends on `ace-tbd-contract-field-partial-defects`,
+- The function type item depends on `ace-679-contract-field-partial-defects`,
   which makes the contract field partial render relation values.
 - No schema change.
 

@@ -21,7 +21,7 @@ See `proposal.md` for the motivation. State on `main`:
 - `ProfileShowFieldsItems` already offers `contracts.officeHours` and
   `contracts.organisationalUnit`, but not `contracts.functionType`.
   `Partials/Profile/Contract/Field.html` renders scalar fields and a few
-  relations; `ace-tbd-contract-field-partial-defects` fixes its relation
+  relations; `ace-679-contract-field-partial-defects` fixes its relation
   handling.
 
 ## Goals / Non-Goals
@@ -96,7 +96,7 @@ a method with an argument cannot be called from Fluid.
 
 `ProfileShowFieldsItems` adds `contracts.functionType`, and `Field.html`
 renders it through the shared partial. That depends on the relation handling
-of `ace-tbd-contract-field-partial-defects`.
+of `ace-679-contract-field-partial-defects`.
 
 ## Risks / Trade-offs
 

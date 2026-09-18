@@ -18,7 +18,7 @@ This applies on TYPO3 v13 and v14.
 
 - **WHEN** a visitor views a card plugin that displays the organisational unit
   and the profile's contract belongs to a unit with a display text
-- **THEN** the contract row shows the label "Organisational unit" and the
+- **THEN** the contract row shows the label "Organisational Unit" and the
   unit's display text
 
 #### Scenario: Unit without a display text

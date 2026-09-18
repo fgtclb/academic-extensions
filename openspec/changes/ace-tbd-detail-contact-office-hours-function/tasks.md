@@ -25,7 +25,7 @@
 
 ## 3. Fields to show
 
-- [ ] 3.1 Confirm `ace-tbd-contract-field-partial-defects` is merged, add
+- [ ] 3.1 Confirm `ace-679-contract-field-partial-defects` is merged, add
   `contracts.functionType` to the fields to show and render it in
   `Field.html`; add a functional card test selecting it, and show it fails
   without the item.
