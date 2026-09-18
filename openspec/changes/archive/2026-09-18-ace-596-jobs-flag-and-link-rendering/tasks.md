@@ -41,9 +41,9 @@
 
 ## 4. File the issue
 
-- [ ] 4.1 Verify ACE-596 in YouTrack, extend its scope by the job link
+- [x] 4.1 Verify ACE-596 in YouTrack, extend its scope by the job link
   rendering, and close ACE-371 as its duplicate.
-- [ ] 4.2 Rename the change to `ace-596-jobs-flag-and-link-rendering` and
+- [x] 4.2 Rename the change to `ace-596-jobs-flag-and-link-rendering` and
   commit in TYPO3 Core format, e.g.
   `[BUGFIX] ACE-596: Label job flags and link job URL`.
 
@@ -63,4 +63,4 @@
 - [x] 6.4 `docs/` and the extension's `Documentation/` changelog updated in the
   same change. `docs/` needed no change: it carries no statement about the job
   partials or their labels.
-- [ ] 6.5 Archive the change as the last commit of the pull request.
+- [x] 6.5 Archive the change as the last commit of the pull request.
