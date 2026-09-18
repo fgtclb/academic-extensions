@@ -282,10 +282,11 @@ in a TYPO3 extension is considerably more than the public PHP API:
 | A database column changed, requiring a schema update          | yes   | `Important`               |
 | TypoScript or extension configuration option added or removed | yes   | `Feature` / `Breaking`    |
 | A new or raised dependency                                    | yes   | `Important`               |
+| A **defect fix that changes what a page renders**             | yes   | `Important`               |
 | Internal refactoring with identical behaviour                 | no    | —                         |
 | Tests, CI, the harness, `docs/`                               | no    | —                         |
 
-The two rows in bold type are the ones that get forgotten. **A template change
+The three rows in bold type are the ones that get forgotten. **A template change
 is user facing.** Projects copy partials into their site package and override
 them, so a renamed partial, a changed variable name or a restructured section is
 a breaking change for every project that did — even though no PHP signature
@@ -299,6 +300,23 @@ moved. The repository has documented exactly this repeatedly:
 
 **A changed asset path is user facing** for the same reason: a project may
 reference the file from its own TypoScript, its own template or its build.
+
+**A defect fix is user facing when its output is.** The surfaces above are what
+usually triggers an entry, but none of them is the test. A fix can touch nothing
+but PHP — no template, no option, no column, no signature anybody calls — and
+still change every page an installation serves: a list that comes out in a
+different order, a link target that is suddenly dialable, a row that used to
+render empty. Somebody sees that after an update and goes looking for what caused
+it, and the changelog is where they look.
+`academic-persons/Documentation/Changelog/3.0/Important-PaginatedSelectionKeepsItsOrder.rst`
+is that shape exactly: a controller fix, no surface touched, one `Important`
+entry.
+
+What this rules out is the reasoning "it is a bugfix, so an integrator has
+nothing to do". Having something to do is not the criterion — noticing is. The
+question to answer before deciding against an entry is whether an installation
+that changed nothing of its own renders something different after the update. If
+it does, the entry is `Important`.
 
 When in doubt, write the entry. An `Important` entry that nobody needed costs a
 paragraph; a missing `Breaking` entry costs somebody an afternoon after an
