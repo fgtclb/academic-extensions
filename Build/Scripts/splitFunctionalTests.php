@@ -88,6 +88,12 @@ function main(array $argv): int
         ) . PHP_EOL;
     }
 
+    // More chunks than classes would leave chunks without a test, each of which still
+    // starts its containers. "runTests.sh" runs as many chunks as are written here.
+    if ($numberOfChunks > count($testsPerFile)) {
+        echo sprintf('%d chunks asked for, but only %d test classes: writing %d', $numberOfChunks, count($testsPerFile), count($testsPerFile)) . PHP_EOL;
+        $numberOfChunks = count($testsPerFile);
+    }
     $chunks = distribute($weightPerFile, $numberOfChunks);
 
     if (!is_dir($outputDirectory) && !mkdir($outputDirectory, 0777, true) && !is_dir($outputDirectory)) {
