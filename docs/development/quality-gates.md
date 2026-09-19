@@ -428,6 +428,14 @@ versions and both edge PHP versions, so a defect that is not DBMS specific is
 reported by four jobs instead of twenty — `functional-dbms` needs
 `functional-sqlite`.
 
+Both functional jobs run their suite with `-j 4`, four chunks in parallel, one
+per vCPU of a hosted runner (ACE-692). A single PHPUnit process left three of
+the four idle. Split and run in parallel, the suite took 1.6 to 3.7 times less
+time per job on this branch (TYPO3 v13), measured on the same runner type. Each
+job uploads the JUnit logs of its chunks, which is where the recorded durations
+the chunks are balanced by are refreshed from — see
+[Parallel functional runs](environment.md#parallel-functional-runs--j).
+
 ### The core/PHP pairs are listed, not multiplied
 
 The supported PHP versions differ per core version on this branch, so the jobs

@@ -273,9 +273,11 @@ trailing whitespace, a `## See also` on every `docs/` page. Like `cgl` it fixes
 by default and only reports with `-n`. It needs no node dependency, so it is
 the one node suite that runs without an `npm ci`.
 
-Test discovery: phpunit globs `packages/*/*/Tests/Unit/` and
-`packages/*/*/Tests/Functional/` across **all** extensions at once
-(`Build/phpunit/*.xml`) — there is no per-extension test config.
+Test discovery: phpunit globs `packages/*/*/Tests/Unit/`,
+`packages/*/*/Tests/Functional/` **and** `packages-dev/*/Tests/{Unit,Functional}/`
+across everything at once (`Build/phpunit/*.xml`) — there is no per-extension
+test config. `packages-dev/` is in the glob for the tests of the development
+seed and of the scripts behind `runTests.sh -j`.
 
 ## CI (`.github/workflows/`)
 
@@ -293,6 +295,16 @@ documentation   (independent)
 The DBMS matrix (16 jobs) only starts once the same functional tests passed on
 SQLite for both core versions and both edge PHP versions, so a defect that is
 not DBMS specific is reported by 4 jobs instead of 20.
+
+Every functional job runs with `runTests.sh -j 4`: the suite split into four
+chunks run in parallel, balanced by the committed durations in
+`Build/phpunit/FunctionalTestTimes-<dbms>.json`. The list of what runs comes
+from PHPUnit, never from that file, so a new test cannot fall out of a run — a
+stale file only costs balance — and the run fails unless the chunks together
+executed exactly the tests PHPUnit listed. PHPUnit 10 does not apply
+`--exclude-group` to that list, so the split and the count apply the excluded
+groups themselves. How to refresh the durations:
+[Parallel functional runs](docs/development/environment.md#parallel-functional-runs--j).
 
 Supported PHP versions differ **per core version** on this branch, so the
 core/PHP pairs are listed explicitly as a `combo` axis rather than formed by a

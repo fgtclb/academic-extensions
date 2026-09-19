@@ -76,6 +76,76 @@ you are done:
 rm -rf .Build/Web/typo3temp/var/tests-*
 ```
 
+### Parallel functional runs: `-j`
+
+A functional run is one PHPUnit process, which leaves most cores idle. `-j
+<number>` splits the suite into that many chunks and runs them at the same time:
+
+```bash
+Build/Scripts/runTests.sh -t 13 -d postgres -j 4 -s functional
+```
+
+The script first asks PHPUnit for the tests of this run — `--list-tests-xml`,
+with the same path or filter given after `--` — and
+`Build/Scripts/splitFunctionalTests.php` turns that list into one PHPUnit
+configuration per chunk. PHPUnit 10 writes that list without applying
+`--exclude-group`, but with the groups of every test, so the split drops the
+tests of `not-core-NN`, `not-<dbms>` and `seed-manifest-update` itself: `runTests.sh`
+hands it the same comma separated value it passes to `--exclude-group`. The
+list also names each class without its file, which the split looks up with
+`findFile()` of the composer class loader. That resolves the PSR-4 path without
+loading the class, which matters because a class written for the other core
+version cannot be loaded at all. It then starts itself once per chunk with `-c
+<n>/<total>`. Every chunk gets its own suffix, and with it everything the
+section above isolates: its own container network, its own database container
+and its own instance directory. The output of a chunk is printed once it is
+done, in chunk order, and the run fails if any chunk failed.
+
+**The list decides what runs, never the timings.** A test class is never split,
+because each one sets up its TYPO3 instance and database once for all of its
+tests, and every listed class goes into exactly one chunk. A test added since
+the durations were recorded is therefore always run.
+
+**A run fails when a test got lost on the way.** Green chunks alone do not prove
+that every listed test ran — a class the split left out would simply be absent.
+Once every chunk is green, `Build/Scripts/checkFunctionalTestCount.php` compares
+the number of tests in the list — without the excluded groups, like the split —
+with the number the JUnit logs of the chunks report, skipped tests included on
+both sides, and fails the run on any difference.
+
+**The durations only decide the balance.** The heaviest classes go first, each
+into the chunk that is lightest so far. A test class weighs its recorded
+duration from `Build/phpunit/FunctionalTestTimes-<dbms>.json`, one committed
+file per DBMS, because the same class costs very different times on each. A
+class the file does not know weighs its number of tests times the average
+recorded duration of one test, and without the file every class weighs its
+number of tests. By test count alone the slowest of four chunks ran 12 to 30 %
+behind the average in CI, mostly because two classes of `packages-dev/dev-site`
+import the whole development seed. `SeedManifestTest` and
+`DeliveryRegistrationTest` take some 80 seconds each on MySQL, a tenth of the
+suite apiece; no chunk count can go below the slowest single class. Balanced by
+the recorded durations, the spread was 0 to 9 %.
+
+The files of a run stay in `.Build/functional-runs/<suffix>/`: the test list,
+the chunk configurations, a log and a JUnit log per chunk. Two runs in one
+checkout have different suffixes, so they cannot overwrite each other's chunks.
+
+**Refreshing the durations** is done by hand, when the balance drifts or after a
+large change to the suite. A stale file costs time, never a test. Every
+functional job in CI uploads the JUnit logs of its chunks as an artifact named
+`functional-junit-<dbms>-…`. Download the artifacts of one core and PHP version
+from a green run and write the file for each DBMS:
+
+```bash
+gh run download <run-id> -n functional-junit-mysql-8.0-v13-php8.2 -D .Build/junit/mysql
+Build/Scripts/runTests.sh -d mysql -s recordFunctionalTestTimes -- .Build/junit/mysql/*/junit-*.xml
+```
+
+`Build/Scripts/recordFunctionalTestTimes.php` keys the durations by the path
+below the repository root, so logs from a CI runner match a local checkout. The
+logs of a local `-j` run work just as well, but a workstation is not a runner:
+the proportions between classes hold, the absolute seconds do not.
+
 ### A pseudo TTY only when there is a terminal
 
 `CONTAINER_INTERACTIVE` is `-it --init` by default, and drops to `--init` when
@@ -128,6 +198,8 @@ everything left over after them is the optional trailing argument.
 | `-d <dbms>`       | DBMS for functional tests: `sqlite`, `mariadb`, `mysql`, `postgres`.                | `sqlite`            |
 | `-i <version>`    | DBMS version, only with `-d mariadb\|mysql\|postgres`.                              | per DBMS, see below |
 | `-a <driver>`     | Database driver, only with `-d mariadb\|mysql`: `mysqli` or `pdo_mysql`.            | `mysqli`            |
+| `-j <number>`     | Run `functional` in that many parallel chunks, see below.                           | `1`                 |
+| `-c <n>/<total>`  | Internal: set by `-j` for each chunk it starts. Not meant to be given by hand.      | —                   |
 | `-n`              | Dry run for `cgl`, `cglHeader`, `lintMarkdown` and `lintTypescript`.                | off                 |
 | `-x`              | Enable Xdebug and send debugging information to the host IDE.                       | off                 |
 | `-y <port>`       | Xdebug client port on the host, when the IDE does not listen on the default.        | `9003`              |
@@ -201,24 +273,25 @@ workflow in `.github/workflows/` uses the separator.
 Taken from the `case ${TEST_SUITE} in` statement, which is the authority — the
 help text is prose and can drift, see below.
 
-| Suite                     | What it runs                                                                                        |
-|---------------------------|-----------------------------------------------------------------------------------------------------|
-| `cgl`                     | php-cs-fixer with `Build/php-cs-fixer/config.php`. Fixes in place, `-n` only reports.               |
-| `cglHeader`               | php-cs-fixer with `Build/php-cs-fixer/header-comment.php` for the file header.                      |
-| `checkRstRenderingAll`    | Renders `Documentation/` of every extension in `packages/fgtclb/`.                                  |
-| `checkRstRenderingSingle` | The same for one extension folder, given as trailing argument.                                      |
-| `composer`                | `composer` with all remaining arguments dispatched into the container.                              |
-| `composerUpdate`          | Installs the dependency set for `-t`, see below.                                                    |
-| `functional`              | PHPUnit with `Build/phpunit/FunctionalTests.xml` against the DBMS from `-d`.                        |
-| `lintMarkdown`            | `Build/markdown.mjs` over every Markdown file. Fixes in place, `-n` only reports.                   |
-| `lintPhp`                 | `php -l` over every `*.php` outside the excluded trees.                                             |
-| `openDocumentation`       | Opens a previously rendered documentation in the browser (Linux only, `xdg-open`).                  |
-| `phpstan`                 | PHPStan with `Build/phpstan/Core<12\|13>/phpstan.neon`.                                             |
-| `phpstanGenerateBaseline` | Rewrites `Build/phpstan/Core<12\|13>/phpstan-baseline.neon`.                                        |
-| `unit`                    | PHPUnit with `Build/phpunit/UnitTests.xml`.                                                         |
-| `unitRandom`              | The same, with `--order-by=random` and the seed from `-o`.                                          |
-| `update`                  | Pulls newer `ghcr.io/typo3/core-testing-*` images and removes dangling ones. Also reached via `-u`. |
-| `help`                    | Prints the help text. This is the default when `-s` is omitted.                                     |
+| Suite                       | What it runs                                                                                        |
+|-----------------------------|-----------------------------------------------------------------------------------------------------|
+| `cgl`                       | php-cs-fixer with `Build/php-cs-fixer/config.php`. Fixes in place, `-n` only reports.               |
+| `cglHeader`                 | php-cs-fixer with `Build/php-cs-fixer/header-comment.php` for the file header.                      |
+| `checkRstRenderingAll`      | Renders `Documentation/` of every extension in `packages/fgtclb/`.                                  |
+| `checkRstRenderingSingle`   | The same for one extension folder, given as trailing argument.                                      |
+| `composer`                  | `composer` with all remaining arguments dispatched into the container.                              |
+| `composerUpdate`            | Installs the dependency set for `-t`, see below.                                                    |
+| `functional`                | PHPUnit with `Build/phpunit/FunctionalTests.xml` against the DBMS from `-d`.                        |
+| `lintMarkdown`              | `Build/markdown.mjs` over every Markdown file. Fixes in place, `-n` only reports.                   |
+| `lintPhp`                   | `php -l` over every `*.php` outside the excluded trees.                                             |
+| `openDocumentation`         | Opens a previously rendered documentation in the browser (Linux only, `xdg-open`).                  |
+| `phpstan`                   | PHPStan with `Build/phpstan/Core<12\|13>/phpstan.neon`.                                             |
+| `phpstanGenerateBaseline`   | Rewrites `Build/phpstan/Core<12\|13>/phpstan-baseline.neon`.                                        |
+| `recordFunctionalTestTimes` | Rewrites `Build/phpunit/FunctionalTestTimes-<dbms>.json` from the JUnit logs given after `--`.      |
+| `unit`                      | PHPUnit with `Build/phpunit/UnitTests.xml`.                                                         |
+| `unitRandom`                | The same, with `--order-by=random` and the seed from `-o`.                                          |
+| `update`                    | Pulls newer `ghcr.io/typo3/core-testing-*` images and removes dangling ones. Also reached via `-u`. |
+| `help`                      | Prints the help text. This is the default when `-s` is omitted.                                     |
 
 Anything else falls to the `*)` arm, which prints the help and exits non-zero.
 
