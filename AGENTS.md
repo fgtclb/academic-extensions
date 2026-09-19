@@ -302,6 +302,15 @@ extension is created from. All fourteen carry the same block; change them
 together. Do not add `github-token` to their `shivammathur/setup-php` step —
 that input already defaults to `github.token`.
 
+`nightly.yml` runs the complete `ci.yml` every night for `main` **and** `2`
+(ACE-693). It lives on `main` only — a schedule fires on the default branch
+alone — and starts `ci.yml` on each branch through `workflow_dispatch`, then
+waits for that run and takes over its result, because a dispatched run that
+fails notifies nobody. A possible later reduction of the pull request DBMS
+matrix, with the exact cells, is documented in
+[Quality gates](docs/development/quality-gates.md#reducing-the-pull-request-matrix--documented-not-applied);
+applying it means naming the executed matrix there and here.
+
 There are no `core-*.yml` workflows any more; `core-11.yml` … `core-14.yml` were
 consolidated into `ci.yml`. No badge in this repository referenced them.
 
