@@ -63,6 +63,9 @@ name: "CI"
 
 on:
   pull_request:
+  # Also what "nightly.yml" on "main" starts this workflow through, every night and
+  # for both maintained branches (ACE-693). Removing it removes the nightly run of
+  # this branch.
   workflow_dispatch:
 
 # Least privilege. Nothing in this workflow writes, and it must stay that way:
@@ -73,7 +76,9 @@ permissions:
   contents: read
 
 # Superseded runs of the same pull request are pointless, and this workflow is
-# not cheap. Pushing twice in a minute cancels the first run.
+# not cheap. Pushing twice in a minute cancels the first run. A dispatched run -
+# the nightly one - is grouped by its branch instead, so it never cancels a pull
+# request run and is never cancelled by one.
 concurrency:
   group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
   cancel-in-progress: true
