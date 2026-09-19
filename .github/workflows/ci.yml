@@ -19,6 +19,10 @@ name: "CI"
 #   documentation     (independent, for fast feedback on documentation changes)
 #   frontend assets   (independent, core version agnostic, no composerUpdate)
 #
+# Every functional job runs its suite in four parallel chunks ("runTests.sh -j 4"),
+# one per vCPU of a hosted runner, which does the work of a single phpunit process
+# in a third to a half of the time (ACE-692).
+#
 # The DBMS matrix is the expensive part — 16 jobs, each starting a database
 # container — so it only runs once the same tests have passed on SQLite for both
 # core versions and both edge PHP versions. A failure that is not DBMS specific
@@ -268,8 +272,20 @@ jobs:
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
 
+      # "-j 4": four chunks in parallel, one per vCPU of the runner, balanced by the
+      # durations in "Build/phpunit/FunctionalTestTimes-sqlite.json" (ACE-692).
       - name: "Execute functional tests with SQLite"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -s functional"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -j 4 -s functional"
+
+      # The JUnit logs of the chunks: what "-s recordFunctionalTestTimes" refreshes the
+      # committed durations from. Small, and kept only as long as a pull request is.
+      - name: "Upload the JUnit logs"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "functional-junit-sqlite-v${{ matrix.typo3 }}-php${{ matrix.php-version }}"
+          path: ".Build/functional-runs/*/junit-*.xml"
+          if-no-files-found: "error"
+          retention-days: 7
 
   functional-dbms:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.typo3 }}, PHP ${{ matrix.php-version }})"
@@ -312,8 +328,18 @@ jobs:
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
 
+      # "-j 4": four chunks in parallel, each with a database container of its own,
+      # balanced by "Build/phpunit/FunctionalTestTimes-<dbms>.json" (ACE-692).
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -s functional"
+        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -j 4 -s functional"
+
+      - name: "Upload the JUnit logs"
+        uses: actions/upload-artifact@v6
+        with:
+          name: "functional-junit-${{ matrix.dbms.name }}-${{ matrix.dbms.version }}-v${{ matrix.typo3 }}-php${{ matrix.php-version }}"
+          path: ".Build/functional-runs/*/junit-*.xml"
+          if-no-files-found: "error"
+          retention-days: 7
 
   frontend-assets:
     name: "frontend assets"

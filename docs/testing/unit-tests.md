@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 84 unit test classes across the twelve extensions and two more in
-`packages-dev/dev-site`, 12 of which are the one-line version compatibility
+There are 88 unit test classes across the twelve extensions, one more in
+`packages-dev/dev-site` and three in `packages-dev/testing-helper`, 12 of which are the one-line version compatibility
 test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
 `find packages/fgtclb/*/Tests/Unit packages-dev/*/Tests/Unit -name '*Test.php' | wc -l`.
@@ -73,9 +73,11 @@ Three things follow from those two lines.
 definition of [`packages-dev/dev-site/`](../../packages-dev/dev-site) carries
 tests of its own, and a suite that does not collect them reports the seed as
 green because it never looked at it.
-[`packages-dev/testing-helper/`](../../packages-dev/testing-helper) has no tests
-of its own all the same — its traits are exercised only through the extensions
-that use them.
+[`packages-dev/testing-helper/`](../../packages-dev/testing-helper) carries the
+tests of the three scripts behind `runTests.sh -j`, which split the functional
+suite, check that the chunks ran every listed test, and record the durations
+(ACE-692). Its traits have no tests of their
+own — they are exercised only through the extensions that use them.
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example

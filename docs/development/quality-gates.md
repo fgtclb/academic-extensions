@@ -418,6 +418,14 @@ versions and both edge PHP versions, so a defect that is not DBMS specific is
 reported by four jobs instead of twenty — `functional-dbms` needs
 `functional-sqlite`.
 
+Both functional jobs run their suite with `-j 4`, four chunks in parallel, one
+per vCPU of a hosted runner (ACE-692). A single PHPUnit process left three of
+the four idle. Split and run in parallel, the suite took 2.1 to 4 times less
+time per job on `main`, measured on the same runner type. Each job uploads the
+JUnit logs of its chunks, which is where the recorded durations the chunks are
+balanced by are refreshed from — see
+[Parallel functional runs](environment.md#parallel-functional-runs--j).
+
 ### Three PHP sets
 
 They are three, and they have to be changed together — the table in the header
