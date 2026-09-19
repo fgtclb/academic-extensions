@@ -710,7 +710,13 @@ fi
 # Set $1 to first mass argument, this is the optional test file or test directory to execute
 shift $((OPTIND - 1))
 
+# The suffix names everything a run creates: its container network, every container and
+# the directories of a functional run. A chunk of "-j" appends its chunk number: the
+# chunks start in the same instant, and "$RANDOM" has 15 bits. Two chunks of one run drew
+# the same value in CI, collided on the container network and the database container
+# name, and each removed what the other was using (ACE-695).
 SUFFIX=$(echo $RANDOM)
+[[ -n "${FUNCTIONAL_CHUNK}" ]] && SUFFIX="${SUFFIX}-${FUNCTIONAL_CHUNK%%/*}"
 NETWORK="academic-extensions-${SUFFIX}"
 ${CONTAINER_BIN} network create ${NETWORK} >/dev/null
 
@@ -886,10 +892,11 @@ case ${TEST_SUITE} in
         if [[ "${TEST_SUITE}" == "functional" && -z "${FUNCTIONAL_CHUNK}" && ${FUNCTIONAL_PARALLEL} -gt 1 ]]; then
             # "-j": list the tests of this run - with its group exclusions and any path or
             # filter given after "--" - split the list into chunk configurations, and start
-            # this script once per chunk. Every chunk gets its own suffix, and with it its own
-            # container network, database container and instance directory, so the chunks
-            # cannot see each other. The files of the run live in a directory of its own,
-            # because two runs in one checkout must not overwrite each other's chunks.
+            # this script once per chunk. Every chunk gets its own suffix - ending in its chunk
+            # number - and with it its own container network, database container and instance
+            # directory, so the chunks cannot see each other. The files of the run live in a
+            # directory of its own, because two runs in one checkout must not overwrite each
+            # other's chunks.
             FUNCTIONAL_RUN_DIRECTORY=".Build/functional-runs/${SUFFIX}"
             mkdir -p "${FUNCTIONAL_RUN_DIRECTORY}"
             FUNCTIONAL_TIMINGS="Build/phpunit/FunctionalTestTimes-${DBMS}.json"
