@@ -374,6 +374,15 @@ extension is created from. All fourteen carry the same block; change them
 together. Do not add `github-token` to their `shivammathur/setup-php` step —
 that input already defaults to `github.token`.
 
+The complete `ci.yml` of this branch also runs every night (ACE-693), started
+from `main` by its `nightly.yml`: a schedule fires on the default branch alone,
+so the nightly workflow lives there and starts this branch's `ci.yml` through
+`workflow_dispatch`. That trigger is what it relies on here, and there is no
+`nightly.yml` on this branch. A possible later reduction of the pull request
+DBMS matrix, with this branch's cells, is documented in
+[Quality gates](docs/development/quality-gates.md#reducing-the-pull-request-matrix--documented-not-applied);
+applying it means naming the executed matrix there and here.
+
 There are no `core-*.yml` workflows any more; `core-11.yml` … `core-13.yml` were
 consolidated into `ci.yml`.
 
