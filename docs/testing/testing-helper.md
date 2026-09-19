@@ -53,9 +53,14 @@ consuming class actually provides `$this->get()` or the assertion methods a
 trait calls. Using a trait in a class that does not extend a test case fails at
 runtime, not at install time or in static analysis.
 
-**It has no tests of its own.** The PHPUnit test suites glob
-`packages/*/*/Tests/…`, which does not reach `packages-dev/`. The traits are
-covered only through the extensions that use them.
+**The traits have no tests of their own.** They are covered only through the
+extensions that use them. The package's `Tests/Unit/Build/` holds tests, but for
+something else: the three scripts behind `runTests.sh -j`,
+`Build/Scripts/splitFunctionalTests.php`,
+`Build/Scripts/checkFunctionalTestCount.php` and
+`Build/Scripts/recordFunctionalTestTimes.php` (ACE-692). They run the scripts as
+subprocesses and are collected because the suites glob `packages-dev/*/Tests/`
+as well.
 
 A namespace quirk follows from the same history: every trait lives under
 `FGTCLB\TestingHelper\FunctionalTestCase\`, but

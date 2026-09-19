@@ -96,7 +96,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "FGTCLB\\AcademicsDevSite\\Tests\\": "packages-dev/dev-site/Tests/"
+            "FGTCLB\\AcademicsDevSite\\Tests\\": "packages-dev/dev-site/Tests/",
+            "FGTCLB\\TestingHelper\\Tests\\": "packages-dev/testing-helper/Tests/"
         }
     }
 }

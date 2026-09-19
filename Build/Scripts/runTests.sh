@@ -290,6 +290,8 @@ Options:
             - openDocumentation: Open a rendered extension documentation in the browser (only linux for now)
             - phpstan: phpstan tests
             - phpstanGenerateBaseline: regenerate phpstan baseline, handy after phpstan updates
+            - recordFunctionalTestTimes: write "Build/phpunit/FunctionalTestTimes-<dbms>.json" from the
+              JUnit logs given after "--", the durations "-j" balances its chunks by
             - typecheckJs: "tsc --noEmit" over the TypeScript sources, which the build does not do
             - unit: PHP unit tests
             - unitRandom: PHP unit tests in random order, "-o <number>" to use a specific seed
@@ -390,6 +392,20 @@ Options:
         Send xdebug information to a different port than default 9003 if an IDE like PhpStorm
         is not listening on default port.
 
+    -j <number>
+        Only with -s functional
+        Split the functional suite into <number> chunks that take about the same time and
+        run them in parallel, each with its own database container and instance directory.
+        A test class is never split, and the run fails unless the chunks together executed
+        exactly the tests phpunit listed for it. The chunks are balanced by the recorded durations in
+        "Build/phpunit/FunctionalTestTimes-<dbms>.json" when that file exists, and by the
+        number of tests otherwise. Each chunk writes a JUnit log to
+        ".Build/functional-runs/<run>/junit-<chunk>.xml", the input of
+        "-s recordFunctionalTestTimes". CI runs "-j 4", one chunk per vCPU.
+
+    -c <chunk>/<number-of-chunks>
+        Internal, set by "-j" for each chunk it starts. Runs one chunk prepared by "-j".
+
     -o <number>
         Only with -s unitRandom
         Set the random order seed, so a failing random order run can be repeated:
@@ -463,6 +479,11 @@ DATABASE_DRIVER=""
 DBMS_VERSION=""
 CONTAINER_BIN=""
 CONTAINER_HOST="host.docker.internal"
+FUNCTIONAL_CHUNK=""
+FUNCTIONAL_PARALLEL=1
+
+# Kept for "-j", which starts this script once per chunk with the same arguments.
+ORIGINAL_ARGUMENTS=("$@")
 
 # Option parsing updates above default vars
 # Reset in case getopts has been used previously in the shell
@@ -470,7 +491,7 @@ OPTIND=1
 # Array for invalid options
 INVALID_OPTIONS=()
 # Simple option parsing based on getopts (! not getopt)
-while getopts "a:b:s:d:i:p:t:xy:o:nhu" OPT; do
+while getopts "a:b:c:j:s:d:i:p:t:xy:o:nhu" OPT; do
     case ${OPT} in
         s)
             TEST_SUITE=${OPTARG}
@@ -480,6 +501,18 @@ while getopts "a:b:s:d:i:p:t:xy:o:nhu" OPT; do
                 INVALID_OPTIONS+=("${OPTARG}")
             fi
             CONTAINER_BIN=${OPTARG}
+            ;;
+        c)
+            FUNCTIONAL_CHUNK=${OPTARG}
+            if ! [[ ${FUNCTIONAL_CHUNK} =~ ^[1-9][0-9]*/[1-9][0-9]*$ ]]; then
+                INVALID_OPTIONS+=("c ${OPTARG}")
+            fi
+            ;;
+        j)
+            FUNCTIONAL_PARALLEL=${OPTARG}
+            if ! [[ ${FUNCTIONAL_PARALLEL} =~ ^[1-9][0-9]*$ ]]; then
+                INVALID_OPTIONS+=("j ${OPTARG}")
+            fi
             ;;
         a)
             DATABASE_DRIVER=${OPTARG}
@@ -847,6 +880,67 @@ case ${TEST_SUITE} in
         ;;
     functional|seedManifest)
         PHPUNIT_CONFIG_FILE="Build/phpunit/FunctionalTests.xml"
+        # One "--exclude-group" and not three: PHPUnit 10 rejects the option when it is
+        # given more than once, and this branch runs PHPUnit 10.
+        FUNCTIONAL_EXCLUDED_GROUPS="seed-manifest-update,not-${DBMS},not-core-${CORE_VERSION}"
+        if [[ "${TEST_SUITE}" == "functional" && -z "${FUNCTIONAL_CHUNK}" && ${FUNCTIONAL_PARALLEL} -gt 1 ]]; then
+            # "-j": list the tests of this run - with any path or filter given after "--" -,
+            # split the list into chunk configurations, and start this script once per
+            # chunk. Every chunk gets its own suffix, and with it its own container network,
+            # database container and instance directory, so the chunks cannot see each other. The files of the run live in a directory of its own,
+            # because two runs in one checkout must not overwrite each other's chunks.
+            #
+            # PHPUnit 10 writes the list without applying "--exclude-group", but with the
+            # groups of every test, so the split and the count check apply the exclusions
+            # themselves and are handed them for that.
+            FUNCTIONAL_RUN_DIRECTORY=".Build/functional-runs/${SUFFIX}"
+            mkdir -p "${FUNCTIONAL_RUN_DIRECTORY}"
+            FUNCTIONAL_TIMINGS="Build/phpunit/FunctionalTestTimes-${DBMS}.json"
+            [[ -f "${FUNCTIONAL_TIMINGS}" ]] || FUNCTIONAL_TIMINGS=""
+            ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-list-${SUFFIX} -e XDEBUG_MODE=off ${IMAGE_PHP} \
+                .Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group ${FUNCTIONAL_EXCLUDED_GROUPS} \
+                --list-tests-xml "${FUNCTIONAL_RUN_DIRECTORY}/tests.xml" "$@" >/dev/null
+            SUITE_EXIT_CODE=$?
+            if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+                ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-split-${SUFFIX} -e XDEBUG_MODE=off ${IMAGE_PHP} \
+                    php Build/Scripts/splitFunctionalTests.php "${FUNCTIONAL_RUN_DIRECTORY}/tests.xml" ${FUNCTIONAL_PARALLEL} "${FUNCTIONAL_RUN_DIRECTORY}" "${FUNCTIONAL_EXCLUDED_GROUPS}" ${FUNCTIONAL_TIMINGS}
+                SUITE_EXIT_CODE=$?
+            fi
+            if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+                CHUNK_PIDS=()
+                for CHUNK in $(seq 1 ${FUNCTIONAL_PARALLEL}); do
+                    FUNCTIONAL_RUN_DIRECTORY="${FUNCTIONAL_RUN_DIRECTORY}" "${BASH_SOURCE[0]}" -c "${CHUNK}/${FUNCTIONAL_PARALLEL}" "${ORIGINAL_ARGUMENTS[@]}" > "${FUNCTIONAL_RUN_DIRECTORY}/chunk-${CHUNK}.log" 2>&1 &
+                    CHUNK_PIDS+=($!)
+                done
+                # Output of a chunk is shown once it is done, in chunk order, rather than
+                # interleaved line by line with the others.
+                for CHUNK in $(seq 1 ${FUNCTIONAL_PARALLEL}); do
+                    wait "${CHUNK_PIDS[$((CHUNK - 1))]}"
+                    CHUNK_EXIT_CODE=$?
+                    [[ ${CHUNK_EXIT_CODE} -ne 0 ]] && SUITE_EXIT_CODE=${CHUNK_EXIT_CODE}
+                    [[ "${GITHUB_ACTIONS}" == "true" ]] && echo "::group::Chunk ${CHUNK}/${FUNCTIONAL_PARALLEL} (exit code ${CHUNK_EXIT_CODE})"
+                    echo "Chunk ${CHUNK}/${FUNCTIONAL_PARALLEL} (exit code ${CHUNK_EXIT_CODE})"
+                    cat "${FUNCTIONAL_RUN_DIRECTORY}/chunk-${CHUNK}.log"
+                    [[ "${GITHUB_ACTIONS}" == "true" ]] && echo "::endgroup::"
+                done
+            fi
+            # Green chunks do not prove that every listed test ran: a class the split
+            # left out would simply be absent. Compare what ran with what was listed.
+            if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+                ${CONTAINER_BIN} run ${CONTAINER_COMMON_PARAMS} --name functional-count-${SUFFIX} -e XDEBUG_MODE=off ${IMAGE_PHP} \
+                    php Build/Scripts/checkFunctionalTestCount.php "${FUNCTIONAL_RUN_DIRECTORY}/tests.xml" "${FUNCTIONAL_EXCLUDED_GROUPS}" $(seq -f "${FUNCTIONAL_RUN_DIRECTORY}/junit-%g.xml" 1 ${FUNCTIONAL_PARALLEL})
+                SUITE_EXIT_CODE=$?
+            fi
+            printSummary
+        fi
+        if [[ -n "${FUNCTIONAL_CHUNK}" ]]; then
+            PHPUNIT_CONFIG_FILE="${FUNCTIONAL_RUN_DIRECTORY}/FunctionalTests-Job-${FUNCTIONAL_CHUNK%%/*}.xml"
+            if [[ -z "${FUNCTIONAL_RUN_DIRECTORY}" || ! -f "${PHPUNIT_CONFIG_FILE}" ]]; then
+                echo "No chunk configuration for -c ${FUNCTIONAL_CHUNK}: -c is set by -j and not meant to be given by hand." >&2
+                SUITE_EXIT_CODE=1
+                printSummary
+            fi
+        fi
         if [ "${TEST_SUITE}" == "seedManifest" ]; then
             # The one test of the suite that writes rather than checks: it imports the
             # development seed and rewrites its committed manifest from what the import
@@ -857,9 +951,18 @@ case ${TEST_SUITE} in
             # that does not carry the exclusion.
             COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --group seed-manifest-update packages-dev/dev-site/Tests/Functional/SeedManifestTest.php)
         else
-            # One "--exclude-group" and not three: PHPUnit 10 rejects the option when it is
-            # given more than once, and this branch runs PHPUnit 10.
-            COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group seed-manifest-update,not-${DBMS},not-core-${CORE_VERSION} "$@")
+            COMMAND=(.Build/bin/phpunit -c ${PHPUNIT_CONFIG_FILE} --exclude-group ${FUNCTIONAL_EXCLUDED_GROUPS} "$@")
+            if [[ -n "${FUNCTIONAL_CHUNK}" ]]; then
+                # A test path given on the command line would replace the file list of the
+                # chunk configuration, and every chunk would run all of it. The split was
+                # already restricted to that path, so the chunk drops it and keeps options.
+                CHUNK_COMMAND=()
+                for ARGUMENT in "${COMMAND[@]}"; do
+                    [[ "${ARGUMENT}" != -* && -e "${ARGUMENT}" && "${ARGUMENT}" != .Build/bin/phpunit && "${ARGUMENT}" != "${PHPUNIT_CONFIG_FILE}" ]] && continue
+                    CHUNK_COMMAND+=("${ARGUMENT}")
+                done
+                COMMAND=("${CHUNK_COMMAND[@]}" --log-junit "${FUNCTIONAL_RUN_DIRECTORY}/junit-${FUNCTIONAL_CHUNK%%/*}.xml")
+            fi
         fi
         # Each functional test case gets its own TYPO3 instance below
         # "typo3temp/var/tests/functional-<identifier>". The testing framework derives that
@@ -1001,6 +1104,14 @@ case ${TEST_SUITE} in
             echo "Error: No extension key provided as first argument"
             SUITE_EXIT_CODE=1
         fi
+        ;;
+    recordFunctionalTestTimes)
+        # The JUnit logs come after "--": the ones "-j" leaves in ".Build/functional-runs/",
+        # or the "functional-junit-*" artifacts of a CI run. "-d" selects the file written,
+        # because the same class costs very different times per DBMS.
+        ${CONTAINER_BIN} run ${CONTAINER_SIMPLE_PARAMS} --name record-functional-test-times-${SUFFIX} ${IMAGE_PHP} \
+            php Build/Scripts/recordFunctionalTestTimes.php "Build/phpunit/FunctionalTestTimes-${DBMS}.json" "$@"
+        SUITE_EXIT_CODE=$?
         ;;
     phpstan)
         PHPSTAN_CONFIG_FILE="Build/phpstan/Core${CORE_VERSION}/phpstan.neon"

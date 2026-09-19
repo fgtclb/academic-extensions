@@ -5,9 +5,11 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 31 unit test classes across the twelve extensions, 12 of which are the
-one-line version compatibility test every extension carries (see
-[below](#the-version-compatibility-test)).
+There are 71 unit test classes across the twelve extensions, one more in
+`packages-dev/dev-site` and three in `packages-dev/testing-helper`, 12 of which
+are the one-line version compatibility test every extension carries (see
+[below](#the-version-compatibility-test)). Measured with
+`find packages/fgtclb/*/Tests/Unit packages-dev/*/Tests/Unit -name '*Test.php' | wc -l`.
 
 ## Running them
 
@@ -49,9 +51,10 @@ between tests are exactly the kind of defect a fixed order hides.
 
 ## Discovery
 
-There is no per-extension PHPUnit configuration. One glob in
-[`Build/phpunit/UnitTests.xml:36-44`](../../Build/phpunit/UnitTests.xml#L36-L44)
-collects every extension's unit tests into a single suite:
+There is no per-extension PHPUnit configuration. Two globs in
+[`Build/phpunit/UnitTests.xml:36-50`](../../Build/phpunit/UnitTests.xml#L36-L50)
+collect every extension's unit tests, and those of the development packages,
+into a single suite:
 
 ```xml
 <testsuites>
@@ -61,20 +64,25 @@ collects every extension's unit tests into a single suite:
             test location path needs to be given to phpunit.
         -->
         <directory>../../packages/*/*/Tests/Unit/</directory>
+        <directory>../../packages-dev/*/Tests/Unit/</directory>
     </testsuite>
 </testsuites>
 ```
 
-Three things follow from that single line.
+Three things follow from that.
 
 **A new extension needs no configuration change.** Drop it under
 `packages/<vendor>/<dir>/` with a `Tests/Unit/` folder and it is in the suite.
 
-**`packages-dev/` is not covered.** The glob starts at `packages/`, so all three
-packages there — including
-[`packages-dev/testing-helper/`](../../packages-dev/testing-helper) — have no
-tests of their own. Their traits are exercised only through the extensions that
-use them.
+**`packages-dev/` is covered too**, and the second glob is why: the seed
+definition of [`packages-dev/dev-site/`](../../packages-dev/dev-site) carries
+tests of its own, and a suite that does not collect them reports the seed as
+green because it never looked at it.
+[`packages-dev/testing-helper/`](../../packages-dev/testing-helper) carries the
+tests of the three scripts behind `runTests.sh -j`, which split the functional
+suite, check that the chunks ran every listed test, and record the durations
+(ACE-692). Its traits have no tests of their own — they are exercised only
+through the extensions that use them.
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
