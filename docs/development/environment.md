@@ -66,6 +66,9 @@ other, and it cost roughly one functional run in three (ACE-440).
 `typo3temp/var/tests-${SUFFIX}` on the host and bind mounts it where the testing
 framework looks. A bind mount rather than a tmpfs deliberately: 180 functional
 test classes at some 5 MB each would put the better part of a gigabyte into RAM.
+Nor would a tmpfs be faster: measured in CI on both branches, a tmpfs for these
+directories left the functional jobs exactly as long as the bind mount
+(ACE-698).
 
 **A green run removes its directory; a red one keeps it and prints the path.**
 The instance of a failing test — its configuration, its `typo3temp`, the files

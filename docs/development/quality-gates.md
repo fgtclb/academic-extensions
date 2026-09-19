@@ -264,6 +264,14 @@ the container afterwards — all of it in the `functional` arm. With the
 default `-d sqlite` no container is started; the databases are created in a
 tmpfs below `.Build/Web/typo3temp/var/tests/functional-sqlite-dbs/`.
 
+The database containers keep their data directory in a tmpfs as well, and are
+thrown away after the run. MySQL and MariaDB therefore start without a binary
+log, without flushing the redo log on every commit and without the doublewrite
+buffer (`MYSQL_SERVER_OPTIONS` in `runTests.sh`, ACE-698): durability buys
+nothing there, and the functional jobs took 7 to 15 % less time on MySQL and 5
+to 10 % less on MariaDB. The same settings for PostgreSQL made no measurable
+difference and are not used.
+
 SQLite is the fast default, not the complete one. It accepts SQL that MariaDB,
 MySQL and PostgreSQL reject, so a defect in a query can pass locally and fail
 in the DBMS matrix. Run PostgreSQL as well for anything that writes:
