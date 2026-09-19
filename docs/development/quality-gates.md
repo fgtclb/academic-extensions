@@ -380,9 +380,9 @@ file per core version had no way to make the expensive jobs wait for the cheap
 ones.
 
 ```
-cgl     ─┐
-phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
-lint    ─┘
+cgl     ─┐                ┌─> functional (SQLite)
+phpstan ─┼─> unit ────────┤
+lint    ─┘                └─> functional (MySQL, MariaDB, Postgres)
 
 frontend assets, markdown, documentation   (independent)
 ```
@@ -394,7 +394,7 @@ frontend assets, markdown, documentation   (independent)
 | `lint`              | —                  | PHP 8.2, 8.3, 8.4, 8.5     |
 | `unit`              | cgl, phpstan, lint | PHP 8.2, 8.5 × v13, v14    |
 | `functional-sqlite` | unit               | PHP 8.2, 8.5 × v13, v14    |
-| `functional-dbms`   | functional-sqlite  | the same × 4 DBMS, 16 jobs |
+| `functional-dbms`   | unit               | the same × 4 DBMS, 16 jobs |
 | `frontend-assets`   | —                  | none                       |
 | `markdown`          | —                  | none                       |
 | `documentation`     | —                  | none                       |
@@ -413,10 +413,13 @@ the matrix — so a pull request whose pipeline is not green cannot be merged, b
 anybody. See [Pull requests](../workflow/pull-requests.md).
 
 The DBMS matrix is the expensive part — sixteen jobs, each starting a database
-container. It runs only after the same tests passed on SQLite for both core
-versions and both edge PHP versions, so a defect that is not DBMS specific is
-reported by four jobs instead of twenty — `functional-dbms` needs
-`functional-sqlite`.
+container. It used to run only after the same tests had passed on SQLite, so a
+defect that is not DBMS specific was reported by four jobs instead of twenty. It
+now starts next to the SQLite jobs (ACE-694). In 400 pull request runs the
+staging stopped a run 8 times, while it added the whole SQLite stage — 11
+minutes before ACE-692, some 4 after it — to the critical path of every run that
+went on to pass. A defect found on SQLite now costs the DBMS jobs of that run as
+well.
 
 Both functional jobs run their suite with `-j 4`, four chunks in parallel, one
 per vCPU of a hosted runner (ACE-692). A single PHPUnit process left three of
