@@ -281,17 +281,16 @@ substitute, for three reasons that are all structural rather than occasional:
 The `ci.yml` workflow is staged so that a defect is reported cheaply:
 
 ```
-cgl     ─┐
-phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres) ─┐
-lint    ─┘                                                                         ├─> all checks
-frontend assets, markdown, documentation   (independent) ──────────────────────────┘
+cgl     ─┐                ┌─> functional (SQLite) ──────────────────────┐
+phpstan ─┼─> unit ────────┤                                             ├─> all checks
+lint    ─┘                └─> functional (MySQL, MariaDB, Postgres) ────┤
+frontend assets, markdown, documentation   (independent) ───────────────┘
 ```
 
-The 16-job DBMS matrix only starts once the same functional tests passed on
-SQLite for both core versions and both edge PHP versions. A defect that is not
-DBMS specific is therefore reported by four jobs instead of twenty — but it also
-means a red pipeline can still have most of its work ahead of it, and "the DBMS
-jobs did not run" is not the same as "the DBMS jobs passed".
+The SQLite jobs and the 16-job DBMS matrix start together once `unit` has
+passed (ACE-694). A defect that is not DBMS specific is therefore reported by
+twenty jobs rather than four, and a red SQLite job does not stop the DBMS jobs:
+wait for `all checks` rather than reading the first red job as the whole story.
 
 The `documentation` job uploads the rendered documentation as an artifact, and a
 separate `pr-comment.yml` workflow posts the link as a pull request comment that

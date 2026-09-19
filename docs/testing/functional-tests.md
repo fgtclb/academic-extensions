@@ -127,12 +127,12 @@ it driver specific rather than generally broken, and notes this was the only
 changes a schema declaration, or builds a query by hand. A green SQLite run is
 evidence that the logic is right, not that the SQL is portable.
 
-CI encodes the same judgement as staging
-([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)): the 16-job DBMS
-matrix — MySQL 8.0, MariaDB 10.4, MariaDB 10.6, PostgreSQL 10, each on two core
-versions and two PHP versions — only starts once the identical functional suite
-passed on SQLite for both core versions and both PHP edges. A defect that is not
-DBMS specific is therefore reported by 4 jobs instead of 20.
+CI runs the same suite on SQLite and on the 16-job DBMS matrix — MySQL 8.0,
+MariaDB 10.4, MariaDB 10.6, PostgreSQL 10, each on two core versions and two PHP
+versions — side by side
+([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)). They used to be
+staged, the DBMS jobs waiting for SQLite; that was dropped because it put the
+SQLite stage on the critical path of every green run (ACE-694).
 
 ## The `not-<dbms>` group
 

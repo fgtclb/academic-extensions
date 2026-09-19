@@ -286,15 +286,16 @@ dimension, not a separate file, which is what makes the staging below possible �
 job dependencies cannot cross workflows:
 
 ```
-cgl     ─┐
-phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, Postgres)
-lint    ─┘
+cgl     ─┐                ┌─> functional (SQLite)
+phpstan ─┼─> unit ────────┤
+lint    ─┘                └─> functional (MySQL, MariaDB, Postgres)
 documentation   (independent)
 ```
 
-The DBMS matrix (16 jobs) only starts once the same functional tests passed on
-SQLite for both core versions and both edge PHP versions, so a defect that is
-not DBMS specific is reported by 4 jobs instead of 20.
+The SQLite jobs and the DBMS matrix (16 jobs) start together once `unit` has
+passed. They are deliberately not staged any more (ACE-694): waiting for SQLite
+reported a defect that is not DBMS specific by 4 jobs instead of 20, but put the
+whole SQLite stage on the critical path of every green run.
 
 Every functional job runs with `runTests.sh -j 4`: the suite split into four
 chunks run in parallel, balanced by the committed durations in

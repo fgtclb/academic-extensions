@@ -11,9 +11,9 @@ name: "CI"
 #
 # Staging, cheapest and most likely to fail first:
 #
-#   cgl     ─┐
-#   phpstan ─┼─> unit ─> functional (SQLite) ─> functional (MySQL, MariaDB, …)
-#   lint    ─┘
+#   cgl     ─┐                  ┌─> functional (SQLite)
+#   phpstan ─┼─> unit ──────────┤
+#   lint    ─┘                  └─> functional (MySQL, MariaDB, Postgres)
 #
 #   documentation     (independent, for fast feedback on documentation changes)
 #   frontend assets   (independent, core version agnostic, no composerUpdate)
@@ -22,10 +22,12 @@ name: "CI"
 # one per vCPU of a hosted runner, which does the work of a single phpunit process
 # in a quarter to two thirds of the time (ACE-692).
 #
-# The DBMS matrix is the expensive part — 16 jobs, each starting a database
-# container — so it only runs once the same tests have passed on SQLite for both
-# core versions and both edge PHP versions. A failure that is not DBMS specific
-# is then reported by 4 jobs instead of 20.
+# The SQLite and the DBMS jobs start together, once unit has passed (ACE-694).
+# They used to be staged - the 16 DBMS jobs waited for all four SQLite jobs, so a
+# defect that is not DBMS specific was reported by 4 jobs instead of 20 - but in
+# 400 runs that stopped a run 8 times, while it put the whole SQLite stage on the
+# critical path of every other one. A defect found on SQLite now costs the DBMS
+# jobs of that run as well; a green run is done minutes earlier.
 #
 # Supported PHP versions differ **per core version** on this branch, so the
 # core/PHP pairs are listed explicitly as a "combo" axis instead of being formed
@@ -300,9 +302,8 @@ jobs:
   functional-dbms:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
     runs-on: ubuntu-22.04
-    # Only after the same tests passed on SQLite for every core and edge PHP
-    # version. A defect that is not DBMS specific never reaches these 16 jobs.
-    needs: [ "functional-sqlite" ]
+    # Next to the SQLite jobs, not after them, see the header (ACE-694).
+    needs: [ "unit" ]
     strategy:
       fail-fast: false
       matrix:
