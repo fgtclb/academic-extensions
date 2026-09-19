@@ -462,10 +462,11 @@ database. The order is therefore restored in PHP, after the query, by
 
 **Sort before anything slices the list.** A paginator built from the query
 result pages the *database* order: the sorted list is assigned to a different
-view variable, so the restored order never reaches the template, and the
-paginated statement runs `LIMIT`/`OFFSET` without an `ORDER BY`, which lets two
-pages overlap or skip a record on PostgreSQL. Sort first and paginate the sorted
-array with `TYPO3\CMS\Core\Pagination\ArrayPaginator` instead (ACE-681):
+view variable, so the restored order never reaches the template, and until the
+selection query was ordered the paginated statement ran `LIMIT`/`OFFSET`
+without an `ORDER BY`, which let two pages overlap or skip a record on
+PostgreSQL. Sort first and paginate the sorted array with
+`TYPO3\CMS\Core\Pagination\ArrayPaginator` instead (ACE-681):
 
 ```php
 $paginator = $manualSelection

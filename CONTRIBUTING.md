@@ -151,9 +151,10 @@ on SQLite and only appeared on MySQL, MariaDB or PostgreSQL.
   → [Core version aware code](docs/architecture/core-version-aware-code.md)
 - **Services are stateless.** New services must be; existing ones must not gain
   state. → [Dependency injection](docs/architecture/dependency-injection.md)
-- **Never hand a raw array to `in()` or `notIn()`**, and build a constraint on
-  the query builder that executes it. Both rules come from defects that reached
-  a release. → [Database queries](docs/architecture/database-queries.md)
+- **Never hand a raw array to `in()` or `notIn()`**, build a constraint on the
+  query builder that executes it, and order every result a caller renders or
+  limits. All three rules come from defects that reached a release.
+  → [Database queries](docs/architecture/database-queries.md)
 - Match the surrounding extension's existing style rather than introducing a
   second one alongside it. → [Class design](docs/architecture/class-design.md)
 
