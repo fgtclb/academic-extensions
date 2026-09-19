@@ -1,22 +1,23 @@
 # Database queries
 
-Two rules govern every hand-written query in this repository. Both were learned
-from defects that reached a release — ACE-349 and ACE-356 — and both share a
-property that makes them expensive: the broken code runs green on the default
-test setup and only fails somewhere else, on another database, in production.
+Three rules govern every hand-written query in this repository. All were
+learned from defects that reached a release — ACE-349, ACE-356 and
+ACE-482/ACE-491 — and all share a property that makes them expensive: the
+broken code runs green on the default test setup and only fails somewhere
+else, on another database, in production.
 
 On this branch the first rule is more than a precaution. TYPO3 v12 has **no
 guard at all** against an empty array reaching `in()`, so the malformed SQL
 really is built and really is sent — and SQLite, the default test database,
 accepts it.
 
-Neither rule is a style preference. Each one describes a mechanism in the query
-builder that is easy to misread, and the shape of code that stays correct once
-the mechanism is understood.
+None of the rules is a style preference. The first two describe a mechanism in
+the query builder that is easy to misread; the third describes a guarantee SQL
+never gave, and the shape of code that stays correct once that is understood.
 
 ## Which query builder this is about
 
-Both rules are about the **decorated TYPO3 query builder**,
+Rules 1 and 2 are about the **decorated TYPO3 query builder**,
 `TYPO3\CMS\Core\Database\Query\QueryBuilder`, obtained from the connection pool:
 
 ```php
@@ -35,11 +36,11 @@ It is **not** the Extbase query object. `TYPO3\CMS\Extbase\Persistence\Generic\Q
 also offers an `in()` method (line 503 on v13.4.34, line 512 on v12.4.45), but
 that one takes a plain PHP array by design and builds an object-level
 constraint, not SQL. Extbase repository code such as
-`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:246`
+`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:249`
 (`$query->matching($query->in('uid', $profileUidArray))`) is therefore outside
-the scope of both rules below — ten such call sites exist across five
-repositories. Check which object is in the variable before applying either rule
-to a piece of code.
+the scope of the first two rules below — ten such call sites exist across five
+repositories — while rule 3 applies to **both** query objects. Check which
+object is in the variable before applying a rule to a piece of code.
 
 ## Where the version claims below come from
 
@@ -192,7 +193,7 @@ $queryBuilder->expr()->in(
 ```
 
 That is the form used in
-`packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:317-320`,
+`packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:337-340`,
 and in `academic-persons/Classes/Upgrades/ListTypeToCTypeUpgradeWizard.php:129-132`
 with `PARAM_STR_ARRAY`. Doctrine expands an array parameter when the statement
 is prepared, and an empty one becomes the literal `NULL` — in DBAL 4.4.4 at
@@ -293,7 +294,7 @@ one shape for every value list in the class, so the reader never has to decide
 whether a given list can be empty.
 
 The canonical one is the ACE-349 fix itself
-(`typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:156-159`):
+(`typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:166-169`):
 
 ```php
 $queryBuilder->expr()->in(
@@ -410,7 +411,46 @@ which `executeStatement()` does not treat as an error.
 **Run a suspected parameter defect on PostgreSQL first.** It is the fastest
 route from "this does nothing" to "this is comparing the wrong two things".
 
-## An order the database cannot give: a manual selection
+## Rule 3 — order every result a caller renders or limits
+
+### The rule
+
+A statement without an `ORDER BY` returns rows in an order the database is
+free to choose. In practice SQLite, MySQL and MariaDB return uid order for the
+queries of this repository — uid is the integer primary key, so a table scan
+walks it — which is what lets an unordered query survive review and years of
+production. PostgreSQL's planner picks the access path per query, and the
+moment an index gives it an alternative, the order changes. Both sweeps were
+triggered on the 3.x line: making the person tables workspace aware added an
+index that reversed the unordered profile queries (ACE-482), and the
+partnership teaser rendered a *different partner* on two renders of the same
+seed data, caught only as a CI flake (ACE-491). This branch has neither the
+index nor the flake, and the queries were unordered all the same.
+
+So: every query whose result reaches a user — a frontend list, backend select
+items — or that limits its result (`setLimit(1)` picks *which* row!) carries
+an explicit ordering. Unlike rules 1 and 2 this applies to both query objects:
+`setOrderings()`/`$defaultOrderings` on the Extbase query,
+`orderBy()`/`addOrderBy()` on the decorated query builder.
+
+What to order by, learned from the ACE-482/ACE-491 sweeps:
+
+- **A manually sortable table** (TCA ctrl `sortby`) rendered to users orders
+  by `sorting` with `uid` breaking ties — that is the order the editor
+  arranged in the backend. Extbase does **not** read `sortby` or
+  `default_sortby`, so an Extbase query on such a table stays unordered
+  without this. The exception is a table whose `sorting` is scoped per parent
+  through an inline relation — the persons contracts, sorted within their
+  profile — where a global `ORDER BY sorting` would interleave meaninglessly
+  across parents; such a cross-parent list orders by `uid`.
+- **A demanded ordering** (a plugin's sort option) gets `uid` appended as a
+  tiebreaker — records equal in the demanded ordering must keep a stable
+  relative order.
+- **Everything else** orders by `uid` ascending. That is the order every
+  supported database returned in practice, so no installation sees its lists
+  change — the order becomes guaranteed rather than coincidental.
+
+### An order the database cannot give: a manual selection
 
 A manual selection — the uid list a `profileList` FlexForm field carries — is
 ordered by the editor, and `IN (...)` reproduces that order on no supported
@@ -434,19 +474,32 @@ Both paginators satisfy `PaginatorInterface` and expose `paginatedItems`, so the
 template does not change, and `ArrayPaginator` exists on TYPO3 v12 and v13 alike
 (v12.4.45 and v13.4.34 were checked).
 
-Ordering the selection *query* on top of that is a separate question, and this
-branch answers it nowhere: no repository here declares a fallback ordering, so a
-single ordered branch would read as an accident rather than a decision. ACE-431
-covers it.
+Ordering the selection *query* on top of that is a separate question. It is
+the one branch of `ProfileRepository::applyDemandForQuery()` that still carries
+no ordering; ACE-431 covers it.
+
+### Testing an ordering
+
+Assert the exact result order against a fixture whose `sorting` values
+**contradict** uid order — then the assertion fails on every DBMS, SQLite
+included, as soon as the ordering is dropped. A uid-only ordering cannot be
+made to fail on SQLite at all (uid is the rowid, so uid order *is* its natural
+order): pin the exact order anyway and say so in the test docblock — the
+assertion guards the databases where the order was arbitrary before. The
+ordering tests of `PartnershipRepositoryFindByPidTest` (academic-partners) and
+`CategoryRepositoryOrderingTest` (typo3-category-types) are the references for
+the first shape, `ContractRepositoryFindAllTest` (academic-persons) for the
+second.
 
 ## Testing this class of defect
 
-Both rules fail in the direction the default test run cannot see: rule 1 hides
-behind SQLite's tolerance of `IN ()` on v12, rule 2 hides behind three
-databases silently updating nothing. The functional suite defaults to SQLite
-and to core version 12 — `DBMS="sqlite"` and `CORE_VERSION="12"` in
-`runTests.sh` — so a green local run proves less than it appears to, and on this
-branch the default core version is the one *without* the empty-array guard.
+Rules 1 and 2 fail in the direction the default test run cannot see: rule 1
+hides behind SQLite's tolerance of `IN ()` on v12, rule 2 hides behind three
+databases silently updating nothing (rule 3's testing has its own section
+above). The functional suite defaults to SQLite and to core version 12 —
+`DBMS="sqlite"` and `CORE_VERSION="12"` in `runTests.sh` — so a green local run
+proves less than it appears to, and on this branch the default core version is
+the one *without* the empty-array guard.
 
 Three habits follow.
 
@@ -489,7 +542,8 @@ against a group that does not exist.
 
 ## See also
 
-- `AGENTS.md`, section *Database queries* — the condensed form of both rules.
+- `AGENTS.md`, section *Database queries* — the condensed form of all three
+  rules.
 - `packages/fgtclb/typo3-category-types/Documentation/Changelog/2.4/Important-CategoryRepositoryEmptyUidList.rst`
   — the ACE-349 changelog entry, including the per-DBMS analysis for TYPO3 v12.
 - `packages/fgtclb/academic-projects/Documentation/Changelog/2.4/Important-FlexFormUpgradeWizardMigratesRecords.rst`

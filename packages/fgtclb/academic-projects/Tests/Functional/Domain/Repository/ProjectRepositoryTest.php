@@ -138,6 +138,28 @@ final class ProjectRepositoryTest extends AbstractAcademicProjectsTestCase
         $this->assertSame([11, 13], $this->resultUids($result));
     }
 
+    /**
+     * The `uid` tiebreaker of `findByDemand()` (ACE-491): three projects share one title,
+     * so the default `title asc` ordering leaves their relative order undefined - and the
+     * DBMS resolved it, arbitrarily on PostgreSQL. The fixture's `sorting` values are
+     * deliberately reversed against uid order, so a `sorting`-based accident cannot
+     * produce the expected list. SQLite cannot make the tie itself fail - uid order is
+     * its natural order - so the assertion pins the contract for the DBMS where a tie is
+     * otherwise resolved arbitrarily.
+     */
+    #[Test]
+    public function projectsEqualInTheDemandedOrderingFallBackToUidOrder(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/ProjectRepository/projectsWithEqualTitles.csv');
+
+        $uids = [];
+        foreach ($this->getProjectRepository()->findByDemand(new ProjectDemand()) as $project) {
+            $uids[] = (int)$project->getUid();
+        }
+
+        $this->assertSame([10, 11, 12], $uids);
+    }
+
     private function createDemandForActiveState(string $activeState): ProjectDemand
     {
         $demand = new ProjectDemand();
