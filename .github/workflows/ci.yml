@@ -110,7 +110,7 @@ jobs:
 
   cgl:
     name: "cgl"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -141,18 +141,18 @@ jobs:
             composer-${{ matrix.php-version }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s composerUpdate"
 
       - name: "CGL"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cgl -n"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cgl -n"
 
 # @todo Disabled until the correct file header has been determined for extensions.
 #      - name: "CGL (header comments)"
-#        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cglHeader"
+#        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -s cglHeader"
 
   phpstan:
     name: "phpstan (v${{ matrix.combo.typo3 }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -185,14 +185,14 @@ jobs:
             composer-${{ matrix.combo.php }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.combo.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
 
       - name: "Static code analyzer"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s phpstan"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s phpstan"
 
   lint:
     name: "lint (PHP ${{ matrix.php-version }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -207,11 +207,11 @@ jobs:
       # nor a TYPO3 version. The previous workflows installed dependencies here
       # for nothing, once per PHP version.
       - name: "Run PHP lint"
-        run: "Build/Scripts/runTests.sh -b docker -p ${{ matrix.php-version }} -s lintPhp"
+        run: "Build/Scripts/runTests.sh -b podman -p ${{ matrix.php-version }} -s lintPhp"
 
   unit:
     name: "unit (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [ "cgl", "phpstan", "lint" ]
     strategy:
       fail-fast: false
@@ -244,17 +244,17 @@ jobs:
             composer-${{ matrix.combo.php }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.combo.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
 
       - name: "Execute unit tests"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s unit"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s unit"
 
       - name: "Execute unit tests in random order"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s unitRandom"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s unitRandom"
 
   functional-sqlite:
     name: "functional sqlite (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     needs: [ "unit" ]
     strategy:
       fail-fast: false
@@ -287,12 +287,12 @@ jobs:
             composer-${{ matrix.combo.php }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.combo.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
 
       # "-j 4": four chunks in parallel, one per vCPU of the runner, balanced by the
       # durations in "Build/phpunit/FunctionalTestTimes-sqlite.json" (ACE-692).
       - name: "Execute functional tests with SQLite"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d sqlite -j 4 -s functional"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d sqlite -j 4 -s functional"
 
       # The JUnit logs of the chunks: what "-s recordFunctionalTestTimes" refreshes the
       # committed durations from. Small, and kept only as long as a pull request is.
@@ -306,7 +306,7 @@ jobs:
 
   functional-dbms:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     # Next to the SQLite jobs, not after them, see the header (ACE-694).
     needs: [ "unit" ]
     strategy:
@@ -345,12 +345,12 @@ jobs:
             composer-${{ matrix.combo.php }}-
 
       - name: "Prepare dependencies for TYPO3 v${{ matrix.combo.typo3 }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -s composerUpdate"
 
       # "-j 4": four chunks in parallel, each with a database container of its own,
       # balanced by "Build/phpunit/FunctionalTestTimes-<dbms>.json" (ACE-692).
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
-        run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -j 4 -s functional"
+        run: "Build/Scripts/runTests.sh -b podman -t ${{ matrix.combo.typo3 }} -p ${{ matrix.combo.php }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -j 4 -s functional"
 
       - name: "Upload the JUnit logs"
         uses: actions/upload-artifact@v6
@@ -362,7 +362,7 @@ jobs:
 
   frontend-assets:
     name: "frontend assets"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # No matrix. These suites run in a node container and never touch PHP or the
     # installed core, so repeating them per PHP and core version would check the
     # same sources four times. They also need no "composerUpdate" — nothing here
@@ -380,10 +380,10 @@ jobs:
           restore-keys: "npm-"
 
       - name: "Lint TypeScript"
-        run: "Build/Scripts/runTests.sh -b docker -s lintTypescript -n"
+        run: "Build/Scripts/runTests.sh -b podman -s lintTypescript -n"
 
       - name: "Type check"
-        run: "Build/Scripts/runTests.sh -b docker -s typecheckJs"
+        run: "Build/Scripts/runTests.sh -b podman -s typecheckJs"
 
       # Last, and the one that matters most: the compiled assets are committed,
       # because neither composer nor a TER upload runs a node build. That makes
@@ -391,11 +391,11 @@ jobs:
       # would notice — the artifact would simply go on serving the previous
       # behaviour.
       - name: "Ensure the committed assets match their sources"
-        run: "Build/Scripts/runTests.sh -b docker -s checkJsBuildClean"
+        run: "Build/Scripts/runTests.sh -b podman -s checkJsBuildClean"
 
   markdown:
     name: "markdown"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # Its own job rather than a step of "documentation": that one uploads the
     # pull request context before it renders, and a Markdown defect must not be
     # able to stop it from doing so. No matrix and no cache — the gate reads the
@@ -406,11 +406,11 @@ jobs:
         uses: actions/checkout@v6
 
       - name: "Check the Markdown documentation"
-        run: "Build/Scripts/runTests.sh -b docker -s lintMarkdown -n"
+        run: "Build/Scripts/runTests.sh -b podman -s lintMarkdown -n"
 
   documentation:
     name: "documentation"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
 
       - name: "Checkout"
@@ -442,7 +442,7 @@ jobs:
       # "--fail-on-log --fail-on-error", so a warning fails the job.
       # "checkRstRenderingSingle <extension>" renders a single one locally.
       - name: "Render documentation of all extensions"
-        run: "Build/Scripts/runTests.sh -b docker -s checkRstRenderingAll"
+        run: "Build/Scripts/runTests.sh -b podman -s checkRstRenderingAll"
 
       - name: "Upload rendered documentation"
         uses: actions/upload-artifact@v6
@@ -468,7 +468,7 @@ jobs:
   # did not run has not passed.
   all-checks:
     name: "all checks"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: "always()"
     needs:
       - "cgl"
