@@ -392,12 +392,14 @@ Options:
         Send xdebug information to a different port than default 9003 if an IDE like PhpStorm
         is not listening on default port.
 
-    -j <number>
+    -j <number|auto>
         Only with -s functional
         Split the functional suite into <number> chunks that take about the same time and
         run them in parallel, each with its own database container and instance directory.
-        A test class is never split, and the run fails unless the chunks together executed
-        exactly the tests phpunit listed for it. The chunks are balanced by the recorded durations in
+        "auto" picks the number from the machine: half its CPU cores, but no more chunks
+        than GB of available memory, and at least one. A test class is never split, and the
+        run fails unless the chunks together executed exactly the tests phpunit listed for
+        it. The chunks are balanced by the recorded durations in
         "Build/phpunit/FunctionalTestTimes-<dbms>.json" when that file exists, and by the
         number of tests otherwise. Each chunk writes a JUnit log to
         ".Build/functional-runs/<run>/junit-<chunk>.xml", the input of
@@ -513,7 +515,7 @@ while getopts "a:b:c:j:s:d:i:p:t:xy:o:nhu" OPT; do
             ;;
         j)
             FUNCTIONAL_PARALLEL=${OPTARG}
-            if ! [[ ${FUNCTIONAL_PARALLEL} =~ ^[1-9][0-9]*$ ]]; then
+            if ! [[ ${FUNCTIONAL_PARALLEL} =~ ^([1-9][0-9]*|auto)$ ]]; then
                 INVALID_OPTIONS+=("j ${OPTARG}")
             fi
             ;;
@@ -709,6 +711,22 @@ fi
 
 # Set $1 to first mass argument, this is the optional test file or test directory to execute
 shift $((OPTIND - 1))
+
+# "-j auto": a chunk count that fits the machine (ACE-696). Half the CPU cores, because a
+# chunk of a DBMS run keeps a database container busy next to its PHP process; and no more
+# chunks than GB of available memory, because such a chunk takes some 0.75 GB (MySQL about
+# 530 MB, PHP about 220 MB). SQLite gains nothing beyond some 8 chunks - one of them then
+# holds nothing but the heaviest test class - but more cost it nothing either.
+if [[ "${FUNCTIONAL_PARALLEL}" == "auto" ]]; then
+    CPU_CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)
+    FUNCTIONAL_PARALLEL=$(( CPU_CORES / 2 ))
+    MEMORY_AVAILABLE_GB=$(awk '/^MemAvailable:/ { print int($2 / 1048576) }' /proc/meminfo 2>/dev/null)
+    if [[ -n "${MEMORY_AVAILABLE_GB}" && ${MEMORY_AVAILABLE_GB} -lt ${FUNCTIONAL_PARALLEL} ]]; then
+        FUNCTIONAL_PARALLEL=${MEMORY_AVAILABLE_GB}
+    fi
+    [[ ${FUNCTIONAL_PARALLEL} -lt 1 ]] && FUNCTIONAL_PARALLEL=1
+    [[ -z "${FUNCTIONAL_CHUNK}" ]] && echo "-j auto: ${FUNCTIONAL_PARALLEL} chunks (${CPU_CORES} CPU cores, ${MEMORY_AVAILABLE_GB:-unknown} GB memory available)"
+fi
 
 # The suffix names everything a run creates: its container network, every container and
 # the directories of a functional run. A chunk of "-j" appends its chunk number: the
@@ -911,6 +929,9 @@ case ${TEST_SUITE} in
                 SUITE_EXIT_CODE=$?
             fi
             if [[ ${SUITE_EXIT_CODE} -eq 0 ]]; then
+                # The split writes fewer chunks than asked for when there are fewer test
+                # classes than chunks, e.g. "-j auto" for a single extension.
+                FUNCTIONAL_PARALLEL=$(ls "${FUNCTIONAL_RUN_DIRECTORY}"/FunctionalTests-Job-*.xml | wc -l)
                 CHUNK_PIDS=()
                 for CHUNK in $(seq 1 ${FUNCTIONAL_PARALLEL}); do
                     FUNCTIONAL_RUN_DIRECTORY="${FUNCTIONAL_RUN_DIRECTORY}" "${BASH_SOURCE[0]}" -c "${CHUNK}/${FUNCTIONAL_PARALLEL}" "${ORIGINAL_ARGUMENTS[@]}" > "${FUNCTIONAL_RUN_DIRECTORY}/chunk-${CHUNK}.log" 2>&1 &
