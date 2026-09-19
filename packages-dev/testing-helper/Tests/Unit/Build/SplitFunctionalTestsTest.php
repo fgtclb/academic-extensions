@@ -126,6 +126,17 @@ final class SplitFunctionalTestsTest extends TestCase
     }
 
     #[Test]
+    public function neverWritesMoreChunksThanThereAreTestClasses(): void
+    {
+        [$status, $output] = $this->split(['Alpha' => 3, 'Bravo' => 1], 4);
+
+        self::assertSame(0, $status);
+        self::assertStringContainsString('4 chunks asked for, but only 2 test classes: writing 2', $output);
+        self::assertFileExists($this->directory . '/FunctionalTests-Job-2.xml');
+        self::assertFileDoesNotExist($this->directory . '/FunctionalTests-Job-3.xml');
+    }
+
+    #[Test]
     public function anEmptyTestListFailsInsteadOfWritingChunksThatRunNothing(): void
     {
         [$status, $output] = $this->split([], 2);

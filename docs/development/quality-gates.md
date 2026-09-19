@@ -554,7 +554,11 @@ longer mean what it means today.
 * `lintPhp`, `cgl -n`, `phpstan` and `unit` green for **every** core version
   the branch supports, each after its own `composerUpdate`.
 * `functional` green for the same versions whenever the change can affect
-  runtime behaviour, and against a real DBMS when it writes.
+  runtime behaviour, and against a real DBMS when it writes. Run it with `-j
+  auto` (or a fixed `-j <n>`): the chunks of one run are isolated from each
+  other, and a serial v13 run takes some 7 minutes on SQLite and some 27 on
+  MySQL where `-j 16` takes under 1 and 11 — see
+  [Choosing a chunk count locally](environment.md#choosing-a-chunk-count-locally--j-auto).
 * New behaviour has a test, and the test was shown to fail without the change —
   the suite will not tell you, see `beStrictAboutTestsThatDoNotTestAnything`
   above.

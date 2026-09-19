@@ -411,6 +411,15 @@ unit/functional test and similar may fail, but once active in the related GitHub
 musst always pass green. Try to execute subsets if possible locally during investigation and
 error analysis, but always a full run in the end.
 
+Run the functional gate in parallel chunks: `Build/Scripts/runTests.sh -t <12|13> -d <dbms>
+-j auto -s functional`. `-j auto` takes half the CPU cores, no more chunks than GB of
+available memory, and never more chunks than test classes; it prints what it chose. A
+serial local run on v13 takes some 7 minutes on SQLite and some 27 on MySQL, where `-j 16`
+takes under 1 and 11 on a large workstation. No chunk can be faster than the heaviest test
+class, a class is never split. The run fails unless every listed test ran, so a parallel run
+is as conclusive as a serial one. Details:
+[Choosing a chunk count locally](docs/development/environment.md#choosing-a-chunk-count-locally--j-auto).
+
 In any-case watch pull-request pipelines for pipeline errors when pushing pull-requests.
 
 ## The test suites are deliberately hard breaking
@@ -602,7 +611,7 @@ Before reporting a change as complete:
 - [ ] `lintPhp`, `cgl -n`, `phpstan` and `unit` green for **both** TYPO3 v12 and
       v13, each after its own `composerUpdate`.
 - [ ] `functional` green for the same versions when the change can affect
-      runtime behaviour.
+      runtime behaviour — run with `-j auto`, see "Quality gates" above.
 - [ ] New behaviour has a test, and the test was shown to fail without the
       change.
 - [ ] [`docs/`](docs/Index.md) updated in the same change — a new concept gets a
