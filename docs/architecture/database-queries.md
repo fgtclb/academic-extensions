@@ -424,8 +424,9 @@ moment an index gives it an alternative, the order changes. Both sweeps were
 triggered on the 3.x line: making the person tables workspace aware added an
 index that reversed the unordered profile queries (ACE-482), and the
 partnership teaser rendered a *different partner* on two renders of the same
-seed data, caught only as a CI flake (ACE-491). This branch has neither the
-index nor the flake, and the queries were unordered all the same.
+seed data, caught only as a CI flake (ACE-491). On this branch the person
+tables are not workspace aware, but pages, categories and partnerships are and
+carry that index, and the queries were unordered all the same.
 
 So: every query whose result reaches a user — a frontend list, backend select
 items — or that limits its result (`setLimit(1)` picks *which* row!) carries
@@ -446,9 +447,11 @@ What to order by, learned from the ACE-482/ACE-491 sweeps:
 - **A demanded ordering** (a plugin's sort option) gets `uid` appended as a
   tiebreaker — records equal in the demanded ordering must keep a stable
   relative order.
-- **Everything else** orders by `uid` ascending. That is the order every
-  supported database returned in practice, so no installation sees its lists
-  change — the order becomes guaranteed rather than coincidental.
+- **Everything else** orders by `uid` ascending. That is the order SQLite, MySQL
+  and MariaDB return in practice, so installations on them see no change — the
+  order becomes guaranteed rather than coincidental. PostgreSQL promises no
+  order without one, and an index, such as the one a workspace aware table
+  carries, lets its planner return another.
 
 ### An order the database cannot give: a manual selection
 
