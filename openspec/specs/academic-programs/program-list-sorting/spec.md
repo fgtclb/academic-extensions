@@ -34,6 +34,11 @@ v13 alike.
 - **THEN** the list renders that ordering and the two selects show it as
   selected
 
+#### Scenario: Programs share a sort value
+
+- **WHEN** two programs are equal in the selected ordering
+- **THEN** they are rendered in the same relative order on every request
+
 ### Requirement: Editors can configure the reversed manual order
 
 The program list content element SHALL offer "Page sorting, reversed" as a
