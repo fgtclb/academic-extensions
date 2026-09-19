@@ -311,6 +311,12 @@ matrix, with the exact cells, is documented in
 [Quality gates](docs/development/quality-gates.md#reducing-the-pull-request-matrix--documented-not-applied);
 applying it means naming the executed matrix there and here.
 
+Every workflow job runs on `ubuntu-26.04`, named rather than `ubuntu-latest`
+(ACE-697): `ci.yml`, `nightly.yml`, `pr-comment.yml`, `publish.yml`, the twelve
+package publish workflows and the extension template. Change the label in all of
+them together. `-b docker` stays: `-b podman` still failed the MariaDB jobs on
+Ubuntu 26.04.
+
 There are no `core-*.yml` workflows any more; `core-11.yml` … `core-14.yml` were
 consolidated into `ci.yml`. No badge in this repository referenced them.
 
