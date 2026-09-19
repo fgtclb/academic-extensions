@@ -36,7 +36,7 @@ It is **not** the Extbase query object. `TYPO3\CMS\Extbase\Persistence\Generic\Q
 also offers an `in()` method (line 503 on v13.4.34, line 512 on v12.4.45), but
 that one takes a plain PHP array by design and builds an object-level
 constraint, not SQL. Extbase repository code such as
-`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:249`
+`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:254`
 (`$query->matching($query->in('uid', $profileUidArray))`) is therefore outside
 the scope of the first two rules below — ten such call sites exist across five
 repositories — while rule 3 applies to **both** query objects. Check which
@@ -474,9 +474,13 @@ Both paginators satisfy `PaginatorInterface` and expose `paginatedItems`, so the
 template does not change, and `ArrayPaginator` exists on TYPO3 v12 and v13 alike
 (v12.4.45 and v13.4.34 were checked).
 
-Ordering the selection *query* on top of that is a separate question. It is
-the one branch of `ProfileRepository::applyDemandForQuery()` that still carries
-no ordering; ACE-431 covers it.
+**Order the query anyway.** That the controller sorts is not a reason to leave
+the query unordered: the result is handed to a PSR-14 listener
+(`ModifyListProfilesEvent`) before the sort, and a listener that renders or
+counts it must see the same list twice. The selection branch of
+`ProfileRepository::applyDemandForQuery()` therefore ends with the same
+`uid` fallback ordering as every other branch, even though the visible order is
+produced afterwards in PHP.
 
 ### Testing an ordering
 
