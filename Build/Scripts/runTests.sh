@@ -1007,7 +1007,12 @@ case ${TEST_SUITE} in
         FUNCTIONAL_INSTANCE_DIR="${ROOT_DIR}/.Build/Web/typo3temp/var/tests-${SUFFIX}"
         mkdir -p "${FUNCTIONAL_INSTANCE_DIR}"
         SUITE_EXIT_CODE=$? && [[ "${SUITE_EXIT_CODE}" -ne 0 ]] && printSummary
-        CONTAINER_COMMON_PARAMS="${CONTAINER_COMMON_PARAMS} -v ${FUNCTIONAL_INSTANCE_DIR}:${ROOT_DIR}/.Build/Web/typo3temp/var/tests${CONTAINER_MOUNT_SUFFIX}"
+        if [[ ${IS_CORE_CI} -eq 1 ]]; then
+            # Probe R5: in CI, keep the test instances in memory instead of on the runner disk.
+            CONTAINER_COMMON_PARAMS="${CONTAINER_COMMON_PARAMS} --tmpfs ${ROOT_DIR}/.Build/Web/typo3temp/var/tests:${TMPFS_MOUNT_OPTIONS}"
+        else
+            CONTAINER_COMMON_PARAMS="${CONTAINER_COMMON_PARAMS} -v ${FUNCTIONAL_INSTANCE_DIR}:${ROOT_DIR}/.Build/Web/typo3temp/var/tests${CONTAINER_MOUNT_SUFFIX}"
+        fi
         case ${DBMS} in
             mariadb)
                 echo "Using driver: ${DATABASE_DRIVER}"
