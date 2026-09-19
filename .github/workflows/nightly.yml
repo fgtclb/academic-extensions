@@ -1,0 +1,83 @@
+name: "Nightly"
+
+# Runs the complete "CI" workflow every night, for both maintained lines: "main"
+# and "2" (ACE-693).
+#
+# Why at all: "ci.yml" runs for pull requests and by hand, so a merged state is
+# never checked again. And there is no "composer.lock" - every run resolves its
+# dependencies afresh - so a new TYPO3 patch release or any other dependency
+# release changes what a run installs without a commit here. The nightly run is
+# where that shows up first, rather than in the next unrelated pull request.
+#
+# Why a workflow of its own that starts "ci.yml", instead of a "schedule" trigger
+# in "ci.yml": a schedule only ever fires on the default branch, with the
+# workflow file of the default branch. Branch "2" has a "ci.yml" of its own -
+# other core versions, other PHP versions - which a schedule on "main" cannot
+# reach. "workflow_dispatch" can: it starts "ci.yml" as it is on the branch it is
+# given. Both branches' "ci.yml" carry that trigger already. A dispatch made with
+# "github.token" starts a run, unlike most events that token causes.
+#
+# Why it waits for the run it started: a run started by the dispatch belongs to
+# "github-actions", and a failure there notifies nobody. This job fails when that
+# run fails, and a failed scheduled run is reported the way GitHub reports
+# scheduled workflows: to whoever last changed the "cron" line below. It holds a
+# runner while it waits, one per branch, at a time of night when the 20
+# concurrent jobs of the organization are not contended.
+#
+# The run is the pull request run, job for job - the same 16 DBMS jobs and every
+# gate. Its concurrency group is the branch, "CI-refs/heads/<branch>", while a
+# pull request run is grouped by its number, so the two never cancel each other.
+#
+# Started by hand from the Actions tab with "Run workflow", it does the same.
+
+on:
+  schedule:
+    # Not on the hour: scheduled runs are delayed most at the top of an hour.
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Starting a workflow run and following it.
+  actions: write
+
+jobs:
+
+  ci:
+    name: "CI on ${{ matrix.branch }}"
+    runs-on: ubuntu-latest
+    # The CI run itself takes 10 to 20 minutes. A run that has not finished in two
+    # hours is stuck, not slow.
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [ "main", "2" ]
+    env:
+      GH_TOKEN: "${{ github.token }}"
+      GH_REPO: "${{ github.repository }}"
+    steps:
+
+      # "gh workflow run" does not say which run it started, so the run is found
+      # afterwards: the newest dispatched "CI" run on the branch created since the
+      # dispatch. It takes a few seconds to appear.
+      - name: "Start CI on ${{ matrix.branch }}"
+        id: "start"
+        run: |
+          STARTED="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          gh workflow run ci.yml --ref "${{ matrix.branch }}"
+          RUN_ID=""
+          for ATTEMPT in $(seq 1 30); do
+            sleep 10
+            RUN_ID="$(gh run list --workflow ci.yml --branch "${{ matrix.branch }}" --event workflow_dispatch --created ">=${STARTED}" --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+            [[ -n "${RUN_ID}" ]] && break
+          done
+          if [[ -z "${RUN_ID}" ]]; then
+            echo "No CI run appeared on ${{ matrix.branch }} within five minutes of the dispatch." >&2
+            exit 1
+          fi
+          echo "run-id=${RUN_ID}" >> "${GITHUB_OUTPUT}"
+          echo "CI on \`${{ matrix.branch }}\`: https://github.com/${GH_REPO}/actions/runs/${RUN_ID}" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: "Wait for the CI run and take over its result"
+        run: "gh run watch ${{ steps.start.outputs.run-id }} --exit-status --interval 60"

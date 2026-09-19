@@ -488,6 +488,57 @@ Two consequences follow, and both have cost time before:
    `documentation` job — so the comment lands on the right pull request even
    when the rendering fails.
 
+### The nightly run
+
+`ci.yml` runs for pull requests, so a merged state is never checked again, and
+without a `composer.lock` a new TYPO3 or dependency release changes what a run
+installs without any commit here. [`nightly.yml`](../../.github/workflows/nightly.yml)
+therefore runs the complete `CI` workflow every night at 02:17 UTC, for `main`
+and for `2` (ACE-693). It is the pull request run, job for job.
+
+It does not carry a `schedule` of its own in `ci.yml` because a schedule only
+fires on the default branch, with the workflow file of the default branch —
+branch `2` has a `ci.yml` of its own that a schedule on `main` cannot reach.
+`nightly.yml` lives on `main` and starts `ci.yml` on each branch through
+`workflow_dispatch`, which runs the workflow file of the branch it is given.
+Changes to `nightly.yml` therefore only take effect on `main`, and branch `2`
+carries no copy of it.
+
+Each of its two jobs then waits for the run it started and takes over its
+result. A run started by a dispatch belongs to `github-actions` and notifies
+nobody when it fails; the nightly job failing does, the way GitHub reports a
+failed scheduled workflow. A nightly run on a branch and a pull request run
+never cancel each other: `ci.yml` groups the one by branch and the other by
+pull request number.
+
+`Run workflow` on the *Nightly* workflow in the Actions tab starts the same
+thing by hand.
+
+### Reducing the pull request matrix — documented, not applied
+
+Pull requests run all 16 DBMS jobs today. Should that become too expensive, the
+matrix can shrink for pull requests while the nightly run keeps all of them.
+These are the cells, chosen in the analysis of ACE-691:
+
+A 4-cell variant covers every DBMS family and every core/PHP edge once, with
+PostgreSQL on both core versions because it is where query defects surface:
+
+| Core / PHP    | DBMS         |
+|---------------|--------------|
+| v13 / PHP 8.2 | postgres 10  |
+| v14 / PHP 8.5 | postgres 10  |
+| v14 / PHP 8.2 | mysql 8.0    |
+| v13 / PHP 8.5 | mariadb 10.4 |
+
+An 8-cell variant runs every DBMS on the lowest PHP version of each core version:
+mysql 8.0, mariadb 10.4, mariadb 10.6 and postgres 10, each on v13 / PHP 8.2 and
+v14 / PHP 8.2.
+
+**If a reduction is applied, this page and the CI section of `AGENTS.md` must
+name the executed matrix explicitly** — which cells a pull request runs, and
+which only the nightly run covers — because a green pull request would then no
+longer mean what it means today.
+
 ## Before pushing
 
 * `lintPhp`, `cgl -n`, `phpstan` and `unit` green for **every** core version
