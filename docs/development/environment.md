@@ -98,8 +98,11 @@ loading the class, which matters because a class written for the other core
 version cannot be loaded at all. It then starts itself once per chunk with `-c
 <n>/<total>`. Every chunk gets its own suffix, and with it everything the
 section above isolates: its own container network, its own database container
-and its own instance directory. The output of a chunk is printed once it is
-done, in chunk order, and the run fails if any chunk failed.
+and its own instance directory. A chunk appends its chunk number to its suffix,
+so no two chunks of a run can share one: they start in the same instant, and two
+of them once drew the same `$RANDOM`, took over each other's database container
+and removed each other's network (ACE-695). The output of a chunk is printed
+once it is done, in chunk order, and the run fails if any chunk failed.
 
 **The list decides what runs, never the timings.** A test class is never split,
 because each one sets up its TYPO3 instance and database once for all of its
