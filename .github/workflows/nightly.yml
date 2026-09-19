@@ -45,7 +45,7 @@ jobs:
 
   ci:
     name: "CI on ${{ matrix.branch }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # The CI run itself takes 10 to 20 minutes. A run that has not finished in two
     # hours is stuck, not slow.
     timeout-minutes: 120

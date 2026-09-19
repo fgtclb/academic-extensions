@@ -447,6 +447,14 @@ invocation in the workflow — every step is a `Build/Scripts/runTests.sh` call.
 A gate therefore cannot behave differently in CI than locally, and reproducing
 a red pipeline is a matter of copying the command from the log.
 
+Every job runs on `ubuntu-26.04`, named rather than `ubuntu-latest` (ACE-697):
+that label moves to Ubuntu 26.04 job by job over the weeks from October 19,
+2026, while a named version moves every job at once. Both maintained branches
+were probed on it before the switch. The label is shared by every workflow of
+the repository — `ci.yml`, `nightly.yml`, `pr-comment.yml`, `publish.yml`, the
+twelve package publish workflows and the extension template — and is changed
+in all of them together.
+
 The three deviations from a plain local run are all explained in the workflow
 itself: `-b docker` on every step, explained in its header comment, the
 `composerUpdate` that precedes every job needing a vendor tree, and a workflow
