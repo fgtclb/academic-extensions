@@ -414,9 +414,11 @@ What to order by, learned from the ACE-482/ACE-491 sweeps:
 - **A demanded ordering** (a plugin's sort option) gets `uid` appended as a
   tiebreaker — records equal in the demanded ordering must keep a stable
   relative order.
-- **Everything else** orders by `uid` ascending. That is the order every
-  supported database returned in practice, so no installation sees its lists
-  change — the order becomes guaranteed rather than coincidental.
+- **Everything else** orders by `uid` ascending. That is the order SQLite, MySQL
+  and MariaDB return in practice, so installations on them see no change — the
+  order becomes guaranteed rather than coincidental. PostgreSQL promises no
+  order without one, and an index, such as the one a workspace aware table
+  carries, lets its planner return another.
 
 ### An order the database cannot give: a manual selection
 
