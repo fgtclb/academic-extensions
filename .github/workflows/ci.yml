@@ -289,6 +289,9 @@ jobs:
 
       # "-j 4": four chunks in parallel, one per vCPU of the runner, balanced by the
       # durations in "Build/phpunit/FunctionalTestTimes-sqlite.json" (ACE-692).
+      - name: "Probe: runner hardware"
+        run: "lscpu | grep 'Model name'; nproc; free -g | head -2"
+
       - name: "Execute functional tests with SQLite"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d sqlite -j 4 -s functional"
 
@@ -344,6 +347,9 @@ jobs:
 
       # "-j 4": four chunks in parallel, each with a database container of its own,
       # balanced by "Build/phpunit/FunctionalTestTimes-<dbms>.json" (ACE-692).
+      - name: "Probe: runner hardware"
+        run: "lscpu | grep 'Model name'; nproc; free -g | head -2"
+
       - name: "Execute functional tests with ${{ matrix.dbms.name }} ${{ matrix.dbms.version }}"
         run: "Build/Scripts/runTests.sh -b docker -t ${{ matrix.typo3 }} -p ${{ matrix.php-version }} -d ${{ matrix.dbms.name }} -i ${{ matrix.dbms.version }} -j 4 -s functional"
 
