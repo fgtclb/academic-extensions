@@ -22,7 +22,7 @@ handful of things that are easy to get wrong and expensive to discover later.
 | Version differences, and the v15 blockers               | [Core version aware code](docs/architecture/core-version-aware-code.md) |
 | Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)       |
 | `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                       |
-| **Quoting value lists and binding parameters**          | [Database queries](docs/architecture/database-queries.md)               |
+| **Quoting value lists, binding parameters, ordering**   | [Database queries](docs/architecture/database-queries.md)               |
 | Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                        |
 | The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                        |
 | Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                     |

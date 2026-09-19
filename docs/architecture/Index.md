@@ -10,9 +10,9 @@ describing an intention as if it were the state.
   lines, and a **class split** only when a whole class has to differ.
 - Services are **stateless**. New services must be; existing ones must not gain
   state.
-- Never hand a raw array to `in()` or `notIn()`, and build a constraint on the
-  query builder that executes it. Both rules come from defects that reached a
-  release.
+- Never hand a raw array to `in()` or `notIn()`, build a constraint on the
+  query builder that executes it, and order every result a caller renders or
+  limits. All three rules come from defects that reached a release.
 - One YAML in `academic_persons` drives field validation for **both** the backend
   FormEngine and the frontend edit form. It ships there, not in
   `academic_persons_edit`, because the TCA needs it.
@@ -58,7 +58,7 @@ describing an intention as if it were the state.
 | [Core version aware code](core-version-aware-code.md)           | The version switches that exist today, the one data structure split and what a `Core13/`/`Core14/` PHP split would look like, and the APIs that cannot be migrated while v13 is supported. |
 | [Dependency injection](dependency-injection.md)                 | How services are configured across the extensions, why they must be stateless, and which TYPO3 attributes are safe on both core versions.                                                  |
 | [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                                                                   |
-| [Database queries](database-queries.md)                         | Quoting value lists, and keeping a constraint on the builder that executes it.                                                                                                             |
+| [Database queries](database-queries.md)                         | Quoting value lists, keeping a constraint on the builder that executes it, and ordering every result a caller renders or limits.                                                           |
 | [Frontend-user contact import](frontend-user-contact-import.md) | How telephone and fax data from `fe_users` is identified, typed, synchronized and migrated.                                                                                                |
 | [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                                                          |
 | [Form data transformation](form-data-transformation.md)         | How a value of a JSON payload reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                                                       |

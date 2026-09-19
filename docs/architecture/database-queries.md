@@ -430,10 +430,10 @@ from ACE-681.
 
 **Sort before anything slices the list.** A paginator built from the query
 result pages the *database* order: the sorted list is assigned to a different
-view variable, so the restored order never reaches the template, and the
-paginated statement runs `LIMIT`/`OFFSET` without an `ORDER BY` — which is
-rule 3 again, and lets two pages overlap or skip a record on PostgreSQL. Sort
-first and paginate the sorted array with
+view variable, so the restored order never reaches the template, and until
+the selection query was ordered the paginated statement ran `LIMIT`/`OFFSET`
+without an `ORDER BY` — which is rule 3 again, and let two pages overlap or
+skip a record on PostgreSQL. Sort first and paginate the sorted array with
 `TYPO3\CMS\Core\Pagination\ArrayPaginator` instead:
 
 ```php
