@@ -247,6 +247,14 @@ The DBMS matrix (16 jobs) only starts once the same functional tests passed on
 SQLite for both core versions and both edge PHP versions, so a defect that is
 not DBMS specific is reported by 4 jobs instead of 20.
 
+Every functional job runs with `runTests.sh -j 4`: the suite split into four
+chunks run in parallel, balanced by the committed durations in
+`Build/phpunit/FunctionalTestTimes-<dbms>.json`. The list of what runs comes
+from PHPUnit, never from that file, so a new test cannot fall out of a run — a
+stale file only costs balance — and the run fails unless the chunks together
+executed exactly the tests PHPUnit listed. How to refresh it:
+[Parallel functional runs](docs/development/environment.md#parallel-functional-runs--j).
+
 The three PHP sets in the matrix — one for `lint`, one for `unit`/`functional`,
 one for `cgl`/`phpstan` — **are to be changed together**.
 `phpstan` is the only source gate that runs per core version (it analyses

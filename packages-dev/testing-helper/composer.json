@@ -20,6 +20,11 @@
             "FGTCLB\\TestingHelper\\": "Classes/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "FGTCLB\\TestingHelper\\Tests\\": "Tests/"
+        }
+    },
     "support": {
         "issues": "https://github.com/fgtclb/academic-extensions/issues",
         "source": "https://github.com/fgtclb/academic-extensions",
