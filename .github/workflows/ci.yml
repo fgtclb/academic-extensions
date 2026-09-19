@@ -59,7 +59,17 @@ name: "CI"
 # intermittent, hits any job, and was traced to neither the runner image nor the
 # testing image changing. Selecting docker here avoids crun entirely and leaves
 # the script default and local runs untouched. Drop the flag once GitHub stops
-# producing the mismatch.
+# producing the mismatch - which Ubuntu 26.04 and its Podman 5.7.0 do not: a probe
+# with "-b podman" there failed the MariaDB functional jobs on both maintained
+# branches, while "-b docker" passed every job on the first attempt (ACE-697).
+#
+# Every job runs on "ubuntu-26.04", named rather than "ubuntu-latest" (ACE-697).
+# That label moves from Ubuntu 24.04 to 26.04 in a rollout from October 19 to
+# November 19, 2026, job by job; a named version moves every job at once, when
+# this repository decides to. The same label is used by "pr-comment.yml",
+# "publish.yml", the twelve package publish workflows and the extension template
+# in "Build/templates/extensions/" - change them together. The nightly run of
+# this branch is started by "nightly.yml" on "main", which runs there.
 
 on:
   pull_request:
@@ -110,7 +120,7 @@ jobs:
 
   cgl:
     name: "cgl"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -152,7 +162,7 @@ jobs:
 
   phpstan:
     name: "phpstan (v${{ matrix.combo.typo3 }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -192,7 +202,7 @@ jobs:
 
   lint:
     name: "lint (PHP ${{ matrix.php-version }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -211,7 +221,7 @@ jobs:
 
   unit:
     name: "unit (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs: [ "cgl", "phpstan", "lint" ]
     strategy:
       fail-fast: false
@@ -254,7 +264,7 @@ jobs:
 
   functional-sqlite:
     name: "functional sqlite (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     needs: [ "unit" ]
     strategy:
       fail-fast: false
@@ -306,7 +316,7 @@ jobs:
 
   functional-dbms:
     name: "functional ${{ matrix.dbms.name }} ${{ matrix.dbms.version }} (v${{ matrix.combo.typo3 }}, PHP ${{ matrix.combo.php }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     # Next to the SQLite jobs, not after them, see the header (ACE-694).
     needs: [ "unit" ]
     strategy:
@@ -362,7 +372,7 @@ jobs:
 
   frontend-assets:
     name: "frontend assets"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # No matrix. These suites run in a node container and never touch PHP or the
     # installed core, so repeating them per PHP and core version would check the
     # same sources four times. They also need no "composerUpdate" — nothing here
@@ -395,7 +405,7 @@ jobs:
 
   markdown:
     name: "markdown"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # Its own job rather than a step of "documentation": that one uploads the
     # pull request context before it renders, and a Markdown defect must not be
     # able to stop it from doing so. No matrix and no cache — the gate reads the
@@ -410,7 +420,7 @@ jobs:
 
   documentation:
     name: "documentation"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
 
       - name: "Checkout"
@@ -468,7 +478,7 @@ jobs:
   # did not run has not passed.
   all-checks:
     name: "all checks"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     if: "always()"
     needs:
       - "cgl"

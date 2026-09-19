@@ -44,8 +44,9 @@ script branches on `CONTAINER_BIN` where it assembles
 The GitHub workflows pass `-b docker` on every step. That is not a statement
 about which runtime is better — it works around a crun failure on hosted
 runners and is documented in the header comment of
-[`ci.yml`](../../.github/workflows/ci.yml). There is no reason to pass it
-locally.
+[`ci.yml`](../../.github/workflows/ci.yml). It is still needed on Ubuntu 26.04:
+a probe with `-b podman` failed the MariaDB functional jobs there (ACE-697).
+There is no reason to pass it locally.
 
 Each run creates its own container network — `NETWORK` is
 `academic-extensions-${SUFFIX}` — and `cleanUp()` removes it together with
