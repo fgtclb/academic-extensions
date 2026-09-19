@@ -243,9 +243,10 @@ for the same reason. `phpstan` still does not.
 reason: the TYPO3 core version is a matrix dimension rather than a separate
 file, because job dependencies cannot cross workflows.
 
-The DBMS matrix (16 jobs) only starts once the same functional tests passed on
-SQLite for both core versions and both edge PHP versions, so a defect that is
-not DBMS specific is reported by 4 jobs instead of 20.
+The SQLite jobs and the DBMS matrix (16 jobs) start together once `unit` has
+passed. They are deliberately not staged any more (ACE-694): waiting for SQLite
+reported a defect that is not DBMS specific by 4 jobs instead of 20, but put the
+whole SQLite stage on the critical path of every green run.
 
 Every functional job runs with `runTests.sh -j 4`: the suite split into four
 chunks run in parallel, balanced by the committed durations in
