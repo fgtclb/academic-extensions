@@ -149,6 +149,33 @@ below the repository root, so logs from a CI runner match a local checkout. The
 logs of a local `-j` run work just as well, but a workstation is not a runner:
 the proportions between classes hold, the absolute seconds do not.
 
+#### Choosing a chunk count locally: `-j auto`
+
+`-j auto` picks the chunk count from the machine: half its CPU cores, because a
+chunk of a DBMS run keeps a database container busy next to its PHP process, and
+no more chunks than GB of available memory, because such a chunk takes some
+0.75 GB (MySQL about 530 MB, PHP about 220 MB). It prints what it chose. It
+reads `nproc` and `/proc/meminfo`; on macOS it knows the cores but not the
+memory of the Docker VM, so there it is the cores alone — pass a number when
+the VM is small. Never more chunks are started than the run has test classes,
+so `-j auto` on a single extension does not start empty ones. CI keeps its
+explicit `-j 4`, one chunk per vCPU of a hosted runner.
+
+Measured on a 32 core, 125 GB workstation, TYPO3 v13, PHP 8.2, with other work
+running (ACE-696):
+
+| DBMS      | serial | `-j 4` | `-j 8` | `-j 16` |
+|-----------|--------|--------|--------|---------|
+| sqlite    | 6:35   | 1:48   | 0:59   | 0:39    |
+| mysql 8.0 | 27:00  | —      | 12:51  | 11:07   |
+
+**No chunk can be faster than the heaviest test class**, because a class is never
+split. On this branch that is `SeedManifestTest` or `DeliveryRegistrationTest`,
+some 40 seconds each on SQLite, so SQLite still gains at 16 chunks. On `main`,
+whose `LegacyDeliveryTest` takes some 2 minutes, it stops at 8. The real databases
+gain less from each additional chunk, because a chunk waits on its own database
+far more than on the CPU.
+
 ### A pseudo TTY only when there is a terminal
 
 `CONTAINER_INTERACTIVE` is `-it --init` by default, and drops to `--init` when
@@ -193,24 +220,24 @@ them, so the two do not drift apart.
 The wrapper parses exactly these options in its `while getopts` loop;
 everything left over after them is the optional trailing argument.
 
-| Option            | Meaning                                                                             | Default             |
-|-------------------|-------------------------------------------------------------------------------------|---------------------|
-| `-s <suite>`      | Suite to run. See the table below.                                                  | `help`              |
-| `-t <12\|13>`     | TYPO3 core major version. Selects the dependency set and the PHPStan configuration. | `12`                |
-| `-p <8.1…8.5>`    | PHP version, one of `8.1`, `8.2`, `8.3`, `8.4`, `8.5`. Picks the testing image.     | `8.2`               |
-| `-d <dbms>`       | DBMS for functional tests: `sqlite`, `mariadb`, `mysql`, `postgres`.                | `sqlite`            |
-| `-i <version>`    | DBMS version, only with `-d mariadb\|mysql\|postgres`.                              | per DBMS, see below |
-| `-a <driver>`     | Database driver, only with `-d mariadb\|mysql`: `mysqli` or `pdo_mysql`.            | `mysqli`            |
-| `-j <number>`     | Run `functional` in that many parallel chunks, see below.                           | `1`                 |
-| `-c <n>/<total>`  | Internal: set by `-j` for each chunk it starts. Not meant to be given by hand.      | —                   |
-| `-n`              | Dry run for `cgl`, `cglHeader`, `lintMarkdown` and `lintTypescript`.                | off                 |
-| `-x`              | Enable Xdebug and send debugging information to the host IDE.                       | off                 |
-| `-y <port>`       | Xdebug client port on the host, when the IDE does not listen on the default.        | `9003`              |
-| `-o <seed>`       | Random order seed for `unitRandom`, to replay a specific order.                     | none                |
-| `-u`              | Update the local `typo3/core-testing-*` images and drop dangling ones.              | —                   |
-| `-b <runtime>`    | Container runtime, `docker` or `podman`.                                            | podman, else docker |
-| `-h`              | Print the help text and exit.                                                       | —                   |
-| trailing `[file]` | Path passed on to the tool of the suite — for PHPUnit a test file or directory.     | none                |
+| Option            | Meaning                                                                              | Default             |
+|-------------------|--------------------------------------------------------------------------------------|---------------------|
+| `-s <suite>`      | Suite to run. See the table below.                                                   | `help`              |
+| `-t <12\|13>`     | TYPO3 core major version. Selects the dependency set and the PHPStan configuration.  | `12`                |
+| `-p <8.1…8.5>`    | PHP version, one of `8.1`, `8.2`, `8.3`, `8.4`, `8.5`. Picks the testing image.      | `8.2`               |
+| `-d <dbms>`       | DBMS for functional tests: `sqlite`, `mariadb`, `mysql`, `postgres`.                 | `sqlite`            |
+| `-i <version>`    | DBMS version, only with `-d mariadb\|mysql\|postgres`.                               | per DBMS, see below |
+| `-a <driver>`     | Database driver, only with `-d mariadb\|mysql`: `mysqli` or `pdo_mysql`.             | `mysqli`            |
+| `-j <n\|auto>`    | Run `functional` in that many parallel chunks, `auto` to fit the machine, see below. | `1`                 |
+| `-c <n>/<total>`  | Internal: set by `-j` for each chunk it starts. Not meant to be given by hand.       | —                   |
+| `-n`              | Dry run for `cgl`, `cglHeader`, `lintMarkdown` and `lintTypescript`.                 | off                 |
+| `-x`              | Enable Xdebug and send debugging information to the host IDE.                        | off                 |
+| `-y <port>`       | Xdebug client port on the host, when the IDE does not listen on the default.         | `9003`              |
+| `-o <seed>`       | Random order seed for `unitRandom`, to replay a specific order.                      | none                |
+| `-u`              | Update the local `typo3/core-testing-*` images and drop dangling ones.               | —                   |
+| `-b <runtime>`    | Container runtime, `docker` or `podman`.                                             | podman, else docker |
+| `-h`              | Print the help text and exit.                                                        | —                   |
+| trailing `[file]` | Path passed on to the tool of the suite — for PHPUnit a test file or directory.      | none                |
 
 `-u` is not a modifier: its `u)` arm sets `TEST_SUITE=update`, so it cannot be
 combined with `-s`.
