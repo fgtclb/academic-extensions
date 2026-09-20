@@ -1,9 +1,10 @@
-## Purpose
+# academic-persons/backend-contract-select Specification
 
+## Purpose
 Defines which contracts the backend contract selects offer to an editor, and
 how an integrator restricts them to the storage folders of a site.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Integrators can restrict the offered contracts by page
 
@@ -34,6 +35,10 @@ before. This applies to TYPO3 v13 and v14 alike.
 A contract the edited record already references SHALL stay selectable, even
 when the restriction would exclude it, so that saving the record keeps the
 relation.
+
+This covers the page restriction only. A contract that the select does not
+offer for another reason - because it is hidden, or deleted - is not offered
+before this change either, and this change does not alter that.
 
 #### Scenario: Existing relation outside the restriction
 
