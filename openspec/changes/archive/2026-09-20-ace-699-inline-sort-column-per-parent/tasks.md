@@ -71,7 +71,7 @@
 - [x] 4.2 `Documentation/Changelog/2.4/` entries in the three extensions (what an
       editor saw before, what the wizard does); `docs/architecture/database-queries.md`
       rule 3 gains a sentence on children with two inline parents.
-- [ ] 4.3 Commit messages in TYPO3 Core format with the issue filed after
+- [x] 4.3 Commit messages in TYPO3 Core format with the issue filed after
       implementation; the change archived as the last commit.
 
 ## Notes recorded while implementing
