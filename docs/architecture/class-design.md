@@ -72,18 +72,25 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing** — sixteen so far: the three `RegisterAcademicPageDoktype` listeners
-(partners, programs, projects); in `academic-persons`
-`ProfileImageRelationWriter`, `ProfileImageMetadataService` and the
-`UpdateProfileImageMetadata` listener; and in `academic-persons-edit` the two
-payload data objects `ProfileUpdatePayload` and `ProfileUpdateRequestResult`,
-the seven services `LocalizedProfileUidResolver`,
-`ProfileDocumentSectionProvider`, `ProfileFieldOptionsService`,
-`ProfileRichTextSanitizer`, `ProfileSectionProvider`,
-`ProfileUpdateRequestService` and `ProfileUpdateValidationService`, and the
-`RepairLocalizedProfileImagesUpgradeWizard`. The class-level modifier says the
-same thing as `private readonly` on every property, once, and the compiler
-enforces it for properties added later.
+nothing**, and of an immutable data object. There are 29:
+
+```bash
+grep -rh '^final readonly class' --include='*.php' \
+  packages/fgtclb/*/Classes packages-dev/*/Classes | wc -l
+```
+
+The count is given rather than the list, because an enumeration of names is
+what goes stale: this one read "sixteen" until 2026-09-20, when it was 29. The
+instructive members are the three `RegisterAcademicPageDoktype` listeners
+(partners, programs, projects), which are identical but for their extension;
+the two payload data objects of `academic-persons-edit`,
+`ProfileUpdatePayload` and `ProfileUpdateRequestResult`, which are the data
+object half of the shape; and `ContractSelectScope` of `academic-persons`,
+which is a data object whose producer, `ContractSelectScopeResolver`, carries
+the same modifier as a service.
+
+The class-level modifier says the same thing as `private readonly` on every
+property, once, and the compiler enforces it for properties added later.
 
 The split by visibility says what each is for:
 
@@ -323,14 +330,14 @@ the two supported versions, so a reader has to grep for the method anyway.
 `packages-dev/` and `Tests/` are not counted. The 6 that do not are worth
 knowing so they are fixed rather than copied:
 
-| File                                                                  |
-|-----------------------------------------------------------------------|
-| `academic-partners/Classes/DataProcessing/PartnershipProcessor.php`   |
-| `academic-partners/Classes/DataProcessing/PartnerProcessor.php`       |
-| `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`   |
-| `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`      |
-| `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`     |
-| `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php`  |
+| File                                                                 |
+|----------------------------------------------------------------------|
+| `academic-partners/Classes/DataProcessing/PartnershipProcessor.php`  |
+| `academic-partners/Classes/DataProcessing/PartnerProcessor.php`      |
+| `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`  |
+| `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`     |
+| `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`    |
+| `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php` |
 
 Three of the six are `DataProcessing/` classes, which suggests one origin
 rather than six independent omissions. A fourth,

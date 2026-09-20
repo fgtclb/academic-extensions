@@ -53,7 +53,12 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
             $processorParameters = [
                 'items' => &$items,
                 'config' => $GLOBALS['TCA'][$tableName]['columns'][$fieldName]['config'],
-                'TSconfig' => BackendUtility::getPagesTSconfig($currentPageId),
+                // The content of the field's `itemsProcFunc.` page TSconfig, with that key
+                // already stripped - the shape FormEngine passes, see
+                // docs/architecture/backend-select-items.md. Handing over the whole page
+                // TSconfig tree instead made every handler that reads a setting of its own
+                // find nothing.
+                'TSconfig' => BackendUtility::getPagesTSconfig($currentPageId)['TCEFORM.'][$tableName . '.'][$fieldName . '.']['itemsProcFunc.'] ?? null,
                 'table' => $tableName,
                 'field' => $fieldName,
                 'effectivePid' => $currentPageId,
