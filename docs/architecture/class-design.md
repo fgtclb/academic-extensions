@@ -50,8 +50,8 @@ this and is the pattern to copy:
 ## `readonly` on properties, not on classes
 
 **There is not a single `readonly class` declaration in this repository.**
-`readonly` is used heavily, but always on individual properties: 191 modifiers
-carrying an explicit visibility, of which 190 are constructor-promoted. The one
+`readonly` is used heavily, but always on individual properties: 207 modifiers
+carrying an explicit visibility, of which 206 are constructor-promoted. The one
 non-promoted declaration is
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15, which is
 assigned once in the constructor body because its value is defaulted there.
@@ -60,8 +60,8 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 128   | An injected collaborator                          |
-| `public readonly`    | 43    | A field of an immutable data object               |
+| `private readonly`   | 142   | An injected collaborator                          |
+| `public readonly`    | 45    | A field of an immutable data object               |
 | `protected readonly` | 20    | Either, in classes with subclasses or older style |
 
 Use `private readonly` for every constructor-injected dependency. It states that

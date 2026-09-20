@@ -23,6 +23,7 @@ handful of things that are easy to get wrong and expensive to discover later.
 | Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)       |
 | `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                       |
 | **Quoting value lists, binding parameters, ordering**   | [Database queries](docs/architecture/database-queries.md)               |
+| Items of a backend select, and the value they can drop  | [Backend select items](docs/architecture/backend-select-items.md)       |
 | Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                        |
 | The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                        |
 | Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                     |
