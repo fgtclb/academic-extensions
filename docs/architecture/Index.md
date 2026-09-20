@@ -37,17 +37,18 @@ This branch supports **TYPO3 v12 and v13**.
 
 ## Pages
 
-| Page                                                            | Contents                                                                                                                                         |
-|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Core version aware code](core-version-aware-code.md)           | The four mechanisms in use, the `Core12/`/`Core13/` split in `academic-base`, and how version specific tests are grouped.                        |
-| [Dependency injection](dependency-injection.md)                 | How services are configured across the extensions, why they must be stateless, and which Symfony and TYPO3 attributes exist on both v12 and v13. |
-| [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                         |
-| [Database queries](database-queries.md)                         | Quoting value lists, keeping a constraint on the builder that executes it, and ordering every result a caller renders or limits.                 |
-| [Frontend-user contact import](frontend-user-contact-import.md) | How telephone and fax data from `fe_users` is identified, typed and synchronized.                                                                |
-| [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                |
-| [Form data transformation](form-data-transformation.md)         | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                     |
-| [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.  |
-| [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.       |
+| Page                                                            | Contents                                                                                                                                                       |
+|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Core version aware code](core-version-aware-code.md)           | The four mechanisms in use, the `Core12/`/`Core13/` split in `academic-base`, and how version specific tests are grouped.                                      |
+| [Dependency injection](dependency-injection.md)                 | How services are configured across the extensions, why they must be stateless, and which Symfony and TYPO3 attributes exist on both v12 and v13.               |
+| [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                                       |
+| [Database queries](database-queries.md)                         | Quoting value lists, keeping a constraint on the builder that executes it, and ordering every result a caller renders or limits.                               |
+| [Backend select items](backend-select-items.md)                 | What an `itemsProcFunc` handler is handed on both core versions, the page TSconfig path of a FlexForm field, and the narrowing that silently drops a relation. |
+| [Frontend-user contact import](frontend-user-contact-import.md) | How telephone and fax data from `fe_users` is identified, typed and synchronized.                                                                              |
+| [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                              |
+| [Form data transformation](form-data-transformation.md)         | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                                   |
+| [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                |
+| [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.                     |
 
 ## See also
 
