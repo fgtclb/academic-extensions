@@ -29,8 +29,12 @@ empty without an error, which ACE-431 already recorded.
 - A contract that the record already references is always offered, even
   outside the configured pages, so that saving the record never drops an
   existing relation.
-- Documentation of the setting in the extension's `Documentation/`, and a
-  changelog entry.
+- Documentation of the setting in `academic_persons`' `Documentation/`, with a
+  changelog entry there and a shorter one in `academic_contacts4pages`, whose
+  field the same handler serves.
+- A `docs/` page on what an `itemsProcFunc` handler is handed and on the
+  narrowing that drops a stored value, because that applies to all ten handlers
+  of this repository rather than to this one.
 - TYPO3 v13 and v14 alike.
 
 ## Capabilities
@@ -47,9 +51,17 @@ None.
 ## Impact
 
 `ContractItems`, the repository method behind it, their tests, the
-extension's `Documentation/` and one changelog entry. No schema or TCA
+`Documentation/` of `academic_persons` and a changelog entry in it and in
+`academic_contacts4pages`. Functional tests are added in both of those
+extensions, one per field, plus a unit test for the parsing. No schema or TCA
 change. `ModifyTcaSelectFieldItemsEvent` keeps working unchanged, after the
 new restriction.
+
+One line outside all of that:
+`academic_base`'s `GetSelectItemsForTcaManagedTableFieldMethodTrait` built
+`$parameters['TSconfig']` as the whole page TSconfig tree, which is not the
+shape FormEngine passes. It is an `@api` helper, so a project routing a
+contract field through it would silently lose the new setting.
 
 ## Non-goals
 
@@ -65,7 +77,5 @@ new restriction.
 
 Named in ACE-431 ("worth deciding together") and left out of it on 2026-09-19,
 because it decides which records a select offers, not their order. Not from
-the project differences analysis; adopted into the same pipeline. No YouTrack
-issue is filed yet; the change is renamed to
-`ace-<NNN>-contract-select-storage-scope` when the issue is filed after
-implementation. Relates to ACE-431 and ACE-51.
+the project differences analysis; adopted into the same pipeline. Filed as
+ACE-700 after the implementation was green. Relates to ACE-431 and ACE-51.
