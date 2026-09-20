@@ -25,7 +25,7 @@ values, as for every other manually sortable table since ACE-491.
 The page form renumbers a page's contacts on every save, so a page an editor
 saved has distinct values. Ties come from records that did not pass through
 that form: contacts created from a contract or a contacts role (until
-`ace-tbd-inline-sort-column-per-parent` lands they even renumber `sorting`
+`ace-699-inline-sort-column-per-parent` lands they even renumber `sorting`
 across pages), copies and imports. The test builds the tie directly in its
 fixture rather than depending on one of those paths.
 

@@ -18,7 +18,28 @@ and v14 alike.
 
 - **WHEN** an editor rearranges the contracts listed in an organisational unit
   and saves it
-- **THEN** the unit form shows them in that order the next time it is opened
+- **THEN** the unit form shows them in that order the next time it is opened,
+  and every later save of one of those contracts leaves that order alone
+
+#### Scenario: A contract joins an organisational unit from somewhere else
+
+- **WHEN** a contract is given an organisational unit in its own form on a
+  profile, in the profile editing frontend, or is copied or localized
+- **THEN** it appears at the end of that unit's list rather than in front of
+  the contracts the editor arranged
+
+#### Scenario: A contract changes its organisational unit
+
+- **WHEN** an editor gives a contract a different organisational unit
+- **THEN** it appears at the end of the new unit's list and no longer in the
+  old one
+
+#### Scenario: Editing a contract in a workspace
+
+- **WHEN** an editor changes a contract in a workspace and the workspace is
+  published
+- **THEN** the contract sits where it sat in its organisational unit's list
+  before the edit
 
 #### Scenario: Updating an existing installation
 

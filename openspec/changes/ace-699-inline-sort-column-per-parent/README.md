@@ -1,4 +1,4 @@
-# ace-tbd-inline-sort-column-per-parent
+# ace-699-inline-sort-column-per-parent
 
 Partnerships, contracts and page contacts each have more than one inline
 parent writing the same `sorting` column, so saving a secondary parent

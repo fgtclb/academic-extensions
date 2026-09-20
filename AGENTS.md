@@ -385,6 +385,12 @@ The one flag that is *not* strict is `beStrictAboutTestsThatDoNotTestAnything`,
 which is `false`: a test without an assertion passes here. That makes proving a
 new test can fail more important, not less.
 
+**Assertions are called on `$this`, not on `self`** — `cgl` rewrites
+`self::assertSame()` to `$this->assertSame()`
+(`php_unit_test_case_static_method_calls`, `call_type: this`), so writing `self::`
+only produces churn in the next diff. See
+[Testing](docs/testing/Index.md#rules-that-apply-to-every-test).
+
 ## Verify, do not assume
 
 The most common failure mode of an agent in this repository is a confident,
@@ -409,8 +415,10 @@ ACE-356, ACE-482/ACE-491).
 and arbitrary on PostgreSQL, where an added index reorders it silently.
 Manually sortable tables (TCA ctrl `sortby`, which Extbase does not read)
 order by `sorting` + `uid` tiebreaker; a demanded ordering gets a `uid`
-tiebreaker appended; everything else orders by `uid`. Details and how to test
-it: [Database queries](docs/architecture/database-queries.md).
+tiebreaker appended; everything else orders by `uid`. A child with more than
+one inline parent needs a `foreign_sortby` column per relation, or saving the
+second parent renumbers the first one's list. Details and how to test it:
+[Database queries](docs/architecture/database-queries.md).
 
 **Never hand a raw array to `in()` or `notIn()`.** Quote it with the query
 builder helper meant for it:

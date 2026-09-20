@@ -411,6 +411,16 @@ What to order by, learned from the ACE-482/ACE-491 sweeps:
   through an inline relation — the persons contracts, sorted within their
   profile — where a global `ORDER BY sorting` would interleave meaninglessly
   across parents; such a cross-parent list orders by `uid`.
+- **A child with more than one inline parent** needs one sort column per
+  relation, because `RelationHandler::writeForeignField()` renumbers the
+  children of whichever parent is saved into the column that relation declares.
+  Two relations sharing `sorting` means saving the second one rearranges the
+  first one's list, across every record that owns one of its children. The
+  relation the frontend renders keeps `sorting`; every other one declares a
+  `foreign_sortby` of its own and gets an `ext_tables.sql` column for it —
+  `foreign_sortby` is not derived from TCA the way `ctrl.sortby` is. Three
+  tables in this repository are in that position, and the partnership, contract
+  and page contact relations are the worked examples.
 - **A demanded ordering** (a plugin's sort option) gets `uid` appended as a
   tiebreaker — records equal in the demanded ordering must keep a stable
   relative order.

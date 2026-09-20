@@ -19,6 +19,27 @@ and v14 alike.
 - **WHEN** an editor saves a contacts role that lists contacts of several pages
 - **THEN** every page still renders its contacts in the order arranged on it
 
+#### Scenario: A contract and a contacts role keep their own arrangements
+
+- **WHEN** an editor rearranges the contacts listed in a contract, and
+  rearranges the contacts listed in a contacts role differently
+- **THEN** each of the two forms shows its own order the next time it is
+  opened, and every later save of one of those contacts leaves both alone
+
+#### Scenario: A contact joins a contract or a contacts role from somewhere else
+
+- **WHEN** a contact is given a contract or a contacts role in its own form on
+  a page, or is copied or localized
+- **THEN** it appears at the end of that record's list rather than in front of
+  the contacts the editor arranged
+
+#### Scenario: A contact changes its contract or its contacts role
+
+- **WHEN** an editor gives a contact a different contract or a different
+  contacts role
+- **THEN** it appears at the end of the new record's list and no longer in the
+  old one, and the other of the two relations keeps its order
+
 #### Scenario: Updating an existing installation
 
 - **WHEN** an installation updates and runs the upgrade wizards

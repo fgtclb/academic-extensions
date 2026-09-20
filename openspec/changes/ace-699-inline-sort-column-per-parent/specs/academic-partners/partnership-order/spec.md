@@ -17,7 +17,21 @@ v13 and v14 alike.
 #### Scenario: A role keeps its own arrangement
 
 - **WHEN** an editor rearranges the partnerships listed in a role and saves it
-- **THEN** the role form shows them in that order the next time it is opened
+- **THEN** the role form shows them in that order the next time it is opened,
+  and every later save of one of those partnerships leaves that order alone
+
+#### Scenario: A partnership joins a role from somewhere else
+
+- **WHEN** a partnership is given a role in its own form on a partner page, or
+  is copied or localized
+- **THEN** it appears at the end of that role's list rather than in front of
+  the partnerships the editor arranged
+
+#### Scenario: A partnership changes its role
+
+- **WHEN** an editor gives a partnership a different role
+- **THEN** it appears at the end of the new role's list and no longer in the
+  old one
 
 #### Scenario: Updating an existing installation
 

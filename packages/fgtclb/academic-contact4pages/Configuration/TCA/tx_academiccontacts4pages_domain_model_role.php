@@ -117,6 +117,9 @@ return [
                 'type' => 'inline',
                 'foreign_table' => 'tx_academiccontacts4pages_domain_model_contact',
                 'foreign_field' => 'role',
+                // A sort column of this relation's own: the page relation owns
+                // "sorting", the column the frontend renders contacts in.
+                'foreign_sortby' => 'role_sorting',
                 'appearance' => [
                     'collapseAll' => 1,
                     'expandSingle' => 1,

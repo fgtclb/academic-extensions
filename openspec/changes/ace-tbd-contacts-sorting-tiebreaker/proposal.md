@@ -39,7 +39,7 @@ Contacts with distinct `sorting` values keep their order.
 ## Non-goals
 
 - The shared `sorting` column of page contacts with three inline parents,
-  which is `ace-tbd-inline-sort-column-per-parent`. That change keeps the
+  which is `ace-699-inline-sort-column-per-parent`. That change keeps the
   editor's arrangement intact; this one settles ties. They are independent,
   and either can land first.
 - The language handling of the query (ACE-484 on `main`).

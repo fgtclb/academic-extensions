@@ -31,6 +31,13 @@ always rendered in it, so the rearrangement reaches the frontend.
 - `academic_contacts4pages` (`packages/fgtclb/academic-contact4pages`): page
   contacts get `contract_sorting` and `role_sorting`, declared by the contract
   and the contacts role relation.
+- One DataHandler hook per extension appends a child to the list of a secondary
+  parent as it joins one, because `writeForeignField()` fills the column only
+  when that parent is saved - and the usual editing path assigns the parent from
+  the child's own form instead.
+- `academic_persons` additionally listens to the Extbase persistence events for
+  the same rule: the profile editing frontend writes contracts through the
+  repository, which no DataHandler hook sees.
 - One upgrade wizard per extension seeds each new column from the current
   order within its parent (`sorting`, then `uid`), so the role and unit forms
   keep showing what they show today.
@@ -54,8 +61,9 @@ None.
 
 ## Impact
 
-Four TCA relations, four new integer columns, three upgrade wizards, their
-tests and changelog entries. Nothing renders a role's partnerships, a unit's
+Four TCA relations, four new integer columns, three DataHandler hooks, one
+Extbase persistence listener, three upgrade wizards, their tests and changelog
+entries. Nothing renders a role's partnerships, a unit's
 contracts or a contract's or contacts role's contacts in the frontend today,
 so the new columns only order those backend forms.
 
@@ -73,6 +81,6 @@ so the new columns only order those backend forms.
 Found while correcting the ACE-491 changelogs on both branches (pull requests
 #671 and #672, 2026-09-19): the partners entry had to say that saving a role
 can rearrange a page's partnerships. Not from the project differences analysis;
-adopted into the same pipeline. No YouTrack issue is filed yet; the change is
-renamed to `ace-<NNN>-inline-sort-column-per-parent` when the issue is filed
-after implementation. Relates to ACE-491 and ACE-431.
+adopted into the same pipeline. Tracked as **ACE-699**, filed once the
+implementation was green, and archived as the last commit of the pull request
+that carries it. Relates to ACE-491 and ACE-431.
