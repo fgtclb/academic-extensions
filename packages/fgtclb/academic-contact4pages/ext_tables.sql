@@ -17,6 +17,12 @@ CREATE TABLE tx_academiccontacts4pages_domain_model_contact (
     contract int(11) unsigned DEFAULT '0' NOT NULL,
     role int(11) unsigned DEFAULT '0' NOT NULL,
 
+    -- The sort order within the contract and within the contacts role. The page
+    -- owns the shared "sorting" column; a "foreign_sortby" column is not derived
+    -- from TCA, so both other relations declare one of their own here.
+    contract_sorting int(11) unsigned DEFAULT '0' NOT NULL,
+    role_sorting int(11) unsigned DEFAULT '0' NOT NULL,
+
     -- Signed, due to `-1` option
     email_address int(11) DEFAULT '0' NOT NULL,
     phone_number int(11) DEFAULT '0' NOT NULL,

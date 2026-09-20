@@ -34,6 +34,13 @@ to `12`; `-p` accepts `8.1` through `8.5` and defaults to `8.2`.
 - A test that applies to only one core version is scoped with the
   `not-core-12` / `not-core-13` groups, never with a runtime condition. The name
   says what the group is excluded from, so `not-core-13` runs on v12 only.
+- **Assertions are called on `$this`, not on `self`.** `cgl` decides this, not
+  taste: `Build/php-cs-fixer/config.php` sets
+  `php_unit_test_case_static_method_calls` to `['call_type' => 'this']`, so
+  `self::assertSame(...)` written by hand is rewritten to
+  `$this->assertSame(...)` on the next `cgl` run and shows up as noise in the
+  diff. Write `$this->` in the first place. The one exception the fixer leaves
+  alone is a call inside a closure that has no `$this`.
 
 ## Pages
 
