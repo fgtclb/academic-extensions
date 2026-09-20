@@ -68,6 +68,7 @@ describing an intention as if it were the state.
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
+| [Backend select items](backend-select-items.md)                 | What an `itemsProcFunc` handler is handed on each core version, the page TSconfig path of a FlexForm field, and the narrowing that silently drops a relation.                              |
 
 ## See also
 
