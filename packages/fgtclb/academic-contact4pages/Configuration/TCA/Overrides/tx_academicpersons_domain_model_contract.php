@@ -44,7 +44,9 @@ if (!defined('TYPO3')) {
                         'enableCascadingDelete' => true,
                     ],
                     'foreign_field' =>  'contract',
-                    'foreign_sortby' => 'sorting',
+                    // A sort column of this relation's own: the page relation owns
+                    // "sorting", the column the frontend renders contacts in.
+                    'foreign_sortby' => 'contract_sorting',
                     'foreign_table' => 'tx_academiccontacts4pages_domain_model_contact',
                     'foreign_label' => 'page',
                 ],
