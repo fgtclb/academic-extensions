@@ -25,5 +25,5 @@
       ordering" section of `docs/architecture/database-queries.md` - rule 3
       covers the case, but said nothing about how to make a tie assertion fail
       anywhere.
-- [ ] 3.3 Commit message in TYPO3 Core format with the issue filed after
+- [x] 3.3 Commit message in TYPO3 Core format with the issue filed after
       implementation; the change archived as the last commit.
