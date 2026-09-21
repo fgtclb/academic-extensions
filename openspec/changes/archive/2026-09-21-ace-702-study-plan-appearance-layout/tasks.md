@@ -67,4 +67,4 @@
   `lintTypescript`, `typecheckJs`, `testJs` and `checkJsBuildClean` green.
 - [x] 7.4 `docs/` and the `Documentation/` changelog entry are part of the
   change; `README.md` and `CONTRIBUTING.md` still only summarize.
-- [ ] 7.5 Archive the change as the last commit of the pull request.
+- [x] 7.5 Archive the change as the last commit of the pull request.
