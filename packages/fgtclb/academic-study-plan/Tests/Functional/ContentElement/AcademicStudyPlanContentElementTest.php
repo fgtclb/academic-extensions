@@ -302,6 +302,25 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertSame(1, $this->nodeCountOf($this->renderHomePage(), '//div[@id="c1"]//a[@href="#top"]'));
     }
 
+    /**
+     * The filter list holds one `<li>`, and it is a template rather than a control: the
+     * module clones it per category and empties the list first. Its placeholder text is
+     * therefore never meant to be on screen, so it is rendered `hidden` - unconditionally,
+     * because a script can fail to load on any installation.
+     */
+    #[Test]
+    public function contentElementHidesTheFilterTemplateItem(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $html = $this->renderHomePage();
+
+        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@class="filter"]/li'));
+        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@class="filter"]/li[@hidden]'));
+        // The placeholders themselves stay: they are what the module substitutes.
+        $this->assertStringContainsString('category-label-placeholder', $html);
+    }
+
     #[Test]
     public function contentElementRendersDialogForModuleWithDescription(): void
     {

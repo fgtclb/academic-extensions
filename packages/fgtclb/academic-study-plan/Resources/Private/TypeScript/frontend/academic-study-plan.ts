@@ -112,6 +112,10 @@ class StudyPlan {
             holder.innerHTML = markup;
 
             if (holder.firstElementChild !== null) {
+                // The item in the template carries "hidden" so that its placeholder
+                // text is not on screen on a page this module never reaches. A clone
+                // of it is a real filter button and has to be visible.
+                holder.firstElementChild.removeAttribute('hidden');
                 filterList.appendChild(holder.firstElementChild);
             }
         });
