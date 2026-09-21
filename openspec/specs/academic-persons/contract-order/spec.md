@@ -1,7 +1,9 @@
 # academic-persons/contract-order Specification
 
 ## Purpose
-TBD - created by archiving change ace-699-inline-sort-column-per-parent. Update Purpose after archive.
+Keeps the order an editor arranges the contracts of a profile in, so that
+saving a second record listing the same contracts - an organisational unit -
+cannot renumber it.
 
 ## Requirements
 
