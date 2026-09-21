@@ -38,6 +38,11 @@ None.
 - The rendered markup gains the frame wrapper and the anchor; CSS that
   addressed the header inside the study plan wrapper may need adjusting.
 - No PHP, TCA or database change.
+- `docs/architecture/content-element-rendering.md` is added: the two rendering
+  shapes of this repository, what the `Default` layout renders, and the
+  `record` view variable TYPO3 v14 needs for the header partial. Nothing in
+  `docs/` covered either before, although two extensions already depend on the
+  second and a third assigns the variable pre-emptively.
 
 ## Non-goals
 
