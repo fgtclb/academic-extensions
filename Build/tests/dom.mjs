@@ -169,6 +169,85 @@ const installScrollIntoView = (window) => {
 };
 
 /**
+ * The three methods of "<dialog>", which jsdom declares the element and the
+ * reflected "open" property for and implements none of: "show()", "showModal()"
+ * and "close()" are simply not functions, so a module that opens a dialog dies
+ * with a "TypeError" rather than failing an assertion.
+ *
+ * Modelled through the attribute jsdom already reflects, so "dialog.open" is
+ * the truth here exactly as it is in a browser, together with the "close" event,
+ * the return value and the focus the opening moves into the dialog - a module
+ * that opens one and takes the focus somewhere else has to be observable.
+ *
+ * The top layer, the backdrop and the escape key are not modelled: nothing here
+ * lays anything out, and a test about them would be testing the model. Neither
+ * is the focus a browser puts back where it was when the dialog closes - a
+ * module that restores it itself keeps having to, which fails loudly here
+ * rather than passing on a model that did the work for it. And "close" is
+ * dispatched synchronously where a browser queues it as a task, so a listener
+ * that relies on running after the current task is not observable here.
+ *
+ * Which of the two ways it was opened is reported through the DOM, like the
+ * stubs, because a module that means "showModal()" and calls "show()" looks the
+ * same in every other observable respect:
+ *
+ *   data-test-dialog="modal"   opened with showModal()
+ *   data-test-dialog="open"    opened with show()
+ */
+const installDialog = (window) => {
+    if (typeof window.HTMLDialogElement.prototype.showModal === 'function') {
+        throw new Error('jsdom implements "<dialog>" now. Drop this model and use it.');
+    }
+
+    const open = (dialog, modality) => {
+        if (dialog.hasAttribute('open')) {
+            // Opening an already open dialog the other way round throws, which is
+            // the one case a module can reach by accident: "show()" first and
+            // "showModal()" afterwards leaves it without a backdrop in a browser.
+            if (dialog.getAttribute('data-test-dialog') !== modality) {
+                throw new window.DOMException('The dialog is already open.', 'InvalidStateError');
+            }
+
+            return;
+        }
+        if (modality === 'modal' && !dialog.isConnected) {
+            throw new window.DOMException('The dialog is not in a document.', 'InvalidStateError');
+        }
+
+        dialog.setAttribute('open', '');
+        dialog.setAttribute('data-test-dialog', modality);
+
+        // The "dialog focusing steps": the first control inside it that can take
+        // the focus, or the dialog itself when it holds none.
+        const focusable = dialog.querySelector(
+            ['button', '[href]', 'input', 'select', 'textarea', '[tabindex]:not([tabindex="-1"])']
+                .map((selector) => `${selector}:not([disabled]):not([hidden])`)
+                .join(', '),
+        );
+        (focusable ?? dialog).focus({ preventScroll: true });
+    };
+
+    window.HTMLDialogElement.prototype.show = function show() {
+        open(this, 'open');
+    };
+    window.HTMLDialogElement.prototype.showModal = function showModal() {
+        open(this, 'modal');
+    };
+    window.HTMLDialogElement.prototype.close = function close(returnValue) {
+        if (!this.hasAttribute('open')) {
+            return;
+        }
+
+        this.removeAttribute('open');
+        this.removeAttribute('data-test-dialog');
+        if (returnValue !== undefined) {
+            this.returnValue = String(returnValue);
+        }
+        this.dispatchEvent(new window.Event('close'));
+    };
+};
+
+/**
  * Object URLs, which neither realm can provide on its own.
  *
  * The window's "URL" has no "createObjectURL" in jsdom, and node's - the one a
@@ -226,6 +305,7 @@ export const installDom = () => {
     globalThis.CSS = { escape: escapeCssIdentifier };
     globalThis.matchMedia = matchMedia;
     installScrollIntoView(dom.window);
+    installDialog(dom.window);
     installObjectUrls();
 
     installed = dom;

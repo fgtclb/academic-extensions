@@ -226,6 +226,7 @@ not on `globalThis`, and nothing but a test constructs one.
 | `KeyboardEvent` (not a global)    | `createKeyboardEvent()`, from the window's own constructor — only a test raises one. |
 | `getBoundingClientRect`           | `setBoundingRect()`, per element and per test.                                       |
 | `clientWidth` / `clientHeight`    | `setClientSize()`, shadowed on the instance because both are prototype getters.      |
+| `<dialog>` show/showModal/close   | The reflected `open` attribute, the `close` event, and the modality.                 |
 
 `settle()` drains microtasks and never reaches a timer, which is what makes it
 useful — but the document editor reports its finished close one animation frame
