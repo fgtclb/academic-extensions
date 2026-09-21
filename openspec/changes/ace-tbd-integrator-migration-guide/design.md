@@ -102,7 +102,7 @@ and lists the 2.x override paths with their fate.
 A chapter that depends on a change not released when the guide is written
 (`ace-tbd-program-finder-element`, `ace-tbd-program-application-link`,
 `ace-tbd-study-plan-decimal-credit-points`,
-`ace-tbd-study-plan-partials-js-contract`, `ace-703-study-plan-asset-switch`,
+`ace-704-study-plan-partials-js-contract`, `ace-703-study-plan-asset-switch`,
 `ace-666-keep-hidden-ctype-selectable`, `ace-tbd-legacy-typoscript-paths`,
 `ace-tbd-program-facts-field-list`,
 `ace-tbd-program-page-content-without-getcontent`,
