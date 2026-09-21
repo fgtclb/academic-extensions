@@ -23,6 +23,10 @@ This branch supports **TYPO3 v12 and v13**.
 - In the frontend edit forms, a `disabled` or `readOnly` property is **never**
   written, whatever the request carries. The shipped `profile` set locks the
   three name fields that way, which is intended and regularly misread.
+- A content element template renders the frame, the spacing, the `c{uid}`
+  anchor and the header **only** when it goes through the `Default` layout of
+  whichever package provides `lib.contentElement`. A template without it gets
+  none of them, however complete its Appearance tab looks in the backend.
 - The category summary of the page module is **one implementation in
   `category_types`** and three four-line listeners on
   `ModifyPageLayoutContentEvent`, registered with the `event.listener` tag
@@ -49,6 +53,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Form data transformation](form-data-transformation.md)         | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                                   |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                |
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.                     |
+| [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, and why a content element template needs it.                                                      |
 
 ## See also
 
