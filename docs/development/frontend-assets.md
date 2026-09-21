@@ -148,6 +148,56 @@ Verified present on TYPO3 13.4.34 and 14.3.6: the `f:asset.module` ViewHelper,
 `AssetCollector::addJavaScriptModule()`, and `ImportMap` reading
 `Configuration/JavaScriptModules.php` from every package.
 
+## Making an asset optional
+
+A template that registers its assets itself is the reason an installation
+overrides the whole template to restyle one element — and then either loses the
+script or copies it, after which the copy stops following the original. The way
+out is a switch per asset, and it has a shape:
+
+| Layer                                                       | What it holds                                                               |
+|-------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `Configuration/Sets/<Component>/settings.definitions.yaml`  | `plugin.tx_<ext>.assets.css` / `.js`, `type: bool`, `default: true`         |
+| `Configuration/TypoScript/<Component>/constants.typoscript` | the same two paths, `= 1`, for an installation without site sets            |
+| `Configuration/TypoScript/<Component>/setup.typoscript`     | `settings.assets.css = {$plugin.tx_<ext>.assets.css}` on the content object |
+| the template                                                | `<f:if condition="{settings.assets.css}">` around the `f:asset.*` line      |
+
+Four things about it are worth knowing before copying it:
+
+- **A `FLUIDTEMPLATE` reads `settings.` straight off the content object**
+  (`FluidTemplateContentObject`, `$conf['settings.']` → `{settings}`), so the
+  switch is written on the object itself. An Extbase plugin gets its `settings`
+  from `plugin.tx_*.settings`, its FlexForm and the cObject's own TypoScript
+  merged together (`FrontendConfigurationManager::getConfiguration()`), so the
+  same switch belongs in the plugin's TypoScript there, not on the element.
+- **A boolean site setting arrives as `1` or as the empty string.**
+  `SysTemplateTreeBuilder::addDefaultTypoScriptConstantsFromSite()` concatenates
+  the value into a constants line, and PHP's `false` stringifies to nothing.
+  `1` is truthy for Fluid's `f:if` and the empty string is falsy, so the switch
+  works through either mechanism — but a test asserting the rendered constant
+  asserts `1`, never `true`.
+- **The two defaults have to agree**, for the reason
+  [TypoScript and site sets](../architecture/typoscript-and-site-sets.md#there-is-no-double-parse-guard-and-that-is-deliberate)
+  gives. Assert them in the delivery test of that extension, through both
+  mechanisms, rather than by reading the two files.
+- **Switching a script off does not make the markup work without one.** The
+  markup is the contract an integrator's own script addresses, so it stays
+  exactly as it is. What does have to be handled is markup that is only inert
+  *because* the script rewrites it — `academic_study_plan` renders the item its
+  filter clones as `<li hidden>` and has the module take the attribute off the
+  clones.
+
+One thing the switch cannot reach: an installation that overrides the template
+keeps whatever that copy does, so its own `f:asset` lines load unconditionally
+until they are wrapped as well. The same holds for a hand-written content
+object — it assigns no `settings.assets.` block, both conditions are false, and
+the element loses *both* assets. Say so in the changelog entry rather than
+guarding it in the template.
+
+`academic_study_plan` is the worked example:
+`Tests/Functional/ContentElement/AcademicStudyPlanAssetSwitchTest.php` covers
+both delivery mechanisms and both switches.
+
 ## Libraries come from the core
 
 No library in this repository's frontend code is vendored, and the rule that

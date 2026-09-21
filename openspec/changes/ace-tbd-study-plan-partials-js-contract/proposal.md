@@ -40,7 +40,7 @@ None.
 - Template and four new partials; TypeScript source and committed build
   output of the module.
 - One more setting in the settings definitions added by
-  `ace-tbd-study-plan-asset-switch`.
+  `ace-703-study-plan-asset-switch`.
 - More `testJs` coverage below
   `packages/fgtclb/academic-study-plan/Tests/JavaScript/`, which
   `ace-702-study-plan-appearance-layout` created together with the first test
@@ -66,4 +66,4 @@ code for this today. No YouTrack issue is filed yet; the change is renamed to
 implementation.
 
 Depends on `ace-702-study-plan-appearance-layout` and
-`ace-tbd-study-plan-asset-switch`.
+`ace-703-study-plan-asset-switch`.

@@ -70,6 +70,15 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
     private const COMPONENT_SUBSTITUTED = '<div id="substituted">EXT:academic_study_plan/Resources/Private/Frontend/Default/Partials/</div>';
 
     /**
+     * The two asset switches, which `constants.typoscript` assigns and
+     * `settings.definitions.yaml` declares, with the same default in both. Rendering them
+     * is what asserts that agreement where it matters - in what the frontend ends up
+     * with, through either mechanism. A boolean site setting reaches the constants as
+     * `1`, and as the empty string when it is off.
+     */
+    private const COMPONENT_ASSET_SWITCHES = '<div id="assets">1|1</div>';
+
+    /**
      * @return \Generator<string, array{0: string}>
      */
     public static function everythingDeliveringSetDataProvider(): \Generator
@@ -120,6 +129,16 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
             $body,
             sprintf('The set "%s" delivered a setup the constants were not substituted into.', $set),
         );
+        $this->assertStringContainsString(
+            self::COMPONENT_ASSET_SWITCHES,
+            $body,
+            sprintf(
+                'The set "%s" did not deliver the defaults of the asset switches. Here they come from '
+                . '"settings.definitions.yaml", which a site set contributes last; the static template '
+                . 'case asserts the same value coming from "constants.typoscript".',
+                $set,
+            ),
+        );
     }
 
     /**
@@ -148,6 +167,12 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
             self::COMPONENT_SUBSTITUTED,
             $body,
             'The aggregate static template delivered a setup the constants were not substituted into.',
+        );
+        $this->assertStringContainsString(
+            self::COMPONENT_ASSET_SWITCHES,
+            $body,
+            'The static template did not deliver the defaults of the asset switches. '
+            . 'Together with the site set case above, this is what keeps the two declarations in step.',
         );
     }
 
@@ -244,6 +269,43 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
         $this->assertSetCarriesNoPayload($compatibility);
     }
 
+    /**
+     * The settings of this extension belong to the content element, and the content
+     * element is the only component it ships - so they are declared with the component
+     * set, once. Every default has to stay identical to what `constants.typoscript`
+     * assigns for the same path, so that a site using both delivery mechanisms does not
+     * have its configuration reset by the second parse.
+     */
+    #[Test]
+    public function settingsAreDeclaredWithTheComponentSetOnly(): void
+    {
+        $component = $this->setRegistry()->getSet(self::COMPONENT_SET);
+        $this->assertNotNull($component);
+
+        $definitions = [];
+        foreach ($component->settingsDefinitions as $definition) {
+            $definitions[$definition->key] = $definition->default;
+        }
+
+        $this->assertSame(
+            [
+                'plugin.tx_academicstudyplan.assets.css' => true,
+                'plugin.tx_academicstudyplan.assets.js' => true,
+            ],
+            $definitions,
+        );
+
+        foreach ([self::AGGREGATE_SET, self::COMPATIBILITY_SET] as $name) {
+            $set = $this->setRegistry()->getSet($name);
+            $this->assertNotNull($set);
+            $this->assertSame(
+                [],
+                $set->settingsDefinitions,
+                sprintf('The set "%s" declares settings of its own.', $name),
+            );
+        }
+    }
+
     private function setRegistry(): SetRegistry
     {
         $setRegistry = $this->get(SetRegistry::class);
@@ -269,7 +331,10 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
      * A set that declares neither key does not get `null`: the core defaults both to the
      * set folder itself (`YamlSetDefinitionProvider::createDefinition()`), and reads
      * whatever it finds there. "Carries no payload" therefore means the set folder holds
-     * none of the four files the two mechanisms look for.
+     * none of the four files those two mechanisms look for. The third payload a set can
+     * carry, its settings definitions, is asserted by
+     * `settingsAreDeclaredWithTheComponentSetOnly()` instead - the core has already read
+     * that file by then, so the definitions themselves are the better evidence.
      */
     private function assertSetCarriesNoPayload(SetDefinition $set): void
     {

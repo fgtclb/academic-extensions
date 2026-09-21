@@ -15,7 +15,7 @@ See `proposal.md` for the motivation. On main:
 
 This change builds on `ace-702-study-plan-appearance-layout` (the template
 renders a `Main` section in the Default layout) and on
-`ace-tbd-study-plan-asset-switch` (the settings definitions file exists).
+`ace-703-study-plan-asset-switch` (the settings definitions file exists).
 
 ## Goals / Non-Goals
 
@@ -68,7 +68,7 @@ as a default path.
 
 A third setting, `plugin.tx_academicstudyplan.filter.collapsible` (`bool`,
 default `false`), goes into the settings definitions and constants that
-`ace-tbd-study-plan-asset-switch` adds. The filter partial renders
+`ace-703-study-plan-asset-switch` adds. The filter partial renders
 `data-study-plan-filter-collapsible` when it is on, and the module inserts a
 toggle button with `aria-expanded` and `aria-controls`.
 

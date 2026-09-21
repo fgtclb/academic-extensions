@@ -3,6 +3,10 @@
 # The three Fluid root paths below were assigned in "setup.typoscript" directly
 # until version 2.4. They are constants now, so an installation can point the
 # content element at its own templates without overriding the whole object.
+#
+# The two "assets" switches are declared a second time, as site settings, in
+# "Configuration/Sets/ContentElement/settings.definitions.yaml". The defaults
+# have to stay identical in both files - see the comment there.
 plugin.tx_academicstudyplan {
     view {
         # cat=plugin.tx_academicstudyplan/file; type=string; label=Path to template root (FE)
@@ -11,5 +15,12 @@ plugin.tx_academicstudyplan {
         partialRootPath = EXT:academic_study_plan/Resources/Private/Frontend/Default/Partials/
         # cat=plugin.tx_academicstudyplan/file; type=string; label=Path to template layouts (FE)
         layoutRootPath = EXT:academic_study_plan/Resources/Private/Frontend/Default/Layouts/
+    }
+
+    assets {
+        # cat=plugin.tx_academicstudyplan/enable; type=boolean; label=Load the stylesheet of the content element
+        css = 1
+        # cat=plugin.tx_academicstudyplan/enable; type=boolean; label=Load the script of the content element
+        js = 1
     }
 }

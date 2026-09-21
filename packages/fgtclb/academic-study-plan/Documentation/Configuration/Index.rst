@@ -141,6 +141,68 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
 
 The setting is inherited by every page below the one it is set on.
 
+..  _asset-switches:
+
+Skip the stylesheet or the script
+=================================
+
+The content element brings two assets to every page that carries it: the
+stylesheet :file:`academic-study-plan.css` and the ES module
+:js:`@fgtclb/academic-study-plan/frontend/academic-study-plan.js`. A page
+without the element loads neither.
+
+Both can be switched off per site — for an installation that styles the element
+itself, or that brings its own script:
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Setting
+        -   Default
+        -   Off means
+    *   -   :yaml:`plugin.tx_academicstudyplan.assets.css`
+        -   :yaml:`true`
+        -   The page does not load the stylesheet.
+    *   -   :yaml:`plugin.tx_academicstudyplan.assets.js`
+        -   :yaml:`true`
+        -   The page does not load the script.
+
+With the site set, they are site settings: edit them in the backend, in the
+settings editor of that site, or write them by hand. The editor is the same one
+on both TYPO3 versions and only sits elsewhere —
+:guilabel:`Site Management > Settings` on TYPO3 v13, and
+:guilabel:`Sites > Setup` on TYPO3 v14, which merged it into the module that
+edits the site itself.
+
+..  code-block:: yaml
+    :caption: config/sites/my-site/settings.yaml
+
+    plugin.tx_academicstudyplan.assets.css: false
+
+With the static template, they are TypoScript constants of the same names,
+:guilabel:`Constants` of the root :sql:`sys_template` record:
+
+..  code-block:: typoscript
+    :caption: Constants of the root sys_template record
+
+    plugin.tx_academicstudyplan.assets.css = 0
+
+..  warning::
+
+    Switching the script off leaves the markup exactly as it is. The category
+    filter, the semester accordion and the module dialogs do nothing without a
+    script — bring your own, addressing the same markup.
+
+    The one part of the markup that is not inert is handled: the single
+    :html:`<li>` of the filter list is the template the script clones, and it
+    is rendered :html:`hidden` so that its placeholder text never reaches the
+    screen. A script of your own has to take that attribute off the items it
+    builds from it — otherwise the filter stays empty.
+
+    What stays behind either way is the :html:`<nav>` around that list: a
+    labelled navigation landmark with nothing in it until a script fills it.
+    It is part of the markup contract, so it is yours to fill or to hide.
+
 ..  _one-mechanism-per-site:
 
 Do not combine both
@@ -151,7 +213,8 @@ files twice. The site set is applied before the :sql:`sys_template` record, so
 the second read happens after the site settings and after
 :file:`config/sites/<site>/constants.typoscript` — and it resets every constant
 the extension ships a default for back to that default. For this extension those
-are the three Fluid root paths of the content element.
+are the three Fluid root paths of the content element and the two switches of
+:ref:`Skip the stylesheet or the script <asset-switches>`.
 
 Nothing else is damaged: the :guilabel:`Constants` and :guilabel:`Setup` fields
 of the :sql:`sys_template` record, the page TSconfig of a page and the page

@@ -3,9 +3,12 @@
 # value is what its "setup.typoscript" assigns - so a delivery mechanism that did not
 # reach this site renders an empty or a literal value here.
 #
-# This extension declares no site settings at all, so the constant cannot be one that a
-# "settings.definitions.yaml" also contributes - the trap the sibling extensions have to
-# work around does not exist here.
+# The first constant is deliberately one that no "settings.definitions.yaml" declares: a
+# site set contributes its settings as constants after the constants of its "typoscript"
+# folder, so a declared path renders even when "constants.typoscript" was never read. The
+# last block renders one that both files declare, which is how their defaults are kept in
+# step - it is the only value here that is expected to be the same through either
+# mechanism for that reason rather than by delivery.
 page = PAGE
 page {
   10 = TEXT
@@ -19,4 +22,8 @@ page {
   30 = TEXT
   30.value < tt_content.academic_study_plan.partialRootPaths.100
   30.wrap = <div id="substituted">|</div>
+
+  40 = TEXT
+  40.value = {$plugin.tx_academicstudyplan.assets.css}|{$plugin.tx_academicstudyplan.assets.js}
+  40.wrap = <div id="assets">|</div>
 }
