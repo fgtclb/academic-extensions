@@ -7,8 +7,12 @@
 
 <f:section name="Main">
 
-    <f:asset.css identifier="academicStudyPlan" href="EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css" />
-    <f:asset.module identifier="@fgtclb/academic-study-plan/frontend/academic-study-plan.js" />
+    <f:if condition="{settings.assets.css}">
+        <f:asset.css identifier="academicStudyPlan" href="EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css" />
+    </f:if>
+    <f:if condition="{settings.assets.js}">
+        <f:asset.module identifier="@fgtclb/academic-study-plan/frontend/academic-study-plan.js" />
+    </f:if>
 
     <div
         class="academic-study-plan container"

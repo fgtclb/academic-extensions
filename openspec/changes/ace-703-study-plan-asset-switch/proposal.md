@@ -45,8 +45,13 @@ None.
   files on every page.
 - Splitting the template into partials; that is
   `ace-tbd-study-plan-partials-js-contract`.
-- Backporting to branch `2`, where the assets are `page.include*` entries a
-  project can already unset.
+- Backporting the switches to branch `2`, where the assets are `page.include*`
+  entries a project can already unset — verified on `origin/2`.
+- Backporting the hidden filter template item to branch `2`. Branch `2` carries
+  the same defect, in the same two files, and it is a maintained target; it is
+  left out here only because it is a change of its own on that branch rather
+  than part of this one, and it is named so that it is a decision and not an
+  oversight.
 
 ## Source
 

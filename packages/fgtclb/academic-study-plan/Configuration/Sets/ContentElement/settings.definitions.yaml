@@ -1,0 +1,33 @@
+# Site settings of the study plan content element.
+#
+# Both paths below are also assigned in
+# "EXT:academic_study_plan/Configuration/TypoScript/ContentElement/constants.typoscript",
+# and the default has to be the same in both files: a site that uses the site set and the
+# static template reads the constants after the site settings, so a differing default
+# resets what the integrator configured, silently. "true" here and "1" there are the same
+# value - a boolean site setting reaches the constants as "1" or as the empty string.
+#
+# The definitions sit with the component set rather than with the aggregate because this
+# extension ships exactly one component, and both settings belong to it. Every set that
+# delivers the content element depends on this one, so every site that renders the element
+# can set them.
+categories:
+  academic:
+    label: 'Academic'
+  academic.studyPlan:
+    label: 'Study plan'
+    parent: academic
+
+settings:
+  plugin.tx_academicstudyplan.assets.css:
+    label: 'Load the stylesheet of the content element'
+    description: 'Off for an installation that styles the study plan itself. The markup is unchanged either way.'
+    category: academic.studyPlan
+    type: bool
+    default: true
+  plugin.tx_academicstudyplan.assets.js:
+    label: 'Load the script of the content element'
+    description: 'Off for an installation that brings its own script. Without one the filter, the module dialogs and the mobile accordion do nothing.'
+    category: academic.studyPlan
+    type: bool
+    default: true

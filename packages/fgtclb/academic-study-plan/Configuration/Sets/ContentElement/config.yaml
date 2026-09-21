@@ -4,6 +4,11 @@
 # registers as a static template, and "pagets" at the file that
 # "Configuration/TCA/Overrides/pages.php" registers - there is exactly one
 # physical copy of each, so the two delivery mechanisms can never drift apart.
+#
+# "settings.definitions.yaml" next to this file declares the two asset switches of the
+# content element. They sit with this set rather than with the aggregate because the
+# content element is the only component this extension ships and both settings belong to
+# it - every set that delivers the element depends on this one.
 name: fgtclb/academic-study-plan-content-element
 label: 'Academic Study Plan: Content element'
 dependencies:

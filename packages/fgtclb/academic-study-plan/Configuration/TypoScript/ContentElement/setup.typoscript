@@ -22,5 +22,15 @@ tt_content {
         dataProcessing {
             10 = FGTCLB\AcademicStudyPlan\DataProcessing\StudyPlanProcessor
         }
+        # FLUIDTEMPLATE assigns this block to the view as "{settings}". The template
+        # registers its stylesheet and its module itself, so these two switches are the
+        # only way to render the element without them - an installation that styles it
+        # would otherwise have to override the whole template and lose the script with it.
+        settings {
+            assets {
+                css = {$plugin.tx_academicstudyplan.assets.css}
+                js = {$plugin.tx_academicstudyplan.assets.js}
+            }
+        }
     }
 }

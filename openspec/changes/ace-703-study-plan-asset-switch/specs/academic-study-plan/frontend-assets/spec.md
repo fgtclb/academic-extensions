@@ -37,6 +37,22 @@ markup.
 - **THEN** the page contains the study plan markup but does not load the
   script
 
+### Requirement: The filter shows nothing until a script builds it
+The filter list item the element renders is a template rather than a control,
+so a page on which no script runs SHALL show no filter button at all. This
+holds whether the script was switched off, failed to load or was never
+shipped, and it does not depend on the stylesheet.
+
+#### Scenario: No script runs on the page
+- **WHEN** a page carries the element and no script runs on it
+- **THEN** the page shows no filter button, and in particular none carrying
+  the placeholder text of the template item
+
+#### Scenario: The shipped script runs
+- **WHEN** a page carries the element and the shipped script runs
+- **THEN** the page shows one filter button per category its modules carry,
+  all of them visible
+
 ### Requirement: The switches work without site sets
 An installation that includes the static template instead of the site set
 SHALL be able to switch off either asset through TypoScript constants of the
