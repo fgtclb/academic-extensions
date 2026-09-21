@@ -252,9 +252,8 @@
   var instances = /* @__PURE__ */ new Map();
   var init = () => {
     document.querySelectorAll(".academic-study-plan").forEach((container) => {
-      const identifier = container.dataset.studyPlan ?? "";
-      if (!instances.has(identifier)) {
-        instances.set(identifier, new StudyPlan(container));
+      if (!instances.has(container)) {
+        instances.set(container, new StudyPlan(container));
       }
     });
   };

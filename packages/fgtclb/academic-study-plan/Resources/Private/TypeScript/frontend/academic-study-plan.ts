@@ -2,8 +2,8 @@
  * The interactive study plan: a category filter, per module dialogs, and a
  * mobile layout that collapses each semester into an accordion.
  *
- * One instance per ".academic-study-plan" container, keyed by its
- * "data-study-plan" attribute so a page may carry several.
+ * One instance per ".academic-study-plan" container, keyed by the element
+ * itself so a page may carry several - including two that are the same record.
  */
 const MOBILE_BREAKPOINT = 768;
 const RESIZE_DEBOUNCE = 150;
@@ -344,7 +344,17 @@ class StudyPlan {
     }
 }
 
-const instances = new Map<string, StudyPlan>();
+/**
+ * The running plans, keyed by their container element.
+ *
+ * Not by the value of "data-study-plan": a page can carry the same content
+ * element twice, through an "Insert records" element or a shortcut, and a
+ * template override is free to leave the attribute out, after which every
+ * container keys on the empty string. Either way the second plan would find the
+ * first one's entry, never be started, and never be levelled again by the
+ * resize handler below.
+ */
+const instances = new Map<HTMLElement, StudyPlan>();
 
 /**
  * Starts one instance per study plan of the document, skipping the ones that
@@ -357,9 +367,8 @@ const instances = new Map<string, StudyPlan>();
  */
 const init = (): void => {
     document.querySelectorAll<HTMLElement>('.academic-study-plan').forEach((container): void => {
-        const identifier = container.dataset.studyPlan ?? '';
-        if (!instances.has(identifier)) {
-            instances.set(identifier, new StudyPlan(container));
+        if (!instances.has(container)) {
+            instances.set(container, new StudyPlan(container));
         }
     });
 };
