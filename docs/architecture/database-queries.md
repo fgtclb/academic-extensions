@@ -509,6 +509,21 @@ ordering tests of `PartnershipRepositoryFindByPidTest` (academic-partners) and
 the first shape, `ContractRepositoryFindAllTest` (academic-persons) for the
 second.
 
+A **tie** needs one more step, and a fixture that does not take it is
+toothless. Records sharing a `sorting` value, written into the fixture in
+ascending uid order, come back in that order from a database that simply
+returns them as they were written — which is exactly the order the assertion
+expects, so such a fixture cannot be relied on to fail anywhere. Write the tied
+rows in **descending** uid order instead: PostgreSQL then returns them in that
+write order and the assertion fails without the tiebreaker, while SQLite still
+cannot fail it. Measure it, per database and per core version, and put the
+result in the test docblock rather than claiming a proof that was not run.
+`ContactRepositoryFindByPidTest::contactsSharingASortingValueFallBackToUidOrder()`
+(academic-contact4pages) is the reference.
+`PartnershipRepositoryFindByPidTest::partnershipsWithEqualSortingFallBackToUidOrder()`
+is the counter-example: its fixture writes the tied rows in ascending uid
+order, so it pins the contract without being able to fail.
+
 ## Testing this class of defect
 
 Rules 1 and 2 fail in the direction the default test run cannot see: rule 1
