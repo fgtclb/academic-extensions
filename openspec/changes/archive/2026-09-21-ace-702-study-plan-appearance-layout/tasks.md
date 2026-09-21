@@ -47,4 +47,4 @@
 - [x] 5.5 Commit as `[BUGFIX] ACE-702: Honour the study plan appearance` in
   TYPO3 Core format, with no attribution of any kind. The key was filed and
   verified against YouTrack before the subject was written.
-- [ ] 5.6 Archive the change as the last commit of the pull request.
+- [x] 5.6 Archive the change as the last commit of the pull request.
