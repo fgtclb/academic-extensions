@@ -133,7 +133,7 @@ GUESSED  finder element, e.g. in a home page hero
   test pins the target page, the namespace and the field names; routing work
   (ACE-623) has to keep them.
 - [Duplicate registration in projects] → The `Breaking` changelog names what
-  to delete; the upgrade configuration check (`ace-tbd-upgrade-check-configuration`)
+  to delete; the upgrade configuration check (`ace-713-upgrade-check-configuration`)
   can report it.
 - [Finder and target list use different storage] → Options then disagree
   with the list; the documentation says to point both at the same storage.

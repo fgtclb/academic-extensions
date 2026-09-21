@@ -40,7 +40,10 @@ The behaviour is identical on TYPO3 v13 and v14.
 
 ### Modified Capabilities
 
-None.
+- `academic-base/upgrade-check`: the command takes the extension key and the
+  override folders as an option rather than as its purpose, and its exit
+  status covers the findings of every check group, not only the template
+  override ones.
 
 ## Impact
 

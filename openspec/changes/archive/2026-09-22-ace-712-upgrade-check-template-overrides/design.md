@@ -167,7 +167,7 @@ page template overrides are checked with `--override-path`. Rejected: an own
 frontend bootstrap in academic_base, which would duplicate the version split
 that environment-state-manager already carries.
 
-The configuration check of `ace-tbd-upgrade-check-configuration` stays path
+The configuration check of `ace-713-upgrade-check-configuration` stays path
 and database based; it may use the `--site` mode when a future check needs
 rendered TypoScript.
 

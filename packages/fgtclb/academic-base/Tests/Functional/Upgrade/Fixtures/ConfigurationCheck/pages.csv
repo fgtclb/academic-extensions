@@ -1,0 +1,10 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title","is_siteroot","TSconfig","tsconfig_includes"
+,1,0,1,0,0,0,0,0,"/","Site Root",1,"",""
+,2,1,1,0,0,0,0,0,"/renamed","Renamed folder",0,"@import 'EXT:academic_test_configuration/Configuration/TSconfig/Removed.tsconfig'",""
+,3,1,1,0,0,0,0,0,"/selected","Selected include",0,"","EXT:academic_test_configuration/Configuration/TSconfig/Removed.tsconfig"
+,4,1,1,0,0,0,0,0,"/sound","Sound",0,"@import 'EXT:academic_test_configuration/Configuration/TSconfig/Live.tsconfig'","EXT:academic_test_configuration/Configuration/TSconfig/Live.tsconfig"
+,5,1,1,0,1,0,0,0,"/hidden","Hidden",0,"@import 'EXT:academic_test_configuration/Configuration/TSconfig/Removed.tsconfig'",""
+,6,1,1,1,0,0,0,0,"/deleted","Deleted",0,"@import 'EXT:academic_test_configuration/Configuration/TSconfig/Removed.tsconfig'",""
+,7,1,1,0,0,0,0,0,"/foreign","Foreign",0,"@import 'EXT:fluid_styled_content/Configuration/TsConfig/Gone.tsconfig'",""
+,102,1,1,0,0,1,2,0,"/renamed-de","Renamed folder [DE]",0,"@import 'EXT:academic_test_configuration/Configuration/TSconfig/Removed.tsconfig'",""

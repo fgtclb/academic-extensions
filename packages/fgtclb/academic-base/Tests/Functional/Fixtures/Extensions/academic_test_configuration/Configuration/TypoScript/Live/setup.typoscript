@@ -1,0 +1,3 @@
+# A static template folder that still delivers TypoScript, so a TypoScript
+# record including it is not reported.
+plugin.tx_academictestconfiguration.settings.live = 1

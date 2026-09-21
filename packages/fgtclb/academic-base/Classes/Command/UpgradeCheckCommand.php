@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Command;
 
+use FGTCLB\AcademicBase\Upgrade\ConfigurationChecker;
+use FGTCLB\AcademicBase\Upgrade\ConfigurationFinding;
 use FGTCLB\AcademicBase\Upgrade\TemplateOverrideChecker;
 use FGTCLB\AcademicBase\Upgrade\TemplateOverrideFinding;
 use FGTCLB\AcademicBase\Upgrade\TemplateOverrideFindingKind;
@@ -20,13 +22,20 @@ use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\TypoScript\FrontendTypoScript;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 
 /**
- * Reports the project template overrides of one academic extension that no
- * longer take effect, or that only freeze the upstream markup.
+ * Reports what an upgrade of the academic extensions left behind in a project:
+ * stored configuration that no longer reaches them, and project template
+ * overrides that no longer take effect or that only freeze the upstream markup.
+ *
+ * The configuration group runs on every invocation and needs no argument - it
+ * reads the TypoScript records, the page TSconfig, the site configurations and
+ * the XCLASS registry of the whole installation. The template override group
+ * needs to be pointed at something, so it runs when an extension key is named.
  *
  * An override folder is a folder a project adds to the view root paths of the
  * extension's plugins. Nothing in TYPO3 says a file in it is never resolved: a
@@ -39,7 +48,7 @@ use TYPO3\CMS\Core\Utility\PathUtility;
  */
 #[AsCommand(
     name: 'academic:upgrade:check',
-    description: 'Report project template overrides that the installed academic extension no longer matches.',
+    description: 'Report stored configuration and project template overrides the academic extensions no longer match.',
 )]
 final class UpgradeCheckCommand extends Command
 {
@@ -56,6 +65,7 @@ final class UpgradeCheckCommand extends Command
     ];
 
     public function __construct(
+        private readonly ConfigurationChecker $configurationChecker,
         private readonly PackageManager $packageManager,
         private readonly SiteFinder $siteFinder,
         private readonly StateManagerInterface $stateManager,
@@ -68,16 +78,35 @@ final class UpgradeCheckCommand extends Command
     {
         $this
             ->setHelp(implode("\n", [
-                'Compares the Fluid files below one or more override folders with those the',
-                'installed extension ships, and reports every file that no longer matches one:',
+                'Runs two groups of checks.',
+                '',
+                'The configuration group always runs and takes no argument. It reads the stored',
+                'configuration of the installation and reports what no longer reaches the',
+                'academic extensions, or what reaches them twice:',
+                '',
+                '  static-template          a TypoScript record includes a static template that',
+                '                           delivers no TypoScript any more',
+                '  tsconfig-import          a page or a site imports a page TSconfig file that is',
+                '                           not there',
+                '  tsconfig-syntax          a page or a site uses "<INCLUDE_TYPOSCRIPT:", which',
+                '                           TYPO3 v14 no longer reads',
+                '  alias-set                a site depends on a set that only forwards to another',
+                '  set-and-static-template  a site delivers one extension through both mechanisms',
+                '  xclass                   an academic class is replaced through the XCLASS registry',
+                '',
+                'The template override group runs when an extension key is named. It compares the',
+                'Fluid files below one or more override folders with those the installed extension',
+                'ships, and reports every file that no longer matches one:',
                 '',
                 '  missing-upstream  the extension ships no such file - the override is dead',
                 '  case-mismatch     the extension ships it under a name differing only in case',
                 '  identical         a byte identical copy, which freezes the upstream markup',
                 '',
-                'The first two are problems and let the command exit with 1; the notice does not.',
+                'Everything but a notice is a problem and lets the command exit with 1.',
                 '',
                 'Examples:',
+                '',
+                '  academic:upgrade:check',
                 '',
                 '  academic:upgrade:check academic_persons_edit \\',
                 '      --override-path=EXT:my_site/Resources/Private/Extensions/AcademicPersonsEdit/',
@@ -90,8 +119,9 @@ final class UpgradeCheckCommand extends Command
             ]))
             ->addArgument(
                 'extension',
-                InputArgument::REQUIRED,
-                'Extension key of the academic extension the overrides belong to.',
+                InputArgument::OPTIONAL,
+                'Extension key of the academic extension the overrides belong to. Without it only '
+                . 'the configuration of the installation is checked.',
             )
             ->addOption(
                 'override-path',
@@ -115,19 +145,40 @@ final class UpgradeCheckCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $extensionKey = (string)$input->getArgument('extension');
-        if (!$this->packageManager->isPackageActive($extensionKey)) {
-            $output->writeln(sprintf('<error>The extension "%s" is not active.</error>', $extensionKey));
-            return Command::INVALID;
-        }
-
+        $extensionKey = $input->getArgument('extension');
+        $extensionKey = is_string($extensionKey) && $extensionKey !== '' ? $extensionKey : null;
         /** @var list<string> $overridePaths */
         $overridePaths = $input->getOption('override-path');
         $siteIdentifier = $input->getOption('site');
         $siteIdentifier = is_string($siteIdentifier) && $siteIdentifier !== '' ? $siteIdentifier : null;
-        if ($overridePaths === [] && $siteIdentifier === null) {
+        $upstreamPathOption = $input->getOption('upstream-path');
+        $upstreamPathOption = is_string($upstreamPathOption) && $upstreamPathOption !== ''
+            ? $upstreamPathOption
+            : null;
+
+        if ($extensionKey === null) {
+            // Every option of this command belongs to the template override
+            // group. Accepting one without the extension key would silently
+            // ignore it, and before the argument became optional Symfony
+            // refused the call outright.
+            if ($overridePaths !== [] || $siteIdentifier !== null || $upstreamPathOption !== null) {
+                $output->writeln(
+                    '<error>--override-path, --upstream-path and --site name the override folders of one '
+                    . 'extension, so the extension key has to be given as well.</error>',
+                );
+                return Command::INVALID;
+            }
+        } elseif (!$this->packageManager->isPackageActive($extensionKey)) {
+            $output->writeln(sprintf('<error>The extension "%s" is not active.</error>', $extensionKey));
+            return Command::INVALID;
+        } elseif ($overridePaths === [] && $siteIdentifier === null) {
             $output->writeln('<error>Name at least one --override-path, or a --site to take them from.</error>');
             return Command::INVALID;
+        }
+
+        $configurationProblems = $this->reportConfiguration($output);
+        if ($extensionKey === null) {
+            return $configurationProblems > 0 ? Command::FAILURE : Command::SUCCESS;
         }
 
         $invalidInput = false;
@@ -135,10 +186,7 @@ final class UpgradeCheckCommand extends Command
         $comparisons = [];
 
         if ($overridePaths !== []) {
-            $upstreamPath = $input->getOption('upstream-path');
-            $upstreamPath = is_string($upstreamPath) && $upstreamPath !== ''
-                ? $upstreamPath
-                : sprintf('EXT:%s/Resources/Private/', $extensionKey);
+            $upstreamPath = $upstreamPathOption ?? sprintf('EXT:%s/Resources/Private/', $extensionKey);
             $upstreamFolder = $this->resolveFolder($upstreamPath);
             if ($upstreamFolder === null) {
                 $output->writeln(sprintf(
@@ -184,6 +232,8 @@ final class UpgradeCheckCommand extends Command
             }
         }
 
+        $output->writeln('');
+        $output->writeln('<comment>Template overrides</comment>');
         $problems = 0;
         $notices = 0;
         foreach ($comparisons as $comparison) {
@@ -217,7 +267,60 @@ final class UpgradeCheckCommand extends Command
             return Command::INVALID;
         }
 
-        return $problems > 0 ? Command::FAILURE : Command::SUCCESS;
+        return $problems + $configurationProblems > 0 ? Command::FAILURE : Command::SUCCESS;
+    }
+
+    /**
+     * The configuration group, which takes no argument and checks the whole
+     * installation.
+     *
+     * @return int The number of findings that are more than a notice.
+     */
+    private function reportConfiguration(OutputInterface $output): int
+    {
+        $output->writeln('<comment>Configuration</comment>');
+        $findings = $this->configurationChecker->check();
+        if ($findings === []) {
+            $output->writeln('');
+            $output->writeln('  nothing to report');
+
+            return 0;
+        }
+
+        $problems = 0;
+        $notices = 0;
+        foreach ($findings as $finding) {
+            $problems += $finding->isProblem() ? 1 : 0;
+            $notices += $finding->isProblem() ? 0 : 1;
+            $output->writeln('');
+            $output->writeln('  ' . $this->formatConfigurationFinding($finding));
+            $output->writeln('    ' . $finding->message);
+        }
+
+        $output->writeln('');
+        $output->writeln(sprintf(
+            '%d problem%s and %d notice%s in the stored configuration.',
+            $problems,
+            $problems === 1 ? '' : 's',
+            $notices,
+            $notices === 1 ? '' : 's',
+        ));
+
+        return $problems;
+    }
+
+    private function formatConfigurationFinding(ConfigurationFinding $finding): string
+    {
+        return sprintf(
+            '%s %-24s %s',
+            match ($finding->severity) {
+                ContextualFeedbackSeverity::ERROR => 'x',
+                ContextualFeedbackSeverity::WARNING => '!',
+                default => 'i',
+            },
+            $finding->kind->value,
+            $finding->subject,
+        );
     }
 
     private function format(TemplateOverrideFinding $finding): string

@@ -67,7 +67,7 @@ The four 2.x paths keep delivering "All components" as thin deprecated
 stored 2.3.4 value delivers nothing on `main` without any error, and the next
 save of the template record drops the unregistered value; academic_partners
 already keeps its 2.x value for that reason. Rejected: detection only
-(`ace-tbd-upgrade-check-configuration`), which leaves production rendering
+(`ace-713-upgrade-check-configuration`), which leaves production rendering
 unconfigured until somebody reads the report. That check still reports the
 other dead includes.
 
