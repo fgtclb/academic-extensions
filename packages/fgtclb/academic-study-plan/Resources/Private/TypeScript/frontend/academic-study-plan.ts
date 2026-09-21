@@ -90,10 +90,15 @@ const hexToRgba = (hex: string, alpha: number): string => {
 };
 
 class StudyPlan {
+    private readonly container: HTMLElement;
     private readonly modules: NodeListOf<HTMLElement>;
     private readonly headers: NodeListOf<HTMLElement>;
 
-    public constructor(private readonly container: HTMLElement) {
+    // Declared and assigned rather than written as a constructor parameter
+    // property: node strips types, it does not transform them, so a parameter
+    // property cannot be loaded by the "testJs" suite at all.
+    public constructor(container: HTMLElement) {
+        this.container = container;
         this.modules = this.container.querySelectorAll<HTMLElement>('.module');
         this.headers = this.container.querySelectorAll<HTMLElement>('.header');
 
@@ -341,6 +346,15 @@ class StudyPlan {
 
 const instances = new Map<string, StudyPlan>();
 
+/**
+ * Starts one instance per study plan of the document, skipping the ones that
+ * are already running.
+ *
+ * Exported so that the "testJs" suite can start the module on a fixture of its
+ * own: node hands every test of a file the same module instance, so the two
+ * statements below run once per file and the second test of one would otherwise
+ * drive a module that never saw its markup.
+ */
 const init = (): void => {
     document.querySelectorAll<HTMLElement>('.academic-study-plan').forEach((container): void => {
         const identifier = container.dataset.studyPlan ?? '';
@@ -364,4 +378,4 @@ window.addEventListener('resize', (): void => {
     }, RESIZE_DEBOUNCE);
 });
 
-export {};
+export { init };

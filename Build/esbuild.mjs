@@ -14,13 +14,13 @@
  * See "docs/development/frontend-assets.md".
  */
 import { build } from 'esbuild';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as sass from 'sass';
+import { extensions, passes, repositoryRoot } from './extensions.mjs';
 
 const buildRoot = dirname(fileURLToPath(import.meta.url));
-const repositoryRoot = resolve(buildRoot, '..');
 const development = process.argv.slice(2).includes('--dev');
 const listOutputs = process.argv.slice(2).includes('--list-outputs');
 
@@ -30,58 +30,6 @@ const listOutputs = process.argv.slice(2).includes('--list-outputs');
  * transpiled output for browsers that cannot resolve the module anyway.
  */
 const target = ['chrome89', 'firefox108', 'safari16.4'];
-
-/**
- * Where a package keeps its sources, and where the result belongs. Both are
- * optional: a package that has neither directory contributes nothing, and
- * adding one is picked up without touching any configuration.
- */
-const passes = [
-    { sources: 'Resources/Private/TypeScript', output: 'Resources/Public/JavaScript', extensions: ['.ts'] },
-    { sources: 'Resources/Private/Scss', output: 'Resources/Public/Css', extensions: ['.scss', '.css'] },
-];
-
-/**
- * Every extension in the repository, found rather than listed.
- *
- * A directory counts when it declares an extension key, which is what makes it
- * a TYPO3 extension with a "Resources/" tree — and hands over the key for the
- * import map prefix in the same step.
- */
-const extensions = () => {
-    const candidates = [];
-    for (const group of ['packages', 'packages-dev']) {
-        const groupPath = resolve(repositoryRoot, group);
-        if (!existsSync(groupPath)) {
-            continue;
-        }
-        for (const entry of readdirSync(groupPath, { withFileTypes: true })) {
-            if (!entry.isDirectory()) {
-                continue;
-            }
-            // "packages/" nests one level deeper, by vendor.
-            const path = join(groupPath, entry.name);
-            const nested = group === 'packages'
-                ? readdirSync(path, { withFileTypes: true })
-                    .filter((child) => child.isDirectory())
-                    .map((child) => join(path, child.name))
-                : [path];
-            candidates.push(...nested);
-        }
-    }
-
-    return candidates
-        .map((path) => {
-            const manifest = join(path, 'composer.json');
-            if (!existsSync(manifest)) {
-                return null;
-            }
-            const key = JSON.parse(readFileSync(manifest, 'utf8'))?.extra?.['typo3/cms']?.['extension-key'];
-            return key ? { path, key } : null;
-        })
-        .filter(Boolean)
-        .sort((one, other) => one.path.localeCompare(other.path));
-};
 
 /**
  * Every source file below a directory, recursively.

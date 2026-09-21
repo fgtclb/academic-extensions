@@ -395,6 +395,14 @@ jobs:
       - name: "Type check"
         run: "Build/Scripts/runTests.sh -b docker -s typecheckJs"
 
+      # The only step of this repository that executes a line of the shipped
+      # JavaScript. It belongs here rather than in the "unit" matrix: it runs in
+      # the same node container, reuses the npm cache this job restored and has
+      # no core version, so in that matrix it would install PHP dependencies and
+      # run four times over sources that cannot differ between those runs.
+      - name: "Run the JavaScript tests"
+        run: "Build/Scripts/runTests.sh -b docker -s testJs"
+
       # Last, and the one that matters most: the compiled assets are committed,
       # because neither composer nor a TER upload runs a node build. That makes
       # it possible to change a source and forget to rebuild, which nothing else
