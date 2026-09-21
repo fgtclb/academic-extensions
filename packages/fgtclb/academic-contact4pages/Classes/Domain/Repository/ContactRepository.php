@@ -70,8 +70,19 @@ class ContactRepository extends Repository
         $query->getQuerySettings()->setLanguageAspect($changedLanguageAspect);
         $query->getQuerySettings()->setRespectSysLanguage(false);
         $query->getQuerySettings()->setRespectStoragePage(false);
+        // The contact table is manually sortable (TCA ctrl `sortby`), so the order an editor
+        // arranged in the page form is the one the frontend reproduces - Extbase does not read
+        // `sortby` by itself. `uid` settles contacts sharing a `sorting` value, as rule 3 of
+        // `docs/architecture/database-queries.md` asks: without it the tie belongs to the
+        // database, and PostgreSQL, which promises no order without an `ORDER BY`, hands such
+        // rows back in the order they were written. The tiebreaker is the uid of the row the
+        // query fetches - under a translated language the translation's, which the overlaid
+        // object carries as `_localizedUid` while `getUid()` reports its default record, so a
+        // tie may sort differently per language, deterministically in each. Neither column is
+        // declared in TCA, so the data mapper falls back to the columns of those names.
         $query->setOrderings([
             'sorting' => QueryInterface::ORDER_ASCENDING,
+            'uid' => QueryInterface::ORDER_ASCENDING,
         ]);
 
         if ($contactUids === []) {
