@@ -23,5 +23,5 @@
 - [x] 3.2 `Documentation/Changelog/2.4/Important-*.rst` in
       `academic_contacts4pages`, and the tie recipe added to the "Testing an
       ordering" section of `docs/architecture/database-queries.md`.
-- [ ] 3.3 Commit message in TYPO3 Core format referencing ACE-701; the change
+- [x] 3.3 Commit message in TYPO3 Core format referencing ACE-701; the change
       archived as the last commit.
