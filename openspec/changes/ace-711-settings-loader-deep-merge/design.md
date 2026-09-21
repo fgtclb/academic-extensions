@@ -28,8 +28,8 @@ See `proposal.md` for the motivation. The current state on `main`:
 **Goals:**
 
 - A project file states only what differs from upstream.
-- A complete copy, the shape all five projects ship today, keeps giving
-  exactly its current result, key order included.
+- A copy that is complete at every depth, key order included, keeps giving
+  exactly its current result.
 - The loader stays generic: it knows nothing of the persons schema.
 
 **Non-Goals:**
@@ -60,6 +60,14 @@ list. The persons file has no such map; the documentation says so.
 Rejected: a reserved `remove: true` key as in `CategoryTypes.yaml`. In a
 free-form schema a reserved key collides with a field named `remove`, while
 `null` has no other meaning in these files.
+
+### `null` is dropped at any depth, not only where an earlier package configured the key
+
+A `null` means "not configured", so it is removed whether or not an earlier
+package named the key. The alternative - keeping a `null` that only one package
+ships, because there is nothing to remove - would make the meaning of `~` depend
+on which packages are installed, and hand the normaliser a value the merge
+promises it never sees.
 
 ### Key order follows a complete restatement
 
@@ -112,12 +120,92 @@ the duplicate. The loader this change touches is the generic part of that
 settings system. Both keys are verified in YouTrack before the change is
 renamed to `ace-<NNN>-settings-loader-deep-merge`.
 
+## Verified while implementing
+
+Every premise of the Context section was re-read on `main` at `6e1b29bd9`:
+
+- `SettingsFileLoader::loadMergedArray()` folded with `array_merge()` and the
+  class docblock said "there is no deep merge". Both are replaced.
+- `AcademicPersonsSettingsFactory::get()` is the only consumer of the merged
+  array; `LegacySettingsStatus` and `MigrateSettingsCommand` read
+  `loadPackageArrays()`, which is untouched.
+- The shipped persons settings file contains no `null` value and no map with
+  consecutive integer keys, measured by walking the parsed file. Giving both a
+  meaning therefore changes no shipped configuration.
+- `academic_jobs` still folds its own settings file with `array_merge()` in
+  `AcademicJobsSettingsLoader`. It has a loader of its own and is out of scope;
+  ACE-508 is where the two implementations meet.
+
+## Added while implementing
+
+Six manual and changelog pages claimed the shallow merge beyond the three the
+change named, and are corrected with it - together with the comment blocks and
+docblocks of the last bullet:
+
+- `academic-persons/Documentation/Upgrade/Index.rst`, step 6: the migration
+  command prints every key the overlay produced, so it carries what the
+  installation runs on today, and reducing the override to its deltas is a
+  step of its own - after the omissions it inherits from now on are settled.
+- `academic-persons/Documentation/Changelog/3.0/Breaking-SectionBasedAcademicPersonsSettings.rst`,
+  migration step 2 ("Keep every map the override declares complete").
+- `academic-persons/Documentation/Changelog/3.0/Feature-ConfigurablePublicProfile.rst`,
+  which told an integrator to repeat `structure` and `details` completely. The
+  maps merge now; the lists inside them are still replaced as a whole.
+- `academic-persons/Documentation/Changelog/3.0/Feature-ConfigurableDocumentRowsAndActions.rst`,
+  which said an override restates `rowFields` and `actions` for every section
+  it declares.
+- `academic-base/Documentation/Changelog/3.0/Feature-SharedValidationSettings.rst`,
+  the changelog entry of the loader itself.
+- `academic-persons/Documentation/Changelog/3.0/Important-ValidationPrimitivesMovedToAcademicBase.rst`,
+  which promised "the package walk and top-level merge … are all as before".
+- The comment block of the shipped `Configuration/AcademicPersons/Settings.yaml`,
+  `academic-persons-edit/Documentation/Configuration/Settings/Index.rst`, and the
+  class docblocks of two test classes and two test fixture extensions.
+
+`MigrateSettingsCommand` folds the package arrays itself, with an
+`array_merge()` of its own, so it printed maps the runtime would not produce as
+soon as two packages before the legacy one configured the same top-level key
+partially. `SettingsFileLoader::merge()` is therefore public - the class stays
+`@internal` - and the command folds with it, both for the section maps and for
+the legacy keys it overlays. Its docblock no longer claims agreement by
+accident; it says the two views differ only in how far the package list has
+been walked.
+
+The command is pinned by a unit test rather than a functional one, because the
+defect only shows for a specific package order and `getActivePackages()` does
+not follow the order a functional test lists its fixture extensions in. The
+partial-override fixture it shares with `AcademicPersonsSettingsFactoryTest`
+is therefore a plain package directory under `Tests/Unit/Fixtures/Packages/`,
+not a fixture extension - only `test_legacy_settings` has to be a real
+extension, because functional tests load it.
+
+Two functional test fixtures existed only because of the shallow merge and are
+migrated with it: `test_contract_contact_actions` of `academic_persons_edit`
+restated the whole `contracts` map to take its `actions` away and is now the
+one list it changes - its create posts the fields the shipped settings require
+- and `test_public_profile_settings` of `academic_persons` keeps its two
+layout keys while the editable fields it used to erase now survive.
+
 ## Risks / Trade-offs
 
 - [A project removed upstream entries by leaving them out; one analysed
   project drops `streetNumber`, `country` and `middleName` that way] → The
   Breaking changelog shows the `null` migration with a before and after
   example.
+- [A copy that is complete on the top level but omits a key **inside** a
+  restated entry inherits that key, which the first draft of the changelog
+  called unaffected. The manual's own recipe for unlocking the profile names
+  has that shape: it restates every field of `profile` and leaves `validators`
+  off the three name fields, so they would silently stay locked] → The Breaking
+  entry names exactly that recipe, tells the reader to compare key by key
+  rather than map by map, and gives `validators: []` next to the `~` removal.
+  `Documentation/Configuration/Validations/Index.rst` ships the new recipe.
+- [A reordered full copy decides the display order only while it names every
+  key, so the next upstream addition hands the order back to upstream] → An
+  `important` box next to the order rule in the Breaking entry and a paragraph
+  in `docs/architecture/validation-settings.md`. The rule is kept: always the
+  earlier order loses every project's order at once, always the later order
+  moves a single overridden key to the front.
 - [List and map are told apart wrongly] → Unit tests for an empty list, a
   list against a map, and a map with integer keys.
 - [A later persons-display change builds its settings examples on this merge

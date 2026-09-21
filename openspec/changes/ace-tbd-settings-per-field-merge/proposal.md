@@ -10,7 +10,7 @@ silently miss every upstream addition.
 ## What Changes
 
 - **BREAKING** The persons settings are merged per entry, on top of the
-  generic deep merge of `ace-tbd-settings-loader-deep-merge`:
+  generic deep merge of `ace-711-settings-loader-deep-merge`:
   - fields below `profile`, `special`, `contracts.fields`,
     `contracts.contactSections.*` and `documentSections.*` merge per field;
   - lists such as `validators`, `profile.structure.*`, `rowFields` and
@@ -51,7 +51,7 @@ None.
   the shipped `Settings.yaml` header, the integrator documentation and a 3.0
   `Breaking-` changelog.
 - `academic_base` (`packages/fgtclb/academic-base`): the merge of
-  `ace-tbd-settings-loader-deep-merge` is consumed unchanged. This change
+  `ace-711-settings-loader-deep-merge` is consumed unchanged. This change
   needs no loader parameter and adds no merge of its own.
 - Every installation with its own persons `Settings.yaml`.
 

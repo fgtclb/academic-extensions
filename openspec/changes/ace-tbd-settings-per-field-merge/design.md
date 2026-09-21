@@ -16,7 +16,7 @@ See `proposal.md` for the motivation. State on `main`:
   `structure` and `details` next to the field definitions), `special`,
   `contracts` and `documentSections`. Its header comment documents the
   top-level replacement.
-- `ace-tbd-settings-loader-deep-merge` (cross-cutting, ACE-109/ACE-161) makes
+- `ace-711-settings-loader-deep-merge` (cross-cutting, ACE-109/ACE-161) makes
   the loader merge maps recursively, replace lists, and remove a key on
   `null`.
 
@@ -46,7 +46,7 @@ One analysed project ships no persons `Settings.yaml` copy.
 
 ### Decided: consume the generic merge unchanged, `~` removes
 
-Persons consumes the merge of `ace-tbd-settings-loader-deep-merge` as it is:
+Persons consumes the merge of `ace-711-settings-loader-deep-merge` as it is:
 maps merge recursively, lists replace, and `~` (YAML null) removes an entry.
 There is no replace-only parameter for `validations` and
 `profileInformationsTypes`, and no merge of its own in the persons factory.
@@ -87,7 +87,7 @@ because nothing forces them to shrink.
 
 ### Decided: order follows the loader's rule, no reorder mechanism
 
-The order of merged maps is the rule of `ace-tbd-settings-loader-deep-merge`:
+The order of merged maps is the rule of `ace-711-settings-loader-deep-merge`:
 a map that restates every key of the earlier map takes the later order;
 otherwise the earlier order stays and new keys are appended. For the persons
 maps that means upstream field order stays and project fields follow, and a

@@ -1,0 +1,7 @@
+sections:
+  publications:
+    validators:
+      - disabled
+  lectures:
+    columns:
+      0: only
