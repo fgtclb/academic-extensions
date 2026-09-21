@@ -20,12 +20,10 @@ import { createKeyboardEvent, resetBody, settle, setViewportWidth } from "../../
  * it resolves to and "core:icon" becomes nothing. Everything the module queries
  * is kept verbatim, so a template that drops one of them turns these red.
  *
- * The content element uid is an argument because the module keys the plans it
- * has started by the *value* of "data-study-plan": a second test reusing the
- * value of the first would drive a module that never saw its markup. On a page
- * that value is the uid of the record - but two plans can still share it, or
- * carry none, and then only the first of them is ever started, which is a
- * defect of this branch recorded with ACE-706 rather than fixed by it.
+ * The content element uid is an argument so that a test can say which record
+ * it is rendering. It no longer decides whether a plan is started: the module
+ * keys its instances by the container element since ACE-707, and the test below
+ * that gives two plans the same value is what holds it to that.
  */
 const layoutMarkup = (identifier: string): string =>
   '<div id="c1" class="frame frame-default frame-type-academic_study_plan frame-layout-0">' +
@@ -214,6 +212,39 @@ describe("the study plan inside the content element layout", () => {
       setViewportWidth(wide);
     }
   });
+
+  it("starts every plan of a page, even two that are the same record", async () => {
+    // The same content element twice, which an "Insert records" element or a
+    // shortcut produces - and, with the attribute left out by an override, two
+    // containers that carry no identifier at all.
+    await start(layoutMarkup("5") + layoutMarkup("5"));
+
+    const plans = Array.from(document.querySelectorAll<HTMLElement>(".academic-study-plan"));
+    assert.equal(plans.length, 2);
+
+    // Both filters were rebuilt from the categories their own modules carry: a
+    // plan that was never started still shows the single template item.
+    assert.deepEqual(
+      plans.map((plan) => Array.from(plan.querySelectorAll(".filter button")).length),
+      [2, 2],
+    );
+    // And both semester headers were prepared by the layout branch.
+    assert.deepEqual(
+      plans.map((plan) => plan.querySelector(".header")?.getAttribute("tabindex")),
+      ["-1", "-1"],
+    );
+
+    // Filtering in the second plan leaves the first one alone.
+    const second = plans[1].querySelectorAll<HTMLButtonElement>(".filter button");
+    click(second[0]);
+    await settle();
+
+    assert.deepEqual(
+      plans.map((plan) => plan.querySelector(".module")?.classList.contains("highlighted")),
+      [false, true],
+    );
+  });
+
 
   it("renders a category title as text, whatever it contains", async () => {
     await start(hostileCategoryMarkup());
