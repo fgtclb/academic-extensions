@@ -36,11 +36,15 @@
 
 ## 4. File the issue
 
-- [ ] 4.1 After implementation, file the ACE issue in YouTrack and verify the
-  key.
-- [ ] 4.2 Rename the change to `ace-<NNN>-study-plan-asset-switch`.
-- [ ] 4.3 Commit as `[FEATURE] ACE-<NNN>: Allow skipping the study plan
-  assets` in TYPO3 Core format.
+- [x] 4.1 ACE-703, filed after the gates were green and verified against the
+  API. Type `Story`, Version `3.0.0`, `relates to` HWG-143 and HWG-275.
+- [x] 4.2 Renamed to `ace-703-study-plan-asset-switch`, and the three other
+  changes referencing it by name updated with it.
+- [x] 4.3 Two commits rather than one, because the hidden filter template item
+  is a defect that stands without the switches and needs its own changelog
+  kind: `[BUGFIX] ACE-703: Hide the study plan filter template` and
+  `[FEATURE] ACE-703: Make the study plan assets optional`. The bugfix commit
+  was verified green on its own.
 
 ## 5. Definition of done
 
@@ -57,4 +61,4 @@
   `Important-StudyPlanFilterTemplateItemIsHidden.rst` for the markup change, and
   a chapter in `Documentation/Configuration/Index.rst`. `README.md` and
   `CONTRIBUTING.md` are untouched.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archived as the last commit of the pull request.
