@@ -39,6 +39,44 @@ const categoriesOf = (module: HTMLElement): ModuleCategory[] => {
     }
 };
 
+/**
+ * The colour of a category, as it may be written into a "style" attribute.
+ *
+ * The value comes from a backend record and lands in
+ * "style=\"--category-color: …\"", where a ";" would start a declaration of
+ * whoever titled the record. Only the shapes a colour field can legitimately
+ * produce are let through; anything else leaves the category without a colour,
+ * which is what an empty value already meant.
+ */
+const colourOf = (value: string): string =>
+    /^(#[0-9a-fA-F]{3,8}|[a-zA-Z]{1,32}|rgba?\([0-9.,%\s]+\))$/.test(value) ? value : '';
+
+/**
+ * Replaces the placeholders of the rendered filter item in the clone that is
+ * about to become a real filter button.
+ *
+ * Walks attribute values and text nodes rather than the markup as a string: a
+ * category title is written by an editor, and substituting it into HTML that is
+ * then parsed makes the title's angle brackets markup. Setting an attribute or
+ * a text node cannot do that, whatever the title contains.
+ */
+const substitutePlaceholders = (node: Node, apply: (value: string) => string): void => {
+    if (node instanceof Element) {
+        Array.from(node.attributes).forEach((attribute): void => {
+            const replaced = apply(attribute.value);
+            if (replaced !== attribute.value) {
+                node.setAttribute(attribute.name, replaced);
+            }
+        });
+    }
+
+    if (node.nodeType === Node.TEXT_NODE && node.nodeValue !== null) {
+        node.nodeValue = apply(node.nodeValue);
+    }
+
+    Array.from(node.childNodes).forEach((child): void => substitutePlaceholders(child, apply));
+};
+
 const hexToRgba = (hex: string, alpha: number): string => {
     if (hex === '' || hex.length < 7) {
         return `rgba(0, 0, 0, ${alpha})`;
@@ -79,11 +117,15 @@ class StudyPlan {
      */
     private buildCategoryFilter(): void {
         const filterList = this.container.querySelector<HTMLElement>('.filter');
-        const filterTemplate = this.container.querySelector<HTMLElement>('.filter li')?.outerHTML;
+        const filterItem = this.container.querySelector<HTMLElement>('.filter li');
 
-        if (filterList === null || filterTemplate === undefined) {
+        if (filterList === null || filterItem === null) {
             return;
         }
+
+        // Taken before the list is emptied below, and cloned once more per
+        // category: the item is the only markup this filter has.
+        const filterTemplate = filterItem.cloneNode(true);
 
         // Emptied before the categories are collected, and deliberately so: the
         // one list item Fluid rendered is a template carrying placeholder text,
@@ -103,21 +145,22 @@ class StudyPlan {
         });
 
         categories.forEach((category): void => {
-            const markup = filterTemplate
-                .replace(/category-id-placeholder/g, `${category.uid}`)
-                .replace(/category-color-placeholder/g, `${category.colour}`)
-                .replace(/category-label-placeholder/g, `${category.label}`);
-
-            const holder = document.createElement('li');
-            holder.innerHTML = markup;
-
-            if (holder.firstElementChild !== null) {
-                // The item in the template carries "hidden" so that its placeholder
-                // text is not on screen on a page this module never reaches. A clone
-                // of it is a real filter button and has to be visible.
-                holder.firstElementChild.removeAttribute('hidden');
-                filterList.appendChild(holder.firstElementChild);
+            const item = filterTemplate.cloneNode(true);
+            if (!(item instanceof HTMLElement)) {
+                return;
             }
+
+            substitutePlaceholders(item, (value): string =>
+                value
+                    .replace(/category-id-placeholder/g, String(category.uid))
+                    .replace(/category-color-placeholder/g, colourOf(String(category.colour)))
+                    .replace(/category-label-placeholder/g, String(category.label)));
+
+            // The item in the template carries "hidden" so that its placeholder
+            // text is not on screen on a page this module never reaches. A clone
+            // of it is a real filter button and has to be visible.
+            item.removeAttribute('hidden');
+            filterList.appendChild(item);
         });
     }
 
@@ -307,6 +350,15 @@ class StudyPlan {
 
 const instances = new Map<string, StudyPlan>();
 
+/**
+ * Starts one instance per study plan of the document, skipping the ones that
+ * are already running.
+ *
+ * Exported so that the "testJs" suite can start the module on a fixture of its
+ * own: node hands every test of a file the same module instance, so the two
+ * statements below run once per file and the second test of one would otherwise
+ * drive a module that never saw its markup.
+ */
 const init = (): void => {
     document.querySelectorAll<HTMLElement>('.academic-study-plan').forEach((container): void => {
         const identifier = container.dataset.studyPlan ?? '';
@@ -330,4 +382,4 @@ window.addEventListener('resize', (): void => {
     }, RESIZE_DEBOUNCE);
 });
 
-export {};
+export { init };

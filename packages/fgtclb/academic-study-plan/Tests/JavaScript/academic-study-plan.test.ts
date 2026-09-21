@@ -40,17 +40,73 @@ const layoutMarkup = (): string =>
   "</div>" +
   "</div>";
 
-describe("the study plan inside the content element layout", () => {
-  it("filters by category and leaves the layout header alone", async () => {
-    resetBody(layoutMarkup());
+/**
+ * The same page with a category whose backend title carries markup. An editor
+ * writes that title, and the script substitutes it into the filter item the
+ * template rendered - so the title must arrive as text and never as markup.
+ */
+const hostileCategoryMarkup = (): string =>
+  '<div class="academic-study-plan container" data-study-plan="2">' +
+  '<nav><ul class="filter"><li hidden>' +
+  '<button data-category-id="category-id-placeholder"' +
+  ' data-category-color="category-color-placeholder"' +
+  ' aria-label="Filter by category: category-label-placeholder"' +
+  ' style="--category-color: category-color-placeholder;">category-label-placeholder</button>' +
+  "</li></ul></nav>" +
+  '<ul class="semesters row"><li class="col">' +
+  '<div class="header" aria-hidden="true" inert>First Semester</div>' +
+  "<ul>" +
+  '<li class="module" data-categories=\'[{"uid":1,' +
+  '"label":"<img src=x onerror=\\"globalThis.__studyPlanInjected = true\\"><b class=\\"injected\\">x</b>",' +
+  '"colour":"#cc0000; background: url(evil)"}]\'>Mathematics I</li>' +
+  "</ul>" +
+  "</li></ul>" +
+  "</div>";
 
-    // The module runs on import, as "f:asset.module" loads it: async, after the
-    // document was parsed. The harness window is already in that state, so the
-    // import below reproduces the late load without arranging anything - and
-    // the module's own "readyState" branch is the one a browser takes here.
-    assert.notEqual(document.readyState, "loading");
-    await import("@fgtclb/academic-study-plan/frontend/academic-study-plan.js");
-    await settle();
+/**
+ * Puts the markup in the document and starts the module on it.
+ *
+ * The module runs on import, as "f:asset.module" loads it: async, after the
+ * document was parsed. The harness window is already in that state, so the
+ * import reproduces the late load without arranging anything - and the module's
+ * own "readyState" branch is the one a browser takes here. Node hands every
+ * test of this file the same module instance, so every test after the first one
+ * starts it through the exported initialiser instead.
+ */
+const start = async (markup: string): Promise<void> => {
+  resetBody(markup);
+  assert.notEqual(document.readyState, "loading");
+  const { init } = await import("@fgtclb/academic-study-plan/frontend/academic-study-plan.js");
+  init();
+  await settle();
+};
+
+describe("the study plan inside the content element layout", () => {
+  it("renders a category title as text, whatever it contains", async () => {
+    await start(hostileCategoryMarkup());
+
+    const button = document.querySelector<HTMLButtonElement>(".filter button");
+    assert.ok(button !== null, "the filter was not built");
+
+    // The title is the button's text, with its angle brackets intact - and it
+    // is not markup: nothing it names reached the document.
+    assert.equal(
+      button.textContent,
+      '<img src=x onerror="globalThis.__studyPlanInjected = true"><b class="injected">x</b>',
+    );
+    assert.equal(document.querySelector(".injected"), null);
+    assert.equal(document.querySelector("img"), null);
+    assert.equal(button.getAttribute("aria-label"), `Filter by category: ${button.textContent}`);
+    assert.equal("__studyPlanInjected" in globalThis, false);
+
+    // A colour is written into a "style" attribute, so a value that could close
+    // the declaration and open another is dropped rather than passed through.
+    assert.equal(button.getAttribute("data-category-color"), "");
+    assert.equal(button.getAttribute("style"), "--category-color: ;");
+  });
+
+  it("filters by category and leaves the layout header alone", async () => {
+    await start(layoutMarkup());
 
     // The filter was rebuilt from the categories the modules carry, which only
     // works when the container was found through the frame wrapper.
