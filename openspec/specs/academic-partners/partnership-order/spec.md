@@ -1,7 +1,9 @@
 # academic-partners/partnership-order Specification
 
 ## Purpose
-TBD - created by archiving change ace-699-inline-sort-column-per-parent. Update Purpose after archive.
+Keeps the order an editor arranges the partnerships of a partner page in, so
+that saving a second record listing the same partnerships - a partner role -
+cannot renumber it.
 
 ## Requirements
 
