@@ -31,6 +31,12 @@ on TYPO3 v13 and v14.
   `middleName`
 - **THEN** `middleName` is still configured as academic_persons ships it
 
+#### Scenario: Project leaves a key out of an entry it restates
+- **WHEN** the project file restates the profile field `firstName` without the
+  flags academic_persons declares for it
+- **THEN** `firstName` still carries the flags academic_persons declares,
+  because a restated entry is merged key by key like any other map
+
 ### Requirement: A list is replaced as a whole
 The system SHALL replace a list from an earlier package with the list from the
 later package, without combining their entries. An empty list SHALL replace a
@@ -45,6 +51,11 @@ non-empty one.
 - **WHEN** the project declares an empty flag list for `title`
 - **THEN** `title` carries no flag
 
+#### Scenario: Project declares a map whose keys are numbers
+- **WHEN** a package declares a map whose keys are `0` to `n-1`, which YAML and
+  PHP do not tell apart from a sequence
+- **THEN** a later package replaces it as a whole, as it replaces a list
+
 ### Requirement: A null value removes a key
 The system SHALL remove a key from the combined settings when a later package
 sets it to `null`, whatever value an earlier package gave it. The extension
@@ -53,6 +64,11 @@ SHALL then behave as if no package had configured that key.
 #### Scenario: Project removes an upstream entry
 - **WHEN** the project file sets the profile field `middleName` to `null`
 - **THEN** the combined persons settings contain no `middleName` entry
+
+#### Scenario: The removing package is the only one naming the entry
+- **WHEN** a package sets an entry to `null` that no earlier package configured
+- **THEN** the combined settings contain no such entry, and the extension
+  behaves as it does for any key no package names
 
 ### Requirement: The key order follows a complete restatement
 The system SHALL order the keys of a combined map as the later package orders
@@ -69,3 +85,10 @@ follow it.
 #### Scenario: Project names a single field
 - **WHEN** the project file names only `firstName` below `profile`
 - **THEN** the profile fields keep the order academic_persons ships
+
+#### Scenario: Upstream adds an entry to a map a project reordered
+- **WHEN** a later academic_persons release adds a document section that the
+  project's reordered copy does not name
+- **THEN** the document sections are ordered as academic_persons ships them,
+  the added section in the position that release gives it, until the project
+  names it too

@@ -1,0 +1,5 @@
+legacy: 'a scalar'
+sections:
+  publications:
+    - one
+    - two

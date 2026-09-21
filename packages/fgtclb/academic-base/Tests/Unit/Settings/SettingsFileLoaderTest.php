@@ -14,20 +14,21 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
  * The loader defines how an installation overrides a settings file: every active
- * package may ship one, and they are folded together top-level key by top-level key.
- * That merge depth is what the integrator documentation promises - "restate the whole
- * block" - so it is pinned here together with the cache round trip that makes the
- * object graph's `__set_state()` implementations load-bearing.
+ * package may ship one, and they are folded together recursively - a later package
+ * changes only the keys it names, a list replaces a list, and `null` removes a key.
+ * Those rules are what the integrator documentation promises, so they are pinned here
+ * together with the cache round trip that makes the object graph's `__set_state()`
+ * implementations load-bearing.
  */
 final class SettingsFileLoaderTest extends UnitTestCase
 {
     /**
-     * `array_merge()` on the top level only: the second package replaces the whole
-     * `validations` map of the first, it does not add `lastName` next to `firstName`.
-     * A key the second package does not mention survives.
+     * The merge is recursive: the second package adds `lastName` next to the
+     * `firstName` of the first, it does not replace the whole `validations` map, and
+     * the `types` key it does not mention survives.
      */
     #[Test]
-    public function aLaterPackageReplacesTheWholeTopLevelKey(): void
+    public function aLaterPackageChangesOnlyTheKeysItNames(): void
     {
         $subject = new SettingsFileLoader(
             $this->cacheWithoutEntry(),
@@ -36,7 +37,10 @@ final class SettingsFileLoaderTest extends UnitTestCase
 
         $this->assertSame(
             [
-                'validations' => ['profile' => ['lastName' => ['readonly']]],
+                'validations' => ['profile' => [
+                    'firstName' => ['required'],
+                    'lastName' => ['readonly'],
+                ]],
                 'types' => ['first' => 1],
             ],
             $subject->loadMergedArray('Configuration/Test/Settings.yaml'),
@@ -44,11 +48,12 @@ final class SettingsFileLoaderTest extends UnitTestCase
     }
 
     /**
-     * Package order is what decides who wins, so the same two packages in the other
-     * order give the other result - there is no ordering of its own in the loader.
+     * Package order is what decides the key order of a partial override, so the same
+     * two packages in the other order give the same values in the other order - there
+     * is no ordering of its own in the loader.
      */
     #[Test]
-    public function thePackageOrderDecidesWhichPackageWins(): void
+    public function thePackageOrderDecidesTheKeyOrder(): void
     {
         $subject = new SettingsFileLoader(
             $this->cacheWithoutEntry(),
@@ -57,11 +62,186 @@ final class SettingsFileLoaderTest extends UnitTestCase
 
         $this->assertSame(
             [
-                'validations' => ['profile' => ['firstName' => ['required']]],
+                'validations' => ['profile' => [
+                    'lastName' => ['readonly'],
+                    'firstName' => ['required'],
+                ]],
                 'types' => ['first' => 1],
             ],
             $subject->loadMergedArray('Configuration/Test/Settings.yaml'),
         );
+    }
+
+    /**
+     * A list is a value, not a map: the later list replaces the earlier one instead of
+     * being merged into it, because there is no identity to merge flags by - a project
+     * could otherwise never drop `required`. The sibling key of the replaced list, and
+     * the sibling section, keep what the earlier package gave them.
+     */
+    #[Test]
+    public function aListIsReplacedAsAWhole(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['upstream', 'replacing']),
+        );
+
+        $merged = $subject->loadMergedArray('Configuration/Test/Settings.yaml');
+
+        $this->assertSame(['disabled'], $merged['sections']['publications']['validators']);
+        $this->assertSame('Publications', $merged['sections']['publications']['label']);
+        $this->assertSame('Lectures', $merged['sections']['lectures']['label']);
+    }
+
+    /**
+     * An empty sequence is a list as well, and replacing with it is how a project
+     * clears the flags of a field. An empty YAML map parses to the same empty
+     * array, so `{}` clears a map the same way.
+     */
+    #[Test]
+    public function anEmptyListOrMapClearsTheEarlierValue(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['upstream', 'clearing']),
+        );
+
+        $merged = $subject->loadMergedArray('Configuration/Test/Settings.yaml');
+
+        $this->assertSame([], $merged['sections']['publications']['validators']);
+        $this->assertSame('Publications', $merged['sections']['publications']['label']);
+        $this->assertSame([], $merged['sections']['lectures']);
+    }
+
+    /**
+     * `null` (`~` in YAML) removes the key, at the top level and at any depth. It is
+     * the only way to drop an upstream entry once the merge is recursive: leaving the
+     * entry out means "do not change it".
+     */
+    #[Test]
+    public function aNullValueRemovesATopLevelAndANestedKey(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['upstream', 'removing']),
+        );
+
+        $merged = $subject->loadMergedArray('Configuration/Test/Settings.yaml');
+
+        $this->assertSame(['sections'], array_keys($merged));
+        $this->assertSame(['publications'], array_keys($merged['sections']));
+    }
+
+    /**
+     * `null` means "not configured" whether or not an earlier package named the
+     * key, so a file that is the only one to carry an entry drops it just as well.
+     * Anything else would make the meaning of `~` depend on what is installed.
+     */
+    #[Test]
+    public function aNullRemovesAKeyNoEarlierPackageConfigured(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['removing']),
+        );
+
+        $this->assertSame(['sections' => []], $subject->loadMergedArray('Configuration/Test/Settings.yaml'));
+    }
+
+    /**
+     * Two values only merge when both are maps. A list against a map, a scalar
+     * against a map - and any other pair of types - is a replacement, because
+     * there is nothing to merge key by key.
+     */
+    #[Test]
+    public function aValueOfAnotherTypeReplacesTheEarlierOne(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['upstream', 'retyping']),
+        );
+
+        $merged = $subject->loadMergedArray('Configuration/Test/Settings.yaml');
+
+        $this->assertSame(['one', 'two'], $merged['sections']['publications']);
+        $this->assertSame('a scalar', $merged['legacy']);
+    }
+
+    /**
+     * And the same the other way round: a map from the later package replaces an
+     * earlier list or scalar rather than being folded into it.
+     */
+    #[Test]
+    public function aMapReplacesAnEarlierListOrScalar(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['retyping', 'upstream']),
+        );
+
+        $merged = $subject->loadMergedArray('Configuration/Test/Settings.yaml');
+
+        $this->assertSame(
+            ['label' => 'Publications', 'validators' => ['required', 'readonly']],
+            $merged['sections']['publications'],
+        );
+        $this->assertSame(['flag' => true], $merged['legacy']);
+    }
+
+    /**
+     * A YAML map whose keys happen to be `0 ... n-1` is a PHP list, so it is replaced
+     * rather than merged. Nothing in the shipped settings files has that shape; the
+     * documentation says so.
+     */
+    #[Test]
+    public function aMapWithConsecutiveIntegerKeysCountsAsAList(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['upstream', 'replacing']),
+        );
+
+        $merged = $subject->loadMergedArray('Configuration/Test/Settings.yaml');
+
+        $this->assertSame(['only'], $merged['sections']['lectures']['columns']);
+    }
+
+    /**
+     * When the later map names every key of the earlier one, the later order is the
+     * order of the result. That is what keeps a reordered full copy - the shape every
+     * override had before the merge became recursive - rendering in its own order.
+     */
+    #[Test]
+    public function aCompleteRestatementDecidesTheKeyOrder(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['upstream', 'reordering']),
+        );
+
+        $merged = $subject->loadMergedArray('Configuration/Test/Settings.yaml');
+
+        $this->assertSame(['lectures', 'publications'], array_keys($merged['sections']));
+        $this->assertSame('Lectures reordered', $merged['sections']['lectures']['label']);
+    }
+
+    /**
+     * A partial map must not move the key it names to the front, so the earlier order
+     * is kept and the keys only the later map names follow it.
+     */
+    #[Test]
+    public function aPartialMapKeepsTheEarlierOrderAndAppendsItsNewKeys(): void
+    {
+        $subject = new SettingsFileLoader(
+            $this->cacheWithoutEntry(),
+            $this->packageManager(['upstream', 'extending']),
+        );
+
+        $merged = $subject->loadMergedArray('Configuration/Test/Settings.yaml');
+
+        $this->assertSame(['publications', 'lectures', 'teaching'], array_keys($merged['sections']));
+        $this->assertSame('Lectures changed', $merged['sections']['lectures']['label']);
+        $this->assertSame(['first', 'second'], $merged['sections']['lectures']['columns']);
     }
 
     /**

@@ -34,9 +34,12 @@ The classes, all in the namespace :php:`FGTCLB\AcademicBase\Settings`:
             ``url``, ``tel``, ``textarea`` and ``html`` - see
             :ref:`feature-validation-character-limit-metadata`.
     *   -   :php:`SettingsFileLoader`
-        -   Reads one settings file from every active package, merges them on
-            the top level (the last package wins per key) and caches the
-            normalised object in the core cache.
+        -   Reads one settings file from every active package, merges them
+            recursively - a later package changes only the keys it names, see
+            `Settings files merge recursively
+            <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Changelog/3.0/Breaking-SettingsFilesMergeRecursively.html>`__
+            of :guilabel:`academic_persons` - and caches the normalised object
+            in the core cache.
     *   -   :php:`TcaValidationMerger`
         -   Merges the TCA fragments of a set into a table TCA array.
     *   -   :php:`Exception\UnknownValidatorException`,

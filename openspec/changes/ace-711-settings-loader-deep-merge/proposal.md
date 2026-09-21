@@ -19,8 +19,10 @@ never reaches them.
 - A map that restates every key of the earlier map keeps its own key order. A
   partial map keeps the earlier order, and its new keys are appended.
 - **BREAKING**: a project that removed an upstream entry by leaving it out of
-  its copy gets the entry back and has to set it to `null`. A complete copy,
-  reordered or not, gives the same result as before.
+  its copy gets the entry back and has to set it to `null`. That holds at
+  every depth: a key left off a restated field map — the documented recipe for
+  unlocking the profile names leaves `validators` off three fields — is
+  inherited again, so being complete on the top level is not enough.
 - academic_persons (`packages/fgtclb/academic-persons`) is the only consumer.
   Its settings, the legacy settings report and the migration command work
   unchanged apart from the merge.
@@ -60,9 +62,8 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-05`). Five of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-settings-loader-deep-merge` when the issue is filed after
-implementation.
+this today.
 
-Filed as a sub-issue of ACE-109, with ACE-161 linked as its duplicate (the
-generic settings system this is the merge part of). Relates to ACE-536.
+Filed as **ACE-711**, a sub-task of ACE-109 - the generic settings system this
+is the merge part of. ACE-161 is the duplicate of ACE-109 and is linked as a
+related issue rather than as a duplicate of this change; ACE-536 relates.

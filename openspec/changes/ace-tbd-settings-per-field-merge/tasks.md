@@ -1,6 +1,6 @@
 ## 1. Prerequisites
 
-- [ ] 1.1 Confirm `ace-tbd-settings-loader-deep-merge` is merged, and verify
+- [ ] 1.1 Confirm `ace-711-settings-loader-deep-merge` is merged, and verify
   in the merged loader that maps merge recursively, lists replace and a null
   value removes an entry.
 

@@ -157,7 +157,7 @@ Everything that has no persons knowledge lives in
 |------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
 | `Validation`, `ValidationSet`            | The value objects. `#[Exclude]`d from the container, `__set_state()` for the cache                                             |
 | `ValidationNormalizer`                   | Flag list → `Validation`; `normalizeValidationSets()` for a whole map of flat sets                                             |
-| `SettingsFileLoader`                     | The package walk, the top-level `array_merge()` and the `cache.core` round trip; `loadPackageArrays()` is the per-package view |
+| `SettingsFileLoader`                     | The package walk, the recursive merge and the `cache.core` round trip; `loadPackageArrays()` is the per-package view           |
 | `TcaValidationMerger`                    | `toTcaTableConfig()` builds the `columns.<field>.config` fragment, `merge()` applies it to a table                             |
 | `Exception\UnknownValidatorException`    | Raised by a validation engine for a class name that is not an Extbase validator                                                |
 | `Exception\UnsuitableValidatorException` | Raised by a validator handed a subject it is not built for                                                                     |
@@ -365,20 +365,66 @@ versus `Configuration/TCA/Overrides/` — not a doubt about the coupling itself.
 ## Overriding the settings in an installation
 
 `SettingsFileLoader::loadMergedArray()` walks every **active package**, reads
-`Configuration/AcademicPersons/Settings.yaml` if present, and folds them
-together with `array_merge()`. To change a section:
+`Configuration/AcademicPersons/Settings.yaml` if present, and folds the files
+onto each other **recursively**. To change a section:
 
 - Ship the file in a site package that **depends on `academic_persons`**, so that
-  the package is ordered after it — the last one loaded wins.
-- Restate the **whole top-level map** the change belongs to. `array_merge()` is
-  shallow, so redefining `profile` replaces the layout keys and every field at
-  once, and redefining `documentSections` replaces all eight sections. There is
-  no deep merge, and no syntax for removing a single flag from a single field.
+  the package is ordered after it — the later one wins per key.
+- State **only the keys that differ**. A map is merged key by key at any depth,
+  so a file that names `profile.title.validators` changes that one list and
+  leaves the layout, the other fields and their flags as shipped.
 - Flush the core cache afterwards; the normalised graph is cached in
   `cache.core` under `AcademicPersons_Settings_v3` — the identifier ACE-501
   introduced when the classes moved to `academic_base`; ACE-503 keeps it,
   because nothing was released in between — as a `return <var_export>;`
   statement, which is why every object in the graph has a `__set_state()`.
+
+Four rules decide what the merge does with a value, and they hold at every
+depth:
+
+| The later file has        | Result                                                          |
+|---------------------------|-----------------------------------------------------------------|
+| a map                     | merged key by key with the earlier map                          |
+| a list                    | replaces the earlier list as a whole, an empty one included     |
+| a value of another type   | replaces the earlier value                                      |
+| `null` (`~`)              | removes the key, as if no package had configured it             |
+
+A list replaces rather than combines because a flag list has no identity to
+merge by: a project that could only add entries could never drop `required`
+from `[required]`. A YAML map whose keys happen to be `0 … n-1` is a PHP list
+and is replaced too — nothing in the shipped file has that shape — and an empty
+map, `{}`, parses to the same empty array as an empty sequence, so it clears a
+map.
+
+The key order of a merged map is the order of the later file when that file
+names **every** key of the earlier one, which is what keeps a reordered full
+copy rendering in its own order; a file that names only some keys leaves the
+earlier order alone and its new keys are appended. Order is display order for
+the `profile` entries, `special.<component>.fields`, `contracts.fields`,
+`contracts.contactSections` and `documentSections`.
+
+That trigger is deliberate and it is sharp: a reordered copy decides the order
+until upstream adds an entry it does not name, and from that release on the
+upstream order applies again. Always the earlier order
+(`array_replace_recursive()`) would have taken the order from every reordered
+copy at once, and always the later order would move a single overridden key to
+the front; a project that depends on its order names the new key when it
+updates.
+
+**An entry is no longer removed by leaving it out — at any depth.** A copy of a
+top-level map used to drop everything it did not list; it now changes nothing
+but what it names, and a key left off a restated entry is inherited as well.
+The 3.0 recipe for unlocking the profile names — the whole `profile` map
+restated, with the `validators` key left off the three name fields — therefore
+inherits the shipped `[readonly, disabled]` and keeps them locked. An entry is
+removed with `~` and a flag list emptied with `[]`:
+
+```yaml
+profile:
+  middleName: ~
+  firstName:
+    validators: []
+```
 
 There is no TypoScript and no site-set path — the site sets do not expose
 validations.
@@ -392,8 +438,9 @@ editor. That is usually what is wanted, but it is worth being deliberate about.
 
 `academic_jobs` has its own `Configuration/AcademicJobs/Settings.yaml`, read by
 `AcademicJobsSettingsLoader` into `AcademicJobsSettingsRegistry`. The package
-walk and the shallow `array_merge()` are the same algorithm, so the override
-rules match — but nothing else does, and the two systems share no code.
+walk is the same, but the merge is not: jobs still folds its files with a
+top-level `array_merge()`, so an override there restates the whole top-level
+map, and nothing else matches either — the two systems share no code.
 
 |                         | `academic_persons`                                | `academic_jobs`                                       |
 |-------------------------|---------------------------------------------------|-------------------------------------------------------|

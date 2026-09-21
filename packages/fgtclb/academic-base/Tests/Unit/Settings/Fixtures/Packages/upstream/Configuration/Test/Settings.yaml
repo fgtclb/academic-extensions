@@ -1,0 +1,13 @@
+legacy:
+  flag: true
+sections:
+  publications:
+    label: Publications
+    validators:
+      - required
+      - readonly
+  lectures:
+    label: Lectures
+    columns:
+      0: first
+      1: second

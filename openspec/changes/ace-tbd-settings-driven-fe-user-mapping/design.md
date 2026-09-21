@@ -12,7 +12,8 @@
 - `AcademicPersonsSettingsFactory` normalises `Settings.yaml` into a cached
   object graph (`__set_state()` on every object). It reads only the keys it
   knows, so an unknown top-level key is ignored today.
-- `SettingsFileLoader` merges per top-level key (`array_merge()`).
+- `SettingsFileLoader` merges the package files recursively
+  (`ace-711-settings-loader-deep-merge`).
 
 ## Goals / Non-Goals
 
@@ -98,8 +99,10 @@ mechanism (`ace-tbd-settings-per-field-merge`) for all these keys.
   `ProfileCreateCommandService/UsingDefaultProfileFactoryOnlyTest` and
   `ProfileUpdateCommandService/UsingDefaultProfileFactoryOnlyTest` must stay
   green without a fixture change.
-- [A project ships a partial `frontendUserSync` map] → The top-level merge
-  replaces the whole map. This is documented like the other keys.
+- [A project ships a partial `frontendUserSync` map] → The recursive merge of
+  the loader applies the keys it names and keeps the rest, exactly as for the
+  other keys, and its lists are replaced as a whole. This is documented like
+  the other keys.
 
 ## Open Questions
 
