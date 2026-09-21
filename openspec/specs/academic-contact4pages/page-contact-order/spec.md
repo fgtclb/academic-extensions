@@ -1,7 +1,9 @@
 # academic-contact4pages/page-contact-order Specification
 
 ## Purpose
-TBD - created by archiving change ace-699-inline-sort-column-per-parent. Update Purpose after archive.
+Defines the order in which the contacts of a page are shown, by the contacts
+content element and by the page contacts data processor: the arrangement an
+editor made on that page, and how contacts equal in it are settled.
 
 ## Requirements
 
@@ -50,3 +52,16 @@ and v14 alike.
 - **WHEN** an installation updates and runs the upgrade wizards
 - **THEN** pages, contracts and contacts roles show their contacts in the
   order they showed before the update
+
+### Requirement: Contacts equal in the arrangement keep a stable order
+
+The contacts content element and the page contacts data processor SHALL show
+contacts that are equal in the arrangement of a page in the same relative
+order on every request, on every supported database. This applies to TYPO3
+v13 and v14 alike.
+
+#### Scenario: Two contacts share a position
+
+- **WHEN** two contacts of a page have the same position in the arrangement of
+  that page
+- **THEN** they are shown in the same relative order on every request
