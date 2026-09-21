@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="EXT:academic_base/Resources/Private/Language/locallang_reports.xlf" date="2026-09-22T00:00:00Z" product-name="academic_base">
+    <header/>
+    <body>
+      <trans-unit id="status.label" resname="status.label">
+        <source>Academic Base</source>
+      </trans-unit>
+      <trans-unit id="status.upgradeConfiguration.none.title" resname="status.upgradeConfiguration.none.title">
+        <source>Upgrade configuration</source>
+      </trans-unit>
+      <trans-unit id="status.upgradeConfiguration.none.value" resname="status.upgradeConfiguration.none.value">
+        <source>Nothing stale</source>
+      </trans-unit>
+      <trans-unit id="status.upgradeConfiguration.none.message" resname="status.upgradeConfiguration.none.message">
+        <source>No TypoScript record, page TSconfig, site configuration or XCLASS registration of this installation points at something the installed academic extensions no longer deliver.</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

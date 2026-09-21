@@ -7,25 +7,41 @@ it.
 ## ADDED Requirements
 
 ### Requirement: Stored static templates that deliver nothing are reported
-The check SHALL report every TypoScript record that includes a static template
-of an academic extension which the installation does not register, or whose
-folder holds no TypoScript, as a warning naming the record and the stored path.
-It SHALL behave identically on TYPO3 v13 and v14.
+The check SHALL report every visible TypoScript record that includes a static
+template of an academic extension the installation does not have, or whose
+folder delivers no TypoScript in the installed version, as a warning naming the
+record and the stored path. A record that is deleted, hidden or outside its
+start and end time SHALL NOT be reported, because it delivers nothing to
+anybody. It SHALL behave identically on TYPO3 v13 and v14.
 
 #### Scenario: Static template path without TypoScript
 - **WHEN** a TypoScript record includes an academic static template path that
   the installed extension no longer provides
 - **THEN** the check reports one warning naming the record uid and that path
 
-#### Scenario: Registered static template
-- **WHEN** a TypoScript record includes only static templates that the
-  installed academic extensions register
+#### Scenario: Static template of an extension that is gone
+- **WHEN** a TypoScript record includes a static template of an academic
+  extension that is not installed
+- **THEN** the check reports one warning naming the record uid and the
+  extension
+
+#### Scenario: Working static template
+- **WHEN** a TypoScript record includes only academic static templates whose
+  folders deliver TypoScript in the installed version
+- **THEN** the check reports nothing for that record
+
+#### Scenario: Hidden TypoScript record
+- **WHEN** a hidden TypoScript record includes an academic static template that
+  delivers nothing
 - **THEN** the check reports nothing for that record
 
 ### Requirement: Unresolved academic TSconfig imports are reported
 The check SHALL report every page whose page TSconfig, or whose selected page
 TSconfig includes, reference a file of an academic extension that does not
-exist, as a warning naming the page and the reference.
+exist, as a warning naming the page and the reference. It SHALL read the page
+TSconfig of a site the same way and name the site. The page TSconfig of a
+hidden page SHALL be read, because TYPO3 reads it too; that of a deleted page
+SHALL NOT.
 
 #### Scenario: Import of a renamed folder
 - **WHEN** a page's TSconfig imports a page TSconfig file from a folder of an
@@ -35,6 +51,22 @@ exist, as a warning naming the page and the reference.
 #### Scenario: Import that resolves
 - **WHEN** a page's TSconfig imports an existing academic page TSconfig file
 - **THEN** the check reports nothing for that page
+
+#### Scenario: Import in the page TSconfig of a site
+- **WHEN** the page TSconfig stored next to a site configuration imports an
+  academic page TSconfig file that does not exist
+- **THEN** the check reports one warning naming the site and the import
+
+### Requirement: Academic includes in a syntax TYPO3 v14 dropped are reported
+The check SHALL report every page TSconfig that includes a file of an academic
+extension with the `<INCLUDE_TYPOSCRIPT:` syntax as a warning naming the page or
+site and the reference, whether or not the referenced file exists.
+
+#### Scenario: Legacy include of a file that exists
+- **WHEN** a page's TSconfig includes an existing academic page TSconfig file
+  with `<INCLUDE_TYPOSCRIPT:`
+- **THEN** the check reports one warning naming the page and the reference,
+  because TYPO3 v14 ignores the line without a message
 
 ### Requirement: Alias set dependencies are reported as a notice
 The check SHALL report a site that depends on an alias set of an academic
@@ -73,6 +105,11 @@ extension as a warning, and as an error when the replaced class is final.
 - **WHEN** an installation registers an XCLASS for an academic class that is
   not final
 - **THEN** the check reports a warning naming both classes
+
+#### Scenario: XCLASS of a class the installed version does not have
+- **WHEN** an installation registers an XCLASS for a class of an academic
+  extension that the installed version no longer ships
+- **THEN** the check reports an error naming both classes
 
 ### Requirement: Findings are visible in the status report and on the command line
 The check SHALL be listed in the backend status report when EXT:reports is

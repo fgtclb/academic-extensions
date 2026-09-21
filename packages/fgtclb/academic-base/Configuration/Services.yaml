@@ -8,6 +8,9 @@ services:
     resource: '../Classes/*'
     exclude:
       - '../Classes/Domain/Model/*'
+      # Implements an interface of EXT:reports, so the class cannot be loaded
+      # without that extension. Services.php registers it when it is there.
+      - '../Classes/Report/*'
 
   # @internal not part of public API
   academic-base.serializer:

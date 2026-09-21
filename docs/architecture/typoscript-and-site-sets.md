@@ -233,6 +233,16 @@ Two things follow for the code:
 - Tell integrators, in the extension's own `Documentation/Configuration/`
   chapter, to use one mechanism per site.
 
+There is no guard, but there is a **report**. The configuration group of
+`academic:upgrade:check` names every site that depends on a set of an academic
+extension while a `sys_template` record on its root page includes a static
+template of the same extension — see
+[Upgrade checks](upgrade-checks.md#the-configuration-group). It is a warning
+rather than an error, because the combination is sometimes deliberate: a site
+whose set contribution a `clear` flag wiped recovers exactly by selecting the
+static template. Only the site's **declared** set dependencies and the records
+on its **root page** are compared, which is the case this section is about.
+
 ## The `clear = 3` trap
 
 `IncludeTreeAstBuilderVisitor::visitBeforeChildren()` resets the whole AST when

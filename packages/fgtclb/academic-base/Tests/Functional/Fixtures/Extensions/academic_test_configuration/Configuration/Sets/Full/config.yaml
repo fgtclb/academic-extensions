@@ -1,0 +1,3 @@
+name: fgtclb/academic-test-configuration
+label: Academic Test Configuration
+typoscript: 'EXT:academic_test_configuration/Configuration/TypoScript/Live/'
