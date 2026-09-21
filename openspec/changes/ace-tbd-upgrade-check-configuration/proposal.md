@@ -25,7 +25,7 @@ each fails silently or only at runtime. Six projects found these by hand.
 - The findings are shown in the backend status report when EXT:reports is
   active.
 - The same check becomes the second check group of the `academic:upgrade:check`
-  command proposed by `ace-tbd-upgrade-check-template-overrides`, with a
+  command proposed by `ace-712-upgrade-check-template-overrides`, with a
   non-zero exit status on warnings and errors.
 - Nothing is rewritten: no record, file or site configuration is changed.
 
@@ -59,7 +59,7 @@ None.
   and files belong to the project, and an automatic rewrite is guesswork.
 - Detecting the replacement of a `final` class through dependency injection.
 - Template override checks; they belong to
-  `ace-tbd-upgrade-check-template-overrides`.
+  `ace-712-upgrade-check-template-overrides`.
 - A backport to branch `2`: the check targets the upgrade to 3.0.
 
 ## Source

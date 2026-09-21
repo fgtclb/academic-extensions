@@ -107,7 +107,7 @@ A chapter that depends on a change not released when the guide is written
 `ace-tbd-program-facts-field-list`,
 `ace-tbd-program-page-content-without-getcontent`,
 `ace-tbd-page-templates-sections-subtitle`,
-`ace-tbd-upgrade-check-template-overrides`,
+`ace-712-upgrade-check-template-overrides`,
 `ace-tbd-upgrade-check-configuration`) carries a note naming it as not yet
 available.
 

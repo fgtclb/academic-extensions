@@ -22,6 +22,7 @@ use TYPO3\CMS\Core\Imaging\IconSize;
 final class CurrentColorSvgIconProviderTest extends AbstractAcademicBaseTestCase
 {
     protected array $testExtensionsToLoad = [
+        'fgtclb/environment-state-manager',
         'fgtclb/academic-base',
         'tests/current-color-icons',
     ];

@@ -22,7 +22,10 @@ three projects alone.
   TypoScript of that site: it builds a frontend context for the site's root
   page through `fgtclb/environment-state-manager` and reads the extension's
   plugin view root paths (`templateRootPaths`, `partialRootPaths`,
-  `layoutRootPaths`). `--site` and explicit override folders can be combined.
+  `layoutRootPaths`). A root path inside the extension itself, inside an
+  extension it depends on or inside a TYPO3 system extension is not a project
+  override and is skipped. `--site` and explicit override folders can be
+  combined.
 - The exit status is non-zero when a problem is reported, so the command can
   run in CI. A notice alone does not fail.
 - The command only reads; it changes no file.
@@ -46,7 +49,10 @@ None.
 - academic_base requires `fgtclb/environment-state-manager` in its
   `composer.json` and `ext_emconf.php`, with the constraint the other academic
   extensions already use; eleven of the twelve require it today, so no
-  installation gains a new package.
+  installation gains a new package. That reverses the unreleased
+  `3.0/Breaking-RemovedEnvironmentStateManagerDependency.rst`, which is
+  therefore deleted, and adds the package to the `$testExtensionsToLoad` of the
+  functional test classes that load academic_base.
 - No database, TCA or TypoScript change.
 
 ## Non-goals

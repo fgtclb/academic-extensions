@@ -26,10 +26,10 @@ on TYPO3 v13 and v14.
 ### Requirement: A site's TypoScript can name the override folders
 With the option `--site` and a site identifier, the command SHALL take the
 override folders from the template, partial and layout root paths that the
-site's TypoScript configures for the extension's plugins, excluding the
-extension's own folders, and SHALL compare each with the upstream folder of
-the same kind. The option SHALL be combinable with explicit override folders.
-This applies on TYPO3 v13 and v14.
+site's TypoScript configures for the extension's plugins, excluding every
+folder the extensions ship themselves, and SHALL compare each with the
+upstream folder of the same kind. The option SHALL be combinable with explicit
+override folders. This applies on TYPO3 v13 and v14.
 
 #### Scenario: Site with a project partial root path
 - **WHEN** a site's TypoScript adds a project partial root path for the
@@ -39,10 +39,21 @@ This applies on TYPO3 v13 and v14.
   `EXT:academic_persons/Resources/Private/Partials/`
 - **AND** the extension's own folders produce no finding
 
+#### Scenario: A root path of another extension
+- **WHEN** a site's TypoScript names the partial folder of another academic
+  extension or of a TYPO3 system extension in the same root path list
+- **THEN** no finding is reported for it
+
 #### Scenario: Unknown site
 - **WHEN** the integrator names a site identifier that does not exist
 - **THEN** the command names the invalid input and exits with an error status
   without reporting findings
+
+#### Scenario: Site that does not configure the extension
+- **WHEN** the site's TypoScript configures no view root path for the
+  extension's plugins at all
+- **THEN** the command names the invalid input and exits with an error status
+  rather than reporting that nothing is wrong
 
 ### Requirement: An override without upstream counterpart is a problem
 The command SHALL report `missing-upstream` for an override file that has no

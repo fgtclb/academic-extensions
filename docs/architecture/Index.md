@@ -49,6 +49,12 @@ describing an intention as if it were the state.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
+- A dead template override is invisible: Fluid resolves the first file it finds
+  and says nothing when it finds none of the project's. `academic:upgrade:check`
+  reports them, and a root path is a *project* override only when it lies
+  outside the checked extension, outside what it depends on and outside the
+  system extensions — the partial root paths of every academic plugin name
+  another extension's folder.
 - The profile editor is five custom elements over Fluid's markup, and **none of
   them renders any**: the two whose content comes out of a response clone
   `<template>` prototypes Fluid emitted. They are plain custom elements with
@@ -75,6 +81,7 @@ describing an intention as if it were the state.
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
 | [Backend select items](backend-select-items.md)                 | What an `itemsProcFunc` handler is handed on each core version, the page TSconfig path of a FlexForm field, and the narrowing that silently drops a relation.                              |
 | [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, and the `record` view variable TYPO3 v14 needs for the header.                                                                |
+| [Upgrade checks](upgrade-checks.md)                             | The `academic:upgrade:check` command: what it compares, where it takes the override folders from, and which root paths are a project's.                                                    |
 
 ## See also
 
