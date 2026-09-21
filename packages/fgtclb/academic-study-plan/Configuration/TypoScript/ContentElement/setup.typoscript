@@ -31,6 +31,9 @@ tt_content {
                 css = {$plugin.tx_academicstudyplan.assets.css}
                 js = {$plugin.tx_academicstudyplan.assets.js}
             }
+            filter {
+                collapsible = {$plugin.tx_academicstudyplan.filter.collapsible}
+            }
         }
     }
 }

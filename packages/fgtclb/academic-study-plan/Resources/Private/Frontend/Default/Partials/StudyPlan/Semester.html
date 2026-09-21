@@ -1,0 +1,47 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:comment>
+    One semester column of the study plan.
+
+    Arguments:
+
+    - semester: the semester record, with its `modules`.
+
+    The header is the accordion control on a narrow viewport and inert on a wide
+    one, which is why it is rendered `aria-hidden` and `inert`: the script removes
+    both as soon as it turns the column into an accordion.
+</f:comment>
+
+<li class="col" data-study-plan-semester>
+    <div class="header" aria-hidden="true" inert data-study-plan-semester-header>
+        <div class="wrapper">
+            <div>
+                <h3 class="h6"><b>{semester.label}</b></h3>
+
+                <f:if condition="{semester.credit_points}">
+                    <span class="credits small">
+                        {semester.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+                    </span>
+                </f:if>
+            </div>
+
+            <core:icon identifier="academic-study-plan-plus" alternativeMarkupIdentifier="inline"/>
+            <core:icon identifier="academic-study-plan-minus" alternativeMarkupIdentifier="inline"/>
+        </div>
+
+        <f:if condition="{semester.note}">
+            <span class="note small text-muted">{semester.note}</span>
+        </f:if>
+    </div>
+
+    <ul>
+        <f:for each="{semester.modules}" as="module">
+            <f:render partial="StudyPlan/Module" arguments="{module: module, semester: semester}" />
+        </f:for>
+    </ul>
+</li>
+
+</html>

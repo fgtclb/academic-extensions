@@ -195,8 +195,72 @@ the element loses *both* assets. Say so in the changelog entry rather than
 guarding it in the template.
 
 `academic_study_plan` is the worked example:
-`Tests/Functional/ContentElement/AcademicStudyPlanAssetSwitchTest.php` covers
-both delivery mechanisms and both switches.
+`Tests/Functional/ContentElement/AcademicStudyPlanSiteSettingsTest.php` covers
+both delivery mechanisms and every switch.
+
+## A module finds its parts by attribute, never by class
+
+A frontend module that queries `.filter`, `.module` or `.modal-trigger` has made
+the stylesheet's vocabulary its API. Every markup change an installation needs
+then breaks it, so the installation forks the module — and a fork stops
+following the original on the day it is taken. Three of six analysed projects
+had forked `academic_study_plan` for exactly that.
+
+The contract is a `data-<extension>-*` attribute per part the module drives,
+documented in the extension's own manual with the element each one belongs on,
+and a partial per part so that an override replaces one of them rather than all
+of them. Class names stay what a stylesheet selects.
+
+What that costs, and what it buys:
+
+- **Classes a module *writes* are not part of it.** `highlighted` and `open` are
+  state the stylesheet reacts to; they are documented as written, not as looked
+  up.
+- **A rename is a deprecation.** Markup written for the previous version has to
+  keep working, so each lookup falls back to the old class selector **per part**
+  — a mixed override is the normal case during a migration. The fallback logs
+  nothing: a console message reaches visitors, not integrators. It is announced
+  in a `Deprecation-*.rst` with the removal version named.
+- **The module exports its initialiser.** The `DOMContentLoaded` start stays,
+  but a `testJs` fixture cannot be driven without a way to start the module on
+  it, and node hands every test in a file the same module instance.
+- **Two fixtures, not one.** One that carries only the attributes and none of
+  the old classes, one that carries only the old classes. Removing the fallback
+  has to turn the second red and removing the attribute lookup the first, or
+  neither is proving anything.
+- **The functional test asserts the same inventory.** The jsdom fixture is a
+  copy of the rendered markup and a copy drifts; the counterpart that renders
+  the real page and asserts every attribute is what keeps it honest. It is the
+  rule [JavaScript tests](../testing/javascript-tests.md#where-a-fixture-comes-from)
+  states for every fixture.
+
+An override may put a trigger attribute on a bigger element than the extension
+does — the module element itself rather than a button inside it. Resolve such a
+pair *within* the part it belongs to rather than across the container, or the
+first dialog of the page answers for every module. Two consequences of a
+bigger trigger, both learned in review: a key pressed on a control *inside* it
+belongs to that control, so an activation handler checks `event.target` before
+it calls `preventDefault()`; and the module does not make that element
+focusable, so the manual has to say that the override supplies `tabindex` and
+`role` itself.
+
+Two more, neither of them specific to the study plan:
+
+- **`hidden` does not hide anything the stylesheet gives a `display` to.** The
+  rule that makes the attribute work is the *user agent's*, and any author rule
+  beats it. A module that collapses a part by setting `hidden` needs
+  `.part[hidden] { display: none }` in the extension's own stylesheet, next to
+  the rule it undoes — and neither jsdom nor either PHP suite computes style, so
+  nothing but reading catches its absence. `bk2k/bootstrap-package` carries
+  `[hidden] { display: none !important }`, which is why the dev instances hide
+  it and a plain site does not.
+- **A record's text substituted into markup is an injection.** Cloning a
+  rendered prototype and `.replace()`-ing placeholders into its `outerHTML` was
+  how the study plan built its filter, and a category title is written by an
+  editor: `innerHTML` then parses the title. Substitute into the *clone's*
+  attribute values and text nodes instead — neither can become markup — and
+  treat a value that lands in a `style` attribute as a separate problem, because
+  a `;` there opens a declaration of its own.
 
 ## Libraries come from the core
 

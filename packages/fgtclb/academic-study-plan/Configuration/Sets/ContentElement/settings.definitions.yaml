@@ -31,3 +31,9 @@ settings:
     category: academic.studyPlan
     type: bool
     default: true
+  plugin.tx_academicstudyplan.filter.collapsible:
+    label: 'Collapse the category filter behind a toggle button'
+    description: 'On for a site whose filter would otherwise take up the first screen. The script renders the toggle; without the script the filter stays expanded.'
+    category: academic.studyPlan
+    type: bool
+    default: false

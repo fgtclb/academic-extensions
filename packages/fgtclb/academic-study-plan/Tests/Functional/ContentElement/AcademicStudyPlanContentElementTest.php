@@ -136,6 +136,38 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         return preg_split('#\\s+#', trim($node->getAttribute('class')), -1, PREG_SPLIT_NO_EMPTY) ?: [];
     }
 
+    /**
+     * @return string[] The class attribute of every element below the study plan, in
+     *         document order, without the ones `core:icon` writes - those are the core's
+     *         markup and differ between TYPO3 versions.
+     */
+    private function classInventoryOf(string $html): array
+    {
+        $nodes = $this->parseHtml($html)->query('//div[contains(@class, "academic-study-plan")]//*[@class]');
+        $this->assertInstanceOf(\DOMNodeList::class, $nodes);
+
+        $classes = [];
+        foreach ($nodes as $node) {
+            $this->assertInstanceOf(\DOMElement::class, $node);
+            $class = $node->getAttribute('class');
+            if (!str_contains($class, 'icon')) {
+                $classes[] = $class;
+            }
+        }
+
+        return $classes;
+    }
+
+    private function visibleTextOf(string $html): string
+    {
+        $nodes = $this->parseHtml($html)->query('//div[contains(@class, "academic-study-plan")]');
+        $this->assertInstanceOf(\DOMNodeList::class, $nodes);
+        $node = $nodes->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $node);
+
+        return preg_replace('#\\s+#', ' ', trim($node->textContent)) ?? '';
+    }
+
     #[Test]
     public function contentElementRendersItsSemesters(): void
     {
@@ -321,6 +353,115 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertStringContainsString('category-label-placeholder', $html);
     }
 
+    /**
+     * The contract between the templates and the script: every part the script drives
+     * is found by its own `data-study-plan-*` attribute, on the element the manual
+     * names. An override that keeps them keeps the interaction, whatever it does to the
+     * classes - so a template that drops one of them is a defect this test is here to
+     * report.
+     */
+    #[Test]
+    public function contentElementCarriesTheDataAttributeContract(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $html = $this->renderHomePage();
+
+        // One container, and it is the element the classes name as well.
+        $this->assertSame(
+            1,
+            $this->nodeCountOf($html, '//div[@data-study-plan="1"][contains(@class, "academic-study-plan")]'),
+        );
+        // One filter list, holding the one item the script clones.
+        $this->assertSame(1, $this->nodeCountOf($html, '//div[@data-study-plan]//ul[@data-study-plan-filter]'));
+        $this->assertSame(
+            1,
+            $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li[@data-study-plan-filter-template]'),
+        );
+        // Two semesters, each with its header.
+        $this->assertSame(2, $this->nodeCountOf($html, '//li[@data-study-plan-semester]'));
+        $this->assertSame(
+            2,
+            $this->nodeCountOf($html, '//li[@data-study-plan-semester]/div[@data-study-plan-semester-header]'),
+        );
+        // Three modules, of which the two with content carry a trigger and a dialog.
+        $this->assertSame(3, $this->nodeCountOf($html, '//li[@data-study-plan-module]'));
+        $this->assertSame(
+            2,
+            $this->nodeCountOf($html, '//li[@data-study-plan-module]/button[@data-study-plan-dialog-trigger]'),
+        );
+        $this->assertSame(
+            2,
+            $this->nodeCountOf($html, '//li[@data-study-plan-module]/dialog[@data-study-plan-dialog]'),
+        );
+    }
+
+    /**
+     * The split into partials and the attributes added with it are the whole change:
+     * what a visitor reads and what a stylesheet selects are the same as before. Both
+     * halves are pinned against the output of the unsplit template, recorded from this
+     * very fixture, so a partial that loses an element or a class fails here rather than
+     * in an installation.
+     */
+    #[Test]
+    public function contentElementRendersTheSameTextAndClassesAsTheUnsplitTemplate(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $html = $this->renderHomePage();
+
+        $this->assertSame(
+            'category-label-placeholder First Semester 30 CP Foundation courses Mathematics I 10 CP '
+            . 'Mandatory attendance First Semester, Foundation courses, 30 CP. Show module details: '
+            . 'Mathematics I Mathematics I 10 CP Mandatory attendance Linear algebra and analysis. '
+            . 'Programming Basics 5 CP Second Semester 30 CP Statistics 8 CP Second Semester, , 30 CP. '
+            . 'Show module details: Statistics Statistics 8 CP Descriptive and inductive. '
+            . 'All modules are subject to change.',
+            $this->visibleTextOf($html),
+        );
+        $this->assertSame(
+            [
+                'filter',
+                'semesters row',
+                'col',
+                'header',
+                'wrapper',
+                'h6',
+                'credits small',
+                'note small text-muted',
+                'module clickable',
+                'h6',
+                'credits small',
+                'note small text-muted',
+                'modal-trigger',
+                'visually-hidden',
+                'wrapper',
+                'h6',
+                'credits small',
+                'note small text-muted',
+                // The module without content: the trailing space is what the condition
+                // that adds `clickable` leaves behind, and it was there before as well.
+                'module ',
+                'h6',
+                'credits small',
+                'col',
+                'header',
+                'wrapper',
+                'h6',
+                'credits small',
+                'module clickable',
+                'h6',
+                'credits small',
+                'modal-trigger',
+                'visually-hidden',
+                'wrapper',
+                'h6',
+                'credits small',
+            ],
+            $this->classInventoryOf($html),
+        );
+    }
+
     #[Test]
     public function contentElementRendersDialogForModuleWithDescription(): void
     {
@@ -328,7 +469,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $content = $this->renderHomePage();
         // A module with a description is clickable and gets its own dialog.
-        $this->assertStringContainsString('<dialog id="popup-1">', $content);
+        $this->assertStringContainsString('<dialog id="popup-1" data-study-plan-dialog>', $content);
         $this->assertStringContainsString('Linear algebra and analysis.', $content);
         $this->assertStringContainsString('class="module clickable"', $content);
     }
@@ -374,7 +515,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $content = $this->renderHomePage();
         // Module 2 has neither description nor audio file, so it stays inert.
-        $this->assertStringNotContainsString('<dialog id="popup-2">', $content);
+        $this->assertStringNotContainsString('id="popup-2"', $content);
     }
 
     #[Test]

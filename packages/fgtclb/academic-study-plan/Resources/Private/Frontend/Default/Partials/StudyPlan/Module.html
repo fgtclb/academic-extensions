@@ -1,0 +1,52 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:comment>
+    One module of a semester.
+
+    Arguments:
+
+    - module: the module record.
+    - semester: the semester it belongs to, for the label the dialog trigger
+      announces to a screen reader.
+
+    A module with neither a description nor an audio file has nothing to show, so
+    it carries no trigger and no dialog. An override may move
+    `data-study-plan-dialog-trigger` onto this element itself; the script pairs the
+    trigger with the dialog of the same module either way.
+</f:comment>
+
+<f:variable
+    name="hasContent"
+    value="{f:if(condition: '{module.description} || {module.audioFiles}', then: '1', else: '0')}"
+/>
+
+<li class="module {f:if(condition: hasContent, then: 'clickable')}" data-study-plan-module data-categories="{f:format.json(value: module.categories) -> f:format.htmlspecialchars()}">
+    <h4 class="h6">{module.label}</h4>
+
+    <f:if condition="{module.credit_points}">
+        <span class="credits small">
+            {module.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+        </span>
+    </f:if>
+
+    <f:if condition="{module.note}">
+        <span class="note small text-muted">{module.note}</span>
+    </f:if>
+
+    <f:if condition="{hasContent}">
+        <button class="modal-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
+            <span class="visually-hidden">
+                {semester.label}, {semester.note}, {semester.credit_points}
+                {f:translate(key: 'credits', extensionName: 'academic_study_plan')}.
+                {f:translate(key: 'modal.open', extensionName: 'academic_study_plan')}: {module.label}
+            </span>
+        </button>
+
+        <f:render partial="StudyPlan/ModuleDialog" arguments="{module: module}" />
+    </f:if>
+</li>
+
+</html>

@@ -1,0 +1,36 @@
+<html
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:comment>
+    The category filter of the study plan.
+
+    Arguments:
+
+    - collapsible: renders the marker that makes the script put the list behind a
+      toggle button. Off unless the site switches it on.
+
+    The list holds exactly one item and that item is a template rather than a
+    control: the script empties the list and clones the item once per category the
+    rendered modules carry. It is `hidden` so that its placeholder text never
+    reaches the screen on a page whose script did not run, and the script takes the
+    attribute off every clone it builds.
+</f:comment>
+
+<nav role="navigation" aria-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}">
+    <ul class="filter" data-study-plan-filter{f:if(condition: '{collapsible}', then: ' data-study-plan-filter-collapsible')}>
+        <li hidden data-study-plan-filter-template>
+            <button
+                data-category-id="category-id-placeholder"
+                data-category-color="category-color-placeholder"
+                aria-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}: category-label-placeholder"
+                style="--category-color: category-color-placeholder;"
+            >
+                category-label-placeholder
+            </button>
+        </li>
+    </ul>
+</nav>
+
+</html>

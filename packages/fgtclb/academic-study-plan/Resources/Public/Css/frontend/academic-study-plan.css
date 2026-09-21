@@ -5,6 +5,22 @@
     display: none;
   }
 }
+.academic-study-plan .filter[hidden] {
+  display: none;
+}
+.academic-study-plan .filter-toggle {
+  background: #fff;
+  border: 1px solid black;
+  padding: 0.45rem 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.academic-study-plan .filter-toggle[aria-expanded=true] {
+  margin-bottom: 0.6rem;
+}
 .academic-study-plan .filter {
   display: flex;
   justify-content: flex-start;

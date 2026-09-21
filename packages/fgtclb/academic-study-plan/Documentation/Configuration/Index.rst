@@ -203,6 +203,62 @@ With the static template, they are TypoScript constants of the same names,
     labelled navigation landmark with nothing in it until a script fills it.
     It is part of the markup contract, so it is yours to fill or to hide.
 
+    :ref:`Templates <templates>` documents every part the shipped script
+    drives, which is the list a script of your own has to address.
+
+..  _collapsible-filter:
+
+Collapse the category filter
+============================
+
+The category filter is a row of buttons, one per category the modules of the
+plan carry. On a plan with many categories it takes up the first screen before
+a visitor has seen a single semester.
+
+Switched on, the filter renders collapsed behind a toggle button that states
+whether it is expanded and works by keyboard:
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Setting
+        -   Default
+        -   On means
+    *   -   :yaml:`plugin.tx_academicstudyplan.filter.collapsible`
+        -   :yaml:`false`
+        -   The filter is hidden until the visitor expands it.
+
+..  code-block:: yaml
+    :caption: config/sites/my-site/settings.yaml
+
+    plugin.tx_academicstudyplan.filter.collapsible: true
+
+..  code-block:: typoscript
+    :caption: Constants of the root sys_template record
+
+    plugin.tx_academicstudyplan.filter.collapsible = 1
+
+The toggle is built by the script rather than rendered by the template, for the
+same reason the filter buttons are: a plan whose modules carry no category at
+all ends up with an empty filter, and a control that expands nothing would be
+worse than none. Two consequences follow:
+
+*   Switching :typoscript:`plugin.tx_academicstudyplan.assets.js` off and
+    bringing your own script means bringing the toggle as well. The template
+    renders :html:`data-study-plan-filter-collapsible` on the filter list and
+    nothing else.
+*   The label of the toggle is the one the container carries as
+    :html:`data-filter-label`, which is the translation of
+    :html:`filter.label`. An override that drops that attribute gets no toggle
+    at all rather than an unnamed button, and the filter stays expanded.
+*   The collapsed state is the :html:`hidden` attribute, and the shipped
+    stylesheet is what gives it an effect
+    (:css:`.filter[hidden] { display: none }`) - the browser's own rule for it
+    loses to any author rule that gives the list a :css:`display`. An
+    installation that switches
+    :typoscript:`plugin.tx_academicstudyplan.assets.css` off needs that rule in
+    its own stylesheet.
+
 ..  _one-mechanism-per-site:
 
 Do not combine both
@@ -213,8 +269,9 @@ files twice. The site set is applied before the :sql:`sys_template` record, so
 the second read happens after the site settings and after
 :file:`config/sites/<site>/constants.typoscript` — and it resets every constant
 the extension ships a default for back to that default. For this extension those
-are the three Fluid root paths of the content element and the two switches of
-:ref:`Skip the stylesheet or the script <asset-switches>`.
+are the three Fluid root paths of the content element, the two switches of
+:ref:`Skip the stylesheet or the script <asset-switches>` and the switch of
+:ref:`Collapse the category filter <collapsible-filter>`.
 
 Nothing else is damaged: the :guilabel:`Constants` and :guilabel:`Setup` fields
 of the :sql:`sys_template` record, the page TSconfig of a page and the page
