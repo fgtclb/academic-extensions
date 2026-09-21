@@ -53,18 +53,20 @@
 
 ## 3. File the issue
 
-- [ ] 3.1 Verify ACE-109 and ACE-161 in YouTrack, file the ACE issue as a
-      sub-issue of ACE-109 and link ACE-161 to it as the duplicate, rename
-      the change to `ace-<NNN>-settings-loader-deep-merge`, and commit as
-      `[!!!][TASK] ACE-<NNN>: Merge settings files recursively` in TYPO3 Core
-      format.
+- [x] 3.1 Verify ACE-109, ACE-161 and ACE-536 in YouTrack, file the ACE issue
+      as a sub-task of ACE-109 and link ACE-161 and ACE-536 to it as related
+      issues - ACE-161 is the duplicate of ACE-109, not of this change -,
+      rename the change to `ace-711-settings-loader-deep-merge`, and commit as
+      `[!!!][FEATURE] ACE-711: Deep merge settings files` in TYPO3 Core format;
+      the tag is the one the change type asks for, and the subject keeps to 52
+      characters.
 
 ## 4. Definition of done
 
-- [ ] 4.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 4.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
       `functional` for TYPO3 v13; the same after its own `composerUpdate` for
       TYPO3 v14.
-- [ ] 4.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 4.3 `docs/` and the academic_persons `Documentation/` changelog updated
+- [x] 4.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 4.3 `docs/` and the academic_persons `Documentation/` changelog updated
       in the same change; `README.md` and `CONTRIBUTING.md` still only link.
-- [ ] 4.4 Archive the change as the last commit of the pull request.
+- [x] 4.4 Archive the change as the last commit of the pull request.
