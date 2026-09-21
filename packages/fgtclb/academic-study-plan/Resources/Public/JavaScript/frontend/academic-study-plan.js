@@ -17,6 +17,21 @@
       return [];
     }
   };
+  var colourOf = (value) => /^(#[0-9a-fA-F]{3,8}|[a-zA-Z]{1,32}|rgba?\([0-9.,%\s]+\))$/.test(value) ? value : "";
+  var substitutePlaceholders = (node, apply) => {
+    if (node instanceof Element) {
+      Array.from(node.attributes).forEach((attribute) => {
+        const replaced = apply(attribute.value);
+        if (replaced !== attribute.value) {
+          node.setAttribute(attribute.name, replaced);
+        }
+      });
+    }
+    if (node.nodeType === Node.TEXT_NODE && node.nodeValue !== null) {
+      node.nodeValue = apply(node.nodeValue);
+    }
+    Array.from(node.childNodes).forEach((child) => substitutePlaceholders(child, apply));
+  };
   var hexToRgba = (hex, alpha) => {
     if (hex === "" || hex.length < 7) {
       return `rgba(0, 0, 0, ${alpha})`;
@@ -46,12 +61,12 @@
      * markup therefore stays in the template rather than in here.
      */
     buildCategoryFilter() {
-      var _a;
       const filterList = this.container.querySelector(".filter");
-      const filterTemplate = (_a = this.container.querySelector(".filter li")) == null ? void 0 : _a.outerHTML;
-      if (filterList === null || filterTemplate === void 0) {
+      const filterItem = this.container.querySelector(".filter li");
+      if (filterList === null || filterItem === null) {
         return;
       }
+      const filterTemplate = filterItem.cloneNode(true);
       filterList.innerHTML = "";
       const categories = /* @__PURE__ */ new Map();
       this.container.querySelectorAll(".module[data-categories]").forEach((module) => {
@@ -63,12 +78,12 @@
         });
       });
       categories.forEach((category) => {
-        const markup = filterTemplate.replace(/category-id-placeholder/g, `${category.uid}`).replace(/category-color-placeholder/g, `${category.colour}`).replace(/category-label-placeholder/g, `${category.label}`);
-        const holder = document.createElement("li");
-        holder.innerHTML = markup;
-        if (holder.firstElementChild !== null) {
-          filterList.appendChild(holder.firstElementChild);
+        const item = filterTemplate.cloneNode(true);
+        if (!(item instanceof HTMLElement)) {
+          return;
         }
+        substitutePlaceholders(item, (value) => value.replace(/category-id-placeholder/g, String(category.uid)).replace(/category-color-placeholder/g, colourOf(String(category.colour))).replace(/category-label-placeholder/g, String(category.label)));
+        filterList.appendChild(item);
       });
     }
     initCategoryFilter() {
