@@ -69,17 +69,20 @@
 
 ## 5. File the issue
 
-- [ ] 5.1 File the ACE issue in YouTrack, rename the change to
+- [x] 5.1 File the ACE issue in YouTrack, rename the change to
       `ace-<NNN>-upgrade-check-template-overrides`, and commit as
       `[FEATURE] ACE-<NNN>: Add the template override upgrade check` in TYPO3
-      Core format.
+      Core format. Filed as **ACE-712** (Story, 3.0.0, subtask of ACE-530,
+      relates to ACE-366 and ACE-541); the subject is
+      `[FEATURE] ACE-712: Report dead template overrides`, because the wording
+      above is 58 characters and the limit is 52 including the tag.
 
 ## 6. Definition of done
 
-- [ ] 6.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 6.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
       `functional` for TYPO3 v13; the same after its own `composerUpdate` for
       TYPO3 v14.
-- [ ] 6.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 6.3 `docs/` and the academic_base `Documentation/` changelog updated in
+- [x] 6.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 6.3 `docs/` and the academic_base `Documentation/` changelog updated in
       the same change.
-- [ ] 6.4 Archive the change as the last commit of the pull request.
+- [x] 6.4 Archive the change as the last commit of the pull request.
