@@ -38,3 +38,35 @@ We suggest that you use a sitepackage extension. Learn how to
             layoutRootPath = EXT:mysitepackage/Resources/Private/Extensions/myextension/Layouts/
         }
     }
+
+..  index:: Templates; Images
+
+The image of a project
+----------------------
+
+The project list item and the project page template render their image through
+the shared partial :file:`Academic/Image.html` of `EXT:academic_base`, whose
+arguments and presets are documented in the `Templates` chapter of that
+extension.
+
+Two consequences for an override:
+
+*   Overriding :file:`Project/Item.html` alone changes where the image sits,
+    not how it is rendered. To change the markup, the breakpoints or the
+    widths, place an :file:`Academic/Image.html` of your own in the partial
+    root path above.
+*   The partial root path of `EXT:academic_base` is registered below the
+    constant above, so the copy wins. A view of your own that renders
+    :file:`Project/Item.html` - a page object, for example - has to list that
+    path itself, or the rendering fails on a partial it cannot resolve. Pick a
+    key of your own rather than the one this extension uses, and list it under
+    `paths` too if your page object is a :typoscript:`PAGEVIEW`, which reads no
+    `partialRootPaths`:
+
+    ..  code-block:: typoscript
+
+        # TypoScript setup
+        page.10 {
+            partialRootPaths.-1700000001 = EXT:academic_base/Resources/Private/Partials/
+            paths.-1700000001 = EXT:academic_base/Resources/Private/
+        }

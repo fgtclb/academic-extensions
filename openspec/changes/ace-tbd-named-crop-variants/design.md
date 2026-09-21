@@ -52,7 +52,7 @@ versions (task 1.1) instead of being retyped.
 ### Decided: doktype 40 keeps only the free `default`
 
 Partner page media is the partner logo: the partner list and both partnership
-items render it, with the `logo` preset of `ace-tbd-image-partial-adoption`,
+items render it, with the `logo` preset of `ace-710-image-partial-adoption`,
 and ACE-572 asks for free-ratio logos. Doktype 40 therefore gets no crop
 variant configuration and keeps the core default. Adding `landscape` and
 `portrait` later is non-breaking, while removing them later would orphan crop

@@ -1,0 +1,8 @@
+# A project that overrides the shared image partial of academic_base through the partial
+# root path constant of this extension, the way it overrides any other partial.
+#
+# This plugin has a single partial root path and it is this constant, so the directory the
+# project names here holds nothing but the override. What keeps "Project/Item" resolvable
+# is Extbase: ActionController::addDefaultPathToPaths() prepends the partial directory of
+# the extension when the configured paths do not contain it, at the lowest precedence.
+plugin.tx_academicprojects.view.partialRootPath = EXT:academic_projects/Tests/Functional/Plugins/Fixtures/AcademicProjectsImage/Partials/

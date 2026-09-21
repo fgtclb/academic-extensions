@@ -128,6 +128,14 @@ partial like any other partial of the plugin: it places its own
 constant of that plugin. One override per plugin changes the markup, the
 presets and the breakpoints of every image that plugin renders.
 
+The extensions that ship a page template for their page type -
+`EXT:academic_partners`, `EXT:academic_programs` and `EXT:academic_projects` -
+register the same path in :typoscript:`page.10.partialRootPaths`, and
+`EXT:academic_jobs` does it for the partials it registers there. That array
+belongs to the site package, so the key is a negative one of its own per
+extension rather than `-1`: it sorts below every theme and project path, and
+replaces none of them.
+
 A project that replaces the partial root paths of such a plugin completely
 has to list the academic_base path itself:
 

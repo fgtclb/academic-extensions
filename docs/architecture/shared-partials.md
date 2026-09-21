@@ -41,24 +41,61 @@ turns red with the key `5`.
 
 ## Who registers the path
 
-| View                                                                  | Key  | Renders the partial from                                       |
-|-----------------------------------------------------------------------|------|----------------------------------------------------------------|
-| `plugin.tx_academicpersons` (`Configuration/TypoScript/Default/`)     | `-1` | `Profile/Item.html`, `Profile/PublicProfile/ProfileImage.html` |
-| `plugin.tx_academiccontacts4pages` (`Configuration/TypoScript/List/`) | `-1` | `Profile/Item.html` of `academic_persons`                      |
+| View                                                                  | Key           | Renders the partial from                                                            |
+|-----------------------------------------------------------------------|---------------|-------------------------------------------------------------------------------------|
+| `plugin.tx_academicpersons` (`Configuration/TypoScript/Default/`)     | `-1`          | `Profile/Item.html`, `Profile/PublicProfile/ProfileImage.html`                      |
+| `plugin.tx_academiccontacts4pages` (`Configuration/TypoScript/List/`) | `-1`          | `Profile/Item.html` of `academic_persons`                                           |
+| `plugin.tx_academicpartners`                                          | `-1`          | `Partner/Item.html`, `Partnerships/List/Item.html`, `Partnerships/Teaser/Item.html` |
+| `plugin.tx_academicprograms`                                          | `-1`          | `Program/Item.html`                                                                 |
+| `plugin.tx_academicprojects`                                          | `-1`          | `Project/Item.html`                                                                 |
+| `plugin.tx_academicjobs`                                              | `-1`          | `Job/Item.html`                                                                     |
+| `page.10` of `academic_partners` (doktype 40 only)                    | `-1758484801` | `Pages/AcademicPartner.html`, under `partialRootPaths` and under `paths`            |
+| `page.10` of `academic_programs` (doktype 20 only)                    | `-1758484802` | `Pages/AcademicProgram.html`, under `partialRootPaths` and under `paths`            |
+| `page.10` of `academic_projects` (doktype 30 only)                    | `-1758484803` | `Pages/AcademicProject.html`, under `partialRootPaths` and under `paths`            |
+| `page.10` of `academic_jobs` (every page)                             | `-1758484804` | `Job/Item.html`, which that extension registers in `page.10` as well                |
 
 `academic_persons_edit` registers the persons partials but renders none that
 shows an image, so it does not register the academic_base path. A later
 template of its own that renders `Academic/Image` adds the path with it.
+
+`academic_jobs` renders no page template of its own. It registers the path in
+`page.10` because it has been registering its own partials there all along, so
+a page object that renders `Job/Item` finds that partial — and would then fail
+on the `Academic/Image` it renders.
 
 The contacts plugin renders `Profile/Item` with its own settings, so its setup
 also maps `settings.image.placeholder.default` from the persons constant — the
 same way it maps `detailPid`.
 
 A view that renders the partial without the path fails with a Fluid
-`InvalidTemplateResourceException`. That applies to a project page object that
-renders `Profile/Item` itself, and to a project that replaces the root path
-array of a plugin; the Breaking entries of both extensions name the line to
-add.
+`InvalidTemplateResourceException`. That applies to a project that replaces the
+root path array of a plugin, and to a page object of a project that renders one
+of those partials itself; the Breaking entry of each of the six extensions names
+the line to add.
+
+## The `page.10` keys
+
+`page.10` is the page object of the site package, not of an extension, so the
+key an extension writes into its `partialRootPaths` is a key in someone else's
+array. `-1` is fine in a plugin view, where the extension owns every other key;
+in `page.10` it would replace a theme path that happens to use it. Each of the
+four extensions therefore uses a negative key of its own, unique across them —
+sorting below every theme and project path, and colliding with none of them.
+
+The three page objects are inside a `[page && traverse(page, "doktype") == NN]`
+condition, so two of them never apply to the same page anyway. The distinct keys
+are about the theme, and about a project that adds a path of its own.
+
+A page object comes in two shapes, and only one of them reads `partialRootPaths`.
+`PAGEVIEW` derives its partial and layout root paths from `paths` by appending
+`Partials/` and `Layouts/`, and reads no `partialRootPaths` at all — the class
+docblock of `PageViewContentObject` says so in as many words. The
+three page objects therefore register the academic_base path twice: as
+`EXT:academic_base/Resources/Private/Partials/` under `partialRootPaths` for a
+`FLUIDTEMPLATE` integration, and as `EXT:academic_base/Resources/Private/` under
+`paths` for a `PAGEVIEW` one, both with the same negative key. Registering only
+the first one left a `PAGEVIEW` page dying on `Academic/Image`, which is what
+`Academic*PageTemplateTest::*PageShowsItsMediaOnAPageViewPageObject()` pins.
 
 ## Placeholder
 
@@ -82,6 +119,28 @@ as the default of `plugin.tx_academicpersons.image.placeholder.default`.
   fields and the project override.
 - `academic-contact4pages/Tests/Functional/Plugins/AcademicContacts4PagesListPluginTest.php`
   covers the contacts card, which fails without the path.
+- `academic-{partners,programs,projects,jobs}/Tests/Functional/Plugins/Academic*ImageRenderingTest.php`
+  cover the list items of those four extensions, and
+  `academic-{partners,programs,projects}/Tests/Functional/Pages/Academic*PageTemplateTest.php`
+  the page templates, on a `FLUIDTEMPLATE` and on a `PAGEVIEW` page object. They
+  assert the number of sources and the width of the fallback image, which is what
+  separates one preset from another — every preset renders a `<picture>`, so "is
+  a picture" would pass for the wrong one. The page template fixtures also carry
+  a theme path at the key `0` and a project path at `1` and assert that the
+  extension replaced neither.
+- The shared assertions live in
+  `packages-dev/testing-helper/Classes/FunctionalTestCase/ResponsiveImageAssertionTrait.php`.
+
+`academic_projects` deserves a note. Its plugin view has a single partial root
+path, `0`, and it *is* the project constant, so a project that sets it names a
+directory holding nothing but its override. The other partials of the extension
+stay resolvable all the same: `ActionController::addDefaultPathToPaths()`
+prepends `EXT:academic_projects/Resources/Private/Partials/` when the configured
+paths do not list it, and prepending puts it at the lowest precedence, so the
+project still wins for every file it does carry.
+`AcademicProjectsImageRenderingTest::projectOverrideOfTheSharedImagePartialWins()`
+asserts both halves: the override renders, and the item partial of the extension
+is still found.
 
 ## See also
 
