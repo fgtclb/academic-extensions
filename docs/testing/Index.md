@@ -44,13 +44,14 @@ to `12`; `-p` accepts `8.1` through `8.5` and defaults to `8.2`.
 
 ## Pages
 
-| Page                                              | Contents                                                                                              |
-|---------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| [PHPUnit configuration](phpunit-configuration.md) | Where the configuration comes from, what deviates from the template, and the exact strictness policy. |
-| [Unit tests](unit-tests.md)                       | Running them, discovery, conventions, core version aware tests.                                       |
-| [Functional tests](functional-tests.md)           | Databases and why the default is not enough, loading extensions, real defects each DBMS caught.       |
-| [Fixture extensions](fixture-extensions.md)       | The test-only extensions and the mechanism that registers them.                                       |
-| [Testing helper](testing-helper.md)               | Every trait in `packages-dev/testing-helper/`, and the defect each one exists for.                    |
+| Page                                                | Contents                                                                                                |
+|-----------------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| [PHPUnit configuration](phpunit-configuration.md)   | Where the configuration comes from, what deviates from the template, and the exact strictness policy.   |
+| [Unit tests](unit-tests.md)                         | Running them, discovery, conventions, core version aware tests.                                         |
+| [Functional tests](functional-tests.md)             | Databases and why the default is not enough, loading extensions, real defects each DBMS caught.         |
+| [Fixture extensions](fixture-extensions.md)         | The test-only extensions and the mechanism that registers them.                                         |
+| [Testing helper](testing-helper.md)                 | Every trait in `packages-dev/testing-helper/`, and the defect each one exists for.                      |
+| [JavaScript tests](javascript-tests.md)             | The third suite: node's test runner with jsdom over the frontend TypeScript.                            |
 
 ## See also
 

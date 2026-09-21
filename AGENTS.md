@@ -258,15 +258,22 @@ The complete suite list is `buildJs`, `cgl`, `cglHeader`, `checkJsBuildClean`,
 (dispatch an arbitrary composer command), `composerUpdate`, `functional`,
 `lintMarkdown`, `lintPhp`, `lintTypescript`, `npm` (dispatch an arbitrary npm
 command),
-`openDocumentation`, `phpstan`, `phpstanGenerateBaseline`, `typecheckJs`,
-`unit`, `unitRandom`; plus `help` and `update`.
+`openDocumentation`, `phpstan`, `phpstanGenerateBaseline`, `testJs`,
+`typecheckJs`, `unit`, `unitRandom`; plus `help` and `update`.
 
-The seven node suites — `buildJs`, `checkJsBuildClean`, `cleanJs`,
-`lintMarkdown`, `lintTypescript`, `npm` and `typecheckJs` — are **core version
-independent**. They look at the sources and the committed artifacts, never at
-the installed core, so `-t` changes nothing for them and they need no
+The eight node suites — `buildJs`, `checkJsBuildClean`, `cleanJs`,
+`lintMarkdown`, `lintTypescript`, `npm`, `testJs` and `typecheckJs` — are **core
+version independent**. They look at the sources and the committed artifacts,
+never at the installed core, so `-t` changes nothing for them and they need no
 `composerUpdate`. Note that the frontend ones emit classic scripts here, not ES
 modules: see [Frontend assets](docs/development/frontend-assets.md).
+
+`testJs` is the third test suite: `node --test` with jsdom over
+`packages/*/*/Tests/JavaScript/`, executing the frontend TypeScript sources. It
+is the only suite that runs JavaScript, and the reason a shipped module must
+stay free of `enum`, `namespace`, parameter properties and decorators — node
+strips types, it does not transform them. See
+[JavaScript tests](docs/testing/javascript-tests.md).
 
 `lintMarkdown` checks `docs/`, the root Markdown files and every package's
 `README.md` and `CONTRIBUTING.md` — links that resolve, padded tables, no
