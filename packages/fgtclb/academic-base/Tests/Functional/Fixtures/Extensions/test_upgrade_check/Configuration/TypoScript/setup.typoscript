@@ -1,0 +1,37 @@
+# The view root paths of this fixture extension, in the shape the academic
+# extensions use: the extension's own folders, the shared partials of another
+# academic extension, the partials of a system extension, and one folder a
+# project adds. Only the last one is an override the upgrade check reports on.
+plugin.tx_testupgradecheck {
+  view {
+    templateRootPaths {
+      0 = EXT:test_upgrade_check/Resources/Private/Templates/
+      10 = EXT:test_upgrade_check_project/Resources/Private/Extensions/TestUpgradeCheck/Templates/
+    }
+    partialRootPaths {
+      # Shipped by academic_base, which this extension reaches only through
+      # test_upgrade_check_shared - the requirement closure has to be walked to
+      # its end, not one level deep.
+      -2 = EXT:academic_base/Resources/Private/Partials/
+      # Shipped by the package this extension requires directly - the shape
+      # "plugin.tx_academicpersons.view.partialRootPaths.-1" has.
+      -1 = EXT:test_upgrade_check_shared/Resources/Private/Partials/
+      0 = EXT:test_upgrade_check/Resources/Private/Partials/
+      # Shipped by a system extension - the shape
+      # "plugin.tx_academicpersonsedit.view.partialRootPaths.20" has.
+      20 = EXT:fluid_styled_content/Resources/Private/Partials/
+      30 = EXT:test_upgrade_check_project/Resources/Private/Extensions/TestUpgradeCheck/Partials/
+    }
+    layoutRootPaths {
+      0 = EXT:test_upgrade_check/Resources/Private/Layouts/
+      10 = EXT:test_upgrade_check_project/Resources/Private/Extensions/TestUpgradeCheck/Layouts/
+    }
+  }
+}
+
+# A second plugin, for the extension that ships no "Templates/" folder at all:
+# academic_base has nothing below "Resources/Private/" but "Partials/" and
+# "Language/". Every file of a project folder registered here is therefore a
+# dead override, and the check has to say so rather than fall over the missing
+# upstream folder.
+plugin.tx_academicbase.view.templateRootPaths.10 = EXT:test_upgrade_check_project/Resources/Private/Extensions/TestUpgradeCheck/Templates/

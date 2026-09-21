@@ -8,7 +8,7 @@
 - `academic_base` configures its services in `Configuration/Services.yaml`
   only; it has no `Services.php` yet.
 - The `academic:upgrade:check` command does not exist on main. It is proposed
-  by `ace-tbd-upgrade-check-template-overrides` (candidate `cross-cutting-08`),
+  by `ace-712-upgrade-check-template-overrides` (candidate `cross-cutting-08`),
   and this change adds a second check group to it.
 - On main every extension keeps page TSconfig under `Configuration/TSconfig/`,
   and the persons and study plan alias sets live in `Sets/Default/`. Every 2.x
@@ -87,7 +87,7 @@ The five checks read `sys_template`, `pages.TSconfig` and
 `pages.tsconfig_includes`, the set `config.yaml` files and the XCLASS
 registry, and none of them needs rendered TypoScript. The configuration group
 therefore builds no frontend context. The `--site` mode that
-`ace-tbd-upgrade-check-template-overrides` adds to the command, through
+`ace-712-upgrade-check-template-overrides` adds to the command, through
 `fgtclb/environment-state-manager`, stays available to this group: a future
 check that has to inspect the TypoScript of a site uses it rather than
 building a context of its own.
@@ -168,7 +168,7 @@ Academic extensions: upgrade configuration
   read.
 - [The command group depends on another change] → the status provider is
   useful on its own; the command task is ordered after
-  `ace-tbd-upgrade-check-template-overrides`.
+  `ace-712-upgrade-check-template-overrides`.
 
 ## Migration Plan
 

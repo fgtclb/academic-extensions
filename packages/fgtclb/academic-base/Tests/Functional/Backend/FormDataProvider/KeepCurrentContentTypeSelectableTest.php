@@ -36,6 +36,7 @@ final class KeepCurrentContentTypeSelectableTest extends AbstractAcademicBaseTes
     private const HIDDEN_OTHER_TYPE = 'testhidden_other';
 
     protected array $testExtensionsToLoad = [
+        'fgtclb/environment-state-manager',
         'fgtclb/academic-base',
         'tests/hidden-content-types',
     ];

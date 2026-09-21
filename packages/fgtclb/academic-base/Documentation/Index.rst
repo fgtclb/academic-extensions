@@ -59,6 +59,11 @@ extensions.
         The responsive image partial the academic extensions render their
         images through, and how a project overrides it.
 
+    ..  card:: :ref:`Upgrade check <upgrade-check>`
+
+        The console command that finds the project template overrides an
+        upgrade made dead.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -77,6 +82,7 @@ extensions.
     Installation/Index
     Configuration/Index
     Templates/Index
+    UpgradeCheck/Index
     KnownProblems/Index
     Changelog/Changelog-3
     Changelog/Changelog-2

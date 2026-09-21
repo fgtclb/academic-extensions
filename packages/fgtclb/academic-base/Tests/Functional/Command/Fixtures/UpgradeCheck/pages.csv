@@ -1,0 +1,4 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title","is_siteroot"
+,1,0,1,0,0,0,0,0,"/","Site Root",1
+,2,0,1,0,0,0,0,0,"/","Site Root Without TypoScript",1

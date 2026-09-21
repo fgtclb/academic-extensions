@@ -1,0 +1,19 @@
+{
+    "name": "tests/test-upgrade-check-shared",
+    "description": "A shared partial package the upgrade check fixture extension requires, two links from the checked one",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev",
+        "fgtclb/academic-base": "~3.0.0@dev"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "test_upgrade_check_shared",
+            "version": "3.0.0-dev",
+            "Package": {
+                "providesPackages": []
+            }
+        }
+    }
+}

@@ -42,7 +42,7 @@
 
 ## 3. Command check group
 
-- [ ] 3.1 Once `ace-tbd-upgrade-check-template-overrides` is merged, add the
+- [ ] 3.1 Once `ace-712-upgrade-check-template-overrides` is merged, add the
   configuration group to `academic:upgrade:check`; functional command test
   asserts a non-zero exit status for a warning and status zero for a notice
   only, shown to fail when the exit status ignores the findings.

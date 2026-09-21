@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0">
+  <file source-language="en" datatype="plaintext" original="messages">
+    <body>
+      <trans-unit id="headline">
+        <source>A file that is not a Fluid template</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
