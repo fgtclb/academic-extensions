@@ -76,6 +76,38 @@ final class ContactRepositoryFindByPidTest extends AbstractAcademicContacts4Page
     }
 
     /**
+     * Contacts that share a `sorting` value fall back to uid order. The page form does not
+     * produce such a tie - it renumbers a page's contacts on every save - but three things
+     * around it do. `DataHandler::getSortNumber()` numbers a new record within its *pid*, so
+     * every storage folder runs a sequence of its own and the first contact of each is given
+     * the same default interval; `copyRecord_raw()`, which copies the children of a copied
+     * record, carries the stored `sorting` value over where `copyRecord()` recalculates it;
+     * and an import writes whatever it carries. Contacts written before the sort columns of
+     * ACE-699 existed can share a value as well, from back when saving a contract or a
+     * contacts role renumbered `sorting` across pages.
+     *
+     * The fixture builds the tie directly, spreads it over two storage folders - the query
+     * lifts `respectStoragePage` - and writes the tied contacts in descending uid order, so
+     * the order they were written in contradicts the order asserted here. Contact 13 carries
+     * a lower `sorting` and stays first, which tells the tiebreaker apart from a plain uid
+     * ordering.
+     *
+     * Dropping the tiebreaker was measured against this fixture, on TYPO3 v13 and v14
+     * alike: SQLite, MySQL 8.0 and MariaDB 10.6 keep the test green - none of them promises
+     * an order, they simply return the tied rows in uid order, which SQLite cannot even
+     * avoid because uid is its rowid - while PostgreSQL 10 returns them in the order they
+     * were written and the result becomes `13, 12, 11, 10`. A green default run is therefore
+     * no evidence for this test; `-d postgres` is.
+     */
+    #[Test]
+    public function contactsSharingASortingValueFallBackToUidOrder(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/ContactRepositoryFindByPid/contactsWithEqualSorting.csv');
+
+        $this->assertSame([13, 10, 11, 12], $this->resultUids($this->subject()->findByPid(2)));
+    }
+
+    /**
      * Contact 3 lives in a second storage folder. It has to come back nonetheless, because
      * the query lifts `respectStoragePage` - the plugin never configures a storage pid and
      * an editor is free to file contact records wherever the page tree suits them.
