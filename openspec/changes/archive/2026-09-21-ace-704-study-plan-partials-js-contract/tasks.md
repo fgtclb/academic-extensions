@@ -75,20 +75,21 @@
 
 ## 5. File the issue
 
-- [ ] 5.1 After implementation, file the ACE issue in YouTrack and verify the
-  key.
-- [ ] 5.2 Rename the change to `ace-<NNN>-study-plan-partials-js-contract`.
-- [ ] 5.3 Commit as `[FEATURE] ACE-<NNN>: Split the study plan into partials`
-  in TYPO3 Core format.
+- [x] 5.1 After implementation, file the ACE issue in YouTrack and verify the
+  key: ACE-704, and ACE-705 for the injection review found, which needs a
+  backport to branch `2`.
+- [x] 5.2 Rename the change to `ace-704-study-plan-partials-js-contract`.
+- [x] 5.3 Commit as `[FEATURE] ACE-704: Split the study plan into partials`
+  in TYPO3 Core format, with `[BUGFIX] ACE-705` and `[TASK] ACE-704` beside it.
 
 ## 6. Definition of done
 
-- [ ] 6.1 After `composerUpdate` for TYPO3 v13: `lintPhp`, `cgl -n`,
+- [x] 6.1 After `composerUpdate` for TYPO3 v13: `lintPhp`, `cgl -n`,
   `phpstan`, `unit` and `functional` green.
-- [ ] 6.2 After `composerUpdate` for TYPO3 v14: `lintPhp`, `cgl -n`,
+- [x] 6.2 After `composerUpdate` for TYPO3 v14: `lintPhp`, `cgl -n`,
   `phpstan`, `unit` and `functional` green.
-- [ ] 6.3 `lintMarkdown -n`, `checkRstRenderingAll` and the node suites of
+- [x] 6.3 `lintMarkdown -n`, `checkRstRenderingAll` and the node suites of
   3.4 green.
-- [ ] 6.4 `docs/` and the `Documentation/` changelog entries are part of the
+- [x] 6.4 `docs/` and the `Documentation/` changelog entries are part of the
   change; `README.md` and `CONTRIBUTING.md` still only summarize.
-- [ ] 6.5 Archive the change as the last commit of the pull request.
+- [x] 6.5 Archive the change as the last commit of the pull request.
