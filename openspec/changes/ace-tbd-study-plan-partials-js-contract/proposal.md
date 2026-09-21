@@ -62,5 +62,5 @@ code for this today. No YouTrack issue is filed yet; the change is renamed to
 `ace-<NNN>-study-plan-partials-js-contract` when the issue is filed after
 implementation.
 
-Depends on `ace-tbd-study-plan-appearance-layout` and
+Depends on `ace-702-study-plan-appearance-layout` and
 `ace-tbd-study-plan-asset-switch`.

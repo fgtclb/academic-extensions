@@ -12,23 +12,24 @@ handful of things that are easy to get wrong and expensive to discover later.
 
 ## Read this before changing code
 
-| Topic                                                   | Page                                                                    |
-|---------------------------------------------------------|-------------------------------------------------------------------------|
-| Container based tooling, every suite and option         | [Development environment](docs/development/environment.md)              |
-| What lives where, extension keys, split repositories    | [Monorepo layout](docs/development/monorepo-layout.md)                  |
-| **Dual core setup — read this first**                   | [Dual core setup](docs/development/dual-core-setup.md)                  |
-| The gates and what they check                           | [Quality gates](docs/development/quality-gates.md)                      |
-| The TypeScript and SCSS build, and its committed output | [Frontend assets](docs/development/frontend-assets.md)                  |
-| Version differences, and the v15 blockers               | [Core version aware code](docs/architecture/core-version-aware-code.md) |
-| Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)       |
-| `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                       |
-| **Quoting value lists, binding parameters, ordering**   | [Database queries](docs/architecture/database-queries.md)               |
-| Items of a backend select, and the value they can drop  | [Backend select items](docs/architecture/backend-select-items.md)       |
-| Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                        |
-| The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                        |
-| Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                     |
-| Analysing a backport instead of cherry-picking it       | [Backporting](docs/workflow/backporting.md)                             |
-| Planning a change with OpenSpec before implementing it  | [OpenSpec](docs/workflow/openspec.md)                                   |
+| Topic                                                   | Page                                                                        |
+|---------------------------------------------------------|-----------------------------------------------------------------------------|
+| Container based tooling, every suite and option         | [Development environment](docs/development/environment.md)                  |
+| What lives where, extension keys, split repositories    | [Monorepo layout](docs/development/monorepo-layout.md)                      |
+| **Dual core setup — read this first**                   | [Dual core setup](docs/development/dual-core-setup.md)                      |
+| The gates and what they check                           | [Quality gates](docs/development/quality-gates.md)                          |
+| The TypeScript and SCSS build, and its committed output | [Frontend assets](docs/development/frontend-assets.md)                      |
+| Version differences, and the v15 blockers               | [Core version aware code](docs/architecture/core-version-aware-code.md)     |
+| Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)           |
+| `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                           |
+| **Quoting value lists, binding parameters, ordering**   | [Database queries](docs/architecture/database-queries.md)                   |
+| Items of a backend select, and the value they can drop  | [Backend select items](docs/architecture/backend-select-items.md)           |
+| The frame of a content element, and v14's `record`      | [Content element rendering](docs/architecture/content-element-rendering.md) |
+| Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                            |
+| The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                            |
+| Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                         |
+| Analysing a backport instead of cherry-picking it       | [Backporting](docs/workflow/backporting.md)                                 |
+| Planning a change with OpenSpec before implementing it  | [OpenSpec](docs/workflow/openspec.md)                                       |
 
 ## Local additions and overrides
 

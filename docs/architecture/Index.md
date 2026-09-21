@@ -29,6 +29,11 @@ describing an intention as if it were the state.
   `academic_base`, registered in each plugin view with the root path key `-1`
   — below every key of the extension and of the project, so a project
   override always wins.
+- A content element template renders the frame, the spacing, the `c{uid}`
+  anchor and the header **only** when it goes through the `Default` layout of
+  whichever package provides `lib.contentElement`. On TYPO3 v14 that header
+  partial needs a `record` view variable, which `lib.contentElement` supplies
+  itself and an Extbase plugin view does not.
 - A **brand** icon — an extension or plugin mark — stays with the core
   `SvgIconProvider` and keeps the colours of its file. A record, category or
   action icon is drawn in `currentColor` and registered with the
@@ -69,6 +74,7 @@ describing an intention as if it were the state.
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
 | [Backend select items](backend-select-items.md)                 | What an `itemsProcFunc` handler is handed on each core version, the page TSconfig path of a FlexForm field, and the narrowing that silently drops a relation.                              |
+| [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, and the `record` view variable TYPO3 v14 needs for the header.                                                                |
 
 ## See also
 

@@ -13,7 +13,7 @@ See `proposal.md` for the motivation. On main:
 - `partialRootPaths.100` already points at `Frontend/Default/Partials/`
   through a constant, so partials need no TypoScript change.
 
-This change builds on `ace-tbd-study-plan-appearance-layout` (the template
+This change builds on `ace-702-study-plan-appearance-layout` (the template
 renders a `Main` section in the Default layout) and on
 `ace-tbd-study-plan-asset-switch` (the settings definitions file exists).
 
