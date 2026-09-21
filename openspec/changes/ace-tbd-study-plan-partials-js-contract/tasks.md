@@ -1,51 +1,77 @@
 ## 1. Partials
 
-- [ ] 1.1 Split the template into `StudyPlan/Filter`, `StudyPlan/Semester`,
+- [x] 1.1 Split the template into `StudyPlan/Filter`, `StudyPlan/Semester`,
   `StudyPlan/Module` and `StudyPlan/ModuleDialog`, adding the data attributes;
   extend the functional content element test to assert each attribute, and
   show it fails on the unsplit template.
-- [ ] 1.2 Assert in the same test that the visible text and classes of the
+- [x] 1.2 Assert in the same test that the visible text and classes of the
   default fixture are unchanged, by comparing against the output recorded
   before the split.
 
 ## 2. Module
 
-- [ ] 2.1 Switch every lookup of `academic-study-plan.ts` to the data
+- [x] 2.1 Switch every lookup of `academic-study-plan.ts` to the data
   attribute with a per-part class fallback, and export the initialiser.
-- [ ] 2.2 Add `Tests/JavaScript/academic-study-plan.test.ts` (jsdom): a
-  fixture with data attributes only builds the filter, highlights and opens a
-  dialog; a fixture with the 3.0 classes only does the same. Remove the
-  fallback and watch the legacy case fail, remove the attribute lookup and
-  watch the data case fail, restore both.
-- [ ] 2.3 Cover keyboard operation of the filter buttons, the semester
+- [x] 2.2 Extend `Tests/JavaScript/academic-study-plan.test.ts` (jsdom, created
+  by `ace-702-study-plan-appearance-layout`): a fixture with data attributes
+  only builds the filter, highlights and opens a dialog; a fixture with the 3.0
+  classes only does the same; a fixture that overrides one part and leaves the
+  others upstream does too. Remove the fallback and watch the legacy case fail,
+  remove the attribute lookup and watch the data case fail, restore both.
+- [x] 2.3 Cover keyboard operation of the filter buttons, the semester
   headers and the dialog close button in the same test file.
-- [ ] 2.4 Add a fixture with two modules whose module elements carry
+- [x] 2.4 Add a fixture with two modules whose module elements carry
   `data-study-plan-dialog-trigger` themselves; assert that activating the
   second module opens its own dialog and not the first one's. Restrict the
   trigger lookup to descendants once, watch the test fail, restore it.
 
 ## 3. Collapsible filter
 
-- [ ] 3.1 Add `plugin.tx_academicstudyplan.filter.collapsible` to the
+- [x] 3.1 Add `plugin.tx_academicstudyplan.filter.collapsible` to the
   settings definitions and constants, and render
   `data-study-plan-filter-collapsible` from the filter partial; a functional
   test shows the attribute appears only with the setting on.
-- [ ] 3.2 Insert the toggle in the module; the jsdom test expands and
+- [x] 3.2 Insert the toggle in the module; the jsdom test expands and
   collapses it by keyboard and asserts `aria-expanded`, and fails with the
   toggle handler removed.
-- [ ] 3.3 Run `buildJs`, commit the output, and verify `checkJsBuildClean`,
+- [x] 3.3 Model `show()`, `showModal()` and `close()` of `<dialog>` in
+  `Build/tests/dom.mjs` - jsdom implements none of them - and cover the model
+  in the harness tests of `academic-persons-edit`.
+- [x] 3.4 Run `buildJs`, commit the output, and verify `checkJsBuildClean`,
   `typecheckJs`, `lintTypescript` and `testJs` are green.
+
+## 3b. Review findings
+
+- [x] 3b.1 The collapsible filter did not collapse: `hidden` loses to the
+  extension's own `display: flex`. Add `.filter[hidden] { display: none }` and
+  a rule for the toggle to the SCSS, rebuild the CSS, and say in `docs/` and in
+  the manual that no suite can catch its absence.
+- [x] 3b.2 The category filter was built by substituting into markup and
+  parsing it with `innerHTML`, which makes an editor's category title into
+  markup. Substitute into the clone's attributes and text nodes, restrict the
+  colour, cover it with a hostile fixture. Unchanged since 3.0 and present on
+  branch `2`: ACE-705, a commit of its own, backport still to do.
+- [x] 3b.3 No toggle without `data-filter-label`, and a per-document counter
+  for the filter id instead of `data-study-plan`.
+- [x] 3b.4 `onActivate` leaves a key pressed on a control inside the element to
+  that control; the manual says a module-as-trigger override supplies
+  `tabindex` and `role` itself.
+- [x] 3b.5 Document the four attributes the script reads a *value* from, and
+  correct the container lookup - a union, not a fallback - in the manual and in
+  the deprecation entry.
 
 ## 4. Documentation
 
-- [ ] 4.1 Document the partials, their arguments and every data attribute
+- [x] 4.1 Document the partials, their arguments and every data attribute
   with its element in a new `academic-study-plan/Documentation/Templates/Index.rst`,
   linked from the manual's index, including that the trigger attribute may
   sit on the module element itself and why that is not the default.
-- [ ] 4.2 Add `Documentation/Changelog/3.0/Feature-StudyPlanPartialsAndDataAttributes.rst`
+- [x] 4.2 Add `Documentation/Changelog/3.0/Feature-StudyPlanPartialsAndDataAttributes.rst`
   and `Documentation/Changelog/3.0/Deprecation-StudyPlanClassSelectors.rst`.
-- [ ] 4.3 Add the study plan to any per-extension list in
-  `docs/testing/javascript-tests.md`; verify with `lintMarkdown -n`.
+- [x] 4.3 Document the markup contract as a repository pattern in
+  `docs/development/frontend-assets.md`, and the `<dialog>` model the harness
+  gained in `docs/testing/javascript-tests.md`; verify with `lintMarkdown -n`.
+  That page carries no per-extension list to add the study plan to.
 
 ## 5. File the issue
 
@@ -62,7 +88,7 @@
 - [ ] 6.2 After `composerUpdate` for TYPO3 v14: `lintPhp`, `cgl -n`,
   `phpstan`, `unit` and `functional` green.
 - [ ] 6.3 `lintMarkdown -n`, `checkRstRenderingAll` and the node suites of
-  3.3 green.
+  3.4 green.
 - [ ] 6.4 `docs/` and the `Documentation/` changelog entries are part of the
   change; `README.md` and `CONTRIBUTING.md` still only summarize.
 - [ ] 6.5 Archive the change as the last commit of the pull request.

@@ -6,9 +6,11 @@
 # The first constant is deliberately one that no "settings.definitions.yaml" declares: a
 # site set contributes its settings as constants after the constants of its "typoscript"
 # folder, so a declared path renders even when "constants.typoscript" was never read. The
-# last block renders one that both files declare, which is how their defaults are kept in
-# step - it is the only value here that is expected to be the same through either
-# mechanism for that reason rather than by delivery.
+# last two blocks render paths that both files declare, which is how their defaults are
+# kept in step - they are the only values here that agree through either mechanism for
+# that reason rather than by delivery. The switches of block 40 render the same
+# characters both ways; the one of block 50 does not, because a site setting that is
+# false reaches the constants as the empty string while the constant is assigned "0".
 page = PAGE
 page {
   10 = TEXT
@@ -26,4 +28,8 @@ page {
   40 = TEXT
   40.value = {$plugin.tx_academicstudyplan.assets.css}|{$plugin.tx_academicstudyplan.assets.js}
   40.wrap = <div id="assets">|</div>
+
+  50 = TEXT
+  50.value = {$plugin.tx_academicstudyplan.filter.collapsible}
+  50.wrap = <div id="collapsible">|</div>
 }

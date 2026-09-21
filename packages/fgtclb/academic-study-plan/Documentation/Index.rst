@@ -55,6 +55,11 @@ modules, and categorization features.
         Learn how to include the site set `fgtclb/academic-study-plan` and how
         to configure the content element of this extension.
 
+    ..  card:: :ref:`Templates <templates>`
+
+        The partials of the content element and the data attributes its script
+        drives, for an installation that renders its own markup.
+
     ..  card:: :ref:`Frequently Asked Questions (FAQ) <faq>`
 
         These questions have been frequently asked.
@@ -80,6 +85,7 @@ modules, and categorization features.
     Introduction/Index
     Installation/Index
     Configuration/Index
+    Templates/Index
     Faq/Index
     GetHelp/Index
     KnownProblems/Index

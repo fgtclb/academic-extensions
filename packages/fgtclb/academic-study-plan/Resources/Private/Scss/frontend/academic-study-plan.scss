@@ -14,6 +14,33 @@
         }
     }
 
+    // The collapsible filter is hidden with the "hidden" attribute, which only
+    // the user agent stylesheet gives an effect - and "display: flex" below is
+    // author origin, so it wins over the user agent unconditionally. Without
+    // this rule the toggle would say "collapsed" while the filter stays on
+    // screen. It has to sit next to the rule it undoes.
+    .filter[hidden] {
+        display: none;
+    }
+
+    // The toggle the script inserts in front of the filter when the site asked
+    // for the collapsible filter. It is a control of the same family as the
+    // filter buttons, so it looks like one.
+    .filter-toggle {
+        background: #fff;
+        border: 1px solid black;
+        padding: 0.45rem 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+
+        &[aria-expanded='true'] {
+            margin-bottom: 0.6rem;
+        }
+    }
+
     .filter {
         display: flex;
         justify-content: flex-start;

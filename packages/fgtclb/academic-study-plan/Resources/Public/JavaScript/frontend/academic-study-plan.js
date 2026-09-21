@@ -1,7 +1,31 @@
 /* Generated from Resources/Private/TypeScript — do not edit. */
 const MOBILE_BREAKPOINT = 768;
 const RESIZE_DEBOUNCE = 150;
+let filterSequence = 0;
+const CONTAINER = "data-study-plan";
+const FILTER = "data-study-plan-filter";
+const FILTER_COLLAPSIBLE = "data-study-plan-filter-collapsible";
+const FILTER_TEMPLATE = "data-study-plan-filter-template";
+const SEMESTER = "data-study-plan-semester";
+const SEMESTER_HEADER = "data-study-plan-semester-header";
+const MODULE = "data-study-plan-module";
+const DIALOG_TRIGGER = "data-study-plan-dialog-trigger";
+const DIALOG = "data-study-plan-dialog";
+const LEGACY_CONTAINER = ".academic-study-plan";
+const LEGACY_FILTER = ".filter";
+const LEGACY_FILTER_TEMPLATE = "li";
+const LEGACY_SEMESTER = ".col";
+const LEGACY_SEMESTER_HEADER = ".header";
+const LEGACY_MODULE = ".module";
+const LEGACY_DIALOG_TRIGGER = ".modal-trigger";
+const LEGACY_DIALOG = "dialog";
 const isModuleCategory = (value) => typeof value === "object" && value !== null && "uid" in value;
+const findAll = (root, attribute, legacy) => {
+  const byAttribute = Array.from(root.querySelectorAll(`[${attribute}]`));
+  return byAttribute.length > 0 ? byAttribute : Array.from(root.querySelectorAll(legacy));
+};
+const findOne = (root, attribute, legacy) => root.querySelector(`[${attribute}]`) ?? root.querySelector(legacy);
+const closestOf = (element, attribute, legacy) => element.closest(`[${attribute}]`) ?? element.closest(legacy);
 const categoriesOf = (module) => {
   const raw = module.dataset.categories;
   if (raw === void 0 || raw === "" || raw === "[]") {
@@ -38,21 +62,36 @@ const hexToRgba = (hex, alpha) => {
   const blue = parseInt(hex.slice(5, 7), 16);
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
+const onActivate = (element, handler) => {
+  element.addEventListener("click", handler);
+  element.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    if (event.target !== element) {
+      return;
+    }
+    event.preventDefault();
+    handler(event);
+  });
+};
 class StudyPlan {
   container;
   modules;
   headers;
+  filterList;
   // Declared and assigned rather than written as a constructor parameter
   // property: node strips types, it does not transform them, so a parameter
   // property cannot be loaded by the "testJs" suite at all.
   constructor(container) {
     this.container = container;
-    this.modules = this.container.querySelectorAll(".module");
-    this.headers = this.container.querySelectorAll(".header");
+    this.modules = findAll(this.container, MODULE, LEGACY_MODULE);
+    this.headers = findAll(this.container, SEMESTER_HEADER, LEGACY_SEMESTER_HEADER);
+    this.filterList = findOne(this.container, FILTER, LEGACY_FILTER);
     this.buildCategoryFilter();
     this.initCategoryFilter();
-    this.initModuleClicks();
-    this.initModal();
+    this.initCollapsibleFilter();
+    this.initModuleDialogs();
     this.handleResize();
     this.initHeaderClicks();
   }
@@ -62,15 +101,18 @@ class StudyPlan {
    * markup therefore stays in the template rather than in here.
    */
   buildCategoryFilter() {
-    const filterList = this.container.querySelector(".filter");
-    const filterItem = this.container.querySelector(".filter li");
-    if (filterList === null || filterItem === null) {
+    const filterList = this.filterList;
+    if (filterList === null) {
+      return;
+    }
+    const filterItem = findOne(filterList, FILTER_TEMPLATE, LEGACY_FILTER_TEMPLATE);
+    if (filterItem === null) {
       return;
     }
     const filterTemplate = filterItem.cloneNode(true);
     filterList.innerHTML = "";
     const categories = /* @__PURE__ */ new Map();
-    this.container.querySelectorAll(".module[data-categories]").forEach((module) => {
+    this.modules.forEach((module) => {
       categoriesOf(module).forEach((category) => {
         const uid = String(category.uid);
         if (uid !== "" && uid !== "0" && !categories.has(uid)) {
@@ -85,26 +127,59 @@ class StudyPlan {
       }
       substitutePlaceholders(item, (value) => value.replace(/category-id-placeholder/g, String(category.uid)).replace(/category-color-placeholder/g, colourOf(String(category.colour))).replace(/category-label-placeholder/g, String(category.label)));
       item.removeAttribute("hidden");
+      item.removeAttribute(FILTER_TEMPLATE);
       filterList.appendChild(item);
     });
   }
   initCategoryFilter() {
-    this.container.querySelectorAll(".filter button").forEach((button) => {
-      const toggle = () => {
+    var _a;
+    (_a = this.filterList) == null ? void 0 : _a.querySelectorAll("button").forEach((button) => {
+      onActivate(button, () => {
         if (button.classList.contains("highlighted")) {
           this.clearHighlights();
           return;
         }
         this.highlightCategory(button.dataset.categoryId ?? "", button.dataset.categoryColor ?? "");
         button.classList.add("highlighted");
-      };
-      button.addEventListener("click", toggle);
-      button.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          toggle();
-        }
       });
+    });
+  }
+  /**
+   * Puts the filter behind a toggle button when the site asked for it.
+   *
+   * The toggle is built here rather than rendered by Fluid because the filter
+   * itself is: a plan whose modules carry no category at all ends up with an
+   * empty list, and a control that expands nothing would be worse than none.
+   */
+  initCollapsibleFilter() {
+    const filterList = this.filterList;
+    if (filterList === null || !filterList.hasAttribute(FILTER_COLLAPSIBLE)) {
+      return;
+    }
+    const parent = filterList.parentElement;
+    if (parent === null || filterList.querySelector("button") === null) {
+      return;
+    }
+    const label = this.container.dataset.filterLabel ?? "";
+    if (label === "") {
+      return;
+    }
+    if (filterList.id === "") {
+      filterSequence += 1;
+      filterList.id = `study-plan-filter-${filterSequence}`;
+    }
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "filter-toggle";
+    toggle.textContent = label;
+    toggle.setAttribute("aria-controls", filterList.id);
+    toggle.setAttribute("aria-expanded", "false");
+    filterList.hidden = true;
+    parent.insertBefore(toggle, filterList);
+    onActivate(toggle, () => {
+      const expanded = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      filterList.hidden = expanded;
     });
   }
   highlightCategory(categoryId, colour) {
@@ -117,7 +192,7 @@ class StudyPlan {
         return;
       }
       module.classList.add("highlighted");
-      (_a = module.closest(".col")) == null ? void 0 : _a.classList.add("highlighted", "open");
+      (_a = closestOf(module, SEMESTER, LEGACY_SEMESTER)) == null ? void 0 : _a.classList.add("highlighted", "open");
       this.container.style.setProperty("--highlight-color", hexToRgba(colour, 0.25));
     });
   }
@@ -129,23 +204,16 @@ class StudyPlan {
   }
   initHeaderClicks() {
     this.headers.forEach((header) => {
-      const toggle = () => {
+      onActivate(header, () => {
         if (window.innerWidth > MOBILE_BREAKPOINT) {
           return;
         }
-        const column = header.closest(".col");
+        const column = closestOf(header, SEMESTER, LEGACY_SEMESTER);
         if (column === null) {
           return;
         }
         column.classList.toggle("open");
         header.setAttribute("aria-expanded", String(column.classList.contains("open")));
-      };
-      header.addEventListener("click", toggle);
-      header.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          toggle();
-        }
       });
     });
   }
@@ -191,40 +259,60 @@ class StudyPlan {
       module.style.height = `${moduleHeight}px`;
     });
   }
-  initModuleClicks() {
-    this.container.querySelectorAll(".modal-trigger").forEach((trigger) => {
-      const open = () => {
-        const dialog = document.getElementById(trigger.dataset.dialogId ?? "");
-        if (dialog instanceof HTMLDialogElement) {
-          dialog.showModal();
+  /**
+   * Wires every module with its own dialog: the triggers that open it and the
+   * close button inside it.
+   *
+   * Both are resolved per module rather than per container, which is what lets
+   * an override mark the module element itself as the trigger — the pairing is
+   * then still with the dialog of that very module and not with the first one
+   * on the page.
+   */
+  initModuleDialogs() {
+    const wired = /* @__PURE__ */ new Set();
+    this.modules.forEach((module) => {
+      const dialogs = findAll(module, DIALOG, LEGACY_DIALOG).filter((element) => element instanceof HTMLDialogElement);
+      this.triggersOf(module).forEach((trigger) => {
+        const referenced = document.getElementById(trigger.dataset.dialogId ?? "");
+        const dialog = referenced instanceof HTMLDialogElement ? referenced : dialogs[0];
+        if (dialog === void 0) {
+          return;
         }
-      };
-      trigger.addEventListener("click", open);
-      trigger.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          open();
+        if (!dialogs.includes(dialog)) {
+          dialogs.push(dialog);
+        }
+        onActivate(trigger, () => {
+          if (!dialog.open) {
+            dialog.showModal();
+          }
+        });
+      });
+      dialogs.forEach((dialog) => {
+        if (!wired.has(dialog)) {
+          wired.add(dialog);
+          this.initDialogClose(dialog);
         }
       });
     });
   }
-  initModal() {
-    document.querySelectorAll(".module dialog").forEach((dialog) => {
-      const button = dialog.querySelector("button");
-      if (button === null) {
-        return;
-      }
-      const close = (event) => {
-        this.closeModal(dialog);
-        event.stopPropagation();
-      };
-      button.addEventListener("click", close);
-      button.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          close(event);
-        }
-      });
+  /**
+   * The triggers of one module: the module element itself when it carries the
+   * attribute, and every trigger inside it.
+   */
+  triggersOf(module) {
+    if (module.hasAttribute(DIALOG_TRIGGER)) {
+      return [module, ...module.querySelectorAll(`[${DIALOG_TRIGGER}]`)];
+    }
+    return findAll(module, DIALOG_TRIGGER, LEGACY_DIALOG_TRIGGER);
+  }
+  initDialogClose(dialog) {
+    const button = dialog.querySelector("button");
+    if (button === null) {
+      return;
+    }
+    onActivate(button, (event) => {
+      this.closeModal(dialog);
+      event.stopPropagation();
     });
   }
   /**
@@ -249,10 +337,9 @@ class StudyPlan {
 }
 const instances = /* @__PURE__ */ new Map();
 const init = () => {
-  document.querySelectorAll(".academic-study-plan").forEach((container) => {
-    const identifier = container.dataset.studyPlan ?? "";
-    if (!instances.has(identifier)) {
-      instances.set(identifier, new StudyPlan(container));
+  document.querySelectorAll(`[${CONTAINER}], ${LEGACY_CONTAINER}`).forEach((container) => {
+    if (!instances.has(container)) {
+      instances.set(container, new StudyPlan(container));
     }
   });
 };

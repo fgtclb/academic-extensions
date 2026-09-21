@@ -79,6 +79,17 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
     private const COMPONENT_ASSET_SWITCHES = '<div id="assets">1|1</div>';
 
     /**
+     * The collapsible filter, off by default - and the one place where the two
+     * mechanisms do not render the same characters. A site setting that is `false`
+     * reaches the constants as the empty string, while `constants.typoscript` writes the
+     * `0` it was assigned. Both are false to Fluid, so the element renders the same
+     * either way, and the two constants below say which mechanism produced which.
+     */
+    private const COMPONENT_COLLAPSIBLE_FROM_SET = '<div id="collapsible"></div>';
+
+    private const COMPONENT_COLLAPSIBLE_FROM_STATIC_TEMPLATE = '<div id="collapsible">0</div>';
+
+    /**
      * @return \Generator<string, array{0: string}>
      */
     public static function everythingDeliveringSetDataProvider(): \Generator
@@ -139,6 +150,11 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
                 $set,
             ),
         );
+        $this->assertStringContainsString(
+            self::COMPONENT_COLLAPSIBLE_FROM_SET,
+            $body,
+            sprintf('The set "%s" did not deliver the default of the collapsible filter.', $set),
+        );
     }
 
     /**
@@ -173,6 +189,11 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
             $body,
             'The static template did not deliver the defaults of the asset switches. '
             . 'Together with the site set case above, this is what keeps the two declarations in step.',
+        );
+        $this->assertStringContainsString(
+            self::COMPONENT_COLLAPSIBLE_FROM_STATIC_TEMPLATE,
+            $body,
+            'The aggregate static template did not deliver the default of the collapsible filter.',
         );
     }
 
@@ -291,6 +312,7 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
             [
                 'plugin.tx_academicstudyplan.assets.css' => true,
                 'plugin.tx_academicstudyplan.assets.js' => true,
+                'plugin.tx_academicstudyplan.filter.collapsible' => false,
             ],
             $definitions,
         );

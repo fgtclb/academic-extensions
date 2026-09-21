@@ -1,0 +1,3 @@
+# Read after the constants the extension ships, which is where an integrator of an
+# installation without site sets switches the collapsible filter on.
+plugin.tx_academicstudyplan.filter.collapsible = 1

@@ -2,11 +2,54 @@
  * The interactive study plan: a category filter, per module dialogs, and a
  * mobile layout that collapses each semester into an accordion.
  *
- * One instance per ".academic-study-plan" container, keyed by its
- * "data-study-plan" attribute so a page may carry several.
+ * One instance per container, keyed by the element itself so a page may carry
+ * several.
+ *
+ * ## How the parts are found
+ *
+ * Every part this module drives is found by a "data-study-plan-*" attribute,
+ * never by a class name. The attributes are the contract with the templates:
+ * an installation may replace any partial, with its own classes and its own
+ * nesting, and the interaction keeps working as long as the attributes are
+ * where the manual says they are.
+ *
+ * The class selectors of version 3.0 are still read, per part, when the
+ * attribute finds nothing at all — so an override written for 3.0 keeps
+ * working, and an override that carries the attribute on some parts and not on
+ * others works too. That fallback is deprecated and is removed in 4.0. It
+ * reports nothing: a console message would reach visitors, not integrators.
+ *
+ * Two class names stay class names on purpose: "highlighted" and "open" are
+ * state this module writes and the stylesheet reacts to, not parts it looks up.
  */
 const MOBILE_BREAKPOINT = 768;
 const RESIZE_DEBOUNCE = 150;
+
+/** Counts the filter lists that needed an id of their own, per document. */
+let filterSequence = 0;
+
+const CONTAINER = 'data-study-plan';
+const FILTER = 'data-study-plan-filter';
+const FILTER_COLLAPSIBLE = 'data-study-plan-filter-collapsible';
+const FILTER_TEMPLATE = 'data-study-plan-filter-template';
+const SEMESTER = 'data-study-plan-semester';
+const SEMESTER_HEADER = 'data-study-plan-semester-header';
+const MODULE = 'data-study-plan-module';
+const DIALOG_TRIGGER = 'data-study-plan-dialog-trigger';
+const DIALOG = 'data-study-plan-dialog';
+
+/**
+ * The class selectors version 3.0 identified the same parts by. Deprecated,
+ * read only when the attribute of that part finds nothing, removed in 4.0.
+ */
+const LEGACY_CONTAINER = '.academic-study-plan';
+const LEGACY_FILTER = '.filter';
+const LEGACY_FILTER_TEMPLATE = 'li';
+const LEGACY_SEMESTER = '.col';
+const LEGACY_SEMESTER_HEADER = '.header';
+const LEGACY_MODULE = '.module';
+const LEGACY_DIALOG_TRIGGER = '.modal-trigger';
+const LEGACY_DIALOG = 'dialog';
 
 interface ModuleCategory {
     uid: string | number;
@@ -16,6 +59,27 @@ interface ModuleCategory {
 
 const isModuleCategory = (value: unknown): value is ModuleCategory =>
     typeof value === 'object' && value !== null && 'uid' in value;
+
+/**
+ * Every element of one part, attribute first. The class selector is only read
+ * when the attribute is nowhere below this root, which keeps a 3.0 override of
+ * one part working next to an upstream one of another.
+ */
+const findAll = (root: ParentNode, attribute: string, legacy: string): HTMLElement[] => {
+    const byAttribute = Array.from(root.querySelectorAll<HTMLElement>(`[${attribute}]`));
+
+    return byAttribute.length > 0 ? byAttribute : Array.from(root.querySelectorAll<HTMLElement>(legacy));
+};
+
+const findOne = (root: ParentNode, attribute: string, legacy: string): HTMLElement | null =>
+    root.querySelector<HTMLElement>(`[${attribute}]`) ?? root.querySelector<HTMLElement>(legacy);
+
+/**
+ * The ancestor of an element that is one part, attribute first — the semester
+ * column a module or a header sits in.
+ */
+const closestOf = (element: Element, attribute: string, legacy: string): HTMLElement | null =>
+    element.closest<HTMLElement>(`[${attribute}]`) ?? element.closest<HTMLElement>(legacy);
 
 /**
  * The categories a module carries, read from its "data-categories" attribute.
@@ -89,23 +153,52 @@ const hexToRgba = (hex: string, alpha: number): string => {
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
 
+/**
+ * Runs the handler on a click and on the two keys that activate a control.
+ *
+ * The default of the keydown is prevented, which is what keeps a real button
+ * from running the handler twice: the browser derives its click from the
+ * uncancelled keydown.
+ */
+const onActivate = (element: HTMLElement, handler: (event: Event) => void): void => {
+    element.addEventListener('click', handler);
+    element.addEventListener('keydown', (event: KeyboardEvent): void => {
+        if (event.key !== 'Enter' && event.key !== ' ') {
+            return;
+        }
+
+        // A key pressed on something inside this element belongs to that
+        // something: an override may put the trigger attribute on the whole
+        // module, and Enter on a link or an audio control inside it has to do
+        // what that control does rather than open the dialog.
+        if (event.target !== element) {
+            return;
+        }
+
+        event.preventDefault();
+        handler(event);
+    });
+};
+
 class StudyPlan {
     private readonly container: HTMLElement;
-    private readonly modules: NodeListOf<HTMLElement>;
-    private readonly headers: NodeListOf<HTMLElement>;
+    private readonly modules: HTMLElement[];
+    private readonly headers: HTMLElement[];
+    private readonly filterList: HTMLElement | null;
 
     // Declared and assigned rather than written as a constructor parameter
     // property: node strips types, it does not transform them, so a parameter
     // property cannot be loaded by the "testJs" suite at all.
     public constructor(container: HTMLElement) {
         this.container = container;
-        this.modules = this.container.querySelectorAll<HTMLElement>('.module');
-        this.headers = this.container.querySelectorAll<HTMLElement>('.header');
+        this.modules = findAll(this.container, MODULE, LEGACY_MODULE);
+        this.headers = findAll(this.container, SEMESTER_HEADER, LEGACY_SEMESTER_HEADER);
+        this.filterList = findOne(this.container, FILTER, LEGACY_FILTER);
 
         this.buildCategoryFilter();
         this.initCategoryFilter();
-        this.initModuleClicks();
-        this.initModal();
+        this.initCollapsibleFilter();
+        this.initModuleDialogs();
         this.handleResize();
         this.initHeaderClicks();
     }
@@ -116,10 +209,13 @@ class StudyPlan {
      * markup therefore stays in the template rather than in here.
      */
     private buildCategoryFilter(): void {
-        const filterList = this.container.querySelector<HTMLElement>('.filter');
-        const filterItem = this.container.querySelector<HTMLElement>('.filter li');
+        const filterList = this.filterList;
+        if (filterList === null) {
+            return;
+        }
 
-        if (filterList === null || filterItem === null) {
+        const filterItem = findOne(filterList, FILTER_TEMPLATE, LEGACY_FILTER_TEMPLATE);
+        if (filterItem === null) {
             return;
         }
 
@@ -135,7 +231,7 @@ class StudyPlan {
 
         const categories = new Map<string, ModuleCategory>();
 
-        this.container.querySelectorAll<HTMLElement>('.module[data-categories]').forEach((module): void => {
+        this.modules.forEach((module): void => {
             categoriesOf(module).forEach((category): void => {
                 const uid = String(category.uid);
                 if (uid !== '' && uid !== '0' && !categories.has(uid)) {
@@ -158,15 +254,17 @@ class StudyPlan {
 
             // The item in the template carries "hidden" so that its placeholder
             // text is not on screen on a page this module never reaches. A clone
-            // of it is a real filter button and has to be visible.
+            // of it is a real filter button and has to be visible — and it is no
+            // longer the template, so it stops saying that it is.
             item.removeAttribute('hidden');
+            item.removeAttribute(FILTER_TEMPLATE);
             filterList.appendChild(item);
         });
     }
 
     private initCategoryFilter(): void {
-        this.container.querySelectorAll<HTMLElement>('.filter button').forEach((button): void => {
-            const toggle = (): void => {
+        this.filterList?.querySelectorAll<HTMLElement>('button').forEach((button): void => {
+            onActivate(button, (): void => {
                 if (button.classList.contains('highlighted')) {
                     this.clearHighlights();
                     return;
@@ -174,15 +272,58 @@ class StudyPlan {
 
                 this.highlightCategory(button.dataset.categoryId ?? '', button.dataset.categoryColor ?? '');
                 button.classList.add('highlighted');
-            };
-
-            button.addEventListener('click', toggle);
-            button.addEventListener('keydown', (event: KeyboardEvent): void => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    toggle();
-                }
             });
+        });
+    }
+
+    /**
+     * Puts the filter behind a toggle button when the site asked for it.
+     *
+     * The toggle is built here rather than rendered by Fluid because the filter
+     * itself is: a plan whose modules carry no category at all ends up with an
+     * empty list, and a control that expands nothing would be worse than none.
+     */
+    private initCollapsibleFilter(): void {
+        const filterList = this.filterList;
+        if (filterList === null || !filterList.hasAttribute(FILTER_COLLAPSIBLE)) {
+            return;
+        }
+
+        const parent = filterList.parentElement;
+        if (parent === null || filterList.querySelector('button') === null) {
+            return;
+        }
+
+        // The label of the container is the only text the markup carries for
+        // this control. Without it the toggle would be an unnamed button, which
+        // is worse than the filter everybody can already see, so the plan keeps
+        // its expanded filter instead - the manual says so with the attribute.
+        const label = this.container.dataset.filterLabel ?? '';
+        if (label === '') {
+            return;
+        }
+
+        if (filterList.id === '') {
+            // Per document, not per plan: two plans of one page can carry the
+            // same "data-study-plan" value, or none at all, and two lists with
+            // one id would make both toggles point at the first of them.
+            filterSequence += 1;
+            filterList.id = `study-plan-filter-${filterSequence}`;
+        }
+
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'filter-toggle';
+        toggle.textContent = label;
+        toggle.setAttribute('aria-controls', filterList.id);
+        toggle.setAttribute('aria-expanded', 'false');
+        filterList.hidden = true;
+        parent.insertBefore(toggle, filterList);
+
+        onActivate(toggle, (): void => {
+            const expanded = toggle.getAttribute('aria-expanded') === 'true';
+            toggle.setAttribute('aria-expanded', String(!expanded));
+            filterList.hidden = expanded;
         });
     }
 
@@ -197,7 +338,7 @@ class StudyPlan {
             }
 
             module.classList.add('highlighted');
-            module.closest('.col')?.classList.add('highlighted', 'open');
+            closestOf(module, SEMESTER, LEGACY_SEMESTER)?.classList.add('highlighted', 'open');
             this.container.style.setProperty('--highlight-color', hexToRgba(colour, 0.25));
         });
     }
@@ -211,26 +352,18 @@ class StudyPlan {
 
     private initHeaderClicks(): void {
         this.headers.forEach((header): void => {
-            const toggle = (): void => {
+            onActivate(header, (): void => {
                 if (window.innerWidth > MOBILE_BREAKPOINT) {
                     return;
                 }
 
-                const column = header.closest('.col');
+                const column = closestOf(header, SEMESTER, LEGACY_SEMESTER);
                 if (column === null) {
                     return;
                 }
 
                 column.classList.toggle('open');
                 header.setAttribute('aria-expanded', String(column.classList.contains('open')));
-            };
-
-            header.addEventListener('click', toggle);
-            header.addEventListener('keydown', (event: KeyboardEvent): void => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    toggle();
-                }
             });
         });
     }
@@ -284,44 +417,79 @@ class StudyPlan {
         });
     }
 
-    private initModuleClicks(): void {
-        this.container.querySelectorAll<HTMLElement>('.modal-trigger').forEach((trigger): void => {
-            const open = (): void => {
-                const dialog = document.getElementById(trigger.dataset.dialogId ?? '');
-                if (dialog instanceof HTMLDialogElement) {
-                    dialog.showModal();
-                }
-            };
+    /**
+     * Wires every module with its own dialog: the triggers that open it and the
+     * close button inside it.
+     *
+     * Both are resolved per module rather than per container, which is what lets
+     * an override mark the module element itself as the trigger — the pairing is
+     * then still with the dialog of that very module and not with the first one
+     * on the page.
+     */
+    private initModuleDialogs(): void {
+        // A dialog another module's trigger already reached must not have its close
+        // button wired a second time, or one activation would close it twice.
+        const wired = new Set<HTMLDialogElement>();
 
-            trigger.addEventListener('click', open);
-            trigger.addEventListener('keydown', (event: KeyboardEvent): void => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    open();
+        this.modules.forEach((module): void => {
+            const dialogs = findAll(module, DIALOG, LEGACY_DIALOG)
+                .filter((element): element is HTMLDialogElement => element instanceof HTMLDialogElement);
+
+            this.triggersOf(module).forEach((trigger): void => {
+                const referenced = document.getElementById(trigger.dataset.dialogId ?? '');
+                const dialog = referenced instanceof HTMLDialogElement ? referenced : dialogs[0];
+
+                if (dialog === undefined) {
+                    return;
+                }
+
+                if (!dialogs.includes(dialog)) {
+                    dialogs.push(dialog);
+                }
+
+                onActivate(trigger, (): void => {
+                    // A trigger that is the module element itself sees the clicks of
+                    // everything inside it, the open dialog included.
+                    if (!dialog.open) {
+                        dialog.showModal();
+                    }
+                });
+            });
+
+            dialogs.forEach((dialog): void => {
+                if (!wired.has(dialog)) {
+                    wired.add(dialog);
+                    this.initDialogClose(dialog);
                 }
             });
         });
     }
 
-    private initModal(): void {
-        document.querySelectorAll<HTMLDialogElement>('.module dialog').forEach((dialog): void => {
-            const button = dialog.querySelector('button');
-            if (button === null) {
-                return;
-            }
+    /**
+     * The triggers of one module: the module element itself when it carries the
+     * attribute, and every trigger inside it.
+     */
+    private triggersOf(module: HTMLElement): HTMLElement[] {
+        // The module element counts as one of them, and when it carries the
+        // attribute the class fallback is off for this part: the attribute is
+        // there, on the root, so a leftover ".modal-trigger" inside must not be
+        // wired as a second trigger.
+        if (module.hasAttribute(DIALOG_TRIGGER)) {
+            return [module, ...module.querySelectorAll<HTMLElement>(`[${DIALOG_TRIGGER}]`)];
+        }
 
-            const close = (event: Event): void => {
-                this.closeModal(dialog);
-                event.stopPropagation();
-            };
+        return findAll(module, DIALOG_TRIGGER, LEGACY_DIALOG_TRIGGER);
+    }
 
-            button.addEventListener('click', close);
-            button.addEventListener('keydown', (event: KeyboardEvent): void => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    close(event);
-                }
-            });
+    private initDialogClose(dialog: HTMLDialogElement): void {
+        const button = dialog.querySelector('button');
+        if (button === null) {
+            return;
+        }
+
+        onActivate(button, (event: Event): void => {
+            this.closeModal(dialog);
+            event.stopPropagation();
         });
     }
 
@@ -348,24 +516,32 @@ class StudyPlan {
     }
 }
 
-const instances = new Map<string, StudyPlan>();
+/**
+ * The running plans, keyed by their container so that a second start finds them
+ * again. Nothing prunes it: a container is removed from a page by a script that
+ * this module knows nothing about, and the resize handler below has to reach
+ * every plan that is still on screen.
+ */
+const instances = new Map<HTMLElement, StudyPlan>();
 
 /**
  * Starts one instance per study plan of the document, skipping the ones that
  * are already running.
  *
- * Exported so that the "testJs" suite can start the module on a fixture of its
- * own: node hands every test of a file the same module instance, so the two
- * statements below run once per file and the second test of one would otherwise
- * drive a module that never saw its markup.
+ * Exported so that the "testJs" suite can drive a fixture with it; a browser
+ * reaches it through the two statements below.
  */
 const init = (): void => {
-    document.querySelectorAll<HTMLElement>('.academic-study-plan').forEach((container): void => {
-        const identifier = container.dataset.studyPlan ?? '';
-        if (!instances.has(identifier)) {
-            instances.set(identifier, new StudyPlan(container));
-        }
-    });
+    // The one lookup that is a union rather than a fallback: two plans of one
+    // page can be delivered by different templates, and a legacy one must not
+    // disappear because another one carries the attribute.
+    document
+        .querySelectorAll<HTMLElement>(`[${CONTAINER}], ${LEGACY_CONTAINER}`)
+        .forEach((container): void => {
+            if (!instances.has(container)) {
+                instances.set(container, new StudyPlan(container));
+            }
+        });
 };
 
 if (document.readyState === 'loading') {

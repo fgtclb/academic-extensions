@@ -10,21 +10,22 @@ use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 
 /**
- * The two switches that decide which assets the study plan content element brings to a
- * page.
+ * The settings an integrator configures the study plan content element with: the two
+ * switches that decide which assets it brings to a page, and the one that puts its
+ * category filter behind a toggle button.
  *
  * The element registers its stylesheet and its module from inside its own template, so
  * an installation that styles the element itself has to override that template - and
  * then either loses the module or ships a copy of it. Both assets are switchable
  * instead, once per site.
  *
- * The switches exist twice, under one name: as site settings declared by the content
- * element set, and as TypoScript constants of the same path for an installation that
- * configures its frontend through `sys_template` records. Both delivery mechanisms are
- * covered here, because the two files that declare them are different files and nothing
- * but a test keeps their defaults in step.
+ * Every one of them exists twice, under one name: as a site setting declared by the
+ * content element set, and as a TypoScript constant of the same path for an installation
+ * that configures its frontend through `sys_template` records. Both delivery mechanisms
+ * are covered here, because the two files that declare them are different files and
+ * nothing but a test keeps their defaults in step.
  */
-final class AcademicStudyPlanAssetSwitchTest extends AbstractAcademicStudyPlanTestCase
+final class AcademicStudyPlanSiteSettingsTest extends AbstractAcademicStudyPlanTestCase
 {
     use FrontendPluginRenderingTrait;
     use SiteBasedTestTrait;
@@ -45,6 +46,14 @@ final class AcademicStudyPlanAssetSwitchTest extends AbstractAcademicStudyPlanTe
      * no module was registered at all.
      */
     private const MODULE = '@fgtclb/academic-study-plan/frontend/academic-study-plan.js';
+
+    /**
+     * The marker the filter list carries when the collapsible filter is switched on. It
+     * is the whole of what the setting renders - the toggle button itself is built by
+     * the script, because a filter with no category in it must not get a control that
+     * expands nothing.
+     */
+    private const COLLAPSIBLE = 'data-study-plan-filter-collapsible';
 
     protected function setUp(): void
     {
@@ -156,6 +165,49 @@ final class AcademicStudyPlanAssetSwitchTest extends AbstractAcademicStudyPlanTe
 
         $this->assertStringContainsString(self::STYLESHEET, $html);
         $this->assertStringContainsString(self::MODULE, $html);
+    }
+
+    #[Test]
+    public function filterIsNotCollapsibleWhenTheSiteConfiguresNothing(): void
+    {
+        $this->setUpSiteSetSite();
+
+        $html = $this->renderStudyPlanPage();
+
+        $this->assertStringNotContainsString(self::COLLAPSIBLE, $html);
+        // The filter itself is there, expanded, as it always was.
+        $this->assertStringContainsString('data-study-plan-filter>', $html);
+    }
+
+    #[Test]
+    public function filterIsCollapsibleWhenTheSiteSettingIsOn(): void
+    {
+        $this->setUpSiteSetSite(['plugin.tx_academicstudyplan.filter.collapsible' => true]);
+
+        $html = $this->renderStudyPlanPage();
+
+        $this->assertStringContainsString('data-study-plan-filter ' . self::COLLAPSIBLE . '>', $html);
+        // Nothing else about the element changed with it.
+        $this->assertStringContainsString('category-id-placeholder', $html);
+        $this->assertStringContainsString('First Semester', $html);
+    }
+
+    #[Test]
+    public function filterIsCollapsibleWhenTheTypoScriptConstantIsOn(): void
+    {
+        $this->setUpStaticTemplateSite(['EXT:academic_study_plan/Tests/Functional/ContentElement/Fixtures/TypoScript/Constants/CollapsibleFilter.typoscript']);
+
+        $html = $this->renderStudyPlanPage();
+
+        $this->assertStringContainsString('data-study-plan-filter ' . self::COLLAPSIBLE . '>', $html);
+    }
+
+    #[Test]
+    public function filterIsNotCollapsibleWithTheStaticTemplateAlone(): void
+    {
+        $this->setUpStaticTemplateSite();
+
+        $this->assertStringNotContainsString(self::COLLAPSIBLE, $this->renderStudyPlanPage());
     }
 
     private function renderStudyPlanPage(): string
