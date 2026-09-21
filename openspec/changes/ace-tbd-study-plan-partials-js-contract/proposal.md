@@ -41,8 +41,11 @@ None.
   output of the module.
 - One more setting in the settings definitions added by
   `ace-tbd-study-plan-asset-switch`.
-- New `testJs` coverage below
-  `packages/fgtclb/academic-study-plan/Tests/JavaScript/`.
+- More `testJs` coverage below
+  `packages/fgtclb/academic-study-plan/Tests/JavaScript/`, which
+  `ace-702-study-plan-appearance-layout` created together with the first test
+  of this module - that change had to drop a constructor parameter property
+  before node could load the module at all.
 
 ## Non-goals
 

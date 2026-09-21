@@ -24,6 +24,12 @@ const hexToRgba = (hex, alpha) => {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
 class StudyPlan {
+  container;
+  modules;
+  headers;
+  // Declared and assigned rather than written as a constructor parameter
+  // property: node strips types, it does not transform them, so a parameter
+  // property cannot be loaded by the "testJs" suite at all.
   constructor(container) {
     this.container = container;
     this.modules = this.container.querySelectorAll(".module");
@@ -35,8 +41,6 @@ class StudyPlan {
     this.handleResize();
     this.initHeaderClicks();
   }
-  modules;
-  headers;
   /**
    * Rebuilds the filter from the categories the rendered modules actually
    * carry, using the single list item Fluid rendered as the template. The

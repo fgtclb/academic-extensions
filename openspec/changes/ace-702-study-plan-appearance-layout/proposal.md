@@ -43,6 +43,17 @@ None.
   `record` view variable TYPO3 v14 needs for the header partial. Nothing in
   `docs/` covered either before, although two extensions already depend on the
   second and a third assigns the variable pre-emptively.
+- The module `Resources/Private/TypeScript/frontend/academic-study-plan.ts`
+  loses a constructor parameter property, and its committed build output is
+  rebuilt. Node strips types rather than transforming them, so that one
+  construct made the module unloadable by the `testJs` suite - which is why it
+  had no JavaScript test to extend. The ban `AGENTS.md` states is now enforced
+  by eslint rules instead of by prose, and the module specifier is mapped in
+  `Build/tsconfig.json`.
+- `packages/fgtclb/academic-study-plan/Tests/JavaScript/` is created with the
+  first test of that module: the filter and the accordion, by pointer and by
+  keyboard, against the markup the layout now produces. It takes the place of
+  the by-hand check in the development instances that `tasks.md` planned.
 
 ## Non-goals
 

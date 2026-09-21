@@ -55,6 +55,9 @@
             ],
             "@fgtclb/academic-persons-edit/frontend/*": [
                 "../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/*"
+            ],
+            "@fgtclb/academic-study-plan/frontend/*": [
+                "../packages/fgtclb/academic-study-plan/Resources/Private/TypeScript/frontend/*"
             ]
         }
     },

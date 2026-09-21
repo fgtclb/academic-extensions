@@ -52,10 +52,15 @@ const hexToRgba = (hex: string, alpha: number): string => {
 };
 
 class StudyPlan {
+    private readonly container: HTMLElement;
     private readonly modules: NodeListOf<HTMLElement>;
     private readonly headers: NodeListOf<HTMLElement>;
 
-    public constructor(private readonly container: HTMLElement) {
+    // Declared and assigned rather than written as a constructor parameter
+    // property: node strips types, it does not transform them, so a parameter
+    // property cannot be loaded by the "testJs" suite at all.
+    public constructor(container: HTMLElement) {
+        this.container = container;
         this.modules = this.container.querySelectorAll<HTMLElement>('.module');
         this.headers = this.container.querySelectorAll<HTMLElement>('.header');
 

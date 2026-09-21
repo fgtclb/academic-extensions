@@ -36,6 +36,22 @@ import tseslint from 'typescript-eslint';
 const houseRules = {
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/consistent-type-imports': 'error',
+    // Syntax node cannot strip, and therefore cannot run: the "testJs" suite
+    // loads the sources with node, which strips the types and transforms
+    // nothing. A parameter property, an "enum", a "namespace" or a decorator
+    // makes a module unloadable there while the compiled artifact keeps
+    // working in a browser - so nothing reports it until somebody writes the
+    // first test for that module. "tsconfig.tests.json" catches the same thing
+    // with "erasableSyntaxOnly", but only for a module a test already imports.
+    // "no-namespace" is in "recommended" as well; it is restated so the whole
+    // ban is readable in one place.
+    '@typescript-eslint/parameter-properties': ['error', { prefer: 'class-property' }],
+    '@typescript-eslint/no-namespace': 'error',
+    'no-restricted-syntax': [
+        'error',
+        { selector: 'TSEnumDeclaration', message: 'Use a union of literals; node cannot strip an enum.' },
+        { selector: 'Decorator', message: 'Decorators are not stripped by node.' },
+    ],
     eqeqeq: 'error',
     'no-console': 'error',
     'prefer-const': 'error',
