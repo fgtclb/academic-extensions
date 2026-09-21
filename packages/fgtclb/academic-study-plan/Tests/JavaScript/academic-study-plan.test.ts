@@ -23,7 +23,7 @@ const layoutMarkup = (): string =>
   '<div id="c1" class="frame frame-ruler-before frame-type-academic_study_plan frame-layout-0">' +
   "<header><h2>Study plan B.Sc.</h2></header>" +
   '<div class="academic-study-plan container" data-study-plan="1">' +
-  '<nav><ul class="filter"><li>' +
+  '<nav><ul class="filter"><li hidden>' +
   '<button data-category-id="category-id-placeholder"' +
   ' data-category-color="category-color-placeholder"' +
   ' style="--category-color: category-color-placeholder;">category-label-placeholder</button>' +
@@ -58,6 +58,16 @@ describe("the study plan inside the content element layout", () => {
     assert.deepEqual(
       buttons.map((button) => button.textContent),
       ["Mandatory", "Elective"],
+    );
+
+    // The item Fluid renders is "hidden", so that its placeholder text is not on
+    // screen on a page this module never reaches. The clones built from it are
+    // real filter buttons, so the attribute must be gone from every one of them.
+    assert.deepEqual(
+      Array.from(document.querySelectorAll<HTMLElement>(".filter li")).map((item) =>
+        item.hasAttribute("hidden"),
+      ),
+      [false, false],
     );
 
     // The layout header is not a semester header: it must not have been turned

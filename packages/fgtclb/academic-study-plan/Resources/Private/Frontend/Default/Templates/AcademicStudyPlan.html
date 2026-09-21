@@ -17,7 +17,13 @@
     >
         <nav role="navigation" aria-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}">
             <ul class="filter">
-                <li>
+                <f:comment>
+                    The template the script clones, once per category a module carries.
+                    It is "hidden" because its placeholder text is what a page without
+                    the script would otherwise show as a filter button; the script takes
+                    the attribute off the clones it builds from it.
+                </f:comment>
+                <li hidden>
                     <button
                         data-category-id="category-id-placeholder"
                         data-category-color="category-color-placeholder"

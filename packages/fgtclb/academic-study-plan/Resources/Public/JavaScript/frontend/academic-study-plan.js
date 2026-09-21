@@ -68,6 +68,7 @@ class StudyPlan {
       const holder = document.createElement("li");
       holder.innerHTML = markup;
       if (holder.firstElementChild !== null) {
+        holder.firstElementChild.removeAttribute("hidden");
         filterList.appendChild(holder.firstElementChild);
       }
     });
