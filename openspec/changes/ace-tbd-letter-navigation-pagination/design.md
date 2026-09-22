@@ -32,7 +32,7 @@ See `proposal.md` for the motivation. State on `main`:
 **Non-Goals:**
 
 - Changing the letter predicate or the letter availability; both belong to
-  `ace-tbd-letter-navigation-availability`.
+  `ace-597-letter-navigation-availability`.
 
 ## Decisions
 
@@ -103,12 +103,13 @@ calculation. The cache entry would then be shared by different result pages.
   `/persons/m/page-1`, just as `/persons` and `/persons/page-1` exist today.
   Accepted here; it is a matter of the pagination links, with or without a
   letter.
-- [The letter filter is case sensitive on PostgreSQL] → The persons query is
-  built by Extbase, which renders the filter as a plain `LIKE` on both cores,
-  so `m` does not match `Miller` there. The difference exists today and is
-  named in `ace-tbd-letter-navigation-availability`. The fixtures of this
-  change use last names that match the letter on every DBMS, so the tests
-  assert pagination and not case handling.
+- [The letter filter differs between DBMS] → Not in case: Extbase renders the
+  filter as `ILIKE` on PostgreSQL on both cores, so `m` matches `Miller`
+  everywhere (verified by the tests of `ace-597-letter-navigation-availability`
+  on all four DBMS). It differs for a name starting with an umlaut, which
+  MariaDB and MySQL list under the base letter and PostgreSQL and SQLite under
+  none. The fixtures of this change use ASCII last names, so the tests assert
+  pagination and not collation.
 
 ## Open Questions
 

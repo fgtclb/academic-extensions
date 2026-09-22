@@ -49,7 +49,7 @@ None.
 - No schema change, no new setting, no template change.
 - Depends on `ace-tbd-list-links-keep-state` for page links that keep the
   letter, on `ace-tbd-visitor-filter-ui-routes` for the route set it extends,
-  and on `ace-tbd-letter-navigation-availability` for the letter navigation it
+  and on `ace-597-letter-navigation-availability` for the letter navigation it
   pages under.
 
 ## Non-goals

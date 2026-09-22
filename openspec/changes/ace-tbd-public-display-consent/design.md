@@ -57,10 +57,11 @@ context. Any change of that signature fatally breaks the repository XCLASSes
 that projects carry over from 2.x, and the event already carries exactly this
 kind of condition.
 
-The letter availability of `ace-tbd-letter-navigation-availability` builds its
-own query from the list demand. It has to apply the constraints of the profile
-query event too, or a letter can link to an empty page; a task below verifies
-that.
+The letter availability of `ace-597-letter-navigation-availability` builds its
+query from the list demand and dispatches the profile query event for it with
+the same plugin context, so a consent listener narrows the letters as it
+narrows the list. A task below still verifies that for this listener, because a
+letter that links to an empty page is exactly the defect it would cause.
 
 Rejected: a template condition, which is what one project does today. It
 leaks the profile through lists, counts and pagination. Also rejected:
