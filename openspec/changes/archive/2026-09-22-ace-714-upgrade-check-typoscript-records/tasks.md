@@ -88,7 +88,7 @@
   condition dropped, only the Setup bit read, a resolving reference not
   followed, a foreign file not followed, the `seen` set removed, and the command
   guard removed. Every one produced a red run naming the test that covers it.
-- [ ] 6.7 Archive the change as the last commit of the pull request. It
+- [x] 6.7 Archived as the last commit of the pull request. Verified afterwards that both promoted specs changed and that the selected-folder scenario reached openspec/specs/. It
   modifies two capabilities and adds none, so both delta files carry
   `## MODIFIED Requirements` or `## ADDED Requirements` against the existing
   spec — check the archive really updates
