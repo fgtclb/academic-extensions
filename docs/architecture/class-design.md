@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 267 PHP files declaring 241
-classes, 10 interfaces, 11 traits and 5 enums do not follow one style yet.
+rather than describing an intention as a rule — 301 PHP files declaring 271
+classes, 10 interfaces, 12 traits and 8 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,21 +16,21 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-124 of the 241 classes are `final` (51 %). The distribution is not random: it
+154 of the 271 classes are `final` (57 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
 |--------------------------------------------|---------|---------|----------|----------|
-| `Classes/Upgrades/`                        | 12      | 0       | 0        | 100 %    |
-| `Classes/Service/` and `Classes/Services/` | 24      | 2       | 0        | 92 %     |
-| `Classes/EventListener/`                   | 6       | 1       | 0        | 86 %     |
+| `Classes/Upgrades/`                        | 15      | 0       | 0        | 100 %    |
+| `Classes/Service/` and `Classes/Services/` | 27      | 2       | 0        | 93 %     |
+| `Classes/EventListener/`                   | 10      | 1       | 0        | 91 %     |
 | `Classes/Controller/`                      | 4       | 5       | 0        | 44 %     |
 | `Classes/Domain/Model/Dto/`                | 7       | 10      | 1        | 39 %     |
-| `Classes/ViewHelpers/`                     | 2       | 8       | 0        | 20 %     |
+| `Classes/ViewHelpers/`                     | 3       | 8       | 0        | 27 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 69      | 47      | 4        | 58 %     |
-| **Total**                                  | **124** | **112** | **5**    | **51 %** |
+| Everything else                            | 88      | 47      | 4        | 63 %     |
+| **Total**                                  | **154** | **112** | **5**    | **57 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 265 modifiers, of
-which 257 are constructor-promoted, across 80 files. The eight non-promoted
+`readonly` is used heavily, mostly on individual properties: 291 modifiers, of
+which 283 are constructor-promoted, across 93 files. The eight non-promoted
 declarations are the seven documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
@@ -72,7 +72,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 29:
+nothing**, and of an immutable data object. There are 35:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -117,8 +117,8 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 80 files declare
-257 promoted `readonly` parameters. The fullest example by a wide margin is
+Constructor injection with promoted properties is the default: 91 files declare
+283 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.
@@ -231,17 +231,19 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Eleven sites
+  sit under an excluded path. Thirteen sites
   (`grep -rn '#\[Exclude\]' --include='*.php' packages/fgtclb/*/Classes`):
   `academic-base/Classes/Settings/Validation.php:23`,
-  `academic-base/Classes/Settings/ValidationSet.php:15` and nine classes under
+  `academic-base/Classes/Settings/ValidationSet.php:15`, nine classes under
   `academic-persons/Classes/Settings/` — the eight of the settings graph
   (`ProfileSection`, `ProfileField`, `SpecialField`, `ContractField`,
   `ContractContactSection`, `ContractContactField`, `DocumentSection`,
-  `PublicProfileSettings`) plus `LegacySettingsMigration`. The last one is not
-  a settings value object but the result of the legacy settings overlay; it is
-  excluded for the same reason — it is data the factory produces, not a service
-  the container builds.
+  `PublicProfileSettings`) plus `LegacySettingsMigration` — and the two value
+  objects of the contract selection, `ContractSelection` and
+  `ContractSelectionResult` in `academic-persons/Classes/Service/`.
+  `LegacySettingsMigration` is not a settings value object but the result of
+  the legacy settings overlay; it is excluded for the same reason — it is data
+  the factory produces, not a service the container builds.
 
 The `Settings/` classes show why the attribute is needed: they are immutable
 data objects that happen to live outside `Domain/Model/`, so the package's
@@ -254,15 +256,19 @@ referenced it.
 
 ### Enums
 
-Five, all backed, none pure:
+Eight, all backed, none pure
+(`grep -rl '^enum' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes`):
 
-| Enum                                                              | Backing  |
-|-------------------------------------------------------------------|----------|
-| `academic-bite-jobs/Classes/Enumeration/ListView.php:10`          | `string` |
-| `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:7`   | `int`    |
-| `academic-persons/Classes/Profile/ProfileActionType.php:14`       | `string` |
-| `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12` | `string` |
-| `academic-projects/Classes/Domain/Model/Dto/ActiveState.php:7`    | `string` |
+| Enum                                                               | Backing  |
+|--------------------------------------------------------------------|----------|
+| `academic-base/Classes/Upgrade/ConfigurationFindingKind.php:13`    | `string` |
+| `academic-base/Classes/Upgrade/TemplateOverrideFindingKind.php:14` | `string` |
+| `academic-bite-jobs/Classes/Enumeration/ListView.php:10`           | `string` |
+| `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:7`    | `int`    |
+| `academic-persons/Classes/Profile/ProfileActionType.php:14`        | `string` |
+| `academic-persons/Classes/Service/ContractDisplay.php:15`          | `string` |
+| `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12`  | `string` |
+| `academic-projects/Classes/Domain/Model/Dto/ActiveState.php:7`     | `string` |
 
 Back an enum whenever its values are persisted, passed through a request, or
 written into TCA — a pure enum cannot survive any of those round trips.
