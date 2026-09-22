@@ -58,6 +58,4 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-15`). Three of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-partners-projects-list-events` when the issue is filed after
-implementation.
+this today. Filed as ACE-717 after the implementation was green.

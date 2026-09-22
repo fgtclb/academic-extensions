@@ -78,7 +78,7 @@ as not final; this change supersedes both statements for the controllers.
 
 ### `final` directly in 3.0.0, as a breaking change
 
-Decided by the maintainer on `ace-tbd-partners-projects-list-events`.
+Decided by the maintainer on `ace-717-partners-projects-list-events`.
 Rejected: keeping the classes open. It leaves subclassing as the de facto
 extension point next to the events, and every later constructor change in
 3.x becomes a breaking change for projects that were never promised it.
@@ -126,7 +126,7 @@ about events and may land in a different order.
 The `Breaking-` entries map each subclass purpose to its replacement.
 
 `PartnerController` and `ProjectController`, through the events of
-`ace-tbd-partners-projects-list-events`:
+`ace-717-partners-projects-list-events`:
 
 - Changing the filter or sorting before the query, including remapping a
   sorting choice onto another field: a listener of the demand event, which
@@ -182,7 +182,7 @@ TYPO3's `#[AsEventListener]`, which does the same through the event.
 Hard dependencies, which have to be merged first, because closing a class
 without an event removes the only extension point:
 
-- `ace-tbd-partners-projects-list-events` for `PartnerController` and
+- `ace-717-partners-projects-list-events` for `PartnerController` and
   `ProjectController`;
 - `ace-tbd-program-psr14-events` for `ProgramController`;
 - `ace-tbd-bite-jobs-request-result-events` for `BiteJobsController`;

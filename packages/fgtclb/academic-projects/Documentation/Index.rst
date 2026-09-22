@@ -66,6 +66,11 @@ project managers, research participants or cooperation partners.
 
         Override and customise the frontend templates.
 
+    ..  card:: :ref:`For developers <developers>`
+
+        The events both project list plugins dispatch, and what a listener
+        may change with them.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -84,6 +89,7 @@ project managers, research participants or cooperation partners.
     Installation/Index
     Configuration/Index
     Templates/Index
+    Developers/Index
     KnownProblems/Index
     Changelog/Changelog-3
     Changelog/Changelog-2

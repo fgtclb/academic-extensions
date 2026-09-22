@@ -1,0 +1,4 @@
+# The list listener assigns a view variable that the template of this fixture extension
+# renders, and that template is put in front of the shipped one.
+plugin.tx_academicprojects.settings.testProjectListMarker = projects-marker
+plugin.tx_academicprojects.view.templateRootPaths.10 = EXT:test_project_list_events/Resources/Private/Templates/

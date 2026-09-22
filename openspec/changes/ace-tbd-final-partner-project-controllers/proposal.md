@@ -27,7 +27,7 @@ are `final` already.
   the `DemandFactory` it injects and never reads.
 - A project that subclasses or XCLASSes one of these controllers gets a
   fatal error when the class is loaded, and has to move to the events of
-  its plugin: `ace-tbd-partners-projects-list-events` for partners and
+  its plugin: `ace-717-partners-projects-list-events` for partners and
   projects, `ace-tbd-program-psr14-events` for programs,
   `ace-tbd-bite-jobs-request-result-events` for the B-ITE job list, and
   `ace-tbd-generic-plugin-view-event` for the actions none of those covers.
@@ -67,7 +67,7 @@ None.
   upgrade.
 - `docs/architecture/class-design.md`: the controller counts and a sentence
   on why every plugin controller is closed.
-- Depends on `ace-tbd-partners-projects-list-events`,
+- Depends on `ace-717-partners-projects-list-events`,
   `ace-tbd-program-psr14-events` and
   `ace-tbd-bite-jobs-request-result-events`, which have to land first, so
   that every controller made final has an event-based extension point. The
@@ -90,7 +90,7 @@ None.
 ## Source
 
 Follows from the maintainer's decisions on
-`ace-tbd-partners-projects-list-events` and on this change (project
+`ace-717-partners-projects-list-events` and on this change (project
 differences analysis of 2026-09-12). No YouTrack issue is filed yet; the
 change is renamed to `ace-<NNN>-final-partner-project-controllers` when the
 issue is filed after implementation.

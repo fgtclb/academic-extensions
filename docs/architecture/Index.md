@@ -51,6 +51,12 @@ describing an intention as if it were the state.
   registered as an override of a core backend partial that no core template
   renders — only `academic_programs` ever showed it, and a rename in March 2023
   ended that.
+- A list plugin offers **two** events, not one: a demand event before the query
+  and a list event after it, both carrying the plugin context of
+  `academic_base`. A restriction the plugin guarantees rather than offers - the
+  partner map's "no coordinates, not drawn" - is applied *after* the demand
+  event, so a listener cannot take it away. Everything else it can: the demand
+  *is* the query, so a listener widens as easily as it narrows.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
@@ -82,6 +88,7 @@ describing an intention as if it were the state.
 | [Translation synchronization](translation-synchronization.md)   | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.                                                 |
 | [Shared partials](shared-partials.md)                           | The Fluid partials `academic_base` ships for every extension, the root path key `-1` they are registered with, and which views register it.                                                |
 | [Overridable partials](overridable-partials.md)                 | How a template is cut into partials a project overrides one at a time, the escaping contract of a partial that renders a value, and where the classes go.                                  |
+| [List plugin events](list-plugin-events.md)                     | The demand and list events of the partner and project lists, the plugin context they carry, and the rules that are easy to get wrong.                                                      |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
