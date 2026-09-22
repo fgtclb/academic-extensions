@@ -75,17 +75,41 @@ sets" is the narrower and correct condition here: the academic extensions
 deliver through sets, and a site whose own `typoscript` a record clears is not
 this check's business.
 
-### One scanner, two file suffixes
+### One scanner, two suffix *lists*
 
-`tsConfigReferences()` becomes suffix-agnostic and is used for both fields, and
-`atImportResolves()` becomes `atImportFiles()`, returning the files a reference
-resolves to instead of a boolean. "Resolves" is then "the list is not empty",
-which the existing callers ask, and the new recursion gets the list it needs
-from the same method. The four shapes and their order stay exactly as
+`tsConfigReferences()` needed no change at all — it extracts paths and never
+looked at a suffix. `atImportResolves()` became `atImportFiles()`, returning the
+files a reference resolves to instead of a boolean: "resolves" is then "the list
+is not empty", which the existing callers ask, and the recursion gets the list it
+needs from the same method. The four shapes and their order stay exactly as
 `processAtImport()` has them.
 
-Rejected: a second scanner for TypoScript. The syntax is the same; only the
-suffix differs, and core passes it as a parameter for the same reason.
+**Corrected during the review.** This section said "only the suffix differs, and
+core passes it as a parameter for the same reason". That is wrong, and it was
+asserted as a measured premise. `TreeFromLineStreamBuilder::$atImportTypeToSuffixMap`
+maps `constants` and `setup` to `['typoscript']` and `tsconfig` to
+**`['typoscript', 'tsconfig']`**, and `buildTreeInternal()` calls
+`processAtImport()` once per allowed suffix. So a page TSconfig `@import` of a
+`.typoscript` file resolves in core, and under the single-suffix reading this
+check reported it as dead. `atImportFilesOfType()` loops the same lists.
+
+Rejected: a second scanner for TypoScript. The syntax is identical; only the
+suffix list differs.
+
+### A selected file is not an import
+
+**Found by the review, in code this change added.** A value of
+`tsconfig_includes` is resolved by core with one exact file lookup —
+`TsConfigTreeBuilder::getContentOfTsconfigFile()` on v14, the same logic inlined
+in `getRootlinePageTsConfigTree()` on v13 — and not with the four `@import`
+shapes: no folder, no wildcard, no appended suffix, and no suffix requirement,
+so a selected `.txt` reads fine and a selected folder reads nothing. Resolving
+it through `atImportFiles()` reported the contents of folders TYPO3 never opens.
+`selectedTsConfigPath()` reproduces the lookup instead.
+
+A selected folder gets a finding of its own rather than silence: core's
+`file_exists()` accepts a directory and `file_get_contents()` then reads nothing
+from it and raises a warning, so the value is dead *and* noisy.
 
 ### Following a reference that resolves
 
@@ -101,7 +125,15 @@ scanned, recursively. Two rules keep it honest:
 - **A `seen` set of absolute paths**, so two files importing each other
   terminate and every unresolved reference is reported once. Core has no such
   guard and recurses; it is protected by the file system rather than by the
-  code, and this check must not be.
+  code, and this check must not be. It is created **per page and per site**,
+  because two pages importing the same broken file are two records to correct
+  and each has to be named.
+- **A depth bound of 25 behind it.** Correctness comes from the `seen` set,
+  which bounds the recursion by the number of distinct files. The bound exists
+  for the case where that set breaks: without it a cycle exhausts the memory
+  limit and reports itself as a fatal error somewhere else — measured, 28 tests
+  into a suite run. With it, the same defect produces too many findings, which
+  is a defect that can be seen and tested.
 
 The finding names the page or the site that leads to the file, plus the file,
 because that is where an integrator starts looking.
@@ -144,6 +176,12 @@ takes, so the output column does not move.
   the documentation chapter.
 - [Only the first level of a record's TypoScript is read] → named in both
   "does not check" lists.
+- [Every visible `sys_template` row is read, while core reads one per page
+  along a rootline] → the pre-existing static template checks share that
+  simplification; resolving a rootline per record is a larger step than the
+  finding is worth. Named in both lists.
+- [A relative `@import` inside a followed file is not resolved] → a relative
+  path is never an academic one, so it can only leave a chain unwalked. Named.
 
 ## Migration Plan
 

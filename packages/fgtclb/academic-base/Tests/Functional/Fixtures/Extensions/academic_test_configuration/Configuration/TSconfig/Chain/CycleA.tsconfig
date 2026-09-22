@@ -1,0 +1,8 @@
+# Half of a pair of page TSconfig files that import each other. Core has no
+# cycle guard here and is protected by the file system rather than by its code;
+# the configuration check has to terminate on its own.
+#
+# The dead import is what makes the cycle test more than a "does not hang":
+# it must be reported exactly once, however often the pair is walked.
+@import 'EXT:academic_test_configuration/Configuration/TSconfig/Chain/CycleB.tsconfig'
+@import 'EXT:academic_test_configuration/Configuration/TSconfig/Removed.tsconfig'

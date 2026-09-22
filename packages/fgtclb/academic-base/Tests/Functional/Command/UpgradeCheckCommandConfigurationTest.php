@@ -184,6 +184,43 @@ final class UpgradeCheckCommandConfigurationTest extends AbstractAcademicBaseTes
         ];
     }
 
+    /**
+     * `--upstream-path` names the folder the `--override-path` folders are
+     * compared with, and nothing else - the folders a `--site` names are
+     * compared with the upstream folder of their own kind. Accepting it
+     * without one is accepting an option and ignoring it, which is the failure
+     * mode this command exists to remove.
+     *
+     * @param array<string, string> $parameters
+     */
+    #[Test]
+    #[DataProvider('upstreamPathWithoutAnOverrideFolder')]
+    public function anUpstreamPathWithoutAnOverrideFolderIsInvalidInput(array $parameters): void
+    {
+        $tester = $this->execute([
+            'extension' => 'test_upgrade_check',
+            '--upstream-path' => 'EXT:test_upgrade_check/Resources/Private/Layouts/',
+            ...$parameters,
+        ]);
+
+        $this->assertSame(Command::INVALID, $tester->getStatusCode());
+        $this->assertStringContainsString(
+            'so it needs at least one --override-path',
+            $tester->getDisplay(),
+        );
+    }
+
+    /**
+     * @return array<string, array{0: array<string, string>}>
+     */
+    public static function upstreamPathWithoutAnOverrideFolder(): array
+    {
+        return [
+            'on its own' => [[]],
+            'with a site' => [['--site' => 'probe']],
+        ];
+    }
+
     private function writeSiteWithAliasSet(): void
     {
         $this->writeSiteConfiguration(

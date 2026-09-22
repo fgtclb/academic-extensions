@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicBase\Upgrade;
 
 use Symfony\Component\Yaml\Yaml;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Resource\Security\FileNameValidator;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -78,12 +81,33 @@ final readonly class ConfigurationChecker
         'setup.txt',
     ];
 
-    private const PAGE_TSCONFIG_FILE_SUFFIX = 'tsconfig';
+    /**
+     * The file suffix `TreeFromLineStreamBuilder::processAtImport()` resolves an
+     * `@import` against, which is the one thing that differs between the
+     * TypoScript of a record and the page TSconfig of a page or a site.
+     */
+    private const SUFFIXES_TYPOSCRIPT = ['typoscript'];
+    private const SUFFIXES_TSCONFIG = ['typoscript', 'tsconfig'];
+
+    /**
+     * How deep a page TSconfig import chain is followed.
+     *
+     * Correctness comes from the `seen` set, which bounds the recursion by the
+     * number of distinct files. This is the second net, and it exists for what
+     * happens when the first one breaks: without it, a cycle exhausts the
+     * memory limit and takes the whole process down, so a defect here would
+     * report itself as a fatal error in an unrelated place - in the backend
+     * status report of an installation nobody can debug. With it, the same
+     * defect produces too many findings, which is a defect that can be seen
+     * and tested. Real chains are two or three files deep.
+     */
+    private const MAX_TSCONFIG_DEPTH = 25;
 
     public function __construct(
         private PackageManager $packageManager,
         private ConnectionPool $connectionPool,
         private SiteFinder $siteFinder,
+        private FileNameValidator $fileNameValidator,
     ) {}
 
     /**
@@ -95,6 +119,7 @@ final readonly class ConfigurationChecker
 
         return [
             ...$this->checkStaticTemplates($sysTemplateRows),
+            ...$this->checkRecordTypoScript($sysTemplateRows),
             ...$this->checkPageTsConfig(),
             ...$this->checkSites($sysTemplateRows),
             ...$this->checkXclasses(),
@@ -102,7 +127,7 @@ final readonly class ConfigurationChecker
     }
 
     /**
-     * @param list<array{uid: int, pid: int, title: string, include_static_file: string}> $sysTemplateRows
+     * @param list<array{uid: int, pid: int, title: string, clear: int, constants: string, config: string, include_static_file: string}> $sysTemplateRows
      * @return list<ConfigurationFinding>
      */
     private function checkStaticTemplates(array $sysTemplateRows): array
@@ -199,22 +224,32 @@ final readonly class ConfigurationChecker
         $findings = [];
         foreach ($this->pageRows() as $row) {
             $subject = sprintf('pages:%d', $row['uid']);
-            $location = sprintf('The page %d ("%s")', $row['uid'], $row['title']);
+            $origin = sprintf('the page %d ("%s")', $row['uid'], $row['title']);
+            $seen = [];
             foreach (GeneralUtility::trimExplode(',', $row['tsconfig_includes'], true) as $value) {
-                $findings = [...$findings, ...$this->checkTsConfigInclude($subject, $location, $value)];
+                $findings = [
+                    ...$findings,
+                    ...$this->checkTsConfigInclude($subject, ucfirst($origin), $origin, $value, $seen),
+                ];
             }
-            $findings = [...$findings, ...$this->checkTsConfigContent($subject, $location, $row['TSconfig'])];
+            $findings = [
+                ...$findings,
+                ...$this->checkTsConfigContent($subject, ucfirst($origin), $origin, $row['TSconfig'], $seen),
+            ];
         }
 
         $sites = $this->siteFinder->getAllSites();
         ksort($sites, SORT_STRING);
         foreach ($sites as $site) {
+            $seen = [];
             $findings = [
                 ...$findings,
                 ...$this->checkTsConfigContent(
                     sprintf('site:%s', $site->getIdentifier()),
                     sprintf('The file "config/sites/%s/page.tsconfig"', $site->getIdentifier()),
+                    sprintf('the site "%s"', $site->getIdentifier()),
                     $site->getTSconfig()?->pageTSconfig ?? '',
+                    $seen,
                 ),
             ];
         }
@@ -229,13 +264,33 @@ final readonly class ConfigurationChecker
      * an `EXT:` path, an active extension, and a file that exists below that
      * extension. Anything else is dropped there without a message.
      *
+     * A file that does exist is read, so that an unresolved academic reference
+     * inside it is reported with the page that leads TYPO3 to it - which is
+     * what TYPO3 does with the content it finds there.
+     *
+     * @param array<string, true> $seen
      * @return list<ConfigurationFinding>
      */
-    private function checkTsConfigInclude(string $subject, string $location, string $value): array
-    {
+    private function checkTsConfigInclude(
+        string $subject,
+        string $location,
+        string $origin,
+        string $value,
+        array &$seen,
+    ): array {
+        // A selected file is *not* resolved the way an "@import" is: core does
+        // one exact file lookup for it and nothing else - no folder, no
+        // wildcard, no appended suffix, and no suffix requirement at all. A
+        // file of a project or of another extension is read all the same, and
+        // is followed here for the same reason: the case this exists for is a
+        // project file that resolves and imports an academic path a release
+        // renamed.
+        $path = $this->selectedTsConfigPath($value);
         $extensionKey = $this->academicExtensionKeyOf($value);
         if ($extensionKey === null) {
-            return [];
+            return $path !== null && is_file($path)
+                ? $this->followTsConfigFile($subject, $origin, $path, $seen, 0)
+                : [];
         }
         if (!$this->packageManager->isPackageActive($extensionKey)) {
             return [$this->tsConfigImportFinding($subject, sprintf(
@@ -245,10 +300,22 @@ final readonly class ConfigurationChecker
                 $extensionKey,
             ))];
         }
-        $extensionPath = rtrim($this->packageManager->getPackage($extensionKey)->getPackagePath(), '/') . '/';
-        $fileName = PathUtility::getCanonicalPath($extensionPath . substr($value, strlen('EXT:' . $extensionKey) + 1));
-        if (str_starts_with($fileName, $extensionPath) && is_file($fileName)) {
-            return [];
+        if ($path !== null && is_file($path)) {
+            return $this->followTsConfigFile($subject, $origin, $path, $seen, 0);
+        }
+        if ($path !== null && is_dir($path)) {
+            // Core guards this with `file_exists()`, which a directory passes,
+            // and then calls `file_get_contents()` on it: nothing is read and
+            // the frontend raises a warning. Selecting a folder is never what
+            // the integrator meant - unlike an "@import", a selected value is
+            // one file and nothing else.
+            return [$this->tsConfigImportFinding($subject, sprintf(
+                '%s selects "%s", which is a folder. A selected page TSconfig value names one file and '
+                . 'is not expanded the way an "@import" is, so TYPO3 reads nothing from it and raises a '
+                . 'warning while doing so. Select the file itself.',
+                $location,
+                $value,
+            ))];
         }
 
         return [$this->tsConfigImportFinding($subject, sprintf(
@@ -260,12 +327,20 @@ final readonly class ConfigurationChecker
     }
 
     /**
-     * The academic references of one page TSconfig string.
+     * The academic references of one page TSconfig string, and of every file
+     * its references lead to.
      *
+     * @param array<string, true> $seen Absolute file names already read, so that two files importing each other terminate.
      * @return list<ConfigurationFinding>
      */
-    private function checkTsConfigContent(string $subject, string $location, string $tsConfig): array
-    {
+    private function checkTsConfigContent(
+        string $subject,
+        string $location,
+        string $origin,
+        string $tsConfig,
+        array &$seen,
+        int $depth = 0,
+    ): array {
         if (trim($tsConfig) === '') {
             return [];
         }
@@ -273,6 +348,12 @@ final readonly class ConfigurationChecker
         foreach ($this->tsConfigReferences($tsConfig) as $reference) {
             $extensionKey = $this->academicExtensionKeyOf($reference['path']);
             if ($extensionKey === null) {
+                if (!$reference['legacySyntax']) {
+                    $findings = [
+                        ...$findings,
+                        ...$this->followTsConfigFiles($subject, $origin, $reference['path'], $seen, $depth),
+                    ];
+                }
                 continue;
             }
             if ($reference['legacySyntax']) {
@@ -299,28 +380,268 @@ final readonly class ConfigurationChecker
                 );
                 continue;
             }
-            if ($this->atImportResolves($reference['path'])) {
+            if ($this->atImportFilesOfType($reference['path'], self::SUFFIXES_TSCONFIG) !== []) {
+                $findings = [
+                    ...$findings,
+                    ...$this->followTsConfigFiles($subject, $origin, $reference['path'], $seen, $depth),
+                ];
                 continue;
             }
-            if (!$this->packageManager->isPackageActive($extensionKey)) {
-                $findings[] = $this->tsConfigImportFinding($subject, sprintf(
-                    '%s imports "%s", but the extension "%s" is not installed. TYPO3 skips the import '
-                    . 'without a message.',
-                    $location,
-                    $reference['path'],
-                    $extensionKey,
-                ));
-                continue;
-            }
-            $findings[] = $this->tsConfigImportFinding($subject, sprintf(
-                '%s imports "%s", which matches no file of the installed version. TYPO3 skips '
-                . 'the import without a message.',
+            $findings[] = $this->tsConfigImportFinding($subject, $this->deadImportMessage(
                 $location,
                 $reference['path'],
+                $extensionKey,
+                self::SUFFIXES_TSCONFIG,
             ));
         }
 
         return $findings;
+    }
+
+    /**
+     * Reads every file a page TSconfig reference resolves to and checks its
+     * content, so an unresolved academic reference one file further in is
+     * reported with the page or site that leads TYPO3 to it.
+     *
+     * The `seen` set is keyed by the absolute file name and is what makes two
+     * files importing each other terminate. Core has no such guard; it is
+     * protected by the file system rather than by the code, and a check must
+     * not be. {@see MAX_TSCONFIG_DEPTH} is the second net behind it.
+     *
+     * @param array<string, true> $seen
+     * @return list<ConfigurationFinding>
+     */
+    private function followTsConfigFiles(
+        string $subject,
+        string $origin,
+        string $value,
+        array &$seen,
+        int $depth,
+    ): array {
+        $findings = [];
+        foreach ($this->atImportFilesOfType($value, self::SUFFIXES_TSCONFIG) as $fileName) {
+            $findings = [...$findings, ...$this->followTsConfigFile($subject, $origin, $fileName, $seen, $depth)];
+        }
+
+        return $findings;
+    }
+
+    /**
+     * Reads one page TSconfig file and checks its content.
+     *
+     * The location names the file rather than the expression that led to it:
+     * a folder or wildcard import resolves to several files, and "the file
+     * EXT:my_site/Configuration/TSconfig/" would name a folder and leave the
+     * integrator to find which of its files carries the line.
+     *
+     * @param array<string, true> $seen
+     * @return list<ConfigurationFinding>
+     */
+    private function followTsConfigFile(
+        string $subject,
+        string $origin,
+        string $fileName,
+        array &$seen,
+        int $depth,
+    ): array {
+        if ($depth >= self::MAX_TSCONFIG_DEPTH || isset($seen[$fileName])) {
+            return [];
+        }
+        $seen[$fileName] = true;
+        $content = @file_get_contents($fileName);
+        if (!is_string($content) || trim($content) === '') {
+            return [];
+        }
+
+        return $this->checkTsConfigContent(
+            $subject,
+            sprintf('The file "%s", reached from %s,', $this->displayPath($fileName), $origin),
+            $origin,
+            $content,
+            $seen,
+            $depth + 1,
+        );
+    }
+
+    /**
+     * The path a `tsconfig_includes` value selects, or `null` when TYPO3 does
+     * not even look at it.
+     *
+     * This is `TsConfigTreeBuilder::getContentOfTsconfigFile()` on TYPO3 v14
+     * and the same logic inlined in `getRootlinePageTsConfigTree()` on v13: an
+     * `EXT:` path, an active extension, and a canonical path that stays inside
+     * that extension. Deliberately *not* the four shapes of an `@import` - a
+     * selected folder, a name without its suffix and a wildcard all read
+     * nothing there, while a file of any suffix reads fine.
+     *
+     * Whether the path is a file is left to the caller, because core's
+     * `file_exists()` accepts a folder and then reads nothing from it - which
+     * is a finding of its own rather than a file to follow.
+     */
+    private function selectedTsConfigPath(string $value): ?string
+    {
+        if (!PathUtility::isExtensionPath($value)) {
+            return null;
+        }
+        $parts = explode('/', substr($value, strlen('EXT:')), 2);
+        if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '' || !$this->packageManager->isPackageActive($parts[0])) {
+            return null;
+        }
+        $extensionPath = rtrim($this->packageManager->getPackage($parts[0])->getPackagePath(), '/') . '/';
+        $path = PathUtility::getCanonicalPath($extensionPath . $parts[1]);
+
+        return str_starts_with($path, $extensionPath) && file_exists($path) ? $path : null;
+    }
+
+    /**
+     * An absolute file name as it is worth printing: as an `EXT:` path when the
+     * file belongs to an active package, and relative to the project root
+     * otherwise. Both are what an integrator searches for; the absolute path of
+     * a package is not.
+     */
+    private function displayPath(string $fileName): string
+    {
+        $match = null;
+        foreach ($this->packageManager->getActivePackages() as $package) {
+            $packagePath = rtrim($package->getPackagePath(), '/') . '/';
+            // The longest match, not the first: a package inside another
+            // package's folder would otherwise be named after its host.
+            if (str_starts_with($fileName, $packagePath)
+                && ($match === null || strlen($packagePath) > strlen($match[1]))
+            ) {
+                $match = [$package->getPackageKey(), $packagePath];
+            }
+        }
+        if ($match !== null) {
+            return sprintf('EXT:%s/%s', $match[0], substr($fileName, strlen($match[1])));
+        }
+        $projectPath = rtrim(Environment::getProjectPath(), '/') . '/';
+
+        return str_starts_with($fileName, $projectPath)
+            ? substr($fileName, strlen($projectPath))
+            : $fileName;
+    }
+
+    /**
+     * The academic references in the Constants and Setup fields of the
+     * TypoScript records.
+     *
+     * Core tokenizes both fields in `SysTemplateTreeBuilder` and hands the
+     * stream to the same `TreeFromLineStreamBuilder` that reads page TSconfig,
+     * so an `@import` matching no file is dropped there exactly as silently -
+     * only against the `.typoscript` suffix. This is the case the 2.4 entry
+     * `Breaking-SiteSetsAndStaticTemplatesRestructured.rst` of academic_persons
+     * describes: "A site package that imported one of the removed files by path
+     * fails to resolve it."
+     *
+     * Only the fields themselves are read, not the files they import. The first
+     * level is where a renamed path bites, and reading the whole TypoScript tree
+     * of an installation on every status report render is not worth the second.
+     *
+     * @param list<array{uid: int, pid: int, title: string, clear: int, constants: string, config: string, include_static_file: string}> $sysTemplateRows
+     * @return list<ConfigurationFinding>
+     */
+    private function checkRecordTypoScript(array $sysTemplateRows): array
+    {
+        $findings = [];
+        foreach ($sysTemplateRows as $row) {
+            foreach (['constants' => 'Constants', 'config' => 'Setup'] as $column => $label) {
+                $location = sprintf('The TypoScript record %d ("%s"), field "%s",', $row['uid'], $row['title'], $label);
+                foreach ($this->tsConfigReferences($row[$column]) as $reference) {
+                    $extensionKey = $this->academicExtensionKeyOf($reference['path']);
+                    if ($extensionKey === null) {
+                        continue;
+                    }
+                    if ($reference['legacySyntax']) {
+                        $findings[] = new ConfigurationFinding(
+                            ConfigurationFindingKind::TypoScriptSyntax,
+                            ContextualFeedbackSeverity::WARNING,
+                            sprintf('sys_template:%d', $row['uid']),
+                            sprintf(
+                                '%s includes "%s" with the "<INCLUDE_TYPOSCRIPT:" syntax, which TYPO3 v13 '
+                                . 'deprecated and TYPO3 v14 removed - there it is ignored without a message. '
+                                . 'Write it as "@import \'%s\'" instead.%s',
+                                $location,
+                                $reference['path'],
+                                $reference['path'],
+                                $reference['directory']
+                                    ? ' Note that "@import" of a folder reads its "*.typoscript" files and '
+                                        . 'does not descend into subfolders, which "DIR:" did.'
+                                    : '',
+                            ),
+                        );
+                        continue;
+                    }
+                    if ($this->atImportFilesOfType($reference['path'], self::SUFFIXES_TYPOSCRIPT) !== []) {
+                        continue;
+                    }
+                    $findings[] = new ConfigurationFinding(
+                        ConfigurationFindingKind::TypoScriptImport,
+                        ContextualFeedbackSeverity::WARNING,
+                        sprintf('sys_template:%d', $row['uid']),
+                        $this->deadImportMessage(
+                            $location,
+                            $reference['path'],
+                            $extensionKey,
+                            self::SUFFIXES_TYPOSCRIPT,
+                            'Correct the path, or depend on the site set of the extension instead of '
+                                . 'importing its files.',
+                        ),
+                    );
+                }
+            }
+        }
+
+        return $findings;
+    }
+
+    /**
+     * Why an `@import` of an academic file reads nothing, in the words the
+     * integrator needs.
+     *
+     * Three causes, and telling them apart is the difference between a report
+     * that is believed and one that is not: the extension is gone, the path
+     * matches nothing, or it matches a file that is plainly there and whose
+     * *name* TYPO3 refuses through its `fileDenyPattern` - for which core
+     * contributes nothing in every one of the four `@import` shapes.
+     *
+     * @param list<string> $fileSuffixes
+     */
+    private function deadImportMessage(
+        string $location,
+        string $path,
+        string $extensionKey,
+        array $fileSuffixes,
+        string $advice = '',
+    ): string {
+        if (!$this->packageManager->isPackageActive($extensionKey)) {
+            return sprintf(
+                '%s imports "%s", but the extension "%s" is not installed. TYPO3 skips the import '
+                . 'without a message.',
+                $location,
+                $path,
+                $extensionKey,
+            );
+        }
+        $refused = $this->atImportFilesRefusedByName($path, $fileSuffixes);
+        if ($refused !== []) {
+            return sprintf(
+                '%s imports "%s", which matches the file "%s" - a name TYPO3 refuses through its '
+                . '"fileDenyPattern". It contributes nothing for such a file, so the import is dead '
+                . 'although the file is there. Rename it.',
+                $location,
+                $path,
+                $this->displayPath($refused[0]),
+            );
+        }
+
+        return rtrim(sprintf(
+            '%s imports "%s", which matches no file of the installed version. TYPO3 skips the import '
+            . 'without a message. %s',
+            $location,
+            $path,
+            $advice,
+        ));
     }
 
     private function tsConfigImportFinding(string $subject, string $message): ConfigurationFinding
@@ -437,64 +758,137 @@ final readonly class ConfigurationChecker
     }
 
     /**
-     * Whether an `@import` of page TSconfig reads at least one file.
+     * The files an `@import` reads, in the order it reads them - empty when it
+     * reads none, which is what "the import is dead" means.
      *
      * The four shapes are the ones `TreeFromLineStreamBuilder::processAtImport()`
      * handles for a string that is not itself a file: an exact file, a folder,
-     * a file name without its suffix, and one wildcard in the file name. The
-     * relative lookup of that method is deliberately not reproduced - it needs
-     * the path of the *file* an import stands in, and page TSconfig from the
-     * database has none, so a relative import there never resolves anyway.
+     * a file name without its suffix, and one wildcard in the file name.
+     *
+     * The relative lookup of that method is **not** reproduced. For a string
+     * out of the database that costs nothing - core returns early there too,
+     * because the node has no path - but for the content of a file this check
+     * follows it does: core sets the path of such a node, so a relative import
+     * inside a followed file resolves there and is missed here. A relative
+     * path is never an academic one, so this can only under-report, and it is
+     * named in both "does not check" lists.
+     *
+     * @return list<string> Absolute file names.
      */
-    private function atImportResolves(string $value): bool
+    private function atImportFiles(string $value, string $fileSuffix, bool $applyDenyPattern = true): array
     {
         $absolutePath = rtrim(GeneralUtility::getFileAbsFileName($value), '/');
         if ($absolutePath === '') {
-            return false;
+            return [];
         }
-        if (str_ends_with($absolutePath, '.' . self::PAGE_TSCONFIG_FILE_SUFFIX) && is_file($absolutePath)) {
-            return true;
+        if (str_ends_with($absolutePath, '.' . $fileSuffix) && is_file($absolutePath)) {
+            return !$applyDenyPattern || $this->fileNameValidator->isValid($absolutePath) ? [$absolutePath] : [];
         }
         if (is_dir($absolutePath)) {
-            return $this->folderHoldsAMatch($absolutePath . '/', '', '.' . self::PAGE_TSCONFIG_FILE_SUFFIX);
+            return $this->filesMatching($absolutePath . '/', '', '.' . $fileSuffix, $applyDenyPattern);
         }
-        if (is_file($absolutePath . '.' . self::PAGE_TSCONFIG_FILE_SUFFIX)) {
-            return true;
+        if (is_file($absolutePath . '.' . $fileSuffix)) {
+            $withSuffix = $absolutePath . '.' . $fileSuffix;
+
+            return !$applyDenyPattern || $this->fileNameValidator->isValid($withSuffix) ? [$withSuffix] : [];
         }
         if (!str_contains($absolutePath, '*')) {
-            return false;
+            return [];
         }
         $folder = rtrim(dirname($absolutePath), '/') . '/';
         $filePattern = basename($absolutePath);
         if (!is_dir($folder) || substr_count($filePattern, '*') !== 1) {
-            return false;
+            return [];
         }
-        if (str_ends_with($filePattern, self::PAGE_TSCONFIG_FILE_SUFFIX)) {
-            $filePattern = rtrim(substr($filePattern, 0, -strlen(self::PAGE_TSCONFIG_FILE_SUFFIX)), '.');
+        if (str_ends_with($filePattern, $fileSuffix)) {
+            $filePattern = rtrim(substr($filePattern, 0, -strlen($fileSuffix)), '.');
         }
-        $filePattern .= '.' . self::PAGE_TSCONFIG_FILE_SUFFIX;
+        $filePattern .= '.' . $fileSuffix;
         $wildcardPosition = (int)strpos($filePattern, '*');
 
-        return $this->folderHoldsAMatch(
+        return $this->filesMatching(
             $folder,
             substr($filePattern, 0, $wildcardPosition),
             substr($filePattern, $wildcardPosition + 1),
+            $applyDenyPattern,
         );
     }
 
-    private function folderHoldsAMatch(string $folder, string $prefix, string $suffix): bool
+    /**
+     * The files an `@import` of one *type* reads: core maps the type to a list
+     * of allowed suffixes and calls `processAtImport()` once per suffix
+     * (`TreeFromLineStreamBuilder::$atImportTypeToSuffixMap`). TypoScript
+     * allows `.typoscript`; **page TSconfig allows `.typoscript` and
+     * `.tsconfig`**, in that order.
+     *
+     * Each pass yields only files ending in its own suffix - the exact and
+     * append shapes require it, the folder shape filters by it, and the
+     * wildcard shape normalises the pattern to it - so the two sets are
+     * disjoint and the array keys below are a formality rather than a dedupe
+     * of anything reachable.
+     *
+     * @param list<string> $fileSuffixes
+     * @return list<string> Absolute file names.
+     */
+    private function atImportFilesOfType(string $value, array $fileSuffixes, bool $applyDenyPattern = true): array
     {
+        $files = [];
+        foreach ($fileSuffixes as $fileSuffix) {
+            foreach ($this->atImportFiles($value, $fileSuffix, $applyDenyPattern) as $fileName) {
+                $files[$fileName] = true;
+            }
+        }
+
+        return array_keys($files);
+    }
+
+    /**
+     * The files an `@import` would have read if TYPO3's `fileDenyPattern` did
+     * not refuse their names - empty unless that is what makes the import
+     * dead.
+     *
+     * Worth the second pass on the finding path only: the file is there, an
+     * integrator can see it, and "matches no file of the installed version"
+     * is not a statement they would believe about a file they are looking at.
+     *
+     * @param list<string> $fileSuffixes
+     * @return list<string> Absolute file names.
+     */
+    private function atImportFilesRefusedByName(string $value, array $fileSuffixes): array
+    {
+        return array_values(array_diff(
+            $this->atImportFilesOfType($value, $fileSuffixes, false),
+            $this->atImportFilesOfType($value, $fileSuffixes),
+        ));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function filesMatching(string $folder, string $prefix, string $suffix, bool $applyDenyPattern = true): array
+    {
+        $files = [];
         foreach ((array)(scandir($folder) ?: []) as $entry) {
             $entry = (string)$entry;
             if ($entry === '.' || $entry === '..' || is_dir($folder . $entry)) {
                 continue;
             }
-            if (str_starts_with($entry, $prefix) && str_ends_with($entry, $suffix)) {
-                return true;
+            if (!str_starts_with($entry, $prefix) || !str_ends_with($entry, $suffix)) {
+                continue;
             }
+            // Core guards every file it reads with the deny pattern - all four
+            // shapes of processAtImport(), not only this one. A name it refuses
+            // ("x.php.tsconfig") makes the import contribute nothing, so the
+            // import is dead and this check has to say so rather than read the
+            // file and call it resolved.
+            if ($applyDenyPattern && !$this->fileNameValidator->isValid($folder . $entry)) {
+                continue;
+            }
+            $files[] = $folder . $entry;
         }
+        sort($files, SORT_STRING);
 
-        return false;
+        return $files;
     }
 
     /**
@@ -507,7 +901,7 @@ final readonly class ConfigurationChecker
      * in the list, and is a deliberate choice of whoever wrote the set that
      * pulls it in.
      *
-     * @param list<array{uid: int, pid: int, title: string, include_static_file: string}> $sysTemplateRows
+     * @param list<array{uid: int, pid: int, title: string, clear: int, constants: string, config: string, include_static_file: string}> $sysTemplateRows
      * @return list<ConfigurationFinding>
      */
     private function checkSites(array $sysTemplateRows): array
@@ -541,10 +935,11 @@ final readonly class ConfigurationChecker
                     $extensionKeysWithASet[$extensionKey] = true;
                 }
             }
+            $rootPageId = $site->getRootPageId();
+            $findings = [...$findings, ...$this->clearedSetBranches($site, $rootPageId, $sysTemplateRows)];
             if ($extensionKeysWithASet === []) {
                 continue;
             }
-            $rootPageId = $site->getRootPageId();
             $extensionKeysWithAStaticTemplate = [];
             foreach ($sysTemplateRows as $row) {
                 if ($row['pid'] !== $rootPageId) {
@@ -576,6 +971,70 @@ final readonly class ConfigurationChecker
                     ),
                 );
             }
+        }
+
+        return $findings;
+    }
+
+    /**
+     * The TypoScript records on a site's root page that discard what its site
+     * sets deliver.
+     *
+     * `SysTemplateTreeBuilder` adds the site include to the root node before
+     * the `sys_template` rows, marks a row whose bit for the branch is set as
+     * "clear" (`clear & 1` for constants, `clear & 2` for setup), and
+     * `IncludeTreeAstBuilderVisitor::visitBeforeChildren()` replaces the whole
+     * AST with a fresh root node for such a node. So the record wipes the set
+     * contribution to that branch, and the failure looks like "the extension
+     * ships no TypoScript" rather than like a template record problem.
+     *
+     * The condition is `Site::getSets()`, not `Site::isTypoScriptRoot()`: the
+     * latter also answers true for a site that only carries TypoScript of its
+     * own, which is none of this check's business, and it is `@internal` on
+     * both core versions while `getSets()` is not.
+     *
+     * @param list<array{uid: int, pid: int, title: string, clear: int, constants: string, config: string, include_static_file: string}> $sysTemplateRows
+     * @return list<ConfigurationFinding>
+     */
+    private function clearedSetBranches(Site $site, int $rootPageId, array $sysTemplateRows): array
+    {
+        if ($site->getSets() === []) {
+            return [];
+        }
+        $findings = [];
+        foreach ($sysTemplateRows as $row) {
+            if ($row['pid'] !== $rootPageId) {
+                continue;
+            }
+            $branches = [];
+            if (($row['clear'] & 1) !== 0) {
+                $branches[] = 'Constants';
+            }
+            if (($row['clear'] & 2) !== 0) {
+                $branches[] = 'Setup';
+            }
+            if ($branches === []) {
+                continue;
+            }
+            $findings[] = new ConfigurationFinding(
+                ConfigurationFindingKind::SetBranchCleared,
+                ContextualFeedbackSeverity::WARNING,
+                sprintf('site:%s', $site->getIdentifier()),
+                sprintf(
+                    'The TypoScript record %d ("%s") on the root page %d of the site "%s" clears %s, and '
+                    . 'the site delivers TypoScript through site sets. TYPO3 reads the sets before the '
+                    . 'record, so the flag discards everything they contributed to %s - which looks like '
+                    . 'an extension that ships no TypoScript rather than like a template record. The '
+                    . 'backend button "Create a root TypoScript record" writes both flags. Clear the flag, '
+                    . 'or carry the configuration in the record itself.',
+                    $row['uid'],
+                    $row['title'],
+                    $rootPageId,
+                    $site->getIdentifier(),
+                    implode(' and ', $branches),
+                    count($branches) === 1 ? 'that branch' : 'both branches',
+                ),
+            );
         }
 
         return $findings;
@@ -699,18 +1158,18 @@ final readonly class ConfigurationChecker
      * a deleted, hidden or expired record delivers nothing, so there is nothing
      * to report about it.
      *
-     * @return list<array{uid: int, pid: int, title: string, include_static_file: string}>
+     * Every row is read, not only the ones that include a static template: the
+     * `constants` and `config` fields and the `clear` flag are checked too, and
+     * a record can carry any of them without the other.
+     *
+     * @return list<array{uid: int, pid: int, title: string, clear: int, constants: string, config: string, include_static_file: string}>
      */
     private function sysTemplateRows(): array
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_template');
         $result = $queryBuilder
-            ->select('uid', 'pid', 'title', 'include_static_file')
+            ->select('uid', 'pid', 'title', 'clear', 'constants', 'config', 'include_static_file')
             ->from('sys_template')
-            ->where($queryBuilder->expr()->neq(
-                'include_static_file',
-                $queryBuilder->createNamedParameter(''),
-            ))
             ->orderBy('uid')
             ->executeQuery();
 
@@ -720,7 +1179,10 @@ final readonly class ConfigurationChecker
                 'uid' => (int)$row['uid'],
                 'pid' => (int)$row['pid'],
                 'title' => (string)$row['title'],
-                'include_static_file' => (string)$row['include_static_file'],
+                'clear' => (int)($row['clear'] ?? 0),
+                'constants' => (string)($row['constants'] ?? ''),
+                'config' => (string)($row['config'] ?? ''),
+                'include_static_file' => (string)($row['include_static_file'] ?? ''),
             ];
         }
 

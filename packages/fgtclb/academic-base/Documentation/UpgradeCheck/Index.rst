@@ -109,8 +109,8 @@ away.
             folder holds no TypoScript in the installed version. TYPO3 skips
             the value without a message.
         -   Open the record, select the static template of the installed
-            version in :guilabel:`Include static (from extensions)`, and
-            remove the dead value.
+            version in :guilabel:`Include TypoScript sets`, and remove the
+            dead value.
     *   -   :bash:`tsconfig-import`
         -   A page, or the :file:`page.tsconfig` of a site, imports or selects
             a page TSconfig file of an academic extension that is not there.
@@ -131,6 +131,30 @@ away.
             and TYPO3 v14 removed it - there the line is ignored without a
             message, whether or not the file it names exists.
         -   Write it as :typoscript:`@import 'EXT:...'`.
+    *   -   :bash:`typoscript-import`
+        -   The :guilabel:`Constants` or :guilabel:`Setup` field of a TypoScript
+            record imports a TypoScript file of an academic extension that is
+            not there. TYPO3 skips the import without a message - this is the
+            case the 2.4 changelog of :php:`EXT:academic_persons` warns about
+            for a site package that imports extension files by path.
+        -   Correct the path, or depend on the site set of the extension
+            instead of importing its files.
+    *   -   :bash:`typoscript-syntax`
+        -   The same field includes an academic file with the
+            :typoscript:`<INCLUDE_TYPOSCRIPT:` syntax. TYPO3 v14 removed it, so
+            the line is ignored there whether or not the file exists - and a
+            TypoScript record is where that syntax was most used before
+            :typoscript:`@import` existed.
+        -   Write it as :typoscript:`@import 'EXT:...'`.
+    *   -   :bash:`set-branch-cleared`
+        -   A TypoScript record on the root page of a site that delivers
+            TypoScript through site sets clears the :guilabel:`Constants` or
+            :guilabel:`Setup` branch. TYPO3 reads the sets before the record,
+            so the flag discards everything they contributed - and the result
+            looks like an extension that ships no TypoScript. The backend
+            button :guilabel:`Create a root TypoScript record` writes both
+            flags.
+        -   Clear the flag, or carry the configuration in the record itself.
     *   -   :bash:`alias-set`
         -   A site depends on :yaml:`fgtclb/academic-persons-default` or
             :yaml:`fgtclb/academic-study-plan-default`. Both are aliases
@@ -165,6 +189,18 @@ none of this command's business.
 A hidden TypoScript record is not reported: it delivers nothing to anybody, so
 there is nothing about it to fix. The page TSconfig of a hidden page **is**
 reported, because TYPO3 reads it all the same.
+
+A page TSconfig reference that resolves is **followed**: TYPO3 reads the
+imports inside the file it includes, so a page whose own import is sound can
+still end up with configuration that does not. The finding names the page, and
+the file the line is in.
+
+A value of :guilabel:`Include static Page TSconfig (from extensions)`
+(:sql:`pages.tsconfig_includes`) names one file and is **not** expanded the way
+an :typoscript:`@import` is - no folder, no
+wildcard, no appended suffix, and any file suffix reads fine. Selecting a folder
+therefore delivers nothing and makes TYPO3 raise a warning while reading
+nothing, which is reported as such.
 
 ..  _upgrade-check-report:
 
@@ -350,15 +386,21 @@ What it does not check
 *   Static templates, TSconfig imports and XCLASSes of a project's own
     extensions or of the TYPO3 core. The configuration group is about what the
     academic extensions no longer deliver.
-*   The :guilabel:`Constants` and :guilabel:`Setup` fields of a TypoScript
-    record. An :typoscript:`@import` of a TypoScript file that is gone is
-    dropped there just as silently, and a site package that imported one of the
-    removed files by path is a real case - it is simply not part of this check
-    yet. Only :guilabel:`Include static (from extensions)` is read.
-*   The content of a page TSconfig file that *does* resolve. TYPO3 follows the
-    imports inside it; this check does not.
-*   A :typoscript:`clear` flag of a TypoScript record on a site that is driven
-    by site sets, which throws the whole set contribution away.
+*   The files a TypoScript record's :typoscript:`@import` leads to. The two
+    fields are read and their imports are resolved; the files behind them are
+    not opened. Page TSconfig *is* followed, because those trees are small,
+    while the TypoScript tree of a site package is not.
+*   More than one TypoScript record per page. TYPO3 reads one record per page
+    along the rootline of the page it renders; this check reads every record of
+    the installation, so a second record on a page, or a record on a page no
+    site reaches, is reported although TYPO3 never reads it.
+*   A relative :typoscript:`@import` inside a file that is followed. A relative
+    path is never an academic one, so this only leaves a chain unwalked - it
+    never produces a wrong finding.
+*   A :typoscript:`<INCLUDE_TYPOSCRIPT:` of a file outside the academic
+    extensions. TYPO3 v13 still reads it, so such a file is not followed; on
+    TYPO3 v14 it reads nothing at all, which is what
+    :bash:`tsconfig-syntax` reports.
 *   User TSconfig. No academic extension ships any.
 *   Whether a page TSconfig import that *does* resolve still delivers what it
     used to. The check answers "does TYPO3 read this", not "does it still mean

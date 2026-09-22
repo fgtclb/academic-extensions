@@ -171,6 +171,18 @@ final class UpgradeCheckCommand extends Command
         } elseif (!$this->packageManager->isPackageActive($extensionKey)) {
             $output->writeln(sprintf('<error>The extension "%s" is not active.</error>', $extensionKey));
             return Command::INVALID;
+        } elseif ($overridePaths === [] && $upstreamPathOption !== null) {
+            // It names the folder the --override-path folders are compared
+            // with, and nothing else: the folders a --site names are compared
+            // with the upstream folder of their own kind. Accepting it here
+            // would ignore it, which is the failure mode this command exists
+            // to remove.
+            $output->writeln(
+                '<error>--upstream-path names the folder that the --override-path folders are compared '
+                . 'with, so it needs at least one --override-path. The folders a --site names are '
+                . 'compared with the upstream folder of their own kind.</error>',
+            );
+            return Command::INVALID;
         } elseif ($overridePaths === [] && $siteIdentifier === null) {
             $output->writeln('<error>Name at least one --override-path, or a --site to take them from.</error>');
             return Command::INVALID;

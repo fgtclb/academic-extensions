@@ -60,13 +60,15 @@ is discarded.
 
 ### Requirement: Unresolved academic TSconfig imports are reported
 The check SHALL report every page whose page TSconfig, or whose selected page
-TSconfig includes, reference a file of an academic extension that does not
-exist, as a warning naming the page and the reference. It SHALL read the page
-TSconfig of a site the same way and name the site. A reference that resolves
-SHALL be followed, so that an unresolved academic reference inside the file it
-names is reported with the page or site that leads to it. The page TSconfig of
-a hidden page SHALL be read, because TYPO3 reads it too; that of a deleted page
-SHALL NOT.
+TSconfig includes, reference page TSconfig of an academic extension that TYPO3
+does not read, as a warning naming the page and the reference. A selected value
+naming something of an academic extension other than a file - a folder, for
+instance - SHALL be reported as well, because TYPO3 reads nothing from it. It SHALL read the page TSconfig
+of a site the same way and name the site. A reference that resolves SHALL be
+followed, so that an unresolved academic reference inside the file it names is
+reported with the page or site that leads to it. The page TSconfig of a hidden
+page SHALL be read, because TYPO3 reads it too; that of a deleted page SHALL
+NOT.
 
 #### Scenario: Import of a renamed folder
 - **WHEN** a page's TSconfig imports a page TSconfig file from a folder of an
@@ -88,6 +90,13 @@ SHALL NOT.
   a page TSconfig file of an academic extension that does not exist
 - **THEN** the check reports one warning naming the page and the unresolved
   reference inside the included file
+
+#### Scenario: A selected value naming a folder
+- **WHEN** a page selects a page TSconfig value that names a folder of an
+  academic extension rather than a file
+- **THEN** the check reports one warning naming the page and the folder
+- **AND** reports nothing about the files inside it, because TYPO3 reads none
+  of them
 
 #### Scenario: Files that import each other
 - **WHEN** two page TSconfig files import one another

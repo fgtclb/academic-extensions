@@ -34,6 +34,10 @@ final class ConfigurationCheckerTest extends AbstractAcademicBaseTestCase
         'fgtclb/environment-state-manager',
         'fgtclb/academic-base',
         'tests/academic-test-configuration',
+        // A project site package: its page TSconfig file is there and imports
+        // an academic one that is not, which is the shape a resolving reference
+        // is followed for.
+        'tests/test-upgrade-check-project',
     ];
 
     private const FIXTURES = __DIR__ . '/Fixtures/ConfigurationCheck/';
@@ -270,7 +274,12 @@ final class ConfigurationCheckerTest extends AbstractAcademicBaseTestCase
             'file that is gone' => [$base . 'TSconfig/Removed.tsconfig', true],
             'folder that is gone' => [$base . 'TsConfigOfTwoPointX/', true],
             'wildcard matching nothing' => [$base . 'TSconfig/Removed*.tsconfig', true],
-            'folder without a tsconfig file' => [$base . 'TypoScript/Live/', true],
+            // Page TSconfig allows two suffixes, so a folder holding only a
+            // ".typoscript" file resolves - core loops the allowed suffixes of
+            // the type (TreeFromLineStreamBuilder::$atImportTypeToSuffixMap).
+            'folder with only a typoscript file' => [$base . 'TypoScript/Live/', false],
+            'folder with neither suffix' => [$base . 'TypoScript/Empty/', true],
+            'typoscript file by its own name' => [$base . 'TypoScript/Live/setup.typoscript', false],
         ];
     }
 
@@ -419,15 +428,313 @@ final class ConfigurationCheckerTest extends AbstractAcademicBaseTestCase
         $this->assertStringContainsString('is an API for subclassing', $findings[2]->message);
     }
 
-    private function insertPage(int $uid, string $tsConfig): void
+    /**
+     * Core tokenizes the Constants and Setup fields of a TypoScript record with
+     * the same tokenizer it uses for page TSconfig, and drops an `@import` that
+     * matches no file just as silently - only against the `.typoscript` suffix.
+     */
+    #[Test]
+    public function anImportInATypoScriptFieldThatMatchesNoFileIsReported(): void
+    {
+        $this->insertTypoScriptRecord(
+            constants: "@import 'EXT:academic_test_configuration/Configuration/TypoScript/Removed.typoscript'\n",
+            config: "@import 'EXT:academic_test_configuration/Configuration/TypoScript/Live/setup.typoscript'\n",
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TypoScriptImport);
+
+        $this->assertSame(['sys_template:1'], $this->subjectsOf($findings));
+        $this->assertStringContainsString('field "Constants"', $findings[0]->message);
+        $this->assertStringContainsString(
+            'imports "EXT:academic_test_configuration/Configuration/TypoScript/Removed.typoscript", '
+            . 'which matches no file of the installed version',
+            $findings[0]->message,
+        );
+        $this->assertStringNotContainsString('Setup', $findings[0]->message, 'The Setup import resolves');
+    }
+
+    /**
+     * Without these three the assertion above also holds for a check that
+     * reports every reference it sees: an import that resolves, one of an
+     * extension this check is not about, and a record TYPO3 does not read.
+     */
+    #[Test]
+    public function aResolvingForeignOrHiddenTypoScriptImportIsNotReported(): void
+    {
+        $this->insertTypoScriptRecord(
+            config: "@import 'EXT:academic_test_configuration/Configuration/TypoScript/Live/setup.typoscript'\n"
+                . "@import 'EXT:fluid_styled_content/Configuration/TypoScript/Gone/setup.typoscript'\n",
+        );
+        $this->insertTypoScriptRecord(
+            uid: 2,
+            config: "@import 'EXT:academic_test_configuration/Configuration/TypoScript/Removed.typoscript'\n",
+            hidden: true,
+        );
+
+        $this->assertSame([], $this->get(ConfigurationChecker::class)->check());
+    }
+
+    /**
+     * The syntax TYPO3 v13 deprecated and v14 removed hits a TypoScript record
+     * exactly as it hits page TSconfig - and a record field is where it was
+     * most used before "@import" existed, so it is reported whether or not the
+     * file is there.
+     */
+    #[Test]
+    public function theLegacyIncludeSyntaxInATypoScriptFieldIsReported(): void
+    {
+        $this->insertTypoScriptRecord(
+            config: '<INCLUDE_TYPOSCRIPT: source="FILE:EXT:academic_test_configuration/Configuration/'
+                . 'TypoScript/Live/setup.typoscript">' . "\n",
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TypoScriptSyntax);
+
+        $this->assertSame(['sys_template:1'], $this->subjectsOf($findings));
+        $this->assertStringContainsString('field "Setup"', $findings[0]->message);
+        $this->assertStringContainsString('TYPO3 v14 removed', $findings[0]->message);
+        $this->assertSame(
+            [],
+            $this->findingsOfKind(ConfigurationFindingKind::TypoScriptImport),
+            'A legacy include is one finding, not two',
+        );
+    }
+
+    /**
+     * An extension that is not installed needs the message that says so: the
+     * advice "depend on the site set of the extension instead" cannot be
+     * followed for a package that is not there.
+     */
+    #[Test]
+    public function anImportOfAnExtensionThatIsNotInstalledSaysSo(): void
+    {
+        $this->insertTypoScriptRecord(
+            config: "@import 'EXT:academic_gone/Configuration/TypoScript/setup.typoscript'\n",
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TypoScriptImport);
+
+        $this->assertCount(1, $findings);
+        $this->assertStringContainsString('the extension "academic_gone" is not installed', $findings[0]->message);
+        $this->assertStringNotContainsString('depend on the site set', $findings[0]->message);
+    }
+
+    /**
+     * `DIR:` recursed and `@import` of a folder does not, so the advice to
+     * rewrite it has to say so here as well - with the suffix a TypoScript
+     * record reads.
+     */
+    #[Test]
+    public function aLegacyDirectoryIncludeInATypoScriptFieldSaysImportDoesNotRecurse(): void
+    {
+        $this->insertTypoScriptRecord(
+            config: '<INCLUDE_TYPOSCRIPT: source="DIR:EXT:academic_test_configuration/Configuration/'
+                . 'TypoScript/" extensions="typoscript">' . "\n",
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TypoScriptSyntax);
+
+        $this->assertCount(1, $findings);
+        $this->assertStringContainsString('"*.typoscript" files', $findings[0]->message);
+        $this->assertStringContainsString('does not descend into subfolders', $findings[0]->message);
+    }
+
+    /**
+     * TYPO3 follows the imports inside a file it reads, so a page whose own
+     * import is sound still ends up with configuration that does not resolve.
+     * The finding names the page, because that is where an integrator starts,
+     * and the file, because that is where the line is.
+     */
+    #[Test]
+    public function aPageTsConfigFileThatResolvesIsFollowed(): void
+    {
+        $this->insertPage(
+            10,
+            "@import 'EXT:test_upgrade_check_project/Configuration/TSconfig/Project.tsconfig'\n",
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TsConfigImport);
+
+        $this->assertSame(['pages:10'], $this->subjectsOf($findings));
+        $this->assertStringContainsString(
+            'The file "EXT:test_upgrade_check_project/Configuration/TSconfig/Project.tsconfig", '
+            . 'reached from the page 10 ("Probe"),',
+            $findings[0]->message,
+            'The file is named as an EXT: path, not as the expression that led to it',
+        );
+        $this->assertStringContainsString(
+            'imports "EXT:academic_test_configuration/Configuration/TSconfig/Removed.tsconfig"',
+            $findings[0]->message,
+        );
+    }
+
+    /**
+     * Two files importing each other. Core has no guard here and is protected
+     * by the file system; this check has to terminate on its own, and report
+     * the dead import of the pair once rather than never or twice.
+     */
+    #[Test]
+    public function aCycleBetweenTwoPageTsConfigFilesTerminates(): void
+    {
+        $this->insertPage(
+            10,
+            "@import 'EXT:academic_test_configuration/Configuration/TSconfig/Chain/CycleA.tsconfig'\n",
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TsConfigImport);
+
+        $this->assertCount(1, $findings);
+        $this->assertSame('pages:10', $findings[0]->subject);
+        $this->assertStringContainsString('CycleA.tsconfig', $findings[0]->message);
+        $this->assertStringContainsString('Removed.tsconfig', $findings[0]->message);
+    }
+
+    /**
+     * A selected page TSconfig value is read with one exact file lookup, not
+     * with the four shapes of an `@import`. A folder therefore delivers
+     * nothing - core's `file_exists()` accepts it and `file_get_contents()`
+     * then reads nothing and warns - so the folder itself is the finding, and
+     * nothing inside it may be reported. `Chain/` holds a file with a dead
+     * academic import, which is what makes this more than a smoke test: with
+     * `@import` semantics that file would be read and reported instead.
+     */
+    #[Test]
+    public function aSelectedFolderIsNotExpandedTheWayAnImportIs(): void
+    {
+        $this->insertPage(
+            10,
+            tsconfigIncludes: 'EXT:academic_test_configuration/Configuration/TSconfig/Chain/',
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TsConfigImport);
+
+        $this->assertCount(1, $findings);
+        $this->assertStringContainsString('which is a folder', $findings[0]->message);
+        $this->assertStringNotContainsString(
+            'CycleA',
+            $findings[0]->message,
+            'Nothing inside the folder is read, because TYPO3 reads nothing there either',
+        );
+    }
+
+    /**
+     * The other half: a selected file that TYPO3 does read is followed, so a
+     * dead academic import inside a project file is reported with the page
+     * that selects it.
+     */
+    #[Test]
+    public function aSelectedFileThatResolvesIsFollowed(): void
+    {
+        $this->insertPage(
+            10,
+            tsconfigIncludes: 'EXT:test_upgrade_check_project/Configuration/TSconfig/Project.tsconfig',
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TsConfigImport);
+
+        $this->assertSame(['pages:10'], $this->subjectsOf($findings));
+        $this->assertStringContainsString(
+            'The file "EXT:test_upgrade_check_project/Configuration/TSconfig/Project.tsconfig"',
+            $findings[0]->message,
+        );
+    }
+
+    /**
+     * The same for a selected file of an *academic* extension, which takes the
+     * other branch of the lookup: that one resolves the path itself rather
+     * than falling through to the shared one, so a test naming a project file
+     * leaves it uncovered.
+     */
+    #[Test]
+    public function aSelectedAcademicFileThatResolvesIsFollowed(): void
+    {
+        $this->insertPage(
+            10,
+            tsconfigIncludes: 'EXT:academic_test_configuration/Configuration/TSconfig/Chain/CycleA.tsconfig',
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TsConfigImport);
+
+        $this->assertCount(1, $findings);
+        $this->assertSame('pages:10', $findings[0]->subject);
+        $this->assertStringContainsString('CycleA.tsconfig', $findings[0]->message);
+        $this->assertStringContainsString('Removed.tsconfig', $findings[0]->message);
+    }
+
+    /**
+     * Core checks every file an `@import` resolves to against the deny pattern
+     * and contributes nothing when it refuses, so such an import is dead. The
+     * check has to report it rather than read the file and call the import
+     * resolved - which is what happens when the guard covers the folder shape
+     * only, as it did before the review.
+     */
+    #[Test]
+    public function anImportOfAFileTheDenyPatternRefusesIsReported(): void
+    {
+        $this->insertPage(
+            10,
+            "@import 'EXT:academic_test_configuration/Configuration/TSconfig/Denied.php.tsconfig'\n",
+        );
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::TsConfigImport);
+
+        $this->assertSame(['pages:10'], $this->subjectsOf($findings));
+        $this->assertStringContainsString('a name TYPO3 refuses', $findings[0]->message);
+        $this->assertStringContainsString('Denied.php.tsconfig', $findings[0]->message);
+        $this->assertStringNotContainsString(
+            'matches no file of the installed version',
+            $findings[0]->message,
+            'The file is there and the integrator can see it - the reason has to be the name',
+        );
+    }
+
+    /**
+     * The `seen` set exists to stop a cycle, not to report a file once per
+     * installation: two pages importing the same broken file are two records
+     * to correct, and each has to be named. It is therefore created per page.
+     */
+    #[Test]
+    public function twoPagesReachingTheSameFileAreBothReported(): void
+    {
+        $import = "@import 'EXT:test_upgrade_check_project/Configuration/TSconfig/Project.tsconfig'\n";
+        $this->insertPage(10, $import);
+        $this->insertPage(11, $import);
+
+        $this->assertSame(
+            ['pages:10', 'pages:11'],
+            $this->subjectsOf($this->findingsOfKind(ConfigurationFindingKind::TsConfigImport)),
+        );
+    }
+
+    private function insertTypoScriptRecord(
+        int $uid = 1,
+        string $constants = '',
+        string $config = '',
+        bool $hidden = false,
+    ): void {
+        $this->getConnectionPool()->getConnectionForTable('sys_template')->insert('sys_template', [
+            'uid' => $uid,
+            'pid' => 1,
+            'hidden' => $hidden ? 1 : 0,
+            'title' => 'Probe',
+            'root' => 1,
+            'clear' => 0,
+            'constants' => $constants,
+            'config' => $config,
+            'include_static_file' => '',
+        ]);
+    }
+
+    private function insertPage(int $uid, string $tsConfig = '', string $tsconfigIncludes = ''): void
     {
         $this->getConnectionPool()->getConnectionForTable('pages')->insert('pages', [
             'uid' => $uid,
             'pid' => 0,
             'doktype' => 1,
-            'slug' => '/probe',
+            'slug' => '/probe-' . $uid,
             'title' => 'Probe',
             'TSconfig' => $tsConfig,
+            'tsconfig_includes' => $tsconfigIncludes,
         ]);
     }
 

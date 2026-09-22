@@ -114,6 +114,59 @@ final class ConfigurationCheckerSiteTest extends AbstractAcademicBaseTestCase
     }
 
     /**
+     * `SysTemplateTreeBuilder` adds the site include to the root node before
+     * the `sys_template` rows, and
+     * `IncludeTreeAstBuilderVisitor::visitBeforeChildren()` replaces the whole
+     * AST for a record whose clear bit for the branch is set. So the record
+     * discards everything the site sets contributed to that branch - and the
+     * failure looks like an extension that ships no TypoScript.
+     *
+     * All three shapes in one run, because the rule has two halves: the site
+     * has to deliver through sets, and the record has to clear a branch.
+     */
+    #[Test]
+    public function aRecordClearingABranchTheSetsDeliverIsReported(): void
+    {
+        $this->insertTypoScriptRecord(1, clear: 2);
+        $this->insertTypoScriptRecord(2, clear: 0);
+        $this->insertTypoScriptRecord(3, clear: 3);
+        $this->writeSite('cleared', 1, ['fgtclb/academic-test-configuration'], 'https://www.one.test/');
+        $this->writeSite('kept', 2, ['fgtclb/academic-test-configuration'], 'https://www.two.test/');
+        $this->writeSite('records-only', 3, [], 'https://www.three.test/');
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::SetBranchCleared);
+
+        $this->assertSame(
+            ['site:cleared'],
+            array_map(
+                static fn(ConfigurationFinding $finding): string => $finding->subject,
+                $findings,
+            ),
+            'Only the site that has both halves - sets, and a record clearing a branch',
+        );
+        $this->assertSame(ContextualFeedbackSeverity::WARNING, $findings[0]->severity);
+        $this->assertStringContainsString('clears Setup', $findings[0]->message);
+        $this->assertStringContainsString('discards everything they contributed to that branch', $findings[0]->message);
+    }
+
+    /**
+     * The button that produces this state writes both flags, so the message
+     * has to name both branches rather than one.
+     */
+    #[Test]
+    public function aRecordClearingBothBranchesNamesBoth(): void
+    {
+        $this->insertTypoScriptRecord(1, clear: 3);
+        $this->writeSite('both', 1, ['fgtclb/academic-test-configuration']);
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::SetBranchCleared);
+
+        $this->assertCount(1, $findings);
+        $this->assertStringContainsString('clears Constants and Setup', $findings[0]->message);
+        $this->assertStringContainsString('contributed to both branches', $findings[0]->message);
+    }
+
+    /**
      * The third place page TSconfig is stored: a `page.tsconfig` file next to
      * the site configuration, which TYPO3 v13 and v14 read alike
      * (`TsConfigTreeBuilder::getSitePageTsConfigTree()`).
@@ -147,10 +200,15 @@ final class ConfigurationCheckerSiteTest extends AbstractAcademicBaseTestCase
     /**
      * @param non-empty-string $identifier
      * @param list<string> $sets
+     * @param non-empty-string $base
      */
-    private function writeSite(string $identifier, int $rootPageId, array $sets): void
-    {
-        $site = $this->buildSiteConfiguration(rootPageId: $rootPageId, base: 'https://www.acme.test/');
+    private function writeSite(
+        string $identifier,
+        int $rootPageId,
+        array $sets,
+        string $base = 'https://www.acme.test/',
+    ): void {
+        $site = $this->buildSiteConfiguration(rootPageId: $rootPageId, base: $base);
         if ($sets !== []) {
             $site['dependencies'] = $sets;
         }
@@ -174,12 +232,12 @@ final class ConfigurationCheckerSiteTest extends AbstractAcademicBaseTestCase
         );
     }
 
-    private function insertTypoScriptRecord(int $pageId, string $includeStaticFile): void
+    private function insertTypoScriptRecord(int $pageId, string $includeStaticFile = '', int $clear = 0): void
     {
         $this->getConnectionPool()->getConnectionForTable('sys_template')->insert('sys_template', [
             'pid' => $pageId,
-            'root' => $pageId === 1 ? 1 : 0,
-            'clear' => 0,
+            'root' => 1,
+            'clear' => $clear,
             'title' => 'Probe',
             'constants' => '',
             'config' => '',
