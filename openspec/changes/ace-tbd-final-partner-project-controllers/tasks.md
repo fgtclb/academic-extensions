@@ -1,6 +1,6 @@
 ## 1. Preconditions
 
-- [ ] 1.1 Confirm on main that `ace-tbd-partners-projects-list-events`,
+- [ ] 1.1 Confirm on main that `ace-717-partners-projects-list-events`,
   `ace-tbd-program-psr14-events` and
   `ace-tbd-bite-jobs-request-result-events` are merged and their events
   are dispatched; stop otherwise.

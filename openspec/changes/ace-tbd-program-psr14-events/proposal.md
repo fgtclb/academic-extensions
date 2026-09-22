@@ -48,7 +48,7 @@ None.
   `final` in 3.0.0 through `ace-tbd-final-partner-project-controllers`, which
   depends on these events.
 - Events for `academic_partners` and `academic_projects`; they are proposed as
-  `ace-tbd-partners-projects-list-events` and use the same naming.
+  `ace-717-partners-projects-list-events` and use the same naming.
 - A textual credit points value such as "180/210"; the credit points stay an
   integer.
 - Backporting to branch `2`.

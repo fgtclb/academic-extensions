@@ -1,0 +1,2 @@
+# The demand listener forces the active state the content element does not ask for.
+plugin.tx_academicprojects.settings.testProjectDemandActiveState = active

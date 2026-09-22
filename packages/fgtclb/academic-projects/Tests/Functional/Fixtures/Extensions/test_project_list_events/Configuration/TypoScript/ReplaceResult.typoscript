@@ -1,0 +1,2 @@
+# The list listener replaces the queried projects with a subset of them.
+plugin.tx_academicprojects.settings.testProjectListKeepTitle = Solar fields

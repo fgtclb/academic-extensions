@@ -1,0 +1,4 @@
+# The demand listener hands back a demand it built itself instead of mutating the one the
+# controller passed. A controller that queried its own demand would list every project.
+plugin.tx_academicprojects.settings.testProjectDemandActiveState = active
+plugin.tx_academicprojects.settings.testProjectDemandReplaceDemand = 1

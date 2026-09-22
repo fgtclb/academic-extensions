@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Twenty-three such fixture extensions exist, in eight of the twelve extensions.
+Twenty-five such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -37,11 +37,13 @@ They sit next to the tests that use them, under
 | `test_language_files`                  | `tests/language-files`                  | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                           |
 | `test_legacy_settings`                 | `tests/test-legacy-settings`            | `academic-persons`      | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.            |
 | `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`      | A deliberately misbehaving profile factory and two event listeners.           |
+| `test_partner_list_events`             | `tests/test-partner-list-events`        | `academic-partners`     | Two listeners on the partner demand and list events, and a list template.     |
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
 | `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Single profile partial overrides in two paths, and a card passing a page.     |
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Two listeners narrowing the profile and contract queries of the plugins.      |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
+| `test_project_list_events`             | `tests/test-project-list-events`        | `academic-projects`     | Two listeners on the project demand and list events, and a list template.     |
 | `test_public_profile_settings`         | `tests/test-public-profile-settings`    | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                       |
 | `test_upgrade_check`                   | `tests/test-upgrade-check`              | `academic-base`         | The extension whose templates the upgrade check compares an override with.    |
 | `test_upgrade_check_project`           | `tests/test-upgrade-check-project`      | `academic-base`         | A project site package overriding templates of the fixture above.             |
@@ -49,7 +51,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Seven of the twenty-three have a `Classes/` folder with a `TESTS\…` PSR-4 root;
+Nine of the twenty-five have a `Classes/` folder with a `TESTS\…` PSR-4 root;
 the other sixteen are pure resources.
 
 A minimal one, complete:
@@ -227,7 +229,11 @@ The existing ones show the cases that justify one:
   case for an event: its two listeners register through TYPO3's
   `#[AsEventListener]`, which only means anything once the container has seen
   the class, so the documented way to write a listener is the way the test
-  registers one.
+  registers one. `test_partner_list_events` and `test_project_list_events` are
+  the same case for the list plugin events, one fixture per extension: the
+  partner tests never load `academic_projects` and the project tests never load
+  `academic_partners`, so one fixture listening to all four events would drag an
+  extension into every run that has no business being there.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path. `test_profile_partial_overrides` is the same case for a

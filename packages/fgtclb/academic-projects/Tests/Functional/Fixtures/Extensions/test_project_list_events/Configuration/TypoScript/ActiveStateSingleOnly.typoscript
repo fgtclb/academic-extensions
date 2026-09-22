@@ -1,0 +1,4 @@
+# The same, but only while the single-selection project list renders - the regular project
+# list on the same page is unaffected.
+plugin.tx_academicprojects.settings.testProjectDemandActiveState = active
+plugin.tx_academicprojects.settings.testProjectDemandOnlyForPlugin = ProjectListSingle
