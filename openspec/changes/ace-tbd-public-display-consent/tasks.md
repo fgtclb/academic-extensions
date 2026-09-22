@@ -2,9 +2,10 @@
 
 - [ ] 1.1 Read ACE-50, ACE-20 and ACE-474 in YouTrack and align the tasks with
   the acceptance criteria of ACE-50; note every difference in this file.
-- [ ] 1.2 Confirm `ace-tbd-profile-query-constraint-event` (or its renamed
-  successor) is merged, and verify the event names, the context type and the
-  context-aware uid finders in the merged sources.
+- [ ] 1.2 Confirm `ace-715-profile-query-constraint-event` is merged, and
+  verify the event names, the context type and the context-aware uid finders in
+  the merged sources. It is named after its issue now, so the "or its renamed
+  successor" this task carried no longer applies.
 
 ## 2. Profile field
 

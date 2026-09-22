@@ -10,8 +10,10 @@ See `proposal.md` for the motivation. State on `main`:
   `settings.alphabetPaginationEnabled` is set, without looking at
   `demand.profileList`.
 - `ProfileRepository::setFilters()` filters with
-  `like('last_name', letter . '%')`. `applyDemandForQuery()` returns early
-  for a manual selection, so the letter is ignored there.
+  `like('last_name', letter . '%')`. `resolveDemandForQuery()` - renamed from
+  `applyDemandForQuery()` by `ace-715-profile-query-constraint-event` - returns
+  the selection constraint for a manual selection without ever calling
+  `setFilters()`, so the letter is ignored there.
 - The profile table also has `last_name_alpha`, a read-only one-character
   column, which is the default `groupBy`.
 

@@ -6,9 +6,9 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Fourteen such fixture extensions exist, in seven of the twelve extensions. That is
-the whole population — this is a mechanism used sparingly and only where nothing
-smaller works. Measured with
+Twenty-two such fixture extensions exist, in eight of the twelve extensions.
+That is the whole population — this is a mechanism used sparingly and only
+where nothing smaller works. Measured with
 
 ```bash
 find packages/fgtclb/*/Tests/Functional/Fixtures/Extensions -mindepth 1 -maxdepth 1 -type d | wc -l
@@ -21,27 +21,35 @@ find packages/fgtclb/*/Tests/Functional/Fixtures/Extensions -mindepth 1 -maxdept
 They sit next to the tests that use them, under
 `packages/fgtclb/<extension>/Tests/Functional/Fixtures/Extensions/<extension_key>/`:
 
-| Extension key                    | Composer package name                  | Owned by                | Provides                                                                |
-|----------------------------------|----------------------------------------|-------------------------|-------------------------------------------------------------------------|
-| `test_base_dependency_injection` | `tests/base-test-dependency-injection` | `academic-base`         | Two services to resolve through the container, plus `Services.yaml`.    |
-| `test_bitejobs_stub`             | `tests/test-bitejobs-stub`             | `academic-bite-jobs`    | An `ext_localconf.php` replacing the Guzzle handler stack.              |
-| `test_contract_contact_actions`  | `tests/test-contract-contact-actions`  | `academic-persons-edit` | A `Settings.yaml` narrowing the actions of the contracts section.       |
-| `test_current_color_icons`       | `tests/current-color-icons`            | `academic-base`         | Icons registered through the `currentColor` icon provider.              |
-| `test_exclude_file_column`       | `tests/test-exclude-file-column`       | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.   |
-| `test_jobcontact_schema`         | `tests/test-jobcontact-schema`         | `academic-jobs`         | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates. |
-| `test_language_files`            | `tests/language-files`                 | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                     |
-| `test_legacy_settings`           | `tests/test-legacy-settings`           | `academic-persons`      | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.      |
-| `test_messy_profile_factory`     | `tests/test-messy-profile-factory`     | `academic-persons`      | A deliberately misbehaving profile factory and two event listeners.     |
-| `test_partners_stub`             | `tests/test-partners-stub`             | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.              |
-| `test_plugin_templates`          | `tests/plugin-templates`               | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.         |
-| `test_public_profile_settings`   | `tests/test-public-profile-settings`   | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                 |
-| `test_category_types_group`      | `tests/category-types-group`           | `typo3-category-types`  | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.     |
-| `test_category_types_icons`      | `tests/category-types-icons`           | `typo3-category-types`  | Four category types, one per branch of the icon registrar.              |
+| Extension key                          | Composer package name                   | Owned by                | Provides                                                                      |
+|----------------------------------------|-----------------------------------------|-------------------------|-------------------------------------------------------------------------------|
+| `academic_test_configuration`          | `tests/academic-test-configuration`     | `academic-base`         | An academic extension with the stale configuration the upgrade check reports. |
+| `test_base_dependency_injection`       | `tests/base-test-dependency-injection`  | `academic-base`         | Two services to resolve through the container, plus `Services.yaml`.          |
+| `test_bitejobs_stub`                   | `tests/test-bitejobs-stub`              | `academic-bite-jobs`    | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
+| `test_category_types_group`            | `tests/category-types-group`            | `typo3-category-types`  | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.           |
+| `test_category_types_icons`            | `tests/category-types-icons`            | `typo3-category-types`  | Four category types, one per branch of the icon registrar.                    |
+| `test_category_types_summary_override` | `tests/category-types-summary-override` | `typo3-category-types`  | A page TSconfig override of the page module category summary template.        |
+| `test_contract_contact_actions`        | `tests/test-contract-contact-actions`   | `academic-persons-edit` | A `Settings.yaml` narrowing the actions of the contracts section.             |
+| `test_current_color_icons`             | `tests/current-color-icons`             | `academic-base`         | Icons registered through the `currentColor` icon provider.                    |
+| `test_exclude_file_column`             | `tests/test-exclude-file-column`        | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
+| `test_hidden_content_types`            | `tests/hidden-content-types`            | `academic-base`         | Two content types hidden by page TSconfig, one in the academic group.         |
+| `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`         | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
+| `test_language_files`                  | `tests/language-files`                  | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                           |
+| `test_legacy_settings`                 | `tests/test-legacy-settings`            | `academic-persons`      | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.            |
+| `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`      | A deliberately misbehaving profile factory and two event listeners.           |
+| `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
+| `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
+| `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Two listeners narrowing the profile and contract queries of the plugins.      |
+| `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
+| `test_public_profile_settings`         | `tests/test-public-profile-settings`    | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                       |
+| `test_upgrade_check`                   | `tests/test-upgrade-check`              | `academic-base`         | The extension whose templates the upgrade check compares an override with.    |
+| `test_upgrade_check_project`           | `tests/test-upgrade-check-project`      | `academic-base`         | A project site package overriding templates of the fixture above.             |
+| `test_upgrade_check_shared`            | `tests/test-upgrade-check-shared`       | `academic-base`         | A shared partial package the checked fixture extension requires.              |
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Five of the fourteen have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
-other nine are pure resources.
+Seven of the twenty-two have a `Classes/` folder with a `TESTS\…` PSR-4 root;
+the other fifteen are pure resources.
 
 A minimal one, complete:
 
@@ -190,7 +198,7 @@ protected array $testExtensionsToLoad = [
 ```
 — [`ProfileTitleProviderTest.php:27`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L27)
 
-**The package name is not derivable from the extension key.** All fourteen use
+**The package name is not derivable from the extension key.** All of them use
 the `tests/` vendor, but the second segment follows no rule: `test_plugin_templates`
 is `tests/plugin-templates` (prefix dropped), `test_bitejobs_stub` is
 `tests/test-bitejobs-stub` (prefix kept), and `test_base_dependency_injection`
@@ -203,7 +211,7 @@ renamed for cosmetics.
 
 ## What a fixture extension is for, and what it is not
 
-The fourteen existing ones show the cases that justify one:
+The existing ones show the cases that justify one:
 
 - **Bootstrap-time configuration.** `test_bitejobs_stub` replaces
   `$GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler']` in `ext_localconf.php` so no
@@ -214,7 +222,11 @@ The fourteen existing ones show the cases that justify one:
   the instance is built.
 - **Dependency injection.** `test_base_dependency_injection` and
   `test_messy_profile_factory` ship `Services.yaml` plus classes, so the
-  container really wires them.
+  container really wires them. `test_profile_query_constraints` is the same
+  case for an event: its two listeners register through TYPO3's
+  `#[AsEventListener]`, which only means anything once the container has seen
+  the class, so the documented way to write a listener is the way the test
+  registers one.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path.

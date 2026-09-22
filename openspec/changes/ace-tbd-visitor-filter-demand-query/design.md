@@ -104,7 +104,7 @@ folders references.
 The card page TSconfig removes both new fields, as it already does for
 `viewMode`.
 
-Rejected: a listener on `ace-tbd-profile-query-constraint-event`. The event
+Rejected: a listener on `ace-715-profile-query-constraint-event`. The event
 could add the constraint, but the allow-list has to live in the controller,
 and three projects want the same filter.
 
