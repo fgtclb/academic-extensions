@@ -57,4 +57,4 @@
 - [x] 5.2 `composerUpdate`, then the same suites green with `-t 13`.
 - [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.4 Anything left out is named in the pull request, with the reason.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archive the change as the last commit of the pull request.
