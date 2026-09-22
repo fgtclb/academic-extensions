@@ -290,6 +290,23 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertStringContainsString('Lecturer', $content);
     }
 
+    /**
+     * A contact names one contract, and that is the contract its item shows - even one that
+     * has ended, and even with the contract options of `EXT:academic_persons` in the
+     * settings. They choose among a profile's contracts, which this plugin never renders.
+     * The fixture's contact points at "Professor", ended 2020-12-31, the second of the
+     * profile's two contracts; the options would pick "Dean".
+     */
+    #[Test]
+    public function listPluginRendersTheContractOfTheContactWhateverTheContractOptions(): void
+    {
+        $this->setUpTestCase('contactsListPage_expiredContract');
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('Professor', $content);
+        $this->assertStringNotContainsString('Dean', $content);
+    }
+
     #[Test]
     public function listPluginLinksEachContactToTheConfiguredDetailPage(): void
     {

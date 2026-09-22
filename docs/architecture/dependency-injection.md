@@ -115,32 +115,35 @@ the interface it implements does not exist without EXT:reports.
 ### Attributes are already in use
 
 Contrary to the note in `AGENTS.md` that these extensions do not use attributes,
-they are used in production code across nine of the twelve packages
-(`academic-base`, `academic-jobs`, `academic-partners`, `academic-persons`,
-`academic-persons-edit`, `academic-programs`, `academic-projects`,
-`academic-study-plan` and `typo3-category-types`):
+they are used in production code across ten of the twelve packages
+(`academic-base`, `academic-contact4pages`, `academic-jobs`,
+`academic-partners`, `academic-persons`, `academic-persons-edit`,
+`academic-programs`, `academic-projects`, `academic-study-plan` and
+`typo3-category-types`):
 
 Measured with
 `grep -rhoP '#\[<name>[(\]]' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes | wc -l`:
 
 | Attribute            | Sites | Examples                                                                     |
 |----------------------|-------|------------------------------------------------------------------------------|
-| `#[Autoconfigure]`   | 10    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
+| `#[Autoconfigure]`   | 11    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
 | `#[Autowire]`        | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
-| `#[Exclude]`         | 11    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
-| `#[AsEventListener]` | 3     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
-| `#[AsCommand]`       | 1     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
+| `#[Exclude]`         | 13    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
+| `#[AsEventListener]` | 6     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
+| `#[AsCommand]`       | 2     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
-(`Symfony\Component\Console\Attribute\AsCommand`), not a DI one; the other three
-commands in `academic-persons` are still registered with `console.command` tags
-in YAML. The `#[AsEventListener]` sites are TYPO3's attribute (see below), one
-per `RegisterAcademicPageDoktype` listener in `academic-partners`,
+(`Symfony\Component\Console\Attribute\AsCommand`), not a DI one, on the
+geocoding command and on `academic-base/Classes/Command/UpgradeCheckCommand.php`;
+the other three commands in `academic-persons` are still registered with
+`console.command` tags in YAML. The `#[AsEventListener]` sites are TYPO3's
+attribute (see below): the `RegisterAcademicPageDoktype` and the
+`AddPageModuleCategorySummary` listener of each of `academic-partners`,
 `academic-programs` and `academic-projects`. `#[AsTaggedItem]` and
 `#[AsController]` have zero sites.
 
-For the eleven `#[Exclude]` sites and why `LegacySettingsMigration` is among
+For the thirteen `#[Exclude]` sites and why `LegacySettingsMigration` is among
 them, see [Class design](class-design.md#keep-data-objects-out-of-the-container).
 
 The `#[Autowire]` example is the clearest illustration of the two styles working
@@ -370,6 +373,42 @@ for it:
   which is the point of injecting it: the rule about which contacts a visitor
   sees exists once, and the content element and the page template cannot drift
   apart.
+
+## A view helper with a collaborator
+
+A view helper is a service like any other: it may take its collaborators through
+the constructor, and TYPO3 resolves it from the container. No configuration is
+needed for that. `EXT:fluid` registers `ViewHelperInterface` for
+autoconfiguration with the tag `fluid.viewhelper`, and a compiler pass makes
+every tagged service public and not shared
+(`typo3/cms-fluid/Configuration/Services.php`; the view helper part of that file
+is the same on v13.4 and v14.3).
+A view helper is therefore a fresh instance per use, and the package's
+`resource:` load is all it takes.
+
+`academic-persons/Classes/ViewHelpers/ContractsViewHelper.php` is the example:
+it injects the stateless `ContractSelector` and the core `Context`, and only
+adapts template arguments to them. The rule about which contracts a profile
+shows lives in the service, so a template, a test and any later PHP caller
+apply the same one.
+
+## A value per request belongs to the request
+
+Some results of a rendering have to reach the end of the request: a view helper
+that shows contracts valid today knows the next day on which that changes, and
+the page cache entry must not outlive it. Collecting such a value in a shared
+service - and reading it back in a listener of `ModifyCacheLifetimeForPageEvent`
+- is per-request state in a service that lives for the process, exactly what
+[Services are stateless](#services-are-stateless) excludes.
+
+Core already has a request-scoped object for it. The request attribute
+`frontend.cache.collector` is a `CacheDataCollectorInterface` (TYPO3 v13.3,
+Feature #102422, the same on v13 and v14), and its
+`restrictMaximumLifetime()` keeps the smallest lifetime it is given; the page
+cache entry is written with that lifetime. `ContractsViewHelper` takes the
+request from its rendering context and limits the lifetime there. Without the
+attribute - a rendering outside a frontend page - there is nothing to limit,
+and the view helper does nothing.
 
 ## Other rules
 
