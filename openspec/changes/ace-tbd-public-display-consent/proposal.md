@@ -48,7 +48,7 @@ None.
 - Two follow-up changes in the same 3.0 release, proposed separately:
   consent in `academic_contacts4pages` and a consent toggle in the frontend
   editor of `academic_persons_edit`.
-- Depends on `ace-tbd-profile-query-constraint-event`: the consent condition
+- Depends on `ace-715-profile-query-constraint-event`: the consent condition
   is added through its profile and contract query events. No repository
   method changes its signature.
 - Database: one new column with default `0`.

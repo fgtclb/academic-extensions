@@ -34,8 +34,8 @@ It is **not** the Extbase query object. `TYPO3\CMS\Extbase\Persistence\Generic\Q
 respectively), but that one takes a plain PHP array
 by design and builds an object-level constraint, not SQL. Extbase repository
 code such as
-`packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php:267`
-(`$query->matching($query->in('uid', $profileUidArray))`) is therefore outside
+`ProfileRepository::resolveDemandForQuery()` of `academic-persons`
+(`$query->in('uid', $profileUidArray)`) is therefore outside
 the scope of the first two rules below — rule 3 applies to **both** query
 objects. Check which object is in the variable before applying a rule to a
 piece of code.
@@ -460,7 +460,7 @@ any branch here supports.
 the query unordered: the result is handed to a PSR-14 listener
 (`ModifyListProfilesEvent`) before the sort, and a listener that renders or
 counts it must see the same list twice. The selection branch of
-`ProfileRepository::applyDemandForQuery()` therefore ends with the same
+`ProfileRepository::resolveDemandForQuery()` therefore returns the same
 `uid` fallback ordering as every other branch, even though the visible order is
 produced afterwards in PHP.
 
@@ -491,6 +491,63 @@ result in the test docblock rather than claiming a proof that was not run.
 `PartnershipRepositoryFindByPidTest::partnershipsWithEqualSortingFallBackToUidOrder()`
 is the counter-example: its fixture writes the tied rows in ascending uid
 order, so it pins the contract without being able to fail.
+
+## Rule 3 in an open query — constraints an extension adds
+
+`academic_persons` lets an installed extension narrow what its plugins show:
+`ModifyProfileQueryEvent` and `ModifyContractQueryEvent` hand out the Extbase
+query object and collect `ConstraintInterface` objects from the listeners
+(`ProfileRepository::applyQuery()`,
+`ContractRepository::findByUidsWithContext()`). The shape of that is the third
+rule applied to a query more than one package writes to, and it is the shape to
+copy wherever another extension opens a query up.
+
+**Collect constraints; do not let a listener decide the query.** The repository
+builds its own constraint first, dispatches, then calls `matching()` once on
+the logical `AND` of its own and the collected ones. A *constraint* can
+therefore only narrow: it cannot remove a storage page restriction, a language
+condition or an editor's filter. The listener still needs the query object —
+`equals()`, `logicalNot()` and the rest are on it — which is why it is handed
+out, and that is also the limit of the guarantee. Be precise about it when
+documenting such an event: `getQuerySettings()` returns the **live** settings
+object, `Typo3DbQueryParser` reads `getRespectStoragePage()` and
+`getIgnoreEnableFields()` at parse time (v13 `:655`/`:682`, v14 `:642`/`:665`)
+and `Query::execute()` is lazy on both versions, so a listener that flips one
+of them widens the result and nothing stops it. "A listener cannot widen the
+result" is false; "a constraint cannot widen the result" is true.
+
+**Decide what happens to a listener that writes to the query directly**, and
+test it. "Overwritten" is the obvious answer and it does not survive contact:
+the repository calls `matching()` after the dispatch, so a guard as harmless as
+`if ($constraints !== []) { $query->matching(…); }` leaves the listener's own
+`matching()` standing in exactly the case where the repository has no
+constraint of its own — a plain list without a filter, the most common query
+there is. Dropping it instead needs `matching(null)`, which works (both
+versions leave `Query::$constraint` untyped and `Typo3DbQueryParser` reads it
+only when it is a `ConstraintInterface`) but is typed `ConstraintInterface` in
+the docblock, so phpstan refuses it and a future core that adds the type would
+break it.
+
+What is left is to **fold it in**: read `$query->getConstraint()` after the
+dispatch — it is on `QueryInterface` on both versions, and nothing else has
+written to it yet — and append it to the list. The listener's condition then
+narrows like any other, the guarantee is unchanged, and no untyped core detail
+is relied on. It is still not the documented way, because `matching()` replaces
+and `addConstraint()` collects, so only the last of two such listeners would
+survive; say that where the event is documented.
+
+`setOrderings()` is different: it is called unconditionally, so an ordering a
+listener sets really is overwritten. That is deliberate: it is the editor's choice in the
+content element, a listener that changed it would override that choice for
+every element at once, and rule 3 above is what makes the result reproducible
+in the first place. A listener that *may* order is a different API, and it has
+to say what happens when two of them disagree.
+
+**One `matching()` call, from one place.** A single collected constraint is
+passed through unchanged rather than wrapped: Extbase's `logicalAnd()` pads a
+one-element list with an always-true `uid > 0` comparison
+(`Query::logicalAnd()`, `case 1`, identical on v13 and v14), which is harmless
+but ends up in every query of an installation that has no listener.
 
 ## Testing this class of defect
 

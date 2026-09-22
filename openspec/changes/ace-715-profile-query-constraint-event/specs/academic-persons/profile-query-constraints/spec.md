@@ -63,6 +63,39 @@ one the plugin defines.
   listener restricts it to one last name
 - **THEN** only profiles matching both are shown
 
+#### Scenario: Paginated manual selection
+
+- **WHEN** an editor selects five profiles with pagination at two per page and
+  a listener leaves two of them
+- **THEN** one page is shown, with both remaining profiles in the order of the
+  editor's selection
+
+### Requirement: The extension keeps the order, whatever a listener asks for
+
+The order of a plugin's result SHALL be the one the plugin defines, even when
+an installed extension asks the query for another.
+
+#### Scenario: Listener asks for a different order
+
+- **WHEN** an installed extension asks a list plugin's query to be ordered by
+  last name descending
+- **THEN** the list is shown in the order the plugin defines, and the request
+  is ignored without a message
+
+### Requirement: A condition still narrows when it is expressed as a replacement
+
+A condition an installed extension expresses by replacing what the plugin asked
+the query for, rather than by adding to it, SHALL narrow the result together
+with the plugin's own conditions rather than take their place.
+
+#### Scenario: Listener replaces the plugin's condition instead of adding one
+
+- **WHEN** an editor restricts a list to one organisational unit and an
+  installed extension expresses "last name is Achterberg" by replacing the
+  query's condition rather than adding one
+- **THEN** only profiles satisfying both are shown, and the editor's
+  restriction is not lost
+
 ### Requirement: Listeners know which plugin asked
 
 The system SHALL give a listener the plugin, the content element's settings

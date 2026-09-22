@@ -43,7 +43,7 @@ before deciding whether `ext_tables.sql` needs an entry.
 
 An event listener of `academic_persons`, registered with TYPO3's
 `#[AsEventListener]`, listens to `ModifyProfileQueryEvent` and
-`ModifyContractQueryEvent` of `ace-tbd-profile-query-constraint-event`. When
+`ModifyContractQueryEvent` of `ace-715-profile-query-constraint-event`. When
 `settings.publicDisplayOnly` of the event context is set, it adds
 `equals('publicDisplay', true)` to the profile query and
 `equals('profile.publicDisplay', true)` to the contract query. That covers

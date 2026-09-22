@@ -44,7 +44,11 @@ The behaviour is identical on TYPO3 v13 and v14.
 
 ### Modified Capabilities
 
-None.
+- `academic-persons/profile-list-pagination`: both requirements about a manual
+  selection are narrowed to the profiles a listener leaves. They were written
+  before anything could exclude one, and a listener that excludes a selected
+  profile makes both of them false as they stand - the one naming profiles 3, 1
+  and 2 as much as the one requiring every selected profile on exactly one page.
 
 ## Impact
 
@@ -71,6 +75,4 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-05`). Two of the six analysed projects carry their own code
-for this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-profile-query-constraint-event` when the issue is filed after
-implementation.
+for this today. Filed as ACE-715 after the implementation was green.
