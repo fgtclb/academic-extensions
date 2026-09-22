@@ -28,7 +28,7 @@ renders one image of a record for the frontend:
 A template of an academic extension renders it like this:
 
 ..  code-block:: html
-    :caption: EXT:academic_persons/Resources/Private/Partials/Profile/Item.html
+    :caption: EXT:academic_persons/Resources/Private/Partials/Profile/Item/Image.html
 
     <f:render
         partial="Academic/Image"
@@ -36,7 +36,7 @@ A template of an academic extension renders it like this:
             image: profile.image,
             preset: 'card',
             placeholder: settings.image.placeholder.default,
-            class: 'card-img-top img-fluid'
+            class: 'academic-persons-item__image card-img-top img-fluid'
         }"
     />
 

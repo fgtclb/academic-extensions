@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Twenty-two such fixture extensions exist, in eight of the twelve extensions.
+Twenty-three such fixture extensions exist, in eight of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -39,6 +39,7 @@ They sit next to the tests that use them, under
 | `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`      | A deliberately misbehaving profile factory and two event listeners.           |
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
+| `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Single profile partial overrides in two paths, and a card passing a page.     |
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Two listeners narrowing the profile and contract queries of the plugins.      |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
 | `test_public_profile_settings`         | `tests/test-public-profile-settings`    | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                       |
@@ -48,8 +49,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Seven of the twenty-two have a `Classes/` folder with a `TESTS\…` PSR-4 root;
-the other fifteen are pure resources.
+Seven of the twenty-three have a `Classes/` folder with a `TESTS\…` PSR-4 root;
+the other sixteen are pure resources.
 
 A minimal one, complete:
 
@@ -229,7 +230,16 @@ The existing ones show the cases that justify one:
   registers one.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
-  real extension path.
+  real extension path. `test_profile_partial_overrides` is the same case for a
+  partial override: proving that overriding one small partial reaches every
+  plugin takes a real partial root path, and the fixture ships the TypoScript
+  that registers it for the persons plugins **and** for
+  `academic_contacts4pages`. Like `test_profile_query_constraints` it stays
+  inert until a test includes that TypoScript, so the class can load it once and
+  still render the shipped templates in every other test. It ships **two**
+  partial directories, because a test of the grid override has to run without
+  the name override standing in its way — a second directory is cheaper than a
+  second fixture extension.
 - **A TCA shape the extension no longer ships.** `test_exclude_file_column`
   adds a `file` column with `l10n_mode=exclude` to the profile table, so the
   ACE-487 pin of the translation synchronisation — a late file reference on an

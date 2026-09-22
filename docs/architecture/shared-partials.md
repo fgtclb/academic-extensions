@@ -43,8 +43,8 @@ turns red with the key `5`.
 
 | View                                                                  | Key           | Renders the partial from                                                            |
 |-----------------------------------------------------------------------|---------------|-------------------------------------------------------------------------------------|
-| `plugin.tx_academicpersons` (`Configuration/TypoScript/Default/`)     | `-1`          | `Profile/Item.html`, `Profile/PublicProfile/ProfileImage.html`                      |
-| `plugin.tx_academiccontacts4pages` (`Configuration/TypoScript/List/`) | `-1`          | `Profile/Item.html` of `academic_persons`                                           |
+| `plugin.tx_academicpersons` (`Configuration/TypoScript/Default/`)     | `-1`          | `Profile/Item/Image.html`, `Profile/PublicProfile/ProfileImage.html`                |
+| `plugin.tx_academiccontacts4pages` (`Configuration/TypoScript/List/`) | `-1`          | `Profile/Item/Image.html` of `academic_persons`                                     |
 | `plugin.tx_academicpartners`                                          | `-1`          | `Partner/Item.html`, `Partnerships/List/Item.html`, `Partnerships/Teaser/Item.html` |
 | `plugin.tx_academicprograms`                                          | `-1`          | `Program/Item.html`                                                                 |
 | `plugin.tx_academicprojects`                                          | `-1`          | `Project/Item.html`                                                                 |
@@ -144,6 +144,8 @@ is still found.
 
 ## See also
 
+- [Overridable partials](overridable-partials.md) — how a template is cut
+  into partials a project overrides one at a time.
 - [TypoScript and site sets](typoscript-and-site-sets.md) — where the plugin
   views are configured and delivered.
 - [Functional tests](../testing/functional-tests.md) — the frontend rendering

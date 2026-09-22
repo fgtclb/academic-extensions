@@ -29,6 +29,11 @@ describing an intention as if it were the state.
   `academic_base`, registered in each plugin view with the root path key `-1`
   — below every key of the extension and of the project, so a project
   override always wins.
+- A template a project customises in pieces is **built from pieces**, and the
+  entry partial keeps its name and its arguments so an existing copy of it is
+  not broken. A partial that renders a *value* rather than markup renders it
+  raw: whoever puts it into an element escapes it there, and escaping twice is
+  silent until a name carries an apostrophe.
 - A content element template renders the frame, the spacing, the `c{uid}`
   anchor and the header **only** when it goes through the `Default` layout of
   whichever package provides `lib.contentElement`. On TYPO3 v14 that header
@@ -76,6 +81,7 @@ describing an intention as if it were the state.
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and the `clear = 3` trap.                                                                   |
 | [Translation synchronization](translation-synchronization.md)   | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.                                                 |
 | [Shared partials](shared-partials.md)                           | The Fluid partials `academic_base` ships for every extension, the root path key `-1` they are registered with, and which views register it.                                                |
+| [Overridable partials](overridable-partials.md)                 | How a template is cut into partials a project overrides one at a time, the escaping contract of a partial that renders a value, and where the classes go.                                  |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
