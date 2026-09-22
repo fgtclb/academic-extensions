@@ -260,6 +260,13 @@ This is a bigger trap than the double parse. It is also what an installation
 in that state recovers from by selecting the static template: the record that
 wiped the set contribution can carry the same configuration itself.
 
+It is **reported** since ACE-714: the configuration group of
+`academic:upgrade:check` names every TypoScript record on the root page of a
+site with declared sets that carries a clear bit, and says which branch it
+discards — see [Upgrade checks](upgrade-checks.md#the-configuration-group). A
+warning rather than an error, because the recovery above is a legitimate state
+to be in.
+
 ## Both mechanisms, one site each: the development instances
 
 The instructions above say **one mechanism per site**. The development instances

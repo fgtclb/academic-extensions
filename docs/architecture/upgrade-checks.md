@@ -227,6 +227,9 @@ registry, and answers with a list of findings:
 | `static-template`         | warning          | A TypoScript record includes an academic static template that delivers no TypoScript |
 | `tsconfig-import`         | warning          | A page or a site references an academic page TSconfig file that is not there         |
 | `tsconfig-syntax`         | warning          | A page or a site uses `<INCLUDE_TYPOSCRIPT:`, which TYPO3 v14 no longer reads        |
+| `typoscript-import`       | warning          | The Constants or Setup field of a TypoScript record imports a file that is not there |
+| `typoscript-syntax`       | warning          | The same field uses `<INCLUDE_TYPOSCRIPT:`                                           |
+| `set-branch-cleared`      | warning          | A record on a set-driven site's root page clears a branch those sets deliver         |
 | `alias-set`               | notice           | A site depends on a set that only forwards to another one                            |
 | `set-and-static-template` | warning          | A site delivers one extension through a set and through a static template            |
 | `xclass`                  | warning or error | An academic class is replaced through the XCLASS registry                            |
@@ -256,6 +259,55 @@ time — because that is the container `SysTemplateRepository` uses for a reques
 without a preview. A hidden record delivers nothing to anybody, so there is
 nothing about it to fix.
 
+**The TypoScript of a record** — the same rows, two more columns. Core
+tokenizes `constants` and `config` in
+`SysTemplateTreeBuilder::getTreeBySysTemplateRowsAndSite()` and hands the stream
+to the same `TreeFromLineStreamBuilder` that reads page TSconfig, so an
+`@import` matching no file is dropped there exactly as silently.
+
+**The suffix is a list, not a single value.**
+`TreeFromLineStreamBuilder::$atImportTypeToSuffixMap` maps `constants` and
+`setup` to `['typoscript']` and **`tsconfig` to `['typoscript', 'tsconfig']`**,
+and `buildTreeInternal()` calls `processAtImport()` once per allowed suffix. So
+a page TSconfig `@import` of a `.typoscript` file resolves. The record's list is
+a *subset* of the page TSconfig one, so the asymmetry runs one way only: a
+folder holding nothing but `.tsconfig` files resolves for page TSconfig and
+delivers nothing to a TypoScript record. The checker loops the same lists. Each
+pass yields only files ending in its own suffix, so the two sets are disjoint —
+no file is read twice, and none is missed.
+
+This is the case the 2.4 entry
+`academic-persons/Documentation/Changelog/2.4/Breaking-SiteSetsAndStaticTemplatesRestructured.rst`
+describes in its own Impact section: "A site package that imported one of the
+removed files by path fails to resolve it. `@import` of a missing file is
+silent, so this shows up as missing configuration rather than as an error
+message."
+
+Only the fields themselves are read, not the files they import — see *What it
+does not check*.
+
+**A cleared set branch** — `SysTemplateTreeBuilder` adds the site include to the
+root node *before* the `sys_template` rows, marks a row whose bit for the branch
+is set as "clear" (`clear & 1` for Constants, `clear & 2` for Setup), and
+`IncludeTreeAstBuilderVisitor::visitBeforeChildren()` replaces the whole AST with
+a fresh `RootNode` for such a node. So on a site driven by sets the record
+discards everything those sets contributed to that branch, and the failure looks
+like "the extension ships no TypoScript" rather than like a template record
+problem — which is why
+[TypoScript and site sets](typoscript-and-site-sets.md#the-clear--3-trap) calls
+it a bigger trap than the double parse. The backend's own **Create a root
+TypoScript record** button writes both bits.
+
+The site condition is `Site::getSets() !== []`, not `Site::isTypoScriptRoot()`.
+The latter also answers true for a site that only carries TypoScript of its own,
+which is none of this check's business, and it is `@internal` on both versions
+while `getSets()` is not.
+
+Core's convenience code
+(`$atLeastOneSysTemplateRowHasClearFlag = $siteIsTypoScriptRoot`) does not
+soften this: it only suppresses the flag core sets *automatically* when an
+integrator set none.
+
 **Page TSconfig** — core drops a `tsconfig_includes` entry whose file is gone in
 `TsConfigTreeBuilder::getRootlinePageTsConfigTree()`, and an `@import` that
 matches nothing in `TreeFromLineStreamBuilder::processAtImport()`. The check
@@ -274,6 +326,41 @@ default container: page TSconfig of a **hidden** page is read all the same,
 because `BackendUtility::getPagesTSconfig()` walks a rootline that a hidden page
 is part of. The two tables are therefore queried with different restrictions,
 and that difference is deliberate.
+
+**A selected file and an imported one are not resolved the same way.** A value
+of `tsconfig_includes` goes through one exact file lookup —
+`TsConfigTreeBuilder::getContentOfTsconfigFile()` on v14, the same logic inlined
+in `getRootlinePageTsConfigTree()` on v13: an `EXT:` path, an active extension, a
+canonical path that stays inside it, and the file exists. No folder, no
+wildcard, no appended suffix, and no suffix requirement at all, so a selected
+`.txt` reads fine and a selected folder reads nothing. The four `@import` shapes
+apply to an `@import` and to nothing else, and using them for a selected value
+would report the contents of a folder TYPO3 never opens.
+
+A selected *folder* gets a finding of its own. Core guards the lookup with
+`file_exists()`, which a directory passes, and then calls `file_get_contents()`
+on it: nothing is read, and PHP warns while nothing is read — in the backend as
+much as in the frontend, since `BackendUtility::getPagesTSconfig()` resolves the
+same values.
+
+**A reference that resolves is followed.** TYPO3 reads the imports inside a file
+it includes, so a page whose own import is sound can still end up with
+configuration that does not resolve — the realistic shape is a project file that
+exists and imports an academic path a release renamed. Any resolving file is
+read, not only an academic one; only *academic* references are ever reported.
+The finding names the file as an `EXT:` path rather than the expression that led
+to it — a folder import resolves to several files, and naming the folder would
+leave the integrator to find which of them carries the line — together with the
+page or site that leads TYPO3 there, because that is where they start.
+
+Two files importing each other terminate through a `seen` set keyed by the
+absolute file name. Core has no such guard and is protected by the file system
+rather than by its code; a check must not be. Behind it sits a depth bound of
+25, which exists for the case where the `seen` set breaks: without it a cycle
+exhausts the memory limit and takes the process down, so the defect would report
+itself as a fatal error in the backend status report of an installation nobody
+can debug. With it the same defect produces too many findings — a defect that
+can be seen, and tested.
 
 A site's `page.tsconfig` is the third place page TSconfig is stored, and TYPO3
 v13 and v14 read it alike — `TsConfigTreeBuilder::getSitePageTsConfigTree()`
@@ -358,21 +445,31 @@ references.
 - Static templates, TSconfig imports and XCLASSes of a project's own extensions
   or of the TYPO3 core. The check is about what the academic extensions no
   longer deliver.
-- The `constants` and `config` fields of a `sys_template` record. Core
-  tokenizes those too (`SysTemplateTreeBuilder::getTreeBySysTemplateRowsAndSite()`)
-  and `processAtImport()` drops a missing target there exactly as silently, with
-  `fileSuffix` = `typoscript`. The 2.4 entry
-  `academic-persons/Documentation/Changelog/2.4/Breaking-SiteSetsAndStaticTemplatesRestructured.rst`
-  names that case itself — "`@import` of a missing file is silent, so this shows
-  up as missing configuration rather than as an error message" — so this is a
-  named gap and a candidate for the next round, not an oversight.
-- The content of a page TSconfig file that *does* resolve. Core recurses into
-  it; this check stops at the reference.
-- A `sys_template` `clear` flag on a site driven by sets, which throws the whole
-  set contribution away — the bigger trap of the two described in
-  [TypoScript and site sets](typoscript-and-site-sets.md#the-clear--3-trap).
-  It is a property of a record rather than of a reference, and it is not part of
-  this change.
+- The files a TypoScript record's `@import` leads to. The two fields are read,
+  their imports are resolved, and the recursion stops there. Reading the whole
+  TypoScript tree of an installation on every status report render is not worth
+  the second level, and the first one is where a renamed path bites. Page
+  TSconfig *is* followed, because those trees are small.
+- **More than one TypoScript record per page.**
+  `SysTemplateRepository::getSysTemplateRowsByRootline()` keeps one row per pid
+  — ordered `root DESC, sorting ASC` — and only along the rootline of the page
+  being rendered. This check reads every visible row of the table instead, so a
+  second record on a page, or a record on a page no site reaches, is reported
+  although core never tokenizes it. The pre-existing `static-template` and
+  `set-and-static-template` checks share that simplification; resolving a
+  rootline per record is a larger step than the finding is worth.
+- **A relative `@import` inside a file that is followed.** Core sets the path of
+  a node it built from a file, so `@import './Other.tsconfig'` resolves there;
+  this check does not reproduce the relative lookup. A relative path is never an
+  academic one, so the cost is a chain that is not walked to its end, never a
+  false finding.
+- **A non-academic `<INCLUDE_TYPOSCRIPT:`.** On TYPO3 v13 core still reads it,
+  so a project file included that way is not followed. On v14 the syntax reads
+  nothing at all, which is what the `tsconfig-syntax` finding is about.
+- A file whose name TYPO3's `fileDenyPattern` refuses is skipped here as it is
+  there, in all four `@import` shapes. Core contributes nothing for such a file,
+  so an import naming one is **dead** and is reported as such rather than
+  counted as resolved.
 - User TSconfig. No academic extension ships any.
 - Whether a *resolving* import still delivers what it used to. The check answers
   "does TYPO3 read this", not "does it still mean the same".

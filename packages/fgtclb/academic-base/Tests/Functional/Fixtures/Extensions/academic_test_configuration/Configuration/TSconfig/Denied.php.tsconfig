@@ -1,0 +1,7 @@
+# A file name TYPO3's fileDenyPattern refuses. Core checks every file an
+# "@import" resolves to with FileNameValidator and contributes nothing when it
+# refuses, so an import of this file is dead - and the configuration check has
+# to say so rather than read the file and call the import resolved.
+#
+# The name ends in ".tsconfig", so no PHP tooling of this repository looks at it.
+TCEMAIN.denied = 1

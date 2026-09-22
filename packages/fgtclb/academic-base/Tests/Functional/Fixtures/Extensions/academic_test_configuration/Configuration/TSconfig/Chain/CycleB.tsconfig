@@ -1,0 +1,2 @@
+# The other half of the pair, importing the first one back.
+@import 'EXT:academic_test_configuration/Configuration/TSconfig/Chain/CycleA.tsconfig'

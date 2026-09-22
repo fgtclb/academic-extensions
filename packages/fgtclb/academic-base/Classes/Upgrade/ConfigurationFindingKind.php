@@ -19,8 +19,9 @@ enum ConfigurationFindingKind: string
     case StaticTemplate = 'static-template';
 
     /**
-     * A page, or a site, references an academic page TSconfig file that does
-     * not exist.
+     * A page, or a site, references academic page TSconfig that TYPO3 does not
+     * read: a file that is not there, or a selected value naming something
+     * other than a file.
      */
     case TsConfigImport = 'tsconfig-import';
 
@@ -29,6 +30,19 @@ enum ConfigurationFindingKind: string
      * `<INCLUDE_TYPOSCRIPT:` syntax, which TYPO3 v14 no longer reads.
      */
     case TsConfigSyntax = 'tsconfig-syntax';
+
+    /**
+     * The Constants or Setup field of a TypoScript record imports a TypoScript
+     * file of an academic extension that does not exist.
+     */
+    case TypoScriptImport = 'typoscript-import';
+
+    /**
+     * The Constants or Setup field of a TypoScript record includes a file of an
+     * academic extension with the `<INCLUDE_TYPOSCRIPT:` syntax, which TYPO3
+     * v14 no longer reads.
+     */
+    case TypoScriptSyntax = 'typoscript-syntax';
 
     /**
      * A site depends on an alias set that only forwards to another one.
@@ -40,6 +54,12 @@ enum ConfigurationFindingKind: string
      * template at the same time.
      */
     case SetAndStaticTemplate = 'set-and-static-template';
+
+    /**
+     * A TypoScript record on the root page of a site that is driven by site
+     * sets clears a branch those sets deliver.
+     */
+    case SetBranchCleared = 'set-branch-cleared';
 
     /**
      * An academic class is replaced through the XCLASS registry.
@@ -56,8 +76,11 @@ enum ConfigurationFindingKind: string
             self::StaticTemplate => 'Static template',
             self::TsConfigImport => 'Page TSconfig import',
             self::TsConfigSyntax => 'Page TSconfig syntax',
+            self::TypoScriptImport => 'TypoScript import',
+            self::TypoScriptSyntax => 'TypoScript syntax',
             self::AliasSet => 'Alias set',
             self::SetAndStaticTemplate => 'Set and static template',
+            self::SetBranchCleared => 'Cleared set branch',
             self::Xclass => 'XCLASS',
         };
     }

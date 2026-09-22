@@ -1,0 +1,7 @@
+# A page TSconfig file of a project site package that is there, and that imports
+# a page TSconfig file of an academic extension that is not. This is the shape
+# the check follows a resolving reference for: the page's own import is sound,
+# and the dead one is a file further in.
+@import 'EXT:academic_test_configuration/Configuration/TSconfig/Removed.tsconfig'
+
+TCEMAIN.testUpgradeCheckProject = 1
