@@ -74,12 +74,15 @@
 
 ## 5. Backport
 
-- [ ] 5.1 Open the backport as a separate change on branch `2` after a
-  backport analysis (`docs/workflow/backporting.md`): the same event classes
-  and methods without `getPluginControllerActionContext()`, no repository signature change, a
-  `Feature-*.rst` for 2.4.0. `TYPO3\CMS\Core\Attribute\AsEventListener` does
-  not exist on v12, so the fixture registers its listeners in `Services.yaml`
-  there.
+- [ ] 5.1 **Deliberately open, and not part of this change.** It is a feature
+  on the maintenance line and needs the maintainer's approval first; it is a
+  change of its own on branch `2`, and specs are branch-scoped. Open the
+  backport as a separate change on branch `2` after a backport analysis
+  (`docs/workflow/backporting.md`): the same event classes and methods without
+  `getPluginControllerActionContext()`, and no repository signature change,
+  with a `Feature-*.rst` for 2.4.0.
+  `TYPO3\CMS\Core\Attribute\AsEventListener` does not exist on v12, so the
+  fixture registers its listeners in `Services.yaml` there.
 
 ## 6. File the issue
 
@@ -97,5 +100,5 @@
 - [x] 7.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 7.4 `docs/` and the `Documentation/` changelog updated as in group 4;
   `README.md` and `CONTRIBUTING.md` still only summarise.
-- [ ] 7.5 Anything left out is named in the pull request, with the reason.
-- [ ] 7.6 Archive the change as the last commit of the pull request.
+- [x] 7.5 Anything left out is named in the pull request, with the reason.
+- [x] 7.6 Archive the change as the last commit of the pull request.
