@@ -40,7 +40,7 @@ They sit next to the tests that use them, under
 | `test_partner_list_events`             | `tests/test-partner-list-events`        | `academic-partners`     | Two listeners on the partner demand and list events, and a list template.     |
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
-| `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Single profile partial overrides in two paths, and a card passing a page.     |
+| `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Partial overrides in two paths, a card passing a page, an old list template.  |
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
 | `test_project_list_events`             | `tests/test-project-list-events`        | `academic-projects`     | Two listeners on the project demand and list events, and a list template.     |
@@ -245,7 +245,9 @@ The existing ones show the cases that justify one:
   still render the shipped templates in every other test. It ships **two**
   partial directories, because a test of the grid override has to run without
   the name override standing in its way — a second directory is cheaper than a
-  second fixture extension.
+  second fixture extension. For the same reason it carries a list template of a
+  project written before the letter navigation knew which letters lead
+  somewhere, in a template directory of its own.
 - **A TCA shape the extension no longer ships.** `test_exclude_file_column`
   adds a `file` column with `l10n_mode=exclude` to the profile table, so the
   ACE-487 pin of the translation synchronisation — a late file reference on an
