@@ -62,4 +62,4 @@
 - [x] 5.5 No backport: template refactoring on a maintenance line causes merge
   conflicts for projects that override the files. State it in the pull
   request, together with anything else left out.
-- [ ] 5.6 Archive the change as the last commit of the pull request.
+- [x] 5.6 Archive the change as the last commit of the pull request.
