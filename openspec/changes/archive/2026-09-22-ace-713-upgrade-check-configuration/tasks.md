@@ -86,7 +86,7 @@
   `docs/architecture/typoscript-and-site-sets.md`, the two section indexes, the
   extension manual and `Documentation/Changelog/3.0/Feature-UpgradeConfigurationCheck.rst`
   are part of the change; `README.md` and `CONTRIBUTING.md` are untouched.
-- [ ] 6.6 Archive the change as the last commit of the pull request.
+- [x] 6.6 Archived as the last commit of the pull request.
 
 ## 7. Review round
 
