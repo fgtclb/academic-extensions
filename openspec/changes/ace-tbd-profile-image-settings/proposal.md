@@ -58,7 +58,7 @@ None.
 - Depends on `ace-646-responsive-image-partial` (the partial, the
   placeholder SVG and the `image.placeholder.default` key),
   `ace-tbd-named-crop-variants` (the crop variant names) and
-  `ace-tbd-item-and-list-partials` (the separate item image partial).
+  `ace-716-item-and-list-partials` (the separate item image partial).
 - No database schema change.
 
 ## Non-goals

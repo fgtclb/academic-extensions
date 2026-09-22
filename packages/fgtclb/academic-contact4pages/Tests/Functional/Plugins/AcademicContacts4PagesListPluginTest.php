@@ -36,6 +36,8 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
     {
         $this->configurationToUseInTestInstance = $this->frontendPluginTestConfiguration();
         $this->addCoreExtensionsToLoad('typo3/cms-fluid-styled-content');
+        // Stays inert until a test includes the TypoScript that registers its partial path.
+        $this->addTestExtensionsToLoad('tests/test-profile-partial-overrides');
         parent::setUp();
     }
 
@@ -135,6 +137,46 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertRendersProfileName($content, 'Erika', 'Beispiel');
     }
 
+    /**
+     * This plugin renders the profile item of `EXT:academic_persons` through partial root
+     * paths of its own, so an integrator who overrides one of the item partials has to
+     * register that path here as well. The fixture TypoScript does exactly that, and this
+     * is the test that the second registration is all it takes.
+     */
+    #[Test]
+    public function anOverriddenProfilePartialReachesThisPluginToo(): void
+    {
+        $this->setUpTestCase('contactsListPage', [
+            'EXT:test_profile_partial_overrides/Configuration/TypoScript/PartialOverrides.typoscript',
+        ]);
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('NAME-OVERRIDE[Müllermann]', $content);
+        $this->assertStringContainsString('NAME-OVERRIDE[Huber]', $content);
+        // Overriding the name alone leaves the rest of the item alone.
+        $this->assertSame(3, $this->countProfileCards($content));
+        $this->assertStringContainsString('Dean&#039;s Office', $content);
+    }
+
+    /**
+     * The other half of the boundary: this plugin arranges its contacts itself, so an
+     * override of the item grid of `EXT:academic_persons` - the partial its list, card,
+     * selected-profiles and selected-contracts elements share - reaches it in no way.
+     * The documentation of both extensions says so, and this is where it is pinned.
+     */
+    #[Test]
+    public function anOverriddenItemGridDoesNotReachThisPlugin(): void
+    {
+        $this->setUpTestCase('contactsListPage', [
+            'EXT:test_profile_partial_overrides/Configuration/TypoScript/GridOverride.typoscript',
+        ]);
+
+        $content = $this->renderHomePage();
+        $this->assertStringNotContainsString('GRID-OVERRIDE', $content);
+        $this->assertSame(3, $this->countProfileCards($content));
+        $this->assertRendersProfileName($content, 'Max', 'Müllermann');
+    }
+
     #[Test]
     public function listPluginRendersGroupedContactsOneHeadingLevelDown(): void
     {
@@ -144,7 +186,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         // below the `Profile/Header` an ungrouped one gets. Asserting the level is what
         // proves `groupedProfiles` arrives in the partial.
         $this->assertMatchesRegularExpression(
-            '#<h3 class="card-title">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h3>#',
+            '#<h3 class="academic-persons-item__name card-title">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h3>#',
             $this->renderHomePage(),
         );
     }
@@ -162,7 +204,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         // Without a role the flat branch renders, which uses `Profile/Header` and
         // therefore one heading level higher.
         $this->assertMatchesRegularExpression(
-            '#<h2 class="card-title">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h2>#',
+            '#<h2 class="academic-persons-item__name card-title">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h2>#',
             $content,
         );
     }
@@ -209,7 +251,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         // `Profile/SectionHeader`, so a role-less contact keeps the higher heading level
         // it has on a page with no roles at all - the two branches stay consistent.
         $this->assertMatchesRegularExpression(
-            '#<h2 class="card-title">\s*<a href="[^"]*">Erika\s+Beispiel</a>\s*</h2>#',
+            '#<h2 class="academic-persons-item__name card-title">\s*<a href="[^"]*">Erika\s+Beispiel</a>\s*</h2>#',
             $this->renderHomePage(),
         );
     }

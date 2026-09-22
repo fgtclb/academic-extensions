@@ -1,6 +1,6 @@
 ## 1. Prerequisites
 
-- [ ] 1.1 Confirm that `ace-tbd-item-and-list-partials` and the change for
+- [ ] 1.1 Confirm that `ace-716-item-and-list-partials` and the change for
   candidate `persons-display-10` (list links keep the active state), or their
   renamed successors, are merged on `main`.
 

@@ -20,7 +20,7 @@ See `proposal.md` for the motivation. State on `main`:
 This change builds on three others: `ace-646-responsive-image-partial` ships
 the partial with `image`, `cropVariant`, `preset` and `placeholder`
 arguments, `ace-tbd-named-crop-variants` adds the `square` and `portrait`
-crop variants to the profile image, and `ace-tbd-item-and-list-partials`
+crop variants to the profile image, and `ace-716-item-and-list-partials`
 separates the item image into its own partial.
 
 ## Goals / Non-Goals

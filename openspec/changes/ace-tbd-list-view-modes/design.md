@@ -15,7 +15,7 @@ Site settings are declared in `Configuration/Sets/Full/settings.definitions.yaml
 repeated with the same default in `Configuration/TypoScript/Default/constants.typoscript`,
 and mapped in `setup.typoscript`.
 
-This change builds on `ace-tbd-item-and-list-partials`: the tile grid becomes
+This change builds on `ace-716-item-and-list-partials`: the tile grid becomes
 `Profile/ViewMode/List.html` around its `Profile/List/Items`. The links that
 keep the mode across pagination and letters come from the change for candidate
 `persons-display-10`.

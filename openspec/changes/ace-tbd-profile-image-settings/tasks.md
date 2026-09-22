@@ -1,7 +1,7 @@
 ## 1. Prerequisites
 
 - [ ] 1.1 Confirm `ace-646-responsive-image-partial`,
-  `ace-tbd-named-crop-variants` and `ace-tbd-item-and-list-partials` are
+  `ace-tbd-named-crop-variants` and `ace-716-item-and-list-partials` are
   merged, and verify the crop variant names and the partial arguments in the
   merged sources before writing any setting.
 - [ ] 1.2 Verify that `plugin.tx_academicpersons.image.placeholder.default`

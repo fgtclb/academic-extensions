@@ -47,7 +47,7 @@ None.
   two site settings, labels, and the route enhancers in
   `Configuration/Routes/List.yaml` and
   `Configuration/Routes/ListAndDetail.yaml`.
-- Depends on the item and list partials change (`ace-tbd-item-and-list-partials`)
+- Depends on the item and list partials change (`ace-716-item-and-list-partials`)
   for the tile grid partial. It also depends on the change for candidate
   `persons-display-10`, "Pagination and letter links keep the active list
   state", for the mode to survive pagination.

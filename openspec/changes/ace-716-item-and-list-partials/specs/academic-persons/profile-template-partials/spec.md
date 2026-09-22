@@ -10,15 +10,17 @@ render.
 
 With no override in place, the system SHALL render the profile item and list
 markup of the list, list-and-detail, card, selected-profiles and
-selected-contracts plugins as before, keeping every existing CSS class. The
-only exception is the academic title in the name. This applies on TYPO3 v13 and
-v14.
+selected-contracts plugins as before, and SHALL keep every CSS class those
+elements carried. Three differences are intended: the academic title in the
+name, the separator of an omitted name part, and the classes added below. This
+applies on TYPO3 v13 and v14.
 
 #### Scenario: Default list output
 
 - **WHEN** a visitor opens a grouped list of profiles without academic titles
 - **THEN** the group headers, the items, the contract rows, the images and
-  the pagination render with the same text, links and classes as before
+  the pagination render with the same text, the same links and the same
+  elements as before, and every class they carried is still on them
 
 ### Requirement: The name shows the academic title
 
@@ -30,6 +32,32 @@ leaving extra spaces.
 
 - **WHEN** a profile has the title "Prof. Dr." and the names "Anna Beispiel"
 - **THEN** the item heading reads "Prof. Dr. Anna Beispiel"
+
+#### Scenario: Profile without a middle name
+
+- **WHEN** a profile has no academic title and no middle name
+- **THEN** the item heading holds one space between the first and the last
+  name, where it held two before
+
+### Requirement: Every overridable part carries a stable class
+
+The system SHALL give every part that renders an element of its own a stable
+CSS class, in addition to the classes that element already carried. A part that
+renders a value or nothing SHALL carry no class of its own, and no existing
+class SHALL be removed.
+
+#### Scenario: A project styles one part of the item
+
+- **WHEN** an integrator writes a stylesheet against the class of the item
+  heading, the item image, the group heading, the item grid, a grid column, the
+  page navigation, the letter navigation or the empty state
+- **THEN** that class is present on exactly that element in every plugin that
+  renders it
+
+#### Scenario: A stylesheet written before the split
+
+- **WHEN** a stylesheet builds on the classes the elements carried before
+- **THEN** it still matches, because the new classes are added next to them
 
 ### Requirement: Parts of the item can be overridden on their own
 
@@ -62,12 +90,24 @@ count SHALL render nothing.
 - **WHEN** an integrator overrides only the empty state partial and a list has
   no profiles
 - **THEN** the overridden empty state is shown instead of "No profiles found"
+- **AND** the card, selected-profiles and selected-contracts elements show it
+  as well, because they render the same empty state
+
+#### Scenario: Override of the item grid
+
+- **WHEN** an integrator overrides only the item grid partial
+- **THEN** the list, the card, the selected profiles and the selected contracts
+  all arrange their items the overridden way
+- **AND** the contacts for pages plugin does not, because it arranges its
+  contacts itself
 
 #### Scenario: Result count as an override hook
 
 - **WHEN** an integrator overrides the result count partial to print the
   number of profiles
 - **THEN** the list shows that number, and without the override it shows none
+- **AND** a paginated list can show the number on the page and the number found
+  separately, neither of which it shows without the override
 
 ### Requirement: Existing overrides of the entry partials keep working
 

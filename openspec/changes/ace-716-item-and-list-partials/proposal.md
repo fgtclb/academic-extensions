@@ -12,15 +12,18 @@ upstream correction. Five projects do so today.
 
 - `Profile/Item`, `Profile/List/ItemList`, `Profile/List/Pagination` and
   `Profile/List/AlphabetPagination` stay the entry points, with unchanged
-  arguments.
-- They delegate to small partials: detail link, name, image and contracts for
-  the item, and group header, items, result count and empty state for the
-  list. An integrator overrides one of those instead of the template.
+  arguments. The first two delegate; the two navigations are leaves that only
+  gain a class.
+- The first two delegate to small partials: detail link, name, image and
+  contracts for the item, and group header, items, result count and empty state
+  for the list. An integrator overrides one of those instead of the template.
 - A caller without plugin settings can pass the detail page to the item
   explicitly.
-- Every partial gets a stable BEM class. The existing classes stay.
-- The name shows the academic title when the profile has one. This is the only
-  visible change in the default output.
+- Every partial that renders an element of its own gets a stable BEM class. The
+  existing classes stay.
+- The name shows the academic title when the profile has one, and an omitted
+  part no longer leaves its separator behind. Those two and the added classes
+  are the whole visible change in the default output.
 
 The behaviour is identical on TYPO3 v13 and v14.
 
@@ -43,7 +46,8 @@ None.
 - `academic_contacts4pages` (`packages/fgtclb/academic-contact4pages`) renders
   the persons item and profits without a change of its own. Its partial root
   paths include the persons partials, so a project override has to be added to
-  its paths as well.
+  its paths as well. Its output changes with the persons one - the academic
+  title in the name - so it gets a changelog entry of its own.
 - A functional test fixture extension that overrides one partial.
 - No PHP, setting or schema change.
 
