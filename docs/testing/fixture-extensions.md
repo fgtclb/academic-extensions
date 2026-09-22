@@ -6,8 +6,8 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Eight such fixture extensions exist, in five of the twelve extensions, and the
-table above lists all of them. That is the whole population — this is a
+Twelve such fixture extensions exist, in seven of the twelve extensions, and
+the table below lists all of them. That is the whole population — this is a
 mechanism used sparingly and only where nothing smaller works. Count them with:
 
 ```bash
@@ -20,23 +20,27 @@ find packages/fgtclb/*/Tests/Functional/Fixtures/Extensions \
 They sit next to the tests that use them, under
 `packages/fgtclb/<extension>/Tests/Functional/Fixtures/Extensions/<extension_key>/`:
 
-| Extension key                    | Composer package name                  | Owned by               | Provides                                                                |
-|----------------------------------|----------------------------------------|------------------------|-------------------------------------------------------------------------|
-| `test_base_dependency_injection` | `tests/base-test-dependency-injection` | `academic-base`        | Two services to resolve through the container, plus `Services.yaml`.    |
-| `test_bitejobs_stub`             | `tests/test-bitejobs-stub`             | `academic-bite-jobs`   | An `ext_localconf.php` replacing the Guzzle handler stack.              |
-| `test_jobcontact_schema`         | `tests/test-jobcontact-schema`         | `academic-jobs`        | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates. |
-| `test_language_files`            | `tests/language-files`                 | `academic-persons`     | An XLF pair with awkward label keys (dots, dashes).                     |
-| `test_messy_profile_factory`     | `tests/test-messy-profile-factory`     | `academic-persons`     | A deliberately misbehaving profile factory and two event listeners.     |
-| `test_plugin_templates`          | `tests/plugin-templates`               | `academic-persons`     | Simplified Fluid templates and the TypoScript pointing at them.         |
-| `test_category_types_group`      | `tests/category-types-group`           | `typo3-category-types` | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.     |
-| `test_hidden_content_types`      | `tests/hidden-content-types`           | `academic-base`        | Page TSconfig and TCA hiding content types, for the wizard tests.       |
+| Extension key                          | Composer package name                   | Owned by               | Provides                                                                 |
+|----------------------------------------|-----------------------------------------|------------------------|--------------------------------------------------------------------------|
+| `test_base_dependency_injection`       | `tests/base-test-dependency-injection`  | `academic-base`        | Two services to resolve through the container, plus `Services.yaml`.     |
+| `test_bitejobs_stub`                   | `tests/test-bitejobs-stub`              | `academic-bite-jobs`   | An `ext_localconf.php` replacing the Guzzle handler stack.               |
+| `test_category_types_group`            | `tests/category-types-group`            | `typo3-category-types` | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.      |
+| `test_category_types_summary_override` | `tests/category-types-summary-override` | `typo3-category-types` | A page TSconfig override of the page module category summary template.   |
+| `test_hidden_content_types`            | `tests/hidden-content-types`            | `academic-base`        | Page TSconfig and TCA hiding content types, for the wizard tests.        |
+| `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`        | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.  |
+| `test_language_files`                  | `tests/language-files`                  | `academic-persons`     | An XLF pair with awkward label keys (dots, dashes).                      |
+| `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`     | A deliberately misbehaving profile factory and two event listeners.      |
+| `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`    | An `ext_localconf.php` replacing the Guzzle handler stack.               |
+| `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`     | Simplified Fluid templates and the TypoScript pointing at them.          |
+| `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`     | Two listeners narrowing the profile and contract queries of the plugins. |
+| `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`    | A `CategoryTypes.yaml` adding one type to the programs group.            |
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Four of the eight have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
-other four are pure resources. Only `test_bitejobs_stub` ships an
-`ext_localconf.php`, which is how it replaces the Guzzle handler stack before
-any request is built.
+Six of the twelve have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
+other six are pure resources. Only `test_bitejobs_stub` and
+`test_partners_stub` ship an `ext_localconf.php`, which is how they replace the
+Guzzle handler stack before any request is built.
 
 A minimal one, complete:
 
@@ -192,25 +196,30 @@ protected array $testExtensionsToLoad = [
 ```
 — [`ProfileTitleProviderTest.php:27`](../../packages/fgtclb/academic-persons/Tests/Functional/PageTitle/ProfileTitleProviderTest.php#L27)
 
-**The package name is not derivable from the extension key.** All six use the
-`tests/` vendor, but the second segment follows no rule: `test_plugin_templates`
+**The package name is not derivable from the extension key.** All of them use
+the `tests/` vendor, but the second segment follows no rule: `test_plugin_templates`
 is `tests/plugin-templates` (prefix dropped), `test_jobcontact_schema` is
 `tests/test-jobcontact-schema` (prefix kept), and `test_base_dependency_injection`
 is `tests/base-test-dependency-injection` (words reordered). Read the package
 name out of the fixture's `composer.json` rather than guessing it. New fixtures
 should prefer the mechanical form — the key with underscores turned into
-hyphens — but the existing six are not going to be renamed for cosmetics.
+hyphens, as `test_profile_query_constraints` does — but the older ones are not
+going to be renamed for cosmetics.
 
 ## What a fixture extension is for, and what it is not
 
-The six existing ones show the cases that justify one:
+The existing ones show the cases that justify one:
 
 - **Schema and TCA.** `test_jobcontact_schema` ships `ext_tables.sql` and TCA for
   a table the upgrade wizard tests migrate away from. The table has to exist when
   the instance is built.
 - **Dependency injection.** `test_base_dependency_injection` and
   `test_messy_profile_factory` ship `Services.yaml` plus classes, so the
-  container really wires them.
+  container really wires them. `test_profile_query_constraints` is the same
+  case for an event: its two listeners are registered with the `event.listener`
+  tag, which only means anything once the container has seen the class, so the
+  documented way to register a listener on this branch is the way the test
+  registers one.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path.
