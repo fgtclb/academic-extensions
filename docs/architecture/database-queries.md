@@ -549,6 +549,71 @@ one-element list with an always-true `uid > 0` comparison
 (`Query::logicalAnd()`, `case 1`, identical on v13 and v14), which is harmless
 but ends up in every query of an installation that has no listener.
 
+## Asking a question about a list — reuse its query, not its rules
+
+The letter navigation of the persons list has to know which letters lead to a
+list that is not empty (ACE-597). The answer is only right if it is computed
+under **exactly** the constraints the list applies: storage pages, the
+language statement of the overlay mode, the enable fields, the workspace, the
+editor's filters, and whatever `ModifyProfileDemandEvent` and
+`ModifyProfileQueryEvent` listeners add. Re-implementing any of that is how a
+letter ends up enabled over an empty page.
+
+`ProfileRepository::findAlphabetFilterLetters()` therefore builds the list's
+own query — the same private steps as `findByDemand()`, from a copy of the
+demand without its letter — and runs it the way core's
+`Typo3DbBackend::getObjectCountByQuery()` runs a count (identical on v13.4 and
+v14.3), plus a `resetGroupBy()` that core needs only for its distinct count and
+that here guarantees the single row the aggregates rely on:
+
+```php
+$queryBuilder = GeneralUtility::makeInstance(Typo3DbQueryParser::class)
+    ->convertQueryToDoctrineQueryBuilder($query)
+    ->resetOrderBy()
+    ->resetGroupBy();
+$queryBuilder->getRestrictions()->add(
+    GeneralUtility::makeInstance(WorkspaceRestriction::class, $workspaceId)
+);
+```
+
+and replaces the select list with one conditional aggregate per letter,
+`MAX(CASE WHEN <table>.last_name LIKE 'x%' THEN 1 ELSE 0 END)`. Four details
+carry the correctness:
+
+- **The predicate of the filter, not a first character.** The filter is
+  Extbase's `like()`, which the parser renders as `LIKE`, or `ILIKE` on
+  PostgreSQL. Which letter a name falls under is decided by the collation:
+  MariaDB with `utf8mb4_unicode_ci` lists "Özil" under O, PostgreSQL's `ILIKE`
+  and SQLite's `LIKE` under no letter. A first character compared in PHP would
+  disagree with the list on some DBMS; the same operator cannot.
+- **`MAX()`, not a count.** The function type and organisational unit filters
+  join the contracts, so a profile appears once per contract. `MAX()` is
+  indifferent to that, and without `GROUP BY` the statement returns exactly
+  one row — every letter `0` for an empty list rather than no row.
+- **The workspace restriction count() adds.** In a frontend request the
+  parser's enable fields already keep workspace rows out of a live query; a
+  caller without one — a command, a backend module — would count them. The
+  test `withoutAFrontendRequestOnlyLiveRecordsCountLive()` is the only one
+  that fails without the restriction.
+- **Constant patterns, quoted.** The 26 patterns are literals, passed through
+  `quote()`, so the statement creates no named parameters beside the ones the
+  parser bound — rule 2 does not arise.
+
+The parser is `@internal` to Extbase. It is used in one method, exactly as core
+uses it for `count()`, because it is the only source of the list's language,
+visibility and join handling that does not duplicate them. The fallback, should
+it ever go, is one `count()` per letter: public API, same answer, and roughly 2
+to 15 times slower in the measurements recorded in ACE-597 - least on
+PostgreSQL, most on MariaDB.
+
+How to test such a question: compare its answer with the list itself, for every
+letter and every scenario — the list's count, and live also its records after
+the language overlay — **and** pin absolute expectations, because a parity test
+alone passes when both sides are wrong the same way.
+`packages/fgtclb/academic-persons/Tests/Functional/Domain/Repository/ProfileRepositoryAlphabetFilterLettersTest.php`
+does both, with one fixture profile per rule of the list query so that a rule
+the question misses shows up as one wrong letter.
+
 ## Testing this class of defect
 
 Rules 1 and 2 fail in the direction the default test run cannot see: rule 1

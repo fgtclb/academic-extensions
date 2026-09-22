@@ -41,7 +41,7 @@ They sit next to the tests that use them, under
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
 | `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Single profile partial overrides in two paths, and a card passing a page.     |
-| `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Two listeners narrowing the profile and contract queries of the plugins.      |
+| `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
 | `test_project_list_events`             | `tests/test-project-list-events`        | `academic-projects`     | Two listeners on the project demand and list events, and a list template.     |
 | `test_public_profile_settings`         | `tests/test-public-profile-settings`    | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                       |
@@ -226,7 +226,7 @@ The existing ones show the cases that justify one:
 - **Dependency injection.** `test_base_dependency_injection` and
   `test_messy_profile_factory` ship `Services.yaml` plus classes, so the
   container really wires them. `test_profile_query_constraints` is the same
-  case for an event: its two listeners register through TYPO3's
+  case for an event: its listeners register through TYPO3's
   `#[AsEventListener]`, which only means anything once the container has seen
   the class, so the documented way to write a listener is the way the test
   registers one. `test_partner_list_events` and `test_project_list_events` are
