@@ -11,16 +11,15 @@ ACE-598 and ACE-599.
 
 - Letter availability is computed under the same constraints as the list,
   without the active letter (ACE-597).
-- A letter without profiles is rendered disabled, without a link, and marked
-  for assistive technology (ACE-598).
+- A letter without profiles is rendered disabled, without a link, and
+  announced to assistive technology as having no profiles; the navigation
+  gets an accessible name, and the active letter and "A-Z" are marked as
+  current (ACE-598).
 - No letter navigation is rendered when the plugin shows a manual selection
   (ACE-599).
 - New option `plugin.tx_academicpersons.alphabet.activeLetterResets`, default
   off. When on, the active letter links back to the unfiltered list, which is
   what one project built.
-- The alignment utility class moves from the list to the navigation wrapper,
-  so a project can change the alignment with CSS instead of an override.
-  Rendering stays the same.
 
 Behaviour is identical on TYPO3 v13 and v14.
 
@@ -40,12 +39,13 @@ None.
 - `academic_persons` (`packages/fgtclb/academic-persons`): the profile
   repository (one extra query per uncached list rendering), the profile
   controller's list action, `Templates/Profile/List.html`,
-  `Partials/Profile/List/AlphabetPagination.html`, the site settings and
-  constants of the shared plugin block, the documentation and the 3.0
-  changelog.
+  `Partials/Profile/List/AlphabetPagination.html`, two labels, the site
+  settings and constants of the shared plugin block, the documentation and
+  the 3.0 changelog.
 - Plugins `list` and `listanddetail`.
 - Overrides of `AlphabetPagination.html` keep working but show no
-  availability until they read the new variable.
+  availability until they read the new variable. Overrides of `List.html`
+  that do not pass it keep every letter a link.
 
 ## Non-goals
 
@@ -59,9 +59,8 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-11`). Five of the six analysed projects carry their own code
-for this today. The existing issues carry the work, so no new issue is needed
-for it; the change is renamed to
-`ace-597-letter-navigation-availability` before implementation unless the
-maintainer files an umbrella issue for the added reset option.
+for this today. The existing issues carry the work, and the change is named
+after the first of them, `ace-597-letter-navigation-availability`. The reset
+option, which none of them covers, was filed as ACE-718.
 
-Implements ACE-597, ACE-598 and ACE-599. Relates to ACE-525.
+Implements ACE-597, ACE-598, ACE-599 and ACE-718. Relates to ACE-525.

@@ -1,11 +1,11 @@
 ## 1. Prerequisites
 
-- [ ] 1.1 Confirm that `ace-tbd-list-links-keep-state`,
-  `ace-tbd-visitor-filter-ui-routes` and
-  `ace-tbd-letter-navigation-availability`, or their renamed successors, are
-  merged on `main`. Re-read `listAction()`, both route files and both
-  pagination partials in the merged sources, and note every difference to
-  `design.md` in this file before coding.
+- [ ] 1.1 Confirm that `ace-tbd-list-links-keep-state` and
+  `ace-tbd-visitor-filter-ui-routes`, or their renamed successors, are merged
+  on `main` (`ace-597-letter-navigation-availability` is). Re-read
+  `listAction()`, both route files and both pagination partials in the merged
+  sources, and note every difference to `design.md` in this file before
+  coding.
 
 ## 2. Pagination under a letter
 
