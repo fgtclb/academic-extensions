@@ -6,7 +6,7 @@ CREATE TABLE tx_academicstudyplan_domain_model_category (
 CREATE TABLE tx_academicstudyplan_domain_model_semester (
 		label varchar(255) NOT NULL DEFAULT '',
 		note varchar(255) NOT NULL DEFAULT '',
-		credit_points int(11) NOT NULL DEFAULT '0',
+		credit_points decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
 		modules int(11) unsigned NOT NULL DEFAULT '0',
 		content_element int(11) unsigned NOT NULL DEFAULT '0'
 );
@@ -14,7 +14,7 @@ CREATE TABLE tx_academicstudyplan_domain_model_semester (
 CREATE TABLE tx_academicstudyplan_domain_model_module (
 		label varchar(255) NOT NULL DEFAULT '',
 		note varchar(255) NOT NULL DEFAULT '',
-		credit_points int(11) NOT NULL DEFAULT '0',
+		credit_points decimal(10,2) unsigned NOT NULL DEFAULT '0.00',
 		description text,
 		audio_file int(11) unsigned NOT NULL DEFAULT '0',
 		categories int(11) unsigned NOT NULL DEFAULT '0',

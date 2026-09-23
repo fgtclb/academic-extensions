@@ -116,6 +116,7 @@ return [
             'l10n_mode' => 'exclude',
             'config' => [
                 'type' => 'number',
+                'format' => 'decimal',
                 'size' => 10,
                 'range' => [
                     'lower' => 0,

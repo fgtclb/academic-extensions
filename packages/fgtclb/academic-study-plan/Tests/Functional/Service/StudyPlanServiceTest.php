@@ -121,4 +121,30 @@ final class StudyPlanServiceTest extends AbstractAcademicStudyPlanTestCase
         $invoker = new \ReflectionMethod($subject, 'getTableLanguageFieldName');
         $this->assertSame($expected, $invoker->invoke($subject, $tableName));
     }
+
+    /**
+     * The template and every override receive the credit points as numbers, never as
+     * the "2.50" or "0.00" the decimal column returns.
+     */
+    #[Test]
+    public function fetchSemestersReturnsCreditPointsAsNumbers(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/decimalCreditPoints.csv');
+
+        $semesters = $this->get(StudyPlanService::class)->fetchSemesters(1, 0);
+
+        $this->assertSame(
+            [
+                [30.0, [2.5, 0.0]],
+                [0.0, [12.75]],
+            ],
+            array_map(
+                static fn(array $semester): array => [
+                    $semester['credit_points'],
+                    array_column($semester['modules'], 'credit_points'),
+                ],
+                $semesters,
+            ),
+        );
+    }
 }
