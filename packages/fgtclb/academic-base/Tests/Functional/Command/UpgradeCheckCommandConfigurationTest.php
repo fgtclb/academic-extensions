@@ -32,6 +32,9 @@ final class UpgradeCheckCommandConfigurationTest extends AbstractAcademicBaseTes
     protected array $testExtensionsToLoad = [
         'fgtclb/environment-state-manager',
         'fgtclb/academic-base',
+        // Ships the alias set the notice below is about. Without it the site
+        // would depend on a set TYPO3 cannot provide, which is an error.
+        'fgtclb/academic-study-plan',
         'tests/academic-test-configuration',
         'tests/test-upgrade-check-shared',
         'tests/test-upgrade-check',
@@ -84,6 +87,7 @@ final class UpgradeCheckCommandConfigurationTest extends AbstractAcademicBaseTes
         $tester = $this->execute([]);
 
         $this->assertStringContainsString('i alias-set                site:legacy', $tester->getDisplay());
+        $this->assertStringNotContainsString('unavailable-set', $tester->getDisplay());
         $this->assertStringContainsString(
             '0 problems and 1 notice in the stored configuration.',
             $tester->getDisplay(),
@@ -106,6 +110,31 @@ final class UpgradeCheckCommandConfigurationTest extends AbstractAcademicBaseTes
         $output = $tester->getDisplay();
         $this->assertStringContainsString('i alias-set                site:legacy', $output);
         $this->assertStringContainsString('3 problems and 1 notice in the stored configuration.', $output);
+        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+    }
+
+    /**
+     * A site on a set TYPO3 cannot provide answers every page with HTTP 500, so
+     * the finding is an error and fails the run.
+     */
+    #[Test]
+    public function anUnavailableSetFailsTheRun(): void
+    {
+        $this->writeSiteConfiguration(
+            identifier: 'stale',
+            site: [
+                ...$this->buildSiteConfiguration(rootPageId: 1, base: 'https://www.acme.test/'),
+                'dependencies' => ['fgtclb/academic-programs-content-load'],
+            ],
+            languages: [$this->buildDefaultLanguageConfiguration(identifier: 'EN', base: '/')],
+        );
+
+        $tester = $this->execute([]);
+
+        $output = $tester->getDisplay();
+        $this->assertStringContainsString('x unavailable-set          site:stale', $output);
+        $this->assertStringContainsString('3.0 removed it', $output);
+        $this->assertStringContainsString('1 problem and 0 notices in the stored configuration.', $output);
         $this->assertSame(Command::FAILURE, $tester->getStatusCode());
     }
 
@@ -227,7 +256,7 @@ final class UpgradeCheckCommandConfigurationTest extends AbstractAcademicBaseTes
             identifier: 'legacy',
             site: [
                 ...$this->buildSiteConfiguration(rootPageId: 1, base: 'https://www.acme.test/'),
-                'dependencies' => ['fgtclb/academic-persons-default'],
+                'dependencies' => ['fgtclb/academic-study-plan-default'],
             ],
             languages: [$this->buildDefaultLanguageConfiguration(identifier: 'EN', base: '/')],
         );

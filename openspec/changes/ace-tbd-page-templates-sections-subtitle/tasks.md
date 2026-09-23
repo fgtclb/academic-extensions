@@ -29,11 +29,12 @@
   `Tests/Functional/Tca/StaticRegistrationTest.php` to assert that the
   content load static template is not registered. Record that the
   assertions fail on the unchanged code.
-- [ ] 1.7 Add a delivery case with a site configuration that still lists the
-  removed set next to the component sets: assert that the partner or
-  project page renders with HTTP 200 on v13 and v14, which pins the silent
-  drop the `Breaking-` entries describe. If core raises an error instead,
-  correct the entries and `design.md` before implementing.
+- [ ] 1.7 Add the two removed sets to `ConfigurationChecker::REMOVED_SETS` of
+  `academic_base`, with a `ConfigurationCheckerSiteTest` case per set that
+  asserts the replacement named in the `unavailable-set` error. A site that
+  still lists a removed set answers HTTP 500 on v13 and v14 - core behaviour,
+  found by `ace-tbd-program-page-content-without-getcontent`, not a silent
+  drop.
 
 ## 2. Implementation
 
@@ -77,8 +78,9 @@
   verify both `3.0` indexes list them.
 - [ ] 3.3 Add `Documentation/Changelog/3.0/Breaking-ContentLoadSetRemoved.rst`
   to both extensions from `Build/Documentation/Templates/Changelog-Breaking.rst`:
-  the removed set, static template and aggregate dependency; the silent
-  drop of an unknown set name from a site configuration on v13 and v14; the
+  the removed set, static template and aggregate dependency; the HTTP 500
+  of a site configuration that still names the set, and the
+  `unavailable-set` finding of `academic:upgrade:check`; the
   page template that no longer renders `styles.content.getContent`; the
   migration (remove the set or static template entry, switch a customised
   or overridden `styles.content.getContent` to

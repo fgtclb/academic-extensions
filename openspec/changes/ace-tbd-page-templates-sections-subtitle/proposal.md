@@ -36,7 +36,9 @@ content-load sets define, and those sets are removed in 3.0.
   Partners: Content load override" and "Academic Projects: Content load
   override" are removed, and the aggregate sets no longer depend on them.
   Neither extension defines `styles.content.getContent` any more. A site
-  configuration that still lists a removed set loses it without an error.
+  configuration that still lists a removed set answers every page with HTTP
+  500 (core behaviour, verified by the programs change on v13 and v14);
+  `academic:upgrade:check` reports it as `unavailable-set`.
   The programs set is removed by
   `ace-tbd-program-page-content-without-getcontent`.
 - The markup order stays the same; the subtitle line is the only addition.

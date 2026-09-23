@@ -1,0 +1,7 @@
+# A site package set that depends on an academic set no extension ships, so
+# TYPO3 registers it as invalid.
+name: acme/site-package-base
+label: 'Acme site package base'
+dependencies:
+  - fgtclb/academic-test-configuration
+  - fgtclb/academic-removed-component

@@ -1,0 +1,5 @@
+# An academic set that depends on a set of another vendor no extension ships.
+name: fgtclb/academic-test-missing-foreign
+label: 'Academic test: missing foreign dependency'
+dependencies:
+  - acme/not-installed

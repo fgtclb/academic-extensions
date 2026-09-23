@@ -1,0 +1,6 @@
+# A set of another vendor that misses a set of another vendor - none of the
+# upgrade check's business.
+name: acme/foreign-only
+label: 'Acme foreign only'
+dependencies:
+  - acme/not-installed

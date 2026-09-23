@@ -14,13 +14,19 @@ use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * The three checks a site configuration carries: a dependency on an alias set,
- * one extension delivered through a set and through a static template at the
- * same time, and the page TSconfig file next to the site configuration.
+ * The checks a site configuration carries: a dependency on an alias set or on
+ * a set TYPO3 cannot provide, one extension delivered through a set and
+ * through a static template at the same time, and the page TSconfig file next
+ * to the site configuration.
  *
  * The fixture extension `academic_test_configuration` ships the set
  * `fgtclb/academic-test-configuration` and the static template folder
  * `Configuration/TypoScript/Live`, which is the pair a site can hold both of.
+ * It also ships four sets TYPO3 registers as invalid, because a set they
+ * depend on is missing: `acme/site-package` and `acme/site-package-base`
+ * reach the missing `fgtclb/academic-removed-component`,
+ * `fgtclb/academic-test-missing-foreign` and `acme/foreign-only` the missing
+ * `acme/not-installed`.
  */
 final class ConfigurationCheckerSiteTest extends AbstractAcademicBaseTestCase
 {
@@ -33,6 +39,9 @@ final class ConfigurationCheckerSiteTest extends AbstractAcademicBaseTestCase
     protected array $testExtensionsToLoad = [
         'fgtclb/environment-state-manager',
         'fgtclb/academic-base',
+        // Ships the alias set the notice is about; an alias whose extension is
+        // not installed is an unavailable set.
+        'fgtclb/academic-study-plan',
         'tests/academic-test-configuration',
     ];
 
@@ -52,23 +61,40 @@ final class ConfigurationCheckerSiteTest extends AbstractAcademicBaseTestCase
 
     /**
      * The two alias sets are named by the checker rather than marked in the set
-     * definitions, so the set does not have to exist for the notice to be
-     * right: `Site::getSets()` answers the dependencies a site *declares*, and
-     * a site declaring a set that 4.0 dropped is exactly the case this notice
-     * is about.
+     * definitions: `config.yaml` has no machine readable "this is an alias" key.
      */
     #[Test]
     public function aDependencyOnAnAliasSetIsANotice(): void
     {
-        $this->writeSite('legacy', 1, ['fgtclb/academic-persons-default']);
+        $this->writeSite('legacy', 1, ['fgtclb/academic-study-plan-default']);
 
         $findings = $this->findingsOfKind(ConfigurationFindingKind::AliasSet);
 
         $this->assertCount(1, $findings);
         $this->assertSame('site:legacy', $findings[0]->subject);
         $this->assertSame(ContextualFeedbackSeverity::NOTICE, $findings[0]->severity);
-        $this->assertStringContainsString('Depend on "fgtclb/academic-persons" instead', $findings[0]->message);
+        $this->assertStringContainsString('Depend on "fgtclb/academic-study-plan" instead', $findings[0]->message);
         $this->assertFalse($findings[0]->isProblem(), 'The alias still delivers, so it must not fail a pipeline');
+        $this->assertSame([], $this->findingsOfKind(ConfigurationFindingKind::UnavailableSet));
+    }
+
+    /**
+     * An alias of an extension that is not installed does not deliver: the site
+     * answers HTTP 500, so it is the error and not the notice, which would call
+     * it a set kept so that old site configurations keep working.
+     */
+    #[Test]
+    public function anAliasSetOfAnExtensionThatIsNotInstalledIsOnlyAnError(): void
+    {
+        $this->writeSite('legacy', 1, ['fgtclb/academic-persons-default']);
+
+        $this->assertSame([], $this->findingsOfKind(ConfigurationFindingKind::AliasSet));
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::UnavailableSet);
+        $this->assertCount(1, $findings);
+        $this->assertStringContainsString(
+            'TYPO3 cannot provide "fgtclb/academic-persons-default"',
+            $findings[0]->message,
+        );
     }
 
     #[Test]
@@ -77,6 +103,90 @@ final class ConfigurationCheckerSiteTest extends AbstractAcademicBaseTestCase
         $this->writeSite('current', 1, ['fgtclb/academic-test-configuration']);
 
         $this->assertSame([], $this->findingsOfKind(ConfigurationFindingKind::AliasSet));
+    }
+
+    /**
+     * TYPO3 answers every frontend request of such a site with HTTP 500
+     * (`SiteResolver`), so it is an error, and the set 3.0 removed says what
+     * to do about it.
+     */
+    #[Test]
+    public function aDependencyOnAnUnavailableAcademicSetIsAnError(): void
+    {
+        $this->writeSite('stale', 1, [
+            'fgtclb/academic-test-configuration',
+            'fgtclb/academic-programs-content-load',
+            'fgtclb/academic-not-installed',
+        ]);
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::UnavailableSet);
+
+        $this->assertCount(2, $findings);
+        $this->assertSame('site:stale', $findings[0]->subject);
+        $this->assertSame(ContextualFeedbackSeverity::ERROR, $findings[0]->severity);
+        $this->assertTrue($findings[0]->isProblem());
+        $this->assertStringContainsString(
+            'The site "stale" depends on "fgtclb/academic-programs-content-load". TYPO3 cannot provide '
+                . '"fgtclb/academic-programs-content-load"',
+            $findings[0]->message,
+        );
+        $this->assertStringContainsString('HTTP 500', $findings[0]->message);
+        $this->assertStringContainsString('3.0 removed it', $findings[0]->message);
+        $this->assertStringContainsString('from every set of the site package', $findings[0]->message);
+        $this->assertStringContainsString(
+            'The site "stale" depends on "fgtclb/academic-not-installed". TYPO3 cannot provide',
+            $findings[1]->message,
+        );
+        $this->assertStringNotContainsString('3.0 removed it', $findings[1]->message);
+    }
+
+    /**
+     * A site package set that depends on a missing academic set is invalid
+     * itself, and TYPO3 fails the site for it just the same - the message names
+     * the academic set at the end of the chain, however deep it sits.
+     */
+    #[Test]
+    public function aSitePackageSetMissingAnAcademicSetIsAnError(): void
+    {
+        $this->writeSite('direct', 1, ['acme/site-package-base'], 'https://www.one.test/');
+        $this->writeSite('nested', 2, ['acme/site-package'], 'https://www.two.test/');
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::UnavailableSet);
+
+        $this->assertSame(
+            ['site:direct', 'site:nested'],
+            array_map(static fn(ConfigurationFinding $finding): string => $finding->subject, $findings),
+        );
+        $this->assertStringContainsString(
+            'depends on "acme/site-package-base", which needs "fgtclb/academic-removed-component" - directly or '
+                . 'through another set. TYPO3 cannot provide "fgtclb/academic-removed-component"',
+            $findings[0]->message,
+        );
+        $this->assertStringContainsString(
+            'depends on "acme/site-package", which needs "fgtclb/academic-removed-component"',
+            $findings[1]->message,
+        );
+    }
+
+    /**
+     * An academic set missing a set of another vendor fails the site as well.
+     * A set of another vendor missing one of another vendor, an available set
+     * and a missing set of another vendor are none of this check's business.
+     */
+    #[Test]
+    public function onlyAnAcademicEndOfTheChainIsReported(): void
+    {
+        $this->writeSite('academic', 1, ['fgtclb/academic-test-missing-foreign'], 'https://www.one.test/');
+        $this->writeSite('foreign', 2, ['acme/foreign-only', 'acme/unknown', 'fgtclb/academic-test-configuration'], 'https://www.two.test/');
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::UnavailableSet);
+
+        $this->assertCount(1, $findings);
+        $this->assertSame('site:academic', $findings[0]->subject);
+        $this->assertStringContainsString(
+            'depends on "fgtclb/academic-test-missing-foreign", which needs "acme/not-installed"',
+            $findings[0]->message,
+        );
     }
 
     #[Test]
