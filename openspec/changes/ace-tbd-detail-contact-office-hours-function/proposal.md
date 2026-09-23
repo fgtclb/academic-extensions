@@ -51,7 +51,7 @@ None.
   already covers that.
 - An RTE for office hours in the backend form, which stays a plain text field.
 - Contract selection (first, valid, matching), which belongs to
-  `ace-tbd-contract-display-policy`.
+  `ace-719-contract-display-policy`.
 - A backport to branch `2`, whose detail view has a different structure.
 
 ## Source

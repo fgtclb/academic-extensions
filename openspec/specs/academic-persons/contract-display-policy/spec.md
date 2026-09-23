@@ -1,10 +1,11 @@
-## Purpose
+# academic-persons/contract-display-policy Specification
 
+## Purpose
 Defines which of a profile's contracts the profile views of `academic_persons`
 show, as configured by the editor per content element and by the integrator
 for the detail view.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: All contracts are shown by default
 
@@ -35,9 +36,11 @@ after the other contract options apply.
 
 ### Requirement: Editors can show only contracts matching the plugin filter
 
-The system SHALL offer an option that limits the shown contracts to those of the
-organisational units and function types the plugin is restricted to. Without
-such a restriction the option SHALL have no effect.
+The system SHALL offer editors of the list and list-and-detail plugins an option
+that limits the shown contracts to those of the organisational units and
+function types the plugin is restricted to. Without such a restriction the
+option SHALL have no effect. The card and selected-profiles plugins select their
+profiles by hand, apply no such restriction and do not offer the option.
 
 #### Scenario: Plugin restricted to one unit
 
@@ -54,8 +57,9 @@ such a restriction the option SHALL have no effect.
 
 ### Requirement: Editors can show only contracts valid today
 
-The system SHALL offer an option that limits the shown contracts to those whose
-validity period includes the date the page is rendered for. A missing start
+The system SHALL offer editors of the list, list-and-detail, card and
+selected-profiles plugins an option that limits the shown contracts to those
+whose validity period includes the date the page is rendered for. A missing start
 date and a missing end date SHALL each count as open-ended.
 
 #### Scenario: Expired and current contract
@@ -97,7 +101,7 @@ cache the page no longer than until the next day on which a shown contract
 ends or a contract left out because it has not started yet begins. Without a
 validity option the page cache lifetime SHALL stay unchanged.
 
-#### Scenario: Shown contract ends tomorrow
+#### Scenario: Shown contract ends today
 
 - **WHEN** a list plugin shows only contracts valid today and a listed
   contract ends today
@@ -112,7 +116,7 @@ validity option the page cache lifetime SHALL stay unchanged.
 #### Scenario: No validity option
 
 - **WHEN** no validity option applies to any contract on the page
-- **THEN** the page cache lifetime is the one the site configures
+- **THEN** the page cache lifetime is the one the page has without the option
 
 ### Requirement: A chosen contract is shown as chosen
 

@@ -14,7 +14,8 @@ still does not offer it.
   choose which contracts a profile shows:
   - all of them (the default, today's output), or only the first;
   - optionally only contracts of the plugin's organisational units and function
-    types;
+    types (list and list-and-detail only; the card and selected-profiles
+    plugins select their profiles by hand and apply no such restriction);
   - optionally only contracts valid today.
 - Integrators choose all or first for the position and contact blocks of the
   detail view in `Settings.yaml` (default all), and optionally only contracts
@@ -67,8 +68,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-06`). All six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-contract-display-policy` when the issue is filed after
-implementation.
-
-Relates to ACE-59. Relates to ACE-51.
+this today. Filed after the implementation as ACE-719, which relates to
+ACE-59 and ACE-51.

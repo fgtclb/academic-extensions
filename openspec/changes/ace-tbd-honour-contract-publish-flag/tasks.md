@@ -1,7 +1,7 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Confirm that `ace-tbd-contract-display-policy` (or its renamed
-  successor) is merged on `main`. This change builds on its contract
+- [ ] 1.1 Confirm that `ace-719-contract-display-policy` is merged on
+  `main`. This change builds on its contract
   selection and must not start before it.
 
 ## 2. Site setting

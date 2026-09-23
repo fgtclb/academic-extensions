@@ -10,10 +10,14 @@ The flag and what the code does with it today:
 - Outside the model it is read nowhere but in `academic_persons_edit`, and in a
   `@todo` in `Classes/Backend/FormEngine/ContractItems.php:92`.
 
-Every public view reads `profile.contracts` directly today. The contract display
-policy change (`ace-tbd-contract-display-policy`) routes all of them through
-one contract selection. This change depends on it, and is a small addition to
-that selection.
+The contract display policy change (`ace-719-contract-display-policy`, merged
+on `main`) routes the contract item of the list, list-and-detail, card and
+selected-profiles plugins and the position and contact blocks of the detail
+view through one contract selection, `ContractSelector` behind the
+`persons:contracts` ViewHelper. This change depends on it, and is a small addition to
+that selection. The selected-contracts plugin and `academic_contacts4pages`
+render the one contract that was chosen and do not pass through the selection;
+whether the flag applies to a chosen contract is a decision of this change.
 
 Site settings of `plugin.tx_academicpersons` are declared in
 `Configuration/Sets/Full/settings.definitions.yaml` and repeated with the same
