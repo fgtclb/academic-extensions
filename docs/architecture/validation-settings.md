@@ -23,7 +23,8 @@ does not have `academic_persons_edit` installed still gets the backend half.
 `packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml`
 is the only place the graph is defined — there is no second file in the edit
 extension, which `SettingsSourceTest` pins. Since ACE-503 it
-has four top-level maps:
+has four top-level maps for the profile, and since ACE-720 a fifth for the
+frontend user synchronisation:
 
 | Map                | Holds                                                                                                                                                                       |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -31,6 +32,7 @@ has four top-level maps:
 | `special`          | The components that are not one property: the composed `title`, the `image`, the `skipSync` switch                                                                          |
 | `contracts`        | `fields` of the contract form, and `contactSections` — `physicalAddresses`, `emailAddresses`, `phoneNumbers` — with their own `fields`                                      |
 | `documentSections` | The sortable lists: the seven profile information types and `contracts`, each with `label`, `type`, `fieldName`, `rowFields`, `actions`, `validators`, `helptext`           |
+| `frontendUserSync` | Which `fe_users` column feeds which profile and contract property, see [Frontend-user contact import](frontend-user-contact-import.md)                                      |
 
 The shipped `profile` map is the shortest example of a field, and the one most
 often met:

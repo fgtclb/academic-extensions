@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Twenty-five such fixture extensions exist, in nine of the twelve extensions.
+Twenty-six such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -32,6 +32,7 @@ They sit next to the tests that use them, under
 | `test_contract_contact_actions`        | `tests/test-contract-contact-actions`   | `academic-persons-edit` | A `Settings.yaml` narrowing the actions of the contracts section.             |
 | `test_current_color_icons`             | `tests/current-color-icons`             | `academic-base`         | Icons registered through the `currentColor` icon provider.                    |
 | `test_exclude_file_column`             | `tests/test-exclude-file-column`        | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
+| `test_frontend_user_sync`              | `tests/test-frontend-user-sync`         | `academic-persons`      | A `Settings.yaml` synchronisation map and the `fe_users` columns it reads.    |
 | `test_hidden_content_types`            | `tests/hidden-content-types`            | `academic-base`         | Two content types hidden by page TSconfig, one in the academic group.         |
 | `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`         | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
 | `test_language_files`                  | `tests/language-files`                  | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                           |
@@ -51,8 +52,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Nine of the twenty-five have a `Classes/` folder with a `TESTS\…` PSR-4 root;
-the other sixteen are pure resources.
+Nine of the twenty-six have a `Classes/` folder with a `TESTS\…` PSR-4 root;
+the other seventeen are pure resources.
 
 A minimal one, complete:
 
@@ -261,9 +262,11 @@ The existing ones show the cases that justify one:
   `test_public_profile_settings` ships a `Configuration/AcademicPersons/Settings.yaml`
   that overrides the `profile` map exactly as a site package would,
   `test_contract_contact_actions` ships one that narrows the `actions` of the
-  contracts section, and `test_legacy_settings` ships one in the pre-3.0
-  shape — the settings are collected from every loaded package, so nothing
-  smaller than a package can take part in that merge.
+  contracts section, `test_legacy_settings` ships one in the pre-3.0
+  shape, and `test_frontend_user_sync` one with a `frontendUserSync` map plus
+  the `ext_tables.sql` for the `fe_users` columns that map reads — the settings
+  are collected from every loaded package, so nothing smaller than a package
+  can take part in that merge.
 
 Anything that does *not* need one should not have one. Records go into a CSV
 fixture and are imported with `importCSVDataSet()`; TypoScript that is only read
