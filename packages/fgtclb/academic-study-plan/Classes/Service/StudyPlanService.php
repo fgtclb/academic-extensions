@@ -54,6 +54,7 @@ final class StudyPlanService
                 continue;
             }
             $row = $this->getTranslatedRecord('tx_academicstudyplan_domain_model_semester', $row, $languageUid, $pageRepository);
+            $row['credit_points'] = $this->getCreditPoints($row);
             $row['modules'] = $this->fetchModules((int)$row['uid'], $languageUid, $pageRepository, $context);
             $semesters[] = $row;
         }
@@ -92,6 +93,7 @@ final class StudyPlanService
                 continue;
             }
             $row = $this->getTranslatedRecord('tx_academicstudyplan_domain_model_module', $row, $languageUid, $pageRepository);
+            $row['credit_points'] = $this->getCreditPoints($row);
             $row['categories'] = $this->fetchCategoriesForModule((int)$row['uid'], $languageUid, $pageRepository, $context);
             $row['audioFiles'] = $this->fetchAudioFiles((int)$row['uid']);
             $modules[] = $row;
@@ -175,6 +177,20 @@ final class StudyPlanService
             return $row;
         }
         return $pageRepository->getLanguageOverlay($table, $row) ?? $row;
+    }
+
+    /**
+     * The credit points as a number. The column holds two decimals and the database
+     * returns it as a string - "2.50", "30.00" and "0.00" - which a template prints as
+     * it is. A float prints as "2.5", "30" and "0" instead, in every template override
+     * as well. Conditions are not affected: Fluid reads "0.00" as zero already.
+     *
+     * @param array<string, mixed> $row
+     */
+    private function getCreditPoints(array $row): float
+    {
+        $creditPoints = $row['credit_points'] ?? 0;
+        return is_numeric($creditPoints) ? (float)$creditPoints : 0.0;
     }
 
     private function getWorkspaceId(Context $context): int
