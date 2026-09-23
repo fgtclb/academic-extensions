@@ -1,0 +1,9 @@
+"tx_academicstudyplan_domain_model_semester",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","content_element","label","note","credit_points","modules"
+,1,2,0,0,0,0,1,1,"First Semester","",30.00,2
+,2,2,0,0,0,0,2,1,"Second Semester","",0.00,1
+"tx_academicstudyplan_domain_model_module",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","semester","label","note","credit_points","description","categories"
+,1,2,0,0,0,0,1,1,"Mathematics I","",2.50,"Linear algebra and analysis.",0
+,2,2,0,0,0,0,2,1,"Colloquium","",0.00,"",0
+,3,2,0,0,0,0,1,2,"Thesis","",12.75,"",0

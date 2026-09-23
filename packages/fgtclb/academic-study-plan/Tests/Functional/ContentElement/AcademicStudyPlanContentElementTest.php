@@ -206,6 +206,68 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertMatchesRegularExpression('#10\s+CP#', $content);
     }
 
+    /**
+     * Credit points are stored with two decimals, and read back as "2.50" and "30.00"
+     * on every DBMS. What the visitor reads carries no trailing zeros - in the column
+     * header, in the module, in its dialog and in the label the dialog trigger
+     * announces - because the template receives numbers rather than database strings.
+     */
+    #[Test]
+    public function contentElementRendersDecimalCreditPointsWithoutTrailingZeros(): void
+    {
+        $this->setUpTestCase('studyPlanPage_decimalCreditPoints');
+
+        $this->assertSame(
+            'category-label-placeholder First Semester 30 CP Mathematics I 2.5 CP '
+            . 'First Semester, , 30 CP. Show module details: Mathematics I Mathematics I 2.5 CP '
+            . 'Linear algebra and analysis. Colloquium Second Semester Thesis 12.75 CP '
+            . 'Second Semester, , 0 CP. Show module details: Thesis Thesis 12.75 CP Final project.',
+            $this->visibleTextOf($this->renderHomePage()),
+        );
+    }
+
+    /**
+     * A semester or module without credit points shows none. The partials guard the
+     * value with a condition, which is false for 0 and for "0.00" alike - Fluid reads
+     * a numeric string as a number - so this is a guard for the markup rather than
+     * for the number the template receives.
+     */
+    #[Test]
+    public function contentElementRendersNoCreditPointsWhereThereAreNone(): void
+    {
+        $this->setUpTestCase('studyPlanPage_decimalCreditPoints');
+
+        $this->assertSame(
+            ['30 CP', '2.5 CP', '2.5 CP', '12.75 CP', '12.75 CP'],
+            $this->textsOf($this->renderHomePage(), '//span[contains(@class, "credits")]'),
+        );
+    }
+
+    /**
+     * The label the dialog trigger announces prints the credit points of the semester
+     * without a condition, so a semester without them reads "0 CP" there - as it did
+     * with the former integer column, and not "0.00 CP", because the template receives
+     * a number.
+     */
+    #[Test]
+    public function contentElementAnnouncesTheCreditPointsOfASemesterWithoutThemAsZero(): void
+    {
+        $this->setUpTestCase('studyPlanPage_decimalCreditPoints');
+
+        $labels = array_map(
+            static fn(string $text): string => preg_replace('#\\s+#', ' ', $text) ?? '',
+            $this->textsOf($this->renderHomePage(), '//button[contains(@class, "modal-trigger")]/span'),
+        );
+
+        $this->assertSame(
+            [
+                'First Semester, , 30 CP. Show module details: Mathematics I',
+                'Second Semester, , 0 CP. Show module details: Thesis',
+            ],
+            $labels,
+        );
+    }
+
     #[Test]
     public function contentElementRendersHeader(): void
     {

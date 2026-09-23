@@ -74,6 +74,11 @@ in scope.
     *   -   :file:`StudyPlan/ModuleDialog`
         -   :html:`module`.
 
+The :html:`credit_points` of a semester and of a module are a number, not the
+value the database returns: printed as they are, they read "2.5", "30" and
+"0" rather than "2.50", "30.00" and "0.00". They render with a decimal point on
+every page language; format them in the override for a decimal comma.
+
 ..  _templates-attributes:
 
 The data attributes
