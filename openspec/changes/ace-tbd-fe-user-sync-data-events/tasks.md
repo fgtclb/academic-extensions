@@ -1,6 +1,6 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Verify `ace-tbd-settings-driven-fe-user-mapping` is merged, for the
+- [ ] 1.1 Verify `ace-720-settings-driven-fe-user-mapping` is merged, for the
   added-key mapping test in 2.2.
 
 ## 2. Tests first

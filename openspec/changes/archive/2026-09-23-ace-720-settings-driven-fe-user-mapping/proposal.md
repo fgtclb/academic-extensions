@@ -41,8 +41,11 @@ None.
 
 - The default profile factory delegates its field writes to a new stateless
   mapper.
-- `Settings.yaml` gains a key that is merged per package like the others.
-  The whole map is replaced by the last package that ships it.
+- A mistake in the map makes the synchronisation throw before it writes
+  anything. The settings graph itself is built without an exception, because
+  the TCA reads it.
+- `Settings.yaml` gains a key that is merged per package like the others:
+  maps key by key, and each of the three lists as a whole.
 - No database change. Existing imported records keep their identifiers.
 - Basis for `ace-tbd-fe-user-relation-mapping` and
   `ace-tbd-fe-user-sync-data-events`.
@@ -60,8 +63,8 @@ None.
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-04`). Four of the six analysed projects carry their own code for
 this today: one an approximately 340-line factory and listener, three LDAP
-factories that would keep only their attribute source. No YouTrack issue is
-filed yet; the change is renamed to `ace-<NNN>-<slug>` when the issue is filed
-after implementation.
+factories that would keep only their attribute source. Filed after the
+implementation as ACE-720.
 
-Relates to ACE-278.
+Relates to ACE-278, the field mapping of the HIS connector (ACE-115): a
+different source and scope, which can reuse this map's shape.

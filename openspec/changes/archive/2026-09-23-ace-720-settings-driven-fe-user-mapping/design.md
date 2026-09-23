@@ -53,12 +53,62 @@ frontendUserSync:
 ```
 
 It is normalised into a `FrontendUserSyncSettings` sub-graph of
-`AcademicPersonsSettings`. Unknown profile or contract property names throw
-during normalisation, with an exception code, so a typo fails loudly.
+`AcademicPersonsSettings`, whose list entries are `FrontendUserSyncEntry`
+objects (the columns per record property, and a phone number's type). A
+property mapped to `''` is left out of the graph.
+
+The supported properties are fixed lists: the profile's thirteen free text
+and link fields (the names, title, website and its title, the publications
+link and its title, and the five text fields), the contract's `position` and
+`room`, and the seven address fields. The gender is a fixed selection and the
+`*Alpha` letters are derived, so neither can be mapped. A phone number's
+empty `type` takes `faxNumberType` for the column `fax` and
+`telephoneNumberType` for every other column.
 
 Rejected: flat extension configuration keys, which cannot express lists.
 Also rejected: an upstream LDAP factory, which would couple to
 `causal/ig_ldap_sso_auth` while four projects use four different schemas.
+
+### A mistake is thrown where the map is used, not where it is read
+
+Updated during implementation, decided by the maintainer. The draft had the
+normaliser throw on an unknown property. That graph is also built while the
+TCA is loaded - all six person TCA files read it - and no other key of it
+throws, so a typo in the synchronisation map would stop every backend,
+frontend and CLI request. The normaliser records each mistake instead - an
+unknown key or property, a value that is not a string, a list that is not a
+list, an entry that maps no column, two entries of one list sharing their
+first column, a phone entry reading the column `phone`, whose identifier is the
+one of the telephone records before ACE-365 - in `problems`, and
+the mapper calls `FrontendUserSyncSettings::assertValid()` before it writes
+anything: `\UnexpectedValueException` 1790142324, naming every mistake with
+its path.
+
+A graph cached before this change has no `frontendUserSync`;
+`AcademicPersonsSettings::__set_state()` turns the missing key into a map with
+a problem ("flush the TYPO3 caches") rather than an empty one. The cache
+identifier stays `AcademicPersons_Settings_v3`, which only ever existed on
+`3.0.0-dev`.
+
+### A column the frontend user record lacks is refused by the default factory
+
+The map is not validated against the `fe_users` schema (a non-goal above), so
+a misspelled column would read as empty and remove the imported records. The
+default factory synchronises full `fe_users.*` rows, so it calls
+`FrontendUserProfileMapper::assertColumnsExist()` first, which refuses a
+mapped column - and a missing `uid` - the row does not have
+(`\UnexpectedValueException` 1790142326). A custom factory with sparse data
+skips the call and gets the tolerant behaviour.
+
+### A map without contract sources leaves the contract alone
+
+"No mapped source is set" removes the imported contract; "no source is mapped"
+must not, or `frontendUserSync: ~` and a names-only site package would remove
+every imported contract - with the records editors added, because the contract
+cascades its removal to its contact records.
+`FrontendUserSyncSettings::mapsContract()` tells the two apart, and without a
+source `ProfileFactory` neither creates, nor writes, nor removes the
+contract.
 
 ### A stateless mapper applies it
 
@@ -67,6 +117,15 @@ applies the mapping to a `Profile` and its first imported contract. It gets
 the settings and the repositories injected and holds no data between calls.
 `ProfileFactory` delegates to it on create and update. Custom factories
 extending `AbstractProfileFactory` can inject it.
+
+It is handed the shared `AcademicPersonsSettings` graph, not its factory, whose
+`get()` evaluates the cached graph again on every call. Its public methods are
+`assertColumnsExist()`, `applyProfile()`, `mapsContract()`,
+`hasContractData()` and `applyContract()`. The factory keeps the records: the
+profile, the import identifier of the profile, and creating or removing the
+imported contract. `academic:createprofiles` still creates that contract with
+every new profile, data or not, as before - unless the map names no source of
+it, see above.
 
 Rejected: making `ProfileFactory` non-final so projects can override single
 `apply*` methods. That brings back the copies this change removes.
@@ -78,6 +137,13 @@ The first entry of `physicalAddresses` and `emailAddresses` keeps
 first column of the entry. Phones keep `<column>:fe_users:<uid>`, including
 the legacy telephone fallback. Existing records are therefore matched
 without a migration.
+
+The identifier follows the position and the first column, so an entry moved to
+the front writes onto `fe_users:<uid>`, and the record it wrote before is no
+longer synchronised. Rejected: identifying every entry by its column and
+keeping `fe_users:<uid>` for the shipped columns only, which is independent of
+the order but imports a new record when a project changes the column of its
+first e-mail address, the more common edit.
 
 ### The contract guard follows the mapping
 

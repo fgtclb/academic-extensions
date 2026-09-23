@@ -75,10 +75,16 @@ documented convention `<source>.<key>`, for example `ldap.department`.
 
 The event cannot tell an added key from a real column that a value-map
 listener legitimately rewrites without diffing the arrays, and the mapping of
-`ace-tbd-settings-driven-fe-user-mapping` deliberately does not validate
+`ace-720-settings-driven-fe-user-mapping` deliberately does not validate
 mapped columns against `fe_users`. No TYPO3 column name contains a dot, so a
 dotted key cannot collide with a column by construction. Rejected: rejecting
 unprefixed added keys in the setter.
+
+The default factory of `ace-720-settings-driven-fe-user-mapping` does refuse a
+mapped column the data it synchronises does not have. A listener that adds a
+key the map reads therefore sets it for every frontend user, `''` when the
+source has no value; a key set for some users only stops the run at the first
+user without it.
 
 ## Risks / Trade-offs
 

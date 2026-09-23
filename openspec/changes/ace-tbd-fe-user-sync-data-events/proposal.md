@@ -41,7 +41,7 @@ None.
 - The protected factory method that builds a profile may return nothing.
   Subclasses declaring a non-nullable return type stay compatible.
 - `academic:createprofiles` and `academic:updateprofiles` honour a skip.
-- Uses the mapping of `ace-tbd-settings-driven-fe-user-mapping` for added
+- Uses the mapping of `ace-720-settings-driven-fe-user-mapping` for added
   values. The skip and the nullable creation work without it.
 
 ## Non-goals
