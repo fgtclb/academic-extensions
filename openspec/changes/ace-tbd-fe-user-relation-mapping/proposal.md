@@ -37,7 +37,7 @@ None.
 
 ## Impact
 
-- The frontend-user mapper of `ace-tbd-settings-driven-fe-user-mapping`,
+- The frontend-user mapper of `ace-720-settings-driven-fe-user-mapping`,
   which this change depends on.
 - New read queries on organisational units and function types. New records
   only where creation is configured.

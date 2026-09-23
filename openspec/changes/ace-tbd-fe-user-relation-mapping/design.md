@@ -39,7 +39,10 @@ frontendUserSync:
     functionType: { column: '', matchBy: functionName, create: false, storagePid: 0 }
 ```
 
-An empty `column` means "not mapped". The normaliser rejects:
+An empty `column` means "not mapped". The normaliser records as a problem,
+which the synchronisation throws before it writes (as
+`ace-720-settings-driven-fe-user-mapping` decided for every mistake in the
+map):
 
 - a `matchBy` outside the listed fields;
 - `create: true` with `storagePid: 0`.

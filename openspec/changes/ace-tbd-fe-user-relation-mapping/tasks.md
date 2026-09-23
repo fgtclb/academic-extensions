@@ -1,6 +1,6 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Verify `ace-tbd-settings-driven-fe-user-mapping` is merged.
+- [ ] 1.1 Verify `ace-720-settings-driven-fe-user-mapping` is merged.
 - [ ] 1.2 Check whether `ace-tbd-fe-user-sync-data-events` is merged. The
   employee-type recipe of 4.3 needs its mapped-profile event; if it is not
   merged, 4.3 moves to that change.
