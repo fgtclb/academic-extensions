@@ -1,9 +1,10 @@
-## Purpose
+# academic-study-plan/credit-points Specification
 
+## Purpose
 Defines how editors enter and how visitors see the credit points of study plan
 semesters and modules.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Editors can enter decimal credit points
 The credit points of a semester and of a module SHALL accept non-negative
@@ -12,6 +13,10 @@ without rounding.
 
 #### Scenario: Module worth two and a half credit points
 - **WHEN** an editor enters 2.5 as the credit points of a module and saves
+- **THEN** the module stores 2.50 credit points
+
+#### Scenario: Decimal comma
+- **WHEN** an editor enters 2,5 as the credit points of a module and saves
 - **THEN** the module stores 2.50 credit points
 
 #### Scenario: More than two decimals
@@ -31,6 +36,11 @@ the default template and in template overrides that print the value.
 - **WHEN** a semester stores 30.00 credit points
 - **THEN** the study plan shows "30"
 
+#### Scenario: No credit points
+- **WHEN** a semester or module stores 0.00 credit points
+- **THEN** the study plan shows no credit points for it, and the dialog
+  trigger of a module in that semester announces "0" credit points
+
 ### Requirement: Existing values survive the update
 Credit points stored before the update SHALL keep their value after the
 database compare.
@@ -38,4 +48,4 @@ database compare.
 #### Scenario: Integer value before the update
 - **WHEN** a module stored 5 credit points before the update and the
   database compare has run
-- **THEN** the module stores 5.00 and the study plan shows "5"
+- **THEN** the module keeps 5 credit points and the study plan shows "5"
