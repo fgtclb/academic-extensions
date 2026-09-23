@@ -47,4 +47,4 @@
 - [x] 5.3a `docs/` (task 4.4) and the extension's `Documentation/` with its
   2.4 changelog entry (tasks 4.1 to 4.3) updated in the same change.
 - [x] 5.4 Commit in TYPO3 Core format, `[BUGFIX] ACE-721: <subject>`.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archive the change as the last commit of the pull request.
