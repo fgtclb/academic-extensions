@@ -524,6 +524,18 @@ result in the test docblock rather than claiming a proof that was not run.
 is the counter-example: its fixture writes the tied rows in ascending uid
 order, so it pins the contract without being able to fail.
 
+Descending is where to start, not a law: which order PostgreSQL returns tied rows
+in depends on its version and its plan. The `CONTENT` object of the program page
+(`AcademicProgramPageTemplateTest::mainColumnElementsSharingASortingValueFollowUidOrder()`,
+academic-programs) was measured without its tiebreaker on v12 and v13:
+PostgreSQL 10, the version CI runs, returned the tied rows in the **reverse** of
+their write order, PostgreSQL 16 in write order. That fits the PostgreSQL 12
+change that stores equal B-tree keys in heap order, and `tt_content` has an
+index on `(pid, sorting)` - but no query plan was looked at. A fixture there
+fails on both versions only with two tied pairs, one written in each direction,
+and that is what it carries. When a descending fixture stays green without the
+tiebreaker, add the ascending pair rather than calling the test a guard.
+
 ## Rule 3 in an open query — constraints an extension adds
 
 `academic_persons` lets an installed extension narrow what its plugins show:
