@@ -13,6 +13,8 @@ use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Resource\Security\FileNameValidator;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Set\SetError;
+use TYPO3\CMS\Core\Site\Set\SetRegistry;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -22,12 +24,14 @@ use TYPO3\CMS\Core\Utility\PathUtility;
  * Reports the stored configuration of an installation that no longer reaches
  * the academic extensions after an upgrade.
  *
- * None of these fails loudly. TYPO3 skips a static template folder that holds
- * no TypoScript, an `@import` that matches no file and a `tsconfig_includes`
- * entry whose file is gone without a word, so an upgrade that renames a folder
- * leaves an installation that looks configured and is not. The three remaining
- * checks cover the opposite mistake: configuration that arrives twice, or that
- * replaces a class the extension has since made `final`.
+ * Most of these do not fail loudly. TYPO3 skips a static template folder that
+ * holds no TypoScript, an `@import` that matches no file and a
+ * `tsconfig_includes` entry whose file is gone without a word, so an upgrade
+ * that renames a folder leaves an installation that looks configured and is
+ * not. Other checks cover the opposite mistake: configuration that arrives
+ * twice, or that replaces a class the extension has since made `final`. Two
+ * fail loudly, but only once the upgraded installation runs: an XCLASS of a
+ * `final` class, and a site depending on a set TYPO3 cannot provide.
  *
  * The service only reads - no record, file or site configuration is written -
  * and behaves the same on TYPO3 v13 and v14.
@@ -48,6 +52,23 @@ final readonly class ConfigurationChecker
         'fgtclb/academic-persons-default' => 'fgtclb/academic-persons',
         'fgtclb/academic-study-plan-default' => 'fgtclb/academic-study-plan',
     ];
+
+    /**
+     * The sets a release removed, and what replaced them. A site that still
+     * depends on one is reported like any other unavailable set; this adds the
+     * way out to the message.
+     */
+    private const REMOVED_SETS = [
+        'fgtclb/academic-programs-content-load' => '3.0 removed it: program pages render the content of their '
+            . 'main column without it. Remove the dependency from the site configuration and from every set of '
+            . 'the site package.',
+    ];
+
+    /**
+     * The prefix of every set name of the academic extensions. `category_types`
+     * ships no set.
+     */
+    private const SET_NAME_PREFIX = 'fgtclb/academic-';
 
     /**
      * The extension keys this check is about: everything of the academic
@@ -108,6 +129,7 @@ final readonly class ConfigurationChecker
         private ConnectionPool $connectionPool,
         private SiteFinder $siteFinder,
         private FileNameValidator $fileNameValidator,
+        private SetRegistry $setRegistry,
     ) {}
 
     /**
@@ -892,9 +914,15 @@ final readonly class ConfigurationChecker
     }
 
     /**
-     * The two checks a site configuration carries: a dependency on an alias
-     * set, and one extension delivered through a set and through a static
-     * template at the same time.
+     * The checks a site configuration carries: a dependency on an alias set, on
+     * a set TYPO3 cannot provide, and one extension delivered through a set and
+     * through a static template at the same time.
+     *
+     * A dependency TYPO3 cannot provide is the one check here that core does
+     * not keep quiet about - `SiteConfiguration::determineInvalidSets()` marks
+     * the name, and `SiteResolver` answers every frontend request of the site
+     * with HTTP 500. It is reported anyway, because the command runs before an
+     * upgraded installation goes live and the site does not.
      *
      * Only the *declared* dependencies of a site are looked at, because that is
      * what `Site::getSets()` answers - a set reached through another one is not
@@ -915,7 +943,29 @@ final readonly class ConfigurationChecker
             $subject = sprintf('site:%s', $site->getIdentifier());
             $extensionKeysWithASet = [];
             foreach ($site->getSets() as $setName) {
-                if (isset(self::ALIAS_SETS[$setName])) {
+                // An alias whose extension is not installed is an unavailable set, and the
+                // notice would call it a set that still delivers.
+                $unavailableSet = $this->unavailableAcademicSet($setName);
+                if ($unavailableSet !== null) {
+                    $findings[] = new ConfigurationFinding(
+                        ConfigurationFindingKind::UnavailableSet,
+                        ContextualFeedbackSeverity::ERROR,
+                        $subject,
+                        rtrim(sprintf(
+                            'The site "%s" depends on "%s"%s. TYPO3 cannot provide "%s": no active extension '
+                            . 'ships a valid set of that name. TYPO3 answers every page of the site with HTTP 500 '
+                            . '("depends on unavailable sets") until the dependency is removed or the set is '
+                            . 'available again. %s',
+                            $site->getIdentifier(),
+                            $setName,
+                            $unavailableSet === $setName
+                                ? ''
+                                : sprintf(', which needs "%s" - directly or through another set', $unavailableSet),
+                            $unavailableSet,
+                            self::REMOVED_SETS[$unavailableSet] ?? '',
+                        )),
+                    );
+                } elseif (isset(self::ALIAS_SETS[$setName])) {
                     $findings[] = new ConfigurationFinding(
                         ConfigurationFindingKind::AliasSet,
                         ContextualFeedbackSeverity::NOTICE,
@@ -974,6 +1024,40 @@ final readonly class ConfigurationChecker
         }
 
         return $findings;
+    }
+
+    /**
+     * The academic set that keeps a declared dependency of a site from being
+     * available, or `null` when there is none.
+     *
+     * The answer is the set that is missing: the declared set itself, or the
+     * set it depends on, directly or further down, when that is what makes it
+     * invalid. `SetRegistry::checkMissingDependencies()` records the path below
+     * the declared set as `b[c[missing]]`, so the missing set is the innermost
+     * name. It is reported when either end is academic - an academic set that
+     * misses a set of another vendor or is invalid for any other reason, or a
+     * site package set that misses an academic one. Only the two ends are
+     * looked at: a set of another vendor that reaches a missing set of another
+     * vendor through an academic set is not reported, which is theoretical
+     * while no academic set depends on a set of another vendor. The backend
+     * module "Sites" ("Sites > Setup" on TYPO3 v14) lists every invalid set.
+     */
+    private function unavailableAcademicSet(string $setName): ?string
+    {
+        if ($this->setRegistry->hasSet($setName)) {
+            return null;
+        }
+        $invalidSet = $this->setRegistry->getInvalidSets()[$setName] ?? null;
+        $missingSet = $setName;
+        if ($invalidSet !== null && $invalidSet['error'] === SetError::missingDependency) {
+            $chain = rtrim($invalidSet['context'], ']');
+            $position = strrpos($chain, '[');
+            $missingSet = $position === false ? $chain : substr($chain, $position + 1);
+        }
+
+        return str_starts_with($setName, self::SET_NAME_PREFIX) || str_starts_with($missingSet, self::SET_NAME_PREFIX)
+            ? $missingSet
+            : null;
     }
 
     /**

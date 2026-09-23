@@ -50,6 +50,12 @@ enum ConfigurationFindingKind: string
     case AliasSet = 'alias-set';
 
     /**
+     * A site depends on an academic set that TYPO3 cannot provide, so every
+     * frontend request of the site fails.
+     */
+    case UnavailableSet = 'unavailable-set';
+
+    /**
      * A site delivers one extension through a set and through a static
      * template at the same time.
      */
@@ -79,6 +85,7 @@ enum ConfigurationFindingKind: string
             self::TypoScriptImport => 'TypoScript import',
             self::TypoScriptSyntax => 'TypoScript syntax',
             self::AliasSet => 'Alias set',
+            self::UnavailableSet => 'Unavailable set',
             self::SetAndStaticTemplate => 'Set and static template',
             self::SetBranchCleared => 'Cleared set branch',
             self::Xclass => 'XCLASS',

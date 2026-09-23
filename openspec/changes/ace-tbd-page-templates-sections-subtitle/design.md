@@ -160,10 +160,12 @@ The removal and the template switch land in one commit. Removed alone, every
 partner and project page throws; switched alone, the sets stay a site wide
 redefinition of a global object path that nothing in the extensions needs.
 
-A site configuration that still lists a removed set loses it without an
-error on v13 and v14, as for the programs set; the `Breaking-` entries say
-so, because such a site sees no hint at all. The same holds for a
-`sys_template` record that includes the removed static template.
+A site configuration that still lists a removed set, directly or through a set
+of the site package, answers every page with HTTP 500 on v13 and v14, as for
+the programs set (`SiteConfiguration::determineInvalidSets()`,
+`SiteResolver`); `academic:upgrade:check` reports it as `unavailable-set`. A
+`sys_template` record that includes the removed static template gets nothing
+for it, without a message. The `Breaking-` entries name both.
 
 Rejected: deprecating the sets in 3.x and removing them in 4.0. The
 maintainer decided the removal for 3.0, and a deprecated set would keep
@@ -199,8 +201,12 @@ Guessed layout — a sketch, not a design:
   site defines the path itself.
 
 - [A site configuration or `sys_template` record still names a removed set
-  or static template] → The entry is dropped without an error; the
-  `Breaking-` entries tell the integrator to remove it.
+  or static template] → A removed set fails the whole site with HTTP 500
+  ("depends on unavailable sets"), found by
+  `ace-tbd-program-page-content-without-getcontent` on v13 and v14; a removed
+  static template is skipped without a message. The `Breaking-` entries name
+  both, and the two sets are added to `ConfigurationChecker::REMOVED_SETS` of
+  `academic_base`, so `academic:upgrade:check` says what replaced them.
 
 ## Migration Plan
 

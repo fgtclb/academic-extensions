@@ -1,0 +1,6 @@
+# A site package set that reaches a removed academic set through another set of
+# its own vendor: TYPO3 records the chain as "acme/site-package-base[...]".
+name: acme/site-package
+label: 'Acme site package'
+dependencies:
+  - acme/site-package-base

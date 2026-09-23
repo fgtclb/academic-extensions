@@ -163,6 +163,18 @@ away.
         -   Depend on :yaml:`fgtclb/academic-persons` or
             :yaml:`fgtclb/academic-study-plan` instead, or on the component
             sets the site actually needs.
+    *   -   :bash:`unavailable-set`
+        -   A site depends on a set of an academic extension that TYPO3 cannot
+            provide - the extension is not installed, or a release removed the
+            set - or on a set of its own that depends on one. TYPO3 answers
+            every page of the site with HTTP 500 (*"depends on unavailable
+            sets"*), so it is an error, and it is reported although the site
+            fails loudly: the command runs before the upgraded site does. An
+            alias set that is unavailable is reported here and not as
+            :bash:`alias-set`.
+        -   Remove the dependency from the site configuration and from every
+            set of the site package, or install the extension. For a set a
+            release removed, the message says what replaced it.
     *   -   :bash:`set-and-static-template`
         -   A site depends on a set of an academic extension **and** a
             TypoScript record on its root page includes a static template of

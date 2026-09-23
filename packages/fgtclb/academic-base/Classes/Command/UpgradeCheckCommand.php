@@ -91,6 +91,8 @@ final class UpgradeCheckCommand extends Command
                 '  tsconfig-syntax          a page or a site uses "<INCLUDE_TYPOSCRIPT:", which',
                 '                           TYPO3 v14 no longer reads',
                 '  alias-set                a site depends on a set that only forwards to another',
+                '  unavailable-set          a site depends on an academic set TYPO3 cannot provide,',
+                '                           so every page of the site fails',
                 '  set-and-static-template  a site delivers one extension through both mechanisms',
                 '  xclass                   an academic class is replaced through the XCLASS registry',
                 '',

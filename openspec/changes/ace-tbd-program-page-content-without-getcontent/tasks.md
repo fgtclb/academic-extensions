@@ -1,17 +1,23 @@
 ## 1. Tests first
 
-- [ ] 1.1 Add a case to `Tests/Functional/Pages/AcademicProgramPageTemplateTest.php`
+- [x] 1.1 Add a case to `Tests/Functional/Pages/AcademicProgramPageTemplateTest.php`
   in `academic-programs` whose setup omits
   `Configuration/TypoScript/ContentLoad/setup.typoscript`, with one visible
   `tt_content` record in colPos 0: assert HTTP 200 and the record's content;
   record that it fails on the unchanged code with the `f:cObject` exception.
-- [ ] 1.2 Add fixtures for a second colPos 0 record (manual order), a colPos 1
+- [x] 1.2 Add fixtures for a second colPos 0 record (manual order), a colPos 1
   record and a translated page with translated content; assert the order, the
   absence of the colPos 1 record and the translated content, and record which
   assertions fail on the unchanged code.
-- [ ] 1.3 Add a case with a `PAGEVIEW` fixture page object and assert the same
+- [x] 1.3 Add a case with a `PAGEVIEW` fixture page object and assert the same
   content, so both integrations are covered.
-- [ ] 1.4 Change `Tests/Functional/SiteSet/SiteSetDeliveryTest.php` to assert
+- [x] 1.3a Add two pairs of main column elements, each sharing a `sorting`
+  value, one written in ascending and one in descending uid order, and
+  assert uid order. Measured without the `uid` tiebreaker on v13 and v14:
+  PostgreSQL 10 returns the ties in reverse write order (the ascending pair
+  fails), PostgreSQL 16 in write order (the descending pair fails), SQLite
+  passes; one pair alone would be a guard on one of the two versions.
+- [x] 1.4 Change `Tests/Functional/SiteSet/SiteSetDeliveryTest.php` to assert
   that `fgtclb/academic-programs-content-load` is not registered and that a
   site on the aggregate set has no `styles.content.getContent`, and
   `Tests/Functional/Tca/StaticRegistrationTest.php` to assert that the
@@ -20,16 +26,16 @@
 
 ## 2. Implementation
 
-- [ ] 2.1 Add `page.10.variables.programContent` (`CONTENT` on `tt_content`,
+- [x] 2.1 Add `page.10.variables.programContent` (`CONTENT` on `tt_content`,
   colPos 0, `orderBy = sorting, uid`) inside the doktype 20 condition of
   `Configuration/TypoScript/Page/AcademicPrograms.typoscript`.
-- [ ] 2.2 Replace the `f:cObject` call in
+- [x] 2.2 Replace the `f:cObject` call in
   `Resources/Private/Pages/AcademicProgram.html` with
   `{programContent -> f:format.raw()}` and verify 1.1 to 1.3 pass.
-- [ ] 2.3 Drop the explicit content-load include from the existing page test
+- [x] 2.3 Drop the explicit content-load include from the existing page test
   and verify it still passes.
-- [ ] 2.4 Revert 2.2, watch 1.1 go red, restore it.
-- [ ] 2.5 Remove `Configuration/Sets/ContentLoad/`,
+- [x] 2.4 Revert 2.2, watch 1.1 go red, restore it.
+- [x] 2.5 Remove `Configuration/Sets/ContentLoad/`,
   `Configuration/TypoScript/ContentLoad/`, the dependency on
   `fgtclb/academic-programs-content-load` in
   `Configuration/Sets/Full/config.yaml` and the `addStaticFile()` call of
@@ -37,43 +43,74 @@
   adjust the comments there that mention the override. Verify 1.4 passes and
   grep that `academic_programs` has no reference to the set or the folder
   left.
-- [ ] 2.6 Adjust the comment on the three content-load sets in
+- [x] 2.6 Adjust the comment on the three content-load sets in
   `core-13/config/sites/academics/config.yaml` and
   `core-14/config/sites/academics/config.yaml`, which calls leaving one out a
   fatal error.
 
+## 2a. The upgrade check (added after the premise on unknown sets failed)
+
+- [x] 2a.1 Add `ConfigurationFindingKind::UnavailableSet` (`unavailable-set`)
+  and report it from `ConfigurationChecker::checkSites()` as an error: a
+  declared set `SetRegistry::hasSet()` does not know when either end of its
+  `missingDependency` chain is academic (an academic set that is missing,
+  invalid or misses a set of another vendor; a site package set that misses
+  an academic one); an unavailable alias set gets the error instead of the
+  alias notice; a constant maps `fgtclb/academic-programs-content-load` to
+  what replaced it.
+- [x] 2a.2 Tests in `ConfigurationCheckerSiteTest` (removed and uninstalled
+  academic sets, a site package set missing one directly and through another
+  set, the vendor rule, an alias set of an extension that is not installed
+  reported as an error and not as a notice) and
+  `UpgradeCheckCommandConfigurationTest` (the printed line and the exit
+  status); both alias notice tests now load `academic_study_plan`, whose
+  alias they name, because a site on an alias whose extension is not
+  installed is unavailable. Eleven mutations of both parts, each caught; the
+  `uid` tiebreaker was measured by hand (task 1.3a).
+- [x] 2a.3 The command help text, `docs/architecture/upgrade-checks.md`,
+  `Documentation/UpgradeCheck/Index.rst` and
+  `Documentation/Changelog/3.0/Feature-UpgradeCheckUnavailableSets.rst` of
+  `academic_base`.
+
 ## 3. Documentation
 
-- [ ] 3.1 Replace the content load sections of
+- [x] 3.1 Replace the content load sections of
   `Documentation/Configuration/Index.rst` (the set table row, the section
   "The content load override" and the static template row): the page type
   needs no set, the program page content is
   `page.10.variables.programContent`, and the override no longer exists.
-- [ ] 3.2 Add
+- [x] 3.2 Add
   `Documentation/Changelog/3.0/Breaking-ContentLoadSetRemoved.rst` from
   `Build/Documentation/Templates/Changelog-Breaking.rst`: the removed set,
-  static template and aggregate dependency; the silent drop of an unknown set
-  name from a site configuration; the migration (remove the set or static
+  static template and aggregate dependency; the HTTP 500 of a site whose
+  configuration still names the set; the migration (remove the set or static
   template entry, switch a customised or overridden
   `styles.content.getContent` to `page.10.variables.programContent`, or
   define `styles.content.getContent` in the site package when a site template
   keeps rendering it). Check the reST over/underline lengths.
-- [ ] 3.3 Update the `docs/` page that describes the site sets, if it names
+- [x] 3.3 Update the `docs/` page that describes the site sets, if it names
   the page type dependency or the content-load sets.
 
 ## 4. File the issue
 
 - [ ] 4.1 After implementation, file the ACE issue in YouTrack and rename the
   change to `ace-<NNN>-program-page-content-without-getcontent`.
-- [ ] 4.2 Commit in TYPO3 Core format, `[!!!][BUGFIX] ACE-<NNN>: <subject>`.
+- [ ] 4.2 Commit in TYPO3 Core format, `[!!!][FEATURE] ACE-<NNN>: <subject>`.
 
 ## 5. Definition of done
 
-- [ ] 5.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 5.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 13`.
-- [ ] 5.2 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 5.2 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 14`.
-- [ ] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 5.4 `docs/` and the `Documentation/` changelog updated in the same
+- [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 5.4 `docs/` and the `Documentation/` changelog updated in the same
   change.
 - [ ] 5.5 Archive the change as the last commit of the pull request.
+
+## 6. Backport
+
+- [ ] 6.1 On branch `2`, a change of its own under the same name: the
+  `programContent` variable and the template switch, the content-load set and
+  static template kept, an `Important` changelog entry; no upgrade check
+  finding (branch `2` removes no set).

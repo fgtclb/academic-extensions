@@ -231,6 +231,7 @@ registry, and answers with a list of findings:
 | `typoscript-syntax`       | warning          | The same field uses `<INCLUDE_TYPOSCRIPT:`                                           |
 | `set-branch-cleared`      | warning          | A record on a set-driven site's root page clears a branch those sets deliver         |
 | `alias-set`               | notice           | A site depends on a set that only forwards to another one                            |
+| `unavailable-set`         | error            | A site depends on an academic set TYPO3 cannot provide                               |
 | `set-and-static-template` | warning          | A site delivers one extension through a set and through a static template            |
 | `xclass`                  | warning or error | An academic class is replaced through the XCLASS registry                            |
 
@@ -379,10 +380,31 @@ not ask whether a file exists.
 **Alias sets** — `fgtclb/academic-persons-default` and
 `fgtclb/academic-study-plan-default` are named in a constant of the checker. A
 set definition has no machine readable "this is an alias" key, and introducing a
-custom `config.yaml` key for two sets that go away in 4.0 buys nothing. The set
-does not have to exist for the notice to be right: `Site::getSets()` answers the
-dependencies a site *declares*, verbatim, so a site declaring a set that a later
-release dropped is exactly the case the notice is about.
+custom `config.yaml` key for two sets that go away in 4.0 buys nothing. The
+notice is for an alias that still delivers. An alias TYPO3 cannot provide - its
+extension is not installed, or a later release dropped it - fails the site, so
+it is reported as an unavailable set instead. The change that drops the two in
+4.0 adds them to the checker's list of removed sets.
+
+**Unavailable sets** — the one site check core does not keep quiet about.
+`SiteConfiguration::determineInvalidSets()` marks a declared set that
+`SetRegistry` does not know, or that it registered as invalid, and
+`SiteResolver` answers every frontend request of the site with HTTP 500 ("Site
+… depends on unavailable sets"), on v13 and v14 alike. It is reported anyway,
+because the command runs before an upgraded installation goes live, and the
+site does not. `SetRegistry::hasSet()` and `getInvalidSets()` are public API
+on both versions. A declared set counts when either end of its chain is
+academic: an academic set that is missing, invalid for any reason or misses a
+set of another vendor, and a set of another vendor - a site package set,
+typically - that misses an academic one. A site package set that depends on
+`fgtclb/academic-programs-content-load`, which 3.0 removed, is as unavailable as
+the removed set itself. `SetRegistry::checkMissingDependencies()` records the
+path below the declared set as `b[c[missing]]`, and the check names the
+innermost set. Only the two ends are looked at; a foreign set that reaches a
+missing foreign set through an academic one is not reported, which is
+theoretical while no academic set depends on a set of another vendor. Removed sets
+are listed in a constant of the checker with what replaces them, so the message
+says what to do; any other academic set gets the generic message.
 
 **A set and a static template of one extension** — the set-to-extension map is
 built from the `Configuration/Sets/*/config.yaml` files of the active academic

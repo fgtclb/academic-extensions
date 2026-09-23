@@ -139,6 +139,10 @@ its migration:
 
 - the sets redefined the global `styles.content.getContent` for every page of
   a site, and the aggregate set of each extension depended on them;
+- a site configuration, or a set of the site package, that still names one
+  answers every page with HTTP 500 ("depends on unavailable sets"), so the
+  entry is removed first; `academic:upgrade:check` reports it as
+  `unavailable-set`;
 - the upstream page templates of programs, partners and projects render their
   content without that path in 3.0, so a site using them needs nothing;
 - a site template or project page template that still renders
