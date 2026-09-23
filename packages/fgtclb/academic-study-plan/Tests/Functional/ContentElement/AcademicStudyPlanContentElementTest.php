@@ -21,8 +21,9 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
  * This class is deliberately small. It came with ACE-702, the first change on this branch
  * that needed the rendered content element, and covers what that change is about: the
  * settings of the `Appearance` tab, which the `Default` content element layout renders and
- * a template without that layout silently dropped. `main` carries the full coverage of the
- * element, which was never backported.
+ * a template without that layout silently dropped. Since ACE-722 it covers the credit
+ * points as well. `main` carries the full coverage of the element, which was never
+ * backported.
  */
 final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPlanTestCase
 {
@@ -148,6 +149,51 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertStringContainsString('data-study-plan="1"', $content);
         $this->assertStringContainsString('First Semester', $content);
         $this->assertStringContainsString('Mathematics I', $content);
+    }
+
+    /**
+     * Credit points are stored with two decimals. What the visitor reads carries no
+     * trailing zeros - in the column header, in the module and in its dialog - because
+     * the template receives numbers rather than database strings. A semester or module
+     * without credit points shows none; the template guards the value with a condition,
+     * which is false for 0 and for "0.00" alike, as Fluid reads a numeric string as a
+     * number. On SQLite the declared numeric column returns numbers already, so this
+     * test and the next one tell the cast apart on MariaDB, MySQL and PostgreSQL only.
+     */
+    #[Test]
+    public function contentElementRendersDecimalCreditPointsWithoutTrailingZeros(): void
+    {
+        $this->setUpTestCase('studyPlanPage_decimalCreditPoints');
+
+        $this->assertSame(
+            ['30 CP', '2.5 CP', '2.5 CP', '12.75 CP', '12.75 CP'],
+            $this->textsOf($this->renderHomePage(), '//span[contains(@class, "credits")]'),
+        );
+    }
+
+    /**
+     * The label the dialog trigger announces prints the credit points of the semester
+     * without a condition, so a semester without them reads "0 CP" there - as it did
+     * with the former integer column, and not "0.00 CP", because the template receives
+     * a number.
+     */
+    #[Test]
+    public function contentElementAnnouncesTheCreditPointsOfASemesterWithoutThemAsZero(): void
+    {
+        $this->setUpTestCase('studyPlanPage_decimalCreditPoints');
+
+        $labels = array_map(
+            static fn(string $text): string => preg_replace('#\\s+#', ' ', $text) ?? '',
+            $this->textsOf($this->renderHomePage(), '//button[contains(@class, "modal-trigger")]/span'),
+        );
+
+        $this->assertSame(
+            [
+                'First Semester, , 30 CP. Show module details: Mathematics I',
+                'Second Semester, , 0 CP. Show module details: Thesis',
+            ],
+            $labels,
+        );
     }
 
     /**
