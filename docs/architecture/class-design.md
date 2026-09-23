@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 301 PHP files declaring 271
+rather than describing an intention as a rule — 304 PHP files declaring 274
 classes, 10 interfaces, 12 traits and 8 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-154 of the 271 classes are `final` (57 %). The distribution is not random: it
+157 of the 274 classes are `final` (57 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
@@ -29,8 +29,8 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 3       | 8       | 0        | 27 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 88      | 47      | 4        | 63 %     |
-| **Total**                                  | **154** | **112** | **5**    | **57 %** |
+| Everything else                            | 91      | 47      | 4        | 64 %     |
+| **Total**                                  | **157** | **112** | **5**    | **57 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,9 +55,9 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 291 modifiers, of
-which 283 are constructor-promoted, across 93 files. The eight non-promoted
-declarations are the seven documented fields of
+`readonly` is used heavily, mostly on individual properties: 300 modifiers, of
+which 291 are constructor-promoted, across 95 files. The nine non-promoted
+declarations are the eight documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
 
@@ -72,7 +72,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 35:
+nothing**, and of an immutable data object. There are 36:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -96,9 +96,9 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 130   | An injected collaborator                          |
-| `public readonly`    | 103   | A field of an immutable data object               |
-| `protected readonly` | 22    | Either, in classes with subclasses or older style |
+| `private readonly`   | 165   | An injected collaborator                          |
+| `public readonly`    | 112   | A field of an immutable data object               |
+| `protected readonly` | 23    | Either, in classes with subclasses or older style |
 
 Use `private readonly` for every constructor-injected dependency. It states that
 the service does not rebind it, which is the property half of the stateless rule
@@ -117,14 +117,14 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 91 files declare
-283 promoted `readonly` parameters. The fullest example by a wide margin is
+Constructor injection with promoted properties is the default: 93 files declare
+291 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.
 
 **Method injection is used where a constructor is not available to take
-dependencies.** There are 12 `inject*()` methods across 7 files and **zero**
+dependencies.** There are 10 `inject*()` methods across 6 files and **zero**
 `@inject` annotations — the annotation form is not used at all, which is worth
 keeping true.
 
