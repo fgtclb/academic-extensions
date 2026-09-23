@@ -71,7 +71,7 @@ Rejected:
   project overrides the cell partial to add one.
 
 Contract values in the table come from the contract selection of
-`ace-tbd-contract-display-policy` when that change has landed. Otherwise they
+`ace-719-contract-display-policy` when that change has landed. Otherwise they
 come from every contract, joined as the tile rows are today.
 
 ### Site settings
