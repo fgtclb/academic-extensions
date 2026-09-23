@@ -68,8 +68,8 @@
 - [ ] 6.1 Backport: separate change on branch `2` after a backport analysis
   (`docs/workflow/backporting.md`), for the parts of the programs and
   category types chapters that apply to 2.x (template naming, unit labels,
-  category type rename, legacy migrations). Decimal credit points ship on
-  `main` only and are not mentioned in the branch `2` guide.
+  category type rename, legacy migrations, and the database compare of the
+  decimal credit points, which 2.4 carries as well).
 
 ## 7. Definition of done
 

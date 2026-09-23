@@ -101,7 +101,7 @@ and lists the 2.x override paths with their fate.
 
 A chapter that depends on a change not released when the guide is written
 (`ace-tbd-program-finder-element`, `ace-tbd-program-application-link`,
-`ace-tbd-study-plan-decimal-credit-points`,
+`ace-722-study-plan-decimal-credit-points`,
 `ace-704-study-plan-partials-js-contract`, `ace-703-study-plan-asset-switch`,
 `ace-666-keep-hidden-ctype-selectable`, `ace-tbd-legacy-typoscript-paths`,
 `ace-tbd-program-facts-field-list`,
@@ -119,14 +119,14 @@ static template, or to the site set, as the replacement. Keeping the paths
 turns the step from "your site renders nothing" into a deprecation to clean
 up.
 
-### Decided: decimal credit points are a 3.0 topic only
+### Decided: decimal credit points ship with 2.4 and 3.0
 
-The credit points change of `ace-tbd-study-plan-decimal-credit-points` ships
-on `main` only; it is not backported to branch `2`. The 3.0 study plan
-chapter covers it, and the branch `2` backport of the guide neither mentions
-decimal credit points nor announces a schema change for them. Whether a 2.x
-minor release may carry a schema change therefore has no subject in this
-guide.
+The credit points change of `ace-722-study-plan-decimal-credit-points` ships
+on `main` and, by the maintainer's decision of 2026-09-23, as a backport on
+branch `2` (2.4), with a database compare in both releases. The 3.0 study
+plan chapter covers it for an update from 2.3 or older; an installation on
+2.4 already has the decimal column. The branch `2` backport of the guide
+names the database compare of 2.4.
 
 ### Decided: the content-load sets are documented as removed, not deprecated
 

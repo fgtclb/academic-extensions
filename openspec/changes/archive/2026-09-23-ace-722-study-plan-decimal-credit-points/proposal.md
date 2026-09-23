@@ -16,7 +16,8 @@ without a code change.
 - Visitors see credit points without trailing zeros: "2.5", and "30" rather
   than "30.00", in template overrides as well.
 
-Behaviour is identical on TYPO3 v13 and v14.
+Behaviour is identical on TYPO3 v13 and v14. The change is backported to
+branch `2` as a change of its own (see the design).
 
 ## Capabilities
 
@@ -46,13 +47,9 @@ None.
 - Formatting the number per language (decimal comma); it stays a template
   concern (see the design).
 - A float column, which rounds when values are summed.
-- A backport to branch `2`: no project on that line would consume it (see
-  the design).
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `programs-studyplan-15`). Three of the six analysed projects carry their own
-code for this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-study-plan-decimal-credit-points` when the issue is filed after
-implementation.
+code for this today. Filed as ACE-722 after implementation.
