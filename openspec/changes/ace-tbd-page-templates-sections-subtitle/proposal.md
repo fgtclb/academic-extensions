@@ -40,7 +40,7 @@ content-load sets define, and those sets are removed in 3.0.
   500 (core behaviour, verified by the programs change on v13 and v14);
   `academic:upgrade:check` reports it as `unavailable-set`.
   The programs set is removed by
-  `ace-tbd-program-page-content-without-getcontent`.
+  `ace-721-program-page-content-without-getcontent`.
 - The markup order stays the same; the subtitle line is the only addition.
 
 The behaviour is the same on TYPO3 v13 and v14.
@@ -92,7 +92,7 @@ None.
 - Migrating a project's own subtitle column, which is project work.
 - Crop variants on the page media.
 - The program page and the programs content-load set, which
-  `ace-tbd-program-page-content-without-getcontent` covers.
+  `ace-721-program-page-content-without-getcontent` covers.
 - Backporting to branch `2`, which serves TYPO3 v12.
 
 Depends on candidates `listings-01` (change

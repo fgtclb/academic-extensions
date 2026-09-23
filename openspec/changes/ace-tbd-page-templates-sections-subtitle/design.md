@@ -93,7 +93,7 @@ Neither page template nor any of its partials calls
 `styles.content.getContent` any more. Inside the doktype condition of
 `AcademicPartners.typoscript` and `AcademicProjects.typoscript`, the page
 object gets a variable of its own, as the program page does
-(`ace-tbd-program-page-content-without-getcontent`):
+(`ace-721-program-page-content-without-getcontent`):
 
 ```typoscript
 variables {
@@ -139,7 +139,7 @@ the dependency on `fgtclb/academic-partners-content-load` or
 the `ContentLoad` line of `Configuration/TypoScript/Full/include_static_file.txt`
 and the `addStaticFile()` registration "Content load override" in
 `Configuration/TCA/Overrides/sys_template.php`. The programs set is removed by
-`ace-tbd-program-page-content-without-getcontent`; together the two changes
+`ace-721-program-page-content-without-getcontent`; together the two changes
 remove all three sets, and no academic extension defines
 `styles.content.getContent` afterwards. Marked `[!!!]`, with
 `Breaking-ContentLoadSetRemoved.rst` in both extensions.
@@ -203,7 +203,7 @@ Guessed layout — a sketch, not a design:
 - [A site configuration or `sys_template` record still names a removed set
   or static template] → A removed set fails the whole site with HTTP 500
   ("depends on unavailable sets"), found by
-  `ace-tbd-program-page-content-without-getcontent` on v13 and v14; a removed
+  `ace-721-program-page-content-without-getcontent` on v13 and v14; a removed
   static template is skipped without a message. The `Breaking-` entries name
   both, and the two sets are added to `ConfigurationChecker::REMOVED_SETS` of
   `academic_base`, so `academic:upgrade:check` says what replaced them.

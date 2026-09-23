@@ -70,7 +70,7 @@ None.
 - Hiding parent categories (`ace-tbd-most-specific-categories-only`).
 - Changing the credit points column type or format.
 - A per content element facts selection in the FlexForm.
-- The content-load sets; `ace-tbd-program-page-content-without-getcontent`
+- The content-load sets; `ace-721-program-page-content-without-getcontent`
   removes the programs one.
 - Backporting to branch `2`.
 

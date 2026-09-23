@@ -119,7 +119,7 @@ template (by then its `Program/Page/Facts` section) and the details
 template, render `Program/Facts` in this change, so upstream stops using the
 partial in the same commit. The content-load sets of the three extensions
 are removed in 3.0 as well, by
-`ace-tbd-program-page-content-without-getcontent` for programs and by the
+`ace-721-program-page-content-without-getcontent` for programs and by the
 partner and project page template changes; this change does not touch them.
 
 A deprecated partial cannot announce itself: Fluid renders an override of it

@@ -33,7 +33,7 @@
   `academic_base`, with a `ConfigurationCheckerSiteTest` case per set that
   asserts the replacement named in the `unavailable-set` error. A site that
   still lists a removed set answers HTTP 500 on v13 and v14 - core behaviour,
-  found by `ace-tbd-program-page-content-without-getcontent`, not a silent
+  found by `ace-721-program-page-content-without-getcontent`, not a silent
   drop.
 
 ## 2. Implementation
@@ -65,7 +65,7 @@
 - [ ] 2.6 Adjust the comment on the "-content-load" sets in
   `core-13/config/sites/academics/config.yaml` and
   `core-14/config/sites/academics/config.yaml`, which calls leaving one out
-  a fatal error. `ace-tbd-program-page-content-without-getcontent` touches
+  a fatal error. `ace-721-program-page-content-without-getcontent` touches
   the same comment; whichever lands last removes it entirely.
 
 ## 3. Documentation
