@@ -120,7 +120,7 @@ documentation can fix.
 This change deprecates nothing. The content-load sets of the three
 extensions and `Partials/Program/Categories.html` are removed in 3.0 as a
 breaking change, not deprecated for removal in 4.0: the programs set by
-`ace-tbd-program-page-content-without-getcontent`, the partner and project
+`ace-721-program-page-content-without-getcontent`, the partner and project
 sets by the changes that take their page templates off
 `styles.content.getContent`, the partial by
 `ace-tbd-program-facts-field-list`. This supersedes the earlier

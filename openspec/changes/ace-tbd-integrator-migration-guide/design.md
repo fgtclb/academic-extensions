@@ -105,7 +105,7 @@ A chapter that depends on a change not released when the guide is written
 `ace-704-study-plan-partials-js-contract`, `ace-703-study-plan-asset-switch`,
 `ace-666-keep-hidden-ctype-selectable`, `ace-tbd-legacy-typoscript-paths`,
 `ace-tbd-program-facts-field-list`,
-`ace-tbd-program-page-content-without-getcontent`,
+`ace-721-program-page-content-without-getcontent`,
 `ace-tbd-page-templates-sections-subtitle`,
 `ace-712-upgrade-check-template-overrides`,
 `ace-713-upgrade-check-configuration`) carries a note naming it as not yet
@@ -154,7 +154,7 @@ its migration:
 The removals are owned by three changes, and the step links their `Breaking-`
 entries, which own the detail:
 
-- `ace-tbd-program-page-content-without-getcontent` removes the
+- `ace-721-program-page-content-without-getcontent` removes the
   academic_programs set;
 - `ace-tbd-program-facts-field-list` removes `Partials/Program/Categories.html`;
 - `ace-tbd-page-templates-sections-subtitle` removes the academic_partners and

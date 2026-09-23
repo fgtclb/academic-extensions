@@ -20,7 +20,7 @@ paths on program pages.
 - A site setting names the list page for the back link.
 - Overrides of `AcademicProgram.html` keep working, as long as they no longer
   render `styles.content.getContent`, which
-  `ace-tbd-program-page-content-without-getcontent` removes.
+  `ace-721-program-page-content-without-getcontent` removes.
 
 The behaviour is identical on TYPO3 v13 and v14, for `FLUIDTEMPLATE` and
 `PAGEVIEW` page objects.
@@ -43,7 +43,7 @@ None.
   settings and matching constants for static template installations.
 - Visible output of every program page on sites with a page layout.
 - Sites that reused or cleared index 100 of the page object's paths.
-- Depends on `ace-tbd-program-page-content-without-getcontent`; the facts
+- Depends on `ace-721-program-page-content-without-getcontent`; the facts
   field list and the application link changes plug into the partials.
 
 ## Non-goals
@@ -53,7 +53,7 @@ None.
 - Partners and projects page templates.
 - Removing or deprecating the content-load sets and
   `Partials/Program/Categories.html`; they are removed in 3.0 by
-  `ace-tbd-program-page-content-without-getcontent`, the partner and project
+  `ace-721-program-page-content-without-getcontent`, the partner and project
   page template changes and `ace-tbd-program-facts-field-list`.
 - A backport to branch `2`.
 

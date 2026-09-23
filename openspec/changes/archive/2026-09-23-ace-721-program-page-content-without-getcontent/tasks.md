@@ -93,9 +93,9 @@
 
 ## 4. File the issue
 
-- [ ] 4.1 After implementation, file the ACE issue in YouTrack and rename the
-  change to `ace-<NNN>-program-page-content-without-getcontent`.
-- [ ] 4.2 Commit in TYPO3 Core format, `[!!!][FEATURE] ACE-<NNN>: <subject>`.
+- [x] 4.1 After implementation, file the ACE issue in YouTrack and rename the
+  change to `ace-<NNN>-program-page-content-without-getcontent` - ACE-721.
+- [x] 4.2 Commit in TYPO3 Core format, `[!!!][FEATURE] ACE-<NNN>: <subject>`.
 
 ## 5. Definition of done
 
@@ -106,11 +106,11 @@
 - [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.4 `docs/` and the `Documentation/` changelog updated in the same
   change.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archive the change as the last commit of the pull request.
 
-## 6. Backport
+## 6. Backport (a pull request of its own)
 
-- [ ] 6.1 On branch `2`, a change of its own under the same name: the
-  `programContent` variable and the template switch, the content-load set and
-  static template kept, an `Important` changelog entry; no upgrade check
-  finding (branch `2` removes no set).
+Branch `2` gets the non-breaking part as a change of its own under the same
+name, in its own pull request: the `programContent` variable and the template
+switch; the content-load set and static template stay, with an `Important`
+changelog entry and no upgrade check finding (branch `2` removes no set).
