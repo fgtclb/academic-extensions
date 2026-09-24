@@ -16,7 +16,7 @@ The partner page object already adds
 template `Pages/AcademicPartner.html` can render a partial of the extension.
 `Partner::isDrawable()` exists since ACE-562.
 
-The list and the map share `ListSettings.xml`; `ace-tbd-partner-list-pagination`
+The list and the map share `ListSettings.xml`; `ace-727-partner-list-pagination`
 gives the map a `MapSettings.xml`. Whichever of the two changes lands first
 introduces that file; the other adds its field to it.
 
