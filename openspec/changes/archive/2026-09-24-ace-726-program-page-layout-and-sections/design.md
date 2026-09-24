@@ -16,8 +16,15 @@ Verified on `main` in `packages/fgtclb/academic-programs`:
   (ACE-450).
 - The extension ships no `settings.definitions.yaml`; academic_persons and
   academic_jobs do, together with matching constants.
-- `Tests/Functional/Pages/AcademicProgramPageTemplateTest.php` only checks
-  that the template name resolves.
+- `Tests/Functional/Pages/AcademicProgramPageTemplateTest.php` checks that
+  the template name resolves (ACE-450), and since ACE-721 the media, the
+  content variable and the partial root paths of the site package, on a
+  `FLUIDTEMPLATE` and a `PAGEVIEW` page object. Nothing in it renders a
+  layout. (Re-checked on 2026-09-24; the change was written when the file
+  held the template name case only.)
+- Fluid 4.6 (v13) and 5.3 (v14) both evaluate a `<f:layout name="{…}"/>`
+  argument at render time (`ParsingState::getLayoutName()`), and both throw
+  when the named layout resolves in no layout root path.
 
 ## Goals / Non-Goals
 
@@ -73,6 +80,28 @@ if the dynamic name proves unreliable on v13 or v14. bootstrap_package's
 setting covers layouts named or sectioned differently, and keeping the
 template without a layout is the state all six projects paid for.
 
+### Decided: a fallback layout below every site path
+
+A site package without a layout `Default` would otherwise get an exception on
+every program page, where today it gets the page without its frame: a
+`FLUIDTEMPLATE` package whose page templates use no layout, or one whose
+layouts are named differently. The fallback covers `Default` only; a layout
+the integrator names has to exist, like any Fluid layout. The extension
+therefore ships a layout `Default` that renders nothing but the section
+`Main`, in a directory of its own
+(`Resources/Private/PageLayoutFallback/Layouts/`), registered under a unique
+negative key in `layoutRootPaths` and in `paths`. Every layout a site package
+registers sorts above it while all keys of the array are integers, which
+`TemplatePaths` needs to sort them at all; it is used only where the site has
+no layout `Default`.
+
+It cannot live in `Resources/Private/Layouts/`: on `PAGEVIEW`, `paths.50`
+derives `Layouts/` from the same directory at key 50, which would beat a site
+package registered at `paths.10`.
+
+Rejected: no layout path at all, as first designed. It turns a frameless page
+into an HTTP 500 for a site that changed nothing, and no setting can fix it.
+
 ### Section partials
 
 `Main` renders `Program/Page/Header` (title, subtitle, back link from
@@ -104,11 +133,12 @@ Guessed layout — a sketch, not a design:
 The call to action is shown for orientation only; it belongs to the
 application link change.
 
-### Path index 50, no layout path
+### Path index 50, no layout path at 50
 
 The four path entries move from 100 to 50 and `layoutRootPaths.100` is
 removed, so the site's layouts resolve and a site package's own entries at
-100 are not replaced. One project already runs the extension at 50 for that
+100 are not replaced. The only layout the extension registers is the fallback
+above, far below 50. One project already runs the extension at 50 for that
 reason.
 
 Rejected: keeping 100 and documenting "use a higher index". On `PAGEVIEW`,
@@ -134,7 +164,10 @@ before it removes the partial.
 ## Risks / Trade-offs
 
 - [A site layout without a section `Main` renders an empty page] → The layout
-  setting and an Important changelog entry.
+  setting and the Breaking changelog entry.
+- [A site without a layout `Default`] → The fallback layout; the page renders
+  as it did before, without the site frame. A layout named by the setting that
+  does not exist fails, and the documentation says so.
 - [A project reused or cleared index 100 of `page.10`] → Breaking changelog
   entry with the new index.
 - [Partials of the same name in a site's partial root] → The names live under

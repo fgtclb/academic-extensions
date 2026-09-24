@@ -58,7 +58,7 @@ The behaviour is identical on TYPO3 v13 and v14, for site packages with a
 - The comment on the content-load sets in the site configuration of the
   `core-13` and `core-14` instances.
 - No database schema or dependency change.
-- The program page layout change `ace-tbd-program-page-layout-and-sections`
+- The program page layout change `ace-726-program-page-layout-and-sections`
   builds on this one.
 
 ## Non-goals

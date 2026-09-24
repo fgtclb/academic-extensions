@@ -70,7 +70,7 @@ Verified on `main` in `packages/fgtclb/academic-programs`:
 **Non-Goals:**
 
 - The layout and the section partials of the page; that is
-  `ace-tbd-program-page-layout-and-sections`, which renders this variable in
+  `ace-726-program-page-layout-and-sections`, which renders this variable in
   its content partial.
 - The content-load sets of `academic_partners` and `academic_projects`; see
   the removal decision below.

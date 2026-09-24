@@ -12,11 +12,14 @@ paths on program pages.
 ## What Changes
 
 - **BREAKING** Program pages render inside the site's page layout, `Default`
-  by default, through a `Main` section. The layout name is a site setting.
+  by default, through a `Main` section. The layout name is a site setting. A
+  site without a layout `Default` keeps today's output through a fallback
+  layout.
 - The template is split into named partials (header with an optional link
   back to the list, media, facts, content), each overridable on its own.
 - **BREAKING** The template paths of the page type move from index 100 to 50,
-  so a site package's paths above 50 win; the unused layout path is dropped.
+  so a site package's paths above 50 win; the unused layout path at 100 is
+  dropped.
 - A site setting names the list page for the back link.
 - Overrides of `AcademicProgram.html` keep working, as long as they no longer
   render `styles.content.getContent`, which
@@ -61,8 +64,6 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `programs-studyplan-03`). All six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-program-page-layout-and-sections` when the issue is filed after
-implementation.
+this today. Filed after implementation as ACE-726.
 
 Relates to ACE-450 and ACE-601.

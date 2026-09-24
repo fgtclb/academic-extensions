@@ -1,9 +1,10 @@
-## Purpose
+# academic-programs/program-page-layout Specification
 
+## Purpose
 Defines how a page of the program page type is embedded in the page layout of
 the site, and which parts of it an integrator can replace on their own.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Program pages render inside the site layout
 
@@ -25,6 +26,14 @@ page objects.
 - **WHEN** an integrator sets the program page layout setting to `Wide` and
   the site package provides a layout `Wide`
 - **THEN** program pages render inside the layout `Wide`
+
+#### Scenario: Site package without a Default layout
+
+- **WHEN** the layout setting is left at `Default` and the site package
+  provides no layout `Default`
+- **THEN** the program page renders its program content without the site
+  header and footer, as it did before
+- **AND** the page renders without an error
 
 #### Scenario: Static template installation
 
