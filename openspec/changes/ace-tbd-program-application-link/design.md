@@ -6,7 +6,7 @@ through `TcaManipulator::addToPageTypesGeneralTab()` for page type 20, and
 `ext_tables.sql` declares those four columns. The page template
 `Resources/Private/Pages/AcademicProgram.html` has no layout and no sections;
 candidate `programs-studyplan-03` (change
-`ace-tbd-program-page-layout-and-sections`, proposed separately) plans a
+`ace-726-program-page-layout-and-sections`, proposed separately) plans a
 `Program/Page/CallToAction` partial for exactly this link.
 
 ## Goals / Non-Goals

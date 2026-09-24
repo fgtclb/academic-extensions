@@ -57,7 +57,7 @@ None.
   `ace-tbd-category-type-priority-order` orders by priority. Whichever of
   the two changes lands second turns the facts order test to priorities; no
   code has to be wired.
-- Builds on `ace-tbd-program-page-layout-and-sections`, whose facts section
+- Builds on `ace-726-program-page-layout-and-sections`, whose facts section
   renders the new partial.
 - The credit points icon follows the icon naming of ACE-591 (pull request
   #617), so this change is applied after that pull request has merged.
