@@ -50,7 +50,7 @@ turns red with the key `5`.
 | `plugin.tx_academicprojects`                                          | `-1`          | `Project/Item.html`                                                                 |
 | `plugin.tx_academicjobs`                                              | `-1`          | `Job/Item.html`                                                                     |
 | `page.10` of `academic_partners` (doktype 40 only)                    | `-1758484801` | `Pages/AcademicPartner.html`, under `partialRootPaths` and under `paths`            |
-| `page.10` of `academic_programs` (doktype 20 only)                    | `-1758484802` | `Pages/AcademicProgram.html`, under `partialRootPaths` and under `paths`            |
+| `page.10` of `academic_programs` (doktype 20 only)                    | `-1758484802` | `Program/Page/Media.html`, under `partialRootPaths` and under `paths`               |
 | `page.10` of `academic_projects` (doktype 30 only)                    | `-1758484803` | `Pages/AcademicProject.html`, under `partialRootPaths` and under `paths`            |
 | `page.10` of `academic_jobs` (every page)                             | `-1758484804` | `Job/Item.html`, which that extension registers in `page.10` as well                |
 
@@ -144,6 +144,8 @@ is still found.
 
 ## See also
 
+- [Page type rendering](page-type-rendering.md) — the other keys the page
+  types write into `page.10`, and why the program page uses `50`.
 - [Overridable partials](overridable-partials.md) — how a template is cut
   into partials a project overrides one at a time.
 - [TypoScript and site sets](typoscript-and-site-sets.md) — where the plugin
