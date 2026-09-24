@@ -4,8 +4,8 @@ The filter and sorting forms of the partner, project and program lists submit
 by POST. Each list plugin answers that submission with a `303 See Other` to
 itself, carrying the selection as GET arguments — so a filtered list has a URL
 of its own that can be bookmarked, shared and reloaded, and that a link can
-carry. The planned pagination, active filter and route enhancer changes build
-on it.
+carry. The pagination of the partner list builds on it, and so do the planned
+active filter and route enhancer changes.
 
 This page is about the **shape** of that URL and the reasons behind it. What an
 integrator sees is documented in each extension's changelog.
@@ -43,6 +43,7 @@ link; the demand keys are the ones below.
 | `sortingDirection`            | always                           | `asc`, `desc`                              |
 | `activeState`                 | always, projects only            | `all`, `active`, `completed`               |
 | `filterCollection.categories` | only when a category is selected | one comma list of category uids, ascending |
+| `currentPage`                 | only on a pagination link        | the page, 1 and up; partner list only      |
 
 - **Built from the demand object, not from the request.** Each extension's
   `DemandFactory::createDemandArguments()` is the reverse of
@@ -67,6 +68,37 @@ link; the demand keys are the ones below.
 
 The keys arriving in alphabetical order is not a choice of this code: the page
 router sorts the query arguments recursively by key (`PageArguments`).
+
+## Pagination links
+
+The partner list paginates on request of the content element, and its page
+links are list URLs of this shape with `currentPage` added. The controller
+assigns `demandArguments` - `createDemandArguments()` of the demand the
+request asked for - next to the paginator, and `Partner/Pagination.html` adds
+the page to it. So a link keeps the filter and the sorting, and on the bare
+page it carries the editor's preselection explicitly, which the factory would
+otherwise drop on the first request with a demand argument.
+
+- **Read before the demand event**, the page as well as the link arguments,
+  like the redirect's URL. A listener acts again on the request a page link
+  leads to, so its changes need not travel in the URL, and a listener that
+  hands back a demand of its own keeps the page instead of pinning the list to
+  page one. A listener cannot choose the page.
+- **The redirect never carries a page.** `createDemandArguments()` leaves
+  `currentPage` out, so a filter submission starts on page one of the new
+  selection, which may not have the page the visitor was on.
+- **The factory reads the page and clamps it at 1**; the paginator clamps it
+  at the last page. Neither is an error.
+- **It is below `demand`**, so the prefix exclusion below covers it: every
+  page of a list shares the one page cache entry, as every filter does.
+- **The partner map is not paginated.** Its content element has a FlexForm
+  data structure of its own without the pagination sheet, and its action
+  ignores pagination values an element stored all the same.
+
+The pattern is the one of the profile list of `academic_persons` -
+`QueryResultPaginator`, `NumberedPagination` when `numbered_pagination` is
+loaded and `SimplePagination` otherwise - whose page argument sits in the
+demand too, but whose links carry nothing else.
 
 ## The demand is not part of the cache hash
 
