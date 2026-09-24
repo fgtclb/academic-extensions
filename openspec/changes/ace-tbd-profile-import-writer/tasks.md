@@ -2,7 +2,7 @@
 
 - [ ] 1.1 Confirm `ace-tbd-import-identifier-lookup`,
   `ace-tbd-managed-fields-backend` and
-  `ace-tbd-backend-save-announces-profile-update` are merged; stop
+  `ace-725-backend-save-announces-profile-update` are merged; stop
   otherwise. The writer lives in `academic_persons`; `academic_persons_sync`
   is left untouched (see design).
 
@@ -21,7 +21,7 @@
 - [ ] 2.5 Functional test that a CLI write synchronises the translation of a
   non-translatable field, shown red with the announcement disabled, and that
   a counting listener receives exactly one announcement for the person with
-  origin `Import`, shown red without the import correlation scope.
+  origin `Import`, shown red without the import correlation mark.
 
 ## 3. Retire
 
