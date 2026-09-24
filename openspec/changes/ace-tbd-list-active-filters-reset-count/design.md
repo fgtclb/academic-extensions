@@ -6,7 +6,7 @@ categories keyed by type and is read today by `Templates/Partner/Map.html`
 for its empty state. The result is a `QueryResultInterface`, whose `count()`
 is the total, not a page, so a later pagination does not change the count.
 
-This change depends on `ace-tbd-list-filter-get-urls` (the GET argument shape
+This change depends on `ace-723-list-filter-get-urls` (the GET argument shape
 and `CategoryFilterNormalizer::toFilterArguments()`) and on the
 `settings.filter` namespace introduced by candidate `listings-08`. One
 project's override reads `demand.activeFilters`, which exists on no demand
@@ -38,7 +38,7 @@ defined once.
 
 The reset link carries no demand at all, so it returns to the list as the
 content element presets it (see the preselection decision of
-`ace-tbd-list-filter-get-urls`), which is what an editor who preselected a
+`ace-723-list-filter-get-urls`), which is what an editor who preselected a
 category expects "reset" to mean.
 
 Rejected: a `getActiveFilters()` method on the three demand classes. The

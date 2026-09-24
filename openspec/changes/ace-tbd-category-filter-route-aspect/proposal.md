@@ -1,7 +1,8 @@
 ## Why
 
 Once list filters are GET URLs, a filtered list reads
-`?tx_academicpartners_list[demand][filterCollection][region]=12&cHash=…`.
+`?tx_academicpartners_list[demand][filterCollection][categories]=12` next to
+the plugin's action and controller (`ace-723-list-filter-get-urls`).
 Projects want `/partner/filter/europa-12` instead, in the visitor's language.
 `sys_category` has no slug column, so the core mappers cannot produce that,
 and each project writes its own routing aspect today.

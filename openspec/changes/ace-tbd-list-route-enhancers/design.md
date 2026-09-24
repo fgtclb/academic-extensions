@@ -9,7 +9,7 @@ for the page number.
 
 The arguments to map come from the preceding changes:
 
-- `ace-tbd-list-filter-get-urls`: `demand[filterCollection][categories]`
+- `ace-723-list-filter-get-urls`: `demand[filterCollection][categories]`
   (flat uid list), `demand[sortingField]`, `demand[sortingDirection]`, and
   `demand[activeState]` for projects;
 - `ace-tbd-partner-list-pagination`: `demand[currentPage]` (partners only);

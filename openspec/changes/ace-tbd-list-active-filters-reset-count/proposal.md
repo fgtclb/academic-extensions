@@ -17,7 +17,7 @@ its tags never render server-side.
   `settings.filter.showActiveFilters`, `settings.filter.showReset` and
   `settings.filter.showResultCount`, in the `settings.filter` namespace the
   filter configuration change (candidate `listings-08`) introduces.
-- The links use the GET URL shape of `ace-tbd-list-filter-get-urls`.
+- The links use the GET URL shape of `ace-723-list-filter-get-urls`.
 - Affected extensions:
   - `academic_partners` (`packages/fgtclb/academic-partners`), list and map;
   - `academic_projects` (`packages/fgtclb/academic-projects`), both lists;

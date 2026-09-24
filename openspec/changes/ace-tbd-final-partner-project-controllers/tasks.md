@@ -10,7 +10,7 @@
   `ace-tbd-program-psr14-events` and the partnership and B-ITE actions are
   otherwise covered; stop otherwise.
 - [ ] 1.3 Confirm the state of `ace-tbd-partner-list-pagination`,
-  `ace-tbd-list-filter-get-urls` and `ace-tbd-program-finder-element`, so
+  `ace-723-list-filter-get-urls` and `ace-tbd-program-finder-element`, so
   the changelog entries point only at what is shipped.
 
 ## 2. Architecture test
@@ -31,6 +31,14 @@
   `private readonly`.
 - [ ] 3.2 The same for `ProjectController`.
 - [ ] 3.3 The same for `ProgramController`.
+- [ ] 3.3a In all three list controllers, move the `ExtensionService` of the
+  filter redirect from `injectFilterRedirectExtensionService()` into the
+  constructor and make `redirectFilterSubmission()` private: both exist only
+  for subclasses (`ace-723-list-filter-get-urls`). Correct the subclass
+  bullet of the three `Feature-FilterSelectionsHaveAUrl.rst` entries, and
+  in `docs/architecture/class-design.md` the second legitimate case and the
+  re-counted `inject*()` methods. The design's statement that no controller
+  is documented as a subclassing point no longer holds for these three.
 - [ ] 3.4 The same for `DetailsController`, and drop its unread
   `DemandFactory` constructor argument.
 - [ ] 3.5 The same for `BiteJobsController`. The test from 2.1 turns green.

@@ -1,6 +1,6 @@
 ## 1. Prerequisites
 
-- [ ] 1.1 Confirm `ace-tbd-list-filter-get-urls`,
+- [ ] 1.1 Confirm `ace-723-list-filter-get-urls`,
   `ace-tbd-partner-list-pagination` and `ace-tbd-category-filter-route-aspect`
   are merged; take the argument names from the merged code, not from this
   design.

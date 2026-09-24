@@ -1,6 +1,6 @@
 ## 1. Prerequisites
 
-- [ ] 1.1 Confirm `ace-tbd-list-filter-get-urls` and the `listings-08` filter
+- [ ] 1.1 Confirm `ace-723-list-filter-get-urls` and the `listings-08` filter
   settings change are merged; adopt the final `settings.filter` namespace.
 
 ## 2. Filter arguments ViewHelper in category_types
