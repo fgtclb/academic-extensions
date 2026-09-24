@@ -14,7 +14,7 @@ otherwise, both assigned as `paginator` and `pagination`; its partial
 Its FlexForm is version-split (`Core13/Core14/List.xml`, ACE-560), but only
 because of a value picker; the pagination fields themselves are plain.
 
-This change depends on `ace-tbd-list-filter-get-urls` for the GET shape of
+This change depends on `ace-723-list-filter-get-urls` for the GET shape of
 filter and sorting.
 
 ## Goals / Non-Goals
@@ -35,7 +35,7 @@ filter and sorting.
 
 `PartnerDemand` gains `currentPage` (int, minimum 1); `DemandFactory` reads
 `demand[currentPage]` from the request. The filter redirect of
-`ace-tbd-list-filter-get-urls` never forwards `currentPage`, so a new filter
+`ace-723-list-filter-get-urls` never forwards `currentPage`, so a new filter
 submission starts at page one without extra code.
 
 Rejected: an action argument `int $currentPage`. The pagination links then

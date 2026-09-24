@@ -137,7 +137,7 @@ The `Breaking-` entries map each subclass purpose to its replacement.
   event: the plugin view event of `ace-tbd-generic-plugin-view-event`.
 - Pagination of the partner list: the FlexForm option of
   `ace-tbd-partner-list-pagination`.
-- Bookmarkable filter URLs: the redirect of `ace-tbd-list-filter-get-urls`.
+- Bookmarkable filter URLs: the redirect of `ace-723-list-filter-get-urls`.
 
 `ProgramController`, through the events of `ace-tbd-program-psr14-events`:
 

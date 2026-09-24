@@ -14,7 +14,7 @@ injection. `SlugHelper` has the same constructor
 and `sanitize()` on both versions.
 
 The value this aspect maps is the flat filter argument of
-`ace-tbd-list-filter-get-urls`: a comma separated uid list.
+`ace-723-list-filter-get-urls`: a comma separated uid list.
 
 ## Goals / Non-Goals
 
@@ -50,6 +50,15 @@ Like `PersistedPatternMapper`, the aspect declares itself static mappable: the
 value space is bounded, because `resolve()` only accepts uids of existing
 categories of the configured group. The enhancer can then drop the cache hash
 for the argument, which is the point of a readable URL.
+
+To be revisited before implementing: `ace-723-list-filter-get-urls` excludes
+the demand from the cache hash, so the filter argument needs no hash any more,
+and it did so because a signed demand let anybody create one page cache entry
+per combination of categories. A static mappable value becomes a static route
+argument, and the page cache identifier contains the static route arguments -
+bounded by the group, but still one entry per subset of its categories. The
+filter segment is probably better a plain, not static mappable, route
+variable.
 
 ### The slug is computed, the uid is the key
 

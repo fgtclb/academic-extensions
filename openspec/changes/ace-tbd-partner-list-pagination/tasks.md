@@ -1,6 +1,6 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Confirm `ace-tbd-list-filter-get-urls` is merged; the pagination
+- [ ] 1.1 Confirm `ace-723-list-filter-get-urls` is merged; the pagination
   links build on its GET shape.
 
 ## 2. Configuration

@@ -18,7 +18,7 @@ list should offer the same.
   `georgringer/numbered-pagination` is installed, previous/next links
   otherwise.
 - Pagination links keep the active filter and sorting, using the GET URL
-  shape of `ace-tbd-list-filter-get-urls`. A new filter submission starts at
+  shape of `ace-723-list-filter-get-urls`. A new filter submission starts at
   page 1.
 - The partner map is not paginated.
 - Behaviour is identical on TYPO3 v13 and v14.

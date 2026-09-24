@@ -11,25 +11,26 @@ subclass today.
 
 - A list plugin that receives a filter or sorting submission as POST answers
   with a `303 See Other` redirect to the same list, carrying the submitted
-  selection as GET arguments with a valid cache hash.
+  selection as GET arguments. The selection is read from the submitted form
+  alone, so a form posted to a filtered URL replaces its selection.
+- The selection is not part of the cache hash, so every filter URL of a list
+  shares one page cache entry instead of the redirect signing one per
+  submitted combination.
 - The redirect carries only the normalised selection: the category filter as
   one uid list, the sorting field and direction, and for projects the active
   state. Unknown or foreign category uids and form bookkeeping arguments are
   dropped.
 - Clearing a category the editor preselected stays cleared after the
   redirect; the editor's preselection applies only to the bare list URL.
-- A GET request with those arguments renders the filtered list exactly as the
-  POST did before.
-- Affected extensions:
-  - `academic_partners` (`packages/fgtclb/academic-partners`), list and map
-    plugins;
-  - `academic_projects` (`packages/fgtclb/academic-projects`), both list
-    plugins;
-  - `academic_programs` (`packages/fgtclb/academic-programs`), list plugin;
-  - `category_types` (`packages/fgtclb/typo3-category-types`), which gains
-    the reverse of its existing filter normalisation.
-- No template changes; overridden filter templates keep working.
-- Behaviour is identical on TYPO3 v13 and v14.
+- A GET of that URL renders the list the POST rendered before.
+- The shipped program route enhancer declares no default sorting any more, so
+  the redirect never ends on the bare page, where the preselection applies.
+- Affected: `academic_partners` (`packages/fgtclb/academic-partners`), list
+  and map; `academic_projects` (`packages/fgtclb/academic-projects`), both
+  lists; `academic_programs` (`packages/fgtclb/academic-programs`), list and
+  route enhancer; `category_types` (`packages/fgtclb/typo3-category-types`),
+  the reverse of its filter normalisation.
+- No template changes. Behaviour is identical on TYPO3 v13 and v14.
 
 ## Capabilities
 
@@ -47,11 +48,13 @@ None.
 
 ## Impact
 
-- The list actions of three extensions; the category filter normalisation in
-  `category_types`.
-- A filter POST now answers 303 instead of 200. Project JavaScript that posts
-  the form with `fetch()` and reads the HTML body must follow the redirect
-  (browsers and `fetch()` do so by default).
+- Each list extension adds its plugins' demand to the installation-wide
+  `FE.cacheHash.excludedParameters`.
+- A filter POST answers 303 instead of 200; script that reads the HTML body
+  of the POST must follow the redirect.
+- The program route enhancer generates `/title/asc` for the default sorting,
+  and `/last-updated` alone no longer resolves; 2.4 will be the first release
+  with a working copy.
 - No database schema, TCA or dependency changes.
 
 ## Non-goals
@@ -60,13 +63,12 @@ None.
   this change as separate changes.
 - Switching the forms to `method="get"`.
 - Changing which filters or sortings exist.
-- Backporting to branch `2`.
+- Backporting the redirect to branch `2`; only the route enhancer's
+  `defaults` are dropped there too, in a pull request of its own without an
+  OpenSpec change.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-09`). Two of the six analysed projects carry their own code for this
-today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-list-filter-get-urls` when the issue is filed after implementation.
-
-Relates to ACE-125.
+today. Filed after implementation as ACE-723, which relates to ACE-125.

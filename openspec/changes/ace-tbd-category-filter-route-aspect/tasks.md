@@ -1,6 +1,6 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Confirm `ace-tbd-list-filter-get-urls` is merged and the filter
+- [ ] 1.1 Confirm `ace-723-list-filter-get-urls` is merged and the filter
   argument is the flat comma list this aspect maps.
 
 ## 2. The aspect
