@@ -32,7 +32,7 @@ are `final` already.
   `ace-tbd-bite-jobs-request-result-events` for the B-ITE job list, and
   `ace-tbd-generic-plugin-view-event` for the actions none of those covers.
   Pagination and GET filter URLs of the partner list move to
-  `ace-tbd-partner-list-pagination` and `ace-723-list-filter-get-urls`.
+  `ace-727-partner-list-pagination` and `ace-723-list-filter-get-urls`.
 - An architecture test asserts that every plugin controller is `final`.
 - A `Breaking-` changelog entry per extension with a migration example from
   a subclass to an event listener.
@@ -74,7 +74,7 @@ None.
   partnership plugins, the program details plugin and additional view
   variables of the B-ITE job list are covered by none of the three, so
   `ace-tbd-generic-plugin-view-event` has to land first as well.
-- Lands after `ace-tbd-partner-list-pagination` and
+- Lands after `ace-727-partner-list-pagination` and
   `ace-723-list-filter-get-urls`, so the `Breaking-` entries point at
   shipped replacements.
 - No schema, TCA, template or dependency changes.

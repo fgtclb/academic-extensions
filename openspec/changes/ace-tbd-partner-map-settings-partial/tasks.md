@@ -18,7 +18,7 @@
   setup mapping; a functional rendering test that a site setting reaches the
   `data-zoom` attribute. Show it fails before the mapping exists.
 - [ ] 2.2 `settings.map.layout` in the map's FlexForm (`MapSettings.xml`,
-  created here if `ace-tbd-partner-list-pagination` has not landed); a
+  created here if `ace-727-partner-list-pagination` has not landed); a
   rendering test for the full width class and for its absence by default.
 - [ ] 2.3 `Partials/Partner/Map.html`; `Templates/Partner/Map.html` renders
   it. The existing `partnerMapPlugin*` functional tests stay green unchanged

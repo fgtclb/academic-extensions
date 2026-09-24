@@ -9,7 +9,7 @@
   the B-ITE list action, or that a details event has been added to
   `ace-tbd-program-psr14-events` and the partnership and B-ITE actions are
   otherwise covered; stop otherwise.
-- [ ] 1.3 Confirm the state of `ace-tbd-partner-list-pagination`,
+- [ ] 1.3 Confirm the state of `ace-727-partner-list-pagination`,
   `ace-723-list-filter-get-urls` and `ace-tbd-program-finder-element`, so
   the changelog entries point only at what is shipped.
 

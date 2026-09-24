@@ -15,8 +15,8 @@ list should offer the same.
   - a site setting for the number of page links, as `academic_persons` has.
 - With pagination enabled, the list shows one page of partners and a
   pagination navigation below it. Numbered page links are used when
-  `georgringer/numbered-pagination` is installed, previous/next links
-  otherwise.
+  `georgringer/numbered-pagination` is installed; otherwise the core
+  pagination links every page.
 - Pagination links keep the active filter and sorting, using the GET URL
   shape of `ace-723-list-filter-get-urls`. A new filter submission starts at
   page 1.
@@ -56,8 +56,6 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-11`). One of the six analysed projects carries its own code for this
-today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-partner-list-pagination` when the issue is filed after
-implementation.
+today. Filed after implementation as ACE-727.
 
 Relates to ACE-125.
