@@ -66,7 +66,8 @@ The public profile normaliser accepts the list and keeps only the values
 `position`, `functionType` and `organisationalUnit`; unknown values are
 dropped. `Position.html` renders each configured value of a contract in its
 own element, in order, inside the position line, and separates them with CSS.
-With `ace-tbd-settings-per-field-merge` a project sets only this list.
+Since the settings files merge per entry (ACE-711), a project sets only this
+list.
 
 Rejected: a new public element per field, which is too fine-grained for one
 line and would need structure changes in every project layout.
