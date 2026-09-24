@@ -287,6 +287,50 @@ the session cookie, so an unauthenticated request is sent through
 is the worked example: one data provider naming an endpoint per family, and one
 test per way a request is refused, so a new endpoint family is one line.
 
+## Submitting a rendered form
+
+A test of an Extbase form submits the form the page rendered, not a body
+assembled by hand. `FrontendPluginRenderingTrait::submitFrontendForm()` requests
+the page, finds the form by a class and collects its fields for the controls
+these forms use — checked boxes only, the selected and enabled options, no
+disabled controls or buttons, and `__referrer` and `__trustedProperties` as
+rendered, so Extbase checks the request hash as it does in production. The
+test replaces single values:
+
+```php
+$response = $this->submitFrontendForm('https://www.acme.com/home', 'academic-partners-filtersorting', [
+    'tx_academicpartners_list' => ['demand' => ['filterCollection' => ['region' => '2']]],
+]);
+$location = $this->assertSeeOtherWithCacheHash($response);
+$content = $this->renderFrontendPage($location);
+```
+
+A redirect is returned, not followed, so the test can assert the target before
+it requests it. A value the form does not offer can be sent the same way, which
+is what a crafted request does — but only for a field the form rendered: a
+replaced field the form does not have fails the test, so a renamed field is
+noticed. A body of its own goes through `frontendPostRequest()`. The list filter
+tests of `academic_partners`, `academic_projects` and `academic_programs` are
+the worked examples, see
+[List filter URLs](../architecture/list-filter-urls.md).
+
+The testing framework replaces the `pages` cache with a `NullBackend`, so no
+test is ever served a page from the page cache. A test about what the page
+cache shares restores the database backend for its class:
+
+```php
+$this->configurationToUseInTestInstance = $this->frontendPluginTestConfiguration([
+    'SYS' => ['caching' => ['cacheConfigurations' => ['pages' => [
+        'backend' => Typo3DatabaseBackend::class,
+    ]]]],
+]);
+```
+
+The list filter tests use it to show that two filter URLs served from one cached
+page each render their own selection. A request that renders the page caches it
+— the POST of a form included, before a non-cacheable plugin redirects — so such
+a test empties `cache_pages` before it counts entries.
+
 ## Version-gated tests
 
 Three mechanisms coexist, and they are not interchangeable:

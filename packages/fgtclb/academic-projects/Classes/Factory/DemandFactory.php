@@ -85,4 +85,35 @@ class DemandFactory
 
         return $demand;
     }
+
+    /**
+     * The reverse of {@see createDemandObject()}: the arguments of a list URL that
+     * demands the same selection, read from what the factory accepted rather than from
+     * the request. A category that is not a project category, a uid no category has, an
+     * active state the list does not offer and the referrer and request hash fields of
+     * the form are therefore never part of it.
+     *
+     * The sorting and the active state are always included, even when they equal the
+     * default. Only a request without any demand argument applies the content element's
+     * presets, so a visitor who cleared a preset category would otherwise get it back.
+     * The categories are one comma separated list, see
+     * {@see CategoryFilterNormalizer::toFilterArgument()}, and are left out when nothing
+     * is filtered.
+     *
+     * @return array<string, mixed>
+     */
+    public function createDemandArguments(ProjectDemand $demand): array
+    {
+        $arguments = [
+            'sortingField' => $demand->getSortingField(),
+            'sortingDirection' => $demand->getSortingDirection(),
+            'activeState' => $demand->getActiveState(),
+        ];
+        $filterArgument = $this->categoryFilterNormalizer->toFilterArgument($demand->getFilterCollection());
+        if ($filterArgument !== '') {
+            $arguments['filterCollection'] = ['categories' => $filterArgument];
+        }
+
+        return $arguments;
+    }
 }

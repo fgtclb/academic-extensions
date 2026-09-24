@@ -57,6 +57,12 @@ describing an intention as if it were the state.
   partner map's "no coordinates, not drawn" - is applied *after* the demand
   event, so a listener cannot take it away. Everything else it can: the demand
   *is* the query, so a listener widens as easily as it narrows.
+- A filter or sorting submission of a list plugin answers with a **`303` to a
+  GET URL** carrying the selection, built from the demand object rather than
+  the request. The sorting is always in it, because only the bare page applies
+  the content element's presets - which is also why no route enhancer may
+  declare `defaults` for it. The demand is kept out of the cache hash, so
+  filter URLs do not multiply page cache entries.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
@@ -89,6 +95,7 @@ describing an intention as if it were the state.
 | [Shared partials](shared-partials.md)                           | The Fluid partials `academic_base` ships for every extension, the root path key `-1` they are registered with, and which views register it.                                                |
 | [Overridable partials](overridable-partials.md)                 | How a template is cut into partials a project overrides one at a time, the escaping contract of a partial that renders a value, and where the classes go.                                  |
 | [List plugin events](list-plugin-events.md)                     | The demand and list events of the partner and project lists, the plugin context they carry, and the rules that are easy to get wrong.                                                      |
+| [List filter URLs](list-filter-urls.md)                         | The redirect of a filter submission, the demand in its URL, what is always carried and why, and why an enhancer must not declare defaults for it.                                          |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |

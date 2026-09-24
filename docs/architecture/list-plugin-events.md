@@ -27,6 +27,11 @@ two different questions:
 `ModifyProjectListEvent`, dispatched in the one `listAction()` that serves both
 project list plugins.
 
+Neither event fires for a submission of the filter and sorting form: the plugin
+answers the POST with a redirect before the demand event, and both events fire
+on the GET request that follows, with the selection in the query string rather
+than in the parsed body. See [List filter URLs](list-filter-urls.md).
+
 `academic_persons` has the same pair in a different place.
 `ModifyListProfilesEvent` is its list event and sits in the controller like
 these; its *narrowing* point is `ModifyProfileQueryEvent`, which hangs in the
