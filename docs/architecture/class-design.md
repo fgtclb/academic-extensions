@@ -124,12 +124,12 @@ Constructor injection with promoted properties is the default: 93 files declare
 known problem rather than a model: splitting the controller is ACE-507.
 
 **Method injection is used where a constructor is not available to take
-dependencies.** There are 10 `inject*()` methods across 6 files and **zero**
+dependencies.** There are 13 `inject*()` methods across 9 files and **zero**
 `@inject` annotations — the annotation form is not used at all, which is worth
 keeping true.
 
-The legitimate case is an abstract base class. Its constructor is part of the
-API of every class extending it, including classes in projects outside this
+The first legitimate case is an abstract base class. Its constructor is part of
+the API of every class extending it, including classes in projects outside this
 repository, so adding a dependency there breaks all of them. Method injection
 keeps the constructor free:
 
@@ -157,7 +157,18 @@ The 5 abstract classes and what each is for:
 | `academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php:21` | Extbase validator base pulling `AcademicPersonsSettings` |
 | `academic-persons-edit/Classes/Domain/Model/Dto/AbstractFormData.php:10`          | Base for the form-data DTOs                              |
 
-Method injection on a **concrete** class does not have this justification.
+The second legitimate case is a concrete class that projects subclass while it
+is not `final` yet. The list controllers of `academic_partners`,
+`academic_projects` and `academic_programs` take the `ExtensionService` through
+`injectFilterRedirectExtensionService()` for that reason: a project's controller
+subclass calls `parent::__construct()` with the arguments it knows, and a new
+constructor argument would break it. The method is `final` and named after its
+purpose, as core's own `injectInternalExtensionService()` of `ActionController`
+is, so a subclass cannot declare one of the same name by accident. Once the
+controllers are `final`, the service moves to the constructor.
+
+Apart from that, method injection on a **concrete** class does not have this
+justification.
 `academic-persons-edit/Classes/Service/ListSortingService.php` line 29 is
 existing code, not a template for new code — it is also cited in
 [Dependency injection](dependency-injection.md#where-the-codebase-does-not-comply)

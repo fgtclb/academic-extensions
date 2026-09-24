@@ -179,6 +179,9 @@ assertion — roughly sixty lines per test class before this trait existed
 | `removeWrittenSiteConfiguration()`  | Removes it again in `tearDown()`.                                       |
 | `requestFrontendPage()`             | Fires the sub request, returns the `ResponseInterface`.                 |
 | `renderFrontendPage()`              | The same, asserts `200`, returns the body as a string.                  |
+| `submitFrontendForm()`              | Renders a page and submits one of its POST forms with its fields.       |
+| `frontendPostRequest()`             | A form encoded POST request, for a body no rendered form produces.      |
+| `assertSeeOtherWithCacheHash()`     | Asserts a `303` to a URL of the site with a `cHash`, returns the URL.   |
 
 **When to use it.** In every test that renders a plugin. The class must also
 `use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait` and declare its own
@@ -200,7 +203,7 @@ protected function tearDown(): void
 }
 ```
 
-**The traps it exists for.** Three, all of them silent:
+**The traps it exists for.** Four, the first three of them silent:
 
 - `subrequestPageErrors` is switched on in the configuration. Without it the
   frontend swallows the exception of a sub request and answers a **rendered
@@ -213,6 +216,10 @@ protected function tearDown(): void
 - The two `add…ToLoad()` helpers exist because assigning `$testExtensionsToLoad`
   in a subclass drops everything the abstract test case declared, and the loss
   is not reported.
+- `frontendPostRequest()` writes the body itself. The testing framework
+  otherwise serialises the parsed body with `GuzzleHttp\Psr7\Query::build()`,
+  which cannot handle nested plugin arguments and emits an "Array to string
+  conversion" warning — a failing test under this suite's strictness.
 
 ---
 
