@@ -59,25 +59,28 @@ correctness — instead of reimplementing it.
 dispatch site ──▶ AfterProfileUpdateEvent ──▶ SyncChangesToTranslations ──▶ RecordSynchronizer ──▶ DataHandler
  (persons /                                     (persons_edit, gates)         (persons, @internal)
   persons_edit /
-  project hooks)
+  DataHandler hook)
 ```
 
 ### The event and its dispatch sites
 
 `FGTCLB\AcademicPersons\Event\AfterProfileUpdateEvent`
 (`packages/fgtclb/academic-persons/Classes/Event/AfterProfileUpdateEvent.php`)
-carries one thing: the **persisted default-language profile**. Listeners read
-the database, not the object, so a dispatch is only meaningful after
+carries the **persisted default-language profile**, and since 3.0 the site the
+profile belongs to and the origin of the update (`ProfileUpdateOrigin`, next to
+it). Both are optional constructor arguments, so a dispatcher written for 2.x
+keeps working and yields no site and the origin `Unknown`. Listeners read the
+database, not the object, so a dispatch is only meaningful after
 `persistAll()`, with a real uid, and never for a translation overlay.
 
-| Dispatch site                                                         | Context                                                                                                 | Notes                                                                         |
-|-----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| `AbstractProfileFactory::createProfileForUser()` (persons)            | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | The only in-repo dispatch between 2.0 and 3.0                                 |
-| `AbstractProfileFactory::updateProfileForUser()` (persons)            | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | Dispatches per profile the update ran through (ACE-490)                       |
-| `ProfileController::persistAndDispatchProfileUpdate()` (persons_edit) | Every JSON endpoint of the profile editing frontend that persists a change to the profile aggregate     | Restored with ACE-485; the six controllers it covered became one with ACE-262 |
-| Project-side `DataHandler` hooks                                      | Backend edits, in installations that wire it up themselves                                              | Outside this repository; the main production path                             |
+| Dispatch site                                                     | Context                                                                                                 | Origin, site                                          | Notes                                                                         |
+|-------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------|
+| `AbstractProfileFactory::createProfileForUser()` (persons)        | Profile auto-creation via the `academic:createprofiles` CLI command (login-time wiring is project-side) | `Creation`, none                                      | The only in-repo dispatch between 2.0 and 3.0                                 |
+| `AbstractProfileFactory::updateProfileForUser()` (persons)        | Profile updates from fe_users data via the `academic:updateprofiles` CLI command                        | `Synchronization`, none                               | Dispatches per profile the update ran through (ACE-490)                       |
+| `ProfileController::dispatchProfileUpdate()` (persons_edit)       | Every JSON endpoint of the profile editing frontend that persists a change to the profile aggregate     | `FrontendEditing`, the request's                      | Restored with ACE-485; the six controllers it covered became one with ACE-262 |
+| `DataHandlerHooks::processDatamap_afterAllOperations()` (persons) | Every DataHandler save: the backend form, and imports that write through the DataHandler                | `Backend` or `Import`, the site of the profile's page | Replaces the project-side hooks that did this before 3.0, see below           |
 
-The helper in `ProfileController`
+The helper `persistAndDispatchProfileUpdate()` in `ProfileController`
 (`packages/fgtclb/academic-persons-edit/Classes/Controller/ProfileController.php`)
 enforces the contract in one place: it calls `persistAll()` first, then skips
 the dispatch for a `null` profile, an unpersisted one, or a translation
@@ -114,13 +117,84 @@ registered in that extension's `Services.yaml`) turns the event into a
   positive or that the site does not define. An empty result makes
   `synchronize()` return before doing anything — an installation that leaves
   the setting empty has no translation sync, full stop.
-- **Site resolution**: the site is taken from the `site` attribute of
-  `$GLOBALS['TYPO3_REQUEST']` when present (a `NullSite` counts as absent),
-  falling back to `SiteFinder::getSiteByPageId()` on the profile's pid. No
-  site, no sync. The class's own docblock flags this as a design debt — the
-  event is dispatched from FE, BE and CLI contexts, so the site should travel
-  in the event instead of being reconstructed from globals; that stands as a
-  `@todo`, not as a resolved decision.
+- **Site resolution**: the site of the event wins. Only an event without one —
+  the commands, and dispatchers written for 2.x — falls back to the old
+  lookup: the `site` attribute of `$GLOBALS['TYPO3_REQUEST']` when present (a
+  `NullSite` counts as absent), then `SiteFinder::getSiteByPageId()` on the
+  profile's pid. No site, no sync. The global request is exactly what a
+  backend save must not use: it belongs to the backend module, whose site is
+  the page selected in the page tree, or none. An event of origin `Backend`
+  or `Import` without a site therefore skips the fallback: the hook has
+  looked the page up already and found no site.
+
+### Backend saves, imports and the guard against a second announcement
+
+Before 3.0 a backend save announced nothing, and projects dispatched the event
+from DataHandler hooks of their own, with a faked frontend request for the
+site. `DataHandlerHooks` of `academic_persons` does it now (ACE-725), in
+`processDatamap_afterAllOperations()`: after the whole run is written, it
+takes the profile keys of the datamap through `substNEWwithIDs`, keeps the
+live default-language rows, loads each with
+`ProfileRepository::findByUidForSynchronization()` and dispatches once per
+profile. Per record in `afterDatabaseOperations` was rejected: the DataHandler
+defers that hook for records on the remap stack, and it fires once per record
+and table rather than once per profile.
+
+The finder lifts the whole visibility window, like the frontend-user lookup of
+ACE-667, and pins the language aspect to the raw default-language row. Only a
+frontend request tells it from a narrower lookup: a backend request makes
+Extbase ignore every enable field, and without a request Extbase takes its
+backend path, which applies them all but drops every one of them as soon as
+any is ignored. Its hook test therefore runs in a frontend request.
+
+Three kinds of run are not announced:
+
+- **A nested instance** (`DataHandler::isOuterMostInstance()`). The
+  DataHandler writes a copied or localized record through an instance of its
+  own, and commands are not announced. The check reads the call stack, so it
+  also covers a run started from inside another run's hook — the
+  synchronisation that a backend save's own announcement starts.
+- **A run marked `ProfileWriteCorrelation::Internal`.** `RecordSynchronizer`
+  and `ProfileImageRelationWriter` set the mark after `start()`, and pass a
+  `ReferenceIndexUpdater` of their own that they flush afterwards: started
+  from a backend save's announcement, their run is nested, and the
+  DataHandler flushes the reference index of the outermost run only. One
+  registry is not theirs to flush: the nested-element registry of a
+  `localize` is reset at the end of an outermost `process_cmdmap()` only, so
+  a second localize of the same record into the same language within one
+  request is refused. The synchronisation localizes each record once. Neither is
+  nested when the announcement came from the frontend or a command, and both
+  write the default-language profile row: the synchronizer re-submits the
+  excluded columns once a translation exists, the image writer puts the
+  profile row into its datamap so the relation counter is re-derived. Without
+  the mark, a frontend edit would be announced twice. The repair wizard of
+  `academic_persons_edit` writes through the image writer and needs nothing of
+  its own.
+- **A run in a workspace.** Only live saves are announced.
+
+`ProfileWriteCorrelation::Import` marks an import instead: it is announced,
+with the origin `Import`. The mark is an **aspect** of the correlation id, and
+the scope stays random per run as the DataHandler makes it — the shape the
+core's redirects extension uses to recognise its own nested runs
+(`DataHandlerSlugUpdateHook::isNestedHookInvocation()`). A fixed scope was
+rejected: the history store derives the correlation id of every row from the
+scope, so every internal write of a record would share one history
+correlation id across all runs.
+
+Two listeners behave differently for DataHandler origins:
+
+- `UpdateProfileImageMetadata` returns for `Backend` and `Import`. The hook's
+  `afterDatabaseOperations` has written the metadata for those saves, and only
+  where a name or the image changed; the listener writes on every call.
+- `GenerateSlugForProfile` returns for `Backend`. The editor owns the slug in
+  the backend form, and the DataHandler has made it unique; regenerating it
+  would overwrite a hand-set slug on every save. For every other origin the
+  listener applies the column's `eval` rules as `DataHandler::checkValueForSlug()`
+  does (`unique`, `uniqueInSite`, `uniqueInPid`, in that order) — before 3.0 it
+  never did, and two profiles of the same name shared one slug. It reads the
+  row past the visibility restrictions, and leaves a slug alone that the name
+  still yields - the plain one in any case, a suffixed one while it is unique -
+  so neither existing duplicates nor suffixes are renumbered by a command run.
 
 ### The synchronizer
 
@@ -210,7 +284,7 @@ that differ in whether one exists:
 | Context               | Reached via                                                    | Backend user present?                 |
 |-----------------------|----------------------------------------------------------------|---------------------------------------|
 | Frontend Extbase save | Profile auto-create on login; the frontend editing controllers | No (unless a backend preview session) |
-| Backend               | Project-side DataHandler hooks dispatching the event           | Yes, with a real workspace            |
+| Backend               | The DataHandler hook of `academic_persons`                     | Yes, always live                      |
 | CLI                   | `academic:createprofiles` via a frontend-like bootstrap        | No                                    |
 
 `DataHandlerExecutionContext`
@@ -361,6 +435,9 @@ Stated so they are decisions, not surprises:
 - The changelog entries of the round:
   `academic-persons/Documentation/Changelog/3.0/Important-TranslationSyncRoutedThroughDataHandler.rst`,
   `academic-persons/Documentation/Changelog/3.0/Breaking-ProfileImageIsTranslatable.rst`,
+  `academic-persons/Documentation/Changelog/3.0/Important-BackendSavesAnnounceProfileUpdates.rst`,
+  `academic-persons/Documentation/Changelog/3.0/Feature-ProfileUpdateEventCarriesSiteAndOrigin.rst`,
+  `academic-persons-edit/Documentation/Changelog/3.0/Important-TranslationsFollowBackendSaves.rst`,
   `academic-contact4pages/Documentation/Changelog/3.0/Important-ContactsOfUntranslatedPagesAreNotLocalized.rst`
   and
   `academic-persons-edit/Documentation/Changelog/3.0/Feature-FrontendEditsSynchronizeTranslations.rst`.

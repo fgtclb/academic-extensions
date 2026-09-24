@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Twenty-six such fixture extensions exist, in nine of the twelve extensions.
+Twenty-nine such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -43,17 +43,20 @@ They sit next to the tests that use them, under
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
 | `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Partial overrides in two paths, a card passing a page, an old list template.  |
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |
+| `test_profile_update_recorder`         | `tests/test-profile-update-recorder`    | `academic-persons-edit` | A listener recording every profile update announcement, frontend included.    |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
 | `test_project_list_events`             | `tests/test-project-list-events`        | `academic-projects`     | Two listeners on the project demand and list events, and a list template.     |
 | `test_public_profile_settings`         | `tests/test-public-profile-settings`    | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                       |
+| `test_settings_copy`                   | `tests/test-settings-copy`              | `academic-persons`      | A copy of the contract fields that leaves the room out, removes one with `~`. |
+| `test_settings_removal`                | `tests/test-settings-removal`           | `academic-persons`      | A delta removing one profile field with `~` and copying nothing.              |
 | `test_upgrade_check`                   | `tests/test-upgrade-check`              | `academic-base`         | The extension whose templates the upgrade check compares an override with.    |
 | `test_upgrade_check_project`           | `tests/test-upgrade-check-project`      | `academic-base`         | A project site package overriding templates of the fixture above.             |
 | `test_upgrade_check_shared`            | `tests/test-upgrade-check-shared`       | `academic-base`         | A shared partial package the checked fixture extension requires.              |
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Nine of the twenty-six have a `Classes/` folder with a `TESTS\…` PSR-4 root;
-the other seventeen are pure resources.
+Ten of the twenty-nine have a `Classes/` folder with a `TESTS\…` PSR-4 root;
+the other nineteen are pure resources.
 
 A minimal one, complete:
 
