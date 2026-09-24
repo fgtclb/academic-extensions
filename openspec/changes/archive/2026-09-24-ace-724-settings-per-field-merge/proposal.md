@@ -3,15 +3,16 @@
 The persons settings files of all active packages are merged per entry since
 ACE-711 (`ace-711-settings-loader-deep-merge`): maps merge key by key, lists
 replace, and `~` removes an entry. A project therefore needs only a delta, and
-five of the six analysed projects still ship full copies of the upstream maps
-- ace-demo copies all of `profile` to drop `required` from `gender` and
-`validFrom` (ACE-536).
+five of the six analysed projects still ship full copies of the upstream
+settings - ace-demo copies all of `profile` to drop `required` from `gender`
+and `validFrom` (ACE-536). Four still use the pre-3.0 keys; migrating them
+prints complete maps, copies again.
 
-Those copies have to be shrunk by hand, and they are not harmless in the
-meantime. Under the per-entry merge an entry a copy leaves out is inherited
-from upstream: one project drops `streetNumber`, `country` and `middleName` by
-omission, and gets them back. Nothing tells the integrator which entries a
-copy leaves out, and nothing produces the delta the copy stands for.
+Those copies have to be shrunk by hand, and a copy in the 3.0 shape is not
+harmless in the meantime: under the per-entry merge an entry it leaves out is
+inherited from upstream instead of removed. Nothing tells the integrator which
+entries a copy leaves out, and nothing produces the delta the copy stands
+for.
 
 ## What Changes
 
@@ -63,10 +64,10 @@ None.
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-15`, with `persons-data-09` merged into it).
 
-Reduced on 2026-09-24, decided with the maintainer: the first draft proposed
-the per-entry merge as a breaking change of its own, and ACE-711 was merged
-before it with that merge, its breaking changelog and its documentation. What
-stayed is making the copies visible and printing their deltas.
+Reduced on 2026-09-24 with the maintainer: the first draft proposed the
+per-entry merge as a breaking change, and ACE-711 was merged before it with
+that merge, its changelog and its documentation. What stayed is making the
+copies visible and printing their deltas.
 
 Filed as ACE-724 after the implementation; it relates to ACE-536, ACE-109,
 ACE-161 and ACE-711. The slug keeps the name of the first draft, under which
