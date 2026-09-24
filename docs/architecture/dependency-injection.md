@@ -129,7 +129,7 @@ Measured with
 | `#[Autoconfigure]`   | 11    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
 | `#[Autowire]`        | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
-| `#[Exclude]`         | 15    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
+| `#[Exclude]`         | 16    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
 | `#[AsEventListener]` | 6     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 2     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 

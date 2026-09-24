@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-157 of the 274 classes are `final` (57 %). The distribution is not random: it
+159 of the 276 classes are `final` (58 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
@@ -29,8 +29,8 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 3       | 8       | 0        | 27 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 91      | 47      | 4        | 64 %     |
-| **Total**                                  | **157** | **112** | **5**    | **57 %** |
+| Everything else                            | 93      | 47      | 4        | 65 %     |
+| **Total**                                  | **159** | **112** | **5**    | **58 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 300 modifiers, of
-which 291 are constructor-promoted, across 95 files. The nine non-promoted
+`readonly` is used heavily, mostly on individual properties: 302 modifiers, of
+which 293 are constructor-promoted, across 95 files. The nine non-promoted
 declarations are the eight documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
@@ -72,7 +72,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 36:
+nothing**, and of an immutable data object. There are 38:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -96,7 +96,7 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 165   | An injected collaborator                          |
+| `private readonly`   | 167   | An injected collaborator                          |
 | `public readonly`    | 112   | A field of an immutable data object               |
 | `protected readonly` | 23    | Either, in classes with subclasses or older style |
 
@@ -118,7 +118,7 @@ required, not a deviation.
 ## Constructor injection, and the abstract class exception
 
 Constructor injection with promoted properties is the default: 93 files declare
-291 promoted `readonly` parameters. The fullest example by a wide margin is
+293 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.

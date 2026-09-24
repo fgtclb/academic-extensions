@@ -115,8 +115,10 @@ not usable while the container is built. Its test asks `StatusRegistry`
 directly: the class aggregating the providers differs between the core
 versions (`Report\Status\Status` on v13, `Service\StatusService` on v14),
 while the registry, the interface and `Status` itself are identical. The
-whole layer — migrator, command, status, the overlay call and the loader
-method — is removed in 4.0.
+legacy layer — the migrator, the overlay call, and the legacy halves of the
+command and the status — is removed in 4.0; the `--delta` mode and the
+override entries of the status stay, see
+[Finding what an override changes](#finding-what-an-override-changes).
 
 `LegacySettingsMigratorTest` covers the mapping against the shipped file,
 `LegacySettingsOverlayTest` pins that a legacy `readonly` state reaches the TCA
@@ -427,6 +429,51 @@ profile:
   firstName:
     validators: []
 ```
+
+### Finding what an override changes
+
+`Settings\SettingsOverrideComparator` (ACE-724) compares every package's file
+with the merge of the packages loaded before it — folded with
+`SettingsFileLoader::merge()`, so it cannot disagree with the runtime — and
+returns one `SettingsOverride` per package after the first: the delta, the
+entries the package removes with `~`, and the entries a copied map leaves out.
+It has two consumers:
+`academic:persons:settings:migrate --delta` prints them, and
+`Report\LegacySettingsStatus` adds one status per package that removes or
+omits something — a notice when it omits, an info when it only removes.
+
+- **The delta is exact.** Merged onto the earlier packages it gives the array
+  the package's own file gives, **key order included**; every test of the
+  comparator asserts that. An entry equal to the earlier one is dropped, a `~`
+  is kept only where an earlier package has the key, a map against a non-map is
+  kept whole, and so is a map whose delta would be a list (integer keys). The
+  order rule of the merge makes one case expensive: a map that names every
+  earlier key decides the order, so where dropping its unchanged keys would
+  change the merged order — it sorts them differently, or places a new key
+  among them — the delta restates every key that map names. A field that gained
+  `validators` between two shipped keys is therefore printed whole. A partial
+  map decides nothing, and its new keys are their own delta.
+- **An omission is a heuristic, and says so.** Below the top level, a map is a
+  copy when the package restates at least two of its earlier entries
+  unchanged, or when it sits inside a copy — a copied map used to replace
+  everything below it, so a cut-down `fields` map inside a restated `contracts`
+  is a copy whatever it restates. "Unchanged" is a subset in any key order: a
+  restated field that lacks a key upstream added after the copy was made, or
+  sorts its keys differently, still counts — that drift is what the report is
+  for. Every earlier entry a copy does not name is reported, and a single
+  restated entry does not make a copy. The rule errs both ways. A copy that
+  restates at most one entry of a map unchanged and sits in no other copy is
+  missed — `contracts.fields` cut down to the position alone. A delta written
+  verbosely, restating two unchanged keys next to its change, is taken for a
+  copy and gets a notice for its siblings, although `--delta` still shrinks it
+  to the change; the report then names more, never less. Relative thresholds
+  were tried and missed exactly the copies that leave out the most. The top
+  level is never a copy, because the top-level merge never removed an unnamed
+  top-level map. Omissions are never turned into `~` automatically: the entry
+  may be one the copy meant to drop or one upstream added after the copy was
+  made, and only the integrator can tell — writing `~` for all of them would
+  freeze the copy against every later upstream addition, which is the drift
+  the merge ended.
 
 There is no TypoScript and no site-set path — the site sets do not expose
 validations.
