@@ -43,7 +43,7 @@ None.
 ## Non-goals
 
 - Dispatching the profile update event for backend saves. That is the change
-  `ace-tbd-backend-save-announces-profile-update`, which depends on this one.
+  `ace-725-backend-save-announces-profile-update`, which depends on this one.
 - Changing how translations are synchronised, or which languages are allowed.
 - Creating translations for profiles that were already created without them.
   The next update run or edit of those profiles catches up, as it does today.

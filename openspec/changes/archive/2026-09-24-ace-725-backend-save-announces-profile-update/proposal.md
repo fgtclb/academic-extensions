@@ -10,8 +10,11 @@ from the global request.
 ## What Changes
 
 - A backend save of a default-language profile announces the update once per
-  profile and run. Translations and the slug follow, exactly as after a
-  frontend edit.
+  profile and run. Translations follow, exactly as after a frontend edit. The
+  slug stays as the editor left it in the backend form.
+- Wherever the slug is still regenerated from the name, after a marked
+  import, a frontend edit or a command, it is made unique in the profile's
+  folder, as the column's `uniqueInPid` asks.
 - The profile update event carries the site of the profile and where the
   update came from: creation, synchronisation, frontend editing, backend,
   import or unknown. Every existing dispatcher passes its origin.
@@ -68,6 +71,5 @@ Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-03`). Three of the six analysed projects are affected today:
 one carries a DataHandler hook with request faking, one a command-line
 workaround, and the third, whose import is DataHandler based, would get
-translations and slugs from this change without code of its own. No
-YouTrack issue is filed yet; the change is renamed to `ace-<NNN>-<slug>` when
-the issue is filed after implementation.
+translations and slugs from this change without code of its own. Filed after
+implementation as ACE-725.

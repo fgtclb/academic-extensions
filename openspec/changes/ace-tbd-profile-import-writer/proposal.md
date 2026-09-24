@@ -25,7 +25,7 @@ logic that could help.
   no longer supplied; manually created records and excluded profiles are
   never touched.
 - Every write goes through DataHandler, so history, workspaces rules and the
-  profile update announcement of `ace-tbd-backend-save-announces-profile-update`
+  profile update announcement of `ace-725-backend-save-announces-profile-update`
   apply. The writer marks its runs as an import, so each person is announced
   once, in the same request, with the origin import.
 
@@ -48,7 +48,7 @@ None.
   event, a retire policy.
 - Depends on `ace-tbd-import-identifier-lookup`,
   `ace-tbd-managed-fields-backend` and
-  `ace-tbd-backend-save-announces-profile-update`.
+  `ace-725-backend-save-announces-profile-update`.
 - Developer and integrator documentation, a 3.0 feature changelog.
 
 ## Non-goals

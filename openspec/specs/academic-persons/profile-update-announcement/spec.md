@@ -1,27 +1,50 @@
+# academic-persons/profile-update-announcement Specification
+
 ## Purpose
-
 Defines when `academic_persons` announces that a profile changed, so that
-translations, slugs and the listeners of installations follow every save,
-whether frontend or backend, exactly once.
+the translations and the listeners of installations follow every save,
+whether frontend or backend, exactly once, and what happens to the slug.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Backend saves of default-language profiles are announced
 The system SHALL announce a profile update after a live backend save that
 creates or changes a default-language profile, on TYPO3 v13 and v14. When
 `academic_persons_edit` is installed, the translations in the allowed
-languages and the slug SHALL follow that save.
+languages SHALL follow that save.
 
 #### Scenario: Editor changes the last name in the backend
 - **WHEN** a backend user changes the last name of a default-language
   profile and saves it, with one allowed translation language configured
-- **THEN** the translation carries the new last name and the profile slug is
-  regenerated
+- **THEN** the translation carries the new last name
 
 #### Scenario: Import writes through the DataHandler
 - **WHEN** an import running with a backend user writes three
   default-language profiles in one DataHandler run
 - **THEN** each of the three profiles is announced once and synchronised
+
+### Requirement: A backend save keeps the slug the editor left
+The system MUST NOT regenerate the slug of a profile after a backend save.
+After an import that marks its run as an import, a frontend edit and the
+frontend-user commands it SHALL regenerate the slug from the name, unique in
+the profile's folder, also for a hidden profile. A slug the name still yields
+SHALL stay as it is: the plain one in any case, a suffixed one while it is
+unique in the folder.
+
+#### Scenario: Editor set the slug by hand
+- **WHEN** a backend user sets the slug of a profile by hand, and later
+  changes and saves another field of it
+- **THEN** the profile keeps the slug the editor set
+
+#### Scenario: Import writes a second profile of the same name
+- **WHEN** an import marked as an import writes a profile "John Doe" into a
+  folder that already holds a profile with the slug `john-doe`
+- **THEN** the imported profile gets the slug `john-doe-1`
+
+#### Scenario: Two profiles already share a slug
+- **WHEN** two profiles "John Doe" in one folder both have the slug
+  `john-doe`, and one of them is updated by an import without a name change
+- **THEN** both keep the slug `john-doe`
 
 ### Requirement: Saves of translations alone are not announced
 The system MUST NOT announce a profile update when a backend save touches

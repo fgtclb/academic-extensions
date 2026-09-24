@@ -10,7 +10,7 @@ TCA `readOnly`, so read-only identifier columns are writable.
 The change needs three others first: the identifier lookup
 (`ace-tbd-import-identifier-lookup`), the managed-field resolver
 (`ace-tbd-managed-fields-backend`) and the announcement of DataHandler writes
-(`ace-tbd-backend-save-announces-profile-update`).
+(`ace-725-backend-save-announces-profile-update`).
 
 ## Goals / Non-Goals
 
@@ -39,8 +39,8 @@ updated, skipped and vetoed records and DataHandler errors.
 Matching uses `ImportedRecordFinder`; new records get `NEW` ids, relations to
 units and function types are resolved by identifier and left empty with a
 result message when missing. The whole tree is one datamap, run inside
-`runAsLiveBackendUser()` with the import correlation scope of
-`ace-tbd-backend-save-announces-profile-update` set. Existing rows get only
+`runAsLiveBackendUser()` with the import correlation mark of
+`ace-725-backend-save-announces-profile-update` set. Existing rows get only
 the columns `ManagedFieldResolver` names; `hidden` is never in a datamap for
 an existing row.
 
@@ -79,7 +79,7 @@ rejected: deprecating `academic_persons_sync` in a separate change now.
 
 Each person is announced once, in the same request, with the origin
 `Import`, because the writer runs its datamap under the import correlation
-scope. This is the decision of `ace-tbd-backend-save-announces-profile-update`
+mark. This is the decision of `ace-725-backend-save-announces-profile-update`
 on the same question, which this change depends on. One datamap per person
 means one announcement per person, the same cost as
 `academic:updateprofiles`.
