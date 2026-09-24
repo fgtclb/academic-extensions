@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 304 PHP files declaring 274
-classes, 10 interfaces, 12 traits and 8 enums do not follow one style yet.
+rather than describing an intention as a rule — 308 PHP files declaring 276
+classes, 10 interfaces, 12 traits and 10 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 302 modifiers, of
-which 293 are constructor-promoted, across 95 files. The nine non-promoted
+`readonly` is used heavily, mostly on individual properties: 308 modifiers, of
+which 299 are constructor-promoted, across 95 files. The nine non-promoted
 declarations are the eight documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
@@ -96,7 +96,7 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 167   | An injected collaborator                          |
+| `private readonly`   | 173   | An injected collaborator                          |
 | `public readonly`    | 112   | A field of an immutable data object               |
 | `protected readonly` | 23    | Either, in classes with subclasses or older style |
 
@@ -267,19 +267,21 @@ referenced it.
 
 ### Enums
 
-Eight, all backed, none pure
+Ten, all backed, none pure
 (`grep -rl '^enum' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes`):
 
-| Enum                                                               | Backing  |
-|--------------------------------------------------------------------|----------|
-| `academic-base/Classes/Upgrade/ConfigurationFindingKind.php:13`    | `string` |
-| `academic-base/Classes/Upgrade/TemplateOverrideFindingKind.php:14` | `string` |
-| `academic-bite-jobs/Classes/Enumeration/ListView.php:10`           | `string` |
-| `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:7`    | `int`    |
-| `academic-persons/Classes/Profile/ProfileActionType.php:14`        | `string` |
-| `academic-persons/Classes/Service/ContractDisplay.php:15`          | `string` |
-| `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12`  | `string` |
-| `academic-projects/Classes/Domain/Model/Dto/ActiveState.php:7`     | `string` |
+| Enum                                                                   | Backing  |
+|------------------------------------------------------------------------|----------|
+| `academic-base/Classes/Upgrade/ConfigurationFindingKind.php:13`        | `string` |
+| `academic-base/Classes/Upgrade/TemplateOverrideFindingKind.php:14`     | `string` |
+| `academic-bite-jobs/Classes/Enumeration/ListView.php:10`               | `string` |
+| `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:7`        | `int`    |
+| `academic-persons/Classes/DataHandling/ProfileWriteCorrelation.php:33` | `string` |
+| `academic-persons/Classes/Event/ProfileUpdateOrigin.php:19`            | `string` |
+| `academic-persons/Classes/Profile/ProfileActionType.php:14`            | `string` |
+| `academic-persons/Classes/Service/ContractDisplay.php:15`              | `string` |
+| `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12`      | `string` |
+| `academic-projects/Classes/Domain/Model/Dto/ActiveState.php:7`         | `string` |
 
 Back an enum whenever its values are persisted, passed through a request, or
 written into TCA — a pure enum cannot survive any of those round trips.

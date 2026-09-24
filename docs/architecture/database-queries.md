@@ -243,8 +243,8 @@ grep -rn "expr()->\(not\)\?[iI]n(.*\[[^]]*\])" --include='*.php' packages/fgtclb
 
 ### Call sites to copy from
 
-Ten classes under `packages/fgtclb/*/Classes/` use the quoting helpers, 18
-call sites in total:
+Seventeen classes under `packages/fgtclb/*/Classes/` use the quoting helpers,
+25 call sites in total:
 
 ```bash
 grep -rln "quoteArrayBasedValueListTo" packages/fgtclb/*/Classes/ | wc -l
