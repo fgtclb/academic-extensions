@@ -58,11 +58,11 @@
 
 ## 5. Definition of done
 
-- [ ] 5.1 `Build/Scripts/runTests.sh -t 13 -s composerUpdate`, then
+- [x] 5.1 `Build/Scripts/runTests.sh -t 13 -s composerUpdate`, then
   `lintPhp`, `cgl -n`, `phpstan`, `unit` and `functional` with `-t 13` green.
-- [ ] 5.2 The same for `-t 14` after its own `composerUpdate`.
-- [ ] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 5.4 `docs/` and the `Documentation/` changelog entries are part of the
+- [x] 5.2 The same for `-t 14` after its own `composerUpdate`.
+- [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 5.4 `docs/` and the `Documentation/` changelog entries are part of the
   change; `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 5.5 Archive the change as the last commit of the pull request and
+- [x] 5.5 Archive the change as the last commit of the pull request and
   verify the delta spec landed in `openspec/specs/`.
