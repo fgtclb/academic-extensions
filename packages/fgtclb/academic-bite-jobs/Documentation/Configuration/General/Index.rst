@@ -45,3 +45,34 @@ content element; it is not offered in the plugin settings. An empty value, or
 A content element saved before version 2.1 may still store a grouping setting of
 its own, which wins over the TypoScript. The upgrade wizard
 `academicBiteJobs_listViewFlexFormUpgradeWizard` removes it.
+
+..  _configuration-general-content-element-header:
+
+The header of the content element
+=================================
+
+The header and the subheader an editor enters on a :guilabel:`Job list`
+content element are rendered by the content element layout of the site, as for
+any other content element. The layouts of :guilabel:`EXT:fluid_styled_content`
+and of the bootstrap package do that, and the plugin renders no header of its
+own.
+
+A site whose content element layout renders no header, because its element
+templates render it instead, lets the plugin render it:
+
+..  code-block:: typoscript
+    :caption: TypoScript constants
+
+    plugin.tx_academicbitejobs.renderContentElementHeader = 1
+
+The template then renders the header partial of
+:guilabel:`EXT:fluid_styled_content` above the jobs, so the switch needs that
+extension installed; this extension does not require it. Do not switch it on
+where the layout renders the header: the header then appears twice.
+
+For the header layout :guilabel:`Default`, the partial takes the heading level
+from :typoscript:`plugin.tx_academicbitejobs.settings.defaultHeaderType`, which
+is mapped from the constant :typoscript:`styles.content.defaultHeaderType` of
+:guilabel:`EXT:fluid_styled_content`. A site that does not include the
+TypoScript of :guilabel:`EXT:fluid_styled_content` sets the setting itself;
+without it, such a header renders as an empty :html:`<header>` element.
