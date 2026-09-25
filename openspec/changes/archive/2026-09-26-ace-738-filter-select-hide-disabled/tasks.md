@@ -55,4 +55,4 @@ this branch is 2.1.
   change; `docs/`: nothing to change (3.2).
 - [x] 5.5 Commit message in TYPO3 Core format with `Resolves: ACE-738`, no
   attribution.
-- [ ] 5.6 Archive the change as the last commit of the pull request.
+- [x] 5.6 Archive the change as the last commit of the pull request.
