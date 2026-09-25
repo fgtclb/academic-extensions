@@ -25,9 +25,9 @@
 
 ## 4. Definition of done
 
-- [ ] 4.1 `Build/Scripts/runTests.sh -t 12 -s composerUpdate`, then
+- [x] 4.1 `Build/Scripts/runTests.sh -t 12 -s composerUpdate`, then
   `lintPhp`, `cgl -n`, `phpstan`, `unit` and `functional` with `-t 12` green.
-- [ ] 4.2 The same for `-t 13` after its own `composerUpdate`.
-- [ ] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 4.4 Commit as `[BUGFIX] ACE-729: <subject>` in TYPO3 Core format, and
+- [x] 4.2 The same for `-t 13` after its own `composerUpdate`.
+- [x] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 4.4 Commit as `[BUGFIX] ACE-729: <subject>` in TYPO3 Core format, and
   archive the change as the last commit of the pull request.
