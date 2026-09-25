@@ -613,8 +613,8 @@ done; the trait is used by one test class today.
 
 Four assertions for one icon identifier, plus one that derives the whole set
 from the TCA. Used by the `Tests/Functional/Imaging/RecordIconsTest.php` of every
-extension that ships record icons and by the category type registration test of
-`typo3-category-types`:
+extension that ships record icons, by the category type registration test of
+`typo3-category-types` and by the `FactIconsTest.php` of `academic-programs`:
 
 ```php
 use ColourSchemeAwareIconsTrait;

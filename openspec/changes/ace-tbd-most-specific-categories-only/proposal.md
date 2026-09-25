@@ -36,7 +36,7 @@ None.
   query, no schema change.
 - `academic_programs` (`packages/fgtclb/academic-programs`): one site
   setting and its constant; the facts rendering introduced by
-  `ace-tbd-program-facts-field-list` uses the reduced list when it is on.
+  `ace-733-program-facts-field-list` uses the reduced list when it is on.
 - List filtering is unaffected.
 
 ## Non-goals

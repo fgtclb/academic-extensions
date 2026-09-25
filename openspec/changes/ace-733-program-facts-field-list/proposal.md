@@ -15,7 +15,8 @@ register a pseudo icon for them.
   `prerequisites`.
 - A second site setting lists the facts of the program card in the list,
   defaulting to `degree`.
-- An empty list keeps today's output of each place exactly.
+- An empty list keeps the facts of each place and their order: the same
+  facts as today, rendered by the shared partial below.
 - Category type facts follow the category type order of the `programs`
   group wherever the list does not order them itself: the registry order
   today, the priority order once `ace-tbd-category-type-priority-order` has
@@ -60,7 +61,9 @@ None.
 - Builds on `ace-726-program-page-layout-and-sections`, whose facts section
   renders the new partial.
 - The credit points icon follows the icon naming of ACE-591 (pull request
-  #617), so this change is applied after that pull request has merged.
+  #617). That pull request was still open when this change was applied, so the
+  icon ships ahead of it, in its naming and file layout, and #617 extends the
+  licence file on its rebase.
 - Project overrides of `Partials/Program/Categories.html` stop rendering and
   have to move to the facts partials; the Breaking changelog describes the
   migration.
@@ -78,6 +81,4 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `programs-studyplan-05`). All six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-program-facts-field-list` when the issue is filed after
-implementation.
+this today. Filed after implementation as ACE-733, which names this change.

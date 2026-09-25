@@ -104,7 +104,7 @@ A chapter that depends on a change not released when the guide is written
 `ace-722-study-plan-decimal-credit-points`,
 `ace-704-study-plan-partials-js-contract`, `ace-703-study-plan-asset-switch`,
 `ace-666-keep-hidden-ctype-selectable`, `ace-tbd-legacy-typoscript-paths`,
-`ace-tbd-program-facts-field-list`,
+`ace-733-program-facts-field-list`,
 `ace-721-program-page-content-without-getcontent`,
 `ace-tbd-page-templates-sections-subtitle`,
 `ace-712-upgrade-check-template-overrides`,
@@ -149,14 +149,14 @@ its migration:
   `styles.content.getContent` defines it itself, and the guide shows the
   definition the sets carried;
 - a project override of `Partials/Program/Categories.html` moves to the facts
-  partial of `ace-tbd-program-facts-field-list`.
+  partial of `ace-733-program-facts-field-list`.
 
 The removals are owned by three changes, and the step links their `Breaking-`
 entries, which own the detail:
 
 - `ace-721-program-page-content-without-getcontent` removes the
   academic_programs set;
-- `ace-tbd-program-facts-field-list` removes `Partials/Program/Categories.html`;
+- `ace-733-program-facts-field-list` removes `Partials/Program/Categories.html`;
 - `ace-tbd-page-templates-sections-subtitle` removes the academic_partners and
   academic_projects sets and switches their page templates off
   `styles.content.getContent`.

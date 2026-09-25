@@ -51,7 +51,7 @@ None.
 
 - The category type registry of `category_types` and its cached type list.
 - Every frontend and backend output that iterates the types of a group.
-- The program facts of `ace-tbd-program-facts-field-list`, which replace
+- The program facts of `ace-733-program-facts-field-list`, which replace
   `Partials/Program/Categories.html` on `main` in 3.0, follow the same order
   when their field list is empty. Whichever change lands second extends the
   facts order test to priorities.

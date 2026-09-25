@@ -162,7 +162,7 @@ templates off `styles.content.getContent`
 (`ace-673-page-template-category-block` and
 `ace-tbd-page-templates-sections-subtitle`), so no page template loses the
 object it still renders. `Partials/Program/Categories.html` is removed by
-`ace-tbd-program-facts-field-list`, which replaces its last callers.
+`ace-733-program-facts-field-list`, which replaces its last callers.
 
 The three sets are identical, redefine a global object for every page of a
 site, and exist only for the page templates of the three extensions. Once

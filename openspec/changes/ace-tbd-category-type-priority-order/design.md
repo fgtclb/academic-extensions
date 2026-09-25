@@ -11,9 +11,10 @@ See `proposal.md` for the motivation. Verified on `main` at `6bea855a6`:
 - `CategoryCollectionFactory` hands `getCategoryTypeIdentifierByGroup()` to
   `CategoryCollection::setTypeIdentifiers()`, and
   `CategoryCollection::getAllCategoriesByType()` builds its result in that
-  order. The programs templates `Partials/Program/Categories.html`,
-  `Partials/Program/DemandCategories.html` and `Partials/Program/Item.html`
-  all iterate that result.
+  order. The programs template `Partials/Program/DemandCategories.html` and,
+  since `ace-733-program-facts-field-list`, the facts of the program page,
+  the details element and the program card
+  (`Classes/Service/ProgramFactsBuilder.php`) all iterate that result.
 - The page module category summary is the one consumer that does **not**.
   `Backend\PageCategorySummaryRenderer::rows()` takes its row order from
   `CategoryTypeRegistry::getGroupedCategoryTypes()[<group>]` and uses
@@ -113,7 +114,7 @@ for a need that a number covers.
 
 ### The program facts follow this order
 
-`ace-tbd-program-facts-field-list` replaces `Program/Categories` with a facts
+`ace-733-program-facts-field-list` replaces `Program/Categories` with a facts
 field list on `main` and decides that its category type facts follow the
 category type order wherever the list does not order them itself (an empty
 list, the default). It reads the order from
@@ -135,7 +136,7 @@ own order; that is the integrator's explicit choice, not a second rule.
   cache flush, like every change to a `CategoryTypes.yaml`.
 
 - [`Partials/Program/Categories.html` is removed on `main` in 3.0 by
-  `ace-tbd-program-facts-field-list`] → resolved there: its facts follow
+  `ace-733-program-facts-field-list`] → resolved there: its facts follow
   this order, see "The program facts follow this order". The program page
   facts scenario holds on both branches before and after that change.
 

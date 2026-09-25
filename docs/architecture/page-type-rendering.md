@@ -29,7 +29,10 @@ the two read different properties:
 So an extension registers every path twice, once per shape, and passes values
 to its template through `variables` — the one property both read the same way.
 A value through `settings` would arrive at a different path in each shape
-(`PageViewContentObject::render()`).
+(`PageViewContentObject::render()`). `dataProcessing` is read by both as well,
+so a value a processor needs goes in as an option of that processor: the
+program facts take their field list as `factsFields` of `program-data`, see
+[Program facts](program-facts.md).
 
 ## Path keys
 
@@ -98,7 +101,9 @@ differ per extension.
 
 The section renders `Program/Page/Header`, `Media`, `Facts` and `Content`, the
 rule of [Overridable partials](overridable-partials.md) applied to a page
-template: a project that changes one part overrides one file. The header
+template: a project that changes one part overrides one file. `Facts` renders
+`Program/Facts`, which the details content element and the program card render
+as well. The header
 renders one element of its own (`academic-programs-detail__header`), because it
 sits in a reversed flex column with the media and several siblings there would
 be reordered.
@@ -124,3 +129,5 @@ media, the content variable and the site package's partial root paths.
   partials.
 - [TypoScript and site sets](typoscript-and-site-sets.md) — where the page
   object refinement is delivered from.
+- [Program facts](program-facts.md) — the facts section of the program page and
+  its two siblings.
