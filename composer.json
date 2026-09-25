@@ -102,6 +102,7 @@
     "autoload-dev": {
         "psr-4": {
             "FGTCLB\\AcademicsDevSite\\Tests\\": "packages-dev/dev-site/Tests/",
+            "FGTCLB\\AcademicsMonorepoShared\\Tests\\": "packages-dev/monorepo-shared/Tests/",
             "FGTCLB\\TestingHelper\\Tests\\": "packages-dev/testing-helper/Tests/"
         }
     }

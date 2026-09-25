@@ -57,10 +57,9 @@ repository (`Build/php-cs-fixer/config.php:49-68`):
 So `bin/`, `core-13/`, `core-14/` and the PHP files at the repository root are
 **not** covered by this gate at all. A file placed there is never reformatted
 and never reported — which is worth knowing before concluding from a green run
-that the whole repository is formatted. `packages-dev/` *is* covered: the seed
-definition of `packages-dev/dev-site` carries PHP and tests of its own, and a
-formatting standard that stops at a directory boundary is one nobody
-remembers.
+that the whole repository is formatted. `packages-dev/` *is* covered: all three
+of its packages carry PHP and tests of their own, and a formatting standard
+that stops at a directory boundary is one nobody remembers.
 
 `ignoreVCSIgnored(true)` is what keeps generated trees out even when they sit
 inside a scanned directory, so the gate does not depend on the `exclude()` list
@@ -240,8 +239,10 @@ two `Tests/Functional/` globs on the same lines.)
 The first glob is `packages/*/*`, so it picks up the tests of **every**
 extension in the mono repository in one run — twelve of them under
 `packages/fgtclb/` today — and would pick up another vendor directory as well.
-The second collects `packages-dev/`, where the seed definition of
-`packages-dev/dev-site` carries tests of its own.
+The second collects `packages-dev/`, where all three packages carry tests of
+their own: the seed definition of `packages-dev/dev-site`, the scripts behind
+`runTests.sh -j` in `packages-dev/testing-helper`, and the `ext_emconf.php`
+dependency key check in `packages-dev/monorepo-shared`.
 
 **There is no per-extension PHPUnit configuration**, and adding one would be a
 step backwards: the extensions depend on each other, and a test suite that only
