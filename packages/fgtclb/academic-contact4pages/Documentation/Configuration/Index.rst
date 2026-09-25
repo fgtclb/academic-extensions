@@ -166,3 +166,84 @@ Nothing else is damaged: the :guilabel:`Constants` and :guilabel:`Setup` fields
 of the :sql:`sys_template` record, the page TSconfig of a page and the page
 TSconfig files selected on a page are all applied afterwards and still win. Use
 one mechanism per site and the question does not arise.
+
+..  _configuration-contact-list:
+
+The contact list
+================
+
+..  _configuration-group-by-role:
+
+Group by role
+-------------
+
+The :guilabel:`Configuration` tab of the content element offers
+:guilabel:`Group by role` (:typoscript:`settings.groupByRole`), switched on by
+default.
+
+*   **On** – one heading per role, each followed by the contacts of that role,
+    then the contacts without a role. A page on which no contact has a role
+    renders one list without headings.
+*   **Off** – all contacts in one list, in the order they are sorted on the
+    page. A contact with a role shows its role name above its card, in an
+    element with the class `academic-contacts4pages__role`.
+
+A content element saved before the option existed stores no value for it and
+reads the TypoScript default, so it keeps grouping:
+
+..  code-block:: typoscript
+    :caption: Shipped TypoScript setup
+
+    plugin.tx_academiccontacts4pages.settings.groupByRole = 1
+
+A value stored in the content element always wins over it.
+
+..  _configuration-contact-item-partial:
+
+The contact item partial
+------------------------
+
+:file:`Contacts/List.html` arranges the contacts and renders each of them
+through :file:`Contacts/Item.html` of this extension — in the role groups,
+below them and in the list that is not grouped. The grid column around the
+partial belongs to the list template. By default the partial renders the
+profile item of `EXT:academic_persons`.
+
+To change the card of a contact, override this partial rather than the list
+template:
+
+..  code-block:: typoscript
+    :caption: TypoScript setup
+
+    plugin.tx_academiccontacts4pages.view.partialRootPaths.20 = EXT:my_sitepackage/Resources/Private/Extensions/academic_contacts4pages/Partials/
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Argument
+        -   Holds
+    *   -   `contact`
+        -   The contact.
+    *   -   `role`
+        -   The role of the contact, or nothing when it has none.
+    *   -   `profile`
+        -   The profile behind the contract of the contact.
+    *   -   `contract`
+        -   The contract the contact names.
+    *   -   `settings`
+        -   The plugin settings.
+    *   -   `data`
+        -   The content element record, as an array.
+    *   -   `grouped`
+        -   Set when the contact renders below the heading of its role. The
+            default partial then renders the profile name one heading level
+            lower and leaves out the role name, which the heading already
+            shows.
+
+The list template also receives `record`, the content element as a record
+object. A project list template that renders the header partial of
+`EXT:fluid_styled_content` itself needs it on TYPO3 v14 — which only makes
+sense where the layout of the content element leaves the header out, as it is
+rendered twice otherwise. See
+:ref:`the changelog entry <important-contacts4pages-plugin-assigns-record-view-variable>`
+for what such a template needs.

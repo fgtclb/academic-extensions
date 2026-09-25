@@ -37,8 +37,9 @@ A contact record consists of:
     An optional role, for example :guilabel:`Dean's office` or
     :guilabel:`Student advisors`. Contacts sharing a role are rendered as a
     group below the name of that role, contacts without a role are rendered
-    below the grouped ones. Roles are records of their own and are usually kept
-    in a storage folder.
+    below the grouped ones — unless :guilabel:`Group by role` is switched off
+    in the content element, see :ref:`configuration-group-by-role`. Roles are
+    records of their own and are usually kept in a storage folder.
 
 ..  _introduction-frontend:
 
@@ -51,7 +52,10 @@ or directly in a page template through the data processor
 :php:`FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor`, which
 adds the contacts and their roles to the page rendering. Both display the person
 through the :file:`Profile/Item` partial of `EXT:academic_persons`, so contacts
-look like the profiles rendered by that extension.
+look like the profiles rendered by that extension. The content element renders
+it through a partial of its own, :file:`Contacts/Item.html`, which a site
+package overrides to change the card, see
+:ref:`configuration-contact-item-partial`.
 
 A contact is only shown while the person behind it is visible in the frontend.
 A contact whose contract is hidden, or whose profile is hidden, outside its

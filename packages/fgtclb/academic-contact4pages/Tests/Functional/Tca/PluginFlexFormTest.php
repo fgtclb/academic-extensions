@@ -33,4 +33,21 @@ final class PluginFlexFormTest extends AbstractAcademicContacts4PagesTestCase
     {
         $this->assertPluginFlexFormIsResolved($cType);
     }
+
+    /**
+     * A new content element groups its contacts by role, which is what every content
+     * element did before the option existed.
+     */
+    #[Test]
+    public function contactListOffersRoleGroupingSwitchedOnByDefault(): void
+    {
+        $fields = $this->resolvePluginFlexFormDataStructure('academiccontacts4pages_list')['sheets']['sDEF']['ROOT']['el'] ?? [];
+
+        $this->assertSame(
+            ['settings.showHiddenRecords', 'settings.groupByRole'],
+            array_map(strval(...), array_keys($fields)),
+        );
+        $this->assertSame('check', $fields['settings.groupByRole']['config']['type'] ?? null);
+        $this->assertSame('1', (string)($fields['settings.groupByRole']['config']['default'] ?? null));
+    }
 }

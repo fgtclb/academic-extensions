@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicContacts4pages\Controller;
 
+use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
 use FGTCLB\AcademicContacts4pages\Service\AddressRecordProvider;
 use FGTCLB\AcademicContacts4pages\Service\PageContactsProvider;
 use Psr\Http\Message\ResponseInterface;
@@ -13,6 +14,8 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 final class ContactsController extends ActionController
 {
+    use GetCurrentContentRecordMethodTrait;
+
     private PageContactsProvider $pageContactsProvider;
 
     public function injectPageContactsProvider(PageContactsProvider $pageContactsProvider): void
@@ -22,8 +25,9 @@ final class ContactsController extends ActionController
 
     public function listAction(): ResponseInterface
     {
+        $contentObjectRenderer = $this->getCurrentContentObjectRenderer();
         /** @var array<string, mixed> */
-        $contentElementData = $this->getCurrentContentObjectRenderer()?->data ?? [];
+        $contentElementData = $contentObjectRenderer?->data ?? [];
         $showHiddenRecords = (bool)($this->settings['showHiddenRecords'] ?? false);
 
         // Which contacts are shown, and the split into roles and role-less contacts, is
@@ -48,8 +52,11 @@ final class ContactsController extends ActionController
             $contact->setAddressRecordProvider($addressRecordProvider);
         }
 
+        // The shipped template does not need `record`. A project template that renders the
+        // header partial of EXT:fluid_styled_content does on TYPO3 v14, see the trait.
         $this->view->assignMultiple([
             'data' => $contentElementData,
+            'record' => $this->getCurrentContentRecord($contentObjectRenderer),
             'contacts' => $pageContacts->contacts,
             'roles' => $pageContacts->roles,
             'contactsWithoutRole' => $pageContacts->contactsWithoutRole,

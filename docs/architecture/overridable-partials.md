@@ -102,6 +102,21 @@ default would change every list that exists, and an empty partial is what
 removes one project's template copy without touching any other installation.
 It receives everything an implementation would need and is documented as a hook.
 
+## A list renders its items through a partial of its own
+
+A list template that arranges records — groups them, sorts them into columns —
+renders each record through an item partial of its own extension, even when
+that partial does nothing but render a shared one. `academic_contacts4pages`
+renders every contact through `Contacts/Item.html`, which by default only
+renders `Profile/Item` of `academic_persons`, so a project changes the contact
+card without copying the list template that groups the contacts.
+
+Overriding the extension's partial root path key `10` with a directory that
+lacks that partial does not break the element: Extbase adds the extension's own
+`Resources/Private/Partials/` as the lowest-priority path whenever the
+configured paths do not contain it (`ActionController::addDefaultPathToPaths()`,
+the same on v13 and v14).
+
 ## Tests
 
 The split is testable in one shape: a fixture extension that overrides **one**
