@@ -1,7 +1,7 @@
 ## Context
 
 See `proposal.md` for the motivation. The finder of
-`ace-tbd-program-finder-element` renders its selects server side, disables an
+`ace-91-program-finder-element` renders its selects server side, disables an
 option no program in storage carries, and posts to the program list.
 
 The repository discovers TypeScript sources per extension without any

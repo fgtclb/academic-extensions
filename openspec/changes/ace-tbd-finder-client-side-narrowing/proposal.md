@@ -5,7 +5,7 @@ reloading". Three projects, the ACE demo among them, get there today by
 reloading the whole finder through a topwire turbo frame on every change: a
 dependency and a request per selection, for data that fits into one
 attribute. A fourth plans the same. The finder element itself is proposed
-separately as `ace-tbd-program-finder-element`; this change adds the
+separately as `ace-91-program-finder-element`; this change adds the
 narrowing on top of it.
 
 ## What Changes
@@ -34,7 +34,7 @@ None.
 ### Modified Capabilities
 
 - `academic-programs/program-finder`: introduced by
-  `ace-tbd-program-finder-element`; gains the requirements for narrowing the
+  `ace-91-program-finder-element`; gains the requirements for narrowing the
   options, for the match count and for announcing it.
 
 ## Impact
@@ -64,4 +64,4 @@ yet; the change is renamed to `ace-<NNN>-finder-client-side-narrowing` when
 the issue is filed after implementation.
 
 Relates to ACE-91 (its "only possible combinations" criterion; the element
-itself is `ace-tbd-program-finder-element`).
+itself is `ace-91-program-finder-element`).

@@ -1,7 +1,7 @@
 # Backend select items
 
 Eleven classes across six extensions build the items of a backend select with an
-`itemsProcFunc`, and 22 fields are configured with one:
+`itemsProcFunc`, and 23 fields are configured with one:
 
 ```bash
 grep -rh 'itemsProcFunc' packages/*/*/Configuration | wc -l
@@ -167,12 +167,13 @@ The items of a TCA column are then at
 FlexForm element at
 `$result['processedTca']['columns']['pi_flexform']['config']['ds']['sheets'][$sheet]['ROOT']['el'][$element]['config']['items']`.
 
-Six test classes do this today:
+Seven test classes do this today:
 `academic-base/Tests/Functional/Backend/FormDataProvider/KeepCurrentContentTypeSelectableTest.php`,
 `academic-partners/Tests/Functional/Backend/FormEngine/PartnerSelectOrderTest.php`,
 the two `ContractSelectStorageScopeTest` of `academic-persons` and
-`academic-contact4pages`, `ViewModeFieldsTest` of `academic-persons` and
-`FilterTypesFieldTest` of `academic-programs`. All six give the request
+`academic-contact4pages`, `ViewModeFieldsTest` of `academic-persons`, and
+`FilterTypesFieldTest` and `ProgramFinderFieldsTest` of `academic-programs`.
+All seven give the request
 `SystemEnvironmentBuilder::REQUESTTYPE_BE` and a `normalizedParams` attribute,
 and set `$GLOBALS['LANG']`, because labels are resolved during the compile.
 

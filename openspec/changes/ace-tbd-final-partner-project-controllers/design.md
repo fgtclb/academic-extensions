@@ -147,7 +147,7 @@ The `Breaking-` entries map each subclass purpose to its replacement.
   categories, or adding view variables: a listener of
   `ModifyListProgramsEvent`.
 - An own finder action next to the list: the finder element of
-  `ace-tbd-program-finder-element` where it has shipped; until then a
+  `ace-91-program-finder-element` where it has shipped; until then a
   project keeps its own plugin with its own controller class, which is
   unaffected by this change.
 

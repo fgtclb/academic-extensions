@@ -10,7 +10,7 @@
   `ace-tbd-program-psr14-events` and the partnership and B-ITE actions are
   otherwise covered; stop otherwise.
 - [ ] 1.3 Confirm the state of `ace-727-partner-list-pagination`,
-  `ace-723-list-filter-get-urls` and `ace-tbd-program-finder-element`, so
+  `ace-723-list-filter-get-urls` and `ace-91-program-finder-element`, so
   the changelog entries point only at what is shipped.
 
 ## 2. Architecture test

@@ -26,9 +26,16 @@ preselected.
 - Submitting opens the target page with the selection applied to its program
   list, in the argument shape the list accepts today.
 - **BREAKING** for installations that register
-  `academicprograms_programfinder` themselves: they remove their
-  registration, or the type item and the plugin configuration exist twice.
-  Their stored elements and `settings.listPid` values keep working.
+  `academicprograms_programfinder` themselves, or declare a `finderAction()`
+  in a class extending or replacing the program controller: their
+  registration, loaded after this one, collides with it - it replaces or
+  duplicates the type item, replaces the data structure and, for the same
+  controller class, the finder action; a project `Program/Finder.html` is
+  rendered by the upstream action - until they remove it. Their stored
+  elements and `settings.listPid` values keep working.
+- A program list keeps its configured sorting when a filter submission
+  carries none: the finder submits none, and neither does the filter of a
+  list whose sorting select is hidden, which fell back to title ascending.
 
 Behaviour is identical on TYPO3 v13 and v14.
 
@@ -41,7 +48,8 @@ Behaviour is identical on TYPO3 v13 and v14.
 
 ### Modified Capabilities
 
-None.
+- `academic-programs/program-list-sorting`: a filter that carries no sorting
+  keeps the sorting configured for the list element.
 
 ## Impact
 
@@ -49,9 +57,9 @@ None.
   labels, page TSconfig and a site set in `academic_programs`.
 - The static page TSconfig and TypoScript registrations for installations
   without site sets.
-- Builds on the category type selection of candidate `programs-studyplan-09`
-  and on the site-wide filter type setting of
-  `ace-tbd-list-filter-order-visible-labels`.
+- Builds on the category type items provider, the filter type resolver and
+  the site-wide filter type setting of `ace-736-program-list-filter-types`
+  (candidate `programs-studyplan-09`, merged).
 
 ## Non-goals
 
@@ -68,8 +76,8 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `programs-studyplan-10`). Four of the six analysed projects carry their own
-code for this today, and a fifth plans the same. No YouTrack issue is filed
-yet; the change is renamed to `ace-<NNN>-program-finder-element` when the
-issue is filed after implementation.
+code for this today, and a fifth plans the same.
 
-Implements ACE-91 (together with `ace-tbd-finder-client-side-narrowing`).
+Implements part of ACE-91: the finder element. The rest of ACE-91 - options
+narrowed without a reload - is `ace-tbd-finder-client-side-narrowing`, so
+ACE-91 stays open after this change.

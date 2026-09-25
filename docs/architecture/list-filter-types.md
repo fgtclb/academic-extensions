@@ -3,8 +3,8 @@
 The filter form of a list offers one select per category type of its group.
 Which types it offers, and in which order, is the **filter types** setting:
 a comma-separated list of type identifiers under one key,
-`settings.filter.categoryTypes`. Today the program list reads it; the partner
-and project lists do not yet.
+`settings.filter.categoryTypes`. Today the program list and the program finder
+read it; the partner and project lists do not yet.
 
 What an integrator or editor sees is documented in the extension's
 `Documentation/Configuration/`. This page is about how the value is resolved and
@@ -12,10 +12,10 @@ the rules that are easy to get wrong.
 
 ## Two levels, one key
 
-| Level               | Where it is set                                                              |
-|---------------------|------------------------------------------------------------------------------|
-| The site            | Constant or site setting `plugin.tx_academicprograms.filter.categoryTypes`   |
-| One content element | FlexForm field `settings.filter.categoryTypes` of the `Program List` element |
+| Level               | Where it is set                                                                                  |
+|---------------------|--------------------------------------------------------------------------------------------------|
+| The site            | Constant or site setting `plugin.tx_academicprograms.filter.categoryTypes`                       |
+| One content element | FlexForm field `settings.filter.categoryTypes` of the `Program List` or `Program Finder` element |
 
 The constant is mapped to `settings.filter.categoryTypes` in `setup.typoscript`,
 and Extbase merges the FlexForm over it. An element that leaves its field empty
@@ -93,6 +93,48 @@ select drops a value that is not among its items silently — see
 Here that is intended: the next save removes the type the project removed.
 Until then the resolver ignores it.
 
+## The program finder
+
+The `Program Finder` element of `academic_programs` renders the same selects as
+a form of its own, one per filter type, and posts them to the list plugin of
+another page, see [List filter URLs](list-filter-urls.md#which-plugins). It
+reads the same key at both levels, through the same
+`ignoreFlexFormSettingsIfEmpty` entry — an entry in the extension block
+`plugin.tx_academicprograms` applies to every plugin of the extension, as long
+as no plugin block `plugin.tx_academicprograms_<plugin>` sets its own — and
+the same resolver.
+
+It differs in one place: with both levels empty it offers `degree,topic`, not
+every type with a category. A finder is a compact entry, and a dozen selects is
+no entry. The default is a constant of `ProgramController`, applied before the
+resolver, so a site without a `topic` category gets the degree alone.
+
+Its options come from `findAllApplicable()` over the programs in the finder's
+own storage (`pages`, `recursive`), not over the storage of the list it
+targets: `settings.listPid` names a page, which can carry several lists or
+none. The documentation tells integrators to point both at the same storage.
+
+It renders no form without a target it can link: `finderAction()` builds the
+list URI itself and hands an empty string on, because a hidden, deleted or
+access restricted page yields an empty URI without an exception, and a form with
+an empty `action` posts to the page it is on, where nothing answers it. Nor does
+it render one when none of its types has a category.
+
+The finder submits no sorting. `DemandFactory::createDemandObject()` applies the
+sorting of the element to a demand that carries none, so the target list keeps
+its configured sorting - which also fixes the filter form of a list whose
+sorting select is hidden. The selection replaces the list's preset categories,
+as the list's own filter does.
+
+A preselected category is a plain uid list in the FlexForm
+(`settings.preselectedCategories`, a `category` field with `oneToMany`, which
+FlexForms store inline). The controller turns it into one value per offered
+type — the first of a type in the stored list wins, which is the one higher in
+the category tree, because the tree element submits its checked nodes in tree
+order; and a disabled one preselects nothing, because
+a browser does not submit a disabled option and the visitor would search for
+something other than what the select shows.
+
 ## Tests
 
 | What                                         | Test                                                                                 |
@@ -102,6 +144,12 @@ Until then the resolver ignores it.
 | The field as FormEngine compiles it          | `academic-programs/Tests/Functional/Backend/FormEngine/FilterTypesFieldTest.php`     |
 | Order, fallback, site set, unoffered filters | `academic-programs/Tests/Functional/Plugins/AcademicProgramsListFilterTypesTest.php` |
 | The stored order after a save                | `academic-programs/Tests/Functional/Backend/FormEngine/FilterTypesFieldTest.php`     |
+| The finder: default, order, preselection     | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderTest.php`          |
+| The finder: target URI, sorting, no form     | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderTest.php`          |
+| The finder renders outside the page cache    | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderCachingTest.php`   |
+| A filter without sorting keeps the element's | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFilterUrlTest.php`       |
+| Which sorting a demand gets                  | `academic-programs/Tests/Functional/Factory/DemandFactorySortingTest.php`            |
+| The finder fields, and what a save stores    | `academic-programs/Tests/Functional/Backend/FormEngine/ProgramFinderFieldsTest.php`  |
 
 ## See also
 

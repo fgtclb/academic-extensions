@@ -21,11 +21,22 @@ other sites, on TYPO3 v13 and v14.
 
 ### Requirement: A target list page is required
 The program finder SHALL require the editor to choose exactly one target page
-that carries the program list.
+that carries the program list, and SHALL render no form without a target page
+it can link, on TYPO3 v13 and v14.
 
 #### Scenario: Saving without a target page
-- **WHEN** an editor saves a program finder without a target page
-- **THEN** the backend refuses the record and marks the field as required
+- **WHEN** an editor saves a program finder without a target page in the
+  backend form
+- **THEN** the form marks the field as required and does not save the record
+
+#### Scenario: A finder stored without a target page
+- **WHEN** a finder record without a target page reaches the frontend, for
+  example written by an import
+- **THEN** the finder renders no form
+
+#### Scenario: The target page is hidden later
+- **WHEN** the target page of a finder is hidden after the finder was saved
+- **THEN** the finder renders no form
 
 ### Requirement: The finder offers the configured category types in order
 The program finder SHALL render one select per configured category type, in
@@ -45,9 +56,15 @@ that order, when those are not set either.
 - **THEN** the finder shows a location select followed by a degree select
 
 #### Scenario: Configured types
-- **WHEN** the editor chooses the types location and degree, in that order
-- **THEN** the finder shows a location select followed by a degree select and
-  no other select
+- **WHEN** the editor chooses the types topic and degree, in that order
+- **AND** the site-wide filter types of the program list name location and
+  degree
+- **THEN** the finder shows a topic select followed by a degree select and no
+  other select
+
+#### Scenario: No offered type has a category
+- **WHEN** none of the category types the finder offers has a category
+- **THEN** the finder renders no form
 
 ### Requirement: Options follow the programs in storage
 Each select SHALL offer the categories of its type, and SHALL disable every
@@ -65,15 +82,31 @@ selected option of its select when the page loads.
 - **WHEN** the editor preselected the degree "Bachelor"
 - **THEN** the degree select shows "Bachelor" as selected
 
+#### Scenario: Two preselected categories of one type
+- **WHEN** the editor preselected the degrees "Master" and "Bachelor", and
+  "Master" is higher in the category tree
+- **THEN** the degree select shows "Master" as selected
+
+#### Scenario: A preselection the finder cannot show
+- **WHEN** the editor preselected a category of a type the finder does not
+  offer, or a category no program in the finder's storage carries
+- **THEN** no option is selected for it
+
 ### Requirement: Submitting opens the list pre-filtered
 Submitting the program finder SHALL open the target page, whose program list
-SHALL show only the programs matching every selected category and SHALL show
-the selection in its own filter.
+SHALL show only the programs matching every selected category, in the
+sorting configured for that list, and SHALL show the selection in its own
+filter unless the list hides it.
 
 #### Scenario: Visitor searches for Master programs
 - **WHEN** a visitor selects the degree "Master" and submits the finder
 - **THEN** the target page opens, its program list shows only Master
   programs, and its degree filter shows "Master"
+
+#### Scenario: The target list is sorted by title, descending
+- **WHEN** the target list is configured to sort by title, descending, and a
+  visitor submits the finder
+- **THEN** the list shows the matching programs by title, descending
 
 ### Requirement: Stored finder elements keep working
 Content elements an installation stored as program finders with a target list

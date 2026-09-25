@@ -23,6 +23,12 @@ of the plugin that rendered the form. The partner map renders the partial whose
 form names `action="list"`; its URL therefore points at the `List` plugin, but
 its fields carry the map's own namespace, and so does the redirect.
 
+The program finder of `academic_programs` has no redirect of its own. Its form
+posts into the namespace of `ProgramList` on the target page, in the per-type
+shape of the list's own form, `demand[filterCollection][<type>]`, and the
+list's redirect answers it. That shape is therefore a contract the finder
+depends on; see [List filter types](list-filter-types.md#the-program-finder).
+
 ## The demand in the URL
 
 ```text
@@ -60,11 +66,13 @@ link; the demand keys are the ones below.
   gives one selection one URL, and a later route enhancer one variable instead
   of one per category type.
 - **The sorting is always carried**, even when it equals the default. A factory
-  applies the content element's preset categories and sorting only when no
-  demand argument arrives at all. A visitor who clears a preset category gets a
-  URL without a filter — but with the sorting, so it is not the bare page, and
-  the preset stays cleared. The bare page URL is the one place the preset
-  applies.
+  applies the content element's preset categories only when no demand argument
+  arrives at all, and its sorting then and when a demand carries no sorting of
+  its own (in `academic_programs`: a list with a hidden sorting select, the
+  program finder). A visitor who clears a preset category gets a URL without a
+  filter — but with the sorting, so it is not the bare page, and the preset
+  stays cleared. The bare page URL is the one place the preset categories
+  apply.
 
 The keys arriving in alphabetical order is not a choice of this code: the page
 router sorts the query arguments recursively by key (`PageArguments`).
