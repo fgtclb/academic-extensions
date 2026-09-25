@@ -43,7 +43,7 @@ See `proposal.md` for the motivation. On main:
   plugin settings, the content element record, the submitted demand array or
   `null`, and the request. Dispatched in `listAction()` directly after
   `DemandFactory::createDemandObject()`, and in the finder action once
-  `ace-tbd-program-finder-element` lands.
+  `ace-91-program-finder-element` lands.
 - `ModifyListProgramsEvent`: the programs (`iterable`, with a setter), the
   demand, the applicable `CategoryCollection` (with a setter) and a map of
   additional view variables. Dispatched before `assignMultiple()`; the query

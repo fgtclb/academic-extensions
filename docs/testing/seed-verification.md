@@ -109,7 +109,7 @@ checkout — see
 ### `LegacyDeliveryTest` — the two trees against each other
 
 Renders every mirrored page of `/` and of `/legacy/`, in both languages, and
-compares the markup — 104 page pairs, which is the 56 pages of the mirror minus
+compares the markup — 106 page pairs, which is the 57 pages of the mirror minus
 the four the seed hides, times two languages.
 
 This is the only thing that catches the failure mode the `/legacy/` tree exists
@@ -117,7 +117,7 @@ to expose. `include_static_file` and `tsconfig_includes` are comma separated
 lists read with `trimExplode`; an entry that resolves to nothing contributes
 nothing, raises nothing, and the page still answers `200` with a piece of its
 configuration missing. No assertion on one tree can see that. Removing a single
-entry from the seeded `sys_template` record makes 84 of the 104 rendered page
+entry from the seeded `sys_template` record made 84 of the then 104 rendered page
 pairs differ.
 
 What is normalised away is listed in the test, one comment per rule, and it is
@@ -159,6 +159,22 @@ versions 15 and 16.
 `constants.typoscript`, a `setup.typoscript` **or** an `include_static_file.txt`
 — the aggregate folders of the academic extensions hold nothing but the third
 one.
+
+## Two checks of the YAML itself
+
+Two unit tests in
+[`packages-dev/dev-site/Tests/Unit/`](../../packages-dev/dev-site/Tests/Unit)
+look at the definition without importing it:
+
+- `GeneratedLegacyScenarioTest` runs `generateLegacyScenario.php --check`, so a
+  `Scenario.yaml` changed without regenerating `ScenarioLegacy.yaml` fails.
+- `CategoryVariantTypeTest` asserts that every language variant of a category
+  repeats the `type` of its original. `sys_category.type` is not
+  `l10n_mode: exclude`, so a variant without it is stored as `default`, and the
+  language overlay of the category repository then gives the category that type
+  in the translated language: the German categories of the seed had lost their
+  types that way, and no German list offered a category filter. Nothing else
+  reports it - the manifest measures what the seed says, and it said nothing.
 
 ## Why the manifest and the snapshot can agree at all
 

@@ -31,7 +31,7 @@
 #
 # The storage folders of "/data" are not mirrored at all. Mirroring a folder
 # whose records are shared leaves an empty folder in the backend that looks like
-# it should hold something, so "/" has 65 pages and "/legacy/" has 56.
+# it should hold something, so "/" has 66 pages and "/legacy/" has 57.
 #
 # UIDS
 #
@@ -2248,6 +2248,72 @@ entities:
                                                   <value index="vDEF">0</value>
                                               </field>
                                               <field index="settings.showHiddenRecords">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                          </language>
+                                      </sheet>
+                                  </data>
+                              </T3FlexForms>
+            - self:
+                  id: 1253
+                  title: 'Program finder'
+                  slug: '/programs/finder'
+              languageVariants:
+                - self:
+                      id: 1753
+                      language: 1
+                      title: 'Studiengangsfinder'
+                      slug: '/studiengaenge/finder'
+              entities:
+                content:
+                  - self:
+                        id: 1064
+                        CType: 'academicprograms_programfinder'
+                        header: 'Find your programme'
+                        header_layout: 2
+                        pages: '1250'
+                        recursive: 1
+                        pi_flexform: |
+                          <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                          <T3FlexForms>
+                              <data>
+                                  <sheet index="sDEF">
+                                      <language index="lDEF">
+                                          <field index="settings.listPid">
+                                              <value index="vDEF">1251</value>
+                                          </field>
+                                          <field index="settings.filter.categoryTypes">
+                                              <value index="vDEF"></value>
+                                          </field>
+                                          <field index="settings.preselectedCategories">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                      </language>
+                                  </sheet>
+                              </data>
+                          </T3FlexForms>
+                    languageVariants:
+                      - self:
+                            id: 1564
+                            language: 1
+                            CType: 'academicprograms_programfinder'
+                            header: 'Finde deinen Studiengang'
+                            header_layout: 2
+                            pages: '1250'
+                            recursive: 1
+                            pi_flexform: |
+                              <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                              <T3FlexForms>
+                                  <data>
+                                      <sheet index="sDEF">
+                                          <language index="lDEF">
+                                              <field index="settings.listPid">
+                                                  <value index="vDEF">1251</value>
+                                              </field>
+                                              <field index="settings.filter.categoryTypes">
+                                                  <value index="vDEF"></value>
+                                              </field>
+                                              <field index="settings.preselectedCategories">
                                                   <value index="vDEF">1</value>
                                               </field>
                                           </language>

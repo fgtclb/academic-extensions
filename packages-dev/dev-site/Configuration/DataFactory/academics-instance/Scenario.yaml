@@ -2221,6 +2221,12 @@ entities:
                       title: 'Daten · Kategorien'
                       slug: '/data/categories'
                       doktype: 254
+              # Every language variant repeats the "type" of its original.
+              # "sys_category.type" is not "l10n_mode: exclude": a variant without
+              # it is stored as "default", and the overlay of the category
+              # repository then reads that type in German - no German list offered
+              # a category filter until the variants stated it. The unit test
+              # "CategoryVariantTypeTest" of this package checks it.
               entities:
                 category:
                   - self:
@@ -2231,6 +2237,7 @@ entities:
                       - self:
                             id: 501
                             language: 1
+                            type: 'degree'
                             title: 'Bachelor of Engineering'
                   - self:
                         id: 2
@@ -2240,6 +2247,7 @@ entities:
                       - self:
                             id: 502
                             language: 1
+                            type: 'degree'
                             title: 'Master of Science'
                   - self:
                         id: 3
@@ -2249,6 +2257,7 @@ entities:
                       - self:
                             id: 503
                             language: 1
+                            type: 'program_type'
                             title: 'Vollzeit'
                   - self:
                         id: 4
@@ -2258,6 +2267,7 @@ entities:
                       - self:
                             id: 504
                             language: 1
+                            type: 'program_type'
                             title: 'Teilzeit'
                   - self:
                         id: 5
@@ -2267,6 +2277,7 @@ entities:
                       - self:
                             id: 505
                             language: 1
+                            type: 'teaching_language'
                             title: 'Deutsch'
                   - self:
                         id: 6
@@ -2276,6 +2287,7 @@ entities:
                       - self:
                             id: 506
                             language: 1
+                            type: 'teaching_language'
                             title: 'Englisch'
                   - self:
                         id: 7
@@ -2285,6 +2297,7 @@ entities:
                       - self:
                             id: 507
                             language: 1
+                            type: 'topic'
                             title: 'Informatik'
                   - self:
                         id: 8
@@ -2294,6 +2307,7 @@ entities:
                       - self:
                             id: 508
                             language: 1
+                            type: 'topic'
                             title: 'Nachhaltigkeit'
                   - self:
                         id: 9
@@ -2303,6 +2317,7 @@ entities:
                       - self:
                             id: 509
                             language: 1
+                            type: 'department'
                             title: 'Fachbereich Web Engineering'
                   - self:
                         id: 10
@@ -2312,6 +2327,7 @@ entities:
                       - self:
                             id: 510
                             language: 1
+                            type: 'admission_restriction'
                             title: 'Zulassungsfrei'
                   - self:
                         id: 11
@@ -2321,6 +2337,7 @@ entities:
                       - self:
                             id: 511
                             language: 1
+                            type: 'application_period'
                             title: 'Wintersemester'
                   - self:
                         id: 12
@@ -2330,6 +2347,7 @@ entities:
                       - self:
                             id: 512
                             language: 1
+                            type: 'begin_program'
                             title: 'Beginn im Wintersemester'
                   - self:
                         id: 13
@@ -2339,6 +2357,7 @@ entities:
                       - self:
                             id: 513
                             language: 1
+                            type: 'costs'
                             title: 'Gebührenfrei'
                   - self:
                         id: 14
@@ -2348,6 +2367,7 @@ entities:
                       - self:
                             id: 514
                             language: 1
+                            type: 'paying'
                             title: 'Semesterbeitrag'
                   - self:
                         id: 15
@@ -2357,6 +2377,7 @@ entities:
                       - self:
                             id: 515
                             language: 1
+                            type: 'standard_period'
                             title: 'Sechs Semester'
                   - self:
                         id: 16
@@ -2366,6 +2387,7 @@ entities:
                       - self:
                             id: 516
                             language: 1
+                            type: 'location'
                             title: 'Campus Mönchengladbach'
                   - self:
                         id: 17
@@ -2375,6 +2397,7 @@ entities:
                       - self:
                             id: 517
                             language: 1
+                            type: 'competence_field'
                             title: 'Barrierefreiheit'
                   - self:
                         id: 18
@@ -2384,6 +2407,7 @@ entities:
                       - self:
                             id: 518
                             language: 1
+                            type: 'competence_field'
                             title: 'Data Engineering'
                   - self:
                         id: 19
@@ -2393,6 +2417,7 @@ entities:
                       - self:
                             id: 519
                             language: 1
+                            type: 'cooperation'
                             title: 'Regionale Industrie'
                   - self:
                         id: 20
@@ -2402,6 +2427,7 @@ entities:
                       - self:
                             id: 520
                             language: 1
+                            type: 'funding_partner'
                             title: 'Bundesministerium'
                   - self:
                         id: 21
@@ -2411,6 +2437,7 @@ entities:
                       - self:
                             id: 521
                             language: 1
+                            type: 'department'
                             title: 'Fachbereich Data Science'
                   - self:
                         id: 22
@@ -2420,6 +2447,7 @@ entities:
                       - self:
                             id: 522
                             language: 1
+                            type: 'region'
                             title: 'Nordrhein-Westfalen'
                   - self:
                         id: 23
@@ -2429,6 +2457,7 @@ entities:
                       - self:
                             id: 523
                             language: 1
+                            type: 'region'
                             title: 'Rheinland-Pfalz'
                   - self:
                         id: 24
@@ -2438,6 +2467,7 @@ entities:
                       - self:
                             id: 524
                             language: 1
+                            type: 'partner_type'
                             title: 'Hochschule'
                   - self:
                         id: 25
@@ -2447,6 +2477,7 @@ entities:
                       - self:
                             id: 525
                             language: 1
+                            type: 'collaboration_type'
                             title: 'Gemeinsame Forschung'
                   - self:
                         id: 26
@@ -2456,6 +2487,7 @@ entities:
                       - self:
                             id: 526
                             language: 1
+                            type: 'sdg'
                             title: 'Hochwertige Bildung'
                   - self:
                         id: 27
@@ -2465,6 +2497,7 @@ entities:
                       - self:
                             id: 527
                             language: 1
+                            type: 'default'
                             title: 'Angestellte'
                   - self:
                         id: 28
@@ -2474,6 +2507,7 @@ entities:
                       - self:
                             id: 528
                             language: 1
+                            type: 'default'
                             title: 'Freiberuflich'
             # The one folder the seeded editor group may not see: it keeps
             # "perms_groupid: 0" while every other page of the seed hands the
@@ -4696,6 +4730,76 @@ entities:
                                       </sheet>
                                   </data>
                               </T3FlexForms>
+            # The program finder: the default selects (degree, then topic), the
+            # Bachelor of Engineering preselected, the storage of the list, and
+            # the list page above as its target. Its preselection is a plain uid
+            # list in the FlexForm, so unlike the preset list it can be seeded.
+            - self:
+                  id: 253
+                  title: 'Program finder'
+                  slug: '/programs/finder'
+              languageVariants:
+                - self:
+                      id: 753
+                      language: 1
+                      title: 'Studiengangsfinder'
+                      slug: '/studiengaenge/finder'
+              entities:
+                content:
+                  - self:
+                        id: 64
+                        CType: 'academicprograms_programfinder'
+                        header: 'Find your programme'
+                        header_layout: 2
+                        pages: '250'
+                        recursive: 1
+                        pi_flexform: |
+                          <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                          <T3FlexForms>
+                              <data>
+                                  <sheet index="sDEF">
+                                      <language index="lDEF">
+                                          <field index="settings.listPid">
+                                              <value index="vDEF">251</value>
+                                          </field>
+                                          <field index="settings.filter.categoryTypes">
+                                              <value index="vDEF"></value>
+                                          </field>
+                                          <field index="settings.preselectedCategories">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                      </language>
+                                  </sheet>
+                              </data>
+                          </T3FlexForms>
+                    languageVariants:
+                      - self:
+                            id: 564
+                            language: 1
+                            CType: 'academicprograms_programfinder'
+                            header: 'Finde deinen Studiengang'
+                            header_layout: 2
+                            pages: '250'
+                            recursive: 1
+                            pi_flexform: |
+                              <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                              <T3FlexForms>
+                                  <data>
+                                      <sheet index="sDEF">
+                                          <language index="lDEF">
+                                              <field index="settings.listPid">
+                                                  <value index="vDEF">251</value>
+                                              </field>
+                                              <field index="settings.filter.categoryTypes">
+                                                  <value index="vDEF"></value>
+                                              </field>
+                                              <field index="settings.preselectedCategories">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                          </language>
+                                      </sheet>
+                                  </data>
+                              </T3FlexForms>
             # The rich one: every extension column filled, nine categories, a
             # media file, a contact of its own and a second content element -
             # a plugin of another extension on a record page is the composition
@@ -6500,7 +6604,7 @@ entities:
           pagetypes_select: '1,3,4,6,7,20,30,40,199,254'
           tables_select: 'pages,tt_content,sys_category,sys_file_reference,tx_academiccontacts4pages_domain_model_contact,tx_academiccontacts4pages_domain_model_role,tx_academicjobs_domain_model_job,tx_academicpartners_domain_model_partnership,tx_academicpartners_domain_model_role,tx_academicpersons_domain_model_address,tx_academicpersons_domain_model_contract,tx_academicpersons_domain_model_email,tx_academicpersons_domain_model_function_type,tx_academicpersons_domain_model_location,tx_academicpersons_domain_model_organisational_unit,tx_academicpersons_domain_model_phone_number,tx_academicpersons_domain_model_profile,tx_academicpersons_domain_model_profile_information,tx_academicstudyplan_domain_model_category,tx_academicstudyplan_domain_model_module,tx_academicstudyplan_domain_model_semester'
           tables_modify: 'pages,tt_content,sys_category,sys_file_reference,tx_academiccontacts4pages_domain_model_contact,tx_academiccontacts4pages_domain_model_role,tx_academicjobs_domain_model_job,tx_academicpartners_domain_model_partnership,tx_academicpartners_domain_model_role,tx_academicpersons_domain_model_address,tx_academicpersons_domain_model_contract,tx_academicpersons_domain_model_email,tx_academicpersons_domain_model_function_type,tx_academicpersons_domain_model_location,tx_academicpersons_domain_model_organisational_unit,tx_academicpersons_domain_model_phone_number,tx_academicpersons_domain_model_profile,tx_academicpersons_domain_model_profile_information,tx_academicstudyplan_domain_model_category,tx_academicstudyplan_domain_model_module,tx_academicstudyplan_domain_model_semester'
-          explicit_allowdeny: 'tt_content:CType:academicbitejobs_list,tt_content:CType:academiccontacts4pages_list,tt_content:CType:academicjobs_detail,tt_content:CType:academicjobs_list,tt_content:CType:academicjobs_newjobform,tt_content:CType:academicpartners_list,tt_content:CType:academicpartners_map,tt_content:CType:academicpartners_partnershipslist,tt_content:CType:academicpartners_partnershipsteaser,tt_content:CType:academicpersons_card,tt_content:CType:academicpersons_detail,tt_content:CType:academicpersons_list,tt_content:CType:academicpersons_listanddetail,tt_content:CType:academicpersons_selectedcontracts,tt_content:CType:academicpersons_selectedprofiles,tt_content:CType:academicpersonsedit_profileediting,tt_content:CType:academicprograms_programdetails,tt_content:CType:academicprograms_programlist,tt_content:CType:academicprojects_projectlist,tt_content:CType:academicprojects_projectlistsingle,tt_content:CType:academic_study_plan'
+          explicit_allowdeny: 'tt_content:CType:academicbitejobs_list,tt_content:CType:academiccontacts4pages_list,tt_content:CType:academicjobs_detail,tt_content:CType:academicjobs_list,tt_content:CType:academicjobs_newjobform,tt_content:CType:academicpartners_list,tt_content:CType:academicpartners_map,tt_content:CType:academicpartners_partnershipslist,tt_content:CType:academicpartners_partnershipsteaser,tt_content:CType:academicpersons_card,tt_content:CType:academicpersons_detail,tt_content:CType:academicpersons_list,tt_content:CType:academicpersons_listanddetail,tt_content:CType:academicpersons_selectedcontracts,tt_content:CType:academicpersons_selectedprofiles,tt_content:CType:academicpersonsedit_profileediting,tt_content:CType:academicprograms_programdetails,tt_content:CType:academicprograms_programfinder,tt_content:CType:academicprograms_programlist,tt_content:CType:academicprojects_projectlist,tt_content:CType:academicprojects_projectlistsingle,tt_content:CType:academic_study_plan'
           non_exclude_fields: 'pages:link,pages:tx_academiccontacts4pages_contacts,pages:tx_academicpartners_partnerships,pages:tx_academicprojects_budget,pages:tx_academicprojects_end_date,pages:tx_academicprojects_funders,pages:tx_academicprojects_project_title,pages:tx_academicprojects_short_description,pages:tx_academicprojects_start_date,tx_academiccontacts4pages_domain_model_contact:contract,tx_academiccontacts4pages_domain_model_contact:email_address,tx_academiccontacts4pages_domain_model_contact:hidden,tx_academiccontacts4pages_domain_model_contact:page,tx_academiccontacts4pages_domain_model_contact:phone_number,tx_academiccontacts4pages_domain_model_contact:physical_address,tx_academiccontacts4pages_domain_model_contact:sys_language_uid,tx_academiccontacts4pages_domain_model_role:contacts,tx_academiccontacts4pages_domain_model_role:description,tx_academiccontacts4pages_domain_model_role:hidden,tx_academiccontacts4pages_domain_model_role:sys_language_uid,tx_academicjobs_domain_model_job:alumni_recommend,tx_academicjobs_domain_model_job:company_name,tx_academicjobs_domain_model_job:contact_additional_information,tx_academicjobs_domain_model_job:contact_email,tx_academicjobs_domain_model_job:contact_name,tx_academicjobs_domain_model_job:contact_phone,tx_academicjobs_domain_model_job:contractual_relationship,tx_academicjobs_domain_model_job:description,tx_academicjobs_domain_model_job:employment_start_date,tx_academicjobs_domain_model_job:employment_type,tx_academicjobs_domain_model_job:endtime,tx_academicjobs_domain_model_job:hidden,tx_academicjobs_domain_model_job:image,tx_academicjobs_domain_model_job:internationals_welcome,tx_academicjobs_domain_model_job:link,tx_academicjobs_domain_model_job:required_degree,tx_academicjobs_domain_model_job:sector,tx_academicjobs_domain_model_job:slug,tx_academicjobs_domain_model_job:starttime,tx_academicjobs_domain_model_job:sys_language_uid,tx_academicjobs_domain_model_job:title,tx_academicjobs_domain_model_job:type,tx_academicjobs_domain_model_job:work_location,tx_academicpartners_domain_model_partnership:hidden,tx_academicpartners_domain_model_partnership:page,tx_academicpartners_domain_model_partnership:partner,tx_academicpartners_domain_model_partnership:sys_language_uid,tx_academicpartners_domain_model_role:description,tx_academicpartners_domain_model_role:hidden,tx_academicpartners_domain_model_role:partnerships,tx_academicpartners_domain_model_role:sys_language_uid,tx_academicpersons_domain_model_address:hidden,tx_academicpersons_domain_model_address:sys_language_uid,tx_academicpersons_domain_model_contract:email_addresses,tx_academicpersons_domain_model_contract:hidden,tx_academicpersons_domain_model_contract:location,tx_academicpersons_domain_model_contract:office_hours,tx_academicpersons_domain_model_contract:phone_numbers,tx_academicpersons_domain_model_contract:physical_addresses,tx_academicpersons_domain_model_contract:position,tx_academicpersons_domain_model_contract:publish,tx_academicpersons_domain_model_contract:room,tx_academicpersons_domain_model_contract:sys_language_uid,tx_academicpersons_domain_model_contract:tx_academiccontacts4pages_contacts,tx_academicpersons_domain_model_email:hidden,tx_academicpersons_domain_model_email:sys_language_uid,tx_academicpersons_domain_model_function_type:hidden,tx_academicpersons_domain_model_function_type:sys_language_uid,tx_academicpersons_domain_model_location:hidden,tx_academicpersons_domain_model_location:sys_language_uid,tx_academicpersons_domain_model_organisational_unit:contracts,tx_academicpersons_domain_model_organisational_unit:hidden,tx_academicpersons_domain_model_organisational_unit:sys_language_uid,tx_academicpersons_domain_model_phone_number:hidden,tx_academicpersons_domain_model_phone_number:sys_language_uid,tx_academicpersons_domain_model_profile:contracts,tx_academicpersons_domain_model_profile:cooperation,tx_academicpersons_domain_model_profile:core_competences,tx_academicpersons_domain_model_profile:endtime,tx_academicpersons_domain_model_profile:fe_group,tx_academicpersons_domain_model_profile:frontend_users,tx_academicpersons_domain_model_profile:hidden,tx_academicpersons_domain_model_profile:lectures,tx_academicpersons_domain_model_profile:memberships,tx_academicpersons_domain_model_profile:miscellaneous,tx_academicpersons_domain_model_profile:press_media,tx_academicpersons_domain_model_profile:publications,tx_academicpersons_domain_model_profile:publications_link,tx_academicpersons_domain_model_profile:publications_link_title,tx_academicpersons_domain_model_profile:scientific_research,tx_academicpersons_domain_model_profile:slug,tx_academicpersons_domain_model_profile:starttime,tx_academicpersons_domain_model_profile:supervised_doctoral_thesis,tx_academicpersons_domain_model_profile:supervised_thesis,tx_academicpersons_domain_model_profile:sys_language_uid,tx_academicpersons_domain_model_profile:teaching_area,tx_academicpersons_domain_model_profile:vita,tx_academicpersons_domain_model_profile_information:hidden,tx_academicpersons_domain_model_profile_information:sys_language_uid,tx_academicstudyplan_domain_model_category:hidden,tx_academicstudyplan_domain_model_category:sys_language_uid,tx_academicstudyplan_domain_model_module:hidden,tx_academicstudyplan_domain_model_module:sys_language_uid,tx_academicstudyplan_domain_model_semester:hidden,tx_academicstudyplan_domain_model_semester:sys_language_uid'
           groupMods: 'web_layout,web_list,web_info,file_filelist'
 

@@ -27,8 +27,8 @@ declare(strict_types=1);
  * The storage folders of "/data" are the one thing it does not mirror. Their
  * records are shared - every plugin of the mirror names the pids of the "/"
  * tree - so a mirrored folder would be an empty folder in the backend that
- * looks like it should hold something (ACE-460, S3-3). 65 pages of "/" become
- * 56 pages of "/legacy/".
+ * looks like it should hold something (ACE-460, S3-3). 66 pages of "/" become
+ * 57 pages of "/legacy/".
  *
  *   php Build/Scripts/generateLegacyScenario.php
  *   php Build/Scripts/generateLegacyScenario.php --check   # exit 1 if it would change
@@ -87,7 +87,7 @@ const MIRRORED_ENTITIES = ['content', 'contact', 'partnership', 'semester', 'mod
  * The FlexForm fields that hold a page uid. Listed rather than pattern matched:
  * "settings.pages" of the felogin plugin also holds one and must not move.
  */
-const FLEXFORM_PAGE_FIELDS = ['settings.detailPid', 'settings.redirectPageId', 'settings.redirectPageLogin'];
+const FLEXFORM_PAGE_FIELDS = ['settings.detailPid', 'settings.listPid', 'settings.redirectPageId', 'settings.redirectPageLogin'];
 
 /**
  * Page uid columns of the mirrored tables, per entity.
@@ -572,7 +572,7 @@ function fileHeader(): string
         #
         # The storage folders of "/data" are not mirrored at all. Mirroring a folder
         # whose records are shared leaves an empty folder in the backend that looks like
-        # it should hold something, so "/" has 65 pages and "/legacy/" has 56.
+        # it should hold something, so "/" has 66 pages and "/legacy/" has 57.
         #
         # UIDS
         #

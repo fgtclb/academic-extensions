@@ -81,11 +81,12 @@ That is the only reason that file ever holds an `@import`.
 ### When several content elements share one TypoScript block
 
 The layout above assumes each component owns its own `constants.typoscript` and
-`setup.typoscript`. Two extensions do not work that way: `academic-persons`
-delivers six content elements and `academic-jobs` three, all of them configured
-by a single `plugin.tx_<key>` block. Splitting such a block per component would
-duplicate the same settings; delivering it from every component set would parse
-it once per enabled component.
+`setup.typoscript`. Five extensions do not work that way: `academic-persons`
+delivers six content elements, `academic-partners` four, `academic-jobs` and
+`academic-programs` three each and `academic-projects` two, all of them
+configured by a single `plugin.tx_<key>` block per extension. Splitting such a
+block per component would duplicate the same settings; delivering it from every
+component set would parse it once per enabled component.
 
 Neither is necessary. The shared block stays in one folder, and each component
 folder holds nothing but a one-line `include_static_file.txt` naming it:
@@ -109,10 +110,10 @@ disk.
 
 **The shared folder keeps whatever name it already had.** It is the value
 stored in existing `sys_template` records and often the path functional tests
-load directly, so renaming it costs a migration and buys nothing. The two
+load directly, so renaming it costs a migration and buys nothing. The five
 extensions therefore differ, and deliberately: `academic-persons` keeps
-`TypoScript/Default/`, `academic-jobs` keeps the TypoScript root itself, with
-its component folders as subfolders of it. Read what `addStaticFile()`
+`TypoScript/Default/`, the other four keep the TypoScript root itself, with
+their component folders as subfolders of it. Read what `addStaticFile()`
 registers today before choosing.
 
 The same mechanism serves a component that needs another *extension's*
@@ -287,8 +288,8 @@ would only find a difference somebody guessed at in advance.
 
 The mirror is the content pages only. The nine storage folders below `/data`
 are **not** mirrored: their records are shared, so a mirrored folder would be an
-empty folder in the backend that looks like it should hold something. `/` is 65
-pages, `/legacy/` is 56, and the `pages` table carries 242 rows once the German
+empty folder in the backend that looks like it should hold something. `/` is 66
+pages, `/legacy/` is 57, and the `pages` table carries 246 rows once the German
 variant of every one of them is counted.
 
 The two trees share their record storage. Roughly fifteen of the seeded tables

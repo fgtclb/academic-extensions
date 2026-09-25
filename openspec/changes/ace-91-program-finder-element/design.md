@@ -38,7 +38,8 @@ See `proposal.md` for the motivation. On main:
 
 CType `academicprograms_programfinder`, plugin `ProgramFinder`, FlexForm key
 `settings.listPid`. Stored records of those three projects migrate for free;
-the price is the breaking duplicate registration until they delete theirs.
+the price is that their own registration collides with this one until they
+delete it (see Risks).
 
 Rejected: a new name, which would need a record migration in three projects.
 
@@ -48,8 +49,10 @@ Upstream adopts the CType `academicprograms_programfinder` with plugin
 `ProgramFinder` and `settings.listPid`, and ships a Breaking changelog entry
 that names what the projects with their own registration delete. Their
 stored records then render with the upstream element without a migration,
-while a new name would need a record migration in three projects; the
-upgrade configuration check can report the duplicate registration.
+while a new name would need a record migration in three projects. The
+upgrade configuration check reports an XCLASS of the controller, not a
+project registration of the content type; a finding for that would be a
+follow-up.
 
 ### A non-cacheable `finderAction()` on `ProgramController`
 
@@ -69,26 +72,58 @@ controller already has.
 ### The form targets the list plugin
 
 `Templates/Program/Finder.html` renders `f:form` with
-`pageUid="{settings.listPid}"`, `extensionName="AcademicPrograms"`,
-`pluginName="ProgramList"` and `action="list"`, and one select per type named
-`demand[filterCollection][<type>]`, with the method the list's own filter form
-uses. The shape is pinned by a test, because the finder now depends on it.
+`actionUri="{listUri}"`, `extensionName="AcademicPrograms"` and
+`pluginName="ProgramList"` - the latter two set the field name prefix - and
+one select per type named `demand[filterCollection][<type>]`, with the method
+the list's own filter form uses. The shape is pinned by a test, because the
+finder now depends on it.
+
+`finderAction()` builds `listUri` itself (`uriFor('list', …, 'ProgramList')`
+on `settings.listPid`) instead of letting the form do it: a page that cannot
+be linked - hidden, deleted, access restricted - yields an empty URI without
+an exception, and a form with an empty `action` posts to the page it is on.
+An empty URI renders no form, and so does a finder whose types have no
+category.
+
+The finder submits no sorting. `DemandFactory::createDemandObject()` now
+applies the element's `settings.sorting` to a demand that carries none, not
+only to a request without any demand, so the target list keeps its sorting.
+The same gap hit the filter form of a list whose sorting select is hidden;
+both get an `Important` changelog entry. The selection replaces the list's
+preset categories, as its own filter does.
 
 ### FlexForm and registration
 
 `Configuration/FlexForms/ProgramFinderSettings.xml` holds:
 
-- `settings.listPid`: `group` on `pages`, `maxitems` 1, required;
+- `settings.listPid`: `group` on `pages`, `minitems` and `maxitems` 1,
+  required. FormEngine enforces `required` in the browser; the DataHandler
+  does not check it on a relation field (verified on v13 and v14:
+  `validateValueForRequired()` is called by the scalar field types, not for
+  group, select, category or inline), so a
+  record written by an import can lack it and the finder then renders no
+  form. FormEngine submits `pages_<uid>`, the DataHandler stores the bare uid
+  for a single allowed table, which is what the controller casts;
 - `settings.filter.categoryTypes`: `selectMultipleSideBySide` from the
-  category type items provider of `programs-studyplan-09`. An empty field
-  falls back to the site-wide
-  `plugin.tx_academicprograms.settings.filter.categoryTypes` through
-  `ignoreFlexFormSettingsIfEmpty`, and `finderAction()` offers
-  `degree,topic` when that is empty as well;
-- `settings.preselectedCategories`: `category`, `oneToMany`, restricted to
-  typed categories like the list's `settings.categories`.
+  category type items provider `CategoryTypeItemsProcFunc` of ACE-736. An
+  empty field falls back to the site-wide
+  `plugin.tx_academicprograms.settings.filter.categoryTypes` through the
+  existing `ignoreFlexFormSettingsIfEmpty` entry - an entry in the extension
+  block applies to every plugin of the extension unless a plugin block sets
+  its own - so it covers the finder too, and `finderAction()` offers
+  `degree,topic` (a class constant) when that is empty as well. The resolver
+  `FilterTypeResolver` of ACE-736 drops types without categories, as for the
+  list;
+- `settings.preselectedCategories`: `category`, `oneToMany` without `MM`, so
+  the FlexForm stores the uid list inline, restricted to typed categories
+  like the list's `settings.categories`.
 
-A preselected category whose type is not offered is ignored.
+A select holds one value, so the first preselected category of a type in the
+stored list wins; the category tree of the field stores the checked
+categories in tree order, so that is the one higher in the tree.
+A preselected category whose type is not offered is ignored, and so is one
+that is disabled: a browser does not submit a disabled option, and the
+visitor would search for something other than what the select shows.
 
 ### Decided: the finder uses the filter type key of the list
 
@@ -132,9 +167,17 @@ GUESSED  finder element, e.g. in a home page hero
 - [The finder posts into another plugin's argument namespace] → The functional
   test pins the target page, the namespace and the field names; routing work
   (ACE-623) has to keep them.
-- [Duplicate registration in projects] → The `Breaking` changelog names what
-  to delete; the upgrade configuration check (`ace-713-upgrade-check-configuration`)
-  can report it.
+- [Registration in projects] → A project registration loaded later collides
+  with this one, verified on v13 and v14: `addPlugin()` replaces an item of
+  the same value, `addTcaSelectItem()` or a direct write adds it a second
+  time; an assigned data structure replaces this one; `configurePlugin()`
+  replaces the entry of the same controller class, its uncached actions
+  included, while a controller of its own is added behind the upstream
+  default; a subclass or XCLASS of `ProgramController` with a
+  `finderAction()` of its own overrides this one, fatally when the signature
+  is incompatible; and a project `Program/Finder.html` in the template root
+  is rendered by this action. The `Breaking` changelog says so and names what
+  to delete; the upgrade configuration check reports the XCLASS case only.
 - [Finder and target list use different storage] → Options then disagree
   with the list; the documentation says to point both at the same storage.
 

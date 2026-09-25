@@ -83,7 +83,7 @@ final class SqliteFileRowReader extends SeedRowReader
         if ($uids !== null) {
             // Written out rather than bound: the uid list comes from the seed
             // definition, is cast to int here, and SQLite has a bind parameter
-            // limit a 242 element IN list would be uncomfortably close to.
+            // limit a 246 element IN list would be uncomfortably close to.
             $sql .= ' WHERE uid IN (' . implode(',', array_map(intval(...), $uids)) . ')';
         }
 
