@@ -57,6 +57,15 @@ keeps it: every type with a category, in the registry order of the group.
 Leaving out a type whose categories are all disabled would change the default
 output of every list, which is a decision of its own.
 
+Leaving out the disabled **options** is a switch of the form field:
+`<ct:form.filterSelect hideDisabledOptions="1">` renders no option for a
+category without results, but keeps one the visitor selected (a preselection
+by `selectAllByDefault` does not count), and with `groupByParent` keeps a
+disabled parent while one of its descendants is shown. It is off by default,
+and neither the shipped `DemandCategories.html` partials nor the program
+finder's `Finder.html` sets it; the rules are in
+[the changelog entry](../../packages/fgtclb/typo3-category-types/Documentation/Changelog/2.4/Feature-FilterSelectCanHideOptionsWithoutResults.rst).
+
 The resolver is stateless, autowired and `@internal`. `ProgramController`
 receives it through a `final` `inject*()` method rather than its constructor,
 because the controller is not final and project subclasses call the

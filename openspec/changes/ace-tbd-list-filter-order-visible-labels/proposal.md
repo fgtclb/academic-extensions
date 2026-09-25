@@ -46,7 +46,7 @@ None.
   helper that orders and splits the filter types. It has no visitor-facing
   behaviour of its own, so it carries no spec.
 - Depends on the change that lets the filter form field hide options without
-  results (`ace-tbd-filter-select-hide-disabled`).
+  results (`ace-738-filter-select-hide-disabled`).
 - Functional tests of the three list plugins, a unit test of the helper,
   `Feature-` changelog entries.
 

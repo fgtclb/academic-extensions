@@ -13,7 +13,7 @@ by parent category; one project does this three times.
 - A selected option is always kept, even without results, so an active
   filter stays visible and removable.
 - With grouping by parent category, a parent without results is kept while
-  one of its children is shown, so the hierarchy stays intact.
+  one of its descendants is shown, so the hierarchy stays intact.
 - Default off: without the switch the output is unchanged.
 
 The behaviour is identical on TYPO3 v13 and v14.
@@ -50,6 +50,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-07`). One of the six analysed projects carries its own code for this
-today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-filter-select-hide-disabled` when the issue is filed after
-implementation.
+today. Filed after implementation as ACE-738, for `main` and the backport to
+branch `2`.

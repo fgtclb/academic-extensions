@@ -1,6 +1,6 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Confirm `ace-tbd-filter-select-hide-disabled` is merged or stacked
+- [ ] 1.1 Confirm `ace-738-filter-select-hide-disabled` is merged or stacked
   below this change, and verify the filter form field accepts
   `hideDisabledOptions`.
 

@@ -16,8 +16,22 @@ to TYPO3 v13 and v14 alike.
 #### Scenario: Switch on
 
 - **WHEN** an integrator enables the switch and one category of the filter
-  has no result
+  has no result and is not selected
 - **THEN** the filter renders no option for that category
+
+#### Scenario: Every option without results
+
+- **WHEN** the switch is on, the filter has an "all" option in front, and no
+  category of the filter has a result
+- **THEN** the "all" option is still rendered, as the way back to every
+  result
+
+#### Scenario: Template renders the options itself
+
+- **WHEN** an integrator enables the switch and renders the options in the
+  template instead of letting the form field render them
+- **THEN** the options the template receives lack the categories without
+  results, exactly as the rendered options would
 
 #### Scenario: Switch off
 
@@ -27,8 +41,10 @@ to TYPO3 v13 and v14 alike.
 
 ### Requirement: A selected option is always kept
 
-With the switch on, an option SHALL still be rendered when it is the
-currently selected value, even when its category has no result.
+With the switch on, an option SHALL still be rendered when the visitor has
+selected it - the value the filter is set to - even when its category has no
+result. A preselection of every option while nothing is selected is no such
+selection.
 
 #### Scenario: Selected category without results
 
@@ -36,6 +52,13 @@ currently selected value, even when its category has no result.
   without results
 - **THEN** that option is rendered, selected, so the visitor can see and
   change the active filter
+
+#### Scenario: Selected by default only
+
+- **WHEN** the switch is on, a multiple select preselects every option while
+  nothing is selected, and one category has no result
+- **THEN** that option is left out: nothing is selected, so there is no active
+  filter to keep
 
 ### Requirement: The parent hierarchy stays intact
 
@@ -49,3 +72,16 @@ descendants is rendered.
   result and one child has results
 - **THEN** the parent is rendered as a disabled option and the child is
   rendered below it
+
+#### Scenario: Parent and child without results
+
+- **WHEN** the switch is on, options are grouped by parent, and neither the
+  parent nor its child has a result
+- **THEN** neither is rendered
+
+#### Scenario: Not grouped
+
+- **WHEN** the switch is on, options are not grouped, the parent has no result
+  and one child has results
+- **THEN** only the child is rendered: without grouping no option is shown
+  below another
