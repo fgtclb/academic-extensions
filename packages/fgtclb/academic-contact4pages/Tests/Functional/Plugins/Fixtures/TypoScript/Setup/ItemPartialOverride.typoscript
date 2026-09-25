@@ -1,0 +1,2 @@
+# A site package registering its own contact item partial above the shipped one.
+plugin.tx_academiccontacts4pages.view.partialRootPaths.20 = EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/Partials/

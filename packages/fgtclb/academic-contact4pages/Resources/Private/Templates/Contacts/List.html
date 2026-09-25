@@ -4,7 +4,7 @@
 >
 
 <div class="academic-contacts4pages">
-    <f:if condition="{roles}">
+    <f:if condition="{settings.groupByRole} && {roles}">
         <f:then>
             <f:for each="{roles}" as="role">
                 <div class="row">
@@ -21,13 +21,15 @@
                         <f:if condition="{contact.role.uid} == {role.uid}">
                             <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                                 <f:render
-                                    partial="Profile/Item"
+                                    partial="Contacts/Item"
                                     arguments="{
+                                        contact: contact,
+                                        role: role,
                                         profile: contact.contract.profile,
                                         contract: contact.contract,
                                         settings: settings,
                                         data: data,
-                                        groupedProfiles: 'true'
+                                        grouped: 1
                                     }"
                                 />
                             </div>
@@ -41,8 +43,9 @@
                     <f:for each="{contactsWithoutRole}" as="contact">
                         <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                             <f:render
-                                partial="Profile/Item"
+                                partial="Contacts/Item"
                                 arguments="{
+                                    contact: contact,
                                     profile: contact.contract.profile,
                                     contract: contact.contract,
                                     settings: settings,
@@ -59,8 +62,10 @@
                 <f:for each="{contacts}" as="contact">
                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                         <f:render
-                            partial="Profile/Item"
+                            partial="Contacts/Item"
                             arguments="{
+                                contact: contact,
+                                role: contact.role,
                                 profile: contact.contract.profile,
                                 contract: contact.contract,
                                 settings: settings,

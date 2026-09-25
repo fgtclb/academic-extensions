@@ -1,0 +1,51 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<f:comment>
+    One contact of the page, as "Contacts/List" renders every one of them: in a role group,
+    below the groups for a contact without a role, and in the list that is not grouped.
+    A project that wants its own card overrides this partial rather than the list template.
+    The grid column around it belongs to the list template.
+
+    Arguments:
+    - contact:  the contact
+    - role:     the role of the contact, or null when it has none
+    - profile:  the profile behind the contract of the contact
+    - contract: the contract the contact names
+    - settings: the plugin settings
+    - data:     the content element record, as an array
+    - grouped:  set when the contact renders below the heading of its role
+</f:comment>
+
+<f:if condition="{grouped}">
+    <f:then>
+        <f:render
+            partial="Profile/Item"
+            arguments="{
+                profile: profile,
+                contract: contract,
+                settings: settings,
+                data: data,
+                groupedProfiles: 'true'
+            }"
+        />
+    </f:then>
+    <f:else>
+        <f:if condition="{role}">
+            <p class="academic-contacts4pages__role">{role.name}</p>
+        </f:if>
+        <f:render
+            partial="Profile/Item"
+            arguments="{
+                profile: profile,
+                contract: contract,
+                settings: settings,
+                data: data
+            }"
+        />
+    </f:else>
+</f:if>
+
+</html>

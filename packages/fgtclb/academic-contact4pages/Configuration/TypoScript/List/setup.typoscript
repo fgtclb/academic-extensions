@@ -1,6 +1,10 @@
 plugin.tx_academiccontacts4pages {
   settings {
     detailPid = {$plugin.tx_academicpersons.detailPid}
+    # The default of the "Group by role" option. A content element saved before the option
+    # existed stores no value for it and reads this one, so it keeps grouping; a stored value
+    # of the content element wins.
+    groupByRole = 1
   }
   view {
     templateRootPaths {
