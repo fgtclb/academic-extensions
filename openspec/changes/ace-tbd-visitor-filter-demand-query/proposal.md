@@ -45,7 +45,7 @@ None.
   the 3.0 changelog.
 - Plugins `list` and `listanddetail`.
 - `ModifyProfileDemandEvent` listeners see two new demand properties.
-- Depends on `ace-tbd-list-links-keep-state` for pagination and letter links
+- Depends on `ace-734-list-links-keep-state` for pagination and letter links
   that keep the filter.
 - No schema change.
 

@@ -95,7 +95,7 @@ That is eighteen explicit routes per enhancer. The filter key segments are
 `einheit`). Every variable gets explicit `requirements` of `[^/]+`, which
 also keeps the two-segment filter routes apart from `/{profile_name}`.
 Pagination is off under a letter today; the follow-up change that allows it,
-decided with `ace-tbd-list-links-keep-state`, extends this route set with the
+decided with `ace-734-list-links-keep-state`, extends this route set with the
 letter and page combinations.
 
 ### Decided: a letter combined with a filter is routed

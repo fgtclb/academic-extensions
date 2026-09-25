@@ -16,7 +16,7 @@ See `proposal.md` for the motivation. State on `main`:
   first, and among those the one with more variables first. Its logic is the
   same on v13 and v14; the differences between the two files are type
   declarations and redundant conditions.
-- `ace-tbd-list-links-keep-state` keeps the letter in page links and drops the
+- `ace-734-list-links-keep-state` keeps the letter in page links and drops the
   page from letter links. `ace-tbd-visitor-filter-ui-routes` adds the filter
   routes with explicit `requirements` and states that this change extends its
   route set.
@@ -48,7 +48,7 @@ for a letter on a single page. An editor who wants that disables pagination.
 ### A letter change resets the page
 
 Letter links and the link back to all letters carry no page number, as
-`ace-tbd-list-links-keep-state` already builds them. This change adds only
+`ace-734-list-links-keep-state` already builds them. This change adds only
 the tests that pin it for a list that is now paginated under a letter.
 
 Rejected: keeping the page number across a letter change. Pages of two

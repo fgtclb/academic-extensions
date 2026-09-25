@@ -43,7 +43,7 @@ restriction lives there and would be overwritten, widening the list.
 
 `initializeListAction()` allows a property only when its FlexForm flag
 (`settings.filter.functionType`, `settings.filter.organisationalUnit`) is on.
-Through `ace-tbd-list-links-keep-state` the property joins the constant of
+Through `ace-734-list-links-keep-state` the property joins the constant of
 visitor-settable properties. `adoptSettings()` then resets the value to `0`
 unless it is among the filter options. That handles unknown records and
 values outside the restriction in one place.

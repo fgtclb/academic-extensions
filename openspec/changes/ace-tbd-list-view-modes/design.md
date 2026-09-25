@@ -40,7 +40,8 @@ A private method of `ProfileController` resolves the mode:
 - It takes `settings.viewMode.default`.
 - When `settings.viewMode.enabled` is set, a request argument `viewMode`
   overrides the default, provided the value is in
-  `settings.viewMode.allowed`.
+  `settings.viewMode.allowed`. In the list plugins that argument is the
+  demand property `demand/viewMode`, see "The switch".
 - A value that is not allowed, or that does not match `^[a-z][a-zA-Z0-9]*$`,
   is ignored.
 
@@ -140,7 +141,21 @@ for the same path shape.
 `Profile/ViewMode/Switch.html` renders one `f:link.action` per allowed mode,
 with `rel="nofollow"` like the letter links, and `aria-current` on the active
 one. It builds its arguments from the active list state of `persons-display-10`
-and changes only `viewMode`.
+and changes only `viewMode`: it overrides it with the chosen mode, and removes
+it for the default mode, so a link to the default mode carries none.
+
+That state, `activeListArguments`, holds properties of the profile demand
+only: those on the list of visitor-settable properties in `ProfileController`
+whose value differs from that of a fresh demand. For the pagination and letter
+links to carry the mode, the list and list-and-detail plugins take it as the
+demand property `demand/viewMode`, add it to that list, and map that argument
+in the `/view-mode/{viewMode}` routes. `adoptSettings()` writes the **resolved**
+mode back into the demand, as `ace-tbd-visitor-filter-demand-query` does for
+its filters: the default mode as the empty value, so a link to it carries
+none, and a mode the resolution rejected as the empty value as well, so it
+never reaches a link. The selected-profiles and selected-contracts plugins
+have no demand and no navigation links; there the mode stays the plugin
+argument `viewMode`.
 
 Guessed layout — a sketch, not a design:
 

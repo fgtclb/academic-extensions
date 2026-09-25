@@ -50,7 +50,7 @@ None.
   command, or on their next save; until then their filter URL uses query
   parameters.
 - Depends on `ace-tbd-visitor-filter-demand-query` and
-  `ace-tbd-list-links-keep-state`. Combines with `ace-tbd-list-view-modes`:
+  `ace-734-list-links-keep-state`. Combines with `ace-tbd-list-view-modes`:
   whichever of the two lands second adds the filter routes with the view
   mode segment.
 
@@ -59,7 +59,7 @@ None.
 - Routes for a letter with a page, with or without a filter. The follow-up
   change that allows
   pagination under an active letter, decided with
-  `ace-tbd-list-links-keep-state`, extends this route set.
+  `ace-734-list-links-keep-state`, extends this route set.
 - An upgrade wizard for the slugs: every wizard is a TYPO3 v15 blocker call
   site (ACE-294), and none is added while v13 is supported.
 - Automatic submission on selection.

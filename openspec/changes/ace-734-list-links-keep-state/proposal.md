@@ -63,6 +63,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-10`). Two of the six analysed projects carry their own code
-for this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-list-links-keep-state` when the issue is filed after
-implementation.
+for this today. Filed after implementation as ACE-734, which names this
+change.
