@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Git hooks of this repository, opted in once per clone:
+#
+#   git config core.hooksPath Build/git-hooks
+#
+# post-checkout: gives the DDEV instances of a linked worktree project names of their own, on "git worktree add" and
+# on every branch checkout inside a worktree - see "Build/Scripts/ddevWorktreeNames.sh". A file checkout ("$3" is 0)
+# changes nothing it depends on.
+#
+# Git runs the hook of the checkout the command was started in, but inside the checkout that changed. The script is
+# therefore taken from the working directory, so a worktree always runs the version of its own branch - and a branch
+# without it runs nothing. The hook never fails the checkout: a warning is all a naming problem is worth there.
+# ----------------------------------------------------------------------------------------------------------------------
+
+if [[ "${3:-0}" != "1" ]]; then
+    exit 0
+fi
+
+SCRIPT="$(git rev-parse --show-toplevel 2>/dev/null)/Build/Scripts/ddevWorktreeNames.sh"
+# "git worktree add" passes an all-zero previous HEAD. That is when the names are worth printing; on a branch switch
+# only a warning is.
+OPTIONS=(-q)
+if [[ "${1}" =~ ^0+$ ]]; then
+    OPTIONS=()
+fi
+if [[ -x "${SCRIPT}" ]]; then
+    "${SCRIPT}" "${OPTIONS[@]}" || echo "Warning: ${SCRIPT} failed, the DDEV instances of this worktree may carry the committed names." >&2
+fi
+exit 0

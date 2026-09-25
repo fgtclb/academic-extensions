@@ -419,6 +419,12 @@ What that costs is a dependency set per worktree, not per branch: `.Build/`,
 a fresh worktree starts cold and needs its own `-s composerUpdate` for each core
 version before any suite that needs dependencies will run.
 
+The DDEV instances of a worktree need project names of their own, or DDEV
+refuses to start them while the main checkout holds the committed ones.
+`git config core.hooksPath Build/git-hooks`, once per clone, makes
+`git worktree add` write them —
+[Instances in git worktrees](instances.md#instances-in-git-worktrees).
+
 Without the mount the failure is misleading — composer cannot determine a
 version for the path packages without git, so the install stops on the one path
 package that carries no `branch-alias` rather than on anything git shaped:

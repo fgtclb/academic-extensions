@@ -55,6 +55,106 @@ both:
   `core-12/` on `main`. Switching removes its tracked files and leaves its
   ignored trees, so the folder stays behind as untracked noise.
 
+## Instances in git worktrees
+
+Every checkout carries the same `core-*/.ddev/config.yaml`, and with it the same
+project names. A [git worktree](environment.md#git-worktrees) is a second
+checkout, so without help its instances claim the names the main checkout
+already holds, and DDEV refuses a name that is registered for another directory.
+It refuses whether that project is running or only stopped:
+
+```
+Failed to start core12-academics-v2: project core12-academics-v2 project root is
+already set to …/academic-extensions/core-12, refusing to change it to
+…/worktree/core-12; you can `ddev stop --unlist core12-academics-v2` …
+```
+
+Unlisting in one checkout to start the other works, and moves the problem to
+the next switch. Instead, a linked worktree gets names of its own:
+
+| Checkout        | `core-12/`                     | `core-13/`                     |
+|-----------------|--------------------------------|--------------------------------|
+| main checkout   | `core12-academics-v2`          | `core13-academics-v2`          |
+| linked worktree | `core12-academics-v2-3513e252` | `core13-academics-v2-3513e252` |
+
+`Build/Scripts/ddevWorktreeNames.sh` writes them into
+`core-*/.ddev/config.worktree.local.yaml`: the committed name as prefix, and the
+first eight hex digits of the git hash of the worktree's resolved absolute path
+as suffix, so both instances of one worktree share it. DDEV merges every
+`.ddev/config.*.yaml` over `config.yaml` in lexical order, so the file overrides
+the committed name. It also sorts after a `config.local.yaml` of your own and
+wins over that file's `name`, while the rest of your file still applies. The
+file is git-ignored, and nothing tracked changes. The instances need no other
+change either: the site configurations use host-less `base` values and
+`trustedHostsPattern` is `.*`, so the instance answers under
+`https://core12-academics-v2-3513e252.ddev.site` as it does under the committed
+name.
+
+The main checkout is never touched: the script recognizes it by `git rev-parse
+--git-dir` being the common git directory and does nothing there. A
+`config.worktree.local.yaml` the script did not write, recognized by its first
+line, is left alone with a warning.
+
+### Opting in: the post-checkout hook
+
+The script runs by itself once the repository's hooks directory is enabled,
+**once per clone** — the setting lives in the shared git configuration and
+therefore covers every worktree:
+
+```shell
+git config core.hooksPath Build/git-hooks
+```
+
+`Build/git-hooks/post-checkout` then runs the script on `git worktree add`,
+before DDEV has ever seen the new worktree, and again on every branch checkout
+inside a worktree. A switch to the other version line brings the other instance
+folder, which needs its name too. A file checkout does nothing, and the hook
+never fails a checkout.
+
+Git takes the hook from the checkout the command is started in, relative to its
+top level, and runs it inside the checkout that changed. The hook therefore
+calls the script of the new worktree, never its own copy, and a branch that does
+not carry the script runs nothing. `git worktree add --no-checkout` runs no
+hook at all.
+
+Without the hook, or for a worktree created before it, run the script by hand
+before the first `ddev start` there:
+
+```shell
+Build/Scripts/ddevWorktreeNames.sh
+```
+
+### What the names do not cover
+
+- **A worktree that was already started under the committed name** holds that
+  registration. Release it there first, then name it and start it again:
+
+  ```shell
+  cd core-12 && ddev stop --unlist core12-academics-v2
+  ../Build/Scripts/ddevWorktreeNames.sh && ddev start
+  ```
+
+- **Removing a worktree** leaves its projects behind — containers, volumes and
+  the registration — because git has no hook for `git worktree remove`. Delete
+  them first, in each instance of the worktree:
+
+  ```shell
+  ddev delete -Oy
+  git worktree remove <path>
+  ```
+
+  A project whose directory is already gone is deleted by name from anywhere:
+  `ddev delete -Oy core12-academics-v2-3513e252`. `ddev list` shows its
+  approot.
+
+- **Moving a worktree** changes its path and therefore its names. `ddev delete
+  -Oy` before `git worktree move`, run the script afterwards.
+
+- **Switching branches inside one worktree** behaves like switching them in the
+  main checkout, described above: the prefix changes with the version line, so
+  the same directory gets a second name, and `ddev stop --unlist <old name>`
+  clears it.
+
 ## Accounts
 
 ### Backend
