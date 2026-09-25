@@ -1,7 +1,8 @@
 ## Purpose
 
 Defines which category filter selects the program list plugin offers to a
-visitor and in which order, as chosen by the editor per list.
+visitor and in which order, as chosen by the editor per list or by the
+integrator for the whole site.
 
 ## ADDED Requirements
 
@@ -42,28 +43,49 @@ those types, in the order the editor chose them.
 With no filter type chosen in the element, the system SHALL offer the filter
 types of the site-wide filter type setting of the program list, in their
 configured order. With that setting empty as well, the system SHALL render a
-filter select for every type of the programs group that has categories among
-the listed programs, in the type order of the group.
+filter select for every type of the programs group that has at least one
+category, in the type order of the group.
 
 #### Scenario: Site-wide filter types apply
 - **WHEN** the site-wide filter types of the program list name only `degree`
 - **AND** the editor chose no filter type for the element
 - **THEN** the filter form shows only the degree select
 
+#### Scenario: Site-wide filter types set as a site setting
+- **WHEN** a site that uses the site set of the extension sets the filter
+  types of the program list to `program_type` and `degree`
+- **AND** the editor chose no filter type for the element
+- **THEN** the filter form shows the program type select followed by the
+  degree select
+
 #### Scenario: Existing plugin after the update
 - **WHEN** a program list plugin was saved before the field existed
 - **AND** the site sets no filter types
 - **THEN** its filter form shows the same selects in the same order as before
 
+#### Scenario: Project template written before the filter types
+- **WHEN** a project template renders the filter form of the program list
+  without handing the resolved filter types on
+- **THEN** its filter form shows the same selects in the same order as before,
+  whatever filter types the element or the site set
+
 ### Requirement: A chosen type without categories is left out
-The system SHALL NOT render a select for a chosen type that has no categories
-among the listed programs, and SHALL ignore a chosen type that is no longer
-registered.
+The system SHALL NOT render a select for a chosen type that has no category
+at all, and SHALL ignore a chosen type that is no longer registered. A chosen
+type with categories SHALL be offered even when none of them is carried by a
+listed program, with those categories as disabled options, as without a
+choice.
 
 #### Scenario: Chosen type has no categories
-- **WHEN** the editor chose the filter types `degree` and `costs`
-- **AND** none of the listed programs carries a `costs` category
+- **WHEN** the editor chose the filter types `teaching_language` and `degree`
+- **AND** no category of the type `teaching_language` exists
 - **THEN** the filter form shows only the degree select
+
+#### Scenario: Chosen type has categories on no listed program
+- **WHEN** the editor chose the filter types `degree` and `costs`
+- **AND** a `costs` category exists, but none of the listed programs carries it
+- **THEN** the filter form shows the degree select followed by the costs select
+- **AND** the costs category is a disabled option
 
 #### Scenario: Chosen type was removed later
 - **WHEN** the editor chose the filter type `costs`

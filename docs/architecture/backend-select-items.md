@@ -1,7 +1,7 @@
 # Backend select items
 
-Ten classes across five extensions build the items of a backend select with an
-`itemsProcFunc`, and 21 fields are configured with one:
+Eleven classes across six extensions build the items of a backend select with an
+`itemsProcFunc`, and 22 fields are configured with one:
 
 ```bash
 grep -rh 'itemsProcFunc' packages/*/*/Configuration | wc -l
@@ -9,9 +9,10 @@ grep -rh 'itemsProcFunc' packages/*/*/Configuration | wc -l
 
 `AddressRecordItems` (contact4pages), `EmploymentTypeItems` and `TypeItems`
 (jobs), `CountryItems` and `PartnerItems` (partners), `ContractItems`,
-`ProfileShowFieldsItems`, `DemandValues` and `RecordTypes` (persons) and
-`SortingItemsProcFunc` (projects). Eight live in a `Classes/Backend/FormEngine/`
-directory; `DemandValues` and `RecordTypes` are in `Classes/Tca/`. They are
+`ProfileShowFieldsItems`, `DemandValues` and `RecordTypes` (persons),
+`SortingItemsProcFunc` (projects) and `CategoryTypeItemsProcFunc`
+(category_types). Nine live in a `Classes/Backend/FormEngine/` directory;
+`DemandValues` and `RecordTypes` are in `Classes/Tca/`. They are
 configured on TCA columns and on FlexForm elements alike.
 
 This page is about what such a handler is handed, what it may do with it, and
@@ -166,15 +167,16 @@ The items of a TCA column are then at
 FlexForm element at
 `$result['processedTca']['columns']['pi_flexform']['config']['ds']['sheets'][$sheet]['ROOT']['el'][$element]['config']['items']`.
 
-Four test classes do this today:
+Six test classes do this today:
 `academic-base/Tests/Functional/Backend/FormDataProvider/KeepCurrentContentTypeSelectableTest.php`,
-`academic-partners/Tests/Functional/Backend/FormEngine/PartnerSelectOrderTest.php`
-and the two `ContractSelectStorageScopeTest` of `academic-persons` and
-`academic-contact4pages`. All four give the request
+`academic-partners/Tests/Functional/Backend/FormEngine/PartnerSelectOrderTest.php`,
+the two `ContractSelectStorageScopeTest` of `academic-persons` and
+`academic-contact4pages`, `ViewModeFieldsTest` of `academic-persons` and
+`FilterTypesFieldTest` of `academic-programs`. All six give the request
 `SystemEnvironmentBuilder::REQUESTTYPE_BE` and a `normalizedParams` attribute,
 and set `$GLOBALS['LANG']`, because labels are resolved during the compile.
 
-## Five of the ten dispatch an event, five do not
+## Five of the eleven dispatch an event, six do not
 
 `FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent` carries the whole
 parameter array and is dispatched **after** the handler built its items, so a
@@ -185,11 +187,16 @@ return.
 Only five handlers dispatch it, so "can my listener reach this select?" has two
 answers:
 
-| Dispatches the event                                | Builds its items and returns              |
-|-----------------------------------------------------|-------------------------------------------|
-| `AddressRecordItems` (contact4pages)                | `CountryItems`, `PartnerItems` (partners) |
-| `EmploymentTypeItems`, `TypeItems` (jobs)           | `DemandValues`, `RecordTypes` (persons)   |
-| `ContractItems`, `ProfileShowFieldsItems` (persons) | `SortingItemsProcFunc` (projects)         |
+| Dispatches the event                                | Builds its items and returns                 |
+|-----------------------------------------------------|----------------------------------------------|
+| `AddressRecordItems` (contact4pages)                | `CountryItems`, `PartnerItems` (partners)    |
+| `EmploymentTypeItems`, `TypeItems` (jobs)           | `DemandValues`, `RecordTypes` (persons)      |
+| `ContractItems`, `ProfileShowFieldsItems` (persons) | `SortingItemsProcFunc` (projects)            |
+|                                                     | `CategoryTypeItemsProcFunc` (category_types) |
+
+`CategoryTypeItemsProcFunc` offers the types of a category group, which a
+project changes where it registers them, in `CategoryTypes.yaml` — see
+[List filter types](list-filter-types.md#the-items-of-the-field).
 
 ```bash
 grep -rln ModifyTcaSelectFieldItemsEvent packages/*/*/Classes
