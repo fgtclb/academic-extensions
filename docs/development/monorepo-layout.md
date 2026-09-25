@@ -322,13 +322,15 @@ here.
 
 `fgtclb/academics-monorepo-testing-helper` autoloads
 `FGTCLB\TestingHelper\` from `Classes/` and is required as a dev dependency of
-the root. It ships three functional-test traits in
+the root. It ships five functional-test traits in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/`:
 
 | Trait                                  | Purpose                                                                          |
 |----------------------------------------|----------------------------------------------------------------------------------|
+| `ContentElementHeaderAssertionTrait`   | Counts where the header of a content element rendered, and how often.            |
 | `ExtensionCoreVersionCompatTestsTrait` | Asserts the running core major is one the extension declares support for.        |
 | `ExtensionsLoadedTestsTrait`           | Asserts the extension set under test is loaded.                                  |
+| `FrontendPluginRenderingTrait`         | Renders a frontend plugin through a real request.                                |
 | `TcaHelperMethodsTrait`                | Backs up, restores and updates `$GLOBALS['TCA']` around a test that modifies it. |
 
 They live in a package rather than in one extension's `Tests/` folder because

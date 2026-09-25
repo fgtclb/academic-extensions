@@ -168,7 +168,7 @@ surroundings; do not reformat the file.
 ### The test harness is not at parity
 
 `packages-dev/testing-helper/` — the shared functional-test traits — has grown
-on `main` and was not backported wholesale. This branch has four of the eight:
+on `main` and was not backported wholesale. This branch has five of the ten:
 
 | Trait                                  | `2` — this branch | `main` |
 |----------------------------------------|-------------------|--------|
@@ -176,16 +176,18 @@ on `main` and was not backported wholesale. This branch has four of the eight:
 | `ExtensionsLoadedTestsTrait`           | yes               | yes    |
 | `TcaHelperMethodsTrait`                | yes               | yes    |
 | `FrontendPluginRenderingTrait`         | yes               | yes    |
+| `ContentElementHeaderAssertionTrait`   | yes               | yes    |
 | `ColourSchemeAwareIconsTrait`          | no                | yes    |
 | `DeprecatedCoreLabelsTrait`            | no                | yes    |
 | `EnsureTtContentListTypeColumnTrait`   | no                | yes    |
 | `PluginFlexFormDataStructureTrait`     | no                | yes    |
+| `ResponsiveImageAssertionTrait`        | no                | yes    |
 
 All of them live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`;
-here that directory holds the first four files. Count it rather than trusting
-this table — it has been wrong before.
+here that directory holds the five marked for this branch. Count it rather than
+trusting this table — it has been wrong before.
 
-The consequence is narrower than the missing four suggest, and it is worth
+The consequence is narrower than the missing five suggest, and it is worth
 checking per change rather than assumed: a trait being on both branches does not
 mean the test directory that uses it is. Frontend plugin rendering tests do have
 a home here — `academic-bite-jobs`, `academic-contact4pages`, `academic-jobs`,

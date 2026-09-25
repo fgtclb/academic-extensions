@@ -65,6 +65,50 @@ treats `optional` as a property of a *section*, never of a partial, so the
 template's earlier `Header/All` render was just as hard a requirement on
 whoever provides `lib.contentElement`.
 
+## Who renders the header of a plugin
+
+A plugin content element renders through the same layout. Its CType is
+`tt_content.<CType> =< lib.contentElement` with the `Generic` template, so the
+`Default` layout renders the `Header` section around the plugin output, as it
+does for any other element. A plugin template that renders `Header/All` as well
+shows the header twice: with an explicit header layout, the header and the
+subheader appear twice; with the header layout "Default", the plugin leaves an
+empty `<header></header>` behind. The partial takes the heading level for
+"Default" from `settings.defaultHeaderType`, which the settings of
+`lib.contentElement` carry and plugin settings do not.
+
+Whether the layout renders the header is a property of the site, not of the
+extension. The layouts of EXT:fluid_styled_content and `bk2k/bootstrap-package`
+render it; a site package may ship a `Default` layout without a `Header`
+section and render the header in its element templates instead. A plugin
+template can therefore not decide on its own, and one that renders the header
+does it behind a switch per extension, off by default:
+
+| Plugin setting                        | Mapped from                                                                                                          |
+|---------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| `settings.renderContentElementHeader` | the constant `plugin.tx_<key>.renderContentElementHeader`, default `0`; on v13 a site setting of `academic_jobs` too |
+| `settings.defaultHeaderType`          | the constant `styles.content.defaultHeaderType` of EXT:fluid_styled_content                                          |
+
+The second one is the constant the `lib.contentElement` of
+EXT:fluid_styled_content reads. Where the constants of EXT:fluid_styled_content
+are not included, it is undefined, and the header layout "Default" then
+renders an empty `<header>` in the plugin. That is the case on a
+`bk2k/bootstrap-package` site, whose `lib.contentElement` reads a constant of
+its own and which includes no TypoScript of EXT:fluid_styled_content.
+TypoScript has no fallback for an undefined constant, so a site in that
+position that switches the header on sets the plugin setting itself.
+
+`academic_jobs` and `academic_bite_jobs` render the header this way. The other
+plugins render none of their own, with one exception on this branch: the
+`ProfileEdit` layout of `academic_persons_edit` renders `Header/All`
+unconditionally, so the profile editing plugin shows the double header too.
+`main` replaced that editor (ACE-262); here it waits for a change of its own.
+
+A test of a plugin header counts the headings in the DOM through
+`ContentElementHeaderAssertionTrait` of the
+[testing helper](../testing/testing-helper.md), because an assertion that the
+header text appears passes on a header that renders twice.
+
 ## Testing the appearance settings
 
 A rendering test asserts the frame markup through the DOM rather than as a

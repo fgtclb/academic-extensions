@@ -54,7 +54,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Form data transformation](form-data-transformation.md)           | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                                     |
 | [Page module category summary](page-module-category-summary.md)   | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                  |
 | [TypoScript and site sets](typoscript-and-site-sets.md)           | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.                       |
-| [Content element rendering](content-element-rendering.md)         | The two rendering shapes, what the `Default` layout renders, and why a content element template needs it.                                                        |
+| [Content element rendering](content-element-rendering.md)         | The two rendering shapes, what the `Default` layout renders, why a template needs it, and who renders a plugin's header.                                         |
 
 ## See also
 
