@@ -1,42 +1,45 @@
 ## 1. Tests first
 
-- [ ] 1.1 Add frontend rendering tests for each of the thirteen plugin views
-      with the header "Hello" in layout 0 and in layout 100 (precedent: the
-      academic_jobs plugin tests); assert the heading and its absence, and
-      record that the layout 0 cases fail on the current templates.
-- [ ] 1.2 Add cases for the contacts list and the partnerships list and teaser
-      with a subheader and two roles; assert the subheader appears once, and
-      record that it fails after 2.2 without 2.3.
-- [ ] 1.3 Run the layout 0 cases on v14 without the `record` assignment and
-      record the failure, which proves the controller part is needed there.
+- [ ] 1.1 For each of the thirteen plugin views, a frontend rendering test
+      with a header, a subheader and the header layout 2 on the default
+      (fluid_styled_content) layout: exactly one heading and one subheader,
+      counted in the DOM with `ContentElementHeaderAssertionTrait` of the
+      testing helper (added by the jobs change), and no `header` element
+      holding the header text in the plugin output - the profile detail
+      renders a `header` of its own (`Profile/PublicProfile/Headline`), so
+      counting every `header` does not work there. It passes today; it pins
+      that the switch off changes nothing.
+- [ ] 1.2 The same views with the switch on and a fixture content element
+      layout without a `Header` section: the header once inside the plugin
+      output for the header layouts "Default" and 2, none for "Hidden".
+      Record that the cases fail on the current templates.
+- [ ] 1.3 Run the switched-on cases on v14 without the `record` assignment
+      and record the failure, which proves the controller part is needed.
 
 ## 2. Implementation
 
-- [ ] 2.1 Require `typo3/cms-fluid-styled-content` in the five
-      `composer.json` and `ext_emconf.php` files, and register its partial
-      path below every project slot; verify a project override of
-      `Header/All` at the project slot still wins.
-- [ ] 2.2 Assign `record` in the seven controllers and render `Header/All`
-      in the thirteen templates; verify 1.1 and 1.3 on v13 and v14.
-- [ ] 2.3 Stop passing `data.subheader` to the role headings; verify 1.2.
+- [ ] 2.1 Constant and setting `renderContentElementHeader` (default `0`),
+      a site setting where the extension declares settings, and
+      `settings.defaultHeaderType` in the five extensions,
+      the partial path of EXT:fluid_styled_content below every project slot;
+      verify a project override of `Header/All` at the project slot wins.
+- [ ] 2.2 Assign `record` in the persons, partners, programs and projects
+      controllers and render `Header/All` behind the switch in the thirteen
+      templates; verify group 1 on v13 and v14.
 
 ## 3. Documentation
 
-- [ ] 3.1 Add the plugin header rule to the `docs/` page on frontend
-      templates, or a new page linked from its section `Index.md`.
-- [ ] 3.2 Add `Documentation/Changelog/3.0/Breaking-PluginsRenderContentElementHeader.rst`
-      to the five extensions from
-      `Build/Documentation/Templates/Changelog-Breaking.rst`: the markup before
-      and after, the affected installations (a header rendered outside the
-      plugin template), the migration (remove it, or header layout "Hidden")
-      and the new requirement on `typo3/cms-fluid-styled-content`.
+- [ ] 3.1 The switch in the configuration chapter of each extension: what it
+      does and when a site needs it; `docs/architecture/content-element-rendering.md`
+      lists the extensions that have it.
+- [ ] 3.2 `Documentation/Changelog/3.0/Feature-PluginsCanRenderContentElementHeader.rst`
+      in the five extensions.
 
 ## 4. File the issue
 
 - [ ] 4.1 File the ACE issue in YouTrack, rename the change to
       `ace-<NNN>-plugin-content-element-header`, and commit as
-      `[!!!][FEATURE] ACE-<NNN>: Render the header in every plugin` in TYPO3
-      Core format.
+      `[FEATURE] ACE-<NNN>: <subject>` in TYPO3 Core format.
 
 ## 5. Definition of done
 

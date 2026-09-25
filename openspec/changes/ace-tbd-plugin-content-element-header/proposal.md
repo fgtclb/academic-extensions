@@ -1,15 +1,25 @@
 ## Why
 
-Only five of twenty frontend plugin templates render the header of their
-content element: jobs, bite jobs and the study plan. Every other academic
-plugin ignores the header an editor enters, and two of the analysed projects
-copy plugin templates for no other reason than to add it.
+Two of the analysed projects copy plugin templates for no other reason than to
+add the content element header. Their site package ships a content element
+layout without a header section and renders headers in its element templates,
+so a plugin, which renders through that layout, shows no header at all.
+
+Updated 2026-09-25, together with `ace-tbd-jobs-header-rendered-twice`: this
+change used to say that every plugin except jobs, bite jobs and the study plan
+"ignores the header an editor enters", and planned to add the header partial
+to thirteen templates unconditionally. That premise is false on a site with
+the content element layout of EXT:fluid_styled_content or
+`bk2k/bootstrap-package`: the layout renders the header around every plugin,
+and a template that renders it too shows it twice - which is what the jobs
+templates do today. The plugins need the header only where the site's layout
+leaves it out, so it becomes a switch.
 
 ## What Changes
 
-- The plugins of five extensions render the content element header and
-  subheader above their output, with the standard header partial of
-  EXT:fluid_styled_content, as the jobs plugins do:
+- The plugins of five extensions gain the switch the jobs header fix
+  introduces, "render the content element header in the plugin", one per
+  extension and off by default:
   - academic_persons (`packages/fgtclb/academic-persons`): profile list,
     card, detail, selected profiles, selected contracts;
   - academic_partners (`packages/fgtclb/academic-partners`): partner list,
@@ -19,15 +29,12 @@ copy plugin templates for no other reason than to add it.
   - academic_projects (`packages/fgtclb/academic-projects`): project list;
   - academic_contacts4pages (`packages/fgtclb/academic-contact4pages`):
     contacts list.
-- Editors hide it with the header layout "Hidden".
-- The role headings of the contacts list and the partnerships list and teaser
-  keep the header layout but no longer repeat the subheader.
-- The five extensions require `typo3/cms-fluid-styled-content`.
-- **BREAKING** (markup): headers appear where none rendered before, and a
-  project that renders its own header outside the plugin template shows two.
-  This is announced as a Breaking changelog entry per extension, with the
-  markup before and after and the migration: remove the project's own header,
-  or hide the content element header with the header layout "Hidden".
+- Off, nothing changes: the header renders once, from the content element
+  layout. On, the plugin renders the header and subheader above its output,
+  with the header partial of EXT:fluid_styled_content, for every header
+  layout except "Hidden".
+- A `Feature-` changelog entry per extension; no visible change without the
+  switch.
 - TYPO3 v14's header partial needs the content record, which the controllers
   provide. TYPO3 v13 reads the content element data. The visible result is the
   same on both.
@@ -36,8 +43,8 @@ copy plugin templates for no other reason than to add it.
 
 ### New Capabilities
 
-- `academic-persons/plugin-content-element-header`: the header of persons
-  plugins.
+- `academic-persons/plugin-content-element-header`: who renders the header
+  of the persons plugins.
 - `academic-partners/plugin-content-element-header`: the same for partners
   plugins.
 - `academic-programs/plugin-content-element-header`: the same for programs
@@ -53,22 +60,28 @@ None.
 
 ## Impact
 
-- Thirteen templates and seven controllers in five extensions.
-- The plugin TypoScript of the five extensions (header partial path), their
-  `composer.json` and `ext_emconf.php`.
+- Thirteen templates and six controllers in five extensions (the contacts
+  controller already assigns `record`, ACE-728).
+- The plugin TypoScript (constant, setting, header partial path, default
+  header type) of the five extensions, and the site settings definitions of
+  persons, partners and programs - projects and contacts4pages declare none.
 - No database or TCA change.
 
 ## Non-goals
 
-- A switch to turn the header off other than the header layout.
+- A switch shared by all extensions (see the jobs change).
 - The academic_persons_edit editing plugin.
 - Rich-text headers and the header palette of projects.
 - Backporting to branch `2`.
 
+Depends on `ace-tbd-jobs-header-rendered-twice`, which introduces the switch
+and its documentation.
+
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
-`cross-cutting-04`). Three of the six analysed projects carry their own code
-for this today. No YouTrack issue is filed yet; the change is renamed to
+`cross-cutting-04`), corrected on 2026-09-25 as described above. Three of the
+six analysed projects carry their own code for this today. No YouTrack issue
+is filed yet; the change is renamed to
 `ace-<NNN>-plugin-content-element-header` when the issue is filed after
 implementation.
