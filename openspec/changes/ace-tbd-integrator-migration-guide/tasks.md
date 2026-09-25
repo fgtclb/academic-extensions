@@ -17,7 +17,7 @@
   `styles.content.getContent` definition for site templates that still
   render it, and links to the `Breaking-` entries of the owning changes:
   `ace-721-program-page-content-without-getcontent` (programs set),
-  `ace-tbd-program-facts-field-list` (`Partials/Program/Categories.html`) and
+  `ace-733-program-facts-field-list` (`Partials/Program/Categories.html`) and
   `ace-tbd-page-templates-sections-subtitle` (partners and projects sets).
 - [ ] 2.2 Link the guide from the index of every other manual
   (`academic-bite-jobs`, `academic-contact4pages`, `academic-jobs`,

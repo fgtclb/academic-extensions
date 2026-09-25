@@ -29,7 +29,7 @@ the built-in facts `creditPoints`, `jobProfile`, `performanceScope` and
   of the group nor a built-in fact
 - **THEN** that item is skipped and the other facts render in order
 
-### Requirement: An empty facts list keeps the current output
+### Requirement: An empty facts list keeps the current facts
 With the facts setting empty, the program page SHALL show every category type
 of the `programs` group in the category type order followed by the four
 built-in facts, and the details content element SHALL show every category

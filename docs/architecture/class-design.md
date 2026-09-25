@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 309 PHP files declaring 276
-classes, 10 interfaces, 13 traits and 10 enums do not follow one style yet.
+rather than describing an intention as a rule — 314 PHP files declaring 279
+classes, 11 interfaces, 13 traits and 11 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,21 +16,21 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-159 of the 276 classes are `final` (58 %). The distribution is not random: it
+162 of the 279 classes are `final` (58 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
 |--------------------------------------------|---------|---------|----------|----------|
 | `Classes/Upgrades/`                        | 15      | 0       | 0        | 100 %    |
-| `Classes/Service/` and `Classes/Services/` | 27      | 2       | 0        | 93 %     |
+| `Classes/Service/` and `Classes/Services/` | 28      | 2       | 0        | 93 %     |
 | `Classes/EventListener/`                   | 10      | 1       | 0        | 91 %     |
 | `Classes/Controller/`                      | 4       | 5       | 0        | 44 %     |
 | `Classes/Domain/Model/Dto/`                | 7       | 10      | 1        | 39 %     |
-| `Classes/ViewHelpers/`                     | 3       | 8       | 0        | 27 %     |
-| `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
+| `Classes/ViewHelpers/`                     | 4       | 8       | 0        | 33 %     |
+| `Classes/Domain/Model/` (excluding `Dto/`) | 1       | 23      | 0        | 4 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
 | Everything else                            | 93      | 47      | 4        | 65 %     |
-| **Total**                                  | **159** | **112** | **5**    | **58 %** |
+| **Total**                                  | **162** | **112** | **5**    | **58 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 308 modifiers, of
-which 299 are constructor-promoted, across 95 files. The nine non-promoted
+`readonly` is used heavily, mostly on individual properties: 310 modifiers, of
+which 301 are constructor-promoted, across 97 files. The nine non-promoted
 declarations are the eight documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
@@ -72,7 +72,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 38:
+nothing**, and of an immutable data object. There are 40:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -96,7 +96,7 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 173   | An injected collaborator                          |
+| `private readonly`   | 175   | An injected collaborator                          |
 | `public readonly`    | 112   | A field of an immutable data object               |
 | `protected readonly` | 23    | Either, in classes with subclasses or older style |
 
@@ -117,14 +117,14 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 93 files declare
-293 promoted `readonly` parameters. The fullest example by a wide margin is
+Constructor injection with promoted properties is the default: 95 files declare
+301 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.
 
 **Method injection is used where a constructor is not available to take
-dependencies.** There are 13 `inject*()` methods across 9 files and **zero**
+dependencies.** There are 14 `inject*()` methods across 10 files and **zero**
 `@inject` annotations — the annotation form is not used at all, which is worth
 keeping true.
 
@@ -164,8 +164,10 @@ is not `final` yet. The list controllers of `academic_partners`,
 subclass calls `parent::__construct()` with the arguments it knows, and a new
 constructor argument would break it. The method is `final` and named after its
 purpose, as core's own `injectInternalExtensionService()` of `ActionController`
-is, so a subclass cannot declare one of the same name by accident. Once the
-controllers are `final`, the service moves to the constructor.
+is, so a subclass cannot declare one of the same name by accident. The details
+controller of `academic_programs` takes its `ProgramFactsBuilder` through
+`injectProgramFactsBuilder()` for the same reason. Once the controllers are
+`final`, the services move to the constructor.
 
 Apart from that, method injection on a **concrete** class does not have this
 justification.
@@ -187,14 +189,14 @@ grep -rho 'GeneralUtility::makeInstance(' --include='*.php' \
   packages/fgtclb/*/Classes packages-dev/*/Classes | wc -l
 ```
 
-106 call sites across the `Classes/` directories. Some are unavoidable: TCA and
-FormEngine code under `Classes/Backend/` and `Classes/Tca/` (22 sites) runs
+120 call sites across the `Classes/` directories. Some are unavoidable: TCA and
+FormEngine code under `Classes/Backend/` and `Classes/Tca/` (23 sites) runs
 where no container-injected instance is available, and a `DeletedRestriction` or
 similar throwaway object is not a service at all.
 
 The rest are not unavoidable. `makeInstance()` appears inside domain models
 (9 sites, for example `academic-partners/Classes/Domain/Model/Partner.php` lines
-121 and 184), repositories (12) and controllers (8) — all places that can take a
+121 and 222), repositories (16) and controllers (8) — all places that can take a
 constructor argument instead. Prefer injection; reach for `makeInstance()` when
 there is genuinely no container, and not as a shortcut around editing a
 constructor.
@@ -267,7 +269,7 @@ referenced it.
 
 ### Enums
 
-Ten, all backed, none pure
+Eleven, all backed, none pure
 (`grep -rl '^enum' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes`):
 
 | Enum                                                                   | Backing  |
@@ -281,6 +283,7 @@ Ten, all backed, none pure
 | `academic-persons/Classes/Profile/ProfileActionType.php:14`            | `string` |
 | `academic-persons/Classes/Service/ContractDisplay.php:15`              | `string` |
 | `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12`      | `string` |
+| `academic-programs/Classes/Enumeration/ProgramFactsPlace.php:11`       | `string` |
 | `academic-projects/Classes/Domain/Model/Dto/ActiveState.php:7`         | `string` |
 
 Back an enum whenever its values are persisted, passed through a request, or
@@ -342,26 +345,27 @@ the two supported versions, so a reader has to grep for the method anyway.
 
 ## Strict types
 
-253 of the 259 files declare `strict_types=1` (98 %) — here counted over
+299 of the 304 files declare `strict_types=1` (98 %) — here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
-`packages-dev/` and `Tests/` are not counted. The 6 that do not are worth
+`packages-dev/` and `Tests/` are not counted. The 5 that do not are worth
 knowing so they are fixed rather than copied:
 
 | File                                                                 |
 |----------------------------------------------------------------------|
 | `academic-partners/Classes/DataProcessing/PartnershipProcessor.php`  |
 | `academic-partners/Classes/DataProcessing/PartnerProcessor.php`      |
-| `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`  |
 | `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`     |
 | `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`    |
 | `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php` |
 
-Three of the six are `DataProcessing/` classes, which suggests one origin
-rather than six independent omissions. A fourth,
-`academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php`, was one
-of them until it gained a constructor (ACE-101) and was fixed on the way.
+Two of the five are `DataProcessing/` classes, which suggests one origin
+rather than five independent omissions. Two more were among them until they
+gained a constructor and were fixed on the way:
+`academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php` (ACE-101)
+and `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`, when it
+started to build the program facts.
 
 ## Static analysis
 

@@ -2,8 +2,12 @@
 
 See `proposal.md` - Why. Verified on main:
 
-- `academic-programs/Resources/Private/Partials/Program/Categories.html:17-34`
-  and `Partials/Program/Item.html:36-38` print every assigned category.
+- Since `ace-733-program-facts-field-list`, the program page, the details
+  element and the program card print their categories through
+  `academic-programs/Classes/Service/ProgramFactsBuilder.php`, which takes
+  every assigned category of a type from `getAllCategoriesByType()`, and
+  `Resources/Private/Partials/Program/Facts/Item.html` prints each of them;
+  `Partials/Program/Categories.html` is removed.
 - `typo3-category-types/Classes/Collection/CategoryCollection.php:63-83`
   groups the attached categories per type; it holds every category of the
   program and each `Category` knows its `parentId`
@@ -11,7 +15,7 @@ See `proposal.md` - Why. Verified on main:
 - `CategoryRepository::getCategoryRootline()`
   (`Domain/Repository/CategoryRepository.php:297`) walks up with one query
   per level; `Category::getParent()` queries as well.
-- The facts rendering this builds on is `ace-tbd-program-facts-field-list`.
+- The facts rendering this builds on is `ace-733-program-facts-field-list`.
 
 ## Goals / Non-Goals
 
@@ -52,7 +56,7 @@ the category's type.
 
 `plugin.tx_academicprograms.facts.mostSpecificOnly` (bool, default false), in
 the same `settings.definitions.yaml` and constants as the facts fields of
-`ace-tbd-program-facts-field-list`, reaching the page through the
+`ace-733-program-facts-field-list`, reaching the page through the
 `program-data` processor option and the plugins through their settings. The
 facts builder switches the collection method.
 

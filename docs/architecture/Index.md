@@ -66,6 +66,10 @@ describing an intention as if it were the state.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
+- The facts of a program are built by **one** stateless builder for the three
+  places that show them, from a field list per place. An empty list means what
+  the place showed before the list existed, and category types keep the order
+  of the registry unless the list names them.
 - A dead template override is invisible: Fluid resolves the first file it finds
   and says nothing when it finds none of the project's. `academic:upgrade:check`
   reports them, and a root path is a *project* override only when it lies
@@ -95,6 +99,7 @@ describing an intention as if it were the state.
 | [Shared partials](shared-partials.md)                           | The Fluid partials `academic_base` ships for every extension, the root path key `-1` they are registered with, and which views register it.                                                |
 | [Overridable partials](overridable-partials.md)                 | How a template is cut into partials a project overrides one at a time, the escaping contract of a partial that renders a value, and where the classes go.                                  |
 | [Page type rendering](page-type-rendering.md)                   | How the page types refine the site's page object: `FLUIDTEMPLATE` against `PAGEVIEW`, the path keys, the layout contract and its fallback.                                                 |
+| [Program facts](program-facts.md)                               | The one builder behind the facts of the program page, the details element and the program card, what an empty field list means, and the partial per row.                                   |
 | [List plugin events](list-plugin-events.md)                     | The demand and list events of the partner and project lists, the plugin context they carry, and the rules that are easy to get wrong.                                                      |
 | [List filter URLs](list-filter-urls.md)                         | The redirect of a filter submission, the demand in its URL, what is always carried and why, the page of a pagination link, and why an enhancer must not declare defaults for it.           |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |

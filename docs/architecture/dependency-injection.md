@@ -58,7 +58,7 @@ which is why the two styles coexist without friction. Beyond the header, seven
 files carry real definitions: `event.listener` tags, `data.processor` tags, an
 `extbase.type_converter` tag, three `console.command` tags, factory-produced
 services, one interface alias, and several `public: true` markers on
-repositories and registries.
+repositories, registries and one data processor.
 
 Two spellings are worth knowing because they are inconsistent across the
 packages and the difference is not cosmetic:
@@ -361,14 +361,23 @@ class ContactsProcessor implements DataProcessorInterface
 }
 ```
 
+`academic_programs` publishes `ProgramDataProcessor` for the same reason, in
+its `Configuration/Services.yaml`, although the extension itself names it by its
+tag identifier `program-data`: an identifier is resolved through the tagged
+service locator and needs no publishing, but a project page object may still
+name the class.
+
 This is the "TYPO3 API entry point" exception of the rule below, not a reason to
 publish services in general. Two consequences are worth knowing before reaching
 for it:
 
 - The processor stays **non-`final`**, because projects subclass it. A subclass
   named in TypoScript is only constructed correctly when the project's own
-  `Services.yaml` autowires it; otherwise TYPO3 takes the `makeInstance` path
-  and the missing constructor argument is fatal.
+  `Services.yaml` registers it as a **public** service, or tags it
+  `data.processor` and TypoScript names that identifier. Autowiring alone is
+  not enough: both lookups ask the container's `has()`, which does not see a
+  private service, so TYPO3 takes the `makeInstance` path and the missing
+  constructor argument is fatal.
 - `ContactsProcessor` shares `PageContactsProvider` with `ContactsController`,
   which is the point of injecting it: the rule about which contacts a visitor
   sees exists once, and the content element and the page template cannot drift

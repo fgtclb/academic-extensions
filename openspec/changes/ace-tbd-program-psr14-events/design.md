@@ -6,7 +6,12 @@ See `proposal.md` for the motivation. On main:
   queries, collects the applicable categories and assigns, all in one method
   (`Classes/Controller/ProgramController.php`).
 - `ProgramDataProcessor` creates `ProgramDataFactory` with `makeInstance()`,
-  and the factory maps a fixed field list into `ProgramData`.
+  and the factory maps a fixed field list into `ProgramData`. Since
+  `ace-733-program-facts-field-list` the processor has a constructor taking
+  `ProgramFactsBuilder`, is `public: true` in `Configuration/Services.yaml`
+  (so a page object naming it by class name keeps working), and emits
+  `facts` next to `program`; this change appends its collaborators to that
+  constructor.
 - Controllers, factories and models are not `final`, and one project
   subclasses the controller.
 - `academic_persons` already has `ModifyProfileDemandEvent` (final,

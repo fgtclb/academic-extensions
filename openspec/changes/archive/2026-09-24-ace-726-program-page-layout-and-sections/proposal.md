@@ -57,7 +57,7 @@ None.
 - Removing or deprecating the content-load sets and
   `Partials/Program/Categories.html`; they are removed in 3.0 by
   `ace-721-program-page-content-without-getcontent`, the partner and project
-  page template changes and `ace-tbd-program-facts-field-list`.
+  page template changes and `ace-733-program-facts-field-list`.
 - A backport to branch `2`.
 
 ## Source

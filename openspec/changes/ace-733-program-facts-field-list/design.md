@@ -21,7 +21,12 @@ See `proposal.md` - Why. Verified on main in
 - The extension has no `settings.definitions.yaml`. `academic_persons` keeps
   its definitions with the aggregate set only, keyed by the constant path,
   with the defaults mirrored in `constants.typoscript`
-  (`academic-persons/Configuration/Sets/Full/`).
+  (`academic-persons/Configuration/Sets/Full/`). Re-checked at apply:
+  `ace-726-program-page-layout-and-sections` has since added
+  `Configuration/Sets/Full/settings.definitions.yaml` with the two page
+  settings in exactly that convention, and this change extends it; the facts
+  of the page moved to `Partials/Program/Page/Facts.html`, which renders
+  `Program/Categories` and the fixed list.
 - A PAGEVIEW page object assigns `settings` from the TypoScript constants and
   ignores `page.10.settings` (`PageViewContentObject.php:101` on 13.4.35 and
   14.3.6); only `dataProcessing` and `variables` reach both integrations.
@@ -71,12 +76,24 @@ object ignores.
 A `final readonly` `ProgramFactsBuilder` (autowired, no state) takes the
 program's category collection, the four built-in values and the field list,
 and returns an ordered list of `final readonly` `ProgramFact` items
-(identifier, label, icon identifier, values). Both `Program` and
-`ProgramData` feed it through one small interface they implement. An empty
-list resolves per place: page = all types then the built-ins, details = all
-types, card = `degree`. The processor, `DetailsController` and a
-`<ap:program.facts>` ViewHelper for the card call it; the partials
+(identifier, label key, icon identifier, categories or value). Both `Program`
+and `ProgramData` feed it through one small interface they implement,
+`ProgramFactsSourceInterface`. An empty list resolves per place, named by the
+enum `ProgramFactsPlace`: page = all types then the built-ins, details = all
+types, card = `degree`. The processor, `DetailsController` (by method
+injection, so the constructor project subclasses call stays unchanged) and a
+`<ace:program.facts>` ViewHelper for the card call it - `ace` is the prefix the
+extension's templates already use for its namespace; the partials
 `Program/Facts` and `Program/Facts/Item` render the result.
+
+The facts are one list in every place: `<ul class="academic-programs-facts">`
+with an `<li class="academic-programs-facts__item
+academic-programs-facts__item--<identifier>">` per fact and a colon after
+every label. The page's second list for the built-ins and the card's own
+markup go; the card keeps its Bootstrap list group classes through two
+partial arguments. With an empty setting each place therefore shows the same
+facts in the same order, in the new markup - which the Breaking changelog
+describes.
 
 Rejected: resolving `{program.{field}}` in Fluid. It needs three copies of the
 built-in/type distinction and cannot skip unknown identifiers cleanly.
@@ -100,8 +117,15 @@ card: title / image / card.fields (default: degree)
 The credit points fact gets the icon identifier
 `tx-academicprograms-info-credit-points`, a Font Awesome Free solid SVG
 placed under `Icons/info/` as the icon consolidation of ACE-584 to ACE-594
-lays it out. The icon task is applied after pull request #617 (ACE-591) has
-merged; `main` does not carry that convention yet.
+lays it out.
+
+At apply, pull request #617 (ACE-591) was still open, unchanged since
+2026-09-10 and 222 commits behind `main`. The maintainer decided to ship the
+icon ahead of it rather than wait: the identifier and file layout above,
+`CurrentColorSvgIconProvider`, and `Resources/Public/Icons/LICENSE-font-awesome.txt`
+in the format of #617, listing this one file, so #617 merges its list into it
+on its rebase. The drawing is `certificate`: `award` is the projects'
+competence field in #617, and `coins` would read as costs.
 
 The decided convention is
 `tx-<extension key without underscores>-<group>-<name>`, with category type
@@ -162,6 +186,11 @@ removes.
 - [A project override of `Program/Categories` silently stops rendering] →
   The Breaking changelog names the replacement partials and the setting that
   reproduces the old order.
+- [A project template override that still renders `Program/Categories` - an
+  `AcademicProgram.html` or `Details/Show.html` copied from an earlier
+  version - fails with Fluid's missing partial exception] → named in the
+  Breaking changelog with the one-line replacement; keeping a delegating
+  `Categories.html` was rejected with the deprecation (D-104).
 - [The facts no longer follow the category type priority once
   `ace-tbd-category-type-priority-order` lands] → resolved by the decision
   above: the default facts take the type order from the registry, and the

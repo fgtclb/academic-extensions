@@ -23,8 +23,11 @@
   plugin lists the location before the degree; show it fails without 1.2.
 - [ ] 2.3 Verify that the `sys_category` `type` select items follow the order
   with a functional TCA assertion, and show it fails without 1.2.
-- [ ] 2.4 If `ace-tbd-program-facts-field-list` has landed, extend its facts
-  order test (its task 2.7) to the priority order: the fixture raises
+- [ ] 2.4 `ace-733-program-facts-field-list` has landed: extend its facts
+  order test (its task 2.7,
+  `academic-programs/Tests/Functional/Facts/ProgramFactsTest.php`, today
+  pinning the registry order degree - standard period - location) to the
+  priority order: the fixture raises
   `location` above `degree`, the program page and the details element with
   an empty facts setting show the location before the degree; show it fails
   without 1.2. If it has not landed, that change writes the test against
