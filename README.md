@@ -251,6 +251,22 @@ EXT_CONSTANTS.php`. `ddev start` fixes it — its post-start hook runs
 `composer install` — and `ddev composer install` does the same without a
 restart.
 
+### Git worktrees
+
+A linked `git worktree` is a second checkout with the same project names, and
+DDEV refuses a name another directory holds. Enable the repository's hooks once
+per clone and every new worktree gets names of its own, such as
+`core13-academics-v3-3513e252`, before its first `ddev start`:
+
+```shell
+git config core.hooksPath Build/git-hooks
+```
+
+For a worktree that already exists, run `Build/Scripts/ddevWorktreeNames.sh`
+in it. Before `git worktree remove`, run `ddev delete -Oy` in each of its
+instances. The details are in
+[Instances in git worktrees](docs/development/instances.md#instances-in-git-worktrees).
+
 ### Without DDEV
 
 The instances do not depend on DDEV. `config/system/additional.php` recomputes the

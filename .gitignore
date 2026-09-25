@@ -69,6 +69,13 @@
 /core-13/.ddev/traefik/
 /core-14/.ddev/traefik/
 
+# The DDEV project name of an instance in a linked git worktree, written by
+# "Build/Scripts/ddevWorktreeNames.sh". DDEV's own ".ddev/.gitignore" covers it
+# too, but that file only exists after the first "ddev start", and this one is
+# written before it - by the post-checkout hook, on "git worktree add".
+/core-13/.ddev/config.worktree.local.yaml
+/core-14/.ddev/config.worktree.local.yaml
+
 # The instance of the *other* version line. Branch "2" carries "core-12/" and
 # "core-13/"; this branch carries "core-13/" and "core-14/". Switching branches
 # in one checkout removes the tracked files of "core-12/" but leaves its ignored
