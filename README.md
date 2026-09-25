@@ -260,6 +260,22 @@ only, so the other name's certificate is left visible — and the instance folde
 of the other version line, `core-14/` here and `core-12/` on `main`, whose
 ignored trees stay behind when its tracked files go.
 
+### Git worktrees
+
+A linked `git worktree` is a second checkout with the same project names, and
+DDEV refuses a name another directory holds. Enable the repository's hooks once
+per clone and every new worktree gets names of its own, such as
+`core12-academics-v2-3513e252`, before its first `ddev start`:
+
+```shell
+git config core.hooksPath Build/git-hooks
+```
+
+For a worktree that already exists, run `Build/Scripts/ddevWorktreeNames.sh`
+in it. Before `git worktree remove`, run `ddev delete -Oy` in each of its
+instances. The details are in
+[Instances in git worktrees](docs/development/instances.md#instances-in-git-worktrees).
+
 ### Without DDEV
 
 The instances do not depend on DDEV. `config/system/additional.php` recomputes the

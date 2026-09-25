@@ -59,9 +59,11 @@ extensions that use them. The package's `Tests/Unit/Build/` holds tests, but for
 something else: the three scripts behind `runTests.sh -j`,
 `Build/Scripts/splitFunctionalTests.php`,
 `Build/Scripts/checkFunctionalTestCount.php` and
-`Build/Scripts/recordFunctionalTestTimes.php` (ACE-692). They run the scripts as
-subprocesses and are collected because the suites glob `packages-dev/*/Tests/`
-as well.
+`Build/Scripts/recordFunctionalTestTimes.php` (ACE-692), and
+`Build/Scripts/ddevWorktreeNames.sh` with the `post-checkout` hook that runs it
+(ACE-737), against a throwaway repository with a linked worktree. They run the
+scripts as subprocesses and are collected because the suites glob
+`packages-dev/*/Tests/` as well.
 
 A namespace quirk follows from the same history: every trait lives under
 `FGTCLB\TestingHelper\FunctionalTestCase\`, but
