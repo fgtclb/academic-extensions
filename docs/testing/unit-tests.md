@@ -5,9 +5,10 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 71 unit test classes across the twelve extensions, one more in
-`packages-dev/dev-site` and three in `packages-dev/testing-helper`, 12 of which
-are the one-line version compatibility test every extension carries (see
+There are 81 unit test classes: 76 across the twelve extensions, one in
+`packages-dev/dev-site`, one in `packages-dev/monorepo-shared` and three in
+`packages-dev/testing-helper`. Twelve of them are the one-line version
+compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
 `find packages/fgtclb/*/Tests/Unit packages-dev/*/Tests/Unit -name '*Test.php' | wc -l`.
 
@@ -83,6 +84,9 @@ tests of the three scripts behind `runTests.sh -j`, which split the functional
 suite, check that the chunks ran every listed test, and record the durations
 (ACE-692). Its traits have no tests of their own — they are exercised only
 through the extensions that use them.
+[`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
+the check that every `ext_emconf.php` of the repository names its dependencies
+by extension key, see [below](#the-ext_emconfphp-dependency-keys).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -98,7 +102,9 @@ them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
 `TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
-unit test case, and no unit test extends another test class.
+unit test case, and no unit test extends another test class. The five below
+`packages-dev/` are the exception to the base class: they need nothing of
+TYPO3 and extend PHPUnit's `TestCase` directly.
 
 **The namespace mirrors the path, which mirrors `Classes/`.**
 `FGTCLB\AcademicPersons\Tests\Unit\Domain\Model\EmailTest` tests
@@ -225,6 +231,47 @@ confusing pile of unrelated failures. See
 ([`typo3-category-types/Tests/Unit/VersionCompareTest.php`](../../packages/fgtclb/typo3-category-types/Tests/Unit/VersionCompareTest.php));
 the content is identical. Every extension also carries the same test in its
 functional suite.
+
+## The `ext_emconf.php` dependency keys
+
+[`ExtEmConfDependencyKeysTest`](../../packages-dev/monorepo-shared/Tests/Unit/ExtEmConfDependencyKeysTest.php)
+reads every `ext_emconf.php` below `packages/` — the twelve extensions and
+their fixture extensions — and asserts that each key of `depends`, `suggests`
+and `conflicts` names an extension that exists. It lives in
+`packages-dev/monorepo-shared` rather than in an extension because it checks
+the repository as a whole, and a split-out extension has nothing to compare
+against.
+
+A classic, non-Composer installation resolves an extension's dependencies from
+those keys. A key that is no extension key is a dependency on nothing, and
+nothing else reports it: Composer installations read `composer.json` instead,
+and the testing framework skips such a name silently. `academic_jobs` named
+`rte-ckeditor` and `fluid-styled-content` from 2.1.0 on, and nothing noticed
+until ACE-731.
+
+What counts as valid is read, not listed:
+
+| Key                                       | Accepted for                                                                            |
+|-------------------------------------------|-----------------------------------------------------------------------------------------|
+| `typo3`, `php`                            | everything — they are constraints of their own, not extension keys                      |
+| the key of every installed TYPO3 package  | everything — core extensions and the packages of this repository alike                  |
+| the key of every fixture extension        | fixture extensions only, which may depend on each other                                 |
+| an entry of `NOT_INSTALLED` in the test   | `suggests` and `conflicts`, when the extension's `composer.json` names that package too |
+
+The installed keys come from Composer's `InstalledVersions` and each package's
+`extra.typo3/cms.extension-key`, so a new core version or a new extension needs
+no change. `NOT_INSTALLED` holds the one suggested extension the development
+setup does not install — `fgtclb/page-backend-layout`, which nothing here
+requires — and a second test fails once it is installed after all.
+
+The keys are deliberately **not** compared with the extension's
+`composer.json`. Three extensions name a core extension in one file and not in
+the other — `academic_base` depends on `backend` only in `ext_emconf.php`,
+`academic_study_plan` on `fluid`, `frontend` and `install` only in
+`composer.json`, and `academic_partners` on `install` and its suggestion of
+`scheduler` only there — and an equality check would fail today for no
+defect. `academic_jobs` carries that stricter
+check for itself, `academic-jobs/Tests/Unit/ExtEmConfDependenciesTest.php`.
 
 ## See also
 

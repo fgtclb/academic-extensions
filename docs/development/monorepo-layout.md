@@ -54,7 +54,8 @@ Three packages that are never released as extensions and never shipped to an
 installation:
 
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`, type
-  `library`. It centralizes the TYPO3 core dependency constraints.
+  `library`. It centralizes the TYPO3 core dependency constraints, and checks
+  the `ext_emconf.php` dependency keys of every extension.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`,
   type `library`. Shared functional-test traits.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key
@@ -317,6 +318,11 @@ Raising the supported v12 patch level, or adding v14 later, is one edit in that
 file. The individual extensions declare only the system extensions they
 themselves use, and adding a system extension for a test only needs it added
 here.
+
+Its `Tests/Unit/` holds the one check that concerns the dependency metadata of
+all extensions at once: every key an `ext_emconf.php` names in `depends`,
+`suggests` or `conflicts` has to name an extension that exists. See
+[Unit tests](../testing/unit-tests.md#the-ext_emconfphp-dependency-keys).
 
 ## `packages-dev/testing-helper/` — shared test traits
 

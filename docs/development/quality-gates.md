@@ -51,16 +51,18 @@ it.
 What it scans matters more than the rules, because it is narrower than the
 repository (`Build/php-cs-fixer/config.php:49-68`):
 
-| Finder call              | Value                                       |
-|--------------------------|---------------------------------------------|
-| `in()`                   | `packages/fgtclb/`, `Build`                 |
-| `exclude()`              | `.Build/`, `Build/`, `var/`, `node_modules` |
-| `ignoreVCSIgnored(true)` | anything git ignores is skipped             |
+| Finder call              | Value                                        |
+|--------------------------|----------------------------------------------|
+| `in()`                   | `packages/fgtclb/`, `packages-dev/`, `Build` |
+| `exclude()`              | `.Build/`, `Build/`, `var/`, `node_modules`  |
+| `ignoreVCSIgnored(true)` | anything git ignores is skipped              |
 
-So `packages-dev/`, `bin/`, `core-12/`, `core-13/` and the PHP files at the
-repository root are **not** covered by this gate at all. A file placed there is
-never reformatted and never reported — which is worth knowing before concluding
-from a green run that the whole repository is formatted.
+So `bin/`, `core-12/`, `core-13/` and the PHP files at the repository root are
+**not** covered by this gate at all. A file placed there is never reformatted
+and never reported — which is worth knowing before concluding from a green run
+that the whole repository is formatted. `packages-dev/` *is* covered: all three
+of its packages carry PHP and tests of their own, and a formatting standard
+that stops at a directory boundary is one nobody remembers.
 
 `ignoreVCSIgnored(true)` is what keeps generated trees out even when they sit
 inside a scanned directory, so the gate does not depend on the `exclude()` list
