@@ -87,7 +87,7 @@ Both enhancers get these routes:
 - each of these with `{localized_page}-{page}`;
 - each of these with `{letter}`, without a page variant;
 - each of the nine above with the `/view-mode/{viewMode}` segment of
-  `ace-tbd-list-view-modes`, placed after the filter segments and before the
+  `ace-735-list-view-modes`, placed after the filter segments and before the
   page or letter.
 
 That is eighteen explicit routes per enhancer. The filter key segments are
@@ -110,7 +110,7 @@ optional segment, because Symfony omits only trailing defaults (ACE-623).
 
 ### Decided: the view mode segment combines with the filter routes
 
-The `/view-mode/{viewMode}` route of `ace-tbd-list-view-modes` (a
+The `/view-mode/{viewMode}` route of `ace-735-list-view-modes` (a
 `StaticValueMapper` on the shipped modes) extends this route set: every
 filter route, with page or letter or alone, also exists with the view mode
 segment. Whichever of the two changes lands second adds these combinations
