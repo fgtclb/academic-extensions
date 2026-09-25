@@ -49,6 +49,11 @@
         "typo3/cms-tstemplate": "^12.4.22 || ^13.4",
         "typo3/cms-workspaces": "^12.4.22 || ^13.4"
     },
+    "autoload-dev": {
+        "psr-4": {
+            "FGTCLB\\AcademicsMonorepoShared\\Tests\\": "Tests/"
+        }
+    },
     "config": {
         "sort-packages": true,
         "allow-plugins": {

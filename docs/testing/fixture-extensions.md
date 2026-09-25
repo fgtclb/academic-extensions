@@ -40,7 +40,10 @@ Each is a real, complete TYPO3 extension: a `composer.json` of type
 Six of the twelve have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
 other six are pure resources. Only `test_bitejobs_stub` and
 `test_partners_stub` ship an `ext_localconf.php`, which is how they replace the
-Guzzle handler stack before any request is built.
+Guzzle handler stack before any request is built. The `ext_emconf.php` is
+checked like every other one: its `depends` names extension keys, and a
+fixture extension may name another fixture extension, which a real extension
+may not — see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
 
 A minimal one, complete:
 
