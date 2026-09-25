@@ -1,0 +1,10 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+<f:comment>
+    Stands in for a site package's own contact card: it prints what the partial receives,
+    so a test can tell which contact rendered through it, with which role and in which branch.
+</f:comment>
+<p class="item-override">ITEM-OVERRIDE[{contact.uid}|{role.name}|{f:if(condition: grouped, then: 'grouped', else: 'flat')}|{profile.lastName}|{contract.position}|{data.uid}|{settings.detailPid}]</p>
+</html>

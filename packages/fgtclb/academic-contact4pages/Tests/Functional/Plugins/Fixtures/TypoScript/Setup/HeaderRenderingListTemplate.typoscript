@@ -1,0 +1,14 @@
+# A site package that renders the header of the contacts element in its own list template,
+# through the header partial of EXT:fluid_styled_content, rather than in the layout of the
+# element - so the header renders once.
+tt_content.academiccontacts4pages_list.layoutRootPaths.50 = EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/Layouts/
+
+plugin.tx_academiccontacts4pages {
+  # The header partial falls back to this type for the header layout "Default", and plugin
+  # settings do not carry it the way the settings of `lib.contentElement` do.
+  settings.defaultHeaderType = {$styles.content.defaultHeaderType}
+  view {
+    templateRootPaths.20 = EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/Templates/
+    partialRootPaths.0 = EXT:fluid_styled_content/Resources/Private/Partials/
+  }
+}

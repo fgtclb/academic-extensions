@@ -24,6 +24,12 @@
       <trans-unit id="flexform.showHiddenRecords.description">
         <source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
       </trans-unit>
+      <trans-unit id="flexform.groupByRole.label">
+        <source>Group by role</source>
+      </trans-unit>
+      <trans-unit id="flexform.groupByRole.description">
+        <source>If enabled, contacts are listed below a heading per role, followed by the contacts without a role. If disabled, all contacts are listed in the order they are sorted on the page, and a contact with a role shows its role name.</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

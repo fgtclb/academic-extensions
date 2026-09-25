@@ -49,7 +49,11 @@ None.
 
 - A layout select with several shipped card designs.
 - Changing the page data processor; that is candidate `listings-19`.
-- Backporting to branch `2`; to be decided after `main`.
+
+The option and the item partial are backported to branch `2` (2.4) in a
+change of its own there, with the same name. The `record` view variable stays on `main`: branch `2`
+supports TYPO3 v12 and v13, whose header partial reads `data`, and
+`academic_base` there has no trait to build the record.
 
 Depends on candidate `listings-02` (change
 `ace-101-contacts-skip-unresolved-profiles`), after which the item partial
@@ -59,5 +63,4 @@ never receives a contact without a visible profile.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-18`). Five of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-<slug>` when the issue is filed after implementation.
+this today. Filed as ACE-728 after the implementation was green.

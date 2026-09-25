@@ -49,8 +49,9 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
 
     /**
      * @param list<string> $additionalConstantFiles Constants loaded after the shipped ones.
+     * @param list<string> $additionalSetupFiles Setup loaded after the shipped one.
      */
-    private function setUpTestCase(string $dataSet, array $additionalConstantFiles = []): void
+    private function setUpTestCase(string $dataSet, array $additionalConstantFiles = [], array $additionalSetupFiles = []): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicContacts4PagesListPlugin/' . $dataSet . '.csv');
         $this->setUpFrontendRootPage(
@@ -65,12 +66,15 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
                     ],
                     $additionalConstantFiles,
                 ),
-                'setup' => [
-                    'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
-                    'EXT:academic_persons/Configuration/TypoScript/Default/setup.typoscript',
-                    'EXT:academic_contacts4pages/Configuration/TypoScript/List/setup.typoscript',
-                    'EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/Rendering.typoscript',
-                ],
+                'setup' => array_merge(
+                    [
+                        'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
+                        'EXT:academic_persons/Configuration/TypoScript/Default/setup.typoscript',
+                        'EXT:academic_contacts4pages/Configuration/TypoScript/List/setup.typoscript',
+                        'EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/Rendering.typoscript',
+                    ],
+                    $additionalSetupFiles,
+                ),
             ],
         );
         $this->writeFrontendPluginTestSite([
@@ -91,6 +95,61 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->getConnectionPool()
             ->getConnectionForTable('tt_content')
             ->update('tt_content', ['header' => $header], ['uid' => 1]);
+    }
+
+    /**
+     * Stores the FlexForm of the content element with exactly the given fields, the way the
+     * backend saves it - a field that is not passed is not stored at all.
+     *
+     * @param array<string, string> $fields
+     */
+    private function setContentElementFlexForm(array $fields): void
+    {
+        $fieldXml = '';
+        foreach ($fields as $name => $value) {
+            $fieldXml .= sprintf('<field index="%s"><value index="vDEF">%s</value></field>', $name, $value);
+        }
+        $this->getConnectionPool()
+            ->getConnectionForTable('tt_content')
+            ->update(
+                'tt_content',
+                [
+                    'pi_flexform' => '<?xml version="1.0" encoding="utf-8" standalone="yes" ?><T3FlexForms><data>'
+                        . '<sheet index="sDEF"><language index="lDEF">' . $fieldXml . '</language></sheet>'
+                        . '</data></T3FlexForms>',
+                ],
+                ['uid' => 1],
+            );
+    }
+
+    /**
+     * The role headings of the grouped list: `Profile/Header` renders them with an empty
+     * class attribute, as no position class is passed.
+     *
+     * @return list<string>
+     */
+    private function roleHeadings(string $content): array
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML($content, LIBXML_NOERROR);
+        $headings = [];
+        foreach ($this->nodes(new \DOMXPath($document), "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages ')]//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6][not(@class) or normalize-space(@class) = '']") as $heading) {
+            $headings[] = trim($heading->textContent);
+        }
+
+        return $headings;
+    }
+
+    /**
+     * The profile names in the order the page renders them.
+     *
+     * @return list<string>
+     */
+    private function renderedLastNames(string $content): array
+    {
+        preg_match_all('#(Müllermann|Huber|Beispiel|Nebenan)#u', $content, $matches);
+
+        return $matches[1];
     }
 
     /**
@@ -142,6 +201,10 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
      * paths of its own, so an integrator who overrides one of the item partials has to
      * register that path here as well. The fixture TypoScript does exactly that, and this
      * is the test that the second registration is all it takes.
+     *
+     * It replaces the path of key `10`, which is where the shipped `Contacts/Item.html` of
+     * this extension lives, so it also pins that Extbase keeps resolving that partial: it
+     * adds the extension's own partial path whenever the configured ones lack it.
      */
     #[Test]
     public function anOverriddenProfilePartialReachesThisPluginToo(): void
@@ -385,6 +448,184 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertRendersProfileName($content, 'Paula', 'Prüfer');
         $this->assertSame(2, $this->countProfileCards($content), 'The hidden contact row renders, the unresolved ones do not.');
         $this->assertStringNotContainsString('Student Advisors', $content);
+    }
+
+    /**
+     * The `contactsListPage_interleavedRoles` fixture sorts its four contacts so that the
+     * grouped order differs from the editor's order: Müllermann (Dean's Office), Huber
+     * (Student Advisors), Beispiel (no role), Nebenan (Dean's Office). Their uids run the
+     * other way round, so neither order can come out of uid order by accident.
+     */
+    #[Test]
+    public function listPluginGroupsByRoleWhenTheOptionIsOn(): void
+    {
+        $this->setUpTestCase('contactsListPage_interleavedRoles');
+        $this->setContentElementFlexForm(['settings.showHiddenRecords' => '0', 'settings.groupByRole' => '1']);
+
+        $content = $this->renderHomePage();
+        $this->assertSame(['Dean\'s Office', 'Student Advisors'], $this->roleHeadings($content));
+        $this->assertSame(['Müllermann', 'Nebenan', 'Huber', 'Beispiel'], $this->renderedLastNames($content));
+        $this->assertStringNotContainsString('academic-contacts4pages__role', $content);
+    }
+
+    /**
+     * Content elements saved before the option existed carry no value for it, and the
+     * TypoScript default is what keeps them grouped.
+     */
+    #[Test]
+    public function listPluginGroupsByRoleWhenTheStoredFlexFormLacksTheOption(): void
+    {
+        $this->setUpTestCase('contactsListPage_interleavedRoles');
+        $this->setContentElementFlexForm(['settings.showHiddenRecords' => '0']);
+
+        $content = $this->renderHomePage();
+        $this->assertSame(['Dean\'s Office', 'Student Advisors'], $this->roleHeadings($content));
+        $this->assertSame(['Müllermann', 'Nebenan', 'Huber', 'Beispiel'], $this->renderedLastNames($content));
+    }
+
+    #[Test]
+    public function listPluginRendersAllContactsInSortingOrderWhenTheOptionIsOff(): void
+    {
+        $this->setUpTestCase('contactsListPage_interleavedRoles');
+        $this->setContentElementFlexForm(['settings.showHiddenRecords' => '0', 'settings.groupByRole' => '0']);
+
+        $content = $this->renderHomePage();
+        $this->assertSame([], $this->roleHeadings($content));
+        $this->assertSame(['Müllermann', 'Huber', 'Beispiel', 'Nebenan'], $this->renderedLastNames($content));
+        $this->assertSame(4, $this->countProfileCards($content));
+        // One row for all of them, not one per role.
+        $this->assertSame(1, substr_count($content, '<div class="row">'));
+        // Not grouped, so every name renders one heading level up, as a role-less contact does.
+        $this->assertMatchesRegularExpression(
+            '#<h2 class="academic-persons-item__name card-title">\s*<a href="[^"]*">Horst\s+Huber</a>\s*</h2>#',
+            $content,
+        );
+    }
+
+    #[Test]
+    public function listPluginNamesTheRoleOfEachContactWhenTheOptionIsOff(): void
+    {
+        $this->setUpTestCase('contactsListPage_interleavedRoles');
+        $this->setContentElementFlexForm(['settings.showHiddenRecords' => '0', 'settings.groupByRole' => '0']);
+
+        $document = new \DOMDocument();
+        $document->loadHTML($this->renderHomePage(), LIBXML_NOERROR);
+        $xpath = new \DOMXPath($document);
+        $roleOfContact = [];
+        // One grid column per contact, holding the role name and the card.
+        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages ')]/div[@class='row']/div") as $item) {
+            preg_match('#(Müllermann|Huber|Beispiel|Nebenan)#u', $item->textContent, $name);
+            $role = $this->nodes($xpath, ".//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages__role ')]", $item)->item(0);
+            $roleOfContact[$name[1] ?? '?'] = $role === null ? null : trim($role->textContent);
+        }
+
+        $this->assertSame(
+            [
+                'Müllermann' => 'Dean\'s Office',
+                'Huber' => 'Student Advisors',
+                'Beispiel' => null,
+                'Nebenan' => 'Dean\'s Office',
+            ],
+            $roleOfContact,
+        );
+    }
+
+    /**
+     * A site package's `Contacts/Item.html` replaces the card of every contact: the
+     * grouped ones, the one without a role below them, and all of them in the flat list.
+     */
+    #[Test]
+    public function anOverriddenItemPartialRendersEveryGroupedContact(): void
+    {
+        $this->setUpTestCase(
+            'contactsListPage_interleavedRoles',
+            [],
+            ['EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/ItemPartialOverride.typoscript'],
+        );
+
+        $content = $this->renderHomePage();
+        $this->assertSame(0, $this->countProfileCards($content));
+        $this->assertSame(['Dean\'s Office', 'Student Advisors'], $this->roleHeadings($content));
+        preg_match_all('#ITEM-OVERRIDE\[[^\]]*\]#', $content, $matches);
+        $this->assertSame(
+            [
+                'ITEM-OVERRIDE[4|Dean&#039;s Office|grouped|Müllermann|Professor|1|3]',
+                'ITEM-OVERRIDE[1|Dean&#039;s Office|grouped|Nebenan|Coordinator|1|3]',
+                'ITEM-OVERRIDE[3|Student Advisors|grouped|Huber|Lecturer|1|3]',
+                'ITEM-OVERRIDE[2||flat|Beispiel|Assistant|1|3]',
+            ],
+            $matches[0],
+        );
+    }
+
+    #[Test]
+    public function anOverriddenItemPartialRendersEveryContactOfTheFlatList(): void
+    {
+        $this->setUpTestCase(
+            'contactsListPage_interleavedRoles',
+            [],
+            ['EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/ItemPartialOverride.typoscript'],
+        );
+        $this->setContentElementFlexForm(['settings.showHiddenRecords' => '0', 'settings.groupByRole' => '0']);
+
+        preg_match_all('#ITEM-OVERRIDE\[[^\]]*\]#', $this->renderHomePage(), $matches);
+        $this->assertSame(
+            [
+                'ITEM-OVERRIDE[4|Dean&#039;s Office|flat|Müllermann|Professor|1|3]',
+                'ITEM-OVERRIDE[3|Student Advisors|flat|Huber|Lecturer|1|3]',
+                'ITEM-OVERRIDE[2||flat|Beispiel|Assistant|1|3]',
+                'ITEM-OVERRIDE[1|Dean&#039;s Office|flat|Nebenan|Coordinator|1|3]',
+            ],
+            $matches[0],
+        );
+    }
+
+    #[Test]
+    public function anOverriddenItemPartialRendersContactsOfAPageWithoutRoles(): void
+    {
+        $this->setUpTestCase(
+            'contactsListPage_withoutRoles',
+            [],
+            ['EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/ItemPartialOverride.typoscript'],
+        );
+
+        $content = $this->renderHomePage();
+        $this->assertSame(0, $this->countProfileCards($content));
+        $this->assertStringContainsString('|flat|Müllermann|', $content);
+        $this->assertStringContainsString('|flat|Huber|', $content);
+    }
+
+    /**
+     * A site package that renders the header of this element in its list template, through
+     * the header partial of `EXT:fluid_styled_content`, needs `record` on TYPO3 v14, where
+     * that partial renders the header through it. The fixture moves the header out of the
+     * layout of the element, as such a site package does, so it renders exactly once. The
+     * uid is printed so the variable is asserted on v13 too, whose partial reads `data`.
+     */
+    #[Test]
+    public function aListTemplateOverrideCanRenderTheCoreHeaderPartial(): void
+    {
+        $this->setUpTestCase(
+            'contactsListPage',
+            [],
+            ['EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/HeaderRenderingListTemplate.typoscript'],
+        );
+        $this->setContentElementHeader('Your contacts');
+
+        $document = new \DOMDocument();
+        $document->loadHTML($this->renderHomePage(), LIBXML_NOERROR);
+        $xpath = new \DOMXPath($document);
+        $headers = $this->nodes($xpath, "//*[self::h1 or self::h2 or self::h3][normalize-space() = 'Your contacts']");
+        $this->assertSame(1, $headers->length, 'The header renders exactly once.');
+        $this->assertSame(
+            1,
+            $this->countNodes($xpath, "//div[@class = 'list-override']//*[self::h1 or self::h2 or self::h3][normalize-space() = 'Your contacts']"),
+            'The header renders in the list template.',
+        );
+        $this->assertSame(
+            'RECORD-UID[1]',
+            trim((string)$this->nodes($xpath, "//div[@class = 'list-override']/p")->item(0)?->textContent),
+        );
     }
 
     /**

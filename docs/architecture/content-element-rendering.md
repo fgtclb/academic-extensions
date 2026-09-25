@@ -95,10 +95,14 @@ header the editor entered actually appears:
 Those four plugin templates are the whole list of templates that render the
 partial directly; the study plan reaches it through the layout's `Header`
 section instead. No other plugin template renders a content element header at
-all, so no other controller needs the record — although
-`academic_persons_edit` assigns it anyway, pre-emptively, through the same
-trait. That the remaining plugins ignore the header an editor enters is a
-defect of its own and is not this page's subject.
+all, so no other controller needs the record for its own templates. Two
+assign it anyway through the same trait: `academic_persons_edit`
+pre-emptively, and `academic_contacts4pages`, because projects replace its
+list template with one that renders the header. That only works where the
+project also takes the header out of the element's layout, or the header
+renders twice; `AcademicContacts4PagesListPluginTest` renders such a fixture
+setup and asserts the header appears once. The remaining plugins get the header
+from the layout of `lib.contentElement`, like any content element.
 
 ## Testing the appearance settings
 

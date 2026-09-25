@@ -18,6 +18,21 @@
                     </items>
                 </config>
             </settings.showHiddenRecords>
+            <settings.groupByRole>
+                <label>LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:flexform.groupByRole.label</label>
+                <description>LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:flexform.groupByRole.description</description>
+                <config>
+                    <type>check</type>
+                    <renderType>checkboxToggle</renderType>
+                    <default>1</default>
+                    <items>
+                        <numIndex index="0">
+                            <label></label>
+                            <value>1</value>
+                        </numIndex>
+                    </items>
+                </config>
+            </settings.groupByRole>
         </el>
     </ROOT>
 </T3DataStructure>

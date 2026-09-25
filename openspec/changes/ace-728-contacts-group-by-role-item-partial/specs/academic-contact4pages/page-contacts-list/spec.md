@@ -10,7 +10,8 @@ The contacts content element SHALL offer an editor option to group contacts
 by role. The option SHALL be on for new content elements and for content
 elements saved before the option existed. With the option on, contacts with a
 role SHALL render under one heading per role, and contacts without a role
-SHALL render after the grouped contacts, as they do today.
+SHALL render after the grouped contacts, as they do today. This applies to
+TYPO3 v13 and v14 alike.
 
 #### Scenario: Grouping on
 - **WHEN** a page has contacts with the roles "Dean" and "Office" and the option is on
@@ -27,7 +28,7 @@ SHALL render after the grouped contacts, as they do today.
 ### Requirement: The ungrouped list names the role of each contact
 With role grouping switched off, the content element SHALL show the role name
 with each contact that has a role, and SHALL show no role for a contact
-without one.
+without one. This applies to TYPO3 v13 and v14 alike.
 
 #### Scenario: Contact with a role in the ungrouped list
 - **WHEN** grouping is off and a contact has the role "Dean"
@@ -42,7 +43,8 @@ The content element SHALL render each contact through one item template of
 `academic_contacts4pages`, in the grouped list, in the ungrouped list and for
 contacts without a role. Without an override, the item template SHALL produce
 the same markup as before the change. An integrator SHALL be able to replace
-the item template alone through the extension's partial paths.
+the item template alone through the extension's partial paths. This applies
+to TYPO3 v13 and v14 alike.
 
 #### Scenario: No override
 - **WHEN** no integrator template overrides the item template
@@ -59,5 +61,5 @@ header through the core header template. On TYPO3 v14 that header template
 requires the record.
 
 #### Scenario: Header rendered through the core header template on TYPO3 v14
-- **WHEN** an integrator's list template renders the content element header through the core header template on TYPO3 v14
-- **THEN** the page renders without error and shows the header of the content element
+- **WHEN** an integrator's list template renders the content element header through the core header template on TYPO3 v14, and the layout of the content element leaves the header out
+- **THEN** the page renders without error and shows the header of the content element exactly once

@@ -30,6 +30,14 @@
         <source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
         <target>Wenn aktiviert, werden versteckte (deaktivierte) Datensätze unabhängig von den Backend-Vorschaueinstellungen im Frontend ausgegeben.</target>
       </trans-unit>
+      <trans-unit id="flexform.groupByRole.label">
+        <source>Group by role</source>
+        <target>Nach Rolle gruppieren</target>
+      </trans-unit>
+      <trans-unit id="flexform.groupByRole.description">
+        <source>If enabled, contacts are listed below a heading per role, followed by the contacts without a role. If disabled, all contacts are listed in the order they are sorted on the page, and a contact with a role shows its role name.</source>
+        <target>Wenn aktiviert, werden die Kontakte unter einer Überschrift je Rolle aufgeführt, gefolgt von den Kontakten ohne Rolle. Wenn deaktiviert, werden alle Kontakte in der auf der Seite festgelegten Reihenfolge aufgeführt; Kontakte mit einer Rolle zeigen den Namen ihrer Rolle an.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
