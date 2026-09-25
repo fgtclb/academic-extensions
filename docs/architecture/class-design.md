@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 315 PHP files declaring 280
+rather than describing an intention as a rule — 318 PHP files declaring 283
 classes, 11 interfaces, 13 traits and 11 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-163 of the 280 classes are `final` (58 %). The distribution is not random: it
+166 of the 283 classes are `final` (59 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
@@ -29,8 +29,8 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 5       | 8       | 0        | 38 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1       | 23      | 0        | 4 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 93      | 47      | 4        | 65 %     |
-| **Total**                                  | **163** | **112** | **5**    | **58 %** |
+| Everything else                            | 96      | 47      | 4        | 65 %     |
+| **Total**                                  | **166** | **112** | **5**    | **59 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -72,7 +72,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 40:
+nothing**, and of an immutable data object. There are 43:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -124,7 +124,7 @@ Constructor injection with promoted properties is the default: 95 files declare
 known problem rather than a model: splitting the controller is ACE-507.
 
 **Method injection is used where a constructor is not available to take
-dependencies.** There are 14 `inject*()` methods across 10 files and **zero**
+dependencies.** There are 15 `inject*()` methods across 10 files and **zero**
 `@inject` annotations — the annotation form is not used at all, which is worth
 keeping true.
 
@@ -166,8 +166,9 @@ constructor argument would break it. The method is `final` and named after its
 purpose, as core's own `injectInternalExtensionService()` of `ActionController`
 is, so a subclass cannot declare one of the same name by accident. The details
 controller of `academic_programs` takes its `ProgramFactsBuilder` through
-`injectProgramFactsBuilder()` for the same reason. Once the controllers are
-`final`, the services move to the constructor.
+`injectProgramFactsBuilder()` for the same reason, and its list controller the
+`FilterTypeResolver` through `injectFilterTypeResolver()`. Once the controllers
+are `final`, the services move to the constructor.
 
 Apart from that, method injection on a **concrete** class does not have this
 justification.

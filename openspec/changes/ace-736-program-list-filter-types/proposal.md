@@ -1,9 +1,8 @@
 ## Why
 
 The program list renders one filter select for every category type of the
-programs group that has categories among the listed programs, in the order of
-the type registry. There is no way to offer fewer filters, or the same
-filters in another order. Four projects hard-code their own ordered list of
+programs group that has a category, in the order of the type registry. There
+is no way to offer fewer filters, or the same filters in another order. Four projects hard-code their own ordered list of
 four to seven types in a template override, and a fifth asks for a different
 set of filters.
 
@@ -18,8 +17,15 @@ set of filters.
   well, today's behaviour stays: every type with categories is offered, in
   the type order of the group.
 - With the field set, the filter form offers exactly the chosen types, in the
-  chosen order. A chosen type without categories among the listed programs
-  is still left out, as today.
+  chosen order. A chosen type without any category is still left out, as
+  today; a type whose categories are on no listed program is still offered,
+  with those categories as disabled options, as today.
+- The program list gets the site-wide filter type setting itself, as a
+  constant and a site setting under the same key, because the listings change
+  that owns it for all three lists is not applied yet.
+- Where the resolved filter types do not reach the filter partial - a
+  project controller or template written before them - the partial offers
+  every type with a category, as before.
 - `category_types` gains a reusable backend select that offers the category
   types of one group, with their titles and icons, in the type order of the
   group. The program field uses it, and partner and project lists can use it
@@ -48,9 +54,11 @@ None.
 - The FlexForm of the program list plugin and its labels.
 - The filter form of the program list.
 - A new items provider in `category_types` for TCA and FlexForm select fields.
-- Builds on `ace-tbd-list-filter-order-visible-labels`, which owns the
-  site-wide setting and the resolver of the filter types; this change owns
-  the items provider the finder element reuses as well.
+- Applied before `ace-tbd-list-filter-order-visible-labels`, which owns the
+  site-wide setting and the resolver of the filter types for all three lists:
+  this change adds the resolver in the shape that change describes and the
+  site-wide setting for the program list, and owns the items provider the
+  finder element reuses as well.
 - No database schema change; existing plugins keep today's filters.
 
 ## Non-goals
@@ -71,9 +79,7 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `programs-studyplan-09`). Five of the six analysed projects carry their own
-code for this today. No YouTrack issue is filed yet; the change is
-renamed to `ace-<NNN>-program-list-filter-types` when the issue is filed
-after implementation.
+code for this today. Filed after the implementation as ACE-736.
 
 The default order of the types follows `ace-tbd-category-type-priority-order`
 once that change lands; this change does not depend on it.

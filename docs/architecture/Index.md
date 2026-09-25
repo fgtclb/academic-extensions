@@ -66,6 +66,11 @@ describing an intention as if it were the state.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
+- The filters a list offers are **one setting under one key**,
+  `settings.filter.categoryTypes`: site-wide as a constant, per element as a
+  FlexForm field that an empty value does not override. It decides what the
+  form offers, never what the list accepts, and a type is offered when it has
+  any category — not only one on a listed record.
 - The facts of a program are built by **one** stateless builder for the three
   places that show them, from a field list per place. An empty list means what
   the place showed before the list existed, and category types keep the order
@@ -102,6 +107,7 @@ describing an intention as if it were the state.
 | [Program facts](program-facts.md)                               | The one builder behind the facts of the program page, the details element and the program card, what an empty field list means, and the partial per row.                                   |
 | [List plugin events](list-plugin-events.md)                     | The demand and list events of the partner and project lists, the plugin context they carry, and the rules that are easy to get wrong.                                                      |
 | [List filter URLs](list-filter-urls.md)                         | The redirect of a filter submission, the demand in its URL, what is carried and why, the links of a pagination and of the profile list, and why an enhancer declares no defaults.          |
+| [List filter types](list-filter-types.md)                       | Which category filters a list offers and in which order, the site and element level of one setting, the rule for a type without categories, and the items of the field.                    |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |

@@ -54,7 +54,7 @@ None.
 
 - A per-content-element setting in the FlexForm. The per-element override of
   the program filter types under the same key `settings.filter.categoryTypes`
-  is `ace-tbd-program-list-filter-types`, which builds on this change.
+  is `ace-736-program-list-filter-types`, which builds on this change.
 - Removing the hard-coded grid column classes of the filter cells.
 - Bookmarkable filter URLs, active filter tags, reset links or result counts.
 - One shared filter partial for all extensions.

@@ -64,7 +64,7 @@ None.
 ## Non-goals
 
 - A per content element order setting. Choosing and ordering the filter
-  types of one list is `ace-tbd-program-list-filter-types`.
+  types of one list is `ace-736-program-list-filter-types`.
 - Ordering the category records within one type. They keep `sorting`.
 - Ordering the groups themselves. Group declarations are not parsed yet.
 - New YAML syntax such as `position` or `after`.

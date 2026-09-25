@@ -13,6 +13,16 @@ See `proposal.md` for the motivation. Verified on `main`:
 - `categories` comes from `CategoryRepository::findAllApplicable()` in
   `PartnerController::listAction()` and `mapAction()`,
   `ProjectController::listAction()` and `ProgramController::listAction()`.
+- **Since `ace-736-program-list-filter-types`:** `category_types` ships
+  `FilterTypeResolver` and `FilterTypes` in the shape described below, and
+  the program list already reads `settings.filter.categoryTypes` - constant
+  `plugin.tx_academicprograms.filter.categoryTypes`, site setting, FlexForm
+  override - and loops `filterTypes.visible` in its `DemandCategories`
+  partial. What is left for the program list is `visibleCount`,
+  `hideDisabledOptions`, the disclosure and the per-type label. Note that
+  `findAllApplicable()` returns every category of the group, those on no
+  listed record disabled, so "a type without categories" means a type
+  without any category.
 - None of the three extensions has a `settings` block in its TypoScript or a
   `settings.definitions.yaml`. `academic_jobs` has one
   (`Sets/Full/settings.definitions.yaml`), and
@@ -47,8 +57,10 @@ mapped in `setup.typoscript`, and declared in a new
 default, as `academic_jobs` does. The `settings.filter` namespace is meant to
 be reused by later filter features.
 
-Rejected: a FlexForm field per content element. Every project sets this
-site-wide; a per-element value would have to be repeated on every list.
+Rejected: a FlexForm field per content element for the partner and project
+lists. Every project sets this site-wide; a per-element value would have to be
+repeated on every list. The program list has one for `categoryTypes`, see
+below.
 
 ### Decided: TypoScript and site settings only
 
@@ -62,7 +74,7 @@ FlexForm override can be added later without breaking anything.
 
 `settings.filter.categoryTypes` is the only name for the filter type
 selection. This change delivers it as the site-wide default for all three
-lists; `ace-tbd-program-list-filter-types` adds a FlexForm field of the same
+lists; `ace-736-program-list-filter-types` adds a FlexForm field of the same
 name to the program list as a per-element override, where an empty field
 falls back to the site value, and the program finder element uses the same
 key. Both changes resolve the value through `FilterTypeResolver`, which reads
