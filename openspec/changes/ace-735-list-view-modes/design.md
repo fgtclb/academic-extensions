@@ -46,9 +46,21 @@ A private method of `ProfileController` resolves the mode:
   is ignored.
 
 `listAction()`, `selectedProfilesAction()` and `selectedContractsAction()` then
-assign `viewMode` and `viewModePartial`, the UpperCamelCase form
-(`GeneralUtility::underscoredToUpperCamelCase()`). The templates render
-`Profile/ViewMode/{viewModePartial}`.
+assign `viewMode` and `viewModePartial`, the mode with an upper case first
+letter (`ucfirst()`: the pattern admits no underscore, and
+`GeneralUtility::underscoredToUpperCamelCase()` would lowercase `contactCards`
+to `Contactcards`), and for the switch
+`viewModes` - the allowed modes, empty while the switch is off or fewer than
+two modes are allowed - and
+`defaultViewMode`. The templates render `Profile/ViewMode/{viewModePartial}`;
+the list renders it from `Profile/List/ItemList.html`, once per group of a
+grouped list, so a table per letter group under the shipped `groupBy`.
+
+The default mode is the element's `settings.viewMode.default` while it is
+allowed; otherwise the tiles, or the first allowed mode where the tiles are not
+allowed. An allow-list without a single valid entry is `list`. The list reads
+the resolved mode before its events, like `activeListArguments`: a demand a
+listener hands back is not resolved again and must not name a partial.
 
 The pattern check keeps a request from ever naming a path segment, even with a
 misconfigured allow-list.
@@ -69,11 +81,16 @@ Rejected:
   `Profile/ViewMode/Table/Cell.html` per column. The cell partial switches over
   the shipped keys `name`, `position`, `organisationalUnit`, `emailAddresses`,
   `phoneNumbers` and `room`. An unknown key renders an empty cell, and a
-  project overrides the cell partial to add one.
+  project overrides the cell partial to add one. While the element restricts
+  its fields (`settings.showFields`), the action drops a shipped contract
+  column whose field `contracts.<column>` is not among them, so the table
+  never shows a field the tiles of the same element hide; the name and
+  columns of a project stay.
 
 Contract values in the table come from the contract selection of
-`ace-719-contract-display-policy` when that change has landed. Otherwise they
-come from every contract, joined as the tile rows are today.
+`ace-719-contract-display-policy`, which has landed: a profile row shows the
+contracts `persons:contracts` selects for the plugin settings, one value per
+line, and a row of the selected contracts element shows its own contract.
 
 ### Site settings
 
@@ -109,12 +126,13 @@ with the static segment `view-mode` followed by `{viewMode}`:
 
 `{viewMode}` maps through a `StaticValueMapper` whose map holds the shipped
 modes `list` and `table`. Every variable of these routes gets explicit
-`requirements`, because an aspect makes a path variable greedy; that also
-keeps them apart from `/{profile_name}`. The routes are explicit rather than
-an optional segment, because Symfony omits only trailing defaults (ACE-623).
-A link to the default mode carries no view mode, since the active list state
-only holds values that differ from their default, so the plain list URL
-stays the URL of the default mode. The selected-profiles and
+`requirements`, because an aspect makes a path variable greedy - see the
+outcome below for what they do and do not separate; `/{profile_name}` stays
+apart only because its mapper rejects the value. The routes are explicit
+rather than an optional segment, because Symfony omits only trailing defaults
+(ACE-623). A link to the default mode carries no view mode, since the active
+list state only holds values that differ from their default, so the plain list
+URL stays the URL of the default mode. The selected-profiles and
 selected-contracts plugins have no route enhancer; their mode stays a
 cHash-protected query argument.
 
@@ -125,8 +143,28 @@ implementation, with tests: a project adds a mode by extending the map of
 the shipped enhancer key in its site configuration. If that is not possible
 without copying the enhancer, a dedicated mapper replaces the static one. It
 is site-aware, takes its values from the `viewMode.allowed` site setting and
-keeps the pattern check of the mode resolution. The outcome is recorded here
-before the change is merged.
+keeps the pattern check of the mode resolution.
+
+Outcome: the static mapper is enough. `YamlFileLoader::processImports()`
+merges a site's own `routeEnhancers` over the imported file with
+`ArrayUtility::replaceAndAppendScalarValuesRecursive()` on v13 and v14, so a
+site that imports `List.yaml` and adds
+`ProfileListPlugin.aspects.viewMode.map.contact-cards: contact` gets
+`/view-mode/contact-cards` for its mode, and the shipped entries stay. The
+segment is the key of the map and need not be the name of the mode. No
+dedicated mapper is shipped.
+
+The `requirements` are `viewMode: '[^/]+'`, `localized_page: '[^/]+'`,
+`page: '[0-9]+'` and `letter: '[a-z]'`. They are enhancer-wide - an Extbase
+enhancer has no per-route requirements - so they pin the existing page and
+letter routes as well, without a change for any URL those mappers resolve.
+Measured: with the shipped mappers they are not load-bearing, because every
+mapper rejects a value that spans two segments and the matcher falls through;
+the routing tests pass without them. They stay as the design asked, so a
+site's own mapper cannot turn a greedy variable into a multi-segment match.
+The view mode requirement is deliberately looser than the partial-name
+pattern, which the controller enforces anyway: a site may map a segment such
+as `contact-cards`.
 
 The filter routes of `ace-tbd-visitor-filter-ui-routes` combine with this
 segment. Whichever of the two changes lands second adds the combined routes.
@@ -138,11 +176,15 @@ for the same path shape.
 
 ### The switch
 
-`Profile/ViewMode/Switch.html` renders one `f:link.action` per allowed mode,
-with `rel="nofollow"` like the letter links, and `aria-current` on the active
-one. It builds its arguments from the active list state of `persons-display-10`
-and changes only `viewMode`: it overrides it with the chosen mode, and removes
-it for the default mode, so a link to the default mode carries none.
+`Profile/ViewMode/Switch.html` renders one link per allowed mode, with
+`rel="nofollow"` like the letter links, and `aria-current="true"` on the
+active one. A link that carries no argument at all - the default mode of a
+list without page or letter, the default mode of a selected element - is the
+page itself (`f:uri.page()`): an action link would carry the controller, and
+with it a query string and a cHash, where the list has a plain URL. It builds
+its arguments from the active list state of `persons-display-10` and changes
+only `viewMode`: it overrides it with the chosen mode, and removes it for the
+default mode, so a link to the default mode carries none.
 
 That state, `activeListArguments`, holds properties of the profile demand
 only: those on the list of visitor-settable properties in `ProfileController`

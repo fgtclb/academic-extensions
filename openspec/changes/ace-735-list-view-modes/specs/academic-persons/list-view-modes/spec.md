@@ -31,22 +31,39 @@ row. This applies on TYPO3 v13 and v14.
 The system SHALL take the table columns and their order from a site setting.
 Its default SHALL be name, position, e-mail addresses, phone numbers and room.
 
+The table SHALL leave out a contract column whose field the content element
+does not show, while the element restricts its fields, as the tiles leave the
+field out. The restriction SHALL NOT remove the name column or a column the
+extension does not ship.
+
 #### Scenario: Integrator reduces the columns
 
 - **WHEN** the integrator sets the columns to name and e-mail addresses
 - **THEN** the table has exactly these two columns in this order
 
+#### Scenario: Editor restricts the fields
+
+- **WHEN** the editor restricts the fields of a table element to position and
+  room
+- **THEN** the table has the columns name, position and room
+
 ### Requirement: Visitors switch between allowed modes
 
 When the editor enables the visitor switch, the system SHALL offer one link per
 allowed mode and render the mode the visitor chose. The active mode SHALL be
-marked as current for assistive technology. When the switch is disabled, the
-system SHALL render the default mode and ignore a requested mode.
+marked as current for assistive technology. With fewer than two allowed modes
+the system SHALL render no switch. When the switch is disabled, the system
+SHALL render the default mode and ignore a requested mode.
 
 #### Scenario: Visitor switches to the table
 
 - **WHEN** the switch is enabled and a visitor follows the "Table" link
 - **THEN** the table is shown and the "Table" link is marked as current
+
+#### Scenario: One allowed mode
+
+- **WHEN** the switch is enabled and the site allows only the table
+- **THEN** the table is shown without a switch
 
 #### Scenario: Switch disabled
 

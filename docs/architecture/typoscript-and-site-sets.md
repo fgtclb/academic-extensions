@@ -363,13 +363,14 @@ enhancer carries `limitToPages`, and `PageUriMatcher::matchCollection()` takes
 the first candidate route whose path matches *and* whose aspects resolve. The
 insertion order is the `imports:` order.
 
-Three of the five routes are declared twice, byte identical down to the mapper:
+Six persons routes are declared twice, byte identical down to the mapper:
 
-| Route                     | Declared in                         |
-|---------------------------|-------------------------------------|
-| `/{profile_name}`         | `Detail.yaml`, `ListAndDetail.yaml` |
-| `{localized_page}-{page}` | `List.yaml`, `ListAndDetail.yaml`   |
-| `/{letter}`               | `List.yaml`, `ListAndDetail.yaml`   |
+| Route                                                   | Declared in                         |
+|---------------------------------------------------------|-------------------------------------|
+| `/{profile_name}`                                       | `Detail.yaml`, `ListAndDetail.yaml` |
+| `{localized_page}-{page}`                               | `List.yaml`, `ListAndDetail.yaml`   |
+| `/{letter}`                                             | `List.yaml`, `ListAndDetail.yaml`   |
+| `/view-mode/{viewMode}`, alone, with page, with letter  | `List.yaml`, `ListAndDetail.yaml`   |
 
 So the file imported first takes those URLs on every page of the site, and the
 plugin on the other page never receives its argument. That is ACE-470: the

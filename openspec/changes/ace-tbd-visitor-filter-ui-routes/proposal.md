@@ -21,7 +21,7 @@ and the separate enhancer collided with the shipped one.
 - The `ProfileListPlugin` and `ProfileListAndDetailPlugin` enhancers get
   filter routes: each filter alone, both filters, each with a page and each
   with a letter. Every one of them also exists with the view mode segment of
-  `ace-tbd-list-view-modes`.
+  `ace-735-list-view-modes`.
 - The documentation tells projects to extend the shipped enhancer key rather
   than adding a second enhancer.
 
@@ -50,7 +50,7 @@ None.
   command, or on their next save; until then their filter URL uses query
   parameters.
 - Depends on `ace-tbd-visitor-filter-demand-query` and
-  `ace-734-list-links-keep-state`. Combines with `ace-tbd-list-view-modes`:
+  `ace-734-list-links-keep-state`. Combines with `ace-735-list-view-modes`:
   whichever of the two lands second adds the filter routes with the view
   mode segment.
 

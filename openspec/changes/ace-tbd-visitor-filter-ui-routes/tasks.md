@@ -3,9 +3,9 @@
 - [ ] 1.1 Confirm `ace-tbd-visitor-filter-demand-query` and
   `ace-734-list-links-keep-state` are merged, and verify the demand property
   names and `filterOptions` in the merged sources.
-- [ ] 1.2 Check whether `ace-tbd-list-view-modes` is merged. If it is, this
+- [ ] 1.2 Check whether `ace-735-list-view-modes` is merged. If it is, this
   change adds the view mode variants of its routes (3.2); if not, record in
-  the pull request that `ace-tbd-list-view-modes` adds them.
+  the pull request that `ace-735-list-view-modes` adds them.
 
 ## 2. Form
 

@@ -110,7 +110,8 @@ carried, because the content element sets it, and the demand stays in the cache
 hash, because the list action is cacheable. The mechanism is its own.
 
 - **One list of visitor values.** `ProfileController` names the demand
-  properties a visitor sets, today `currentPage` and `alphabetFilter`. The
+  properties a visitor sets, today `currentPage`, `alphabetFilter` and
+  `viewMode`. The
   property mapping accepts exactly those, plus the keys of `settings.demand`,
   whose values the controller writes over the request's — so the sorting cannot
   be set from a URL however it is spelled. A change that lets a visitor set a
@@ -132,8 +133,16 @@ hash, because the list action is cacheable. The mechanism is its own.
   that none of them reaches a link.
 - **The demand is part of the cache hash here.** The profile list action is
   cacheable and there is no exclusion for its namespace, so every link variant
-  is a page cache entry of its own, covered by its `cHash`. With page and letter
-  as the only values, the links are exactly the ones they were before.
+  is a page cache entry of its own, covered by its `cHash` - or, behind the
+  shipped route enhancers, by its speaking path. A view mode is one entry per
+  mode, like a letter.
+- **The view mode is resolved before it is carried.** Unlike page and letter
+  it names a partial, so the list action checks it against the switch of the
+  content element and the allowed modes, and writes the result back into the
+  demand: empty for the default mode and for a rejected one. A link therefore
+  carries a mode only while it differs from the default, the list in its
+  default mode keeps its URLs, and the switch link to the default mode removes
+  the mode - or is the plain page, when nothing else is left to carry.
 - **No pagination under a letter.** `listAction()` still switches pagination
   off while a letter is selected. Lifting that, and the route set that goes
   with it, is a change of its own.

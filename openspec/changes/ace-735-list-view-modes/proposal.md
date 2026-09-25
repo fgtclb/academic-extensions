@@ -66,5 +66,4 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-08`). Four of the six analysed projects carry their own code
-for this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-list-view-modes` when the issue is filed after implementation.
+for this today. Filed after the implementation as ACE-735.
