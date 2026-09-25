@@ -42,7 +42,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | [Icons](architecture/icons.md)                                               | Which provider to register an icon with, the two markups, and how a template's icons stay resolvable.                                         |
 | [The profile editing contract](architecture/profile-editing-contract.md)     | The `data-*` contract between the Fluid-rendered profile editor and the five custom elements that drive it.                                   |
 | [Backend select items](architecture/backend-select-items.md)                 | What an `itemsProcFunc` handler receives, how page TSconfig reaches a FlexForm field, and why a narrowed select has to keep its stored value. |
-| [Content element rendering](architecture/content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, and the `record` view variable TYPO3 v14 needs for the header.                   |
+| [Content element rendering](architecture/content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, who renders a plugin's header, and the `record` variable TYPO3 v14 needs for it. |
 | [Upgrade checks](architecture/upgrade-checks.md)                             | The `academic:upgrade:check` command: the stale configuration it reports, and how it tells a project override folder from a shipped one.      |
 
 ## [Testing](testing/Index.md)

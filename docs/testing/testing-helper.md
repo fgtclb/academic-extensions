@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but eight PHP traits — the parts of the test setup that were being copied
+but ten PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -11,6 +11,8 @@ necessary.
 | [`ExtensionCoreVersionCompatTestsTrait`](#extensioncoreversioncompatteststrait) | Asserts the run really happens on a supported core version.         |
 | [`ExtensionsLoadedTestsTrait`](#extensionsloadedteststrait)                     | Asserts an extension resolves by package name and by extension key. |
 | [`FrontendPluginRenderingTrait`](#frontendpluginrenderingtrait)                 | The scaffolding every frontend plugin rendering test needs.         |
+| [`ContentElementHeaderAssertionTrait`](#contentelementheaderassertiontrait)     | Counts where the header of a content element rendered, how often.   |
+| [`ResponsiveImageAssertionTrait`](../architecture/shared-partials.md)           | Asserts what the shared image partial of `academic_base` rendered.  |
 | [`PluginFlexFormDataStructureTrait`](#pluginflexformdatastructuretrait)         | Resolves a plugin FlexForm the way FormEngine does.                 |
 | [`DeprecatedCoreLabelsTrait`](#deprecatedcorelabelstrait)                       | Guards TCA against core labels TYPO3 v14 retired.                   |
 | [`EnsureTtContentListTypeColumnTrait`](#ensurettcontentlisttypecolumntrait)     | Re-creates `tt_content.list_type` where v14 removed it.             |
@@ -220,6 +222,37 @@ protected function tearDown(): void
   otherwise serialises the parsed body with `GuzzleHttp\Psr7\Query::build()`,
   which cannot handle nested plugin arguments and emits an "Array to string
   conversion" warning — a failing test under this suite's strictness.
+
+---
+
+## `ContentElementHeaderAssertionTrait`
+
+[`Classes/FunctionalTestCase/ContentElementHeaderAssertionTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/ContentElementHeaderAssertionTrait.php)
+
+**What it does.** Counts, in a rendered page, the headings `h1` to `h6` that
+read a given text (`countHeadingsReading()`) and the `header` elements
+(`countHeaderElements()`), each in the whole page or below the element an XPath
+scope selects.
+
+**When to use it.** In every test of a plugin header. A plugin renders inside
+the layout of `lib.contentElement`, which renders the header itself, so the
+questions are where the header rendered and how often - see
+[Who renders the header of a plugin](../architecture/content-element-rendering.md#who-renders-the-header-of-a-plugin).
+
+```php
+$content = $this->renderFrontendPage('https://www.acme.com/home');
+$this->assertSame(1, $this->countHeadingsReading($content, 'Open positions'));
+$this->assertSame(0, $this->countHeaderElements(
+    $content,
+    '//div[contains(concat(" ", normalize-space(@class), " "), " academic-jobs-list ")]',
+));
+```
+
+**The trap it exists for.** `assertStringContainsString()` on the header text
+passes on a header that renders twice, and on an empty `<header></header>` a
+plugin leaves behind next to the heading of the layout. Both were in the job
+plugins in every release since 2.1.0, and the text assertions added later did
+not see them.
 
 ---
 

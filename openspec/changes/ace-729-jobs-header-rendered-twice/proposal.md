@@ -66,6 +66,5 @@ None.
 ## Source
 
 Adopted from outside the analysis: found in the review of ACE-728 (pull
-request #738) and verified by rendering. No YouTrack issue is filed yet; the
-change is renamed to `ace-<NNN>-jobs-header-rendered-twice` when the issue is
-filed after implementation.
+request #738) and verified by rendering. Filed as ACE-729 after the
+implementation.

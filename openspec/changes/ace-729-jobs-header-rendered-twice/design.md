@@ -76,9 +76,17 @@ the core layout and replaces a site package's own layout.
 With the switch on, `Header/All` must not emit an empty element for the header
 layout "Default". The plugin setup maps
 `settings.defaultHeaderType = {$styles.content.defaultHeaderType}`, the
-constant `lib.contentElement` uses. The implementation verifies what an
-undefined constant yields where EXT:fluid_styled_content's TypoScript is not
-included, and guards it if the partial then renders nothing sensible.
+constant `lib.contentElement` uses.
+
+Probed where EXT:fluid_styled_content's constants are not included: the
+constant stays undefined, the setting carries the literal reference, and
+"Default" renders an empty `<header>` in the plugin - and no heading in the
+elements of EXT:fluid_styled_content either, whose layout reads the same
+constant. Documented, not guarded: TypoScript has no fallback for an undefined
+constant, and a constant of our own with a literal default would stop following
+the one a site sets for all its other elements. A site without
+EXT:fluid_styled_content's TypoScript sets the plugin setting itself; the
+configuration chapters say so.
 
 ### Keep `record`, the partial path and the requirement
 
@@ -107,6 +115,25 @@ off by default. It depends on this change.
 `ace-tbd-jobs-list-pagination` and `ace-tbd-jobs-form-flag-fields` touch the
 same templates; the change is a wrapping condition per template, so whichever
 lands second rebases trivially.
+
+### Tests count headings
+
+The header tests count the headings reading the header and the subheader, and
+the `header` elements inside the plugin wrapper, in the DOM. The helper is a
+trait of the testing helper package, `ContentElementHeaderAssertionTrait`,
+because `ace-tbd-plugin-content-element-header` needs the same assertions in
+five more extensions.
+
+### Verification
+
+Against the unchanged templates and TypoScript, on TYPO3 v13 and v14 alike,
+the new tests fail in the same three cases per plugin: the header layout 2
+renders the header twice, "Default" leaves an empty `<header>` inside the
+plugin, and the switched on "Default" case renders no heading because
+`defaultHeaderType` is not mapped. "Hidden" passes unchanged, with the switch
+off and on. Removing only the `defaultHeaderType` mapping from the finished
+change turns exactly the switched on "Default" cases red (v13); removing the
+`record` assignment turns the switched on cases red on v14.
 
 ## Risks / Trade-offs
 

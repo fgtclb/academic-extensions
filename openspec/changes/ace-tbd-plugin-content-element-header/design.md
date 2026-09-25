@@ -12,7 +12,7 @@ Verified on `main`, first on 2026-09-12 and again on 2026-09-25:
 - On such a site a plugin template that renders `Header/All` as well shows
   the header and the subheader twice with an explicit header layout, and an
   empty `<header>` with "Default" - probed for the jobs templates, see
-  `ace-tbd-jobs-header-rendered-twice`, which adds a per-extension switch.
+  `ace-729-jobs-header-rendered-twice`, which adds a per-extension switch.
 - The projects behind this change use a content element layout that renders
   the frame and `Main` only; their element templates render headers. On such
   a site no plugin shows a header, which is why they copy plugin templates.

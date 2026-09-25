@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicBiteJobs\Tests\Functional\Plugins;
 
 use FGTCLB\AcademicBiteJobs\Tests\Functional\AbstractAcademicBiteJobsTestCase;
+use FGTCLB\TestingHelper\FunctionalTestCase\ContentElementHeaderAssertionTrait;
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -13,8 +14,12 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 /**
  * Renders the `academicbitejobs_list` plugin in the frontend.
  *
- * This guards the `record` view variable: TYPO3 v14 renders the header of the
- * `EXT:fluid_styled_content` `Header/All` partial with `{record -> f:render.text(...)}`,
+ * The header of the content element renders once: by default the content element layout
+ * renders it and the plugin does not. A site whose layout renders no header switches
+ * `renderContentElementHeader` on, and the template then renders it itself.
+ *
+ * That switched on case guards the `record` view variable: TYPO3 v14 renders the header of
+ * the `EXT:fluid_styled_content` `Header/All` partial with `{record -> f:render.text(...)}`,
  * which raises an exception when no record object is available. Extbase plugin views
  * assign only `data`, so without the record the plugin fails to render on v14, while it
  * still renders on v13 whose partial reads `data`.
@@ -28,8 +33,13 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
  */
 final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestCase
 {
+    use ContentElementHeaderAssertionTrait;
     use FrontendPluginRenderingTrait;
     use SiteBasedTestTrait;
+
+    private const HEADER = 'Open positions';
+    private const SUBHEADER = 'Apply by the end of the month';
+    private const LIST_WRAPPER = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-bite-jobs-list ")]';
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8', 'iso' => 'en', 'hrefLang' => 'en-US', 'direction' => ''],
@@ -51,8 +61,9 @@ final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestC
 
     /**
      * @param string[] $additionalSetupFiles
+     * @param string[] $additionalConstantFiles
      */
-    private function setUpTestCase(array $additionalSetupFiles = []): void
+    private function setUpTestCase(array $additionalSetupFiles = [], array $additionalConstantFiles = []): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicBiteJobsListPlugin/biteJobsListPage.csv');
         $this->setUpFrontendRootPage(
@@ -61,6 +72,7 @@ final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestC
                 'constants' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript',
                     'EXT:academic_bite_jobs/Configuration/TypoScript/List/constants.typoscript',
+                    ...$additionalConstantFiles,
                 ],
                 'setup' => [
                     'EXT:fluid_styled_content/Configuration/TypoScript/setup.typoscript',
@@ -151,14 +163,51 @@ final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestC
         $this->assertStringContainsString('academic-bite-jobs-list', $this->renderHomePage());
     }
 
+    /**
+     * The header layouts "Default", 2 and "Hidden", with the number of times the header and
+     * the subheader have to render: "Default" is the layout the header partial resolves
+     * through a setting, and the one a plugin rendering it without that setting leaves an
+     * empty `<header>` for.
+     *
+     * @return array<string, array{int, int}>
+     */
+    public static function headerLayouts(): array
+    {
+        return [
+            'header layout "Default"' => [0, 1],
+            'header layout 2' => [2, 1],
+            'header layout "Hidden"' => [100, 0],
+        ];
+    }
+
     #[Test]
-    public function biteJobsListPluginRendersContentElementHeader(): void
+    #[DataProvider('headerLayouts')]
+    public function biteJobsListPluginLeavesTheContentElementHeaderToTheLayout(int $headerLayout, int $expectedHeadings): void
     {
         $this->setUpTestCase();
-        // Rendering a header is what requires the `record` view variable on TYPO3 v14.
-        $this->updateContentElement(['header' => 'Open positions']);
+        $this->updateContentElement(['header' => self::HEADER, 'subheader' => self::SUBHEADER, 'header_layout' => $headerLayout]);
 
-        $this->assertStringContainsString('Open positions', $this->renderHomePage());
+        $content = $this->renderHomePage();
+        $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::HEADER));
+        $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::SUBHEADER));
+        $this->assertSame(0, $this->countHeaderElements($content, self::LIST_WRAPPER));
+    }
+
+    #[Test]
+    #[DataProvider('headerLayouts')]
+    public function biteJobsListPluginRendersTheContentElementHeaderWhenSwitchedOn(int $headerLayout, int $expectedHeadings): void
+    {
+        $this->setUpTestCase(
+            ['EXT:academic_bite_jobs/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/LayoutWithoutHeader.typoscript'],
+            ['EXT:academic_bite_jobs/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/RenderContentElementHeader.typoscript'],
+        );
+        $this->updateContentElement(['header' => self::HEADER, 'subheader' => self::SUBHEADER, 'header_layout' => $headerLayout]);
+
+        $content = $this->renderHomePage();
+        $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::HEADER));
+        $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::HEADER, self::LIST_WRAPPER));
+        $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::SUBHEADER));
+        $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::SUBHEADER, self::LIST_WRAPPER));
     }
 
     /**

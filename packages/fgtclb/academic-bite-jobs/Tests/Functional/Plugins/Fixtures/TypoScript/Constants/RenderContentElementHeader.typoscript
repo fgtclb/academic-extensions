@@ -1,0 +1,2 @@
+# The site lets the job list render the header of its content element itself.
+plugin.tx_academicbitejobs.renderContentElementHeader = 1

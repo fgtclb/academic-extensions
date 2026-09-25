@@ -56,6 +56,45 @@ extension's own `layoutRootPath` constant points at a directory that does not
 exist, and Fluid skips a root path it cannot read, so it changes nothing either
 way.
 
+## Who renders the header of a plugin
+
+A plugin content element renders through the same layout. Its CType is
+`tt_content.<CType> =< lib.contentElement` with the `Generic` template, so the
+`Default` layout renders the `Header` section around the plugin output, as it
+does for any other element. A plugin template that renders `Header/All` as well
+shows the header twice: with an explicit header layout, the header and the
+subheader appear twice; with the header layout "Default", the plugin leaves an
+empty `<header></header>` behind. The partial takes the heading level for
+"Default" from `settings.defaultHeaderType`, which the settings of
+`lib.contentElement` carry and plugin settings do not.
+
+Whether the layout renders the header is a property of the site, not of the
+extension. The layouts of EXT:fluid_styled_content and `bk2k/bootstrap-package`
+render it; a site package may ship a `Default` layout without a `Header`
+section and render the header in its element templates instead. A plugin
+template can therefore not decide on its own, and one that renders the header
+does it behind a switch per extension, off by default:
+
+| Plugin setting                        | Mapped from                                                                                                   |
+|---------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| `settings.renderContentElementHeader` | the constant `plugin.tx_<key>.renderContentElementHeader`, default `0`; a site setting of `academic_jobs` too |
+| `settings.defaultHeaderType`          | the constant `styles.content.defaultHeaderType` of EXT:fluid_styled_content                                   |
+
+The second one is the constant the `lib.contentElement` of
+EXT:fluid_styled_content reads. Where the constants of EXT:fluid_styled_content
+are not included, it is undefined, and the header layout "Default" then
+renders an empty `<header>` in the plugin. That is the case on a
+`bk2k/bootstrap-package` site, whose `lib.contentElement` reads a constant of
+its own and which includes no TypoScript of EXT:fluid_styled_content.
+TypoScript has no fallback for an undefined constant, so a site in that
+position that switches the header on sets the plugin setting itself.
+
+`academic_jobs` and `academic_bite_jobs` render the header this way. The other
+plugins render none of their own. A test of a plugin header counts the headings
+in the DOM through `ContentElementHeaderAssertionTrait` of the
+[testing helper](../testing/testing-helper.md), because an assertion that the
+header text appears passes on a header that renders twice.
+
 ## The `record` view variable on TYPO3 v14
 
 TYPO3 v14 rewrote the EXT:fluid_styled_content header partial. `Header/All`
@@ -87,22 +126,24 @@ header the editor entered actually appears:
 
 | Reaches `Header/All`                             | How                | Test                                  |
 |--------------------------------------------------|--------------------|---------------------------------------|
-| `academic_jobs` `Job/List.html`, `Job/Show.html` | renders it itself  | `AcademicJobsListAndDetailPluginTest` |
-| `academic_jobs` `Job/New.html`                   | renders it itself  | `AcademicJobsNewJobFormPluginTest`    |
-| `academic_bite_jobs` `BiteJobs/List.html`        | renders it itself  | `AcademicBiteJobsListPluginTest`      |
+| `academic_jobs` `Job/List.html`, `Job/Show.html` | behind the switch  | `AcademicJobsListAndDetailPluginTest` |
+| `academic_jobs` `Job/New.html`                   | behind the switch  | `AcademicJobsNewJobFormPluginTest`    |
+| `academic_bite_jobs` `BiteJobs/List.html`        | behind the switch  | `AcademicBiteJobsListPluginTest`      |
 | `academic_study_plan` `AcademicStudyPlan.html`   | through the layout | `AcademicStudyPlanContentElementTest` |
 
 Those four plugin templates are the whole list of templates that render the
-partial directly; the study plan reaches it through the layout's `Header`
-section instead. No other plugin template renders a content element header at
-all, so no other controller needs the record for its own templates. Two
-assign it anyway through the same trait: `academic_persons_edit`
-pre-emptively, and `academic_contacts4pages`, because projects replace its
-list template with one that renders the header. That only works where the
-project also takes the header out of the element's layout, or the header
-renders twice; `AcademicContacts4PagesListPluginTest` renders such a fixture
-setup and asserts the header appears once. The remaining plugins get the header
-from the layout of `lib.contentElement`, like any content element.
+partial directly, and each test renders them with the switch on and a fixture
+layout without a header, which is the case that needs the record. The study
+plan reaches the partial through the layout's `Header` section instead. No
+other plugin template renders a content element header at all, so no other
+controller needs the record for its own templates. Two assign it anyway through
+the same trait: `academic_persons_edit` pre-emptively, and
+`academic_contacts4pages`, because projects replace its list template with one
+that renders the header. That only works where the project also takes the
+header out of the element's layout, or the header renders twice;
+`AcademicContacts4PagesListPluginTest` renders such a fixture setup and asserts
+the header appears once. The remaining plugins get the header from the layout
+of `lib.contentElement`, like any content element.
 
 ## Testing the appearance settings
 
