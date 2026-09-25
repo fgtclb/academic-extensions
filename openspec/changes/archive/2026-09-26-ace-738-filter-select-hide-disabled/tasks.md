@@ -46,9 +46,9 @@
 
 ## 5. Backport
 
-- [ ] 5.1 Backport: separate change on branch `2` after a backport analysis
+- [x] 5.1 Backport: separate change on branch `2` after a backport analysis
   (`docs/workflow/backporting.md`) that diffs the filter form field between
-  the two lines; not a cherry-pick.
+  the two lines; not a cherry-pick (a separate pull request on `2`).
 
 ## 6. Definition of done
 
@@ -59,4 +59,4 @@
 - [x] 6.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 6.4 `docs/` and the extension's `Documentation/` changelog updated in the
   same change.
-- [ ] 6.5 Archive the change as the last commit of the pull request.
+- [x] 6.5 Archive the change as the last commit of the pull request.
