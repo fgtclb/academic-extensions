@@ -13,8 +13,9 @@
 
 - [ ] 2.1 Add `Resources/Private/TypeScript/frontend/program-finder.ts` (no
   `enum`, `namespace`, parameter properties or decorators) with an exported
-  initialiser, add `Configuration/JavaScriptModules.php`, and load the module
-  from the finder template with `f:asset.module`.
+  initialiser, add `Configuration/JavaScriptModules.php` unless it exists
+  already, and load the module from the finder template with
+  `f:asset.module`.
 - [ ] 2.2 Add `Tests/JavaScript/program-finder.test.ts` (jsdom): with three
   programs, selecting degree A disables the topic only program B carries,
   clearing restores it, and the count reads two; remove the disable step, watch

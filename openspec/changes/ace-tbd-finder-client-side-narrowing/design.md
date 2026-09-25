@@ -60,7 +60,8 @@ them.
   committed and checked by `checkJsBuildClean`.
 - Specifier `@fgtclb/academic-programs/frontend/program-finder.js`, from a new
   `Configuration/JavaScriptModules.php` with the `core` dependency, shaped like
-  the study plan's.
+  the study plan's - unless `ace-tbd-program-list-results-in-place` landed
+  first and added it; the specifier prefix is the same for both modules.
 - The finder template loads it with `f:asset.module`, so it reaches only pages
   that carry a finder.
 - The module exports its initialiser, so the jsdom test can run it on a
