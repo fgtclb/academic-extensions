@@ -76,9 +76,9 @@
   functional 2799 in 16 chunks after the review, all green.)
 - [x] 5.2 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
   `functional` for TYPO3 v14; record the results. (v14.3.7: unit 1112,
-  functional 2813 in 16 chunks, all green; PostgreSQL for both touched
+  functional 2815 in 16 chunks after the review, all green; PostgreSQL for both touched
   extensions, 390 tests, green.)
 - [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.4 `docs/` and the `Documentation/` changelog of both extensions
   updated in the same change; `README.md` and `CONTRIBUTING.md` only link.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archive the change as the last commit of the pull request.
