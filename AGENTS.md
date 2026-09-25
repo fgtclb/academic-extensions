@@ -12,24 +12,25 @@ handful of things that are easy to get wrong and expensive to discover later.
 
 ## Read this before changing code
 
-| Topic                                                   | Page                                                                        |
-|---------------------------------------------------------|-----------------------------------------------------------------------------|
-| Container based tooling, every suite and option         | [Development environment](docs/development/environment.md)                  |
-| What lives where, extension keys, split repositories    | [Monorepo layout](docs/development/monorepo-layout.md)                      |
-| **Dual core setup — read this first**                   | [Dual core setup](docs/development/dual-core-setup.md)                      |
-| The gates and what they check                           | [Quality gates](docs/development/quality-gates.md)                          |
-| The TypeScript and SCSS build, and its committed output | [Frontend assets](docs/development/frontend-assets.md)                      |
-| Version differences, and the v15 blockers               | [Core version aware code](docs/architecture/core-version-aware-code.md)     |
-| Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)           |
-| `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                           |
-| **Quoting value lists, binding parameters, ordering**   | [Database queries](docs/architecture/database-queries.md)                   |
-| Items of a backend select, and the value they can drop  | [Backend select items](docs/architecture/backend-select-items.md)           |
-| Content element frame and header, v14's `record`        | [Content element rendering](docs/architecture/content-element-rendering.md) |
-| Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                            |
-| The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                            |
-| Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                         |
-| Analysing a backport instead of cherry-picking it       | [Backporting](docs/workflow/backporting.md)                                 |
-| Planning a change with OpenSpec before implementing it  | [OpenSpec](docs/workflow/openspec.md)                                       |
+| Topic                                                   | Page                                                                                   |
+|---------------------------------------------------------|----------------------------------------------------------------------------------------|
+| Container based tooling, every suite and option         | [Development environment](docs/development/environment.md)                             |
+| What lives where, extension keys, split repositories    | [Monorepo layout](docs/development/monorepo-layout.md)                                 |
+| **Dual core setup — read this first**                   | [Dual core setup](docs/development/dual-core-setup.md)                                 |
+| The gates and what they check                           | [Quality gates](docs/development/quality-gates.md)                                     |
+| The TypeScript and SCSS build, and its committed output | [Frontend assets](docs/development/frontend-assets.md)                                 |
+| Version differences, and the v15 blockers               | [Core version aware code](docs/architecture/core-version-aware-code.md)                |
+| Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)                      |
+| `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                                      |
+| **Quoting value lists, binding parameters, ordering**   | [Database queries](docs/architecture/database-queries.md)                              |
+| Items of a backend select, and the value they can drop  | [Backend select items](docs/architecture/backend-select-items.md)                      |
+| Content element frame and header, v14's `record`        | [Content element rendering](docs/architecture/content-element-rendering.md)            |
+| Both suites, their strictness and their conventions     | [Testing](docs/testing/Index.md)                                                       |
+| The shared functional test traits                       | [Testing helper](docs/testing/testing-helper.md)                                       |
+| Commit message conventions                              | [Commit messages](docs/workflow/commit-messages.md)                                    |
+| Analysing a backport instead of cherry-picking it       | [Backporting](docs/workflow/backporting.md)                                            |
+| Planning a change with OpenSpec before implementing it  | [OpenSpec](docs/workflow/openspec.md)                                                  |
+| **DDEV instances in a git worktree**                    | [Instances in git worktrees](docs/development/instances.md#instances-in-git-worktrees) |
 
 ## Local additions and overrides
 
@@ -157,12 +158,49 @@ together.
 - `core-13/`, `core-14/` — ready-to-start development instances, one per core version, both themed with `bk2k/bootstrap-package` — the `/` tree only: that extension delivers through site sets and nothing through a static template from its version 16 on, so the `/legacy/` tree is delivered by a minimal page object of `packages-dev/dev-site` instead. See [TypoScript and site sets](docs/architecture/typoscript-and-site-sets.md). SQLite only, no database container; seeded on first start from `sqlite-databases/core-*.sqlite` by `config/system/additional.php`, and those templates are themselves produced by seeding an empty instance from `packages-dev/dev-site`. Their `config/` and `composer.lock` are **tracked**; `public/`, `var/`, `vendor/` and `config/system/additional/*.php` are not. They are not part of any test run — `runTests.sh` never touches them.
 - `sqlite-databases/` — committed database templates for those instances. `core-*/patches` symlinks into the shared `patches/` pool consumed by `vaimo/composer-patches`.
 - Deleting an instance database does **not** empty the instance: `config/system/additional.php` seeds it from the template again on the next request. `ddev composer instance:fresh` drops it and writes the git-ignored marker `core-NN/.no-database-seed` that suppresses the seeding, so an instance can be rebuilt from nothing; `sqlite:apply` clears the marker. See [Rebuilding an instance from nothing](docs/development/environment.md#rebuilding-an-instance-from-nothing).
-- Switching branches in one checkout collides in DDEV: the instance folders have the same path on every branch but the project names differ per version line (`core13-academics-v3` on `main`, `core13-academics-v2` on `2`), and DDEV refuses a second name for a known path. `ddev stop --unlist <other-name>` clears it; it removes only the registration. The instance database in the git-ignored `core-*/var/` survives the switch, so reset it with `ddev composer sqlite:apply`. So does `core-*/vendor/`, and that one is then wrong — its autoloader points at the other branch's path packages and `vendor/bin/typo3` dies on a missing `EXT_CONSTANTS.php`; `ddev composer install` rebuilds it. Two leftovers are ignored rather than cleaned: `core-*/.ddev/traefik/`, which DDEV lists in its own `.gitignore` under the current project name only, so a rename leaves a stale certificate and private key visible, and the instance folder of the other version line (`core-12/` here, `core-14/` on branch `2`).
+- Switching branches in one checkout collides in DDEV: the instance folders have the same path on every branch but the project names differ per version line (`core13-academics-v3` on `main`, `core13-academics-v2` on `2`), and DDEV refuses a second name for a known path. `ddev stop --unlist <other-name>` clears it; it removes only the registration. The instance database in the git-ignored `core-*/var/` survives the switch, so reset it with `ddev composer sqlite:apply`. So does `core-*/vendor/`, and that one is then wrong — its autoloader points at the other branch's path packages and `vendor/bin/typo3` dies on a missing `EXT_CONSTANTS.php`; `ddev composer install` rebuilds it. Two leftovers are ignored rather than cleaned: `core-*/.ddev/traefik/`, which DDEV lists in its own `.gitignore` under the current project name only, so a rename leaves a stale certificate and private key visible, and the instance folder of the other version line (`core-12/` here, `core-14/` on branch `2`). A linked git worktree collides differently — same name, second path — see "DDEV instances in git worktrees" below.
 
 The extension directory name does not always equal the extension key: e.g.
 `packages/fgtclb/academic-contact4pages/` ships extension key
 `academic_contacts4pages`. The extension key is the authoritative one in
 `composer.json` → `extra.typo3/cms.extension-key`.
+
+## DDEV instances in git worktrees
+
+Every checkout carries the same `core-*/.ddev/config.yaml` and therefore the
+same DDEV project names. **The committed names belong to the main checkout.**
+DDEV refuses a name that is registered for another directory, whether that
+project runs or is only stopped, and the way out — `ddev stop --unlist` — has to
+happen in the checkout that holds the name, which is usually the maintainer's.
+
+A linked worktree therefore runs its instances under names of its own,
+`<committed name>-<8 hex of its path>`, written by
+`Build/Scripts/ddevWorktreeNames.sh` into the git-ignored
+`core-*/.ddev/config.worktree.local.yaml`. With
+`git config core.hooksPath Build/git-hooks` set, the `post-checkout` hook does
+that on `git worktree add` — and a worktree created by an agent tool goes
+through `git worktree add` too. The script does nothing in the main checkout.
+
+- **Before the first `ddev` command in a worktree**, make sure both
+  `core-*/.ddev/config.worktree.local.yaml` exist. If they do not — hooks not
+  enabled, `--no-checkout`, or a worktree older than the hook — run
+  `Build/Scripts/ddevWorktreeNames.sh` in the worktree. Never start an instance
+  of a worktree without it.
+- **Check the name without registering anything**: `ddev debug configyaml | grep
+  '^name'` inside the instance. `ddev list` shows every project with its
+  approot.
+- **Never set `core.hooksPath` yourself.** It is shared by every worktree of the
+  clone and belongs to whoever owns it; running the script is enough.
+- **Never change the name in a tracked file**: no edit of `name:` in
+  `config.yaml`, no `ddev config --project-name`, which rewrites it.
+- **Never `ddev stop --unlist` or `ddev delete` a project whose approot is not
+  your worktree.** If a worktree was started under the committed name before
+  it was named, release that registration *in the worktree*, then run the
+  script and start again.
+- **Clean up what you started.** Run `ddev delete -Oy` in each instance of the
+  worktree before `git worktree remove` — git has no hook for the removal, so
+  containers, volumes and the registration otherwise stay. A project whose
+  directory is already gone is deleted by name: `ddev delete -Oy <name>`.
 
 ## Version support
 
@@ -237,7 +275,8 @@ Test discovery: phpunit globs `packages/*/*/Tests/Unit/`,
 across everything at once (`Build/phpunit/*.xml`) — there is no per-extension
 test config. `packages-dev/` is in the glob because all three of its packages
 carry tests of their own — the seed definition of `packages-dev/dev-site`, the
-tests of the `runTests.sh -j` scripts in `packages-dev/testing-helper`, and the
+tests of the `runTests.sh -j` scripts and of the DDEV worktree name script in
+`packages-dev/testing-helper`, and the
 check in `packages-dev/monorepo-shared` that every `ext_emconf.php` names its
 dependencies by extension key; `cgl` covers that directory for the same reason.
 `phpstan` still does not.
