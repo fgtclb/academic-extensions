@@ -1,0 +1,4 @@
+# Stands in for a project that points the partial root path of this plugin at a directory of
+# its own, as it does to override a persons partial for this plugin too; the persons partials
+# hold no `Contacts/Item.html`.
+plugin.tx_academiccontacts4pages.view.partialRootPath = EXT:academic_persons/Resources/Private/Partials/
