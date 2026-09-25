@@ -10,9 +10,10 @@ at although the directory does not exist yet.
 
 `ContactsController` is `final`, assigns `data`, `contacts`, `roles` and
 `contactsWithoutRole`, and no `record`. `ContactRepository::findByPid()`
-orders by `sorting` and `uid` (`ContactRepository.php:83-86`), so the flat list already
-has the editor's order. The FlexForm `Configuration/FlexForms/ContactsList.xml`
-holds only `settings.showHiddenRecords` and has no Core13/Core14 split.
+orders by `sorting` and `uid` (`ContactRepository.php:83-86`), so the flat
+list already has the editor's order. The FlexForm
+`Configuration/FlexForms/ContactsList.xml` holds only
+`settings.showHiddenRecords` and has no Core13/Core14 split.
 
 ## Goals / Non-Goals
 
@@ -64,9 +65,10 @@ directory of its own — as the 3.0 changelog tells it to for the persons
 partials — does not lose the shipped `Contacts/Item.html`: Extbase's
 `ActionController::addDefaultPathToPaths()` puts
 `EXT:academic_contacts4pages/Resources/Private/Partials/` as the
-lowest-priority path whenever the configured paths do not contain it. The existing test
-`anOverriddenProfilePartialReachesThisPluginToo` does exactly that and keeps
-rendering all cards, so it pins the behaviour on both core versions.
+lowest-priority path whenever the configured paths do not contain it. The
+existing test `anOverriddenProfilePartialReachesThisPluginToo` does exactly
+that and keeps rendering all cards, so it pins the behaviour on both core
+versions.
 
 Rejected: a layout select with shipped card designs. The designs differ per
 project anyway, and one overridable partial plus the switch covers all four
