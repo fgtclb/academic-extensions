@@ -56,7 +56,10 @@ They sit next to the tests that use them, under
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
 Ten of the twenty-nine have a `Classes/` folder with a `TESTS\…` PSR-4 root;
-the other nineteen are pure resources.
+the other nineteen are pure resources. The `ext_emconf.php` is checked like
+every other one: its `depends` names extension keys, and a fixture extension
+may name another fixture extension, which a real extension may not — see
+[Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
 
 A minimal one, complete:
 

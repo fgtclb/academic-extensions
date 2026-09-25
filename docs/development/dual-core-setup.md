@@ -200,7 +200,7 @@ their regular folders. The phpunit suites glob
 such a subfolder would be discovered without any configuration change. The
 same two files add `packages-dev/*/Tests/Unit/` and
 `packages-dev/*/Tests/Functional/` on line 49, for the tests of the development
-seed.
+packages.
 
 Whichever shape is used, add a comment saying **why** the test is limited and,
 where the limitation ends with v13 support, a `@todo` to drop the group. The

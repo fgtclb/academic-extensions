@@ -54,7 +54,8 @@ Three packages that are never released as extensions and never shipped to an
 installation:
 
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`, type
-  `library`. It centralizes the TYPO3 core dependency constraints.
+  `library`. It centralizes the TYPO3 core dependency constraints, and checks
+  the `ext_emconf.php` dependency keys of every extension.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`,
   type `library`. Shared functional-test traits.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key
@@ -74,7 +75,7 @@ rather than code, and how that content is applied is described in
 - `Build/phpunit/` — `UnitTests.xml` and `FunctionalTests.xml`. Test discovery
   is repository-wide: each suite carries two globs, `../../packages/*/*/Tests/…`
   on line 42 and `../../packages-dev/*/Tests/…` on line 49, so the tests of the
-  development seed are collected as well. There is no per-extension phpunit
+  development packages are collected as well. There is no per-extension phpunit
   configuration; a run always covers all extensions unless it is restricted by
   a trailing path argument.
 - `Build/phpstan/Core13/` and `Build/phpstan/Core14/` — one configuration and
@@ -312,6 +313,11 @@ Raising the supported v14 patch level, or adding v15 later, is one edit in that
 file. The individual extensions declare only the system extensions they
 themselves use, and adding a system extension for a test only needs it added
 here.
+
+Its `Tests/Unit/` holds the one check that concerns the dependency metadata of
+all extensions at once: every key an `ext_emconf.php` names in `depends`,
+`suggests` or `conflicts` has to name an extension that exists. See
+[Unit tests](../testing/unit-tests.md#the-ext_emconfphp-dependency-keys).
 
 ## `packages-dev/testing-helper/` — shared test traits
 

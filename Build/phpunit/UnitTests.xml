@@ -41,10 +41,10 @@
             -->
             <directory>../../packages/*/*/Tests/Unit/</directory>
             <!--
-                "packages-dev/" as well, and not only "packages/": the seed definition of
-                "packages-dev/dev-site" is verified by tests of its own, and a suite that does
-                not collect them is a suite that reports the seed as green because it never
-                looked at it.
+                "packages-dev/" as well, and not only "packages/": all three carry tests of
+                their own - the seed of "dev-site", the "runTests.sh -j" scripts of
+                "testing-helper", the ext_emconf.php key check of "monorepo-shared" - and a
+                suite that does not collect them reports them green unseen.
             -->
             <directory>../../packages-dev/*/Tests/Unit/</directory>
         </testsuite>
