@@ -6,7 +6,7 @@ one of them on a single page. That setting belongs to the editor, and the
 letter overrides it without telling anyone.
 
 The switch-off made sense while page links dropped the letter. Once
-`ace-tbd-list-links-keep-state` keeps the letter in every page link, it has
+`ace-734-list-links-keep-state` keeps the letter in every page link, it has
 no technical reason left. The maintainer decided, with that change, that
 pagination under an active letter is allowed, but in a change of its own:
 this one.
@@ -47,7 +47,7 @@ None.
 - Existing content elements with both pagination and the letter navigation
   enabled show fewer profiles per letter page than before.
 - No schema change, no new setting, no template change.
-- Depends on `ace-tbd-list-links-keep-state` for page links that keep the
+- Depends on `ace-734-list-links-keep-state` for page links that keep the
   letter, on `ace-tbd-visitor-filter-ui-routes` for the route set it extends,
   and on `ace-597-letter-navigation-availability` for the letter navigation it
   pages under.
@@ -66,7 +66,7 @@ None.
 
 ## Source
 
-Follows from the maintainer's decision on `ace-tbd-list-links-keep-state`
+Follows from the maintainer's decision on `ace-734-list-links-keep-state`
 (project differences analysis of 2026-09-12). No YouTrack issue is filed yet;
 the change is renamed to `ace-<NNN>-letter-navigation-pagination` when the
 issue is filed after implementation.

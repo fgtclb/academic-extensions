@@ -98,7 +98,45 @@ otherwise drop on the first request with a demand argument.
 The pattern is the one of the profile list of `academic_persons` -
 `QueryResultPaginator`, `NumberedPagination` when `numbered_pagination` is
 loaded and `SimplePagination` otherwise - whose page argument sits in the
-demand too, but whose links carry nothing else.
+demand too, and whose links are built as the next section describes.
+
+## The links of the profile list
+
+The profile list of `academic_persons` has no filter form and no redirect: its
+page and its letter are chosen through links, the pagination and the letter
+navigation. It carries only what the visitor chose, built from the demand as
+above, but two of the rules above do not hold for it: the sorting is not
+carried, because the content element sets it, and the demand stays in the cache
+hash, because the list action is cacheable. The mechanism is its own.
+
+- **One list of visitor values.** `ProfileController` names the demand
+  properties a visitor sets, today `currentPage` and `alphabetFilter`. The
+  property mapping accepts exactly those, plus the keys of `settings.demand`,
+  whose values the controller writes over the request's — so the sorting cannot
+  be set from a URL however it is spelled. A change that lets a visitor set a
+  further value adds it to that list and to nothing else.
+- **`activeListArguments`, built from the demand.** The list action assigns the
+  properties of that list whose value differs from the default of a fresh
+  demand, read after the content element settings and **before** any event, for
+  the reason given above. Unknown and foreign request values never reach it.
+- **Merged by a view helper, not listed in a literal.**
+  `Partner/Pagination.html` names every demand key in a Fluid array literal,
+  because Fluid cannot merge arrays; a project had to copy both navigation
+  partials of the profile list to forward one more value that way.
+  `persons:listArguments` returns `activeListArguments` with the link's own
+  change applied: `overrides` for the page or the letter, `remove` for the page
+  on a letter link, so a new letter starts on page one.
+- **`addQueryString` is rejected.** It carries every query parameter of the
+  current request into the link, foreign ones included. A test with a foreign
+  parameter, an unknown plugin argument and a sorting in the request guards
+  that none of them reaches a link.
+- **The demand is part of the cache hash here.** The profile list action is
+  cacheable and there is no exclusion for its namespace, so every link variant
+  is a page cache entry of its own, covered by its `cHash`. With page and letter
+  as the only values, the links are exactly the ones they were before.
+- **No pagination under a letter.** `listAction()` still switches pagination
+  off while a letter is selected. Lifting that, and the route set that goes
+  with it, is a change of its own.
 
 ## The demand is not part of the cache hash
 

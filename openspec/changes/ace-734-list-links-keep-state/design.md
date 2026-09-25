@@ -9,7 +9,8 @@ See `proposal.md` for the motivation. State on `main`:
   effectively never visitor-settable.
 - `listAction()` switches pagination off while `alphabetFilter` is set.
 - `Pagination.html` links with `{demand: {currentPage: ...}}` five times, and
-  `AlphabetPagination.html` with `{demand: {alphabetFilter: ...}}` twice.
+  `AlphabetPagination.html` with `{demand: {alphabetFilter: ...}}` four times:
+  three links back to all letters and one letter link.
 
 ## Goals / Non-Goals
 
@@ -51,10 +52,20 @@ and `ace-tbd-visitor-filter-demand-query` add their keys to that constant.
 
 Fluid cannot merge arrays, and listing every key in an array literal is what
 forced a project to copy both partials. A small stateless ViewHelper in
-`academic_persons` returns `activeListArguments` with the given overrides
-applied (`currentPage`, or `alphabetFilter` with `currentPage` removed). Its
-`overrides` argument is optional with an empty default: Fluid 5 rejects a
-required argument that has a default.
+`academic_persons`, `persons:listArguments`, returns `activeListArguments` with
+the given overrides applied (`currentPage`, or `alphabetFilter` with
+`currentPage` removed). `overrides` sets values and `remove` drops the comma
+separated keys it names; an override cannot remove, because the link back to
+all letters has to keep the empty `alphabetFilter` it carries today. Both
+arguments, and `arguments` itself, are optional with an empty default: Fluid 5
+rejects a required argument that has a default, and a project list template
+that does not pass `activeListArguments` on keeps rendering the links it
+rendered before.
+
+The value is read before `ModifyProfileDemandEvent`, `ModifyProfileQueryEvent`
+and `ModifyListProfilesEvent`, as the partner list reads its link arguments
+before its demand event: a listener acts again on the request a link leads to,
+so what it changes need not travel in the URL.
 
 Rejected: precomputing every page URL in the controller. The page numbers
 depend on the pagination class (`NumberedPagination` or `SimplePagination`),
@@ -80,10 +91,17 @@ stays off under a letter.
 
 - [More URL variants per list page] → Each variant is a distinct visible
   list, and the values are covered by cHash.
-- [The defect is not observable on `main` alone] → The red test needs a
-  second visitor value, so this change lands together with, or directly
-  before, the first of the two changes that add one. The foreign-parameter
-  test is green today and guards the rejected `addQueryString` approach.
+- [The defect is not observable on `main` alone] → The shipped templates
+  cannot show it while page and letter are the only visitor values. The red
+  test therefore renders the shipped partials under a fixture list template
+  that adds a second value, `viewMode`, to `activeListArguments`, the way the
+  first change that adds one will; it is red against the unchanged partials.
+  A second test pins that the shipped templates generate exactly the links
+  they generated before. The foreign-parameter test is green today and guards
+  the rejected `addQueryString` approach.
+- [`activeListArguments` holds demand properties only] → A later visitor
+  value is carried only when it is a property of the demand on the visitor
+  list. `ace-tbd-list-view-modes` states this for the view mode.
 - [Values without a route enhancer entry show up as query parameters] →
   Accepted; `ace-tbd-visitor-filter-ui-routes` adds routes for the filters.
 

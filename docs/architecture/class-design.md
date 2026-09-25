@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 314 PHP files declaring 279
+rather than describing an intention as a rule — 315 PHP files declaring 280
 classes, 11 interfaces, 13 traits and 11 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-162 of the 279 classes are `final` (58 %). The distribution is not random: it
+163 of the 280 classes are `final` (58 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
@@ -26,11 +26,11 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/EventListener/`                   | 10      | 1       | 0        | 91 %     |
 | `Classes/Controller/`                      | 4       | 5       | 0        | 44 %     |
 | `Classes/Domain/Model/Dto/`                | 7       | 10      | 1        | 39 %     |
-| `Classes/ViewHelpers/`                     | 4       | 8       | 0        | 33 %     |
+| `Classes/ViewHelpers/`                     | 5       | 8       | 0        | 38 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1       | 23      | 0        | 4 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
 | Everything else                            | 93      | 47      | 4        | 65 %     |
-| **Total**                                  | **162** | **112** | **5**    | **58 %** |
+| **Total**                                  | **163** | **112** | **5**    | **58 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -345,7 +345,7 @@ the two supported versions, so a reader has to grep for the method anyway.
 
 ## Strict types
 
-299 of the 304 files declare `strict_types=1` (98 %) — here counted over
+300 of the 305 files declare `strict_types=1` (98 %) — here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;

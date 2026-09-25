@@ -1,6 +1,6 @@
 ## 1. Prerequisites
 
-- [ ] 1.1 Confirm `ace-tbd-list-links-keep-state` is merged or lands in the
+- [ ] 1.1 Confirm `ace-734-list-links-keep-state` is merged or lands in the
   same pull request, and verify its constant of visitor-settable properties
   exists.
 
