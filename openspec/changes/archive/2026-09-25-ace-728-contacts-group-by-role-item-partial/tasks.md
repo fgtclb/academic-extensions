@@ -47,4 +47,4 @@
 - [x] 4.2 The same with `-t 13`.
 - [x] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 4.4 Commit in TYPO3 Core format, `[FEATURE] ACE-728: <subject>`.
-- [ ] 4.5 Archive the change as the last commit of the pull request.
+- [x] 4.5 Archive the change as the last commit of the pull request.
