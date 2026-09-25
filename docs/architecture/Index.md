@@ -101,7 +101,7 @@ describing an intention as if it were the state.
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
 | [Backend select items](backend-select-items.md)                 | What an `itemsProcFunc` handler is handed on each core version, the page TSconfig path of a FlexForm field, and the narrowing that silently drops a relation.                              |
-| [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, and the `record` view variable TYPO3 v14 needs for the header.                                                                |
+| [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, who renders a plugin's header, and the `record` variable TYPO3 v14 needs for it.                                              |
 | [Upgrade checks](upgrade-checks.md)                             | The `academic:upgrade:check` command: the stored configuration it reads, what it compares template overrides with, and which root paths are a project's.                                   |
 
 ## See also

@@ -5,7 +5,7 @@ add the content element header. Their site package ships a content element
 layout without a header section and renders headers in its element templates,
 so a plugin, which renders through that layout, shows no header at all.
 
-Updated 2026-09-25, together with `ace-tbd-jobs-header-rendered-twice`: this
+Updated 2026-09-25, together with `ace-729-jobs-header-rendered-twice`: this
 change used to say that every plugin except jobs, bite jobs and the study plan
 "ignores the header an editor enters", and planned to add the header partial
 to thirteen templates unconditionally. That premise is false on a site with
@@ -74,7 +74,7 @@ None.
 - Rich-text headers and the header palette of projects.
 - Backporting to branch `2`.
 
-Depends on `ace-tbd-jobs-header-rendered-twice`, which introduces the switch
+Depends on `ace-729-jobs-header-rendered-twice`, which introduces the switch
 and its documentation.
 
 ## Source

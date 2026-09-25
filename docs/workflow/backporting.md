@@ -161,10 +161,12 @@ on `main` and was not backported wholesale:
 | `FrontendPluginRenderingTrait`         | yes    | yes |
 | `PluginFlexFormDataStructureTrait`     | yes    | no  |
 | `ColourSchemeAwareIconsTrait`          | yes    | no  |
+| `ResponsiveImageAssertionTrait`        | yes    | no  |
+| `ContentElementHeaderAssertionTrait`   | yes    | yes |
 
-All eight live in
+All ten live in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/` on `main`; branch `2`
-has four of them.
+has five of them.
 
 Count the directory rather than trusting this table, and check the individual
 extension too: a trait being on both branches does not mean the test directory

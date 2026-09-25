@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 308 PHP files declaring 276
-classes, 10 interfaces, 12 traits and 10 enums do not follow one style yet.
+rather than describing an intention as a rule — 309 PHP files declaring 276
+classes, 10 interfaces, 13 traits and 10 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
