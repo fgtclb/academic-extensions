@@ -164,10 +164,14 @@ on `main` and was not backported wholesale:
 | `ResponsiveImageAssertionTrait`        | yes    | no  |
 | `ContentElementHeaderAssertionTrait`   | yes    | yes |
 | `CategoryFilterFormAssertionTrait`     | yes    | yes |
+| `CropVariantsAssertionTrait`           | yes    | no  |
+| `StaticTemplateTypoScriptTrait`        | yes    | yes |
 
-All eleven live in
-`packages-dev/testing-helper/Classes/FunctionalTestCase/` on `main`; branch `2`
-has six of them.
+All thirteen live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`
+on `main`; branch `2` has seven of them, the last since the backport of
+ACE-745. It exists on both, but not as the same code: TYPO3 v12 has no
+`FrontendTypoScriptFactory`, so the copy on branch `2` builds the TypoScript
+from `SysTemplateTreeBuilder` itself.
 
 Count the directory rather than trusting this table, and check the individual
 extension too: a trait being on both branches does not mean the test directory

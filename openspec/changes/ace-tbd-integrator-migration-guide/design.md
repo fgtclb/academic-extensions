@@ -103,7 +103,7 @@ A chapter that depends on a change not released when the guide is written
 (`ace-91-program-finder-element`, `ace-tbd-program-application-link`,
 `ace-722-study-plan-decimal-credit-points`,
 `ace-704-study-plan-partials-js-contract`, `ace-703-study-plan-asset-switch`,
-`ace-666-keep-hidden-ctype-selectable`, `ace-tbd-legacy-typoscript-paths`,
+`ace-666-keep-hidden-ctype-selectable`, `ace-745-legacy-typoscript-paths`,
 `ace-733-program-facts-field-list`,
 `ace-721-program-page-content-without-getcontent`,
 `ace-tbd-page-templates-sections-subtitle`,
@@ -113,7 +113,7 @@ available.
 
 ### Decided: the static template step names the 2.x paths as deprecated
 
-The 2.x TypoScript paths stay until 4.0 (`ace-tbd-legacy-typoscript-paths`),
+The 2.x TypoScript paths stay until 4.0 (`ace-745-legacy-typoscript-paths`),
 so step 5 documents them as deprecated and points to the "All components"
 static template, or to the site set, as the replacement. Keeping the paths
 turns the step from "your site renders nothing" into a deprecation to clean

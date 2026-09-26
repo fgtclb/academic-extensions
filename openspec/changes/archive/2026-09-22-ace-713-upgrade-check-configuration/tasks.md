@@ -6,7 +6,7 @@
   `ConfigurationCheckerTest` covers a working folder, a folder without
   TypoScript, an extension that is gone, a foreign extension and a hidden
   record; shown to fail with the check removed and with the restrictions
-  changed. The four 2.x paths `ace-tbd-legacy-typoscript-paths` keeps are not
+  changed. The four 2.x paths `ace-745-legacy-typoscript-paths` keeps are not
   touched: they hold TypoScript, so they are correctly not reported, and the
   row asserting it belongs to that change.
 - [x] 1.2 Added the page TSconfig check for all three forms, with the four

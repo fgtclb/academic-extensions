@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but twelve PHP traits — the parts of the test setup that were being copied
+but thirteen PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -20,6 +20,7 @@ necessary.
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
 | [`ColourSchemeAwareIconsTrait`](#colourschemeawareiconstrait)                   | Asserts a record icon follows the backend colour scheme.            |
 | [`CropVariantsAssertionTrait`](#cropvariantsassertiontrait)                     | Reads the crop variants the image cropper offers for a record.      |
+| [`StaticTemplateTypoScriptTrait`](#statictemplatetyposcripttrait)               | Builds the TypoScript a record delivers, and what its form keeps.   |
 
 ## How an extension gets access
 
@@ -746,6 +747,56 @@ what the cropper finally shows is decided by two protected methods of
 variant is configured, the other reads the stored crop in and fits each area
 into the ratio of its variant. The trait calls both, so a test follows the
 installed core instead of a copy of its rules.
+
+## `StaticTemplateTypoScriptTrait`
+
+Builds the whole TypoScript a root TypoScript record delivers to the frontend,
+and reads which of its stored static templates the backend form keeps. Used by
+`LegacyStaticTemplatePathTest` of `academic-bite-jobs`,
+`academic-contact4pages`, `academic-persons-edit` and `academic-study-plan`,
+see [the paths of version 2.3](../architecture/typoscript-and-site-sets.md#the-paths-of-version-23-keep-delivering-until-40):
+
+```php
+use StaticTemplateTypoScriptTrait;
+
+#[Test]
+public function aStoredLegacyPathDeliversWhatAllComponentsDelivers(): void
+{
+    $allComponents = $this->typoScriptOfTemplateRecord('EXT:academic_bite_jobs/Configuration/TypoScript/Full');
+
+    // Without it, two empty trees would compare equal.
+    $this->assertSame(
+        'EXT:academic_bite_jobs/Resources/Private/Templates/',
+        $allComponents['setup']['plugin.']['tx_academicbitejobs.']['view.']['templateRootPaths.']['10'] ?? null,
+    );
+    $this->assertSame($allComponents, $this->typoScriptOfTemplateRecord('EXT:academic_bite_jobs/Configuration/TypoScript'));
+}
+```
+
+— shortened from [`academic-bite-jobs/Tests/Functional/TypoScript/LegacyStaticTemplatePathTest.php`](../../packages/fgtclb/academic-bite-jobs/Tests/Functional/TypoScript/LegacyStaticTemplatePathTest.php)
+
+| Method                          | Returns                                                           |
+|---------------------------------|-------------------------------------------------------------------|
+| `typoScriptOfTemplateRecord()`  | The flat settings and the setup array a record builds.            |
+| `setupFilesOfTemplateRecord()`  | Every file its setup reads, once per read, in order.              |
+| `staticTemplatesTheFormKeeps()` | The stored static templates the backend form of the record keeps. |
+
+The first two take the value of `include_static_file` and, optionally, the
+Constants and Setup fields, and build the record in memory with `clear = 3`
+and no site, so no record or site set of the test instance takes part. The
+third writes the record as uid 1 on page 1; the page and the backend user have
+to be set up by the test.
+
+**The traps it exists for.** A stored static template that finds no file, and
+an `@import` that finds none, both deliver nothing without a message, so a
+frontend test that looks for one value proves only that this value arrived.
+Comparing the whole tree catches the rest, and so does counting the files: two
+reads of the same file build the same tree, and only the file list shows them.
+The trees are built with `FrontendTypoScriptFactory`, which both core versions
+mark `@internal`; it is the one place that turns records into frontend
+TypoScript, and a test is the right place to depend on it. The form drops a
+stored value that is not among the items of the field, which is what makes an
+unregistered static template disappear on the next save.
 
 ## See also
 

@@ -33,6 +33,11 @@ final class StaticRegistrationTest extends AbstractAcademicStudyPlanTestCase
             'EXT:academic_study_plan/Configuration/TypoScript/Full',
             'Academic Study Plan: All components (academic_study_plan)',
         ];
+        // The path this extension registered up to version 2.3, kept as deprecated until 4.0.
+        yield 'path up to 2.3' => [
+            'EXT:academic_study_plan/Configuration/TypoScript/Default',
+            'Academic Study Plan: Path up to 2.3 (deprecated, use All components) (academic_study_plan)',
+        ];
     }
 
     #[Test]
@@ -80,23 +85,6 @@ final class StaticRegistrationTest extends AbstractAcademicStudyPlanTestCase
     }
 
     /**
-     * The value this extension registered before the configuration was cut per component.
-     * It is gone, and the Breaking changelog entry of version 2.4 is what tells an
-     * installation which entry to select instead - a test that let it come back silently
-     * would make that entry a lie.
-     */
-    #[Test]
-    public function theStaticTemplateOfTheUnsplitConfigurationIsGone(): void
-    {
-        $values = array_column(
-            $GLOBALS['TCA']['sys_template']['columns']['include_static_file']['config']['items'] ?? [],
-            'value',
-        );
-
-        $this->assertNotContains('EXT:academic_study_plan/Configuration/TypoScript/Default', $values);
-    }
-
-    /**
      * @return \Generator<string, array{0: string, 1: string}>
      */
     public static function pageTsConfigFileIsRegisteredDataProvider(): \Generator
@@ -137,10 +125,11 @@ final class StaticRegistrationTest extends AbstractAcademicStudyPlanTestCase
     }
 
     /**
-     * The counterpart of `theStaticTemplateOfTheUnsplitConfigurationIsGone()` for the page
-     * TSconfig file. This extension is the only one of the twelve that registered one
-     * before the restructuring, so this is the single stored value of that kind the
-     * conversion invalidated.
+     * The page TSconfig file this extension registered before the configuration was cut per
+     * component. It is gone, and the Breaking changelog entry of version 2.4 is what tells an
+     * installation which entry to select instead. This extension is the only one of the
+     * twelve that registered one before the restructuring, so this is the single stored value
+     * of that kind the conversion invalidated.
      */
     #[Test]
     public function thePageTsConfigFileOfTheUnsplitConfigurationIsGone(): void
