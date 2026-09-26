@@ -26,4 +26,21 @@ defined('TYPO3') || die();
         'Academic Contacts4Pages: All components',
     );
 
+    //==================================================================================================================
+    // The entry below keeps the value installations stored in "sys_template.include_static_file" up to version 2.3.
+    //
+    // Deprecated since 2.4, removed in 4.0. The folder delivers the TypoScript of this extension, so a record that
+    // still stores it keeps its configuration. Registering it keeps the value when the record is saved: the backend
+    // form drops a stored value that is not among the items.
+    //
+    // Unlike "All components", it does not bring the TypoScript of EXT:academic_persons along: a record of version 2.3
+    // stores that as an entry of its own. The trailing slash is part of the value version 2.3 registered and stored,
+    // and has to stay, or the form drops the stored value.
+    //==================================================================================================================
+    ExtensionManagementUtility::addStaticFile(
+        'academic_contacts4pages',
+        'Configuration/TypoScript/',
+        'Academic Contacts4Pages: Path up to 2.3 (deprecated, use All components)',
+    );
+
 })();

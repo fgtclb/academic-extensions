@@ -168,7 +168,8 @@ surroundings; do not reformat the file.
 ### The test harness is not at parity
 
 `packages-dev/testing-helper/` — the shared functional-test traits — has grown
-on `main` and was not backported wholesale. This branch has six of the eleven:
+on `main` and was not backported wholesale. This branch has seven of the
+thirteen:
 
 | Trait                                  | `2` — this branch | `main` |
 |----------------------------------------|-------------------|--------|
@@ -178,17 +179,22 @@ on `main` and was not backported wholesale. This branch has six of the eleven:
 | `FrontendPluginRenderingTrait`         | yes               | yes    |
 | `ContentElementHeaderAssertionTrait`   | yes               | yes    |
 | `CategoryFilterFormAssertionTrait`     | yes               | yes    |
+| `StaticTemplateTypoScriptTrait`        | yes               | yes    |
 | `ColourSchemeAwareIconsTrait`          | no                | yes    |
 | `DeprecatedCoreLabelsTrait`            | no                | yes    |
 | `EnsureTtContentListTypeColumnTrait`   | no                | yes    |
 | `PluginFlexFormDataStructureTrait`     | no                | yes    |
 | `ResponsiveImageAssertionTrait`        | no                | yes    |
+| `CropVariantsAssertionTrait`           | no                | yes    |
 
 All of them live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`;
-here that directory holds the six marked for this branch. Count it rather than
-trusting this table — it has been wrong before.
+here that directory holds the seven marked for this branch. Count it rather than
+trusting this table — it has been wrong before. `StaticTemplateTypoScriptTrait`
+is on both, but not as the same code: TYPO3 v12 has no
+`FrontendTypoScriptFactory`, so the copy here builds the TypoScript from
+`SysTemplateTreeBuilder` itself.
 
-The consequence is narrower than the missing five suggest, and it is worth
+The consequence is narrower than the missing six suggest, and it is worth
 checking per change rather than assumed: a trait being on both branches does not
 mean the test directory that uses it is. Frontend plugin rendering tests do have
 a home here — `academic-bite-jobs`, `academic-contact4pages`, `academic-jobs`,

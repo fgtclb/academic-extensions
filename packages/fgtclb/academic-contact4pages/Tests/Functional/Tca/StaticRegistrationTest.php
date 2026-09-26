@@ -33,6 +33,11 @@ final class StaticRegistrationTest extends AbstractAcademicContacts4PagesTestCas
             'EXT:academic_contacts4pages/Configuration/TypoScript/Full',
             'Academic Contacts4Pages: All components (academic_contacts4pages)',
         ];
+        // The path this extension registered up to version 2.3, kept as deprecated until 4.0.
+        yield 'path up to 2.3' => [
+            'EXT:academic_contacts4pages/Configuration/TypoScript/',
+            'Academic Contacts4Pages: Path up to 2.3 (deprecated, use All components) (academic_contacts4pages)',
+        ];
     }
 
     #[Test]
