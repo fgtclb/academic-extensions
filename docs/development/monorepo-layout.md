@@ -323,11 +323,12 @@ all extensions at once: every key an `ext_emconf.php` names in `depends`,
 
 `fgtclb/academics-monorepo-testing-helper` autoloads
 `FGTCLB\TestingHelper\` from `Classes/` and is required as a dev dependency of
-the root. It ships ten functional-test traits in
+the root. It ships eleven functional-test traits in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/`:
 
 | Trait                                  | Purpose                                                                             |
 |----------------------------------------|-------------------------------------------------------------------------------------|
+| `CategoryFilterFormAssertionTrait`     | Reads the category filters of a list's filter form, and where they render.          |
 | `ColourSchemeAwareIconsTrait`          | Asserts a record icon follows the backend colour scheme.                            |
 | `ContentElementHeaderAssertionTrait`   | Counts where the header of a content element rendered, and how often.               |
 | `DeprecatedCoreLabelsTrait`            | Asserts that no TCA label points at a core label deprecated on the running version. |

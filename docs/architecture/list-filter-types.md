@@ -3,8 +3,11 @@
 The filter form of a list offers one select per category type of its group.
 Which types it offers, and in which order, is the **filter types** setting:
 a comma-separated list of type identifiers under one key,
-`settings.filter.categoryTypes`. Today the program list and the program finder
-read it; the partner and project lists do not yet.
+`settings.filter.categoryTypes`. The partner list and map, both project lists,
+the program list and the program finder read it. Two more keys of the same
+`settings.filter` namespace shape the form: `visibleCount` and
+`hideDisabledOptions`, see [Visible count and options without
+results](#visible-count-and-options-without-results).
 
 What an integrator or editor sees is documented in the extension's
 `Documentation/Configuration/`. This page is about how the value is resolved and
@@ -12,10 +15,10 @@ the rules that are easy to get wrong.
 
 ## Two levels, one key
 
-| Level               | Where it is set                                                                                  |
-|---------------------|--------------------------------------------------------------------------------------------------|
-| The site            | Constant or site setting `plugin.tx_academicprograms.filter.categoryTypes`                       |
-| One content element | FlexForm field `settings.filter.categoryTypes` of the `Program List` or `Program Finder` element |
+| Level               | Where it is set                                                                                                 |
+|---------------------|-----------------------------------------------------------------------------------------------------------------|
+| The site            | Constant or site setting `plugin.tx_academic<partners\|projects\|programs>.filter.categoryTypes`                |
+| One content element | FlexForm field `settings.filter.categoryTypes` of the `Program List` or `Program Finder` element, programs only |
 
 The constant is mapped to `settings.filter.categoryTypes` in `setup.typoscript`,
 and Extbase merges the FlexForm over it. An element that leaves its field empty
@@ -34,10 +37,11 @@ names for one concept would have to be kept apart in every template override.
 
 `FGTCLB\CategoryTypes\Filter\FilterTypeResolver` turns the collection of the
 list and the setting into a `FilterTypes` value: the offered identifiers, in
-order, split into `visible` and `more` by an optional visible count. The program
-list passes no count, so everything is `visible`; the split exists for the
-partner, project and program lists to share once they offer a "more filters"
-disclosure.
+order, split into `visible` and `more` by an optional visible count.
+`resolveFromSettings()` reads both from the plugin settings, `filter.categoryTypes`
+and `filter.visibleCount`, and is what the partner, project and program list
+actions call; a value TypoScript or a site setting cannot deliver counts as not
+set. The finder calls `resolve()` with its own default and no count.
 
 The collection is the one `CategoryRepository::findAllApplicable()` returns,
 and that is where the rule comes from that is easiest to get wrong. It holds
@@ -61,15 +65,17 @@ Leaving out the disabled **options** is a switch of the form field:
 `<ct:form.filterSelect hideDisabledOptions="1">` renders no option for a
 category without results, but keeps one the visitor selected (a preselection
 by `selectAllByDefault` does not count), and with `groupByParent` keeps a
-disabled parent while one of its descendants is shown. It is off by default,
-and neither the shipped `DemandCategories.html` partials nor the program
-finder's `Finder.html` sets it; the rules are in
+disabled parent while one of its descendants is shown; the rules are in
 [the changelog entry](../../packages/fgtclb/typo3-category-types/Documentation/Changelog/2.4/Feature-FilterSelectCanHideOptionsWithoutResults.rst).
+The shipped `DemandCategories.html` partials and the finder's `Finder.html`
+pass `settings.filter.hideDisabledOptions` to it.
 
-The resolver is stateless, autowired and `@internal`. `ProgramController`
-receives it through a `final` `inject*()` method rather than its constructor,
-because the controller is not final and project subclasses call the
-constructor.
+The resolver is stateless, autowired and `@internal`. `PartnerController`,
+`ProjectController` and `ProgramController` receive it through a `final`
+`inject*()` method rather than their constructor, because the controllers are
+not final and project subclasses call the constructor. The partner and project
+actions resolve the categories the list event handed back, so a listener that
+changes them changes the filters too.
 
 The partial loops `filterTypes.visible` when `filterTypes` reaches it, and falls
 back to the loop it had before when it does not: a subclass that overrides
@@ -77,6 +83,72 @@ back to the loop it had before when it does not: a subclass that overrides
 partial with its own arguments instead of `{_all}`, would otherwise lose every
 filter on the update. The fallback ignores the setting, which is the one thing
 such a project has to change to use it.
+
+## Visible count and options without results
+
+| Key                                   | Default | Read by                                         |
+|---------------------------------------|---------|-------------------------------------------------|
+| `settings.filter.visibleCount`        | `0`     | The resolver, for the list actions              |
+| `settings.filter.hideDisabledOptions` | `0`     | The partials and `Finder.html`, in the template |
+
+Both are a constant and a site setting per extension, mapped into
+`settings.filter` in `setup.typoscript`, with no FlexForm field. They are
+declared with each extension's **aggregate** set: the partner list and map, and
+both project elements, render the same form, and a set declares settings only
+for itself. A site on a component set alone gets the defaults of the constants.
+
+With a count, the filters after it go into a native `<details>` with a
+`<summary>` labelled `filter.moreFilters`, as one `col-12` cell of the form's
+row holding a `row` of its own. Without one, or with a count that covers every
+filter, the markup is what it was before the settings existed, which the list
+tests pin cell by cell. `<details>` gets `open` while a filter inside it has a
+value: the partial loops `filterTypes.more` and sets a variable through
+`f:variable`, which reaches the enclosing scope on Fluid 4 and 5 alike, because
+the `ScopedVariableProvider` of `f:for` writes an added variable to the global
+provider too. A category the editor preselected in the element counts as a value
+as well: the filter shows it selected, so the disclosure opens for it. The
+finder has no disclosure; it is compact by design.
+
+A filter whose options are all left out keeps rendering, with its "All" option
+only. Leaving the whole filter out was rejected: which categories are disabled
+changes with every filter the visitor sets, so filters would come and go, and
+the visible count would move filters in and out of the disclosure, while the
+visitor narrows the list.
+
+## The "All" option
+
+The first option of every filter reads
+`sys_category.<group>.allOptions.<type>` and falls back to the shared
+`sys_category.<group>.allOptions` through the `default` argument of
+`f:translate`. No extension ships a label per type, so the output is unchanged
+until a site adds one.
+
+A site adds one with `_LOCAL_LANG`, under `plugin.tx_academic<group>` for every
+plugin of the extension or `plugin.tx_academic<group>_<plugin>` for one. That
+works on both core versions only because the filter templates pass the
+extension name in **UpperCamelCase**, `extensionName: 'AcademicPartners'`. The
+two versions build the TypoScript key differently:
+
+| Template passes       | TYPO3 v13 reads                         | TYPO3 v14 reads                                                      |
+|-----------------------|-----------------------------------------|----------------------------------------------------------------------|
+| `'AcademicPartners'`  | `plugin.tx_academicpartners[_<plugin>]` | `plugin.tx_academicpartners[_<plugin>]`                              |
+| `'academic_partners'` | `plugin.tx_academic_partners` only      | `plugin.tx_academicpartners[_<plugin>]` - the underscore is stripped |
+
+v13 lowercases the name as given; v14's
+`LanguageService::loadTypoScriptLabelsFromExtension()` removes the underscores
+first. v13 reads the plugin path only for the plugin that renders the template,
+because it takes the configuration the Extbase configuration manager merged for
+that plugin - for these filters that is always the case. Measured with a
+functional probe and in both development instances, where the list and the
+finder of the site set tree and of the `/legacy/` tree render the overridden
+label in English and German, and lose it on v13 as soon as a template passes
+`academic_partners` again. Most other templates of the extensions still pass the
+underscored name; that is a defect of its own.
+
+A language file override works too, under the key of each core version:
+`$GLOBALS['TYPO3_CONF_VARS']['SYS']['locallangXMLOverride']` on v13,
+`$GLOBALS['TYPO3_CONF_VARS']['LANG']['resourceOverrides']` on v14, which
+renamed it (Breaking-107436) and does not read the old key.
 
 ## What the setting does not restrict
 
@@ -113,10 +185,13 @@ reads the same key at both levels, through the same
 as no plugin block `plugin.tx_academicprograms_<plugin>` sets its own — and
 the same resolver.
 
-It differs in one place: with both levels empty it offers `degree,topic`, not
+It differs in two places. With both levels empty it offers `degree,topic`, not
 every type with a category. A finder is a compact entry, and a dozen selects is
 no entry. The default is a constant of `ProgramController`, applied before the
-resolver, so a site without a `topic` category gets the degree alone.
+resolver, so a site without a `topic` category gets the degree alone. And it
+ignores the visible count: `finderAction()` calls `resolve()` without one
+rather than `resolveFromSettings()`, so every select is shown and there is no
+disclosure.
 
 Its options come from `findAllApplicable()` over the programs in the finder's
 own storage (`pages`, `recursive`), not over the storage of the list it
@@ -146,19 +221,20 @@ something other than what the select shows.
 
 ## Tests
 
-| What                                         | Test                                                                                 |
-|----------------------------------------------|--------------------------------------------------------------------------------------|
-| The resolution rules and the split           | `typo3-category-types/Tests/Unit/Filter/FilterTypeResolverTest.php`                  |
-| The items, and core getting the provider     | `typo3-category-types/Tests/{Unit,Functional}/Backend/FormEngine/…`                  |
-| The field as FormEngine compiles it          | `academic-programs/Tests/Functional/Backend/FormEngine/FilterTypesFieldTest.php`     |
-| Order, fallback, site set, unoffered filters | `academic-programs/Tests/Functional/Plugins/AcademicProgramsListFilterTypesTest.php` |
-| The stored order after a save                | `academic-programs/Tests/Functional/Backend/FormEngine/FilterTypesFieldTest.php`     |
-| The finder: default, order, preselection     | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderTest.php`          |
-| The finder: target URI, sorting, no form     | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderTest.php`          |
-| The finder renders outside the page cache    | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderCachingTest.php`   |
-| A filter without sorting keeps the element's | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFilterUrlTest.php`       |
-| Which sorting a demand gets                  | `academic-programs/Tests/Functional/Factory/DemandFactorySortingTest.php`            |
-| The finder fields, and what a save stores    | `academic-programs/Tests/Functional/Backend/FormEngine/ProgramFinderFieldsTest.php`  |
+| What                                          | Test                                                                                           |
+|-----------------------------------------------|------------------------------------------------------------------------------------------------|
+| The resolution rules, the split, the settings | `typo3-category-types/Tests/Unit/Filter/FilterTypeResolverTest.php`                            |
+| The items, and core getting the provider      | `typo3-category-types/Tests/{Unit,Functional}/Backend/FormEngine/…`                            |
+| The field as FormEngine compiles it           | `academic-programs/Tests/Functional/Backend/FormEngine/FilterTypesFieldTest.php`               |
+| Order, fallback, site set, unoffered filters  | `academic-programs/Tests/Functional/Plugins/AcademicProgramsListFilterTypesTest.php`           |
+| Count, disclosure, hidden options, labels     | `academic-<partners\|projects\|programs>/Tests/Functional/Plugins/Academic*ListFilterTest.php` |
+| The stored order after a save                 | `academic-programs/Tests/Functional/Backend/FormEngine/FilterTypesFieldTest.php`               |
+| The finder: default, order, preselection      | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderTest.php`                    |
+| The finder: target URI, sorting, no form      | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderTest.php`                    |
+| The finder renders outside the page cache     | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFinderCachingTest.php`             |
+| A filter without sorting keeps the element's  | `academic-programs/Tests/Functional/Plugins/AcademicProgramsFilterUrlTest.php`                 |
+| Which sorting a demand gets                   | `academic-programs/Tests/Functional/Factory/DemandFactorySortingTest.php`                      |
+| The finder fields, and what a save stores     | `academic-programs/Tests/Functional/Backend/FormEngine/ProgramFinderFieldsTest.php`            |
 
 ## See also
 

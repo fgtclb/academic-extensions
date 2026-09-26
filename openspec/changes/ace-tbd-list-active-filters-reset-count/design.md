@@ -68,7 +68,7 @@ this site-wide.
 
 The three `settings.filter.show*` switches are TypoScript and site settings
 only, the same answer as for the filter settings of
-`ace-tbd-list-filter-order-visible-labels`. It is the same question on the
+`ace-739-list-filter-order-visible-labels`. It is the same question on the
 same `settings.filter` namespace, and a FlexForm override can be added later
 without breaking anything.
 

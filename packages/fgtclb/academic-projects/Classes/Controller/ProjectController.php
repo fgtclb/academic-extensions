@@ -11,6 +11,7 @@ use FGTCLB\AcademicProjects\Event\ModifyProjectDemandEvent;
 use FGTCLB\AcademicProjects\Event\ModifyProjectListEvent;
 use FGTCLB\AcademicProjects\Factory\DemandFactory;
 use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
+use FGTCLB\CategoryTypes\Filter\FilterTypeResolver;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Http\PropagateResponseException;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -20,6 +21,8 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class ProjectController extends ActionController
 {
     private ExtensionService $filterRedirectExtensionService;
+
+    private FilterTypeResolver $filterTypeResolver;
 
     public function __construct(
         protected readonly ProjectRepository $projectRepository,
@@ -59,10 +62,12 @@ class ProjectController extends ActionController
             pluginControllerActionContext: $context,
         ));
 
+        $categories = $listEvent->getCategories();
         $assignedValues = [
             'projects' => $listEvent->getProjects(),
             'demand' => $demandObject,
-            'categories' => $listEvent->getCategories(),
+            'categories' => $categories,
+            'filterTypes' => $this->filterTypeResolver->resolveFromSettings($categories, $this->settings),
             'data' => $contentElementData,
         ];
 
@@ -78,6 +83,14 @@ class ProjectController extends ActionController
     final public function injectFilterRedirectExtensionService(ExtensionService $extensionService): void
     {
         $this->filterRedirectExtensionService = $extensionService;
+    }
+
+    /**
+     * Method injection for the same reason as {@see injectFilterRedirectExtensionService()}.
+     */
+    final public function injectFilterTypeResolver(FilterTypeResolver $filterTypeResolver): void
+    {
+        $this->filterTypeResolver = $filterTypeResolver;
     }
 
     /**

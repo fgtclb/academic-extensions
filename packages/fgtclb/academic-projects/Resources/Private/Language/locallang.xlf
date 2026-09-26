@@ -17,6 +17,9 @@
       <trans-unit id="sys_category.projects.allOptions">
         <source>All options</source>
       </trans-unit>
+      <trans-unit id="filter.moreFilters">
+        <source>More filters</source>
+      </trans-unit>
       <trans-unit id="sys_category.projects.department">
         <source>Department</source>
       </trans-unit>

@@ -1,18 +1,19 @@
 ## Purpose
 
-Defines which category filters the partner list and map content elements
-offer a visitor, in which order, how many are visible at first and how their
-"all" options are labelled.
+Defines which category filters the partner list and map content elements offer
+a visitor, in which order, how many are visible at first, how their "all"
+options are labelled and whether options without results are shown.
 
 ## ADDED Requirements
 
 ### Requirement: Integrators choose and order the filter types
 
-The partner filter SHALL offer the category types named in the setting for
-the filter types, in the order given there, and SHALL ignore a name that is
-not a registered partner category type. With the setting empty, it SHALL
-offer every registered partner category type that has categories, in
-registry order, as before. This applies to TYPO3 v13 and v14 alike.
+The partner filter SHALL offer the category types named in the setting for the
+filter types, in the order given there, and SHALL ignore a name that is not a
+registered partner category type, and a type without any category. With the
+setting empty, it SHALL offer every registered partner category type that has
+categories, in registry order, as before. This applies to TYPO3 v13 and v14
+alike.
 
 #### Scenario: Explicit order
 
@@ -22,7 +23,9 @@ registry order, as before. This applies to TYPO3 v13 and v14 alike.
 
 #### Scenario: No configuration
 
-- **WHEN** no filter types are configured
+- **WHEN** neither filter types, a visible count nor the switch for options
+  without results is configured
+- **AND** the site overrides no label of the filter form
 - **THEN** the partner filter output is the same as before the change
 
 ### Requirement: Only the first filters are visible
@@ -31,7 +34,8 @@ With a visible count greater than 0, the partner filter SHALL show that many
 filters directly and SHALL put the remaining filters into a "more filters"
 disclosure that works without JavaScript. The disclosure SHALL be open when
 one of the filters inside it has an active value. A visible count of 0 SHALL
-show all filters directly.
+show all filters directly, and so SHALL a visible count that covers every
+offered filter.
 
 #### Scenario: Visible count of one
 
@@ -49,7 +53,9 @@ show all filters directly.
 
 The "all" option of a filter SHALL use the label defined for its category type
 when one exists, and SHALL fall back to the generic "all" label of the
-extension otherwise.
+extension otherwise. The extension SHALL ship no label per type.
+A label a site sets in TypoScript for every plugin of the extension, or for
+one of its plugins, SHALL reach the filter on TYPO3 v13 and v14 alike.
 
 #### Scenario: Per-type label defined
 
@@ -57,11 +63,17 @@ extension otherwise.
 - **THEN** the region filter's "all" option shows that label, and other
   filters show the generic label
 
+#### Scenario: Label set for the whole extension on TYPO3 v13
+- **WHEN** a site on TYPO3 v13 sets the label of the "all" option of the
+  region type for every plugin of the extension
+- **THEN** the region filter's "all" option shows that label, as on TYPO3 v14
+
 ### Requirement: Options without results can be hidden
 
 With the setting to hide options without results enabled, the partner filter
-SHALL leave out options that no partner of the current result carries,
-except the selected one.
+SHALL leave out options that no partner of the current result carries, except
+a selected one. A filter whose options are all left out SHALL still be
+offered, with its "all" option only.
 
 #### Scenario: Hide options without results
 
