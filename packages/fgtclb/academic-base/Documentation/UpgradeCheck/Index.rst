@@ -257,8 +257,10 @@ A changed copy of a file the extension still ships is not reported - that is a
 deliberate override, and it works.
 
 Only :file:`*.html` files are compared. XLIFF files are overridden through
-:php:`locallangXMLOverride`, not through a view root path, and are none of this
-command's business.
+:php:`$GLOBALS['TYPO3_CONF_VARS']['SYS']['locallangXMLOverride']` on TYPO3 v13,
+:php:`$GLOBALS['TYPO3_CONF_VARS']['LANG']['resourceOverrides']` on TYPO3 v14,
+or through :typoscript:`_LOCAL_LANG` in TypoScript, not through a view root
+path, and are none of this command's business.
 
 A file named :file:`Name.fluid.html` against an upstream :file:`Name.html` is
 reported as :bash:`missing-upstream`. That is deliberate: Fluid resolves the

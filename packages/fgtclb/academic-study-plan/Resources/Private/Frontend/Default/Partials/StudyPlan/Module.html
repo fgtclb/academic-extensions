@@ -28,7 +28,7 @@
 
     <f:if condition="{module.credit_points}">
         <span class="credits small">
-            {module.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+            {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
         </span>
     </f:if>
 
@@ -40,8 +40,8 @@
         <button class="modal-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
             <span class="visually-hidden">
                 {semester.label}, {semester.note}, {semester.credit_points}
-                {f:translate(key: 'credits', extensionName: 'academic_study_plan')}.
-                {f:translate(key: 'modal.open', extensionName: 'academic_study_plan')}: {module.label}
+                {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}.
+                {f:translate(key: 'modal.open', extensionName: 'AcademicStudyPlan')}: {module.label}
             </span>
         </button>
 

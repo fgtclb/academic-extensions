@@ -35,7 +35,7 @@
                     <li>
                         <core:icon identifier="category_types.projects.{type}"/>
 
-                        <b>{f:translate(key: 'sys_category.projects.{type}', extensionName: 'academic_projects')}:</b>
+                        <b>{f:translate(key: 'sys_category.projects.{type}', extensionName: 'AcademicProjects')}:</b>
 
                         <span>
                             <f:for each="{categories}" as="category" iteration="i">
@@ -51,12 +51,12 @@
     <ul>
         <f:if condition="{project.startDate} || {project.endDate}">
             <li>
-                <b>{f:translate(key: 'project.runtime', extensionName: 'academic_projects')}:</b>
+                <b>{f:translate(key: 'project.runtime', extensionName: 'AcademicProjects')}:</b>
 
                 <span>
                     <f:if condition="{project.startDate}">
                         <f:if condition="!{project.endDate}">
-                            {f:translate(key: 'project.since', extensionName: 'academic_projects')}
+                            {f:translate(key: 'project.since', extensionName: 'AcademicProjects')}
                         </f:if>
 
                         <f:format.date date="{project.startDate}" format="%m.%Y"/>
@@ -66,7 +66,7 @@
 
                     <f:if condition="{project.endDate}">
                         <f:if condition="!{project.startDate}">
-                            {f:translate(key: 'project.until', extensionName: 'academic_projects')}
+                            {f:translate(key: 'project.until', extensionName: 'AcademicProjects')}
                         </f:if>
 
                         <f:format.date date="{project.endDate}" format="%m.%Y"/>
@@ -77,7 +77,7 @@
 
         <f:if condition="{project.budget}">
             <li>
-                <b>{f:translate(key: 'project.budget', extensionName: 'academic_projects')}:</b>
+                <b>{f:translate(key: 'project.budget', extensionName: 'AcademicProjects')}:</b>
 
                 <span>{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</span>
             </li>
@@ -85,7 +85,7 @@
 
         <f:if condition="{project.funders}">
             <li>
-                <b>{f:translate(key: 'project.funders', extensionName: 'academic_projects')}:</b>
+                <b>{f:translate(key: 'project.funders', extensionName: 'AcademicProjects')}:</b>
 
                 <f:format.html>{project.funders}</f:format.html>
             </li>

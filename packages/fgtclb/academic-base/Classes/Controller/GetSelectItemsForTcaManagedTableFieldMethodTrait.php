@@ -7,6 +7,7 @@ namespace FGTCLB\AcademicBase\Controller;
 use FGTCLB\AcademicJobs\Controller\JobController;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
@@ -67,6 +68,18 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
             GeneralUtility::callUserFunction($itemProcFunc, $processorParameters, $this);
             $items = $processorParameters['items'];
         }
+        // Translated with the extension name, not the key: up to TYPO3 v13 the core reads the
+        // `_LOCAL_LANG` overrides of `plugin.tx_<name>` exactly as the name is spelled, so the
+        // key `academic_jobs` looked in `plugin.tx_academic_jobs`. A name without an
+        // underscore is taken as given - converting it would lowercase it.
+        $extensionName = str_contains($extensionKey, '_')
+            ? GeneralUtility::underscoredToUpperCamelCase($extensionKey)
+            : $extensionKey;
+        // TYPO3 v14 reads the `_LOCAL_LANG` override of the plugin only from the request it is
+        // handed; TYPO3 v13 takes it from the configuration manager and has no parameter for
+        // the request. Spread, the argument list fits both signatures.
+        // @todo Pass the request directly once TYPO3 v13 support is dropped.
+        $requestArgument = (new Typo3Version())->getMajorVersion() >= 14 ? [$request] : [];
         $returnItems = [];
         foreach ($items as $item) {
             $itemValue = (string)($item['value'] ?? '');
@@ -80,7 +93,10 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
             $returnItems[] = [
                 'label' => ($localizationUtility->translate(
                     $labelIdentifier,
-                    $extensionKey,
+                    $extensionName,
+                    null,
+                    null,
+                    ...$requestArgument,
                 ) ?? $labelIdentifier) ?: $labelIdentifier,
                 'value' => $itemValue,
             ];
