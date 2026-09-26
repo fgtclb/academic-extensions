@@ -7,6 +7,9 @@ namespace FGTCLB\AcademicProjects\Domain\Model\Dto;
 use FGTCLB\AcademicProjects\Enumeration\SortingOptions;
 use FGTCLB\CategoryTypes\Collection\FilterCollection;
 
+/**
+ * @api
+ */
 class ProjectDemand
 {
     /** @var int[] */

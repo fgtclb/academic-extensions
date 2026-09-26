@@ -19,6 +19,7 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
 
 /**
  * Reports the stored configuration of an installation that no longer reaches
@@ -1163,6 +1164,10 @@ final readonly class ConfigurationChecker
      * class that extends one the upgrade removed is a fatal error, and a check
      * that reports the problem by dying of it helps nobody.
      *
+     * An XCLASS of a domain model is a notice, not a warning: Extbase creates
+     * models through `GeneralUtility::getClassName()`, so registering a subclass
+     * is how a project adds fields to one, and the models are public API.
+     *
      * @return list<ConfigurationFinding>
      */
     private function checkXclasses(): array
@@ -1215,8 +1220,21 @@ final readonly class ConfigurationChecker
                 ContextualFeedbackSeverity::ERROR,
                 sprintf(
                     'The class "%s" is replaced by "%s" through the XCLASS registry, and it is final: a '
-                    . 'subclass of it is a fatal error. Achieve the change through an event listener, a '
-                    . 'service decoration or a replacement service instead.',
+                    . 'subclass of it is a fatal error. Achieve the change through an event listener, or your '
+                    . 'own implementation of an interface the extension points chapter of academic_base lists.',
+                    $className,
+                    $xclassName,
+                ),
+            ];
+        }
+
+        if (is_subclass_of($className, DomainObjectInterface::class)) {
+            return [
+                ContextualFeedbackSeverity::NOTICE,
+                sprintf(
+                    'The domain model "%s" is extended by "%s" through the XCLASS registry. That is the '
+                    . 'supported way to add fields to a model of the academic extensions. Check that the '
+                    . 'getters and setters the subclass overrides still exist.',
                     $className,
                     $xclassName,
                 ),
@@ -1226,10 +1244,10 @@ final readonly class ConfigurationChecker
         return [
             ContextualFeedbackSeverity::WARNING,
             sprintf(
-                'The class "%s" is replaced by "%s" through the XCLASS registry. None of the academic '
-                . 'extensions is an API for subclassing, so the replacement breaks on any release. Achieve '
-                . 'the change through an event listener, a service decoration or a replacement service '
-                . 'instead.',
+                'The class "%s" is replaced by "%s" through the XCLASS registry. That is not supported for '
+                . 'any class of the academic extensions but a domain model, so the replacement may break on '
+                . 'any release. Achieve the change through an event listener, or your own implementation of '
+                . 'an interface the extension points chapter of academic_base lists.',
                 $className,
                 $xclassName,
             ),

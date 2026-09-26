@@ -16,6 +16,8 @@ use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
  *
  * The plugin the demand belongs to is on the context: the two list plugins are registered
  * as `ProjectList` and `ProjectListSingle`.
+ *
+ * @api
  */
 final class ModifyProjectDemandEvent
 {

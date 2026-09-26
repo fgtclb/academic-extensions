@@ -21,6 +21,8 @@ use TYPO3\CMS\Frontend\ContentObject\DataProcessorInterface;
  * by class name in `page.10.dataProcessing.400`: TYPO3 takes such an entry from the
  * service container when it knows the name and instantiates the class itself otherwise,
  * and only the container way passes the provider to the constructor.
+ *
+ * @api
  */
 #[Autoconfigure(public: true)]
 class ContactsProcessor implements DataProcessorInterface

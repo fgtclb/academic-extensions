@@ -15,6 +15,8 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  * Interface describing an extbase plugin controller action context container for the bare minimum,
  * using the interface in controller action events instead of a concrete implementation open it up
  * for customization in the future.
+ *
+ * @api
  */
 interface PluginControllerActionContextInterface
 {

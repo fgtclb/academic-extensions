@@ -78,7 +78,7 @@ actions pass their persons context, which satisfies that interface once
 ### Decided: lands last, after the context and the policy change
 
 The landing order is `ace-442-single-action-context-interface`, then
-`ace-tbd-extension-point-policy`, then this change. The context change is
+`ace-749-extension-point-policy`, then this change. The context change is
 small and does not break listeners, and this change already depends on it;
 the policy change then provides the extension point page this change adds its
 event to. The event class carries an `@api` docblock tag, the marker
@@ -128,7 +128,7 @@ event, which already runs on both versions. Nothing else differs.
 - [A listener overrides a variable the controller assigned] → documented as
   unsupported beyond adding variables; the protected ones stay out of reach.
 - [A new action forgets the dispatch] → the functional test lists every
-  rendering path; the contributor rule of `ace-tbd-extension-point-policy`
+  rendering path; the contributor rule of `ace-749-extension-point-policy`
   requires the call for new actions.
 - [A project relies on a removed event to change data after the query] →
   the `Breaking-` entry names each setter and its replacement; filtering

@@ -1,7 +1,7 @@
 ## 1. Event and trait
 
 - [ ] 1.0 Verify that `ace-442-single-action-context-interface` and
-  `ace-tbd-extension-point-policy` have landed; stop otherwise.
+  `ace-749-extension-point-policy` have landed; stop otherwise.
 - [ ] 1.1 Add the `final` `ModifyPluginViewEvent`, with an `@api` docblock
   tag, to `academic-base/Classes/Event/` and a unit test for its getters.
 - [ ] 1.2 Add the dispatching trait to `academic-base/Classes/Controller/`,
@@ -62,7 +62,7 @@
 ## 4. Documentation
 
 - [ ] 4.1 Document the event on the extension point page of `academic_base`
-  created by `ace-tbd-extension-point-policy`, with a listener example using
+  created by `ace-749-extension-point-policy`, with a listener example using
   TYPO3's `#[AsEventListener]`.
 - [ ] 4.2 Add `academic-base/Documentation/Changelog/3.0/Feature-ModifyPluginViewEvent.rst`
   and a short `Feature-PluginViewEvent.rst` pointing to it in the 3.0

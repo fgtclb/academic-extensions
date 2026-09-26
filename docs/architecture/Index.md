@@ -81,6 +81,10 @@ describing an intention as if it were the state.
   outside the checked extension, outside what it depends on and outside the
   system extensions — the partial root paths of every academic plugin name
   another extension's folder.
+- What a project may build on is **one list**, the extension points page of
+  `academic_base`, and the `@api` tags name the same classes. Everything else
+  is not API, `final` or not. The one supported XCLASS is a subclass of a
+  domain model, to add fields to it.
 - The profile editor is five custom elements over Fluid's markup, and **none of
   them renders any**: the two whose content comes out of a response clone
   `<template>` prototypes Fluid emitted. They are plain custom elements with
@@ -94,7 +98,7 @@ describing an intention as if it were the state.
 |-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Core version aware code](core-version-aware-code.md)           | The version switches that exist today, the one data structure split and what a `Core13/`/`Core14/` PHP split would look like, and the APIs that cannot be migrated while v13 is supported. |
 | [Dependency injection](dependency-injection.md)                 | How services are configured across the extensions, why they must be stateless, where a value per request goes instead, and which TYPO3 attributes are safe on both core versions.          |
-| [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                                                                   |
+| [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, the traps in Extbase models, and what is public API and how an event is shaped.                                    |
 | [Database queries](database-queries.md)                         | Quoting value lists, keeping a constraint on the builder that executes it, ordering every result a caller renders or limits, and reusing a list's query to ask about it.                   |
 | [Frontend-user contact import](frontend-user-contact-import.md) | How telephone and fax data from `fe_users` is identified, typed, synchronized and migrated.                                                                                                |
 | [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                                                          |

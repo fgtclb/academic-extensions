@@ -10,6 +10,9 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 
+/**
+ * @api
+ */
 class Contact extends AbstractEntity
 {
     public const DISPLAY_ALL = 0;

@@ -64,6 +64,11 @@ extensions.
         The console command that finds the project template overrides an
         upgrade made dead.
 
+    ..  card:: :ref:`For developers <developers>`
+
+        What a project may build on: the events, interfaces and domain models
+        of every academic extension, and what is not public API.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -83,6 +88,7 @@ extensions.
     Configuration/Index
     Templates/Index
     UpgradeCheck/Index
+    Developers/Index
     KnownProblems/Index
     Changelog/Changelog-3
     Changelog/Changelog-2

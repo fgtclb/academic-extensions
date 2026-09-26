@@ -1,0 +1,454 @@
+..  index:: ! Extension points, ! Public API
+..  _developers-extension-points:
+
+================
+Extension points
+================
+
+This page is the contract between the academic extensions and the code of a
+project. It covers every academic extension and :guilabel:`category_types`,
+and it is a complete list: what it names is public API, and what it does not
+name is not.
+
+Every class, interface, trait and enum listed here carries the :php:`@api`
+tag in its docblock, so the promise is visible in the code as well. A test of
+the extensions' own repository makes sure the tags and this page name the
+same classes.
+
+..  contents::
+    :local:
+    :depth: 1
+
+..  _developers-extension-points-promise:
+
+What the promise means
+======================
+
+Public API does not change silently. A release that breaks or deprecates
+anything listed on this page says so in the changelog of the extension:
+
+*   a :guilabel:`Breaking` entry when existing code stops working, with the
+    migration;
+*   a :guilabel:`Deprecation` entry when the old way keeps working until the
+    next major version, and says what replaces it.
+
+Anything else may change in any release, a bugfix release included, and
+without a changelog entry. Code that relies on it has to be checked on every
+update.
+
+..  _developers-extension-points-api:
+
+What is public API
+==================
+
+*   The :ref:`events <developers-extension-points-events>`, and the
+    :ref:`types they hand to a listener <developers-extension-points-types>`.
+*   The :ref:`interfaces <developers-extension-points-interfaces>`.
+*   The :ref:`services and classes <developers-extension-points-services>` a
+    project names in its configuration or its code.
+*   The two :ref:`traits <developers-extension-points-traits>` of
+    :guilabel:`academic_base` for Extbase controllers.
+*   The :ref:`domain models <developers-extension-points-models>`: their
+    public getters, which the templates read, and extending them to add fields.
+*   Templates, partials and sections: their paths below
+    :file:`Resources/Private/`, the names of their sections, the variables
+    they receive, and the ViewHelpers they call, by tag name and arguments.
+    The :guilabel:`Templates` chapter of each extension describes how to
+    override them.
+*   Settings: the site settings of the site sets, the TypoScript constants and
+    settings, and the settings of the content elements.
+*   The TypoScript and page TSconfig keys the extensions document.
+*   The keys of the language files, which a site overrides labels by.
+*   The format of :file:`Configuration/CategoryTypes.yaml`, see the
+    `category types chapter of category_types
+    <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/CategoryTypes/Index.html>`__.
+
+..  _developers-extension-points-not-api:
+
+What is not public API
+======================
+
+Everything else. In particular:
+
+*   **Controllers.** The controllers of :guilabel:`academic_contacts4pages`,
+    :guilabel:`academic_jobs`, :guilabel:`academic_persons` and
+    :guilabel:`academic_persons_edit` are :php:`final`. Five controllers are
+    not final yet: :php:`BiteJobsController` of :guilabel:`academic_bite_jobs`,
+    :php:`PartnerController` of :guilabel:`academic_partners`,
+    :php:`ProgramController` and :php:`DetailsController` of
+    :guilabel:`academic_programs`, and :php:`ProjectController` of
+    :guilabel:`academic_projects`. They are left open so that an existing
+    subclass keeps working for now, not as an invitation: a subclass breaks
+    whenever an action or a constructor changes, and they may become final in
+    the next major version. The partner and project lists dispatch a demand
+    and a list event that replace such a subclass; for the other three, see
+    :ref:`developers-extension-points-minimum`.
+*   **Repositories.** A condition a plugin should apply belongs in a demand or
+    a query event, not in an XCLASS of the repository.
+*   **Services, data processors, ViewHelper classes, backend item providers,
+    hooks, event listeners, commands and upgrade wizards**, except the few
+    :ref:`a project names <developers-extension-points-services>`. A service
+    is replaced through the container where it is registered behind one of the
+    interfaces below, never by subclassing it.
+*   **Everything marked** :php:`@internal`. The marker says in the code what
+    the absence of :php:`@api` says for the rest.
+
+An XCLASS is unsupported for every class but a domain model, listed or not: a
+listed class keeps what it promises to a caller, not what it offers to a
+subclass. The :ref:`upgrade check <upgrade-check-configuration>` reports such
+an XCLASS as a warning, and as an error when the class is final or gone. How
+to extend a model is described under :ref:`developers-extension-points-models`.
+
+..  _developers-extension-points-events:
+
+Events
+======
+
+Every event is a :php:`final` class, dispatched through the PSR-14 event
+dispatcher of TYPO3. A listener registers for it with the
+:php:`#[AsEventListener]` attribute of TYPO3. The developer chapters of
+`academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Index.html>`__,
+`academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/main/en-us/Developers/Index.html>`__
+and
+`academic_projects <https://docs.typo3.org/p/fgtclb/academic-projects/main/en-us/Developers/Index.html>`__
+describe their events in detail, with examples.
+
+..  list-table::
+    :header-rows: 1
+    :widths: 30 40 30
+
+    *   -   Event
+        -   Dispatched
+        -   A listener may
+    *   -   :php:`\FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent`
+        -   when the backend builds the items of a select field of
+            :guilabel:`academic_jobs` (type, employment type),
+            :guilabel:`academic_persons` (the contract and the shown fields
+            of the plugins) or :guilabel:`academic_contacts4pages` (the
+            contract and the addresses of a contact)
+        -   replace the items and the other item provider parameters
+    *   -   :php:`\FGTCLB\AcademicJobs\Event\ModifyJobControllerNewActionViewEvent`
+        -   in the job form plugin, before the form is rendered
+        -   assign further view variables
+    *   -   :php:`\FGTCLB\AcademicJobs\Event\AfterSaveJobEvent`
+        -   in the job form plugin, after a submitted job is saved
+        -   change the page redirected to, and how the confirmation message
+            is shown
+    *   -   :php:`\FGTCLB\AcademicPartners\Event\ModifyPartnerDemandEvent`
+        -   in the partner list and the partner map, before the partners are
+            queried
+        -   replace the demand
+    *   -   :php:`\FGTCLB\AcademicPartners\Event\ModifyPartnerListEvent`
+        -   in the partner list and the partner map, after the query
+        -   replace the partners and the categories, assign further view
+            variables
+    *   -   :php:`\FGTCLB\AcademicProjects\Event\ModifyProjectDemandEvent`
+        -   in the project list, before the projects are queried
+        -   replace the demand
+    *   -   :php:`\FGTCLB\AcademicProjects\Event\ModifyProjectListEvent`
+        -   in the project list, after the query
+        -   replace the projects and the categories, assign further view
+            variables
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyProfileDemandEvent`
+        -   in the list, list-and-detail and card plugins, before the profile
+            query and the query of the letter navigation are built from the
+            demand
+        -   replace the demand
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyProfileQueryEvent`
+        -   right before the profile query of the list, list-and-detail and
+            card plugins, of the letter navigation and of the
+            selected-profiles plugin is executed
+        -   add conditions
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyContractQueryEvent`
+        -   right before the contract query of the selected-contracts plugin
+            is executed
+        -   add conditions
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyListProfilesEvent`
+        -   in the list and list-and-detail plugins, after the query
+        -   replace the profiles and the demand, assign further view
+            variables
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyDetailProfileEvent`
+        -   in the detail and list-and-detail plugins, before the profile is
+            rendered
+        -   replace the profile and the page title formats, assign further
+            view variables
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifySelectedProfilesEvent`
+        -   in the selected-profiles plugin, after the query
+        -   replace the profiles, assign further view variables
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifySelectedContractsEvent`
+        -   in the selected-contracts plugin, after the query
+        -   replace the contracts, assign further view variables
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyProfileTitlePlaceholderReplacementEvent`
+        -   when the page title of a profile's detail view is built, once
+            per placeholder of the title format
+        -   replace the value of the placeholder
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyProfileImageMetadataEvent`
+        -   right before the metadata of a profile image is written, for the
+            file and for the file reference
+        -   change or empty the fields that are written
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\AfterProfileUpdateEvent`
+        -   after a profile was created or updated: by a backend save or an
+            import through the DataHandler, by the commands
+            :bash:`academic:createprofiles` and :bash:`academic:updateprofiles`,
+            and by the profile editing of :guilabel:`academic_persons_edit`
+        -   react to it; the profile, its site and the origin of the update
+            are read only
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ChooseProfileFactoryEvent`
+        -   in the commands :bash:`academic:createprofiles` and
+            :bash:`academic:updateprofiles`, once per frontend user
+        -   choose the profile factory that creates or updates the profile
+
+Two events are not on this list. The event the same two commands dispatch
+before they set up the environment of a frontend user's site,
+:php:`ModifyProfileCommandEnvironmentStateBuildContextForFrontendUserEvent`,
+is marked :php:`@internal` as experimental, like the environment handling it
+belongs to. And the event the 2.4 changelog of
+:guilabel:`academic_persons_edit` mentions for filling form data from other
+sources before it is written is not dispatched yet.
+
+..  _developers-extension-points-types:
+
+What an event hands over
+========================
+
+A listener types against whatever an event's methods declare, so these types
+are public API together with the events. Classes of TYPO3 and of other
+packages are not listed; their own documentation applies.
+
+..  list-table::
+    :header-rows: 1
+    :widths: 50 50
+
+    *   -   Type
+        -   Handed over by
+    *   -   :php:`\FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface`
+        -   every event a plugin action dispatches: the request, the site and
+            its language, the content object, the settings of the content
+            element and the plugin name
+    *   -   :php:`\FGTCLB\AcademicPersons\Domain\Model\Dto\PluginControllerActionContextInterface`
+        -   the list, detail, selected-profiles, selected-contracts and title
+            placeholder events of :guilabel:`academic_persons`, which still
+            declare this copy of the interface above. It adds nothing to it,
+            is deprecated, and is removed in 4.0; type a listener against the
+            :guilabel:`academic_base` interface.
+    *   -   :php:`\FGTCLB\AcademicPersons\Domain\Model\Dto\DemandInterface`
+        -   the profile demand and query events
+    *   -   :php:`\FGTCLB\AcademicPersons\Domain\Model\Dto\ProfileDemand`
+        -   the profile list event
+    *   -   :php:`\FGTCLB\AcademicPartners\Domain\Model\Dto\PartnerDemand`
+        -   the partner demand and list events
+    *   -   :php:`\FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand`
+        -   the project demand and list events
+    *   -   :php:`\FGTCLB\CategoryTypes\Collection\CategoryCollection`
+        -   the partner and project list events
+    *   -   :php:`\FGTCLB\CategoryTypes\Collection\FilterCollection`
+        -   the partner and project demands, which carry the category filter
+            of the request
+    *   -   :php:`\FGTCLB\AcademicPersons\Profile\ProfileFactoryInterface`
+        -   the profile factory event, which takes an implementation of it
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\ProfileUpdateOrigin`
+        -   the profile update event
+    *   -   :php:`\FGTCLB\AcademicPersons\Profile\ProfileActionType`
+        -   the profile factory event
+    *   -   :php:`\FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode`
+        -   the job save event
+
+..  _developers-extension-points-interfaces:
+
+Interfaces
+==========
+
+A project implements an interface, types against it, or aliases it to an
+implementation of its own where the container hands one out.
+
+..  list-table::
+    :header-rows: 1
+    :widths: 50 50
+
+    *   -   Interface
+        -   What it is for
+    *   -   :php:`\FGTCLB\CategoryTypes\Collection\GetCategoryCollectionInterface`
+        -   A model that carries categories of :guilabel:`category_types`
+            implements it, as the partner, program and project models do.
+    *   -   :php:`\FGTCLB\AcademicPersonsEdit\Service\ProfileRichTextSanitizerInterface`
+        -   The sanitizer the profile editing runs rich text through. A
+            project replaces it by aliasing this interface to its own
+            implementation, in an extension that depends on
+            :guilabel:`academic_persons_edit`.
+    *   -   :php:`\FGTCLB\AcademicPersons\Types\TypesInterface`
+        -   What the lists of address, email and phone number types are read
+            through. The lists come from the extension configuration, and the
+            extension asks for them by their own class names, so a project
+            changes them there; an implementation of its own is not used.
+    *   -   :php:`\FGTCLB\AcademicPersons\DemandValues\DemandValuesInterface`
+        -   The same for the sorting and grouping values the profile list
+            offers.
+    *   -   :php:`\FGTCLB\AcademicPrograms\Domain\Model\ProgramFactsSourceInterface`
+        -   What the facts of a program are built from: the program model of
+            the content elements and the data of the program page implement
+            it.
+
+The abstract classes that implement some of them for the extensions
+themselves are not public API.
+
+..  _developers-extension-points-services:
+
+Services and classes a project names
+====================================
+
+These are named in a project's configuration, or injected into its code. Use
+them as they are; they are not meant to be subclassed or replaced.
+
+..  list-table::
+    :header-rows: 1
+    :widths: 50 50
+
+    *   -   Class
+        -   Named
+    *   -   :php:`\FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`
+        -   as the :php:`provider` of an icon in :file:`Configuration/Icons.php`,
+            for an SVG drawn in ``currentColor``
+    *   -   :php:`\FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor`
+        -   as a data processor of a page template, for the contacts of the
+            page
+    *   -   :php:`\FGTCLB\CategoryTypes\Backend\FormEngine\CategoryTypeItemsProcFunc`
+        -   as the :php:`itemsProcFunc` of a select field of a project's TCA or
+            FlexForm that offers category types
+    *   -   :php:`\FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry`
+        -   injected, to read the registered category types
+    *   -   :php:`\FGTCLB\CategoryTypes\Backend\PageCategorySummaryRenderer`
+        -   injected into a listener that shows the category summary of a page
+            type of its own in the page module
+    *   -   :php:`\FGTCLB\AcademicPersons\Profile\FrontendUserProfileMapper`
+        -   injected into a profile factory of its own, to apply the
+            configured map of frontend user fields
+    *   -   :php:`\FGTCLB\AcademicPersons\DataHandling\ProfileWriteCorrelation`
+        -   in import code, as :php:`ProfileWriteCorrelation::Import`, to mark
+            a DataHandler run that writes profiles, so the profile update event
+            announces it with the origin :php:`ProfileUpdateOrigin::Import`;
+            and as :php:`ProfileWriteCorrelation::Internal` in a listener of
+            the profile update event that writes profiles through the
+            DataHandler, so that write is not announced again
+
+..  _developers-extension-points-traits:
+
+Traits
+======
+
+..  list-table::
+    :header-rows: 1
+    :widths: 50 50
+
+    *   -   Trait
+        -   What it is for
+    *   -   :php:`\FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait`
+        -   Returns the record of the current content element, which a
+            plugin assigns as the :fluid:`record` view variable so that the
+            header of the content element renders on TYPO3 v14.
+    *   -   :php:`\FGTCLB\AcademicBase\Controller\GetSelectItemsForTcaManagedTableFieldMethodTrait`
+        -   Reads the items of a select field as the backend would offer them,
+            with the item provider applied and the labels translated.
+
+..  _developers-extension-points-models:
+
+Domain models
+=============
+
+The domain models are what the templates read, so their public getters are
+public API. A project may extend a model to add fields of its own. Extbase
+creates a model through :php:`GeneralUtility::getClassName()`, so the way to
+do that is a subclass registered as the XCLASS of the model:
+
+..  code-block:: php
+    :caption: EXT:my_extension/ext_localconf.php
+
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\FGTCLB\AcademicPersons\Domain\Model\Profile::class] = [
+        'className' => \MyVendor\MyExtension\Domain\Model\Profile::class,
+    ];
+
+Extbase maps the subclass by its own class name, so it needs an entry in the
+project's :file:`Configuration/Extbase/Persistence/Classes.php`: the
+:php:`tableName` of the model, and its :php:`recordType` if the extension
+declares one - a subclass inherits the :php:`properties` of the parent entry,
+but neither of those two. The new columns need their TCA and their database
+fields; a :php:`properties` entry is needed only for a column whose name does
+not match the property. A model the extensions create themselves with
+:php:`new`, a profile a profile factory creates for instance, is still of the
+original class. The :ref:`upgrade check
+<upgrade-check-configuration>` lists such an XCLASS as a notice: it does not
+fail the check, and it is a reminder to make sure the getters and setters the
+subclass overrides still exist after an update.
+
+..  list-table::
+    :header-rows: 1
+    :widths: 30 70
+
+    *   -   Extension
+        -   Models
+    *   -   :guilabel:`academic_contacts4pages`
+        -   :php:`\FGTCLB\AcademicContacts4pages\Domain\Model\Contact`,
+            :php:`\FGTCLB\AcademicContacts4pages\Domain\Model\Role`
+    *   -   :guilabel:`academic_jobs`
+        -   :php:`\FGTCLB\AcademicJobs\Domain\Model\Job`
+    *   -   :guilabel:`academic_partners`
+        -   :php:`\FGTCLB\AcademicPartners\Domain\Model\Partner`,
+            :php:`\FGTCLB\AcademicPartners\Domain\Model\Partnership`,
+            :php:`\FGTCLB\AcademicPartners\Domain\Model\Role`
+    *   -   :guilabel:`academic_persons`
+        -   :php:`\FGTCLB\AcademicPersons\Domain\Model\Address`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\Contract`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\Email`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\FrontendUser`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\FunctionType`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\Location`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\OrganisationalUnit`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\PhoneNumber`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\Profile`,
+            :php:`\FGTCLB\AcademicPersons\Domain\Model\ProfileInformation`
+    *   -   :guilabel:`academic_persons_sync`
+        -   :php:`\FGTCLB\AcademicPersonsSync\Domain\Model\FrontendUser`
+    *   -   :guilabel:`academic_programs`
+        -   :php:`\FGTCLB\AcademicPrograms\Domain\Model\Program`
+    *   -   :guilabel:`academic_projects`
+        -   :php:`\FGTCLB\AcademicProjects\Domain\Model\Project`
+    *   -   :guilabel:`category_types`
+        -   :php:`\FGTCLB\CategoryTypes\Domain\Model\Category`,
+            :php:`\FGTCLB\CategoryTypes\Domain\Model\CategoryType`
+
+The models of :guilabel:`category_types` are not Extbase models; the extension
+builds them itself. Their getters are public API all the same, but they cannot
+be extended through an XCLASS.
+
+..  _developers-extension-points-minimum:
+
+The extension points every extension should have
+================================================
+
+Three kinds of extension point together make subclassing and XCLASSing
+unnecessary. Not every extension offers all three yet:
+
+..  list-table::
+    :header-rows: 1
+    :widths: 30 35 35
+
+    *   -   Extension point
+        -   Offered today
+        -   Planned
+    *   -   A view event per plugin action, to assign further view variables
+            or replace what is rendered
+        -   the list, detail, selected-profiles and selected-contracts plugins
+            of :guilabel:`academic_persons`, the partner and project lists, the
+            job form
+        -   one event that every plugin action of every extension dispatches
+    *   -   A demand event per repository query a plugin runs, to change what
+            is queried
+        -   :guilabel:`academic_persons`, :guilabel:`academic_partners`,
+            :guilabel:`academic_projects`
+        -   the list plugins of the other extensions
+    *   -   An after-save event per write, to react to a saved record
+        -   the profile of :guilabel:`academic_persons`, the job form of
+            :guilabel:`academic_jobs`
+        -   the other writes of the frontend editing
+
+A planned extension point is listed here once it is dispatched, and not
+before.

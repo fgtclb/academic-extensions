@@ -33,7 +33,7 @@
 - [ ] 4.2 Add `Documentation/Changelog/3.0/Feature-ProgramListAndPageEvents.rst`,
   naming the new constructor of `ProgramDataProcessor`.
 - [ ] 4.3 If `docs/` carries a list of extension points by then
-  (`ace-tbd-extension-point-policy`), add the three events; otherwise state in
+  (`ace-749-extension-point-policy`), add the three events; otherwise state in
   the pull request that `docs/` needs no change.
 
 ## 5. File the issue

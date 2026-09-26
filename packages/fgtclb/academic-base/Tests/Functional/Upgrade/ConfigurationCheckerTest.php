@@ -9,6 +9,7 @@ use FGTCLB\AcademicBase\Upgrade\ConfigurationChecker;
 use FGTCLB\AcademicBase\Upgrade\ConfigurationFinding;
 use FGTCLB\AcademicBase\Upgrade\ConfigurationFindingKind;
 use FGTCLB\AcademicBase\Upgrade\TemplateOverrideChecker;
+use FGTCLB\AcademicTestConfiguration\Domain\Model\Entry;
 use FGTCLB\AcademicTestConfiguration\Replaceable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -393,10 +394,11 @@ final class ConfigurationCheckerTest extends AbstractAcademicBaseTestCase
     }
 
     /**
-     * Three XCLASS registrations, three answers. Only the replaced class is
+     * Four XCLASS registrations, four answers. Only the replaced class is
      * ever reflected - loading a subclass of a class the upgrade removed is a
      * fatal error, and a check that reports the problem by dying of it helps
-     * nobody.
+     * nobody. A domain model is a notice: registering a subclass of it is how
+     * a project adds fields to a model.
      */
     #[Test]
     public function anXclassIsReportedBySeverityOfTheReplacedClass(): void
@@ -404,6 +406,7 @@ final class ConfigurationCheckerTest extends AbstractAcademicBaseTestCase
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'] = [
             TemplateOverrideChecker::class => ['className' => 'MyProject\\Xclass\\TemplateOverrideChecker'],
             Replaceable::class => ['className' => 'MyProject\\Xclass\\Replaceable'],
+            Entry::class => ['className' => 'MyProject\\Xclass\\Entry'],
             'FGTCLB\\AcademicTestConfiguration\\Removed' => ['className' => 'MyProject\\Xclass\\Removed'],
             \stdClass::class => ['className' => 'MyProject\\Xclass\\StdClass'],
         ];
@@ -413,6 +416,7 @@ final class ConfigurationCheckerTest extends AbstractAcademicBaseTestCase
         $this->assertSame(
             [
                 TemplateOverrideChecker::class,
+                Entry::class,
                 'FGTCLB\\AcademicTestConfiguration\\Removed',
                 Replaceable::class,
             ],
@@ -422,10 +426,12 @@ final class ConfigurationCheckerTest extends AbstractAcademicBaseTestCase
         );
         $this->assertSame(ContextualFeedbackSeverity::ERROR, $findings[0]->severity);
         $this->assertStringContainsString('it is final', $findings[0]->message);
-        $this->assertSame(ContextualFeedbackSeverity::ERROR, $findings[1]->severity);
-        $this->assertStringContainsString('does not ship it any more', $findings[1]->message);
-        $this->assertSame(ContextualFeedbackSeverity::WARNING, $findings[2]->severity);
-        $this->assertStringContainsString('is an API for subclassing', $findings[2]->message);
+        $this->assertSame(ContextualFeedbackSeverity::NOTICE, $findings[1]->severity);
+        $this->assertStringContainsString('supported way to add fields', $findings[1]->message);
+        $this->assertSame(ContextualFeedbackSeverity::ERROR, $findings[2]->severity);
+        $this->assertStringContainsString('does not ship it any more', $findings[2]->message);
+        $this->assertSame(ContextualFeedbackSeverity::WARNING, $findings[3]->severity);
+        $this->assertStringContainsString('not supported for any class', $findings[3]->message);
     }
 
     /**

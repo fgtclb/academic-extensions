@@ -108,7 +108,7 @@ extending Extbase's `ActionController`, and asserts that it is `final`. It
 also asserts that it found the nine controllers of main, so a changed scan
 path cannot turn it into a test of nothing. It is shown red on main, naming
 exactly the five open controllers, before the keyword is added. It sits in
-`packages-dev/` for the reason `ace-tbd-extension-point-policy` gives for
+`packages-dev/` for the reason `ace-749-extension-point-policy` gives for
 its event test: it spans all extensions and must not travel into a split
 repository. When that change has landed, both tests live side by side.
 
@@ -118,7 +118,7 @@ regression check that the container still builds the controllers.
 Rejected: one reflection test per controller below each extension's
 `Tests/Unit/Controller/`. Five tests for one rule, and a controller added
 later would be open until someone remembers to write a sixth. Rejected:
-widening the event test of `ace-tbd-extension-point-policy`. That test is
+widening the event test of `ace-749-extension-point-policy`. That test is
 about events and may land in a different order.
 
 ### Migration from a subclass, per controller
@@ -195,7 +195,7 @@ without an event removes the only extension point:
   accepts either.
 
 Because `ace-tbd-generic-plugin-view-event` lands after
-`ace-tbd-extension-point-policy`, this change does too, and its
+`ace-749-extension-point-policy`, this change does too, and its
 documentation can name the policy page.
 
 The pagination and filter URL changes, and the program finder element, are

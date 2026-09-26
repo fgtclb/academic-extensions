@@ -13,6 +13,9 @@ namespace FGTCLB\AcademicPersonsSync\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
+/**
+ * @api
+ */
 class FrontendUser extends AbstractEntity
 {
     public function __construct()

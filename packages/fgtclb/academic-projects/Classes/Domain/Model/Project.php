@@ -12,6 +12,9 @@ use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 use TYPO3\CMS\Extbase\Persistence\ObjectStorage;
 
+/**
+ * @api
+ */
 class Project extends AbstractEntity implements GetCategoryCollectionInterface
 {
     protected int $doktype = 0;
