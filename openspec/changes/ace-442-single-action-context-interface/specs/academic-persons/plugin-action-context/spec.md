@@ -18,8 +18,8 @@ v13 and v14.
 
 ### Requirement: The persons context exposes the content element
 The context of a persons plugin event SHALL provide the content element that
-holds the plugin, and SHALL provide none when the context was not built for a
-content element.
+holds the plugin, and SHALL provide none, without an error, when the request
+it was built from carries no content element.
 
 #### Scenario: Persons list plugin
 - **WHEN** a listener of the persons list event reads the content element from
@@ -28,8 +28,13 @@ content element.
 
 #### Scenario: Profile page title
 - **WHEN** a listener of the profile title placeholder event reads the content
-  element from the context while the page title is built
-- **THEN** it receives no content element and no error
+  element from the context while the detail plugin sets the page title
+- **THEN** it receives the content element record of that detail plugin
+
+#### Scenario: Context built outside a content element
+- **WHEN** the context is built from a request that carries no content
+  element, or carries something else under that name
+- **THEN** reading the content element gives none and raises no error
 
 ### Requirement: Listeners typed against the persons context keep working
 Listeners written against the persons plugin action context SHALL keep working

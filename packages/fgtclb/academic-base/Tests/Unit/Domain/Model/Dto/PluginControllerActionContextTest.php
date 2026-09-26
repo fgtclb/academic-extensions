@@ -21,8 +21,8 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  * it answers or raises therefore depends only on the request attributes an extbase plugin
  * happens to carry, which is what is pinned here.
  *
- * `EXT:academic_persons` carries its own, older copy of this class with its own functional test
- * ({@see \FGTCLB\AcademicPersons\Tests\Functional\Domain\Model\Dto\PluginControllerActionContext}),
+ * `EXT:academic_persons` carries its own copy of this class, deprecated for 4.0, with its own
+ * functional test ({@see \FGTCLB\AcademicPersons\Tests\Functional\Domain\Model\Dto\PluginControllerActionContextTest}),
  * which covers the plain pass-through of request, site, language and settings. Not repeated here:
  * this covers the branching, the delegation and the raising instead.
  */
@@ -45,6 +45,18 @@ final class PluginControllerActionContextTest extends UnitTestCase
     public function getContentObjectRendererReturnsNullWithoutAContentObject(): void
     {
         $this->assertNull($this->subject(new ServerRequest())->getContentObjectRenderer());
+    }
+
+    /**
+     * The same holds as for the extbase attribute below: anything can sit under the name, and a
+     * getter declared nullable must answer null rather than fail with a `TypeError`.
+     */
+    #[Test]
+    public function getContentObjectRendererReturnsNullForAForeignAttributeValue(): void
+    {
+        $subject = $this->subject((new ServerRequest())->withAttribute('currentContentObject', new \stdClass()));
+
+        $this->assertNull($subject->getContentObjectRenderer());
     }
 
     /**

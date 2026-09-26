@@ -52,7 +52,7 @@ None.
 - `docs/architecture/class-design.md` gains an extension point section.
 - An `@api` docblock tag on each class, interface and trait the page lists
   that does not carry one yet; no code changes otherwise.
-- Lands after `ace-tbd-single-action-context-interface` and before
+- Lands after `ace-442-single-action-context-interface` and before
   `ace-tbd-generic-plugin-view-event`.
 - A unit test below `packages-dev/`, never shipped with an extension.
 - An `Important-` changelog entry in `academic_base`.
