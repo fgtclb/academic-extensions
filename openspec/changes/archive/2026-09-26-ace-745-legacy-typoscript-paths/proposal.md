@@ -61,8 +61,8 @@ None.
 
 - Detecting stored 2.3 values or dead imports (candidate `cross-cutting-09`).
 - A guard against a site using a set and a static template together.
-- Restoring TypoScript of version 2.3 that 2.4 removed on purpose, beyond what "All
-  components" delivers.
+- Restoring TypoScript of version 2.3 that 2.4 removed on purpose, beyond what
+  "All components" delivers.
 
 ## Source
 
