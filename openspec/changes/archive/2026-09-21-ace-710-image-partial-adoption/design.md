@@ -45,7 +45,7 @@ repeats the same markup five times.
 `Partner/Item.html` renders the first `partner.media` of the partner page,
 which is the partner logo, exactly as both partnership item partials do. The
 same image gets the same preset: `logo`, with no crop and SVG passed through.
-This also matches `ace-tbd-named-crop-variants`, which keeps the partner page
+This also matches `ace-744-named-crop-variants`, which keeps the partner page
 media free-ratio (ACE-572). Rejected: `card`, as first proposed, which would
 render one logo with two presets depending on the plugin.
 
