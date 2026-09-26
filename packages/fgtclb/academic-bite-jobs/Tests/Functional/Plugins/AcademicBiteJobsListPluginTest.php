@@ -10,7 +10,6 @@ use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
-use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 
 /**
  * Renders the `academicbitejobs_list` plugin in the frontend.
@@ -45,23 +44,7 @@ final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestC
 
     protected function setUp(): void
     {
-        // The Extbase class schema cache stays in memory for this class. TYPO3 core writes it
-        // from the destructor of the reflection service, and when the garbage collector runs
-        // that destructor inside another serialize(), the entry gets back references of the
-        // outer call and cannot be read back. On TYPO3 v12, PHP 8.1 and PostgreSQL this class
-        // hit it whenever another test class ran before it in the same process (ACE-729, the
-        // defect itself is recorded with ACE-725). An in-memory cache is never serialized.
-        $this->configurationToUseInTestInstance = $this->frontendPluginTestConfiguration([
-            'SYS' => [
-                'caching' => [
-                    'cacheConfigurations' => [
-                        'extbase' => [
-                            'backend' => TransientMemoryBackend::class,
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        $this->configurationToUseInTestInstance = $this->frontendPluginTestConfiguration();
         $this->addCoreExtensionsToLoad('typo3/cms-fluid-styled-content');
         $this->addTestExtensionsToLoad('tests/test-bitejobs-stub');
         parent::setUp();

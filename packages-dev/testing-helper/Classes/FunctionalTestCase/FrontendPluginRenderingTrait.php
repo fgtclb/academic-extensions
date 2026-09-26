@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FGTCLB\TestingHelper\FunctionalTestCase;
 
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
@@ -60,6 +61,14 @@ trait FrontendPluginRenderingTrait
      * frontend swallows the exception of a sub request and answers a rendered error page,
      * so an assertion on the status code alone would pass.
      *
+     * The Extbase class schema cache stays in memory. TYPO3 writes it from the destructor of
+     * its reflection service, and when the garbage collector runs that destructor inside
+     * another serialize(), the stored entry gets back references of the outer call: reading
+     * it back fails with "unserialize(): Error at offset", or the process crashes. Which test
+     * class it hits depends on the classes before it in the same process, so a new class
+     * moves it to another one (ACE-725, ACE-729, ACE-742). An in-memory cache is never
+     * serialized.
+     *
      * @param array<string, mixed> $additionalConfiguration Merged recursively, so a single
      *        key can be added to `FE` without repeating the rest of it.
      * @return array<string, mixed>
@@ -71,6 +80,13 @@ trait FrontendPluginRenderingTrait
                 'encryptionKey' => '4408d27a916d51e624b69af3554f516dbab61037a9f7b9fd6f81b4d3bedeccb6',
                 'features' => [
                     'subrequestPageErrors' => true,
+                ],
+                'caching' => [
+                    'cacheConfigurations' => [
+                        'extbase' => [
+                            'backend' => TransientMemoryBackend::class,
+                        ],
+                    ],
                 ],
             ],
             'FE' => [
