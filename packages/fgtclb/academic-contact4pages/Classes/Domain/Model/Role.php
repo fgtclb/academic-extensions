@@ -6,6 +6,9 @@ namespace FGTCLB\AcademicContacts4pages\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
+/**
+ * @api
+ */
 class Role extends AbstractEntity
 {
     protected string $name = '';

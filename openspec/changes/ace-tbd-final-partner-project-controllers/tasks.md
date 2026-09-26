@@ -17,7 +17,7 @@
 
 - [ ] 2.1 Add a unit test to a `packages-dev/` package covered by the
   phpunit glob, next to the event class test of
-  `ace-tbd-extension-point-policy` if that has landed: it reflects every
+  `ace-749-extension-point-policy` if that has landed: it reflects every
   non-abstract class extending `ActionController` below
   `packages/fgtclb/*/Classes/Controller/`, asserts that it is `final`, and
   asserts that nine controllers were found.
@@ -66,7 +66,7 @@
   controller row and the totals of the `final` table with the commands on
   the page, and state that every plugin controller is `final`, is extended
   through its events, and that the architecture test enforces it. If
-  `ace-tbd-extension-point-policy` has landed, link its integrator page
+  `ace-749-extension-point-policy` has landed, link its integrator page
   from that sentence.
 
 ## 5. File the issue

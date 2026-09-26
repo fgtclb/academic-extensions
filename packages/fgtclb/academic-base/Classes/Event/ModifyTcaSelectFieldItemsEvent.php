@@ -12,6 +12,8 @@ use TYPO3\CMS\Core\Site\Entity\Site;
  *
  * - {@see \FGTCLB\AcademicJobs\Backend\FormEngine\EmploymentTypeItems::itemsProcFunc()}
  * - {@see \FGTCLB\AcademicJobs\Backend\FormEngine\TypeItems::itemsProcFunc()}
+ *
+ * @api
  */
 final class ModifyTcaSelectFieldItemsEvent
 {

@@ -33,6 +33,10 @@ This extension is meant as a connector extension between `academic_persons_edit
 <https://extensions.typo3.org/extension/academic_persons_edit>`__ and external
 user sources like LDAP imports.
 
+What a project may build on in this extension, and what it may not, is stated
+for all academic extensions on the `extension points page of academic_base
+<https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Developers/ExtensionPoints/Index.html>`__.
+
 ----
 
 ..  card-grid::

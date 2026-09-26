@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 118 unit test classes: 110 across the twelve extensions, two in
-`packages-dev/dev-site`, two in `packages-dev/monorepo-shared` and four in
+There are 120 unit test classes: 111 across the twelve extensions, two in
+`packages-dev/dev-site`, three in `packages-dev/monorepo-shared` and four in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -81,9 +81,10 @@ suite, check that the chunks ran every listed test, and record the durations
 own — they are exercised only through the extensions that use them.
 [`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
 the check that every `ext_emconf.php` of the repository names its dependencies
-by extension key, see [below](#the-ext_emconfphp-dependency-keys), and the one
+by extension key, see [below](#the-ext_emconfphp-dependency-keys), the one
 that every translation names its extension without an underscore, see
-[below](#the-extension-name-of-translations).
+[below](#the-extension-name-of-translations), and the extension point checks,
+see [below](#the-extension-points).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -363,6 +364,31 @@ keeps the overrides one translation has read for the ones after it, and on
 TYPO3 v14 not the name at all: v14 strips the underscores and falls back to the
 name of the request. This check holds the templates, and the names handed to
 `translate()` directly in PHP.
+
+## The extension points
+
+[`ExtensionPointTest`](../../packages-dev/monorepo-shared/Tests/Unit/ExtensionPointTest.php)
+holds what a test can hold of the extension point policy in
+[Class design](../architecture/class-design.md#extension-points). It reads the
+classes below `packages/fgtclb/*/Classes/` with PHP's tokenizer and asserts:
+
+- every event class - named `…Event`, below an `Event/` directory - is `final`,
+  and a class other than the event itself creates it with `new`, resolved
+  through the namespace and the imports of the file. "Created" stands in for
+  "dispatched": several events are handed to the dispatcher through a variable,
+  so a search for `dispatch(new …)` would miss them. An event created another
+  way goes into the test's `CREATED_ELSEWHERE` with the place that creates it;
+- every class implementing Extbase's `DomainObjectInterface` carries `@api`,
+  because the upgrade check treats an XCLASS of a model as supported, and no
+  class carries both `@api` and `@internal`;
+- the classes whose declaration carries `@api` in its docblock and the
+  `\FGTCLB\…` names of the `:php:` role on the extension points page of
+  `academic_base` are the same set. The page therefore names a class that is
+  not API without its namespace.
+
+It lives in `packages-dev/monorepo-shared` for the same reason as the two
+checks above: it looks at every extension at once, and a split-out extension
+has nothing to compare against.
 
 ## See also
 

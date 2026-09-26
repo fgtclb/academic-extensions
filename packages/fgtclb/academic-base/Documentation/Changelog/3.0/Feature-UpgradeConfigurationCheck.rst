@@ -70,7 +70,7 @@ Six findings are reported:
         -   A class of an academic extension is replaced through
             :php:`$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']`.
         -   error when the replaced class is :php:`final` or no longer
-            exists, warning otherwise
+            exists, notice when it is a domain model, warning otherwise
 
 Each of these fails silently in TYPO3: a static template folder without
 TypoScript, an :typoscript:`@import` that matches no file and a selected page

@@ -6,7 +6,7 @@ re-register the plugin. Every constructor or action change upstream breaks
 such a subclass silently or fatally. Once each of these plugins dispatches
 events, the subclass has a supported replacement, and leaving the classes
 open keeps an unsupported extension point alive that the extension point
-policy of `ace-tbd-extension-point-policy` excludes anyway. 3.0.0 is the
+policy of `ace-749-extension-point-policy` excludes anyway. 3.0.0 is the
 major version in which this break is allowed, and four plugin controllers
 are `final` already.
 

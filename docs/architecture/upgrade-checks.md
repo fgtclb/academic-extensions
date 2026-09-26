@@ -234,7 +234,7 @@ registry, and answers with a list of findings:
 | `alias-set`               | notice           | A site depends on a set that only forwards to another one                            |
 | `unavailable-set`         | error            | A site depends on an academic set TYPO3 cannot provide                               |
 | `set-and-static-template` | warning          | A site delivers one extension through a set and through a static template            |
-| `xclass`                  | warning or error | An academic class is replaced through the XCLASS registry                            |
+| `xclass`                  | notice to error  | An academic class is replaced through the XCLASS registry                            |
 
 Everything the group looks at belongs to an academic extension: an `EXT:` path
 below `academic_*` or `category_types`, a set of one of those packages, a class
@@ -428,7 +428,11 @@ class name starts with `FGTCLB\Academic` or `FGTCLB\CategoryTypes\`. Only the
 **replaced** class is ever reflected, never the replacement: loading a subclass
 of a class the upgrade removed is a fatal error, and a check that reports the
 problem by dying of it helps nobody. A replaced class that is final is an error,
-one that no longer exists is an error, anything else is a warning.
+one that no longer exists is an error, a domain model - a class implementing
+Extbase's `DomainObjectInterface` - is a notice, anything else is a warning.
+The model is the exception because an XCLASS is the only way to add fields to
+a model Extbase creates, and the models are public API; see
+[Class design](class-design.md#extension-points).
 
 The class name prefix is used rather than the autoload configuration of the
 active packages, because the interesting case is an XCLASS of a class 3.0

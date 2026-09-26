@@ -52,6 +52,8 @@ use TYPO3\CMS\Core\Utility\PathUtility;
  * `IconFactory` fetches the provider from the container. The class is therefore a
  * regular autowired service of `EXT:academic_base` and must not be excluded from the
  * container. TYPO3 v13 instantiates it with `new` and needs nothing.
+ *
+ * @api
  */
 final class CurrentColorSvgIconProvider extends AbstractSvgIconProvider
 {

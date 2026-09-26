@@ -35,7 +35,8 @@ tracks whether the framework instantiates the class or the container does.
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
 provided by swapping the implementation behind an interface — not by leaving
-the class open.
+the class open. What a project may build on instead is stated in
+[Extension points](#extension-points).
 
 **Extbase domain models cannot be final in practice.** All 19 classes extending
 `AbstractEntity` are plain `class`, and this is the framework's shape rather
@@ -367,6 +368,68 @@ gained a constructor and were fixed on the way:
 `academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php` (ACE-101)
 and `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`, when it
 started to build the program facts.
+
+## Extension points
+
+The public API of every extension is listed on one page of the rendered
+manual:
+[`academic-base/Documentation/Developers/ExtensionPoints/Index.rst`](../../packages/fgtclb/academic-base/Documentation/Developers/ExtensionPoints/Index.rst).
+It names the events and the types they hand to a listener, the interfaces, the
+services and classes a project names in its configuration or injects, the two
+controller traits of `academic_base` and the domain models, and next to the PHP the
+templates, settings, TypoScript and TSconfig keys, label keys and
+`CategoryTypes.yaml`. The page is a whitelist: a class it does not list is not
+API, whether it is `final` or not. It is written for integrators, who read the
+manual rather than this repository.
+
+- **`@api` and the page name the same classes.** Every class, interface,
+  trait and enum the page lists carries `@api` in its docblock, and nothing
+  else does. A class added to the page gets the tag in the same change, and
+  the other way round. A change that breaks or deprecates anything of a tagged
+  class needs a `Breaking-` or a `Deprecation-` changelog entry, which is what
+  the tag is for: it sits where the change is made. A class carries `@api` or
+  `@internal`, never both.
+- **The page names a class that is not API without its namespace**, as
+  `PartnerController`, never as `\FGTCLB\AcademicPartners\Controller\PartnerController`.
+  The test below reads every namespaced `:php:` name on the page as a claim of
+  API.
+- **Domain models are API**, and a project extends one by registering a
+  subclass as its XCLASS: Extbase creates models through
+  `GeneralUtility::getClassName()`. `academic:upgrade:check` reports that
+  XCLASS as a notice rather than a warning, see
+  [Upgrade checks](upgrade-checks.md). Repositories are not API.
+- **The five controllers that are not `final` yet are not API either.** They
+  stay open so that existing project subclasses keep working; that is why
+  their new collaborators arrive through method injection (see above). Do not
+  make them more open, and point a project at an event instead.
+
+Events follow one shape:
+
+- **`final`**, in `Classes/Event/`.
+- **Named `Modify…Event`** when a listener may change something, and
+  **`After…Event`** when the event announces something that happened.
+  Three events predate the rule and stay, because a rename or a move breaks
+  every listener for nothing: `ChooseProfileFactoryEvent` of
+  `academic_persons`, its `@internal`
+  `Service/Event/ModifyProfileCommandEnvironmentStateBuildContextForFrontendUserEvent`,
+  and `AfterSaveJobEvent` of `academic_jobs`, which lets a listener change the
+  redirect and the confirmation message that follow the save.
+- **A setter only for what a listener may change**; everything else is a
+  getter over a `readonly` property.
+- **An event a plugin action dispatches carries the plugin action context of
+  `academic_base`**, `PluginControllerActionContextInterface`, through
+  `getPluginControllerActionContext()`. The copy in `academic_persons` is
+  deprecated and goes in 4.0 (ACE-442, ACE-747); a new event never declares
+  it.
+- **Dispatched, tested and listed.** An event is listed on the page with the
+  place that dispatches it and what a listener may change, both checked in the
+  source, and a test proves that a listener's change arrives. A documented
+  event that is never dispatched is the defect ACE-445 describes.
+
+[`ExtensionPointTest`](../testing/unit-tests.md#the-extension-points) in
+`packages-dev/monorepo-shared` holds what a test can: every event class is
+`final` and created by production code, every domain model carries `@api`,
+and the page and the tags name the same classes.
 
 ## Static analysis
 

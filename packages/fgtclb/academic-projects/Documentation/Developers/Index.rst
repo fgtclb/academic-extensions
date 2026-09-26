@@ -10,6 +10,10 @@ are the supported way to change what a plugin queries and what it renders, and
 they replace the only alternative there used to be: subclassing
 :php:`ProjectController` and re-registering the plugin.
 
+Which classes of this extension are public API, and what that promises, is
+stated for all academic extensions on the `extension points page of
+academic_base <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Developers/ExtensionPoints/Index.html>`__.
+
 ..  _developers-project-events:
 
 The two events

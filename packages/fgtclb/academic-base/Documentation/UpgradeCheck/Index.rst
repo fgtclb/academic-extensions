@@ -187,10 +187,15 @@ away.
             :php:`$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']`. It is an
             error when the replaced class is :php:`final` - a subclass of it
             is a fatal error - and when the installed version does not ship
-            the class any more.
-        -   Achieve the change through an event listener, a service
-            decoration or a replacement service. None of the academic
-            extensions is an API for subclassing.
+            the class any more. It is only a notice when the class is a
+            domain model: a subclass of a model is how a project adds fields
+            to it.
+        -   Achieve the change through an event listener, or your own
+            implementation of a listed interface. Apart from the domain
+            models, no class of the academic extensions may be replaced
+            this way; see :ref:`developers-extension-points`. For a model,
+            make sure the getters and setters the subclass overrides still
+            exist.
 
 Only the academic extensions are looked at: an :bash:`EXT:` path below
 :bash:`academic_*` or :bash:`category_types`, a set of one of those extensions,
