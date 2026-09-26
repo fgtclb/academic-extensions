@@ -328,11 +328,12 @@ all extensions at once: every key an `ext_emconf.php` names in `depends`,
 
 `fgtclb/academics-monorepo-testing-helper` autoloads
 `FGTCLB\TestingHelper\` from `Classes/` and is required as a dev dependency of
-the root. It ships five functional-test traits in
+the root. It ships six functional-test traits in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/`:
 
 | Trait                                  | Purpose                                                                          |
 |----------------------------------------|----------------------------------------------------------------------------------|
+| `CategoryFilterFormAssertionTrait`     | Reads the category filters of a list's filter form, and where they render.       |
 | `ContentElementHeaderAssertionTrait`   | Counts where the header of a content element rendered, and how often.            |
 | `ExtensionCoreVersionCompatTestsTrait` | Asserts the running core major is one the extension declares support for.        |
 | `ExtensionsLoadedTestsTrait`           | Asserts the extension set under test is loaded.                                  |

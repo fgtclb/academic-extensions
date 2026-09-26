@@ -4,4 +4,16 @@ plugin.tx_academicprojects {
     partialRootPath = EXT:academic_projects/Resources/Private/Partials/
     layoutRootPath = EXT:academic_projects/Resources/Private/Layouts/
   }
+
+  # The category filters of the project lists. Also site settings of the set
+  # "fgtclb/academic-projects", with the same defaults - see
+  # "Configuration/Sets/Full/settings.definitions.yaml".
+  filter {
+    # cat=plugin.tx_academicprojects/filter; type=string; label=Filter types: comma-separated category type identifiers of the group "projects", in the order the filter form offers them; empty offers every type with categories
+    categoryTypes =
+    # cat=plugin.tx_academicprojects/filter; type=int+; label=Visible filters: how many filters are shown right away, the others behind "More filters"; 0 shows every filter
+    visibleCount = 0
+    # cat=plugin.tx_academicprojects/filter; type=boolean; label=Hide options without results: leave out the categories no listed project carries instead of showing them disabled
+    hideDisabledOptions = 0
+  }
 }
