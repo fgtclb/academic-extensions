@@ -10,15 +10,15 @@
     <div
         class="academic-study-plan container"
         data-study-plan="{data.uid}"
-        data-filter-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}"
+        data-filter-label="{f:translate(key: 'filter.label', extensionName: 'AcademicStudyPlan')}"
     >
-        <nav role="navigation" aria-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}">
+        <nav role="navigation" aria-label="{f:translate(key: 'filter.label', extensionName: 'AcademicStudyPlan')}">
             <ul class="filter">
                 <li>
                     <button
                         data-category-id="category-id-placeholder"
                         data-category-color="category-color-placeholder"
-                        aria-label="{f:translate(key: 'filter.label', extensionName: 'academic_study_plan')}: category-label-placeholder"
+                        aria-label="{f:translate(key: 'filter.label', extensionName: 'AcademicStudyPlan')}: category-label-placeholder"
                         style="--category-color: category-color-placeholder;"
                     >
                         category-label-placeholder
@@ -38,7 +38,7 @@
 
                                     <f:if condition="{semester.credit_points}">
                                         <span class="credits small">
-                                            {semester.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+                                            {semester.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
                                         </span>
                                     </f:if>
                                 </div>
@@ -64,7 +64,7 @@
 
                                     <f:if condition="{module.credit_points}">
                                         <span class="credits small">
-                                            {module.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+                                            {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
                                         </span>
                                     </f:if>
 
@@ -76,8 +76,8 @@
                                         <button class="modal-trigger" data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
                                             <span class="visually-hidden">
                                                 {semester.label}, {semester.note}, {semester.credit_points}
-                                                {f:translate(key: 'credits', extensionName: 'academic_study_plan')}.
-                                                {f:translate(key: 'modal.open', extensionName: 'academic_study_plan')}: {module.label}
+                                                {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}.
+                                                {f:translate(key: 'modal.open', extensionName: 'AcademicStudyPlan')}: {module.label}
                                             </span>
                                         </button>
 
@@ -88,12 +88,12 @@
 
                                                     <f:if condition="{module.credit_points}">
                                                         <span class="credits small" aria-hidden="true">
-                                                            {module.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+                                                            {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
                                                         </span>
                                                     </f:if>
                                                 </div>
 
-                                                <button aria-label="{f:translate(key: 'modal.close', extensionName: 'academic_study_plan')}">
+                                                <button aria-label="{f:translate(key: 'modal.close', extensionName: 'AcademicStudyPlan')}">
                                                     <core:icon identifier="academic-study-plan-close" alternativeMarkupIdentifier="inline" />
                                                 </button>
                                             </div>
@@ -108,7 +108,7 @@
 
                                             <f:if condition="{module.audioFiles}">
                                                 <f:for each="{module.audioFiles}" as="audioFile">
-                                                    <audio controls aria-label="{f:translate(key: 'modal.audio', extensionName: 'academic_study_plan')}: {module.label}">
+                                                    <audio controls aria-label="{f:translate(key: 'modal.audio', extensionName: 'AcademicStudyPlan')}: {module.label}">
                                                         <source src="{audioFile.publicUrl}" type="{audioFile.mimeType}">
                                                     </audio>
                                                 </f:for>

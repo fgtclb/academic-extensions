@@ -6,7 +6,7 @@
 
 <div class="col-12 col-md-6 col-lg-4 col-xl-3">
     <label for="activeState" class="form-label">
-        {f:translate(key: 'activeState.label', extensionName: 'academic_projects')}
+        {f:translate(key: 'activeState.label', extensionName: 'AcademicProjects')}
     </label>
 
     <f:form.select
@@ -18,7 +18,7 @@
     >
         <f:for each="{demand.possibleActiveStates}" as="option">
             <option value="{option}" {f:if(condition: '{option} == {demand.activeState}', then: 'selected')}>
-                {f:translate(key: 'activeState.{option}', extensionName: 'academic_projects')}
+                {f:translate(key: 'activeState.{option}', extensionName: 'AcademicProjects')}
             </option>
         </f:for>
     </f:form.select>

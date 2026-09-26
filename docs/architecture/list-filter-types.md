@@ -76,18 +76,11 @@ and falls back to the shared `sys_category.<group>.allOptions` through the
 output is unchanged until a site adds one.
 
 A site adds one through `_LOCAL_LANG` under `plugin.tx_academic<group>` or
-`plugin.tx_academic<group>_<plugin>`. That works only because the filter
-templates pass the extension name in **UpperCamelCase**:
-
-| Template passes       | TYPO3 v12 and v13 read                  |
-|-----------------------|-----------------------------------------|
-| `'AcademicPartners'`  | `plugin.tx_academicpartners[_<plugin>]` |
-| `'academic_partners'` | `plugin.tx_academic_partners` only      |
-
-Both versions lowercase the name as given. Most other templates of the
-extensions still pass the underscored name; that is ACE-740. A language file
-override through `$GLOBALS['TYPO3_CONF_VARS']['SYS']['locallangXMLOverride']`
-works too.
+`plugin.tx_academic<group>_<plugin>`. The filter templates were the first to
+pass the extension name in UpperCamelCase, `extensionName: 'AcademicPartners'`,
+which is what makes TYPO3 v12 and v13 read that path; every other template
+followed with ACE-740. Why, and what else decides the path:
+[Label overrides](label-overrides.md).
 
 ## What the settings do not restrict
 
@@ -105,6 +98,8 @@ submitted filter of a type the form does not offer still filters the list.
 
 ## See also
 
+- [Label overrides](label-overrides.md) - the path a `_LOCAL_LANG` override is
+  read from, and why the extension name decides it.
 - [TypoScript and site sets](typoscript-and-site-sets.md) - why a constant and
   its site setting share one default, and what v12 sees.
 - [Testing helper](../testing/testing-helper.md) - the trait the filter tests

@@ -55,6 +55,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                     |
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.                          |
 | [List filter types](list-filter-types.md)                       | Which category filters the partner, project and program lists offer, in which order and how many right away, options without results, and the per-type "All" label. |
+| [Label overrides](label-overrides.md)                           | How a site overrides a label through `_LOCAL_LANG`, and the extension name that decides the path.                                                                   |
 | [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, why a template needs it, and who renders a plugin's header.                                            |
 
 ## See also
