@@ -168,7 +168,7 @@ surroundings; do not reformat the file.
 ### The test harness is not at parity
 
 `packages-dev/testing-helper/` — the shared functional-test traits — has grown
-on `main` and was not backported wholesale. This branch has five of the ten:
+on `main` and was not backported wholesale. This branch has six of the eleven:
 
 | Trait                                  | `2` — this branch | `main` |
 |----------------------------------------|-------------------|--------|
@@ -177,6 +177,7 @@ on `main` and was not backported wholesale. This branch has five of the ten:
 | `TcaHelperMethodsTrait`                | yes               | yes    |
 | `FrontendPluginRenderingTrait`         | yes               | yes    |
 | `ContentElementHeaderAssertionTrait`   | yes               | yes    |
+| `CategoryFilterFormAssertionTrait`     | yes               | yes    |
 | `ColourSchemeAwareIconsTrait`          | no                | yes    |
 | `DeprecatedCoreLabelsTrait`            | no                | yes    |
 | `EnsureTtContentListTypeColumnTrait`   | no                | yes    |
@@ -184,14 +185,15 @@ on `main` and was not backported wholesale. This branch has five of the ten:
 | `ResponsiveImageAssertionTrait`        | no                | yes    |
 
 All of them live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`;
-here that directory holds the five marked for this branch. Count it rather than
+here that directory holds the six marked for this branch. Count it rather than
 trusting this table — it has been wrong before.
 
 The consequence is narrower than the missing five suggest, and it is worth
 checking per change rather than assumed: a trait being on both branches does not
 mean the test directory that uses it is. Frontend plugin rendering tests do have
 a home here — `academic-bite-jobs`, `academic-contact4pages`, `academic-jobs`,
-`academic-persons`, `academic-persons-edit` and `academic-projects` each carry a
+`academic-partners`, `academic-persons`, `academic-persons-edit`,
+`academic-programs` and `academic-projects` each carry a
 `Tests/Functional/Plugins/` tree — but an extension that has none
 yet needs its fixtures written as part of the backport. Where a test genuinely
 has no home, that means one of three things, and the choice is worth stating in
