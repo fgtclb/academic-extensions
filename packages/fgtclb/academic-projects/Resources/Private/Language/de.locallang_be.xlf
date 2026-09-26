@@ -183,6 +183,14 @@
         <source>Project</source>
         <target>Projekt</target>
       </trans-unit>
+      <trans-unit id="pages.media.crop_variant.landscape">
+        <source>Landscape</source>
+        <target>Querformat</target>
+      </trans-unit>
+      <trans-unit id="pages.media.crop_variant.portrait">
+        <source>Portrait</source>
+        <target>Hochformat</target>
+      </trans-unit>
       <trans-unit id="pages.budget">
         <source>Project budget</source>
         <target>Projektbudget</target>

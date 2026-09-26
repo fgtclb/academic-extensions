@@ -146,6 +146,8 @@ is still found.
 
 - [Page type rendering](page-type-rendering.md) — the other keys the page
   types write into `page.10`, and why the program page uses `50`.
+- [Crop variants](crop-variants.md) — the variant names the images offer
+  for the `cropVariant` argument of the partial.
 - [Overridable partials](overridable-partials.md) — how a template is cut
   into partials a project overrides one at a time.
 - [TypoScript and site sets](typoscript-and-site-sets.md) — where the plugin

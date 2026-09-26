@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but eleven PHP traits — the parts of the test setup that were being copied
+but twelve PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -19,6 +19,7 @@ necessary.
 | [`EnsureTtContentListTypeColumnTrait`](#ensurettcontentlisttypecolumntrait)     | Re-creates `tt_content.list_type` where v14 removed it.             |
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
 | [`ColourSchemeAwareIconsTrait`](#colourschemeawareiconstrait)                   | Asserts a record icon follows the backend colour scheme.            |
+| [`CropVariantsAssertionTrait`](#cropvariantsassertiontrait)                     | Reads the crop variants the image cropper offers for a record.      |
 
 ## How an extension gets access
 
@@ -700,6 +701,51 @@ also asserts that the walk found something, so it cannot pass by finding nothing
 The identifiers are listed per extension rather than read out of
 `Configuration/Icons.php`, so a rename has to be made twice instead of silently
 agreeing with itself.
+
+## `CropVariantsAssertionTrait`
+
+Reads the crop variants an editor gets in the image cropper for the first file
+reference of a file field, used by the crop variant tests of `academic-persons`,
+`academic-programs`, `academic-projects` and `academic-partners`, see
+[Crop variants](../architecture/crop-variants.md):
+
+```php
+use CropVariantsAssertionTrait;
+
+#[Test]
+public function theProfileImageOffersDefaultSquareAndPortrait(): void
+{
+    $variants = $this->offeredCropVariants('tx_academicpersons_domain_model_profile', 1, 'image');
+
+    $this->assertSame(['default', 'square', 'portrait'], array_keys($variants));
+    $this->assertSame(['1:1' => 1.0], $this->aspectRatiosOf($variants['square']));
+}
+```
+
+— [`academic-persons/Tests/Functional/Backend/FormEngine/ProfileImageCropVariantsTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Backend/FormEngine/ProfileImageCropVariantsTest.php)
+
+| Method                               | Returns                                                                    |
+|--------------------------------------|----------------------------------------------------------------------------|
+| `offeredCropVariants()`              | The variants the cropper offers, keyed by name, in the order it shows.     |
+| `cropVariantsWithoutConfiguration()` | The same for the same reference, with the field's variants removed.        |
+| `aspectRatiosOf()`                   | The aspect ratios of one variant, as their value keyed by their id.        |
+| `compileRecordForm()`                | The record form as FormEngine compiles it when the record is opened.       |
+
+The record needs a file reference in the field, the file has to exist in the
+storage with its width in the metadata, and the backend user has to be set up.
+
+**The traps it exists for.** A crop configuration lives in three places — the
+field, the `columnsOverrides` of a record type, and the `overrideChildTca`
+applied to each file reference — and `$GLOBALS['TCA']` shows each of them
+unmerged. FormEngine compiles a collapsed file reference with the columns of its
+title only, so the crop field is missing until the reference is expanded; the
+trait records the reference as expanded in the backend user's inline state, as
+the backend does when an editor opens it, and compiles the record again. And
+what the cropper finally shows is decided by two protected methods of
+`ImageManipulationElement`: one drops the built-in `default` as soon as a
+variant is configured, the other reads the stored crop in and fits each area
+into the ratio of its variant. The trait calls both, so a test follows the
+installed core instead of a copy of its rules.
 
 ## See also
 

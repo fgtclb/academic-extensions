@@ -2,9 +2,9 @@
 
 The projects' templates request named crop variants (`portrait`, `square`,
 `landscape`) for profile images and academic page media, but no academic
-extension defines any crop variant. Six projects therefore add the same crop
-variants to TCA themselves, and editors on a fresh installation only get the
-free default crop.
+extension defines any crop variant. Five of the six analysed projects therefore
+add the same crop variants to TCA themselves, and editors on a fresh
+installation only get the free default crop.
 
 ## What Changes
 
@@ -43,8 +43,11 @@ None.
 - The profile TCA of academic_persons and the page type TCA overrides of
   academic_programs and academic_projects; no TCA change in
   academic_partners.
-- Projects that define the same crop variant names keep their own
-  definitions; upstream variants they do not define appear next to theirs.
+- Projects that define the same crop variant names on the same field keep
+  their own definitions; upstream variants they do not define appear next to
+  theirs. Variants a project configured on the media field of every page, or
+  on `sys_file_reference` for every image, are merged with the extension's;
+  the extension's values win key by key.
 - No database, template or dependency change.
 
 ## Non-goals
@@ -61,7 +64,6 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-03`). Five of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-named-crop-variants` when the issue is filed after implementation.
+this today. Filed as ACE-744 once implemented.
 
 Relates to ACE-572 (free-ratio crop for partner logos) and ACE-263.

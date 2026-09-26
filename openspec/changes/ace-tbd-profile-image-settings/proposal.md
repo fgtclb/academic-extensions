@@ -31,7 +31,7 @@ variants in TCA has to override the templates as well.
 - The item image partial and the public profile image partial pass these
   settings to the responsive image partial.
 - The crop variants `square` and `portrait` themselves are added by the change
-  `ace-tbd-named-crop-variants`; this change only consumes their names.
+  `ace-744-named-crop-variants`; this change only consumes their names.
 
 Behaviour is identical on TYPO3 v13 and v14.
 
@@ -57,7 +57,7 @@ None.
   the responsive image partial; nothing changes there.
 - Depends on `ace-646-responsive-image-partial` (the partial, the
   placeholder SVG and the `image.placeholder.default` key),
-  `ace-tbd-named-crop-variants` (the crop variant names) and
+  `ace-744-named-crop-variants` (the crop variant names) and
   `ace-716-item-and-list-partials` (the separate item image partial).
 - No database schema change.
 
