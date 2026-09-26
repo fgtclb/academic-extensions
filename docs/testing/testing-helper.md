@@ -209,13 +209,19 @@ and constants in traits arrived in PHP 8.2. A trait constant is a fatal
 it takes the whole suite down rather than one test. The `main` branch, which
 starts at PHP 8.2, declares it as a constant.
 
-**The traps it exists for.** Three, all of them silent:
+**The traps it exists for.** Four, three of them silent:
 
 - `subrequestPageErrors` is switched on in the configuration. Without it the
   frontend swallows the exception of a sub request and answers a **rendered
   error page**, so a test asserting only the status code passes while the plugin
   is broken. `renderFrontendPage()` asserting `200` is only meaningful because
   of that flag.
+- The Extbase class schema cache is kept in memory. TYPO3 writes it from the
+  destructor of its reflection service; when the garbage collector runs that
+  destructor inside another `serialize()`, the stored entry cannot be read back
+  (`unserialize(): Error at offset`) or the process crashes. Which class it hits
+  depends on the classes before it in the same process, so each new test class
+  moved it to another one (ACE-725, ACE-729, ACE-742).
 - A written site configuration outlives the test instance, so the next test
   finds a site it did not write. Hence the explicit `removeWrittenSiteConfiguration()`
   in `tearDown()`.
