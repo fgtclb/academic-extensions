@@ -42,7 +42,8 @@ neither is to be converted into the other without a reason.
 
 ## Every event carries the plugin context
 
-The context is `FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext`,
+The context is declared as
+`FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface`,
 built from the request and the settings, and it is what makes one listener
 serve several plugins:
 
@@ -57,9 +58,14 @@ The plugin name is the one the plugin was **registered** with — `List`, `Map`,
 on the context are the settings of the content element that is rendering, so a
 listener can read a FlexForm field an editor filled in.
 
-`academic_persons` has a second, older context class of its own under
-`FGTCLB\AcademicPersons\Domain\Model\Dto\`, used by the events it shipped before
-the shared one existed. New events take the `academic_base` one.
+`academic_persons` has a second, older context of its own under
+`FGTCLB\AcademicPersons\Domain\Model\Dto\`, which the persons events declare
+because they were written before the shared one existed. Since 3.0 its interface
+extends the `academic_base` one, so a listener typed against the shared
+interface takes a persons context as well, and the persons actions hand the same
+object to their own event and to the repository's query event. Interface and
+class are deprecated and go in 4.0 (ACE-747), when the persons events declare
+the `academic_base` interface. New events take the `academic_base` one.
 
 ## Rules that are easy to get wrong
 

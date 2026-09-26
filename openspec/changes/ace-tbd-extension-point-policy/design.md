@@ -89,7 +89,7 @@ be triggered. Rejected: the page as the only list.
 
 ### Decided: landing order single context, policy, view event
 
-`ace-tbd-single-action-context-interface` lands first, then this change,
+`ace-442-single-action-context-interface` lands first, then this change,
 then `ace-tbd-generic-plugin-view-event`. The context change is small and
 does not break listeners, because the persons interface extends the base
 one, and the view event already depends on it. The rule can then name the

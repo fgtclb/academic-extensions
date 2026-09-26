@@ -64,7 +64,7 @@ None.
   seven extensions.
 - Five event classes removed: one in `academic_jobs`, four in
   `academic_persons`, together with their dispatches and their unit tests.
-- Lands after `ace-tbd-single-action-context-interface` and
+- Lands after `ace-442-single-action-context-interface` and
   `ace-tbd-extension-point-policy`.
 - No change to templates, variables, settings or TypoScript.
 - A fixture extension for the functional tests.

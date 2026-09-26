@@ -13,9 +13,28 @@
   `ModifySelectedProfilesEvent`, `ModifySelectedContractsEvent` and
   `ModifyProfileTitlePlaceholderReplacementEvent`. The analysis counted six;
   the source has five.
-- The persons context is built by `ProfileController` and by
-  `ProfileTitleProvider`, the latter outside any content element.
-- `academic_jobs` and `academic_persons_edit` already use the base context.
+- The persons context is built by `ProfileController` only, in its list,
+  detail, selected profiles and selected contracts actions. `ProfileTitleProvider`
+  receives the context of the detail action, so the profile title placeholder
+  event carries the content element of the detail plugin. (The analysis said
+  the title provider built its own context outside any content element; it
+  does not.)
+- Since ACE-715 the same controller also builds an `academic_base` context
+  for the repository calls of `ModifyProfileQueryEvent` and
+  `ModifyContractQueryEvent`, so three actions build two context objects from
+  the same request and settings. A `@todo` there points at this change.
+- The base class reads `getContentObjectRenderer()` from the request
+  attribute `currentContentObject` without checking its type, while
+  `getExtbaseRequestParameters()` checks it. A foreign value under that
+  attribute is a `TypeError` in a getter declared nullable (ACE-442).
+- `getApplicationType()` throws: core's `ApplicationType::fromRequest()`
+  raises 1606222812 for a request without the attribute (ACE-442).
+  `getSite()` and `getLanguage()` return their attributes unchecked:
+  `getSite()` is a `TypeError` for a request carrying core's `NullSite`,
+  which is no `Site`, and both are for a foreign value. All three are left
+  to ACE-748.
+- `academic_jobs`, `academic_partners`, `academic_persons_edit` and
+  `academic_projects` already use the base context.
 
 ## Goals / Non-Goals
 
@@ -45,6 +64,28 @@ interface. It needs the class alias loader wiring in the extension's
 real one for static analysis and IDEs; `extends` gives the same compatibility
 in plain PHP.
 
+### Both classes answer null for a foreign content object
+
+The persons class gains `getContentObjectRenderer()`, and it and the base
+class return the request attribute only when it is a `ContentObjectRenderer`,
+as `getExtbaseRequestParameters()` already does for its attribute. Rejected:
+copying the unguarded base lookup, which would give the persons class the
+`TypeError` ACE-442 reports for the base one.
+
+### One context object per persons action
+
+The persons controller builds one persons context per action and hands it to
+both the repository and the event. The repository parameter is typed against
+the `academic_base` interface, which the persons context now satisfies. That
+settles the `@todo` ACE-715 left in the controller.
+
+### getApplicationType() keeps throwing
+
+Returning `null` instead changes the declared return type of the
+`academic_base` interface to `?ApplicationType`, which breaks every listener
+that uses the value unchecked and every class implementing the interface. It
+is a decision of its own, ACE-748, and not part of this change.
+
 ### The persons events keep their declared types
 
 Widening their getter return types to the base interface now would break a
@@ -72,7 +113,7 @@ policy change writes afterwards.
 
 The persons interface and the persons context class are deprecated in 3.0 and
 removed in 4.0, together with switching the declared types of the remaining
-persons events to the `academic_base` interface. Removing the interface or
+persons events to the `academic_base` interface (ACE-747). Removing the interface or
 widening the event getters within 3.x is a fatal error or a type break for
 listeners, so only a major release can do it. Of the five persons events
 typed against the persons interface today, `ace-tbd-generic-plugin-view-event`
@@ -82,9 +123,9 @@ placeholder event.
 
 ### Keep the persons class
 
-The persons controller and the page title provider keep building the persons
-context, because the persons events require its type. It is marked
-deprecated together with the interface.
+The persons controller keeps building the persons context, because the
+persons events require its type. It is marked deprecated together with the
+interface.
 
 ## Risks / Trade-offs
 

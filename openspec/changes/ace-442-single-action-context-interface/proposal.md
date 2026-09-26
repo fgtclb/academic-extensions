@@ -15,6 +15,11 @@ cannot be reused for a persons event, and the generic plugin view event of
   4.0.
 - The persons context class provides the content element, resolved the same
   way as the `academic_base` context does it.
+- The content element accessor of both context classes answers `null` when
+  the request carries something other than a content object under that name,
+  instead of failing with a type error.
+- The persons plugin actions build one context and hand it to the repository
+  and to the event alike.
 - The persons events keep their declared types, so listeners typed against the
   persons interface keep working, and listeners typed against the
   `academic_base` interface work as well.
@@ -29,6 +34,8 @@ The behaviour is identical on TYPO3 v13 and v14.
 
 - `academic-persons/plugin-action-context`: what a listener of a persons
   plugin event can rely on from the context it receives.
+- `academic-base/plugin-action-context`: that reading the content element
+  from the context of an academic plugin never fails.
 
 ### Modified Capabilities
 
@@ -36,11 +43,14 @@ None.
 
 ## Impact
 
-- Two files in `academic_persons` (interface and context class); no change in
-  `academic_base`.
+- The interface, the context class and the controller of `academic_persons`;
+  the context class of `academic_base` gets the type check of its content
+  element accessor.
 - The five persons events typed against the persons interface are unchanged
   in signature.
 - `Breaking-` and `Deprecation-` changelog entries in `academic_persons`.
+- An `Important-` changelog entry in `academic_base` for the content element
+  accessor.
 
 ## Non-goals
 
@@ -49,11 +59,13 @@ None.
 - Changing the declared types of the persons events; that happens with the
   removal in 4.0.
 - A backport to branch `2`: it changes API.
+- `getApplicationType()` answering `null` instead of throwing; that changes the
+  interface of `academic_base` and is ACE-748.
+- Removing the persons interface and class; that is 4.0 and ACE-747.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-13`). Four of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-single-action-context-interface` when the issue is filed after
-implementation.
+this today. It implements ACE-442, which the analysis did not find; the
+removal in 4.0 is ACE-747, the throwing application type getter ACE-748.

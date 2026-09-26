@@ -1,6 +1,6 @@
 ## 1. Event and trait
 
-- [ ] 1.0 Verify that `ace-tbd-single-action-context-interface` and
+- [ ] 1.0 Verify that `ace-442-single-action-context-interface` and
   `ace-tbd-extension-point-policy` have landed; stop otherwise.
 - [ ] 1.1 Add the `final` `ModifyPluginViewEvent`, with an `@api` docblock
   tag, to `academic-base/Classes/Event/` and a unit test for its getters.
@@ -42,6 +42,22 @@
   the listener is not called; shown red by keeping the dispatch. The
   existing detail page title tests stay green, and one with the setting
   `pageTitleFormat` is shown red by ignoring the setting.
+- [ ] 3.5 Carry the removal into what ACE-442 wrote about the persons
+  context: the persons `Breaking-PluginControllerActionContextInterfaceExtendsBase.rst`
+  and `Deprecation-PersonsPluginControllerActionContext.rst`, which say the
+  persons events keep declaring the persons interface throughout 3.x; the
+  event table of the plugin action context section in the persons
+  `Developers/Index.rst`; the subsection on classes implementing the plugin
+  action context in the persons `Upgrade/Index.rst`; the paragraph on the
+  persons context in `docs/architecture/list-plugin-events.md`, which says
+  the persons actions hand the same object to their event and to the query
+  event; a MODIFIED delta for the requirement "Listeners typed against the
+  persons context keep working" of `academic-persons/plugin-action-context`,
+  whose scenario is the detail plugin; and `AcademicPersonsPluginActionContextTest` with
+  the fixture extension `test_plugin_action_context`, whose listeners listen
+  to the list and detail events. After the removal, only the profile title
+  placeholder event carries the persons context; the test moves its checks
+  to that event and to the generic view event.
 
 ## 4. Documentation
 

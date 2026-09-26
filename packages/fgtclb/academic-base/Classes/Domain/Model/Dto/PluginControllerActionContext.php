@@ -31,7 +31,8 @@ final class PluginControllerActionContext implements PluginControllerActionConte
 
     public function getContentObjectRenderer(): ?ContentObjectRenderer
     {
-        return $this->request->getAttribute('currentContentObject');
+        $attribute = $this->request->getAttribute('currentContentObject');
+        return $attribute instanceof ContentObjectRenderer ? $attribute : null;
     }
 
     public function getRequest(): ServerRequestInterface
