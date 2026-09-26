@@ -19,8 +19,10 @@ real ones:
     :file:`Configuration/Sets/AcademicStudyPlan/page.tsconfig` both imported
     :file:`Configuration/TSconfig/Includes/academic-study-plan.tsconfig`.
 
-The indirection is gone. Both mechanisms now read one physical copy of every
-file, and both of them deliver the extension per component:
+The indirection is gone, apart from the deprecated path of version 2.3, see
+:ref:`deprecation-legacy-static-template-path`. Both mechanisms now read one
+physical copy of every file, and both of them deliver the extension per
+component:
 
 *   :file:`Configuration/TypoScript/ContentElement/` holds the TypoScript of the
     :guilabel:`Academic Study Plan` content element and is what the static
@@ -53,19 +55,23 @@ Impact
 ======
 
 A :sql:`sys_template` record that selected the old static template keeps its
-stored value, and that value now points at a folder holding no
-:file:`constants.typoscript` and no :file:`setup.typoscript`. It is not an
-error — the frontend simply loses the content element configuration, and the
-element renders as an empty content element.
+stored value. The folder of that value holds no TypoScript of its own any more.
+It imports the files of the component folder instead, so it delivers what
+:guilabel:`All components` delivers — deprecated, until version 4.0, see
+:ref:`deprecation-legacy-static-template-path`.
 
 A page record that selected the old page TSconfig file keeps its stored value
 too, and that value now points at a file that does not exist. An unresolved page
 TSconfig include is silent, so the content element stops being selectable on
 that page tree without any message.
 
-A site package that imported one of the shipped files by path fails to resolve
-it. :typoscript:`@import` of a missing file is silent, so this also shows up as
-missing configuration rather than as an error message.
+A site package that imported
+:file:`Configuration/TypoScript/Default/setup.typoscript` by path keeps getting
+the configuration, deprecated in the same way, once it also imports the
+:file:`constants.typoscript` that folder holds now. Every other shipped file it
+imported by path fails to resolve. :typoscript:`@import` of a missing file is
+silent, so this shows up as missing configuration rather than as an error
+message.
 
 ..  warning::
 

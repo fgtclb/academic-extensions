@@ -105,6 +105,11 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
         -   The TypoScript of the :guilabel:`Job list` content element.
     *   -   :guilabel:`Academic Bite Jobs: All components (academic_bite_jobs)`
         -   Every component this extension ships, in one entry.
+    *   -   :guilabel:`Academic Bite Jobs: Path up to 2.3 (deprecated, use All
+            components) (academic_bite_jobs)`
+        -   The same as :guilabel:`All components`, for a record that still
+            stores the path of version 2.3. Deprecated, removed in version 4.0,
+            see :ref:`deprecation-legacy-static-template-path`.
 
 ..  _static-pagetsconfig:
 

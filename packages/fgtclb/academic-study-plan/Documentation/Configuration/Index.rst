@@ -119,6 +119,11 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
             element.
     *   -   :guilabel:`Academic Study Plan: All components (academic_study_plan)`
         -   Every component this extension ships, in one entry.
+    *   -   :guilabel:`Academic Study Plan: Path up to 2.3 (deprecated, use All
+            components) (academic_study_plan)`
+        -   The same as :guilabel:`All components`, for a record that still
+            stores the path of version 2.3. Deprecated, removed in version 4.0,
+            see :ref:`deprecation-legacy-static-template-path`.
 
 ..  _static-pagetsconfig:
 

@@ -128,6 +128,12 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
         -   The TypoScript of the :guilabel:`Contact list` content element.
     *   -   :guilabel:`Academic Contacts4Pages: All components (academic_contacts4pages)`
         -   Every component this extension ships, in one entry.
+    *   -   :guilabel:`Academic Contacts4Pages: Path up to 2.3 (deprecated, use All
+            components) (academic_contacts4pages)`
+        -   The same as :guilabel:`All components` without the TypoScript of
+            EXT:academic_persons, for a record that still stores the path of
+            version 2.3. Deprecated, removed in version 4.0, see
+            :ref:`deprecation-legacy-static-template-path`.
 
 ..  _static-pagetsconfig:
 

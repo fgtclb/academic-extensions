@@ -1,0 +1,11 @@
+# Deprecated since 2.4, removed in 4.0.
+#
+# The static template path this extension offered up to version 2.3. It is
+# stored in TypoScript records and imported by site packages, so it keeps
+# delivering the files of the component folder below, as "All components"
+# does. The TypoScript of EXT:academic_persons, which "All components" brings
+# along, is not included here: in version 2.3 it came from an entry of its own
+# in the same record, and including it again would read it twice. Select
+# "Academic Contacts4Pages: All components", or depend on the site set,
+# instead.
+@import 'EXT:academic_contacts4pages/Configuration/TypoScript/List/setup.typoscript'

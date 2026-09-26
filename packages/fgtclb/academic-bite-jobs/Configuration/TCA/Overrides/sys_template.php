@@ -26,4 +26,17 @@ defined('TYPO3') || die();
         'Academic Bite Jobs: All components',
     );
 
+    //==================================================================================================================
+    // The entry below keeps the value installations stored in "sys_template.include_static_file" up to version 2.3.
+    //
+    // Deprecated since 2.4, removed in 4.0. The folder delivers what "All components" delivers, so a record
+    // that still stores it keeps its configuration. Registering it keeps the value when the record is saved: the
+    // backend form drops a stored value that is not among the items.
+    //==================================================================================================================
+    ExtensionManagementUtility::addStaticFile(
+        'academic_bite_jobs',
+        'Configuration/TypoScript',
+        'Academic Bite Jobs: Path up to 2.3 (deprecated, use All components)',
+    );
+
 })();

@@ -12,7 +12,9 @@ that were found while verifying it against the core source of TYPO3 v13.4.34
 and v14.3.6.
 
 `academic-bite-jobs` is the reference implementation: one component, both
-mechanisms, nothing else in the way.
+mechanisms, nothing else in the way — apart from the two deprecated files at
+the root of its `TypoScript/` folder, which a new extension does not need, see
+[below](#the-paths-of-version-23-keep-delivering-until-40).
 
 ## The one physical copy rule
 
@@ -140,7 +142,75 @@ resolves, the path does not exist, and the include returns having loaded
 nothing, with no exception and no log entry. A comment line is not allowed
 either, but at least fails loudly: it is parsed as a path and throws
 `RuntimeException` 1651137904. Write the entries without a trailing slash, the
-way the core and `bk2k/bootstrap-package` write them.
+way the core and `bk2k/bootstrap-package` write them. That is about the file;
+a value registered with `addStaticFile()` has to stay exactly as installations
+stored it.
+
+### The paths of version 2.3 keep delivering until 4.0
+
+A static template path is stored in `sys_template.include_static_file`, and
+site packages `@import` the files in it. Both fail silently once the folder
+holds no TypoScript, and the backend form drops a stored value that is no
+longer among the items, so the next save of the record removes it for good.
+
+Four of the five extensions with a shared block kept their old path for free:
+the shared folder is the one they always registered. The fifth,
+`academic-partners`, registered its entry under the wrong extension key up to
+2.3, see its
+[`Important-StaticTemplateAndBackendLayoutRegistration.rst`](../../packages/fgtclb/academic-partners/Documentation/Changelog/3.0/Important-StaticTemplateAndBackendLayoutRegistration.rst).
+The other four extensions moved their only TypoScript into a component folder,
+and keep the path of version 2.3 alive on purpose (ACE-745), deprecated since
+2.4 and removed in 4.0:
+
+| Extension                | Path up to 2.3                     | Delivers                     |
+|--------------------------|------------------------------------|------------------------------|
+| `academic-bite-jobs`     | `Configuration/TypoScript`         | `TypoScript/List/`           |
+| `academic-contact4pages` | `Configuration/TypoScript/`        | `TypoScript/List/`           |
+| `academic-persons-edit`  | `Configuration/TypoScript`         | `TypoScript/ProfileEditing/` |
+| `academic-study-plan`    | `Configuration/TypoScript/Default` | `TypoScript/ContentElement/` |
+
+Each of these folders holds a `constants.typoscript` and a `setup.typoscript`
+that do nothing but `@import` the file of the same name in the component
+folder, and `TCA/Overrides/sys_template.php` registers the folder again, with a
+label that says it is deprecated. A record that stores the path gets what "All
+components" delivers, and an import of the old files gets what an import of the
+component files gets. The contacts4pages value keeps its trailing slash: it has
+to equal the value version 2.3 registered, or the form drops it. Only a scoped
+`addTypoScript()` keyed by a folder path would tell the two apart, and no
+extension of this repository registers one.
+
+An `include_static_file.txt` naming `Full` looks shorter and is wrong twice.
+It serves a stored record but not an import, because an import reads the file
+it names and nothing else. And next to a `setup.typoscript` it makes a stored
+record read the component twice.
+
+**`academic-contact4pages` differs from "All components" on purpose.** "All
+components" brings `academic_persons/Configuration/TypoScript/Default` along,
+because the setup reads constants of that extension. The path of version 2.3
+never did: a record of that version stores the persons entry next to it, and
+including it again would read the persons TypoScript twice — which resets
+persons constants set in between and applies its `:= addToList()` twice. The
+old folder therefore has no `include_static_file.txt`, and a record that
+stores the persons entry and the old path gets what "All components" gets.
+
+**Version 2.3 had no `constants.typoscript` in the folders of
+`academic-contact4pages` and `academic-study-plan`.** Their setup reads
+constants now, so a site package that imports only the old `setup.typoscript`
+gets the configuration with `{$…}` left unresolved. It has to import the new
+`constants.typoscript` of the same folder into its constants too; the
+Deprecation entries of both extensions say so.
+
+A site that depends on the site set and still stores an old path, or imports
+its files, goes from an include that found nothing to a double parse, see
+[below](#there-is-no-double-parse-guard-and-that-is-deliberate).
+
+`LegacyStaticTemplatePathTest` in each of the four extensions compares the
+whole TypoScript of the old path with that of "All components", and that of an
+import of the old files with an import of the component files, through
+[`StaticTemplateTypoScriptTrait`](../testing/testing-helper.md#statictemplatetyposcripttrait).
+A component added to `Full` later and missing from the old folder turns it
+red. The same class checks that every file is read once, and that the backend
+form keeps a stored old path.
 
 ## Hide by default, enable per component
 
@@ -447,7 +517,7 @@ All ten extensions that have configuration to convert follow this layout:
 It was done as ACE-458, per extension, each with its own Breaking changelog
 entry, because every conversion moves paths that a site package may `@import`.
 A new extension follows the layout from the start; `academic-bite-jobs` is the
-smallest complete example to copy.
+smallest complete example to copy, without its deprecated root files.
 
 `academic-persons` is the one extension where six content elements share a
 single `plugin.tx_academicpersons` block. It keeps that block in

@@ -85,7 +85,7 @@ actually applies.
 
 The 2.x static template paths of bite_jobs, contacts4pages, persons_edit and
 study_plan stay until 4.0, delivered and registered as deprecated by
-`ace-tbd-legacy-typoscript-paths`, so the static template check reports none
+`ace-745-legacy-typoscript-paths`, so the static template check reports none
 of them. A silently dropped include is worse than a deprecated working one.
 The check keeps its value for other dead static template values, dead
 `TsConfig/` imports, renamed set folders, alias sets, a set combined with a
