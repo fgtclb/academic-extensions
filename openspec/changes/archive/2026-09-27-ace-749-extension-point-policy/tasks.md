@@ -79,4 +79,4 @@
 - [x] 7.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 7.5 `docs/` and the `Documentation/Changelog/3.0/` entry are part of the
   change; `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 7.6 Archive the change as the last commit of the pull request.
+- [x] 7.6 Archive the change as the last commit of the pull request.
