@@ -1,0 +1,2 @@
+# The site lets the contacts list render the header of its content element itself.
+plugin.tx_academiccontacts4pages.renderContentElementHeader = 1

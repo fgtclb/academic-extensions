@@ -55,7 +55,7 @@ None.
 - No PHP, TCA or database change. The `record` view variable and the partial
   path of EXT:fluid_styled_content stay.
 - Backport to branch `2` (2.4.0): the defect exists there unchanged.
-- The same switch is the pattern `ace-tbd-plugin-content-element-header`
+- The same switch is the pattern `ace-743-plugin-content-element-header`
   applies to five more extensions; that change was updated with this one.
 
 ## Non-goals

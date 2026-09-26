@@ -235,7 +235,9 @@ protected function tearDown(): void
 **What it does.** Counts, in a rendered page, the headings `h1` to `h6` that
 read a given text (`countHeadingsReading()`) and the `header` elements
 (`countHeaderElements()`), each in the whole page or below the element an XPath
-scope selects.
+scope selects. `countContentElementHeaderNodes()`, which both build on, counts
+the nodes of any query; a test uses it to prove the scope element rendered at
+all, so that a count of zero below it means something.
 
 **When to use it.** In every test of a plugin header. A plugin renders inside
 the layout of `lib.contentElement`, which renders the header itself, so the

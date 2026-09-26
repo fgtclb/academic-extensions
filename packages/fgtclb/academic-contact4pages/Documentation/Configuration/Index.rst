@@ -160,7 +160,8 @@ files twice. The site set is applied before the :sql:`sys_template` record, so
 the second read happens after the site settings and after
 :file:`config/sites/<site>/constants.typoscript` — and it resets every constant
 the extension ships a default for back to that default. For this extension
-those are the three Fluid root paths of the plugin.
+those are the three Fluid root paths of the plugin and the
+:ref:`content element header <configuration-content-element-header>` switch.
 
 Nothing else is damaged: the :guilabel:`Constants` and :guilabel:`Setup` fields
 of the :sql:`sys_template` record, the page TSconfig of a page and the page
@@ -246,4 +247,43 @@ object. A project list template that renders the header partial of
 sense where the layout of the content element leaves the header out, as it is
 rendered twice otherwise. See
 :ref:`the changelog entry <important-contacts4pages-plugin-assigns-record-view-variable>`
-for what such a template needs.
+for what such a template needs. The shipped template renders the header itself
+while :ref:`the switch below <configuration-content-element-header>` is on, so a
+copy made for the header alone is no longer needed.
+
+..  _configuration-content-element-header:
+
+The header of the content elements
+==================================
+
+The header and the subheader an editor enters on a :guilabel:`Contacts for this
+page` content element are rendered by the content element layout of the site, as
+for any other content element. The layouts of
+:guilabel:`EXT:fluid_styled_content` and of the bootstrap package do that, and
+the plugins render no header of their own.
+
+A site whose content element layout renders no header, because its element
+templates render it instead, lets the plugins render it:
+
+..  code-block:: typoscript
+    :caption: TypoScript constants
+
+    plugin.tx_academiccontacts4pages.renderContentElementHeader = 1
+
+The extension declares no site settings, so a site that uses the site set sets
+the constant in :file:`config/sites/<site>/constants.typoscript`. The templates
+then render the header partial of :guilabel:`EXT:fluid_styled_content` above
+their output, for every header layout except :guilabel:`Hidden`. Do not switch
+it on where the layout renders the header: the header then appears twice.
+
+The extension does not require :guilabel:`EXT:fluid_styled_content`. It adds the
+partial path of that extension below every other one, so a site package that
+ships a :file:`Header/All.html` of its own renders that one instead, and a site
+without :guilabel:`EXT:fluid_styled_content` provides the partial that way.
+
+For the header layout :guilabel:`Default`, the partial takes the heading level
+from :typoscript:`plugin.tx_academiccontacts4pages.settings.defaultHeaderType`, which is mapped
+from the constant :typoscript:`styles.content.defaultHeaderType` of
+:guilabel:`EXT:fluid_styled_content`. A site that does not include the
+TypoScript of :guilabel:`EXT:fluid_styled_content` sets the setting itself;
+without it, such a header renders as an empty :html:`<header>` element.

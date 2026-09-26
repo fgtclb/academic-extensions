@@ -28,6 +28,14 @@ Verified on `main`, first on 2026-09-12 and again on 2026-09-25:
   partners, programs and projects controllers do not. The persons and
   contacts controllers are final, the partners, programs and projects
   controllers are not.
+- Re-checked on 2026-09-26 before the implementation: the program finder
+  (ACE-91, merged after the analysis) is a third plugin of academic_programs,
+  `ProgramController::finderAction()` with `Program/Finder.html`. It gets the
+  switch like the list and the details, so the switch of an extension covers
+  every one of its plugins. Its template has no wrapper element; the header
+  renders in front of the form. Projects declares site settings since
+  ACE-739, so it gets the site setting too; contacts4pages still declares none
+  and gets the constant only, like `academic_bite_jobs`.
 - The role heading partials do not print the subheader: both use it only to
   pick the heading level, `Partner/Header` together with `grouped`.
   The requirement "role headings do not repeat the subheader" of the earlier
@@ -68,8 +76,9 @@ TypoScript (see the jobs change).
 
 Each action assigns `record` through the trait next to `data`, in
 `ProfileController` (five actions, including the early returns of
-`selectedProfilesAction()` and `selectedContractsAction()`),
-`PartnerController`, `ProgramController`, `DetailsController` and
+`selectedProfilesAction()` and `selectedContractsAction()`, which assigned no
+`data` either, through one private method for both), `PartnerController`,
+`ProgramController` (list and finder), `DetailsController` and
 `ProjectController`. Assigning it is harmless with the switch off. Each
 plugin setup maps `settings.defaultHeaderType` as the jobs change does, so
 the header layout "Default" renders a heading when switched on.

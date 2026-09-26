@@ -11,6 +11,12 @@ plugin.tx_academiccontacts4pages {
     # existed stores no value for it and reads this one, so it keeps grouping; a stored value
     # of the content element wins.
     groupByRole = 1
+    # The content element layout renders the header of every content element, so the
+    # templates render it only for a site whose layout leaves it out. The header partial
+    # falls back to the type of the header layout "Default" through the setting below,
+    # which plugin settings do not carry the way the settings of `lib.contentElement` do.
+    renderContentElementHeader = {$plugin.tx_academiccontacts4pages.renderContentElementHeader}
+    defaultHeaderType = {$styles.content.defaultHeaderType}
   }
   view {
     templateRootPaths {
@@ -18,8 +24,14 @@ plugin.tx_academiccontacts4pages {
     }
 
     partialRootPaths {
+      # The header partial of EXT:fluid_styled_content, which the templates render while
+      # "renderContentElementHeader" is switched on. The key sorts below every other one,
+      # the shared partials of EXT:academic_base included, so a "Header/All" of the
+      # project wins over it.
+      -2 = EXT:fluid_styled_content/Resources/Private/Partials/
       # The shared partials of EXT:academic_base, which "Profile/Item" renders the image
-      # through. The key sorts below every other one, so an override wins over them.
+      # through. The key sorts below the paths of the extensions and of the project, so an
+      # override wins over them.
       -1 = EXT:academic_base/Resources/Private/Partials/
       5 = EXT:academic_persons/Resources/Private/Partials/
       10 = {$plugin.tx_academiccontacts4pages.view.partialRootPath}

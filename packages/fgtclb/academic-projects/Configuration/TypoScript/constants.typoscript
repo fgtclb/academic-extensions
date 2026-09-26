@@ -5,6 +5,11 @@ plugin.tx_academicprojects {
     layoutRootPath = EXT:academic_projects/Resources/Private/Layouts/
   }
 
+  # Also a site setting of the set "fgtclb/academic-projects", with the same default -
+  # see "Configuration/Sets/Full/settings.definitions.yaml".
+  # cat=plugin.tx_academicprojects//a; type=boolean; label=Render the content element header in the project lists: only for a site whose content element layout renders no header
+  renderContentElementHeader = 0
+
   # The category filters of the project lists. Also site settings of the set
   # "fgtclb/academic-projects", with the same defaults - see
   # "Configuration/Sets/Full/settings.definitions.yaml".

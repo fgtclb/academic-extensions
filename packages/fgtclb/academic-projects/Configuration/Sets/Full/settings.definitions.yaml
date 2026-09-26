@@ -1,4 +1,5 @@
-# Site settings of the category filters of the project lists.
+# Site settings of the category filters and of the content element header of the
+# project lists.
 #
 # Every path below is also assigned in
 # "Configuration/TypoScript/constants.typoscript", and the default has to be the
@@ -7,11 +8,11 @@
 # what the integrator configured, silently.
 #
 # Declared with the aggregate set rather than with a component set: both
-# content elements, "Projects" and "Projects (selected)", render the filter,
-# and a set can only declare settings next to its own "config.yaml". A site that
-# depends on a component set alone still gets the defaults of the constants,
-# but the site settings editor does not offer the settings - depend on this set
-# for that.
+# content elements, "Projects" and "Projects (selected)", render the filter
+# and the header, and a set can only declare settings next to its own
+# "config.yaml". A site that depends on a component set alone still gets the
+# defaults of the constants, but the site settings editor does not offer the
+# settings - depend on this set for that.
 categories:
   academic:
     label: 'Academic'
@@ -35,6 +36,12 @@ settings:
   plugin.tx_academicprojects.filter.hideDisabledOptions:
     label: 'Project lists | Hide options without results'
     description: 'Leaves out the categories no listed project carries, instead of showing them as disabled options. A selected category is always shown.'
+    category: academic.projects
+    type: bool
+    default: false
+  plugin.tx_academicprojects.renderContentElementHeader:
+    label: 'Project lists | Render the content element header'
+    description: 'Only for a site whose content element layout renders no header. The layouts of EXT:fluid_styled_content and of the bootstrap package render it, and switched on there the header appears twice.'
     category: academic.projects
     type: bool
     default: false
