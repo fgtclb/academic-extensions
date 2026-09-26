@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Twenty-nine such fixture extensions exist, in nine of the twelve extensions.
+Thirty-two such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -37,6 +37,7 @@ They sit next to the tests that use them, under
 | `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`         | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
 | `test_language_files`                  | `tests/language-files`                  | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                           |
 | `test_legacy_settings`                 | `tests/test-legacy-settings`            | `academic-persons`      | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.            |
+| `test_literal_helptext`                | `tests/test-literal-helptext`           | `academic-persons-edit` | A `Settings.yaml` with literal help texts for a contract and a contact field. |
 | `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`      | A deliberately misbehaving profile factory and two event listeners.           |
 | `test_partner_list_events`             | `tests/test-partner-list-events`        | `academic-partners`     | Two listeners on the partner demand and list events, and a list template.     |
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
@@ -44,7 +45,9 @@ They sit next to the tests that use them, under
 | `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Partial overrides in two paths, a card passing a page, an old list template.  |
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |
 | `test_profile_update_recorder`         | `tests/test-profile-update-recorder`    | `academic-persons-edit` | A listener recording every profile update announcement, frontend included.    |
+| `test_profile_view_modes`              | `tests/test-profile-view-modes`         | `academic-persons`      | A project view mode of the profile lists, with its TypoScript.                |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
+| `test_programs_removed_category_type`  | `tests/programs-removed-category-type`  | `academic-programs`     | A `CategoryTypes.yaml` removing a type from the programs group.               |
 | `test_project_list_events`             | `tests/test-project-list-events`        | `academic-projects`     | Two listeners on the project demand and list events, and a list template.     |
 | `test_public_profile_settings`         | `tests/test-public-profile-settings`    | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                       |
 | `test_settings_copy`                   | `tests/test-settings-copy`              | `academic-persons`      | A copy of the contract fields that leaves the room out, removes one with `~`. |
@@ -55,8 +58,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Ten of the twenty-nine have a `Classes/` folder with a `TESTS\…` PSR-4 root;
-the other nineteen are pure resources. The `ext_emconf.php` is checked like
+Ten of the thirty-two have a `Classes/` folder with a `TESTS\…` PSR-4 root;
+the other twenty-two are pure resources. The `ext_emconf.php` is checked like
 every other one: its `depends` names extension keys, and a fixture extension
 may name another fixture extension, which a real extension may not — see
 [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).

@@ -150,7 +150,7 @@ together.
 ## Layout
 
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
-- `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable. Its one unit test checks that every `ext_emconf.php` names its dependencies by extension key.
+- `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable. Its two unit tests check that every `ext_emconf.php` names its dependencies by extension key and that every translation, in a template or in PHP, names its extension without an underscore.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Eleven of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed set `Configuration/DataFactory/academics-instance/` the DDEV instances are built from. Content, not code, apart from one page object it ships twice (as a static template and as a site set) because the `/legacy/` tree cannot be themed. Written into an empty instance with `ddev composer instance:seed`, which runs the `data-factory:import academics-instance` command of `sbuerk/data-factory`. `ScenarioLegacy.yaml` is **generated** by `Build/Scripts/generateLegacyScenario.php` from `Scenario.yaml` — change the generator, never the generated file, and `--check` reports a stale one. The seed is verified by tests of its own, see [Seed verification](docs/testing/seed-verification.md).
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
@@ -277,8 +277,9 @@ test config. `packages-dev/` is in the glob because all three of its packages
 carry tests of their own — the seed definition of `packages-dev/dev-site`, the
 tests of the `runTests.sh -j` scripts and of the DDEV worktree name script in
 `packages-dev/testing-helper`, and the
-check in `packages-dev/monorepo-shared` that every `ext_emconf.php` names its
-dependencies by extension key; `cgl` covers that directory for the same reason.
+checks in `packages-dev/monorepo-shared` of the `ext_emconf.php` dependency keys
+and of the extension name of every translation; `cgl` covers that
+directory for the same reason.
 `phpstan` still does not.
 
 ## CI (`.github/workflows/`)

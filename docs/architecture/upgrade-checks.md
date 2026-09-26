@@ -213,7 +213,8 @@ that branch on both versions.
   record of the version a copy was taken from; `identical` is the only statement
   it can make about a copy.
 - Anything that is not a `*.html` file. XLIFF files are overridden through
-  `locallangXMLOverride`, not through a view root path.
+  `SYS.locallangXMLOverride` on TYPO3 v13 and `LANG.resourceOverrides` on v14,
+  or through `_LOCAL_LANG` in TypoScript, not through a view root path.
 
 ## The configuration group
 

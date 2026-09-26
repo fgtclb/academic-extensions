@@ -124,31 +124,11 @@ The first option of every filter reads
 until a site adds one.
 
 A site adds one with `_LOCAL_LANG`, under `plugin.tx_academic<group>` for every
-plugin of the extension or `plugin.tx_academic<group>_<plugin>` for one. That
-works on both core versions only because the filter templates pass the
-extension name in **UpperCamelCase**, `extensionName: 'AcademicPartners'`. The
-two versions build the TypoScript key differently:
-
-| Template passes       | TYPO3 v13 reads                         | TYPO3 v14 reads                                                      |
-|-----------------------|-----------------------------------------|----------------------------------------------------------------------|
-| `'AcademicPartners'`  | `plugin.tx_academicpartners[_<plugin>]` | `plugin.tx_academicpartners[_<plugin>]`                              |
-| `'academic_partners'` | `plugin.tx_academic_partners` only      | `plugin.tx_academicpartners[_<plugin>]` - the underscore is stripped |
-
-v13 lowercases the name as given; v14's
-`LanguageService::loadTypoScriptLabelsFromExtension()` removes the underscores
-first. v13 reads the plugin path only for the plugin that renders the template,
-because it takes the configuration the Extbase configuration manager merged for
-that plugin - for these filters that is always the case. Measured with a
-functional probe and in both development instances, where the list and the
-finder of the site set tree and of the `/legacy/` tree render the overridden
-label in English and German, and lose it on v13 as soon as a template passes
-`academic_partners` again. Most other templates of the extensions still pass the
-underscored name; that is a defect of its own.
-
-A language file override works too, under the key of each core version:
-`$GLOBALS['TYPO3_CONF_VARS']['SYS']['locallangXMLOverride']` on v13,
-`$GLOBALS['TYPO3_CONF_VARS']['LANG']['resourceOverrides']` on v14, which
-renamed it (Breaking-107436) and does not read the old key.
+plugin of the extension or `plugin.tx_academic<group>_<plugin>` for one. The filter
+templates were the first to pass the extension name in UpperCamelCase,
+`extensionName: 'AcademicPartners'`, which is what makes TYPO3 v13 read that path;
+every other template followed with ACE-740. Why, and what else decides the path:
+[Label overrides](label-overrides.md).
 
 ## What the setting does not restrict
 
@@ -238,6 +218,8 @@ something other than what the select shows.
 
 ## See also
 
+- [Label overrides](label-overrides.md) — the path a `_LOCAL_LANG` override is
+  read from, and why the extension name decides it.
 - [List filter URLs](list-filter-urls.md) — the URL a filter submission
   redirects to, and why it carries no category type.
 - [Backend select items](backend-select-items.md) — what an items provider is

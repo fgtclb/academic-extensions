@@ -148,3 +148,4 @@ one mechanism per site and the question does not arise.
    :titlesonly:
 
    General/Index
+   Labels/Index

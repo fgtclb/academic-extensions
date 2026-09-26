@@ -242,7 +242,8 @@ extension in the mono repository in one run — twelve of them under
 The second collects `packages-dev/`, where all three packages carry tests of
 their own: the seed definition of `packages-dev/dev-site`, the scripts behind
 `runTests.sh -j` in `packages-dev/testing-helper`, and the `ext_emconf.php`
-dependency key check in `packages-dev/monorepo-shared`.
+dependency key check and the extension name check of translations in
+`packages-dev/monorepo-shared`.
 
 **There is no per-extension PHPUnit configuration**, and adding one would be a
 step backwards: the extensions depend on each other, and a test suite that only

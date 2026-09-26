@@ -23,12 +23,12 @@
 
             <f:if condition="{module.credit_points}">
                 <span class="credits small" aria-hidden="true">
-                    {module.credit_points} {f:translate(key: 'credits', extensionName: 'academic_study_plan')}
+                    {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
                 </span>
             </f:if>
         </div>
 
-        <button aria-label="{f:translate(key: 'modal.close', extensionName: 'academic_study_plan')}">
+        <button aria-label="{f:translate(key: 'modal.close', extensionName: 'AcademicStudyPlan')}">
             <core:icon identifier="academic-study-plan-close" alternativeMarkupIdentifier="inline" />
         </button>
     </div>
@@ -43,7 +43,7 @@
 
     <f:if condition="{module.audioFiles}">
         <f:for each="{module.audioFiles}" as="audioFile">
-            <audio controls aria-label="{f:translate(key: 'modal.audio', extensionName: 'academic_study_plan')}: {module.label}">
+            <audio controls aria-label="{f:translate(key: 'modal.audio', extensionName: 'AcademicStudyPlan')}: {module.label}">
                 <source src="{audioFile.publicUrl}" type="{audioFile.mimeType}">
             </audio>
         </f:for>

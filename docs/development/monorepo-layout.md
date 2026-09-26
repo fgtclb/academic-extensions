@@ -55,7 +55,8 @@ installation:
 
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`, type
   `library`. It centralizes the TYPO3 core dependency constraints, and checks
-  the `ext_emconf.php` dependency keys of every extension.
+  the `ext_emconf.php` dependency keys of every extension and the extension
+  name of every translation, in templates and in PHP.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`,
   type `library`. Shared functional-test traits.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key
@@ -314,9 +315,10 @@ file. The individual extensions declare only the system extensions they
 themselves use, and adding a system extension for a test only needs it added
 here.
 
-Its `Tests/Unit/` holds the one check that concerns the dependency metadata of
-all extensions at once: every key an `ext_emconf.php` names in `depends`,
-`suggests` or `conflicts` has to name an extension that exists. See
+Its `Tests/Unit/` holds two checks that concern all extensions at once: every
+key an `ext_emconf.php` names in `depends`, `suggests` or `conflicts` has to
+name an extension that exists, and every translation, in a template or in PHP,
+has to name its extension without an underscore. See
 [Unit tests](../testing/unit-tests.md#the-ext_emconfphp-dependency-keys).
 
 ## `packages-dev/testing-helper/` — shared test traits

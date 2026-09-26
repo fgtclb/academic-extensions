@@ -22,6 +22,9 @@ use Psr\Http\Message\RequestInterface;
  * can neither extend nor be extended by a non-readonly one. `BiteJobsService` itself is
  * `final` and type hinted in the controller, so it cannot be replaced either.
  *
+ * A search for the listing key `no-postings` is answered without postings, which is how a
+ * test reaches the message of an empty list.
+ *
  * The handler is registered in `ext_localconf.php` through
  * `$GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler']`, which TYPO3 v13 and v14 evaluate
  * identically.
@@ -33,6 +36,13 @@ final class StubHttpHandler
      */
     public function __invoke(RequestInterface $request, array $options): PromiseInterface
     {
+        $search = json_decode((string)$request->getBody(), true);
+        if (is_array($search) && ($search['key'] ?? null) === 'no-postings') {
+            return Create::promiseFor(
+                new Response(200, ['Content-Type' => 'application/json'], (string)json_encode(['jobPostings' => []]))
+            );
+        }
+
         return Create::promiseFor(
             new Response(
                 200,
