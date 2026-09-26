@@ -37,6 +37,11 @@ final class StaticRegistrationTest extends AbstractAcademicBiteJobsTestCase
             'EXT:academic_bite_jobs/Configuration/TypoScript/Full',
             'Academic Bite Jobs: All components (academic_bite_jobs)',
         ];
+        // The path this extension registered up to version 2.3, kept as deprecated until 4.0.
+        yield 'path up to 2.3' => [
+            'EXT:academic_bite_jobs/Configuration/TypoScript',
+            'Academic Bite Jobs: Path up to 2.3 (deprecated, use All components) (academic_bite_jobs)',
+        ];
     }
 
     #[Test]

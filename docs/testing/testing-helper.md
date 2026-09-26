@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but six PHP traits — the parts of the test setup that were being copied
+but seven PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -14,6 +14,7 @@ necessary.
 | [`ContentElementHeaderAssertionTrait`](#contentelementheaderassertiontrait)     | Counts where the header of a content element rendered, how often.   |
 | [`CategoryFilterFormAssertionTrait`](#categoryfilterformassertiontrait)         | Reads the category filters of a list's filter form, and where.      |
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
+| [`StaticTemplateTypoScriptTrait`](#statictemplatetyposcripttrait)               | Builds the TypoScript a record delivers, and what its form keeps.   |
 
 ## How an extension gets access
 
@@ -358,6 +359,59 @@ pairing is reported as such.
 The class docblock carries a `@todo` proposing extraction into a dedicated
 public helper package with its own TYPO3 and testing-framework constraints. Not
 done; the trait is used by one test class today.
+
+## `StaticTemplateTypoScriptTrait`
+
+Builds the whole TypoScript a root TypoScript record delivers to the frontend,
+on TYPO3 v12 and v13, and reads which of its stored static templates the
+backend form keeps. Used by `LegacyStaticTemplatePathTest` of
+`academic-bite-jobs`, `academic-contact4pages`, `academic-persons-edit` and
+`academic-study-plan`, see [the paths of version
+2.3](../architecture/typoscript-and-site-sets.md#the-paths-of-version-23-keep-delivering-until-40):
+
+```php
+use StaticTemplateTypoScriptTrait;
+
+#[Test]
+public function aStoredLegacyPathDeliversWhatAllComponentsDelivers(): void
+{
+    $allComponents = $this->typoScriptOfTemplateRecord('EXT:academic_bite_jobs/Configuration/TypoScript/Full');
+
+    // Without it, two empty trees would compare equal.
+    $this->assertSame(
+        'EXT:academic_bite_jobs/Resources/Private/Templates/',
+        $allComponents['setup']['plugin.']['tx_academicbitejobs.']['view.']['templateRootPaths.']['10'] ?? null,
+    );
+    $this->assertSame($allComponents, $this->typoScriptOfTemplateRecord('EXT:academic_bite_jobs/Configuration/TypoScript'));
+}
+```
+
+— shortened from [`academic-bite-jobs/Tests/Functional/TypoScript/LegacyStaticTemplatePathTest.php`](../../packages/fgtclb/academic-bite-jobs/Tests/Functional/TypoScript/LegacyStaticTemplatePathTest.php)
+
+| Method                          | Returns                                                           |
+|---------------------------------|-------------------------------------------------------------------|
+| `typoScriptOfTemplateRecord()`  | The flat settings and the setup array a record builds.            |
+| `setupFilesOfTemplateRecord()`  | Every file its setup reads, once per read, in order.              |
+| `staticTemplatesTheFormKeeps()` | The stored static templates the backend form of the record keeps. |
+
+The first two take the value of `include_static_file` and, optionally, the
+Constants and Setup fields, and build the record in memory with `clear = 3`
+and no site, so no record or site set of the test instance takes part. The
+third writes the record as uid 1 on page 1; the page and the backend user have
+to be set up by the test.
+
+**The traps it exists for.** A stored static template that finds no file, and
+an `@import` that finds none, both deliver nothing without a message, so a
+frontend test that looks for one value proves only that this value arrived.
+Comparing the whole tree catches the rest, and so does counting the files: two
+reads of the same file build the same tree, and only the file list shows them.
+TYPO3 v12 has no `FrontendTypoScriptFactory`, so the trees are built the way
+the Extbase `BackendConfigurationManager` of v12 builds them, with
+`SysTemplateTreeBuilder` and the AST builder visitor, both `@internal`; on v13
+the same classes run inside `FrontendTypoScriptFactory`. Conditions are not
+evaluated; none of the compared trees has one. The form drops a stored value
+that is not among the items of the field, which is what makes an unregistered
+static template disappear on the next save.
 
 ## See also
 

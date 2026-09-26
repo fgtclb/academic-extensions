@@ -63,15 +63,17 @@ Impact
 ======
 
 A :sql:`sys_template` record that selected the old static template keeps its
-stored value, and that value now points at a folder holding no
-:file:`constants.typoscript` and no :file:`setup.typoscript`. It is not an
-error — the frontend simply loses the plugin configuration and the data
-processor that assigns the contacts of a page to the page template, and the
-plugin renders with no template paths.
+stored value. The folder of that value holds no TypoScript of its own any more.
+It imports the files of the component folder instead, so it delivers the
+TypoScript of this extension as before — deprecated, until version 4.0, see
+:ref:`deprecation-legacy-static-template-path`.
 
-A site package that imported one of the shipped files by path fails to resolve
-it. :typoscript:`@import` of a missing file is silent, so this also shows up as
-missing configuration rather than as an error message.
+A site package that imported :file:`Configuration/TypoScript/setup.typoscript`
+by path keeps getting the configuration, deprecated in the same way, once it
+also imports the :file:`constants.typoscript` that folder holds now. Every
+other shipped file it imported by path fails to resolve. :typoscript:`@import`
+of a missing file is silent, so this shows up as missing configuration rather
+than as an error message.
 
 The :guilabel:`Contact list` content element is no longer offered in the backend
 until the page TSconfig of the component is included, through the site set or

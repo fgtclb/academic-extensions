@@ -1,0 +1,11 @@
+# Deprecated since 2.4, removed in 4.0.
+#
+# The static template path this extension offered up to version 2.3. It is
+# stored in TypoScript records and imported by site packages, so it keeps
+# delivering what "All components" delivers, and nothing else. Select "Academic
+# Study Plan: All components", or, on TYPO3 v13, depend on the site set
+# instead.
+#
+# The stylesheet and the script of the content element are added to the page
+# object by the setup of the component, as this folder did in version 2.3.
+@import 'EXT:academic_study_plan/Configuration/TypoScript/ContentElement/setup.typoscript'
