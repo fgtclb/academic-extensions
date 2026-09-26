@@ -163,10 +163,11 @@ on `main` and was not backported wholesale:
 | `ColourSchemeAwareIconsTrait`          | yes    | no  |
 | `ResponsiveImageAssertionTrait`        | yes    | no  |
 | `ContentElementHeaderAssertionTrait`   | yes    | yes |
+| `CategoryFilterFormAssertionTrait`     | yes    | yes |
 
-All ten live in
+All eleven live in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/` on `main`; branch `2`
-has five of them.
+has six of them.
 
 Count the directory rather than trusting this table, and check the individual
 extension too: a trait being on both branches does not mean the test directory

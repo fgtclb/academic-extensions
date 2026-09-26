@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but ten PHP traits — the parts of the test setup that were being copied
+but eleven PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -12,6 +12,7 @@ necessary.
 | [`ExtensionsLoadedTestsTrait`](#extensionsloadedteststrait)                     | Asserts an extension resolves by package name and by extension key. |
 | [`FrontendPluginRenderingTrait`](#frontendpluginrenderingtrait)                 | The scaffolding every frontend plugin rendering test needs.         |
 | [`ContentElementHeaderAssertionTrait`](#contentelementheaderassertiontrait)     | Counts where the header of a content element rendered, how often.   |
+| [`CategoryFilterFormAssertionTrait`](#categoryfilterformassertiontrait)         | Reads the category filters of a list's filter form, and where.      |
 | [`ResponsiveImageAssertionTrait`](../architecture/shared-partials.md)           | Asserts what the shared image partial of `academic_base` rendered.  |
 | [`PluginFlexFormDataStructureTrait`](#pluginflexformdatastructuretrait)         | Resolves a plugin FlexForm the way FormEngine does.                 |
 | [`DeprecatedCoreLabelsTrait`](#deprecatedcorelabelstrait)                       | Guards TCA against core labels TYPO3 v14 retired.                   |
@@ -257,6 +258,38 @@ plugins in every release since 2.1.0, and the text assertions added later did
 not see them.
 
 ---
+
+## `CategoryFilterFormAssertionTrait`
+
+[`Classes/FunctionalTestCase/CategoryFilterFormAssertionTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/CategoryFilterFormAssertionTrait.php)
+
+**What it does.** Reads the category filters out of the filter form of a
+partner, project or program list, or of the program finder, selected by the
+class of the form. `renderedCategoryFilters()` returns the category types of
+the filters in document order, split into those shown right away and those in
+the "More filters" disclosure, together with the state of the disclosure and its
+label. `categoryFilterOptions()` returns the option labels of one filter, a
+disabled one marked, and `categoryFilterCellMarkup()` the markup of the cell
+around each filter with the whitespace collapsed, for a regression pin that
+does not depend on template indentation.
+
+**When to use it.** In every test of what a list's filter form offers:
+which filters, in which order, where, and with which options. The category type
+comes from the field name, `…[demand][filterCollection][<type>]`, not from the
+`id`, which the finder makes unique per content element.
+
+```php
+$content = $this->renderFrontendPage('https://www.acme.com/home');
+$this->assertSame(
+    ['visible' => ['sdg'], 'more' => ['region'], 'disclosure' => 'closed', 'summary' => 'More filters'],
+    $this->renderedCategoryFilters($content, 'academic-partners-filtersorting'),
+);
+```
+
+**The trap it exists for.** A string assertion on the page passes for a filter
+rendered in the wrong place, and for a disclosure that is open when it should be
+closed; a select found by its `id` alone does not tell a category filter from a
+sorting select.
 
 ## `PluginFlexFormDataStructureTrait`
 

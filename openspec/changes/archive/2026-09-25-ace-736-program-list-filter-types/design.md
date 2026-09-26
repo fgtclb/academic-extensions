@@ -25,7 +25,7 @@ again at `62e8ef142` before the implementation:
   exists by now (ACE-687), but holds the page module summary only. The
   `sys_category` `type` select builds its items inline in
   `Configuration/TCA/Overrides/sys_category.php`.
-- `ace-tbd-list-filter-order-visible-labels` is not applied: there is no
+- `ace-739-list-filter-order-visible-labels` is not applied: there is no
   `FilterTypeResolver` and no `settings.filter` key in any list. The program
   list has a `settings.definitions.yaml` by now (ACE-726, ACE-733).
 - Core passes the field's whole `config` to an `itemsProcFunc`, including a
@@ -107,7 +107,7 @@ adds the same key to partners and projects and finds the program list done.
 ### Resolve the list with the shared resolver
 
 `listAction()` hands the effective `settings.filter.categoryTypes` to the
-`FilterTypeResolver` of `ace-tbd-list-filter-order-visible-labels` and
+`FilterTypeResolver` of `ace-739-list-filter-order-visible-labels` and
 assigns its result as `filterTypes`; `DemandCategories.html` loops
 `filterTypes.visible`. The resolver drops identifiers without an entry in
 `allCategoriesByType` (removed type) and types without any category, and an

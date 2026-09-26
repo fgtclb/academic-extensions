@@ -30,7 +30,7 @@
   16 of the 18 new functional tests fail; the two that pass are the
   regression pins for an element without the field.)
 - [x] 2.3 Resolve the effective value in `listAction()` through the
-  `FilterTypeResolver` of `ace-tbd-list-filter-order-visible-labels` (added
+  `FilterTypeResolver` of `ace-739-list-filter-order-visible-labels` (added
   in that shape if this change is applied first) and loop the result in
   `DemandCategories.html`; verify 2.2 passes.
 - [x] 2.4 Remove the `ignoreFlexFormSettingsIfEmpty` entry, watch the

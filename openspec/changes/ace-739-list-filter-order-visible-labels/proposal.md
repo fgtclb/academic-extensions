@@ -18,7 +18,12 @@ behind a toggle, and label each "all" option per type.
   falls back to today's generic label.
 - The same three settings, with the same names, in all three extensions,
   settable through TypoScript and site settings.
-- Without configuration the filter output is unchanged.
+- On TYPO3 v13, a TypoScript label override of the filter form is read from
+  `plugin.tx_academic<group>` and `plugin.tx_academic<group>_<plugin>`, as on
+  v14, and no longer from `plugin.tx_academic_<group>`. An `Important-`
+  changelog entry per extension says what to copy.
+- Without configuration, and apart from that label path on v13, the filter
+  output is unchanged.
 
 The behaviour is identical on TYPO3 v13 and v14.
 
@@ -28,12 +33,15 @@ The behaviour is identical on TYPO3 v13 and v14.
 
 - `academic-partners/list-filter`: which category filters the partner list
   and map offer, in which order and how they are labelled.
-- `academic-projects/list-filter`: the same for the project list.
-- `academic-programs/list-filter`: the same for the program list.
+- `academic-projects/list-filter`: the same for the two project lists.
 
 ### Modified Capabilities
 
-None.
+- `academic-programs/program-list-filter-types`: the program list, which
+  already offers configured filter types in order, gains the visible count,
+  the per-type "all" label and the hidden options without results.
+- `academic-programs/program-finder`: the finder follows the list in the
+  hidden options and the per-type "all" label.
 
 ## Impact
 
@@ -42,19 +50,25 @@ None.
   `academic_programs` (`packages/fgtclb/academic-programs`): list
   controllers, the `DemandCategories` filter partials, TypoScript constants
   and setup, site settings definitions, labels.
-- `category_types` (`packages/fgtclb/typo3-category-types`): a stateless
-  helper that orders and splits the filter types. It has no visitor-facing
-  behaviour of its own, so it carries no spec.
+- `category_types` (`packages/fgtclb/typo3-category-types`): the stateless
+  helper that orders and splits the filter types exists since
+  `ace-736-program-list-filter-types`; it gains a method that reads the plugin
+  settings. It has no visitor-facing behaviour of its own, so it carries no
+  spec.
+- `packages-dev/testing-helper`: a trait that reads the filters of a list's
+  filter form, shared by the tests of the three extensions.
 - Depends on the change that lets the filter form field hide options without
   results (`ace-738-filter-select-hide-disabled`).
-- Functional tests of the three list plugins, a unit test of the helper,
-  `Feature-` changelog entries.
+- Functional tests of the three list plugins and the finder, a unit test of
+  the helper, `Feature-` and `Important-` changelog entries in
+  `Changelog/2.4/` - the change is backported to branch `2`.
 
 ## Non-goals
 
 - A per-content-element setting in the FlexForm. The per-element override of
   the program filter types under the same key `settings.filter.categoryTypes`
-  is `ace-736-program-list-filter-types`, which builds on this change.
+  is `ace-736-program-list-filter-types`, merged before this change; this
+  change builds on it.
 - Removing the hard-coded grid column classes of the filter cells.
 - Bookmarkable filter URLs, active filter tags, reset links or result counts.
 - One shared filter partial for all extensions.
@@ -63,6 +77,4 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-08`). Four of the six analysed projects carry their own code for this
-today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-list-filter-order-visible-labels` when the issue is filed after
-implementation.
+today. Implemented as ACE-739.

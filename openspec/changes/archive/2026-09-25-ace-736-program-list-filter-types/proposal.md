@@ -11,7 +11,7 @@ set of filters.
 - A new list plugin field "Filter types": a multiple select of the category
   types of the programs group, in which the editor picks the filters and
   their order. It is stored under the key of the site-wide filter type
-  setting that `ace-tbd-list-filter-order-visible-labels` adds for the
+  setting that `ace-739-list-filter-order-visible-labels` adds for the
   partner, project and program lists, and overrides it for one element.
 - An empty field falls back to the site-wide setting. With that empty as
   well, today's behaviour stays: every type with categories is offered, in
@@ -54,7 +54,7 @@ None.
 - The FlexForm of the program list plugin and its labels.
 - The filter form of the program list.
 - A new items provider in `category_types` for TCA and FlexForm select fields.
-- Applied before `ace-tbd-list-filter-order-visible-labels`, which owns the
+- Applied before `ace-739-list-filter-order-visible-labels`, which owns the
   site-wide setting and the resolver of the filter types for all three lists:
   this change adds the resolver in the shape that change describes and the
   site-wide setting for the program list, and owns the items provider the

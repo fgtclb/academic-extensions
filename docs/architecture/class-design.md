@@ -124,7 +124,7 @@ Constructor injection with promoted properties is the default: 95 files declare
 known problem rather than a model: splitting the controller is ACE-507.
 
 **Method injection is used where a constructor is not available to take
-dependencies.** There are 15 `inject*()` methods across 10 files and **zero**
+dependencies.** There are 17 `inject*()` methods across 10 files and **zero**
 `@inject` annotations — the annotation form is not used at all, which is worth
 keeping true.
 
@@ -166,9 +166,9 @@ constructor argument would break it. The method is `final` and named after its
 purpose, as core's own `injectInternalExtensionService()` of `ActionController`
 is, so a subclass cannot declare one of the same name by accident. The details
 controller of `academic_programs` takes its `ProgramFactsBuilder` through
-`injectProgramFactsBuilder()` for the same reason, and its list controller the
-`FilterTypeResolver` through `injectFilterTypeResolver()`. Once the controllers
-are `final`, the services move to the constructor.
+`injectProgramFactsBuilder()` for the same reason, and all three list
+controllers take the `FilterTypeResolver` through `injectFilterTypeResolver()`.
+Once the controllers are `final`, the services move to the constructor.
 
 Apart from that, method injection on a **concrete** class does not have this
 justification.

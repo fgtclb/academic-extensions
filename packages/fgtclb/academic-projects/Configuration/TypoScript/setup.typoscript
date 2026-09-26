@@ -14,6 +14,15 @@
 @import 'EXT:academic_projects/Configuration/TypoScript/Page/'
 
 plugin.tx_academicprojects {
+  settings {
+    # The category filters of both project lists, see "constants.typoscript".
+    filter {
+      categoryTypes = {$plugin.tx_academicprojects.filter.categoryTypes}
+      visibleCount = {$plugin.tx_academicprojects.filter.visibleCount}
+      hideDisabledOptions = {$plugin.tx_academicprojects.filter.hideDisabledOptions}
+    }
+  }
+
   view {
     templateRootPaths {
       0 = {$plugin.tx_academicprojects.view.templateRootPath}
