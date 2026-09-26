@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 81 unit test classes: 76 across the twelve extensions, one in
-`packages-dev/dev-site`, one in `packages-dev/monorepo-shared` and three in
+There are 84 unit test classes: 77 across the twelve extensions, one in
+`packages-dev/dev-site`, two in `packages-dev/monorepo-shared` and four in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -86,7 +86,9 @@ suite, check that the chunks ran every listed test, and record the durations
 through the extensions that use them.
 [`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
 the check that every `ext_emconf.php` of the repository names its dependencies
-by extension key, see [below](#the-ext_emconfphp-dependency-keys).
+by extension key, see [below](#the-ext_emconfphp-dependency-keys), and the one
+that every translation names its extension without an underscore, see
+[below](#the-extension-name-of-translations).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -272,6 +274,25 @@ the other — `academic_base` depends on `backend` only in `ext_emconf.php`,
 `scheduler` only there — and an equality check would fail today for no
 defect. `academic_jobs` carries that stricter
 check for itself, `academic-jobs/Tests/Unit/ExtEmConfDependenciesTest.php`.
+
+## The extension name of translations
+
+[`TranslationExtensionNameTest`](../../packages-dev/monorepo-shared/Tests/Unit/TranslationExtensionNameTest.php)
+reads every Fluid template below `packages/fgtclb/*/Resources/Private/` and
+fails on an `f:translate` that names no extension, and on an `extensionName`
+with an underscore, in either notation and inside the argument of another view
+helper as well. It also reads every class below `packages/fgtclb/*/Classes/`
+and fails on a string literal with an underscore and neither dot nor colon -
+an extension key, not a label key - handed to a `translate()` call. A name in
+an argument list that is built first and then handed over is not seen. TYPO3 v12
+and v13 read `_LOCAL_LANG` overrides for an underscored name from a path no
+site uses (ACE-740), see [Label overrides](../architecture/label-overrides.md).
+
+The functional label tests of each extension prove every kind of call against
+both core versions, but only as the first translation of its file in a
+request: the core keeps the overrides one translation has read for the ones
+after it. This check holds the templates, and the names handed to
+`translate()` directly in PHP.
 
 ## See also
 

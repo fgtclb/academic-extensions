@@ -67,6 +67,13 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
             GeneralUtility::callUserFunction($itemProcFunc, $processorParameters, $this);
             $items = $processorParameters['items'];
         }
+        // Translated with the extension name, not the key: TYPO3 v12 and v13 read the
+        // `_LOCAL_LANG` overrides of `plugin.tx_<name>` exactly as the name is spelled, so the
+        // key `academic_jobs` looked in `plugin.tx_academic_jobs`. A name without an
+        // underscore is taken as given - converting it would lowercase it.
+        $extensionName = str_contains($extensionKey, '_')
+            ? GeneralUtility::underscoredToUpperCamelCase($extensionKey)
+            : $extensionKey;
         $returnItems = [];
         foreach ($items as $item) {
             $itemValue = (string)($item['value'] ?? '');
@@ -80,7 +87,7 @@ trait GetSelectItemsForTcaManagedTableFieldMethodTrait
             $returnItems[] = [
                 'label' => ($localizationUtility->translate(
                     $labelIdentifier,
-                    $extensionKey,
+                    $extensionName,
                 ) ?? $labelIdentifier) ?: $labelIdentifier,
                 'value' => $itemValue,
             ];

@@ -166,3 +166,9 @@ one mechanism per site and the question does not arise.
 
 The question does not arise on TYPO3 v12 either, where there is only one
 mechanism.
+
+..  toctree::
+   :maxdepth: 5
+   :titlesonly:
+
+   Labels/Index

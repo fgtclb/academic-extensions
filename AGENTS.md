@@ -150,7 +150,7 @@ together.
 ## Layout
 
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
-- `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable. Its one unit test checks that every `ext_emconf.php` names its dependencies by extension key.
+- `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable. Its two unit tests check that every `ext_emconf.php` names its dependencies by extension key and that every translation, in a template or in PHP, names its extension without an underscore.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Six of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed set `Configuration/DataFactory/academics-instance/` the DDEV instances are built from. Content and instance configuration, not code. Written into an empty instance with `ddev composer instance:seed`, which runs the `data-factory:import` command of `sbuerk/data-factory`. The seed set delivers the instance TypoScript through one root `sys_template` record rather than through site sets, because site sets arrived in TYPO3 v13.1 and this branch also supports v12.
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
@@ -323,8 +323,9 @@ Test discovery: phpunit globs `packages/*/*/Tests/Unit/`,
 `packages/*/*/Tests/Functional/` **and** `packages-dev/*/Tests/{Unit,Functional}/`
 across everything at once (`Build/phpunit/*.xml`) — there is no per-extension
 test config. `packages-dev/` is in the glob for the tests of the development
-seed, of the scripts behind `runTests.sh -j`, and for the check that every
-`ext_emconf.php` names its dependencies by extension key.
+seed, of the scripts behind `runTests.sh -j`, and for the checks that every
+`ext_emconf.php` names its dependencies by extension key and that every
+translation names its extension without an underscore.
 
 ## CI (`.github/workflows/`)
 
