@@ -21,11 +21,11 @@ leaves it out, so it becomes a switch.
   introduces, "render the content element header in the plugin", one per
   extension and off by default:
   - academic_persons (`packages/fgtclb/academic-persons`): profile list,
-    card, detail, selected profiles, selected contracts;
+    list and detail, card, detail, selected profiles, selected contracts;
   - academic_partners (`packages/fgtclb/academic-partners`): partner list,
     map, partnerships list and teaser;
-  - academic_programs (`packages/fgtclb/academic-programs`): program list and
-    program details;
+  - academic_programs (`packages/fgtclb/academic-programs`): program list,
+    program details and program finder;
   - academic_projects (`packages/fgtclb/academic-projects`): project list;
   - academic_contacts4pages (`packages/fgtclb/academic-contact4pages`):
     contacts list.
@@ -60,11 +60,11 @@ None.
 
 ## Impact
 
-- Thirteen templates and six controllers in five extensions (the contacts
+- Fourteen templates and five controllers in five extensions (the contacts
   controller already assigns `record`, ACE-728).
 - The plugin TypoScript (constant, setting, header partial path, default
   header type) of the five extensions, and the site settings definitions of
-  persons, partners and programs - projects and contacts4pages declare none.
+  persons, partners, programs and projects - contacts4pages declares none.
 - No database or TCA change.
 
 ## Non-goals
@@ -81,7 +81,5 @@ and its documentation.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-04`), corrected on 2026-09-25 as described above. Three of the
-six analysed projects carry their own code for this today. No YouTrack issue
-is filed yet; the change is renamed to
-`ace-<NNN>-plugin-content-element-header` when the issue is filed after
-implementation.
+six analysed projects carry their own code for this today. Filed as ACE-743
+after the implementation.

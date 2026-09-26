@@ -45,6 +45,11 @@ trait ContentElementHeaderAssertionTrait
         return $this->countContentElementHeaderNodes($html, $scope . '//header');
     }
 
+    /**
+     * Counts the nodes an XPath query selects: the two helpers above build on it, and a test
+     * uses it to prove that the element a scope stands for rendered at all, so that a count
+     * of zero below it means something.
+     */
     private function countContentElementHeaderNodes(string $html, string $query): int
     {
         $document = new \DOMDocument();

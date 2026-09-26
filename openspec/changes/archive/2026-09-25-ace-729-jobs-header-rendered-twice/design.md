@@ -18,7 +18,7 @@ Verified on `main` (`a4a4ff0a9`) and `origin/2` on 2026-09-25:
   and render headers in its element templates. One analysed project does
   (its content element layout renders the frame and `Main` only); it copies
   plugin templates to add `Header/All` - the evidence behind
-  `ace-tbd-plugin-content-element-header`.
+  `ace-743-plugin-content-element-header`.
 - Probe (functional tests, header "Open positions", subheader set, FSC
   layout): header layout "Default" - one heading and one subheader from the
   layout, plus an empty `<header></header>` from the plugin template; header
@@ -101,7 +101,7 @@ An `Important-` entry per extension in `Documentation/Changelog/2.4/`, on
 decision as ACE-728). It names the switch for sites whose layout renders no
 header, and the `Header/All` line a project copy of a template should drop.
 
-### `ace-tbd-plugin-content-element-header` follows this pattern
+### `ace-743-plugin-content-element-header` follows this pattern
 
 That change planned to add `Header/All` unconditionally to thirteen templates
 on the premise that those plugins "ignore the header an editor enters". On a
@@ -121,7 +121,7 @@ lands second rebases trivially.
 The header tests count the headings reading the header and the subheader, and
 the `header` elements inside the plugin wrapper, in the DOM. The helper is a
 trait of the testing helper package, `ContentElementHeaderAssertionTrait`,
-because `ace-tbd-plugin-content-element-header` needs the same assertions in
+because `ace-743-plugin-content-element-header` needs the same assertions in
 five more extensions.
 
 ### Verification

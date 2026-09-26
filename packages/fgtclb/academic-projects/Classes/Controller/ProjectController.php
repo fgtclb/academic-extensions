@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Controller;
 
+use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface;
 use FGTCLB\AcademicProjects\Domain\Repository\ProjectRepository;
@@ -20,6 +21,8 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class ProjectController extends ActionController
 {
+    use GetCurrentContentRecordMethodTrait;
+
     private ExtensionService $filterRedirectExtensionService;
 
     private FilterTypeResolver $filterTypeResolver;
@@ -69,6 +72,7 @@ class ProjectController extends ActionController
             'categories' => $categories,
             'filterTypes' => $this->filterTypeResolver->resolveFromSettings($categories, $this->settings),
             'data' => $contentElementData,
+            'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
         ];
 
         $this->view->assignMultiple($assignedValues);

@@ -75,10 +75,10 @@ section and render the header in its element templates instead. A plugin
 template can therefore not decide on its own, and one that renders the header
 does it behind a switch per extension, off by default:
 
-| Plugin setting                        | Mapped from                                                                                                   |
-|---------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| `settings.renderContentElementHeader` | the constant `plugin.tx_<key>.renderContentElementHeader`, default `0`; a site setting of `academic_jobs` too |
-| `settings.defaultHeaderType`          | the constant `styles.content.defaultHeaderType` of EXT:fluid_styled_content                                   |
+| Plugin setting                        | Mapped from                                                                                                                                      |
+|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `settings.renderContentElementHeader` | the constant `plugin.tx_<key>.renderContentElementHeader`, default `0`; a site setting too where the extension declares site settings of its own |
+| `settings.defaultHeaderType`          | the constant `styles.content.defaultHeaderType` of EXT:fluid_styled_content                                                                      |
 
 The second one is the constant the `lib.contentElement` of
 EXT:fluid_styled_content reads. Where the constants of EXT:fluid_styled_content
@@ -89,8 +89,31 @@ its own and which includes no TypoScript of EXT:fluid_styled_content.
 TypoScript has no fallback for an undefined constant, so a site in that
 position that switches the header on sets the plugin setting itself.
 
-`academic_jobs` and `academic_bite_jobs` render the header this way. The other
-plugins render none of their own. A test of a plugin header counts the headings
+Seven extensions render the header this way, and each has the switch once, for
+all of its plugins:
+
+| Extension                 | Plugins                                                                    | Site setting | Path of `Header/All` |
+|---------------------------|----------------------------------------------------------------------------|--------------|----------------------|
+| `academic_jobs`           | list, detail, new job form                                                 | yes          | key `0`              |
+| `academic_bite_jobs`      | list                                                                       | no           | key `0`              |
+| `academic_persons`        | list, list and detail, card, detail, selected profiles, selected contracts | yes          | key `-2`             |
+| `academic_partners`       | partner list, map, partnerships list, partnerships teaser                  | yes          | key `-2`             |
+| `academic_programs`       | program list, program details, program finder                              | yes          | key `-2`             |
+| `academic_projects`       | project list, selected projects                                            | yes          | key `-2`             |
+| `academic_contacts4pages` | contacts list                                                              | no           | key `-2`             |
+
+The partial path is the one of EXT:fluid_styled_content,
+`EXT:fluid_styled_content/Resources/Private/Partials/`. `academic_jobs` and
+`academic_bite_jobs` have had it at key `0` all along. In the other five, `-1` is
+taken by the [shared partials](shared-partials.md) and `0` by the extension's
+own path in four of them, so the path sits at `-2`, below every path of a
+project: a `Header/All` of a site package wins over it. None of the five
+requires EXT:fluid_styled_content. Nothing reads the partial while the switch
+is off, and a site that switches it on either has EXT:fluid_styled_content or
+provides its own `Header/All`.
+
+The editing plugin of `academic_persons_edit` has no switch; its templates
+render no content element header. A test of a plugin header counts the headings
 in the DOM through `ContentElementHeaderAssertionTrait` of the
 [testing helper](../testing/testing-helper.md), because an assertion that the
 header text appears passes on a header that renders twice.
@@ -124,26 +147,30 @@ renders `Header/All` without the record is green on v13 and fatal on v14, which
 is why everything that reaches that partial has a functional test asserting a
 header the editor entered actually appears:
 
-| Reaches `Header/All`                             | How                | Test                                  |
-|--------------------------------------------------|--------------------|---------------------------------------|
-| `academic_jobs` `Job/List.html`, `Job/Show.html` | behind the switch  | `AcademicJobsListAndDetailPluginTest` |
-| `academic_jobs` `Job/New.html`                   | behind the switch  | `AcademicJobsNewJobFormPluginTest`    |
-| `academic_bite_jobs` `BiteJobs/List.html`        | behind the switch  | `AcademicBiteJobsListPluginTest`      |
-| `academic_study_plan` `AcademicStudyPlan.html`   | through the layout | `AcademicStudyPlanContentElementTest` |
+| Reaches `Header/All`                                                                    | How                | Test                                      |
+|-----------------------------------------------------------------------------------------|--------------------|-------------------------------------------|
+| `academic_jobs` `Job/List.html`, `Job/Show.html`                                        | behind the switch  | `AcademicJobsListAndDetailPluginTest`     |
+| `academic_jobs` `Job/New.html`                                                          | behind the switch  | `AcademicJobsNewJobFormPluginTest`        |
+| `academic_bite_jobs` `BiteJobs/List.html`                                               | behind the switch  | `AcademicBiteJobsListPluginTest`          |
+| `academic_persons` `Profile/{List,Card,Detail,SelectedProfiles,SelectedContracts}.html` | behind the switch  | `AcademicPersonsContentElementHeaderTest` |
+| `academic_partners` `Partner/{List,Map,PartnershipsList,PartnershipsTeaser}.html`       | behind the switch  | `AcademicPartnersPluginTest`              |
+| `academic_programs` `Program/List.html`, `Details/Show.html`                            | behind the switch  | `AcademicProgramsPluginTest`              |
+| `academic_programs` `Program/Finder.html`                                               | behind the switch  | `AcademicProgramsFinderTest`              |
+| `academic_projects` `Project/List.html`                                                 | behind the switch  | `AcademicProjectsProjectListPluginTest`   |
+| `academic_contacts4pages` `Contacts/List.html`                                          | behind the switch  | `AcademicContacts4PagesListPluginTest`    |
+| `academic_study_plan` `AcademicStudyPlan.html`                                          | through the layout | `AcademicStudyPlanContentElementTest`     |
 
-Those four plugin templates are the whole list of templates that render the
-partial directly, and each test renders them with the switch on and a fixture
-layout without a header, which is the case that needs the record. The study
-plan reaches the partial through the layout's `Header` section instead. No
-other plugin template renders a content element header at all, so no other
-controller needs the record for its own templates. Two assign it anyway through
-the same trait: `academic_persons_edit` pre-emptively, and
-`academic_contacts4pages`, because projects replace its list template with one
-that renders the header. That only works where the project also takes the
-header out of the element's layout, or the header renders twice;
+Those plugin templates are the whole list of templates that render the partial
+directly, and each test renders them with the switch on and a fixture layout
+without a header, which is the case that needs the record: every controller
+behind them assigns it. The study plan reaches the partial through the
+layout's `Header` section instead. `academic_persons_edit` assigns the record
+pre-emptively; its templates render no content element header. A project that
+replaces a list template with one rendering the header unconditionally, as
+projects did for the contacts list, gets the record too - it only has to take
+the header out of the element's layout, or the header renders twice;
 `AcademicContacts4PagesListPluginTest` renders such a fixture setup and asserts
-the header appears once. The remaining plugins get the header from the layout
-of `lib.contentElement`, like any content element.
+the header appears once.
 
 ## Testing the appearance settings
 
