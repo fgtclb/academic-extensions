@@ -77,5 +77,5 @@
 - [x] 5.1 `lintPhp`, `cgl -n`, `phpstan`, `unit` and `functional -j auto` for TYPO3 v13 and
   v14, each after its own `composerUpdate`.
 - [x] 5.2 `checkRstRenderingAll` and `lintMarkdown -n`.
-- [ ] 5.3 Commit message in the TYPO3 Core format with `ACE-740`; this change archived as
+- [x] 5.3 Commit message in the TYPO3 Core format with `ACE-740`; this change archived as
   the last commit of the pull request.
