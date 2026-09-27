@@ -30,9 +30,9 @@ return [
             'inlineIcon' => true,
         ],
         3 =>  [
-            'identifier' => 'department',
+            'identifier' => 'project_department',
             'extensionKey' => 'academic_projects',
-            'title' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.department',
+            'title' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.project_department',
             'group' => 'projects',
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Department.svg',
             'priority' => 0,

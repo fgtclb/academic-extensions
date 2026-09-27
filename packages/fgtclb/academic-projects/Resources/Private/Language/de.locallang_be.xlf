@@ -160,7 +160,7 @@
         <source>Academic Projects</source>
         <target>Akademische Projekte</target>
       </trans-unit>
-      <trans-unit id="sys_category.projects.department">
+      <trans-unit id="sys_category.projects.project_department">
         <source>Department</source>
         <target>Organisationseinheit</target>
       </trans-unit>

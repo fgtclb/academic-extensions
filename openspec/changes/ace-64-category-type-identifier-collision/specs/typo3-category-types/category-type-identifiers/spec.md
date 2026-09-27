@@ -17,6 +17,11 @@ v14.
 - **THEN** loading the category types fails with an error that names
   `department` and both extension keys
 
+#### Scenario: Identifiers differing only in case or surrounding spaces
+- **WHEN** one extension declares the type `degree` in one group and another
+  declares `Degree ` in another group
+- **THEN** loading the category types fails as for the same identifier
+
 #### Scenario: Override within the same group
 - **WHEN** a later extension overrides the type `department` of the group
   `programs` with `useExisting: true`

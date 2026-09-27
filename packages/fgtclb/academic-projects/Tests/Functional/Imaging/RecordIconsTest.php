@@ -31,7 +31,7 @@ final class RecordIconsTest extends AbstractAcademicProjectsTestCase
             'category_types.projects.competence_field',
             'category_types.projects.cooperation',
             'category_types.projects.funding_partner',
-            'category_types.projects.department',
+            'category_types.projects.project_department',
         ];
         foreach ($identifiers as $identifier) {
             yield $identifier => [$identifier];

@@ -143,7 +143,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
     /**
      * The fixture assigns one category of type "competence_field" and one of type
-     * "department" to the page, so both type labels and both category titles have to reach
+     * "project_department" to the page, so both type labels and both category titles have to reach
      * the output.
      */
     #[Test]

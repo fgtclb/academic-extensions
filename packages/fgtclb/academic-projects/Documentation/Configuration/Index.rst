@@ -242,8 +242,9 @@ site:
         -   empty
         -   The category types to offer, in this order, as a comma separated
             list of type identifiers, for example
-            `department,competence_field`. Empty offers every type that has a
-            category, in the order of the category types of the group.
+            `project_department,competence_field`. Empty offers every type
+            that has a category, in the order of the category types of the
+            group.
     *   -   :typoscript:`plugin.tx_academicprojects.filter.visibleCount`
         -   0
         -   How many filters the form shows right away. The others follow in a
@@ -262,7 +263,7 @@ site:
     plugin:
       tx_academicprojects:
         filter:
-          categoryTypes: 'department,competence_field'
+          categoryTypes: 'project_department,competence_field'
           visibleCount: 1
           hideDisabledOptions: true
 

@@ -2431,13 +2431,13 @@ entities:
                             title: 'Bundesministerium'
                   - self:
                         id: 21
-                        type: 'department'
+                        type: 'project_department'
                         title: 'Department of Data Science'
                     languageVariants:
                       - self:
                             id: 521
                             language: 1
-                            type: 'department'
+                            type: 'project_department'
                             title: 'Fachbereich Data Science'
                   - self:
                         id: 22

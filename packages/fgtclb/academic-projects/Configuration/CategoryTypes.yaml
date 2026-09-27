@@ -18,8 +18,8 @@ types:
     group: projects
     icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/FundingPartner.svg'
     inlineIcon: true
-  - identifier: department
-    title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.department'
+  - identifier: project_department
+    title: 'LLL:EXT:academic_projects/Resources/Private/Language/locallang.xlf:sys_category.projects.project_department'
     group: projects
     icon: 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Department.svg'
     inlineIcon: true

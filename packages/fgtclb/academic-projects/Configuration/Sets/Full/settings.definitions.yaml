@@ -23,7 +23,7 @@ categories:
 settings:
   plugin.tx_academicprojects.filter.categoryTypes:
     label: 'Project lists | Filter types'
-    description: 'The category filters the project lists offer, in this order, comma-separated: category type identifiers of the group "projects" (competence_field, cooperation, funding_partner, department, ...). A type without categories is left out. Empty: every category type with categories, in the type order of the group.'
+    description: 'The category filters the project lists offer, in this order, comma-separated: category type identifiers of the group "projects" (competence_field, cooperation, funding_partner, project_department, ...). A type without categories is left out. Empty: every category type with categories, in the type order of the group.'
     category: academic.projects
     type: string
     default: ''
