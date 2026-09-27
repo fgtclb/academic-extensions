@@ -202,6 +202,21 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
     }
 
     /**
+     * The contacts render the profile item of `EXT:academic_persons` with its default contract
+     * fields, office hours among them. Office hours written in the frontend editor are HTML
+     * and render as markup, not as escaped text.
+     */
+    #[Test]
+    public function listPluginRendersOfficeHoursAsMarkup(): void
+    {
+        $this->setUpTestCase('contactsListPage_officeHours');
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('<p>Tuesday 10:00 to 12:00</p>', $content);
+        $this->assertStringNotContainsString('&lt;p&gt;Tuesday', $content);
+    }
+
+    /**
      * This plugin renders the profile item of `EXT:academic_persons` through partial root
      * paths of its own, so an integrator who overrides one of the item partials has to
      * register that path here as well. The fixture TypoScript does exactly that, and this
