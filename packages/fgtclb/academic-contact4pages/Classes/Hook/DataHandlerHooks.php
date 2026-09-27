@@ -14,7 +14,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Removes translated contacts pointing at pages that are not translated into the
- * contact's language (ACE-484 / ACE-103 / HNEE-1249).
+ * contact's language (ACE-484 / ACE-103).
  *
  * A contact's `page` column is a plain `group` relation to the default-language page
  * uid, so DataHandler `localize` copies it verbatim into every translation - whether

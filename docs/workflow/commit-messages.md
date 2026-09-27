@@ -215,6 +215,17 @@ that wrong link then survives in the history, in the changelog and in the
 release notes. Look the key up and confirm it describes the change in hand
 before committing.
 
+The same YouTrack instance holds the projects of the customers this
+repository is developed for. Their keys must **never** appear in this public
+repository, not in a commit message, a pull request, a file, or an archived
+OpenSpec change. They name a customer and lead to a tracker nobody outside can
+read. Link the ACE issue to the project issue in YouTrack instead, and give the
+ACE key here. For files, `CustomerIssueKeyTest` in
+`packages-dev/monorepo-shared` refuses every reference of the shape `ABC-NNN`
+whose prefix is not on its short list of known ones, see
+[Customer issue keys](../testing/unit-tests.md#customer-issue-keys). A commit
+message and a pull request text are checked by nobody but their author.
+
 ## Attribution
 
 Contributions are attributed to the person who submits them. Whoever submits a
