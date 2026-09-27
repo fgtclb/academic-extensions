@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Thirteen such fixture extensions exist, in seven of the twelve extensions, and
+Fourteen such fixture extensions exist, in seven of the twelve extensions, and
 the table below lists all of them. That is the whole population — this is a
 mechanism used sparingly and only where nothing smaller works. Count them with:
 
@@ -26,6 +26,7 @@ They sit next to the tests that use them, under
 | `test_bitejobs_stub`                   | `tests/test-bitejobs-stub`              | `academic-bite-jobs`   | An `ext_localconf.php` replacing the Guzzle handler stack.               |
 | `test_category_types_group`            | `tests/category-types-group`            | `typo3-category-types` | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.      |
 | `test_category_types_summary_override` | `tests/category-types-summary-override` | `typo3-category-types` | A page TSconfig override of the page module category summary template.   |
+| `test_frontend_readonly`               | `tests/test-frontend-readonly`          | `academic-persons`     | A `validations` map locking four fields for the frontend editor only.    |
 | `test_hidden_content_types`            | `tests/hidden-content-types`            | `academic-base`        | Page TSconfig and TCA hiding content types, for the wizard tests.        |
 | `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`        | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.  |
 | `test_language_files`                  | `tests/language-files`                  | `academic-persons`     | An XLF pair with awkward label keys (dots, dashes).                      |
@@ -38,8 +39,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Six of the thirteen have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
-other seven are pure resources. Only `test_bitejobs_stub` and
+Six of the fourteen have a `Classes/` folder with a `TESTS\…` PSR-4 root. The
+other eight are pure resources. Only `test_bitejobs_stub` and
 `test_partners_stub` ship an `ext_localconf.php`, which is how they replace the
 Guzzle handler stack before any request is built. The `ext_emconf.php` is
 checked like every other one: its `depends` names extension keys, and a
