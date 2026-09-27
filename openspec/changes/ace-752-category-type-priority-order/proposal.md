@@ -73,9 +73,9 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-15`, merged with `programs-studyplan-06`). Five of the six
-analysed projects carry their own code for this today. No YouTrack issue is
-filed yet; the change is renamed to `ace-<NNN>-category-type-priority-order`
-when the issue is filed after implementation.
+analysed projects carry their own code for this today. The analysis found no
+issue; ACE-752 was filed after implementation, as a subtask of the category
+types epic ACE-42, related to two project issues.
 
 Depends on ACE-751 (`ace-751-category-types-yaml-docs`), which documents the
 `useExisting` override that carries the `priority`.

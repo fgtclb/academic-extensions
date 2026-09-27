@@ -58,20 +58,20 @@ plugin and the category summary of a program page in the backend.
 #### Scenario: Program page facts
 - **WHEN** a program page carries categories of the types `location` and
   `degree`
-- **AND** `degree` has a higher priority than `location`
-- **THEN** a visitor sees the degree before the location in the facts of the
+- **AND** `location` has a higher priority than `degree`
+- **THEN** a visitor sees the location before the degree in the facts of the
   program page and of the program details plugin
 
 #### Scenario: List filter selects
 - **WHEN** the program list plugin renders its filter form
-- **AND** `degree` has a higher priority than `location`
-- **THEN** the degree select is rendered before the location select
+- **AND** `location` has a higher priority than `degree`
+- **THEN** the location select is rendered before the degree select
 
 #### Scenario: Backend category summary
 - **WHEN** the page module renders the category summary of a program page
-- **AND** `degree` has a higher priority than `location`
-- **THEN** the category summary of that page lists the degree before the
-  location
+- **AND** `location` has a higher priority than `degree`
+- **THEN** the category summary of that page lists the location before the
+  degree
 
 ### Requirement: The backend type select follows the type order
 The system SHALL offer the category types in the type select of a category
@@ -79,5 +79,5 @@ record in the type order of their group.
 
 #### Scenario: Editor edits a category
 - **WHEN** an editor opens the type select of a category record
-- **AND** `degree` has a higher priority than `location`
-- **THEN** `degree` is offered before `location`
+- **AND** `location` has a higher priority than `degree`
+- **THEN** `location` is offered before `degree`
