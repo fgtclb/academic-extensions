@@ -66,6 +66,17 @@ keeps what core detected either way. Twenty icons ship with the flag set today,
 from `academic-partners` (4), `academic-programs` (12) and `academic-projects`
 (4) — every category type of this repository.
 
+The same method registers `category_types.group.<group>` for every group
+declared with an icon in the `groups:` section of that file (ACE-364), with the
+same choice of provider. No backend view renders them — the option groups of
+the type select carry a label only — so they are icons for templates. The three
+groups of this repository declare one each, drawn in `currentColor` and with
+`inlineIcon: true`: `academic-partners`, `academic-programs` and
+`academic-projects`, in `Resources/Public/Icons/CategoryGroups/`. The type
+icons of a group named `group` would share their identifiers with the group
+icons, which is why the developer documentation of `category_types` rules the
+name out.
+
 ### Where the identifiers are consumed
 
 The backend consumes identifiers through `typeicon_classes` in 21 files under

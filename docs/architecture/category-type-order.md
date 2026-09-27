@@ -57,6 +57,12 @@ type that a site package adds to the `programs` group while `academic_projects`,
 loaded after `academic_programs`, declared its types in between. That type moves
 from the end of the list into its group.
 
+The type select of a category is the one place where the groups can come in
+another order. It passes the titles of the groups declared with a title
+(ACE-364) to FormEngine as `itemGroups`, and FormEngine lists those groups
+first, in their declaration order, and appends the groups it only finds in the
+items. A group without a title therefore comes after all groups with one.
+
 ## The loader keeps its order
 
 `CategoryTypeLoader::loadUncached()` still returns the types keyed by
