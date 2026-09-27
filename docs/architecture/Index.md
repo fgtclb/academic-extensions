@@ -27,6 +27,11 @@ This branch supports **TYPO3 v12 and v13**.
   anchor and the header **only** when it goes through the `Default` layout of
   whichever package provides `lib.contentElement`. A template without it gets
   none of them, however complete its Appearance tab looks in the backend.
+- Category types are ordered **in one place**,
+  `CategoryTypeRegistry::attach()`: by priority, the highest first, and in
+  declaration order where priorities are equal. No consumer sorts types, so the
+  program categories, the list filters, the page module summary and the type
+  select of a category follow without a change.
 - The category summary of the page module is **one implementation in
   `category_types`** and three four-line listeners on
   `ModifyPageLayoutContentEvent`, registered with the `event.listener` tag
@@ -53,6 +58,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                                   |
 | [Form data transformation](form-data-transformation.md)         | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                                        |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                     |
+| [Category type order](category-type-order.md)                   | Where the priority order of category types is decided, why in the registry, and what the flat list and the cache do.                                                |
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.                          |
 | [List filter types](list-filter-types.md)                       | Which category filters the partner, project and program lists offer, in which order and how many right away, options without results, and the per-type "All" label. |
 | [Label overrides](label-overrides.md)                           | How a site overrides a label through `_LOCAL_LANG`, and the extension name that decides the path.                                                                   |

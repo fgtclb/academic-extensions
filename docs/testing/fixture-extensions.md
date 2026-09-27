@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Twelve such fixture extensions exist, in seven of the twelve extensions, and
+Thirteen such fixture extensions exist, in seven of the twelve extensions, and
 the table below lists all of them. That is the whole population — this is a
 mechanism used sparingly and only where nothing smaller works. Count them with:
 
@@ -33,12 +33,13 @@ They sit next to the tests that use them, under
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`    | An `ext_localconf.php` replacing the Guzzle handler stack.               |
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`     | Simplified Fluid templates and the TypoScript pointing at them.          |
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`     | Two listeners narrowing the profile and contract queries of the plugins. |
+| `test_programs_category_type_priority` | `tests/programs-category-type-priority` | `academic-programs`    | A `CategoryTypes.yaml` raising the priority of a programs type.          |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`    | A `CategoryTypes.yaml` adding one type to the programs group.            |
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Six of the twelve have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
-other six are pure resources. Only `test_bitejobs_stub` and
+Six of the thirteen have a `Classes/` folder with a `TESTS\…` PSR-4 root; the
+other seven are pure resources. Only `test_bitejobs_stub` and
 `test_partners_stub` ship an `ext_localconf.php`, which is how they replace the
 Guzzle handler stack before any request is built. The `ext_emconf.php` is
 checked like every other one: its `depends` names extension keys, and a
