@@ -131,11 +131,12 @@ Measured with
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
 | `#[Exclude]`         | 16    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
 | `#[AsEventListener]` | 6     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
-| `#[AsCommand]`       | 2     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
+| `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
 (`Symfony\Component\Console\Attribute\AsCommand`), not a DI one, on the
-geocoding command and on `academic-base/Classes/Command/UpgradeCheckCommand.php`;
+geocoding command, on `academic-base/Classes/Command/UpgradeCheckCommand.php`
+and on `academic-projects/Classes/Command/MigrateProjectDepartmentsCommand.php`;
 the other three commands in `academic-persons` are still registered with
 `console.command` tags in YAML. The `#[AsEventListener]` sites are TYPO3's
 attribute (see below): the `RegisterAcademicPageDoktype` and the

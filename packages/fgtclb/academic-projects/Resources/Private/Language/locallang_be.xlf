@@ -125,7 +125,7 @@
       <trans-unit id="sys_category.projects.group">
         <source>Academic Projects</source>
       </trans-unit>
-      <trans-unit id="sys_category.projects.department">
+      <trans-unit id="sys_category.projects.project_department">
         <source>Department</source>
       </trans-unit>
       <trans-unit id="sys_category.projects.competence_field">

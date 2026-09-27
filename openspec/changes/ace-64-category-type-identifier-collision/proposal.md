@@ -16,20 +16,25 @@ around it.
   declaring such an identifier fails at load time instead of producing a
   broken select.
 - **BREAKING** `academic_projects` (`packages/fgtclb/academic-projects`): the
-  department type is renamed to `project_department`. Templates, filters and
-  `CategoryTypes.yaml` overrides naming the projects department must follow.
+  department type is renamed to `project_department`, with its label key and
+  icon identifier. Templates, label overrides, filters and
+  `CategoryTypes.yaml` overrides naming the projects department must follow,
+  and so must the filter setting `plugin.tx_academicprojects.filter.categoryTypes`
+  and the filter links of the project list, which carry the identifier as the
+  parameter name.
 - `academic_projects` ships a console command,
   `academic:projects:department:migrate`, that moves stored department
   categories to `project_department`. It is not an upgrade wizard, because no
-  new wizard is added while TYPO3 v13 is supported (ACE-294). The command:
-  - a category assigned only to project pages is moved, with its
-    translations;
-  - without `academic_programs` installed, every `department` category is
-    moved;
-  - a category assigned only to program pages stays unchanged;
-  - a category assigned to both, or to no page, stays unchanged and is listed
-    for a manual decision;
-  - can be run again, moving only what is left.
+  new wizard is added while TYPO3 v13 is supported (ACE-294). What it does:
+  - A category assigned to a project page and to no program page moves,
+    with its translations and workspace versions. Pages of other types
+    decide nothing.
+  - Without `academic_programs` installed, every `department` category
+    moves.
+  - A category assigned to program pages only stays unchanged.
+  - A category assigned to program and project pages, or to no program or
+    project page, stays unchanged and is listed for a manual decision.
+  - It can be run again and moves only what is left.
 - `academic_programs` (`packages/fgtclb/academic-programs`) keeps
   `department`.
 - The development seed moves its project department category to the new
@@ -71,8 +76,6 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-16`). Three of the six analysed projects carry their own code for
-this today. The change implements the existing issue ACE-64 and is renamed to
-`ace-64-category-type-identifier-collision` once that issue is verified in
-YouTrack before implementation starts.
+this today. The change implements the existing issue ACE-64.
 
 Implements ACE-64.

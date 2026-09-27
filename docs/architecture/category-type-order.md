@@ -85,6 +85,8 @@ is rebuilt in a `finally` block so that it includes them too.
 
 ## See also
 
+- [Category type identifiers](category-type-identifiers.md) — the loader
+  refuses an identifier two groups declare before the registry sorts anything.
 - [Program facts](program-facts.md) — the facts follow the order when the field
   list names no types.
 - [List filter types](list-filter-types.md) — a list offers its filters in this
