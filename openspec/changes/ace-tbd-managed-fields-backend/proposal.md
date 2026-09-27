@@ -51,7 +51,7 @@ None.
 - The frontend editor. It is a change of its own
   (`ace-tbd-managed-fields-editor`) built on the same settings.
 - Changing the global `readonly` flag or its leak into TCA; that is
-  `ace-tbd-frontend-only-readonly-flag`.
+  `ace-756-frontend-only-readonly-flag`.
 - Enforcing the lock in DataHandler. An admin, an import or a script may still
   write a managed field; this is a presentation lock of the backend form.
 - Translation records: they keep the behaviour core gives them.

@@ -27,7 +27,7 @@ See `proposal.md` for the motivation. What exists on `main`:
 
 - Enforcing the lock in DataHandler.
 - Touching the existing `readonly` flag (see
-  `ace-tbd-frontend-only-readonly-flag`).
+  `ace-756-frontend-only-readonly-flag`).
 
 ## Decisions
 

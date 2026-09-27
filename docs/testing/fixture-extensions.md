@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Thirty-six such fixture extensions exist, in nine of the twelve extensions.
+Forty-one such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -33,6 +33,7 @@ They sit next to the tests that use them, under
 | `test_contract_contact_actions`        | `tests/test-contract-contact-actions`   | `academic-persons-edit` | A `Settings.yaml` narrowing the actions of the contracts section.             |
 | `test_current_color_icons`             | `tests/current-color-icons`             | `academic-base`         | Icons registered through the `currentColor` icon provider.                    |
 | `test_exclude_file_column`             | `tests/test-exclude-file-column`        | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
+| `test_frontend_readonly`               | `tests/test-frontend-readonly`          | `academic-persons`      | Frontend-only field locks, also loaded by the `academic-persons-edit` tests.  |
 | `test_frontend_user_sync`              | `tests/test-frontend-user-sync`         | `academic-persons`      | A `Settings.yaml` synchronisation map and the `fe_users` columns it reads.    |
 | `test_hidden_content_types`            | `tests/hidden-content-types`            | `academic-base`         | Two content types hidden by page TSconfig, one in the academic group.         |
 | `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`         | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
@@ -45,6 +46,7 @@ They sit next to the tests that use them, under
 | `test_plugin_action_context`           | `tests/test-plugin-action-context`      | `academic-persons`      | A listener recording the content element of an event's plugin context.        |
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
 | `test_plugin_view_event`               | `tests/test-plugin-view-event`          | `academic-base`         | A recording plugin view listener, a leftover one, three probe templates.      |
+| `test_position_fields`                 | `tests/test-position-fields`            | `academic-persons`      | A `Settings.yaml` listing every field of the position line.                   |
 | `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Partial overrides in two paths, a card passing a page, an old list template.  |
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |
 | `test_profile_update_recorder`         | `tests/test-profile-update-recorder`    | `academic-persons-edit` | A listener recording every profile update announcement, frontend included.    |
@@ -59,11 +61,14 @@ They sit next to the tests that use them, under
 | `test_upgrade_check`                   | `tests/test-upgrade-check`              | `academic-base`         | The extension whose templates the upgrade check compares an override with.    |
 | `test_upgrade_check_project`           | `tests/test-upgrade-check-project`      | `academic-base`         | A project site package overriding templates of the fixture above.             |
 | `test_upgrade_check_shared`            | `tests/test-upgrade-check-shared`       | `academic-base`         | A shared partial package the checked fixture extension requires.              |
+| `test_visibility_switch_disabled`      | `tests/test-visibility-switch-disabled` | `academic-persons-edit` | A `Settings.yaml` disabling the profile visibility switch.                    |
+| `test_visibility_switch_readonly`      | `tests/test-visibility-switch-readonly` | `academic-persons-edit` | A `Settings.yaml` making the profile visibility switch read-only.             |
+| `test_visibility_switch_removed`       | `tests/test-visibility-switch-removed`  | `academic-persons-edit` | A `Settings.yaml` removing the profile visibility switch with `~`.            |
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twelve of the thirty-five have a `Classes/` folder with a `TESTS\…` PSR-4 root;
-the other twenty-three are pure resources. The `ext_emconf.php` is checked like
+Twelve of the forty-one have a `Classes/` folder with a `TESTS\…` PSR-4 root.
+The other twenty-nine are pure resources. The `ext_emconf.php` is checked like
 every other one: its `depends` names extension keys, and a fixture extension
 may name another fixture extension, which a real extension may not — see
 [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).

@@ -67,11 +67,12 @@ with that key or `propertyName` in the set's target map, and the
 `profileInformation` set onto the `validators` map of every timeline section;
 `profileInformationsTypes.<id>` refines the `label` of the document section
 with that key. The rule is *overlay, not replace*: a legacy set
-decides the five flags the old shape knew (`required`, `readonly`, `disabled`,
-`email`, `number`) for every field of its target — an unlisted field loses them,
-exactly as it was unconfigured before, which is what made the 2.x manual's
-example unlock the name fields by not listing them — and the flags it could not
-express (`url`, `date`, `tel`, `textarea`, `html`) stay as shipped. Two things
+decides the six flags the old shape knew (`required`, `readonly`, `disabled`,
+`email`, `number` and, since 2.4, `frontendreadonly`) for every field of its
+target — an unlisted field loses them, exactly as it was unconfigured before,
+which is what made the 2.x manual's example unlock the name fields by not
+listing them — and the flags it could not express (`url`, `date`, `tel`,
+`textarea`, `html`) stay as shipped. Two things
 are lossy and end up in the migration's `notes`: an eighth type under
 `profileInformationsTypes` is reported, not created — it would need a profile
 relation and a TCA column — and a `type` or `fieldName` under such a key is
@@ -128,18 +129,19 @@ array the graph was built from.
 The recognised flags, all matched case-insensitively
 (`ValidationNormalizer::normalizeValidation()` in `academic_base`):
 
-| Flag       | Effect                                                                  |
-|------------|-------------------------------------------------------------------------|
-| `required` | Adds `NotEmptyValidator`, and `required` + `minitems` to the TCA config |
-| `disabled` | Field must not be edited. Forces `readOnly`, and cancels `required`     |
-| `readonly` | Field is shown but not writable. Cancels `required`                     |
-| `email`    | Adds `EmailAddressValidator`, TCA `type` and input type `email`         |
-| `number`   | TCA `type` and input type `number` — no validator                       |
-| `url`      | Adds `UrlValidator` and input type `url` — TCA untouched                |
-| `date`     | Input type `date` only — the TCA column keeps its own `datetime` config |
-| `tel`      | Input type `tel` only — no format enforced, TCA untouched               |
-| `textarea` | Input type `textarea` only — TCA untouched                              |
-| `html`     | Input type `textarea` and `Validation::isRichText()` — TCA untouched    |
+| Flag               | Effect                                                                                    |
+|--------------------|-------------------------------------------------------------------------------------------|
+| `required`         | Adds `NotEmptyValidator`, and `required` + `minitems` to the TCA config                   |
+| `disabled`         | Field must not be edited. Forces `readOnly`, and cancels `required`                       |
+| `readonly`         | Field is shown but not writable. Cancels `required`                                       |
+| `frontendreadonly` | Like `readonly` for the frontend, and TCA untouched: the backend keeps `required` as well |
+| `email`            | Adds `EmailAddressValidator`, TCA `type` and input type `email`                           |
+| `number`           | TCA `type` and input type `number` — no validator                                         |
+| `url`              | Adds `UrlValidator` and input type `url` — TCA untouched                                  |
+| `date`             | Input type `date` only — the TCA column keeps its own `datetime` config                   |
+| `tel`              | Input type `tel` only — no format enforced, TCA untouched                                 |
+| `textarea`         | Input type `textarea` only — TCA untouched                                                |
+| `html`             | Input type `textarea` and `Validation::isRichText()` — TCA untouched                      |
 
 An unknown flag is kept in `Validation::$flags` and has no other effect.
 
@@ -259,16 +261,23 @@ the fix.
 ```php
 $readOnly = in_array('readonly', $flags, true);
 $disabled = in_array('disabled', $flags, true);
-$required = !$disabled && !$readOnly && in_array('required', $flags, true);
+$frontendReadOnly = in_array('frontendreadonly', $flags, true);
+$backendRequired = !$disabled && !$readOnly && in_array('required', $flags, true);
+$required = $backendRequired && !$frontendReadOnly;
 ...
 if ($disabled) {
     // @todo Investigate how to handle that for the backend / TCA FormEngine, therefore switch to
     //       readOnly for now
     $readOnly = true;
 }
+$tcaConfig['readOnly'] = $readOnly;
+...
+if ($frontendReadOnly) {
+    $readOnly = true;
+}
 ```
 
-Two consequences worth knowing:
+Three consequences worth knowing:
 
 - **`disabled` implies `readOnly`.** FormEngine has no per-field notion matching
   the HTML `disabled` attribute, so `disabled` is expressed to the backend as
@@ -279,6 +288,16 @@ Two consequences worth knowing:
   cannot be demanded of them, so no validator is generated. This is why the
   three shipped name fields produce no validators at all — all three are
   `readonly` and `disabled`.
+- **`frontendreadonly` is set after the TCA fragment.** `Validation::$readOnly`
+  and `$required` are what the frontend reads, `$tcaConfig` is what the backend
+  reads, and the flag changes only the first two. A `required` beside it still
+  gives the TCA `required` and `minitems`, because a backend editor can
+  correct the value an owner cannot. `readonly` or `disabled` beside it still
+  lock the TCA column. Rejected: making `readonly` itself frontend-only, which
+  would unlock the backend of every installation that relies on the shared
+  lock. A record an owner creates in the frontend is therefore stored without
+  such a field, and the record editor asks for it the next time the record is
+  saved there.
 
 `Validation::$fieldName` is the property name converted with
 `GeneralUtility::camelCaseToLowerCaseUnderscored()`, i.e. the database column,
@@ -327,6 +346,8 @@ the `range` of the year columns is untouched.
 
 So marking a field `disabled` or `readonly` in the YAML makes it read only in the
 backend record editor as well — by design, and for every backend user.
+`frontendreadonly` is the lock that stays out of the TCA, for a field that
+owners must not change and backend editors must be able to correct.
 
 There is one exception. `special.hidden` is the owner's visibility switch of the
 profile editor and writes the table's `disabled` enable column. Its flags decide
@@ -363,8 +384,8 @@ versus `Configuration/TCA/Overrides/` — not a doubt about the coupling itself.
    the profile validator `getProfileUpdateValidationSet()`, and the profile
    information validator the set of the section its record type belongs to — so a publication is never validated by the
    lecture section.
-3. **Transformation.** `disabled` and `readOnly` properties are never written to
-   the model, whatever the request contains — see
+3. **Transformation.** `disabled` and `readOnly` properties, `frontendreadonly`
+   ones included, are never written to the model, whatever the request contains — see
    [Form data transformation](form-data-transformation.md), which is where that
    rule and the traps around it are documented.
 

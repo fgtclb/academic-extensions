@@ -23,6 +23,9 @@ use TYPO3\CMS\Extbase\Validation\Validator\ValidatorInterface;
  * Flags are matched case-insensitively. `disabled` and `readonly` cancel
  * `required`, and `disabled` is expressed to the backend as `readOnly`,
  * because FormEngine has no per-field notion matching the HTML attribute.
+ * `frontendreadonly` locks the field for the frontend only: it cancels the
+ * frontend side of `required` and leaves the TCA fragment as it would be
+ * without the flag, so a backend editor can still correct the value.
  *
  * Only `required`, `email` and `url` produce an Extbase validator. `email`
  * and `number` also set the TCA column type; every other flag - `date`,
@@ -75,7 +78,9 @@ final class ValidationNormalizer
         $tcaConfig = [];
         $readOnly = in_array('readonly', $flags, true);
         $disabled = in_array('disabled', $flags, true);
-        $required = !$disabled && !$readOnly && in_array('required', $flags, true);
+        $frontendReadOnly = in_array('frontendreadonly', $flags, true);
+        $backendRequired = !$disabled && !$readOnly && in_array('required', $flags, true);
+        $required = $backendRequired && !$frontendReadOnly;
         $inputType = match (strtolower(trim($renderType))) {
             'select' => 'select',
             'checkbox' => 'checkbox',
@@ -98,8 +103,15 @@ final class ValidationNormalizer
         $tcaConfig['required'] = false;
         if ($required) {
             $validatorClassNames[] = NotEmptyValidator::class;
+        }
+        if ($backendRequired) {
             $tcaConfig['required'] = true;
             $tcaConfig['minitems'] = 1;
+        }
+        if ($frontendReadOnly) {
+            // Set after the TCA fragment on purpose, so the backend form stays
+            // exactly as it would be without the flag.
+            $readOnly = true;
         }
         if (in_array('email', $flags, true)) {
             $validatorClassNames[] = EmailAddressValidator::class;
