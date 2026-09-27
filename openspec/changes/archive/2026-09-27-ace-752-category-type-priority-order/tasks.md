@@ -115,4 +115,4 @@
 - [x] 6.4 `docs/` and the `typo3-category-types`
   `Documentation/Changelog/2.4/` entries updated in the same change;
   `README.md` and `CONTRIBUTING.md` only link.
-- [ ] 6.5 Archive the change as the last commit of the pull request.
+- [x] 6.5 Archive the change as the last commit of the pull request.
