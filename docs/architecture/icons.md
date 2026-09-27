@@ -17,14 +17,14 @@ grep -c "'provider' => CurrentColorSvgIconProvider" \
   packages/fgtclb/*/Configuration/Icons.php
 ```
 
-Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **69
-registrations in total: 27 with the core `SvgIconProvider` and 42 with
+Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **70
+registrations in total: 27 with the core `SvgIconProvider` and 43 with
 `CurrentColorSvgIconProvider`**:
 
 | Package                  | Registrations | `CurrentColorSvgIconProvider` |
 |--------------------------|---------------|-------------------------------|
 | `academic-jobs`          | 19            | 1                             |
-| `academic-persons`       | 16            | 15                            |
+| `academic-persons`       | 17            | 16                            |
 | `academic-persons-edit`  | 17            | 16                            |
 | `academic-study-plan`    | 7             | 3                             |
 | `academic-contact4pages` | 4             | 2                             |
@@ -32,7 +32,7 @@ registrations in total: 27 with the core `SvgIconProvider` and 42 with
 | `academic-bite-jobs`     | 1             | –                             |
 | `academic-programs`      | 2             | 2                             |
 
-The 42 are of three kinds. Twenty-two are control icons — the six of the public
+The 43 are of three kinds. Twenty-three are control icons, the seven of the public
 profile of `academic-persons` and the sixteen of the profile editing view of
 `academic-persons-edit`, all Bootstrap Icons. Nineteen are **record icons**:
 every identifier a TCA record type resolves through `ctrl.typeicon_classes`,
@@ -150,19 +150,19 @@ sizes both shapes the same.
   resolves — is drawn in `currentColor` and registered with
   `CurrentColorSvgIconProvider`. The record list, the page tree and FormEngine
   all take the *default* markup, so an `<img>` there keeps the ink of its file
-  on the dark cards of a dark backend colour scheme. That is 19 of the 42
+  on the dark cards of a dark backend colour scheme. That is 19 of the 43
   registrations today, plus the 20 programmatic `category_types.*` ones that ask
   for it with `inlineIcon: true` (ACE-523).
 - An **action or control icon** — an arrow, a pencil, a bin, a fold-out chevron —
   is registered the same way, for the same reason: it follows the text colour in
   the backend *and* in the frontend, with or without the `inline` argument. That
-  is 22 registrations, all Bootstrap Icons: the six
-  `academic-persons-*` icons of the public profile — envelope, phone, address,
-  room and the plus and minus of the fold-out entries — and the sixteen
+  is 23 registrations, all Bootstrap Icons: the seven
+  `academic-persons-*` icons of the public profile (envelope, phone, address,
+  room, clock and the plus and minus of the fold-out entries) and the sixteen
   `academic-persons-edit-*` controls of the profile editing view.
 - An **icon of a value** in the frontend is registered the same way, so it takes
   the colour of the text it stands in: `tx-academicprograms-info-credit-points`,
-  the last of the 42.
+  the last of the 43.
 - Everything else stays with the core `SvgIconProvider` — 27 registrations: the
   seventeen `academic_jobs-*` icons of the job detail fields, the three frontend
   controls of `academic-study-plan` (asked for with
@@ -373,7 +373,7 @@ identifier that no longer resolves, the second catches a rename in
 alone would also pass, since the placeholder replaces the identifier. Every
 plugin or content element rendering test that renders icons should carry both;
 `academic-persons/Tests/Functional/Plugins/AcademicPersonsPublicProfilePluginTest.php`,
-`profileRendersOnlyResolvableIcons()`, does so for the six icons of the public
+`profileRendersOnlyResolvableIcons()`, does so for the seven icons of the public
 profile.
 
 The registry is asserted on its own beside that:
