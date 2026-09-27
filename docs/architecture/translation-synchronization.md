@@ -408,6 +408,26 @@ default record, the duplicated translations that pre-3.0 installations already
 carry collapse to one rendered contact **without any database cleanup** — the
 legacy rows stay, they just stop being selected alongside their originals.
 
+## The visibility switch does not wait for the synchronizer
+
+The owner's visibility switch of the profile editor (ACE-50) writes `hidden`,
+an `l10n_mode => exclude` column, and a translation left visible would keep the
+profile public in its language. It therefore does not rely on the chain above,
+which runs only for the languages in `profile/allowedLanguages`.
+`ProfileVisibilityWriter` submits the value for the default-language uid as a
+DataHandler datamap of its own, marked `ProfileWriteCorrelation::Internal`, and
+core's `DataMapProcessor` carries it into every translation in the same run,
+the way a backend save does. The editor then announces the update like its
+other endpoints, so the synchronizer still runs where it is configured.
+
+The editor reaches a hidden profile through
+`ProfileRepository::findByFrontendUserIncludingHidden()`. Extbase overlays the
+translation through `PageRepository`, which reads the visibility aspect of the
+context and not the query settings, so that lookup lifts the aspect to hidden
+content while its query runs. Without it a hidden profile would come back in
+its default language in a translated site language, and every text edit made
+there would write the default record.
+
 ## Named gaps
 
 Stated so they are decisions, not surprises:

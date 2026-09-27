@@ -10,7 +10,7 @@ as `data-*` attributes on one element, the plugin root of
 
 | Group     | Count | Examples                                                         |
 |-----------|-------|------------------------------------------------------------------|
-| Endpoints | 15    | `data-update-url`, `data-toggle-document-visibility-url`         |
+| Endpoints | 16    | `data-update-url`, `data-toggle-document-visibility-url`         |
 | Profile   | 2     | `data-profile-uid`, `data-editor-language`                       |
 | Image     | 5     | `data-has-image`, `data-image-cropper-ratio`                     |
 | Messages  | 26    | `data-message-saving`, `data-message-document-delete-confirm`    |
