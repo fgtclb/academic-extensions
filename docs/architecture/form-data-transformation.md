@@ -145,7 +145,9 @@ synchronised into the profile — which is also why `skipSync` exists.
 `AcademicPersonsSettingsFactory` delegates to) computes:
 
 ```php
-$required = !$disabled && !$readOnly && in_array('required', $flags, true);
+$frontendReadOnly = in_array('frontendreadonly', $flags, true);
+$backendRequired = !$disabled && !$readOnly && in_array('required', $flags, true);
+$required = $backendRequired && !$frontendReadOnly;
 ...
 if ($disabled) {
     // @todo Investigate how to handle that for the backend / TCA FormEngine, therefore switch to
@@ -165,11 +167,18 @@ effect either.
 produces, so the `||` in rule 1 only distinguishes the two for a `Validation`
 built by hand.
 
+`frontendreadonly` sets `readOnly` as well, so rule 1 protects such a
+property exactly like a `readonly` one. The difference is on the backend
+side only: the flag leaves the TCA fragment alone, and a backend editor can
+still change the value. See
+[Validation settings](validation-settings.md#normalisation).
+
 **The same configuration also drives the TYPO3 backend**, deliberately: the TCA
 files merge the set of their own section in through `TcaValidationMerger`, so a
-locked field is read-only in the record editor as well. That coupling — and the
-reason the settings ship in `academic_persons` rather than in the edit
-extension — is documented in [Validation settings](validation-settings.md).
+field locked with `readonly` or `disabled` is read-only in the record editor as
+well. That coupling — and the reason the settings ship in `academic_persons`
+rather than in the edit extension — is documented in
+[Validation settings](validation-settings.md).
 
 ## Overriding the set in an instance
 

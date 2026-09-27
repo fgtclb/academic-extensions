@@ -12,8 +12,11 @@ backend lock field by field through TCEFORM.
   and the backend form stays editable.
 - `readonly` and `disabled` keep their current meaning in both places. When a
   field lists both `frontendreadonly` and `readonly`, `readonly` wins.
-- The flag works for profile, contract and contract contact fields, which
-  are all governed by `Settings.yaml`.
+- The flag works for profile, contract, contract contact and document
+  fields, which are all governed by `Settings.yaml`, and in the expanded map
+  form of a document field.
+- A pre-3.0 `validations` map that lists the flag keeps it when it is mapped
+  onto the section maps.
 
 This affects:
 
@@ -40,8 +43,9 @@ None.
 
 ## Impact
 
-- One more recognised flag in the validation normaliser. No change to the
-  merged TCA of fields that do not use it.
+- One more recognised flag in the validation normaliser, in the document
+  map form and in the legacy settings migrator. No change to the merged TCA
+  of fields that do not use it.
 - Documentation of the validator list in `Settings.yaml` and in the
   extension manual.
 
@@ -57,5 +61,4 @@ None.
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-08`). Three of the six analysed projects carry their own code for
 this today: two reset TCEFORM `readOnly`, one covers the same need in its
-settings. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-<slug>` when the issue is filed after implementation.
+settings. Tracked as ACE-756.

@@ -1,7 +1,7 @@
 ## Context
 
 - `ValidationNormalizer::normalizeValidation()`
-  (`academic-base/Classes/Settings/ValidationNormalizer.php:66-99`) derives
+  (`academic-base/Classes/Settings/ValidationNormalizer.php`) derives
   `readOnly` from `readonly` or `disabled`. It suppresses `required` for
   read-only fields and always writes `$tcaConfig['readOnly'] = $readOnly`.
 - `TcaValidationMerger::merge()` folds `tcaConfig` into the TCA columns with
@@ -46,6 +46,27 @@ editor can still be forced to fill the field.
 
 Rejected: suppressing `required` in both places, which would silently drop a
 backend constraint an integrator asked for.
+
+### The flag is part of the legacy vocabulary and of the document map form
+
+The document validators accept flags as `<flag>: true` in an expanded map.
+`frontendreadonly` is added to that list, so the map form and the flag list
+mean the same.
+
+The migrator of the pre-3.0 `validations` map decides a fixed set of flags
+for every field of its target and keeps every other flag of the section maps.
+Branch `2` gets the flag in the same release line (2.4), so its `validations`
+map knows it, and a 2.4 site package that is updated to 3.0 has to keep the
+lock exactly where it listed it. The flag therefore joins that set. Without
+it, a listed flag would still survive, but a section map entry for a field
+the legacy map does not list would keep a lock the installation never had.
+
+### Changelog placement
+
+The `academic_persons` entry goes into `Changelog/2.4`, because the backport
+ships the flag in 2.4 and the entry is the same on both branches. The
+`academic_base` entry goes into `Changelog/3.0`: the normaliser only exists
+there since 3.0, and branch `2` changes `academic_persons` alone.
 
 ### No core version split
 

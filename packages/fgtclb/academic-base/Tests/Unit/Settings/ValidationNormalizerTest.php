@@ -82,6 +82,90 @@ final class ValidationNormalizerTest extends UnitTestCase
                 flags: ['disabled', 'required'],
             ),
         ];
+        yield 'frontendreadonly: read-only in the frontend, the TCA fragment stays unlocked' => [
+            'flags' => ['frontendreadonly'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: true,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => false, 'required' => false],
+                inputType: 'text',
+                flags: ['frontendreadonly'],
+            ),
+        ];
+        yield 'frontendreadonly is matched case-insensitively' => [
+            'flags' => ['FrontendReadOnly'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: true,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => false, 'required' => false],
+                inputType: 'text',
+                flags: ['frontendreadonly'],
+            ),
+        ];
+        yield 'frontendreadonly with readonly: readonly still locks the TCA column' => [
+            'flags' => ['frontendreadonly', 'readonly'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: true,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => true, 'required' => false],
+                inputType: 'text',
+                flags: ['frontendreadonly', 'readonly'],
+            ),
+        ];
+        yield 'frontendreadonly with disabled: disabled still locks the TCA column' => [
+            'flags' => ['disabled', 'frontendreadonly'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: true,
+                readOnly: true,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => true, 'required' => false],
+                inputType: 'text',
+                flags: ['disabled', 'frontendreadonly'],
+            ),
+        ];
+        yield 'frontendreadonly with required: no frontend validator, TCA keeps required and minitems' => [
+            'flags' => ['required', 'frontendreadonly'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: true,
+                validatorClassNames: [],
+                tcaConfig: ['readOnly' => false, 'required' => true, 'minitems' => 1],
+                inputType: 'text',
+                flags: ['required', 'frontendreadonly'],
+            ),
+        ];
+        yield 'frontendreadonly with email: the email validator and TCA type stay' => [
+            'flags' => ['email', 'frontendreadonly'],
+            'expected' => new Validation(
+                identifier: 'firstName',
+                fieldName: 'first_name',
+                required: false,
+                disabled: false,
+                readOnly: true,
+                validatorClassNames: [EmailAddressValidator::class],
+                tcaConfig: ['readOnly' => false, 'required' => false, 'type' => 'email'],
+                inputType: 'email',
+                flags: ['email', 'frontendreadonly'],
+            ),
+        ];
         yield 'email: EmailAddressValidator, TCA type and input type' => [
             'flags' => ['email'],
             'expected' => new Validation(
