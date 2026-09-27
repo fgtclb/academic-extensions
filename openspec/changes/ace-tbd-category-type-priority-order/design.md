@@ -130,8 +130,8 @@ own order; that is the integrator's explicit choice, not a second rule.
   reorder after a cache flush. Named in an `Important-` changelog entry.
   Within this repository no package sets it.
 - [An override has to load after the owning extension] → the existing loader
-  requirement, documented by `ace-tbd-category-types-yaml-docs`; an override
-  of an unknown type still throws.
+  requirement, documented by ACE-751; an override of an unknown type still
+  throws.
 - [The TCA of `sys_category` is cached] → the new select order shows after a
   cache flush, like every change to a `CategoryTypes.yaml`.
 

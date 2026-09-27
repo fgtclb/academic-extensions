@@ -27,9 +27,12 @@
 
 ## 4. Documentation
 
-- [ ] 4.1 Document the `groups:` section on the `CategoryTypes.yaml` page of
-  `category_types` (from `ace-tbd-category-types-yaml-docs`, or its TCA page
-  if that has not landed), including the icon identifier scheme.
+- [ ] 4.1 Replace the note that the `groups:` section is not read on
+  `typo3-category-types/Documentation/Developers/CategoryTypes/Index.rst`
+  (added by ACE-751) with the documentation of the section, including the icon
+  identifier scheme, and update the item group statement of
+  `Documentation/Developers/TCA/Index.rst` and the group heading assertion of
+  `Tests/Functional/Configuration/SysCategoryTypeTest.php`.
 - [ ] 4.2 Add `typo3-category-types/Documentation/Changelog/3.0/Feature-CategoryTypeGroupTitlesAndIcons.rst`
   and `academic-partners/Documentation/Changelog/3.0/Feature-CategoryTypeGroupTitle.rst`
   from `Build/Documentation/Templates/Changelog-Feature.rst`.

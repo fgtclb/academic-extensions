@@ -77,5 +77,5 @@ analysed projects carry their own code for this today. No YouTrack issue is
 filed yet; the change is renamed to `ace-<NNN>-category-type-priority-order`
 when the issue is filed after implementation.
 
-Depends on `ace-tbd-category-types-yaml-docs`, which documents the
+Depends on ACE-751 (`ace-751-category-types-yaml-docs`), which documents the
 `useExisting` override that carries the `priority`.
