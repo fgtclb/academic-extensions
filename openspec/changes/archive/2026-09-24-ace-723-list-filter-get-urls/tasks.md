@@ -86,8 +86,8 @@
 ## 4. File the issue
 
 - [x] 4.1 After implementation, file the ACE issue in YouTrack (relates to
-  ACE-125): ACE-723, Story, Version 3.0.0, relates to ACE-125, ACE-612 and
-  THB-614. Rename the change to `ace-723-list-filter-get-urls`, and commit as
+  ACE-125): ACE-723, Story, Version 3.0.0, relates to ACE-125, ACE-612 and a
+  project issue. Rename the change to `ace-723-list-filter-get-urls`, and commit as
   `[FEATURE] ACE-723: Redirect list filters to GET URLs` in TYPO3 Core
   format.
 

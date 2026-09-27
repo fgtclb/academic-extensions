@@ -58,7 +58,8 @@ installation:
   the `ext_emconf.php` dependency keys of every extension, the extension name
   of every translation, in templates and in PHP, and the extension point
   policy: final and used event classes, and the `@api` tags against the page
-  that lists them.
+  that lists them. It also keeps the issue keys of customer projects out of
+  the sources of this public repository.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`,
   type `library`. Shared functional-test traits.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key

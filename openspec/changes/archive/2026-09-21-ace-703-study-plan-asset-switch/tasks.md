@@ -37,7 +37,7 @@
 ## 4. File the issue
 
 - [x] 4.1 ACE-703, filed after the gates were green and verified against the
-  API. Type `Story`, Version `3.0.0`, `relates to` HWG-143 and HWG-275.
+  API. Type `Story`, Version `3.0.0`, `relates to` two project issues.
 - [x] 4.2 Renamed to `ace-703-study-plan-asset-switch`, and the three other
   changes referencing it by name updated with it.
 - [x] 4.3 Two commits rather than one, because the hidden filter template item

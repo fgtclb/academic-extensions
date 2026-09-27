@@ -18,7 +18,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Target behaviour of the translation synchronization for `academic_contacts4pages`
- * contact records (ACE-484, resolving ACE-103 / HNEE-1249).
+ * contact records (ACE-484, resolving ACE-103).
  *
  * A contact is an inline child of a contract (foreign_field `contract`), so the
  * DataHandler cascade of a profile synchronization localizes the contract and the
@@ -295,7 +295,7 @@ final class ContactTranslationSynchronizationTest extends AbstractAcademicContac
     }
 
     /**
-     * The real-world value of the read-side fix (HNEE-class installations): a legacy
+     * The real-world value of the read-side fix, for installations with old data: a legacy
      * duplicated contact translation that an earlier synchronizer version already
      * wrote into the database - page untranslated, `page` column copied verbatim -
      * collapses to one contact per language context without any database cleanup.

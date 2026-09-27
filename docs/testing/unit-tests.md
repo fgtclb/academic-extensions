@@ -83,8 +83,9 @@ own — they are exercised only through the extensions that use them.
 the check that every `ext_emconf.php` of the repository names its dependencies
 by extension key, see [below](#the-ext_emconfphp-dependency-keys), the one
 that every translation names its extension without an underscore, see
-[below](#the-extension-name-of-translations), and the extension point checks,
-see [below](#the-extension-points).
+[below](#the-extension-name-of-translations), the extension point checks,
+see [below](#the-extension-points), and the check that no source file names an
+issue of a customer project, see [below](#customer-issue-keys).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -389,6 +390,31 @@ classes below `packages/fgtclb/*/Classes/` with PHP's tokenizer and asserts:
 It lives in `packages-dev/monorepo-shared` for the same reason as the two
 checks above: it looks at every extension at once, and a split-out extension
 has nothing to compare against.
+
+## Customer issue keys
+
+The repository is public, so no file in it names an issue of a customer
+project: the key tells the reader which customer reported what, and the
+tracker behind it is private.
+[`CustomerIssueKeyTest`](../../packages-dev/monorepo-shared/Tests/Unit/CustomerIssueKeyTest.php)
+holds that for the files, and the rule itself is in
+[Commit messages](../workflow/commit-messages.md#issue-references).
+
+The test cannot list the customer projects, because the list would name them.
+It refuses every reference of the shape `ABC-NNN` instead, meaning two to five
+capital letters, a hyphen and a number, unless the prefix is on its short list of
+known ones: `ACE`, and licence, standard and advisory names such as
+`GPL-2.0`, `UTF-8`, `PSR-14` or `CVE-2026`. A new name of
+that kind goes into `KNOWN_PREFIXES`, a customer key never does. A prefix of
+six letters or more is not checked, and none exists.
+
+It reads the text files of the repository root, `.github/`, `Build/`, `bin/`,
+the `config/` directories of the two development instances, `docs/`,
+`openspec/`, `packages/` and `packages-dev/`. It skips what composer, npm, the
+documentation renderer, the test bootstrap and the instances write, the
+machine-local `*.local.*` files, symbolic links (their target is read) and
+binaries. `git ls-files` is not an option, because in a git worktree the git
+directory is outside the directory the test container mounts.
 
 ## See also
 
