@@ -134,7 +134,7 @@ The `Breaking-` entries map each subclass purpose to its replacement.
 - Additional view variables, or a replaced or reduced result: a listener of
   the list event.
 - The partnership list and teaser actions, which that change gives no
-  event: the plugin view event of `ace-tbd-generic-plugin-view-event`.
+  event: the plugin view event of `ace-750-generic-plugin-view-event`.
 - Pagination of the partner list: the FlexForm option of
   `ace-727-partner-list-pagination`.
 - Bookmarkable filter URLs: the redirect of `ace-723-list-filter-get-urls`.
@@ -154,7 +154,7 @@ The `Breaking-` entries map each subclass purpose to its replacement.
 `DetailsController`:
 
 - Changing the program or adding view variables of the details plugin: a
-  listener of the plugin view event of `ace-tbd-generic-plugin-view-event`.
+  listener of the plugin view event of `ace-750-generic-plugin-view-event`.
   `ModifyProgramDataEvent` of `ace-tbd-program-psr14-events` changes the
   data of the program page template, which is rendered by a data
   processor, not by this controller.
@@ -167,7 +167,7 @@ The `Breaking-` entries map each subclass purpose to its replacement.
 - Removing, enriching or grouping the postings: a listener of
   `AfterBiteJobsFetchedEvent`.
 - Additional view variables: a listener of the plugin view event of
-  `ace-tbd-generic-plugin-view-event`.
+  `ace-750-generic-plugin-view-event`.
 
 For every controller, the plugin registration: remove the project's own
 `configurePlugin()` call or XCLASS registration that points at the
@@ -186,7 +186,7 @@ without an event removes the only extension point:
   `ProjectController`;
 - `ace-tbd-program-psr14-events` for `ProgramController`;
 - `ace-tbd-bite-jobs-request-result-events` for `BiteJobsController`;
-- `ace-tbd-generic-plugin-view-event` for `DetailsController`, the two
+- `ace-750-generic-plugin-view-event` for `DetailsController`, the two
   partnership actions of `PartnerController` and additional view variables
   of `BiteJobsController`. None of the three changes above dispatches an
   event there, so without it the rule of every finalised controller having
@@ -194,7 +194,7 @@ without an event removes the only extension point:
   details event in `ace-tbd-program-psr14-events`; the precondition task
   accepts either.
 
-Because `ace-tbd-generic-plugin-view-event` lands after
+Because `ace-750-generic-plugin-view-event` lands after
 `ace-749-extension-point-policy`, this change does too, and its
 documentation can name the policy page.
 

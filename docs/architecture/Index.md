@@ -57,6 +57,11 @@ describing an intention as if it were the state.
   partner map's "no coordinates, not drawn" - is applied *after* the demand
   event, so a listener cannot take it away. Everything else it can: the demand
   *is* the query, so a listener widens as easily as it narrows.
+- Every plugin of seven academic extensions dispatches **one** view event, the
+  same for all of them, after the action assigned its own variables and before
+  the one it protects, the validations of the job form. The per-action view
+  events of the jobs and persons plugins are gone; a listener checks the plugin
+  and action on the context. The profile editing is left out.
 - A filter or sorting submission of a list plugin answers with a **`303` to a
   GET URL** carrying the selection, built from the demand object rather than
   the request. The sorting is always in it, because only the bare page applies
@@ -98,7 +103,7 @@ describing an intention as if it were the state.
 |-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Core version aware code](core-version-aware-code.md)           | The version switches that exist today, the one data structure split and what a `Core13/`/`Core14/` PHP split would look like, and the APIs that cannot be migrated while v13 is supported. |
 | [Dependency injection](dependency-injection.md)                 | How services are configured across the extensions, why they must be stateless, where a value per request goes instead, and which TYPO3 attributes are safe on both core versions.          |
-| [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, the traps in Extbase models, and what is public API and how an event is shaped.                                    |
+| [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, traits, the traps in Extbase models, and what is public API and how an event is shaped.                            |
 | [Database queries](database-queries.md)                         | Quoting value lists, keeping a constraint on the builder that executes it, ordering every result a caller renders or limits, and reusing a list's query to ask about it.                   |
 | [Frontend-user contact import](frontend-user-contact-import.md) | How telephone and fax data from `fe_users` is identified, typed, synchronized and migrated.                                                                                                |
 | [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                                                          |
@@ -111,6 +116,7 @@ describing an intention as if it were the state.
 | [Page type rendering](page-type-rendering.md)                   | How the page types refine the site's page object: `FLUIDTEMPLATE` against `PAGEVIEW`, the path keys, the layout contract and its fallback.                                                 |
 | [Program facts](program-facts.md)                               | The one builder behind the facts of the program page, the details element and the program card, what an empty field list means, and the partial per row.                                   |
 | [List plugin events](list-plugin-events.md)                     | The demand and list events of the partner and project lists, the plugin context they carry, and the rules that are easy to get wrong.                                                      |
+| [Plugin view event](plugin-view-event.md)                       | The one view event the plugins of seven extensions dispatch, where each action calls it, what a listener cannot change, and the test that renders every plugin.                            |
 | [List filter URLs](list-filter-urls.md)                         | The redirect of a filter submission, the demand in its URL, what is carried and why, the links of a pagination and of the profile list, and why an enhancer declares no defaults.          |
 | [List filter types](list-filter-types.md)                       | Which category filters a list offers, in which order and how many right away, options without results, the per-type "All" label, and the program finder.                                   |
 | [Label overrides](label-overrides.md)                           | How a site overrides a label through `_LOCAL_LANG`, the extension name that decides the path on v13 and v14, and the PHP places that hand the request on.                                  |

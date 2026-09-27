@@ -13,6 +13,9 @@ they replace the only alternative there used to be: subclassing
 Which classes of this extension are public API, and what that promises, is
 stated for all academic extensions on the `extension points page of
 academic_base <https://docs.typo3.org/p/fgtclb/academic-base/main/en-us/Developers/ExtensionPoints/Index.html>`__.
+Both project list plugins also dispatch :php:`ModifyPluginViewEvent` of
+:guilabel:`academic_base` when they render, after the list event; that page
+describes it.
 
 ..  _developers-project-events:
 

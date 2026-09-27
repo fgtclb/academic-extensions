@@ -30,8 +30,9 @@
 
 - [ ] 4.1 Add the publish rule to the contract selection and its value object;
   verify 3.1, 3.2 and 3.4 pass.
-- [ ] 4.2 Apply the rule to the selected contracts after
-  `ModifySelectedContractsEvent`; verify 3.3 passes.
+- [ ] 4.2 Apply the rule to the selected contracts right after the query and
+  before they are sorted and assigned (the selected contracts event there was
+  removed with the generic plugin view event); verify 3.3 passes.
 - [ ] 4.3 Remove the rule on purpose and watch 3.1 to 3.3 go red; restore.
 - [ ] 4.4 Check the existing persons functional fixtures for contracts with
   `publish = 0` that now disappear from rendered output, and adjust each

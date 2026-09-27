@@ -32,13 +32,17 @@ answers the POST with a redirect before the demand event, and both events fire
 on the GET request that follows, with the selection in the query string rather
 than in the parsed body. See [List filter URLs](list-filter-urls.md).
 
-`academic_persons` has the same pair in a different place.
-`ModifyListProfilesEvent` is its list event and sits in the controller like
-these; its *narrowing* point is `ModifyProfileQueryEvent`, which hangs in the
-repository and hands the listener the Extbase query rather than the demand,
-because four content elements share that one query. Both shapes are supported
-API; which one an extension has follows from where its filtering lives, and
-neither is to be converted into the other without a reason.
+`academic_persons` narrows in a different place, and has no list event. Its
+demand event, `ModifyProfileDemandEvent`, and its *narrowing* point,
+`ModifyProfileQueryEvent`, hang in the repository, the query event handing the
+listener the Extbase query rather than the demand, because four content
+elements share that one query. Both shapes are supported API; which one an
+extension has follows from where its filtering lives, and neither is to be
+converted into the other without a reason. The list event it had,
+`ModifyListProfilesEvent`, went in 3.0 with the other per-action view events: a
+variable for the view comes from the [plugin view event](plugin-view-event.md),
+which every plugin of seven academic extensions dispatches, the partner and
+project lists after their list event.
 
 ## Every event carries the plugin context
 
@@ -59,13 +63,14 @@ on the context are the settings of the content element that is rendering, so a
 listener can read a FlexForm field an editor filled in.
 
 `academic_persons` has a second, older context of its own under
-`FGTCLB\AcademicPersons\Domain\Model\Dto\`, which the persons events declare
-because they were written before the shared one existed. Since 3.0 its interface
-extends the `academic_base` one, so a listener typed against the shared
-interface takes a persons context as well, and the persons actions hand the same
-object to their own event and to the repository's query event. Interface and
-class are deprecated and go in 4.0 (ACE-747), when the persons events declare
-the `academic_base` interface. New events take the `academic_base` one.
+`FGTCLB\AcademicPersons\Domain\Model\Dto\`, which its page title placeholder
+event still declares because it was written before the shared one existed. Since
+3.0 its interface extends the `academic_base` one, so a listener typed against
+the shared interface takes a persons context as well, and the persons actions
+hand a persons context to the repository's query events and to the page title.
+Interface and class are deprecated and go in 4.0 (ACE-747), when that event
+declares the `academic_base` interface. New events take the `academic_base`
+one, and the plugin view event builds its own.
 
 ## Rules that are easy to get wrong
 

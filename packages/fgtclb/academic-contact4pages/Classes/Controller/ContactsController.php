@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicContacts4pages\Controller;
 
+use FGTCLB\AcademicBase\Controller\DispatchModifyPluginViewEventMethodTrait;
 use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
 use FGTCLB\AcademicContacts4pages\Service\AddressRecordProvider;
 use FGTCLB\AcademicContacts4pages\Service\PageContactsProvider;
@@ -14,6 +15,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 final class ContactsController extends ActionController
 {
+    use DispatchModifyPluginViewEventMethodTrait;
     use GetCurrentContentRecordMethodTrait;
 
     private PageContactsProvider $pageContactsProvider;
@@ -61,6 +63,7 @@ final class ContactsController extends ActionController
             'roles' => $pageContacts->roles,
             'contactsWithoutRole' => $pageContacts->contactsWithoutRole,
         ]);
+        $this->dispatchModifyPluginViewEvent($this->request, $this->settings, $this->view, $this->eventDispatcher);
 
         return $this->htmlResponse();
     }

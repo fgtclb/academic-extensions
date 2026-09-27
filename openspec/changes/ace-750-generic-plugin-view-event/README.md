@@ -1,3 +1,3 @@
-# ace-tbd-generic-plugin-view-event
+# ace-750-generic-plugin-view-event
 
 Generic plugin view event in academic_base

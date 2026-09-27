@@ -7,7 +7,8 @@
   - jobs `JobController`: `list`, `show` (early return without a job), `new`;
   - `PartnerController`: `list`, `map`, `partnershipsList`,
     `partnershipsTeaser`;
-  - programs `ProgramController::list` and `DetailsController::show`;
+  - programs `ProgramController::list`, `ProgramController::finder` and
+    `DetailsController::show`;
   - `ProjectController::list`, `ContactsController::list`,
     `BiteJobsController::list`.
 - `FGTCLB\AcademicJobs\Event\ModifyJobControllerNewActionViewEvent` is the
@@ -46,7 +47,7 @@
 ### One generic event instead of one event per action
 
 `FGTCLB\AcademicBase\Event\ModifyPluginViewEvent` with
-`getPluginControllerActionContext()` and `getView()`. Rejected: seventeen
+`getPluginControllerActionContext()` and `getView()`. Rejected: eighteen
 `Modify<Plugin><Action>ViewEvent` classes, each to be documented, tested and
 kept in step. A listener that needs one action checks the action name on the
 context.
@@ -65,15 +66,25 @@ assignment that must stay protected.
 
 Rejected: overriding `htmlResponse()` in the trait so no path can be missed.
 It would fire after the jobs `validations` assignment and make it
-replaceable, and a trait method silently shadows an override a project
-controller might add. The coverage risk is handled by the functional test
+replaceable. It would not protect the event from a project subclass either:
+a subclass of a controller that is not `final` yet that overrides
+`htmlResponse()` or an action without calling the parent drops the dispatch
+in both designs. The coverage risk is handled by the functional test
 enumerating every rendering path instead.
 
 ### The context is the academic_base one, for persons as well
 
-The event is typed against the `academic_base` context interface. The persons
-actions pass their persons context, which satisfies that interface once
-`ace-442-single-action-context-interface` has landed.
+The event is typed against the `academic_base` context interface, and the
+trait builds that context itself for every action, the persons actions
+included, at the moment it dispatches. The listener therefore reads the
+settings as the action left them: the persons list turns its pagination off
+under a letter after the query, and a context built before the query would
+still say it is on. They can differ from `{settings}` in the view, which
+Extbase assigns before the action runs.
+
+Rejected: passing the persons context the persons actions build for their
+query events. It is deprecated for 4.0 (ACE-747) and adds nothing to the
+`academic_base` interface, so a new event has no reason to hand it out.
 
 ### Decided: lands last, after the context and the policy change
 
@@ -107,8 +118,13 @@ that checks the action name on the context, linking
 `Feature-ModifyPluginViewEvent.rst`. They also list what the generic event
 does not carry, with its replacement:
 
-- the list demand: `ModifyProfileDemandEvent`, before the query;
-- the detail page title format: the plugin setting `pageTitleFormat`;
+- the list demand: `ModifyProfileDemandEvent`, before the query. It reaches
+  the repository only, the query and the letters offered; the active letter,
+  the pagination and the order of a manual selection follow the demand of
+  the request, where the demand handed back by the removed list event drove
+  them;
+- the detail page title format: the plugin setting `pageTitleFormat`, or
+  its TypoScript value for every content element that sets none;
 - replacing the profiles, contracts or the detail profile after the query:
   reassigning the view variable in a listener of the generic event; the
   page title and the pagination keep using the queried result.
@@ -125,14 +141,16 @@ event, which already runs on both versions. Nothing else differs.
 
 ## Risks / Trade-offs
 
-- [A listener overrides a variable the controller assigned] → documented as
-  unsupported beyond adding variables; the protected ones stay out of reach.
+- [A listener overrides a variable the controller assigned] → it replaces
+  the variable in the view only, and the documentation says so; what the
+  action computed from the query keeps the queried result, and the one
+  protected variable, the job form's `validations`, stays out of reach.
 - [A new action forgets the dispatch] → the functional test lists every
   rendering path; the contributor rule of `ace-749-extension-point-policy`
   requires the call for new actions.
 - [A project relies on a removed event to change data after the query] →
   the `Breaking-` entry names each setter and its replacement; filtering
-  belongs into the demand event.
+  belongs in the demand event.
 - [A leftover listener stays unnoticed at runtime] → it is never called and
   raises nothing; the `Breaking-` entry says to search for the five class
   names, and phpstan reports them.
