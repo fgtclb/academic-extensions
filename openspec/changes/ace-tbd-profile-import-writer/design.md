@@ -9,7 +9,7 @@ TCA `readOnly`, so read-only identifier columns are writable.
 
 The change needs three others first: the identifier lookup
 (`ace-tbd-import-identifier-lookup`), the managed-field resolver
-(`ace-tbd-managed-fields-backend`) and the announcement of DataHandler writes
+(`ace-758-managed-fields-backend`) and the announcement of DataHandler writes
 (`ace-725-backend-save-announces-profile-update`).
 
 ## Goals / Non-Goals

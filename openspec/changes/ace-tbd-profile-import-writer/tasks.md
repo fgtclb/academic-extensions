@@ -1,7 +1,7 @@
 ## 1. Prerequisites
 
 - [ ] 1.1 Confirm `ace-tbd-import-identifier-lookup`,
-  `ace-tbd-managed-fields-backend` and
+  `ace-758-managed-fields-backend` and
   `ace-725-backend-save-announces-profile-update` are merged; stop
   otherwise. The writer lives in `academic_persons`; `academic_persons_sync`
   is left untouched (see design).

@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Forty-one such fixture extensions exist, in nine of the twelve extensions.
+Forty-three such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -40,6 +40,8 @@ They sit next to the tests that use them, under
 | `test_language_files`                  | `tests/language-files`                  | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                           |
 | `test_legacy_settings`                 | `tests/test-legacy-settings`            | `academic-persons`      | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.            |
 | `test_literal_helptext`                | `tests/test-literal-helptext`           | `academic-persons-edit` | A `Settings.yaml` with literal help texts for a contract and a contact field. |
+| `test_managed_fields`                  | `tests/test-managed-fields`             | `academic-persons`      | A `Settings.yaml` naming managed fields of four record types.                 |
+| `test_managed_fields_mistake`          | `tests/test-managed-fields-mistake`     | `academic-persons`      | A `Settings.yaml` misspelling a managed contract field.                       |
 | `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`      | A deliberately misbehaving profile factory and two event listeners.           |
 | `test_partner_list_events`             | `tests/test-partner-list-events`        | `academic-partners`     | Two listeners on the partner demand and list events, and a list template.     |
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
@@ -67,8 +69,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twelve of the forty-one have a `Classes/` folder with a `TESTS\…` PSR-4 root.
-The other twenty-nine are pure resources. The `ext_emconf.php` is checked like
+Twelve of the forty-three have a `Classes/` folder with a `TESTS\…` PSR-4 root.
+The other thirty-one are pure resources. The `ext_emconf.php` is checked like
 every other one: its `depends` names extension keys, and a fixture extension
 may name another fixture extension, which a real extension may not — see
 [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).

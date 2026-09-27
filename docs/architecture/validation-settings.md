@@ -23,8 +23,9 @@ does not have `academic_persons_edit` installed still gets the backend half.
 `packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml`
 is the only place the graph is defined — there is no second file in the edit
 extension, which `SettingsSourceTest` pins. Since ACE-503 it
-has four top-level maps for the profile, and since ACE-720 a fifth for the
-frontend user synchronisation:
+has four top-level maps for the profile, since ACE-720 a fifth for the
+frontend user synchronisation, and since ACE-758 a sixth for the fields a
+synchronisation owns:
 
 | Map                | Holds                                                                                                                                                                       |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -33,6 +34,7 @@ frontend user synchronisation:
 | `contracts`        | `fields` of the contract form, and `contactSections` — `physicalAddresses`, `emailAddresses`, `phoneNumbers` — with their own `fields`                                      |
 | `documentSections` | The sortable lists: the seven profile information types and `contracts`, each with `label`, `type`, `fieldName`, `rowFields`, `actions`, `validators`, `helptext`           |
 | `frontendUserSync` | Which `fe_users` column feeds which profile and contract property, see [Frontend-user contact import](frontend-user-contact-import.md)                                      |
+| `managedFields`    | Per record type, the fields that are read-only on the records a synchronisation wrote, see [Managed fields](#managed-fields-a-lock-per-record)                              |
 
 The shipped `profile` map is the shortest example of a field, and the one most
 often met:
@@ -209,6 +211,7 @@ with a `__set_state()`:
 | `ContractField`                                   | `contracts.fields`                                       | as a profile field, plus `optionSource`, `helptext`, `autocomplete`                                                                                                                                        |
 | `ContractContactSection` → `ContractContactField` | `contracts.contactSections`                              | as a profile field, plus `autocomplete` and `helptext`; the section carries the `ValidationSet`                                                                                                            |
 | `DocumentSection`                                 | `documentSections`, `contracts` completing its own entry | `label`, `type`, `fieldName`, `readOnly`, `rowFields`, `actions`, `helptexts` (keyed like `validators`), `ValidationSet`; `allowsAction()`, `getAllowedActions()`, `allowsCreate()`, `allowsDragSorting()` |
+| `ManagedFieldsSettings`                           | `managedFields`                                          | per record type the managed property and column, resolved through the fields above, plus `problems` and `assertValid()`, see [Managed fields](#managed-fields-a-lock-per-record)                           |
 
 Three details of the normalisation are easy to get wrong:
 
@@ -394,6 +397,59 @@ versus `Configuration/TCA/Overrides/` — not a doubt about the coupling itself.
 `getDocumentSection($key)->type`, which is what the removed
 `ProfileInformationType` did before.
 
+## Managed fields: a lock per record
+
+The flags above lock a field of **every** record of a table. That is right for
+a value no editor may change, and wrong for one a synchronisation owns on some
+records only: the global `readonly` also locked the e-mail address an editor
+added by hand. `managedFields` (ACE-758) is the lock per record, and it is kept
+apart from the flags on purpose.
+
+- **It lives in its own map.** `managedFields.<record type>` lists fields of
+  `profile`, `contracts`, `emailAddresses`, `phoneNumbers` and
+  `physicalAddresses` by their settings key or property. The factory resolves
+  each entry through the field of its own record type, so `type` means the
+  type of that contact list only, and keeps property and column in
+  `ManagedFieldsSettings`. A field the settings do not configure cannot be
+  managed: the graph is built while the TCA loads, so it cannot look at TCA
+  columns.
+- **It never reaches the TCA.** `ManagedFieldResolver` (`Classes/Profile/`)
+  answers per row: a record is a candidate when it has an `import_identifier`,
+  is a default-language row, and its profile has `skip_sync = 0`. The profile
+  of a contract or a contact is read with the deleted restriction only, the
+  way the synchronisation reads it, so a hidden profile stays locked. A
+  profile that cannot be found locks nothing.
+- **FormEngine applies it.** The data provider
+  `Backend/FormEngine/ManagedFieldsReadOnly` is registered for
+  `tcaDatabaseRecord` after `TcaColumnsProcessFieldDescriptions` and before
+  `TcaFlexPrepare`, the same position on v13 and v14. It sets
+  `config.readOnly` and appends a note naming the import identifier to the
+  already translated description. Inline children run the same data group, so
+  the contracts and contacts inside a profile form are covered as well.
+- **DataHandler is untouched.** The lock applies to the form only. The
+  synchronisation, an import or a script keep writing the fields, and a
+  DataHandler hook would have had to tell them apart from an editor.
+- **Copies and workspaces.** `import_identifier` has no
+  `setToDefaultOnCopy`, so a copy of a synchronised record is locked as well
+  (ACE-759). The parent rows are read live, without a workspace overlay, so a
+  draft `skip_sync` unlocks the contracts and contacts of a profile only once
+  it is published.
+- **Translations are left alone.** The synchronisation writes default-language
+  rows only, and a translated `position` or `title` is editorial content no
+  source delivers. The `l10n_mode: exclude` columns are read only on a
+  translation through core anyway.
+
+A mistake in the map follows the rule of `frontendUserSync`: the factory
+records it in `problems` instead of throwing, because a typo must not break
+the TCA, and the resolver throws it (1790536034) when a person record form is
+compiled. `ManagedFieldResolverTest` (unit and functional) and
+`ManagedFieldsReadOnlyTest` pin the rules above.
+
+The two locks combine. The shipped name fields carry `readonly` and
+`disabled`, which already lock them on every record, so a project that wants
+them locked on synchronised profiles only replaces those flags, typically with
+`frontendreadonly`, and names the fields in `managedFields`.
+
 ## Overriding the settings in an installation
 
 `SettingsFileLoader::loadMergedArray()` walks every **active package**, reads
@@ -556,6 +612,9 @@ Integrator-facing documentation exists:
 - `academic-persons/Documentation/Configuration/Validations/Index.rst` — the
   flags, the character limits, the locked-by-default name fields and both
   consumers.
+- `academic-persons/Documentation/Configuration/ManagedFields/Index.rst`:
+  the `managedFields` map, which records it locks and how it combines with the
+  flags.
 - `academic-jobs/Documentation/Configuration/Validations/Index.rst` — the second
   implementation, documenting only what actually takes effect, with the
   `disabled`/`readonly` trap called out.
@@ -586,7 +645,7 @@ above.
   `TcaValidationMerger`, with their unit tests in
   `packages/fgtclb/academic-base/Tests/Unit/Settings/`.
 - `packages/fgtclb/academic-persons/Classes/Settings/` —
-  `AcademicPersonsSettingsFactory`, `AcademicPersonsSettings` and the eight
-  value objects of the graph, with their unit tests in
+  `AcademicPersonsSettingsFactory`, `AcademicPersonsSettings` and the value
+  objects of the graph, with their unit tests in
   `packages/fgtclb/academic-persons/Tests/Unit/Settings/` and the TCA
   functional tests in `packages/fgtclb/academic-persons/Tests/Functional/Tca/`.
