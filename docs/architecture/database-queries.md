@@ -457,9 +457,9 @@ the template does not change, and `ArrayPaginator` exists on every core version
 any branch here supports.
 
 **Order the query anyway.** That the controller sorts is not a reason to leave
-the query unordered: the result is handed to a PSR-14 listener
-(`ModifyListProfilesEvent`) before the sort, and a listener that renders or
-counts it must see the same list twice. The selection branch of
+the query unordered: `findByDemand()` is public, the sort is the list action's
+own business, and any other caller that renders, pages or limits the result as
+it comes must get the same list twice. The selection branch of
 `ProfileRepository::resolveDemandForQuery()` therefore returns the same
 `uid` fallback ordering as every other branch, even though the visible order is
 produced afterwards in PHP.

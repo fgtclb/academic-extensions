@@ -80,9 +80,11 @@ Everything else. In particular:
     :guilabel:`academic_projects`. They are left open so that an existing
     subclass keeps working for now, not as an invitation: a subclass breaks
     whenever an action or a constructor changes, and they may become final in
-    the next major version. The partner and project lists dispatch a demand
-    and a list event that replace such a subclass; for the other three, see
-    :ref:`developers-extension-points-minimum`.
+    the next major version. Each of their actions dispatches the
+    :ref:`plugin view event <developers-extension-points-plugin-view>`, and
+    the partner and project lists a demand and a list event as well, which
+    replace such a subclass. A subclass that overrides an action without
+    calling the parent action drops those events for its plugin.
 *   **Repositories.** A condition a plugin should apply belongs in a demand or
     a query event, not in an XCLASS of the repository.
 *   **Services, data processors, ViewHelper classes, backend item providers,
@@ -127,9 +129,15 @@ describe their events in detail, with examples.
             of the plugins) or :guilabel:`academic_contacts4pages` (the
             contract and the addresses of a contact)
         -   replace the items and the other item provider parameters
-    *   -   :php:`\FGTCLB\AcademicJobs\Event\ModifyJobControllerNewActionViewEvent`
-        -   in the job form plugin, before the form is rendered
-        -   assign further view variables
+    *   -   :php:`\FGTCLB\AcademicBase\Event\ModifyPluginViewEvent`
+        -   in every plugin of :guilabel:`academic_bite_jobs`,
+            :guilabel:`academic_contacts4pages`, :guilabel:`academic_jobs`,
+            :guilabel:`academic_partners`, :guilabel:`academic_persons`,
+            :guilabel:`academic_programs` and :guilabel:`academic_projects`,
+            once each time an action renders its view, after the action
+            assigned its own variables
+        -   assign further view variables, see
+            :ref:`developers-extension-points-plugin-view`
     *   -   :php:`\FGTCLB\AcademicJobs\Event\AfterSaveJobEvent`
         -   in the job form plugin, after a submitted job is saved
         -   change the page redirected to, and how the confirmation message
@@ -163,21 +171,6 @@ describe their events in detail, with examples.
         -   right before the contract query of the selected-contracts plugin
             is executed
         -   add conditions
-    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyListProfilesEvent`
-        -   in the list and list-and-detail plugins, after the query
-        -   replace the profiles and the demand, assign further view
-            variables
-    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyDetailProfileEvent`
-        -   in the detail and list-and-detail plugins, before the profile is
-            rendered
-        -   replace the profile and the page title formats, assign further
-            view variables
-    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifySelectedProfilesEvent`
-        -   in the selected-profiles plugin, after the query
-        -   replace the profiles, assign further view variables
-    *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifySelectedContractsEvent`
-        -   in the selected-contracts plugin, after the query
-        -   replace the contracts, assign further view variables
     *   -   :php:`\FGTCLB\AcademicPersons\Event\ModifyProfileTitlePlaceholderReplacementEvent`
         -   when the page title of a profile's detail view is built, once
             per placeholder of the title format
@@ -206,6 +199,50 @@ belongs to. And the event the 2.4 changelog of
 :guilabel:`academic_persons_edit` mentions for filling form data from other
 sources before it is written is not dispatched yet.
 
+..  _developers-extension-points-plugin-view:
+
+Adding a variable to the view of a plugin
+-----------------------------------------
+
+One listener of :php:`ModifyPluginViewEvent` serves every plugin. The context
+it hands over names the plugin and the action, so a listener that means one of
+them checks both. The plugin name is the one the plugin is registered with,
+:php:`List`, :php:`Detail` or :php:`ProjectListSingle` for example, and the
+extension name tells two plugins of the same name apart:
+
+..  code-block:: php
+    :caption: EXT:my_sitepackage/Classes/EventListener/AddOfficeHoursLink.php
+
+    namespace MyVendor\MySitepackage\EventListener;
+
+    use FGTCLB\AcademicBase\Event\ModifyPluginViewEvent;
+    use TYPO3\CMS\Core\Attribute\AsEventListener;
+
+    final class AddOfficeHoursLink
+    {
+        #[AsEventListener]
+        public function __invoke(ModifyPluginViewEvent $event): void
+        {
+            $context = $event->getPluginControllerActionContext();
+            if ($context->getControllerExtensionName() !== 'AcademicPersons'
+                || $context->getActionName() !== 'detail'
+            ) {
+                return;
+            }
+            $event->getView()->assign('officeHoursPageId', 42);
+        }
+    }
+
+The variable is then available to the templates, partials and sections of
+that plugin, and a template override renders it.
+
+The event runs after the action assigned its own variables, so a listener
+that assigns one of them again replaces it in the view, and only there: the
+pagination and the page title keep the profiles the query returned, for
+example. A change of which records are shown belongs in a demand or a query
+event. One variable is assigned after the event on purpose and cannot be
+replaced at all: the validations of the job form.
+
 ..  _developers-extension-points-types:
 
 What an event hands over
@@ -226,15 +263,16 @@ packages are not listed; their own documentation applies.
             its language, the content object, the settings of the content
             element and the plugin name
     *   -   :php:`\FGTCLB\AcademicPersons\Domain\Model\Dto\PluginControllerActionContextInterface`
-        -   the list, detail, selected-profiles, selected-contracts and title
-            placeholder events of :guilabel:`academic_persons`, which still
-            declare this copy of the interface above. It adds nothing to it,
-            is deprecated, and is removed in 4.0; type a listener against the
-            :guilabel:`academic_base` interface.
+        -   the title placeholder event of :guilabel:`academic_persons`, which
+            still declares this copy of the interface above. It adds nothing
+            to it, is deprecated, and is removed in 4.0; type a listener
+            against the :guilabel:`academic_base` interface.
     *   -   :php:`\FGTCLB\AcademicPersons\Domain\Model\Dto\DemandInterface`
         -   the profile demand and query events
     *   -   :php:`\FGTCLB\AcademicPersons\Domain\Model\Dto\ProfileDemand`
-        -   the profile list event
+        -   the profile demand and query events as the demand of the list,
+            list-and-detail and card plugins, which they declare as the
+            interface above
     *   -   :php:`\FGTCLB\AcademicPartners\Domain\Model\Dto\PartnerDemand`
         -   the partner demand and list events
     *   -   :php:`\FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand`
@@ -435,11 +473,10 @@ unnecessary. Not every extension offers all three yet:
         -   Offered today
         -   Planned
     *   -   A view event per plugin action, to assign further view variables
-            or replace what is rendered
-        -   the list, detail, selected-profiles and selected-contracts plugins
-            of :guilabel:`academic_persons`, the partner and project lists, the
-            job form
-        -   one event that every plugin action of every extension dispatches
+        -   the plugins of the seven extensions named at the event above,
+            through one event
+        -   none: the profile editing of :guilabel:`academic_persons_edit`
+            gets events on the data its forms write instead
     *   -   A demand event per repository query a plugin runs, to change what
             is queried
         -   :guilabel:`academic_persons`, :guilabel:`academic_partners`,

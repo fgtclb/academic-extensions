@@ -131,21 +131,6 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Classes/Domain/Repository/ProfileRepository.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:__construct\\(\\) has parameter \\$profiles with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface but does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
-			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:getProfiles\\(\\) return type with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
-			message: "#^Method FGTCLB\\\\AcademicPersons\\\\Event\\\\ModifyListProfilesEvent\\:\\:setProfiles\\(\\) has parameter \\$profiles with generic interface TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface but does not specify its types\\: TKey, TValue$#"
-			count: 1
-			path: ../../../packages/fgtclb/academic-persons/Classes/Event/ModifyListProfilesEvent.php
-
-		-
 			message: "#^Property FGTCLB\\\\AcademicPersons\\\\Tests\\\\Functional\\\\ExtensionLoadedTest\\:\\:\\$expectedLoadedExtensions has no type specified\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/ExtensionLoadedTest.php

@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 321 PHP files declaring 283
-classes, 11 interfaces, 16 traits and 11 enums do not follow one style yet.
+rather than describing an intention as a rule — 318 PHP files declaring 279
+classes, 11 interfaces, 17 traits and 11 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-166 of the 283 classes are `final` (59 %). The distribution is not random: it
+162 of the 279 classes are `final` (58 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
@@ -29,8 +29,8 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 5       | 8       | 0        | 38 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1       | 23      | 0        | 4 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 96      | 47      | 4        | 65 %     |
-| **Total**                                  | **166** | **112** | **5**    | **59 %** |
+| Everything else                            | 92      | 47      | 4        | 64 %     |
+| **Total**                                  | **162** | **112** | **5**    | **58 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -56,8 +56,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 310 modifiers, of
-which 301 are constructor-promoted, across 97 files. The nine non-promoted
+`readonly` is used heavily, mostly on individual properties: 302 modifiers, of
+which 293 are constructor-promoted, across 93 files. The nine non-promoted
 declarations are the eight documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
@@ -118,8 +118,8 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 95 files declare
-301 promoted `readonly` parameters. The fullest example by a wide margin is
+Constructor injection with promoted properties is the default: 91 files declare
+293 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.
@@ -345,29 +345,64 @@ optional field use `getProperties()` and index into it, or guard with
 No line numbers here: that file is core's and its line numbers differ between
 the two supported versions, so a reader has to grep for the method anyway.
 
+## Traits
+
+A trait **may** share a method between classes that have nothing else in
+common. It **must not** rely on the class it is used in: no property of that
+class and no method of it. Everything the method needs is a parameter:
+
+- **With a native type**, the union included, as the view is typed
+  `FluidViewInterface|CoreViewInterface`.
+- **An array parameter carries its shape** in the docblock, at least its key
+  and value types, such as `array<string, mixed>` or `string[]`, so PHPStan
+  needs no baseline entry for it.
+- **`$this` is handed on as a value at most.** Passing the calling object to a
+  callee that asks for one is fine; reading from it is not.
+
+A trait written that way works in every class that uses it, and nothing in the
+class depends on which of its members the trait happens to read.
+`DispatchModifyPluginViewEventMethodTrait` is the example: an action hands it
+the request, its settings, the view and the event dispatcher, although all four
+are properties of every Extbase controller.
+
+The four traits under `packages/fgtclb/*/Classes/` follow the rule:
+
+| Trait                                              | Takes                                                                                                                                                               |
+|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `DispatchModifyPluginViewEventMethodTrait`         | the request, the settings, the view and the event dispatcher                                                                                                        |
+| `GetCurrentContentRecordMethodTrait`               | the content object renderer                                                                                                                                         |
+| `GetSelectItemsForTcaManagedTableFieldMethodTrait` | the request, the localization utility, the extension key, the table, the field and the values to drop, and hands `$this` to the item provider as the calling object |
+| `TtContentListTypeColumnTrait`                     | the connection pool                                                                                                                                                 |
+
+The thirteen traits of `packages-dev/testing-helper/` are the exception. They
+are used only in test cases, twelve of them only in functional ones, so they
+call `$this->get()`, the assertions and the other helpers of the test case, and
+two declare properties: one keeps a backup of the TCA, one a fixed map of
+retired core labels. See [Testing helper](../testing/testing-helper.md).
+
 ## Strict types
 
-300 of the 305 files declare `strict_types=1` (98 %) — here counted over
+302 of the 305 files declare `strict_types=1` (99 %) — here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;
-`packages-dev/` and `Tests/` are not counted. The 5 that do not are worth
+`packages-dev/` and `Tests/` are not counted. The 3 that do not are worth
 knowing so they are fixed rather than copied:
 
 | File                                                                 |
 |----------------------------------------------------------------------|
 | `academic-partners/Classes/DataProcessing/PartnershipProcessor.php`  |
 | `academic-partners/Classes/DataProcessing/PartnerProcessor.php`      |
-| `academic-persons/Classes/Event/ModifySelectedProfilesEvent.php`     |
-| `academic-persons/Classes/Event/ModifySelectedContractsEvent.php`    |
 | `academic-projects/Classes/ViewHelpers/Format/ReplaceViewHelper.php` |
 
-Two of the five are `DataProcessing/` classes, which suggests one origin
-rather than five independent omissions. Two more were among them until they
+Two of the three are `DataProcessing/` classes, which suggests one origin
+rather than independent omissions. Two more were among them until they
 gained a constructor and were fixed on the way:
 `academic-contact4pages/Classes/DataProcessing/ContactsProcessor.php` (ACE-101)
 and `academic-programs/Classes/DataProcessing/ProgramDataProcessor.php`, when it
-started to build the program facts.
+started to build the program facts. And two more went with the selected
+profiles and selected contracts events of `academic_persons`, which 3.0
+removed in favour of the plugin view event.
 
 ## Extension points
 
@@ -402,6 +437,15 @@ manual rather than this repository.
   stay open so that existing project subclasses keep working; that is why
   their new collaborators arrive through method injection (see above). Do not
   make them more open, and point a project at an event instead.
+- **Every plugin action that renders a view dispatches the plugin view
+  event**, `ModifyPluginViewEvent` of `academic_base`, through the trait
+  method `dispatchModifyPluginViewEvent()`, once on every path that renders.
+  The action hands it the request, its settings, the view and the event
+  dispatcher, see [Traits](#traits).
+  A new action calls it too, and gets a row in the test that renders every
+  plugin; see [Plugin view event](plugin-view-event.md). No plugin gets a view
+  event of its own. The profile editing of `academic_persons_edit` is the one
+  exception: its forms get events on the data they write.
 
 Events follow one shape:
 

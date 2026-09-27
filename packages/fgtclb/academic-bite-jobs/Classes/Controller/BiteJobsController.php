@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBiteJobs\Controller;
 
+use FGTCLB\AcademicBase\Controller\DispatchModifyPluginViewEventMethodTrait;
 use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
 use FGTCLB\AcademicBiteJobs\Enumeration\ListView;
 use FGTCLB\AcademicBiteJobs\Services\BiteJobsService;
@@ -13,6 +14,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class BiteJobsController extends ActionController
 {
+    use DispatchModifyPluginViewEventMethodTrait;
     use GetCurrentContentRecordMethodTrait;
 
     public function __construct(
@@ -40,6 +42,7 @@ class BiteJobsController extends ActionController
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
             'jobs' => $this->biteJobsService->fetchBiteJobs($this->request),
         ]);
+        $this->dispatchModifyPluginViewEvent($this->request, $this->settings, $this->view, $this->eventDispatcher);
 
         return $this->htmlResponse();
     }

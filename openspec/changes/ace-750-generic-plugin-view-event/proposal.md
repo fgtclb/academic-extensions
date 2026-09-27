@@ -20,7 +20,7 @@ add a variable.
   - `academic_partners` (`packages/fgtclb/academic-partners`): list, map,
     partnerships list, partnerships teaser;
   - `academic_programs` (`packages/fgtclb/academic-programs`): program list,
-    program details;
+    program finder, program details;
   - `academic_projects` (`packages/fgtclb/academic-projects`): project list;
   - `academic_contacts4pages` (`packages/fgtclb/academic-contact4pages`):
     contact list;
@@ -55,15 +55,21 @@ The behaviour is identical on TYPO3 v13 and v14.
 
 ### Modified Capabilities
 
-None.
+- `academic-persons/plugin-action-context`: the scenarios that named the
+  removed list and detail events move to the plugin view event and the
+  profile title placeholder event, the one persons event that still declares
+  the persons context.
 
 ## Impact
 
 - One event class, marked `@api`, and one controller trait in
-  `academic_base`; one dispatch per rendering path in nine controllers of
+  `academic_base`; one dispatch per rendering path in eight controllers of
   seven extensions.
 - Five event classes removed: one in `academic_jobs`, four in
   `academic_persons`, together with their dispatches and their unit tests.
+  The persons test fixtures, tests, manual sections and unreleased 3.0
+  changelog entries that describe a listener of the removed events are
+  changed with them.
 - Lands after `ace-442-single-action-context-interface` and
   `ace-749-extension-point-policy`.
 - No change to templates, variables, settings or TypoScript.
@@ -90,6 +96,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-12`). Four of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-generic-plugin-view-event` when the issue is filed after
+this today. The analysis found no issue; ACE-750 was filed after the
 implementation.

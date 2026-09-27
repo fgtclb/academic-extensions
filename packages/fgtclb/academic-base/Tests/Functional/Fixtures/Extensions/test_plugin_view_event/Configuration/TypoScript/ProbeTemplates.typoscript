@@ -1,0 +1,5 @@
+# Templates that print the variables the listener of this extension assigns, put in front
+# of the shipped ones of the persons list, the partner map and the job form.
+plugin.tx_academicpersons.view.templateRootPaths.100 = EXT:test_plugin_view_event/Resources/Private/Templates/
+plugin.tx_academicpartners.view.templateRootPaths.100 = EXT:test_plugin_view_event/Resources/Private/Templates/
+plugin.tx_academicjobs.view.templateRootPaths.100 = EXT:test_plugin_view_event/Resources/Private/Templates/

@@ -70,6 +70,11 @@ otherwise.
 - **WHEN** a detail content element sets a page title format
 - **THEN** the page title of a profile detail follows that format
 
+#### Scenario: Default title format
+- **WHEN** a detail content element sets no page title format
+- **THEN** the page title of a profile detail is built from the title, the
+  first, middle and last name of the profile
+
 ### Requirement: Protected variables stay protected
 A variable that an action assigns after its extension points on purpose SHALL
 NOT be replaceable through the plugin view event.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Controller;
 
+use FGTCLB\AcademicBase\Controller\DispatchModifyPluginViewEventMethodTrait;
 use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface;
@@ -21,6 +22,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 class ProjectController extends ActionController
 {
+    use DispatchModifyPluginViewEventMethodTrait;
     use GetCurrentContentRecordMethodTrait;
 
     private ExtensionService $filterRedirectExtensionService;
@@ -76,6 +78,7 @@ class ProjectController extends ActionController
         ];
 
         $this->view->assignMultiple($assignedValues);
+        $this->dispatchModifyPluginViewEvent($this->request, $this->settings, $this->view, $this->eventDispatcher);
 
         return $this->htmlResponse();
     }

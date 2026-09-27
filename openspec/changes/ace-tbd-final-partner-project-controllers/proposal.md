@@ -30,7 +30,7 @@ are `final` already.
   its plugin: `ace-717-partners-projects-list-events` for partners and
   projects, `ace-tbd-program-psr14-events` for programs,
   `ace-tbd-bite-jobs-request-result-events` for the B-ITE job list, and
-  `ace-tbd-generic-plugin-view-event` for the actions none of those covers.
+  `ace-750-generic-plugin-view-event` for the actions none of those covers.
   Pagination and GET filter URLs of the partner list move to
   `ace-727-partner-list-pagination` and `ace-723-list-filter-get-urls`.
 - An architecture test asserts that every plugin controller is `final`.
@@ -73,7 +73,7 @@ None.
   that every controller made final has an event-based extension point. The
   partnership plugins, the program details plugin and additional view
   variables of the B-ITE job list are covered by none of the three, so
-  `ace-tbd-generic-plugin-view-event` has to land first as well.
+  `ace-750-generic-plugin-view-event` has to land first as well.
 - Lands after `ace-727-partner-list-pagination` and
   `ace-723-list-filter-get-urls`, so the `Breaking-` entries point at
   shipped replacements.

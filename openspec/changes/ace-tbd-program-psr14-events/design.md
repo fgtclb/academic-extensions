@@ -15,8 +15,10 @@ See `proposal.md` for the motivation. On main:
 - Controllers, factories and models are not `final`, and one project
   subclasses the controller.
 - `academic_persons` already has `ModifyProfileDemandEvent` (final,
-  getter/setter, dispatched in `ProfileRepository::findByDemand()`) and
-  `ModifyListProfilesEvent`.
+  getter/setter, dispatched in `ProfileRepository::findByDemand()`). Its list
+  event `ModifyListProfilesEvent` was removed with the generic plugin view
+  event (`ace-750-generic-plugin-view-event`), which the program list and
+  details already dispatch.
 - Extbase injects the event dispatcher into every `ActionController` through
   `injectEventDispatcher()`, on v13 and on v14 (verified in both installed
   core trees).
@@ -32,7 +34,7 @@ See `proposal.md` for the motivation. On main:
 
 **Non-Goals:**
 
-- A generic plugin view event; `ace-tbd-generic-plugin-view-event` proposes
+- A generic plugin view event; `ace-750-generic-plugin-view-event` proposes
   one in `academic_base`, and these events do not wait for it.
 
 ## Decisions

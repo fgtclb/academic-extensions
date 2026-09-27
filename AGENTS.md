@@ -21,7 +21,7 @@ handful of things that are easy to get wrong and expensive to discover later.
 | The TypeScript and SCSS build, and its committed output | [Frontend assets](docs/development/frontend-assets.md)                                 |
 | Version differences, and the v15 blockers               | [Core version aware code](docs/architecture/core-version-aware-code.md)                |
 | Service configuration and stateless services            | [Dependency injection](docs/architecture/dependency-injection.md)                      |
-| `final`, `readonly`, injection, data objects            | [Class design](docs/architecture/class-design.md)                                      |
+| `final`, `readonly`, injection, data objects, traits    | [Class design](docs/architecture/class-design.md)                                      |
 | **Quoting value lists, binding parameters, ordering**   | [Database queries](docs/architecture/database-queries.md)                              |
 | Items of a backend select, and the value they can drop  | [Backend select items](docs/architecture/backend-select-items.md)                      |
 | Content element frame and header, v14's `record`        | [Content element rendering](docs/architecture/content-element-rendering.md)            |

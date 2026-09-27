@@ -54,7 +54,7 @@ contract.
 
 The contract selection drops unpublished contracts when the setting is on.
 `selectedContractsAction()` runs the selected contracts through the same rule
-before sorting them, after `ModifySelectedContractsEvent`.
+right after the query, before sorting them.
 
 The candidate put an SQL condition into `ContractRepository::findByUids()`.
 That is rejected. It needs a new parameter on a public repository method, and a
