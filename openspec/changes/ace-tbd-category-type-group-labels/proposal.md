@@ -46,7 +46,7 @@ None.
 
 - Ordering groups or types. Groups keep their first-seen order, and a group
   `priority` has no effect yet; ordering types is
-  `ace-tbd-category-type-priority-order`.
+  `ace-752-category-type-priority-order`.
 - Showing group icons in the type select; the option groups of a select carry
   a label only.
 - Inline SVG rendering for group icons.

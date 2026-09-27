@@ -45,6 +45,11 @@ describing an intention as if it were the state.
   `academic_base` provider that inlines it, so it follows the text colour in
   the backend and the frontend, on the dark cards of a dark colour scheme
   included.
+- Category types are ordered **in one place**,
+  `CategoryTypeRegistry::attach()`: by priority, the highest first, and in
+  declaration order where priorities are equal. No consumer sorts types, so the
+  facts, the list filters, the page module summary and the type select of a
+  category follow without a change.
 - The category summary of the page module is **one implementation in
   `category_types`** and three four-line listeners on
   `ModifyPageLayoutContentEvent`. It shipped three times as a partial before,
@@ -122,6 +127,7 @@ describing an intention as if it were the state.
 | [Label overrides](label-overrides.md)                           | How a site overrides a label through `_LOCAL_LANG`, the extension name that decides the path on v13 and v14, and the PHP places that hand the request on.                                  |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                              |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                            |
+| [Category type order](category-type-order.md)                   | Where the priority order of category types is decided, why in the registry, what the flat list and the cache do, and which outputs follow it.                                              |
 | [The profile editing contract](profile-editing-contract.md)     | The `data-*` attributes the profile editor is configured with, the reader that parses them once, and the five custom elements that drive it.                                               |
 | [Backend select items](backend-select-items.md)                 | What an `itemsProcFunc` handler is handed on each core version, the page TSconfig path of a FlexForm field, and the narrowing that silently drops a relation.                              |
 | [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, who renders a plugin's header, and the `record` variable TYPO3 v14 needs for it.                                              |

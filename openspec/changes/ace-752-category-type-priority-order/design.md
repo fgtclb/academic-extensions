@@ -29,6 +29,12 @@ See `proposal.md` for the motivation. Verified on `main` at `6bea855a6`:
   from the cache. The order therefore survives the cache in both paths.
 - `Configuration/TCA/Overrides/sys_category.php` builds the items of the
   `type` select from `getCategoryTypes()`.
+- Re-verified on `main` at `7d6d8c581` (2026-09-27). One consumer was added
+  since the analysis: `Backend\FormEngine\CategoryTypeItemsProcFunc`, the
+  items of the filter types select (`ace-736`), reads
+  `getGroupedCategoryTypes()` and follows without a change. The partner and
+  project pages, items and filters iterate `getAllCategoriesByType()` and
+  follow as well.
 - No `CategoryTypes.yaml` under `packages/fgtclb/` sets `priority` (academic
   partners, programs and projects checked).
 - The unit test `attachedTypesAreReturnedInAttachmentOrder` pins the
@@ -51,19 +57,21 @@ See `proposal.md` for the motivation. Verified on `main` at `6bea855a6`:
 
 ### Sort in the registry, not in the loader
 
-`attach()` sorts the affected groups after inserting and rebuilds the flat
+`attach()` sorts every group after inserting and rebuilds the flat
 `$registry` from them: groups in the order they were first seen, and within a
-group by priority descending. PHP's `usort()` is stable since 8.0, so equal
+group by priority descending. PHP's `uasort()` is stable since 8.0, so equal
 priorities keep their insertion order without an explicit tiebreaker.
 
 Sorting in the loader was rejected. The registry is public API and a test or
 a third-party package can `attach()` without the loader; the registry is the
 only place every consumer passes through. Sorting in each getter was rejected
 because it repeats the work on every call, while `attach()` runs once per
-request, or once per cache fill.
+request, when the registry is built.
 
-The existing duplicate check in `attach()` stays, so a duplicate still
-throws before anything is sorted.
+The existing duplicate check in `attach()` stays. A duplicate throws in the
+middle of the loop, after the types before it were added to their group, as
+before; the loop therefore runs in `try`/`finally` and the flat list is
+rebuilt in the `finally` block, so it never misses a type the groups hold.
 
 ### Decided: higher priority first
 
@@ -103,8 +111,12 @@ installation. The analysis holds only an excerpt of that project's
 
 `getCategoryTypes()` feeds the backend `type` select and the icon
 registration. Keeping it in grouped order makes the select follow the
-configured order. Types of one group never interleave with those of another
-group anyway, because each package declares one group.
+configured order. Before, the flat list was the attachment order across
+groups. The two differ when a type is added to a group after a group that was
+first declared later already has types: for example a type a site package adds
+to the `programs` group, while `academic_projects`, loaded after
+`academic_programs`, declared its types in between. That type moves from the
+end of the list into its group.
 
 ### No new order syntax
 

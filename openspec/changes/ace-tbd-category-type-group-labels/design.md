@@ -68,7 +68,7 @@ one line with two-space indentation, in English and German.
 ### Decided: a group `priority` reads higher first
 
 The `priority` this change reads and keeps on a group follows the direction
-decided for types in `ace-tbd-category-type-priority-order`: higher value
+decided for types in `ace-752-category-type-priority-order`: higher value
 first, stable on load order for equal values. This change still does not
 order the groups; a later ordering change applies that direction, so a
 `priority` declared today already means what it will mean then.
@@ -77,7 +77,7 @@ order the groups; a later ordering change applies that direction, so a
 
 This change does not order groups. They stay in the order in which they were
 first seen while loading, which is package load order and the order that
-`ace-tbd-category-type-priority-order` keeps for groups while it sorts the
+`ace-752-category-type-priority-order` keeps for groups while it sorts the
 types within a group. A group `priority` is read and kept on the group model
 but has no effect yet. A later group sort uses the direction of the type
 order, higher first. Rejected: sorting groups by `priority` in this change,
