@@ -47,4 +47,4 @@
 - [x] 4.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 4.5 Commit message in TYPO3 Core format with the verified ACE-756
   reference.
-- [ ] 4.6 Archive the change as the last commit of the pull request.
+- [x] 4.6 Archive the change as the last commit of the pull request.
