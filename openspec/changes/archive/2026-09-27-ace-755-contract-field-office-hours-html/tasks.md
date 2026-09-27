@@ -26,12 +26,12 @@
 
 ## 4. Definition of done
 
-- [ ] 4.1 `composerUpdate -t 13`, then `lintPhp`, `cgl -n`, `phpstan`, `unit`
+- [x] 4.1 `composerUpdate -t 13`, then `lintPhp`, `cgl -n`, `phpstan`, `unit`
   and `functional` green for v13.
-- [ ] 4.2 `composerUpdate -t 14`, then `lintPhp`, `cgl -n`, `phpstan`, `unit`
+- [x] 4.2 `composerUpdate -t 14`, then `lintPhp`, `cgl -n`, `phpstan`, `unit`
   and `functional` green for v14.
-- [ ] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 4.4 Commit as `[BUGFIX] ACE-755: Render office hours of list items` in
+- [x] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 4.4 Commit as `[BUGFIX] ACE-755: Render office hours of list items` in
   TYPO3 Core format.
-- [ ] 4.5 Archive the change as the last commit of the pull request.
+- [x] 4.5 Archive the change as the last commit of the pull request.
 - [x] 4.6 No backport to branch `2`, see the non-goals of the proposal.
