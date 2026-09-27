@@ -35,10 +35,16 @@
 
 ## 3. Documentation
 
-- [ ] 3.1 Rewrite the `priority` paragraph of the `CategoryTypes.yaml` page
-  that `ace-tbd-category-types-yaml-docs` added, which states "no effect",
-  into the ordering rule (higher first, stable for equal values), with a
-  `useExisting` override example.
+- [ ] 3.1 Rewrite the `priority` paragraph of
+  `typo3-category-types/Documentation/Developers/CategoryTypes/Index.rst`,
+  which states that nothing sorts by it (written by ACE-664), and the
+  statements on the same page that the types keep their declaration order,
+  that a changed type keeps its position and that `getCategoryTypes()`
+  returns declaration order, plus the registration order statement of
+  `Documentation/Developers/TCA/Index.rst`; rewrite them into the ordering
+  rule (higher first, stable for equal values), with a `useExisting` override
+  example. If the sorting happens in `CategoryTypeLoader::loadUncached()`,
+  revisit the key order assertions of its unit tests as well.
 - [ ] 3.2 Add `Documentation/Changelog/2.4/Feature-CategoryTypesAreOrderedByPriority.rst`
   and an `Important-` entry naming the reorder for packages that already set
   `priority`, in `typo3-category-types`, in the 2.4 folder because the

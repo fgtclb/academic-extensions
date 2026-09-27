@@ -50,9 +50,10 @@
   and `academic-projects/Documentation/Changelog/3.0/Breaking-ProjectDepartmentCategoryType.rst`
   (rename, the migration command as the upgrade step, ambiguous categories,
   rollback) from the templates in `Build/Documentation/Templates/`.
-- [ ] 5.2 State the uniqueness rule on the `CategoryTypes.yaml` page of
-  `category_types` (from `ace-tbd-category-types-yaml-docs`, or its TCA page
-  if that has not landed).
+- [ ] 5.2 Turn the uniqueness advice into the enforced rule on
+  `typo3-category-types/Documentation/Developers/CategoryTypes/Index.rst`, key
+  `identifier` (linked there by ACE-751), and in the section "Keep identifiers
+  unique across groups" of `Documentation/Developers/TCA/Index.rst`.
 - [ ] 5.3 `docs/`: add the rule where `docs/` describes category type
   registration; if no page does, say in the pull request why `docs/` is
   unchanged.
