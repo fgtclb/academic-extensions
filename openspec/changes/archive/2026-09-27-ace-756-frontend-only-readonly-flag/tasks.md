@@ -75,4 +75,4 @@
 - [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.4 `docs/` and both extensions' `Documentation/` changelogs updated in
   the same change.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archive the change as the last commit of the pull request.
