@@ -59,4 +59,4 @@
   `functional` green with `-t 14`.
 - [x] 5.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 5.6 Archive the change as the last commit of the pull request.
+- [x] 5.6 Archive the change as the last commit of the pull request.
