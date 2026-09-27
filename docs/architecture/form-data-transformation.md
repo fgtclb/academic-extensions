@@ -33,13 +33,18 @@ property was submitted.
 ## The decision, in order
 
 Every factory setter is guarded by the same private helper, `mayApplyProperty()`,
-identical in all six (`ProfileFactory.php`, `ContractFactory.php`,
-`AddressFactory.php`, `ProfileInformationFactory.php`, `EmailFactory.php`,
-`PhoneNumberFactory.php`):
+in all six (`ProfileFactory.php`, `ContractFactory.php`, `AddressFactory.php`,
+`ProfileInformationFactory.php`, `EmailFactory.php`, `PhoneNumberFactory.php`).
+The five whose records carry an import identifier also take the properties the
+synchronisation manages on the record (ACE-760), which `updateFromFormData()`
+receives from the controller:
 
 ```php
-private function mayApplyProperty(ValidationSet $validationSet, ProfileFormData $form, string $propertyName): bool
+private function mayApplyProperty(ValidationSet $validationSet, ProfileFormData $form, string $propertyName, array $managedProperties): bool
 {
+    if (in_array($propertyName, $managedProperties, true)) {
+        return false;
+    }
     $validation = $validationSet->get($propertyName);
     if ($validation !== null && ($validation->readOnly || $validation->disabled)) {
         // ReadOnly or disabled: keep existing persisted data and ignore the submitted value.
@@ -49,10 +54,11 @@ private function mayApplyProperty(ValidationSet $validationSet, ProfileFormData 
 }
 ```
 
-So a value is written only when **both** hold:
+So a value is written only when **all three** hold:
 
-1. the property is not configured `readOnly` or `disabled`, and
-2. an override was registered for it — `shouldApplyProperty()` is
+1. the synchronisation does not manage the property on this record,
+2. the property is not configured `readOnly` or `disabled`, and
+3. an override was registered for it. `shouldApplyProperty()` is
    `hasPropertyOverride()`, nothing else.
 
 The order matters and is deliberate: the validation configuration wins over
@@ -65,17 +71,29 @@ This is not a validation rule that leaked into the wrong layer. It is the last
 of three places that refuse a locked property, and the only one that cannot be
 bypassed by a hand-built request:
 
-| Layer                               | What it does                                                                 |
-|-------------------------------------|------------------------------------------------------------------------------|
-| The rendered control                | A locked field renders as text, without an edit button                       |
-| `ProfileUpdateValidationService`    | Whitelists the payload keys against the settings graph, dropping locked ones |
-| `mayApplyProperty()` in the factory | Refuses the write even when an override was registered anyway                |
+| Layer                               | What it does                                                                        |
+|-------------------------------------|-------------------------------------------------------------------------------------|
+| The rendered control                | A locked field renders as text or read-only, without an edit button                 |
+| The endpoint                        | Checks the payload keys against the settings graph and drops the locked ones        |
+| `mayApplyProperty()` in the factory | Refuses the write even when an override was registered anyway                       |
 
-A request that posts a locked property is answered `422` with the error code
-`invalid_profile_data` and the message `Unknown profile property "…"` — a
-locked property is not part of the editable set, so it is refused the way an
-invented property name is. It never reaches the factory. The guard is what
-makes that a policy rather than a coincidence of the caller.
+A request that posts a locked property is answered as if it had left the
+property out: the stored value stays, the other properties of the request are
+written, and the `data` of the profile endpoint's answer does not name it. That
+holds for the profile, document and contact endpoints alike, and for a field
+managed on the record as for `readonly`, `frontendreadonly` and `disabled`. A
+key the settings graph does not have is still refused, with `422`,
+`invalid_profile_data` and `Unknown profile property "…"` on the profile
+endpoint and "This field cannot be changed." on the other two.
+
+Until ACE-760 the endpoints refused a locked property with `422` as well. The
+editor sends every field of an open contract or contact when it saves, the
+locked ones included, so a record with a locked field could not be saved from
+the browser at all. The two switches with an endpoint of their own, the
+synchronisation switch and the profile visibility, still refuse: their one
+value is the whole request, and ignoring it would answer a success for nothing.
+The guard in the factory is what makes the rule a policy rather than a
+coincidence of the caller.
 
 ## Rule 2 — only what the payload carried
 
@@ -132,9 +150,9 @@ synchronised into the profile — which is also why `skipSync` exists.
 > **The trap.** A test, a script or a `curl` that posts
 > `{"data": {"firstName": "…"}}` and then asserts the record changed will find
 > it unchanged, and it is very easy to read that as "the endpoint is broken".
-> It is neither: the field renders read-only, the payload key is refused by the
-> whitelist with `invalid_profile_data`, and rule 1 would discard it even if it
-> got through. **When a
+> It is neither: the field renders read-only, the endpoint drops the payload
+> key and answers a success, and rule 1 would discard it even if it got
+> through. **When a
 > transformation test needs an editable property, use one that the shipped set
 > does not lock** — `website` and `websiteTitle` are the ones the factory tests
 > settled on.

@@ -404,6 +404,82 @@ and anything that does not match is refused. `displayValue` is untouched by all
 of it and stays the `MEDIUMDATE` of the site language, the way the public views
 render a contract date.
 
+## Fields and rows the synchronisation owns
+
+Three locks reach the editor, and they differ in their reach:
+
+| Lock                                          | Locks                                        | Set in                         |
+|-----------------------------------------------|----------------------------------------------|--------------------------------|
+| `readonly` of a document section              | every record of the section, and its actions | `documentSections.<id>`        |
+| `readonly`, `frontendreadonly`, `disabled`    | one field on every record                    | the validators of the field    |
+| `managedFields` of `academic_persons`         | one field on a synchronised record only      | `managedFields.<record type>`  |
+
+The third one (ACE-760) is decided per record by the `ManagedFieldResolver`
+of `academic_persons` that the backend form uses too (see
+[Validation settings](validation-settings.md#managed-fields-a-lock-per-record)).
+In the default language it is decided on the record the editor writes. In a
+translated site language the editor holds translation overlays, and there the
+decision splits:
+
+- **Shared fields stay locked, translated ones follow the translation.** A
+  managed field whose column all languages share (`l10n_mode` `exclude`, the
+  website for instance) is locked on the translation as well, decided on the
+  default-language record, because the backend shows it read-only there and
+  the next translation synchronisation would replace a value written into
+  the translation row. A translated column, such as the contract position, is
+  text the synchronisation does not write, and stays editable, as in the
+  backend. The edit of a row follows the same answer.
+- **The delete follows the default-language record.** An Extbase delete of an
+  overlay removes the record behind its uid, the default-language one, so a
+  row the synchronisation owns is refused in every language. That such a
+  delete leaves the translation behind is an older defect of its own
+  (ACE-761).
+`ManagedRecordLocks` of `academic_persons_edit` is the one place the editor
+asks. It answers the managed properties of a profile, contract or contact, and
+the actions a row loses: a row with a managed field loses `delete`, and
+`edit` as well once every field that the settings leave editable is managed.
+Hiding and sorting stay, because the synchronisation writes neither
+`hidden` nor `sorting`. An installation that declares no managed field sees
+no difference.
+
+The same answer reaches every part of the editor:
+
+- **The profile page.** `ProfileSectionProvider` gives a managed field a
+  copy of its validation with `readOnly` set and `required` cleared, built for
+  this one page and never cached, and `Field/ManagedBadge.html` renders the
+  "Synchronised" marker in the preview and in the group editor.
+- **The contract rows.** `ProfileDocumentSectionProvider` hands each contract
+  its own action list and a flag for the marker, which
+  `Documents/Actions.html` renders next to the "Hidden" tag.
+- **The form responses.** A field descriptor of `documentForm` and
+  `contractContactForm` carries `managed`, next to `readOnly` and `required`,
+  and the `field-default`, `field-wide` and `field-checkbox` prototypes render
+  the marker through `data-pe-when="managed"`.
+- **The contact rows.** A contact item carries `managed`, `editable` and
+  `deletable`, and the `contact-row` prototype leaves the edit and the delete
+  button out through `data-pe-when`. A missing flag reads as allowed, so an
+  answer of an older controller keeps its buttons.
+- **The endpoints.** The form endpoints refuse the `edit` and `delete` modes
+  and the write endpoints the edit and the delete of such a row, with the
+  existing `403` codes `document_action_not_allowed` and
+  `contract_contact_action_not_allowed`.
+
+**A submitted value for a locked field is ignored, never refused.** The
+editor sends every field of an open contract or contact when it saves, the
+locked ones included, so the profile, document and contact endpoints drop a
+field that is managed on the record or locked by its validators and store the
+rest. Until ACE-760 they answered it with `422`, which made a record with a
+locked field unsaveable from the browser. A key the section does not have is
+still refused. The factories keep the second line in `mayApplyProperty()`,
+see [Form data transformation](form-data-transformation.md#rule-1--disabled-and-readonly-protect-persisted-data).
+
+**A read-only select or checkbox is disabled.** Neither control knows a
+read-only state. The field builder of `field-clone.ts` disables it when it
+clones the control, and `isControlDisabled()` of the same file applies that
+rule again when a request of either editor element ends. The request is built
+from the editor's values rather than from the controls, so a disabled control
+still sends its value.
+
 ## The five elements
 
 | Element                                     | Renders | Responsibility                                                         |

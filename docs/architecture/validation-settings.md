@@ -426,9 +426,22 @@ apart from the flags on purpose.
   `config.readOnly` and appends a note naming the import identifier to the
   already translated description. Inline children run the same data group, so
   the contracts and contacts inside a profile form are covered as well.
-- **DataHandler is untouched.** The lock applies to the form only. The
-  synchronisation, an import or a script keep writing the fields, and a
-  DataHandler hook would have had to tell them apart from an editor.
+- **The frontend editor applies it too** (ACE-760). The resolver has a
+  second entry point that takes the domain model the editor writes and
+  answers property names, and `ManagedRecordLocks` of `academic_persons_edit`
+  turns them into read-only fields with a "Synchronised" marker and into the
+  row actions the synchronisation takes away: a row with a managed field
+  cannot be deleted, and offers no edit once every editable field of it is
+  managed. A submitted value for a managed field is ignored, as one for a
+  `readonly` field is. In a translated site language a managed field whose
+  column all languages share stays locked, a translated one is editable as
+  in the backend, and the delete is still decided on the default-language
+  record, which is the row it removes. See
+  [The profile editing contract](profile-editing-contract.md#fields-and-rows-the-synchronisation-owns).
+- **DataHandler is untouched.** The lock applies to the backend form and the
+  frontend editor only. The synchronisation, an import or a script keep
+  writing the fields, and a DataHandler hook would have had to tell them apart
+  from an editor.
 - **Copies and workspaces.** `import_identifier` has no
   `setToDefaultOnCopy`, so a copy of a synchronised record is locked as well
   (ACE-759). The parent rows are read live, without a workspace overlay, so a
@@ -442,8 +455,9 @@ apart from the flags on purpose.
 A mistake in the map follows the rule of `frontendUserSync`: the factory
 records it in `problems` instead of throwing, because a typo must not break
 the TCA, and the resolver throws it (1790536034) when a person record form is
-compiled. `ManagedFieldResolverTest` (unit and functional) and
-`ManagedFieldsReadOnlyTest` pin the rules above.
+compiled. `ManagedFieldResolverTest` (unit and functional),
+`ManagedFieldsReadOnlyTest` and, for the editor,
+`AcademicPersonsEditManagedFieldsTest` pin the rules above.
 
 The two locks combine. The shipped name fields carry `readonly` and
 `disabled`, which already lock them on every record, so a project that wants

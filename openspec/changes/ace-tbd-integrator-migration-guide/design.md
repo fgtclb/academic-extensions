@@ -93,7 +93,7 @@ A table maps each 2.x override intent to its 3.0 setting:
 - labels: the `profileEditing.*` keys;
 - icons: `Icons.php`.
 
-It names the gaps without a replacement (`ace-tbd-managed-fields-editor`,
+It names the gaps without a replacement (`ace-760-managed-fields-editor`,
 `ace-tbd-editor-before-write-event`, `ace-tbd-editor-custom-profile-fields`)
 and lists the 2.x override paths with their fate.
 
