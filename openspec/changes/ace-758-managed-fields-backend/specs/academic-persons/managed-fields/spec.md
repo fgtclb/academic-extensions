@@ -21,6 +21,18 @@ managed, on TYPO3 v13 and v14.
 - **THEN** only the position field of contracts can become read-only, and no
   field of a profile, e-mail address, phone number or physical address does
 
+### Requirement: A name that matches no field is reported
+The system SHALL report a declared managed field that matches no field of its
+record type when the backend form of a person record is opened, naming it.
+The installation SHALL keep working otherwise, and the backend forms of all
+other records SHALL NOT be affected, on TYPO3 v13 and v14.
+
+#### Scenario: Misspelled contract field
+- **WHEN** an integrator declares `positon` as managed for contracts
+- **THEN** opening the backend form of any person record shows an error
+  naming `positon`
+- **AND** the backend form of a page opens as before
+
 ### Requirement: A managed field is read-only on a synchronised record
 The system SHALL render a declared managed field read-only in the backend form
 of a record that carries an import identifier and whose profile is not

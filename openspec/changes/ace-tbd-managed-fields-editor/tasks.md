@@ -1,6 +1,6 @@
 ## 1. Prerequisite
 
-- [ ] 1.1 Confirm `ace-tbd-managed-fields-backend` is merged and its resolver
+- [ ] 1.1 Confirm `ace-758-managed-fields-backend` is merged and its resolver
   is available; stop otherwise.
 
 ## 2. Server side

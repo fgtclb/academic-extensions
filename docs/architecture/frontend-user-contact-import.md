@@ -165,5 +165,8 @@ installation that needs them corrected has to do so deliberately:
   the mapper are stateless.
 - [Validation settings](validation-settings.md) — the settings graph the map is
   part of, and how the package files are merged.
+- [Managed fields](validation-settings.md#managed-fields-a-lock-per-record):
+  how the fields the synchronisation writes are locked in the backend form of
+  the records it wrote.
 - [Testing](../testing/Index.md) — functional coverage across supported core
   versions and DBMSs.

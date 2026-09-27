@@ -17,7 +17,7 @@ logic that could help.
   yields one profile.
 - A profile excluded from the synchronisation is left untouched.
 - A new record gets every supplied field. An existing record gets only the
-  supplied fields declared as managed (`ace-tbd-managed-fields-backend`), so
+  supplied fields declared as managed (`ace-758-managed-fields-backend`), so
   local data survives.
 - The visibility of existing records is never changed.
 - A listener can change or veto each record write.
@@ -47,7 +47,7 @@ None.
 - `academic_persons`: the writer, its data objects, a result object, one
   event, a retire policy.
 - Depends on `ace-tbd-import-identifier-lookup`,
-  `ace-tbd-managed-fields-backend` and
+  `ace-758-managed-fields-backend` and
   `ace-725-backend-save-announces-profile-update`.
 - Developer and integrator documentation, a 3.0 feature changelog.
 

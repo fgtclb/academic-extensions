@@ -11,7 +11,7 @@ are all dead on 3.0, so today there is no way to get it.
 - The frontend editor of `academic_persons_edit`
   (`packages/fgtclb/academic-persons-edit`) reads the managed fields declared
   for `academic_persons` (`packages/fgtclb/academic-persons`) by
-  `ace-tbd-managed-fields-backend`.
+  `ace-758-managed-fields-backend`.
 - On a managed record (import identifier set, profile not excluded from the
   synchronisation) a managed field is rendered read-only with a
   "synchronised" marker, and a submitted value for it is ignored; the stored
@@ -47,7 +47,7 @@ None.
 
 ## Non-goals
 
-- The backend form (`ace-tbd-managed-fields-backend`).
+- The backend form (`ace-758-managed-fields-backend`).
 - Profile information (vita, publications); it has no import identifier.
 - Letting the owner unlock a managed field; excluding the profile from the
   synchronisation is the existing way.

@@ -4,13 +4,18 @@ See `proposal.md` for the motivation. What exists on `main`:
 
 - `skip_sync` on the profile only gates `academic:updateprofiles`
   (`academic-persons/Classes/Profile/AbstractProfileFactory.php`).
-- The fe_users synchronisation writes `import_identifier` as `fe_users:<uid>`
-  on profile, contract, address, e-mail and phone rows
-  (`academic-persons/Classes/Profile/ProfileFactory.php`). The column is
-  `passthrough` on all eight person tables, so it never reaches a form.
+- The fe_users synchronisation writes `import_identifier` on profile,
+  contract, address, e-mail and phone rows: `fe_users:<uid>` on the profile,
+  the contract and the first address and e-mail address
+  (`academic-persons/Classes/Profile/ProfileFactory.php`), and
+  `<first column>:fe_users:<uid>` on every further contact record
+  (`academic-persons/Classes/Profile/FrontendUserProfileMapper.php`, since
+  ACE-720). The column is `passthrough` on all eight person tables, so it
+  never reaches a form.
 - The `readonly` validation flag becomes TCA `readOnly` for every record of the
-  table through `TcaValidationMerger` in the TCA files. No FormEngine data
-  provider exists in any academic extension.
+  table through `TcaValidationMerger` in the TCA files. `academic_base` has
+  one FormEngine data provider (`KeepCurrentContentTypeSelectable`), which
+  shows the registration pattern. `academic_persons` has none.
 - `tcaDatabaseRecord` in `DefaultConfiguration.php` is the data group on v13
   and v14 alike, and it compiles inline children too, so one provider covers
   the profile form and its nested contracts and contacts.
@@ -45,10 +50,17 @@ managedFields:
 The entries are the field identifiers the settings already use, resolved to
 database columns through the existing field descriptors (`propertyName`,
 `fieldName`), so an integrator writes the same names in `managedFields` as in
-`profile`, `contracts.fields` and `contracts.contactSections`. An unknown
-identifier fails the settings build with an exception naming it, like any
-other invalid settings entry. The typed graph gets a small read-only value
-object; `AcademicPersonsSettings` exposes it.
+`profile`, `contracts.fields` and `contracts.contactSections`. A contact list
+resolves its names in its own section only, since every contact section has
+a field for the property `type`. The typed graph gets a small read-only value
+object, `ManagedFieldsSettings`, which `AcademicPersonsSettings` exposes.
+
+An unknown identifier is recorded in `problems` of that object and thrown
+(1790536034) by the resolver, so every person record form fails with a message
+naming it. Changed from "fails the settings build": the graph is built while
+the TCA files load, and `frontendUserSync` (ACE-720) already established that a
+typo in the settings must not take the TCA down. The shipped file declares the
+five lists empty.
 
 Rejected: a TCA `ctrl` key per table. Every project would need TCA overrides
 for five tables, and the frontend editor could not read it without a second
@@ -56,21 +68,31 @@ source of truth.
 
 ### One stateless resolver, one data provider
 
-`FGTCLB\AcademicPersons\Sync\ManagedFieldResolver` (`final readonly`) takes a
-table name and a row and returns the managed column names. It is empty when
-the row has no `import_identifier`, when it is not a default-language row, or
-when its profile has `skip_sync = 1`. The owning profile of a contract or a
-contact is read with the `QueryBuilder` (deleted restriction only, so a hidden
-profile still counts, as the sync treats it).
+`FGTCLB\AcademicPersons\Profile\ManagedFieldResolver` (`final readonly`)
+takes a table name and a row and returns the managed column names. It is
+empty when the row has no `import_identifier`, when it is not a
+default-language row, or when its profile has `skip_sync = 1` or cannot be
+found. The owning profile of a contract or a contact is read with the
+`QueryBuilder` (deleted restriction only, so a hidden profile still counts, as
+the sync treats it).
 
-`FGTCLB\AcademicPersons\Backend\Form\FormDataProvider\ManagedFieldsReadOnly`
-is registered in `ext_localconf.php` for `tcaDatabaseRecord`, after
-`TcaColumnsProcessShowitem` and before `TcaColumnsProcessFieldDescriptions`,
-so the description it sets is still an `LLL:` reference that core translates.
-It only touches `processedTca.columns` of the table being compiled. Services
-are autowired through `Services.yaml`; the provider carries
+`FGTCLB\AcademicPersons\Backend\FormEngine\ManagedFieldsReadOnly` is
+registered in `ext_localconf.php` for `tcaDatabaseRecord`, depending on
+`TcaColumnsProcessFieldDescriptions` and before `TcaFlexPrepare`, which is the
+same position in both vendor trees. The note names the import identifier, so
+it cannot stay an `LLL:` reference for core to translate: the provider
+translates it itself and appends it to the already translated description, on
+a line of its own. Running before the relation and select providers, it reads
+the values of the row as they are stored. It only touches
+`processedTca.columns` of the table being compiled. Services are autowired
+through `Services.yaml`, and the provider carries
 `#[Autoconfigure(public: true)]` because FormEngine instantiates it through
 `GeneralUtility::makeInstance()`.
+
+The two classes live next to their neighbours rather than in the namespaces
+first sketched: the resolver in `Classes/Profile/` with the synchronisation
+mapper, the provider in `Classes/Backend/FormEngine/` with the other FormEngine
+classes of `academic_persons`.
 
 Rejected: one project's approach of field lists in code, which also looped over
 the lists of every table for every table.
@@ -115,6 +137,11 @@ translatable fields on translations too.
   lookup per compiled record, bounded by the inline children of one profile.
 - [A changed identifier list is only seen after a cache flush] → Same as every
   other settings change; documented.
+- [A copy keeps the import identifier of its original, so it is locked too] →
+  Existing gap of the data model, documented and filed as ACE-759.
+- [Parent rows are read live, without a workspace overlay] → A draft
+  `skip_sync` unlocks the contracts and contacts once it is published.
+  Documented.
 
 ## Open Questions
 

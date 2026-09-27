@@ -57,10 +57,10 @@ this and is the pattern to copy:
 ## `readonly` on properties, and on stateless service classes
 
 `readonly` is used heavily, mostly on individual properties: 302 modifiers, of
-which 293 are constructor-promoted, across 93 files. The nine non-promoted
-declarations are the eight documented fields of
+which 293 are constructor-promoted, across 93 files. The ten non-promoted
+declarations are the nine documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
-`typo3-category-types/Classes/Collection/FilterCollection.php` line 15.
+`typo3-category-types/Classes/Collection/FilterCollection.php` line 17.
 
 ```bash
 grep -rhoP '\b(private|public|protected) readonly\b' --include='*.php' \

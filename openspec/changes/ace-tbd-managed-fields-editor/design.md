@@ -15,7 +15,7 @@ See `proposal.md`. On `main`:
 - The profile carries `import_identifier` since the fe_users sync writes it
   on the profile too (`ProfileFactory.php`), so profile fields can be managed.
 
-This change depends on `ace-tbd-managed-fields-backend` for the settings key
+This change depends on `ace-758-managed-fields-backend` for the settings key
 and `ManagedFieldResolver`.
 
 ## Goals / Non-Goals

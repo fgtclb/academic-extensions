@@ -155,7 +155,7 @@ non-empty". This replaces the hard-coded column list.
 The mapping lives in `Configuration/AcademicPersons/Settings.yaml` under the
 top-level key `frontendUserSync`. The settings graph is not editor-only
 today: `academic_persons` itself reads it in five classes and in all six
-person TCA files, and `ace-tbd-managed-fields-backend` puts `managedFields`
+person TCA files, and `ace-758-managed-fields-backend` puts `managedFields`
 into the same graph. One file keeps one loader, one cache and one patch
 mechanism (`ace-tbd-settings-per-field-merge`) for all these keys.
 

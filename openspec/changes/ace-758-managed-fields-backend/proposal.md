@@ -61,8 +61,6 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-10`). Four of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-managed-fields-backend` when the issue is filed after
-implementation.
+this today. Filed as ACE-758.
 
 Relates to ACE-234 and ACE-279.
