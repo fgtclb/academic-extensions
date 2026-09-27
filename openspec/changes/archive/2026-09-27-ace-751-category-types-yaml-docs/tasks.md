@@ -30,4 +30,4 @@
   `functional` green with `-t 13`.
 - [x] 4.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 4.5 Commit as `[TASK] ACE-751: Document category type overrides`.
-- [ ] 4.6 Archive the change as the last commit of the pull request.
+- [x] 4.6 Archive the change as the last commit of the pull request.
