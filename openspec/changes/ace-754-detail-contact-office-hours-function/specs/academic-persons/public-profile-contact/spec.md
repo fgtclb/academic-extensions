@@ -62,9 +62,9 @@ gender-specific name is maintained.
 - **THEN** the general name of the function type is shown
 
 ### Requirement: List items can show the function type
-The list, listanddetail and card plugins SHALL offer the function type among
-the fields to show, and SHALL then show its name, following the profile's
-gender, for each contract.
+The list, listanddetail, card, selected profiles and selected contracts
+plugins SHALL offer the function type among the fields to show, and SHALL then
+show its name, following the profile's gender, for each contract.
 
 #### Scenario: Function type selected for the card
 - **WHEN** an editor selects the function type among the card's fields to
