@@ -51,13 +51,14 @@ Six sets exist, one per editable record type: `profile`, `contract`,
 The recognised flags, all matched case-insensitively
 (`AcademicPersonsSettingsFactory::normalizeValidations()`):
 
-| Flag       | Effect                                                                  |
-|------------|-------------------------------------------------------------------------|
-| `required` | Adds `NotEmptyValidator`, and `required` + `minitems` to the TCA config |
-| `disabled` | Field must not be edited. Forces `readOnly`, and cancels `required`     |
-| `readonly` | Field is shown but not writable. Cancels `required`                     |
-| `email`    | Adds `EmailAddressValidator`, TCA `type` and input type `email`         |
-| `number`   | TCA `type` and input type `number` — no validator today                 |
+| Flag               | Effect                                                                                    |
+|--------------------|-------------------------------------------------------------------------------------------|
+| `required`         | Adds `NotEmptyValidator`, and `required` + `minitems` to the TCA config                   |
+| `disabled`         | Field must not be edited. Forces `readOnly`, and cancels `required`                       |
+| `readonly`         | Field is shown but not writable. Cancels `required`                                       |
+| `frontendreadonly` | Like `readonly` for the frontend, and TCA untouched: the backend keeps `required` as well |
+| `email`            | Adds `EmailAddressValidator`, TCA `type` and input type `email`                           |
+| `number`           | TCA `type` and input type `number` — no validator today                                   |
 
 Anything else in the list is ignored. There is no `url` flag yet; the source
 carries a `@todo` for it.
@@ -69,16 +70,23 @@ The factory turns each flag list into one `Validation` value object:
 ```php
 $readOnly = in_array('readonly', $validators, true);
 $disabled = in_array('disabled', $validators, true);
-$required = !$disabled && !$readOnly && in_array('required', $validators, true);
+$frontendReadOnly = in_array('frontendreadonly', $validators, true);
+$backendRequired = !$disabled && !$readOnly && in_array('required', $validators, true);
+$required = $backendRequired && !$frontendReadOnly;
 ...
 if ($disabled) {
     // @todo Investigate how to handle that for the backend / TCA FormEngine, therefore switch to
     //       readOnly for now
     $readOnly = true;
 }
+$tcaConfig['readOnly'] = $readOnly;
+...
+if ($frontendReadOnly) {
+    $readOnly = true;
+}
 ```
 
-Two consequences worth knowing:
+Three consequences worth knowing:
 
 - **`disabled` implies `readOnly`.** FormEngine has no per-field notion matching
   the HTML `disabled` attribute, so `disabled` is expressed to the backend as
@@ -89,6 +97,16 @@ Two consequences worth knowing:
   cannot be demanded of them, so no validator is generated. This is why the
   shipped `profile` set produces no validators at all — all three of its entries
   are `disabled` — and why the `- required` on `firstName` has no effect.
+- **`frontendreadonly` is set after the TCA fragment.** `Validation::$readOnly`
+  and `$required` are what the frontend reads, `$tcaConfig` is what the backend
+  reads, and the flag changes only the first two. A `required` beside it still
+  gives the TCA `required` and `minitems`, because a backend editor can
+  correct the value an owner cannot. `readonly` or `disabled` beside it still
+  lock the TCA column. Rejected: making `readonly` itself frontend-only, which
+  would unlock the backend of every installation that relies on the shared
+  lock. A record an owner creates in the frontend is therefore stored without
+  such a field, and the record editor asks for it the next time the record is
+  saved there.
 
 `Validation::$fieldName` is the property name converted with
 `GeneralUtility::camelCaseToLowerCaseUnderscored()`, i.e. the database column:
@@ -112,6 +130,8 @@ Extbase property and the TCA column.
 
 So marking a field `disabled` or `readonly` in the YAML makes it read only in the
 backend record editor as well — by design, and for every backend user.
+`frontendreadonly` is the lock that stays out of the TCA, for a field that
+owners must not change and backend editors must be able to correct.
 
 The merge is not written the same way everywhere: the profile table uses
 `ArrayUtility::mergeRecursiveWithOverrule()`, the contract table uses
@@ -134,10 +154,10 @@ versus `Configuration/TCA/Overrides/` — not a doubt about the coupling itself.
    control: `disabled`, `readonly` and `required` attributes.
 2. **Validation.** `required` contributes `NotEmptyValidator` to the
    `*FormDataValidator` of the matching argument.
-3. **Transformation.** `disabled` and `readOnly` properties are never written to
-   the model, whatever the request contains — see
-   [Form data transformation](form-data-transformation.md), which is where that
-   rule and the traps around it are documented.
+3. **Transformation.** `disabled` and `readOnly` properties, `frontendreadonly`
+   ones included, are never written to the model, whatever the request
+   contains — see [Form data transformation](form-data-transformation.md),
+   which is where that rule and the traps around it are documented.
 
 An unknown identifier yields an empty `ValidationSet`, so every property falls
 through as unconfigured.
@@ -161,9 +181,9 @@ There is no TypoScript and no site-set path — the site sets do not expose
 validations.
 
 Because both consumers read the same data, an override changes the backend and
-the frontend together. Re-enabling the profile name fields for the frontend edit
-form therefore also makes those columns writable again in the backend record
-editor. That is usually what is wanted, but it is worth being deliberate about.
+the frontend together, with `frontendreadonly` as the one exception.
+Re-enabling the profile name fields for the frontend edit form therefore also
+makes those columns writable again in the backend record editor. That is usually what is wanted, but it is worth being deliberate about.
 
 ## The second implementation, in `academic_jobs`
 
@@ -224,9 +244,6 @@ Still open, in the YAML files themselves rather than in the manuals:
 - The persons header calls it "Validation configuration for
   EXT:academic_persons_edit or custom implementation" — it omits the backend,
   which is half the point.
-- Its inline flag list documents `required`, `email`, `disabled` and `readonly`
-  but **not** `number`, which the file itself uses for `streetNumber`, `zip` and
-  `year`.
 - `@internal … will change until 2.1.0 release` is stale; the branch is
   `2.4.x-dev`.
 - The jobs file's copied comment block is wrong for that extension, as above.

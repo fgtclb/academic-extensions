@@ -71,7 +71,7 @@ worth knowing:
 | Control                               | Marked `disabled`                        | Marked `readOnly`                              |
 |---------------------------------------|------------------------------------------|------------------------------------------------|
 | `f:form.textfield`, `f:form.textarea` | Not submitted at all — the key is absent | Submitted, with the value it was rendered with |
-| `f:form.select`, `f:form.checkbox`    | **Submitted as `''`** — see below        | Submitted, with the value it was rendered with |
+| `f:form.select`, `f:form.checkbox`    | **Submitted as `''`** — see below        | Submitted, with whatever the owner chose       |
 
 The select and checkbox case is the one that bites. Both view helpers emit a
 companion hidden field so that an empty selection still reaches the server, and
@@ -93,6 +93,13 @@ it, because as far as the request is concerned the field was submitted.
 For a disabled text field the guard is belt-and-braces: a browser omits the key,
 so rule 2 would already skip it. It still matters, because a hand-built or
 forged POST can carry the key anyway.
+
+A `readOnly` select or checkbox is the other gap. Browsers ignore the
+`readonly` attribute on both, so the owner can still change the control, and
+the changed value is submitted. Rule 1 discards it on save, the stored value
+stays, and the change silently disappears. That holds for `readonly` and
+`frontendreadonly` alike. Rendering those controls `disabled` is tracked as
+ACE-757. On `main` the rewritten editor does that already.
 
 ## Rule 2 — only what the request carried
 
@@ -118,7 +125,7 @@ empty DTO default. See
 
 ## The shipped defaults, and the trap they set
 
-`packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml:80-87`
+`packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml:95-102`
 is the only place the `profile` set is defined:
 
 ```yaml
@@ -153,10 +160,12 @@ backed `fe_user`, synchronised into the profile — which is also why
 
 ### `- required` on `firstName` is inert
 
-`AcademicPersonsSettingsFactory::normalizeValidations()` (`:99-109`) computes:
+`AcademicPersonsSettingsFactory::normalizeValidations()` (`:99-125`) computes:
 
 ```php
-$required = !$disabled && !$readOnly && in_array('required', $validators, true);
+$frontendReadOnly = in_array('frontendreadonly', $validators, true);
+$backendRequired = !$disabled && !$readOnly && in_array('required', $validators, true);
+$required = $backendRequired && !$frontendReadOnly;
 ...
 if ($disabled) {
     // @todo Investigate how to handle that for the backend / TCA FormEngine, therefore switch to
@@ -174,10 +183,17 @@ which is correct — a field the user cannot edit cannot be required of them. Th
 produces, so the `||` in rule 1 only distinguishes the two for a `Validation`
 built by hand.
 
+`frontendreadonly` sets `readOnly` as well, so rule 1 protects such a
+property exactly like a `readonly` one. The difference is on the backend
+side only: the flag leaves the TCA fragment alone, and a backend editor can
+still change the value. See
+[Validation settings](validation-settings.md#normalisation).
+
 **The same configuration also drives the TYPO3 backend**, deliberately: all six
-TCA tables merge in `getValidationTcaTableConfig()`, so a locked field is read
-only in the record editor as well. That coupling — and the reason the settings
-ship in `academic_persons` rather than in the edit extension — is documented in
+TCA tables merge in `getValidationTcaTableConfig()`, so a field locked with
+`readonly` or `disabled` is read only in the record editor as well. That
+coupling — and the reason the settings ship in `academic_persons` rather than
+in the edit extension — is documented in
 [Validation settings](validation-settings.md).
 
 ## Overriding the set in an instance
