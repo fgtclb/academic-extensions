@@ -49,7 +49,7 @@ None.
 ## Non-goals
 
 - The frontend editor. It is a change of its own
-  (`ace-tbd-managed-fields-editor`) built on the same settings.
+  (`ace-760-managed-fields-editor`) built on the same settings.
 - Changing the global `readonly` flag or its leak into TCA; that is
   `ace-756-frontend-only-readonly-flag`.
 - Enforcing the lock in DataHandler. An admin, an import or a script may still
