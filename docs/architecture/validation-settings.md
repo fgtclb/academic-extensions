@@ -29,7 +29,7 @@ frontend user synchronisation:
 | Map                | Holds                                                                                                                                                                       |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `profile`          | The public detail layout (`structure`, `details`) **and** every editable profile property: `section`, `fieldType`, `renderType`, `validators`, `helptext`, `characterLimit` |
-| `special`          | The components that are not one property: the composed `title`, the `image`, the `skipSync` switch                                                                          |
+| `special`          | The components that are not one property: the composed `title`, the `image`, the `skipSync` and the `hidden` switch                                                         |
 | `contracts`        | `fields` of the contract form, and `contactSections` — `physicalAddresses`, `emailAddresses`, `phoneNumbers` — with their own `fields`                                      |
 | `documentSections` | The sortable lists: the seven profile information types and `contracts`, each with `label`, `type`, `fieldName`, `rowFields`, `actions`, `validators`, `helptext`           |
 | `frontendUserSync` | Which `fe_users` column feeds which profile and contract property, see [Frontend-user contact import](frontend-user-contact-import.md)                                      |
@@ -203,7 +203,7 @@ with a `__set_state()`:
 |---------------------------------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `PublicProfileSettings`                           | `profile.structure`, `profile.details`                   | The layout columns and the per-element property lists, maps and label references                                                                                                                           |
 | `ProfileSection` → `ProfileField`                 | every other `profile` entry, grouped by `section`        | `propertyName`, `fieldName`, `fieldType`, `renderType`, `Validation`, `position`, `helptext`                                                                                                               |
-| `SpecialField`                                    | `special`                                                | `type`, `renderType`, composed `fieldIdentifiers`, renderer `settings` (the image's `ratio`); `hasDirectProfileProperty()` is true only for `skipSync`                                                     |
+| `SpecialField`                                    | `special`                                                | `type`, `renderType`, composed `fieldIdentifiers`, renderer `settings` (the image's `ratio`); `hasDirectProfileProperty()` is true for `skipSync` and `hidden`                                             |
 | `ContractField`                                   | `contracts.fields`                                       | as a profile field, plus `optionSource`, `helptext`, `autocomplete`                                                                                                                                        |
 | `ContractContactSection` → `ContractContactField` | `contracts.contactSections`                              | as a profile field, plus `autocomplete` and `helptext`; the section carries the `ValidationSet`                                                                                                            |
 | `DocumentSection`                                 | `documentSections`, `contracts` completing its own entry | `label`, `type`, `fieldName`, `readOnly`, `rowFields`, `actions`, `helptexts` (keyed like `validators`), `ValidationSet`; `allowsAction()`, `getAllowedActions()`, `allowsCreate()`, `allowsDragSorting()` |
@@ -292,7 +292,7 @@ falls back from one to another:
 | Accessor                                                    | Returns                                                                                |
 |-------------------------------------------------------------|----------------------------------------------------------------------------------------|
 | `getProfileValidationSet(?$section)`                        | One section's set, or all sections folded (a later section wins per property)          |
-| `getProfileUpdateValidationSet()`                           | All sections plus the direct special fields (`skipSync`) — what the profile TCA merges |
+| `getProfileUpdateValidationSet()`                           | All sections plus the direct special fields (`skipSync`, `hidden`)                     |
 | `getProfileValidationSetForFields($ids, $section)`          | The named fields of one section, keyed by property                                     |
 | `getContractContactValidationSet($section)`, `…ForFields()` | One contact section's set                                                              |
 | `getDocumentValidationSet($id)`                             | One document section's validation set, by settings key                                 |
@@ -311,7 +311,7 @@ section; the sixth merges a `types` fragment:
 
 | Section                                    | TCA file                                                  | Call                                                                                 |
 |--------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------------------|
-| `profile` + `special.skipSync`             | `tx_academicpersons_domain_model_profile.php`             | `merge($tca, $settings->getProfileUpdateValidationSet())`                            |
+| `profile` + `special.skipSync`             | `tx_academicpersons_domain_model_profile.php`             | `merge($tca, <the update set without the disabled column>)`                          |
 | `contracts.fields`                         | `tx_academicpersons_domain_model_contract.php`            | `merge($tca, $settings->getDocumentValidationSet('contracts'))`                      |
 | `contracts.contactSections.emailAddresses` | `tx_academicpersons_domain_model_email.php`               | `merge($tca, $settings->getContractContactValidationSet('emailAddresses'))`          |
 | `…phoneNumbers`                            | `tx_academicpersons_domain_model_phone_number.php`        | `merge($tca, $settings->getContractContactValidationSet('phoneNumbers'))`            |
@@ -327,6 +327,13 @@ the `range` of the year columns is untouched.
 
 So marking a field `disabled` or `readonly` in the YAML makes it read only in the
 backend record editor as well — by design, and for every backend user.
+
+There is one exception. `special.hidden` is the owner's visibility switch of the
+profile editor and writes the table's `disabled` enable column. Its flags decide
+whether *owners* may show or hide a profile, and an installation sets them
+exactly when editors are meant to decide instead. The profile TCA file therefore
+leaves the validation of that column out of the merge, and the backend
+checkbox stays writable whatever the YAML says.
 
 The merge is `ArrayUtility::mergeRecursiveWithOverrule()` for all six tables. A
 missing section is a no-op, so a table may be asked about a section nobody
