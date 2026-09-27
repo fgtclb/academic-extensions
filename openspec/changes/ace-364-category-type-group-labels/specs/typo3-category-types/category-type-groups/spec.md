@@ -31,13 +31,15 @@ identifier as the heading.
 - **THEN** the type select shows those types below the heading `news`
 
 ### Requirement: A later declaration of a group wins
-When two packages declare the same group, the title and icon of the package
-loaded later SHALL be used.
+When two packages declare the same group, the values the package loaded later
+declares SHALL replace the earlier ones, and the values it leaves out SHALL be
+kept.
 
 #### Scenario: Project relabels a shipped group
 - **WHEN** a project that requires the programs extension declares the group
-  `programs` with its own title
+  `programs` with its own title and no icon
 - **THEN** the type select shows the project's title for the programs group
+- **AND** the programs group keeps the icon the programs extension declares
 
 ### Requirement: A declared group icon is available to integrators
 The icon declared for a group SHALL be available under the icon identifier

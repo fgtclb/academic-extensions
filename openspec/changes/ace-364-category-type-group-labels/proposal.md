@@ -9,8 +9,8 @@ loader reads only the types. ACE-364 asks for the group titles.
 ## What Changes
 
 - `category_types` (`packages/fgtclb/typo3-category-types`) reads the
-  `groups:` section of `CategoryTypes.yaml`: identifier, title and icon. A
-  `priority` is read and kept for a later ordering change.
+  `groups:` section of `CategoryTypes.yaml`: identifier, title, icon and
+  `inlineIcon`. A `priority` is read and kept for a later ordering change.
 - The type select shows the group title as the heading of its types. A group
   without a declaration keeps showing its identifier.
 - A later package can redeclare a group to change its title or icon,
@@ -18,7 +18,12 @@ loader reads only the types. ACE-364 asks for the group titles.
 - A declared group icon is registered under the icon identifier
   `category_types.group.<identifier>`.
 - `academic_partners` (`packages/fgtclb/academic-partners`) declares its
-  `partners` group with a title, the one shipped group without a declaration.
+  `partners` group with a title and an icon, the one shipped group without a
+  declaration.
+- The group icons that `academic_programs` (`packages/fgtclb/academic-programs`)
+  and `academic_projects` (`packages/fgtclb/academic-projects`) declare were
+  never shipped: the files do not exist. The three shipped groups get Font
+  Awesome Free icons at the declared paths.
 
 The behaviour is identical on TYPO3 v13 and v14.
 
@@ -40,24 +45,26 @@ None.
 - A second cache entry for the groups.
 - `academic_partners`: `CategoryTypes.yaml` and two labels (English and
   German).
-- `Feature-` changelog entries in `category_types` and `academic_partners`.
+- One new SVG each in `academic_programs`, `academic_projects` and
+  `academic_partners`, with the Font Awesome attribution file.
+- `Feature-` changelog entries in `category_types` and `academic_partners`,
+  and `Important-` entries in `academic_programs` and `academic_projects`,
+  whose type select heading changes although they declare nothing new.
 
 ## Non-goals
 
 - Ordering groups or types. Groups keep their first-seen order, and a group
   `priority` has no effect yet; ordering types is
   `ace-752-category-type-priority-order`.
-- Showing group icons in the type select; the option groups of a select carry
-  a label only.
-- Inline SVG rendering for group icons.
+- Showing group icons anywhere in the backend, the type select included,
+  where the option groups of a select carry a label only.
 - A backport to branch `2`.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `cross-cutting-17`). Two of the six analysed projects carry their own code for
-this today. The change implements the existing issue ACE-364 and is renamed to
-`ace-364-category-type-group-labels` once that issue is verified in YouTrack
-before implementation starts.
+this today. The change implements the existing issue ACE-364, verified in
+YouTrack before implementation started.
 
 Implements ACE-364.

@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Thirty-five such fixture extensions exist, in nine of the twelve extensions.
+Thirty-six such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -27,8 +27,9 @@ They sit next to the tests that use them, under
 | `test_base_dependency_injection`       | `tests/base-test-dependency-injection`  | `academic-base`         | Two services to resolve through the container, plus `Services.yaml`.          |
 | `test_bitejobs_stub`                   | `tests/test-bitejobs-stub`              | `academic-bite-jobs`    | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
 | `test_category_types_group`            | `tests/category-types-group`            | `typo3-category-types`  | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.           |
-| `test_category_types_icons`            | `tests/category-types-icons`            | `typo3-category-types`  | Four category types, one per branch of the icon registrar.                    |
+| `test_category_types_icons`            | `tests/category-types-icons`            | `typo3-category-types`  | Four category types, one per branch of the icon registrar, and three groups.  |
 | `test_category_types_summary_override` | `tests/category-types-summary-override` | `typo3-category-types`  | A page TSconfig override of the page module category summary template.        |
+| `test_category_types_undeclared_group` | `tests/category-types-undeclared-group` | `typo3-category-types`  | A type in a group no package declares, then one in a group the file declares. |
 | `test_contract_contact_actions`        | `tests/test-contract-contact-actions`   | `academic-persons-edit` | A `Settings.yaml` narrowing the actions of the contracts section.             |
 | `test_current_color_icons`             | `tests/current-color-icons`             | `academic-base`         | Icons registered through the `currentColor` icon provider.                    |
 | `test_exclude_file_column`             | `tests/test-exclude-file-column`        | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
