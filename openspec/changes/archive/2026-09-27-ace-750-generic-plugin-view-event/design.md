@@ -59,10 +59,17 @@ code base cost more than they save.
 ### Explicit dispatch through a trait method
 
 A trait in `academic-base/Classes/Controller/` provides one protected method
-that builds the `academic_base` context from `$this->request` and
-`$this->settings` and dispatches the event with `$this->view`. Every rendering
-path calls it once, after the action's own assignments, and before any
-assignment that must stay protected.
+that takes the request, the settings, the view and the event dispatcher,
+builds the `academic_base` context from the request and the settings,
+dispatches the event with the view, and returns the dispatched event, so an
+action can hand its context on. Every rendering path calls it once, after
+the action's own assignments, and before any assignment that must stay
+protected.
+
+The trait reads no property and calls no method of the controller, although
+all four arguments are controller properties: a trait must not depend on the
+class it is used in. The rule is written down in
+`docs/architecture/class-design.md`, section Traits.
 
 Rejected: overriding `htmlResponse()` in the trait so no path can be missed.
 It would fire after the jobs `validations` assignment and make it

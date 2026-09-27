@@ -13,8 +13,8 @@ shared plugin action context of the academic extensions is expected, on TYPO3
 v13 and v14.
 
 #### Scenario: Listener typed against the shared context
-- **WHEN** a listener of the persons list event passes the event's context to
-  code that expects the shared academic plugin action context
+- **WHEN** a listener of the profile title placeholder event passes the event's
+  context to code that expects the shared academic plugin action context
 - **THEN** the call succeeds without a type error
 
 ### Requirement: The persons context exposes the content element
@@ -23,8 +23,8 @@ holds the plugin, and SHALL provide none, without an error, when the request
 it was built from carries no content element.
 
 #### Scenario: Persons list plugin
-- **WHEN** a listener of the persons list event reads the content element from
-  the context
+- **WHEN** a listener of the profile query event reads the content element
+  from the context while the persons list plugin renders
 - **THEN** it receives the content element record of that plugin
 
 #### Scenario: Profile page title
@@ -38,10 +38,11 @@ it was built from carries no content element.
 - **THEN** reading the content element gives none and raises no error
 
 ### Requirement: Listeners typed against the persons context keep working
-Listeners written against the persons plugin action context SHALL keep working
-unchanged in every 3.x release.
+Listeners of the profile title placeholder event written against the persons
+plugin action context SHALL keep working unchanged in every 3.x release.
 
 #### Scenario: Existing project listener
-- **WHEN** a project listener types the persons context in its signature and
-  the persons detail plugin renders
+- **WHEN** a project listener of the profile title placeholder event types the
+  persons context in its signature and the persons detail plugin sets the page
+  title
 - **THEN** the listener is called with the context as before

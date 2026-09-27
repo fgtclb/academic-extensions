@@ -1,10 +1,12 @@
+# academic-base/plugin-view-event Specification
+
 ## Purpose
+Lets an integrator add variables to the view of the plugins of seven academic
+extensions through one event listener, without copying, subclassing or
+replacing a controller, and replaces the per-action view events of the jobs
+and persons plugins.
 
-Lets an integrator add variables to the view of any academic plugin through
-one event listener, without copying, subclassing or replacing a controller,
-and replaces the per-action view events of the jobs and persons plugins.
-
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Every academic plugin view can be extended by a listener
 The persons, jobs, partners, programs, projects, contacts for pages and BITE

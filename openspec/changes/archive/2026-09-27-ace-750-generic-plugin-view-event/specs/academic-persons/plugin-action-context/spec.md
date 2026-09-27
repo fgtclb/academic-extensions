@@ -12,8 +12,8 @@ v13 and v14.
 
 ### Requirement: The persons context exposes the content element
 The context of a persons plugin event SHALL provide the content element that
-holds the plugin, and SHALL provide none, without an
-error, when the request it was built from carries no content element.
+holds the plugin, and SHALL provide none, without an error, when the request
+it was built from carries no content element.
 
 #### Scenario: Persons list plugin
 - **WHEN** a listener of the profile query event reads the content element
