@@ -86,9 +86,9 @@ is not found under `plugin.tx_academicprograms.categoryRootUids` there
 (`SiteSettingsProvider::getProvidedSettings()`, v13 and v14). The settings
 editor keeps such a value when it saves the settings of the site
 (`SettingsDiff::create()`). A setting that only one component reads is declared
-on that component's set instead, as the list set of `academic_partners`, the
-profile editing set of `academic_persons_edit` and the content element set of
-`academic_study_plan` do.
+on that component's set instead, as the list and the map set of
+`academic_partners`, the profile editing set of `academic_persons_edit` and the
+content element set of `academic_study_plan` do.
 
 Not every component belongs behind a site set. An extension may ship one that
 has to apply to every installation regardless of the site configuration — the

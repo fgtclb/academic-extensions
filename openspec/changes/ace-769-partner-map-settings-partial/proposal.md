@@ -19,8 +19,9 @@ partner page cannot show the partner's own location without copying it.
 - A map layout choice in the map content element: "content width" (default)
   or "full width", which adds a modifier class for the theme to style.
 - The map markup moves into a reusable partial that takes a list of partners.
-  The map plugin renders it as before; a partner page template can render it
-  for the single partner of the page when that partner has coordinates.
+  The map plugin renders it as before, and a partner page template can render it
+  for the single partner of the page when that partner has coordinates. The
+  partner page data processor hands the map settings to the page template.
 - Behaviour is identical on TYPO3 v13 and v14.
 
 ## Capabilities
@@ -38,27 +39,30 @@ None.
 
 - The frontend module `map.ts` and its committed build (the
   `checkJsBuildClean` gate sees a changed `map.js`).
-- `Templates/Partner/Map.html` renders the new partial; an overridden
+- `Templates/Partner/Map.html` renders the new partial. An overridden
   `Map.html` keeps working and simply does not get the new attributes, so its
   map uses the defaults.
 - A new `settings.definitions.yaml` in the map set, TypoScript constants and
-  setup, a FlexForm field, labels.
+  setup, a FlexForm sheet with one field, labels, and an option of the
+  `partner-data` processor.
 - No schema change, no new dependency.
 
 ## Non-goals
 
-- Rendering the map on the partner page by default; the partner page
+- Rendering the map on the partner page by default. The partner page
   template stays as it is, the partial makes it possible.
 - Marker icons, cluster styling or a different map library.
 - A new `tt_content` column for full width.
-- Backporting to branch `2`: the ES module exists only on `main`.
+- Backporting to branch `2`: it is a feature, and branch `2` still supports
+  TYPO3 v12, which has no site sets or settings definitions.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-14`). Three of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-partner-map-settings-partial` when the issue is filed after
-implementation.
+this today. Filed after the implementation as ACE-769.
 
-Relates to ACE-93 and ACE-571.
+Relates to ACE-93 (the zoom complaint of the demo) and ACE-540 (the map
+assets as ES modules, whose partial overrides this change keeps working).
+ACE-571, named by the analysis, is about the partner list cards and is not
+related.

@@ -32,7 +32,10 @@ A value through `settings` would arrive at a different path in each shape
 (`PageViewContentObject::render()`). `dataProcessing` is read by both as well,
 so a value a processor needs goes in as an option of that processor: the
 program facts take their field list as `factsFields` of `program-data`, see
-[Program facts](program-facts.md).
+[Program facts](program-facts.md). A value the template needs goes the same
+way: `partner-data` takes the map settings as its option `map` and hands them
+to the partner page as `{mapSettings}`, for a site package template that renders
+the map partial for the partner of the page.
 
 ## Path keys
 
