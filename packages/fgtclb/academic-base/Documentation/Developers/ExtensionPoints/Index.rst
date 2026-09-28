@@ -110,6 +110,7 @@ Every event is a :php:`final` class, dispatched through the PSR-14 event
 dispatcher of TYPO3. A listener registers for it with the
 :php:`#[AsEventListener]` attribute of TYPO3. The developer chapters of
 `academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Index.html>`__,
+`academic_persons_edit <https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/Developers/Index.html>`__,
 `academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/main/en-us/Developers/Index.html>`__
 and
 `academic_projects <https://docs.typo3.org/p/fgtclb/academic-projects/main/en-us/Developers/Index.html>`__
@@ -190,14 +191,22 @@ describe their events in detail, with examples.
         -   in the commands :bash:`academic:createprofiles` and
             :bash:`academic:updateprofiles`, once per frontend user
         -   choose the profile factory that creates or updates the profile
+    *   -   :php:`\FGTCLB\AcademicPersonsEdit\Event\BeforeProfileEditingWriteEvent`
+        -   in the profile editing of :guilabel:`academic_persons_edit`, once
+            for every write the editor accepted, before anything of it is
+            stored: the profile, its switches and image, and its documents and
+            contacts
+        -   refuse the write with a reason the person is shown, or replace the
+            values it stores, which are validated again
 
-Two events are not on this list. The event the same two commands dispatch
+One event is not on this list. The event the commands
+:bash:`academic:createprofiles` and :bash:`academic:updateprofiles` dispatch
 before they set up the environment of a frontend user's site,
 :php:`ModifyProfileCommandEnvironmentStateBuildContextForFrontendUserEvent`,
 is marked :php:`@internal` as experimental, like the environment handling it
-belongs to. And the event the 2.4 changelog of
-:guilabel:`academic_persons_edit` mentions for filling form data from other
-sources before it is written is not dispatched yet.
+belongs to. The event the 2.4 changelog of :guilabel:`academic_persons_edit`
+mentions for filling form data from other sources before it is written is
+:php:`BeforeProfileEditingWriteEvent` from 3.0 on.
 
 ..  _developers-extension-points-plugin-view:
 
@@ -290,6 +299,8 @@ packages are not listed; their own documentation applies.
         -   the profile factory event
     *   -   :php:`\FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode`
         -   the job save event
+    *   -   :php:`\FGTCLB\AcademicPersonsEdit\Event\ProfileEditingAction`
+        -   the write event of the profile editing
 
 ..  _developers-extension-points-interfaces:
 
@@ -476,7 +487,7 @@ unnecessary. Not every extension offers all three yet:
         -   the plugins of the seven extensions named at the event above,
             through one event
         -   none: the profile editing of :guilabel:`academic_persons_edit`
-            gets events on the data its forms write instead
+            has an event before each of its writes instead
     *   -   A demand event per repository query a plugin runs, to change what
             is queried
         -   :guilabel:`academic_persons`, :guilabel:`academic_partners`,

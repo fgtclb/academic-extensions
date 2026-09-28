@@ -480,6 +480,23 @@ rule again when a request of either editor element ends. The request is built
 from the editor's values rather than from the controls, so a disabled control
 still sends its value.
 
+## A write a listener refused
+
+Every write endpoint offers the write to `BeforeProfileEditingWriteEvent`
+before it stores anything, see
+[Form data transformation](form-data-transformation.md#the-listener-before-the-write).
+A listener that refuses it makes the endpoint answer `422` with the error
+`write_refused` and the listener's reason as `message`, and no `errors`.
+
+The editor needs no code of its own for that answer. Every request path
+already shows the `message` of a failed request: the field and full form
+saves, the two switches and the image removal through the status region, the
+image upload through the alert of the image editor, and the document and
+contact editors through the alert of the open editor, which keeps the editor
+open with the person's input. All of them write it as text, through
+`textContent`, so a reason cannot inject markup. `write-refused.test.ts` holds
+that for the three editors a person types into.
+
 ## The five elements
 
 | Element                                     | Renders | Responsibility                                                         |
