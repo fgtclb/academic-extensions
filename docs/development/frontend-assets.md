@@ -104,10 +104,52 @@ so each tool does the part it is good at.
 point at them relatively. That is what keeps a stylesheet working in a composer
 installation, where only `Resources/Public/` is published.
 
-Nothing is minified: the emitted files are meant to be readable, and nothing here
-is large enough for the size to be worth the loss. Source maps are never
+Nothing of this repository's own output is minified: the emitted files are meant
+to be readable, and nothing here is large enough for the size to be worth the
+loss. The libraries of the vendor pass are the exception, see
+[Libraries built from their packages](#libraries-built-from-their-packages). Source maps are never
 committed; `npm run build:dev` carries an inline one instead, and differs from
 the committed build in nothing else.
+
+## Libraries built from their packages
+
+`academic_partners` ships the map libraries Leaflet 1.9.4 and
+Leaflet.markercluster 1.5.3. TYPO3 ships neither. They are exact dependencies of
+`Build/package.json`, and `Build/vendor.mjs` writes them as part of the build, so
+`checkJsBuildClean` guards them like every other artifact:
+
+| File                                           | Built from                                              |
+|------------------------------------------------|---------------------------------------------------------|
+| `Resources/Public/JavaScript/leaflet.js`       | `leaflet/dist/leaflet-src.esm.js`                       |
+| `Resources/Public/JavaScript/markerCluster.js` | `leaflet.markercluster/src/index.js`, with `L` injected |
+
+The frontend of this branch has no import map, since TYPO3 v12 renders none, so
+both are classic scripts at the paths the template has always loaded:
+
+- **Leaflet publishes `window.LeafletObject`, not `window.L`**, so it cannot
+  collide with another Leaflet on the page. The copies these files replace were
+  the same releases with `L` renamed by replacing the text, which also turned
+  the SVG path command `L` into `LeafletObject` and broke every line and polygon
+  the map drew. A small entry per library, `Build/vendor/leaflet-classic.mjs`
+  and `markercluster-classic.mjs`, publishes the globals instead and leaves the
+  code alone.
+- **The globals are the ones the replaced builds published**: `LeafletObject`
+  and `leaflet`, `LeafletObject.noConflict()`, and `Leaflet.markercluster` for
+  the plugin. `LeafletObject` is a plain copy of the module namespace, so its
+  members stay writable for a plugin of a project, as they were. Both scripts
+  run in strict mode.
+- **The plugin extends that global.** It publishes only classic builds, and its
+  ES sources read and extend the global `L`. esbuild injects
+  `Build/vendor/leaflet-global.mjs`, which is `window.LeafletObject`, wherever
+  they name it.
+- **Both are minified**, with the licence comments kept: they are not ours to
+  read, the readable source is the pinned package, and the page loads what it
+  loaded before.
+- **The stylesheets and images stay as they were.** `Css/leaflet.css` points
+  Leaflet at the marker icon of the extension in `Css/images/`.
+
+A test reads these two files rather than a source, see
+[JavaScript tests](../testing/javascript-tests.md).
 
 ## Loading the result
 
@@ -157,9 +199,9 @@ installation, and is only noticed when someone wonders why a fix had no effect.
 `checkJsBuildClean` is therefore mandatory, not optional.
 
 That gate cannot simply delete the output directories the way a single-extension
-repository can. `academic_partners` keeps vendored files there that have no
-source — a minified mapping library, its plugin, their stylesheets and their
-images — and deleting them would report a permanently dirty tree. So
+repository can. `academic_partners` keeps files there that have no source, the
+stylesheets and images of its map libraries, and deleting them would report a
+permanently dirty tree. So
 `node esbuild.mjs --list-outputs` derives the exact set of files the build would
 write, from the same discovery the build itself uses, and the gate removes only
 those. A source that stopped producing an output is still caught, as a deletion

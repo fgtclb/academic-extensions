@@ -117,10 +117,21 @@ behind it raises an error naming both, rather than falling through to node's
 ## Nothing is stubbed here
 
 There is no list of stubbed libraries to keep short: **none of the four frontend
-modules of this branch imports a library at all.** The two CKEditor 4 modules
-and the partner map reach for a global that their template loads from a content
-delivery network, which is not a module specifier and cannot be resolved — a
-test of one of those has to put that global in place itself, and none does yet.
+modules of this branch imports a library at all.** They reach for a global that
+their template loads as a classic script, which is not a module specifier and
+cannot be resolved. The two CKEditor 4 modules take theirs from a content
+delivery network, and no test puts it in place yet. The partner map takes
+`window.LeafletObject` from the two classic scripts of its extension, and
+`map.test.ts` puts a recording stub in its place.
+
+Those two scripts are built from their npm packages (see
+[Frontend assets](../development/frontend-assets.md#libraries-built-from-their-packages)),
+and `map-libraries.test.ts` is the one test that reads built files rather than a
+source: there, the files are the source. It runs them through
+`runClassicScripts()` of the harness, a window of its own that evaluates classic
+scripts in its global scope as a browser does, and checks the globals, the
+plugin and the writable members they publish, and that Leaflet writes the line
+command of an SVG path as `L`.
 
 ## What jsdom does not have, and what stands in for it
 
@@ -133,6 +144,7 @@ not on `globalThis`, and nothing but a test constructs one.
 | `<dialog>` show/showModal/close | The reflected `open` attribute, the `close` event, the focus and the modality. |
 | `KeyboardEvent` (not a global)  | `createKeyboardEvent()`, from the window's own constructor.                    |
 | `window.innerWidth`             | `setViewportWidth()`; jsdom reports a fixed 1024 and cannot resize.            |
+| Classic scripts                 | `runClassicScripts()`, a window of its own that evaluates them globally.       |
 
 jsdom declares `HTMLDialogElement` and reflects its `open` property, and
 implements **none** of `show()`, `showModal()` and `close()` — a module that
