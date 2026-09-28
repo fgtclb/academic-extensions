@@ -35,7 +35,9 @@ let byPrefix = new Map();
  * CKEditor 5 and CropperJS are both delivered by TYPO3 - the first by
  * EXT:rte_ckeditor, the second by EXT:core - and both are browser-only: one
  * pulls in a rendering engine, the other measures a layout and rasterises
- * through a canvas. What the tests are about is the code of this repository
+ * through a canvas. Leaflet and its marker cluster plugin are shipped by
+ * academic_partners, built from their npm packages, and draw into a layout
+ * jsdom does not have. What the tests are about is the code of this repository
  * around them, so each is replaced by a stub that records what was asked of it.
  *
  * A stub is a liability, so the list is kept short on purpose and every entry
@@ -49,6 +51,8 @@ const stubs = new Map([
     ['@ckeditor/ckeditor5-list', 'stubs/ckeditor.mjs'],
     ['@ckeditor/ckeditor5-paragraph', 'stubs/ckeditor.mjs'],
     ['cropperjs', 'stubs/cropper.mjs'],
+    ['leaflet', 'stubs/leaflet.mjs'],
+    ['leaflet.markercluster', 'stubs/leaflet.markercluster.mjs'],
 ]);
 
 export const initialize = (data) => {

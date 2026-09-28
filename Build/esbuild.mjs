@@ -19,6 +19,7 @@ import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as sass from 'sass';
 import { extensions, passes, repositoryRoot } from './extensions.mjs';
+import { buildVendorLibraries, vendorDirectoryOf, vendorLibraries } from './vendor.mjs';
 
 const buildRoot = dirname(fileURLToPath(import.meta.url));
 const development = process.argv.slice(2).includes('--dev');
@@ -160,6 +161,9 @@ if (listOutputs) {
             }
         }
     }
+    for (const entry of vendorLibraries) {
+        process.stdout.write(relative(repositoryRoot, vendorDirectoryOf(repositoryRoot, entry)) + '\n');
+    }
     process.exit(0);
 }
 
@@ -196,6 +200,9 @@ for (const extension of found) {
         built += entryPoints.length;
     }
 }
+
+// The third party libraries, from their pinned npm packages - see "vendor.mjs".
+built += await buildVendorLibraries(repositoryRoot, target);
 
 if (built === 0) {
     process.stdout.write(
