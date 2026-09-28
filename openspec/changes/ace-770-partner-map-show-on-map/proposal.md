@@ -14,8 +14,11 @@ who switches a partner off the map still finds it there, with no hint why.
   is switched off, as it renders none for a partner without coordinates.
 - The partner list, the partnerships list and the partnerships teaser are not
   affected: the switch is about the map.
-- The switch is read from the record in the default language, as the
-  coordinates are, and translations no longer offer a value of their own.
+- The switch is read from the record in the language of the page, as the map
+  query reads every other column. It is synchronized with the default record,
+  as the coordinates are, so a translation follows it unless an editor
+  detaches it. The upgrade wizard that synchronized the coordinates copies the
+  switch onto existing translations as well.
 - Behaviour is identical on TYPO3 v13 and v14.
 
 ## Capabilities

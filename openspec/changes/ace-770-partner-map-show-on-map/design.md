@@ -16,9 +16,10 @@ coordinates (ACE-562). `PartnerRepository::findByDemand()` adds
 The partial `Partials/Partner/Map.html` (ACE-769) renders a single `partner`
 only when `{partner.drawable}` is true.
 
-The column has no `l10n_mode`, so a translation of a partner page carries its
-own value. The map draws a translated partner at the coordinates of its default
-language record (`partnerMapPluginDrawsATranslatedPartnerAtItsDefaultCoordinates`).
+The column has no `l10n_mode` and no synchronization, so a translation of a
+partner page carries its own value. The coordinates are synchronized (ACE-562),
+so a translated partner is drawn where its default record is
+(`partnerMapPluginDrawsATranslatedPartnerAtItsDefaultCoordinates`).
 
 Branch `2` has the same map action, demand and repository, and no map partial.
 
@@ -54,30 +55,62 @@ the other, and there is exactly one caller.
 partners is drawn as given, since it comes from a query that already applied
 the rule.
 
-### The default language decides
+### The record of the page language decides, synchronized
 
-The switch describes the partner, not a translation of its page. The map
-already draws a translated partner at its default coordinates. The column gets
-`l10n_mode => 'exclude'`, so a translation shows the value of the default
-record and cannot hold a value of its own that would be ignored.
+Planned as "the default language decides", with `l10n_mode => 'exclude'`. The
+premise was checked during implementation and is false: on TYPO3 v13 and v14,
+on a site with `fallbackType: fallback`, the map query in German evaluates the
+constraint on the German record. A translation switched off leaves the partner
+out of the German map, and a translation left on keeps it there while the
+default record is switched off.
 
-To verify during implementation: which record the query evaluates for a
-translated partner, on both core versions, with a translation whose stored
-value differs from its default record. The test pins the result either way.
+Stefan decided (2026-09-28): keep what the query does, and synchronize the
+column. It gets `behaviour.allowLanguageSynchronization`, as
+`geocode_latitude` and `geocode_longitude` have, so a translation follows its
+default record and an editor can detach it for one language. DataHandler
+synchronizes a translation that existed before the change as well, since a
+field without a stored state counts as synchronized.
 
-### An Important changelog entry, no upgrade wizard
+What synchronization does not repair is the stored value: it takes effect when
+the default record is saved. Nothing read the switch before, so a translation
+made while its default record was switched off can still hold that `0`, and the
+partner would leave the map of that language with the update. The upgrade wizard
+of ACE-562, which copied the coordinates, becomes
+`SynchronizePartnerTranslationsUpgradeWizard` (identifier
+`academicPartners_synchronizePartnerTranslations`) and copies the switch as
+well. 3.0 is not released, so the wizard is renamed rather than joined by a
+second one (Stefan). Each group, the coordinate pair and the switch, is compared
+and detached on its own, so a translation out of step in one and detached in the
+other is handled either way round.
+
+Rejected: `l10n_mode => 'exclude'`. The query would still read the
+translation, and a translation whose value differs today would keep it until
+the default record is saved again, invisible in the backend. Rejected: leaving
+the column as it is. A translation would copy the value once and never follow
+the default record again.
+
+### An Important changelog entry
 
 The update changes what an existing site renders, but it only removes partners
-an editor explicitly switched off. The entry names the query that lists them:
-`SELECT uid, title FROM pages WHERE doktype = 40 AND show_on_map = 0 AND
-sys_language_uid = 0 AND deleted = 0`.
+an editor explicitly switched off. The entry names the query that lists them,
+in every language, and the wizard:
+`SELECT uid, sys_language_uid, title FROM pages WHERE doktype = 40 AND
+show_on_map = 0 AND deleted = 0 AND t3ver_wsid = 0`.
+
+### One property for a template
+
+`Partner::isShownOnMap()` combines `isDrawable()` and the switch. The partial
+checks it, and a site package template that guards a map for one partner uses
+it instead of `{partner.drawable}`, which the changelog of ACE-562 recommended
+before the partial existed. That changelog now shows the partial.
 
 ## Risks / Trade-offs
 
 - [A site used the switch as a note without meaning it] → the partner leaves
   the map after the update. The changelog entry and its query are the remedy.
-- [An overridden `Partner/Map.html` partial] → keeps its own guard and draws a
-  switched-off single partner until it adds the check. Named in the changelog.
+- [An overridden `Partner/Map.html` partial, or a site package template that
+  guards with `{partner.drawable}`] → draws a single partner whose switch is
+  off until it checks `{partner.shownOnMap}`. Named in the changelog.
 
 ## Open Questions
 

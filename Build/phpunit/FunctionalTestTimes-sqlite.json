@@ -106,7 +106,7 @@
     "packages/fgtclb/academic-partners/Tests/Functional/Tca/StaticRegistrationTest.php": 3.49,
     "packages/fgtclb/academic-partners/Tests/Functional/TsConfig/BackendLayoutRegistrationTest.php": 1.91,
     "packages/fgtclb/academic-partners/Tests/Functional/Upgrades/SeedPartnershipRoleSortingUpgradeWizardTest.php": 2.27,
-    "packages/fgtclb/academic-partners/Tests/Functional/Upgrades/SynchronizePartnerCoordinatesUpgradeWizardTest.php": 2.7,
+    "packages/fgtclb/academic-partners/Tests/Functional/Upgrades/SynchronizePartnerTranslationsUpgradeWizardTest.php": 2.7,
     "packages/fgtclb/academic-partners/Tests/Functional/VersionCompatTest.php": 1.94,
     "packages/fgtclb/academic-persons-edit/Tests/Functional/Domain/Factory/AddressFactoryTest.php": 2.69,
     "packages/fgtclb/academic-persons-edit/Tests/Functional/Domain/Factory/ContractFactoryTest.php": 2.98,
