@@ -59,6 +59,10 @@ What is public API
     settings, and the settings of the content elements.
 *   The TypoScript and page TSconfig keys the extensions document.
 *   The keys of the language files, which a site overrides labels by.
+*   The identifier ``academic-persons/apply-settings-to-tca`` of the listener
+    that applies the persons settings to the compiled TCA, so that a listener
+    of :php:`TYPO3\CMS\Core\Configuration\Event\AfterTcaCompilationEvent`
+    can be ordered after it. The listener class is not public API.
 *   The format of :file:`Configuration/CategoryTypes.yaml`, see the
     `category types chapter of category_types
     <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/CategoryTypes/Index.html>`__.

@@ -84,9 +84,8 @@ final class TcaValidationMergerTest extends UnitTestCase
     }
 
     /**
-     * TCA files call this for every table the extension knows, whether or not an
-     * integrator configured a validation set for it - the settings lookup answers
-     * `null` for an unknown identifier, and that has to be a no-op here.
+     * A caller may have no validation set for a table at all, and handing over
+     * `null` then has to be a no-op.
      */
     #[Test]
     public function aMissingSetProducesAnEmptyArray(): void
