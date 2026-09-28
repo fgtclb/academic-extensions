@@ -236,11 +236,12 @@ side only: the flag leaves the TCA fragment alone, and a backend editor can
 still change the value. See
 [Validation settings](validation-settings.md#normalisation).
 
-**The same configuration also drives the TYPO3 backend**, deliberately: the TCA
-files merge the set of their own section in through `TcaValidationMerger`, so a
-field locked with `readonly` or `disabled` is read-only in the record editor as
-well. That coupling — and the reason the settings ship in `academic_persons`
-rather than in the edit extension — is documented in
+**The same configuration also drives the TYPO3 backend**, deliberately: a
+listener of the compiled TCA merges the set of each section into its table
+through `TcaValidationMerger`, so a field locked with `readonly` or `disabled`
+is read-only in the record editor as well. That coupling — and the reason the
+settings ship in `academic_persons` rather than in the edit extension — is
+documented in
 [Validation settings](validation-settings.md).
 
 ## Overriding the set in an instance

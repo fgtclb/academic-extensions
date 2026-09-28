@@ -23,7 +23,7 @@ tracks whether the framework instantiates the class or the container does.
 |--------------------------------------------|---------|---------|----------|----------|
 | `Classes/Upgrades/`                        | 15      | 0       | 0        | 100 %    |
 | `Classes/Service/` and `Classes/Services/` | 28      | 2       | 0        | 93 %     |
-| `Classes/EventListener/`                   | 10      | 1       | 0        | 91 %     |
+| `Classes/EventListener/`                   | 11      | 1       | 0        | 92 %     |
 | `Classes/Controller/`                      | 4       | 5       | 0        | 44 %     |
 | `Classes/Domain/Model/Dto/`                | 7       | 10      | 1        | 39 %     |
 | `Classes/ViewHelpers/`                     | 5       | 8       | 0        | 38 %     |

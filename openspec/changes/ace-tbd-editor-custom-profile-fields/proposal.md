@@ -17,8 +17,14 @@ and the factory, is fatal on 3.0.
   (`packages/fgtclb/academic-persons-edit`) renders such a field with the
   configured renderer, validates, limits and sanitises it like any other
   field, reads it from the stored profile row and writes it to that column.
-- The project ships the column itself (SQL and TCA); a declared column that is
-  not in the profile TCA fails the settings build with a message naming it.
+- The project ships the column itself (SQL and TCA). A declared column that is
+  not in the profile TCA, or that the editor must not write, raises a
+  deprecation notice naming it while the TCA is compiled, and makes the editor
+  fail with a message naming it. The backend and the install tool keep
+  working.
+- The validators of a project field reach its TCA column like those of any
+  other field, which needs the settings applied after the TCA overrides
+  (`ace-763-settings-tca-after-overrides`, merged first).
 - On a translation the value is read from and written to the translation row.
 
 The behaviour is identical on TYPO3 v13 and v14.
@@ -36,8 +42,9 @@ None.
 
 ## Impact
 
-- `academic_persons`: the settings graph accepts and checks `custom` fields;
-  the `Settings.yaml` header comment changes.
+- `academic_persons`: the settings graph accepts `custom` fields, and the TCA
+  listener checks their columns. The `Settings.yaml` header comment changes.
+- Depends on `ace-763-settings-tca-after-overrides`.
 - `academic_persons_edit`: form data carries a bag of project values; the
   profile update writes them after the regular save.
 - A fixture extension with a project column for the functional tests.

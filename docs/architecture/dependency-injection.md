@@ -130,7 +130,7 @@ Measured with
 | `#[Autowire]`        | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
 | `#[Exclude]`         | 17    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
-| `#[AsEventListener]` | 6     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
+| `#[AsEventListener]` | 7     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
@@ -141,8 +141,9 @@ the other three commands in `academic-persons` are still registered with
 `console.command` tags in YAML. The `#[AsEventListener]` sites are TYPO3's
 attribute (see below): the `RegisterAcademicPageDoktype` and the
 `AddPageModuleCategorySummary` listener of each of `academic-partners`,
-`academic-programs` and `academic-projects`. `#[AsTaggedItem]` and
-`#[AsController]` have zero sites.
+`academic-programs` and `academic-projects`, and `ApplySettingsToTca` of
+`academic-persons`, which applies the persons settings to the compiled TCA.
+`#[AsTaggedItem]` and `#[AsController]` have zero sites.
 
 For the thirteen `#[Exclude]` sites and why `LegacySettingsMigration` is among
 them, see [Class design](class-design.md#keep-data-objects-out-of-the-container).
@@ -203,14 +204,18 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     ) {}
 ```
 
-The seven event listeners follow the same shape — a single `__invoke()` and
-promoted `private readonly` dependencies (or a `readonly class`). Four are
-registered by YAML tag: `academic-jobs/Classes/EventListener/GenerateJobSlug.php`,
+The twelve event listener classes follow the same shape, promoted
+`private readonly` dependencies (or a `readonly class`) and a single
+`__invoke()`, apart from `AssignContractOrganisationalUnitSorting`, which has
+one method per persistence event. Five are registered by YAML tag:
+`academic-jobs/Classes/EventListener/GenerateJobSlug.php`,
 `academic-persons/Classes/EventListener/UpdateProfileImageMetadata.php`,
+`.../AssignContractOrganisationalUnitSorting.php`,
 `academic-persons-edit/Classes/EventListener/GenerateSlugForProfile.php` and
-`.../SyncChangesToTranslations.php`. Three are registered by attribute — the
-`RegisterAcademicPageDoktype` of `academic-partners`, `academic-programs` and
-`academic-projects`.
+`.../SyncChangesToTranslations.php`. Seven are registered by attribute: the
+`RegisterAcademicPageDoktype` and the `AddPageModuleCategorySummary` of
+`academic-partners`, `academic-programs` and `academic-projects`, and
+`ApplySettingsToTca` of `academic-persons`.
 
 ### Where the codebase does not comply
 
@@ -322,13 +327,15 @@ Always set `identifier` explicitly — it is what `before`/`after` ordering in
 other extensions refers to, and an auto-derived one changes when the class is
 renamed.
 
-Both spellings are in use here: four listeners are registered by YAML tag
-(`academic-jobs/Configuration/Services.yaml`,
+Both spellings are in use here: five listener classes are registered by YAML
+tag (`academic-jobs/Configuration/Services.yaml`,
 `academic-persons/Configuration/Services.yaml` and
-`academic-persons-edit/Configuration/Services.yaml`, which carries two), and the
-three `RegisterAcademicPageDoktype` listeners of `academic-partners`,
-`academic-programs` and `academic-projects` carry
-`#[AsEventListener(identifier: '…/register-page-doktype')]` on the class. The
+`academic-persons-edit/Configuration/Services.yaml`, which carry one, two and
+two), and seven carry `#[AsEventListener]` on the class: the
+`RegisterAcademicPageDoktype` and `AddPageModuleCategorySummary` listeners of
+`academic-partners`, `academic-programs` and `academic-projects`, for example
+`#[AsEventListener(identifier: '…/register-page-doktype')]`, and
+`ApplySettingsToTca` of `academic-persons`. The
 two are equivalent — the attribute is only a shorter spelling of the same tag —
 and new listeners should prefer the attribute. Note that `academic-persons`' own
 user manual already documents the TYPO3 attribute as the way integrators register

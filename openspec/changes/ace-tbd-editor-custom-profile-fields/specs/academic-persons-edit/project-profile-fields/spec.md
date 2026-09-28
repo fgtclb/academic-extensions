@@ -19,7 +19,19 @@ frontend editor at the configured position.
 #### Scenario: Column missing in TCA
 - **WHEN** an integrator declares a project field whose column is not in the
   profile TCA
-- **THEN** building the settings fails with a message naming the column
+- **THEN** a deprecation notice names the column while the TCA is compiled,
+  the backend keeps working, and the frontend editor fails with a message
+  naming the column
+
+#### Scenario: Column the editor must not write
+- **WHEN** an integrator declares a project field on a system column of the
+  profile, such as the column that hides it
+- **THEN** a deprecation notice names the column while the TCA is compiled,
+  and the frontend editor fails with a message naming the column
+
+#### Scenario: Required project field in the backend
+- **WHEN** an integrator declares a project field as required
+- **THEN** the backend form requires the project column as well
 
 ### Requirement: Project field values are validated and stored
 The system SHALL validate, limit and sanitise a submitted project field value

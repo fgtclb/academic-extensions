@@ -236,10 +236,10 @@ Three details of the normalisation are easy to get wrong:
 
 `fieldType` and `renderType` are **frontend metadata only**. The normaliser
 never derives a TCA `type` from them; the six TCA files declare their column
-types and the settings overlay `readOnly` and `required` (plus the `email` and
-`number` types, as before). `SettingsValidationOverridesTest` pins that the
-`website` column stays `input` under a `combinedLink` render type and that the
-rich text columns keep their `enableRichtext`.
+types and the settings listener overlays `readOnly` and `required` (plus the
+`email` and `number` types, as before). `SettingsValidationOverridesTest` pins
+that the `website` column stays `input` under a `combinedLink` render type and
+that the rich text columns keep their `enableRichtext`.
 
 Nothing is logged when an entry is dropped: a profile field without a
 `section`, `fieldType` or `renderType`, a document section without `label`,
@@ -326,19 +326,21 @@ identifier for an unknown section.
 
 ## Consumer 1 — the TYPO3 backend FormEngine
 
-`TcaValidationMerger::merge($tableTca, $validationSet)` returns the table array
-with a `columns.<field>.config` fragment built from each `Validation::$tcaConfig`
-merged in, and **five of the six TCA files call it** with the set of their own
-section; the sixth merges a `types` fragment:
+`ApplySettingsToTca` of `academic_persons` applies the graph to the TCA of the
+six person tables, as a listener of `AfterTcaCompilationEvent` with the
+identifier `academic-persons/apply-settings-to-tca`. For five tables it calls
+`TcaValidationMerger::merge($tableTca, $validationSet)`, which merges a
+`columns.<field>.config` fragment built from each `Validation::$tcaConfig`. The
+sixth gets a `types` fragment:
 
-| Section                                    | TCA file                                                  | Call                                                                                 |
-|--------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------------------|
-| `profile` + `special.skipSync`             | `tx_academicpersons_domain_model_profile.php`             | `merge($tca, <the update set without the disabled column>)`                          |
-| `contracts.fields`                         | `tx_academicpersons_domain_model_contract.php`            | `merge($tca, $settings->getDocumentValidationSet('contracts'))`                      |
-| `contracts.contactSections.emailAddresses` | `tx_academicpersons_domain_model_email.php`               | `merge($tca, $settings->getContractContactValidationSet('emailAddresses'))`          |
-| `…phoneNumbers`                            | `tx_academicpersons_domain_model_phone_number.php`        | `merge($tca, $settings->getContractContactValidationSet('phoneNumbers'))`            |
-| `…physicalAddresses`                       | `tx_academicpersons_domain_model_address.php`             | `merge($tca, $settings->getContractContactValidationSet('physicalAddresses'))`       |
-| the timeline `documentSections`            | `tx_academicpersons_domain_model_profile_information.php` | `mergeRecursiveWithOverrule($tca, $settings->getDocumentValidationTcaTypesConfig())` |
+| Table                                                 | Section                                    | Merge                                                                                |
+|-------------------------------------------------------|--------------------------------------------|--------------------------------------------------------------------------------------|
+| `tx_academicpersons_domain_model_profile`             | `profile` + `special.skipSync`             | `merge($tca, <the update set without the disabled column>)`                          |
+| `tx_academicpersons_domain_model_contract`            | `contracts.fields`                         | `merge($tca, $settings->getDocumentValidationSet('contracts'))`                      |
+| `tx_academicpersons_domain_model_email`               | `contracts.contactSections.emailAddresses` | `merge($tca, $settings->getContractContactValidationSet('emailAddresses'))`          |
+| `tx_academicpersons_domain_model_phone_number`        | `…phoneNumbers`                            | `merge($tca, $settings->getContractContactValidationSet('phoneNumbers'))`            |
+| `tx_academicpersons_domain_model_address`             | `…physicalAddresses`                       | `merge($tca, $settings->getContractContactValidationSet('physicalAddresses'))`       |
+| `tx_academicpersons_domain_model_profile_information` | the timeline `documentSections`            | `mergeRecursiveWithOverrule($tca, $settings->getDocumentValidationTcaTypesConfig())` |
 
 The profile information table is one table with a `type` column shared by the
 seven timeline types, so a section's flags land in the `columnsOverrides` of
@@ -355,19 +357,72 @@ owners must not change and backend editors must be able to correct.
 There is one exception. `special.hidden` is the owner's visibility switch of the
 profile editor and writes the table's `disabled` enable column. Its flags decide
 whether *owners* may show or hide a profile, and an installation sets them
-exactly when editors are meant to decide instead. The profile TCA file therefore
-leaves the validation of that column out of the merge, and the backend
-checkbox stays writable whatever the YAML says.
+exactly when editors are meant to decide instead. The listener therefore leaves
+the validation of that column out of the merge, and the backend checkbox stays
+writable whatever the YAML says.
 
-The merge is `ArrayUtility::mergeRecursiveWithOverrule()` for all six tables. A
-missing section is a no-op, so a table may be asked about a section nobody
-configured. All six call sites carry the same `@todo`:
+### Why a listener after the overrides
 
-> MAIN TCA Files should be kept without dynamic calls, and following should be
-> done in override files.
+Until ACE-763 the six TCA files merged the graph themselves, at the end of
+`Configuration/TCA/`, and carried a `@todo` that the call belonged somewhere
+else. Two things were wrong with that place:
 
-That is a structural note about *where* the call belongs — `Configuration/TCA/`
-versus `Configuration/TCA/Overrides/` — not a doubt about the coupling itself.
+- **Every `Configuration/TCA/Overrides` file ran after the merge.** A site
+  package that replaced a column wholesale, to change its label or its rich
+  text configuration, dropped `required` and `readOnly` of that column without
+  a word. One analysed project replaces five profile columns that way.
+- **The graph was built while the TCA was incomplete.** A column a project adds
+  in its overrides did not exist yet, so nothing that reads the TCA could check
+  a settings entry against it. Project columns editable in the frontend editor
+  need exactly that check.
+
+`AfterTcaCompilationEvent` is the one place after all overrides, after the TCA
+migration and preparation, and before the compiled TCA is cached. The TCA
+cache and the `TcaSchema` cache hold the merged result: `BootCompletedEvent`
+would come after both are written, and `BeforeTcaOverridesEvent` comes before
+any project column exists.
+
+Consequences, each pinned by `SettingsAfterTcaOverridesTest`:
+
+- **The settings win over a TCA override of the keys they set.** Every fragment
+  writes `readOnly` and `required`, also when they are false, so a site package
+  that sets either on a configured column in its overrides loses it. It sets
+  them in `Settings.yaml` instead, or orders an `AfterTcaCompilationEvent`
+  listener of its own after `academic-persons/apply-settings-to-tca`.
+- **A settings field whose column the TCA does not have adds nothing.** The
+  merge in the TCA files created a `columns.<field>.config` fragment without a
+  `type`, and the TCA migration then stopped the whole TCA build with
+  `Missing "type" in TCA of field`.
+- **The listener adds the `email[subst]` soft reference** to every `email`
+  column of the five tables with flags on their columns. The core adds it
+  while it prepares the TCA, which is before the event, and the e-mail column
+  of the contact records only becomes an `email` column through the settings.
+- **It is ordered after `content-blocks-tca`**, the TCA listener of
+  EXT:content_blocks. That listener runs in `BeforeTcaOverridesEvent` in
+  content_blocks 1.6.5 (TYPO3 v13) and 2.4.10 (TYPO3 v14) and so is earlier
+  anyway. Should it move to this event, the settings still come last. An
+  `after` that names no listener of the event is dropped by the core's
+  dependency ordering, so the ordering needs no dependency on that extension.
+- **The cached state is what counts.** The test reads the `tca_base` and the
+  `TcaSchema` entries of the `core` cache the bootstrap wrote, not only
+  `$GLOBALS['TCA']`.
+
+The install tool builds the TCA with the listeners of extensions, through the
+same container as a request. Its TCA checks do not: the checks for TCA
+migrations and for TCA in `ext_tables.php` use
+`TcaFactory::createNotMigrated()`, which stops after the overrides and
+dispatches no `AfterTcaCompilationEvent`.
+They used to see the settings flags and now do not, which changes nothing they
+report, because no TCA migration touches `required`, `readOnly`, `minitems` or
+the `email` and `number` types.
+
+The identifier `academic-persons/apply-settings-to-tca` is public API, listed
+on the extension points page of `academic_base`. The class is not.
+`SettingsAfterTcaOverridesTest` pins the identifier with a listener ordered
+after it. The core runs a listener with fewer orderings later, so that fixture
+listener is also ordered after `content-blocks-tca` like the persons listener,
+which leaves the ordering after the persons identifier as the only reason it
+runs last.
 
 ## Consumer 2 — the frontend edit form
 
@@ -411,8 +466,8 @@ apart from the flags on purpose.
   each entry through the field of its own record type, so `type` means the
   type of that contact list only, and keeps property and column in
   `ManagedFieldsSettings`. A field the settings do not configure cannot be
-  managed: the graph is built while the TCA loads, so it cannot look at TCA
-  columns.
+  managed: the graph is cached on its own, apart from the TCA, so it cannot
+  look at TCA columns.
 - **It never reaches the TCA.** `ManagedFieldResolver` (`Classes/Profile/`)
   answers per row: a record is a candidate when it has an `import_identifier`,
   is a default-language row, and its profile has `skip_sync = 0`. The profile
@@ -593,7 +648,7 @@ map, and nothing else matches either — the two systems share no code.
 |-------------------------|---------------------------------------------------|-------------------------------------------------------|
 | Normalisation           | once, at load, into `Validation` objects          | none — three readers reinterpret the raw array        |
 | Keyword case            | lowercased before matching                        | case sensitive                                        |
-| Backend TCA             | merged by all six TCA files                       | `getValidationsForTca()` exists but **has no caller** |
+| Backend TCA             | merged after the overrides by a TCA listener      | `getValidationsForTca()` exists but **has no caller** |
 | Frontend rendering      | `disabled` / `readonly` / `required` / input type | required asterisk and input type only                 |
 | Transformation guard    | yes — locked properties are never written         | none                                                  |
 | `disabled` / `readonly` | supported                                         | **understood by none of the three readers**           |

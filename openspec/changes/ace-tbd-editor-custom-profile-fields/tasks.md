@@ -1,8 +1,11 @@
 ## 1. Settings
 
-- [ ] 1.1 Accept `custom: true` profile fields in the settings graph, check the
-  column against the profile TCA, and refuse system and mapped columns; unit
-  and functional tests for each refusal, shown red with the check removed.
+- [ ] 1.0 Start after `ace-763-settings-tca-after-overrides` is merged.
+- [ ] 1.1 Accept `custom: true` profile fields in the settings graph. The TCA
+  listener merges an allowed project column and raises an `E_USER_DEPRECATED`
+  notice for a missing, system, model or non-scalar column. The editor fails
+  with a message naming it. Unit and functional tests for each refusal, shown
+  red with the check removed.
 - [ ] 1.2 Rewrite the header comment of
   `academic-persons/Configuration/AcademicPersons/Settings.yaml` that says the
   file creates no columns or properties.
