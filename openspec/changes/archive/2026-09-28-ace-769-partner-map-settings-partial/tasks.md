@@ -56,12 +56,12 @@
 
 ## 5. Definition of done
 
-- [ ] 5.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
-  `functional` for TYPO3 v13, with the results recorded.
-- [ ] 5.2 `composerUpdate`, then the same five suites for TYPO3 v14, with
-  the results recorded.
-- [ ] 5.3 `testJs`, `lintTypescript`, `typecheckJs`, `checkJsBuildClean`,
+- [x] 5.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+  `functional` for TYPO3 v13, all green.
+- [x] 5.2 `composerUpdate`, then the same five suites for TYPO3 v14, all
+  green.
+- [x] 5.3 `testJs`, `lintTypescript`, `typecheckJs`, `checkJsBuildClean`,
   `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 5.4 `docs/` and the `academic-partners` `Documentation/` changelog
+- [x] 5.4 `docs/` and the `academic-partners` `Documentation/` changelog
   updated, `README.md` and `CONTRIBUTING.md` still only link.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archive the change as the last commit of the pull request.
