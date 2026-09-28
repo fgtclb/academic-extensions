@@ -8,7 +8,8 @@ program needs to carry only its most specific category.
 
 ### Requirement: Editors can include subcategories in the list filter
 The program list plugin SHALL offer an option to include subcategories when it
-filters by category. The option SHALL be off for new and existing plugins.
+filters by category, on TYPO3 v13 and v14. The option SHALL be off for new and
+existing plugins.
 
 #### Scenario: Existing plugin after the update
 - **WHEN** a program list plugin was saved before the option existed
@@ -35,6 +36,13 @@ depth.
 - **AND** program B carries only a category two levels below "Bachelor"
 - **AND** a visitor filters by "Bachelor"
 - **THEN** program B is listed
+
+#### Scenario: Selection submitted by a program finder
+- **WHEN** the option of the list is on
+- **AND** a visitor selects "Bachelor" in a program finder that targets the
+  page of the list, and submits it
+- **AND** program A carries only "Bachelor of Science"
+- **THEN** program A is listed
 
 #### Scenario: Program carries an unrelated sibling
 - **WHEN** the option is on
@@ -80,9 +88,27 @@ the category tree SHALL NOT prevent the list from rendering.
 - **THEN** the list renders, and each of them matches programs that carry the
   other one
 
-### Requirement: The filter form is unchanged
-The system SHALL render the filter options and the selected value exactly as
-without the option.
+### Requirement: The filter offers a parent whose subcategory is carried
+With the option on, the filter form of the program list SHALL treat a
+category as carried when a listed program carries the category or any visible
+subcategory of it in the programs group. Such a category SHALL be offered as a
+selectable option, and SHALL be kept when the site hides options without
+results. A selected category SHALL be shown as the selected option of its
+filter. With the option off, the filter form SHALL render its options exactly
+as before.
+
+#### Scenario: Only the child is carried
+- **WHEN** the option is on
+- **AND** the listed programs carry "Bachelor of Science" but none carries
+  "Bachelor"
+- **THEN** "Bachelor" is a selectable option of its filter
+
+#### Scenario: Only the child is carried, option off
+- **WHEN** the option is off
+- **AND** the site does not hide options without results
+- **AND** the listed programs carry "Bachelor of Science" but none carries
+  "Bachelor"
+- **THEN** "Bachelor" is shown as a disabled option, as before
 
 #### Scenario: Visitor selected the parent
 - **WHEN** the option is on

@@ -22,8 +22,7 @@ neither a TypeScript directory nor an import map today.
 
 **Non-Goals:**
 
-- Mirroring subcategory matching before `programs-studyplan-08` lands; see
-  Risks.
+- Subcategory matching beyond the map, see Risks.
 
 ## Decisions
 
@@ -107,10 +106,12 @@ GUESSED  finder after selecting "Master"
 
 - [Payload size for large program sets] → Only integer uids of the offered
   types are sent; a few hundred programs stay in the low kilobytes.
-- [Semantics drift from the server filter] → When subcategory matching
-  (`programs-studyplan-08`) lands, the map has to list the ancestors of each
-  assigned category for the types where it is switched on. That change owns
-  the adaptation and its test.
+- [Semantics drift from the server filter] → Subcategory matching
+  (`programs-studyplan-08`) landed first, with the finder field
+  `settings.filter.includeSubcategories`. With that field on, the map has to
+  list the ancestors of each assigned category as well, the way the finder
+  enables a parent on the server. This change owns the adaptation and its
+  test.
 - [A screen reader announces every change] → The region is polite, so an
   announcement waits for the current speech and does not interrupt it.
 
