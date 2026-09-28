@@ -65,6 +65,13 @@ partner of a partner page.
   for the page's partner, which has coordinates
 - **THEN** the page shows a map with one marker at that partner's location
 
+#### Scenario: Partner page uses the map settings of the site
+
+- **WHEN** an integrator renders the map partial in the partner page template
+  with the map settings the page offers, and the site limits the maximum zoom
+- **THEN** the map of that partner zooms in no further than that level, on a
+  `FLUIDTEMPLATE` and on a `PAGEVIEW` page object
+
 #### Scenario: Partner without coordinates
 
 - **WHEN** the partner of the page has no coordinates

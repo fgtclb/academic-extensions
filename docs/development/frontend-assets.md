@@ -262,6 +262,53 @@ Two more, neither of them specific to the study plan:
   treat a value that lands in a `style` attribute as a separate problem, because
   a `;` there opens a declaration of its own.
 
+## Configuration arrives as data attributes
+
+A module that draws something needs values an integrator should be able to
+change: where the partner map is centred, how far it zooms, which tile server
+it loads. They are site settings, the template writes them as data attributes
+on the element the module draws into, and the module reads them from there.
+The partner map is the example, `Resources/Private/TypeScript/frontend/map.ts`
+of `academic_partners`:
+
+| Attribute on `#map`                  | Site setting and constant `plugin.tx_academicpartners.map.*` | Fallback                                    |
+|--------------------------------------|--------------------------------------------------------------|---------------------------------------------|
+| `data-academic-partners-center-lat`  | `centerLatitude`                                             | 51.1657, and only together with a longitude |
+| `data-academic-partners-center-lng`  | `centerLongitude`                                            | 10.4515, and only together with a latitude  |
+| `data-academic-partners-zoom`        | `zoom`                                                       | 6                                           |
+| `data-academic-partners-max-zoom`    | `maxZoom`                                                    | 18                                          |
+| `data-academic-partners-padding`     | `padding`                                                    | 50                                          |
+| `data-academic-partners-tile-url`    | `tileUrl`                                                    | the OpenStreetMap tile server               |
+| `data-academic-partners-attribution` | `attribution`                                                | the attribution the map always showed       |
+
+Why it is done this way, and what the module has to get right:
+
+- **Every value falls back on its own, to the value the module used before it
+  was configurable.** A template override that predates the attributes renders
+  none of them, and its map has to look as it did. So the module owns the
+  defaults as well, and the settings definitions and the constants repeat them.
+  Nothing ties the three together by itself: a functional test pins the
+  definitions and the constants to one list of values, and `map.test.ts` pins
+  the module to a copy of it.
+- **An empty attribute is an absent one.** `Number('')` is `0`, a zoom level and
+  a coordinate, so the raw value is tested before the conversion, exactly as the
+  partner coordinates are. A value outside its range falls back as well.
+- **A pair falls back as a pair.** Half a centre is a place nobody chose.
+- **A coordinate is a `string` setting.** The number field of the site
+  settings editor steps by 0.01 unless the definition sets a `step`, so the
+  browser refuses to save a coordinate with four decimals, and a finer `step`
+  runs into the float arithmetic of `NumberType::validate()` for some values.
+  The module checks the range instead.
+- **The attributes sit on the element, not in a JSON block.** An override that
+  only changes the surrounding markup keeps them, and each one is tested on its
+  own in `Tests/JavaScript/map.test.ts`, with the module started through the
+  exported initialiser.
+
+The configuration attributes follow the rule of the previous section. The
+parts of the map predate it: the module still finds them by id and by the class
+`map-partner`, and reads `data-lat`, `data-lng`, `data-name` and `data-link`.
+Moving those would be a change of its own, with a deprecation.
+
 ## Libraries come from the core
 
 No library in this repository's frontend code is vendored, and the rule that
