@@ -21,14 +21,14 @@
 
 ## 4. Commit
 
-- [ ] 4.1 Commit as `[TASK] ACE-771: Build partner map libraries from npm` in
+- [x] 4.1 Commit as `[TASK] ACE-771: Build partner map libraries from npm` in
   TYPO3 Core format, with `Resolves: ACE-771`.
 
 ## 5. Definition of done
 
-- [ ] 5.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan` and `unit` for
+- [x] 5.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan` and `unit` for
   TYPO3 v12 and v13. The change touches no PHP and no template, so
   `functional` is not required.
-- [ ] 5.2 `testJs`, `lintTypescript`, `typecheckJs`, `checkJsBuildClean`,
+- [x] 5.2 `testJs`, `lintTypescript`, `typecheckJs`, `checkJsBuildClean`,
   `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 5.3 Archive the change as the last commit of the pull request.
+- [x] 5.3 Archive the change as the last commit of the pull request.
