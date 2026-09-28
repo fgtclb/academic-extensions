@@ -25,7 +25,10 @@ two different questions:
 `ModifyPartnerListEvent`, dispatched in both `listAction()` and `mapAction()`;
 `academic_projects` ships `ModifyProjectDemandEvent` and
 `ModifyProjectListEvent`, dispatched in the one `listAction()` that serves both
-project list plugins.
+project list plugins. `academic_programs` ships `ModifyProgramDemandEvent` and
+`ModifyProgramListEvent`, dispatched in `listAction()` and in `finderAction()`
+of the program finder. The finder renders no program: the categories of its
+list event are the options of its selects and decide its preselection.
 
 Neither event fires for a submission of the filter and sorting form: the plugin
 answers the POST with a redirect before the demand event, and both events fire
@@ -41,8 +44,8 @@ extension has follows from where its filtering lives, and neither is to be
 converted into the other without a reason. The list event it had,
 `ModifyListProfilesEvent`, went in 3.0 with the other per-action view events: a
 variable for the view comes from the [plugin view event](plugin-view-event.md),
-which every plugin of seven academic extensions dispatches, the partner and
-project lists after their list event.
+which every plugin of seven academic extensions dispatches, the partner,
+program and project lists after their list event.
 
 ## Every event carries the plugin context
 
@@ -57,10 +60,11 @@ if ($event->getPluginControllerActionContext()->getPluginName() !== 'Map') {
 }
 ```
 
-The plugin name is the one the plugin was **registered** with — `List`, `Map`,
-`ProjectList`, `ProjectListSingle` — not the content element type. The settings
-on the context are the settings of the content element that is rendering, so a
-listener can read a FlexForm field an editor filled in.
+The plugin name is the one the plugin was **registered** with, not the content
+element type: `List`, `Map`, `ProgramList`, `ProgramFinder`, `ProjectList` or
+`ProjectListSingle`. The settings on the context are the settings of the
+content element that is rendering, so a listener can read a FlexForm field an
+editor filled in.
 
 `academic_persons` has a second, older context of its own under
 `FGTCLB\AcademicPersons\Domain\Model\Dto\`, which its page title placeholder
@@ -112,23 +116,38 @@ is true and as `pid IN (…)` when it is not, so carrying one without the other
 turns a single-selection element into a storage-folder restriction. Mutate
 where you can; carry everything over where you cannot.
 
-**A replaced result is rendered as it is.** `setPartners()` and
-`setProjects()` take whatever query result a listener hands back, and the
+**A replaced result is rendered as it is.** `setPartners()`, `setPrograms()`
+and `setProjects()` take whatever query result a listener hands back, and the
 repository's `setOrderings()` is not reapplied to it. A result a listener built
 itself carries its own ordering, or the list is in whatever order the database
 returns — which is not the same list twice on PostgreSQL.
 
 **The categories are not recomputed after the list event.** They are computed
 from the queried records, once, before the event. A listener that replaces the
-result and wants the filter to match it sets the categories too, and builds
-them the way the controller does —
+result and wants the filter to match it sets the categories too, and builds them
+the way the controller does, with
 `CategoryRepository::findAllApplicable($group, ...$narrowed->toArray())`, which
 keeps every category of the group and marks the ones no record carries as
 disabled options. `findByGroupAndUidList()` returns a bare list instead, so a
 listener that reaches for it silently drops the disabled options the plugin
-otherwise renders. Recomputing them after the event would run
-`findAllApplicable()` a second time on every request that has no listener at
-all.
+otherwise renders. A program list or finder that includes subcategories computes
+them with `findAllApplicableWithSubcategories()`, which also enables every
+ancestor of a carried category (see
+[Subcategory matching](subcategory-matching.md)), so a program listener asks the
+demand's `getIncludeSubcategories()` which of the two to call. Recomputing them
+after the event would run `findAllApplicable()` a second time on every request
+that has no listener at all.
+
+## The program page event
+
+A program page is rendered by a page object, not by a plugin, so there is no
+demand and no list. Its data processor dispatches `ModifyProgramDataEvent` once
+it has built the program data from the page record, with the data, the page
+record and the request. The data a listener hands back is what the page
+template receives, and the facts of the page are built from it *after* the
+event, so a changed credit points value shows in the facts as well. The event
+does not reach the program details content element, which reads the Extbase
+model and has the plugin view event for its view.
 
 ## Testing them
 

@@ -11,6 +11,8 @@ use FGTCLB\AcademicPartners\Event\ModifyPartnerListEvent;
 use FGTCLB\AcademicPersons\Event\ModifyContractQueryEvent;
 use FGTCLB\AcademicPersons\Event\ModifyProfileQueryEvent;
 use FGTCLB\AcademicPersons\Event\ModifyProfileTitlePlaceholderReplacementEvent;
+use FGTCLB\AcademicPrograms\Event\ModifyProgramDemandEvent;
+use FGTCLB\AcademicPrograms\Event\ModifyProgramListEvent;
 use FGTCLB\AcademicProjects\Event\ModifyProjectDemandEvent;
 use FGTCLB\AcademicProjects\Event\ModifyProjectListEvent;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
@@ -41,6 +43,18 @@ final class RecordPluginContextListener
 
     #[AsEventListener(identifier: 'test-plugin-view-event/context-of-partner-list')]
     public function onPartnerList(ModifyPartnerListEvent $event): void
+    {
+        $this->record($event, $event->getPluginControllerActionContext());
+    }
+
+    #[AsEventListener(identifier: 'test-plugin-view-event/context-of-program-demand')]
+    public function onProgramDemand(ModifyProgramDemandEvent $event): void
+    {
+        $this->record($event, $event->getPluginControllerActionContext());
+    }
+
+    #[AsEventListener(identifier: 'test-plugin-view-event/context-of-program-list')]
+    public function onProgramList(ModifyProgramListEvent $event): void
     {
         $this->record($event, $event->getPluginControllerActionContext());
     }

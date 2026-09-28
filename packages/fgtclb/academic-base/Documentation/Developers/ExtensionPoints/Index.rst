@@ -76,8 +76,8 @@ Everything else. In particular:
 
 *   **Controllers.** The controllers of :guilabel:`academic_contacts4pages`,
     :guilabel:`academic_jobs`, :guilabel:`academic_persons` and
-    :guilabel:`academic_persons_edit` are :php:`final`. Five controllers are
-    not final yet: :php:`BiteJobsController` of :guilabel:`academic_bite_jobs`,
+    :guilabel:`academic_persons_edit` are :php:`final`. Five controllers are not
+    final yet: :php:`BiteJobsController` of :guilabel:`academic_bite_jobs`,
     :php:`PartnerController` of :guilabel:`academic_partners`,
     :php:`ProgramController` and :php:`DetailsController` of
     :guilabel:`academic_programs`, and :php:`ProjectController` of
@@ -85,10 +85,11 @@ Everything else. In particular:
     subclass keeps working for now, not as an invitation: a subclass breaks
     whenever an action or a constructor changes, and they may become final in
     the next major version. Each of their actions dispatches the
-    :ref:`plugin view event <developers-extension-points-plugin-view>`, and
-    the partner and project lists a demand and a list event as well, which
-    replace such a subclass. A subclass that overrides an action without
-    calling the parent action drops those events for its plugin.
+    :ref:`plugin view event <developers-extension-points-plugin-view>`, and the
+    partner, program and project lists and the program finder a demand and a
+    list event as well, which replace such a subclass. A subclass that
+    overrides an action without calling the parent action drops those events
+    for its plugin.
 *   **Repositories.** A condition a plugin should apply belongs in a demand or
     a query event, not in an XCLASS of the repository.
 *   **Services, data processors, ViewHelper classes, backend item providers,
@@ -115,7 +116,8 @@ dispatcher of TYPO3. A listener registers for it with the
 :php:`#[AsEventListener]` attribute of TYPO3. The developer chapters of
 `academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Index.html>`__,
 `academic_persons_edit <https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/Developers/Index.html>`__,
-`academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/main/en-us/Developers/Index.html>`__
+`academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/main/en-us/Developers/Index.html>`__,
+`academic_programs <https://docs.typo3.org/p/fgtclb/academic-programs/main/en-us/Developers/Index.html>`__
 and
 `academic_projects <https://docs.typo3.org/p/fgtclb/academic-projects/main/en-us/Developers/Index.html>`__
 describe their events in detail, with examples.
@@ -155,6 +157,18 @@ describe their events in detail, with examples.
         -   in the partner list and the partner map, after the query
         -   replace the partners and the categories, assign further view
             variables
+    *   -   :php:`\FGTCLB\AcademicPrograms\Event\ModifyProgramDemandEvent`
+        -   in the program list and the program finder, before the programs
+            are queried
+        -   replace the demand
+    *   -   :php:`\FGTCLB\AcademicPrograms\Event\ModifyProgramListEvent`
+        -   in the program list and the program finder, after the query
+        -   replace the programs and the categories, assign further view
+            variables
+    *   -   :php:`\FGTCLB\AcademicPrograms\Event\ModifyProgramDataEvent`
+        -   on a program page, after its data is built from the page record
+            and before the facts are built from it
+        -   replace the data the page template receives
     *   -   :php:`\FGTCLB\AcademicProjects\Event\ModifyProjectDemandEvent`
         -   in the project list, before the projects are queried
         -   replace the demand
@@ -288,13 +302,17 @@ packages are not listed; their own documentation applies.
             interface above
     *   -   :php:`\FGTCLB\AcademicPartners\Domain\Model\Dto\PartnerDemand`
         -   the partner demand and list events
+    *   -   :php:`\FGTCLB\AcademicPrograms\Domain\Model\Dto\ProgramDemand`
+        -   the program demand and list events
+    *   -   :php:`\FGTCLB\AcademicPrograms\Domain\Model\ProgramData`
+        -   the program data event
     *   -   :php:`\FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand`
         -   the project demand and list events
     *   -   :php:`\FGTCLB\CategoryTypes\Collection\CategoryCollection`
-        -   the partner and project list events
+        -   the partner, program and project list events
     *   -   :php:`\FGTCLB\CategoryTypes\Collection\FilterCollection`
-        -   the partner and project demands, which carry the category filter
-            of the request
+        -   the partner, program and project demands, which carry the
+            category filter of the request
     *   -   :php:`\FGTCLB\AcademicPersons\Profile\ProfileFactoryInterface`
         -   the profile factory event, which takes an implementation of it
     *   -   :php:`\FGTCLB\AcademicPersons\Event\ProfileUpdateOrigin`

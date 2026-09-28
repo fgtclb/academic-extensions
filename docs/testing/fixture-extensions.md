@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Forty-eight such fixture extensions exist, in nine of the twelve extensions.
+Forty-nine such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -55,6 +55,7 @@ They sit next to the tests that use them, under
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |
 | `test_profile_update_recorder`         | `tests/test-profile-update-recorder`    | `academic-persons-edit` | A listener recording every profile update announcement, frontend included.    |
 | `test_profile_view_modes`              | `tests/test-profile-view-modes`         | `academic-persons`      | A project view mode of the profile lists, with its TypoScript.                |
+| `test_program_events`                  | `tests/test-program-events`             | `academic-programs`     | Listeners on the program demand, list and page data events, a list template.  |
 | `test_programs_category_type_priority` | `tests/programs-category-type-priority` | `academic-programs`     | A `CategoryTypes.yaml` raising the priority of a type of the programs group.  |
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
 | `test_programs_removed_category_type`  | `tests/programs-removed-category-type`  | `academic-programs`     | A `CategoryTypes.yaml` removing a type from the programs group.               |
@@ -74,7 +75,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Sixteen of the forty-eight have a `Classes/` folder with a `TESTS\…` PSR-4 root.
+Seventeen of the forty-nine have a `Classes/` folder with a `TESTS\…` PSR-4 root.
 The other thirty-two are pure resources. The `ext_emconf.php` is checked like
 every other one: its `depends` names extension keys, and a fixture extension
 may name another fixture extension, which a real extension may not — see
@@ -255,11 +256,12 @@ The existing ones show the cases that justify one:
   case for an event: its listeners register through TYPO3's
   `#[AsEventListener]`, which only means anything once the container has seen
   the class, so the documented way to write a listener is the way the test
-  registers one. `test_partner_list_events` and `test_project_list_events` are
-  the same case for the list plugin events, one fixture per extension: the
-  partner tests never load `academic_projects` and the project tests never load
-  `academic_partners`, so one fixture listening to all four events would drag an
-  extension into every run that has no business being there.
+  registers one. `test_partner_list_events`, `test_program_events` and
+  `test_project_list_events` are the same case for the list plugin events, one
+  fixture per extension: the partner tests never load `academic_projects` and
+  the project tests never load `academic_partners`, so one fixture listening to
+  the events of all three would drag an extension into every run that has no
+  business being there.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path. `test_profile_partial_overrides` is the same case for a

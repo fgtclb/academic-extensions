@@ -76,9 +76,9 @@ pass `settings.filter.hideDisabledOptions` to it.
 The resolver is stateless, autowired and `@internal`. `PartnerController`,
 `ProjectController` and `ProgramController` receive it through a `final`
 `inject*()` method rather than their constructor, because the controllers are
-not final and project subclasses call the constructor. The partner and project
-actions resolve the categories the list event handed back, so a listener that
-changes them changes the filters too.
+not final and project subclasses call the constructor. The partner, program and
+project actions resolve the categories the list event handed back, so a listener
+that changes them changes the filters too.
 
 The partial loops `filterTypes.visible` when `filterTypes` reaches it, and falls
 back to the loop it had before when it does not: a subclass that overrides

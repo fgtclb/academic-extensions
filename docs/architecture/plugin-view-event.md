@@ -54,17 +54,18 @@ as no trait of the extensions does, see [Class design](class-design.md#traits).
   parent drops the dispatch either way.
 - **One context per rendering.** Every action builds its context once, before
   its first event and after its settings are settled, and hands the same object
-  to every event it dispatches: the demand and list events of the partner and
-  project lists, the query and page title events of the persons plugins, the
-  write event of the profile editor, and this one. A listener that follows a
-  rendering through its events gets one context (ACE-767). The persons list
-  therefore decides before its query that a letter switches the pagination off,
-  and the persons actions hand their deprecated persons context to this event as
-  well. It implements the `academic_base` interface the event declares
-  (ACE-747).
+  to every event it dispatches: the demand and list events of the partner,
+  program and project lists and of the program finder, the query and page title
+  events of the persons plugins, the write event of the profile editor, and this
+  one. A listener that follows a rendering through its events gets one context
+  (ACE-767). The persons list therefore decides before its query that a letter
+  switches the pagination off, and the persons actions hand their deprecated
+  persons context to this event as well. It implements the `academic_base`
+  interface the event declares (ACE-747).
 
-The partner and project lists keep their demand and list events, see
-[List plugin events](list-plugin-events.md). The view event comes after both.
+The partner, program and project lists and the program finder have demand and
+list events of their own, see [List plugin events](list-plugin-events.md). The
+view event comes after both.
 
 ## What a listener cannot do
 
@@ -102,17 +103,17 @@ of the action's own assignments.
 A second listener of the fixture records the context of every event that carries
 one. The test renders every plugin that dispatches more than the view event: the
 persons list with and without a letter, the persons detail, card, selected
-profiles and selected contracts, the partner list and map, and the project list.
-For each it asserts the sequence of events and that all of them received the
-same context object. Another test asserts that under a letter every event of the
-persons list sees the pagination switched off. A context built a second time
-anywhere in such an action turns its row red.
+profiles and selected contracts, the partner list and map, the program list and
+finder, and the project list. For each it asserts the sequence of events and
+that all of them received the same context object. Another test asserts that
+under a letter every event of the persons list sees the pagination switched off.
+A context built a second time anywhere in such an action turns its row red.
 
 ## See also
 
 - [Class design](class-design.md#extension-points) — the rules every event
   follows, and the page that lists them.
 - [List plugin events](list-plugin-events.md) — the demand and list events of
-  the partner and project lists, and the plugin context.
+  the partner, program and project lists, and the plugin context.
 - [Fixture extensions](../testing/fixture-extensions.md) — how
   `test_plugin_view_event` is discovered and loaded.
