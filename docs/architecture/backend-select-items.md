@@ -167,15 +167,57 @@ The items of a TCA column are then at
 FlexForm element at
 `$result['processedTca']['columns']['pi_flexform']['config']['ds']['sheets'][$sheet]['ROOT']['el'][$element]['config']['items']`.
 
-Seven test classes do this today:
-`academic-base/Tests/Functional/Backend/FormDataProvider/KeepCurrentContentTypeSelectableTest.php`,
-`academic-partners/Tests/Functional/Backend/FormEngine/PartnerSelectOrderTest.php`,
-the two `ContractSelectStorageScopeTest` of `academic-persons` and
-`academic-contact4pages`, `ViewModeFieldsTest` of `academic-persons`, and
-`FilterTypesFieldTest` and `ProgramFinderFieldsTest` of `academic-programs`.
-All seven give the request
-`SystemEnvironmentBuilder::REQUESTTYPE_BE` and a `normalizedParams` attribute,
-and set `$GLOBALS['LANG']`, because labels are resolved during the compile.
+The test classes that do this are found with
+
+```bash
+grep -rl FormDataCompiler packages/*/*/Tests
+```
+
+and all of them give the request `SystemEnvironmentBuilder::REQUESTTYPE_BE` and
+a `normalizedParams` attribute, and set `$GLOBALS['LANG']`, because labels are
+resolved during the compile. The items of a category tree are the exception, see
+the next section.
+
+## A category tree that starts at a site setting
+
+TYPO3 resolves `###SITE:<path>###` in `treeConfig.startingPoints` of a category
+field from the configuration of the record's site
+(`AbstractItemProvider::parseStartingPointsFromSiteConfiguration()`, identical
+on v13 and v14). It is the documented way to start a tree per site, and it has
+one flaw for a setting that may be empty: an empty value, a text, a missing path
+and a record outside of every site all end up as a single starting point `0`.
+`TreeDataProviderFactory` makes the first level of the tree selectable whenever
+`startingPoints` holds no comma and the field configures no
+`appearance.nonSelectableLevels`, so the whole tree comes back with its top node
+selectable, which it is not without `startingPoints`.
+
+`academic_programs` therefore keeps the marker in its TCA and FlexForms as the
+declaration, and its form data provider `CategoryTreeRoot` replaces it before
+`TcaCategory` runs: with the uids of the setting, or by removing
+`startingPoints` when the setting names none. It is registered after
+`SiteResolving` and `TcaColumnsOverrides`, because the marker of a program page
+arrives with the columns overrides of its page type, and before `TcaCategory`,
+in three form data groups. `flexFormSegment` runs no `TcaColumnsOverrides`, and
+core ignores a dependency that is not part of the group:
+
+| Group                        | Compiles                                              |
+|------------------------------|-------------------------------------------------------|
+| `tcaDatabaseRecord`          | the record form                                       |
+| `flexFormSegment`            | a FlexForm field, in the form and in the tree request |
+| `tcaSelectTreeAjaxFieldData` | the tree request of a TCA column                      |
+
+The tree is not part of the form. FormEngine renders the field, and the tree
+loads its items afterwards from `FormSelectTreeAjaxController`, which compiles
+the field alone through `tcaSelectTreeAjaxFieldData`. A provider registered for
+the record form only changes the configuration a test asserts, not the tree an
+editor sees.
+
+Test the tree through that controller, as `CategoryTreeRootTest` of
+`academic-programs` does. Compiling `tcaDatabaseRecord` with
+`selectTreeCompileItems` looks equivalent and is not on v14:
+`TcaColumnsRemoveEmptyRelations` (v14.2, core issue #109366) counts the `value`
+of the items, tree items carry an `identifier` instead, and the category field
+is removed from the result.
 
 ## Five of the eleven dispatch an event, six do not
 
