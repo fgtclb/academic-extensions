@@ -53,16 +53,16 @@
 
 ## 6. Definition of done
 
-- [ ] 6.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 6.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
   `functional` for TYPO3 v13, all green.
-- [ ] 6.2 `composerUpdate`, then the same five suites for TYPO3 v14, all
+- [x] 6.2 `composerUpdate`, then the same five suites for TYPO3 v14, all
   green.
-- [ ] 6.3 `functional` on PostgreSQL for both core versions (`-d postgres -j
+- [x] 6.3 `functional` on PostgreSQL for both core versions (`-d postgres -j
   8`), since the change adds a query constraint.
-- [ ] 6.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 6.5 `docs/` and the `academic-partners` `Documentation/` changelog
+- [x] 6.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 6.5 `docs/` and the `academic-partners` `Documentation/` changelog
   updated, `README.md` and `CONTRIBUTING.md` still only link.
-- [ ] 6.6 Archive the change as the last commit of the pull request.
-- [ ] 6.7 Backport analysis for branch `2` (`docs/workflow/backporting.md`):
+- [x] 6.6 Archive the change as the last commit of the pull request.
+- [x] 6.7 Backport analysis for branch `2` (`docs/workflow/backporting.md`):
   the map action, demand and repository are the same there, the partial does
   not exist. The backport is a change of its own on `2`.
