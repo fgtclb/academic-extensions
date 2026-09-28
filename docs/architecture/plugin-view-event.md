@@ -37,13 +37,10 @@ Not covered, on purpose:
 Through the trait
 `FGTCLB\AcademicBase\Controller\DispatchModifyPluginViewEventMethodTrait`, which
 is `@internal`. Its one method, `dispatchModifyPluginViewEvent()`, takes the
-request, the settings, the view and the event dispatcher from the action,
-builds the `academic_base` plugin action context from the request and the
-settings, and dispatches the event with the view. It returns the dispatched
-event, so an action can hand its context on to another event or a service; an
-action that needs nothing of it ignores the return value, as all of them do
-today. It reads nothing of the controller itself, as no trait of the
-extensions does; see [Class design](class-design.md#traits).
+plugin action context, the view and the event dispatcher from the action, and
+dispatches the event with the context and the view. It returns the dispatched
+event, which no action needs today. It reads nothing of the controller itself,
+as no trait of the extensions does, see [Class design](class-design.md#traits).
 
 - **Called once on every path that renders**, after the action assigned its own
   variables, so a listener sees the view as the template will.
@@ -55,11 +52,16 @@ extensions does; see [Class design](class-design.md#traits).
   from a project subclass of one of the controllers that are not `final` yet:
   a subclass that overrides `htmlResponse()` or an action without calling the
   parent drops the dispatch either way.
-- **The context is built at the dispatch**, not taken from the action. The
-  persons list switches its pagination off under a letter after the query, and
-  a context built before would still carry the setting as it was. For the
-  same reason the persons actions do not hand over the deprecated persons
-  context they build for their query events (ACE-747).
+- **One context per rendering.** Every action builds its context once, before
+  its first event and after its settings are settled, and hands the same object
+  to every event it dispatches: the demand and list events of the partner and
+  project lists, the query and page title events of the persons plugins, the
+  write event of the profile editor, and this one. A listener that follows a
+  rendering through its events gets one context (ACE-767). The persons list
+  therefore decides before its query that a letter switches the pagination off,
+  and the persons actions hand their deprecated persons context to this event as
+  well. It implements the `academic_base` interface the event declares
+  (ACE-747).
 
 The partner and project lists keep their demand and list events, see
 [List plugin events](list-plugin-events.md). The view event comes after both.
@@ -96,6 +98,15 @@ event is registered and not called.
 A new action that renders a view gets a row in that data provider. Removing
 the dispatch from any path turns its row red, and so does moving it in front
 of the action's own assignments.
+
+A second listener of the fixture records the context of every event that carries
+one. The test renders every plugin that dispatches more than the view event: the
+persons list with and without a letter, the persons detail, card, selected
+profiles and selected contracts, the partner list and map, and the project list.
+For each it asserts the sequence of events and that all of them received the
+same context object. Another test asserts that under a letter every event of the
+persons list sees the pagination switched off. A context built a second time
+anywhere in such an action turns its row red.
 
 ## See also
 

@@ -362,14 +362,14 @@ class and no method of it. Everything the method needs is a parameter:
 A trait written that way works in every class that uses it, and nothing in the
 class depends on which of its members the trait happens to read.
 `DispatchModifyPluginViewEventMethodTrait` is the example: an action hands it
-the request, its settings, the view and the event dispatcher, although all four
-are properties of every Extbase controller.
+its plugin action context, the view and the event dispatcher, although the view
+and the dispatcher are properties of every Extbase controller.
 
 The four traits under `packages/fgtclb/*/Classes/` follow the rule:
 
 | Trait                                              | Takes                                                                                                                                                               |
 |----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `DispatchModifyPluginViewEventMethodTrait`         | the request, the settings, the view and the event dispatcher                                                                                                        |
+| `DispatchModifyPluginViewEventMethodTrait`         | the plugin action context, the view and the event dispatcher                                                                                                        |
 | `GetCurrentContentRecordMethodTrait`               | the content object renderer                                                                                                                                         |
 | `GetSelectItemsForTcaManagedTableFieldMethodTrait` | the request, the localization utility, the extension key, the table, the field and the values to drop, and hands `$this` to the item provider as the calling object |
 | `TtContentListTypeColumnTrait`                     | the connection pool                                                                                                                                                 |
@@ -440,13 +440,16 @@ manual rather than this repository.
 - **Every plugin action that renders a view dispatches the plugin view
   event**, `ModifyPluginViewEvent` of `academic_base`, through the trait
   method `dispatchModifyPluginViewEvent()`, once on every path that renders.
-  The action hands it the request, its settings, the view and the event
+  The action hands it its plugin action context, the view and the event
   dispatcher, see [Traits](#traits).
   A new action calls it too, and gets a row in the test that renders every
   plugin; see [Plugin view event](plugin-view-event.md). No plugin gets a view
   event of its own. The profile editing of `academic_persons_edit` is the one
   exception: it dispatches no plugin view event, and offers each of its writes
   to `BeforeProfileEditingWriteEvent` instead.
+- **An action builds its plugin action context once**, before its first event
+  and after its settings are settled, and hands that one object to every event
+  it dispatches, the plugin view event included (ACE-767).
 
 Events follow one shape:
 

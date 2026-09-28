@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBase\Controller;
 
-use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
+use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface;
 use FGTCLB\AcademicBase\Event\ModifyPluginViewEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\View\ViewInterface as CoreViewInterface;
 use TYPO3Fluid\Fluid\View\ViewInterface as FluidViewInterface;
 
@@ -29,28 +28,22 @@ use TYPO3Fluid\Fluid\View\ViewInterface as FluidViewInterface;
 trait DispatchModifyPluginViewEventMethodTrait
 {
     /**
-     * The context is built here, from the request and the settings as the action left them,
-     * and not taken from the action: an action may change a setting after its query. Those
-     * settings can differ from `{settings}` in the view, which Extbase assigns before the
+     * The context is the one the action built once its settings were settled, and handed to
+     * every other event it dispatched before, so a listener sees one context per rendering.
+     * Its settings can differ from `{settings}` in the view, which Extbase assigns before the
      * action runs.
      *
-     * It returns the dispatched event, so a caller can hand its context on, to another event
-     * or to a service. A caller that needs nothing of it ignores the return value.
-     *
-     * @param array<string, mixed> $settings
+     * It returns the dispatched event. A caller that needs nothing of it ignores the return
+     * value.
      */
     protected function dispatchModifyPluginViewEvent(
-        ServerRequestInterface $request,
-        array $settings,
+        PluginControllerActionContextInterface $pluginControllerActionContext,
         FluidViewInterface|CoreViewInterface $view,
         EventDispatcherInterface $eventDispatcher,
     ): ModifyPluginViewEvent {
         /** @var ModifyPluginViewEvent $event */
         $event = $eventDispatcher->dispatch(new ModifyPluginViewEvent(
-            pluginControllerActionContext: new PluginControllerActionContext(
-                request: $request,
-                settings: $settings,
-            ),
+            pluginControllerActionContext: $pluginControllerActionContext,
             view: $view,
         ));
         return $event;

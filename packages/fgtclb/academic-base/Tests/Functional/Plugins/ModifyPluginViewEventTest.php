@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use TESTS\TestPluginViewEvent\EventListener\LeftoverListProfilesListener;
+use TESTS\TestPluginViewEvent\EventListener\RecordPluginContextListener;
 use TESTS\TestPluginViewEvent\EventListener\RecordPluginViewListener;
 use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -69,10 +70,12 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
         RecordPluginViewListener::$replaceValidations = false;
         RecordPluginViewListener::$replaceData = false;
         LeftoverListProfilesListener::$calls = 0;
+        RecordPluginContextListener::$contexts = [];
     }
 
     protected function tearDown(): void
     {
+        RecordPluginContextListener::$contexts = [];
         RecordPluginViewListener::$renderings = [];
         RecordPluginViewListener::$assignedBefore = [];
         RecordPluginViewListener::$replaceValidations = false;
@@ -136,7 +139,7 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
     /**
      * A URL with plugin arguments, and the cHash the frontend asks for with them.
      *
-     * @param array<string, array<string, int|string>> $arguments By plugin namespace.
+     * @param array<string, array<string, mixed>> $arguments By plugin namespace.
      */
     private function pageUrl(int $pageId, string $slug, array $arguments = []): string
     {
@@ -294,5 +297,96 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
 
         $this->assertSame(['AcademicPersons/List/list'], RecordPluginViewListener::$renderings);
         $this->assertSame(0, LeftoverListProfilesListener::$calls);
+    }
+
+    /**
+     * The renderings that dispatch more than the plugin view event, with the events that carry
+     * a context in the order they are dispatched.
+     *
+     * @return array<string, array{int, string, array<string, array<string, mixed>>, list<string>}>
+     */
+    public static function renderingsWithSeveralEvents(): array
+    {
+        return [
+            'persons list' => [10, 'persons-list', [], ['ModifyProfileQueryEvent', 'ModifyPluginViewEvent']],
+            'persons list with a letter' => [
+                18,
+                'persons-list-letters',
+                ['tx_academicpersons_list' => ['demand' => ['alphabetFilter' => 'A']]],
+                ['ModifyProfileQueryEvent', 'ModifyProfileQueryEvent', 'ModifyPluginViewEvent'],
+            ],
+            'persons detail' => [
+                12,
+                'persons-detail',
+                ['tx_academicpersons_detail' => ['profile' => 1]],
+                // One title event per placeholder of the default title format.
+                [
+                    'ModifyProfileTitlePlaceholderReplacementEvent',
+                    'ModifyProfileTitlePlaceholderReplacementEvent',
+                    'ModifyProfileTitlePlaceholderReplacementEvent',
+                    'ModifyProfileTitlePlaceholderReplacementEvent',
+                    'ModifyPluginViewEvent',
+                ],
+            ],
+            'persons card' => [13, 'persons-card', [], ['ModifyProfileQueryEvent', 'ModifyPluginViewEvent']],
+            'persons selected profiles' => [14, 'persons-selected-profiles', [], ['ModifyProfileQueryEvent', 'ModifyPluginViewEvent']],
+            'persons selected contracts' => [16, 'persons-selected-contracts', [], ['ModifyContractQueryEvent', 'ModifyPluginViewEvent']],
+            'partners list' => [30, 'partners-list', [], ['ModifyPartnerDemandEvent', 'ModifyPartnerListEvent', 'ModifyPluginViewEvent']],
+            'partners map' => [31, 'partners-map', [], ['ModifyPartnerDemandEvent', 'ModifyPartnerListEvent', 'ModifyPluginViewEvent']],
+            'projects list' => [50, 'projects-list', [], ['ModifyProjectDemandEvent', 'ModifyProjectListEvent', 'ModifyPluginViewEvent']],
+        ];
+    }
+
+    /**
+     * Every event of one rendering receives the same context, so a listener that follows a
+     * rendering through its events can rely on it.
+     *
+     * @param array<string, array<string, mixed>> $arguments
+     * @param list<string> $expectedEvents
+     */
+    #[DataProvider('renderingsWithSeveralEvents')]
+    #[Test]
+    public function everyEventOfARenderingReceivesTheSameContext(
+        int $pageId,
+        string $slug,
+        array $arguments,
+        array $expectedEvents,
+    ): void {
+        $this->setUpTestCase();
+
+        $this->renderFrontendPage($this->pageUrl($pageId, $slug, $arguments));
+
+        $recorded = RecordPluginContextListener::$contexts;
+        $this->assertSame($expectedEvents, array_column($recorded, 'event'));
+        foreach ($recorded as $record) {
+            $this->assertSame(
+                $recorded[0]['context'],
+                $record['context'],
+                sprintf('%s received another context than %s.', $record['event'], $recorded[0]['event']),
+            );
+        }
+    }
+
+    /**
+     * A letter switches the pagination of the persons list off. The one context of the
+     * rendering carries that from the start, so the profile query sees it as the view does.
+     */
+    #[Test]
+    public function theContextOfAPersonsListUnderALetterCarriesThePaginationSwitchedOff(): void
+    {
+        $this->setUpTestCase();
+
+        $this->renderFrontendPage($this->pageUrl(18, 'persons-list-letters', [
+            'tx_academicpersons_list' => ['demand' => ['alphabetFilter' => 'A']],
+        ]));
+
+        $this->assertNotSame([], RecordPluginContextListener::$contexts);
+        foreach (RecordPluginContextListener::$contexts as $record) {
+            $this->assertSame(
+                '0',
+                $record['context']->getSettings()['paginationEnabled'] ?? null,
+                sprintf('%s received the pagination switched on.', $record['event']),
+            );
+        }
     }
 }

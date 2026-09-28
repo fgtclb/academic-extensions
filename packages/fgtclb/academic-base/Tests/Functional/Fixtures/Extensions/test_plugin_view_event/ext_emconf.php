@@ -2,7 +2,7 @@
 
 $EM_CONF[$_EXTKEY] = [
     'title' => 'TESTS: Academic Plugin View Event',
-    'description' => 'Extension listening to the plugin view event of every academic plugin for tests',
+    'description' => 'Extension listening to the plugin view event of every academic plugin, and recording the plugin context of every event, for tests',
     'version' => '3.0.0',
     'category' => 'misc',
     'state' => 'beta',

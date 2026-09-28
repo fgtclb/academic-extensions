@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicContacts4pages\Controller;
 
 use FGTCLB\AcademicBase\Controller\DispatchModifyPluginViewEventMethodTrait;
 use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
+use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicContacts4pages\Service\AddressRecordProvider;
 use FGTCLB\AcademicContacts4pages\Service\PageContactsProvider;
 use Psr\Http\Message\ResponseInterface;
@@ -27,6 +28,7 @@ final class ContactsController extends ActionController
 
     public function listAction(): ResponseInterface
     {
+        $context = new PluginControllerActionContext($this->request, $this->settings);
         $contentObjectRenderer = $this->getCurrentContentObjectRenderer();
         /** @var array<string, mixed> */
         $contentElementData = $contentObjectRenderer?->data ?? [];
@@ -63,7 +65,7 @@ final class ContactsController extends ActionController
             'roles' => $pageContacts->roles,
             'contactsWithoutRole' => $pageContacts->contactsWithoutRole,
         ]);
-        $this->dispatchModifyPluginViewEvent($this->request, $this->settings, $this->view, $this->eventDispatcher);
+        $this->dispatchModifyPluginViewEvent($context, $this->view, $this->eventDispatcher);
 
         return $this->htmlResponse();
     }
