@@ -71,10 +71,9 @@ for classes that have no other reason to change then.
 Rejected: leaving the program and B-ITE controllers for a change of their
 own. Their events are proposed for 3.0.0 as well, so the precondition that
 made closing them premature, a plugin without any event, is gone by the
-time this change lands. `ace-tbd-program-psr14-events` still lists making
-the program controller final as a non-goal for a later major version, and
-`ace-677-bite-jobs-list-grouping-and-views` describes `BiteJobsController`
-as not final; this change supersedes both statements for the controllers.
+time this change lands. `ace-677-bite-jobs-list-grouping-and-views`
+describes `BiteJobsController` as not final, and this change supersedes that
+statement.
 
 ### `final` directly in 3.0.0, as a breaking change
 
@@ -139,13 +138,13 @@ The `Breaking-` entries map each subclass purpose to its replacement.
   `ace-727-partner-list-pagination`.
 - Bookmarkable filter URLs: the redirect of `ace-723-list-filter-get-urls`.
 
-`ProgramController`, through the events of `ace-tbd-program-psr14-events`:
+`ProgramController`, through the events of `ace-766-program-psr14-events`:
 
 - Changing the selection before the query: a listener of
   `ModifyProgramDemandEvent`.
 - Replacing or reordering the programs, adjusting the offered filter
   categories, or adding view variables: a listener of
-  `ModifyListProgramsEvent`.
+  `ModifyProgramListEvent`.
 - An own finder action next to the list: the finder element of
   `ace-91-program-finder-element` where it has shipped; until then a
   project keeps its own plugin with its own controller class, which is
@@ -155,7 +154,7 @@ The `Breaking-` entries map each subclass purpose to its replacement.
 
 - Changing the program or adding view variables of the details plugin: a
   listener of the plugin view event of `ace-750-generic-plugin-view-event`.
-  `ModifyProgramDataEvent` of `ace-tbd-program-psr14-events` changes the
+  `ModifyProgramDataEvent` of `ace-766-program-psr14-events` changes the
   data of the program page template, which is rendered by a data
   processor, not by this controller.
 
@@ -184,14 +183,14 @@ without an event removes the only extension point:
 
 - `ace-717-partners-projects-list-events` for `PartnerController` and
   `ProjectController`;
-- `ace-tbd-program-psr14-events` for `ProgramController`;
+- `ace-766-program-psr14-events` for `ProgramController`;
 - `ace-tbd-bite-jobs-request-result-events` for `BiteJobsController`;
 - `ace-750-generic-plugin-view-event` for `DetailsController`, the two
   partnership actions of `PartnerController` and additional view variables
   of `BiteJobsController`. None of the three changes above dispatches an
   event there, so without it the rule of every finalised controller having
   an event-based extension point does not hold. The alternative is a
-  details event in `ace-tbd-program-psr14-events`; the precondition task
+  details event in `ace-766-program-psr14-events`; the precondition task
   accepts either.
 
 Because `ace-750-generic-plugin-view-event` lands after

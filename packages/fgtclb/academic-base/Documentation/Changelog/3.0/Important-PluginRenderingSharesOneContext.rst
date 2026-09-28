@@ -17,8 +17,8 @@ Every action now builds its context once, before its first event and after its
 settings are settled, and hands the same object to every event it dispatches:
 
 *   :php:`\FGTCLB\AcademicBase\Event\ModifyPluginViewEvent`,
-*   the demand and list events of :guilabel:`academic_partners` and
-    :guilabel:`academic_projects`,
+*   the demand and list events of :guilabel:`academic_partners`,
+    :guilabel:`academic_programs` and :guilabel:`academic_projects`,
 *   the query and page title events of :guilabel:`academic_persons`,
 *   and the write event of :guilabel:`academic_persons_edit`.
 

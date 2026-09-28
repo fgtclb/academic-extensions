@@ -1,13 +1,13 @@
 ## 1. Preconditions
 
 - [ ] 1.1 Confirm on main that `ace-717-partners-projects-list-events`,
-  `ace-tbd-program-psr14-events` and
+  `ace-766-program-psr14-events` and
   `ace-tbd-bite-jobs-request-result-events` are merged and their events
   are dispatched; stop otherwise.
 - [ ] 1.2 Confirm that `ace-750-generic-plugin-view-event` is merged and
   dispatched in the program details action, both partnership actions and
   the B-ITE list action, or that a details event has been added to
-  `ace-tbd-program-psr14-events` and the partnership and B-ITE actions are
+  `ace-766-program-psr14-events` and the partnership and B-ITE actions are
   otherwise covered; stop otherwise.
 - [ ] 1.3 Confirm the state of `ace-727-partner-list-pagination`,
   `ace-723-list-filter-get-urls` and `ace-91-program-finder-element`, so

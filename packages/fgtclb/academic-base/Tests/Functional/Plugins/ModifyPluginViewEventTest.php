@@ -333,6 +333,8 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
             'persons selected contracts' => [16, 'persons-selected-contracts', [], ['ModifyContractQueryEvent', 'ModifyPluginViewEvent']],
             'partners list' => [30, 'partners-list', [], ['ModifyPartnerDemandEvent', 'ModifyPartnerListEvent', 'ModifyPluginViewEvent']],
             'partners map' => [31, 'partners-map', [], ['ModifyPartnerDemandEvent', 'ModifyPartnerListEvent', 'ModifyPluginViewEvent']],
+            'programs list' => [40, 'programs-list', [], ['ModifyProgramDemandEvent', 'ModifyProgramListEvent', 'ModifyPluginViewEvent']],
+            'programs finder' => [41, 'programs-finder', [], ['ModifyProgramDemandEvent', 'ModifyProgramListEvent', 'ModifyPluginViewEvent']],
             'projects list' => [50, 'projects-list', [], ['ModifyProjectDemandEvent', 'ModifyProjectListEvent', 'ModifyPluginViewEvent']],
         ];
     }
