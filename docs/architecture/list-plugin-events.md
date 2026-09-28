@@ -84,12 +84,13 @@ the settings the action uses.
 ## Rules that are easy to get wrong
 
 **A restriction the plugin must keep runs after the demand event.** The partner
-map restricts the demand to partners that can be drawn, because a partner
-without coordinates ends up at 0/0 instead of being left out (ACE-562). That
-restriction is applied *after* the event, so a listener that hands back a fresh
-demand — with the restriction off again — still gets a map without them. The
-same holds for anything else a plugin guarantees rather than offers: dispatch
-first, then enforce.
+map restricts the demand to partners that can be drawn: partners with
+coordinates, because one without ends up at 0/0 instead of being left out
+(ACE-562), and with "Show on map" switched on (ACE-770). That restriction is
+applied *after* the event, so a listener that hands back a fresh demand, with
+the restriction off again, still gets a map without them. The same holds for
+anything else a plugin guarantees rather than offers: dispatch first, then
+enforce.
 
 **A demand listener widens as easily as it narrows.** This is not the
 constraint API of `academic_persons`, where the **conditions** a listener hands

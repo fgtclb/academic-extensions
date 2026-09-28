@@ -38,13 +38,27 @@ switch is off, as it renders none for a partner without coordinates.
   coordinates and "Show on map" switched off
 - **THEN** no map is rendered
 
-### Requirement: The default language decides
+### Requirement: A translation follows its default record
 
-The switch SHALL be read from the partner in the default language. A
-translation of a partner page SHALL NOT hold a value of its own.
+The map SHALL read the switch of the partner in the language of the page. A
+translation SHALL follow the switch of its default record unless an editor
+detached it from its default record.
 
-#### Scenario: Translated partner
+#### Scenario: Default record switched off
 
-- **WHEN** a partner is switched off in the default language and the map is
-  rendered in another language
-- **THEN** the map does not draw that partner in that language either
+- **WHEN** an editor switches a partner off the map in the default language
+  and the translation is not detached
+- **THEN** the map draws that partner in no language
+
+#### Scenario: Detached translation
+
+- **WHEN** an editor detached the switch of a translation and switched it off
+- **THEN** the map of that language leaves the partner out, and the map of the
+  default language still draws it
+
+#### Scenario: Translation made before the update
+
+- **WHEN** a translation made before the update holds a different switch than
+  its default record and is not detached
+- **THEN** after the upgrade wizard ran, the map of that language follows the
+  default record
