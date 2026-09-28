@@ -77,4 +77,4 @@
 - [x] 5.4 `docs/`, the `Documentation/` of both extensions and the changelog
   of `academic-programs` updated in the same change. `README.md` and
   `CONTRIBUTING.md` only link.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archive the change as the last commit of the pull request.
