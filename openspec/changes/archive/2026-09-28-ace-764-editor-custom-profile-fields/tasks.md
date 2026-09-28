@@ -39,11 +39,11 @@
 
 ## 5. Definition of done
 
-- [ ] 5.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 5.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
   `functional` for TYPO3 v13, and the same after its own `composerUpdate` for
   TYPO3 v14; the write tests also with `-d postgres`.
-- [ ] 5.2 `checkJsBuildClean`, `testJs`, `lintMarkdown -n` and
+- [x] 5.2 `checkJsBuildClean`, `testJs`, `lintMarkdown -n` and
   `checkRstRenderingAll` green.
-- [ ] 5.3 `docs/` and the extension's `Documentation/` changelog updated in the
+- [x] 5.3 `docs/` and the extension's `Documentation/` changelog updated in the
   same change.
-- [ ] 5.4 Archive the change as the last commit of the pull request.
+- [x] 5.4 Archive the change as the last commit of the pull request.
