@@ -38,4 +38,4 @@
   chapter, the upgrade guide, the two 3.0 entries that named the TCA files, and
   the identifier on the extension points page of `academic_base`.
 - [x] 3.5 File the ACE issue, rename the change, commit in TYPO3 Core format.
-- [ ] 3.6 Archive the change as the last commit of the pull request.
+- [x] 3.6 Archive the change as the last commit of the pull request.
