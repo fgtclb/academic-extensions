@@ -44,4 +44,4 @@
 - [x] 4.2 After `composerUpdate` for TYPO3 v14: the same.
 - [x] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 4.4 The commit message in TYPO3 Core format with ACE-767.
-- [ ] 4.5 Archive the change as the last commit of the pull request.
+- [x] 4.5 Archive the change as the last commit of the pull request.
