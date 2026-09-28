@@ -41,3 +41,9 @@ export declare const createKeyboardEvent: (
  * reports a fixed 1024 and cannot resize; the study plan switches layout at 768.
  */
 export declare const setViewportWidth: (width: number) => void;
+
+/**
+ * A window of its own, with scripts enabled, that evaluates each classic script
+ * in its global scope, in order, and is returned.
+ */
+export declare const runClassicScripts: (...scripts: string[]) => Window & { eval(code: string): unknown };

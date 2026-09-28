@@ -191,3 +191,27 @@ export const createKeyboardEvent = (type, { key = '' } = {}) =>
 export const setViewportWidth = (width) => {
     Object.defineProperty(installDom().window, 'innerWidth', { value: width, configurable: true });
 };
+
+/**
+ * A window of its own that runs classic scripts the way a browser does, and
+ * returns it.
+ *
+ * The shared window runs no scripts: the modules under test are imported, not
+ * evaluated. A classic script is different. Its top level "var" and its bare
+ * names belong to the window, which neither an import nor a function body
+ * reproduces, so this window is created with scripts enabled and evaluates each
+ * one in its global scope, in order. Used for the map libraries, which are
+ * shipped as classic scripts on this branch.
+ */
+export const runClassicScripts = (...scripts) => {
+    const dom = new JSDOM('<!doctype html><html lang="en"><body></body></html>', {
+        pretendToBeVisual: true,
+        runScripts: 'outside-only',
+        url: 'https://example.test/',
+    });
+    for (const script of scripts) {
+        dom.window.eval(script);
+    }
+
+    return dom.window;
+};

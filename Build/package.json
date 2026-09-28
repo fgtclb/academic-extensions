@@ -30,5 +30,9 @@
         "sass": "^1.93.2",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.46.2"
+    },
+    "dependencies": {
+        "leaflet": "1.9.4",
+        "leaflet.markercluster": "1.5.3"
     }
 }
