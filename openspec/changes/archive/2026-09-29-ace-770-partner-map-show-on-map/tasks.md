@@ -40,4 +40,4 @@
 - [x] 6.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 6.3 `docs/`: nothing to change. The page on list plugin events that
   `main` extended does not exist on this branch.
-- [ ] 6.4 Archive the change as the last commit of the pull request.
+- [x] 6.4 Archive the change as the last commit of the pull request.
