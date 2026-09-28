@@ -72,6 +72,24 @@ is `fgtclb/<extension-key-with-dashes>-<component>`. The aggregate keeps the
 name the extension already published, so a site that depends on it keeps
 working while its payload moves into the component sets underneath it.
 
+Where several components of an extension read the same site settings, the
+extension declares them on its aggregate set, as `academic_jobs`,
+`academic_partners`, `academic_persons`, `academic_programs` and
+`academic_projects` do. A settings definition belongs to the set whose
+`config.yaml` sits next to it, and a site only gets the definitions of the sets
+it depends on. A site that depends on a component set only, or on no set of the
+extension, is therefore not offered those settings in the site settings editor.
+It can still write one to its `settings.yaml`, but only as a tree: TYPO3 keeps a
+value no set of the site declares under its path when it is nested, and escapes
+the dots of a flat key, so `plugin.tx_academicprograms.categoryRootUids: '12'`
+is not found under `plugin.tx_academicprograms.categoryRootUids` there
+(`SiteSettingsProvider::getProvidedSettings()`, v13 and v14). The settings
+editor keeps such a value when it saves the settings of the site
+(`SettingsDiff::create()`). A setting that only one component reads is declared
+on that component's set instead, as the list set of `academic_partners`, the
+profile editing set of `academic_persons_edit` and the content element set of
+`academic_study_plan` do.
+
 Not every component belongs behind a site set. An extension may ship one that
 has to apply to every installation regardless of the site configuration — the
 content element group label of `academic-base` is one, because a group that is
