@@ -445,13 +445,18 @@ manual rather than this repository.
   A new action calls it too, and gets a row in the test that renders every
   plugin; see [Plugin view event](plugin-view-event.md). No plugin gets a view
   event of its own. The profile editing of `academic_persons_edit` is the one
-  exception: its forms get events on the data they write.
+  exception: it dispatches no plugin view event, and offers each of its writes
+  to `BeforeProfileEditingWriteEvent` instead.
 
 Events follow one shape:
 
 - **`final`**, in `Classes/Event/`.
-- **Named `Modify…Event`** when a listener may change something, and
-  **`After…Event`** when the event announces something that happened.
+- **Named `Modify…Event`** when a listener may change something,
+  **`Before…Event`** when a listener may refuse something that is about to
+  happen, and change it as well, and **`After…Event`** when the event
+  announces something that happened. `BeforeProfileEditingWriteEvent` of
+  `academic_persons_edit` is the one `Before…Event` so far: it is dispatched
+  before every write of the profile editor, and a refusal stops the write.
   Three events predate the rule and stay, because a rename or a move breaks
   every listener for nothing: `ChooseProfileFactoryEvent` of
   `academic_persons`, its `@internal`

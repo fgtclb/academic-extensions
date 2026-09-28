@@ -62,8 +62,53 @@ So a value is written only when **all three** hold:
    `hasPropertyOverride()`, nothing else.
 
 The order matters and is deliberate: the validation configuration wins over
-everything, including an override. A PSR-14 listener that replaces an override
-before the transformation runs cannot write a property the configuration locks.
+everything, including an override. Even a value that reached the store by
+mistake cannot write a property the configuration locks.
+
+## The listener before the write
+
+`BeforeProfileEditingWriteEvent` of `academic_persons_edit` is dispatched once
+for every write of the editor, fifteen endpoints in all: the profile, its two
+switches, the image upload and removal, and the create, update, visibility,
+delete and sort endpoints of documents and of contacts. A listener refuses the
+write, or replaces the values it stores. `ProfileEditingAction` names the
+write, and `carriesFields()` says whether it has values to replace: the
+profile, the synchronisation switch, and the creation and update of a document
+or contact. The integrator side, with examples, is the
+[developer chapter of `academic_persons_edit`](../../packages/fgtclb/academic-persons-edit/Documentation/Developers/Index.rst).
+
+Three decisions shape it:
+
+- **It is dispatched after every check of the request, and right before the
+  factory or writer call.** Authentication, ownership, the action allow-list,
+  the locks of the synchronisation on the row, the normalisation and the
+  validation all come first, so a listener sees only a write that would
+  otherwise be stored. The sort by a complete order checks the order before the
+  dispatch for that reason, which `reorderDocumentRecords()` did on its own
+  before.
+- **Replaced values take the path of submitted ones.** The fields a listener
+  sees are the submitted values in their JSON shape, reduced to the keys the
+  normalisation accepted, so a locked field the browser sent is not among
+  them. When a listener changed them, the controller runs the same
+  normalisation and validation on the new values that it ran on the submitted
+  ones: `createFormData()` and the validator for the profile,
+  `normalizeAndValidateDocumentFields()` and
+  `normalizeAndValidateContractContactFields()` for the rest. A locked field is
+  dropped again, an invalid value is a `422`, and rich text runs through the
+  sanitiser. A listener never touches the override store, so the factories
+  only ever read normalised values from it.
+- **A refusal is `422` `write_refused`** with the listener's reason as the
+  message, the error shape the editor already shows as text. The event is
+  stoppable and a refusal stops it.
+
+Three alternatives were rejected:
+
+- Dispatching before the validation. A listener would get raw payloads and
+  could copy unsanitised input into a rich text field.
+- One event class per endpoint. A listener refusing "any write of X" would
+  register for each of them, and would miss the class a new endpoint adds.
+- Opening the `final` controller for inheritance. It changes with every
+  feature of the editor.
 
 ## Rule 1 — `disabled` and `readOnly` protect persisted data
 
@@ -218,5 +263,7 @@ Note that it changes the backend record editor at the same time.
   pattern that exercises this path end to end.
 - `packages/fgtclb/academic-persons-edit/Documentation/ProfileEditing/Index.rst`
   — the integrator-facing description of the endpoints and their payloads.
+- `packages/fgtclb/academic-persons-edit/Documentation/Developers/Index.rst`:
+  the write event, as integrators read it.
 - `packages/fgtclb/academic-persons/Configuration/AcademicPersons/Settings.yaml`
   — the shipped sets, and the only file that defines them.

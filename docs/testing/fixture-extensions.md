@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Forty-four such fixture extensions exist, in nine of the twelve extensions.
+Forty-five such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -32,6 +32,7 @@ They sit next to the tests that use them, under
 | `test_category_types_undeclared_group` | `tests/category-types-undeclared-group` | `typo3-category-types`  | A type in a group no package declares, then one in a group the file declares. |
 | `test_contract_contact_actions`        | `tests/test-contract-contact-actions`   | `academic-persons-edit` | A `Settings.yaml` narrowing the actions of the contracts section.             |
 | `test_current_color_icons`             | `tests/current-color-icons`             | `academic-base`         | Icons registered through the `currentColor` icon provider.                    |
+| `test_editor_write_listener`           | `tests/test-editor-write-listener`      | `academic-persons-edit` | A listener of the editor write event, refusing or replacing as a test says.   |
 | `test_exclude_file_column`             | `tests/test-exclude-file-column`        | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
 | `test_frontend_readonly`               | `tests/test-frontend-readonly`          | `academic-persons`      | Frontend-only field locks, also loaded by the `academic-persons-edit` tests.  |
 | `test_frontend_user_sync`              | `tests/test-frontend-user-sync`         | `academic-persons`      | A `Settings.yaml` synchronisation map and the `fe_users` columns it reads.    |
@@ -70,7 +71,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twelve of the forty-four have a `Classes/` folder with a `TESTS\…` PSR-4 root.
+Thirteen of the forty-five have a `Classes/` folder with a `TESTS\…` PSR-4 root.
 The other thirty-two are pure resources. The `ext_emconf.php` is checked like
 every other one: its `depends` names extension keys, and a fixture extension
 may name another fixture extension, which a real extension may not — see
