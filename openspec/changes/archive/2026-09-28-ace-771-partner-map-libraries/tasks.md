@@ -62,6 +62,7 @@
 - [x] 6.2 The same for TYPO3 v14.
 - [x] 6.3 `testJs`, `lintTypescript`, `typecheckJs`, `checkJsBuildClean`,
   `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 6.4 Archive the change as the last commit of the pull request.
-- [ ] 6.5 Backport analysis for branch `2`: the same files and build exist
-  there. The backport is a change of its own on `2`.
+- [x] 6.4 Archive the change as the last commit of the pull request.
+- [x] 6.5 Backport analysis for branch `2`: the same files and build exist
+  there. The backport is a change of its own on `2`, not part of this pull
+  request.
