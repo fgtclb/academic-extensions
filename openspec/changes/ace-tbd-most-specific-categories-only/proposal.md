@@ -42,7 +42,7 @@ None.
 ## Non-goals
 
 - Matching a parent filter against programs that carry only the child
-  (`ace-tbd-filter-match-subcategories`).
+  (`ace-765-filter-match-subcategories`).
 - The frontend order of a degree hierarchy (ACE-620).
 - A "hide in frontend" column on `sys_category`.
 - The same switch for the partner and project listings; it follows when an

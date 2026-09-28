@@ -16,6 +16,13 @@ page reload.
 - **WHEN** the visitor resets the degree select to its empty value
 - **THEN** the option "Robotics" is selectable again
 
+#### Scenario: A program carries a subcategory of the option
+- **WHEN** the finder includes subcategories
+- **AND** a visitor selects the topic "Robotics"
+- **AND** the only program with "Robotics" carries "Master of Science", a
+  child of the degree "Master", and none carries "Master" itself
+- **THEN** the option "Master" stays selectable
+
 ### Requirement: The finder states how many programs match
 The program finder SHALL show the number of programs that match all current
 selections and SHALL update it on every change of a selection.

@@ -9,6 +9,11 @@
   the storage are absent from the map; prove the assertion by building the map
   from an unrestricted query once and watching it go red.
 
+- [ ] 1.3 With the finder field `settings.filter.includeSubcategories` on, list
+  the visible ancestors of each assigned category in the map as well, so the
+  module enables a parent whose subcategory is carried, as the server does.
+  Assert both states of the field in the payload test.
+
 ## 2. Frontend module
 
 - [ ] 2.1 Add `Resources/Private/TypeScript/frontend/program-finder.ts` (no

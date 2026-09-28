@@ -16,10 +16,16 @@ same applies to the categories an editor preselects in the list plugin.
   selects in the filter form.
 - Several selections still all have to match: the option widens each
   selection by its subtree, it does not change how selections combine.
-- The filter form is unchanged: the options and the selected value render as
-  today.
+- With the option on, the filter form offers a parent category as soon as a
+  listed program carries one of its subcategories. Without that, the parent
+  would stay a disabled option whenever editors assign only the specific
+  category, and a visitor could never select it.
+- The program finder gets the same option, for the options of its own form.
+  It submits to a program list, whose option decides the result.
 - `category_types` gains a way to resolve the descendants of a set of
-  categories, restricted to the types of one group.
+  categories, restricted to the types of one group, and a variant of the
+  applicable category lookup that counts a carried subcategory for its
+  ancestors.
 
 Affected extensions: `academic_programs` (`packages/fgtclb/academic-programs`)
 and `category_types` (`packages/fgtclb/typo3-category-types`).
@@ -35,11 +41,15 @@ The behaviour is identical on TYPO3 v13 and v14.
 
 ### Modified Capabilities
 
-None.
+- `academic-programs/program-finder`: the finder gets the same option. With
+  it on, a finder option is enabled, and a preselected category selected, when
+  a program carries one of its subcategories.
+- `academic-programs/program-list-filter-types`: with the option on, hiding
+  options without results keeps a parent whose subcategory is carried.
 
 ## Impact
 
-- The FlexForm of the program list plugin and its labels.
+- The FlexForms of the program list and the program finder, and their labels.
 - The program list query, which gains one lookup per request for the
   descendants of the selected categories when the option is on.
 - The category repository of `category_types`, used by other extensions only
@@ -55,14 +65,15 @@ None.
   candidate `programs-studyplan-07`.
 - The frontend order of the degree hierarchy (ACE-620).
 - The same option for academic partners and projects.
+- The program-to-category map of the client-side finder narrowing
+  (`ace-tbd-finder-client-side-narrowing`), which is not merged yet and adapts
+  to this option itself.
 - A backport to branch `2`.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `programs-studyplan-08`). Three of the six analysed projects carry their own
-code for this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-filter-match-subcategories` when the issue is filed after
-implementation.
+code for this today. Implements ACE-765, filed for this change.
 
 Relates to ACE-620.

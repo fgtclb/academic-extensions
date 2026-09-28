@@ -47,7 +47,10 @@ The collection is the one `CategoryRepository::findAllApplicable()` returns,
 and that is where the rule comes from that is easiest to get wrong. It holds
 **every** category of every type of the group, not only those of the listed
 records; a category no listed record carries is marked disabled and rendered as
-a disabled option. So:
+a disabled option. A list or finder with the field **Include subcategories** on
+takes `findAllApplicableWithSubcategories()` instead, which also enables a
+category whose subcategory is carried, see
+[Subcategory matching](subcategory-matching.md#offering-a-parent). So:
 
 | A type …                                         | Is offered |
 |--------------------------------------------------|------------|
@@ -174,9 +177,12 @@ rather than `resolveFromSettings()`, so every select is shown and there is no
 disclosure.
 
 Its options come from `findAllApplicable()` over the programs in the finder's
-own storage (`pages`, `recursive`), not over the storage of the list it
-targets: `settings.listPid` names a page, which can carry several lists or
-none. The documentation tells integrators to point both at the same storage.
+own storage (`pages`, `recursive`), not over the storage of the list it targets,
+or from `findAllApplicableWithSubcategories()` with its field **Include
+subcategories** on, see [Subcategory
+matching](subcategory-matching.md#the-finder-and-its-target-list):
+`settings.listPid` names a page, which can carry several lists or none. The
+documentation tells integrators to point both at the same storage.
 
 It renders no form without a target it can link: `finderAction()` builds the
 list URI itself and hands an empty string on, because a hidden, deleted or
@@ -218,6 +224,8 @@ something other than what the select shows.
 
 ## See also
 
+- [Subcategory matching](subcategory-matching.md): a selected category that
+  matches its subtree, and a parent offered for a carried subcategory.
 - [Label overrides](label-overrides.md) — the path a `_LOCAL_LANG` override is
   read from, and why the extension name decides it.
 - [List filter URLs](list-filter-urls.md) — the URL a filter submission
