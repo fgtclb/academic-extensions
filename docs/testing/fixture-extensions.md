@@ -49,7 +49,7 @@ They sit next to the tests that use them, under
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
 | `test_plugin_action_context`           | `tests/test-plugin-action-context`      | `academic-persons`      | A listener recording the content element of an event's plugin context.        |
 | `test_plugin_templates`                | `tests/plugin-templates`                | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
-| `test_plugin_view_event`               | `tests/test-plugin-view-event`          | `academic-base`         | A recording plugin view listener, a leftover one, three probe templates.      |
+| `test_plugin_view_event`               | `tests/test-plugin-view-event`          | `academic-base`         | Listeners recording the view event and every context, a leftover, probes.     |
 | `test_position_fields`                 | `tests/test-position-fields`            | `academic-persons`      | A `Settings.yaml` listing every field of the position line.                   |
 | `test_profile_partial_overrides`       | `tests/test-profile-partial-overrides`  | `academic-persons`      | Partial overrides in two paths, a card passing a page, an old list template.  |
 | `test_profile_query_constraints`       | `tests/test-profile-query-constraints`  | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |

@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicBiteJobs\Controller;
 
 use FGTCLB\AcademicBase\Controller\DispatchModifyPluginViewEventMethodTrait;
 use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
+use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicBiteJobs\Enumeration\ListView;
 use FGTCLB\AcademicBiteJobs\Services\BiteJobsService;
 use Psr\Http\Message\ResponseInterface;
@@ -35,6 +36,7 @@ class BiteJobsController extends ActionController
 
     public function listAction(): ResponseInterface
     {
+        $context = new PluginControllerActionContext($this->request, $this->settings);
         $contentElementData = $this->getCurrentContentObjectRenderer()?->data ?? [];
 
         $this->view->assignMultiple([
@@ -42,7 +44,7 @@ class BiteJobsController extends ActionController
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
             'jobs' => $this->biteJobsService->fetchBiteJobs($this->request),
         ]);
-        $this->dispatchModifyPluginViewEvent($this->request, $this->settings, $this->view, $this->eventDispatcher);
+        $this->dispatchModifyPluginViewEvent($context, $this->view, $this->eventDispatcher);
 
         return $this->htmlResponse();
     }

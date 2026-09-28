@@ -41,6 +41,7 @@ class ProjectController extends ActionController
      */
     public function listAction(?array $demand = null): ResponseInterface
     {
+        $context = $this->pluginControllerActionContext();
         /** @var array<string, mixed> $contentElementData */
         $contentElementData = $this->getCurrentContentObjectRenderer()?->data ?? [];
         $this->redirectFilterSubmission($contentElementData);
@@ -50,7 +51,6 @@ class ProjectController extends ActionController
             $contentElementData
         );
 
-        $context = $this->pluginControllerActionContext();
         /** @var ModifyProjectDemandEvent $demandEvent */
         $demandEvent = $this->eventDispatcher->dispatch(new ModifyProjectDemandEvent($demandObject, $context));
         $demandObject = $demandEvent->getDemand();
@@ -78,7 +78,7 @@ class ProjectController extends ActionController
         ];
 
         $this->view->assignMultiple($assignedValues);
-        $this->dispatchModifyPluginViewEvent($this->request, $this->settings, $this->view, $this->eventDispatcher);
+        $this->dispatchModifyPluginViewEvent($context, $this->view, $this->eventDispatcher);
 
         return $this->htmlResponse();
     }

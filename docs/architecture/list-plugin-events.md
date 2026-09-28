@@ -70,7 +70,12 @@ the shared interface takes a persons context as well, and the persons actions
 hand a persons context to the repository's query events and to the page title.
 Interface and class are deprecated and go in 4.0 (ACE-747), when that event
 declares the `academic_base` interface. New events take the `academic_base`
-one, and the plugin view event builds its own.
+one.
+
+Every action builds its context once, before its first event, and hands the
+same object to its demand, list and query events and to the plugin view event
+(ACE-767). A listener of several events of one rendering gets one context, with
+the settings the action uses.
 
 ## Rules that are easy to get wrong
 

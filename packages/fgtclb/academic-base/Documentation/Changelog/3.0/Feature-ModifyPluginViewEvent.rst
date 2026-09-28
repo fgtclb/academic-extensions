@@ -16,10 +16,10 @@ once each time an action renders its view. It is dispatched after the action
 assigned its own variables, including the renderings of an empty or not found
 state, like the job detail without a job.
 
-The event hands a listener the view and the plugin action context of
-:guilabel:`academic_base`: the request, the site and its language, the content
-element, its settings, and the extension, plugin and action name. One listener
-serves every plugin and checks the names for the one it means:
+The event hands a listener the view and a plugin action context typed against
+the :guilabel:`academic_base` interface: the request, the site and its language,
+the content element, its settings, and the extension, plugin and action name.
+One listener serves every plugin and checks the names for the one it means:
 
 ..  code-block:: php
     :caption: EXT:my_sitepackage/Classes/EventListener/AddContactPageToPartnerMap.php

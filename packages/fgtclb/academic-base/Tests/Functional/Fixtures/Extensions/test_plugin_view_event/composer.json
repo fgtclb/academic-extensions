@@ -1,6 +1,6 @@
 {
     "name": "tests/test-plugin-view-event",
-    "description": "Extension listening to the plugin view event of academic_base in every academic plugin",
+    "description": "Extension listening to the plugin view event of academic_base in every academic plugin, and recording the plugin context of every event",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
     "authors": [
