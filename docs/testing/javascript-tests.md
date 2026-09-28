@@ -156,9 +156,10 @@ suite, and no pin that could silently drift away from what the core ships.
 
 ## The stubs, and what they cost
 
-Two libraries are replaced: the six `@ckeditor/ckeditor5-*` bundles of
-`EXT:rte_ckeditor` and the `cropperjs` of `EXT:core`. Both are browser-only and
-neither is ours.
+These libraries are replaced: the six `@ckeditor/ckeditor5-*` bundles of
+`EXT:rte_ckeditor`, the `cropperjs` of `EXT:core`, and `leaflet` with
+`leaflet.markercluster`, the map libraries `academic_partners` builds from their
+npm packages. All of them are browser-only, and none of them is ours.
 
 A stub is a liability, so the list stays short on purpose and every entry is a
 library this repository does not own. Anything written here is tested for real.
@@ -168,7 +169,12 @@ The CKEditor and CropperJS stubs report through the DOM —
 the textarea, `data-test-cropper`, `data-test-cropper-destroys`,
 `data-test-cropper-ratio` and `data-test-cropper-width` on the cropper's stage —
 so a test asserts on the element it already has and imports nothing from the
-harness.
+harness. The Leaflet stubs have no element to report on, since a map is drawn
+into a layout jsdom does not have. They record into `recorded` of
+`Build/tests/stubs/leaflet.mjs` instead, and a test imports that file by its
+path: it is the same module instance the resolve hook hands the module under
+test for `leaflet`, so what the map asked of Leaflet is what the test reads.
+`resetLeaflet()` starts each test from nothing.
 
 Two things about the CKEditor stub are read *from* the markup rather than
 reported into it. `data-test-ckeditor-initial` on the textarea is what the

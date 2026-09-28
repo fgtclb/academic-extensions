@@ -111,10 +111,12 @@ so each tool does the part it is good at.
 point at them relatively. That is what keeps a stylesheet working in a composer
 installation, where only `Resources/Public/` is published.
 
-Nothing is minified: the emitted files are meant to be readable, and nothing here
-is large enough for the size to be worth the loss. Source maps are never
-committed; `npm run build:dev` carries an inline one instead, and differs from
-the committed build in nothing else.
+Nothing of this repository's own output is minified: the emitted files are meant
+to be readable, and nothing here is large enough for the size to be worth the
+loss. The libraries of the vendor pass are the exception, see [Libraries come
+from the core](#libraries-come-from-the-core). Source maps are never committed;
+`npm run build:dev` carries an inline one instead, and differs from the
+committed build in nothing else.
 
 ## Loading the result
 
@@ -280,6 +282,7 @@ of `academic_partners`:
 | `data-academic-partners-padding`     | `padding`                                                    | 50                                          |
 | `data-academic-partners-tile-url`    | `tileUrl`                                                    | the OpenStreetMap tile server               |
 | `data-academic-partners-attribution` | `attribution`                                                | the attribution the map always showed       |
+| `data-academic-partners-marker-icon` | none, the partial writes the icon of the extension           | the marker icon of Leaflet                  |
 
 Why it is done this way, and what the module has to get right:
 
@@ -311,12 +314,13 @@ Moving those would be a change of its own, with a deprecation.
 
 ## Libraries come from the core
 
-No library in this repository's frontend code is vendored, and the rule that
-gets there is short: **before shipping a library, ask what the core already
-ships, and what version it is.** TYPO3 delivers a set of JavaScript libraries
-through import maps of its own, and a specifier that resolves through the core's
-map costs the page nothing, is cached across every extension that uses it, and
-is upgraded by a core update rather than by a commit here.
+Two libraries are shipped, Leaflet and its marker cluster plugin for the map of
+`academic_partners`, and the rule that keeps it at that is short: **before
+shipping a library, ask what the core already ships, and what version it is.**
+TYPO3 delivers a set of JavaScript libraries through import maps of its own, and
+a specifier that resolves through the core's map costs the page nothing, is
+cached across every extension that uses it, and is upgraded by a core update
+rather than by a commit here.
 
 The two the profile editor uses both come from there:
 
@@ -357,15 +361,61 @@ What follows from taking a library from the core:
   the first candidate, and the API difference has to be a real obstacle before
   a copy is shipped instead. Check the version, not the presence of a mapping.
 
-Should a library ever have to be shipped after all, it is committed under
+A library that has to be shipped after all is committed under
 `Resources/Public/JavaScript/vendor/<library>/<version>/` with its licence file
 beside it, published under a bare specifier by the extension's
 `Configuration/JavaScriptModules.php`, and never imported by path.
-`academic_partners` ships a mapping library and its plugin straight in
-`Resources/Public/JavaScript/` and predates all of this. Files below
-`Resources/Public/` that have no source under `Resources/Private/` are outside
-the build gate by construction: `checkJsBuildClean` neither writes nor deletes
-them.
+
+It is not copied in by hand. It is a dependency of `Build/package.json` at an
+exact version, and `Build/vendor.mjs` writes it from the installed package as
+part of the build, so `checkJsBuildClean` guards it like every other artifact.
+Leaflet and its marker cluster plugin, the map libraries of `academic_partners`,
+are the example:
+
+| Library               | Version | Specifier               | Built from                                              |
+|-----------------------|---------|-------------------------|---------------------------------------------------------|
+| Leaflet               | 1.9.4   | `leaflet`               | `dist/leaflet-src.esm.js`, the ES module of the package |
+| Leaflet.markercluster | 1.5.3   | `leaflet.markercluster` | `src/index.js`, bundled with `leaflet` kept external    |
+
+What the vendor build does, and why:
+
+- **The version in the path comes from the installed package.** A version
+  change in `package.json` moves the directory, the import map of the extension
+  has to follow, and a functional test of the extension notices a path that
+  stayed behind. `--list-outputs` names the directory of the library rather than
+  of the version, so the gate removes a directory an older version left behind.
+- **The modules are minified, and nothing else of the build is.** They are not
+  ours to read, the readable source is the pinned package, and a page should not
+  load more than the release does. Licence comments are kept.
+- **A plugin written for the global `L` gets a copy of the Leaflet module as
+  its `L`.** The marker cluster plugin publishes only classic builds, and its ES
+  sources read and extend the global. esbuild injects
+  `Build/vendor/leaflet-global.mjs` wherever they name `L`: a copy, because a
+  module namespace cannot take the members the plugin adds, holding the same
+  classes, so what it includes into `L.Marker` reaches every marker.
+- **The bare specifier is global to the page.** The import map holds one entry
+  per specifier, and the last package that maps `leaflet` wins for every module
+  of the page. A theme or extension that maps another Leaflet takes the map
+  with it, or the other way round.
+- **The stylesheets and images of a package are copied as they are**, with two
+  exceptions that keep the gate independent of the machine: text files get LF
+  line endings (Leaflet ships CRLF, which git stores differently depending on a
+  machine's attributes), and every file is written with mode `0644` (the marker
+  cluster package ships its files executable). A change a site needs goes into
+  the extension's own files: the `width: auto !important` of
+  `academic_partners/.../frontend/map.scss`, and the extension's own marker
+  icon, whose URL the map module reads from
+  `data-academic-partners-marker-icon`, and whose directory it hands to every
+  marker as `Icon.Default({ imagePath })`.
+
+Before this, `academic_partners` shipped both libraries as minified copies in
+`Resources/Public/JavaScript/`, with their global `L` renamed to
+`LeafletObject` by replacing the text. That replacement also hit the SVG path
+command `"L"` inside Leaflet, which broke every line and polygon the map drew,
+and nothing showed which release the files were. The copies stay, unused and
+deprecated, until 4.0. Files below `Resources/Public/` that have no source and
+no entry in `Build/vendor.mjs` are outside the build gate by construction:
+`checkJsBuildClean` neither writes nor deletes them.
 
 ## Artifacts are committed, and that makes a gate mandatory
 
@@ -389,9 +439,9 @@ installation, and is only noticed when someone wonders why a fix had no effect.
 `checkJsBuildClean` is therefore mandatory, not optional.
 
 That gate cannot simply delete the output directories the way a single-extension
-repository can. `academic_partners` keeps vendored files there that have no
-source — a minified mapping library, its plugin, their stylesheets and their
-images — and deleting them would report a permanently dirty tree. So
+repository can. `academic_partners` keeps files there that have no source, the
+deprecated classic copies of its map libraries with their stylesheets and
+images, and deleting them would report a permanently dirty tree. So
 `node esbuild.mjs --list-outputs` derives the exact set of files the build would
 write, from the same discovery the build itself uses, and the gate removes only
 those. A source that stopped producing an output is still caught, as a deletion
