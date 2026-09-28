@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Forty-six such fixture extensions exist, in nine of the twelve extensions.
+Forty-eight such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -59,6 +59,8 @@ They sit next to the tests that use them, under
 | `test_programs_extra_category_type`    | `tests/programs-extra-category-type`    | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
 | `test_programs_removed_category_type`  | `tests/programs-removed-category-type`  | `academic-programs`     | A `CategoryTypes.yaml` removing a type from the programs group.               |
 | `test_project_list_events`             | `tests/test-project-list-events`        | `academic-projects`     | Two listeners on the project demand and list events, and a list template.     |
+| `test_project_profile_column_removed`  | `tests/project-column-removed`          | `academic-persons-edit` | A listener after the persons settings removing a project column.              |
+| `test_project_profile_fields`          | `tests/test-project-profile-fields`     | `academic-persons-edit` | Project columns of every type a project field takes, one managed, a listener. |
 | `test_public_profile_settings`         | `tests/test-public-profile-settings`    | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                       |
 | `test_settings_copy`                   | `tests/test-settings-copy`              | `academic-persons`      | A copy of the contract fields that leaves the room out, removes one with `~`. |
 | `test_settings_removal`                | `tests/test-settings-removal`           | `academic-persons`      | A delta removing one profile field with `~` and copying nothing.              |
@@ -72,7 +74,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Fourteen of the forty-six have a `Classes/` folder with a `TESTS\…` PSR-4 root.
+Sixteen of the forty-eight have a `Classes/` folder with a `TESTS\…` PSR-4 root.
 The other thirty-two are pure resources. The `ext_emconf.php` is checked like
 every other one: its `depends` names extension keys, and a fixture extension
 may name another fixture extension, which a real extension may not — see

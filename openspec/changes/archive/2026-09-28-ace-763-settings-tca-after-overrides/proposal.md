@@ -8,7 +8,7 @@ a rich text configuration, drops `required` and `readOnly` of that column
 without a word, and one analysed project does so for five profile columns. The
 settings are also built while the TCA is incomplete, so a column a project adds
 in its overrides cannot be checked against them. Project columns editable in
-the frontend editor (`ace-tbd-editor-custom-profile-fields`) need exactly that
+the frontend editor (`ace-764-editor-custom-profile-fields`) need exactly that
 check, so this change comes first.
 
 ## What Changes
@@ -50,5 +50,5 @@ None.
 - The settings of `academic_jobs`, a separate implementation whose TCA method
   has no caller.
 - Project columns in the settings, the frontend editor, and the check of a
-  declared column. Those are `ace-tbd-editor-custom-profile-fields`.
+  declared column. Those are `ace-764-editor-custom-profile-fields`.
 - Backporting to branch `2`.

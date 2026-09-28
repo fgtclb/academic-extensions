@@ -206,14 +206,14 @@ with a `__set_state()`:
 | Object                                            | Built from                                               | Carries                                                                                                                                                                                                    |
 |---------------------------------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `PublicProfileSettings`                           | `profile.structure`, `profile.details`                   | The layout columns and the per-element property lists, maps and label references. A contract block adds `contracts` and `onlyValid`, and `position` its ordered `fields`                                   |
-| `ProfileSection` → `ProfileField`                 | every other `profile` entry, grouped by `section`        | `propertyName`, `fieldName`, `fieldType`, `renderType`, `Validation`, `position`, `helptext`                                                                                                               |
+| `ProfileSection` → `ProfileField`                 | every other `profile` entry, grouped by `section`        | `propertyName`, `fieldName`, `fieldType`, `renderType`, `Validation`, `position`, `helptext`, `custom` for a project field                                                                                 |
 | `SpecialField`                                    | `special`                                                | `type`, `renderType`, composed `fieldIdentifiers`, renderer `settings` (the image's `ratio`); `hasDirectProfileProperty()` is true for `skipSync` and `hidden`                                             |
 | `ContractField`                                   | `contracts.fields`                                       | as a profile field, plus `optionSource`, `helptext`, `autocomplete`                                                                                                                                        |
 | `ContractContactSection` → `ContractContactField` | `contracts.contactSections`                              | as a profile field, plus `autocomplete` and `helptext`; the section carries the `ValidationSet`                                                                                                            |
 | `DocumentSection`                                 | `documentSections`, `contracts` completing its own entry | `label`, `type`, `fieldName`, `readOnly`, `rowFields`, `actions`, `helptexts` (keyed like `validators`), `ValidationSet`; `allowsAction()`, `getAllowedActions()`, `allowsCreate()`, `allowsDragSorting()` |
 | `ManagedFieldsSettings`                           | `managedFields`                                          | per record type the managed property and column, resolved through the fields above, plus `problems` and `assertValid()`, see [Managed fields](#managed-fields-a-lock-per-record)                           |
 
-Three details of the normalisation are easy to get wrong:
+Four details of the normalisation are easy to get wrong:
 
 - **A field's key is not always its property.** The contact sections need
   unique keys across three record types that all have a `type` column, so
@@ -233,6 +233,11 @@ Three details of the normalisation are easy to get wrong:
   top-level `contracts` map (`array_replace`), and its validation set is the
   contract fields'. `DocumentSection::isContractSection()` is what the TCA
   fragment builder branches on.
+- **A project field names its column itself.** A profile entry with
+  `custom: true` is a column a site package added (ACE-764). Its property name
+  is its key, whatever `propertyName` says, and its `fieldName` is taken as
+  written, empty when the entry names none. The entry is kept either way, so
+  the column check below can name the mistake. The factory reads no TCA.
 
 `fieldType` and `renderType` are **frontend metadata only**. The normaliser
 never derives a TCA `type` from them; the six TCA files declare their column
@@ -361,6 +366,52 @@ exactly when editors are meant to decide instead. The listener therefore leaves
 the validation of that column out of the merge, and the backend checkbox stays
 writable whatever the YAML says.
 
+### Project fields and the column check
+
+A project field is merged like any other field once its column may be used, so a
+`required` project field is required in the backend form as well.
+`ProjectProfileFieldCheck` decides that, for the listener here and for the
+editor, see
+[Form data transformation](form-data-transformation.md#project-fields). It
+refuses a column in this order: an entry without a `fieldName`, a key that is a property of the
+shipped `Profile` model, a column the TCA does not have, a system column (`uid`,
+`pid`, the `t3ver_*` columns and every column the `ctrl` section names for the
+core), a column of a `Profile` property, a TCA type other than `input`, `text`,
+`email`, `link`, `number` and `check`, the renderers `select` and
+`combinedLink`, a renderer that does not fit the type (`checkbox` takes a
+`check` column and nothing else does, `ckeditor` takes a `text` column), an
+`email` or `link` column without the `email` or `url` validator, and a `link`
+column whose `allowedTypes` leave out `url`. The DataHandler checks those two
+types itself, empties an invalid value and reports an error, which would come
+after the Extbase write of the same request. A project field with the `url`
+validator also refuses every value that is not an `http` or `https` address,
+because the validator lets a `t3://` link through, which the DataHandler
+resolves and may refuse. The shipped model is the class itself, not an XCLASS of
+it, so a project that maps its column in its model XCLASS can declare it.
+
+A refused column gets nothing of the settings, and the listener raises an
+`E_USER_DEPRECATED` notice naming the field, the column and the reason. Not an
+exception, because a typo would take down the backend, the frontend and the
+install tool with the TCA, until the cache is flushed from the command line.
+Not a log entry alone, because a typo would go unnoticed. The deprecation level
+is the one a TYPO3 installation routes to a log of its own and that the test
+suites of this repository and of most projects turn into a failure. It is not a
+real deprecation, and the message says what is wrong. The compiled TCA is
+cached, so the notice comes once per cache build.
+
+A regular field whose column the TCA does not have stays silently out of the
+merge. Only a declared project field raises the notice.
+
+The tests assert the notice by collecting it with an error handler of their own
+around the listener call. PHPUnit 11.5 counts a deprecation it was told to
+expect as a deprecation of the test all the same, unless the whole test carries
+`#[IgnoreDeprecations]`, which would hide an unexpected one as well. A notice
+raised while the test instance compiles its TCA cannot be asserted at all: the
+deprecations of `setUp()` are dropped before the test runs, and still fail the
+run. The editor's own check is therefore tested with a fixture listener ordered
+after the settings that removes the column, which the settings listener cannot
+see.
+
 ### Why a listener after the overrides
 
 Until ACE-763 the six TCA files merged the graph themselves, at the end of
@@ -446,6 +497,11 @@ runs last.
    ones included, are never written to the model, whatever the request contains — see
    [Form data transformation](form-data-transformation.md), which is where that
    rule and the traps around it are documented.
+
+A project field goes through the same three steps. Its view carries the stored
+value, since the model has no property for it, and its value is written through
+the DataHandler after the Extbase write, see
+[Form data transformation](form-data-transformation.md#project-fields).
 
 `ProfileDocumentSectionProvider` maps the settings key of a section
 (`pressMedia`) to the record type (`press_media`) through
@@ -690,6 +746,9 @@ Integrator-facing documentation exists:
 - `academic-persons-edit/Documentation/Configuration/General/Index.rst` — a
   *Which fields can be edited* section pointing at the persons manual, since that
   is where integrators meet the locked name fields.
+- `academic-persons-edit/Documentation/Configuration/Settings/Index.rst`: the
+  *Project fields* section, how a site package makes a column of its own
+  editable.
 
 Cross-extension links are plain external URLs to docs.typo3.org. That is
 deliberate — no FGTCLB extension registers an intersphinx inventory in its

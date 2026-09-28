@@ -19,7 +19,7 @@
 
 ## 2. The project field change
 
-- [x] 2.1 Record in `ace-tbd-editor-custom-profile-fields` that it depends on
+- [x] 2.1 Record in `ace-764-editor-custom-profile-fields` that it depends on
   this change, and its decisions: the column check at use in the editor, and a
   deprecation notice while the TCA is compiled.
 
