@@ -23,6 +23,12 @@ frontend editor at the configured position.
   the backend keeps working, and the frontend editor fails with a message
   naming the column
 
+#### Scenario: Renderer that does not fit the column
+- **WHEN** an integrator declares a checkbox on a column that is no checkbox
+  column, or an e-mail column without the e-mail validator
+- **THEN** a deprecation notice names the column while the TCA is compiled,
+  and the frontend editor fails with a message naming the column
+
 #### Scenario: Column the editor must not write
 - **WHEN** an integrator declares a project field on a system column of the
   profile, such as the column that hides it
@@ -49,10 +55,17 @@ accepted value in the declared column.
 
 ### Requirement: Project fields follow the edited language
 The system SHALL read and write a project field on the translation when the
-person edits a translation of the profile.
+person edits a translation of the profile. A column the translations take from
+the default language SHALL be written for the default language and every
+translation.
 
 #### Scenario: Translated name prefix
 - **WHEN** the person saves a name prefix while editing the language-1
   translation
 - **THEN** the language-1 profile row holds the value and the default-language
   row keeps its own
+
+#### Scenario: Column shared by all languages
+- **WHEN** the person saves a project field whose column is excluded from
+  translation while editing the language-1 translation
+- **THEN** the default-language row and the language-1 row hold the value

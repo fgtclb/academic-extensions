@@ -127,7 +127,9 @@ property out: the stored value stays, the other properties of the request are
 written, and the `data` of the profile endpoint's answer does not name it. That
 holds for the profile, document and contact endpoints alike, and for a field
 managed on the record as for `readonly`, `frontendreadonly` and `disabled`. A
-key the settings graph does not have is still refused, with `422`,
+key the settings graph does not have, neither as a property nor as a
+[project field](#project-fields), is still
+refused, with `422`,
 `invalid_profile_data` and `Unknown profile property "…"` on the profile
 endpoint and "This field cannot be changed." on the other two.
 
@@ -164,6 +166,80 @@ objects have empty-string defaults, so a factory that wrote every property would
 clear every field the request did not mention. See
 `packages/fgtclb/academic-persons-edit/Documentation/Changelog/2.4/Important-FormDataTransformationOnlyMapsSubmittedFields.rst`
 for the entry that introduced it.
+
+## Project fields
+
+A site package can add a column to the profile table and declare it in the
+settings with `custom: true` (ACE-764). No property of `Profile` or of
+`ProfileFormData` carries it, so it takes its own path through the same steps:
+
+| Step            | Regular property                               | Project field                                                                   |
+|-----------------|------------------------------------------------|---------------------------------------------------------------------------------|
+| Payload key     | A property of `ProfileFormData`                | Its identifier, which `AcademicPersonsSettings::getCustomProfileFields()` knows |
+| Registered as   | `setPropertyOverride()`                        | `ProfileFormData::setCustomValue()`, an override plus the name                  |
+| Validation      | `ProfileFormDataValidator`, one pass           | The same pass: it admits a property with a custom value                         |
+| Written by      | `ProfileFactory`, then `persistAll()`          | `ProjectProfileFields::writeValues()`, a DataHandler datamap, after that        |
+| Row written     | The row Extbase resolved                       | The row `LocalizedProfileUidResolver` resolves for the site language            |
+| Answered        | The submitted value                            | The value read back after the write                                             |
+
+Because the value is an override, rule 1 and rule 2 hold unchanged, the answer
+of the request names it, and a listener of the write event can replace it like
+any other field. `ProfileFactory` has no setter for it and never writes it.
+
+The DataHandler write runs as the synthetic admin user of
+`DataHandlerExecutionContext::runAsLiveBackendUser()`, marked
+`ProfileWriteCorrelation::Internal`, so the backend save announcement of
+ACE-725 stays out of it. It happens between `persistAll()` and the
+`AfterProfileUpdateEvent` the editor dispatches, so the translation
+synchronisation reads the new value. A frontend request in a workspace preview
+is refused with `409` before anything is written, as the visibility switch is.
+
+On a translation, the DataHandler drops a column with `l10n_mode: exclude` from
+the data of the row, and one with `allowLanguageSynchronization` while the
+`l10n_state` of the row takes it from the default language. Neither is an error,
+so the write would answer a success and store nothing. `writeValues()` therefore
+sends an excluded column to the default-language record, from which the same run
+carries it into the translations, and marks a synchronised column `custom` in the
+`l10n_state` of the translation. The answer carries the values read back after
+the write, so a `max` of the column or a hook shows in it.
+
+The two writes are not one transaction. A value the DataHandler refuses although
+it passed the validation, through a hook of the installation for example, is
+answered with `500` and logged, and the Extbase part of the request stays
+stored. The column check keeps the known cases out of that path: the
+DataHandler validates an `email` and a `link` column itself, so such a column
+needs the validator that refuses an invalid value first, a `link` column has to
+allow web addresses, and a project field with the `url` validator takes nothing
+but an `http` or `https` address.
+
+An update made in a translation is not announced, as for every other field of
+the editor. A shared column written to the default-language record from there
+is no exception: the DataHandler carries it into the translations in the same
+run, and the synchronisation has nothing left to do.
+
+Which column a project field may use is decided in one place,
+`ProjectProfileFieldCheck` of `academic_persons`. The TCA listener asks it for
+every project field while the TCA is compiled and raises an `E_USER_DEPRECATED`
+notice for a refused one. The editor asks it again against the TCA schema of the
+request: for every project field when it renders the page, which then fails with
+`InvalidProjectProfileFieldException`, and for the submitted ones when it writes,
+before their values are validated, which answers `500` and
+`invalid_project_field`. It checks again after a listener of the write event
+replaced the fields. The second check is not redundant: a listener ordered after
+the settings can still remove or change the column, and a production
+installation does not log deprecations.
+
+A submitted key is looked up among the project fields first. The form data
+object has a property of its own for the names of the project values, and
+`_hasProperty()` is `property_exists()`, so a project field named like it would
+otherwise be taken for a property of the profile and never written.
+
+Rejected, as recorded in the change: a magic `__get()`/`__set()` on the form data
+object, which would hide a typo from phpstan and from the key check that refuses
+an unknown payload. A `QueryBuilder` update of the column, which writes no
+history, calls no hook and bypasses the workspace handling. An XCLASS of the form
+data object and its factory, the 2.x way, which one project used and which is
+fatal on 3.0.
 
 ## The shipped defaults, and the trap they set
 
