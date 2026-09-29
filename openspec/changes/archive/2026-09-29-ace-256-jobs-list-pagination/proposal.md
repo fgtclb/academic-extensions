@@ -3,20 +3,22 @@
 The job list renders every job of the configured type on one page. Portals
 with many open positions get a long page, and one project built pagination
 for its own clone of the job list and states the job portal needs it too.
-`academic_persons` already paginates its list.
+`academic_persons` already paginates its list, and `academic_partners` does
+since 3.0.
 
 ## What Changes
 
 - The job list content element of `academic_jobs`
   (`packages/fgtclb/academic-jobs`) gains an optional pagination:
-  - a FlexForm switch "Enable pagination" (off by default) and a "Results per
-    page" field;
-  - a site setting for the number of page links, as `academic_persons` has.
+  - a FlexForm sheet "Pagination" with a switch "Enable pagination" (off by
+    default) and a "Results per page" field,
+  - a site setting for the number of page links, as the person and partner
+    lists have.
 - With pagination enabled, the list shows one page of jobs and a pagination
-  navigation below it, only when there is more than one page. Numbered page
-  links are used when `georgringer/numbered-pagination` is installed,
-  previous/next links otherwise.
-- The page is a plain plugin argument; there is no filter to keep.
+  navigation below it, only when there is more than one page. With
+  `georgringer/numbered-pagination` installed the navigation links a limited
+  number of pages around the current one, without it every page.
+- The page is a plain plugin argument. There is no filter to keep.
 - Behaviour is identical on TYPO3 v13 and v14.
 
 ## Capabilities
@@ -50,7 +52,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-16`). One of the six analysed projects carries its own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-jobs-list-pagination` when the issue is filed after implementation.
-
-Implements ACE-256.
+this today. It implements ACE-256, which asks for the same pagination on
+behalf of that project.
