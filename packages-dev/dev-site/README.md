@@ -49,7 +49,7 @@ globally unique across the active packages, and discovery finds the set wherever
 the extension shipping it is installed — which is what resolves inside DDEV and
 on a host stack alike.
 
-Four rules the set follows, all of which matter when changing it:
+Five rules the set follows, all of which matter when changing it:
 
 - **It declares uids.** The committed site configurations point at
   `rootPageId: 1` and the plugins name their pages and records by uid. A
@@ -74,6 +74,12 @@ Four rules the set follows, all of which matter when changing it:
   collides on the suggested uids and is refused, so a run belongs to a freshly
   set up instance — see
   [Rebuilding an instance from nothing](../../docs/development/environment.md#rebuilding-an-instance-from-nothing).
+- **Every multi-line value is a block with strip chomping**, `|-` and never a
+  plain `|`. A plain block keeps or loses its final newline depending on the
+  release of `symfony/yaml` that reads it, so the same file imported different
+  content into the test instances and the development instances (ACE-776). A
+  unit test rejects a block without `-`, see
+  [The YAML parser](../../docs/testing/seed-verification.md#the-yaml-parser).
 
 ## What this is not
 

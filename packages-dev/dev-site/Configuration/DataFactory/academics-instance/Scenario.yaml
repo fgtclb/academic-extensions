@@ -162,7 +162,7 @@ entities:
                 CType: 'text'
                 header: 'What this is'
                 header_layout: 2
-                bodytext: |
+                bodytext: |-
                   <p>A development instance of the <strong>fgtclb/academic-extensions</strong>
                   mono repository. Every page below, every content element on it and every
                   record they read is written by one seed definition, so the instance can be
@@ -177,7 +177,7 @@ entities:
                     CType: 'text'
                     header: 'Worum es geht'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>Eine Entwicklungsinstanz des Monorepos
                       <strong>fgtclb/academic-extensions</strong>. Jede Seite, jedes Inhaltselement
                       und jeder Datensatz stammt aus einer Seed-Definition, damit die Instanz aus
@@ -193,7 +193,7 @@ entities:
                 CType: 'textmedia'
                 header: 'Seeded assets'
                 header_layout: 2
-                bodytext: |
+                bodytext: |-
                   <p>The images of this instance are generated placeholders. Each one draws
                   its own name and its pixel dimensions, so a wrong reference is visible
                   without opening the record.</p>
@@ -206,7 +206,7 @@ entities:
                     CType: 'textmedia'
                     header: 'Bilder aus dem Seed'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>The images of this instance are generated placeholders. Each one draws
                       its own name and its pixel dimensions, so a wrong reference is visible
                       without opening the record.</p>
@@ -679,7 +679,7 @@ entities:
                         location: 1
                         position: 'Head of Web Engineering'
                         room: '404'
-                        office_hours: |
+                        office_hours: |-
                           Mo. 09:00 - 11:00
                           Thu. 14:00 - 16:00
                         email_addresses: '1,17'
@@ -693,7 +693,7 @@ entities:
                             location: 1
                             position: 'Leitung Web Engineering'
                             room: '404'
-                            office_hours: |
+                            office_hours: |-
                               Mo. 09:00 - 11:00
                               Do. 14:00 - 16:00
                             email_addresses: '501,517'
@@ -2584,7 +2584,7 @@ entities:
                     CType: 'text'
                     header: 'What is on these pages'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>Every plugin of EXT:academic_persons, one per page, all reading the same
                       two storage folders.</p>
                 languageVariants:
@@ -2594,7 +2594,7 @@ entities:
                         CType: 'text'
                         header: 'Was auf diesen Seiten steht'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Jedes Plugin von EXT:academic_persons, eines je Seite, alle lesen dieselben
                           beiden Datenordner.</p>
               - self:
@@ -2635,7 +2635,7 @@ entities:
                         header: 'Profile list'
                         header_layout: 2
                         pages: '110,111'
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -2686,7 +2686,7 @@ entities:
                             header: 'Profilliste'
                             header_layout: 2
                             pages: '110,111'
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -2754,7 +2754,7 @@ entities:
                         header: 'Profile list, grouped by letter'
                         header_layout: 2
                         pages: '110,111'
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -2793,7 +2793,7 @@ entities:
                             header: 'Profilliste, nach Buchstaben gruppiert'
                             header_layout: 2
                             pages: '110,111'
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -2844,7 +2844,7 @@ entities:
                         header: 'Profile list, filtered'
                         header_layout: 2
                         pages: '110,111'
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -2892,7 +2892,7 @@ entities:
                             header: 'Profilliste, gefiltert'
                             header_layout: 2
                             pages: '110,111'
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -2953,7 +2953,7 @@ entities:
                         header: 'Profile list and detail'
                         header_layout: 2
                         pages: '110,111'
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -2986,7 +2986,7 @@ entities:
                             header: 'Profilliste mit Detailansicht'
                             header_layout: 2
                             pages: '110,111'
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3032,7 +3032,7 @@ entities:
                         CType: 'academicpersons_detail'
                         header: 'Profile'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3055,7 +3055,7 @@ entities:
                             CType: 'academicpersons_detail'
                             header: 'Profil'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3091,7 +3091,7 @@ entities:
                         CType: 'academicpersons_card'
                         header: 'Three cards, linking to the detail page'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3120,7 +3120,7 @@ entities:
                             CType: 'academicpersons_card'
                             header: 'Drei Karten mit Link auf die Detailseite'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3147,7 +3147,7 @@ entities:
                         CType: 'academicpersons_card'
                         header: 'One card without a detail page'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3170,7 +3170,7 @@ entities:
                             CType: 'academicpersons_card'
                             header: 'Eine Karte ohne Detailseite'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3207,7 +3207,7 @@ entities:
                         CType: 'academicpersons_selectedprofiles'
                         header: 'A selection across both storage folders'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3239,7 +3239,7 @@ entities:
                             CType: 'academicpersons_selectedprofiles'
                             header: 'Eine Auswahl über beide Datenordner'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3269,7 +3269,7 @@ entities:
                         CType: 'academicpersons_selectedprofiles'
                         header: 'The two hidden profiles'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3295,7 +3295,7 @@ entities:
                             CType: 'academicpersons_selectedprofiles'
                             header: 'Die beiden versteckten Profile'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3333,7 +3333,7 @@ entities:
                         CType: 'academicpersons_selectedcontracts'
                         header: 'Three contracts'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3359,7 +3359,7 @@ entities:
                             CType: 'academicpersons_selectedcontracts'
                             header: 'Drei Verträge'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3383,7 +3383,7 @@ entities:
                         CType: 'academicpersons_selectedcontracts'
                         header: 'One contract, table view'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3412,7 +3412,7 @@ entities:
                             CType: 'academicpersons_selectedcontracts'
                             header: 'Ein Vertrag, Tabellenansicht'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3454,7 +3454,7 @@ entities:
                     CType: 'felogin_login'
                     header: 'Login'
                     header_layout: 2
-                    pi_flexform: |
+                    pi_flexform: |-
                       <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                       <T3FlexForms>
                           <data>
@@ -3490,7 +3490,7 @@ entities:
                         CType: 'felogin_login'
                         header: 'Anmeldung'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3583,7 +3583,7 @@ entities:
                     CType: 'text'
                     header: 'Contacts belong to a page'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>A contact points at a contract of EXT:academic_persons and at the page it
                       is shown on. The two list pages below therefore carry contacts of their own.</p>
                 languageVariants:
@@ -3593,7 +3593,7 @@ entities:
                         CType: 'text'
                         header: 'Kontakte gehören zu einer Seite'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Ein Kontakt verweist auf einen Vertrag aus EXT:academic_persons und auf die
                           Seite, auf der er erscheint. Die beiden Listenseiten unten führen deshalb
                           eigene Kontakte.</p>
@@ -3702,7 +3702,7 @@ entities:
                         CType: 'academiccontacts4pages_list'
                         header: 'Contacts'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3722,7 +3722,7 @@ entities:
                             CType: 'academiccontacts4pages_list'
                             header: 'Kontakte'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3781,7 +3781,7 @@ entities:
                         CType: 'academiccontacts4pages_list'
                         header: 'Contacts, hidden ones included'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3801,7 +3801,7 @@ entities:
                             CType: 'academiccontacts4pages_list'
                             header: 'Kontakte, versteckte eingeschlossen'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3852,7 +3852,7 @@ entities:
                     CType: 'text'
                     header: 'Ten jobs in three types'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>Four jobs, three side jobs and three theses, two of them hidden. The list
                       variants below filter on the type and on the hidden flag.</p>
                 languageVariants:
@@ -3862,7 +3862,7 @@ entities:
                         CType: 'text'
                         header: 'Zehn Stellen in drei Arten'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Vier Stellen, drei Nebenjobs und drei Abschlussarbeiten, zwei davon
                           versteckt. Die Listenvarianten unten filtern nach Art und nach dem
                           Versteckt-Kennzeichen.</p>
@@ -3884,7 +3884,7 @@ entities:
                         CType: 'academicjobs_list'
                         header: 'All jobs'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3907,7 +3907,7 @@ entities:
                             CType: 'academicjobs_list'
                             header: 'Alle Stellen'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -3943,7 +3943,7 @@ entities:
                         CType: 'academicjobs_list'
                         header: 'Theses, hidden ones included'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -3966,7 +3966,7 @@ entities:
                             CType: 'academicjobs_list'
                             header: 'Abschlussarbeiten, versteckte eingeschlossen'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -4027,7 +4027,7 @@ entities:
                         CType: 'academicjobs_newjobform'
                         header: 'Post a job'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -4050,7 +4050,7 @@ entities:
                             CType: 'academicjobs_newjobform'
                             header: 'Stelle ausschreiben'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -4083,7 +4083,7 @@ entities:
                         CType: 'text'
                         header: 'Thank you'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>The job was written to the storage folder and is waiting for
                           review. This page is what "settings.redirectPageId" of the form
                           points at.</p>
@@ -4094,7 +4094,7 @@ entities:
                             CType: 'text'
                             header: 'Vielen Dank'
                             header_layout: 2
-                            bodytext: |
+                            bodytext: |-
                               <p>Die Stelle wurde in den Datenordner geschrieben und wartet auf
                               Prüfung. Auf diese Seite verweist "settings.redirectPageId" des
                               Formulars.</p>
@@ -4124,7 +4124,7 @@ entities:
                         CType: 'academicbitejobs_list'
                         header: 'Vacancies from b-ite'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -4156,7 +4156,7 @@ entities:
                             CType: 'academicbitejobs_list'
                             header: 'Stellen aus b-ite'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -4513,7 +4513,7 @@ entities:
                     CType: 'text'
                     header: 'Six programmes'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>Six pages of doktype 20, one of them hidden and one of them deliberately
                       sparse. Together they carry all twelve category types of the
                       <em>programs</em> group.</p>
@@ -4524,7 +4524,7 @@ entities:
                         CType: 'text'
                         header: 'Sechs Studiengänge'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Sechs Seiten vom Typ 20, eine davon versteckt und eine bewusst
                           unvollständig. Zusammen tragen sie alle zwölf Kategorietypen der Gruppe
                           <em>programs</em>.</p>
@@ -4548,7 +4548,7 @@ entities:
                         header_layout: 2
                         pages: '250'
                         recursive: 1
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -4582,7 +4582,7 @@ entities:
                             header_layout: 2
                             pages: '250'
                             recursive: 1
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -4639,7 +4639,7 @@ entities:
                         header_layout: 2
                         pages: '250'
                         recursive: 1
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -4673,7 +4673,7 @@ entities:
                             header_layout: 2
                             pages: '250'
                             recursive: 1
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -4721,7 +4721,7 @@ entities:
                         header_layout: 2
                         pages: '250'
                         recursive: 1
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -4749,7 +4749,7 @@ entities:
                             header_layout: 2
                             pages: '250'
                             recursive: 1
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -4846,7 +4846,7 @@ entities:
                         CType: 'academiccontacts4pages_list'
                         header: 'Who to ask'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -4866,7 +4866,7 @@ entities:
                             CType: 'academiccontacts4pages_list'
                             header: 'Ansprechpersonen'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -5229,7 +5229,7 @@ entities:
                     CType: 'text'
                     header: 'Six projects'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>Three running, two completed and one hidden, so the active state filter
                       has something on both sides.</p>
                 languageVariants:
@@ -5239,7 +5239,7 @@ entities:
                         CType: 'text'
                         header: 'Sechs Projekte'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Drei laufende, zwei abgeschlossene und ein verstecktes Projekt, damit der
                           Filter nach Projektstatus auf beiden Seiten etwas findet.</p>
           children:
@@ -5261,7 +5261,7 @@ entities:
                         header: 'All projects'
                         header_layout: 2
                         pages: '260'
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -5300,7 +5300,7 @@ entities:
                             header: 'Alle Projekte'
                             header_layout: 2
                             pages: '260'
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -5349,7 +5349,7 @@ entities:
                         header: 'Running projects'
                         header_layout: 2
                         pages: '260'
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -5388,7 +5388,7 @@ entities:
                             header: 'Laufende Projekte'
                             header_layout: 2
                             pages: '260'
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -5440,7 +5440,7 @@ entities:
                         header: 'Three projects'
                         header_layout: 2
                         pages: '320,322,324'
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -5479,7 +5479,7 @@ entities:
                             header: 'Drei Projekte'
                             header_layout: 2
                             pages: '320,322,324'
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -5562,7 +5562,7 @@ entities:
                         CType: 'academiccontacts4pages_list'
                         header: 'Who to ask'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -5582,7 +5582,7 @@ entities:
                             CType: 'academiccontacts4pages_list'
                             header: 'Ansprechpersonen'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -5768,7 +5768,7 @@ entities:
                     CType: 'text'
                     header: 'Six partners'
                     header_layout: 2
-                    bodytext: |
+                    bodytext: |-
                       <p>Six pages of doktype 40, one hidden and one kept off the map. The map
                       itself loads its tiles from tile.openstreetmap.org in the visitor's browser,
                       so it needs internet access even though nothing on the server side does.</p>
@@ -5779,7 +5779,7 @@ entities:
                         CType: 'text'
                         header: 'Sechs Partner'
                         header_layout: 2
-                        bodytext: |
+                        bodytext: |-
                           <p>Sechs Seiten vom Typ 40, eine versteckt und eine bewusst nicht auf der
                           Karte. Die Karte selbst lädt ihre Kacheln im Browser von
                           tile.openstreetmap.org, benötigt also Internetzugang - serverseitig tut das
@@ -5804,7 +5804,7 @@ entities:
                         header_layout: 2
                         pages: '270'
                         recursive: 1
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -5838,7 +5838,7 @@ entities:
                             header_layout: 2
                             pages: '270'
                             recursive: 1
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -5882,7 +5882,7 @@ entities:
                         header_layout: 2
                         pages: '270'
                         recursive: 1
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -5916,7 +5916,7 @@ entities:
                             header_layout: 2
                             pages: '270'
                             recursive: 1
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -5960,7 +5960,7 @@ entities:
                         header_layout: 2
                         pages: '270'
                         recursive: 1
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -5994,7 +5994,7 @@ entities:
                             header_layout: 2
                             pages: '270'
                             recursive: 1
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>
@@ -6205,7 +6205,7 @@ entities:
                         CType: 'academiccontacts4pages_list'
                         header: 'Who to ask'
                         header_layout: 2
-                        pi_flexform: |
+                        pi_flexform: |-
                           <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                           <T3FlexForms>
                               <data>
@@ -6225,7 +6225,7 @@ entities:
                             CType: 'academiccontacts4pages_list'
                             header: 'Ansprechpersonen'
                             header_layout: 2
-                            pi_flexform: |
+                            pi_flexform: |-
                               <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
                               <T3FlexForms>
                                   <data>

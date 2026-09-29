@@ -160,9 +160,9 @@ versions 15 and 16.
 — the aggregate folders of the academic extensions hold nothing but the third
 one.
 
-## Two checks of the YAML itself
+## Three checks of the YAML itself
 
-Two unit tests in
+Three unit tests in
 [`packages-dev/dev-site/Tests/Unit/`](../../packages-dev/dev-site/Tests/Unit)
 look at the definition without importing it:
 
@@ -175,13 +175,16 @@ look at the definition without importing it:
   in the translated language: the German categories of the seed had lost their
   types that way, and no German list offered a category filter. Nothing else
   reports it - the manifest measures what the seed says, and it said nothing.
+- `SeedBlockScalarChompingTest` rejects a literal or folded block without strip
+  chomping in any file of a seed set. It reads the files as text, because the
+  parser is what it guards against, see [The YAML parser](#the-yaml-parser).
 
 ## Why the manifest and the snapshot can agree at all
 
 The manifest is generated from an import in a **functional test instance** and
 then used to measure the `sqlite-databases/core-NN.sqlite` snapshot, which is
 produced by an import in a **real DDEV instance**. Those are two different
-environments, and two of their differences reach the stored data. Both are
+environments, and three of their differences reach the stored data. All are
 pinned rather than excluded from the projection, because both are real
 differences that a reader would otherwise have to know about:
 
@@ -205,9 +208,42 @@ the committed site configurations of `core-NN/config/sites/` through
 changed in the instance reaches the measurement without anyone remembering to
 mirror it.
 
-The rule behind both: when the manifest and the snapshot disagree, ask which
-environment is wrong before adjusting what is measured. Dropping a column from
-the projection hides a difference that is real.
+### The YAML parser
+
+The two environments read the seed with different releases of `symfony/yaml`:
+the functional suites with whatever `composerUpdate` installed that day, the
+development instances with the release their committed `composer.lock` pins.
+That stays harmless only while every release reads the seed the same way, and
+on 2026-09-29 one did not (ACE-776).
+
+A literal block without a chomping indicator (`bodytext: |`) is *clipped*: the
+value ends with exactly one newline. symfony/yaml 7.4.18 and earlier dropped
+that newline when the line after the block was a less indented key or list
+item, and kept it before a sibling key or a comment. 7.4.20 keeps it
+everywhere, as the specification says. 57 of the 80 blocks of `Scenario.yaml`
+were in the first position, so the import of 7.4.20 wrote a newline more into
+`tt_content.bodytext`, `tt_content.pi_flexform` and `sys_template.constants`.
+`SeedManifestTest` failed on every functional job of every pull request, while
+`SnapshotManifestTest` still passed against the templates the instances built
+with their locked 7.4.18. Nothing in the repository had changed.
+
+The rule that keeps it from coming back:
+
+- **Every block scalar of a seed set states strip chomping**: `|-`, or `>-` for
+  a folded one. Strip removes every trailing newline in every release, so the
+  value no longer depends on the parser. No value of the seed needs a final
+  newline. `Build/Scripts/generateLegacyScenario.php` writes its blocks the
+  same way, and `SeedBlockScalarChompingTest` fails on a block without `-`.
+- **A manifest that drifts while the seed did not change points at a
+  dependency**, not at the environment. Compare the `Installing` lines of the
+  composer step of the last green and the first red CI run, and parse the seed
+  with both releases of the suspect package before regenerating anything. A
+  manifest regenerated to match one release is red against the snapshots,
+  which the other release produced.
+
+The rule behind all three: when the manifest and the snapshot disagree, ask
+which environment is wrong before adjusting what is measured. Dropping a column
+from the projection hides a difference that is real.
 
 ## See also
 
