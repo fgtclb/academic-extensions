@@ -8,10 +8,11 @@ new-job form of `academic_jobs`, and how an integrator changes its wording.
 ### Requirement: Submitted jobs are announced with a templated mail
 When a visitor submits a job through the new-job form, the system SHALL send
 the configured recipient one mail with the configured sender and subject,
-rendered from a mail template into an HTML and a plain-text part. Both parts
-MUST name the submitted job by its title and MUST contain a link that opens
-the new job record in the TYPO3 backend. This SHALL behave the same on TYPO3
-v13 and v14.
+rendered from a mail template into an HTML and a plain-text part, unless the
+mail format of the installation, or on TYPO3 v14 of the site, selects one of
+them. Every part MUST name the submitted job by its title and MUST contain a
+link that opens the new job record in the TYPO3 backend. This SHALL behave the
+same on TYPO3 v13 and v14.
 
 #### Scenario: Visitor submits a job
 - **WHEN** a visitor submits the new-job form with the title "Research assistant"
@@ -32,6 +33,10 @@ replace the one shipped with the extension.
 #### Scenario: Project template replaces the shipped one
 - **WHEN** a site package registers a mail template path with a higher priority that contains a `JobCreated` template
 - **THEN** the mail is rendered from the site package's template
+
+#### Scenario: Mail template path of the site on TYPO3 v14
+- **WHEN** a site on TYPO3 v14 uses the site set `typo3/email` and lists a mail template path with a `JobCreated` template in `email.templateRootPaths`
+- **THEN** the mail is rendered from that template, as every mail core sends for that site
 
 #### Scenario: Another template name
 - **WHEN** an integrator sets `email.templateName` to the name of another template in the mail template paths

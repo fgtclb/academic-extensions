@@ -21,8 +21,8 @@ cannot express a version switch of its own (ACE-560, see below). No `Core13/` or
 than shipped code. Every other core version difference is resolved **inside**
 the file that has it.
 
-Five mechanisms are in use, and they differ by *where* the difference sits —
-not by preference:
+Six mechanisms are in use. They differ by *where* the difference sits, not by
+preference:
 
 | Mechanism                                  | Used in                                                           | Count               |
 |--------------------------------------------|-------------------------------------------------------------------|---------------------|
@@ -31,8 +31,10 @@ not by preference:
 | Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/`                        | 3 files             |
 | Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`                             | 2 files             |
 | One file per version, selected by path     | `packages/fgtclb/academic-persons/Configuration/FlexForms/Core*/` | 2 data structures   |
+| Check for an API only one version has      | `packages/fgtclb/*/Classes/`                                      | 2 files             |
 
-All of them switch on `(new Typo3Version())->getMajorVersion()`.
+All of them but the last switch on `(new Typo3Version())->getMajorVersion()`.
+The last checks for the API itself.
 
 ### A switch inside a class
 
@@ -122,6 +124,35 @@ that renders it.
 The whole method carries a `@todo` naming the v13 support end as its exit — the
 shape the rule below asks for. What it guards is measured in
 [Icons](icons.md#how-the-provider-is-wired-per-core-version).
+
+### An API only one version has
+
+Two classes check for a core API rather than for the major version. The
+`method_exists()` gate of `RecordSynchronizer::hasTranslation()` in
+`academic-persons` selects `LocalizationRepository::getRecordTranslation()`,
+which v13 lacks, see
+[Translation synchronization](translation-synchronization.md).
+
+[`JobController::createEmail()`](../../packages/fgtclb/academic-jobs/Classes/Controller/JobController.php)
+creates the notification mail of the new-job form through
+`TYPO3\CMS\Core\Mail\TemplatedEmailFactory`, which TYPO3 14.2 added and
+which declares the constructor of `FluidEmail` internal. The factory adds the
+mail template paths and the format of the core site set `typo3/email`. TYPO3
+v13 has neither, and the method builds the `FluidEmail` itself there:
+
+```php
+if (class_exists(TemplatedEmailFactory::class)) {
+    return GeneralUtility::makeInstance(TemplatedEmailFactory::class)->createFromRequest($this->request);
+}
+
+return GeneralUtility::makeInstance(FluidEmail::class)->setRequest($this->request);
+```
+
+The check is on the class, not on the major version, because PHPStan
+understands it. Analysed against TYPO3 v13, where the class does not exist, a
+`getMajorVersion()` switch around the same call is reported as an unknown
+class and would need a baseline entry. The factory cannot be injected while
+the branch supports v13, which the `@todo` of the method names.
 
 ### A switch inside a configuration file
 
@@ -302,9 +333,10 @@ Splitting a class in two to express that would cost more than it saves, and it
 would double the code to delete when v13 support ends.
 
 The threshold is not the number of switches but their reach: once a class needs
-different *dependencies*, different *method signatures*, or an API that does
-not exist on the other version at all, a switch cannot express it and the class
-has to exist twice.
+different *dependencies*, different *method signatures*, or several APIs that
+do not exist on the other version at all, a switch cannot express it and the
+class has to exist twice. A single call of such an API is still a check in the
+file, see [An API only one version has](#an-api-only-one-version-has).
 
 ## What a folder split would look like
 
