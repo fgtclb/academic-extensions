@@ -133,6 +133,6 @@
 - [x] 8.3 `lintMarkdown -n`, `checkRstRenderingAll` and `seedManifest` green.
 - [x] 8.4 `docs/` and both `Documentation/` changelogs updated as in group 6.
   `README.md` and `CONTRIBUTING.md` still only summarise.
-- [ ] 8.5 No backport: a removal on a maintenance line. State it in the pull
+- [x] 8.5 No backport: a removal on a maintenance line. State it in the pull
   request, together with anything else left out.
-- [ ] 8.6 Archive the change as the last commit of the pull request.
+- [x] 8.6 Archive the change as the last commit of the pull request.
