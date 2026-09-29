@@ -107,6 +107,12 @@ A scenario file cannot amend a record another file declares: `ScenarioComposer`
 appends entities and rejects a repeated id with exception 1568146788. That is
 why the two shapes are two full trees rather than one tree and a patch.
 
+`GeneratedLegacyScenarioTest` runs the `--check` mode as a unit test, and
+`SeedBlockScalarChompingTest` rejects a literal or folded block without strip
+chomping in any file of either set. The second one reads the files as text,
+because the parser is what it guards against, see
+[The YAML parser](#the-yaml-parser).
+
 ## The four checks
 
 ### `SeedManifestTest` — the definition against the manifest
@@ -198,8 +204,8 @@ one.
 The manifest is generated from an import in a **functional test instance** and
 then used to measure the `sqlite-databases/core-NN.sqlite` snapshot, which is
 produced by an import in a **real DDEV instance**. Those are two different
-environments, and two of their differences reach the stored data. Both are
-pinned rather than excluded from the projection, because both are real
+environments, and three of their differences could reach the stored data. They
+are pinned rather than excluded from the projection, because they are real
 differences that a reader would otherwise have to know about:
 
 **The timezone — measured, and currently not a problem here.** TYPO3 can derive
@@ -225,9 +231,44 @@ the committed site configurations of `core-NN/config/sites/` through
 changed in the instance reaches the measurement without anyone remembering to
 mirror it.
 
-The rule behind both: when the manifest and the snapshot disagree, ask which
-environment is wrong before adjusting what is measured. Dropping a column from
-the projection hides a difference that is real.
+### The YAML parser
+
+The two environments read the seed with different releases of `symfony/yaml`:
+the functional suites with whatever `composerUpdate` installed that day, the
+development instances with the release their committed `composer.lock` pins,
+a 6.4 one in `core-12` and a 7.4 one in `core-13`. That stays harmless only
+while every release reads the seed the same way, and on 2026-09-29 two did not
+(ACE-776).
+
+A literal block without a chomping indicator (`bodytext: |`) is *clipped*: the
+value ends with exactly one newline. symfony/yaml 6.4.45 and 7.4.18 dropped
+that newline when the line after the block was a less indented key or list
+item, and kept it before a sibling key or a comment. 6.4.47 and 7.4.20 keep it
+everywhere, as the specification says. The import of the new releases wrote a
+newline more into `tt_content.bodytext`, `tt_content.pi_flexform` and
+`sys_template.constants`, and `SeedManifestTest` failed on both core versions,
+while `SnapshotManifestTest` still passed against the templates the instances
+built with their locked releases. Nothing in the repository had changed.
+
+The rule that keeps it from coming back:
+
+- **Every block scalar of a seed set states strip chomping**: `|-`, or `>-` for
+  a folded one. Strip removes every trailing newline in every release, so the
+  value no longer depends on the parser. No value of the seed needs a final
+  newline. `Build/Scripts/generateLegacyScenario.php` writes the blocks of
+  `ScenarioLegacy.yaml` the same way, and the dumper of symfony/yaml writes
+  `|-` into the generated `Scenario.yaml` for every value without a final
+  newline. `SeedBlockScalarChompingTest` fails on a block without `-`.
+- **A manifest that drifts while the seed did not change points at a
+  dependency**, not at the environment. Compare the `Installing` lines of the
+  composer step of the last green and the first red CI run, and parse the seed
+  with both releases of the suspect package before regenerating anything. A
+  manifest regenerated to match one release is red against the snapshots,
+  which the other release produced.
+
+The rule behind all three: when the manifest and the snapshot disagree, ask
+which environment is wrong before adjusting what is measured. Dropping a column
+from the projection hides a difference that is real.
 
 ## See also
 
