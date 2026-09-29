@@ -561,6 +561,41 @@ one-element list with an always-true `uid > 0` comparison
 (`Query::logicalAnd()`, `case 1`, identical on v13 and v14), which is harmless
 but ends up in every query of an installation that has no listener.
 
+## Two conditions on one relation match one related row
+
+The persons list narrows by function type and by organisational unit, both
+fields of a contract, and a visitor can set both at once (ACE-779). The
+question that decides what the list means is whether both conditions have to
+hold for **one** contract or may each hold for **any** contract of the profile.
+The answer the list gives is one contract: a person who is a professor in one
+unit and a lecturer in another is not a professor of the second unit.
+
+Extbase gives that answer by itself. `Typo3DbQueryParser::addUnionStatement()`
+joins a property path through `getUniqueAlias()`, which returns the alias it
+already made for the same path (v13 `:942`, v14 `:936`). Every condition on
+`contracts.*` in one query therefore reads the same joined contract row, the
+editor's `in()` restriction and the visitor's `equals()` alike:
+
+```php
+$filters[] = $query->in('contracts.functionType', $demand->getFunctionTypes());
+$filters[] = $query->equals('contracts.functionType', $demand->getFunctionTypeFilter());
+$filters[] = $query->equals('contracts.organisationalUnit', $demand->getOrganisationalUnitFilter());
+```
+
+Two consequences to keep in mind when adding a condition on a relation:
+
+- **"Any related row" needs a subquery of its own**, one per condition. A
+  second condition on the same property path is never an independent `EXISTS`.
+- **The join repeats the profile once per matching contract.** The parser
+  marks the query as distinct for a to-many relation (`suggestDistinctQuery`),
+  and the list and its count show a profile once. A query that selects its own
+  columns, as the letter question below does, has to aggregate instead.
+
+`Tests/Functional/Plugins/AcademicPersonsVisitorListFilterTest.php` of
+`academic_persons` pins both: a profile whose function type and unit sit on
+two different contracts is not listed, and one with two matching contracts is
+listed once.
+
 ## Asking a question about a list — reuse its query, not its rules
 
 The letter navigation of the persons list has to know which letters lead to a

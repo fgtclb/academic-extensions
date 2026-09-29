@@ -46,7 +46,7 @@ A private constant of the controller lists the visitor-settable properties.
 Today that is `currentPage` and `alphabetFilter`. `initializeListAction()`
 allows exactly those, plus the `settings.demand` keys as today, and
 `activeListArguments` is built from the same list. `ace-tbd-list-view-modes`
-and `ace-tbd-visitor-filter-demand-query` add their keys to that constant.
+and `ace-779-visitor-filter-demand-query` add their keys to that constant.
 
 ### Merging in a ViewHelper, not in Fluid literals
 

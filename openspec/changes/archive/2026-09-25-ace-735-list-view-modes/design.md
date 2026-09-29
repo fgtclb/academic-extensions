@@ -192,7 +192,7 @@ whose value differs from that of a fresh demand. For the pagination and letter
 links to carry the mode, the list and list-and-detail plugins take it as the
 demand property `demand/viewMode`, add it to that list, and map that argument
 in the `/view-mode/{viewMode}` routes. `adoptSettings()` writes the **resolved**
-mode back into the demand, as `ace-tbd-visitor-filter-demand-query` does for
+mode back into the demand, as `ace-779-visitor-filter-demand-query` does for
 its filters: the default mode as the empty value, so a link to it carries
 none, and a mode the resolution rejected as the empty value as well, so it
 never reaches a link. The selected-profiles and selected-contracts plugins

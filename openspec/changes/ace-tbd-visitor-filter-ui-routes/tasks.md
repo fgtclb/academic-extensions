@@ -1,6 +1,6 @@
 ## 1. Prerequisites
 
-- [ ] 1.1 Confirm `ace-tbd-visitor-filter-demand-query` and
+- [ ] 1.1 Confirm `ace-779-visitor-filter-demand-query` and
   `ace-734-list-links-keep-state` are merged, and verify the demand property
   names and `filterOptions` in the merged sources.
 - [ ] 1.2 Check whether `ace-735-list-view-modes` is merged. If it is, this
@@ -20,6 +20,10 @@
   list.
 - [ ] 2.3 Assert in a functional test that the rendered form contains no
   `<script` and no `on*=` attribute.
+- [ ] 2.4 Flush the cache tag `profile_list_view` when a function type or an
+  organisational unit is saved, hidden or deleted, so the form offers what
+  the records say, and cover it in a functional test (ACE-779 left the
+  options cached until the page cache expires).
 
 ## 3. Slugs and routes
 
