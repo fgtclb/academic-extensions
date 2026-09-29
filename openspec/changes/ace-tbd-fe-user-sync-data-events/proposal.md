@@ -18,6 +18,8 @@ for users without data, because a factory must return a profile.
   visibility window or initials.
 - A custom factory may decline to create a profile. The command then creates
   nothing for that user and continues with the next one.
+- The documentation shows how a listener of the mapped profile sets the
+  employee type, which `ace-780-fe-user-relation-mapping` leaves to projects.
 - Existing factories keep working unchanged.
 
 Only `academic_persons` (`packages/fgtclb/academic-persons`) is affected. The

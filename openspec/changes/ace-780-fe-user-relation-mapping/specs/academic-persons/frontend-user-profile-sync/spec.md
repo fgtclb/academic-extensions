@@ -16,6 +16,31 @@ to the synchronised contract.
 - **WHEN** two function types carry the same function name
 - **THEN** the one with the lower uid is assigned, on every database
 
+#### Scenario: Only an exact value matches
+- **WHEN** the function type is mapped and a function type differs from the
+  frontend user's value in case only
+- **THEN** it is not assigned, on every database
+
+#### Scenario: A hidden record matches
+- **WHEN** the organisational unit is mapped and the only unit carrying the
+  frontend user's value is hidden
+- **THEN** that unit is assigned and no other one is created
+
+#### Scenario: Deleted records never match
+- **WHEN** creation is enabled and only a deleted unit carries the frontend
+  user's value
+- **THEN** a live unit is created and assigned
+
+#### Scenario: Workspace records never match
+- **WHEN** a unit of a workspace and a live unit carry the frontend user's
+  value, and the unit of the workspace has the lower uid
+- **THEN** the live unit is assigned
+
+#### Scenario: Only a translation carries the value
+- **WHEN** creation is enabled and only the translation of a unit carries the
+  frontend user's value
+- **THEN** a unit of the default language is created and assigned
+
 ### Requirement: Missing organisational units and function types can be created
 The system SHALL create a missing organisational unit or function type on the
 configured storage page only when creation is enabled for that relation. A
@@ -28,13 +53,19 @@ second synchronisation SHALL reuse the created record.
 
 #### Scenario: Creation disabled
 - **WHEN** creation is disabled and no matching record exists
-- **THEN** no record is created and the contract relation stays empty
+- **THEN** no record is created and the contract has no record of that kind
+  afterwards, one assigned before included
+
+#### Scenario: Creation without a storage page
+- **WHEN** a site package enables creation without naming a storage page
+- **THEN** the synchronisation refuses to run and names the mistake, before
+  anything is written
 
 ### Requirement: Empty sources clear only mapped relations
 The system SHALL clear a mapped relation when its source value is empty. It
 MUST NOT change a relation that is not mapped.
 
-#### Scenario: Department removed in the source
+#### Scenario: Function type removed in the source
 - **WHEN** the function type is mapped and the frontend user's source column
   becomes empty
 - **THEN** the contract no longer has a function type

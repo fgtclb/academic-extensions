@@ -31,6 +31,16 @@
   Extend the developer chapter. Verify the rendering.
 - [ ] 4.2 Extend `docs/architecture/frontend-user-contact-import.md` with the
   event order and the skip semantics. Verify `lintMarkdown -n`.
+- [ ] 4.3 Taken over from `ace-780-fe-user-relation-mapping`, which is merged
+  first. Document the employee-type recipe in the section
+  "Organisational unit and function type" of the frontend user
+  synchronisation chapter: a stateless listener of the mapped-profile event,
+  registered with TYPO3's `#[AsEventListener]`, reads the source value from
+  the frontend-user data, resolves the category with its own ordered query
+  (for example restricted to one category type when `category_types` is
+  installed) and sets it on the profile's contracts. Keep the statement that
+  the synchronisation itself never sets the employee type. Verify the
+  rendering.
 
 ## 5. File the issue
 

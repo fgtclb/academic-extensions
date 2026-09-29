@@ -47,14 +47,14 @@ None.
 - `Settings.yaml` gains a key that is merged per package like the others:
   maps key by key, and each of the three lists as a whole.
 - No database change. Existing imported records keep their identifiers.
-- Basis for `ace-tbd-fe-user-relation-mapping` and
+- Basis for `ace-780-fe-user-relation-mapping` and
   `ace-tbd-fe-user-sync-data-events`.
 
 ## Non-goals
 
 - An upstream LDAP factory, or any dependency on an LDAP extension.
 - Mapping relations (organisational unit, function type, employee type). That
-  is `ace-tbd-fe-user-relation-mapping`.
+  is `ace-780-fe-user-relation-mapping`.
 - Multi-value sources, value transformations or visibility mapping.
 - A backport to branch `2`, which lacks the 3.0 settings graph.
 

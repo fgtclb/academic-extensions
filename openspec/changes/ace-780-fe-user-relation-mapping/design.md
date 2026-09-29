@@ -12,8 +12,10 @@
   `academic_persons` does not require that package (`composer.json`). The
   candidate's `categoryType` option would therefore only work when it is
   installed. The candidate did not mention this.
-- The default factory never sets any of the three relations
-  (`Classes/Profile/ProfileFactory.php:139-174`).
+- The default factory never sets any of the three relations. Since
+  `ace-720-settings-driven-fe-user-mapping` it delegates the writes to
+  `Classes/Profile/FrontendUserProfileMapper.php`, whose `applyContract()`
+  sets `position` and `room` only (re-checked on `main` at `9b733e894`).
 
 ## Goals / Non-Goals
 
@@ -50,6 +52,16 @@ map):
 Rejected: creating records without a configured storage page, which is what
 one project does today (page 1).
 
+### Relation entries in the settings graph
+
+The normaliser takes `organisationalUnit` and `functionType` out of the
+`contract` map before it checks the plain properties, and keeps a relation
+with a column as a `FrontendUserSyncRelation` in a new `relations` property of
+`FrontendUserSyncSettings`. A missing `matchBy` takes the first field the
+relation offers, a missing `create` is `false`, a missing `storagePid` is `0`.
+The two problems above are also reported for a relation without a column,
+because another package may set the column later.
+
 ### Decided: no employee type mapping in the first version
 
 The first version ships the `organisationalUnit` and `functionType` mappings
@@ -80,12 +92,28 @@ TYPO3 `QueryBuilder`:
 
 - a `DeletedRestriction` only, so hidden records still match and are not
   duplicated;
-- live workspace and default language (`sys_language_uid IN (0, -1)`);
-- a named string parameter for the value;
-- `ORDER BY uid` and `setMaxResults(1)`.
+- live workspace (`t3ver_wsid = 0`) and default language
+  (`sys_language_uid IN (0, -1)`);
+- a named string parameter for the value, trimmed by the mapper;
+- `ORDER BY uid`.
 
-The contract receives the object through the Extbase repository by uid.
-Creation goes through the persistence manager like every other factory write.
+PHP takes the first candidate whose field is identical to the value, instead
+of `setMaxResults(1)`. `utf8mb4_unicode_ci`, the collation TYPO3 creates its
+MySQL and MariaDB tables with, ignores case, accents and trailing blanks,
+PostgreSQL and SQLite do not, so the database alone would assign different
+records on different systems. Decided while implementing.
+
+The contract receives the object through an Extbase query by uid that ignores
+storage pages and enable fields and reads the default language without
+overlays, the way
+`AbstractProfileFactory::findFrontendUserIgnoringVisibility()` loads a hidden
+frontend user. Creation goes through the persistence manager like every other
+factory write, and `persistAll()` runs right after the `add()`: the update
+command maps every profile of a frontend user before it persists them
+together, so a record that is only added would be created a second time for
+the next profile of the same user. `persistAll()` writes everything pending at
+that moment, which the documentation of the mapper states for custom
+factories. Decided while implementing, with a test.
 
 Rejected: Extbase queries for the lookup. They respect storage pages and
 enable fields by default, and they give less control over the ordering.
