@@ -15,14 +15,14 @@ order is decided and why there.
 `attach()` sorts every group after it has added the types, and rebuilds the flat
 list from the groups. Nothing else sorts types, and no consumer has to:
 
-| Consumer                                             | Reads                                             |
-|------------------------------------------------------|---------------------------------------------------|
-| Facts of the program page, details element, card     | `CategoryCollection::getAllCategoriesByType()`    |
-| Categories of a partner or project page and item     | `CategoryCollection::getAllCategoriesByType()`    |
-| Filter selects of the program, partner, project list | `CategoryCollection::getAllCategoriesByType()`    |
-| Page module category summary                         | `CategoryTypeRegistry::getGroupedCategoryTypes()` |
-| A select of the types of one group (filter types)    | `CategoryTypeRegistry::getGroupedCategoryTypes()` |
-| Type select of a category, type icons                | `CategoryTypeRegistry::getCategoryTypes()`        |
+| Consumer                                             | Reads                                                                                                         |
+|------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| Facts of the program page, details element, card     | `CategoryCollection::getAllCategoriesByType()`, or `getMostSpecificCategoriesByType()`, which keeps its order |
+| Categories of a partner or project page and item     | `CategoryCollection::getAllCategoriesByType()`                                                                |
+| Filter selects of the program, partner, project list | `CategoryCollection::getAllCategoriesByType()`                                                                |
+| Page module category summary                         | `CategoryTypeRegistry::getGroupedCategoryTypes()`                                                             |
+| A select of the types of one group (filter types)    | `CategoryTypeRegistry::getGroupedCategoryTypes()`                                                             |
+| Type select of a category, type icons                | `CategoryTypeRegistry::getCategoryTypes()`                                                                    |
 
 The category collection takes its type order from
 `getCategoryTypeIdentifierByGroup()`, so it follows without a change.

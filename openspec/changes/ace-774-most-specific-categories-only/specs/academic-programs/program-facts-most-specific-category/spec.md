@@ -27,6 +27,11 @@ program details content element and the program card, on TYPO3 v13 and v14.
   its grandchild of the same type
 - **THEN** the fact shows the grandchild only
 
+#### Scenario: Parent assigned alone
+- **WHEN** the setting is on and a program carries the degree "Bachelor" and
+  none of its subcategories
+- **THEN** the degree fact shows "Bachelor"
+
 #### Scenario: Ancestor of another type
 - **WHEN** the setting is on and a program carries a category whose parent
   belongs to another category type

@@ -53,8 +53,6 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `programs-studyplan-07`). Four of the six analysed projects carry their own
-code for this today. No YouTrack issue is filed yet; the change is renamed
-to `ace-<NNN>-most-specific-categories-only` when the issue is filed after
-implementation.
+code for this today. Implements ACE-774, filed for this change.
 
 Relates to ACE-620.
