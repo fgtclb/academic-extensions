@@ -509,7 +509,8 @@ file, or in an event listener. The most instructive one is
 FlexForm `ds` shape differs and **neither version tolerates the other's**, see
 ACE-293). The counts per mechanism are measured in
 [Core version aware code](docs/architecture/core-version-aware-code.md) and are
-deliberately not repeated here.
+deliberately not repeated here. Two classes check for an API only one version has
+instead, with `class_exists()` or `method_exists()`.
 
 Keep it that way while the difference is a line or two. Reach for the folder
 split below only when a whole class has to differ, or when the file format

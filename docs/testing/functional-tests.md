@@ -331,6 +331,51 @@ page each render their own selection. A request that renders the page caches it
 — the POST of a form included, before a non-cacheable plugin redirects — so such
 a test empties `cache_pages` before it counts entries.
 
+## Reading a sent mail
+
+A test of a mail reads what the recipient gets, not an object the code built.
+The `mbox` transport of core appends every sent mail to one file, on TYPO3 v13
+and v14 alike, so the test class configures it for its test instance:
+
+```php
+protected function setUp(): void
+{
+    $this->configurationToUseInTestInstance = $this->frontendPluginTestConfiguration([
+        'MAIL' => [
+            'transport' => 'mbox',
+            'transport_mbox_file' => static::getInstancePath() . '/typo3temp/notification-mails.mbox',
+        ],
+    ]);
+    parent::setUp();
+    // delete the file here, see below
+}
+```
+
+Three things about it are not obvious:
+
+- **Mail configuration is per class.** Every frontend request of the testing
+  framework bootstraps again from the configuration of the test instance, so a
+  value of `$GLOBALS['TYPO3_CONF_VARS']['MAIL']` changed at runtime is gone by
+  the time the plugin sends. A test that needs other mail template paths is a
+  class of its own. `getInstancePath()` is static, so the file name is known
+  before `parent::setUp()`. The testing framework marks it `@internal`, so a
+  framework update may rename it, and the test then fails loudly rather than
+  silently.
+- **The file outlives a test.** The instance is kept for all tests of a class,
+  so `setUp()` deletes the file after `parent::setUp()`.
+- **The parts are encoded.** A Fluid mail is `multipart/alternative` with
+  quoted-printable parts, so the test splits the parts at the boundary and
+  decodes each by its `Content-Transfer-Encoding` before it asserts text.
+
+The form that sends the mail is posted with its hidden fields. TYPO3 v13 sends
+the redirect a plugin action returns with `header()` and answers 200, TYPO3
+v14 answers the redirect, so a test that runs on both asserts the created
+record rather than the status.
+
+[`AbstractAcademicJobsNotificationMailTestCase`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AbstractAcademicJobsNotificationMailTestCase.php)
+is the worked example, with a test class for the shipped template and one that
+registers a mail template path of its own.
+
 ## Version-gated tests
 
 Three mechanisms coexist, and they are not interchangeable:
