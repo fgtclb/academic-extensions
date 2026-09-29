@@ -107,7 +107,10 @@ gained for this, keyed by package key in loading order — and the migrator logs
 **one `LogLevel::WARNING` per package and legacy key** through
 `LoggerAwareInterface`, on the cache miss that builds the graph. It is never an
 `E_USER_DEPRECATED`: both phpunit suites run with `failOnDeprecation`, so a
-fixture shipping the old shape would turn every functional test red. The
+fixture shipping the old shape would turn every functional test red. A
+contract field whose property 3.0 removed, `contracts.fields.publish` of a
+copied map (ACE-775), is left out of the graph by the factory with a warning
+of the same kind, rather than stopping the TCA build with an exception. The
 console command `academic:persons:settings:migrate` (`MigrateSettingsCommand`)
 prints the migrated four maps per legacy package and exits with 1 when one
 exists; it deliberately has no `--write` — the file belongs to a version

@@ -129,7 +129,7 @@ Measured with
 | `#[Autoconfigure]`   | 13    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
 | `#[Autowire]`        | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
-| `#[Exclude]`         | 17    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
+| `#[Exclude]`         | 18    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
 | `#[AsEventListener]` | 7     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
@@ -285,13 +285,17 @@ versions diverge:
 | `TYPO3\CMS\Backend\Attribute\AsAvatarProvider`, `AsSidebarComponent` | **no**   | yes             | no                             |
 
 `TYPO3\CMS\Extbase\Attribute\*` does not exist on v13 at all. The
-`Install\Attribute\UpgradeWizard` row is the one all twelve upgrade wizards use:
+`Install\Attribute\UpgradeWizard` row is the one all sixteen upgrade wizards use:
 on v14 it survives as a deprecated subclass shim in
 `cms-core/DeprecatedClasses/ext-install/`, so it still works, but its
-replacement `Core\Attribute\UpgradeWizard` is absent on v13. The twelfth,
-`academic-bite-jobs/Classes/Upgrades/ListViewFlexFormUpgradeWizard.php`, is a
-deliberate exception to "do not add new uses": it repairs content elements a 2.1
-rename broke, and it is migrated together with the others under ACE-294. See
+replacement `Core\Attribute\UpgradeWizard` is absent on v13. Wizards were
+added since anyway, each a deliberate exception to "do not add new uses" and
+migrated together with the others under ACE-294. Two examples:
+`academic-bite-jobs/Classes/Upgrades/ListViewFlexFormUpgradeWizard.php` repairs
+content elements a 2.1 rename broke, and
+`academic-persons/Classes/Upgrades/MigrateContractPublishToHiddenUpgradeWizard.php`
+is shipped unregistered, see
+[A service a site package registers](#a-service-a-site-package-registers). See
 [Core version aware code](core-version-aware-code.md#apis-that-cannot-be-modernised-yet)
 for both.
 
@@ -426,6 +430,44 @@ cache entry is written with that lifetime. `ContractsViewHelper` takes the
 request from its rendering context and limits the lifetime there. Without the
 attribute - a rendering outside a frontend page - there is nothing to limit,
 and the view helper does nothing.
+
+## A service a site package registers
+
+Some services must exist without being active. The example is
+`MigrateContractPublishToHiddenUpgradeWizard` of `academic_persons` (ACE-775).
+It carries a removed contract flag into `hidden`, which is right for a project
+whose own code gave the flag a meaning, and hides every contract of any other
+installation, where each carries the default "not published". Listed in the
+upgrade wizards of every installation, it would be one click, or one
+`upgrade:run` without a name, away from doing that.
+
+The class carries Symfony's `#[Exclude]` next to TYPO3's `#[UpgradeWizard]`.
+The `resource:` load of the package's `Services.yaml` then registers it only as
+an abstract definition tagged `container.excluded`, which the compiled container
+drops, so nothing is tagged `install.upgradewizard` and the core does not know
+the wizard. A site package that wants it declares the class in its own
+`Services.yaml`:
+
+```yaml
+services:
+  FGTCLB\AcademicPersons\Upgrades\MigrateContractPublishToHiddenUpgradeWizard:
+    autowire: true
+    autoconfigure: true
+```
+
+Autoconfiguration reads the `UpgradeWizard` attribute and adds the tag with the
+identifier, on TYPO3 v13.4 (`cms-install/Configuration/Services.php`) and v14.3
+(`cms-core/Configuration/Services.php`) alike. The declaration replaces the
+excluded definition in either loading order: `FileLoader` does not register an
+excluded class whose id is already defined, and a later definition overwrites
+it.
+
+The attribute sits on the class rather than in the `exclude:` list of
+`Services.yaml`, so the reason the service is inactive is stated where it is
+defined. Two functional tests pin both sides: one that the registry does not
+know the identifier, and one with a fixture extension that declares the class,
+where it does. The Important changelog entry of the extension shows the
+declaration.
 
 ## Other rules
 
