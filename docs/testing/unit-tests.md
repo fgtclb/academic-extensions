@@ -294,6 +294,35 @@ request: the core keeps the overrides one translation has read for the ones
 after it. This check holds the templates, and the names handed to
 `translate()` directly in PHP.
 
+## The links of the manuals
+
+[`DocumentationGuidesTest`](../../packages-dev/monorepo-shared/Tests/Unit/DocumentationGuidesTest.php)
+reads the `Documentation/guides.xml` of every package below `packages/fgtclb/`
+and asserts that the links docs.typo3.org builds from it lead to the package
+itself:
+
+| Attribute                  | Has to be                                                               |
+|----------------------------|-------------------------------------------------------------------------|
+| `edit-on-github`           | `fgtclb/academic-extensions`, the split repositories are read-only      |
+| `edit-on-github-branch`    | the branch of the only `extra.branch-alias` of the root `composer.json` |
+| `edit-on-github-directory` | `packages/fgtclb/<package directory>/Documentation`                     |
+| `project-repository`       | `https://github.com/fgtclb/<package directory>`, the split repository   |
+| `project-home`             | `https://extensions.typo3.org/extension/<extension key>/`               |
+
+A third test fails on a `guides.xml` outside a `Documentation/` directory. The
+renderer reads `Documentation/guides.xml` only (`--config=Documentation`), and
+`bin/set-version` does not update another one.
+
+The files were copied from one another, and nothing else notices a copy that
+kept the wrong value: the render succeeds, and a link only fails when somebody
+follows it. The manuals of `category_types` and `academic_study_plan` sent
+every "Edit on GitHub" link into the manual of `academic_base` until ACE-773.
+
+The edit branch is read from the branch alias because the branch name is not
+in the files of a checkout, and in a git worktree the git directory is outside
+the directory the test container mounts. On this branch both are `2`. A newly
+cut version branch changes both, see [Releasing](../workflow/releasing.md).
+
 ## See also
 
 - [PHPUnit configuration](phpunit-configuration.md)
