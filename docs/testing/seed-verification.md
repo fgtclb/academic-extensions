@@ -185,7 +185,7 @@ The manifest is generated from an import in a **functional test instance** and
 then used to measure the `sqlite-databases/core-NN.sqlite` snapshot, which is
 produced by an import in a **real DDEV instance**. Those are two different
 environments, and three of their differences reach the stored data. All are
-pinned rather than excluded from the projection, because both are real
+pinned rather than excluded from the projection, because they are real
 differences that a reader would otherwise have to know about:
 
 **The timezone.** TYPO3 derives the timestamp it stores in a date field with the
@@ -218,14 +218,15 @@ on 2026-09-29 one did not (ACE-776).
 
 A literal block without a chomping indicator (`bodytext: |`) is *clipped*: the
 value ends with exactly one newline. symfony/yaml 7.4.18 and earlier dropped
-that newline when the line after the block was a less indented key or list
-item, and kept it before a sibling key or a comment. 7.4.20 keeps it
-everywhere, as the specification says. 57 of the 80 blocks of `Scenario.yaml`
-were in the first position, so the import of 7.4.20 wrote a newline more into
-`tt_content.bodytext`, `tt_content.pi_flexform` and `sys_template.constants`.
-`SeedManifestTest` failed on every functional job of every pull request, while
-`SnapshotManifestTest` still passed against the templates the instances built
-with their locked 7.4.18. Nothing in the repository had changed.
+that newline when the block ended a mapping nested in a list item, such as the
+`self:` of a seed entity, and the next line was less indented. 7.4.20 keeps it
+everywhere, as the specification says. Most blocks of `Scenario.yaml` and
+`ScenarioLegacy.yaml` are in that position, so the import of 7.4.20 wrote a
+newline more into `tt_content.bodytext`, `tt_content.pi_flexform` and
+`sys_template.constants`. `SeedManifestTest` failed on every functional job of
+every pull request, while `SnapshotManifestTest` still passed against the
+templates the instances built with their locked 7.4.15. Nothing in the
+repository had changed.
 
 The rule that keeps it from coming back:
 
@@ -233,7 +234,8 @@ The rule that keeps it from coming back:
   a folded one. Strip removes every trailing newline in every release, so the
   value no longer depends on the parser. No value of the seed needs a final
   newline. `Build/Scripts/generateLegacyScenario.php` writes its blocks the
-  same way, and `SeedBlockScalarChompingTest` fails on a block without `-`.
+  same way, and `SeedBlockScalarChompingTest` fails on a block without `-`, in
+  the `.yaml` and the `.yml` files of every set.
 - **A manifest that drifts while the seed did not change points at a
   dependency**, not at the environment. Compare the `Installing` lines of the
   composer step of the last green and the first red CI run, and parse the seed
