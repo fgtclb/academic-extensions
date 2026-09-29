@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicsDevSite\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -12,8 +13,9 @@ use PHPUnit\Framework\TestCase;
  * chomping (`|-`, `>-`).
  *
  * Without an indicator a block is clipped, and whether it keeps its final
- * newline depended on the symfony/yaml release that read it: 6.4.45 and 7.4.18
- * dropped it when the next line was a less indented key or list item, 6.4.47
+ * newline depended on the symfony/yaml release that read it: 6.4.45, 7.4.18 and
+ * earlier dropped it when the block ended a mapping nested in a list item, such
+ * as the `self:` of a seed entity, and the next line was less indented. 6.4.47
  * and 7.4.20 keep it everywhere, as the specification says (ACE-776). The
  * functional suites always install the newest release and the development
  * instances their locked one, so the same seed imported different `bodytext`,
@@ -28,22 +30,28 @@ use PHPUnit\Framework\TestCase;
 final class SeedBlockScalarChompingTest extends TestCase
 {
     /**
-     * A key or list item whose value is a block scalar: the indicator, an
+     * A line that starts a block scalar: any number of list dashes, an optional
+     * key, optional node properties (`!!str`, `&anchor`), the indicator with an
      * optional indentation digit and chomping indicator in either order, and an
      * optional comment.
      */
-    private const BLOCK_HEADER = '/^(?<indent> *)(?:- +)?(?:[^\s#][^#]*?: +)?(?<style>[|>])(?<modifiers>[-+1-9]{0,2}) *(?:#.*)?$/';
+    private const BLOCK_HEADER = '/^(?<indent> *)(?<dash>(?:- +)*)(?<key>[^\s#-][^#]*?:[ \t]+)?(?:[!&]\S*[ \t]+)*(?<style>[|>])(?<modifiers>[-+1-9]{0,2})[ \t]*(?:#.*)?$/';
 
     #[Test]
     public function everyBlockScalarOfTheSeedStripsItsFinalNewline(): void
     {
-        $files = glob(dirname(__DIR__, 2) . '/Configuration/DataFactory/*/*.yaml') ?: [];
+        $directory = dirname(__DIR__, 2) . '/Configuration/DataFactory';
+        // Both extensions: the scenario files are ".yaml", the set definitions
+        // ".yml", and the file references of a set carry values of their own.
+        $files = array_merge(glob($directory . '/*/*.yaml') ?: [], glob($directory . '/*/*.yml') ?: []);
         $this->assertNotSame([], $files, 'No seed set found.');
 
         $offending = [];
         foreach ($files as $file) {
-            foreach ($this->findUnstrippedBlocks($file) as $lineNumber => $line) {
-                $offending[] = sprintf('%s:%d: %s', basename($file), $lineNumber, trim($line));
+            $lines = file($file, FILE_IGNORE_NEW_LINES);
+            $this->assertIsArray($lines);
+            foreach (self::findUnstrippedBlocks($lines) as $lineNumber => $line) {
+                $offending[] = sprintf('%s/%s:%d: %s', basename(dirname($file)), basename($file), $lineNumber, trim($line));
             }
         }
 
@@ -51,17 +59,53 @@ final class SeedBlockScalarChompingTest extends TestCase
             [],
             $offending,
             'Write these blocks with strip chomping ("|-" or ">-"). A clipped block keeps or loses its final'
-            . ' newline depending on the symfony/yaml release, see docs/testing/seed-verification.md.',
+            . ' newline depending on the symfony/yaml release, see docs/testing/seed-verification.md. A'
+            . ' generated file is fixed in its source or its generator, never by hand.',
         );
     }
 
     /**
+     * @return \Generator<string, array{list<string>, list<int>}>
+     */
+    public static function blockHeaders(): \Generator
+    {
+        yield 'stripped blocks of every style' => [
+            ['a: |-', '  x', 'b: >-', '  y', 'c: |2-', '   z', 'd: |-  # comment', '  w'],
+            [],
+        ];
+        yield 'a clipped and a kept block' => [['a: |', '  x', 'b: |+', '  y'], [1, 3]];
+        yield 'a folded block' => [['a: >', '  x'], [1]];
+        yield 'a block on a list item' => [['- |', '  x'], [1]];
+        yield 'a block on a nested list item' => [['- - |', '    x'], [1]];
+        yield 'a sibling after a block on a compact list item' => [['- a: |-', '    x', '  b: |', '    y'], [3]];
+        yield 'node properties' => [['a: !!str |', '  x', 'b: &anchor |', '  y'], [1, 3]];
+        yield 'a tab before the comment' => [["a: |\t# comment", '  x'], [1]];
+        yield 'a line inside a block that looks like a header' => [['a: |-', '  b: |', '  c'], []];
+        yield 'a quoted value that looks like a header' => [["a: 'b: |'", 'c: "d: |"'], []];
+    }
+
+    /**
+     * @param list<string> $lines
+     * @param list<int> $expectedLineNumbers
+     */
+    #[Test]
+    #[DataProvider('blockHeaders')]
+    public function theGuardFindsEveryClippedOrKeptBlock(array $lines, array $expectedLineNumbers): void
+    {
+        $this->assertSame($expectedLineNumbers, array_keys(self::findUnstrippedBlocks($lines)));
+    }
+
+    /**
+     * The lines of a block are those after its header that are empty or indented
+     * deeper than the header's key - or, without a key, deeper than the header.
+     * A key after a list dash sits at the column after the dash, which is where
+     * the siblings of that key start, so they are read as headers of their own.
+     *
+     * @param list<string> $lines
      * @return array<int, string> the header lines without strip chomping, by line number
      */
-    private function findUnstrippedBlocks(string $file): array
+    private static function findUnstrippedBlocks(array $lines): array
     {
-        $lines = file($file, FILE_IGNORE_NEW_LINES);
-        $this->assertIsArray($lines);
         $found = [];
         $blockIndent = null;
         foreach ($lines as $index => $line) {
@@ -75,7 +119,7 @@ final class SeedBlockScalarChompingTest extends TestCase
             if (preg_match(self::BLOCK_HEADER, $line, $match) !== 1) {
                 continue;
             }
-            $blockIndent = strlen($match['indent']);
+            $blockIndent = strlen($match['indent']) + (($match['key'] ?? '') !== '' ? strlen($match['dash']) : 0);
             if (!str_contains($match['modifiers'], '-')) {
                 $found[$index + 1] = $line;
             }
