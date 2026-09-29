@@ -241,10 +241,10 @@ while every release reads the seed the same way, and on 2026-09-29 two did not
 (ACE-776).
 
 A literal block without a chomping indicator (`bodytext: |`) is *clipped*: the
-value ends with exactly one newline. symfony/yaml 6.4.45 and 7.4.18 dropped
-that newline when the line after the block was a less indented key or list
-item, and kept it before a sibling key or a comment. 6.4.47 and 7.4.20 keep it
-everywhere, as the specification says. The import of the new releases wrote a
+value ends with exactly one newline. symfony/yaml 6.4.45, 7.4.18 and earlier
+releases dropped that newline when the block ended a mapping nested in a list
+item, such as the `self:` of a seed entity, and the next line was less
+indented. 6.4.47 and 7.4.20 keep it everywhere, as the specification says. The import of the new releases wrote a
 newline more into `tt_content.bodytext`, `tt_content.pi_flexform` and
 `sys_template.constants`, and `SeedManifestTest` failed on both core versions,
 while `SnapshotManifestTest` still passed against the templates the instances
@@ -257,8 +257,9 @@ The rule that keeps it from coming back:
   value no longer depends on the parser. No value of the seed needs a final
   newline. `Build/Scripts/generateLegacyScenario.php` writes the blocks of
   `ScenarioLegacy.yaml` the same way, and the dumper of symfony/yaml writes
-  `|-` into the generated `Scenario.yaml` for every value without a final
-  newline. `SeedBlockScalarChompingTest` fails on a block without `-`.
+  `|-` into the generated `Scenario.yaml` for every block it writes of a value
+  without a final newline. `SeedBlockScalarChompingTest` fails on a block
+  without `-`, in the `.yaml` and the `.yml` files of both sets.
 - **A manifest that drifts while the seed did not change points at a
   dependency**, not at the environment. Compare the `Installing` lines of the
   composer step of the last green and the first red CI run, and parse the seed
