@@ -17,9 +17,9 @@ page 1, because no storage page can be configured.
   the same on every database.
 - An empty source value clears the relation. An unmapped relation is not
   touched.
-- The employee type is not mapped. The documentation shows how a project
-  sets it in a listener of the mapped-profile event that
-  `ace-tbd-fe-user-sync-data-events` adds.
+- The employee type is not mapped. How a project sets it in a listener of
+  the mapped-profile event is documented by `ace-tbd-fe-user-sync-data-events`,
+  which adds that event and is not merged yet.
 
 Only `academic_persons` (`packages/fgtclb/academic-persons`) is affected. The
 behaviour is identical on TYPO3 v13 and v14.
@@ -41,8 +41,8 @@ None.
   which this change depends on.
 - New read queries on organisational units and function types. New records
   only where creation is configured.
-- The employee-type listener recipe in the documentation refers to the event
-  of `ace-tbd-fe-user-sync-data-events`.
+- The employee-type listener recipe moves to
+  `ace-tbd-fe-user-sync-data-events`, which adds the event it needs.
 - No database schema change, and no dependency on `category_types`.
 
 ## Non-goals
@@ -62,7 +62,6 @@ Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-05`). Three of the six analysed projects carry their own code for
 this today: an organisational unit lookup and creation, multi-value relations
 (only partly covered) and an employee-type category lookup, which stays
-project code in a listener. No YouTrack issue is filed yet; the change is
-renamed to `ace-<NNN>-<slug>` when the issue is filed after implementation.
+project code in a listener.
 
-Relates to ACE-278.
+Implements ACE-780. Relates to ACE-278 and ACE-720.

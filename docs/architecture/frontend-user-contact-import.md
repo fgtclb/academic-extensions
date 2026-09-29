@@ -60,6 +60,84 @@ A graph cached before the map existed has no `frontendUserSync`.
 instead of passing for an empty map. The cache identifier stays
 `AcademicPersons_Settings_v3`: it only ever existed on `3.0.0-dev`.
 
+## Contract relations are looked up, never imported
+
+`contract.organisationalUnit` and `contract.functionType` are maps of their
+own - `column`, `matchBy`, `create`, `storagePid` - and the normaliser takes
+them out of the `contract` map before it checks the plain properties. A
+relation with a column becomes a `FrontendUserSyncRelation` in
+`FrontendUserSyncSettings::$relations`. A `matchBy` the relation does not
+offer, `create: true` without a `storagePid`, a `create` that is no boolean and
+a `storagePid` that is no page uid are problems like any other mistake of the
+map, even on a relation without a column: the column may come from another
+package later. The relations count as contract sources for `mapsContract()`,
+`hasContractData()` and `getColumns()`.
+
+`Profile\ContractRelationResolver`, stateless like the mapper, resolves the
+value in two steps:
+
+1. The `QueryBuilder` selects the candidates: `DeletedRestriction` only, so a
+   hidden record is found rather than created again, the default language
+   (`sys_language_uid IN (0, -1)`), the live workspace (`t3ver_wsid = 0`), and
+   `ORDER BY uid`. PHP then takes the first candidate whose field is identical
+   to the value. The database cannot decide that alone: `utf8mb4_unicode_ci`,
+   the collation TYPO3 creates its MySQL and MariaDB tables with, ignores case
+   and accents and compares `'X '` equal to `'X'`. PostgreSQL and SQLite do
+   not, and one value would name different records on different databases.
+2. The Extbase object is loaded by that uid with storage pages, language and
+   enable fields ignored and the default language without overlays pinned,
+   through the persistence manager like
+   `AbstractProfileFactory::findFrontendUserIgnoringVisibility()`. An Extbase
+   query was not used for the lookup itself: it respects storage pages and
+   enable fields unless every setting is switched off, and the matching would
+   still depend on the collation.
+
+A created record is added and **persisted at once**. `updateProfileForUser()`
+maps every profile of a frontend user before it persists them together, so a
+record that is only added is invisible to the lookup for the second profile,
+which would create it again. `persistAll()` writes everything pending in the
+persistence manager at that moment. For the default factory that is the
+profiles of the same user mapped before, and anything it removed. A custom
+factory that adds its profile before it calls `applyContract()` gets the
+profile and its contract written half-built, and completed by its own
+`persistAll()` later. Two runs in parallel are not guarded against each other.
+The commands are meant to run one after the other.
+
+A value longer than the 255 characters of `unit_name`, `unique_name` and
+`function_name` fails the insert on PostgreSQL and on MySQL and MariaDB in
+strict mode, which stops the command. Without strict mode MySQL and MariaDB
+cut it to 255 characters, so it never matches again and is created on every
+run. SQLite stores it whole.
+
+A hidden unit or function type is assigned but loads as `null` when the
+contract is read again: the child query of the relation respects enable
+fields. So every run sets it anew and writes the contract, and a hidden unit
+is taken as newly joined by `AssignContractOrganisationalUnitSorting`, which
+moves the contract to the end of the unit's list. A hidden unit is not
+rendered, so nobody sees that order.
+
+A mapped relation is owned by the synchronisation, like a mapped property: an
+empty value (blanks only included) sets `null` without a lookup, and so does a
+value that matches nothing while `create` is off. An unmapped relation is not
+touched. `hasContractData()` reads a relation value the same way, trimmed, so
+blanks are no contract data and `'0'` is. The employee type has no mapping:
+`employee_type` is a `sys_category` relation without a type restriction,
+`academic_persons` does not require `category_types`, and a title match across
+every category would be ambiguous.
+
+`FrontendUserSyncRelationMappingTest`, with the fixture extension
+`test_frontend_user_sync_relations`, gives every rule a record it can fail on:
+a deleted unit and a new record of a workspace carry the searched unique name
+at a lower uid than the live one, a value only a translation carries has to
+create a new unit, a unit for all languages is found, and the searched
+function name is carried by a lower-case record and two records written in
+descending uid order. `FrontendUserSyncRelationMatchByNameTest` loads the other
+map, `test_frontend_user_sync_relations_by_name`: units matched by name and
+never created, function types created. Without `ORDER BY` PostgreSQL returns
+the tie in write order, and without the PHP comparison MySQL and MariaDB return
+the lower-case record. SQLite can fail neither of the two, so the class belongs
+to the DBMS runs.
+
 ## Visibility does not stop the synchronisation
 
 Both commands ignore the visibility of a record when they select it, and
@@ -160,7 +238,7 @@ installation that needs them corrected has to do so deliberately:
 ## See also
 
 - [Database queries](database-queries.md) — the ordering rule the record match
-  depends on.
+  and the relation lookup depend on.
 - [Dependency injection](dependency-injection.md) — why the shared resolver and
   the mapper are stateless.
 - [Validation settings](validation-settings.md) — the settings graph the map is
