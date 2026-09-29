@@ -58,7 +58,7 @@
 - [x] 5.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.5 `docs/` and the `academic-jobs` `Documentation/` changelog updated,
   `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 5.6 Archive the change as the last commit of the pull request, and
+- [x] 5.6 Archive the change as the last commit of the pull request, and
   verify the requirement landed in
   `openspec/specs/academic-jobs/new-job-notification/spec.md`.
 - [x] 5.7 Backport analysis for branch `2` (`docs/workflow/backporting.md`):
