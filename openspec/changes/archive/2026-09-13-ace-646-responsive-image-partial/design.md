@@ -95,13 +95,13 @@ card and a persons card show the same placeholder.
 
 The card reads the placeholder from `settings.image.placeholder.default` of
 the persons plugins, the key family `image.placeholder.*` that
-`ace-tbd-profile-image-settings` owns, and this change ships
+`ace-778-profile-image-settings` owns, and this change ships
 `EXT:academic_persons/Resources/Public/Images/ProfilePlaceholder.svg` as its
 default. If this change lands first it introduces only that one key;
 the image settings change adds the per-gender siblings next to it. An empty
 value keeps today's cards without an image. The value is an `EXT:` resource
 path only, and a placeholder file that does not exist fails the rendering
-instead of being skipped, as decided in `ace-tbd-profile-image-settings`.
+instead of being skipped, as decided in `ace-778-profile-image-settings`.
 The first draft declared a separate `profileImagePlaceholder` setting, which
 left two settings for one value with contradicting defaults.
 

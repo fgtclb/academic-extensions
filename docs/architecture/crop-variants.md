@@ -3,7 +3,8 @@
 Templates request an image crop by the name of its variant. Three extensions
 configure named variants on the images a template of a site package is most
 likely to crop. The templates of the extensions themselves render `default`
-through the [image partial](shared-partials.md) of `academic_base`.
+through the [image partial](shared-partials.md) of `academic_base`, apart from
+`academic_persons`, which renders the variant a site setting names per view.
 
 | Image                          | Extension           | Variants and aspect ratios                         |
 |--------------------------------|---------------------|----------------------------------------------------|

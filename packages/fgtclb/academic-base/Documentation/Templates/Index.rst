@@ -25,20 +25,26 @@ renders one image of a record for the frontend:
 *   the placeholder as one :html:`<img>` when there is no image, and nothing
     when there is no placeholder either.
 
-A template of an academic extension renders it like this:
+A template of an academic extension renders it like this, here with the
+settings of :guilabel:`EXT:academic_persons` that choose the crop variant and
+the placeholder of its card:
 
 ..  code-block:: html
-    :caption: EXT:academic_persons/Resources/Private/Partials/Profile/Item/Image.html
 
     <f:render
         partial="Academic/Image"
         arguments="{
             image: profile.image,
             preset: 'card',
+            cropVariant: settings.image.card.cropVariant,
             placeholder: settings.image.placeholder.default,
             class: 'academic-persons-item__image card-img-top img-fluid'
         }"
     />
+
+The template of the persons card itself picks the crop variant of its view and
+a placeholder per gender first, see the :guilabel:`Profile image` chapter of
+:guilabel:`EXT:academic_persons`.
 
 ..  _templates-image-arguments:
 

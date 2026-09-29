@@ -34,7 +34,7 @@
       `Partials/Profile/PublicProfile/ProfileImage.html` to the partial, add
       `Resources/Public/Images/ProfilePlaceholder.svg` as the default of
       `settings.image.placeholder.default` (introduce only that key if
-      `ace-tbd-profile-image-settings` has not landed; reuse it if it has,
+      `ace-778-profile-image-settings` has not landed; reuse it if it has,
       and never add a second placeholder setting), and register the
       academic_base partials at key `-1` in the persons and contacts4pages
       views, the contacts view also mapping the placeholder setting; verify

@@ -230,6 +230,31 @@ A component added to `Full` later and missing from the old folder turns it
 red. The same class checks that every file is read once, and that the backend
 form keeps a stored old path.
 
+## A setting is a value or a group, never both
+
+TypoScript constants allow `a.b = x` next to `a.b.c = y`, and so does the flat
+map of site settings: `SiteSettings::getMap()` and `getAllFlat()`, which feed
+the constants, keep both keys side by side. Two other places cannot, on TYPO3
+v13 and v14 alike, and neither of them reports it.
+
+- **The settings tree.** `SiteSettings::create()` builds `getAll()` with
+  `ArrayUtility::setValueByPath()`, which turns a scalar it meets on the way
+  into an empty array before it descends, and a later value on the node
+  itself replaces the array of its children. One of the two is gone from the
+  tree.
+- **A `settings.yaml` in tree form**, which is what the backend settings
+  editor writes. A YAML node is a scalar or a mapping, never both, and
+  `SiteSettingsProvider` hands a definition whose path resolves to a mapping
+  that mapping as its value, then removes the whole subtree, children
+  included.
+
+So a setting that later gains siblings of a more specific kind is named for
+the generic case from the start. The profile image placeholder of
+`academic-persons` is `image.placeholder.default`, not `image.placeholder`,
+because `image.placeholder.mr`, `.ms` and `.diverse` sit next to it. The
+constant keeps the same name, since both mechanisms must declare the same
+paths.
+
 ## Hide by default, enable per component
 
 An extension registers its content elements in TCA for the whole installation —
