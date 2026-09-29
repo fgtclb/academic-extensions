@@ -12,7 +12,7 @@ See `proposal.md` for the motivation. State on `main`:
   `import_identifier`, and `tx_academicpersons_domain_model_organisational_unit`
   has `unit_name`, `unique_name`, `display_text`, `long_text` and
   `import_identifier`. Neither has a `slug` column.
-- `ace-tbd-visitor-filter-demand-query` provides the demand properties
+- `ace-779-visitor-filter-demand-query` provides the demand properties
   `functionTypeFilter` and `organisationalUnitFilter` and the view variable
   `filterOptions`.
 - Route enhancers are never loaded automatically, and an aspect makes a path

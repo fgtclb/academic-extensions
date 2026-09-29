@@ -1,6 +1,6 @@
 ## Why
 
-`ace-tbd-visitor-filter-demand-query` lets the persons list accept a function
+`ace-779-visitor-filter-demand-query` lets the persons list accept a function
 type or organisational unit filter, but a visitor has no way to choose one,
 and the route enhancers only know the page and the letter. One project built
 a dropdown with an inline `onchange` handler and a route file of its own. The
@@ -49,7 +49,7 @@ None.
 - Database: two new columns. Existing records get their slug from the
   command, or on their next save; until then their filter URL uses query
   parameters.
-- Depends on `ace-tbd-visitor-filter-demand-query` and
+- Depends on `ace-779-visitor-filter-demand-query` and
   `ace-734-list-links-keep-state`. Combines with `ace-735-list-view-modes`:
   whichever of the two lands second adds the filter routes with the view
   mode segment.

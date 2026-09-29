@@ -2,7 +2,7 @@
 
 - [x] 1.1 Decide with the maintainer whether this change lands with, or
   directly before, `ace-tbd-list-view-modes` or
-  `ace-tbd-visitor-filter-demand-query`, because its red test needs a second
+  `ace-779-visitor-filter-demand-query`, because its red test needs a second
   visitor value; record the decision in this file.
   Decided: directly before `ace-tbd-list-view-modes`, the order of the
   processing plan, where that change waits for this one. The red test does

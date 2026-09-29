@@ -17,7 +17,8 @@ upstream request.
 - Values outside the editor's restriction, unknown values and non-integer
   values are ignored.
 - The list view receives the filter options, ordered by name, for the form
-  that `ace-tbd-visitor-filter-ui-routes` adds.
+  that `ace-tbd-visitor-filter-ui-routes` adds. The page and letter links keep
+  an active filter.
 - The card plugin, which shares the list FlexForm, hides both options.
 
 Behaviour is identical on TYPO3 v13 and v14. The fields are added to both
@@ -61,9 +62,8 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-12`). Three of the six analysed projects carry their own code
-for this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-visitor-filter-demand-query` when the issue is filed after
-implementation.
+for this today. Filed as ACE-779.
 
-Relates to ACE-18, which this change implements together with
-`ace-tbd-visitor-filter-ui-routes`.
+Relates to ACE-18. That issue asked for a public subset of the persons
+directory and is marked as a duplicate of ACE-20, so this change does not
+implement it.

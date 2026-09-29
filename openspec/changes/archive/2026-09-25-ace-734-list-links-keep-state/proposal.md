@@ -9,7 +9,7 @@ paging.
 On `main` the only visitor values today are the page and the letter, and
 pagination is switched off while a letter is active. The loss therefore
 becomes visible with the changes that add visitor values:
-`ace-tbd-list-view-modes` (view mode) and `ace-tbd-visitor-filter-demand-query`
+`ace-tbd-list-view-modes` (view mode) and `ace-779-visitor-filter-demand-query`
 (filters). This change provides the mechanism both rely on.
 
 ## What Changes
