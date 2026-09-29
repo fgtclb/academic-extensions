@@ -241,6 +241,43 @@ with `assertCSVDataSet()` (14 call sites). Fixtures of a plugin test live in a
 `Fixtures/<TestClassName>/` folder beside it, one file per scenario, which keeps
 a fixture from being quietly reused by a test it was not written for.
 
+## A mail that cannot be sent
+
+The mail configuration and the log writers are part of the configuration of
+the test instance. Every frontend request of the testing framework bootstraps
+again from it, so a value changed at runtime is gone by the time the plugin
+sends: one test class per configuration.
+
+- **A failing transport** is a class of the tests that implements Symfony's
+  `TransportInterface` and throws from `send()`, selected by its class name as
+  `MAIL.transport`. Core instantiates it with the mail settings as the only
+  argument, on TYPO3 v12 and v13. The `null` transport sends nothing and
+  reports every mail as sent.
+- **An address** that fails needs no transport of its own: an empty recipient
+  or sender fails while the mail is built.
+- **The log** is read from a file writer configured for the logger of the class
+  under test, under `LOG` with the class name as the path. The writer keeps its
+  file open across the requests of a class, so `setUp()` truncates the file
+  rather than deleting it.
+- **The form is posted** with its hidden fields. The testing helper of this
+  branch has no helper for a post, so the test sets the encoded body and the
+  parsed body of the `InternalRequest` itself. TYPO3 v12 and v13 send the
+  redirect a plugin action returns with `header()` and answer 200.
+- **The messages of the form** are queued in the session of the visitor. The
+  test takes the `fe_typo_user` cookie from the answer to the post, sends it
+  with `withCookieParams()` on the next request, and renders the queue with
+  `f:flashMessages` in a `COA_INT` on the page it requests. The queue is named
+  `extbase.flashmessages.<plugin namespace>`.
+- **A post that fails** ends the test with the exception that left the
+  plugin. A test that expects an error catches it around the post only and
+  rethrows any other exception, because a failed assertion of PHPUnit is a
+  `RuntimeException` too.
+
+[`AbstractAcademicJobsFailingNotificationMailTestCase`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AbstractAcademicJobsFailingNotificationMailTestCase.php)
+is the example, and its test classes cover a failing transport, an empty
+recipient and sender, a recipient that cannot be parsed, and the warning the
+visitor sees.
+
 ## Version-gated tests
 
 Three mechanisms coexist, and they are not interchangeable:
