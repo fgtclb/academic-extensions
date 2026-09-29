@@ -45,4 +45,4 @@
   `README.md` and `CONTRIBUTING.md` still only summarize and link.
 - [x] 5.4 What is left out is stated in the pull request: the missing mail
   template of `main`, which has no counterpart here.
-- [ ] 5.5 Archive the change as the last commit of the pull request.
+- [x] 5.5 Archive the change as the last commit of the pull request.
