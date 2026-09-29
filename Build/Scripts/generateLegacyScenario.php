@@ -369,7 +369,10 @@ function emitField(array &$lines, int $indent, string $key, mixed $value): void
 {
     $pad = str_repeat(' ', $indent);
     if (is_string($value) && str_contains($value, "\n")) {
-        $lines[] = $pad . $key . ': |';
+        // Strip chomping, stated rather than implied: a clipped block ("|") gains
+        // or loses its final newline depending on the symfony/yaml release that
+        // reads it (ACE-776), and the value is written without one anyway.
+        $lines[] = $pad . $key . ': |-';
         foreach (explode("\n", rtrim($value, "\n")) as $line) {
             $lines[] = rtrim($pad . '  ' . $line);
         }

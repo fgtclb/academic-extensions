@@ -206,7 +206,7 @@
                 "tx_academicstudyplan_semesters",
                 "uid"
             ],
-            "checksum": "c029553a23e51c9a071a6064d666cb7905eb30fe"
+            "checksum": "3dac1f453d9803f967b5c2864a1811bb6d10cfb5"
         },
         "tx_academiccontacts4pages_domain_model_contact": {
             "rows": 44,
@@ -338,7 +338,7 @@
                 "valid_from",
                 "valid_to"
             ],
-            "checksum": "39ddb930970bb96681506f9640a27aa321fcc0de"
+            "checksum": "1729d4fef87780e5cc1ea43181d18f766bb4e63e"
         },
         "tx_academicpersons_domain_model_email": {
             "rows": 36,
