@@ -54,10 +54,16 @@ notifications of EXT:backend, the install tool and EXT:workspaces catch
 
 `sendEmail()` wraps building and sending the mail, and catches
 `Symfony\Component\Mime\Exception\RfcComplianceException`,
+`Symfony\Component\Mime\Exception\InvalidArgumentException`,
 `Symfony\Component\Mailer\Exception\TransportExceptionInterface` and
 `TYPO3Fluid\Fluid\Exception`, logs, and returns `false`. The first covers an
 empty or invalid recipient or sender, as core's login notification catches
-it. The Fluid base
+it. The second is its sibling, not its parent, and covers an address that
+cannot be parsed at all, such as a display name without its closing `>`, and
+one with a control character. Its common interface
+`Symfony\Component\Mime\Exception\ExceptionInterface` is not caught, since it
+also covers the `LogicException` of a missing email validator, a setup
+defect. The Fluid base
 class covers a template that cannot be found (`InvalidTemplateResourceException`,
 verified on Fluid 4.6.1 and 5.3.2) and a template that cannot be parsed or
 rendered.
@@ -98,14 +104,15 @@ configuration is fixed per test instance (see `docs/testing/functional-tests.md`
 "Reading a sent mail").
 
 The unknown template case reuses the `mbox` test base of ACE-370 with
-`email.templateName` set to a name no path holds, and the address case with
-`email.recipientEmail` set to an empty value.
+`email.templateName` set to a name no path holds, and the address cases with
+`email.recipientEmail` and `email.from` set to an empty value.
 
-What the tests assert: the job row exists, the request ends in the redirect of
-a saved job (303 on TYPO3 v14, a 200 without an error on v13, which sends a
-returned redirect with `header()`), the rendered result carries no exception,
+What the tests assert: the job row exists, no exception leaves the plugin,
 and one log entry of level error names the uid. The log is read from a file
-writer configured for the controller's logger in the test instance.
+writer configured for the controller's logger in the test instance. The
+redirect of a saved job is asserted in a test for TYPO3 v14 only, since v13
+sends a returned redirect with `header()` and answers 200 with the rest of the
+page.
 
 ## Risks / Trade-offs
 

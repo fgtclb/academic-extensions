@@ -376,6 +376,39 @@ record rather than the status.
 is the worked example, with a test class for the shipped template and one that
 registers a mail template path of its own.
 
+### A mail that cannot be sent
+
+A mail that fails is tested with the mail configuration too, one class per
+configuration:
+
+- **A failing transport** is a class of the tests that implements Symfony's
+  `TransportInterface` and throws from `send()`, selected by its class name as
+  `MAIL.transport`. Core instantiates it with the mail settings as the only
+  argument, on TYPO3 v13 and v14.
+- **An address or a template** that fails needs no transport of its own. An
+  empty recipient or sender fails while the mail is built, a template name no
+  path holds fails while the `mbox` transport renders it.
+- **The log** is read from a file writer configured for the logger of the class
+  under test, under `LOG` with the class name as the path. The writer keeps its
+  file open across the requests of a class, so `setUp()` truncates the file
+  rather than deleting it.
+- **The messages of the form** are queued in the session of the visitor. The
+  test takes the `fe_typo_user` cookie from the answer to the post, sends it
+  with `withCookieParams()` on the next request, and renders the queue with
+  `f:flashMessages` in a `COA_INT` on the page it requests. The queue is named
+  `extbase.flashmessages.<plugin namespace>`. Only TYPO3 v14 answers the post
+  with the redirect, so only a `not-core-13` test follows it.
+- **A post that fails** ends the test with the exception that left the
+  plugin. A test that gets a response therefore knows that nothing did, and
+  one that expects an error catches it around the post only and rethrows any
+  other exception, because a failed assertion of PHPUnit is a
+  `RuntimeException` too.
+
+[`AbstractAcademicJobsFailingNotificationMailTestCase`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AbstractAcademicJobsFailingNotificationMailTestCase.php)
+is the example, and its test classes cover a failing transport, an empty
+recipient and sender, a recipient that cannot be parsed, a missing template,
+the warning the visitor sees, and the redirect on TYPO3 v14.
+
 ## Version-gated tests
 
 Three mechanisms coexist, and they are not interchangeable:
