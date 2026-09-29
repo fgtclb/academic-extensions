@@ -20,8 +20,9 @@ fields.
 - **THEN** neither field is offered
 
 ### Requirement: Visitors see the application link on the program page
-A program page with an application link SHALL render a link to its target,
-labelled with the label the editor entered.
+A program page with an application link SHALL render a link to its target
+when the target can be linked, labelled with the label the editor entered or
+with a translated default label.
 
 #### Scenario: Link and label set
 - **WHEN** the application link points to page 5 and the label is
@@ -35,6 +36,10 @@ labelled with the label the editor entered.
 #### Scenario: Link left empty
 - **WHEN** the application link is empty
 - **THEN** the program page renders no application link, whatever the label
+
+#### Scenario: Link target cannot be linked
+- **WHEN** the application link points to a page that is hidden
+- **THEN** the program page renders neither a link nor its label
 
 ### Requirement: Templates can render the application link
 The application link and its label SHALL be available to template overrides

@@ -102,14 +102,24 @@ differ per extension.
 
 ## Partials as the override seam
 
-The section renders `Program/Page/Header`, `Media`, `Facts` and `Content`, the
-rule of [Overridable partials](overridable-partials.md) applied to a page
-template: a project that changes one part overrides one file. `Facts` renders
-`Program/Facts`, which the details content element and the program card render
-as well. The header
+The section renders `Program/Page/Header`, `Media`, `CallToAction`, `Facts` and
+`Content`, the rule of [Overridable partials](overridable-partials.md) applied
+to a page template: a project that changes one part overrides one file.
+`Facts` renders `Program/Facts`, which the details content element and the
+program card render as well. The header
 renders one element of its own (`academic-programs-detail__header`), because it
 sits in a reversed flex column with the media and several siblings there would
 be reordered.
+
+`CallToAction` renders the application link of the page (ACE-777) after that
+column, not inside the header: a project that overrides the header keeps the
+link. Like the link back to the list in the header, it resolves the URL first
+and renders nothing when the target cannot be linked, because
+`f:link.typolink` would leave the bare label on the page. It reads nothing but
+`program`, so a list item override renders the same partial, and its class is
+therefore the block `academic-programs-application` rather than an element of
+`academic-programs-detail`, see
+[Classes are added, never moved](overridable-partials.md#classes-are-added-never-moved).
 
 ## Tests
 
@@ -122,7 +132,8 @@ the page template runs the compiled class, at the latest the second program
 page of the layout setting test; in a run of the whole class an earlier test
 has compiled it already.
 `AcademicProgramPageTemplateTest.php` next to it keeps the template name, the
-media, the content variable and the site package's partial root paths.
+media, the content variable and the site package's partial root paths, and
+`AcademicProgramApplicationLinkTest.php` the application link.
 
 ## See also
 
