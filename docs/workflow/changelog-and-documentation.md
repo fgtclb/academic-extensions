@@ -49,6 +49,14 @@ eight changelog entries.
 `Documentation/` folder — so it is not maintained by hand. See
 [Releasing](releasing.md).
 
+It also carries the links docs.typo3.org puts on every page. "Edit on GitHub"
+is built from `edit-on-github`, `edit-on-github-branch` and
+`edit-on-github-directory`, and has to lead to this mono repository, to the
+branch the file lives on and to the package's own `Documentation/` directory.
+`project-repository` names the split repository and `project-home` the
+extension in the TER. A unit test holds all five, see
+[Unit tests](../testing/unit-tests.md#the-links-of-the-manuals).
+
 The extension key is not always the directory name: `academic-contact4pages`
 ships `academic_contacts4pages`. The manual's `Index.rst` states the key, the
 directory does not.

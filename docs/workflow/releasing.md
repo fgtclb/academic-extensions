@@ -99,6 +99,12 @@ rehearse a bump. `--source-branch=<name>` only selects which
 `extra.branch-alias.dev-<branch>` key is written; it defaults to `main`, so a
 release on branch `2` must pass `--source-branch=2`.
 
+Cutting a new version branch changes one thing neither script writes: the
+`edit-on-github-branch` of every `Documentation/guides.xml`, which names the
+branch the manual is edited on. The branch alias and those attributes have to
+agree, and a unit test fails until they do, see
+[Unit tests](../testing/unit-tests.md#the-links-of-the-manuals).
+
 ## `bin/release` — orchestrate the release
 
 ```shell
