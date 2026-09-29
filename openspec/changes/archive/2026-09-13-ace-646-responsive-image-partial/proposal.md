@@ -24,7 +24,7 @@ the version it copied.
   ships a neutral placeholder that the card shows for a profile without an
   image; an integrator replaces or disables the placeholder through the
   setting `image.placeholder.default`, the one placeholder key the image
-  settings change (`ace-tbd-profile-image-settings`) owns.
+  settings change (`ace-778-profile-image-settings`) owns.
 - academic_contacts4pages (`packages/fgtclb/academic-contact4pages`) renders
   the persons item partial, so its view registers the academic_base partials
   too and hands the placeholder setting to it.
@@ -67,7 +67,7 @@ None.
   academic_projects and academic_jobs (candidate `cross-cutting-02`).
 - Defining crop variants in TCA (candidate `cross-cutting-03`).
 - A gendered or per-profile placeholder; the per-gender siblings of the
-  placeholder key belong to `ace-tbd-profile-image-settings`.
+  placeholder key belong to `ace-778-profile-image-settings`.
 - A placeholder setting of its own next to `image.placeholder.default`.
 - Backporting to branch `2`, where webp output is rejected on TYPO3 v12
   (ACE-303).

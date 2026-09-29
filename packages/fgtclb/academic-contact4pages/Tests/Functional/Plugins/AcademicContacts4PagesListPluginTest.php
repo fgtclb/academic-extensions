@@ -50,6 +50,8 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->addCoreExtensionsToLoad('typo3/cms-fluid-styled-content');
         // Stays inert until a test includes the TypoScript that registers its partial path.
         $this->addTestExtensionsToLoad('tests/test-profile-partial-overrides');
+        // Ships the placeholders the image settings test reads.
+        $this->addTestExtensionsToLoad('tests/test-profile-placeholders');
         parent::setUp();
     }
 
@@ -825,6 +827,57 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
             'Images/ProfilePlaceholder.svg',
             (string)$this->nodes($xpath, './/img', $withoutImage)->item(0)?->attributes?->getNamedItem('src')?->nodeValue,
         );
+    }
+
+    /**
+     * @return \Generator<string, array{0: string, 1: string, 2: string}>
+     */
+    public static function genderDataProvider(): \Generator
+    {
+        yield 'mr' => ['mr', 'PlaceholderForGenderMr', 'PersonMr.svg'];
+        yield 'ms' => ['ms', 'PlaceholderForGenderMs', 'PersonMs.svg'];
+        yield 'diverse' => ['diverse', 'PlaceholderForGenderDiverse', 'PersonDiverse.svg'];
+    }
+
+    /**
+     * The contacts view renders the item of EXT:academic_persons, so it follows the image
+     * settings of the persons plugins the way a list does: the list crop variant, and the
+     * placeholder of the profile's gender. The fixture image is 600 x 800 pixels, its
+     * `default` crop area 600 x 720 and its square crop area 600 x 600. The placeholders are
+     * the ones the persons tests use, from the fixture extension "test_profile_placeholders".
+     */
+    #[DataProvider('genderDataProvider')]
+    #[Test]
+    public function listPluginFollowsTheImageSettingsOfTheProfileList(string $gender, string $constants, string $fileName): void
+    {
+        $this->setUpTestCase(
+            'contactsListPage_profileImageSettings',
+            [
+                'EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/ProfileImageSettings.typoscript',
+                'EXT:academic_persons/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/' . $constants . '.typoscript',
+            ],
+        );
+        $this->getConnectionPool()
+            ->getConnectionForTable('tx_academicpersons_domain_model_profile')
+            ->update('tx_academicpersons_domain_model_profile', ['gender' => $gender], ['uid' => 2]);
+        $folder = $this->instancePath . '/fileadmin/images';
+        GeneralUtility::mkdir_deep($folder);
+        copy(__DIR__ . '/Fixtures/Files/portrait.jpg', $folder . '/portrait.jpg');
+
+        $document = new \DOMDocument();
+        $document->loadHTML($this->renderHomePage(), LIBXML_NOERROR);
+        $xpath = new \DOMXPath($document);
+        $cards = $this->nodes($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-persons-item ')]");
+        $this->assertSame(2, $cards->length);
+
+        $imageQuery = './/img[contains(concat(\' \', normalize-space(@class), \' \'), \' academic-persons-item__image \')]';
+        $image = $this->nodes($xpath, $imageQuery, $cards->item(0))->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $image);
+        $this->assertSame(['600', '600'], [$image->getAttribute('width'), $image->getAttribute('height')]);
+
+        $placeholder = $this->nodes($xpath, $imageQuery, $cards->item(1))->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $placeholder);
+        $this->assertStringEndsWith('Images/' . $fileName, $placeholder->getAttribute('src'));
     }
 
     /**

@@ -1,0 +1,3 @@
+# The list crop variant of the persons plugins. The contacts view renders the item of
+# EXT:academic_persons and follows it.
+plugin.tx_academicpersons.image.list.cropVariant = square

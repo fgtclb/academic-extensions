@@ -64,8 +64,9 @@ a page object that renders `Job/Item` finds that partial — and would then fail
 on the `Academic/Image` it renders.
 
 The contacts plugin renders `Profile/Item` with its own settings, so its setup
-also maps `settings.image.placeholder.default` from the persons constant — the
-same way it maps `detailPid`.
+also maps the list crop variant and the placeholders from the persons
+constants, the same way it maps `detailPid`. See
+[below](#crop-variant-and-placeholder-are-chosen-by-the-caller).
 
 A view that renders the partial without the path fails with a Fluid
 `InvalidTemplateResourceException`. That applies to a project that replaces the
@@ -106,6 +107,31 @@ extension is a deploy error a functional test catches, while a skipped one
 would hide it. `academic_persons` ships `Resources/Public/Images/ProfilePlaceholder.svg`
 as the default of `plugin.tx_academicpersons.image.placeholder.default`.
 
+## Crop variant and placeholder are chosen by the caller
+
+The partial takes `cropVariant` and `placeholder` as plain arguments and reads
+no setting itself, so every extension decides where they come from. In
+`academic_persons` they are site settings: a crop variant per view
+(`image.list`, `image.card`, `image.detail`) and a placeholder per gender next
+to the default one. `Profile/Item/Image.html` picks the gender placeholder when
+the profile has a gender and that setting is not empty, and the default one
+otherwise.
+
+All six persons content elements share one settings array, so the item image
+cannot tell the card from the list by its settings. The card template passes
+`imageView: 'card'` down through `Profile/List/Items` and `Profile/Item`, and
+a caller that passes nothing gets `list`. A project copy of one of those three
+templates made before the argument existed therefore renders the list crop
+variant in its card. The contacts element of `academic_contacts4pages` renders
+the same item with plugin settings of its own, and maps the list crop variant
+and the placeholders of the persons constants into them, so a contact keeps
+looking like a listed profile.
+
+An image without a crop stored for the requested variant renders uncropped,
+not with its `default` crop. The frontend editor of `academic_persons_edit`
+stores no crop area, so its images never carry `square` or `portrait`. With
+its default cropper render type it crops the file itself before the upload.
+
 ## Tests
 
 - `academic-base/Tests/Functional/Partials/` renders the partial through a
@@ -117,8 +143,12 @@ as the default of `plugin.tx_academicpersons.image.placeholder.default`.
 - `academic-persons/Tests/Functional/Plugins/AcademicPersonsProfileImageRenderingTest.php`
   covers the card, the public profile, the placeholder setting, the shown
   fields and the project override.
+  `AcademicPersonsProfileImageSettingsTest.php` next to it covers the crop
+  variant per view, told apart by the dimensions of the processed image, the
+  gender placeholders, a placeholder of another extension and a missing one.
 - `academic-contact4pages/Tests/Functional/Plugins/AcademicContacts4PagesListPluginTest.php`
-  covers the contacts card, which fails without the path.
+  covers the contacts card, which fails without the path, and the list crop
+  variant and gender placeholder it takes over from the persons settings.
 - `academic-{partners,programs,projects,jobs}/Tests/Functional/Plugins/Academic*ImageRenderingTest.php`
   cover the list items of those four extensions, and
   `academic-{partners,programs,projects}/Tests/Functional/Pages/Academic*PageTemplateTest.php`

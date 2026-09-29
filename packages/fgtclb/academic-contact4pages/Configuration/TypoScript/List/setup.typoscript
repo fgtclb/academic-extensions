@@ -1,9 +1,17 @@
 plugin.tx_academiccontacts4pages {
   settings {
     detailPid = {$plugin.tx_academicpersons.detailPid}
-    # "Profile/Item" of EXT:academic_persons reads the placeholder from the plugin settings,
-    # which are the settings of this plugin here.
-    image.placeholder.default = {$plugin.tx_academicpersons.image.placeholder.default}
+    # "Profile/Item" of EXT:academic_persons reads the list crop variant and the placeholders
+    # from the plugin settings, which are the settings of this plugin here.
+    image {
+      list.cropVariant = {$plugin.tx_academicpersons.image.list.cropVariant}
+      placeholder {
+        default = {$plugin.tx_academicpersons.image.placeholder.default}
+        mr = {$plugin.tx_academicpersons.image.placeholder.mr}
+        ms = {$plugin.tx_academicpersons.image.placeholder.ms}
+        diverse = {$plugin.tx_academicpersons.image.placeholder.diverse}
+      }
+    }
     # "Profile/Contract/Field" of EXT:academic_persons reads the phone link prefix from the
     # same place, so a contact rendered here gets the link target a profile gets there.
     phoneNumbers.telPrefix = {$plugin.tx_academicpersons.phoneNumbers.telPrefix}

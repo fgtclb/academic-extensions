@@ -45,10 +45,15 @@ extensions sort their elements into.
     The setup of this extension reads
     :typoscript:`{$plugin.tx_academicpersons.detailPid}` — a constant this
     extension does not declare and that belongs to
-    :guilabel:`EXT:academic_persons`. Two further constants of that extension
-    are mapped the same way, because the partials rendering a contact read
-    them: the image placeholder
-    :typoscript:`{$plugin.tx_academicpersons.image.placeholder.default}` and
+    :guilabel:`EXT:academic_persons`. Further constants of that extension are
+    mapped the same way, because the partials rendering a contact read them:
+    the crop variant of the lists
+    :typoscript:`{$plugin.tx_academicpersons.image.list.cropVariant}`, the
+    image placeholders
+    :typoscript:`{$plugin.tx_academicpersons.image.placeholder.default}`,
+    :typoscript:`{$plugin.tx_academicpersons.image.placeholder.mr}`,
+    :typoscript:`{$plugin.tx_academicpersons.image.placeholder.ms}` and
+    :typoscript:`{$plugin.tx_academicpersons.image.placeholder.diverse}`, and
     the phone link prefix
     :typoscript:`{$plugin.tx_academicpersons.phoneNumbers.telPrefix}`.
 
