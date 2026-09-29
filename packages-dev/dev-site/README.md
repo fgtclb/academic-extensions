@@ -30,7 +30,7 @@ A set is addressed by its identifier, never by a filesystem path: the command
 looks for a `Configuration/DataFactory/<identifier>/config.yml` in every active
 extension, which resolves inside DDEV and on a host stack alike.
 
-Two rules the definition follows, both of which matter when changing it:
+Three rules the definition follows, all of which matter when changing it:
 
 - **It declares uids**, because the committed site configurations point at
   `rootPageId: 1` and the plugins name their pages and records by uid. A
@@ -39,6 +39,12 @@ Two rules the definition follows, both of which matter when changing it:
 - **It expects an empty page tree.** Seeding on top of an existing tree collides
   rather than adding, so a seed run belongs to a freshly set up instance — see
   [Rebuilding an instance from nothing](../../docs/development/environment.md#rebuilding-an-instance-from-nothing).
+- **Every multi-line value is a block with strip chomping**, `|-` and never a
+  plain `|`. A plain block keeps or loses its final newline depending on the
+  release of `symfony/yaml` that reads it, so the same file imported different
+  content into the test instances and the development instances (ACE-776). A
+  unit test rejects a block without `-`, see
+  [The YAML parser](../../docs/testing/seed-verification.md#the-yaml-parser).
 
 ## The TypoScript of the instances
 
