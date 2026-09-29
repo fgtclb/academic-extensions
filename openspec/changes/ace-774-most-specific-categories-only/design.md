@@ -34,10 +34,23 @@ See `proposal.md` - Why. Verified on main:
 
 `CategoryCollection::getMostSpecificCategoriesByType(): array` returns the
 same shape as `getAllCategoriesByType()`, without every category that is the
-ancestor of another category of the same type in the collection. It builds a
-uid-to-parent map of the attached categories once and walks each category's
-parents through that map, stopping at a uid that is not attached, at a cycle
-or at the root.
+ancestor of another category of the same type in the collection. The
+collection is keyed by uid already, so it walks each category's parents
+through its own entries, stopping at a uid that is not attached, at the root
+or at a uid it has already passed.
+
+A parent chain that leads back to the category it started from is a cycle, in
+which every category is the ancestor of every other one. Hiding them for that
+would leave the whole fact empty, so a walk that returns to its start hides
+nothing. A category below a cycle still hides the cycle.
+
+The walk reads `Category::getParentId()`, the parent of the overlaid row. The
+core copies `parent` into a translation as it is
+(`DataHandler::copyRecord_processManyToMany()` only localizes references with
+`localizeReferencesAtParentLocalization`, which `sys_category.parent` does not
+set), so a translation points at the default language parent, whose uid is the
+uid the collection holds. An editor who changes a translation's parent changes
+the hierarchy for that language.
 
 Rejected: the rootline query per category, which costs one query per level,
 category and program - a list of 20 programs pays for it on every render.
@@ -48,17 +61,30 @@ settings, not portable between instances (one project's
 
 ### Same type only
 
-A parent of another type stands for another fact row; hiding it would drop a
-whole fact. The walk therefore only considers ancestors whose type equals
-the category's type.
+A parent of another type stands for another fact row, and hiding it would
+drop a whole fact. The walk therefore only hides ancestors whose type equals
+the category's type. It still passes a parent of another type, so an ancestor
+of the same type above it is found.
 
 ### One boolean setting in academic_programs
 
 `plugin.tx_academicprograms.facts.mostSpecificOnly` (bool, default false), in
 the same `settings.definitions.yaml` and constants as the facts fields of
-`ace-733-program-facts-field-list`, reaching the page through the
-`program-data` processor option and the plugins through their settings. The
-facts builder switches the collection method.
+`ace-733-program-facts-field-list`. It reaches the page through the
+`program-data` processor option `factsMostSpecificOnly`, the details element
+through `settings.facts.mostSpecificOnly`, and the card through the new
+argument `mostSpecificOnly` of `<ace:program.facts>`, which
+`Partials/Program/Item.html` hands `settings.facts.mostSpecificOnly`.
+`ProgramFactsBuilder::build()` takes it as an optional fourth argument and
+switches the collection method.
+
+The card reads the facts switch rather than a `card.` setting of its own, so a
+program shows the same categories in all three places. An override of
+`Program/Item.html` that calls the view helper without the argument keeps
+showing every category on the card, which the changelog says.
+
+`category_types` gets a Feature changelog of its own for the new public method
+of the `@api` collection.
 
 Rejected: `academicPrograms.facts.mostSpecificOnly` as the candidate
 proposed; the repository's settings are keyed by the constant path.

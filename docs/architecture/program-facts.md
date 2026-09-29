@@ -50,6 +50,39 @@ never sorts them, so a change to the order of the registry — a priority, an
 extension that registers a type — reaches the facts without a line here.
 A list that names types keeps the order it names them in.
 
+## Only the most specific category
+
+`plugin.tx_academicprograms.facts.mostSpecificOnly` makes the builder take the
+categories from `CategoryCollection::getMostSpecificCategoriesByType()` of
+`category_types` instead of `getAllCategoriesByType()`. The switch reaches the
+three callers the way the field lists do: the processor option
+`factsMostSpecificOnly`, `settings.facts.mostSpecificOnly` in the details
+controller, and the argument `mostSpecificOnly` of `<ace:program.facts>`, which
+the card hands `settings.facts.mostSpecificOnly`. The card uses the facts
+switch rather than one of its own, so a program shows the same categories in
+all three places.
+
+The collection method leaves out every category that is an ancestor of another
+category of the same type in the collection. It walks up through the parents of
+the attached categories only, without a query: a list of twenty programs would
+otherwise pay one rootline query per level, category and program on every
+render. The price is that a level which is not assigned breaks the line, which
+is fine for the two-level degree hierarchies the analysed projects use. A
+parent of another type is kept, because it is another fact, and the walk passes
+it, so an ancestor of the same type above it is still found. A parent chain
+that leads back to itself hides nothing of its own, since each of its categories
+would otherwise hide the others and leave the fact empty.
+
+The walk reads `Category::getParentId()`, which is the parent of the category
+in the rendered language. The core copies the parent into a translation as it
+is, so it points at the default language parent and the walk finds it. An
+editor who points a translation at another parent changes the hierarchy for
+that language.
+
+The setting is programs only. The workarounds the analysis found all hide a
+parent degree, and none of the partner or project listings asks for it. With the
+method in `category_types`, extending it later costs a setting per extension.
+
 ## One partial per row
 
 `Partials/Program/Facts.html` renders the list and `Partials/Program/Facts/Item.html`
@@ -79,6 +112,11 @@ the rich text rendered raw are asserted on their own.
 `Tests/Unit/Service/ProgramFactsBuilderTest.php` covers the list rules, a type
 order that is not the registry's included, and
 `Tests/Functional/Imaging/FactIconsTest.php` the credit points icon.
+`Tests/Functional/Facts/ProgramFactsMostSpecificCategoryTest.php` renders the
+three places with a parent and a child degree assigned, with the setting off
+and on, as a constant and as a site setting, renders a translated program page,
+and filters the list by the parent either way. The walk itself is covered in
+`typo3-category-types/Tests/Unit/Collection/CategoryCollectionTest.php`.
 
 ## See also
 
