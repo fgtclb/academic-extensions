@@ -50,4 +50,4 @@
 - [x] 5.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.5 `docs/` and the `Documentation/` changelog entry are part of the
   change. `README.md` and `CONTRIBUTING.md` still only summarize.
-- [ ] 5.6 Archive the change as the last commit of the pull request.
+- [x] 5.6 Archive the change as the last commit of the pull request.
