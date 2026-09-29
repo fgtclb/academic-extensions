@@ -155,6 +155,35 @@ hash, because the list action is cacheable. The mechanism is its own.
   off while a letter is selected. Lifting that, and the route set that goes
   with it, is a change of its own.
 
+## The links of the job list
+
+The job list of `academic_jobs` paginates the same way as the partner list: a
+FlexForm sheet "Pagination", the fallbacks of results per page and number of
+links, and `QueryResultPaginator` with `NumberedPagination` or
+`SimplePagination`. Its links are simpler, because the list has no filter and
+no demand. The job type and whether hidden jobs show come from the content
+element, so a page link carries the page and nothing else, as the plugin
+argument `tx_academicjobs_list[currentPage]`.
+
+- **The action reads the page itself**, not as an argument of its signature.
+  A value that is no integer would fail the argument validation, and a POST
+  reaches every list without a cache hash, so any job list could be turned
+  into an error page. The action takes such a value, and one below 1, as the
+  first page, as the demand factory of the partner list does. The paginator
+  clamps a page beyond the last one.
+- **The page is part of the cache hash.** There is no exclusion for the job
+  list namespace, so every page of a list is a page cache entry of its own
+  around the placeholder of the non-cacheable action. A visitor cannot add
+  entries: only the list builds a valid `cHash`, and it builds one per page it
+  has. The partner list excludes its demand for a reason the job list does not
+  have, a redirect that would hand out a hash for any selection.
+- **No demand, no event.** The page is not part of anything a listener sees
+  before the query. A listener of the plugin view event finds `paginator` and
+  `pagination` in the view, next to `jobs`. The paginator is built before that
+  event, so a listener that replaces `jobs` changes nothing a paginated list
+  renders. The profile list behaves the same, see
+  [Plugin view event](plugin-view-event.md).
+
 ## The demand is not part of the cache hash
 
 A page with a non-cacheable plugin is still page-cached — the page around the
