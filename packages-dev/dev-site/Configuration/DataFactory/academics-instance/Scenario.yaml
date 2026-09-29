@@ -682,7 +682,6 @@ entities:
                         office_hours: |
                           Mo. 09:00 - 11:00
                           Thu. 14:00 - 16:00
-                        publish: 1
                         email_addresses: '1,17'
                         phone_numbers: '1,14'
                         physical_addresses: '1,7'
@@ -697,7 +696,6 @@ entities:
                             office_hours: |
                               Mo. 09:00 - 11:00
                               Do. 14:00 - 16:00
-                            publish: 1
                             email_addresses: '501,517'
                             phone_numbers: '501,514'
                             physical_addresses: '501,507'
@@ -708,7 +706,6 @@ entities:
                         location: 3
                         position: 'Professor for Accessibility'
                         room: '405'
-                        publish: 1
                         email_addresses: '2'
                         phone_numbers: '2,17'
                     languageVariants:
@@ -718,7 +715,6 @@ entities:
                             location: 3
                             position: 'Professur für Barrierefreiheit'
                             room: '405'
-                            publish: 1
                             email_addresses: '502'
                             phone_numbers: '502,517'
                   - self:
@@ -728,7 +724,6 @@ entities:
                         location: 1
                         position: 'Lecturer for Integration'
                         room: '201'
-                        publish: 1
                         email_addresses: '3'
                         phone_numbers: '3'
                         physical_addresses: '2'
@@ -740,7 +735,6 @@ entities:
                             location: 1
                             position: 'Dozent für Integration'
                             room: '201'
-                            publish: 1
                             email_addresses: '503'
                             phone_numbers: '503'
                             physical_addresses: '502'
@@ -752,7 +746,6 @@ entities:
                         position: 'Professor for Data Science'
                         room: '310'
                         office_hours: 'Tue. 10:00 - 12:00'
-                        publish: 1
                         email_addresses: '4,18'
                         phone_numbers: '4,15'
                         physical_addresses: '8'
@@ -764,7 +757,6 @@ entities:
                             position: 'Professur für Data Science'
                             room: '310'
                             office_hours: 'Di. 10:00 - 12:00'
-                            publish: 1
                             email_addresses: '504,518'
                             phone_numbers: '504,515'
                             physical_addresses: '508'
@@ -774,7 +766,6 @@ entities:
                         function_type: 3
                         location: 2
                         position: 'Head of Applied Statistics'
-                        publish: 1
                         email_addresses: '5'
                         phone_numbers: '5'
                         physical_addresses: '3'
@@ -784,7 +775,6 @@ entities:
                             language: 1
                             location: 2
                             position: 'Leitung Angewandte Statistik'
-                            publish: 1
                             email_addresses: '505'
                             phone_numbers: '505'
                             physical_addresses: '503'
@@ -795,7 +785,6 @@ entities:
                         location: 3
                         position: 'Lecturer for Media Theory'
                         room: '112'
-                        publish: 1
                         email_addresses: '6'
                         phone_numbers: '6'
                     languageVariants:
@@ -805,7 +794,6 @@ entities:
                             location: 3
                             position: 'Dozent für Medientheorie'
                             room: '112'
-                            publish: 1
                             email_addresses: '506'
                             phone_numbers: '506'
                   - self:
@@ -816,7 +804,6 @@ entities:
                         position: 'Professor for Web Engineering'
                         room: '406'
                         office_hours: 'Wed. 13:00 - 15:00'
-                        publish: 1
                         email_addresses: '7'
                         phone_numbers: '7,16'
                         physical_addresses: '4'
@@ -828,7 +815,6 @@ entities:
                             position: 'Professur für Web Engineering'
                             room: '406'
                             office_hours: 'Mi. 13:00 - 15:00'
-                            publish: 1
                             email_addresses: '507'
                             phone_numbers: '507,516'
                             physical_addresses: '504'
@@ -838,7 +824,6 @@ entities:
                         function_type: 3
                         location: 3
                         position: 'Research assistant'
-                        publish: 1
                         email_addresses: '8'
                         phone_numbers: '8'
                     languageVariants:
@@ -847,7 +832,6 @@ entities:
                             language: 1
                             location: 3
                             position: 'Wissenschaftlicher Mitarbeiter'
-                            publish: 1
                             email_addresses: '508'
                             phone_numbers: '508'
                   - self:
@@ -857,7 +841,6 @@ entities:
                         location: 1
                         position: 'Research assistant for Accessibility'
                         room: '407'
-                        publish: 1
                         email_addresses: '9'
                         phone_numbers: '9'
                         physical_addresses: '5'
@@ -868,7 +851,6 @@ entities:
                             location: 1
                             position: 'Wissenschaftliche Mitarbeiterin Barrierefreiheit'
                             room: '407'
-                            publish: 1
                             email_addresses: '509'
                             phone_numbers: '509'
                             physical_addresses: '505'
@@ -879,7 +861,6 @@ entities:
                         location: 2
                         position: 'Guest lecturer'
                         hidden: 1
-                        publish: 1
                         email_addresses: '10'
                         phone_numbers: '10'
                     languageVariants:
@@ -889,7 +870,6 @@ entities:
                             location: 2
                             position: 'Lehrbeauftragter'
                             hidden: 1
-                            publish: 1
                             email_addresses: '510'
                             phone_numbers: '510'
                   - self:
@@ -900,7 +880,6 @@ entities:
                         position: 'Research assistant'
                         valid_from: 1704067200
                         valid_to: 1735603200
-                        publish: 1
                         email_addresses: '11'
                         phone_numbers: '11'
                         physical_addresses: '6'
@@ -910,7 +889,6 @@ entities:
                             language: 1
                             location: 3
                             position: 'Wissenschaftliche Mitarbeiterin'
-                            publish: 1
                             email_addresses: '511'
                             phone_numbers: '511'
                             physical_addresses: '506'
@@ -920,7 +898,6 @@ entities:
                         function_type: 2
                         location: 2
                         position: 'Lecturer for Statistics'
-                        publish: 0
                         email_addresses: '12'
                         phone_numbers: '12'
                     languageVariants:
@@ -929,7 +906,6 @@ entities:
                             language: 1
                             location: 2
                             position: 'Dozent für Statistik'
-                            publish: 0
                             email_addresses: '512'
                             phone_numbers: '512'
                   - self:
@@ -938,7 +914,6 @@ entities:
                         function_type: 4
                         location: 3
                         position: 'Guest lecturer for Media Studies'
-                        publish: 0
                         email_addresses: '13'
                         phone_numbers: '13'
                     languageVariants:
@@ -947,7 +922,6 @@ entities:
                             language: 1
                             location: 3
                             position: 'Lehrbeauftragte Medienwissenschaft'
-                            publish: 0
                             email_addresses: '513'
                             phone_numbers: '513'
                 emailAddress:
@@ -1669,7 +1643,6 @@ entities:
                         function_type: 2
                         location: 3
                         position: 'External lecturer'
-                        publish: 1
                         email_addresses: '14'
                         phone_numbers: '18'
                     languageVariants:
@@ -1678,7 +1651,6 @@ entities:
                             language: 1
                             location: 3
                             position: 'Externe Lehrkraft'
-                            publish: 1
                             email_addresses: '514'
                             phone_numbers: '518'
                   - self:
@@ -1687,7 +1659,6 @@ entities:
                         function_type: 2
                         location: 1
                         position: 'External research fellow'
-                        publish: 1
                         email_addresses: '15'
                         phone_numbers: '19'
                     languageVariants:
@@ -1696,7 +1667,6 @@ entities:
                             language: 1
                             location: 1
                             position: 'Externer Forschungsstipendiat'
-                            publish: 1
                             email_addresses: '515'
                             phone_numbers: '519'
                   - self:
@@ -1705,7 +1675,6 @@ entities:
                         function_type: 4
                         location: 3
                         position: 'External guest lecturer'
-                        publish: 1
                         email_addresses: '16'
                         phone_numbers: '20'
                     languageVariants:
@@ -1714,7 +1683,6 @@ entities:
                             language: 1
                             location: 3
                             position: 'Externer Lehrbeauftragter'
-                            publish: 1
                             email_addresses: '516'
                             phone_numbers: '520'
                 emailAddress:
@@ -6605,7 +6573,7 @@ entities:
           tables_select: 'pages,tt_content,sys_category,sys_file_reference,tx_academiccontacts4pages_domain_model_contact,tx_academiccontacts4pages_domain_model_role,tx_academicjobs_domain_model_job,tx_academicpartners_domain_model_partnership,tx_academicpartners_domain_model_role,tx_academicpersons_domain_model_address,tx_academicpersons_domain_model_contract,tx_academicpersons_domain_model_email,tx_academicpersons_domain_model_function_type,tx_academicpersons_domain_model_location,tx_academicpersons_domain_model_organisational_unit,tx_academicpersons_domain_model_phone_number,tx_academicpersons_domain_model_profile,tx_academicpersons_domain_model_profile_information,tx_academicstudyplan_domain_model_category,tx_academicstudyplan_domain_model_module,tx_academicstudyplan_domain_model_semester'
           tables_modify: 'pages,tt_content,sys_category,sys_file_reference,tx_academiccontacts4pages_domain_model_contact,tx_academiccontacts4pages_domain_model_role,tx_academicjobs_domain_model_job,tx_academicpartners_domain_model_partnership,tx_academicpartners_domain_model_role,tx_academicpersons_domain_model_address,tx_academicpersons_domain_model_contract,tx_academicpersons_domain_model_email,tx_academicpersons_domain_model_function_type,tx_academicpersons_domain_model_location,tx_academicpersons_domain_model_organisational_unit,tx_academicpersons_domain_model_phone_number,tx_academicpersons_domain_model_profile,tx_academicpersons_domain_model_profile_information,tx_academicstudyplan_domain_model_category,tx_academicstudyplan_domain_model_module,tx_academicstudyplan_domain_model_semester'
           explicit_allowdeny: 'tt_content:CType:academicbitejobs_list,tt_content:CType:academiccontacts4pages_list,tt_content:CType:academicjobs_detail,tt_content:CType:academicjobs_list,tt_content:CType:academicjobs_newjobform,tt_content:CType:academicpartners_list,tt_content:CType:academicpartners_map,tt_content:CType:academicpartners_partnershipslist,tt_content:CType:academicpartners_partnershipsteaser,tt_content:CType:academicpersons_card,tt_content:CType:academicpersons_detail,tt_content:CType:academicpersons_list,tt_content:CType:academicpersons_listanddetail,tt_content:CType:academicpersons_selectedcontracts,tt_content:CType:academicpersons_selectedprofiles,tt_content:CType:academicpersonsedit_profileediting,tt_content:CType:academicprograms_programdetails,tt_content:CType:academicprograms_programfinder,tt_content:CType:academicprograms_programlist,tt_content:CType:academicprojects_projectlist,tt_content:CType:academicprojects_projectlistsingle,tt_content:CType:academic_study_plan'
-          non_exclude_fields: 'pages:link,pages:tx_academiccontacts4pages_contacts,pages:tx_academicpartners_partnerships,pages:tx_academicprojects_budget,pages:tx_academicprojects_end_date,pages:tx_academicprojects_funders,pages:tx_academicprojects_project_title,pages:tx_academicprojects_short_description,pages:tx_academicprojects_start_date,tx_academiccontacts4pages_domain_model_contact:contract,tx_academiccontacts4pages_domain_model_contact:email_address,tx_academiccontacts4pages_domain_model_contact:hidden,tx_academiccontacts4pages_domain_model_contact:page,tx_academiccontacts4pages_domain_model_contact:phone_number,tx_academiccontacts4pages_domain_model_contact:physical_address,tx_academiccontacts4pages_domain_model_contact:sys_language_uid,tx_academiccontacts4pages_domain_model_role:contacts,tx_academiccontacts4pages_domain_model_role:description,tx_academiccontacts4pages_domain_model_role:hidden,tx_academiccontacts4pages_domain_model_role:sys_language_uid,tx_academicjobs_domain_model_job:alumni_recommend,tx_academicjobs_domain_model_job:company_name,tx_academicjobs_domain_model_job:contact_additional_information,tx_academicjobs_domain_model_job:contact_email,tx_academicjobs_domain_model_job:contact_name,tx_academicjobs_domain_model_job:contact_phone,tx_academicjobs_domain_model_job:contractual_relationship,tx_academicjobs_domain_model_job:description,tx_academicjobs_domain_model_job:employment_start_date,tx_academicjobs_domain_model_job:employment_type,tx_academicjobs_domain_model_job:endtime,tx_academicjobs_domain_model_job:hidden,tx_academicjobs_domain_model_job:image,tx_academicjobs_domain_model_job:internationals_welcome,tx_academicjobs_domain_model_job:link,tx_academicjobs_domain_model_job:required_degree,tx_academicjobs_domain_model_job:sector,tx_academicjobs_domain_model_job:slug,tx_academicjobs_domain_model_job:starttime,tx_academicjobs_domain_model_job:sys_language_uid,tx_academicjobs_domain_model_job:title,tx_academicjobs_domain_model_job:type,tx_academicjobs_domain_model_job:work_location,tx_academicpartners_domain_model_partnership:hidden,tx_academicpartners_domain_model_partnership:page,tx_academicpartners_domain_model_partnership:partner,tx_academicpartners_domain_model_partnership:sys_language_uid,tx_academicpartners_domain_model_role:description,tx_academicpartners_domain_model_role:hidden,tx_academicpartners_domain_model_role:partnerships,tx_academicpartners_domain_model_role:sys_language_uid,tx_academicpersons_domain_model_address:hidden,tx_academicpersons_domain_model_address:sys_language_uid,tx_academicpersons_domain_model_contract:email_addresses,tx_academicpersons_domain_model_contract:hidden,tx_academicpersons_domain_model_contract:location,tx_academicpersons_domain_model_contract:office_hours,tx_academicpersons_domain_model_contract:phone_numbers,tx_academicpersons_domain_model_contract:physical_addresses,tx_academicpersons_domain_model_contract:position,tx_academicpersons_domain_model_contract:publish,tx_academicpersons_domain_model_contract:room,tx_academicpersons_domain_model_contract:sys_language_uid,tx_academicpersons_domain_model_contract:tx_academiccontacts4pages_contacts,tx_academicpersons_domain_model_email:hidden,tx_academicpersons_domain_model_email:sys_language_uid,tx_academicpersons_domain_model_function_type:hidden,tx_academicpersons_domain_model_function_type:sys_language_uid,tx_academicpersons_domain_model_location:hidden,tx_academicpersons_domain_model_location:sys_language_uid,tx_academicpersons_domain_model_organisational_unit:contracts,tx_academicpersons_domain_model_organisational_unit:hidden,tx_academicpersons_domain_model_organisational_unit:sys_language_uid,tx_academicpersons_domain_model_phone_number:hidden,tx_academicpersons_domain_model_phone_number:sys_language_uid,tx_academicpersons_domain_model_profile:contracts,tx_academicpersons_domain_model_profile:cooperation,tx_academicpersons_domain_model_profile:core_competences,tx_academicpersons_domain_model_profile:endtime,tx_academicpersons_domain_model_profile:fe_group,tx_academicpersons_domain_model_profile:frontend_users,tx_academicpersons_domain_model_profile:hidden,tx_academicpersons_domain_model_profile:lectures,tx_academicpersons_domain_model_profile:memberships,tx_academicpersons_domain_model_profile:miscellaneous,tx_academicpersons_domain_model_profile:press_media,tx_academicpersons_domain_model_profile:publications,tx_academicpersons_domain_model_profile:publications_link,tx_academicpersons_domain_model_profile:publications_link_title,tx_academicpersons_domain_model_profile:scientific_research,tx_academicpersons_domain_model_profile:slug,tx_academicpersons_domain_model_profile:starttime,tx_academicpersons_domain_model_profile:supervised_doctoral_thesis,tx_academicpersons_domain_model_profile:supervised_thesis,tx_academicpersons_domain_model_profile:sys_language_uid,tx_academicpersons_domain_model_profile:teaching_area,tx_academicpersons_domain_model_profile:vita,tx_academicpersons_domain_model_profile_information:hidden,tx_academicpersons_domain_model_profile_information:sys_language_uid,tx_academicstudyplan_domain_model_category:hidden,tx_academicstudyplan_domain_model_category:sys_language_uid,tx_academicstudyplan_domain_model_module:hidden,tx_academicstudyplan_domain_model_module:sys_language_uid,tx_academicstudyplan_domain_model_semester:hidden,tx_academicstudyplan_domain_model_semester:sys_language_uid'
+          non_exclude_fields: 'pages:link,pages:tx_academiccontacts4pages_contacts,pages:tx_academicpartners_partnerships,pages:tx_academicprojects_budget,pages:tx_academicprojects_end_date,pages:tx_academicprojects_funders,pages:tx_academicprojects_project_title,pages:tx_academicprojects_short_description,pages:tx_academicprojects_start_date,tx_academiccontacts4pages_domain_model_contact:contract,tx_academiccontacts4pages_domain_model_contact:email_address,tx_academiccontacts4pages_domain_model_contact:hidden,tx_academiccontacts4pages_domain_model_contact:page,tx_academiccontacts4pages_domain_model_contact:phone_number,tx_academiccontacts4pages_domain_model_contact:physical_address,tx_academiccontacts4pages_domain_model_contact:sys_language_uid,tx_academiccontacts4pages_domain_model_role:contacts,tx_academiccontacts4pages_domain_model_role:description,tx_academiccontacts4pages_domain_model_role:hidden,tx_academiccontacts4pages_domain_model_role:sys_language_uid,tx_academicjobs_domain_model_job:alumni_recommend,tx_academicjobs_domain_model_job:company_name,tx_academicjobs_domain_model_job:contact_additional_information,tx_academicjobs_domain_model_job:contact_email,tx_academicjobs_domain_model_job:contact_name,tx_academicjobs_domain_model_job:contact_phone,tx_academicjobs_domain_model_job:contractual_relationship,tx_academicjobs_domain_model_job:description,tx_academicjobs_domain_model_job:employment_start_date,tx_academicjobs_domain_model_job:employment_type,tx_academicjobs_domain_model_job:endtime,tx_academicjobs_domain_model_job:hidden,tx_academicjobs_domain_model_job:image,tx_academicjobs_domain_model_job:internationals_welcome,tx_academicjobs_domain_model_job:link,tx_academicjobs_domain_model_job:required_degree,tx_academicjobs_domain_model_job:sector,tx_academicjobs_domain_model_job:slug,tx_academicjobs_domain_model_job:starttime,tx_academicjobs_domain_model_job:sys_language_uid,tx_academicjobs_domain_model_job:title,tx_academicjobs_domain_model_job:type,tx_academicjobs_domain_model_job:work_location,tx_academicpartners_domain_model_partnership:hidden,tx_academicpartners_domain_model_partnership:page,tx_academicpartners_domain_model_partnership:partner,tx_academicpartners_domain_model_partnership:sys_language_uid,tx_academicpartners_domain_model_role:description,tx_academicpartners_domain_model_role:hidden,tx_academicpartners_domain_model_role:partnerships,tx_academicpartners_domain_model_role:sys_language_uid,tx_academicpersons_domain_model_address:hidden,tx_academicpersons_domain_model_address:sys_language_uid,tx_academicpersons_domain_model_contract:email_addresses,tx_academicpersons_domain_model_contract:hidden,tx_academicpersons_domain_model_contract:location,tx_academicpersons_domain_model_contract:office_hours,tx_academicpersons_domain_model_contract:phone_numbers,tx_academicpersons_domain_model_contract:physical_addresses,tx_academicpersons_domain_model_contract:position,tx_academicpersons_domain_model_contract:room,tx_academicpersons_domain_model_contract:sys_language_uid,tx_academicpersons_domain_model_contract:tx_academiccontacts4pages_contacts,tx_academicpersons_domain_model_email:hidden,tx_academicpersons_domain_model_email:sys_language_uid,tx_academicpersons_domain_model_function_type:hidden,tx_academicpersons_domain_model_function_type:sys_language_uid,tx_academicpersons_domain_model_location:hidden,tx_academicpersons_domain_model_location:sys_language_uid,tx_academicpersons_domain_model_organisational_unit:contracts,tx_academicpersons_domain_model_organisational_unit:hidden,tx_academicpersons_domain_model_organisational_unit:sys_language_uid,tx_academicpersons_domain_model_phone_number:hidden,tx_academicpersons_domain_model_phone_number:sys_language_uid,tx_academicpersons_domain_model_profile:contracts,tx_academicpersons_domain_model_profile:cooperation,tx_academicpersons_domain_model_profile:core_competences,tx_academicpersons_domain_model_profile:endtime,tx_academicpersons_domain_model_profile:fe_group,tx_academicpersons_domain_model_profile:frontend_users,tx_academicpersons_domain_model_profile:hidden,tx_academicpersons_domain_model_profile:lectures,tx_academicpersons_domain_model_profile:memberships,tx_academicpersons_domain_model_profile:miscellaneous,tx_academicpersons_domain_model_profile:press_media,tx_academicpersons_domain_model_profile:publications,tx_academicpersons_domain_model_profile:publications_link,tx_academicpersons_domain_model_profile:publications_link_title,tx_academicpersons_domain_model_profile:scientific_research,tx_academicpersons_domain_model_profile:slug,tx_academicpersons_domain_model_profile:starttime,tx_academicpersons_domain_model_profile:supervised_doctoral_thesis,tx_academicpersons_domain_model_profile:supervised_thesis,tx_academicpersons_domain_model_profile:sys_language_uid,tx_academicpersons_domain_model_profile:teaching_area,tx_academicpersons_domain_model_profile:vita,tx_academicpersons_domain_model_profile_information:hidden,tx_academicpersons_domain_model_profile_information:sys_language_uid,tx_academicstudyplan_domain_model_category:hidden,tx_academicstudyplan_domain_model_category:sys_language_uid,tx_academicstudyplan_domain_model_module:hidden,tx_academicstudyplan_domain_model_module:sys_language_uid,tx_academicstudyplan_domain_model_semester:hidden,tx_academicstudyplan_domain_model_semester:sys_language_uid'
           groupMods: 'web_layout,web_list,web_info,file_filelist'
 
   beUser:

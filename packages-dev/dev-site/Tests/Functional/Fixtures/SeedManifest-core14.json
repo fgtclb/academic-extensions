@@ -28,7 +28,7 @@
                 "title",
                 "uid"
             ],
-            "checksum": "76756632c5abc27cff9017d8781d77e249a11603"
+            "checksum": "240082324c1d41734f110834c14f356316f2d1ab"
         },
         "be_users": {
             "rows": 1,
@@ -332,14 +332,13 @@
                 "physical_addresses",
                 "pid",
                 "position",
-                "publish",
                 "room",
                 "sys_language_uid",
                 "uid",
                 "valid_from",
                 "valid_to"
             ],
-            "checksum": "3bf1520e27aea4904e8879d8bb70364fbbe5e054"
+            "checksum": "39ddb930970bb96681506f9640a27aa321fcc0de"
         },
         "tx_academicpersons_domain_model_email": {
             "rows": 36,
