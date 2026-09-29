@@ -1,9 +1,10 @@
-## Purpose
+# academic-jobs/list-pagination Specification
 
+## Purpose
 Lets an editor split a long job list into pages that visitors can move
 between.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Editors can enable pagination per job list
 
@@ -26,9 +27,9 @@ SHALL render every job of the configured type, as before this change.
 ### Requirement: Visitors can move between pages
 
 With pagination enabled, the list SHALL render the requested page of jobs.
-The navigation SHALL be rendered only when there is more than one page;
-numbered page links SHALL be rendered when numbered pagination is installed,
-previous and next links otherwise.
+The navigation SHALL be rendered only when there is more than one page. With
+numbered pagination installed it SHALL link at most the number of pages the
+site configures, five by default. Without it, it SHALL link every page.
 
 #### Scenario: Visitor opens the last page
 
@@ -39,13 +40,26 @@ previous and next links otherwise.
 #### Scenario: Only one page
 
 - **WHEN** pagination is enabled with ten results per page and the list has
-  four jobs
-- **THEN** the four jobs are shown and no navigation is rendered
+  five jobs
+- **THEN** the five jobs are shown and no navigation is rendered
+
+#### Scenario: Numbered pagination limits the page links
+
+- **WHEN** numbered pagination is installed, the site allows two page links
+  and the list has three pages
+- **THEN** the first page links pages one and two by number, and page three
+  only as the last page
 
 #### Scenario: Invalid page number
 
 - **WHEN** a visitor requests page zero or a page beyond the last one
 - **THEN** the first or the last page is shown respectively
+
+#### Scenario: A page that is no number
+
+- **WHEN** a request carries a page that is no number, by link or by form
+  submission, to a list with or without pagination
+- **THEN** the list renders as for page one, and no error is shown
 
 ### Requirement: Paging keeps the configured job type
 
@@ -56,3 +70,8 @@ content element is configured with.
 
 - **WHEN** a list configured for theses is paged
 - **THEN** every page shows theses only
+
+#### Scenario: Paging a list that shows hidden jobs
+
+- **WHEN** a list configured to show hidden jobs is paged
+- **THEN** the hidden jobs are paged with the others
