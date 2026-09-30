@@ -71,7 +71,7 @@
   `testing-helper`), and every page that states a measured test count.
 - [x] 5.3 `README.md` "Releasing (maintainers)": the third script, in the
   summarize-and-link style the section has.
-- [ ] 5.4 The version tables of `README.md` and the twelve package READMEs:
+- [x] 5.4 The version tables of `README.md` and the twelve package READMEs:
   `main` as `^3, 3.0.x-dev (dev-main)`, `2` as `^2, 2.4.x-dev (2.x-dev)`, branch
   cell `2`. Under "Testing 3.x.x", the sentence that says `2.x`. Verify with
   `git grep -n '3\.x-dev'` returning nothing outside `openspec/changes/archive`.
