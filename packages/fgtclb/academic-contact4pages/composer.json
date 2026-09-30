@@ -40,7 +40,7 @@
             "extension-key": "academic_contacts4pages",
             "version": "3.0.0-dev",
             "Package": {
-                "providesPackages": {}
+                "providesPackages": []
             }
         },
         "branch-alias": {

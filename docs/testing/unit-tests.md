@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 136 unit test classes: 122 across the twelve extensions, three in
-`packages-dev/dev-site`, six in `packages-dev/monorepo-shared` and five in
+There are 137 unit test classes: 122 across the twelve extensions, three in
+`packages-dev/dev-site`, seven in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -86,9 +86,10 @@ by extension key, see [below](#the-ext_emconfphp-dependency-keys), the one
 that every translation names its extension without an underscore, see
 [below](#the-extension-name-of-translations), the extension point checks,
 see [below](#the-extension-points), the check that no source file names an
-issue of a customer project, see [below](#customer-issue-keys), and the checks
+issue of a customer project, see [below](#customer-issue-keys), the checks
 of the manual links and the branch alias key, see
-[below](#the-links-of-the-manuals).
+[below](#the-links-of-the-manuals), and the check of the form
+`bin/set-version` writes, see [below](#the-form-binset-version-writes).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -465,6 +466,29 @@ accepts one as well. Branch `2` carried `dev-2` from its cut until ACE-784, so
 `2.4.x-dev` did not exist and no split package requiring a sibling with
 `~2.4.0@dev` installed from it. `bin/set-version` writes the key through the
 same script, see [Releasing](../workflow/releasing.md).
+
+## The form bin/set-version writes
+
+[`SetVersionNormalFormTest`](../../packages-dev/monorepo-shared/Tests/Unit/SetVersionNormalFormTest.php)
+asserts that the files `bin/set-version` writes are stored in the form its
+tools write them, so that a run with the version the branch already carries
+changes nothing:
+
+| Check                                                                   | Files                                                               |
+|-------------------------------------------------------------------------|---------------------------------------------------------------------|
+| no comment                                                              | every `ext_emconf.php` below `packages/fgtclb/`, fixtures included  |
+| the academic keys last in `depends` and `suggests`, in package order    | the same                                                            |
+| no `"providesPackages": {}`                                             | `packages/fgtclb/*/composer.json`, `packages-dev/*/composer.json`   |
+| `require` and `require-dev` in composer's order                         | every manifest of the repository with `config.sort-packages`        |
+
+packwright writes `ext_emconf.php` from its data, so a comment is lost and a
+constraint it sets moves to the end of its list. `composer config` re-encodes
+`extra.typo3/cms`, and an empty `providesPackages` object comes back as `[]`,
+which TYPO3 reads alike. Until ACE-787 a run with an unchanged version
+rewrote 22 files on `main`, and every release carried them into its commits.
+The test cannot run the tools themselves, `pkw` and `tailor` are not part of
+the container, so the pre-release checklist asks for that run, see
+[Releasing](../workflow/releasing.md#pre-release-checklist).
 
 ## See also
 

@@ -49,7 +49,7 @@
             "extension-key": "academic_persons_sync",
             "version": "3.0.0-dev",
             "Package": {
-                "providesPackages": {}
+                "providesPackages": []
             }
         },
         "branch-alias": {
