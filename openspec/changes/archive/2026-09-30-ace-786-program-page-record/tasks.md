@@ -36,5 +36,5 @@
 - [x] 4.4 `README.md` and `CONTRIBUTING.md` still only summarize and link.
 - [x] 4.5 Commit as `[BUGFIX] ACE-786: <subject>`, subject at most 52
   characters, body wrapped at 72.
-- [ ] 4.6 Archive the change as the last commit of the pull request and verify
+- [x] 4.6 Archive the change as the last commit of the pull request and verify
   the delta spec landed in `openspec/specs/`.
