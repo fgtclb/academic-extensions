@@ -4,20 +4,19 @@
 >
 
 <div class="page-contacts">
-    <p>COUNT:{contacts -> f:count()}</p>
+    <p>TOP-LEVEL-COUNT:{contacts -> f:count()}</p>
+    <p>TOP-LEVEL-ROLES:{roles -> f:count()}</p>
+    <p>COUNT:{pageContacts.contacts -> f:count()}</p>
 
-    <f:for each="{roles}" as="role">
+    <f:for each="{pageContacts.roles}" as="role">
         <p>ROLE:{role.name}</p>
     </f:for>
 
-    <f:for each="{contacts}" as="contact">
+    <f:for each="{pageContacts.contacts}" as="contact">
         <p>CONTACT:{contact.contract.profile.lastName}</p>
-        <f:for each="{contact.contract.emailAddresses}" as="emailAddress">
-            <p>EMAIL:{emailAddress.email}</p>
-        </f:for>
     </f:for>
 
-    <f:for each="{contactsWithoutRole}" as="contact">
+    <f:for each="{pageContacts.contactsWithoutRole}" as="contact">
         <p>WITHOUT-ROLE:{contact.contract.profile.lastName}</p>
     </f:for>
 </div>

@@ -1,0 +1,3 @@
+# The processor named by its class, the way installations attach it to their own page
+# objects, instead of by the identifier the shipped TypoScript uses.
+page.10.dataProcessing.400 = FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor

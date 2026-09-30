@@ -7,10 +7,9 @@ namespace FGTCLB\AcademicContacts4pages\Controller;
 use FGTCLB\AcademicBase\Controller\DispatchModifyPluginViewEventMethodTrait;
 use FGTCLB\AcademicBase\Controller\GetCurrentContentRecordMethodTrait;
 use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
-use FGTCLB\AcademicContacts4pages\Service\AddressRecordProvider;
+use FGTCLB\AcademicContacts4pages\Event\PageContactsOutput;
 use FGTCLB\AcademicContacts4pages\Service\PageContactsProvider;
 use Psr\Http\Message\ResponseInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -32,10 +31,10 @@ final class ContactsController extends ActionController
         $contentObjectRenderer = $this->getCurrentContentObjectRenderer();
         /** @var array<string, mixed> */
         $contentElementData = $contentObjectRenderer?->data ?? [];
-        $showHiddenRecords = (bool)($this->settings['showHiddenRecords'] ?? false);
 
         // Which contacts are shown, and the split into roles and role-less contacts, is
-        // decided by the provider - the data processor of this extension asks the same one.
+        // decided by the provider - the data processor of this extension asks the same one,
+        // and the provider dispatches the event that lets a listener change them for both.
         // Contacts without a role are a list of their own rather than a filter in the
         // template: the grouped branch can only render a contact that belongs to one of the
         // roles, so without this list they were dropped from the output entirely as soon as
@@ -43,18 +42,11 @@ final class ContactsController extends ActionController
         // whether the ungrouped block is needed at all, instead of emitting an empty row.
         $pageContacts = $this->pageContactsProvider->get(
             (int)($contentElementData['pid'] ?? 0),
-            $showHiddenRecords
+            (bool)($this->settings['showHiddenRecords'] ?? false),
+            PageContactsOutput::Plugin,
+            $this->request,
+            $context,
         );
-
-        // Hidden address records are missing from the contract relation no matter what the
-        // query above ignores, see AddressRecordProvider. Handing the provider over is what
-        // lets a contact display them, so it only happens while the option is on.
-        $addressRecordProvider = $showHiddenRecords
-            ? GeneralUtility::makeInstance(AddressRecordProvider::class)
-            : null;
-        foreach ($pageContacts->contacts as $contact) {
-            $contact->setAddressRecordProvider($addressRecordProvider);
-        }
 
         // The shipped template does not need `record`. A project template that renders the
         // header partial of EXT:fluid_styled_content does on TYPO3 v14, see the trait.

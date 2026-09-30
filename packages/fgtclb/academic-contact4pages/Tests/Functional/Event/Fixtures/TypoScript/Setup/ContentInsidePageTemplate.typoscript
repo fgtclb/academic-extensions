@@ -1,0 +1,9 @@
+# The content element rendered by the page template itself, before the contacts of the
+# page, instead of by a content object of its own after the page template.
+page {
+  10 {
+    templateName = PageContactsAfterContent
+    templateRootPaths.20 = EXT:academic_contacts4pages/Tests/Functional/Event/Fixtures/Templates/
+  }
+  20 >
+}

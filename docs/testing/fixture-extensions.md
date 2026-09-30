@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Fifty-six such fixture extensions exist, in nine of the twelve extensions.
+Fifty-seven such fixture extensions exist, in ten of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -21,64 +21,65 @@ find packages/fgtclb/*/Tests/Functional/Fixtures/Extensions -mindepth 1 -maxdept
 They sit next to the tests that use them, under
 `packages/fgtclb/<extension>/Tests/Functional/Fixtures/Extensions/<extension_key>/`:
 
-| Extension key                               | Composer package name                             | Owned by                | Provides                                                                      |
-|---------------------------------------------|---------------------------------------------------|-------------------------|-------------------------------------------------------------------------------|
-| `academic_test_configuration`               | `tests/academic-test-configuration`               | `academic-base`         | An academic extension with the stale configuration the upgrade check reports. |
-| `test_base_dependency_injection`            | `tests/base-test-dependency-injection`            | `academic-base`         | Two services to resolve through the container, plus `Services.yaml`.          |
-| `test_bitejobs_stub`                        | `tests/test-bitejobs-stub`                        | `academic-bite-jobs`    | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
-| `test_category_types_group`                 | `tests/category-types-group`                      | `typo3-category-types`  | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.           |
-| `test_category_types_icons`                 | `tests/category-types-icons`                      | `typo3-category-types`  | Four category types, one per branch of the icon registrar, and three groups.  |
-| `test_category_types_summary_override`      | `tests/category-types-summary-override`           | `typo3-category-types`  | A page TSconfig override of the page module category summary template.        |
-| `test_category_types_undeclared_group`      | `tests/category-types-undeclared-group`           | `typo3-category-types`  | A type in a group no package declares, then one in a group the file declares. |
-| `test_contract_contact_actions`             | `tests/test-contract-contact-actions`             | `academic-persons-edit` | A `Settings.yaml` narrowing the actions of the contracts section.             |
-| `test_contract_publish_column`              | `tests/test-contract-publish-column`              | `academic-persons`      | The contract column `publish` of 2.x, as before the database compare.         |
-| `test_contract_publish_renamed`             | `tests/test-contract-publish-renamed`             | `academic-persons`      | The contract column `publish` as the database compare renames it.             |
-| `test_contract_publish_wizard`              | `tests/test-contract-publish-wizard`              | `academic-persons`      | The `publish` upgrade wizard registered in a site package's `Services.yaml`.  |
-| `test_current_color_icons`                  | `tests/current-color-icons`                       | `academic-base`         | Icons registered through the `currentColor` icon provider.                    |
-| `test_editor_write_listener`                | `tests/test-editor-write-listener`                | `academic-persons-edit` | A listener of the editor write event, refusing or replacing as a test says.   |
-| `test_exclude_file_column`                  | `tests/test-exclude-file-column`                  | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
-| `test_frontend_readonly`                    | `tests/test-frontend-readonly`                    | `academic-persons`      | Frontend-only field locks, also loaded by the `academic-persons-edit` tests.  |
-| `test_frontend_user_sync`                   | `tests/test-frontend-user-sync`                   | `academic-persons`      | A `Settings.yaml` synchronisation map and the `fe_users` columns it reads.    |
-| `test_frontend_user_sync_events`            | `tests/test-frontend-user-sync-events`            | `academic-persons`      | Listeners of both synchronisation events, and a factory creating no profile.  |
-| `test_frontend_user_sync_relations`         | `tests/test-frontend-user-sync-relations`         | `academic-persons`      | A synchronisation map assigning the organisational unit and function type.    |
-| `test_frontend_user_sync_relations_by_name` | `tests/test-frontend-user-sync-relations-by-name` | `academic-persons`      | A synchronisation map matching units by name and creating function types.     |
-| `test_hidden_content_types`                 | `tests/hidden-content-types`                      | `academic-base`         | Two content types hidden by page TSconfig, one in the academic group.         |
-| `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`         | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
-| `test_language_files`                       | `tests/language-files`                            | `academic-persons`      | An XLF pair with awkward label keys (dots, dashes).                           |
-| `test_legacy_settings`                      | `tests/test-legacy-settings`                      | `academic-persons`      | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.            |
-| `test_literal_helptext`                     | `tests/test-literal-helptext`                     | `academic-persons-edit` | A `Settings.yaml` with literal help texts for a contract and a contact field. |
-| `test_managed_fields`                       | `tests/test-managed-fields`                       | `academic-persons`      | A `Settings.yaml` naming managed fields of four record types.                 |
-| `test_managed_fields_editor`                | `tests/test-managed-fields-editor`                | `academic-persons-edit` | Managed fields that leave one contact row editable and lock another one.      |
-| `test_managed_fields_mistake`               | `tests/test-managed-fields-mistake`               | `academic-persons`      | A misspelled managed field, also loaded by the `academic-persons-edit` tests. |
-| `test_messy_profile_factory`                | `tests/test-messy-profile-factory`                | `academic-persons`      | A deliberately misbehaving profile factory and two event listeners.           |
-| `test_partner_list_events`                  | `tests/test-partner-list-events`                  | `academic-partners`     | Two listeners on the partner demand and list events, and a list template.     |
-| `test_partners_stub`                        | `tests/test-partners-stub`                        | `academic-partners`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
-| `test_plugin_action_context`                | `tests/test-plugin-action-context`                | `academic-persons`      | A listener recording the content element of an event's plugin context.        |
-| `test_plugin_templates`                     | `tests/plugin-templates`                          | `academic-persons`      | Simplified Fluid templates and the TypoScript pointing at them.               |
-| `test_plugin_view_event`                    | `tests/test-plugin-view-event`                    | `academic-base`         | Listeners recording the view event and every context, a leftover, probes.     |
-| `test_position_fields`                      | `tests/test-position-fields`                      | `academic-persons`      | A `Settings.yaml` listing every field of the position line.                   |
-| `test_profile_partial_overrides`            | `tests/test-profile-partial-overrides`            | `academic-persons`      | Partial overrides in two paths, a card passing a page, an old list template.  |
-| `test_profile_placeholders`                 | `tests/test-profile-placeholders`                 | `academic-persons`      | Profile image placeholders of a site package, one per gender.                 |
-| `test_profile_query_constraints`            | `tests/test-profile-query-constraints`            | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |
-| `test_profile_update_recorder`              | `tests/test-profile-update-recorder`              | `academic-persons`      | A listener recording every profile update announcement, frontend included.    |
-| `test_profile_view_modes`                   | `tests/test-profile-view-modes`                   | `academic-persons`      | A project view mode of the profile lists, with its TypoScript.                |
-| `test_program_events`                       | `tests/test-program-events`                       | `academic-programs`     | Listeners on the program demand, list and page data events, a list template.  |
-| `test_programs_category_type_priority`      | `tests/programs-category-type-priority`           | `academic-programs`     | A `CategoryTypes.yaml` raising the priority of a type of the programs group.  |
-| `test_programs_extra_category_type`         | `tests/programs-extra-category-type`              | `academic-programs`     | A `CategoryTypes.yaml` adding one type to the programs group.                 |
-| `test_programs_removed_category_type`       | `tests/programs-removed-category-type`            | `academic-programs`     | A `CategoryTypes.yaml` removing a type from the programs group.               |
-| `test_project_list_events`                  | `tests/test-project-list-events`                  | `academic-projects`     | Two listeners on the project demand and list events, and a list template.     |
-| `test_project_profile_column_removed`       | `tests/project-column-removed`                    | `academic-persons-edit` | A listener after the persons settings removing a project column.              |
-| `test_project_profile_fields`               | `tests/test-project-profile-fields`               | `academic-persons-edit` | Project columns of every type a project field takes, one managed, a listener. |
-| `test_public_profile_settings`              | `tests/test-public-profile-settings`              | `academic-persons`      | A `Settings.yaml` overriding the public profile layout.                       |
-| `test_settings_copy`                        | `tests/test-settings-copy`                        | `academic-persons`      | A copy of the contract fields that leaves the room out, removes one with `~`. |
-| `test_settings_removal`                     | `tests/test-settings-removal`                     | `academic-persons`      | A delta removing one profile field with `~` and copying nothing.              |
-| `test_tca_override_after_settings`          | `tests/tca-override-after-settings`               | `academic-persons`      | TCA overrides and listeners changing columns and a type the settings set.     |
-| `test_upgrade_check`                        | `tests/test-upgrade-check`                        | `academic-base`         | The extension whose templates the upgrade check compares an override with.    |
-| `test_upgrade_check_project`                | `tests/test-upgrade-check-project`                | `academic-base`         | A project site package overriding templates of the fixture above.             |
-| `test_upgrade_check_shared`                 | `tests/test-upgrade-check-shared`                 | `academic-base`         | A shared partial package the checked fixture extension requires.              |
-| `test_visibility_switch_disabled`           | `tests/test-visibility-switch-disabled`           | `academic-persons-edit` | A `Settings.yaml` disabling the profile visibility switch.                    |
-| `test_visibility_switch_readonly`           | `tests/test-visibility-switch-readonly`           | `academic-persons-edit` | A `Settings.yaml` making the profile visibility switch read-only.             |
-| `test_visibility_switch_removed`            | `tests/test-visibility-switch-removed`            | `academic-persons-edit` | A `Settings.yaml` removing the profile visibility switch with `~`.            |
+| Extension key                               | Composer package name                             | Owned by                 | Provides                                                                      |
+|---------------------------------------------|---------------------------------------------------|--------------------------|-------------------------------------------------------------------------------|
+| `academic_test_configuration`               | `tests/academic-test-configuration`               | `academic-base`          | An academic extension with the stale configuration the upgrade check reports. |
+| `test_base_dependency_injection`            | `tests/base-test-dependency-injection`            | `academic-base`          | Two services to resolve through the container, plus `Services.yaml`.          |
+| `test_bitejobs_stub`                        | `tests/test-bitejobs-stub`                        | `academic-bite-jobs`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
+| `test_category_types_group`                 | `tests/category-types-group`                      | `typo3-category-types`   | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.           |
+| `test_category_types_icons`                 | `tests/category-types-icons`                      | `typo3-category-types`   | Four category types, one per branch of the icon registrar, and three groups.  |
+| `test_category_types_summary_override`      | `tests/category-types-summary-override`           | `typo3-category-types`   | A page TSconfig override of the page module category summary template.        |
+| `test_category_types_undeclared_group`      | `tests/category-types-undeclared-group`           | `typo3-category-types`   | A type in a group no package declares, then one in a group the file declares. |
+| `test_contract_contact_actions`             | `tests/test-contract-contact-actions`             | `academic-persons-edit`  | A `Settings.yaml` narrowing the actions of the contracts section.             |
+| `test_contract_publish_column`              | `tests/test-contract-publish-column`              | `academic-persons`       | The contract column `publish` of 2.x, as before the database compare.         |
+| `test_contract_publish_renamed`             | `tests/test-contract-publish-renamed`             | `academic-persons`       | The contract column `publish` as the database compare renames it.             |
+| `test_contract_publish_wizard`              | `tests/test-contract-publish-wizard`              | `academic-persons`       | The `publish` upgrade wizard registered in a site package's `Services.yaml`.  |
+| `test_current_color_icons`                  | `tests/current-color-icons`                       | `academic-base`          | Icons registered through the `currentColor` icon provider.                    |
+| `test_editor_write_listener`                | `tests/test-editor-write-listener`                | `academic-persons-edit`  | A listener of the editor write event, refusing or replacing as a test says.   |
+| `test_exclude_file_column`                  | `tests/test-exclude-file-column`                  | `academic-persons`       | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
+| `test_frontend_readonly`                    | `tests/test-frontend-readonly`                    | `academic-persons`       | Frontend-only field locks, also loaded by the `academic-persons-edit` tests.  |
+| `test_frontend_user_sync`                   | `tests/test-frontend-user-sync`                   | `academic-persons`       | A `Settings.yaml` synchronisation map and the `fe_users` columns it reads.    |
+| `test_frontend_user_sync_events`            | `tests/test-frontend-user-sync-events`            | `academic-persons`       | Listeners of both synchronisation events, and a factory creating no profile.  |
+| `test_frontend_user_sync_relations`         | `tests/test-frontend-user-sync-relations`         | `academic-persons`       | A synchronisation map assigning the organisational unit and function type.    |
+| `test_frontend_user_sync_relations_by_name` | `tests/test-frontend-user-sync-relations-by-name` | `academic-persons`       | A synchronisation map matching units by name and creating function types.     |
+| `test_hidden_content_types`                 | `tests/hidden-content-types`                      | `academic-base`          | Two content types hidden by page TSconfig, one in the academic group.         |
+| `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
+| `test_language_files`                       | `tests/language-files`                            | `academic-persons`       | An XLF pair with awkward label keys (dots, dashes).                           |
+| `test_legacy_settings`                      | `tests/test-legacy-settings`                      | `academic-persons`       | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.            |
+| `test_literal_helptext`                     | `tests/test-literal-helptext`                     | `academic-persons-edit`  | A `Settings.yaml` with literal help texts for a contract and a contact field. |
+| `test_managed_fields`                       | `tests/test-managed-fields`                       | `academic-persons`       | A `Settings.yaml` naming managed fields of four record types.                 |
+| `test_managed_fields_editor`                | `tests/test-managed-fields-editor`                | `academic-persons-edit`  | Managed fields that leave one contact row editable and lock another one.      |
+| `test_managed_fields_mistake`               | `tests/test-managed-fields-mistake`               | `academic-persons`       | A misspelled managed field, also loaded by the `academic-persons-edit` tests. |
+| `test_messy_profile_factory`                | `tests/test-messy-profile-factory`                | `academic-persons`       | A deliberately misbehaving profile factory and two event listeners.           |
+| `test_page_contacts_listener`               | `tests/test-page-contacts-listener`               | `academic-contact4pages` | A listener of the page contacts event, removing the contact a test names.     |
+| `test_partner_list_events`                  | `tests/test-partner-list-events`                  | `academic-partners`      | Two listeners on the partner demand and list events, and a list template.     |
+| `test_partners_stub`                        | `tests/test-partners-stub`                        | `academic-partners`      | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
+| `test_plugin_action_context`                | `tests/test-plugin-action-context`                | `academic-persons`       | A listener recording the content element of an event's plugin context.        |
+| `test_plugin_templates`                     | `tests/plugin-templates`                          | `academic-persons`       | Simplified Fluid templates and the TypoScript pointing at them.               |
+| `test_plugin_view_event`                    | `tests/test-plugin-view-event`                    | `academic-base`          | Listeners recording the view event and every context, a leftover, probes.     |
+| `test_position_fields`                      | `tests/test-position-fields`                      | `academic-persons`       | A `Settings.yaml` listing every field of the position line.                   |
+| `test_profile_partial_overrides`            | `tests/test-profile-partial-overrides`            | `academic-persons`       | Partial overrides in two paths, a card passing a page, an old list template.  |
+| `test_profile_placeholders`                 | `tests/test-profile-placeholders`                 | `academic-persons`       | Profile image placeholders of a site package, one per gender.                 |
+| `test_profile_query_constraints`            | `tests/test-profile-query-constraints`            | `academic-persons`       | Listeners narrowing and counting the queries, and one replacing the demand.   |
+| `test_profile_update_recorder`              | `tests/test-profile-update-recorder`              | `academic-persons`       | A listener recording every profile update announcement, frontend included.    |
+| `test_profile_view_modes`                   | `tests/test-profile-view-modes`                   | `academic-persons`       | A project view mode of the profile lists, with its TypoScript.                |
+| `test_program_events`                       | `tests/test-program-events`                       | `academic-programs`      | Listeners on the program demand, list and page data events, a list template.  |
+| `test_programs_category_type_priority`      | `tests/programs-category-type-priority`           | `academic-programs`      | A `CategoryTypes.yaml` raising the priority of a type of the programs group.  |
+| `test_programs_extra_category_type`         | `tests/programs-extra-category-type`              | `academic-programs`      | A `CategoryTypes.yaml` adding one type to the programs group.                 |
+| `test_programs_removed_category_type`       | `tests/programs-removed-category-type`            | `academic-programs`      | A `CategoryTypes.yaml` removing a type from the programs group.               |
+| `test_project_list_events`                  | `tests/test-project-list-events`                  | `academic-projects`      | Two listeners on the project demand and list events, and a list template.     |
+| `test_project_profile_column_removed`       | `tests/project-column-removed`                    | `academic-persons-edit`  | A listener after the persons settings removing a project column.              |
+| `test_project_profile_fields`               | `tests/test-project-profile-fields`               | `academic-persons-edit`  | Project columns of every type a project field takes, one managed, a listener. |
+| `test_public_profile_settings`              | `tests/test-public-profile-settings`              | `academic-persons`       | A `Settings.yaml` overriding the public profile layout.                       |
+| `test_settings_copy`                        | `tests/test-settings-copy`                        | `academic-persons`       | A copy of the contract fields that leaves the room out, removes one with `~`. |
+| `test_settings_removal`                     | `tests/test-settings-removal`                     | `academic-persons`       | A delta removing one profile field with `~` and copying nothing.              |
+| `test_tca_override_after_settings`          | `tests/tca-override-after-settings`               | `academic-persons`       | TCA overrides and listeners changing columns and a type the settings set.     |
+| `test_upgrade_check`                        | `tests/test-upgrade-check`                        | `academic-base`          | The extension whose templates the upgrade check compares an override with.    |
+| `test_upgrade_check_project`                | `tests/test-upgrade-check-project`                | `academic-base`          | A project site package overriding templates of the fixture above.             |
+| `test_upgrade_check_shared`                 | `tests/test-upgrade-check-shared`                 | `academic-base`          | A shared partial package the checked fixture extension requires.              |
+| `test_visibility_switch_disabled`           | `tests/test-visibility-switch-disabled`           | `academic-persons-edit`  | A `Settings.yaml` disabling the profile visibility switch.                    |
+| `test_visibility_switch_readonly`           | `tests/test-visibility-switch-readonly`           | `academic-persons-edit`  | A `Settings.yaml` making the profile visibility switch read-only.             |
+| `test_visibility_switch_removed`            | `tests/test-visibility-switch-removed`            | `academic-persons-edit`  | A `Settings.yaml` removing the profile visibility switch with `~`.            |
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
@@ -268,8 +269,10 @@ The existing ones show the cases that justify one:
   fixture per extension: the partner tests never load `academic_projects` and
   the project tests never load `academic_partners`, so one fixture listening to
   the events of all three would drag an extension into every run that has no
-  business being there. `test_frontend_user_sync_events` needs a package for
-  two reasons: its listeners of the synchronisation events register through
+  business being there. `test_page_contacts_listener` does the same for the
+  page contacts event of `academic_contacts4pages`.
+  `test_frontend_user_sync_events` needs a package for two reasons: its
+  listeners of the synchronisation events register through
   the container, and its `frontendUserSync` map, which reads a value one of
   them adds, is merged into the settings only from a loaded package.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and

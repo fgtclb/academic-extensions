@@ -1,0 +1,25 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<f:comment>
+    A page template that renders the content of the page first and its contacts after it, as
+    a layout with the contacts in a sidebar below the content does. The content element then
+    asks for the contacts after the data processor did, and before the contacts of the page
+    output are rendered.
+</f:comment>
+<main>
+    <f:cObject typoscriptObjectPath="styles.content.get" />
+</main>
+
+<div class="page-contacts">
+    <f:for each="{contacts}" as="contact">
+        <p>CONTACT:{contact.contract.profile.lastName}</p>
+        <f:for each="{contact.contract.emailAddresses}" as="emailAddress">
+            <p>EMAIL:{emailAddress.email}</p>
+        </f:for>
+    </f:for>
+</div>
+
+</html>

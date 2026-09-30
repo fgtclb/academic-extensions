@@ -49,13 +49,13 @@ Frontend output
 The contacts of a page are rendered either with the content element
 :guilabel:`Contacts for this page`, which can be placed anywhere on the page,
 or directly in a page template through the data processor
-:php:`FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor`, which
-adds the contacts and their roles to the page rendering. Both display the person
-through the :file:`Profile/Item` partial of `EXT:academic_persons`, so contacts
-look like the profiles rendered by that extension. The content element renders
-it through a partial of its own, :file:`Contacts/Item.html`, which a site
-package overrides to change the card, see
-:ref:`configuration-contact-item-partial`.
+`academic-page-contacts`, which adds the contacts, their roles and the contacts
+without a role to the page rendering, see :ref:`configuration-page-contacts`.
+Both display the person through the :file:`Profile/Item` partial of
+`EXT:academic_persons`, so contacts look like the profiles rendered by that
+extension. The content element renders it through a partial of its own,
+:file:`Contacts/Item.html`, which a site package overrides to change the card,
+see :ref:`configuration-contact-item-partial`.
 
 A contact is only shown while the person behind it is visible in the frontend.
 A contact whose contract is hidden, or whose profile is hidden, outside its

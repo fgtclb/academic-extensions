@@ -13,3 +13,12 @@ services:
   # resolves a public service from the container - constructor injection needs it.
   FGTCLB\AcademicContacts4pages\Hook\ContactSortingHook:
     public: true
+
+  # The identifier the shipped TypoScript attaches the page contacts processor by. Tagged
+  # here rather than by an attribute on the class: an attribute tag becomes an `_instanceof`
+  # rule, which would give a project's subclass of the processor the same identifier, and of
+  # two services with one identifier the container silently keeps the first.
+  FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor:
+    tags:
+      - name: 'data.processor'
+        identifier: 'academic-page-contacts'

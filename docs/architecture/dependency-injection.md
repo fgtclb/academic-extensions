@@ -349,19 +349,23 @@ lines 41–43.
 
 ## A data processor with a collaborator has to be published
 
-TypoScript names a data processor by class name:
+TypoScript names a data processor by the identifier of its `data.processor` tag
+or by class name:
 
 ```typoscript
+page.10.dataProcessing.400 = academic-page-contacts
 page.10.dataProcessing.400 = FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor
 ```
 
-TYPO3 resolves that name in two steps
-(`ContentDataProcessor::getDataProcessor()`, identical on v13 and v14): if the
-container knows the name it returns **that service**, otherwise it falls back to
-`GeneralUtility::makeInstance()` on the class. A processor whose services are
-private therefore takes the second path and is constructed with no arguments —
-so a constructor dependency is only ever injected when the processor is
-published:
+TYPO3 resolves that name in three steps (`ContentDataProcessor::process()` and
+`getDataProcessor()`, identical on v13 and v14): the identifier through the
+tagged service locator of `DataProcessorRegistry`, then, if the container knows
+the name, **that service**, and otherwise `GeneralUtility::makeInstance()` on
+the class. The shipped TypoScript uses the identifier, which needs no
+publishing. Installations name the class in their own TypoScript, though, and a
+processor whose service is private then takes the last path and is constructed
+with no arguments. So a constructor dependency is only injected on every path
+when the processor is published:
 
 ```php
 #[Autoconfigure(public: true)]
@@ -375,25 +379,32 @@ class ContactsProcessor implements DataProcessorInterface
 
 `academic_programs` publishes `ProgramDataProcessor` for the same reason, in
 its `Configuration/Services.yaml`, although the extension itself names it by its
-tag identifier `program-data`: an identifier is resolved through the tagged
-service locator and needs no publishing, but a project page object may still
-name the class.
+tag identifier `program-data`.
+
+The tag of `ContactsProcessor` sits in `Configuration/Services.yaml` as well,
+not in an `#[AutoconfigureTag]` attribute on the class. An attribute tag is
+registered as an `_instanceof` rule, so a project's subclass would carry the
+same identifier, and of two services with one identifier the tagged locator
+silently keeps the first. `public: true` is inherited the same way, which is
+what a subclass needs.
 
 This is the "TYPO3 API entry point" exception of the rule below, not a reason to
 publish services in general. Two consequences are worth knowing before reaching
 for it:
 
-- The processor stays **non-`final`**, because projects subclass it. A subclass
-  named in TypoScript is only constructed correctly when the project's own
-  `Services.yaml` registers it as a **public** service, or tags it
-  `data.processor` and TypoScript names that identifier. Autowiring alone is
-  not enough: both lookups ask the container's `has()`, which does not see a
-  private service, so TYPO3 takes the `makeInstance` path and the missing
-  constructor argument is fatal.
+- The processor stays **non-`final`**, and `process()` keeps its signature
+  without a return type, because the 3.0 changelog describes how projects
+  subclass it. A subclass named in TypoScript is only constructed correctly when
+  the project's own `Services.yaml` registers it as a **public** service, or
+  tags it `data.processor` with an identifier of its own and TypoScript names
+  that identifier. Autowiring alone is not enough: both lookups ask the
+  container's `has()`, which does not see a private service, so TYPO3 takes
+  the `makeInstance` path and the missing constructor argument is fatal.
+  `ModifyPageContactsEvent` changes the contacts without a subclass.
 - `ContactsProcessor` shares `PageContactsProvider` with `ContactsController`,
   which is the point of injecting it: the rule about which contacts a visitor
-  sees exists once, and the content element and the page template cannot drift
-  apart.
+  sees, and the event that changes them, exist once, and the content element
+  and the page template cannot drift apart.
 
 ## A view helper with a collaborator
 

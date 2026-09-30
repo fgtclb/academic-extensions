@@ -53,11 +53,13 @@ plugin.tx_academiccontacts4pages {
 
 # The data processor that assigns the contacts of the current page to the page template.
 # It belongs to this component because it reads the same records and renders them through
-# the same partials as the content element does.
+# the same partials as the content element does. It takes the options "as",
+# "showHiddenRecords" and "pageUid", see the manual, and can be attached to further page
+# objects by the same identifier.
 page {
   10 {
     dataProcessing {
-      400 = FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor
+      400 = academic-page-contacts
     }
   }
 }

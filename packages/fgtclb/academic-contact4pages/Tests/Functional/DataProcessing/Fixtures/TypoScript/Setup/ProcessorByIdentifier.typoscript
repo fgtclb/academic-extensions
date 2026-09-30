@@ -1,0 +1,3 @@
+# The processor named by its identifier, set here explicitly so the test does not depend
+# on what the shipped TypoScript uses.
+page.10.dataProcessing.400 = academic-page-contacts
