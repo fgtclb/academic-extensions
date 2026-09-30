@@ -35,15 +35,15 @@
 
 ## 5. Commit
 
-- [ ] 5.1 Commit as `[FEATURE] ACE-102: Add events to the B-ITE job list` in
+- [x] 5.1 Commit as `[FEATURE] ACE-102: Add events to the B-ITE job list` in
   TYPO3 Core format, with `Resolves: ACE-102`.
 
 ## 6. Definition of done
 
-- [ ] 6.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
+- [x] 6.1 `composerUpdate`, then `lintPhp`, `cgl -n`, `phpstan`, `unit` and
   `functional` for TYPO3 v12 (PHP 8.1) and v13 (PHP 8.2), `functional` on
   PostgreSQL with `-j 8` for both, MariaDB and MySQL for the bite jobs tests.
-- [ ] 6.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 6.3 `docs/` and the `academic-bite-jobs` `Documentation/` changelog
+- [x] 6.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 6.3 `docs/` and the `academic-bite-jobs` `Documentation/` changelog
   updated, `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 6.4 Archive the change as the last commit of the pull request.
+- [x] 6.4 Archive the change as the last commit of the pull request.
