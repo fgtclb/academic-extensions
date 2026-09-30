@@ -14,17 +14,17 @@
 
 ## 2. `bin/cut-branch`
 
-- [ ] 2.1 Apply the `edit-on-github-branch` writer of `bin/set-version`, and add
+- [x] 2.1 Apply the `edit-on-github-branch` writer of `bin/set-version`, and add
   `bin/cut-branch` with `SOURCE_BRANCH="2"` and `(default: 2)`. Verify that
   `diff` against `main`'s copies shows only the per-branch lines, and that a
   real run of `bin/set-version 2.4.0 post-release` on an export changes no
   `guides.xml`.
-- [ ] 2.2 `--dry-run` of `bin/cut-branch 2.4 2.5.0` in a scratch clone prints
+- [x] 2.2 `--dry-run` of `bin/cut-branch 2.4 2.5.0` in a scratch clone prints
   both phases with the key `2.4.x-dev` for the new branch and changes nothing.
 
 ## 3. The key data
 
-- [ ] 3.1 Verify on an export that the fixed `bin/set-version 2.4.0 dev` turns
+- [x] 3.1 Verify on an export that the fixed `bin/set-version 2.4.0 dev` turns
   exactly the thirteen `"dev-2": "2.4.x-dev"` lines into
   `"2.x-dev": "2.4.x-dev"`, apart from formatting it does not own, and make
   exactly that edit in the thirteen files.

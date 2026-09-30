@@ -5,7 +5,8 @@
 #
 # Applies a version (and its derived variants) to every relevant file: the
 # runTests.sh COMPOSER_ROOT_VERSION, each split extension (composer.json,
-# ext_emconf.php, VERSION, tailor, branch-alias), the functional-test fixture
+# ext_emconf.php, VERSION, tailor, branch-alias, the edit branch of its
+# manual), the functional-test fixture
 # extensions, the three packages-dev packages, the ddev instances and the root
 # composer.json (monorepo-shared requirement + branch-alias).
 #
@@ -35,7 +36,8 @@
 # Options:
 #   --source-branch=<name>   git branch the version is applied on (default: 2)
 #                            It keys the branch-alias with the version name
-#                            composer gives that branch: dev-main, 2.x-dev.
+#                            composer gives that branch (dev-main, 2.x-dev) and
+#                            is the edit-on-github-branch of every manual.
 #   --dry-run                print every change without touching a file
 #   -h, --help               show this help
 #
@@ -326,6 +328,23 @@ apply_extension_composer_version() {
     run "${COMPOSER}" config -d "${dir}" "extra.typo3/cms.version" "${PACKAGE_VERSION}"
 }
 
+# Helper: set edit-on-github-branch of a split extension's manual. The edit link
+# of a manual leads to the branch its version line is maintained on, and
+# DocumentationGuidesTest reads that branch from the branch alias, so both are
+# written from the same --source-branch.
+apply_edit_branch() {
+    local dir="$1" file="$1/Documentation/guides.xml" value
+    [ -f "${file}" ] || return 0
+    step "${dir}" "guides.xml edit-on-github-branch = ${SOURCE_BRANCH}"
+    value="$(printf '%s' "${SOURCE_BRANCH}" | "${SED}" 's/[&|\\]/\\&/g')"
+    run "${SED}" -i -E "s|(edit-on-github-branch=\")[^\"]*\"|\\1${value}\"|" "${file}"
+    if [ "${DRY_RUN}" -eq 0 ]; then
+        [ "$(grep -c 'edit-on-github-branch=' "${file}")" -eq 1 ] \
+            && grep -qF "edit-on-github-branch=\"${SOURCE_BRANCH}\"" "${file}" \
+            || die "${file}: expected one edit-on-github-branch=\"${SOURCE_BRANCH}\""
+    fi
+}
+
 # Helper: write a VERSION file.
 apply_version_file() {
     local dir="$1"
@@ -347,7 +366,8 @@ run "${SED}" -i \
     Build/Scripts/runTests.sh
 
 # ---------------------------------------------------------------------------
-# 2. Split extensions: composer deps, branch-alias, tailor, VERSION file
+# 2. Split extensions: composer deps, branch-alias, tailor, VERSION file and
+#    the edit branch of the manual
 # ---------------------------------------------------------------------------
 info "Split extensions"
 for dir in "${SPLIT_DIRS[@]}"; do
@@ -363,6 +383,7 @@ for dir in "${SPLIT_DIRS[@]}"; do
         run "${TAILOR_CMD[@]}" --path="${dir}" set-version --no-docs -- "${TAILOR_VERSION}"
     fi
     apply_version_file "${dir}"
+    apply_edit_branch "${dir}"
 done
 
 # ---------------------------------------------------------------------------
