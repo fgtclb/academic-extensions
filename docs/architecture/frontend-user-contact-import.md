@@ -230,6 +230,98 @@ a profile outside its window stays invisible in the frontend. The display paths
 — the "show hidden records" option, the selected profiles and the detail view —
 share a different helper, which lifts the hidden flag only.
 
+## Cleaning up profiles of inactive frontend users
+
+`academic:cleanupprofiles` (ACE-215) is the one command that changes whether a
+profile is shown. It is a command of its own rather than an option of
+`academic:updateprofiles`, whose contract is the table above: the
+synchronisation never writes visibility, and a scheduled update must not start
+deleting profiles because an option was added to it.
+
+`Provider\InactiveFrontendUserProfileProvider` selects the candidates with one
+query: live profiles of the default language or of all languages
+(`deleted = 0`, `sys_language_uid IN (-1, 0)`, `t3ver_wsid = 0`) with
+`skip_sync = 0`, joined to their `tx_academicpersons_feuser_mm` rows and, by a
+left join, to `fe_users`, ordered by profile and frontend user uid. The query
+runs without restrictions, so disabled, expired and deleted frontend users
+reach PHP, and so does a relation whose `fe_users` row is gone, with `null`
+columns. PHP then applies the rule to the rows of each profile.
+
+Only profiles the synchronisation manages are looked at: a profile with an
+`import_identifier`, which `ProfileFactory` writes on every create and update,
+or with a frontend user whose `tx_extbase_type` is the one
+`FrontendUserProvider` reads. A custom factory that writes no identifier still
+has its profiles cleaned up through the record type. The backend form shows
+`skip_sync` only for a profile with an import identifier, so a profile reached
+through the record type alone cannot be excluded by an editor. The manual
+names `--exclude-pids` and an import identifier as the ways out. A profile an
+editor linked to some other login is left alone, since the synchronisation
+never touches it either.
+
+The rule for each linked frontend user:
+
+| A linked frontend user is | When                                                   |
+|---------------------------|--------------------------------------------------------|
+| deleted                   | `deleted = 1`, or its row is missing                   |
+| inactive                  | not deleted, and `disable = 1` or `0 < endtime <= now` |
+| active                    | anything else, a start time ahead included             |
+
+One active frontend user keeps the profile. A profile whose users are all
+deleted gets the `--deleted` action (`delete`, `hide` or `keep`), and one whose
+users are all deleted or inactive, at least one of them inactive, the
+`--disabled` action (`hide` or `keep`). "Now" is the date aspect of the
+context, which is the time the run started.
+
+The page options narrow which profiles are looked at, never the rule. A profile
+is looked at when one of its frontend users is on an included page, or on any
+page without `--include-pids`, and none is on an excluded page. A missing
+`fe_users` row lies on no page. So a profile linked to a frontend user in an
+excluded folder is left alone, and a profile linked only to missing rows is
+cleaned up by a run without `--include-pids` only.
+
+Every write is a DataHandler run of its own per profile, inside
+`DataHandlerExecutionContext::runAsLiveBackendUser()`: a synthetic admin in the
+live workspace, because an installation-wide cleanup has no business writing
+into the workspace of whoever is logged in. Hiding is a datamap `hidden = 1` on
+the default-language record, which `DataMapProcessor` carries into every
+translation because the column is `l10n_mode => exclude`. Deleting is a cmdmap
+`delete`, which the DataHandler cascades to the translations and to the
+contracts with their contact records, and records in the history.
+
+The runs carry no `ProfileWriteCorrelation` mark, so they behave like the same
+change in the backend. A hidden profile is announced as
+`AfterProfileUpdateEvent` with the origin `Backend`, except a profile set to
+all languages, which a backend hide does not announce either, and
+`DataHandlerHooks` flushes the list and detail cache tags of the plugins. A
+delete is a command and is not announced, as in the backend.
+`DataHandlerHooks::processCmdmap_postProcess()` flushes the same tags for a
+deleted or restored profile, and for the parent of a translation, since the
+detail view is tagged with the default-language uid. Before this change a
+profile deleted in the backend stayed on cached list and detail pages: the core
+flushes the page of the record and the tags of the table and the uid, and the
+plugins carry neither, because Extbase does not tag its pages with the records
+it reads (`frontend.cache.autoTagging` is off by default).
+
+A profile that is hidden already is left out, so it is neither listed nor
+counted. Writing `hidden = 1` again would not add a history entry, since the
+DataHandler drops unchanged values, but it would still flush the list cache on
+every scheduled run. A hidden profile whose users are all deleted is deleted
+all the same.
+
+Page lists are checked before anything is read: a part that is no page uid
+stops the command with exit code 2, because `intExplode()` would silently turn
+`12;13` into `12` and exclude less than was meant.
+
+The command never shows a profile again, and nothing records that it hid one
+(ACE-229). A frontend user that is deleted and imported again gets a new uid, so
+a mark on the old relation could not show the profile again anyway. A mark
+column stays possible as an addition later.
+
+Rejected: a raw SQL `UPDATE`, which one project shipped and which bypasses the
+history, cache clearing and translations. Also rejected: evaluating the rule
+per profile through Extbase, which is one query per profile and hides the very
+rows the rule is about.
+
 ## Identity and presentation are separate
 
 The source field defines the import identity:
