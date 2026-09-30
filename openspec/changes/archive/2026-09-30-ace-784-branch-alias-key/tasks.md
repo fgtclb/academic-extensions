@@ -36,10 +36,10 @@
 
 ## 4. Documentation
 
-- [ ] 4.1 `docs/workflow/releasing.md` of this branch: the default and key
+- [x] 4.1 `docs/workflow/releasing.md` of this branch: the default and key
   paragraph (which calls `dev-2` the intended state), the line references into
   `bin/set-version`, the edit branch, a `bin/cut-branch` section.
-- [ ] 4.2 `docs/testing/unit-tests.md` (manual links, the alias key test, the
+- [x] 4.2 `docs/testing/unit-tests.md` (manual links, the alias key test, the
   measured class count), `docs/testing/testing-helper.md`, `AGENTS.md` (four
   `monorepo-shared` tests, the script tests of `testing-helper`).
 - [x] 4.3 The version tables of `README.md` and the twelve package READMEs as
@@ -49,14 +49,14 @@
 
 ## 5. Definition of done
 
-- [ ] 5.1 `lintPhp` green.
-- [ ] 5.2 After `-t 12 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [x] 5.1 `lintPhp` green.
+- [x] 5.2 After `-t 12 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional -j auto` (SQLite) green with `-t 12`.
-- [ ] 5.3 The same with `-t 13` after its own `composerUpdate`.
-- [ ] 5.4 `lintMarkdown -n` and `checkRstRenderingAll` green (render output
+- [x] 5.3 The same with `-t 13` after its own `composerUpdate`.
+- [x] 5.4 `lintMarkdown -n` and `checkRstRenderingAll` green (render output
   removed before the lint).
-- [ ] 5.5 Commits as in design.md, TYPO3 Core format, each green on its own.
-- [ ] 5.6 Archive the change as the last commit of the pull request.
+- [x] 5.5 Commits as in design.md, TYPO3 Core format, each green on its own.
+- [x] 5.6 Archive the change as the last commit of the pull request.
 - [ ] 5.7 After the merge: `repo.packagist.org/p2/fgtclb/<pkg>~dev.json`
   records `{"2.x-dev": "2.4.x-dev"}` for all twelve, and a dry run of
   `composer require fgtclb/academic-persons:2.4.x-dev` resolves without an
