@@ -28,12 +28,6 @@ defined('TYPO3') or die;
 
     ExtensionManagementUtility::addStaticFile(
         'academic_projects',
-        'Configuration/TypoScript/ContentLoad',
-        'Academic Projects: Content load override',
-    );
-
-    ExtensionManagementUtility::addStaticFile(
-        'academic_projects',
         'Configuration/TypoScript/Full',
         'Academic Projects: All components',
     );
@@ -43,8 +37,8 @@ defined('TYPO3') or die;
     //
     // It is the shared "plugin.tx_academicprojects" block every component folder includes, plus the page object of the
     // page type this extension registers. Selecting it is equivalent to what the single entry of this extension
-    // delivered before the configuration was cut per component, minus the "styles.content" override above - but it
-    // does not make any content element selectable, which the page TSconfig does.
+    // delivered before the configuration was cut per component, minus the "styles.content" override that 3.0 removed -
+    // but it does not make any content element selectable, which the page TSconfig does.
     //==================================================================================================================
     ExtensionManagementUtility::addStaticFile(
         'academic_projects',

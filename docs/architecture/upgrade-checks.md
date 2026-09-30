@@ -398,7 +398,7 @@ on both versions. A declared set counts when either end of its chain is
 academic: an academic set that is missing, invalid for any reason or misses a
 set of another vendor, and a set of another vendor - a site package set,
 typically - that misses an academic one. A site package set that depends on
-`fgtclb/academic-programs-content-load`, which 3.0 removed, is as unavailable as
+one of the three content-load sets 3.0 removed is as unavailable as
 the removed set itself. `SetRegistry::checkMissingDependencies()` records the
 path below the declared set as `b[c[missing]]`, and the check names the
 innermost set. Only the two ends are looked at; a foreign set that reaches a

@@ -70,3 +70,13 @@ Two consequences for an override:
             partialRootPaths.-1700000001 = EXT:academic_base/Resources/Private/Partials/
             paths.-1700000001 = EXT:academic_base/Resources/Private/
         }
+
+..  index:: Templates; Project page
+
+The project page
+----------------
+
+The page type :guilabel:`Academic project` renders through a page template of
+its own and five partials below :file:`Project/Page/`. They are registered on
+the page object of the site, not through the constants above, and each of them
+can be replaced on its own, see :ref:`project-page-partials`.

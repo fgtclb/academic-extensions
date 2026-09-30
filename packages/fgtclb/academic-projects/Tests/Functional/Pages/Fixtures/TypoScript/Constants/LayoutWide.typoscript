@@ -1,0 +1,2 @@
+# An integrator naming another page layout for project pages.
+plugin.tx_academicprojects.page.layout = Wide

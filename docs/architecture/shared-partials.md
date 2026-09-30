@@ -49,9 +49,9 @@ turns red with the key `5`.
 | `plugin.tx_academicprograms`                                          | `-1`          | `Program/Item.html`                                                                 |
 | `plugin.tx_academicprojects`                                          | `-1`          | `Project/Item.html`                                                                 |
 | `plugin.tx_academicjobs`                                              | `-1`          | `Job/Item.html`                                                                     |
-| `page.10` of `academic_partners` (doktype 40 only)                    | `-1758484801` | `Pages/AcademicPartner.html`, under `partialRootPaths` and under `paths`            |
+| `page.10` of `academic_partners` (doktype 40 only)                    | `-1758484801` | `Partner/Page/Media.html`, under `partialRootPaths` and under `paths`               |
 | `page.10` of `academic_programs` (doktype 20 only)                    | `-1758484802` | `Program/Page/Media.html`, under `partialRootPaths` and under `paths`               |
-| `page.10` of `academic_projects` (doktype 30 only)                    | `-1758484803` | `Pages/AcademicProject.html`, under `partialRootPaths` and under `paths`            |
+| `page.10` of `academic_projects` (doktype 30 only)                    | `-1758484803` | `Project/Page/Media.html`, under `partialRootPaths` and under `paths`               |
 | `page.10` of `academic_jobs` (every page)                             | `-1758484804` | `Job/Item.html`, which that extension registers in `page.10` as well                |
 
 `academic_persons_edit` registers the persons partials but renders none that

@@ -106,7 +106,7 @@ A chapter that depends on a change not released when the guide is written
 `ace-666-keep-hidden-ctype-selectable`, `ace-745-legacy-typoscript-paths`,
 `ace-733-program-facts-field-list`,
 `ace-721-program-page-content-without-getcontent`,
-`ace-tbd-page-templates-sections-subtitle`,
+`ace-785-page-templates-sections-subtitle`,
 `ace-712-upgrade-check-template-overrides`,
 `ace-713-upgrade-check-configuration`) carries a note naming it as not yet
 available.
@@ -157,7 +157,7 @@ entries, which own the detail:
 - `ace-721-program-page-content-without-getcontent` removes the
   academic_programs set;
 - `ace-733-program-facts-field-list` removes `Partials/Program/Categories.html`;
-- `ace-tbd-page-templates-sections-subtitle` removes the academic_partners and
+- `ace-785-page-templates-sections-subtitle` removes the academic_partners and
   academic_projects sets and switches their page templates off
   `styles.content.getContent`.
  The first draft asked whether to deprecate the sets for removal in

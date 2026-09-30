@@ -33,10 +33,6 @@ final class StaticRegistrationTest extends AbstractAcademicProjectsTestCase
             'EXT:academic_projects/Configuration/TypoScript/ProjectListSingle',
             'Academic Projects: Projects (selected) (academic_projects)',
         ];
-        yield 'content load override' => [
-            'EXT:academic_projects/Configuration/TypoScript/ContentLoad',
-            'Academic Projects: Content load override (academic_projects)',
-        ];
         yield 'all components' => [
             'EXT:academic_projects/Configuration/TypoScript/Full',
             'Academic Projects: All components (academic_projects)',
@@ -91,6 +87,23 @@ final class StaticRegistrationTest extends AbstractAcademicProjectsTestCase
                 $label,
             ),
         );
+    }
+
+    /**
+     * The "styles.content.getContent" override is removed in 3.0, and with it its static
+     * template. An installation that still selects it gets nothing for it - the Breaking
+     * changelog entry names the value to drop.
+     */
+    #[Test]
+    public function contentLoadStaticTemplateIsNotRegistered(): void
+    {
+        $values = array_column(
+            $GLOBALS['TCA']['sys_template']['columns']['include_static_file']['config']['items'] ?? [],
+            'value',
+        );
+
+        $this->assertContains('EXT:academic_projects/Configuration/TypoScript/Full', $values);
+        $this->assertNotContains('EXT:academic_projects/Configuration/TypoScript/ContentLoad', $values);
     }
 
     /**

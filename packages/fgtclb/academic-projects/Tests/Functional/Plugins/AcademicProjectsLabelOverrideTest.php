@@ -111,7 +111,6 @@ final class AcademicProjectsLabelOverrideTest extends AbstractAcademicProjectsTe
             [
                 'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/SitePackage.typoscript',
                 'EXT:academic_projects/Configuration/TypoScript/setup.typoscript',
-                'EXT:academic_projects/Configuration/TypoScript/ContentLoad/setup.typoscript',
             ],
             $setup,
         );

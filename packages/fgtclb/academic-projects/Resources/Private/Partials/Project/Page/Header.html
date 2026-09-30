@@ -1,0 +1,26 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:comment>
+    The header of the project page: the project title, or the title of the page without
+    one, the subtitle of the page and the short description.
+
+    One element, because the page template renders it inside a reversed flex column
+    together with the media: the image is shown above the header, the heading stays
+    first in the document.
+</f:comment>
+
+<div class="academic-projects-detail__header">
+    <h1>{f:if(condition: '{project.projectTitle}', then: '{project.projectTitle}', else: '{pageRecord.title}')}</h1>
+
+    <f:if condition="{pageRecord.subtitle}">
+        <p class="academic-projects-detail__subtitle">{pageRecord.subtitle}</p>
+    </f:if>
+
+    <f:format.html>{project.shortDescription}</f:format.html>
+</div>
+
+</html>

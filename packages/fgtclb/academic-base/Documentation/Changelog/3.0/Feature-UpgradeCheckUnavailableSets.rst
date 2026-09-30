@@ -36,10 +36,13 @@ depends on a set of an academic extension TYPO3 cannot provide:
         render the content of their main column without it. Remove the dependency from the site
         configuration and from every set of the site package.
 
-For a set a release removed, the message says what replaced it. So far that is
-`fgtclb/academic-programs-content-load`, which 3.0 removed - see
-:file:`Breaking-ContentLoadSetRemoved.rst` in the 3.0 changelog of
-:php:`EXT:academic_programs`.
+For a set a release removed, the message says what replaced it. So far these
+are the three content-load sets 3.0 removed, `fgtclb/academic-partners-content-load`,
+`fgtclb/academic-programs-content-load` and
+`fgtclb/academic-projects-content-load` - see
+:file:`Breaking-ContentLoadSetRemoved.rst` in the 3.0 changelogs of
+:php:`EXT:academic_partners`, :php:`EXT:academic_programs` and
+:php:`EXT:academic_projects`.
 
 Impact
 ======

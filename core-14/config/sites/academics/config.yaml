@@ -74,12 +74,7 @@ dependencies:
   # A development instance is meant to offer everything, hence all of them.
   #
   # Each aggregate depends on its own component sets, so naming it enables the
-  # whole extension. Do not name component sets here by hand: the two
-  # "-content-load" sets of partners and projects are dependencies of their
-  # aggregates and leaving one out is a fatal error, not a degraded page -
-  # nothing else defines "styles.content.getContent" and their page templates
-  # call it through "f:cObject". The program page renders its content without
-  # it.
+  # whole extension.
   - fgtclb/academic-base
   - fgtclb/academic-bite-jobs
   - fgtclb/academic-contacts4pages

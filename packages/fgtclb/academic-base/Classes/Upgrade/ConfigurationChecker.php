@@ -60,7 +60,13 @@ final readonly class ConfigurationChecker
      * way out to the message.
      */
     private const REMOVED_SETS = [
+        'fgtclb/academic-partners-content-load' => '3.0 removed it: partner pages render the content of their '
+            . 'main column without it. Remove the dependency from the site configuration and from every set of '
+            . 'the site package.',
         'fgtclb/academic-programs-content-load' => '3.0 removed it: program pages render the content of their '
+            . 'main column without it. Remove the dependency from the site configuration and from every set of '
+            . 'the site package.',
+        'fgtclb/academic-projects-content-load' => '3.0 removed it: project pages render the content of their '
             . 'main column without it. Remove the dependency from the site configuration and from every set of '
             . 'the site package.',
     ];

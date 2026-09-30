@@ -141,6 +141,37 @@ final class ConfigurationCheckerSiteTest extends AbstractAcademicBaseTestCase
     }
 
     /**
+     * The partner and project content-load sets went with the page template change
+     * of 3.0, a change after the programs set, and are named the same way.
+     */
+    #[Test]
+    public function aDependencyOnARemovedPartnerOrProjectContentLoadSetNamesWhatReplacedIt(): void
+    {
+        $this->writeSite('stale-pages', 1, [
+            'fgtclb/academic-test-configuration',
+            'fgtclb/academic-partners-content-load',
+            'fgtclb/academic-projects-content-load',
+        ]);
+
+        $findings = $this->findingsOfKind(ConfigurationFindingKind::UnavailableSet);
+
+        $this->assertCount(2, $findings);
+        foreach (['partners' => $findings[0], 'projects' => $findings[1]] as $extension => $finding) {
+            $this->assertSame(ContextualFeedbackSeverity::ERROR, $finding->severity);
+            $this->assertStringContainsString(
+                sprintf('depends on "fgtclb/academic-%s-content-load"', $extension),
+                $finding->message,
+            );
+            $this->assertStringContainsString('3.0 removed it', $finding->message);
+            $this->assertStringContainsString(
+                sprintf('%s pages render the content of their main column without it', rtrim($extension, 's')),
+                $finding->message,
+            );
+            $this->assertStringContainsString('from every set of the site package', $finding->message);
+        }
+    }
+
+    /**
      * A site package set that depends on a missing academic set is invalid
      * itself, and TYPO3 fails the site for it just the same - the message names
      * the academic set at the end of the chain, however deep it sits.

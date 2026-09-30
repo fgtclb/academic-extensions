@@ -7,6 +7,7 @@ namespace FGTCLB\AcademicProjects\Tests\Functional\Pages;
 use FGTCLB\AcademicProjects\Tests\Functional\AbstractAcademicProjectsTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use FGTCLB\TestingHelper\FunctionalTestCase\ResponsiveImageAssertionTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -33,6 +34,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * The short description and the funders are rich text. They are rendered through the
  * site's "lib.parseFunc_RTE", so a link the editor set to a page reaches the visitor as
  * the page's URL. Printed raw, as before ACE-676, the "t3://" reference itself did.
+ *
+ * The page renders the content of its main column through "page.10.variables.projectContent",
+ * which the extension defines inside the same page type condition. None of the setups
+ * here defines "styles.content.getContent": the page template used to render that global
+ * object, which only an opt-in set defined, and every project page of a site without it
+ * died with an exception of "f:cObject".
  */
 final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTestCase
 {
@@ -42,7 +49,15 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8', 'iso' => 'en', 'hrefLang' => 'en-US', 'direction' => ''],
+        'DE' => ['id' => 1, 'title' => 'Deutsch', 'locale' => 'de_DE.UTF8', 'iso' => 'de', 'hrefLang' => 'de-DE', 'direction' => ''],
     ];
+
+    /**
+     * The two main column elements of the project page, in their manual order - which is
+     * the reverse of their uid order.
+     */
+    private const FIRST_ELEMENT = 'The first element of the main column.';
+    private const SECOND_ELEMENT = 'The second element of the main column.';
 
     protected function setUp(): void
     {
@@ -63,10 +78,12 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
     /**
      * @param bool $withFluidStyledContent false leaves out the TypoScript of fluid_styled_content,
      *                                     so only the core default "lib.parseFunc_RTE" is defined
+     * @param list<string> $additionalSetup TypoScript files included after the extension
      */
-    private function setUpTestCase(bool $withFluidStyledContent = true): void
+    private function setUpTestCase(bool $withFluidStyledContent = true, array $additionalSetup = []): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicProjectPageTemplateTest/page.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicProjectPageTemplateTest/content.csv');
         $constants = [
             'EXT:academic_projects/Configuration/TypoScript/constants.typoscript',
         ];
@@ -74,10 +91,8 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
             // The site package first, the extension after it - see the fixture.
             'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/SitePackage.typoscript',
             'EXT:academic_projects/Configuration/TypoScript/setup.typoscript',
-            // The page template renders "styles.content.getContent", which only this component
-            // assigns - it is opt-in since the configuration was cut per component.
-            'EXT:academic_projects/Configuration/TypoScript/ContentLoad/setup.typoscript',
             'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/PartialRootPathProbe.typoscript',
+            ...$additionalSetup,
         ];
         if ($withFluidStyledContent) {
             array_unshift($constants, 'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript');
@@ -95,7 +110,50 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
                 identifier: 'EN',
                 base: '/',
             ),
+            $this->buildLanguageConfiguration(
+                identifier: 'DE',
+                base: '/de/',
+            ),
         ]);
+    }
+
+    /**
+     * A site configured through site sets alone, the way a v13 or v14 site is set up.
+     *
+     * The site package comes from a "sys_template" record, because the sets of a site are
+     * included before its records: the extension refines "page.10" first, and the page
+     * object of the site package keeps what the extension assigned. "clear" stays "0" -
+     * the flag "setUpFrontendRootPage()" writes discards everything the sets contributed.
+     *
+     * @param list<string> $sets
+     */
+    private function setUpSiteSetTestCase(array $sets): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicProjectPageTemplateTest/page.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicProjectPageTemplateTest/content.csv');
+        $this->getConnectionPool()->getConnectionForTable('sys_template')->insert(
+            'sys_template',
+            [
+                'pid' => 1,
+                'root' => 1,
+                'clear' => 0,
+                'title' => 'Site package',
+                'constants' => '',
+                'config' => '@import \'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/SitePackageAfterSets.typoscript\'',
+            ],
+        );
+        $this->writeSiteConfiguration(
+            // The page TSconfig of a site is cached under its identifier for the whole class.
+            identifier: 'acme-' . substr(md5(implode(',', $sets)), 0, 10),
+            site: $this->buildSiteConfiguration(
+                rootPageId: 1,
+                base: self::FRONTEND_PLUGIN_TEST_BASE,
+                additionalRootConfiguration: ['dependencies' => ['typo3/fluid-styled-content', ...$sets]],
+            ),
+            languages: [
+                $this->buildDefaultLanguageConfiguration(identifier: 'EN', base: '/'),
+            ],
+        );
     }
 
     /**
@@ -104,6 +162,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
     private function setUpPageViewTestCase(): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicProjectPageTemplateTest/page.csv');
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicProjectPageTemplateTest/content.csv');
         $this->setUpFrontendRootPage(
             pageId: 1,
             typoScriptFiles: [
@@ -116,9 +175,6 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
                     // The site package first, the extension after it - see the fixture.
                     'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/SitePackagePageView.typoscript',
                     'EXT:academic_projects/Configuration/TypoScript/setup.typoscript',
-                    // The page template renders "styles.content.getContent", which only this component
-                    // assigns - it is opt-in since the configuration was cut per component.
-                    'EXT:academic_projects/Configuration/TypoScript/ContentLoad/setup.typoscript',
                 ],
             ],
         );
@@ -304,5 +360,166 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
             'img-fluid',
             'The laboratory of the Quantum Optics project',
         );
+    }
+
+    #[Test]
+    public function projectPageRendersTheContentOfItsMainColumnInTheManualOrder(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertMainColumnInManualOrder($content);
+    }
+
+    /**
+     * The last four elements of the main column are two pairs, each sharing a `sorting`
+     * value: the first pair is written in ascending uid order, the second in descending.
+     * PostgreSQL returns tied rows in an order that depends on its version, so one pair
+     * alone is a guard on some of them - see the same test of the program page. Measured
+     * without the `uid` tiebreaker on v13: PostgreSQL 10, which CI runs, fails the
+     * ascending pair, SQLite passes. A green default run is no evidence for this test,
+     * `-d postgres` is.
+     */
+    #[Test]
+    public function mainColumnElementsSharingASortingValueFollowUidOrder(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $positions = [];
+        foreach ([
+            self::SECOND_ELEMENT,
+            'A tie, the lower uid.',
+            'A tie, the higher uid.',
+            'A second tie, the lower uid.',
+            'A second tie, the higher uid.',
+        ] as $text) {
+            $position = strpos($content, $text);
+            $this->assertIsInt($position, sprintf('"%s" is missing.', $text));
+            $positions[$text] = $position;
+        }
+        $sorted = $positions;
+        asort($sorted);
+        $this->assertSame(
+            array_keys($positions),
+            array_keys($sorted),
+            'The last elements of the main column are not in sorting order with uid order for ties.',
+        );
+    }
+
+    /**
+     * The content element in another column, and the hidden one, stay out of the page.
+     */
+    #[Test]
+    public function projectPageRendersNoContentOfOtherColumnsAndNoHiddenContent(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString(self::FIRST_ELEMENT, $content);
+        $this->assertStringNotContainsString('A note in the side column.', $content);
+        $this->assertStringNotContainsString('A hidden draft.', $content);
+    }
+
+    #[Test]
+    public function projectPageRendersTheContentOfItsMainColumnOnAPageViewPageObject(): void
+    {
+        $this->setUpPageViewTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertMainColumnInManualOrder($content);
+        $this->assertStringNotContainsString('A note in the side column.', $content);
+    }
+
+    #[Test]
+    public function translatedProjectPageRendersTheTranslatedContent(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/de/quantum-optics');
+
+        $first = strpos($content, 'Das erste Element der Hauptspalte.');
+        $second = strpos($content, 'Das zweite Element der Hauptspalte.');
+        $this->assertIsInt($first, 'The first translated content element is missing.');
+        $this->assertIsInt($second, 'The second translated content element is missing.');
+        $this->assertLessThan($second, $first, 'The translated content elements are not in their manual order.');
+        $this->assertStringNotContainsString(self::FIRST_ELEMENT, $content);
+        $this->assertStringNotContainsString(self::SECOND_ELEMENT, $content);
+    }
+
+    /**
+     * The content is a variable of the project page object, so an integrator adjusts it
+     * for project pages alone - here to render the side column instead. The root page has
+     * a side column element too, and it stays out of the root page.
+     */
+    #[Test]
+    public function integratorAdjustsTheProjectPageContent(): void
+    {
+        $this->setUpTestCase(additionalSetup: [
+            'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/ProjectContentFromSideColumn.typoscript',
+        ]);
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString('A note in the side column.', $content);
+        $this->assertStringNotContainsString(self::FIRST_ELEMENT, $content);
+
+        $rootPage = $this->renderFrontendPage('https://www.acme.com/');
+        $this->assertStringContainsString('site-package-default-template', $rootPage);
+        $this->assertStringNotContainsString('A note in the side column of the root page.', $rootPage);
+    }
+
+    /**
+     * The fallback template of the fixture site package renders the variable as well, so
+     * a variable defined for every page would put the main column of the root page here.
+     */
+    #[Test]
+    public function projectPageContentIsNotDefinedForOtherPageTypes(): void
+    {
+        $this->setUpTestCase();
+
+        $content = $this->renderFrontendPage('https://www.acme.com/');
+
+        $this->assertStringContainsString('site-package-default-template', $content);
+        $this->assertStringNotContainsString('Welcome to the root page.', $content);
+    }
+
+    /**
+     * @return \Generator<string, array{0: list<string>}>
+     */
+    public static function siteSetDataProvider(): \Generator
+    {
+        yield 'project list set alone' => [['fgtclb/academic-projects-project-list']];
+        yield 'selected projects set alone' => [['fgtclb/academic-projects-project-list-single']];
+        yield 'aggregate set' => [['fgtclb/academic-projects']];
+    }
+
+    /**
+     * @param list<string> $sets
+     */
+    #[Test]
+    #[DataProvider('siteSetDataProvider')]
+    public function projectPageRendersTheContentOfItsMainColumnOnASiteSetSite(array $sets): void
+    {
+        $this->setUpSiteSetTestCase($sets);
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString('<h1>Quantum Optics</h1>', $content);
+        $this->assertMainColumnInManualOrder($content);
+        $this->assertStringNotContainsString('A note in the side column.', $content);
+    }
+
+    private function assertMainColumnInManualOrder(string $content): void
+    {
+        $first = strpos($content, self::FIRST_ELEMENT);
+        $second = strpos($content, self::SECOND_ELEMENT);
+        $this->assertIsInt($first, 'The first content element of the main column is missing.');
+        $this->assertIsInt($second, 'The second content element of the main column is missing.');
+        $this->assertLessThan($second, $first, 'The content elements of the main column are not in their manual order.');
     }
 }
