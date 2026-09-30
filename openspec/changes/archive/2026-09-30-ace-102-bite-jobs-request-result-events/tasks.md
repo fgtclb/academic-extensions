@@ -46,22 +46,22 @@
   ACE-154 as its duplicate and rename the change to
   `ace-102-bite-jobs-request-result-events`; otherwise keep the issue under
   that epic and name the change after it.
-- [ ] 4.2 Commit in TYPO3 Core format `[FEATURE] ACE-102: <subject>`,
+- [x] 4.2 Commit in TYPO3 Core format `[FEATURE] ACE-102: <subject>`,
   subject at most 52 characters, body wrapped at 72, referencing only the
   issue that stays.
 
 ## 5. Backport
 
-- [ ] 5.1 Backport: separate change on branch `2` after a backport analysis
-  (`docs/workflow/backporting.md`).
+- [x] 5.1 Backport: separate change on branch `2` after a backport analysis
+  (`docs/workflow/backporting.md`), in a pull request of its own.
 
 ## 6. Definition of done
 
-- [ ] 6.1 `Build/Scripts/runTests.sh -t 13 -s composerUpdate`, then
+- [x] 6.1 `Build/Scripts/runTests.sh -t 13 -s composerUpdate`, then
   `lintPhp`, `cgl -n`, `phpstan`, `unit` and `functional` with `-t 13` green.
-- [ ] 6.2 The same for `-t 14` after its own `composerUpdate`.
-- [ ] 6.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 6.4 `docs/` and the `Documentation/` changelog entry are part of the
+- [x] 6.2 The same for `-t 14` after its own `composerUpdate`.
+- [x] 6.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 6.4 `docs/` and the `Documentation/` changelog entry are part of the
   change; `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 6.5 Archive the change as the last commit of the pull request and
+- [x] 6.5 Archive the change as the last commit of the pull request and
   verify the delta spec landed in `openspec/specs/`.
