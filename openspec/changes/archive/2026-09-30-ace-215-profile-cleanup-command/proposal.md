@@ -52,7 +52,7 @@ None.
 ## Non-goals
 
 - Showing a profile again when its frontend user is re-enabled. Re-enabling
-  stays manual; a marker column is a later, additive follow-up under ACE-229
+  stays manual. A marker column is a later, additive follow-up under ACE-229
   (see `design.md`).
 - Moving profiles to an alumni folder.
 - Cleaning up records of external imports that are not linked to frontend
