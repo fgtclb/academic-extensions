@@ -290,10 +290,10 @@ version number.
 | 2.2    | `2.2.x`      | `2.2.2`         | `bin/release`, `bin/set-version`         |
 | 1      | `1.x`        | -               | none — that branch has no `bin/` scripts |
 
-Both scripts are kept as the *same* implementation on every branch. Only two
-things legitimately differ per branch: the `--source-branch` default (which
-equals the branch itself) and the version examples in the help output (which
-must lie inside that branch's version range).
+Both scripts, and `bin/cut-branch` where it exists, are kept as the *same*
+implementation on every branch. Only two things legitimately differ per branch:
+the `--source-branch` default (which equals the branch itself) and the version
+examples in the help output (which must lie inside that branch's version range).
 
 ### Required tooling
 
@@ -320,7 +320,8 @@ It rewrites, in one pass:
 
 1. `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION`
 2. split extensions → academic composer deps, `extra.typo3/cms.version`,
-   branch-alias, `tailor set-version`, `VERSION` file
+   branch-alias, `tailor set-version`, `VERSION` file, the edit branch of the
+   manual
 3. functional-test fixture extensions → composer deps only
 4. `ext_emconf.php` → `version` plus `depends`/`suggests` constraints
 5. `packages-dev/*` → academic deps, `extra.typo3/cms.version`, `VERSION` file
@@ -331,6 +332,11 @@ There are no path-repository version maps to keep in sync any more. The composer
 plugin `sbuerk/extended-path-repository` derives a path package's version from
 the package itself, so steps 2 and 5 — which write `extra.typo3/cms.version` and
 the `VERSION` file — are what sets the version everywhere it is consumed.
+
+The branch alias is keyed to the version name composer gives the
+`--source-branch`, `dev-main` for `main` and `2.x-dev` for `2`. Composer ignores
+any other key without a word, see
+[Releasing](docs/workflow/releasing.md#binset-version--apply-a-version-across-the-repository).
 
 The script only edits working-tree files — it performs no git and no network
 operations. `--dry-run` prints every single change without touching a file and
@@ -363,6 +369,19 @@ Two independent safety gates control how far a run goes:
 run outside a git work tree or when the target tag already exists; a dirty
 working tree is fatal for `--execute` and only a warning otherwise, so the flow
 stays rehearsable.
+
+### `bin/cut-branch`: cut a version branch
+
+```shell
+bin/cut-branch <branch> <next-version> [--source-branch=<name>] [--dry-run|--execute]
+```
+
+`bin/cut-branch 3 4.0.0` on `main` pushes the current commit as branch `3`,
+keys its branch alias, manual edit links and script defaults to `3` in a pull
+request against it, and moves `main` to `4.0.0-dev` in a second one. It has the
+safety gates of `bin/release` and ends with the steps it leaves to the
+maintainer, see
+[Releasing](docs/workflow/releasing.md#bincut-branch-cut-a-version-branch).
 
 ### What the pushed tag triggers
 

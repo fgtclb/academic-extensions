@@ -8,7 +8,8 @@ repository root is a composer `project`, not an extension, and has nothing to
 publish; the three `packages-dev/` packages are versioned but never released.
 
 Two scripts do the work, and neither of them is optional knowledge: `bin/set-version`
-writes the version everywhere, `bin/release` drives git and GitHub around it.
+writes the version everywhere, `bin/release` drives git and GitHub around it. A
+third, `bin/cut-branch`, cuts a new version branch with the same two.
 
 ## Where the version lives
 
@@ -54,7 +55,7 @@ bin/set-version <version> <type> [--source-branch=<name>] [--dry-run]
 ```
 
 It edits working-tree files and does **nothing else**: no git, no network
-(`bin/set-version:42-43`). That separation is what makes it safe to run and
+(`bin/set-version:44-45`). That separation is what makes it safe to run and
 inspect on its own.
 
 `<version>` is always a bare `MAJOR.MINOR.PATCH`; the `-dev` suffixes are
@@ -66,16 +67,17 @@ derived, never passed. `<type>` decides how:
 | `post-release` | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 | `dev`          | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 
-`post-release` and `dev` share one derivation (`bin/set-version:193-206`); `dev`
+`post-release` and `dev` share one derivation (`bin/set-version:195-208`); `dev`
 is the thin variant used for branching and forced minor or major bumps.
 `post-release` does **not** increment anything — the version passed is already
 the next one.
 
-What one run rewrites, in order (`bin/set-version:340-434`):
+What one run rewrites, in order (`bin/set-version:359-455`):
 
 1. `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION`
 2. every split extension → academic composer dependencies,
-   `extra.typo3/cms.version`, branch alias, `tailor set-version`, `VERSION`
+   `extra.typo3/cms.version`, branch alias, `tailor set-version`, `VERSION`,
+   `edit-on-github-branch` of `Documentation/guides.xml`
 3. functional-test fixture extensions → composer dependencies only
 4. every `ext_emconf.php` (splits **and** fixtures) → `version`, plus the
    `depends`/`suggests` constraints for each academic extension key
@@ -86,10 +88,10 @@ What one run rewrites, in order (`bin/set-version:340-434`):
 
 Nothing in that list is hardcoded. The package set is discovered by looking for
 directories under `packages/fgtclb/*/` that carry both a `composer.json` and an
-`ext_emconf.php` (`bin/set-version:224-235`); the extension key is read from
+`ext_emconf.php` (`bin/set-version:226-237`); the extension key is read from
 `extra.typo3/cms.extension-key`, never guessed from the directory name; fixture
 extensions are found under `Tests/Functional/Fixtures/Extensions`
-(`bin/set-version:240-245`); the `packages-dev` packages and the development
+(`bin/set-version:242-247`); the `packages-dev` packages and the development
 instances are discovered by path. A thirteenth extension, a fourth
 `packages-dev` package or a `core-15` instance is picked up by existing, which
 is precisely what the previously hardcoded instance list failed to do.
@@ -101,7 +103,7 @@ and the copy on branch `2` defaults to `2`.
 
 The branch alias is keyed to the version name composer gives that branch:
 `dev-main` for `main`, `2.x-dev` for `2`, `2.2.x-dev` for `2.2`.
-`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:123-140`).
+`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:125-142`).
 Composer applies an alias only under that key and skips any other without a
 word, and `composer validate --strict` accepts it as well. Branch `2` carried
 `dev-2` from its cut until ACE-784, so `2.4.x-dev` did not exist and no split
@@ -112,11 +114,12 @@ branch in two ways (`v3`) or when the version lies outside a numeric branch
 (`3.0.0` for `2`). A reader that validates the package drops the whole branch
 for such an alias.
 
-Cutting a new version branch changes one thing neither script writes: the
-`edit-on-github-branch` of every `Documentation/guides.xml`, which names the
-branch the manual is edited on. The branch alias and those attributes have to
-agree, and a unit test fails until they do, see
-[Unit tests](../testing/unit-tests.md#the-links-of-the-manuals).
+The `edit-on-github-branch` of every `Documentation/guides.xml` names the
+branch the manual is edited on, and is written from `--source-branch` as well.
+The branch alias and those attributes have to agree, and a unit test fails
+until they do, see
+[Unit tests](../testing/unit-tests.md#the-links-of-the-manuals). On an ordinary
+run neither changes.
 
 ## `bin/release` — orchestrate the release
 
@@ -173,8 +176,65 @@ Pre-flight (`bin/release:178-200`):
 
 Tooling is resolved and verified up front, before anything changes:
 `bin/set-version` needs `composer`, `php`, `tailor`, `pkw`, `jq` and `sed` on
-`PATH` (`bin/set-version:154-160`); `bin/release` additionally needs `git` and an
+`PATH` (`bin/set-version:156-162`); `bin/release` additionally needs `git` and an
 authenticated `gh` (`bin/release:154-162`).
+
+## `bin/cut-branch`: cut a version branch
+
+```shell
+bin/cut-branch <branch> <next-version> [--source-branch=<name>] [--dry-run|--execute]
+```
+
+A version branch is cut when the source branch moves on to the next major or
+minor version and the current one stays maintained: `bin/cut-branch 3 4.0.0` on
+`main` leaves `3.x` on a branch `3` and moves `main` to `4.0.0-dev`. Branch `2`
+was cut by hand, in five commits over eleven weeks, and got the branch alias
+key wrong (ACE-784), the default of both scripts (ACE-249) and the edit branch
+of the manuals (ACE-773). The script takes over what is mechanical. It has the
+safety gates of `bin/release`, see [above](#two-independent-safety-gates).
+
+**Phase 1, the new branch** (`bin/cut-branch:303-324`)
+
+1. `git push origin <source commit>:refs/heads/<branch>`, skipped when the
+   branch already exists on `origin` at that commit, so a branch created by
+   hand or an interrupted run continues
+2. `git checkout -b cut-<branch> <source commit>`
+3. `bin/set-version <current version> dev --source-branch=<branch>`: the branch
+   alias becomes `<branch>.x-dev`, the edit branch of the manuals `<branch>`
+4. the `--source-branch` default of `bin/set-version`, `bin/release` and
+   `bin/cut-branch` becomes `<branch>`, two lines each
+5. commit `[TASK] Prepare branch <branch>`, push, PR against the new branch,
+   checks, admin rebase-merge
+
+**Phase 2, the source branch** (`bin/cut-branch:329-344`)
+
+1. `git checkout -b set-version-<next-version> <source commit>`
+2. `bin/set-version <next-version> dev`
+3. the version example in the help of `bin/set-version` and `bin/release`
+   becomes `<next-version>`
+4. commit `[TASK] Set version <next-version>`, push, PR, checks, admin
+   rebase-merge
+
+It refuses before anything is touched (`bin/cut-branch:196-230`, `:264-298`) a
+branch name that is not `MAJOR` or `MAJOR.MINOR`, versions that do not agree
+across the twelve `VERSION` files or are no dev version, a current version
+outside the new branch, a next version inside it or below the current one, a
+next version outside a numeric source branch, an existing local branch of the
+three it creates, a branch on `origin` at another commit, and a dirty tree
+unless it is a dry run.
+
+It ends with what it leaves to the maintainer, because each needs a permission
+or a judgement the script must not have:
+
+- the GitHub ruleset `version-branches`, which covers `2` and `2.[3-9]` upward
+  but no branch `3` yet, and protects against deletion and force pushes
+- the branch list of `.github/workflows/nightly.yml`
+- the DDEV project names of the source branch and the pages that name them
+- the prose that names a version line: the README version tables, `AGENTS.md`,
+  `docs/Index.md`, [Backporting](backporting.md), `openspec/config.yaml`
+- the TYPO3 core versions the source branch supports next
+- the YouTrack versions, and the new branch on Packagist once the splitter
+  carried it over
 
 ## The tag has to match `ext_emconf.php`
 

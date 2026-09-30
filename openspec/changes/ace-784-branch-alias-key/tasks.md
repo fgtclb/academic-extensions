@@ -41,15 +41,15 @@
 
 ## 4. `bin/cut-branch`
 
-- [ ] 4.1 `bin/set-version` writes `edit-on-github-branch` of every
+- [x] 4.1 `bin/set-version` writes `edit-on-github-branch` of every
   `packages/fgtclb/*/Documentation/guides.xml` from `--source-branch`, in every
   mode, and asserts one attribute per file with that value. Verify that a real
   run on `main` changes no `guides.xml`, and that `--source-branch=3` changes
   exactly the twelve attributes.
-- [ ] 4.2 Add `bin/cut-branch <branch> <next-version>` with `--source-branch`
+- [x] 4.2 Add `bin/cut-branch <branch> <next-version>` with `--source-branch`
   (default `main`), `--dry-run`, `--execute` and `--help`, the guards, phase 1,
   phase 2 and the final checklist as designed. No version example in its help.
-- [ ] 4.3 Rehearse in a scratch clone below `.agent/tmp/` with a local bare
+- [x] 4.3 Rehearse in a scratch clone below `.agent/tmp/` with a local bare
   repository as `origin`: `--dry-run` for `3 4.0.0` prints both phases and
   changes nothing, the default mode creates `cut-3` with the thirteen alias
   lines, the twelve edit branches and the two default lines of each of the
@@ -61,7 +61,7 @@
 
 ## 5. Documentation
 
-- [ ] 5.1 `docs/workflow/releasing.md`: the key sentence, the `--source-branch=2`
+- [x] 5.1 `docs/workflow/releasing.md`: the key sentence, the `--source-branch=2`
   advice for a `2` release from `main` (contradicts the page on `2`), the line
   references into `bin/set-version`, the edit branch now written by the
   script, and a section `bin/cut-branch` with the checklist.
@@ -69,7 +69,7 @@
   alias test), `docs/testing/testing-helper.md` (the new script test),
   `AGENTS.md` (six `monorepo-shared` tests, the script tests of
   `testing-helper`), and every page that states a measured test count.
-- [ ] 5.3 `README.md` "Releasing (maintainers)": the third script, in the
+- [x] 5.3 `README.md` "Releasing (maintainers)": the third script, in the
   summarize-and-link style the section has.
 - [ ] 5.4 The version tables of `README.md` and the twelve package READMEs:
   `main` as `^3, 3.0.x-dev (dev-main)`, `2` as `^2, 2.4.x-dev (2.x-dev)`, branch
