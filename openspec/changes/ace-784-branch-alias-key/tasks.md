@@ -75,7 +75,7 @@
   `main` as `^3, 3.0.x-dev (dev-main)`, `2` as `^2, 2.4.x-dev (2.x-dev)`, branch
   cell `2`. Under "Testing 3.x.x", the sentence that says `2.x`. Verify with
   `git grep -n '3\.x-dev'` returning nothing outside `openspec/changes/archive`.
-- [ ] 5.5 `Documentation/Changelog/2.4/Important-BranchAliasKey.rst` in all
+- [x] 5.5 `Documentation/Changelog/2.4/Important-BranchAliasKey.rst` in all
   twelve packages from `Build/Documentation/Templates/Changelog-Important.rst`,
   each with its own label and `ext:<key>` index. It describes the `2.x`
   branch: `2.4.x-dev` installs, inline aliases can go. Check the over and
