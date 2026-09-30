@@ -78,6 +78,10 @@ describing an intention as if it were the state.
   the content element's presets - which is also why no route enhancer may
   declare `defaults` for it. The demand is kept out of the cache hash, so
   filter URLs do not multiply page cache entries.
+- A category filter reaches the path through the `CategoryFilterMapper` aspect
+  of `category_types` as `<slug>-<uid>` parts, read back **by uid only**. The
+  aspect is not static mappable on purpose: a static route argument is part of
+  the page cache identifier, and the lists keep their filter out of it.
 - The profile editor's configuration crosses the Fluid boundary as `data-*`
   attributes on one element, and is **read once** into a frozen object that is
   handed down. No module reads `root.dataset` a second time.
@@ -129,6 +133,7 @@ describing an intention as if it were the state.
 | [Plugin view event](plugin-view-event.md)                       | The one view event the plugins of seven extensions dispatch, where each action calls it, what a listener cannot change, and the test that renders every plugin.                                              |
 | [List filter URLs](list-filter-urls.md)                         | The redirect of a filter submission, the demand in its URL, what is carried and why, the page links of the partner, profile and job lists, and why an enhancer declares no defaults.                         |
 | [List filter types](list-filter-types.md)                       | Which category filters a list offers, in which order and how many right away, options without results, the per-type "All" label, and the program finder.                                                     |
+| [Category filter routing](category-filter-routing.md)           | The routing aspect for category filter values: the segment, why the uid stays in it, why it is not static mappable, and why it is no core mapper.                                                            |
 | [Subcategory matching](subcategory-matching.md)                 | How a selected category matches its subtree in the program list, why each selection is widened on its own, how a parent is offered, and the finder field.                                                    |
 | [Label overrides](label-overrides.md)                           | How a site overrides a label through `_LOCAL_LANG`, the extension name that decides the path on v13 and v14, and the PHP places that hand the request on.                                                    |
 | [Icons](icons.md)                                               | Where icons are registered and consumed, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                                                |

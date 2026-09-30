@@ -21,7 +21,12 @@ and each project writes its own routing aspect today.
     `all` / `alle`.
 - Options: the category group (for example `partners`) and the locale map
   of the empty token.
-- A renamed category changes its generated URL; the old URL keeps resolving,
+- The filter stays a dynamic route argument, never a static one, and a
+  dynamic argument reaches the page cache identifier only through a cHash.
+  The lists exclude their demand from the cache hash
+  (`ace-723-list-filter-get-urls`), so their filter URLs carry no cHash and
+  share one page cache entry.
+- A renamed category changes its generated URL. The old URL keeps resolving,
   because only the uid is read.
 - Behaviour is identical on TYPO3 v13 and v14.
 
@@ -40,7 +45,7 @@ None.
 
 - A new aspect type registered in the system routing configuration.
 - No schema change: the slug is computed at runtime from the title.
-- Used by `ace-tbd-list-route-enhancers`; unused until a site's route
+- Used by `ace-tbd-list-route-enhancers`, and unused until a site's route
   enhancer references it.
 
 ## Non-goals
@@ -54,8 +59,6 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-12`). Two of the six analysed projects carry their own code for this
-today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-category-filter-route-aspect` when the issue is filed after
-implementation.
-
-Implements ACE-623.
+today. ACE-623 is the demo site's own task for readable list URLs and was
+solved in the demo project, so this change has an issue of its own, ACE-782,
+which relates to it.

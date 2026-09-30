@@ -205,6 +205,12 @@ it carries none, and each of the six sorting paths is a page cache entry of its
 own: those segments are static route arguments, and the page cache identifier
 contains them.
 
+The `CategoryFilterMapper` aspect of `category_types` puts the filter into a
+readable path without changing any of this: it is not static mappable, so the
+filter stays a dynamic argument, excluded from the hash, and a filter path adds
+no page cache entry either. See
+[Category filter routing](category-filter-routing.md#not-static-mappable).
+
 The setting is installation-wide; it names the plugin namespaces and nothing
 else. A plugin namespace changed with `view.pluginNamespace` in TypoScript is
 not covered by it. And nothing else in the cached page may read the demand: a
