@@ -83,20 +83,20 @@
 
 ## 6. Definition of done
 
-- [ ] 6.1 `lintPhp` green.
-- [ ] 6.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [x] 6.1 `lintPhp` green.
+- [x] 6.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional -j auto` (SQLite) green with `-t 13`.
-- [ ] 6.3 The same with `-t 14` after its own `composerUpdate`.
-- [ ] 6.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 6.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 6.6 Commits in TYPO3 Core format, subjects at most 52 characters, body
+- [x] 6.3 The same with `-t 14` after its own `composerUpdate`.
+- [x] 6.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 6.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
+- [x] 6.6 Commits in TYPO3 Core format, subjects at most 52 characters, body
   wrapped at 72, no attribution of any tool:
   `[BUGFIX] ACE-784: Key branch alias to composer name` (groups 1 to 3 with
   their docs), `[TASK] ACE-784: Add a script to cut a version branch` (group 4
   with its docs), `[DOCS] ACE-784: Name existing dev versions in README`,
-  `[DOCS] ACE-784: Add changelog for the branch alias key`. Each commit green
+  `[DOCS] ACE-784: Add branch alias key changelog`. Each commit green
   on its own.
-- [ ] 6.7 Archive the change as the last commit of the pull request
+- [x] 6.7 Archive the change as the last commit of the pull request
   (`skip_specs`, no main spec changes).
 - [ ] 6.8 Backport: a change of its own on branch `2` after the backport
   analysis (`docs/workflow/backporting.md`), with the thirteen `composer.json`
