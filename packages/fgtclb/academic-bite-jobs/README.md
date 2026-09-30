@@ -18,13 +18,12 @@ the TYPO3 extension "Academic Jobs b-ite" was created, which only requires
 the b-ite key to seamlessly display job adverts from the b-ite platform on
 a TYPO3 website.
 
-The developed plug-in currently supports different categorisations, which
-are read from b-ite, e.g. `appointment procedures`, `academic staff`,
-`non-scientific staff` and `training positions`.
-
 List view, tile view and table view are currently available as display modes.
-There are also options for grouping and sorting as well as a limit for the
-number of job adverts to be displayed.
+There are also options for sorting and grouping as well as a limit for the
+number of job adverts to be displayed. Categorisations that differ from one
+B-ITE installation to the next, such as `appointment procedures` or
+`academic staff`, are added by a project with event listeners, as the manual
+describes.
 
 > [!NOTE]
 > This extension is currently in beta state - please notice that there might be changes to the structure

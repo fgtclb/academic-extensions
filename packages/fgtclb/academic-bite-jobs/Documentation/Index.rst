@@ -69,6 +69,11 @@ advertisements are also available in the plugin.
 
         Override and customise the frontend templates.
 
+    ..  card:: :ref:`For developers <developers>`
+
+        Change the request to B-ITE and the postings it returns with event
+        listeners.
+
     ..  card:: :ref:`Known problems <known-problems>`
 
         Known issues and information about them.
@@ -87,6 +92,7 @@ advertisements are also available in the plugin.
     Installation/Index
     Configuration/Index
     Templates/Index
+    Developers/Index
     KnownProblems/Index
     Changelog/Changelog-2
 

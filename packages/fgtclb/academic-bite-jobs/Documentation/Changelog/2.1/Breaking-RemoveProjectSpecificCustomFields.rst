@@ -83,4 +83,8 @@ The grouping of the job list is configured in TypoScript since version 2.4,
 with `plugin.tx_academicbitejobs.settings.jobs.groupBy`, see
 :ref:`configuration-general-group-by`.
 
+The filter by a custom field and the grouping by its value are possible again
+since version 2.4, with two event listeners of the project and the TypoScript
+setting above, see :ref:`feature-1790774401` and :ref:`developers-example`.
+
 .. index:: FlexForm, Fluid, Frontend

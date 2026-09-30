@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBiteJobs\Services;
 
+use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContextInterface;
+use FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsEvent;
+use FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsRequestEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Http\RequestFactory;
@@ -14,71 +18,91 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 final class BiteJobsService
 {
-    /**
-     * @var array<string|array<string, mixed>, mixed>|null $responseBody
-     * @todo Response state on a service class ? A really really bad idea.
-     */
-    protected $responseBody;
-
     public function __construct(
         private readonly RequestFactory $requestFactory,
         private readonly LoggerInterface $logger,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {}
 
     /**
-     * @return string[]
+     * @return list<array<string, mixed>>
      */
-    public function fetchBiteJobs(?ServerRequestInterface $request = null): array
-    {
+    public function fetchBiteJobs(
+        ?ServerRequestInterface $request = null,
+        ?PluginControllerActionContextInterface $pluginControllerActionContext = null,
+    ): array {
+        $request ??= $GLOBALS['TYPO3_REQUEST'] ?? new ServerRequest();
         $flexformTool = GeneralUtility::makeInstance(FlexFormService::class);
 
         /** @var array<string, mixed> $contentElementData */
-        $contentElementData = $this->getCurrentContentObjectRenderer($request ?? $GLOBALS['TYPO3_REQUEST'] ?? new ServerRequest())?->data ?? [];
+        $contentElementData = $this->getCurrentContentObjectRenderer($request)?->data ?? [];
         $settings = $flexformTool->convertFlexFormContentToArray((string)($contentElementData['pi_flexform'] ?? ''));
 
-        $jobsSettings = $settings['settings']['jobs'];
+        // A content element without a stored FlexForm, created by an import for example,
+        // has no settings at all. It sends the request with empty values, as it always did,
+        // instead of failing on the missing keys.
+        $jobsSettings = is_array($settings['settings']['jobs'] ?? null) ? $settings['settings']['jobs'] : [];
 
-        $filter = [];
-
-        $jobs = [];
-        $additionalOptions = json_encode([
-            'key' => $jobsSettings['jobListingKey'],
-            'channel' => 0,
-            'locale' => 'de',
-            'page' => [
-                'offset' => 0,
+        $requestEvent = new ModifyBiteJobPostingsRequestEvent(
+            [
+                'key' => $jobsSettings['jobListingKey'] ?? null,
+                'channel' => 0,
+                'locale' => 'de',
+                'page' => [
+                    'offset' => 0,
+                ],
+                'filter' => [],
+                'sort' => [
+                    'order' => $jobsSettings['sortingDirection'] ?? null,
+                    'by' => $jobsSettings['sortBy'] ?? null,
+                ],
             ],
-            'filter' => $filter,
-            'sort' => [
-                'order' => $jobsSettings['sortingDirection'],
-                'by' => $jobsSettings['sortBy'],
-            ],
-        ]);
+            $jobsSettings,
+            $request,
+            $pluginControllerActionContext,
+        );
+        $this->eventDispatcher->dispatch($requestEvent);
 
         $searchUrl = 'https://jobs.b-ite.com/api/v1/postings/search';
 
+        $responseData = [];
         try {
             $response = $this->requestFactory->request($searchUrl, 'POST', [
                 'headers' => ['Content-Type' => 'application/json'],
-                'body' => $additionalOptions,
+                'body' => json_encode($requestEvent->getPayload(), JSON_THROW_ON_ERROR),
             ]);
 
-            $this->responseBody = json_decode($response->getBody()->getContents(), true);
+            $decoded = json_decode($response->getBody()->getContents(), true);
+            if (is_array($decoded)) {
+                $responseData = $decoded;
+            }
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
                 'Error while fetching jobs from Bite API: %s',
                 $e->getMessage()
             ));
         }
-        if (!empty($this->responseBody['jobPostings'])) {
-            $jobs = $this->responseBody['jobPostings'];
+
+        $jobPostings = [];
+        if (is_array($responseData['jobPostings'] ?? null)) {
+            $jobPostings = array_values(array_filter($responseData['jobPostings'], is_array(...)));
         }
+
+        $resultEvent = new ModifyBiteJobPostingsEvent(
+            $jobPostings,
+            $responseData,
+            $jobsSettings,
+            $request,
+            $pluginControllerActionContext,
+        );
+        $this->eventDispatcher->dispatch($resultEvent);
+        $jobPostings = $resultEvent->getJobPostings();
 
         if (!empty($jobsSettings['limit'])) {
-            $jobs = array_slice($jobs, 0, (int)$jobsSettings['limit']);
+            $jobPostings = array_slice($jobPostings, 0, (int)$jobsSettings['limit']);
         }
 
-        return $jobs;
+        return $jobPostings;
     }
 
     private function getCurrentContentObjectRenderer(ServerRequestInterface $request): ?ContentObjectRenderer

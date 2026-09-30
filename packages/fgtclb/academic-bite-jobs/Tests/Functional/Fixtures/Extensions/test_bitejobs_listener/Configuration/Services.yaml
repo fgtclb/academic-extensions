@@ -1,0 +1,32 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  TESTS\TestBitejobsListener\:
+    resource: '../Classes/*'
+
+  # Registered by tag, because TYPO3 v12 has no #[AsEventListener] attribute.
+  TESTS\TestBitejobsListener\EventListener\ChangeBiteJobsRequest:
+    tags:
+      - name: event.listener
+        identifier: 'test-bitejobs-listener/change-request'
+
+  TESTS\TestBitejobsListener\EventListener\ChangeBiteJobsPostings:
+    tags:
+      - name: event.listener
+        identifier: 'test-bitejobs-listener/change-postings'
+
+  TESTS\TestBitejobsListener\EventListener\RecordBiteJobsEvents:
+    tags:
+      - name: event.listener
+        identifier: 'test-bitejobs-listener/record-request'
+        method: 'recordRequest'
+        event: FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsRequestEvent
+        after: 'test-bitejobs-listener/change-request'
+      - name: event.listener
+        identifier: 'test-bitejobs-listener/record-result'
+        method: 'recordResult'
+        event: FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsEvent
+        after: 'test-bitejobs-listener/change-postings'

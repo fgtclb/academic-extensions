@@ -247,7 +247,7 @@ v12 + v13 branch none of that applies: every one of them is a current,
 non-deprecated API on both supported versions, and this branch uses all three —
 17 `Extbase\Annotation` imports in 13 files, 10 upgrade wizards in 6 extensions,
 and one `FlexFormService` call site in
-`academic-bite-jobs/Classes/Services/BiteJobsService.php` lines 11 and 33.
+`academic-bite-jobs/Classes/Services/BiteJobsService.php` lines 15 and 35.
 
 That analysis lives on `main`, where it is relevant. Do not port it here.
 

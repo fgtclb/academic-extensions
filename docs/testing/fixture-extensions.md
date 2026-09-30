@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Fourteen such fixture extensions exist, in seven of the twelve extensions, and
+Fifteen such fixture extensions exist, in seven of the twelve extensions, and
 the table below lists all of them. That is the whole population — this is a
 mechanism used sparingly and only where nothing smaller works. Count them with:
 
@@ -23,6 +23,7 @@ They sit next to the tests that use them, under
 | Extension key                          | Composer package name                   | Owned by               | Provides                                                                 |
 |----------------------------------------|-----------------------------------------|------------------------|--------------------------------------------------------------------------|
 | `test_base_dependency_injection`       | `tests/base-test-dependency-injection`  | `academic-base`        | Two services to resolve through the container, plus `Services.yaml`.     |
+| `test_bitejobs_listener`               | `tests/test-bitejobs-listener`          | `academic-bite-jobs`   | Listeners of the B-ITE request and result events, one recording both.    |
 | `test_bitejobs_stub`                   | `tests/test-bitejobs-stub`              | `academic-bite-jobs`   | An `ext_localconf.php` replacing the Guzzle handler stack.               |
 | `test_category_types_group`            | `tests/category-types-group`            | `typo3-category-types` | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.      |
 | `test_category_types_summary_override` | `tests/category-types-summary-override` | `typo3-category-types` | A page TSconfig override of the page module category summary template.   |
@@ -224,7 +225,10 @@ The existing ones show the cases that justify one:
   case for an event: its two listeners are registered with the `event.listener`
   tag, which only means anything once the container has seen the class, so the
   documented way to register a listener on this branch is the way the test
-  registers one.
+  registers one. `test_bitejobs_listener` is the same case for the request and
+  result events of `academic_bite_jobs`. Its recording listener keeps the
+  events in a static property, so a test reads what a listener was handed
+  during a frontend request too.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path.
