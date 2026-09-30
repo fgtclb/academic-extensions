@@ -26,7 +26,7 @@
 **Non-Goals:**
 
 - Validating that a mapped column exists in `fe_users`. Listeners of
-  `ace-tbd-fe-user-sync-data-events` may add keys that are not columns.
+  `ace-781-fe-user-sync-data-events` may add keys that are not columns.
 
 ## Decisions
 
