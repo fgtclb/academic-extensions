@@ -42,10 +42,15 @@ A template that needs a field of the page therefore resolves the record
 itself. The partner and project page templates set `pageRecord` to
 `{page.pageRecord}`, and to `{data}` when that is empty, and hand it to their
 partials. `page` comes first because `PAGEVIEW` reserves that name, while a
-`PAGEVIEW` site package may assign a `data` of its own. The `partner-data` and
-`project-data` processors resolve the record in the same order. Up to ACE-785
-they read `data` first, and such a site package made them fail with a type
-error. `program-data` still reads `data` first (ACE-786).
+`PAGEVIEW` site package may assign a `data` of its own. The `partner-data`,
+`project-data` and `program-data` processors resolve the record in the same
+order, and use `data` only when `page` is not a page information object. Up to
+ACE-785 (partners, projects) and ACE-786 (programs) they read `data` first, and
+such a site package made them fail with a type error, or read the wrong array
+as the page record. Checking that `data` is an array would not be enough: a
+site package may assign the records of a query as `data`, which is an array and
+not the page record. The program page test pins that case, the partner and
+project tests assign a text.
 The project heading falls back to `pageRecord.title`, and both headers render
 `pageRecord.subtitle`, the core field. Before ACE-785 the project heading read
 `{data.title}` and stayed empty on `PAGEVIEW`. Assigning `data` through a data
@@ -182,7 +187,9 @@ page of the layout setting test; in a run of the whole class an earlier test
 has compiled it already.
 `AcademicProgramPageTemplateTest.php` next to it keeps the template name, the
 media, the content variable and the site package's partial root paths, and
-`AcademicProgramApplicationLinkTest.php` the application link.
+`AcademicProgramApplicationLinkTest.php` the application link. In the layout
+test, a `PAGEVIEW` site package that assigns a text or the records of a query
+as `data` pins the page-first order of `program-data`.
 
 `AcademicPartnerPageLayoutTest.php` and `AcademicProjectPageLayoutTest.php`
 repeat the layout cases for the other two page types, with a header or facts
