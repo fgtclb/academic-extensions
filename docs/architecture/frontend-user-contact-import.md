@@ -299,8 +299,10 @@ deleted or restored profile, and for the parent of a translation, since the
 detail view is tagged with the default-language uid. Before this change a
 profile deleted in the backend stayed on cached list and detail pages: the core
 flushes the page of the record and the tags of the table and the uid, and the
-plugins carry neither, because Extbase does not tag its pages with the records
-it reads (`frontend.cache.autoTagging` is off by default).
+plugins carry neither unless the automatic cache tagging of the core
+(`frontend.cache.autoTagging`) is on, which tags pages with the records they
+show. It is on in instances set up on TYPO3 v13.3 or later and off in instances
+upgraded from an earlier version.
 
 A profile that is hidden already is left out, so it is neither listed nor
 counted. Writing `hidden = 1` again would not add a history entry, since the

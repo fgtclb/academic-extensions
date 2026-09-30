@@ -13,8 +13,9 @@
   `skip_sync` only for a profile with an import identifier.
 - The list and detail plugins are tagged `profile_list_view` and
   `profile_detail_view_<uid>`. `DataHandlerHooks` flushes them after a save,
-  never after a delete, and Extbase does not tag pages with the records it
-  reads (`frontend.cache.autoTagging` is off by default on v13 and v14).
+  never after a delete. Only the automatic cache tagging of the core
+  (`frontend.cache.autoTagging`) tags pages with the records they show, and
+  it is off in instances upgraded from a version before v13.3.
 - Profiles and frontend users are linked through
   `tx_academicpersons_feuser_mm`, with `uid_local` = profile and
   `uid_foreign` = frontend user (`Classes/Provider/FrontendUserProvider.php`).
