@@ -41,6 +41,6 @@
 - [x] 4.5 No changelog entry: nothing an installation observes changes.
 - [x] 4.6 Commit `[BUGFIX] ACE-787: Store files in set-version form`, TYPO3
   Core format, no attribution of any tool.
-- [ ] 4.7 Archive the change as the last commit of the pull request.
+- [x] 4.7 Archive the change as the last commit of the pull request.
 - [ ] 4.8 Backport: a change of its own on branch `2`, where the comments and
   `providesPackages` do not apply and the instance manifests need sorting.
