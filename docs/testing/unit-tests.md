@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 121 unit test classes: 112 across the twelve extensions, two in
-`packages-dev/dev-site`, three in `packages-dev/monorepo-shared` and four in
+There are 136 unit test classes: 122 across the twelve extensions, three in
+`packages-dev/dev-site`, six in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -77,15 +77,18 @@ green because it never looked at it.
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) carries the
 tests of the three scripts behind `runTests.sh -j`, which split the functional
 suite, check that the chunks ran every listed test, and record the durations
-(ACE-692). Its traits have no tests of their
+(ACE-692), and of `Build/Scripts/composerBranchVersion.sh`, which names the
+branch alias key (ACE-784). Its traits have no tests of their
 own — they are exercised only through the extensions that use them.
 [`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
 the check that every `ext_emconf.php` of the repository names its dependencies
 by extension key, see [below](#the-ext_emconfphp-dependency-keys), the one
 that every translation names its extension without an underscore, see
 [below](#the-extension-name-of-translations), the extension point checks,
-see [below](#the-extension-points), and the check that no source file names an
-issue of a customer project, see [below](#customer-issue-keys).
+see [below](#the-extension-points), the check that no source file names an
+issue of a customer project, see [below](#customer-issue-keys), and the checks
+of the manual links and the branch alias key, see
+[below](#the-links-of-the-manuals).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -442,8 +445,26 @@ every "Edit on GitHub" link into the manual of `academic_base` until ACE-773.
 
 The edit branch is read from the branch alias because the branch name is not
 in the files of a checkout, and a git call does not work in a worktree, see
-above. A newly cut version branch changes both, see
+above. The key of the alias is the version name composer gives the branch,
+`dev-main` for `main` and `2.x-dev` for `2`, and the test maps it back to the
+bare branch name. A newly cut version branch changes both, see
 [Releasing](../workflow/releasing.md).
+
+## The branch alias key
+
+[`BranchAliasKeyTest`](../../packages-dev/monorepo-shared/Tests/Unit/BranchAliasKeyTest.php)
+asserts that the root `composer.json` and every package below
+`packages/fgtclb/` carry the same `extra.branch-alias` with exactly one entry,
+that its key is what `Build/Scripts/composerBranchVersion.sh` prints for the
+branch `DocumentationGuidesTest` reads from the root, and that a numeric key
+aliases a minor version inside it (`2.x-dev` to `2.4.x-dev`).
+
+Composer applies an alias only when its key is the version name it gives the
+branch, and skips any other key without a word. `composer validate --strict`
+accepts one as well. Branch `2` carried `dev-2` from its cut until ACE-784, so
+`2.4.x-dev` did not exist and no split package requiring a sibling with
+`~2.4.0@dev` installed from it. `bin/set-version` writes the key through the
+same script, see [Releasing](../workflow/releasing.md).
 
 ## See also
 

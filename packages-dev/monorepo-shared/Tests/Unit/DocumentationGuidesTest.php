@@ -24,8 +24,9 @@ use PHPUnit\Framework\TestCase;
  *   directory, because the split repositories are read-only.
  * - The edit branch is the branch the files live on, so that the manual of a version
  *   line is edited where that version line is maintained. It is read from the only
- *   `extra.branch-alias` of the root `composer.json` (`dev-main`, `dev-2`), which a newly
- *   cut version branch has to change anyway.
+ *   `extra.branch-alias` of the root `composer.json`, whose key is the version name composer
+ *   gives the branch (`dev-main`, `2.x-dev`). `bin/set-version` writes both from the same
+ *   branch name.
  * - The repository link names the split repository, which is named after the package
  *   directory, not after the composer package: `fgtclb/typo3-category-types`.
  * - The extension link names the extension key.
@@ -96,9 +97,11 @@ final class DocumentationGuidesTest extends TestCase
 
     /**
      * The branch this checkout belongs to, from the one branch alias of the root
-     * `composer.json`: `main` for `dev-main`.
+     * `composer.json`. Its key is the version name composer gives the branch: `dev-main`
+     * for `main`, `2.x-dev` for `2`, `2.2.x-dev` for `2.2`. `2.x-dev` would also be the
+     * name of a branch `2.x`, but every version branch here is named by its bare number.
      */
-    private static function branch(): string
+    public static function branch(): string
     {
         $manifest = json_decode(
             (string)file_get_contents(self::repositoryPath() . '/composer.json'),
@@ -107,11 +110,21 @@ final class DocumentationGuidesTest extends TestCase
             JSON_THROW_ON_ERROR,
         );
         $aliases = is_array($manifest) ? ($manifest['extra']['branch-alias'] ?? []) : [];
-        $branches = is_array($aliases) ? array_keys($aliases) : [];
-        if (count($branches) !== 1 || !str_starts_with((string)$branches[0], 'dev-')) {
-            throw new \RuntimeException('The root composer.json needs exactly one "dev-<branch>" branch alias.', 1790668801);
+        $keys = is_array($aliases) ? array_keys($aliases) : [];
+        if (count($keys) !== 1) {
+            throw new \RuntimeException('The root composer.json needs exactly one branch alias.', 1790668801);
         }
-        return substr((string)$branches[0], 4);
+        $key = (string)$keys[0];
+        if (str_starts_with($key, 'dev-')) {
+            return substr($key, 4);
+        }
+        if (preg_match('/^(\d+(?:\.\d+){0,2})\.x-dev$/', $key, $matches) === 1) {
+            return $matches[1];
+        }
+        throw new \RuntimeException(
+            sprintf('The branch alias key "%s" of the root composer.json is no version name composer gives a branch.', $key),
+            1790795892,
+        );
     }
 
     /**

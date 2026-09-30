@@ -33,7 +33,9 @@
 #                                minor/major bumps).
 #
 # Options:
-#   --source-branch=<name>   git branch the branch-alias is keyed to (default: main)
+#   --source-branch=<name>   git branch the version is applied on (default: main)
+#                            It keys the branch-alias with the version name
+#                            composer gives that branch: dev-main, 2.x-dev.
 #   --dry-run                print every change without touching a file
 #   -h, --help               show this help
 #
@@ -61,7 +63,7 @@ step()  { printf '   [%s] %s\n' "$1" "$2"; }
 die()   { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
 
 usage() {
-    sed -n '3,44p' "${BASH_SOURCE[0]}" | sed 's/^#\{0,1\} \{0,1\}//'
+    sed -n '3,/^$/p' "${BASH_SOURCE[0]}" | sed 's/^#\{0,1\} \{0,1\}//'
 }
 
 # Execute a command, or in dry-run mode only print it.
@@ -119,6 +121,25 @@ case "${TYPE}" in
 esac
 
 # ---------------------------------------------------------------------------
+# Branch alias. Composer applies it only when its key is the version name it
+# gives the source branch ("dev-main" for main, "2.x-dev" for 2) and skips any
+# other key silently. Derived and checked in every mode, before a tool or a file
+# is touched: bin/release pushes the tag between its release and its
+# post-release run, so a branch name that cannot work has to stop the first.
+# ---------------------------------------------------------------------------
+BRANCH_ALIAS="${MAJOR}.${MINOR}.x-dev"
+BRANCH_ALIAS_KEY="$("${ROOT_DIR}/Build/Scripts/composerBranchVersion.sh" "${SOURCE_BRANCH}")" \
+    || die "Cannot derive the branch alias key from --source-branch='${SOURCE_BRANCH}'."
+# A numeric key takes only a target inside it ("2.x-dev" -> "2.4.x-dev"). A
+# reader that validates the package drops the whole branch for any other one.
+if [[ "${BRANCH_ALIAS_KEY}" != dev-* ]]; then
+    case "${BRANCH_ALIAS}" in
+        "${BRANCH_ALIAS_KEY%x-dev}"*) : ;;
+        *) die "Version ${PASSED_VERSION} is outside branch '${SOURCE_BRANCH}' (${BRANCH_ALIAS_KEY})." ;;
+    esac
+fi
+
+# ---------------------------------------------------------------------------
 # Resolve + verify binaries (fail early with a clear message). External override
 # is intentionally not offered yet.
 # ---------------------------------------------------------------------------
@@ -155,9 +176,8 @@ PKW_CMD=("${PHP}" "${PKW}")
 #   ACADEMIC_CONSTRAINT   -> composer require constraint for academic package deps
 #                            and for academics-monorepo-shared in the ddev instances
 #   ROOT_SHARED_CONSTRAINT-> composer require academics-monorepo-shared in root
-#   SET_BRANCH_ALIAS/ALIAS-> extra.branch-alias.dev-<source-branch>
+#   SET_BRANCH_ALIAS      -> extra.branch-alias, keyed and checked above
 # ---------------------------------------------------------------------------
-BRANCH_ALIAS="${MAJOR}.${MINOR}.x-dev"
 
 if [ "${TYPE}" = "release" ]; then
     RELEASE_VERSION="${MAJOR}.${MINOR}.${PATCH}"
@@ -190,7 +210,7 @@ step "info" "runTests COMPOSER_ROOT_VERSION = ${RUNTESTS_VERSION}"
 step "info" "package version                = ${PACKAGE_VERSION}"
 step "info" "ext_emconf version             = ${EMCONF_VERSION}"
 step "info" "academic dep constraint        = ${ACADEMIC_CONSTRAINT}"
-[ "${SET_BRANCH_ALIAS}" -eq 1 ] && step "info" "branch-alias dev-${SOURCE_BRANCH}      = ${BRANCH_ALIAS}"
+[ "${SET_BRANCH_ALIAS}" -eq 1 ] && step "info" "$(printf '%-30s' "branch-alias ${BRANCH_ALIAS_KEY}") = ${BRANCH_ALIAS}"
 
 # ---------------------------------------------------------------------------
 # Discover the academic package set: composer name <-> extension key <-> path.
@@ -278,12 +298,21 @@ apply_single_composer_require() {
     run "${COMPOSER}" require -d "${dir}" --no-update "${name}:${constraint}"
 }
 
-# Helper: set the branch-alias for a package (or the root when dir is '.').
+# Helper: set the branch-alias for a package (or the root when dir is '.'). The
+# whole object is replaced, so a key written for another branch cannot survive,
+# and composer re-serializes only that object. Composer falls back to rewriting
+# the file when it cannot edit it in place, and that path nests a key holding
+# dots ("2.x-dev"), hence the check.
 apply_branch_alias() {
-    local dir="$1"
-    step "${dir}" "config extra.branch-alias.dev-${SOURCE_BRANCH} = ${BRANCH_ALIAS}"
-    run "${COMPOSER}" config -d "${dir}" \
-        "extra.branch-alias.dev-${SOURCE_BRANCH}" "${BRANCH_ALIAS}"
+    local dir="$1" alias_json
+    alias_json="$("${JQ}" -cn --arg key "${BRANCH_ALIAS_KEY}" --arg target "${BRANCH_ALIAS}" '{($key): $target}')"
+    step "${dir}" "config extra.branch-alias = ${alias_json}"
+    run "${COMPOSER}" config -d "${dir}" --json extra.branch-alias "${alias_json}"
+    if [ "${DRY_RUN}" -eq 0 ]; then
+        "${JQ}" -e --argjson expected "${alias_json}" \
+            '.extra."branch-alias" == $expected' "${dir}/composer.json" >/dev/null \
+            || die "${dir}/composer.json: extra.branch-alias is not ${alias_json}"
+    fi
 }
 
 # Helper: set extra.typo3/cms.version for a split extension composer.json. TYPO3
