@@ -60,7 +60,7 @@ They sit next to the tests that use them, under
 | `test_profile_partial_overrides`            | `tests/test-profile-partial-overrides`            | `academic-persons`      | Partial overrides in two paths, a card passing a page, an old list template.  |
 | `test_profile_placeholders`                 | `tests/test-profile-placeholders`                 | `academic-persons`      | Profile image placeholders of a site package, one per gender.                 |
 | `test_profile_query_constraints`            | `tests/test-profile-query-constraints`            | `academic-persons`      | Listeners narrowing and counting the queries, and one replacing the demand.   |
-| `test_profile_update_recorder`              | `tests/test-profile-update-recorder`              | `academic-persons-edit` | A listener recording every profile update announcement, frontend included.    |
+| `test_profile_update_recorder`              | `tests/test-profile-update-recorder`              | `academic-persons`      | A listener recording every profile update announcement, frontend included.    |
 | `test_profile_view_modes`                   | `tests/test-profile-view-modes`                   | `academic-persons`      | A project view mode of the profile lists, with its TypoScript.                |
 | `test_program_events`                       | `tests/test-program-events`                       | `academic-programs`     | Listeners on the program demand, list and page data events, a list template.  |
 | `test_programs_category_type_priority`      | `tests/programs-category-type-priority`           | `academic-programs`     | A `CategoryTypes.yaml` raising the priority of a type of the programs group.  |

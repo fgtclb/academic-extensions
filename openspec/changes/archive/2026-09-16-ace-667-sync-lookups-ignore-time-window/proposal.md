@@ -46,7 +46,7 @@ None.
 ## Non-goals
 
 - Hiding or deleting profiles whose frontend user was disabled or removed.
-  That is `ace-tbd-profile-cleanup-command`.
+  That is `ace-215-profile-cleanup-command`.
 - Mapping a visibility window from frontend-user data onto the profile.
 - Changing what the public plugins show.
 

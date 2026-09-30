@@ -9,18 +9,22 @@ writes raw SQL, which bypasses history, cache clearing and translations.
 
 - New command `academic:cleanupprofiles` in `academic_persons`
   (`packages/fgtclb/academic-persons`).
-- A profile qualifies only when every frontend user linked to it is
+- Only profiles the synchronisation manages are looked at: with an import
+  identifier, or with a frontend user of the record type the synchronisation
+  reads. A profile qualifies only when every frontend user linked to it is
   disabled, past its end time or deleted. Profiles excluded from
   synchronisation (`skip_sync`) and profiles with no linked frontend user are
   never touched.
 - For profiles whose users are disabled or expired, `--disabled` chooses
   `hide` (default) or `keep`. For profiles whose users are all deleted,
   `--deleted` chooses `delete` (default), `hide` or `keep`.
-- `--include-pids` and `--exclude-pids` limit the frontend users by page,
-  like the create and update commands. `--dry-run` lists what would change
-  and writes nothing.
+- `--include-pids` and `--exclude-pids` choose the profiles looked at by the
+  pages of their frontend users: one user on an included page takes a profile
+  in, one on an excluded page leaves it alone. `--dry-run` lists what would
+  change and writes nothing.
 - All writes go through the DataHandler, so history, cache clearing and
-  translations follow.
+  translations follow. A deleted or restored profile now also clears the
+  cached list and detail pages, in the backend as well.
 - Profiles are never shown again automatically.
 
 The behaviour is identical on TYPO3 v13 and v14.
@@ -59,7 +63,6 @@ None.
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-07`). Three of the six analysed projects are concerned today:
 two carry their own `academic:cleanupprofiles` command, and the third plans
-the same. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-<slug>` when the issue is filed after implementation.
+the same.
 
 Implements ACE-215. Relates to ACE-229 and ACE-77.
