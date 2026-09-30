@@ -1,44 +1,47 @@
 ## 1. Tests first
 
-- [ ] 1.1 In `Tests/Functional/Services/BiteJobsServiceTest.php`, call the
+- [x] 1.1 In `Tests/Functional/Services/BiteJobsServiceTest.php`, call the
   service twice on one instance: the first with a stub answering postings,
   the second with a handler throwing `ConnectException`. Assert the second
   call returns no postings. Record that it fails against the unchanged
   service, which returns the first response again.
-- [ ] 1.2 Add a fixture extension below `Tests/Functional/Fixtures/Extensions/`
+- [x] 1.2 Add a fixture extension below `Tests/Functional/Fixtures/Extensions/`
   (psr-4 autoload, then `composerUpdate`) with a request listener adding
   `filter.custom.zuordnung` and a result listener removing one posting and
   adding `relationName` to the rest. Assert the captured request body and the
   returned postings. Record that both fail today, where no event is
   dispatched.
-- [ ] 1.3 Assert that the limit applies after the result listener, and that
+- [x] 1.3 Assert that the limit applies after the result listener, and that
   the default payload without listeners is unchanged. Break the order on
   purpose once, watch the limit case go red, restore.
 
 ## 2. Implementation
 
-- [ ] 2.1 Replace `$responseBody` with a local variable, make the class
+- [x] 2.1 Replace `$responseBody` with a local variable, make the class
   `final readonly` and correct the return annotation; verify task 1.1 passes
   and `phpstan` stays green on v13 and v14.
-- [ ] 2.2 Add `ModifyBiteJobsRequestEvent` and `AfterBiteJobsFetchedEvent`
+- [x] 2.2 Add `ModifyBiteJobPostingsRequestEvent` and `ModifyBiteJobPostingsEvent`
   and dispatch them; verify tasks 1.2 and 1.3 pass on v13 and v14.
 
 ## 3. Documentation
 
-- [ ] 3.1 Add an events section to
-  `packages/fgtclb/academic-bite-jobs/Documentation/Configuration/`, listing
+- [x] 3.1 Add a developer chapter
+  `packages/fgtclb/academic-bite-jobs/Documentation/Developers/Index.rst`
+  (the shape of the other extensions with events, see `design.md`), listing
   every payload key and showing the two example listeners.
-- [ ] 3.2 Add `Documentation/Changelog/3.0/Feature-RequestAndResultEvents.rst`
-  and replace the `[TODO]` migration of
+- [x] 3.2 Add `Documentation/Changelog/3.0/Feature-RequestAndResultEvents.rst`
+  and `Important-FailedRequestRendersNoJobs.rst`, and add a pointer to the
+  events to the migration of
   `Documentation/Changelog/2.1/Breaking-RemoveProjectSpecificCustomFields.rst`
-  with a pointer to the events.
-- [ ] 3.3 Record the two events wherever `docs/` lists the extension points of
-  the extensions; if no such list exists, add the stateless service decision
-  to `docs/architecture/dependency-injection.md`.
+  (its `[TODO]` was already replaced by ACE-677).
+- [x] 3.3 Record the two events on the extension points page of
+  `academic_base` and in `docs/architecture/list-plugin-events.md`, and drop
+  the service from the list of stateful services in
+  `docs/architecture/dependency-injection.md`.
 
 ## 4. File the issue
 
-- [ ] 4.1 Verify ACE-102 and ACE-154 in YouTrack. Unless ACE-40 (the parent
+- [x] 4.1 Verify ACE-102 and ACE-154 in YouTrack. Unless ACE-40 (the parent
   of ACE-154) is the epic of `academic_bite_jobs`, keep ACE-102, close
   ACE-154 as its duplicate and rename the change to
   `ace-102-bite-jobs-request-result-events`; otherwise keep the issue under

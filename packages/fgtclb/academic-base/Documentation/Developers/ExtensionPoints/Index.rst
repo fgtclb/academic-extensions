@@ -94,7 +94,8 @@ Everything else. In particular:
     the next major version. Each of their actions dispatches the
     :ref:`plugin view event <developers-extension-points-plugin-view>`, and the
     partner, program and project lists and the program finder a demand and a
-    list event as well, which replace such a subclass. A subclass that
+    list event as well, and the B-ITE job list a request and a result event,
+    which replace such a subclass. A subclass that
     overrides an action without calling the parent action drops those events
     for its plugin.
 *   **Repositories.** A condition a plugin should apply belongs in a demand or
@@ -121,6 +122,7 @@ Events
 Every event is a :php:`final` class, dispatched through the PSR-14 event
 dispatcher of TYPO3. A listener registers for it with the
 :php:`#[AsEventListener]` attribute of TYPO3. The developer chapters of
+`academic_bite_jobs <https://docs.typo3.org/p/fgtclb/academic-bite-jobs/main/en-us/Developers/Index.html>`__,
 `academic_contacts4pages <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/main/en-us/Developers/Index.html>`__,
 `academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Index.html>`__,
 `academic_persons_edit <https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/Developers/Index.html>`__,
@@ -153,6 +155,16 @@ describe their events in detail, with examples.
             assigned its own variables
         -   assign further view variables, see
             :ref:`developers-extension-points-plugin-view`
+    *   -   :php:`\FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsRequestEvent`
+        -   in the job list of :guilabel:`academic_bite_jobs`, after the
+            request to the B-ITE API is built from the plugin settings and
+            before it is sent
+        -   replace the payload of the request
+    *   -   :php:`\FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsEvent`
+        -   in the job list of :guilabel:`academic_bite_jobs`, after the
+            response of the B-ITE API is decoded, also after a failed request,
+            and before the limit is applied
+        -   replace the postings
     *   -   :php:`\FGTCLB\AcademicContacts4pages\Event\ModifyPageContactsEvent`
         -   in the contacts content element and in the data processor of
             the page contacts, after the contacts of the page are read and

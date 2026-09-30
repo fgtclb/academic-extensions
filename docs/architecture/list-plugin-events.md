@@ -150,6 +150,36 @@ event, so a changed credit points value shows in the facts as well. The event
 does not reach the program details content element, which reads the Extbase
 model and has the plugin view event for its view.
 
+## The B-ITE job list
+
+The job list of `academic_bite_jobs` has no demand and no query: it asks the
+B-ITE API. Its pair sits around that request, in `BiteJobsService`, which the
+list action asks for the postings:
+
+| Event                               | Dispatched                                      | A listener can                               |
+|-------------------------------------|-------------------------------------------------|----------------------------------------------|
+| `ModifyBiteJobPostingsRequestEvent` | after the payload is built, before it is sent   | replace the payload, any key the API accepts |
+| `ModifyBiteJobPostingsEvent`        | after the response is decoded, before the limit | replace the postings, add a value to each    |
+
+Three things differ from the list pairs above:
+
+- **The context is nullable.** The action builds it and hands it to the
+  service, which passes it to both events and the plugin view event gets the
+  same object. The service can be called without one, so both events declare
+  `?PluginControllerActionContextInterface` and also carry the plugin settings
+  below `settings.jobs` and the request on their own.
+- **The result event fires on a failed request too**, with no postings and an
+  empty response, so a listener never has to know the failure path. The service
+  keeps no response between calls: a failure is an empty list, never the list of
+  another job list on the same page.
+- **The limit is enforced after the result event.** A listener that groups sees
+  every posting, and the list never renders more than the editor's limit. This
+  is the "dispatch first, then enforce" rule above.
+
+The payload keys the extension sends are listed in its manual, because the
+payload is an array rather than an object: renaming a key is a breaking change
+nothing in PHP would report.
+
 ## Testing them
 
 The listener is the fixture: a small extension under

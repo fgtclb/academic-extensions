@@ -222,10 +222,6 @@ one method per persistence event. Five are registered by YAML tag:
 Stating this plainly, because a rule presented as universally followed is a rule
 nobody checks:
 
-- [`academic-bite-jobs/Classes/Services/BiteJobsService.php`](../../packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php)
-  line 21 holds `protected $responseBody;`, written in `fetchBiteJobs()` and
-  read afterwards. The code says so itself, at line 19:
-  `@todo Response state on a service class ? A really really bad idea.`
 - [`academic-persons-edit/Classes/Service/ListSortingService.php`](../../packages/fgtclb/academic-persons-edit/Classes/Service/ListSortingService.php)
   line 26 keeps a nullable `PersistenceManagerInterface` filled by a
   `#[Required] injectPersistenceManager()` method, while its own docblock at

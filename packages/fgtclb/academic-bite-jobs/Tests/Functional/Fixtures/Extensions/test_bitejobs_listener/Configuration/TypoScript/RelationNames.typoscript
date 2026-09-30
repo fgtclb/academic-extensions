@@ -1,0 +1,9 @@
+# Groups the job list by the relation name the result listener writes into every posting,
+# mapped from the department the stubbed postings carry.
+plugin.tx_academicbitejobs.settings {
+  jobs.groupBy = relationName
+  testRelationNames {
+    Research = Faculty of Research
+    Teaching = Faculty of Teaching
+  }
+}

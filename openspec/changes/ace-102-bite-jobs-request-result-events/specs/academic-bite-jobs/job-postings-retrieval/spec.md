@@ -2,7 +2,7 @@
 
 Defines what the B-ITE job list of `academic_bite_jobs` requests from the
 B-ITE API, how an installed extension changes the request and the returned
-postings, and what a failed request renders.
+postings, and what a failed request renders, on TYPO3 v13 and v14.
 
 ## ADDED Requirements
 
@@ -41,14 +41,22 @@ limit SHALL apply to the list the extension returns.
 - **WHEN** an installed extension adds a relation name to every posting
 - **THEN** the job list templates can read the relation name of every posting
 
+#### Scenario: Extension after a failed request
+- **WHEN** the request to B-ITE fails and an installed extension adds a posting
+- **THEN** the job list renders that posting
+
+#### Scenario: Extension reads the settings of the job list
+- **WHEN** an installed extension reads a TypoScript setting of the job list that asked for the postings
+- **THEN** it receives the setting of that job list
+
 #### Scenario: Limit after the extension
 - **WHEN** the limit is 2 and an installed extension leaves three postings
 - **THEN** the job list renders two postings
 
 ### Requirement: A failed request renders no postings
-When the request to B-ITE fails, the job list SHALL render no postings and
-SHALL log the error, also when another job list on the same page received
-postings before.
+When the request to B-ITE fails, the job list SHALL render no postings, unless
+an installed extension adds postings, and SHALL log the error, also when
+another job list on the same page received postings before.
 
 #### Scenario: Second job list on the page fails
 - **WHEN** two job lists render on one page, the first request succeeds and the second fails

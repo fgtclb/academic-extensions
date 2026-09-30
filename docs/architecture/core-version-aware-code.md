@@ -475,7 +475,7 @@ Details, so each row can be re-checked rather than trusted:
   `convertFlexFormContentToArray()`, exists on `FlexFormTools` only on v14
   (line 298); on v13 the class exists without it. One call site:
   `packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php`
-  lines 11 and 33.
+  lines 15 and 35.
 - **Upgrade wizards** — mechanism 2. 16 wizards in 7 extensions import
   `TYPO3\CMS\Install\Attribute\UpgradeWizard`,
   `TYPO3\CMS\Install\Updates\UpgradeWizardInterface` and

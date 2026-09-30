@@ -42,7 +42,7 @@ class BiteJobsController extends ActionController
         $this->view->assignMultiple([
             'data' => $contentElementData,
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
-            'jobs' => $this->biteJobsService->fetchBiteJobs($this->request),
+            'jobs' => $this->biteJobsService->fetchBiteJobs($this->request, $context),
         ]);
         $this->dispatchModifyPluginViewEvent($context, $this->view, $this->eventDispatcher);
 
