@@ -44,8 +44,8 @@
   `monorepo-shared` tests, the script tests of `testing-helper`).
 - [x] 4.3 The version tables of `README.md` and the twelve package READMEs as
   on `main`. Verify with `git grep -n '3\.x-dev' -- '*.md'`.
-- [ ] 4.4 `Documentation/Changelog/2.4/Important-BranchAliasKey.rst` in the
-  twelve packages, identical to `main` apart from the labels.
+- [x] 4.4 `Documentation/Changelog/2.4/Important-BranchAliasKey.rst` in the
+  twelve packages, identical to `main`, labels included (as ACE-731 did).
 
 ## 5. Definition of done
 
