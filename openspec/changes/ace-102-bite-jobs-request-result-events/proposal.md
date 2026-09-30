@@ -14,11 +14,12 @@ plugin on the same page whose request fails shows the postings of the first.
 - The service keeps no response between calls. A failed request renders no
   postings.
 - Before the request is sent, an event lets an extension change the request
-  payload (filter, channel, locale, sort, paging), with the plugin settings
-  and the current request at hand.
+  payload (filter, channel, locale, sort, paging), with the plugin settings,
+  the current request and the context of the job list at hand.
 - After the response is decoded, an event lets an extension change the
-  postings (remove, enrich, add a grouping value), with the decoded response
-  and the plugin settings at hand.
+  postings (remove, enrich, add a grouping value), with the decoded response,
+  the plugin settings and the context of the job list at hand. It is
+  dispatched after a failed request as well.
 - The configured limit applies after the listeners.
 - The payload keys are documented, since they become public API.
 
@@ -39,7 +40,8 @@ None.
 
 ## Impact
 
-- `academic_bite_jobs`: the service, two new event classes, the manual.
+- `academic_bite_jobs`: the service, the controller hands its context to the
+  service, two new event classes, the manual with a new developer chapter.
 - The service tests and the HTTP stub fixture.
 - No FlexForm, TypoScript or database change. The FlexForm read inside the
   service stays as it is; its API is one of the TYPO3 v15 blockers named in

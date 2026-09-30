@@ -29,7 +29,7 @@ are `final` already.
   fatal error when the class is loaded, and has to move to the events of
   its plugin: `ace-717-partners-projects-list-events` for partners and
   projects, `ace-766-program-psr14-events` for programs,
-  `ace-tbd-bite-jobs-request-result-events` for the B-ITE job list, and
+  `ace-102-bite-jobs-request-result-events` for the B-ITE job list, and
   `ace-750-generic-plugin-view-event` for the actions none of those covers.
   Pagination and GET filter URLs of the partner list move to
   `ace-727-partner-list-pagination` and `ace-723-list-filter-get-urls`.
@@ -69,7 +69,7 @@ None.
   on why every plugin controller is closed.
 - Depends on `ace-717-partners-projects-list-events`,
   `ace-766-program-psr14-events` and
-  `ace-tbd-bite-jobs-request-result-events`, which have to land first, so
+  `ace-102-bite-jobs-request-result-events`, which have to land first, so
   that every controller made final has an event-based extension point. The
   partnership plugins, the program details plugin and additional view
   variables of the B-ITE job list are covered by none of the three, so

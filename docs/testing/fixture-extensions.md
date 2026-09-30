@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Fifty-seven such fixture extensions exist, in ten of the twelve extensions.
+Fifty-eight such fixture extensions exist, in ten of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -25,6 +25,7 @@ They sit next to the tests that use them, under
 |---------------------------------------------|---------------------------------------------------|--------------------------|-------------------------------------------------------------------------------|
 | `academic_test_configuration`               | `tests/academic-test-configuration`               | `academic-base`          | An academic extension with the stale configuration the upgrade check reports. |
 | `test_base_dependency_injection`            | `tests/base-test-dependency-injection`            | `academic-base`          | Two services to resolve through the container, plus `Services.yaml`.          |
+| `test_bitejobs_listener`                    | `tests/test-bitejobs-listener`                    | `academic-bite-jobs`     | Listeners of the B-ITE request and result events, and a recorder.             |
 | `test_bitejobs_stub`                        | `tests/test-bitejobs-stub`                        | `academic-bite-jobs`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
 | `test_category_types_group`                 | `tests/category-types-group`                      | `typo3-category-types`   | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.           |
 | `test_category_types_icons`                 | `tests/category-types-icons`                      | `typo3-category-types`   | Four category types, one per branch of the icon registrar, and three groups.  |
@@ -270,7 +271,11 @@ The existing ones show the cases that justify one:
   the project tests never load `academic_partners`, so one fixture listening to
   the events of all three would drag an extension into every run that has no
   business being there. `test_page_contacts_listener` does the same for the
-  page contacts event of `academic_contacts4pages`.
+  page contacts event of `academic_contacts4pages`, and
+  `test_bitejobs_listener` for the request and result events of
+  `academic_bite_jobs`. Its recording listener keeps those events and the
+  plugin view event of the job list in a static property, so a test reads what
+  a listener was handed during a frontend request too.
   `test_frontend_user_sync_events` needs a package for two reasons: its
   listeners of the synchronisation events register through
   the container, and its `frontendUserSync` map, which reads a value one of

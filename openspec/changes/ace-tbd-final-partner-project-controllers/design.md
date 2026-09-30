@@ -159,12 +159,12 @@ The `Breaking-` entries map each subclass purpose to its replacement.
   processor, not by this controller.
 
 `BiteJobsController`, through the events of
-`ace-tbd-bite-jobs-request-result-events`:
+`ace-102-bite-jobs-request-result-events`:
 
 - Changing the request to B-ITE (filter, channel, locale, sort, paging): a
-  listener of `ModifyBiteJobsRequestEvent`.
+  listener of `ModifyBiteJobPostingsRequestEvent`.
 - Removing, enriching or grouping the postings: a listener of
-  `AfterBiteJobsFetchedEvent`.
+  `ModifyBiteJobPostingsEvent`.
 - Additional view variables: a listener of the plugin view event of
   `ace-750-generic-plugin-view-event`.
 
@@ -184,7 +184,7 @@ without an event removes the only extension point:
 - `ace-717-partners-projects-list-events` for `PartnerController` and
   `ProjectController`;
 - `ace-766-program-psr14-events` for `ProgramController`;
-- `ace-tbd-bite-jobs-request-result-events` for `BiteJobsController`;
+- `ace-102-bite-jobs-request-result-events` for `BiteJobsController`;
 - `ace-750-generic-plugin-view-event` for `DetailsController`, the two
   partnership actions of `PartnerController` and additional view variables
   of `BiteJobsController`. None of the three changes above dispatches an

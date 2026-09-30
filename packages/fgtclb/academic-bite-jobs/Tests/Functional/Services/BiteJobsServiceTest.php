@@ -6,15 +6,12 @@ namespace FGTCLB\AcademicBiteJobs\Tests\Functional\Services;
 
 use FGTCLB\AcademicBiteJobs\Services\BiteJobsService;
 use FGTCLB\AcademicBiteJobs\Tests\Functional\AbstractAcademicBiteJobsTestCase;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Promise\Create;
+use FGTCLB\AcademicBiteJobs\Tests\Functional\BiteJobsApiStubTrait;
 use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use TYPO3\CMS\Core\Http\RequestFactory;
@@ -26,59 +23,27 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  * Direct coverage for `BiteJobsService::fetchBiteJobs()`, the single method behind the
  * `academicbitejobs_list` plugin. `Tests/Functional/Plugins/AcademicBiteJobsListPluginTest`
  * only proves the plugin renders; what the service sends to the b-ite API, and what it makes
- * of the answer, is pinned down here.
+ * of the answer, is pinned down here. No listener of the two events of the service is
+ * installed, so every case shows the request and the postings as they are without one;
+ * `Tests/Functional/Event/BiteJobsEventsTest` covers the listeners.
  *
- * Four things are worth knowing before reading the cases:
+ * How the API is stubbed and where the service reads its settings from is described on
+ * `BiteJobsApiStubTrait`. Two more things are worth knowing before reading the cases:
  *
- * - **No test performs an outgoing request.** Every case installs a Guzzle handler in
- *   `$GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler']`, which `GuzzleClientFactory` uses
- *   verbatim instead of `HandlerStack::create()`. The handler answers from memory, and
- *   `backupGlobals` restores the setting after each test. Stubbing at handler level is the
- *   same technique the `test_bitejobs_stub` fixture extension uses, and for the same reason:
- *   `RequestFactory` and `GuzzleClientFactory` are `readonly` on TYPO3 v14 and plain classes
- *   on v13, so neither can be subclassed for both versions.
  * - The subject is built by hand rather than taken from the container, because the failure
  *   cases assert against the injected logger. `serviceIsResolvableFromTheDependencyInjectionContainer()`
  *   covers the wiring separately.
- * - The service reads its settings from the FlexForm of the content element it is rendered
- *   in, reached through the `currentContentObject` request attribute. `flexFormWithJobSettings()`
- *   builds that XML in the shape FormEngine stores it - see the `pi_flexform` column of
- *   `Tests/Functional/Plugins/Fixtures/AcademicBiteJobsListPlugin/biteJobsListPage.csv`.
- * - Deliberately not covered: a content element without a FlexForm, and a call without any
- *   request. Both reach `$settings['settings']['jobs']` unguarded and raise
- *   `Undefined array key` warnings, which this suite turns into failures. That is a defect in
- *   the service, not something a test should pin down.
- *
- * The `@var` annotations on the return value of `fetchBiteJobs()` are not decoration: the
- * method declares `@return string[]` while it returns the decoded job postings, one array per
- * posting. Without the override PHPStan reads every assertion against a posting as comparing
- * a string to an array, and reports the assertions as always false.
+ * - A content element without a stored FlexForm sends the request with empty values. That
+ *   is pinned down because it used to raise `Undefined array key` warnings, and a warning
+ *   is a failure in this suite.
  */
 final class BiteJobsServiceTest extends AbstractAcademicBiteJobsTestCase
 {
-    /**
-     * A complete plugin configuration, as FormEngine writes it once every field of
-     * `Configuration/FlexForms/AcademicBiteJobsList.xml` has been touched.
-     *
-     * @var array<string, string>
-     */
-    private const COMPLETE_JOB_SETTINGS = [
-        'jobListingKey' => 'test-key',
-        'view' => 'List',
-        'sortBy' => 'title',
-        'sortingDirection' => 'asc',
-        'limit' => '',
-    ];
-
-    /**
-     * The request the stub handler was asked to answer, for the cases asserting the payload.
-     */
-    private ?RequestInterface $handledRequest = null;
+    use BiteJobsApiStubTrait;
 
     #[Test]
     public function jobPostingsOfTheApiResponseAreReturned(): void
     {
-        /** @var array<int, array<string, mixed>> $jobs */
         $jobs = $this->buildSubject($this->respondWith(200, $this->jobPostingsResponse(['First', 'Second'])))
             ->fetchBiteJobs($this->requestWithPluginSettings());
 
@@ -140,7 +105,6 @@ final class BiteJobsServiceTest extends AbstractAcademicBiteJobsTestCase
     #[DataProvider('limitAppliedToTheReturnedPostingsDataProvider')]
     public function limitIsAppliedToTheReturnedPostings(string $limit, array $expectedTitles): void
     {
-        /** @var array<int, array<string, mixed>> $jobs */
         $jobs = $this->buildSubject($this->respondWith(200, $this->jobPostingsResponse(['First', 'Second', 'Third'])))
             ->fetchBiteJobs($this->requestWithPluginSettings(['limit' => $limit]));
 
@@ -238,8 +202,7 @@ final class BiteJobsServiceTest extends AbstractAcademicBiteJobsTestCase
 
     /**
      * A host that cannot be reached at all never produces a response, so the code path
-     * differs from the `5xx` one above - it is the only one where `$responseBody` keeps the
-     * value it had before the call.
+     * differs from the `5xx` one above.
      */
     #[Test]
     public function connectionFailureIsLoggedAndYieldsAnEmptyList(): void
@@ -256,28 +219,69 @@ final class BiteJobsServiceTest extends AbstractAcademicBiteJobsTestCase
     }
 
     /**
-     * Documents current behaviour, not desired behaviour, and the service says so itself:
-     * `$responseBody` carries the last response on the instance, flagged with a `@todo`
-     * calling it a really bad idea. A second call that fails therefore answers with the
-     * postings of the first one instead of with an empty list. It only surfaces where the
-     * service is reused - it is not `shared: false` - and it is the reason the `@todo` is
-     * worth acting on.
+     * B-ITE answers one array per posting in a list. Anything else in `jobPostings` is left
+     * out, and a keyed answer is handed on as a list, so the templates and the listeners
+     * always get a list of postings.
      */
     #[Test]
-    public function failedCallRepeatsThePostingsOfThePreviousCall(): void
+    public function jobPostingsThatAreNotArraysAreLeftOut(): void
+    {
+        $jobs = $this->buildSubject($this->respondWith(200, '{"jobPostings":{"a":{"id":1,"title":"First"},"b":"Second","c":{"id":3,"title":"Third"}}}'))
+            ->fetchBiteJobs($this->requestWithPluginSettings());
+
+        $this->assertSame(
+            [
+                ['id' => 1, 'title' => 'First'],
+                ['id' => 3, 'title' => 'Third'],
+            ],
+            $jobs,
+        );
+    }
+
+    /**
+     * A content element created by an import, for example, has no FlexForm stored. The
+     * request goes out with empty values and the list renders what the API answers.
+     */
+    #[Test]
+    public function contentElementWithoutFlexFormSendsTheRequestWithEmptyValues(): void
+    {
+        $contentObjectRenderer = GeneralUtility::makeInstance(ContentObjectRenderer::class);
+        $contentObjectRenderer->data = ['uid' => 1, 'CType' => 'academicbitejobs_list', 'pi_flexform' => ''];
+
+        $jobs = $this->buildSubject($this->respondWith(200, '{"jobPostings":[]}'))
+            ->fetchBiteJobs((new ServerRequest())->withAttribute('currentContentObject', $contentObjectRenderer));
+
+        $this->assertSame([], $jobs);
+        $this->assertSame(
+            [
+                'key' => null,
+                'channel' => 0,
+                'locale' => 'de',
+                'page' => ['offset' => 0],
+                'filter' => [],
+                'sort' => ['order' => null, 'by' => null],
+            ],
+            $this->handledPayload(),
+        );
+    }
+
+    /**
+     * The service is shared, so two job lists on one page are served by the same instance.
+     * A second request that fails has to render no postings, not the postings of the first
+     * one, which the service kept on its instance before 3.0.
+     */
+    #[Test]
+    public function failedCallAfterASuccessfulOneReturnsNoPostings(): void
     {
         $subject = $this->buildSubject($this->respondWith(200, $this->jobPostingsResponse(['First'])));
         $request = $this->requestWithPluginSettings();
 
-        /** @var array<int, array<string, mixed>> $jobsOfTheFirstCall */
         $jobsOfTheFirstCall = $subject->fetchBiteJobs($request);
         $this->assertSame(['First'], array_column($jobsOfTheFirstCall, 'title'));
 
         $this->installHandler($this->failWith('Connection refused'));
 
-        /** @var array<int, array<string, mixed>> $jobsOfTheSecondCall */
-        $jobsOfTheSecondCall = $subject->fetchBiteJobs($request);
-        $this->assertSame(['First'], array_column($jobsOfTheSecondCall, 'title'));
+        $this->assertSame([], $subject->fetchBiteJobs($request));
     }
 
     /**
@@ -290,14 +294,11 @@ final class BiteJobsServiceTest extends AbstractAcademicBiteJobsTestCase
     {
         $GLOBALS['TYPO3_REQUEST'] = $this->requestWithPluginSettings(['jobListingKey' => 'from-global-request']);
 
-        /** @var array<int, array<string, mixed>> $jobs */
         $jobs = $this->buildSubject($this->respondWith(200, $this->jobPostingsResponse(['First'])))
             ->fetchBiteJobs();
-        $payload = json_decode((string)$this->handledRequest()->getBody(), true);
 
         $this->assertSame(['First'], array_column($jobs, 'title'));
-        $this->assertIsArray($payload);
-        $this->assertSame('from-global-request', $payload['key'] ?? null);
+        $this->assertSame('from-global-request', $this->handledPayload()['key'] ?? null);
     }
 
     /**
@@ -312,18 +313,6 @@ final class BiteJobsServiceTest extends AbstractAcademicBiteJobsTestCase
     }
 
     /**
-     * The request the stub handler answered, asserted to exist - a case reaching this without
-     * an outgoing request would silently assert nothing otherwise.
-     */
-    private function handledRequest(): RequestInterface
-    {
-        $handledRequest = $this->handledRequest;
-        $this->assertNotNull($handledRequest);
-
-        return $handledRequest;
-    }
-
-    /**
      * @param callable(RequestInterface, array<string, mixed>): PromiseInterface $handler
      */
     private function buildSubject(callable $handler, ?LoggerInterface $logger = null): BiteJobsService
@@ -333,86 +322,7 @@ final class BiteJobsServiceTest extends AbstractAcademicBiteJobsTestCase
         return new BiteJobsService(
             $this->get(RequestFactory::class),
             $logger ?? new NullLogger(),
+            $this->get(EventDispatcherInterface::class),
         );
-    }
-
-    /**
-     * @param callable(RequestInterface, array<string, mixed>): PromiseInterface $handler
-     */
-    private function installHandler(callable $handler): void
-    {
-        $GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler'] = HandlerStack::create($handler);
-    }
-
-    /**
-     * @return callable(RequestInterface, array<string, mixed>): PromiseInterface
-     */
-    private function respondWith(int $statusCode, string $body): callable
-    {
-        return function (RequestInterface $request) use ($statusCode, $body): PromiseInterface {
-            $this->handledRequest = $request;
-
-            return Create::promiseFor(new Response($statusCode, ['Content-Type' => 'application/json'], $body));
-        };
-    }
-
-    /**
-     * @return callable(RequestInterface, array<string, mixed>): PromiseInterface
-     */
-    private function failWith(string $message): callable
-    {
-        return function (RequestInterface $request) use ($message): PromiseInterface {
-            $this->handledRequest = $request;
-
-            return Create::rejectionFor(new ConnectException($message, $request));
-        };
-    }
-
-    /**
-     * @param string[] $titles
-     */
-    private function jobPostingsResponse(array $titles): string
-    {
-        $jobPostings = [];
-        foreach ($titles as $index => $title) {
-            $jobPostings[] = ['id' => $index + 1, 'title' => $title];
-        }
-
-        return (string)json_encode(['jobPostings' => $jobPostings]);
-    }
-
-    /**
-     * @param array<string, string> $jobSettings Overrides for `self::COMPLETE_JOB_SETTINGS`.
-     */
-    private function requestWithPluginSettings(array $jobSettings = []): ServerRequestInterface
-    {
-        $contentObjectRenderer = GeneralUtility::makeInstance(ContentObjectRenderer::class);
-        $contentObjectRenderer->data = [
-            'uid' => 1,
-            'CType' => 'academicbitejobs_list',
-            'pi_flexform' => $this->flexFormWithJobSettings(array_replace(self::COMPLETE_JOB_SETTINGS, $jobSettings)),
-        ];
-
-        return (new ServerRequest())->withAttribute('currentContentObject', $contentObjectRenderer);
-    }
-
-    /**
-     * @param array<string, string> $jobSettings
-     */
-    private function flexFormWithJobSettings(array $jobSettings): string
-    {
-        $fields = '';
-        foreach ($jobSettings as $name => $value) {
-            $fields .= sprintf(
-                '<field index="settings.jobs.%s"><value index="vDEF">%s</value></field>',
-                $name,
-                htmlspecialchars($value),
-            );
-        }
-
-        return '<?xml version="1.0" encoding="utf-8" standalone="yes" ?>'
-            . '<T3FlexForms><data><sheet index="sDEF"><language index="lDEF">'
-            . $fields
-            . '</language></sheet></data></T3FlexForms>';
     }
 }

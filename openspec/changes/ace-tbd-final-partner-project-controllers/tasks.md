@@ -2,7 +2,7 @@
 
 - [ ] 1.1 Confirm on main that `ace-717-partners-projects-list-events`,
   `ace-766-program-psr14-events` and
-  `ace-tbd-bite-jobs-request-result-events` are merged and their events
+  `ace-102-bite-jobs-request-result-events` are merged and their events
   are dispatched; stop otherwise.
 - [ ] 1.2 Confirm that `ace-750-generic-plugin-view-event` is merged and
   dispatched in the program details action, both partnership actions and
