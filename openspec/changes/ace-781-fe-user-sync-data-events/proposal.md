@@ -14,8 +14,8 @@ for users without data, because a factory must return a profile.
     mapping can then use;
   - skip the user, so nothing is created or updated.
 - After mapping, the synchronisation announces the mapped profile together
-  with the source data. Listeners can apply value maps such as gender, a
-  visibility window or initials.
+  with the source data. Listeners can apply value maps such as the gender or
+  initials.
 - A custom factory may decline to create a profile. The command then creates
   nothing for that user and continues with the next one.
 - The documentation shows how a listener of the mapped profile sets the
@@ -57,6 +57,6 @@ None.
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-data-06`). Three of the six analysed projects carry their own code
 for this today: LDAP factories with instance caches, request faking and empty
-profiles. A fourth replaces its factory as well. No YouTrack issue is filed
-yet; the change is renamed to `ace-<NNN>-<slug>` when the issue is filed
-after implementation.
+profiles. A fourth replaces its factory as well.
+
+Implements ACE-781. Relates to ACE-720 and ACE-780.

@@ -5,11 +5,12 @@
   dispatched by `ProfileCreateCommandService.php:153` and
   `ProfileUpdateCommandService.php:157`.
 - `AbstractProfileFactory::createProfileFromFrontendUser()` must return a
-  `Profile` (`Classes/Profile/AbstractProfileFactory.php:187`).
-  `createProfileForUser()` is already `?int` in `ProfileFactoryInterface`,
-  and `ProfileCreateCommandService.php:95` ignores its result.
+  `Profile` (`Classes/Profile/AbstractProfileFactory.php:193` on 2026-09-30,
+  `:187` when the change was written). `createProfileForUser()` is already
+  `?int` in `ProfileFactoryInterface`, and
+  `ProfileCreateCommandService.php:95` ignores its result.
 - `ProfileActionType` (`Create`, `Update`) already exists.
-- Factories are shared services (`ProfileFactory.php:25`), so a cache inside
+- Factories are shared services (`ProfileFactory.php:27`), so a cache inside
   a project factory is state that crosses frontend users.
 
 ## Goals / Non-Goals
@@ -28,7 +29,7 @@
 
 ### Two events, dispatched by the abstract factory
 
-- `final class ModifyFrontendUserSyncDataEvent` has
+- `final class BeforeProfileMappedFromFrontendUserEvent` has
   `getFrontendUserData(): array`, `setFrontendUserData(array)`,
   `getAction(): ProfileActionType`, `getProfile(): ?Profile` (null on
   create), `skip()` and `isSkipped()`. It is dispatched before mapping, in
@@ -37,10 +38,33 @@
   `getFrontendUserData()` and `getAction()`. It is dispatched after mapping,
   before `persistAll()`.
 
+The data event was planned as `ModifyFrontendUserSyncDataEvent`. The naming
+rule of `docs/architecture/class-design.md` makes an event whose listener may
+change and refuse what is about to happen a `Before…Event`, so it is
+`BeforeProfileMappedFromFrontendUserEvent`, the counterpart of the event after
+the mapping. That one keeps its name: it announces a finished mapping and has
+no setter, and a listener changes the profile object it carries.
+
 Both are dispatched in `AbstractProfileFactory`, so every subclass gets them.
+`AbstractProfileFactory` becomes public API for that reason: projects extend
+it, and the events and the nullable creation are promised to them. It is
+tagged `@api` and listed on the extension points page of `academic_base`, with
+the two protected methods a subclass implements.
 The order between enrichment and value maps is fixed by the two events.
 Within one event, listeners order themselves with TYPO3's `before` and
 `after`.
+
+On update, the data event belongs to one profile, and a skip leaves out that
+profile only. A listener that should skip the whole frontend user skips every
+one of its events. Every profile's event starts from the row of the frontend
+user, not from what a listener set for the profile before, so a listener
+cannot carry one profile's change into the next. On creation, the
+mapped-profile event comes after the frontend user is attached and before the
+profile is added to the persistence manager.
+
+The data event is not stoppable. A listener after the one that skipped still
+runs and reads `isSkipped()`, which keeps a logging or counting listener
+working. A listener that does expensive work checks the flag first.
 
 Rejected: keeping the whole-factory swap as the only hook. Every copy loses
 the upstream fixes to sub-record matching and hidden handling (ACE-242,
@@ -89,7 +113,8 @@ user without it.
 ## Risks / Trade-offs
 
 - [A listener that changes data for the wrong action] → `getAction()` is
-  always set, and the documentation shows the create and update branches.
+  always set, and the documented directory listener skips on creation only,
+  while an existing profile keeps being updated.
 - [An enrichment listener is slow per user] → Same cost as today's LDAP
   factories. It is not made worse.
 

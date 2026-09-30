@@ -1,7 +1,7 @@
 ## 1. Prerequisite
 
 - [x] 1.1 Verify `ace-720-settings-driven-fe-user-mapping` is merged.
-- [x] 1.2 Check whether `ace-tbd-fe-user-sync-data-events` is merged. The
+- [x] 1.2 Check whether `ace-781-fe-user-sync-data-events` is merged. The
   employee-type recipe of 4.3 needs its mapped-profile event; if it is not
   merged, 4.3 moves to that change. Not merged: 4.3 moved to that change as
   its task 4.3.
@@ -32,7 +32,7 @@
   Verify the rendering.
 - [x] 4.2 Extend `docs/architecture/frontend-user-contact-import.md` with the
   lookup and creation rules. Verify `lintMarkdown -n`.
-- [x] 4.3 Moved to `ace-tbd-fe-user-sync-data-events` (see 1.2). The
+- [x] 4.3 Moved to `ace-781-fe-user-sync-data-events` (see 1.2). The
   configuration chapter states that the synchronisation never sets the
   employee type. The original task: document the employee-type recipe next
   to the relation entries: a stateless listener of

@@ -48,7 +48,7 @@ None.
   maps key by key, and each of the three lists as a whole.
 - No database change. Existing imported records keep their identifiers.
 - Basis for `ace-780-fe-user-relation-mapping` and
-  `ace-tbd-fe-user-sync-data-events`.
+  `ace-781-fe-user-sync-data-events`.
 
 ## Non-goals
 

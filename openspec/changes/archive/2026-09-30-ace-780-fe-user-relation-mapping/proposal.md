@@ -18,7 +18,7 @@ page 1, because no storage page can be configured.
 - An empty source value clears the relation. An unmapped relation is not
   touched.
 - The employee type is not mapped. How a project sets it in a listener of
-  the mapped-profile event is documented by `ace-tbd-fe-user-sync-data-events`,
+  the mapped-profile event is documented by `ace-781-fe-user-sync-data-events`,
   which adds that event and is not merged yet.
 
 Only `academic_persons` (`packages/fgtclb/academic-persons`) is affected. The
@@ -42,7 +42,7 @@ None.
 - New read queries on organisational units and function types. New records
   only where creation is configured.
 - The employee-type listener recipe moves to
-  `ace-tbd-fe-user-sync-data-events`, which adds the event it needs.
+  `ace-781-fe-user-sync-data-events`, which adds the event it needs.
 - No database schema change, and no dependency on `category_types`.
 
 ## Non-goals

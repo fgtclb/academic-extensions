@@ -123,7 +123,8 @@ touched. `hasContractData()` reads a relation value the same way, trimmed, so
 blanks are no contract data and `'0'` is. The employee type has no mapping:
 `employee_type` is a `sys_category` relation without a type restriction,
 `academic_persons` does not require `category_types`, and a title match across
-every category would be ambiguous.
+every category would be ambiguous. A project sets it in a listener of the
+mapped profile, see the next section.
 
 `FrontendUserSyncRelationMappingTest`, with the fixture extension
 `test_frontend_user_sync_relations`, gives every rule a record it can fail on:
@@ -137,6 +138,72 @@ never created, function types created. Without `ORDER BY` PostgreSQL returns
 the tie in write order, and without the PHP comparison MySQL and MariaDB return
 the lower-case record. SQLite can fail neither of the two, so the class belongs
 to the DBMS runs.
+
+## Listeners take part, a factory stays optional
+
+`AbstractProfileFactory` dispatches two events around the mapping, so a
+project adds data or adjusts the result without replacing the factory. A copy
+of the factory misses every later fix to the default one, the matching of the
+contact records and the handling of hidden profiles among them. For one
+frontend user the order is fixed:
+
+1. `ChooseProfileFactoryEvent` chooses the factory (in the command services).
+2. `BeforeProfileMappedFromFrontendUserEvent` carries the frontend user data,
+   the action and, on update, the profile. A listener replaces the data or
+   calls `skip()`.
+3. The factory maps the data it got back.
+4. `AfterProfileMappedFromFrontendUserEvent` carries the profile, the data the
+   mapping used and the action, before anything is persisted.
+5. The profile is persisted and `AfterProfileUpdateEvent` announces it.
+
+On update, steps 2 to 4 repeat for every profile that is synchronised, which
+leaves out `skip_sync` profiles, and step 5 persists and announces them
+together. Every event of step 2 starts from the row of the frontend user rather
+than from what a listener set for the profile before. A skip on update belongs
+to the profile of its event: that profile is left out of the list the update
+persists and announces, exactly like a `skip_sync` profile (ACE-490), and the
+other profiles of the frontend user are updated. On creation, a skip returns before
+the factory is asked, and `createProfileFromFrontendUser()` returning `null`
+ends it after: nothing is added, persisted or announced, and the command takes
+the next frontend user. Nothing records either outcome, so the next run of
+`academic:createprofiles` selects the frontend user again. The data event is
+not stoppable, so a listener after the one that skipped still runs and reads
+`isSkipped()`. One event with a phase flag was rejected, because every listener
+would branch on it. The first event is a `Before…Event` by the naming rule of
+[Class design](class-design.md#extension-points): a listener may change what is
+about to be mapped, and refuse it.
+
+The abstract method returns `?Profile` now. A subclass declaring `Profile`
+narrows the return type, which PHP accepts, so no factory breaks. A subclass
+that overrides `createProfileForUser()` or `updateProfileForUser()` dispatches
+the events only where it calls the parent method.
+
+A key a listener adds is named `<source>.<key>` by convention, `ldap.room` for
+example. `setFrontendUserData()` does not enforce it: it cannot tell an added
+key from a real column a listener rewrites without comparing the arrays, and no
+column of a TYPO3 table contains a dot, so a dotted key cannot hide one. The
+map reads such a key like a column, and `assertColumnsExist()` refuses it when
+it is missing, so a listener sets a key the map reads for every frontend user,
+`''` when its source has nothing.
+
+Listeners, like the factories, are shared services: one object per run. A
+cache in a property would carry one frontend user's directory data into the
+next, which is what several project factories did. The documented listeners
+fetch per event and keep nothing.
+
+`FrontendUserSyncEventsTest`, with the fixture extension
+`test_frontend_user_sync_events`, runs both commands with a stand-in for a
+directory: it adds `ldap.room`, which the fixture map reads as the contract
+room, and `ldap.gender`. It skips a user who has left, but only after adding
+that user's values, so a skip that is ignored shows in the profile, and it
+skips one of the two profiles of another user, which shows that a skip on
+update ends with the profile of its event. The listener of the mapped profile
+rewrites the mapped last name, which only survives when it runs after the
+mapping, and the first listener refuses data that already carries its keys,
+which catches data leaking from one profile of a user into the next. A
+listener of `ChooseProfileFactoryEvent` hands one user a factory that returns
+`null`. A recording listener records every event of a run, and the test
+asserts their order.
 
 ## Visibility does not stop the synchronisation
 

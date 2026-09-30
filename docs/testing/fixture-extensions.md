@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Fifty-five such fixture extensions exist, in nine of the twelve extensions.
+Fifty-six such fixture extensions exist, in nine of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -39,6 +39,7 @@ They sit next to the tests that use them, under
 | `test_exclude_file_column`                  | `tests/test-exclude-file-column`                  | `academic-persons`      | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
 | `test_frontend_readonly`                    | `tests/test-frontend-readonly`                    | `academic-persons`      | Frontend-only field locks, also loaded by the `academic-persons-edit` tests.  |
 | `test_frontend_user_sync`                   | `tests/test-frontend-user-sync`                   | `academic-persons`      | A `Settings.yaml` synchronisation map and the `fe_users` columns it reads.    |
+| `test_frontend_user_sync_events`            | `tests/test-frontend-user-sync-events`            | `academic-persons`      | Listeners of both synchronisation events, and a factory creating no profile.  |
 | `test_frontend_user_sync_relations`         | `tests/test-frontend-user-sync-relations`         | `academic-persons`      | A synchronisation map assigning the organisational unit and function type.    |
 | `test_frontend_user_sync_relations_by_name` | `tests/test-frontend-user-sync-relations-by-name` | `academic-persons`      | A synchronisation map matching units by name and creating function types.     |
 | `test_hidden_content_types`                 | `tests/hidden-content-types`                      | `academic-base`         | Two content types hidden by page TSconfig, one in the academic group.         |
@@ -81,7 +82,7 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Seventeen of the fifty-five have a `Classes/` folder with a `TESTS\…` PSR-4 root.
+Eighteen of the fifty-six have a `Classes/` folder with a `TESTS\…` PSR-4 root.
 The other thirty-eight are pure resources. The `ext_emconf.php` is checked like
 every other one: its `depends` names extension keys, and a fixture extension
 may name another fixture extension, which a real extension may not — see
@@ -267,7 +268,10 @@ The existing ones show the cases that justify one:
   fixture per extension: the partner tests never load `academic_projects` and
   the project tests never load `academic_partners`, so one fixture listening to
   the events of all three would drag an extension into every run that has no
-  business being there.
+  business being there. `test_frontend_user_sync_events` needs a package for
+  two reasons: its listeners of the synchronisation events register through
+  the container, and its `frontendUserSync` map, which reads a value one of
+  them adds, is merged into the settings only from a loaded package.
 - **Resources resolved through `EXT:` paths.** `test_plugin_templates` and
   `test_language_files` exist because TypoScript and `LLL:` references need a
   real extension path. `test_profile_partial_overrides` is the same case for a

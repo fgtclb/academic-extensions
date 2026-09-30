@@ -27,7 +27,7 @@
 **Non-Goals:**
 
 - Value maps or transformations of the source (see
-  `ace-tbd-fe-user-sync-data-events`).
+  `ace-781-fe-user-sync-data-events`).
 - An employee type mapping (see the decision below).
 
 ## Decisions
@@ -74,7 +74,7 @@ option would need a check for an optional package. Without it, the
 all system categories is ambiguous. The one analysed project that needs a
 typed employee-type category restricts it to its own category type and has
 its own lookup. A listener of `AfterProfileMappedFromFrontendUserEvent`
-(`ace-tbd-fe-user-sync-data-events`) covers that without upstream
+(`ace-781-fe-user-sync-data-events`) covers that without upstream
 configuration: it reads the source value from `getFrontendUserData()`,
 resolves the category with its own query and sets it on the contracts of
 `getProfile()`. The documentation shows that recipe.
@@ -130,7 +130,7 @@ contact record, so an empty source sets it to `null`.
 - [Creation races between parallel runs] → The commands run sequentially.
   Parallel runs are out of scope and documented.
 - [A project that needs the employee type depends on the event of
-  `ace-tbd-fe-user-sync-data-events`] → Accepted; the recipe is documented,
+  `ace-781-fe-user-sync-data-events`] → Accepted; the recipe is documented,
   and a mapping can be added later if more projects ask for it.
 
 ## Open Questions

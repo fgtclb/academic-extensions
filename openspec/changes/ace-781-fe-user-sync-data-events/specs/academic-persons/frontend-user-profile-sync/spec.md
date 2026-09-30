@@ -13,8 +13,8 @@ under the key the extension chose.
 
 ### Requirement: Installations can skip a frontend user
 The system SHALL let an installation's extension skip a frontend user during
-creation or update. For a skipped user, no profile SHALL be created, changed
-or announced.
+creation, or one of its profiles during update. What is skipped SHALL NOT be
+created, changed or announced.
 
 #### Scenario: User without directory data
 - **WHEN** an extension skips a frontend user during `academic:createprofiles`
@@ -25,6 +25,12 @@ or announced.
 - **WHEN** an extension skips a frontend user during `academic:updateprofiles`
 - **THEN** that user's profile keeps its values and is not announced as
   updated
+
+#### Scenario: Skip one of two profiles
+- **WHEN** a frontend user has two profiles, and an extension skips only one of
+  them during `academic:updateprofiles`
+- **THEN** the skipped profile keeps its values and is not announced, and the
+  other profile is updated and announced
 
 ### Requirement: Installations can adjust the mapped profile
 The system SHALL let an installation's extension change the mapped profile

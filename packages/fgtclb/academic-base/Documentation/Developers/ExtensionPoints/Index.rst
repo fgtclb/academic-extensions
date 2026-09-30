@@ -46,6 +46,8 @@ What is public API
 *   The :ref:`interfaces <developers-extension-points-interfaces>`.
 *   The :ref:`services and classes <developers-extension-points-services>` a
     project names in its configuration or its code.
+*   The :ref:`base class <developers-extension-points-base-classes>` of a
+    profile factory.
 *   The two :ref:`traits <developers-extension-points-traits>` of
     :guilabel:`academic_base` for Extbase controllers.
 *   The :ref:`domain models <developers-extension-points-models>`: their
@@ -209,6 +211,18 @@ describe their events in detail, with examples.
         -   in the commands :bash:`academic:createprofiles` and
             :bash:`academic:updateprofiles`, once per frontend user
         -   choose the profile factory that creates or updates the profile
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\BeforeProfileMappedFromFrontendUserEvent`
+        -   in the commands :bash:`academic:createprofiles` and
+            :bash:`academic:updateprofiles`, before the data of a frontend
+            user is mapped: once per frontend user on creation, once per
+            synchronised profile on update (not for a profile whose
+            :sql:`skip_sync` flag is set)
+        -   add or change values of the data, skip the frontend user on
+            creation or the profile on update
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\AfterProfileMappedFromFrontendUserEvent`
+        -   in the same commands, after the data of a frontend user was
+            mapped and before the profile is saved
+        -   change the profile
     *   -   :php:`\FGTCLB\AcademicPersonsEdit\Event\BeforeProfileEditingWriteEvent`
         -   in the profile editing of :guilabel:`academic_persons_edit`, once
             for every write the editor accepted, before anything of it is
@@ -318,7 +332,8 @@ packages are not listed; their own documentation applies.
     *   -   :php:`\FGTCLB\AcademicPersons\Event\ProfileUpdateOrigin`
         -   the profile update event
     *   -   :php:`\FGTCLB\AcademicPersons\Profile\ProfileActionType`
-        -   the profile factory event
+        -   the profile factory event and the two events of the frontend user
+            synchronisation
     *   -   :php:`\FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode`
         -   the job save event
     *   -   :php:`\FGTCLB\AcademicPersonsEdit\Event\ProfileEditingAction`
@@ -400,6 +415,25 @@ them as they are; they are not meant to be subclassed or replaced.
             and as :php:`ProfileWriteCorrelation::Internal` in a listener of
             the profile update event that writes profiles through the
             DataHandler, so that write is not announced again
+
+..  _developers-extension-points-base-classes:
+
+Base classes
+============
+
+..  list-table::
+    :header-rows: 1
+    :widths: 50 50
+
+    *   -   Class
+        -   What it is for
+    *   -   :php:`\FGTCLB\AcademicPersons\Profile\AbstractProfileFactory`
+        -   The base of a profile factory a project chooses with the profile
+            factory event. It dispatches the two events of the frontend user
+            synchronisation. A subclass implements the protected methods
+            :php:`createProfileFromFrontendUser()`, which may return
+            :php:`null` to create nothing, and
+            :php:`updateProfileFromFrontendUser()`.
 
 ..  _developers-extension-points-traits:
 

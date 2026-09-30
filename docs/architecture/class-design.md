@@ -406,16 +406,15 @@ removed in favour of the plugin view event.
 
 ## Extension points
 
-The public API of every extension is listed on one page of the rendered
-manual:
+The public API of every extension is listed on one page of the rendered manual:
 [`academic-base/Documentation/Developers/ExtensionPoints/Index.rst`](../../packages/fgtclb/academic-base/Documentation/Developers/ExtensionPoints/Index.rst).
 It names the events and the types they hand to a listener, the interfaces, the
-services and classes a project names in its configuration or injects, the two
-controller traits of `academic_base` and the domain models, and next to the PHP the
-templates, settings, TypoScript and TSconfig keys, label keys and
-`CategoryTypes.yaml`. The page is a whitelist: a class it does not list is not
-API, whether it is `final` or not. It is written for integrators, who read the
-manual rather than this repository.
+services and classes a project names in its configuration or injects, the base
+class of a profile factory, the two controller traits of `academic_base` and the
+domain models, and next to the PHP the templates, settings, TypoScript and
+TSconfig keys, label keys and `CategoryTypes.yaml`. The page is a whitelist: a
+class it does not list is not API, whether it is `final` or not. It is written
+for integrators, who read the manual rather than this repository.
 
 - **`@api` and the page name the same classes.** Every class, interface,
   trait and enum the page lists carries `@api` in its docblock, and nothing
@@ -458,8 +457,11 @@ Events follow one shape:
   **`Before…Event`** when a listener may refuse something that is about to
   happen, and change it as well, and **`After…Event`** when the event
   announces something that happened. `BeforeProfileEditingWriteEvent` of
-  `academic_persons_edit` is the one `Before…Event` so far: it is dispatched
-  before every write of the profile editor, and a refusal stops the write.
+  `academic_persons_edit` is dispatched before every write of the profile
+  editor, and a refusal stops the write.
+  `BeforeProfileMappedFromFrontendUserEvent` of `academic_persons` is
+  dispatched before the frontend user synchronisation maps the data of a
+  frontend user, and a skip stops the creation or the update of the profile.
   Three events predate the rule and stay, because a rename or a move breaks
   every listener for nothing: `ChooseProfileFactoryEvent` of
   `academic_persons`, its `@internal`
