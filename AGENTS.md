@@ -323,7 +323,8 @@ Test discovery: phpunit globs `packages/*/*/Tests/Unit/`,
 `packages/*/*/Tests/Functional/` **and** `packages-dev/*/Tests/{Unit,Functional}/`
 across everything at once (`Build/phpunit/*.xml`) — there is no per-extension
 test config. `packages-dev/` is in the glob for the tests of the development
-seed, of the scripts behind `runTests.sh -j`, and for the checks that every
+seed, of the scripts behind `runTests.sh -j` and of the branch version name
+script, and for the checks that every
 `ext_emconf.php` names its dependencies by extension key, that every
 translation names its extension without an underscore and that the manual
 links in `guides.xml` lead to the package.

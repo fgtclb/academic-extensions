@@ -63,7 +63,9 @@ something else: the three scripts behind `runTests.sh -j`,
 `Build/Scripts/checkFunctionalTestCount.php` and
 `Build/Scripts/recordFunctionalTestTimes.php` (ACE-692), and
 `Build/Scripts/ddevWorktreeNames.sh` with the `post-checkout` hook that runs it
-(ACE-737), against a throwaway repository with a linked worktree. They run the
+(ACE-737), against a throwaway repository with a linked worktree, and
+`Build/Scripts/composerBranchVersion.sh`, the version name composer gives a
+branch and with it the branch alias key (ACE-784). They run the
 scripts as subprocesses and are collected because the suites glob
 `packages-dev/*/Tests/` as well.
 
