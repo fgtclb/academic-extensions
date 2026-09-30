@@ -1,98 +1,46 @@
 <html
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
-    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
 
-<div class="academic-projects-detail container">
-    <div class="d-flex flex-column-reverse">
-        <div>
-            <h1>{f:if(condition: '{project.projectTitle}', then: '{project.projectTitle}', else: '{data.title}')}</h1>
+<f:comment>
+    The page template of the project page type. It renders the section "Main" of the page
+    layout of the site, "Default" unless the site setting
+    "plugin.tx_academicprojects.page.layout" names another one. A site without a layout
+    "Default" gets the fallback layout of this extension, which renders the section alone.
+    A layout the setting names has to exist.
 
-            <f:format.html>{project.shortDescription}</f:format.html>
-        </div>
+    Each part is a partial below "Project/Page/", so a project replaces one of them rather
+    than this file.
+</f:comment>
 
-        <f:for each="{images}" as="image" iteration="i">
-            <f:if condition="{i.isFirst}">
-                <f:comment>The shared partial of EXT:academic_base.</f:comment>
-                <f:render
-                    partial="Academic/Image"
-                    arguments="{
-                        image: image,
-                        preset: 'detail',
-                        class: 'img-fluid'
-                    }"
-                />
-            </f:if>
-        </f:for>
-    </div>
+<f:layout name="{projectPageLayout}" />
 
-    <f:if condition="{project.attributes.allCategoriesByType}">
-        <ul>
-            <f:for each="{project.attributes.allCategoriesByType}" as="categories" key="type">
-                <f:if condition="{categories}">
-                    <li>
-                        <core:icon identifier="category_types.projects.{type}"/>
-
-                        <b>{f:translate(key: 'sys_category.projects.{type}', extensionName: 'AcademicProjects')}:</b>
-
-                        <span>
-                            <f:for each="{categories}" as="category" iteration="i">
-                                {category.title}{f:if(condition: '!{i.isLast}', then: ', ')}
-                            </f:for>
-                        </span>
-                    </li>
-                </f:if>
-            </f:for>
-        </ul>
+<f:section name="Main">
+    <f:comment>
+        The page record: the record of the page information object "page" a PAGEVIEW page
+        object assigns, or "data" of a FLUIDTEMPLATE page object. "page" first, because
+        PAGEVIEW reserves that name, while a PAGEVIEW site package may assign a "data" of
+        its own.
+    </f:comment>
+    <f:variable name="pageRecord" value="{page.pageRecord}" />
+    <f:if condition="!{pageRecord}">
+        <f:variable name="pageRecord" value="{data}" />
     </f:if>
 
-    <ul>
-        <f:if condition="{project.startDate} || {project.endDate}">
-            <li>
-                <b>{f:translate(key: 'project.runtime', extensionName: 'AcademicProjects')}:</b>
+    <div class="academic-projects-detail container">
+        <div class="d-flex flex-column-reverse">
+            <f:render partial="Project/Page/Header" arguments="{_all}" />
+            <f:render partial="Project/Page/Media" arguments="{_all}" />
+        </div>
 
-                <span>
-                    <f:if condition="{project.startDate}">
-                        <f:if condition="!{project.endDate}">
-                            {f:translate(key: 'project.since', extensionName: 'AcademicProjects')}
-                        </f:if>
+        <f:render partial="Project/Page/Categories" arguments="{_all}" />
 
-                        <f:format.date date="{project.startDate}" format="%m.%Y"/>
-                    </f:if>
+        <f:render partial="Project/Page/Facts" arguments="{_all}" />
 
-                    <f:if condition="{project.startDate} && {project.endDate}">-</f:if>
-
-                    <f:if condition="{project.endDate}">
-                        <f:if condition="!{project.startDate}">
-                            {f:translate(key: 'project.until', extensionName: 'AcademicProjects')}
-                        </f:if>
-
-                        <f:format.date date="{project.endDate}" format="%m.%Y"/>
-                    </f:if>
-                </span>
-            </li>
-        </f:if>
-
-        <f:if condition="{project.budget}">
-            <li>
-                <b>{f:translate(key: 'project.budget', extensionName: 'AcademicProjects')}:</b>
-
-                <span>{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</span>
-            </li>
-        </f:if>
-
-        <f:if condition="{project.funders}">
-            <li>
-                <b>{f:translate(key: 'project.funders', extensionName: 'AcademicProjects')}:</b>
-
-                <f:format.html>{project.funders}</f:format.html>
-            </li>
-        </f:if>
-    </ul>
-
-    <f:cObject typoscriptObjectPath="styles.content.getContent"/>
-</div>
+        <f:render partial="Project/Page/Content" arguments="{_all}" />
+    </div>
+</f:section>
 
 </html>

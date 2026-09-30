@@ -120,7 +120,7 @@ grep -rl "<core:icon" packages/fgtclb/*/Resources/Private --include=*.html \
 | `academic-jobs`         | 2 sites, core `phone`/`mail`             | `Job/Item.html`, `Job/Information.html`                         |
 | `academic-partners`     | —                                        | 4 files, `category_types.partners.*` only                       |
 | `academic-programs`     | —                                        | `Program/Facts/Item.html`, `category_types.*` and credit points |
-| `academic-projects`     | —                                        | `AcademicProject.html`, `Project/Item.html`                     |
+| `academic-projects`     | —                                        | `Project/Page/Categories.html`, `Project/Item.html`             |
 
 ## The two markups, and which provider produces what
 

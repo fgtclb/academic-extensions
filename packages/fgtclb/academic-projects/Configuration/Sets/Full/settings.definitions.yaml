@@ -1,5 +1,5 @@
-# Site settings of the category filters and of the content element header of the
-# project lists.
+# Site settings of the project page type, and of the category filters and the
+# content element header of the project lists.
 #
 # Every path below is also assigned in
 # "Configuration/TypoScript/constants.typoscript", and the default has to be the
@@ -7,12 +7,12 @@
 # reads the constants after the site settings, so a differing default resets
 # what the integrator configured, silently.
 #
-# Declared with the aggregate set rather than with a component set: both
-# content elements, "Projects" and "Projects (selected)", render the filter
-# and the header, and a set can only declare settings next to its own
-# "config.yaml". A site that depends on a component set alone still gets the
-# defaults of the constants, but the site settings editor does not offer the
-# settings - depend on this set for that.
+# Declared with the aggregate set rather than with a component set: both content
+# elements, "Projects" and "Projects (selected)", render the filter and the
+# header, every component delivers the page type, and a set can only declare
+# settings next to its own "config.yaml". A site that depends on a component set
+# alone still gets the defaults of the constants, but the site settings editor
+# does not offer the settings - depend on this set for that.
 categories:
   academic:
     label: 'Academic'
@@ -21,6 +21,12 @@ categories:
     parent: academic
 
 settings:
+  plugin.tx_academicprojects.page.layout:
+    label: 'Project page | Page layout'
+    description: 'The Fluid layout of the site package the project page renders its section "Main" into. The layout has to exist. Only for "Default" does the extension bring a fallback, which renders the page without the frame of the site.'
+    category: academic.projects
+    type: string
+    default: 'Default'
   plugin.tx_academicprojects.filter.categoryTypes:
     label: 'Project lists | Filter types'
     description: 'The category filters the project lists offer, in this order, comma-separated: category type identifiers of the group "projects" (competence_field, cooperation, funding_partner, project_department, ...). A type without categories is left out. Empty: every category type with categories, in the type order of the group.'

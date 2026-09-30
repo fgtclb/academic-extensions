@@ -71,21 +71,21 @@ or the code fills in, a category type or a field name for example.
     *   - :xml:`list.noProjectsFound`
         - :file:`Partials/Project/ItemList.html`
     *   - :xml:`project.budget`
-        - :file:`Pages/AcademicProject.html`
+        - :file:`Partials/Project/Page/Facts.html`
     *   - :xml:`project.funders`
-        - :file:`Pages/AcademicProject.html`
+        - :file:`Partials/Project/Page/Facts.html`
     *   - :xml:`project.runtime`
-        - :file:`Pages/AcademicProject.html`
+        - :file:`Partials/Project/Page/Facts.html`
     *   - :xml:`project.since`
-        - :file:`Pages/AcademicProject.html`
+        - :file:`Partials/Project/Page/Facts.html`
     *   - :xml:`project.until`
-        - :file:`Pages/AcademicProject.html`
+        - :file:`Partials/Project/Page/Facts.html`
     *   - :xml:`sorting.direction.label`
         - :file:`Partials/Project/DemandSorting.html`
     *   - :xml:`sorting.field.label`
         - :file:`Partials/Project/DemandSorting.html`
     *   - :xml:`sys_category.projects.<type>`
-        - :file:`Pages/AcademicProject.html`, :file:`Partials/Project/DemandCategories.html`, :file:`Partials/Project/Item.html`
+        - :file:`Partials/Project/Page/Categories.html`, :file:`Partials/Project/DemandCategories.html`, :file:`Partials/Project/Item.html`
     *   - :xml:`sys_category.projects.allOptions`
         - :file:`Partials/Project/DemandCategories.html`
     *   - :xml:`sys_category.projects.allOptions.<type>`

@@ -8,6 +8,7 @@ use FGTCLB\AcademicProjects\Factory\ProjectFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Frontend\ContentObject\DataProcessorInterface;
+use TYPO3\CMS\Frontend\Page\PageInformation;
 
 /**
  * Processor class for project page types
@@ -29,13 +30,13 @@ class ProjectProcessor implements DataProcessorInterface
         array $processorConfiguration,
         array $processedData
     ) {
-        // Try to fetch page data for FLUIDTEMPLATE
-        $pageData = $processedData['data'] ?? [];
-        if ($pageData === []) {
-            // If no page data is available in FLUIDTEMPLATE, try to fetch page data from PAGEVIEW
-            $pageData = $processedData['page']->getPageRecord() ?? [];
-        }
-        if ($pageData !== []) {
+        // The page record: the one of the page information object "page" a PAGEVIEW page
+        // object assigns, or "data" of a FLUIDTEMPLATE page object. "page" first, because
+        // PAGEVIEW reserves that name, while a PAGEVIEW site package may assign a "data" of
+        // its own - the page template resolves it in the same order.
+        $page = $processedData['page'] ?? null;
+        $pageData = $page instanceof PageInformation ? $page->getPageRecord() : ($processedData['data'] ?? []);
+        if (is_array($pageData) && $pageData !== []) {
             $programDataFactory = GeneralUtility::makeInstance(ProjectFactory::class);
             $processedData['project'] = $programDataFactory->get($pageData);
         }

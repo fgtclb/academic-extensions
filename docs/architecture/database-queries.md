@@ -501,8 +501,11 @@ PostgreSQL 16 in write order. That fits the PostgreSQL 12 change that stores
 equal B-tree keys in heap order, and `tt_content` has an index on
 `(pid, sorting)` - but no query plan was looked at. A fixture there fails on
 both versions only with two tied pairs, one written in each direction, and that
-is what it carries. When a descending fixture stays green without the
-tiebreaker, add the ascending pair rather than calling the test a guard.
+is what it carries. The partner and project page tests carry the same two
+pairs (ACE-785). Without the tiebreaker the ascending pair fails there too on
+PostgreSQL 10 and TYPO3 v13, while SQLite passes. When a descending fixture
+stays green without the tiebreaker, add the ascending pair rather than calling
+the test a guard.
 
 ## Rule 3 in an open query — constraints an extension adds
 

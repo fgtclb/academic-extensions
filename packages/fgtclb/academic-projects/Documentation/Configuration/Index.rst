@@ -19,9 +19,8 @@ Pick one of them per site and stay with it — see
 What the sets contain
 =====================
 
-This extension ships two content elements, so it ships two component sets, one
-set for the :typoscript:`styles.content` override described below, and one
-aggregate set that depends on all of them.
+This extension ships two content elements, so it ships two component sets
+and one aggregate set that depends on all of them.
 
 Both content elements are driven by one Extbase plugin, so they share one
 TypoScript block, :typoscript:`plugin.tx_academicprojects`. That block is
@@ -38,10 +37,6 @@ the backend offers, not how much TypoScript is loaded.
         -   The :guilabel:`Projects` content element.
     *   -   `fgtclb/academic-projects-project-list-single`
         -   The :guilabel:`Projects (selected)` content element.
-    *   -   `fgtclb/academic-projects-content-load`
-        -   The :typoscript:`styles.content.getContent` override only. No content
-            element, and nothing this extension is otherwise made of — see
-            :ref:`The content load override <content-load-override>`.
     *   -   `fgtclb/academic-projects`
         -   Everything above. This is the set to use unless you deliberately
             want a subset, and it is the name this extension published before
@@ -96,30 +91,44 @@ What a set does deliver for that page type is its **frontend rendering**: the
 of the shared TypoScript block, so a site that includes no set of this extension
 renders such a page with whatever its own site package defines.
 
-..  _content-load-override:
+..  _project-page-content:
 
-The content load override
-=========================
+The content of a project page
+=============================
 
-:file:`Configuration/TypoScript/ContentLoad/setup.typoscript` redefines
-:typoscript:`styles.content.getContent` for the whole site so that it selects
-:typoscript:`colPos = 0` only. This is an installation-wide rendering change, it
-applies to every page of the site and not only to the pages of this extension,
-and three academic extensions ship the same override.
+A project page renders the content elements of its main column
+(:typoscript:`colPos = 0`) below the project data, in their manual order and in
+the language of the page. Any set of this extension, or the static template of
+the shared block, delivers that, and no other set is needed for it.
 
-It is therefore a set of its own, `fgtclb/academic-projects-content-load`. The
-aggregate set depends on it, so a site on `fgtclb/academic-projects` keeps what
-it had; a site that wants the content elements without the override names the
-component sets it needs instead of the aggregate.
+The content is the variable :typoscript:`projectContent` of the page object,
+defined inside the condition on the project page type, so it exists on project
+pages only. It is a :typoscript:`CONTENT` object that renders the records
+through the :typoscript:`tt_content` object of the site, and it works for a
+:typoscript:`FLUIDTEMPLATE` and a :typoscript:`PAGEVIEW` page object alike.
 
-..  warning::
+To render another column, or to slide the content from the parent pages, change
+the variable inside the same condition:
 
-    The Fluid template of the page type renders
-    :typoscript:`styles.content.getContent` through
-    :html:`<f:cObject typoscriptObjectPath="styles.content.getContent"/>`, and
-    that ViewHelper throws when the path is undefined. A site that opts out of
-    this set and still uses the page type has to define
-    :typoscript:`styles.content.getContent` itself.
+..  code-block:: typoscript
+    :caption: EXT:my_sitepackage/Configuration/TypoScript/setup.typoscript
+
+    [page && traverse(page, "doktype") == 30]
+      page.10.variables.projectContent {
+        select.where = {#colPos}=1
+      }
+    [END]
+
+A page template of your own renders it as
+:html:`{projectContent -> f:format.raw()}`.
+
+..  versionchanged:: 3.0
+
+    Up to 2.x the page template rendered the global object
+    :typoscript:`styles.content.getContent`, which only the set
+    `fgtclb/academic-projects-content-load` defined for the whole site. The set
+    and its static template are removed, see
+    :ref:`breaking-projects-content-load-set-removed`.
 
 ..  note::
 
@@ -130,6 +139,105 @@ component sets it needs instead of the aggregate.
     it needs no configuration; a site that refines it changes how links, allowed
     tags and paragraphs of these fields are rendered, exactly as for every other
     rich text field.
+
+..  _project-page-layout:
+
+The layout of a project page
+============================
+
+A project page renders inside the page layout of the site package, the way the
+other pages of the site do: the page template declares a layout and fills its
+section :html:`Main`. The layout is :file:`Default` unless a setting names
+another one, which is what :composer:`bk2k/bootstrap-package` and most site
+packages provide.
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Site setting / constant
+        -   Default
+        -   Meaning
+    *   -   :typoscript:`plugin.tx_academicprojects.page.layout`
+        -   `Default`
+        -   The Fluid layout of the site package the project page renders its
+            section :html:`Main` into. An empty value is read as `Default`.
+
+It is a site setting of the aggregate set `fgtclb/academic-projects`, and a
+constant of the same name for a site on the static templates. A site that
+depends on a component set alone gets the default, but the site settings editor
+does not offer the setting there. Depend on the aggregate set to configure it.
+
+The page template reaches it as the variable :typoscript:`projectPageLayout` of
+the page object, so it works on a :typoscript:`FLUIDTEMPLATE` and a
+:typoscript:`PAGEVIEW` page object alike.
+
+A site package without a layout :file:`Default` gets the fallback layout of this
+extension, which renders the section :html:`Main` and nothing else: the page
+renders without the header, navigation and footer of the site, as it did up to
+2.x, rather than failing. A layout :file:`Default` of the site package wins over
+it. The fallback exists for :file:`Default` only: a layout the setting names
+has to exist in the site package, or the project page fails as any page with a
+missing Fluid layout does.
+
+..  _project-page-partials:
+
+The parts of a project page
+---------------------------
+
+The section :html:`Main` renders five partials, each of which can be replaced
+on its own:
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Partial
+        -   Renders
+    *   -   :file:`Project/Page/Header.html`
+        -   The project title, or the title of the page without one, the
+            subtitle of the page and the short description, in one element with
+            the class `academic-projects-detail__header`.
+    *   -   :file:`Project/Page/Media.html`
+        -   The first image of the page, through the shared image partial of
+            :guilabel:`EXT:academic_base`.
+    *   -   :file:`Project/Page/Categories.html`
+        -   The categories assigned to the page, grouped by category type.
+    *   -   :file:`Project/Page/Facts.html`
+        -   The runtime, the budget and the funders of the project.
+    *   -   :file:`Project/Page/Content.html`
+        -   The content elements, the variable :typoscript:`projectContent`
+            described above.
+
+Every partial receives all variables of the page: :html:`{project}`,
+:html:`{images}`, :html:`{projectContent}`, :html:`{pageRecord}` and those of the
+site package's page object. :html:`{pageRecord}` is the record of the page on
+both page object types, :html:`{data}` of a :typoscript:`FLUIDTEMPLATE` page
+object and :html:`{page.pageRecord}` of a :typoscript:`PAGEVIEW` one. The
+subtitle is its field :html:`{pageRecord.subtitle}`.
+
+The templates and partials of the page type are registered at the key `50` of
+the page object. Register a directory of your own with a higher key, and its
+files win:
+
+..  code-block:: typoscript
+    :caption: EXT:my_sitepackage/Configuration/TypoScript/setup.typoscript
+
+    # FLUIDTEMPLATE: a directory holding Project/Page/Header.html
+    page.10.partialRootPaths.75 = EXT:my_sitepackage/Resources/Private/Partials/
+
+    # PAGEVIEW: a directory holding Partials/Project/Page/Header.html
+    page.10.paths.75 = EXT:my_sitepackage/Resources/Private/
+
+A site package that registers its own paths above `50` needs no line at all -
+a :typoscript:`PAGEVIEW` site package at :typoscript:`paths.100`, for example:
+a :file:`Partials/Project/Page/Header.html` of its own wins already. An override of
+the whole :file:`Pages/AcademicProject.html` keeps working the same way, and
+renders without a layout, as before.
+
+..  versionchanged:: 3.0
+
+    Up to 2.x the page template declared no layout and rendered every part
+    inline, and its paths used the key `100`. See
+    :ref:`breaking-project-page-renders-inside-the-site-layout`.
 
 ..  _site-set:
 
@@ -186,8 +294,6 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
         -   The TypoScript of the :guilabel:`Projects` content element.
     *   -   :guilabel:`Academic Projects: Projects (selected) (academic_projects)`
         -   The same for :guilabel:`Projects (selected)`.
-    *   -   :guilabel:`Academic Projects: Content load override (academic_projects)`
-        -   The :typoscript:`styles.content.getContent` override on its own.
     *   -   :guilabel:`Academic Projects: All components (academic_projects)`
         -   Every component this extension ships, in one entry.
     *   -   :guilabel:`Academic Projects: Shared plugin settings and page
@@ -196,8 +302,7 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
             :typoscript:`page` object of the page type, on their own. This is
             the entry an installation stored before the configuration was cut
             per component, and it keeps working — but it does not make any
-            content element selectable, which the page TSconfig below does, and
-            it no longer carries the content load override.
+            content element selectable, which the page TSconfig below does.
 
 ..  _static-pagetsconfig:
 

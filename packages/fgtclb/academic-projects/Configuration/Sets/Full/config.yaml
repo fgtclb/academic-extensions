@@ -11,4 +11,3 @@ label: Academic Projects
 dependencies:
   - fgtclb/academic-projects-project-list
   - fgtclb/academic-projects-project-list-single
-  - fgtclb/academic-projects-content-load
