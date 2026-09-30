@@ -254,7 +254,10 @@ prefer the narrower tool.
    (`^12.4.22 || ^13.4` on this branch).
 3. Write `ext_emconf.php`. The `version` and the `constraints.depends.typo3`
    range are read from it by TYPO3, so keep them consistent with the composer
-   file.
+   file. It carries no comment, `bin/set-version` rewrites the file through
+   packwright and drops every comment, and a unit test fails on one, see
+   [Unit tests](unit-tests.md#the-form-binset-version-writes). Write it in
+   packwright's form with `pkw extemconf:normalize <file>`.
 4. Add `Classes/` with a `TESTS\<Something>\` PSR-4 root only if classes are
    needed.
 5. Run `composerUpdate` for the core version you will test on. Nothing else
