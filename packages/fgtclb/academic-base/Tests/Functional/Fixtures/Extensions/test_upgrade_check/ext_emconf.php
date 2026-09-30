@@ -1,10 +1,5 @@
 <?php
 
-// Keep the "Package.providesPackages" key and the version in composer.json next
-// to this file. From TYPO3 v14 on, PackageManager::isComposerOnlyCapable()
-// skips merging this file into the composer manifest only when both are
-// declared; without them v14 merges the constraints below over the composer
-// "require" and the upgrade check tests fail on v14 alone.
 $EM_CONF[$_EXTKEY] = [
     'title' => 'TESTS: Upgrade check upstream',
     'description' => 'The extension the upgrade check compares an override folder with',

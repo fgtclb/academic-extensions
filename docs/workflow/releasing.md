@@ -96,6 +96,15 @@ instances are discovered by path. A thirteenth extension, a fourth
 `packages-dev` package or a `core-15` instance is picked up by existing, which
 is precisely what the previously hardcoded instance list failed to do.
 
+A run with the version the branch already carries changes nothing. The tools
+it calls regenerate what they touch: packwright writes `ext_emconf.php` from
+its data, without comments and with the constraints it sets at the end of their
+list, `composer config` writes an empty `providesPackages` as `[]`, and
+`composer require` sorts `require` where `sort-packages` asks for it. The files
+are stored in exactly that form (ACE-787), and a unit test fails when one
+drifts from it, see
+[Unit tests](../testing/unit-tests.md#the-form-binset-version-writes).
+
 `--dry-run` prints every change without touching a file and is the way to
 rehearse a bump. `--source-branch=<name>` names the branch the version is
 applied on. It defaults to `main`, the branch this copy of the script lives on,
@@ -367,6 +376,10 @@ list is the handful of things they do *not* check.
 - [ ] **The changelog version directory exists** for the line being released
       (`Documentation/Changelog/<minor>/`), and its `Index.rst` is linked from
       `Changelog-<major>.rst`.
+- [ ] **A run with the current version leaves a clean tree.**
+      `bin/set-version <current version> post-release` and `git status` show
+      no change. A change there is a file out of the form the tools write, and
+      would otherwise ride along in the release commit.
 - [ ] **A dry run was read**, not just executed:
       `bin/set-version X.Y.Z release --dry-run` prints every file it would
       touch, and `bin/release X.Y.Z --dry-run` prints the whole plan.

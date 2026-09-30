@@ -328,10 +328,18 @@ prefer the narrower tool.
    `packages/fgtclb/<extension>/Tests/Functional/Fixtures/Extensions/<extension_key>/`.
 2. Write `composer.json` — type `typo3-cms-extension`, a `tests/…` name,
    `extra.typo3/cms.extension-key`, `version`, `Package.providesPackages: []`,
-   and a `typo3/cms-core` constraint matching `monorepo-shared`.
+   and a `typo3/cms-core` constraint matching `monorepo-shared`. The `version`
+   and `providesPackages` are not optional: from TYPO3 v14 on,
+   `PackageManager::isComposerOnlyCapable()` merges `ext_emconf.php` into the
+   manifest unless both are declared, and its constraints then override the
+   composer `require`. The upgrade check tests of `academic_base` failed on v14
+   alone that way.
 3. Write `ext_emconf.php`. The `version` and the `constraints.depends.typo3`
    range are read from it by TYPO3, so keep them consistent with the composer
-   file.
+   file. It carries no comment, `bin/set-version` rewrites the file through
+   packwright and drops every comment, and a unit test fails on one, see
+   [Unit tests](unit-tests.md#the-form-binset-version-writes). Write it in
+   packwright's form with `pkw extemconf:normalize <file>`.
 4. Add `Classes/` with a `TESTS\<Something>\` PSR-4 root only if classes are
    needed.
 5. Run `composerUpdate` for the core version you will test on. Nothing else

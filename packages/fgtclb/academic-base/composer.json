@@ -30,7 +30,7 @@
             "extension-key": "academic_base",
             "version": "3.0.0-dev",
             "Package": {
-                "providesPackages": {}
+                "providesPackages": []
             }
         },
         "branch-alias": {
