@@ -60,11 +60,11 @@ bin/set-version <version> <type> [--source-branch=<name>] [--dry-run]
 ```
 
 It edits working-tree files and does **nothing else**: no git, no network
-(`bin/set-version:40-41`). That separation is what makes it safe to run and
+(`bin/set-version:42-43`). That separation is what makes it safe to run and
 inspect on its own.
 
 `<version>` is always a bare `MAJOR.MINOR.PATCH`; the `-dev` suffixes are
-derived, never passed. `<type>` decides how (`bin/set-version:162-186`):
+derived, never passed. `<type>` decides how (`bin/set-version:182-206`):
 
 | Type           | Package version | `ext_emconf` | Academic dependency constraint | Branch alias |
 |----------------|-----------------|--------------|--------------------------------|--------------|
@@ -72,12 +72,12 @@ derived, never passed. `<type>` decides how (`bin/set-version:162-186`):
 | `post-release` | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 | `dev`          | `X.Y.Z-dev`     | `X.Y.Z`      | `~X.Y.Z@dev`                   | `X.Y.x-dev`  |
 
-`post-release` and `dev` share one derivation (`bin/set-version:173-186`); `dev`
+`post-release` and `dev` share one derivation (`bin/set-version:193-206`); `dev`
 is the thin variant used for branching and forced minor or major bumps.
 `post-release` does **not** increment anything — the version passed is already
 the next one.
 
-What one run rewrites, in order (`bin/set-version:311-405`):
+What one run rewrites, in order (`bin/set-version:340-434`):
 
 1. `Build/Scripts/runTests.sh` → `COMPOSER_ROOT_VERSION`
 2. every split extension → academic composer dependencies,
@@ -93,24 +93,36 @@ What one run rewrites, in order (`bin/set-version:311-405`):
 
 Nothing in that list is hardcoded. The package set is discovered by looking for
 directories under `packages/fgtclb/*/` that carry both a `composer.json` and an
-`ext_emconf.php` (`bin/set-version:204-215`); the extension key is read from
+`ext_emconf.php` (`bin/set-version:224-235`); the extension key is read from
 `extra.typo3/cms.extension-key`, never guessed from the directory name; fixture
 extensions are found under `Tests/Functional/Fixtures/Extensions`
-(`bin/set-version:220-225`); the `packages-dev` packages and the development
+(`bin/set-version:240-245`); the `packages-dev` packages and the development
 instances are discovered by path, `for dir in packages-dev/*/`
-(`bin/set-version:375`) and `for dir in core-*/` (`bin/set-version:390`). A
+(`bin/set-version:404`) and `for dir in core-*/` (`bin/set-version:419`). A
 thirteenth extension, a fourth `packages-dev` package or a `core-14` instance is
 picked up by existing, which is precisely what the previously hardcoded instance
 list failed to do — and is how `packages-dev/dev-site/` was versioned correctly
 the moment it was added.
 
 `--dry-run` prints every change without touching a file and is the way to
-rehearse a bump. `--source-branch=<name>` only selects which
-`extra.branch-alias.dev-<branch>` key is written. **On this branch it defaults
-to `2`** (`bin/set-version:81`), which is what a `2.x` release wants, so the
-flag is not needed here — and the root `composer.json` correspondingly carries
-`extra.branch-alias.dev-2 = 2.4.x-dev`. The copy of the script on `main`
-defaults to `main`. That is the whole difference between the two copies: a
+rehearse a bump. `--source-branch=<name>` names the branch the version is
+applied on. **On this branch it defaults to `2`** (`bin/set-version:83`), which
+is what a `2.x` release wants, so the flag is not needed here.
+
+The branch alias is keyed to the version name composer gives that branch:
+`2.x-dev` for `2`, `dev-main` for `main`, `2.2.x-dev` for `2.2`.
+`Build/Scripts/composerBranchVersion.sh` prints it (`bin/set-version:123-140`).
+Composer applies an alias only under that key and skips any other without a
+word, and `composer validate --strict` accepts it as well. This branch carried
+`dev-2` from its cut until ACE-784, so `2.4.x-dev` did not exist and no split
+package requiring a sibling with `~2.4.0@dev` installed from it. The script
+replaces the whole alias object, so a key written for another branch cannot
+survive, and it stops before it touches anything when composer names the branch
+in two ways (`v3`) or when the version lies outside a numeric branch (`3.0.0`
+for `2`). A reader that validates the package drops the whole branch for such
+an alias.
+
+The copy of the script on `main` defaults to `main`. That is the whole difference between the two copies: a
 `git diff origin/2 origin/main -- bin/set-version bin/release` shows nine
 changed lines, the two `SOURCE_BRANCH` defaults and the version used as an
 example in the help and error texts. Keep it that way — a real change to either
@@ -177,7 +189,7 @@ Pre-flight (`bin/release:178-200`):
 
 Tooling is resolved and verified up front, before anything changes:
 `bin/set-version` needs `composer`, `php`, `tailor`, `pkw`, `jq` and `sed` on
-`PATH` (`bin/set-version:133-139`); `bin/release` additionally needs `git` and an
+`PATH` (`bin/set-version:154-160`); `bin/release` additionally needs `git` and an
 authenticated `gh` (`bin/release:153-162`).
 
 ## The tag has to match `ext_emconf.php`
@@ -310,6 +322,7 @@ list is the handful of things they do *not* check.
       `--source-branch=2` in the copy that lives here, so `bin/release 2.4.0`
       is correct as written — but a `3.x` release is cut on `main`, from the
       copy there, never from this branch with an overridden flag.
+      `bin/set-version` refuses a `3.x` version for `--source-branch=2`.
 - [ ] **Changelog entries are complete** for the version, in every package that
       changed. Nothing enforces this, and after the tag it is too late — see
       [Changelog and documentation](changelog-and-documentation.md).

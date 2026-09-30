@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 84 unit test classes: 77 across the twelve extensions, one in
-`packages-dev/dev-site`, two in `packages-dev/monorepo-shared` and four in
+There are 89 unit test classes: 79 across the twelve extensions, two in
+`packages-dev/dev-site`, three in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -82,7 +82,8 @@ green because it never looked at it.
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) carries the
 tests of the three scripts behind `runTests.sh -j`, which split the functional
 suite, check that the chunks ran every listed test, and record the durations
-(ACE-692). Its traits have no tests of their own — they are exercised only
+(ACE-692), and of `Build/Scripts/composerBranchVersion.sh`, which names the
+branch alias key (ACE-784). Its traits have no tests of their own — they are exercised only
 through the extensions that use them.
 [`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
 the check that every `ext_emconf.php` of the repository names its dependencies
@@ -320,8 +321,10 @@ every "Edit on GitHub" link into the manual of `academic_base` until ACE-773.
 
 The edit branch is read from the branch alias because the branch name is not
 in the files of a checkout, and in a git worktree the git directory is outside
-the directory the test container mounts. On this branch both are `2`. A newly
-cut version branch changes both, see [Releasing](../workflow/releasing.md).
+the directory the test container mounts. The key of the alias is the version
+name composer gives the branch, `2.x-dev` here and `dev-main` on `main`, and the
+test maps it back to the bare branch name, `2` on this branch. A newly cut
+version branch changes both, see [Releasing](../workflow/releasing.md).
 
 ## See also
 
