@@ -6,8 +6,8 @@ through the same code paths production uses. It is the only suite here that
 sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
-It is also by far the larger suite: 228 functional test classes against 84 unit
-test classes, and 367 CSV fixtures. Measured with
+It is also by far the larger suite: 416 functional test classes against 122 unit
+test classes, and 553 CSV fixtures. Measured with
 
 ```bash
 find packages/fgtclb/*/Tests/Functional -name '*Test.php' | wc -l
@@ -17,18 +17,18 @@ find packages -path '*Tests*' -name '*.csv' | wc -l
 
 | Extension                | Functional | Unit |
 |--------------------------|------------|------|
-| `academic-base`          | 11         | 11   |
-| `academic-bite-jobs`     | 8          | 1    |
-| `academic-contact4pages` | 16         | 2    |
-| `academic-jobs`          | 19         | 2    |
-| `academic-partners`      | 19         | 5    |
-| `academic-persons`       | 58         | 19   |
-| `academic-persons-edit`  | 37         | 23   |
+| `academic-base`          | 23         | 15   |
+| `academic-bite-jobs`     | 12         | 3    |
+| `academic-contact4pages` | 24         | 3    |
+| `academic-jobs`          | 29         | 3    |
+| `academic-partners`      | 45         | 7    |
+| `academic-persons`       | 108        | 38   |
+| `academic-persons-edit`  | 62         | 24   |
 | `academic-persons-sync`  | 2          | 1    |
-| `academic-programs`      | 18         | 3    |
-| `academic-projects`      | 19         | 4    |
-| `academic-study-plan`    | 9          | 1    |
-| `typo3-category-types`   | 12         | 12   |
+| `academic-programs`      | 47         | 7    |
+| `academic-projects`      | 30         | 6    |
+| `academic-study-plan`    | 15         | 1    |
+| `typo3-category-types`   | 19         | 14   |
 
 `packages-dev/dev-site` adds four functional and two unit classes on top; both
 suites collect it, see [Unit tests](unit-tests.md#discovery).
