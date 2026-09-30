@@ -84,5 +84,5 @@
 - [x] 4.5 Commit as `[!!!][FEATURE] ACE-785: <subject>`, subject at most 52
   characters, body wrapped at 72, naming the removed
   `styles.content.getContent` call.
-- [ ] 4.6 Archive the change as the last commit of the pull request and verify
+- [x] 4.6 Archive the change as the last commit of the pull request and verify
   the delta specs landed in `openspec/specs/`.

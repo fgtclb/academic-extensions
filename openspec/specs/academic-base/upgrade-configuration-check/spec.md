@@ -261,6 +261,16 @@ vendor SHALL NOT be reported. This applies on TYPO3 v13 and v14.
   to be removed
 - **AND** the command exits with the failure status
 
+#### Scenario: Site depends on a removed partner or project content-load set
+
+- **WHEN** a site configuration depends on
+  `fgtclb/academic-partners-content-load` or
+  `fgtclb/academic-projects-content-load`
+- **THEN** the check reports an error naming the site and the set
+- **AND** the error says that 3.0 removed the set, that partner or project
+  pages render the content of their main column without it, and that the
+  dependency is to be removed
+
 #### Scenario: Site package set depends on a missing academic set
 
 - **WHEN** a site depends on a set of the site package that depends, directly
