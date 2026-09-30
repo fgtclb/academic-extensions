@@ -24,7 +24,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
  * `academicbitejobs_list` plugin. `Tests/Functional/Plugins/AcademicBiteJobsListPluginTest`
  * only proves the plugin renders; what the service sends to the b-ite API, and what it makes
  * of the answer, is pinned down here. No listener of the two events of the service is
- * installed, so every case shows the request and the postings as they are without one;
+ * installed, so every case shows the request and the postings as they are without one.
  * `Tests/Functional/Event/BiteJobsEventsTest` covers the listeners.
  *
  * How the API is stubbed and where the service reads its settings from is described on
