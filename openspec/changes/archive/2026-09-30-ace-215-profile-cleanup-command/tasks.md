@@ -51,4 +51,4 @@
 - [x] 6.2 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 6.3 `docs/` and the `academic-persons` `Documentation/` changelog
   updated, `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 6.4 Archive the change as the last commit of the pull request.
+- [x] 6.4 Archive the change as the last commit of the pull request.
