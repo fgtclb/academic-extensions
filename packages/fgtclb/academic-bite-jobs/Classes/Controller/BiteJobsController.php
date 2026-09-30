@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicBiteJobs\Controller;
 
+use FGTCLB\AcademicBase\Domain\Model\Dto\PluginControllerActionContext;
 use FGTCLB\AcademicBiteJobs\Enumeration\ListView;
 use FGTCLB\AcademicBiteJobs\Services\BiteJobsService;
 use Psr\Http\Message\ResponseInterface;
@@ -30,11 +31,12 @@ class BiteJobsController extends ActionController
 
     public function listAction(): ResponseInterface
     {
+        $context = new PluginControllerActionContext($this->request, $this->settings);
         $contentElementData = $this->getCurrentContentObjectRenderer()?->data ?? [];
 
         $this->view->assignMultiple([
             'data' => $contentElementData,
-            'jobs' => $this->biteJobsService->fetchBiteJobs($this->request),
+            'jobs' => $this->biteJobsService->fetchBiteJobs($this->request, $context),
         ]);
 
         return $this->htmlResponse();
