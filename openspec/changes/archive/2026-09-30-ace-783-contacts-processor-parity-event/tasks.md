@@ -70,5 +70,5 @@
 - [x] 5.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.4 `docs/` and the `Documentation/` changelog entry are part of the
   change, and `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 5.5 Archive the change as the last commit of the pull request and
+- [x] 5.5 Archive the change as the last commit of the pull request and
   verify the delta spec landed in `openspec/specs/`.
