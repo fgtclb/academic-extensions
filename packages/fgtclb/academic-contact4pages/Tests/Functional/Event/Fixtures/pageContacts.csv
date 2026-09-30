@@ -1,0 +1,32 @@
+"pages",
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","l18n_cfg","slug","title"
+,1,0,1,0,0,0,0,0,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/home","Home (EN)"
+,3,1,1,0,0,0,0,0,"/profiles","Profiles"
+,100,1,254,0,0,0,0,0,"/sysfolder-records","Recordcollection"
+"tx_academicpersons_domain_model_profile",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","first_name","last_name","slug"
+,1,100,0,0,0,0,"Max","Müllermann","max-muellermann"
+,2,100,0,0,0,0,"Horst","Huber","horst-huber"
+,3,100,0,0,0,0,"Olga","Olsen","olga-olsen"
+"tx_academicpersons_domain_model_contract",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","profile","position"
+,1,100,0,0,0,0,1,"Professor"
+,2,100,0,0,0,0,2,"Lecturer"
+,3,100,0,0,0,0,3,"Clerk"
+"tx_academicpersons_domain_model_email",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","sorting","contract","email","type"
+,11,100,0,0,0,0,1,1,"max-visible@example.org",""
+,12,100,0,1,0,0,2,1,"max-hidden@example.org",""
+"tx_academiccontacts4pages_domain_model_role",
+,"uid","pid","deleted","hidden","sys_language_uid","l10n_parent","name","description"
+,1,100,0,0,0,0,"Deanery",""
+,2,100,0,0,0,0,"Registry",""
+"tx_academiccontacts4pages_domain_model_contact",
+,"uid","pid","deleted","hidden","sys_language_uid","sorting","page","contract","role"
+,1,100,0,0,0,1,2,1,1
+,2,100,0,0,0,2,2,2,0
+,3,100,0,0,0,3,2,3,2
+"tt_content",
+,"uid","pid","deleted","hidden","sys_language_uid","l18n_parent","CType","header","pi_flexform"
+,1,2,0,0,0,0,"academiccontacts4pages_list","",""

@@ -262,6 +262,128 @@ for what such a template needs. The shipped template renders the header itself
 while :ref:`the switch below <configuration-content-element-header>` is on, so a
 copy made for the header alone is no longer needed.
 
+..  _configuration-page-contacts:
+
+The contacts in a page template
+===============================
+
+The data processor of this extension hands the contacts of a page to a page
+template, for a page layout that shows them outside the content area, as a
+sidebar or a slide-in panel. The shipped TypoScript attaches it to
+:typoscript:`page.10`, where most site packages, the bootstrap package among
+them, put their page template, by its identifier `academic-page-contacts`. The
+contacts are the ones the content element shows: a contact whose contract or
+profile is not visible is left out, and a listener of the
+:ref:`page contacts event <developers-page-contacts-event>` reaches both
+outputs.
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Variable
+        -   Holds
+    *   -   `contacts`
+        -   The contacts of the page, in the order they are sorted on the page.
+    *   -   `roles`
+        -   The roles at least one of those contacts has, keyed by the uid of
+            the role.
+    *   -   `contactsWithoutRole`
+        -   The contacts that have no role, which the grouped list of the
+            content element renders below the role groups.
+
+The processor takes three options, each with :typoscript:`stdWrap`:
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Option
+        -   Default
+        -   Effect
+    *   -   :typoscript:`as`
+        -   empty
+        -   The variable that holds `contacts`, `roles` and
+            `contactsWithoutRole`. Without it, the three are written at the top
+            level of the page template.
+    *   -   :typoscript:`showHiddenRecords`
+        -   `0`
+        -   `1` shows hidden contacts and the hidden e-mail addresses, phone
+            numbers and addresses of a contact, as the
+            :guilabel:`Show hidden records` option of the content element does.
+            The page is cached with them, so every visitor sees them.
+    *   -   :typoscript:`pageUid`
+        -   the page that is rendered
+        -   The page whose contacts are read. Without it, the processor does
+            nothing when it is attached to an object whose current record is
+            not a page, a content element for example.
+
+Contacts are edited in the form of their page and stored on it, so saving them
+clears the cache of that page. A page that shows the contacts of another page
+through :typoscript:`pageUid` is not cleared with it and keeps the old contacts
+until its own cache is cleared. The page TSconfig of the page the contacts
+belong to can clear it as well:
+
+..  code-block:: typoscript
+    :caption: Page TSconfig of the page whose contacts are shown elsewhere
+
+    TCEMAIN.clearCacheCmd = 42
+
+The options go on the shipped entry:
+
+..  code-block:: typoscript
+    :caption: TypoScript setup
+
+    page.10.dataProcessing.400 {
+        as = pageContacts
+        showHiddenRecords = 0
+    }
+
+A site package that defines its page object after this extension's TypoScript
+is included, or that renders a further page object, a page type of its own for
+example, attaches the processor there by the same identifier. Assigning a new
+content object to :typoscript:`page.10` keeps the properties set before, the
+shipped :typoscript:`dataProcessing.400` included, so clear it first, or the
+processor runs twice. A processor attached twice to one page object on purpose
+needs a variable name for at least one of them, or the second overwrites the
+first:
+
+..  code-block:: typoscript
+    :caption: TypoScript setup
+
+    page.10 >
+    page.10 = PAGEVIEW
+    page.10 {
+        paths.10 = EXT:my_sitepackage/Resources/Private/Templates/
+        dataProcessing {
+            40 = academic-page-contacts
+            40.as = pageContacts
+        }
+    }
+
+..  code-block:: html
+    :caption: A page template reading the contacts below `pageContacts`
+
+    <f:for each="{pageContacts.roles}" as="role">
+        <h2>{role.name}</h2>
+        <f:for each="{pageContacts.contacts}" as="contact">
+            <f:if condition="{contact.role.uid} == {role.uid}">
+                <p>{contact.contract.profile.firstName} {contact.contract.profile.lastName}</p>
+            </f:if>
+        </f:for>
+    </f:for>
+    <f:for each="{pageContacts.contactsWithoutRole}" as="contact">
+        <p>{contact.contract.profile.firstName} {contact.contract.profile.lastName}</p>
+    </f:for>
+
+A page template that renders the contacts through the :file:`Profile/Item`
+partial of :guilabel:`EXT:academic_persons` needs the partial root paths of
+that extension and of :guilabel:`EXT:academic_base` in its view, see
+:ref:`breaking-contacts4pages-profile-images-render-as-picture`.
+
+The class name
+:php:`\FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor` in
+place of the identifier keeps working, for TypoScript written before the
+identifier existed.
+
 ..  _configuration-content-element-header:
 
 The header of the content elements

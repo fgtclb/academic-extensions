@@ -1,0 +1,6 @@
+# All three lists below one variable, rendered by a template that reads them there and
+# counts what is left at the top level.
+page.10 {
+  templateName = PageContactsAs
+  dataProcessing.400.as = pageContacts
+}

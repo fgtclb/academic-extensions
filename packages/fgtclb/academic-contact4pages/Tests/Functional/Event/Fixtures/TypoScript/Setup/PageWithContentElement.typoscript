@@ -1,0 +1,16 @@
+# The page template of the data processor tests, followed by the content of the page, so
+# one request renders the page output and the contacts content element.
+#
+# This file is included *before* the setup of the extension, so the shipped
+# "page.10.dataProcessing.400" registration is what attaches the processor here.
+page = PAGE
+page {
+  10 = FLUIDTEMPLATE
+  10 {
+    templateName = PageContacts
+    templateRootPaths {
+      10 = EXT:academic_contacts4pages/Tests/Functional/DataProcessing/Fixtures/Templates/
+    }
+  }
+  20 < styles.content.get
+}

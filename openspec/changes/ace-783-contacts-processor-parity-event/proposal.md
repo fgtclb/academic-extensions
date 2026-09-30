@@ -2,11 +2,12 @@
 
 The page data processor of `academic_contacts4pages`
 (`packages/fgtclb/academic-contact4pages`) hands page templates less than the
-content element renders. It returns no list of contacts without a role (the
-fix of ACE-322 covered only the plugin), ignores its own configuration, never
-shows hidden contacts and always reads the current page. Nothing lets an
-extension change which contacts a page shows, so one project copied the
-whole controller into a second plugin.
+content element renders. Since ACE-101 both read the contacts through the
+same provider, but the processor still returns no list of contacts without a
+role (the fix of ACE-322 covered only the plugin), ignores its own
+configuration, never shows hidden contacts and always reads the current page.
+Nothing lets an extension change which contacts a page shows, so one project
+copied the whole controller into a second plugin.
 
 ## What Changes
 
@@ -18,8 +19,9 @@ whole controller into a second plugin.
 - One event lets an extension change the contacts of a page before either
   output renders them, and tells it whether the content element or the page
   output asked.
-- Plugin and processor read the contacts through the same page contacts
-  provider that candidate `listings-02` introduces.
+- `showHiddenRecords` of the processor also shows hidden address records, as
+  the option of the content element does.
+- The processor gets an identifier, and the class name keeps working.
 - `docs/` and the extension manual explain how to attach the processor to
   further page objects.
 
@@ -40,8 +42,9 @@ None.
 ## Impact
 
 - `academic_contacts4pages`: the data processor, the controller, the page
-  contacts provider of `listings-02`, a new event class,
+  contacts provider, a new event class and its enum,
   `Configuration/Services.yaml`, `Configuration/TypoScript/List/setup.typoscript`.
+- `academic_base`: the extension points page lists the event and the enum.
 - Page templates keep today's top-level variables while `as` is not set.
 - No database change.
 
@@ -52,12 +55,10 @@ None.
 - The cal.com appointment widget of one project, which stays in the project.
 - Backporting to branch `2`.
 
-Depends on candidate `listings-02` (change
-`ace-101-contacts-skip-unresolved-profiles`).
+Depends on candidate `listings-02` (ACE-101), which is merged.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-19`). Three of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-<slug>` when the issue is filed after implementation.
+this today. The change implements ACE-783.

@@ -3,7 +3,7 @@
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
 rather than describing an intention as a rule — 318 PHP files declaring 279
-classes, 11 interfaces, 17 traits and 11 enums do not follow one style yet.
+classes, 11 interfaces, 17 traits and 13 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -271,7 +271,7 @@ referenced it.
 
 ### Enums
 
-Eleven, all backed, none pure
+Thirteen, all backed, none pure
 (`grep -rl '^enum' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes`):
 
 | Enum                                                                   | Backing  |
@@ -279,12 +279,14 @@ Eleven, all backed, none pure
 | `academic-base/Classes/Upgrade/ConfigurationFindingKind.php:13`        | `string` |
 | `academic-base/Classes/Upgrade/TemplateOverrideFindingKind.php:14`     | `string` |
 | `academic-bite-jobs/Classes/Enumeration/ListView.php:10`               | `string` |
-| `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:7`        | `int`    |
-| `academic-persons/Classes/DataHandling/ProfileWriteCorrelation.php:33` | `string` |
-| `academic-persons/Classes/Event/ProfileUpdateOrigin.php:19`            | `string` |
-| `academic-persons/Classes/Profile/ProfileActionType.php:14`            | `string` |
-| `academic-persons/Classes/Service/ContractDisplay.php:15`              | `string` |
+| `academic-contact4pages/Classes/Event/PageContactsOutput.php:14`       | `string` |
+| `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:10`       | `int`    |
 | `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12`      | `string` |
+| `academic-persons-edit/Classes/Event/ProfileEditingAction.php:25`      | `string` |
+| `academic-persons/Classes/DataHandling/ProfileWriteCorrelation.php:35` | `string` |
+| `academic-persons/Classes/Event/ProfileUpdateOrigin.php:21`            | `string` |
+| `academic-persons/Classes/Profile/ProfileActionType.php:17`            | `string` |
+| `academic-persons/Classes/Service/ContractDisplay.php:15`              | `string` |
 | `academic-programs/Classes/Enumeration/ProgramFactsPlace.php:11`       | `string` |
 | `academic-projects/Classes/Domain/Model/Dto/ActiveState.php:7`         | `string` |
 

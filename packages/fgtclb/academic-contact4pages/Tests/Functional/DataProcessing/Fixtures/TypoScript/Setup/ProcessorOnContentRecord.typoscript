@@ -1,0 +1,21 @@
+# The processor attached to the rendering of a content element, whose current record is
+# the content element and not a page. Without "pageUid" it assigns nothing there.
+page.30 = CONTENT
+page.30 {
+  table = tt_content
+  select {
+    pidInList = 2
+    orderBy = uid
+  }
+  renderObj = FLUIDTEMPLATE
+  renderObj {
+    templateName = RecordContacts
+    templateRootPaths {
+      10 = EXT:academic_contacts4pages/Tests/Functional/DataProcessing/Fixtures/Templates/
+    }
+    dataProcessing {
+      10 = academic-page-contacts
+      10.as = recordContacts
+    }
+  }
+}

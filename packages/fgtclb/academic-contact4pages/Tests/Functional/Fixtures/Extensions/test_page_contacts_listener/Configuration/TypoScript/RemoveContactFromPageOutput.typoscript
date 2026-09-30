@@ -1,0 +1,5 @@
+# The listener removes "Huber" only when the data processor asks.
+plugin.tx_testpagecontactslistener {
+  removeContact = 2
+  onlyForOutput = data-processor
+}

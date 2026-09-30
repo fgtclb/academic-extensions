@@ -121,6 +121,7 @@ Events
 Every event is a :php:`final` class, dispatched through the PSR-14 event
 dispatcher of TYPO3. A listener registers for it with the
 :php:`#[AsEventListener]` attribute of TYPO3. The developer chapters of
+`academic_contacts4pages <https://docs.typo3.org/p/fgtclb/academic-contacts4pages/main/en-us/Developers/Index.html>`__,
 `academic_persons <https://docs.typo3.org/p/fgtclb/academic-persons/main/en-us/Developers/Index.html>`__,
 `academic_persons_edit <https://docs.typo3.org/p/fgtclb/academic-persons-edit/main/en-us/Developers/Index.html>`__,
 `academic_partners <https://docs.typo3.org/p/fgtclb/academic-partners/main/en-us/Developers/Index.html>`__,
@@ -152,6 +153,11 @@ describe their events in detail, with examples.
             assigned its own variables
         -   assign further view variables, see
             :ref:`developers-extension-points-plugin-view`
+    *   -   :php:`\FGTCLB\AcademicContacts4pages\Event\ModifyPageContactsEvent`
+        -   in the contacts content element and in the data processor of
+            the page contacts, after the contacts of the page are read and
+            before they are grouped by role
+        -   replace the contacts
     *   -   :php:`\FGTCLB\AcademicJobs\Event\AfterSaveJobEvent`
         -   in the job form plugin, after a submitted job is saved
         -   change the page redirected to, and how the confirmation message
@@ -343,6 +349,8 @@ packages are not listed; their own documentation applies.
         -   the job save event
     *   -   :php:`\FGTCLB\AcademicPersonsEdit\Event\ProfileEditingAction`
         -   the write event of the profile editing
+    *   -   :php:`\FGTCLB\AcademicContacts4pages\Event\PageContactsOutput`
+        -   the page contacts event
 
 ..  _developers-extension-points-interfaces:
 
@@ -401,7 +409,7 @@ them as they are; they are not meant to be subclassed or replaced.
             for an SVG drawn in ``currentColor``
     *   -   :php:`\FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor`
         -   as a data processor of a page template, for the contacts of the
-            page
+            page, by its identifier `academic-page-contacts` or by class name
     *   -   :php:`\FGTCLB\CategoryTypes\Backend\FormEngine\CategoryTypeItemsProcFunc`
         -   as the :php:`itemsProcFunc` of a select field of a project's TCA or
             FlexForm that offers category types

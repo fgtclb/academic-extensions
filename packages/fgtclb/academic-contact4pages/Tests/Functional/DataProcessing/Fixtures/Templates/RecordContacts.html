@@ -1,0 +1,13 @@
+<html
+    data-namespace-typo3-fluid="true"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+>
+
+<div class="record-contacts">
+    <p>RECORD-ASSIGNED:{f:if(condition: recordContacts, then: 'yes', else: 'no')}</p>
+    <f:for each="{recordContacts.contacts}" as="contact">
+        <p>RECORD-CONTACT:{contact.contract.profile.lastName}</p>
+    </f:for>
+</div>
+
+</html>

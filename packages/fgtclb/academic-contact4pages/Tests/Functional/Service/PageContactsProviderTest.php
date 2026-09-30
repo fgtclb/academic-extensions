@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicContacts4pages\Tests\Functional\Service;
 
 use FGTCLB\AcademicContacts4pages\Domain\Model\Contact;
+use FGTCLB\AcademicContacts4pages\Event\PageContactsOutput;
+use FGTCLB\AcademicContacts4pages\Service\PageContacts;
 use FGTCLB\AcademicContacts4pages\Service\PageContactsProvider;
 use FGTCLB\AcademicContacts4pages\Tests\Functional\AbstractAcademicContacts4PagesTestCase;
 use PHPUnit\Framework\Attributes\Test;
+use TYPO3\CMS\Core\Http\ServerRequest;
 
 /**
  * The service both the contacts content element and the page contacts data processor ask
@@ -24,9 +27,17 @@ use PHPUnit\Framework\Attributes\Test;
  */
 final class PageContactsProviderTest extends AbstractAcademicContacts4PagesTestCase
 {
-    private function subject(): PageContactsProvider
+    /**
+     * The contacts of a page as the data processor asks for them, without hidden records.
+     */
+    private function pageContacts(int $pageUid): PageContacts
     {
-        return $this->get(PageContactsProvider::class);
+        return $this->get(PageContactsProvider::class)->get(
+            $pageUid,
+            false,
+            PageContactsOutput::DataProcessor,
+            new ServerRequest('https://www.acme.com/'),
+        );
     }
 
     /**
@@ -48,7 +59,7 @@ final class PageContactsProviderTest extends AbstractAcademicContacts4PagesTestC
     {
         $this->setUpTestCase();
 
-        $this->assertSame([1, 5], $this->uids($this->subject()->get(2)->contacts));
+        $this->assertSame([1, 5], $this->uids($this->pageContacts(2)->contacts));
     }
 
     /**
@@ -60,7 +71,7 @@ final class PageContactsProviderTest extends AbstractAcademicContacts4PagesTestC
     {
         $this->setUpTestCase();
 
-        $roles = $this->subject()->get(2)->roles;
+        $roles = $this->pageContacts(2)->roles;
 
         $this->assertSame([1], array_keys($roles));
         $this->assertSame("Dean's Office", $roles[1]->getName());
@@ -72,7 +83,7 @@ final class PageContactsProviderTest extends AbstractAcademicContacts4PagesTestC
         $this->setUpTestCase();
 
         // Contact 4 has no role either, but its profile has expired.
-        $this->assertSame([5], $this->uids($this->subject()->get(2)->contactsWithoutRole));
+        $this->assertSame([5], $this->uids($this->pageContacts(2)->contactsWithoutRole));
     }
 
     /**
@@ -84,7 +95,7 @@ final class PageContactsProviderTest extends AbstractAcademicContacts4PagesTestC
     {
         $this->setUpTestCase();
 
-        $pageContacts = $this->subject()->get(1);
+        $pageContacts = $this->pageContacts(1);
 
         $this->assertSame([], $pageContacts->contacts);
         $this->assertSame([], $pageContacts->roles);
