@@ -8,10 +8,11 @@ renamed.
 
 ### Requirement: Filter values generate readable segments
 
-The aspect SHALL generate, for a category uid, the segment
-`<title-slug>-<uid>`, where the slug is derived from the category title in
-the language of the generated URL. A comma separated list of uids SHALL
-generate the segments of each uid in list order, joined by commas.
+The aspect SHALL generate, on TYPO3 v13 and v14, the segment
+`<title-slug>-<uid>` for a category uid, where the slug is derived from the
+category title in the language of the generated URL. A comma separated list
+of uids SHALL generate the segments of each uid in list order, joined by
+commas.
 
 #### Scenario: One category in German
 
@@ -25,18 +26,39 @@ generate the segments of each uid in list order, joined by commas.
   and "University"
 - **THEN** the segment is `europe-12,university-31`
 
+#### Scenario: A list URL without cache hash
+
+- **WHEN** a filtered URL is generated for a list plugin that excludes its
+  demand from the cache hash, as the partner, project and program lists do
+- **THEN** the URL is the readable path without a `cHash` argument
+- **AND** opening it renders the filtered list
+
+#### Scenario: A value that cannot be mapped
+
+- **WHEN** a URL is generated for a filter value that names a hidden, deleted,
+  unknown or foreign category, or that is no list of uids
+- **THEN** no segment is generated and the link keeps the filter as a query
+  argument
+
 ### Requirement: Segments resolve by uid only
 
 The aspect SHALL resolve a segment by reading the trailing uid of each
-comma separated part. A part SHALL resolve only when a category with that uid
-exists and belongs to the configured category group; otherwise the whole
-segment MUST NOT resolve.
+comma separated part, on TYPO3 v13 and v14. A part SHALL resolve only when a
+visible category of the default language or of all languages has that uid and
+belongs to the configured category group. Otherwise the whole segment MUST NOT
+resolve.
 
 #### Scenario: Category was renamed
 
 - **WHEN** a visitor opens `europa-12` after category 12 was renamed to
   "Europäische Union"
 - **THEN** the segment resolves to uid 12
+
+#### Scenario: Hidden, deleted or translated record
+
+- **WHEN** a visitor opens a segment whose uid is a hidden or deleted
+  category, or the translation record of a category
+- **THEN** the route does not match
 
 #### Scenario: Foreign or unknown category
 

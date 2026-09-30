@@ -68,6 +68,11 @@ What is public API
 *   The format of :file:`Configuration/CategoryTypes.yaml`, see the
     `category types chapter of category_types
     <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/CategoryTypes/Index.html>`__.
+*   The routing aspect type ``CategoryFilterMapper`` of
+    :guilabel:`category_types` and its settings, see the `routing chapter of
+    category_types
+    <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/Routing/Index.html>`__.
+    The class behind it is not public API.
 
 ..  _developers-extension-points-not-api:
 

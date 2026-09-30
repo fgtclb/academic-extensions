@@ -20,7 +20,7 @@ hand-write the same combinatorics.
   specific first, so each combination generates and resolves.
 - Static path keys and sorting values are localised (for example
   `filter`/`sortierung`/`seite` in German).
-- Category filters use the aspect of `ace-tbd-category-filter-route-aspect`.
+- Category filters use the aspect of `ace-782-category-filter-route-aspect`.
 - The files are not loaded automatically. A site imports them in its site
   configuration and limits them to the list pages, exactly as the
   `academic_persons` route files are used today.
