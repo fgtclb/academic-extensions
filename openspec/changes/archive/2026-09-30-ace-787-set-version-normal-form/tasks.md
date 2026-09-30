@@ -23,4 +23,4 @@
 - [x] 3.5 No changelog entry: nothing an installation observes changes.
 - [x] 3.6 Commit `[BUGFIX] ACE-787: Store files in set-version form`, TYPO3
   Core format, no attribution of any tool.
-- [ ] 3.7 Archive the change as the last commit of the pull request.
+- [x] 3.7 Archive the change as the last commit of the pull request.
