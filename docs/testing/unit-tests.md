@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 89 unit test classes: 79 across the twelve extensions, two in
-`packages-dev/dev-site`, three in `packages-dev/monorepo-shared` and five in
+There are 90 unit test classes: 79 across the twelve extensions, two in
+`packages-dev/dev-site`, four in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -89,7 +89,8 @@ through the extensions that use them.
 the check that every `ext_emconf.php` of the repository names its dependencies
 by extension key, see [below](#the-ext_emconfphp-dependency-keys), and the one
 that every translation names its extension without an underscore, see
-[below](#the-extension-name-of-translations).
+[below](#the-extension-name-of-translations), and the checks of the manual
+links and the branch alias key, see [below](#the-links-of-the-manuals).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -325,6 +326,22 @@ the directory the test container mounts. The key of the alias is the version
 name composer gives the branch, `2.x-dev` here and `dev-main` on `main`, and the
 test maps it back to the bare branch name, `2` on this branch. A newly cut
 version branch changes both, see [Releasing](../workflow/releasing.md).
+
+## The branch alias key
+
+[`BranchAliasKeyTest`](../../packages-dev/monorepo-shared/Tests/Unit/BranchAliasKeyTest.php)
+asserts that the root `composer.json` and every package below
+`packages/fgtclb/` carry the same `extra.branch-alias` with exactly one entry,
+that its key is what `Build/Scripts/composerBranchVersion.sh` prints for the
+branch `DocumentationGuidesTest` reads from the root, and that a numeric key
+aliases a minor version inside it (`2.x-dev` to `2.4.x-dev`).
+
+Composer applies an alias only when its key is the version name it gives the
+branch, and skips any other key without a word. `composer validate --strict`
+accepts one as well. This branch carried `dev-2` from its cut until ACE-784, so
+`2.4.x-dev` did not exist and no split package requiring a sibling with
+`~2.4.0@dev` installed from it. `bin/set-version` writes the key through the
+same script, see [Releasing](../workflow/releasing.md).
 
 ## See also
 

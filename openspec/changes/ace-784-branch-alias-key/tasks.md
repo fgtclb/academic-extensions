@@ -28,10 +28,10 @@
   exactly the thirteen `"dev-2": "2.4.x-dev"` lines into
   `"2.x-dev": "2.4.x-dev"`, apart from formatting it does not own, and make
   exactly that edit in the thirteen files.
-- [ ] 3.2 Add `packages-dev/monorepo-shared/Tests/Unit/BranchAliasKeyTest.php`,
+- [x] 3.2 Add `packages-dev/monorepo-shared/Tests/Unit/BranchAliasKeyTest.php`,
   byte-identical to `main`. Shown red against the unchanged `dev-2` data, green
   after 3.1.
-- [ ] 3.3 Refresh `core-12/composer.lock` and `core-13/composer.lock` only if
+- [x] 3.3 Refresh `core-12/composer.lock` and `core-13/composer.lock` only if
   the refresh changes exactly the 24 alias entries, and state the outcome.
 
 ## 4. Documentation
