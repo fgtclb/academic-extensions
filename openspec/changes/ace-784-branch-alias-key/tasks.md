@@ -42,7 +42,7 @@
 - [ ] 4.2 `docs/testing/unit-tests.md` (manual links, the alias key test, the
   measured class count), `docs/testing/testing-helper.md`, `AGENTS.md` (four
   `monorepo-shared` tests, the script tests of `testing-helper`).
-- [ ] 4.3 The version tables of `README.md` and the twelve package READMEs as
+- [x] 4.3 The version tables of `README.md` and the twelve package READMEs as
   on `main`. Verify with `git grep -n '3\.x-dev' -- '*.md'`.
 - [ ] 4.4 `Documentation/Changelog/2.4/Important-BranchAliasKey.rst` in the
   twelve packages, identical to `main` apart from the labels.
