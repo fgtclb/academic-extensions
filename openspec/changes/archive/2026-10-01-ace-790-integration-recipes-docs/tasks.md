@@ -81,11 +81,11 @@
 
 ## 7. Definition of done
 
-- [ ] 7.1 `lintPhp` green.
-- [ ] 7.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [x] 7.1 `lintPhp` green.
+- [x] 7.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 13`.
-- [ ] 7.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [x] 7.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 14`.
-- [ ] 7.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 7.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 7.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 7.6 Archive the change as the last commit of the pull request.
+- [x] 7.6 Archive the change as the last commit of the pull request.
