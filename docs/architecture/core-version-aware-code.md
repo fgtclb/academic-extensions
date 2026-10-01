@@ -8,19 +8,21 @@ the matching variant is used.
 This page documents what this branch does today. Both options are in use here —
 the folder split is not hypothetical on this branch.
 
-## Four mechanisms are in use
+## Five mechanisms are in use
 
 They differ by *where* the difference sits, not by preference:
 
-| Mechanism                                  | Used in                                                        | Count                  |
-|--------------------------------------------|----------------------------------------------------------------|------------------------|
-| Class folder split                         | `academic-base/Classes/Core12/` and `Classes/Core13/`          | 4 files per version    |
-| Version dependent resource path            | `packages/fgtclb/*/Configuration/TCA/Overrides/tt_content.php` | 5 files, 12 call sites |
-| Version switch inside a configuration file | `packages/fgtclb/*/ext_localconf.php`                          | 3 files                |
-| Version switch inside a PHP class          | `academic-base/Classes/Extbase/Property/TypeConverter/`        | 1 file, 1 switch       |
+| Mechanism                                  | Used in                                                                                                | Count                  |
+|--------------------------------------------|--------------------------------------------------------------------------------------------------------|------------------------|
+| Class folder split                         | `academic-base/Classes/Core12/` and `Classes/Core13/`                                                  | 4 files per version    |
+| Version dependent resource path            | `packages/fgtclb/*/Configuration/TCA/Overrides/tt_content.php`                                         | 5 files, 12 call sites |
+| Version switch inside a configuration file | `packages/fgtclb/*/ext_localconf.php`                                                                  | 3 files                |
+| Version switch inside a PHP class          | `academic-base/Classes/Extbase/Property/TypeConverter/`                                                | 1 file, 1 switch       |
+| Check for the API instead of the version   | the page data processors, `academic-base/Classes/Environment/`, `academic-persons/Classes/Controller/` | 5 files, 6 checks      |
 
-All of them switch on `(new Typo3Version())->getMajorVersion()`. There is no
-`EXT_CONSTANTS.php` anywhere in this branch.
+The first four switch on `(new Typo3Version())->getMajorVersion()`, the fifth
+asks for the method or class it is about to use. There is no `EXT_CONSTANTS.php`
+anywhere in this branch.
 
 ## The folder split in `academic-base`
 
@@ -186,6 +188,27 @@ provides. The properties are still set on v12 because code there may read them
 back through the deprecated accessors. The method carries a `@todo` naming its
 exit condition — dropping it together with the call when v12 support ends.
 
+## A check for the API instead of the version
+
+Some code does not need to know the version, only whether an object offers a
+method or a class exists. Five files ask for it, four with `method_exists()`
+and one with `class_exists()`:
+
+- `StateManagerRootStateInterfaceHelperMethodsTrait.php` in
+  `academic-base/Classes/Environment/` hands the request to the configuration
+  manager with `setRequest()`, which the v13 interface declares and the v12
+  class already has, and the content object with `setContentObject()` where
+  that still exists (v12).
+- `ProfileController::addCacheTags()` in `academic-persons/Classes/Controller/`
+  adds the cache tags through the cache data collector when its class exists
+  (v13), and through the frontend controller otherwise (v12).
+- The page data processors of `academic_programs`, `academic_partners` and
+  `academic_projects` take the page record from `page` when it is an object
+  with `getPageRecord()`, the page information object of a `PAGEVIEW` page
+  object. Its class does not exist on v12, so an `instanceof` against it would
+  be an error of the v12 analysis. See
+  [Page type rendering](page-type-rendering.md).
+
 ## The rule
 
 **Keep a one- or two-line difference as a version switch. Reach for a folder
@@ -200,7 +223,8 @@ The threshold is not the number of switches but their reach: once a class needs
 different *dependencies*, different *method signatures*, or an API that does
 not exist on the other version at all, a switch cannot express it and the class
 has to exist twice — which is exactly why `academic-base` has the split and
-nothing else does.
+nothing else does. Where only one call differs, asking for the method or the
+class, as above, is enough.
 
 ## Static analysis
 
