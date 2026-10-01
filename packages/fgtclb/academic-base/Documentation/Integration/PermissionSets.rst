@@ -197,7 +197,8 @@ academic_partners
 =================
 
 A partner is a page of the page type 40. The other fields the extension
-defines on :sql:`pages` are not :php:`exclude` fields.
+defines on :sql:`pages` are not :php:`exclude` fields, and the column
+:sql:`link` it adds on TYPO3 v13 is shown in no form.
 
 ..  code-block:: yaml
 
@@ -206,7 +207,6 @@ defines on :sql:`pages` are not :php:`exclude` fields.
       pages:
         types: [40]
         fields:
-          - link
           - tx_academicpartners_partnerships
       tt_content:
         types:
