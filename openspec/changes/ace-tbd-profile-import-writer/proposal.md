@@ -46,7 +46,7 @@ None.
 
 - `academic_persons`: the writer, its data objects, a result object, one
   event, a retire policy.
-- Depends on `ace-tbd-import-identifier-lookup`,
+- Depends on `ace-795-import-identifier-lookup`,
   `ace-758-managed-fields-backend` and
   `ace-725-backend-save-announces-profile-update`.
 - Developer and integrator documentation, a 3.0 feature changelog.

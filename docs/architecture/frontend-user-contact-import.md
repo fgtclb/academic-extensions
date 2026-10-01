@@ -398,6 +398,8 @@ installation that needs them corrected has to do so deliberately:
 
 ## See also
 
+- [Import identifiers](import-identifiers.md) — the convention, the field in the
+  backend, and the lookup an import of a project uses.
 - [Database queries](database-queries.md) — the ordering rule the record match
   and the relation lookup depend on.
 - [Dependency injection](dependency-injection.md) — why the shared resolver and

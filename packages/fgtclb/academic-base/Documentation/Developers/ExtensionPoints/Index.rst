@@ -440,6 +440,9 @@ them as they are; they are not meant to be subclassed or replaced.
             and as :php:`ProfileWriteCorrelation::Internal` in a listener of
             the profile update event that writes profiles through the
             DataHandler, so that write is not announced again
+    *   -   :php:`\FGTCLB\AcademicPersons\Import\ImportedRecordFinder`
+        -   injected into import code, to find the person record that carries
+            an import identifier, so the next run updates it
 
 ..  _developers-extension-points-base-classes:
 
