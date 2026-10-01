@@ -59,13 +59,23 @@
   `Important-AcademicGroupComesLastInTheWizard.rst` and the spec
   `academic-base/content-element-wizard-group`.
 
-## 5. Definition of done
+## 5. ACE-791: the page link on TYPO3 v14
 
-- [ ] 5.1 `lintPhp` green.
-- [ ] 5.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [x] 5.1 Add the partner column `link` only when TYPO3 defines none.
+- [x] 5.2 Test the definition against the TCA file of the core extension, the
+  field of TYPO3 on v14 and the column of the extension on v13. Shown red on
+  v14 by restoring the old override, and on v13 by removing the column of the
+  extension whatever TYPO3 defines.
+- [x] 5.3 Add `Important-PageLinkKeepsItsDefinitionOnTypo3V14.rst` and the
+  link requirement of `academic-partners/core-page-fields`.
+
+## 6. Definition of done
+
+- [ ] 6.1 `lintPhp` green.
+- [ ] 6.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 13`.
-- [ ] 5.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [ ] 6.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 14`.
-- [ ] 5.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [x] 5.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 5.6 Archive the change as the last commit of the pull request.
+- [ ] 6.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 6.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
+- [ ] 6.6 Archive the change as the last commit of the pull request.

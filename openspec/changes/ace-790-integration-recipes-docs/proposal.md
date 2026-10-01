@@ -35,6 +35,9 @@ in the new content element wizard, which TYPO3 v13 and v14 build from TCA.
   by position, so the wizard opened on "Special elements" on every
   installation. The group now follows the groups of TYPO3, in the order of
   their registration.
+- ACE-791: on TYPO3 v14, `academic_partners` no longer replaces the field
+  `link` TYPO3 defines on `pages` for the page type "Link". It adds its own
+  column of that name on TYPO3 v13 only, which has none.
 
 ## Capabilities
 
@@ -43,6 +46,8 @@ in the new content element wizard, which TYPO3 v13 and v14 build from TCA.
 - `academic-base/content-element-wizard-group`: where the academic group
   appears in the new content element wizard, and what a site changes about it
   by page TSconfig.
+- `academic-partners/core-page-fields`: the fields TYPO3 defines on `pages`
+  keep their definition when `academic_partners` is installed.
 
 ### Modified Capabilities
 
@@ -53,9 +58,12 @@ None.
 - A documentation chapter in `academic_base`, links in four more manuals.
 - The page TSconfig of the academic group in `academic_base`, with an
   `Important` changelog entry.
-- One functional test and one fixture extension in `academic_base`, and the
-  test counts in `docs/testing/functional-tests.md`.
-- No code or dependency change.
+- The TCA of `pages` in `academic_partners`, with an `Important` changelog
+  entry. No database change: the stored values stay where they are.
+- One functional test and one fixture extension in `academic_base`, one
+  functional test in `academic_partners`, and the test counts in
+  `docs/testing/functional-tests.md`.
+- No PHP class and no dependency change.
 
 ## Non-goals
 
