@@ -9,6 +9,6 @@
 # carry its label on every installation, not only on the sites that enable the
 # set "fgtclb/academic-base-ctype-group" (ACE-453). The very same file is also
 # reachable through that set and through the page field "Page TSconfig" - one
-# physical copy, three ways to it, and assigning the same two values again
-# changes nothing.
+# physical copy, three ways to it, and assigning the same header again changes
+# nothing.
 @import 'EXT:academic_base/Configuration/TSconfig/CTypeGroup/page.tsconfig'

@@ -31,9 +31,9 @@
   from the loaded TCA.
 - [x] 2.5 Link the chapter from the manuals of `academic_persons`,
   `academic_programs`, `academic_projects` and `academic_partners`.
-- [x] 2.6 No `Documentation/Changelog/3.0/` entry: nothing an installation
-  renders or an integrator configures changes. `docs/` changes the test
-  counts only. The pull request says so.
+- [x] 2.6 No `Documentation/Changelog/3.0/` entry for the recipes: nothing
+  an installation renders or an integrator configures changes. `docs/`
+  changes the test counts only. The pull request says so.
 
 ## 3. File the issue
 
@@ -45,13 +45,27 @@
   group position moves "Special elements" to the front) and ACE-793 (the
   partner `description` column replaces the core field).
 
-## 4. Definition of done
+## 4. ACE-792: the shipped group position
 
-- [ ] 4.1 `lintPhp` green.
-- [ ] 4.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [x] 4.1 Remove `after = special` from
+  `academic-base/Configuration/TSconfig/CTypeGroup/page.tsconfig`, keep the
+  header.
+- [x] 4.2 Test the order without a position (the group after the groups of
+  TYPO3), and keep `after = special` as the TSconfig of a page of its own.
+  Shown red by
+  restoring the shipped position, which fails the order test and the "group
+  first with `before`" test.
+- [x] 4.3 Rewrite the position section of the wizard recipe, add
+  `Important-AcademicGroupComesLastInTheWizard.rst` and the spec
+  `academic-base/content-element-wizard-group`.
+
+## 5. Definition of done
+
+- [ ] 5.1 `lintPhp` green.
+- [ ] 5.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 13`.
-- [ ] 4.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [ ] 5.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 14`.
-- [ ] 4.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [x] 4.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 4.6 Archive the change as the last commit of the pull request.
+- [ ] 5.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 5.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
+- [ ] 5.6 Archive the change as the last commit of the pull request.
