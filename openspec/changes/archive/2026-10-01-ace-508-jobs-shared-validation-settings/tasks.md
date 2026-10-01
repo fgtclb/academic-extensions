@@ -91,6 +91,6 @@
   for v13 and v14, because the form writes records.
 - [x] 5.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 5.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 5.6 Commit as `[!!!][TASK] ACE-508: <subject>`, subject at most 52
+- [x] 5.6 Commit as `[!!!][TASK] ACE-508: <subject>`, subject at most 52
   characters including the tags, body wrapped at 72, no attribution.
-- [ ] 5.7 Archive the change as the last commit of the pull request.
+- [x] 5.7 Archive the change as the last commit of the pull request.
