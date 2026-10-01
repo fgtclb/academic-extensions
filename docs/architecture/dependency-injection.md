@@ -126,11 +126,11 @@ Measured with
 
 | Attribute            | Sites | Examples                                                                     |
 |----------------------|-------|------------------------------------------------------------------------------|
-| `#[Autoconfigure]`   | 14    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
-| `#[Autowire]`        | 6     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
+| `#[Autoconfigure]`   | 15    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
+| `#[Autowire]`        | 5     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
-| `#[Exclude]`         | 18    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
-| `#[AsEventListener]` | 7     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
+| `#[Exclude]`         | 20    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
+| `#[AsEventListener]` | 8     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
@@ -142,10 +142,11 @@ the other three commands in `academic-persons` are still registered with
 attribute (see below): the `RegisterAcademicPageDoktype` and the
 `AddPageModuleCategorySummary` listener of each of `academic-partners`,
 `academic-programs` and `academic-projects`, and `ApplySettingsToTca` of
-`academic-persons`, which applies the persons settings to the compiled TCA.
+`academic-persons` and of `academic-jobs`, which apply the settings of their
+extension to the compiled TCA.
 `#[AsTaggedItem]` and `#[AsController]` have zero sites.
 
-For the thirteen `#[Exclude]` sites and why `LegacySettingsMigration` is among
+For the twenty `#[Exclude]` sites and why `LegacySettingsMigration` is among
 them, see [Class design](class-design.md#keep-data-objects-out-of-the-container).
 
 The `#[Autowire]` example is the clearest illustration of the two styles working
@@ -204,7 +205,7 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     ) {}
 ```
 
-The twelve event listener classes follow the same shape, promoted
+The thirteen event listener classes follow the same shape, promoted
 `private readonly` dependencies (or a `readonly class`) and a single
 `__invoke()`, apart from `AssignContractOrganisationalUnitSorting`, which has
 one method per persistence event. Five are registered by YAML tag:
@@ -212,10 +213,10 @@ one method per persistence event. Five are registered by YAML tag:
 `academic-persons/Classes/EventListener/UpdateProfileImageMetadata.php`,
 `.../AssignContractOrganisationalUnitSorting.php`,
 `academic-persons-edit/Classes/EventListener/GenerateSlugForProfile.php` and
-`.../SyncChangesToTranslations.php`. Seven are registered by attribute: the
+`.../SyncChangesToTranslations.php`. Eight are registered by attribute: the
 `RegisterAcademicPageDoktype` and the `AddPageModuleCategorySummary` of
 `academic-partners`, `academic-programs` and `academic-projects`, and
-`ApplySettingsToTca` of `academic-persons`.
+`ApplySettingsToTca` of `academic-persons` and `academic-jobs`.
 
 ### Where the codebase does not comply
 
@@ -226,9 +227,8 @@ nobody checks:
   line 26 keeps a nullable `PersistenceManagerInterface` filled by a
   `#[Required] injectPersistenceManager()` method, while its own docblock at
   line 18 reads `@note Service must be kept stateless.`
-- `academic-jobs/Classes/Loader/AcademicJobsSettingsLoader.php:15` and
-  `typo3-category-types/Classes/Loader/CategoryTypeLoader.php:16` memoize their
-  built registry in a nullable property. Both are `load()` factories for a
+- `typo3-category-types/Classes/Loader/CategoryTypeLoader.php:19` memoizes its
+  built registry in a nullable property. It is the `load()` factory of a
   shared, `public: true` registry, so the cached value is process-wide.
 - `academic-persons/Classes/Profile/AbstractProfileFactory.php` lines 34 and 38
   hold genuine runtime state (`$autoCreateProfiles`,
@@ -331,11 +331,11 @@ Both spellings are in use here: five listener classes are registered by YAML
 tag (`academic-jobs/Configuration/Services.yaml`,
 `academic-persons/Configuration/Services.yaml` and
 `academic-persons-edit/Configuration/Services.yaml`, which carry one, two and
-two), and seven carry `#[AsEventListener]` on the class: the
+two), and eight carry `#[AsEventListener]` on the class: the
 `RegisterAcademicPageDoktype` and `AddPageModuleCategorySummary` listeners of
 `academic-partners`, `academic-programs` and `academic-projects`, for example
 `#[AsEventListener(identifier: '…/register-page-doktype')]`, and
-`ApplySettingsToTca` of `academic-persons`. The
+`ApplySettingsToTca` of `academic-persons` and `academic-jobs`. The
 two are equivalent — the attribute is only a shorter spelling of the same tag —
 and new listeners should prefer the attribute. Note that `academic-persons`' own
 user manual already documents the TYPO3 attribute as the way integrators register

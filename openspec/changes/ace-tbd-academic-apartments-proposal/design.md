@@ -1,24 +1,19 @@
 ## Context
 
-`academic_jobs` carries its own settings stack:
-`Classes/Loader/AcademicJobsSettingsLoader.php` (not marked `@internal`, and
-it caches the loaded registry in a property),
-`Classes/Registry/AcademicJobsSettingsRegistry.php`, the ViewHelpers
-`Classes/ViewHelpers/Validation/{FieldTypeFromValidation,RequiredFromValidation}ViewHelper.php`
-and `Configuration/AcademicJobs/Settings.yaml`. The submission pieces are
-`Classes/SaveForm/FlashMessageCreationMode.php` (a backed enum that
+Since ACE-508, `academic_jobs` reads `Configuration/AcademicJobs/Settings.yaml`
+through the shared settings classes of `academic_base`
+(`Classes/Settings/{SettingsFileLoader,ValidationSet,Validation,ValidationNormalizer,TcaValidationMerger}.php`,
+all `@internal`), and its form partials resolve a field with
+`Classes/ViewHelpers/ValidationEnsureViewHelper.php` of `academic_base`. The
+jobs-only loader, registry and validation ViewHelpers are gone. The submission
+pieces are `Classes/SaveForm/FlashMessageCreationMode.php` (a backed enum that
 `AfterSaveJobEvent` exposes), the partials
 `Resources/Private/Partials/Job/Forms/{Checkbox,DateTime,Errors,FieldWrapper,Select,Textarea,Textfield,Upload}.html`,
 and the save handling in `JobController::createAction()`, which resolves the
 current page, the redirect page and the flash message mode around the
-dispatch of `AfterSaveJobEvent`.
-
-`academic_base` ships `Classes/Settings/{SettingsFileLoader,ValidationSet,Validation,ValidationNormalizer,TcaValidationMerger}.php`
-(the loader is `@internal`) and `Classes/ViewHelpers/ValidationEnsureViewHelper.php`,
-used by `academic_persons` and `academic_persons_edit`.
-`docs/architecture/validation-settings.md` states that the two stacks share
-no code, that the divergence of the three jobs readers is ACE-429, and that
-adopting the shared classes is ACE-508, a behaviour change for jobs.
+dispatch of `AfterSaveJobEvent`. `docs/architecture/validation-settings.md`
+describes how jobs reads its settings, and that the ACE-429 problem with `0`
+for the two selects is still open.
 
 ## Goals / Non-Goals
 
