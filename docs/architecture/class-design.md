@@ -293,6 +293,15 @@ Thirteen, all backed, none pure
 Back an enum whenever its values are persisted, passed through a request, or
 written into TCA — a pure enum cannot survive any of those round trips.
 
+A getter that a Fluid template reads returns the case value, not the enum.
+Fluid cannot cast an enum to a string: on Fluid 4.6 (TYPO3 v13) and 5.3
+(TYPO3 v14) alike, `{state}` in a text, in an attribute or concatenated into a
+ViewHelper argument throws `Cannot cast object ... to string` (1273753083),
+and `{state} == 'active'` is false. Only `{state.value}`, a comparison with
+`f:constant` and the enum passed on alone work. That is why
+`Project::getActiveState()` of `academic_projects` returns `active` or
+`completed`, the value of `ActiveState`, while the enum stays the type in PHP.
+
 ## The Extbase `FileReference` trap
 
 Verified on both trees and identical on both — `.Build/vendor/` carries

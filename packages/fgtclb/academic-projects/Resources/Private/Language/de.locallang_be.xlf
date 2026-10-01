@@ -71,6 +71,14 @@
         <source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
         <target>Wenn aktiviert, werden versteckte (deaktivierte) Datensätze unabhängig von den Backend-Vorschaueinstellungen im Frontend ausgegeben.</target>
       </trans-unit>
+      <trans-unit id="flexform.showActiveStateBadge.label">
+        <source>Show active state badge</source>
+        <target>Aktivstatus als Badge anzeigen</target>
+      </trans-unit>
+      <trans-unit id="flexform.showActiveStateBadge.description">
+        <source>Shows on every project whether it is active or completed, read from its end date.</source>
+        <target>Zeigt an jedem Projekt, ob es aktiv oder abgeschlossen ist, ermittelt aus seinem Enddatum.</target>
+      </trans-unit>
       <trans-unit id="flexform.hideFilter.label">
         <source>Show filter options</source>
         <target>Filteroptionen anzeigen</target>

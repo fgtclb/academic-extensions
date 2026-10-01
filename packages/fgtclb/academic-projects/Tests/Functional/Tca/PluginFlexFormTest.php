@@ -34,4 +34,20 @@ final class PluginFlexFormTest extends AbstractAcademicProjectsTestCase
     {
         $this->assertPluginFlexFormIsResolved($cType);
     }
+
+    /**
+     * The state badge of the project cards is an option of both content elements, off
+     * unless an editor switches it on.
+     */
+    #[Test]
+    #[DataProvider('pluginContentTypeDataProvider')]
+    public function theStateBadgeOptionIsOffByDefault(string $cType): void
+    {
+        $field = $this->resolvePluginFlexFormDataStructure($cType)['sheets']['sDEF']['ROOT']['el']['settings.showActiveStateBadge'] ?? null;
+
+        $this->assertIsArray($field);
+        $this->assertSame('check', $field['config']['type'] ?? null);
+        $this->assertSame('checkboxToggle', $field['config']['renderType'] ?? null);
+        $this->assertSame('0', (string)($field['config']['default'] ?? ''));
+    }
 }

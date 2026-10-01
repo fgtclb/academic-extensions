@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Model;
 
+use FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState;
 use FGTCLB\CategoryTypes\Collection\CategoryCollection;
 use FGTCLB\CategoryTypes\Collection\GetCategoryCollectionInterface;
 use FGTCLB\CategoryTypes\Domain\Repository\CategoryRepository;
@@ -88,6 +89,22 @@ class Project extends AbstractEntity implements GetCategoryCollectionInterface
     public function getEndDate(): ?\DateTime
     {
         return $this->endDate;
+    }
+
+    /**
+     * `active` or `completed`, see `ActiveState::fromEndDate()`. "Now" is taken the way the
+     * list filter takes it, so the two agree at the boundary for an end date as the backend
+     * stores it.
+     *
+     * The value of the case rather than the enum itself: Fluid cannot cast an enum to a
+     * string, so `{project.activeState}` in a text, an attribute or a label key would fail
+     * the whole content element (`1273753083`, Fluid 4.6 and 5.3 alike).
+     *
+     * @return value-of<ActiveState>
+     */
+    public function getActiveState(): string
+    {
+        return ActiveState::fromEndDate($this->endDate, new \DateTime())->value;
     }
 
     public function getBudget(): float

@@ -8,6 +8,13 @@
 <div class="card flex-column-reverse academic-projects-item mt-4">
     <div class="card-content">
         <div class="card-body">
+            <f:if condition="{settings.showActiveStateBadge}">
+                <f:variable name="activeState" value="{project.activeState}"/>
+                <p class="mb-2">
+                    <span class="badge {f:if(condition: '{activeState} == \'active\'', then: 'text-bg-success', else: 'text-bg-secondary')} academic-projects-item__state academic-projects-item__state--{activeState}">{f:translate(key: 'activeState.{activeState}', extensionName: 'AcademicProjects')}</span>
+                </p>
+            </f:if>
+
             <f:render
                 partial="Project/Header"
                 arguments="{

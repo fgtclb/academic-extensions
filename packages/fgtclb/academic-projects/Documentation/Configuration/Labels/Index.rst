@@ -63,7 +63,7 @@ or the code fills in, a category type or a field name for example.
     *   - Key
         - Shown by
     *   - :xml:`activeState.<state>`
-        - :file:`Partials/Project/DemandActiveState.html`
+        - :file:`Partials/Project/DemandActiveState.html`, :file:`Partials/Project/Item.html`
     *   - :xml:`activeState.label`
         - :file:`Partials/Project/DemandActiveState.html`
     *   - :xml:`filter.moreFilters`

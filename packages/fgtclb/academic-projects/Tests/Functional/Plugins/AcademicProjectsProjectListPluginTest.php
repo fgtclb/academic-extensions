@@ -167,6 +167,90 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
         $this->assertStringNotContainsString('Hidden lab', $content);
     }
 
+    /**
+     * The badge is opt in. A content element saved before the option existed has no value
+     * for it, and the TypoScript default keeps it off there as well.
+     */
+    #[Test]
+    #[DataProvider('contentElementsWithoutTheBadge')]
+    public function projectListPluginRendersNoStateBadgeUnlessSwitchedOn(string $dataSet): void
+    {
+        $this->setUpTestCase($dataSet);
+
+        $content = $this->renderHomePage();
+        $this->assertStringContainsString('Finished project', $content);
+        $this->assertSame([
+            'Finished project' => '',
+            'Open ended project' => '',
+            'Project without an end date value' => '',
+            'Running project' => '',
+        ], $this->stateBadgesByProjectTitle($content));
+    }
+
+    /**
+     * @return \Generator<string, array{0: string}>
+     */
+    public static function contentElementsWithoutTheBadge(): \Generator
+    {
+        yield 'saved before the option existed' => ['projectListPage_activeStateBadgeMissing'];
+        yield 'switched off' => ['projectListPage_activeStateBadgeOff'];
+    }
+
+    /**
+     * Every card carries the label of its state, and the modifier class names the state
+     * whatever the label reads in the site language. An end date of `0` and a `NULL` one
+     * both mean no end date.
+     */
+    #[Test]
+    public function projectListPluginRendersTheStateBadgeOfEveryProjectWhenSwitchedOn(): void
+    {
+        $this->setUpTestCase('projectListPage_activeStateBadgeOn');
+
+        $content = $this->renderHomePage();
+        $this->assertSame([
+            'Finished project' => 'completed: Completed',
+            'Open ended project' => 'active: Active',
+            'Project without an end date value' => 'active: Active',
+            'Running project' => 'active: Active',
+        ], $this->stateBadgesByProjectTitle($content));
+        // The colour follows the state through a string comparison in the template, which
+        // would fall through to its "else" for every card if it stopped matching.
+        $this->assertSame(3, substr_count($content, 'badge text-bg-success academic-projects-item__state '));
+        $this->assertSame(1, substr_count($content, 'badge text-bg-secondary academic-projects-item__state '));
+    }
+
+    /**
+     * Reads the cards of the list: the title of each project, with the state its badge
+     * names in its modifier class and the label it shows, or an empty string for a card
+     * without a badge.
+     *
+     * @return array<string, string>
+     */
+    private function stateBadgesByProjectTitle(string $html): array
+    {
+        $document = new \DOMDocument();
+        // The prefix makes libxml read a page without a charset declaration as UTF-8.
+        $document->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_NOERROR);
+        $xpath = new \DOMXPath($document);
+
+        $badges = [];
+        $cards = $xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " academic-projects-item ")]');
+        foreach ($cards ?: [] as $card) {
+            $title = trim((string)$xpath->evaluate('string(.//*[contains(concat(" ", normalize-space(@class), " "), " card-title ")])', $card));
+            $badge = '';
+            $badgeNodes = $xpath->query('.//*[contains(concat(" ", normalize-space(@class), " "), " academic-projects-item__state ")]', $card);
+            foreach ($badgeNodes ?: [] as $badgeNode) {
+                if (!$badgeNode instanceof \DOMElement) {
+                    continue;
+                }
+                preg_match('/academic-projects-item__state--(\S+)/', $badgeNode->getAttribute('class'), $matches);
+                $badge = ($matches[1] ?? '?') . ': ' . trim($badgeNode->textContent);
+            }
+            $badges[$title] = $badge;
+        }
+        return $badges;
+    }
+
     private function setContentElementHeader(int $uid, int $headerLayout): void
     {
         $this->getConnectionPool()

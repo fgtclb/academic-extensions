@@ -127,4 +127,21 @@ final class AcademicProjectsProjectListLocalizationTest extends AbstractAcademic
         $this->assertStringNotContainsString('Quantenforschungsprojekt', $content);
         $this->assertStringNotContainsString('Quantum research project', $content);
     }
+
+    /**
+     * The badge reads the labels of the extension, so a German page shows the German one.
+     * The modifier class stays the state value, the same in every language.
+     */
+    #[Test]
+    public function theStateBadgeShowsTheLabelOfTheSiteLanguage(): void
+    {
+        $this->setUpTestCase('projectListSinglePage_activeStateBadge');
+
+        $content = $this->renderGermanPage();
+        $this->assertStringContainsString('[DE] Solarfelder Projekt', $content);
+        $this->assertMatchesRegularExpression(
+            '#<span class="[^"]*\\bacademic-projects-item__state--completed\\b[^"]*">\\s*Abgeschlossen\\s*</span>#',
+            $content,
+        );
+    }
 }
