@@ -51,5 +51,5 @@
 - [x] 4.5 Commit as `[BUGFIX] ACE-788: <subject>` with the verified key and no
   attribution, subject at most 52 characters, body wrapped at 72. The commit
   and the pull request name what is left out: the rest of ACE-785.
-- [ ] 4.6 Archive the change as the last commit of the pull request and verify
+- [x] 4.6 Archive the change as the last commit of the pull request and verify
   the delta specs landed in `openspec/specs/`.
