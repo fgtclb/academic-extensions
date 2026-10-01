@@ -6,8 +6,8 @@
 - The wizard group is registered twice: as a TCA item group `academic` in
   `academic-base/Configuration/TCA/Overrides/tt_content.php`, and as page
   TSconfig in `academic-base/Configuration/TSconfig/CTypeGroup/page.tsconfig`
-  (group header, `after = special`), which `Configuration/page.tsconfig`
-  loads for the whole installation.
+  (group header, and up to ACE-792 `after = special`), which
+  `Configuration/page.tsconfig` loads for the whole installation.
 - Since TYPO3 v13.0 (Feature #102834) the wizard is built from the TCA items
   (`value`, `label`, `description`, `group`, `icon`), and removing an entry
   goes through `removeItems` (Breaking #102834). Group position, header,
@@ -24,9 +24,9 @@
 - One `before` or `after` on any group makes `orderWizards()` order every
   group through `DependencyOrderingService` instead of by TCA. The groups in
   the dependency come first, every other group follows in the alphabetical
-  order of its identifier. The shipped `after = special` therefore shows
-  "Special elements" and "Academic" before "Typical page content" on every
-  installation.
+  order of its identifier. The `after = special` the extension shipped
+  therefore showed "Special elements" and "Academic" before "Typical page
+  content" on every installation (ACE-792).
 - Program pages are doktype 20, project pages doktype 30, partner pages
   doktype 40.
 
@@ -40,7 +40,6 @@
 **Non-Goals:**
 
 - Keeping the Solr and permission set recipes in step automatically.
-- Changing the shipped group position (ACE-792).
 
 ## Decisions
 
@@ -76,13 +75,25 @@ The element ordering differs per version and has one test per version, tagged
 code alone. The version difference above was found by the test, not by the
 analysis.
 
-### The shipped group position is documented, not changed
+### The shipped group position is removed (ACE-792)
 
-The test pins the order the shipped `after = special` produces, and the recipe
-shows how a site gets the order of TYPO3 back or moves the group to the front.
-Changing the shipped setting changes the wizard of every installation, which is
-a decision of its own and filed as ACE-792. Rejected: removing the setting in
-this change.
+The shipped `after = special` is removed, and the group header stays in the
+page TSconfig. Without a position the groups keep the order of TYPO3, which
+ends with the group academic_base registers. It is a commit of its own after
+the documentation, so the documentation commit describes the state it was
+written against and the fix commit changes test, recipe and changelog
+together.
+
+Rejected: a position that keeps "Typical page content" first, such as also
+positioning the core groups. Every position of any extension or site takes
+part in the same ordering, so such a setting would hold only on installations
+without positions of their own. Rejected as well: keeping the setting and
+documenting it, because it moves a core group for every installation to place
+a group of this extension.
+
+A site that wants the earlier placement sets `after = special` itself, and
+the recipe and the changelog show it. The test keeps that placement on a page
+of its own, so the alphabetical ordering it causes stays proven.
 
 ### The Solr recipe is derived from the schema and the EXT:solr source
 

@@ -40,52 +40,57 @@ wizard as well.
 Where the group appears
 =======================
 
-The page TSconfig this extension loads for the whole installation places the
-group after the group :guilabel:`Special elements` of TYPO3:
+The page TSconfig this extension loads for the whole installation labels the
+group and gives it no position:
 
 ..  code-block:: typoscript
 
     mod.wizards.newContentElement.wizardItems.academic {
       header = LLL:EXT:academic_base/Resources/Private/Language/locallang_be.xlf:content.ctype.group.label
-      after = special
     }
 
-A single `before` or `after` changes how TYPO3 orders all groups. Without
-one, the groups follow the order of their TCA registration. With one, TYPO3
-orders them by those settings: the groups named in them come first, in the
-order the settings ask for, and every other group follows in the alphabetical
-order of its identifier. On an installation with the groups of TYPO3 and no
-other position, the wizard therefore shows:
+Without a position the groups follow the order of their TCA registration, and
+the group follows the groups of TYPO3, because this extension registers it
+after them. An extension that registers a group of its own later adds it
+behind. On an installation without other groups and positions, the wizard
+shows:
 
-#.  :guilabel:`Special elements` (`special`)
-#.  :guilabel:`Academic` (`academic`)
 #.  :guilabel:`Typical page content` (`default`)
-#.  :guilabel:`Form elements` (`forms`)
 #.  :guilabel:`Lists` (`lists`)
 #.  :guilabel:`Menu` (`menu`)
+#.  :guilabel:`Form elements` (`forms`)
+#.  :guilabel:`Special elements` (`special`)
 #.  :guilabel:`Plugins` (`plugins`)
+#.  :guilabel:`Academic` (`academic`)
 
 A group without elements is not shown.
+
+To show the group first, place it before :guilabel:`Typical page content`:
+
+..  code-block:: typoscript
+
+    mod.wizards.newContentElement.wizardItems.academic.before = default
+
+A single `before` or `after` changes how TYPO3 orders all groups. With one,
+TYPO3 orders them by those settings: the groups named in them come first, in
+the order the settings ask for, and every other group follows in the
+alphabetical order of its identifier. The setting above therefore shows
+:guilabel:`Academic`, :guilabel:`Typical page content`,
+:guilabel:`Form elements`, :guilabel:`Lists`, :guilabel:`Menu`,
+:guilabel:`Plugins` and :guilabel:`Special elements`, in this order.
+
+Before version 3.0 this extension placed the group with `after = special`. That
+showed :guilabel:`Special elements` and :guilabel:`Academic` first, followed by
+the other groups in alphabetical order. A site that wants this placement back
+sets it again:
+
+..  code-block:: typoscript
+
+    mod.wizards.newContentElement.wizardItems.academic.after = special
 
 The `before` and `after` of every extension and of the site take part in the
 same ordering, so an installation that positions groups of its own gets a
 different result.
-
-To get the order of TYPO3 back, remove the position. The group then comes last,
-because this extension registers it after the groups of TYPO3:
-
-..  code-block:: typoscript
-
-    mod.wizards.newContentElement.wizardItems.academic.after >
-
-To show the group first, replace `after` with `before`:
-
-..  code-block:: typoscript
-
-    mod.wizards.newContentElement.wizardItems.academic {
-      after >
-      before = default
-    }
 
 ..  _integration-wizard-labels:
 

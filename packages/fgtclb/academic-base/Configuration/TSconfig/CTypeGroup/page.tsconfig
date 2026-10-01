@@ -1,4 +1,8 @@
+# Labels the group of the academic content elements in the new content element
+# wizard. It sets no position: a single "before" or "after" of any group makes
+# TYPO3 order every group by these settings instead of by TCA, which moved the
+# group "Special elements" to the front of the wizard (ACE-792). Without one, the
+# group comes after the groups of TYPO3.
 mod.wizards.newContentElement.wizardItems.academic {
   header = LLL:EXT:academic_base/Resources/Private/Language/locallang_be.xlf:content.ctype.group.label
-  after = special
 }

@@ -28,17 +28,21 @@ in the new content element wizard, which TYPO3 v13 and v14 build from TCA.
     content types and its page types, as documentation only.
 - Links to the chapter from the persons, programs, projects and partners
   manuals.
-- A functional test in `academic_base` pinning every statement of the wizard
-  page, on TYPO3 v13 and v14.
-
-Nothing changes at runtime.
+- A functional test in `academic_base` pinning the wizard behaviour the
+  wizard page describes, on TYPO3 v13 and v14.
+- ACE-792: the page TSconfig of `academic_base` no longer places the academic
+  group after "Special elements". That position made TYPO3 order every group
+  by position, so the wizard opened on "Special elements" on every
+  installation. The group now follows the groups of TYPO3, in the order of
+  their registration.
 
 ## Capabilities
 
 ### New Capabilities
 
-None. The change is documentation plus a test of existing behaviour and sets
-`skip_specs: true`.
+- `academic-base/content-element-wizard-group`: where the academic group
+  appears in the new content element wizard, and what a site changes about it
+  by page TSconfig.
 
 ### Modified Capabilities
 
@@ -47,16 +51,17 @@ None.
 ## Impact
 
 - A documentation chapter in `academic_base`, links in four more manuals.
+- The page TSconfig of the academic group in `academic_base`, with an
+  `Important` changelog entry.
 - One functional test and one fixture extension in `academic_base`, and the
   test counts in `docs/testing/functional-tests.md`.
-- No code, configuration or dependency change.
+- No code or dependency change.
 
 ## Non-goals
 
 - Shipping EXT:solr or permission set configuration, as files or as opt-in
   sets. That adds dependencies on third-party release cycles.
 - Numbering the academic content elements upstream (ACE-286).
-- Changing the shipped position of the academic group (ACE-792).
 - Testing the EXT:solr and permission set recipes in this repository, which
   installs neither package.
 - A backport to branch `2`: the recipes are written against 3.0 paths.

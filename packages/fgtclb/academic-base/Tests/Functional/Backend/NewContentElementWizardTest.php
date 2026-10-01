@@ -37,15 +37,12 @@ final class NewContentElementWizardTest extends AbstractAcademicBaseTestCase
     private const ELEMENTS_ORDERED_PAGE = 7;
     private const ELEMENTS_REDEFINED_PAGE = 8;
     private const ALTERNATIVE_LABEL_PAGE = 9;
-    private const TYPO3_ORDER_PAGE = 10;
+    private const AFTER_SPECIAL_PAGE = 10;
     private const TYPE_HIDDEN_PAGE = 11;
 
     private const PAGE_TSCONFIG = [
         self::GROUP_FIRST_PAGE => <<<'TSCONFIG'
-            mod.wizards.newContentElement.wizardItems.academic {
-              after >
-              before = default
-            }
+            mod.wizards.newContentElement.wizardItems.academic.before = default
             TSCONFIG,
         self::GROUP_RENAMED_PAGE => <<<'TSCONFIG'
             mod.wizards.newContentElement.wizardItems.academic.header = University
@@ -89,8 +86,8 @@ final class NewContentElementWizardTest extends AbstractAcademicBaseTestCase
         self::ALTERNATIVE_LABEL_PAGE => <<<'TSCONFIG'
             TCEFORM.tt_content.CType.altLabels.testwizard_second = Alternative label
             TSCONFIG,
-        self::TYPO3_ORDER_PAGE => <<<'TSCONFIG'
-            mod.wizards.newContentElement.wizardItems.academic.after >
+        self::AFTER_SPECIAL_PAGE => <<<'TSCONFIG'
+            mod.wizards.newContentElement.wizardItems.academic.after = special
             TSCONFIG,
         self::TYPE_HIDDEN_PAGE => <<<'TSCONFIG'
             TCEFORM.tt_content.CType.removeItems := addToList(testwizard_second)
@@ -122,32 +119,33 @@ final class NewContentElementWizardTest extends AbstractAcademicBaseTestCase
     }
 
     /**
-     * The always loaded page TSconfig of academic_base places the group after "Special
-     * elements". A single `before` or `after` makes TYPO3 order every group by those
-     * settings instead of by TCA: the two groups move to the front, and the groups without
-     * a position follow in the alphabetical order of their identifiers. The fixture adds the
-     * element in "Plugins" that shows the difference, as a group behind "Special elements",
-     * and the one in "Form elements" that shows the alphabetical order.
+     * The always loaded page TSconfig of academic_base labels the group and sets no
+     * position, so the groups follow the order of their TCA registration, which ends with
+     * the group academic_base registers.
      */
     #[Test]
-    public function theShippedPositionPutsSpecialElementsAndTheAcademicGroupFirst(): void
+    public function theGroupComesLastAfterTheGroupsOfTypo3(): void
     {
         $this->assertSame(
-            ['special', 'academic', 'default', 'forms', 'lists', 'menu', 'plugins'],
+            ['default', 'lists', 'menu', 'forms', 'special', 'plugins', 'academic'],
             array_keys($this->wizardOn(1)),
         );
     }
 
     /**
-     * Without any `before` or `after` the groups follow the order of their TCA registration,
-     * which ends with the group academic_base registers.
+     * The position academic_base shipped up to ACE-792. A single `before` or `after` makes
+     * TYPO3 order every group by those settings instead of by TCA: the two groups move to
+     * the front, and the groups without a position follow in the alphabetical order of
+     * their identifiers. The fixture adds the element in "Plugins" that shows the
+     * difference, as a group behind "Special elements", and the one in "Form elements"
+     * that shows the alphabetical order.
      */
     #[Test]
-    public function removingThePositionRestoresTheOrderOfTypo3(): void
+    public function afterSpecialPutsSpecialElementsAndTheAcademicGroupFirst(): void
     {
         $this->assertSame(
-            ['default', 'lists', 'menu', 'forms', 'special', 'plugins', 'academic'],
-            array_keys($this->wizardOn(self::TYPO3_ORDER_PAGE)),
+            ['special', 'academic', 'default', 'forms', 'lists', 'menu', 'plugins'],
+            array_keys($this->wizardOn(self::AFTER_SPECIAL_PAGE)),
         );
     }
 
@@ -165,7 +163,7 @@ final class NewContentElementWizardTest extends AbstractAcademicBaseTestCase
     }
 
     #[Test]
-    public function theGroupMovesToTheFrontWithBeforeInsteadOfAfter(): void
+    public function theGroupMovesToTheFrontWithBefore(): void
     {
         $this->assertSame(
             ['academic', 'default', 'forms', 'lists', 'menu', 'plugins', 'special'],
