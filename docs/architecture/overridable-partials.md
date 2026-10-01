@@ -102,6 +102,13 @@ default would change every list that exists, and an empty partial is what
 removes one project's template copy without touching any other installation.
 It receives everything an implementation would need and is documented as a hook.
 
+The same holds inside a form. The new-job form of `academic_jobs` renders the
+empty `Job/Forms/AdditionalFields.html` before its submit button, so a project
+adds a captcha by overriding that partial instead of copying the form template.
+A field in such a slot is named outside the argument the action maps, here
+`job`: Extbase leaves a value it has no argument for alone, while a field bound
+to a property the model does not have fails the property mapping.
+
 ## A list renders its items through a partial of its own
 
 A list template that arranges records — groups them, sorts them into columns —

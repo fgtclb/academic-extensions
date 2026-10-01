@@ -14,7 +14,7 @@
   renders the checkboxes and the controller is unchanged. Add a test that a
   form returned with a validation error keeps a checked flag. The tests run
   on v13 as well.
-- [ ] 1.3 Add a rendering test in a class of its own,
+- [x] 1.3 Add a rendering test in a class of its own,
   `AcademicJobsNewJobFormAdditionalFieldsTest`, with a fixture partial root
   path that overrides `Job/Forms/AdditionalFields.html`, and assert its
   field appears before the submit button. Record that it fails before the
@@ -31,7 +31,7 @@
   each), and verify test 1.1 passes.
 - [x] 2.2 Map `''` to `'0'` for the two flags in `initializeCreateAction()`,
   and verify test 1.2 passes on v13 and v14.
-- [ ] 2.3 Add the empty `Job/Forms/AdditionalFields.html` and render it in
+- [x] 2.3 Add the empty `Job/Forms/AdditionalFields.html` and render it in
   `New.html`, and verify test 1.3 passes and the default form output is
   otherwise unchanged.
 
@@ -40,7 +40,7 @@
 - [x] 3.1 Add `Documentation/Changelog/3.0/Important-NewJobFormOffersTheJobFlags.rst`
   to `academic_jobs`, covering the two checkboxes and the reworded alumni
   label, and verify it renders.
-- [ ] 3.2 Add `Documentation/Changelog/3.0/Feature-NewJobFormAdditionalFieldsPartial.rst`,
+- [x] 3.2 Add `Documentation/Changelog/3.0/Feature-NewJobFormAdditionalFieldsPartial.rst`,
   covering the slot partial with the rule that slot fields are not bound to
   unknown job properties. Describe the slot in the templates chapter of the
   extension's `Documentation/`, and in `docs/` next to the other empty
