@@ -73,7 +73,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 56:
+nothing**, and of an immutable data object. There are 57:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
