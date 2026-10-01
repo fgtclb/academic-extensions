@@ -1,0 +1,16 @@
+"be_users",,,,,,,,,
+,"uid","pid","username","password","admin",,,,
+,1,0,"admin","$1$tCrlLajZ$C0sikFQQ3SWaFAZ1Me0Z/1",1,,,,
+"pages",,,,,,,,,
+,"uid","pid","doktype","deleted","hidden","sys_language_uid","l10n_parent","is_siteroot","slug","title"
+,1,0,1,0,0,0,0,1,"/","Site Root"
+,2,1,1,0,0,0,0,0,"/group-first","Academic group moved to the front"
+,3,1,1,0,0,0,0,0,"/group-renamed","Academic group renamed"
+,4,1,1,0,0,0,0,0,"/element-renamed","Academic element renamed"
+,5,1,1,0,0,0,0,0,"/element-hidden","Academic element hidden"
+,6,1,1,0,0,0,0,0,"/group-hidden","Academic group hidden"
+,7,1,1,0,0,0,0,0,"/elements-ordered","Academic elements ordered with before and after"
+,8,1,1,0,0,0,0,0,"/elements-redefined","Academic elements defined again in another order"
+,9,1,1,0,0,0,0,0,"/alternative-label","Academic content type with an alternative label"
+,10,1,1,0,0,0,0,0,"/typo3-order","Academic group without a position"
+,11,1,1,0,0,0,0,0,"/type-hidden","Academic content type removed from the type field"

@@ -59,6 +59,11 @@ extensions.
         The responsive image partial the academic extensions render their
         images through, and how a project overrides it.
 
+    ..  card:: :ref:`Integration <integration>`
+
+        The new content element wizard, EXT:solr and permission sets with
+        the academic extensions.
+
     ..  card:: :ref:`Upgrade check <upgrade-check>`
 
         The console command that finds the project template overrides an
@@ -87,6 +92,7 @@ extensions.
     Installation/Index
     Configuration/Index
     Templates/Index
+    Integration/Index
     UpgradeCheck/Index
     Developers/Index
     KnownProblems/Index

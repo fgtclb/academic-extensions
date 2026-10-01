@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Fifty-eight such fixture extensions exist, in ten of the twelve extensions.
+Fifty-nine such fixture extensions exist, in ten of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -81,11 +81,12 @@ They sit next to the tests that use them, under
 | `test_visibility_switch_disabled`           | `tests/test-visibility-switch-disabled`           | `academic-persons-edit`  | A `Settings.yaml` disabling the profile visibility switch.                    |
 | `test_visibility_switch_readonly`           | `tests/test-visibility-switch-readonly`           | `academic-persons-edit`  | A `Settings.yaml` making the profile visibility switch read-only.             |
 | `test_visibility_switch_removed`            | `tests/test-visibility-switch-removed`            | `academic-persons-edit`  | A `Settings.yaml` removing the profile visibility switch with `~`.            |
+| `test_wizard_content_elements`              | `tests/wizard-content-elements`                   | `academic-base`          | Three academic content types and two in groups of TYPO3, for the wizard.      |
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Eighteen of the fifty-six have a `Classes/` folder with a `TESTS\…` PSR-4 root.
-The other thirty-eight are pure resources. The `ext_emconf.php` is checked like
+Twenty of the fifty-nine have a `Classes/` folder with a `TESTS\…` PSR-4 root.
+The other thirty-nine are pure resources. The `ext_emconf.php` is checked like
 every other one: its `depends` names extension keys, and a fixture extension
 may name another fixture extension, which a real extension may not — see
 [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
