@@ -188,7 +188,13 @@ copying:
   `Documentation/Changelog/`.
 
 Dropping the option instead of guarding it is not equivalent: v14 removed it,
-but v13 still evaluates it and would search nothing without it.
+but v13 still evaluates it, and without it searches every field its schema
+calls searchable (checked on 13.4.34), which is more than the list names.
+Every name in the list has to be a searchable field of the table. v13 drops
+one that is not, and a list with no field left searches nothing: that kept
+organisational units out of every search on v13 until ACE-794, and the text of
+a profile information out of it, whose list named `description` for
+`bodytext`.
 
 ### A switch inside an event listener
 
