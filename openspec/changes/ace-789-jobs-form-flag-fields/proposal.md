@@ -38,20 +38,19 @@ None.
   `Resources/Private/Templates/Job/New.html`, a new partial
   `Resources/Private/Partials/Job/Forms/AdditionalFields.html`, the create
   action's argument handling and the form labels.
-- Visible output: two new optional checkboxes in the form; the reworded
+- Visible output: two new optional checkboxes in the form, and the reworded
   alumni label in English and German.
-- Functional form submission tests; a `Feature-` changelog entry.
+- Functional form submission tests, an `Important-` changelog entry for the
+  flags and a `Feature-` entry for the slot.
 
 ## Non-goals
 
-- Validating or storing the content of additional fields; the slot only
+- Validating or storing the content of additional fields. The slot only
   renders.
 - Changing the type of the flags on the job model.
-- Rendering the flags in the detail view; that is a change of its own.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-06`). Two of the six analysed projects carry their own code for this
-today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-jobs-form-flag-fields` when the issue is filed after implementation.
+today. Filed as ACE-789.

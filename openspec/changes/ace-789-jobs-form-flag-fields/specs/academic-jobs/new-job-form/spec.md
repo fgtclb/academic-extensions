@@ -22,6 +22,13 @@ TYPO3 v13 and v14 alike.
 - **THEN** the alumni checkbox is labelled "Recommended by alumni", and on a
   German site language "Von Alumni empfohlen"
 
+#### Scenario: Internationals flag label
+
+- **WHEN** a visitor opens the new-job form on the default language
+- **THEN** the internationals checkbox is labelled "International applicants
+  welcome", and on a German site language "Internationale Bewerbungen
+  willkommen"
+
 ### Requirement: Flags are stored as set or not set
 
 A submitted job SHALL store a flag as set when its checkbox was checked and as
@@ -39,6 +46,13 @@ or mapping error.
 - **WHEN** a visitor submits the form with the "internationals welcome"
   checkbox checked
 - **THEN** the job is created with that flag set
+
+#### Scenario: Form returned with an error
+
+- **WHEN** a visitor submits the form with a flag checked and a required field
+  empty
+- **THEN** the form is shown again with the error, and the flag is still
+  checked
 
 ### Requirement: The form has a slot for additional fields
 
