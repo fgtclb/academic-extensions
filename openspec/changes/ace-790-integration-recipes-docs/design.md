@@ -148,25 +148,31 @@ Numbered labels are a catalogue convention of individual projects, and
 ACE-286 owns the question. A published recipe showing one scheme would
 pre-empt that issue.
 
-### The partner fields leave the fields of TYPO3 alone (ACE-791)
+### The partner fields leave the fields of TYPO3 alone (ACE-791, ACE-793)
 
 `ExtensionManagementUtility::addTCAcolumns()` replaces a column of the same name
-with `array_merge()`. `academic_partners` added `link` that way, so it replaced
-the field of TYPO3 v14 on every page type.
+with `array_merge()`. `academic_partners` added `link` and `description` that
+way, so it replaced two fields of TYPO3 on every page type.
 
+- `description` is the description field of TYPO3, which EXT:seo renders as
+  the meta description, and a partner page has always stored its description
+  there. The extension no longer defines the column, and sets its label and
+  five rows as `columnsOverrides` of the partner page type. Rejected: a column
+  of its own with an upgrade wizard that copies the values. It changes nothing
+  a visitor sees, needs a migration, and adds a wizard to the v15 blocker list
+  (ACE-296).
 - `link` is defined by TYPO3 v14 only. The extension adds its own column when
   TYPO3 has none, so v13 keeps it and v14 keeps the field of TYPO3. The column
   of the extension is shown in no form and read by no template, so there is
-  nothing to override for the partner page type. Rejected: renaming the
-  column, which needs a migration of the stored values and an upgrade wizard,
-  one more on the v15 blocker list (ACE-296), for no gain.
+  nothing to override for the partner page type. Rejected: renaming the column,
+  for the same migration cost and no gain.
 
-The declaration in the `ext_tables.sql` of the extension stays. Removing it
-would let the database analyzer alter a column that holds data, so the fix
-is a backend definition, and the database column keeps the type the
-extension gave it.
+The declarations in the `ext_tables.sql` of the extension stay. Removing
+them would let the database analyzer alter columns that hold data, so the
+fix is a backend definition, and the database columns keep the type the
+extension gave them.
 
-It is tested against the TCA file of the core extension, read before any
+Both are tested against the TCA file of the core extension, read before any
 override, so the test does not repeat the definition of TYPO3. A form test was
 not added: the exclude flag, `required` and the label are what FormEngine
 reads, and core tests what it does with them.
@@ -182,6 +188,10 @@ reads, and core tests what it does with them.
 - [A project with its own group positions gets another wizard order] → the
   recipe says that every `before` and `after` takes part, and lists the order
   for an installation without other positions only.
+- [Editor groups lose the page description] → it is an exclude field again,
+  as TYPO3 defines it. That needs action from integrators, so the entry is a
+  `Breaking` one and the commit carries `[!!!]`, and the permission set of
+  partners lists the field.
 
 ## Open Questions
 
