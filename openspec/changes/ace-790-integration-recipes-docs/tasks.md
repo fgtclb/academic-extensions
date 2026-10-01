@@ -1,0 +1,57 @@
+## 1. Wizard behaviour
+
+- [x] 1.1 Add a functional backend test in `academic-base/Tests/Functional/`
+  that builds the new content element wizard and asserts the position of the
+  academic group and the order of its items, on v13 and v14. Shown red by
+  removing `after = special` from
+  `academic-base/Configuration/TSconfig/CTypeGroup/page.tsconfig`, once the
+  fixture has an element in a group behind "Special elements".
+- [x] 1.2 Extend the test with the relabel, position and hide TSconfig the
+  recipe shows, and record which of them take effect on each version:
+  element `before`/`after` on v14 only, defining the elements again on both.
+  Every test shown red by removing or changing the page TSconfig it covers,
+  on v13 and v14.
+
+## 2. Recipes
+
+- [x] 2.1 Create `academic-base/Documentation/Integration/Index.rst` and add
+  it to the toctree of `academic-base/Documentation/Index.rst`.
+- [x] 2.2 Write the wizard recipe from the findings of 1.2 only: group
+  position, relabelling, hiding and item order, without a numbering scheme
+  (left to ACE-286).
+- [x] 2.3 Write the EXT:solr recipe for EXT:solr 13.1: profile index queue
+  with the text columns taken from the profile TCA, the detail link through
+  the detail plugin's arguments, and page queues for doktypes 20, 30 and 40.
+  Name the release (13.1.4) and check it against its source and the
+  configuration of the analysed installations. No v14 section until an
+  EXT:solr release for v14 is checked.
+- [x] 2.4 Take the link to `b13/permission-sets` from its `composer.json`,
+  check the format against the source of release 1.1.0, and write one example
+  per extension with its tables, fields, content types and page types, taken
+  from the loaded TCA.
+- [x] 2.5 Link the chapter from the manuals of `academic_persons`,
+  `academic_programs`, `academic_projects` and `academic_partners`.
+- [x] 2.6 No `Documentation/Changelog/3.0/` entry: nothing an installation
+  renders or an integrator configures changes. `docs/` changes the test
+  counts only. The pull request says so.
+
+## 3. File the issue
+
+- [x] 3.1 File the ACE issue in YouTrack (ACE-790), rename the change to
+  `ace-790-integration-recipes-docs`, and commit in TYPO3 Core format as
+  `[TASK] ACE-790: Document integration recipes`.
+- [x] 3.2 File what the work found outside its scope: ACE-791 (the partner
+  `link` column replaces the core field on TYPO3 v14), ACE-792 (the shipped
+  group position moves "Special elements" to the front) and ACE-793 (the
+  partner `description` column replaces the core field).
+
+## 4. Definition of done
+
+- [ ] 4.1 `lintPhp` green.
+- [ ] 4.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+  `functional` green with `-t 13`.
+- [ ] 4.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+  `functional` green with `-t 14`.
+- [ ] 4.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 4.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
+- [ ] 4.6 Archive the change as the last commit of the pull request.

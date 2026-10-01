@@ -64,7 +64,7 @@ None.
 - An educational_course upgrade wizard: both known projects ran their own,
   and a new wizard adds to the v15 blocker list (ACE-296).
 - Recipes for EXT:solr and b13/permission-sets
-  (`ace-tbd-integration-recipes-docs`).
+  (`ace-790-integration-recipes-docs`).
 - Repeating changelog content.
 
 ## Source
