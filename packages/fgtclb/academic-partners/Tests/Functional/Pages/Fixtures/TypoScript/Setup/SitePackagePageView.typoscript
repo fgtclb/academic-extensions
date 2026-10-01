@@ -13,7 +13,7 @@ page {
   10 = PAGEVIEW
   10 {
     paths {
-      10 = EXT:academic_programs/Tests/Functional/Pages/Fixtures/PageViewTheme/
+      10 = EXT:academic_partners/Tests/Functional/Pages/Fixtures/PageViewTheme/
     }
   }
 }

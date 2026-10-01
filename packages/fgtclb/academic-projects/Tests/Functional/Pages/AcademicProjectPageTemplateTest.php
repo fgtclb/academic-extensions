@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicProjects\Tests\Functional\Pages;
 
 use FGTCLB\AcademicProjects\Tests\Functional\AbstractAcademicProjectsTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
@@ -24,7 +25,7 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
  * renders the site package's fallback template instead - which is what the second
  * assertion is for.
  *
- * The remaining tests pin what the template renders of the categories assigned to the
+ * The category tests pin what the template renders of the categories assigned to the
  * page. That block read a property the model does not have until ACE-673, so it never
  * appeared; asserting the rendered output rather than the property name is what keeps a
  * rename from hiding it again.
@@ -33,7 +34,11 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
  * site's "lib.parseFunc_RTE", so a link the editor set to a page reaches the visitor as
  * the page's URL. Printed raw, as before ACE-676, the "t3://" reference itself did.
  * TYPO3 v13 defines "lib.parseFunc_RTE" for every site; TYPO3 v12 does not, so there the
- * site has to provide it - the last two tests pin both.
+ * site has to provide it - "projectPageResolvesRichTextLinksWithoutFluidStyledContentOnTypo3V13()"
+ * and "projectPageRequiresARichTextConfigurationOnTypo3V12()" pin both.
+ *
+ * The page record tests pin where the data processor and the heading take the page
+ * record from, on a PAGEVIEW and on a FLUIDTEMPLATE page object.
  */
 final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTestCase
 {
@@ -43,6 +48,8 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8', 'iso' => 'en', 'hrefLang' => 'en-US', 'direction' => ''],
     ];
+
+    private const FIXTURES = 'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/';
 
     protected function setUp(): void
     {
@@ -60,8 +67,10 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
     /**
      * @param bool $withFluidStyledContent false leaves out the TypoScript of fluid_styled_content,
      *                                     so "lib.parseFunc_RTE" is only what the core defines
+     * @param string $sitePackage A file below "Fixtures/TypoScript/Setup/", included before the extension.
+     * @param list<string> $additionalSetup Files below "Fixtures/TypoScript/Setup/", included after it.
      */
-    private function setUpTestCase(bool $withFluidStyledContent = true): void
+    private function setUpTestCase(bool $withFluidStyledContent = true, string $sitePackage = 'SitePackage.typoscript', array $additionalSetup = []): void
     {
         $this->importCSVDataSet(__DIR__ . '/Fixtures/AcademicProjectPageTemplateTest/page.csv');
         $constants = [
@@ -69,7 +78,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         ];
         $setup = [
             // The site package first, the extension after it - see the fixture.
-            'EXT:academic_projects/Tests/Functional/Pages/Fixtures/TypoScript/Setup/SitePackage.typoscript',
+            self::FIXTURES . $sitePackage,
             'EXT:academic_projects/Configuration/TypoScript/setup.typoscript',
             // The page template of this page type renders
             // "styles.content.getContent" through "f:cObject", and that ViewHelper
@@ -77,6 +86,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
             // component of its own since 2.4, so a site that renders this page type
             // has to include it - which is what this line is.
             'EXT:academic_projects/Configuration/TypoScript/ContentLoad/setup.typoscript',
+            ...array_map(static fn(string $file): string => self::FIXTURES . $file, $additionalSetup),
         ];
         if ($withFluidStyledContent) {
             array_unshift($constants, 'EXT:fluid_styled_content/Configuration/TypoScript/constants.typoscript');
@@ -106,6 +116,8 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $this->assertStringContainsString('academic-projects-detail', $content);
         $this->assertStringNotContainsString('site-package-default-template', $content);
+        // The project has no project title, so the heading is the title of the page.
+        $this->assertStringContainsString('<h1>Quantum Optics</h1>', $content);
     }
 
     /**
@@ -208,5 +220,66 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         $this->expectExceptionCode(1641989097);
 
         $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+    }
+
+    /**
+     * @return \Generator<string, array{0: string}>
+     */
+    public static function sitePackageDataVariableDataProvider(): \Generator
+    {
+        yield 'a text' => ['SitePackageDataVariable.typoscript'];
+        yield 'the records of a query' => ['SitePackageDataRecords.typoscript'];
+    }
+
+    /**
+     * PAGEVIEW reserves "page" but not "data", so a site package may assign a "data" of
+     * its own. The data processor reads the page record from "page" first, so the short
+     * description of the project it builds still shows, and the template takes the
+     * heading from the same record: the project has no project title, so the heading is
+     * the title of the page. The records of a query are an array as well, so checking
+     * the type of "data" alone would not find the page record.
+     */
+    #[Test]
+    #[DataProvider('sitePackageDataVariableDataProvider')]
+    #[Group('not-core-12')]
+    public function projectPageReadsThePageRecordFromPageWhenAPageViewSitePackageAssignsData(string $dataVariable): void
+    {
+        $this->setUpTestCase(sitePackage: 'SitePackagePageView.typoscript', additionalSetup: [$dataVariable]);
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString('<h1>Quantum Optics</h1>', $content);
+        $this->assertStringContainsString('<a href="/dark-matter">the dark matter project</a>', $content);
+    }
+
+    /**
+     * A project without a project title shows the title of its page. On PAGEVIEW the page
+     * record is "page.pageRecord", there is no "data".
+     */
+    #[Test]
+    #[Group('not-core-12')]
+    public function projectPageWithoutAProjectTitleShowsThePageTitleOnAPageViewPageObject(): void
+    {
+        $this->setUpTestCase(sitePackage: 'SitePackagePageView.typoscript');
+
+        $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
+
+        $this->assertStringContainsString('<h1>Dark Matter</h1>', $content);
+    }
+
+    /**
+     * FLUIDTEMPLATE does not reserve "page", so a site package may assign a "page" of its
+     * own. Only an object with "getPageRecord()" counts as "page", anything else leaves
+     * the page record to "data".
+     */
+    #[Test]
+    public function projectPageReadsThePageRecordFromDataWhenAFluidTemplateSitePackageAssignsPage(): void
+    {
+        $this->setUpTestCase(additionalSetup: ['SitePackagePageVariable.typoscript']);
+
+        $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
+
+        $this->assertStringContainsString('<h1>Quantum Optics</h1>', $content);
+        $this->assertStringContainsString('<a href="/dark-matter">the dark matter project</a>', $content);
     }
 }

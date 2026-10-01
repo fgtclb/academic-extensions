@@ -5,10 +5,21 @@
     data-namespace-typo3-fluid="true"
 >
 
+<f:comment>
+    The page record: the record of the page information object "page" a PAGEVIEW page
+    object assigns on TYPO3 v13, or "data" of a FLUIDTEMPLATE page object. "page" first,
+    because PAGEVIEW reserves that name, while a PAGEVIEW site package may assign a "data"
+    of its own.
+</f:comment>
+<f:variable name="pageRecord" value="{page.pageRecord}" />
+<f:if condition="!{pageRecord}">
+    <f:variable name="pageRecord" value="{data}" />
+</f:if>
+
 <div class="academic-projects-detail container">
     <div class="d-flex flex-column-reverse">
         <div>
-            <h1>{f:if(condition: '{project.projectTitle}', then: '{project.projectTitle}', else: '{data.title}')}</h1>
+            <h1>{f:if(condition: '{project.projectTitle}', then: '{project.projectTitle}', else: '{pageRecord.title}')}</h1>
 
             <f:format.html>{project.shortDescription}</f:format.html>
         </div>

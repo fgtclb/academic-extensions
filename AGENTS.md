@@ -567,6 +567,10 @@ how much has to differ.
 `Configuration/TCA/Overrides/tt_content.php` files, in three `ext_localconf.php`
 files and in single methods such as the one in
 `academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php`.
+Where the code can ask for the API itself, `method_exists()` or
+`class_exists()` replaces the version check, as in the three page data
+processors: the class of the page information object does not exist on v12. See
+[Core version aware code](docs/architecture/core-version-aware-code.md#a-check-for-the-api-instead-of-the-version).
 
 **A folder split, when a whole class has to differ.** The reference is
 `academic-base`, whose `Environment` API exists twice:

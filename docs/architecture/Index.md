@@ -48,7 +48,7 @@ This branch supports **TYPO3 v12 and v13**.
 
 | Page                                                            | Contents                                                                                                                                                            |
 |-----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Core version aware code](core-version-aware-code.md)           | The four mechanisms in use, the `Core12/`/`Core13/` split in `academic-base`, and how version specific tests are grouped.                                           |
+| [Core version aware code](core-version-aware-code.md)           | The five mechanisms in use, the `Core12/`/`Core13/` split in `academic-base`, and how version specific tests are grouped.                                           |
 | [Dependency injection](dependency-injection.md)                 | How services are configured across the extensions, why they must be stateless, and which Symfony and TYPO3 attributes exist on both v12 and v13.                    |
 | [Class design](class-design.md)                                 | `final`, `readonly`, constructor versus method injection, data objects, and the traps in Extbase models.                                                            |
 | [Database queries](database-queries.md)                         | Quoting value lists, keeping a constraint on the builder that executes it, and ordering every result a caller renders or limits.                                    |
@@ -63,6 +63,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [List filter types](list-filter-types.md)                       | Which category filters the partner, project and program lists offer, in which order and how many right away, options without results, and the per-type "All" label. |
 | [Label overrides](label-overrides.md)                           | How a site overrides a label through `_LOCAL_LANG`, and the extension name that decides the path.                                                                   |
 | [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, why a template needs it, and who renders a plugin's header.                                            |
+| [Page type rendering](page-type-rendering.md)                   | How the program, partner and project page types refine the site's page object, and where their page record comes from on `FLUIDTEMPLATE` and `PAGEVIEW`.            |
 
 ## See also
 
