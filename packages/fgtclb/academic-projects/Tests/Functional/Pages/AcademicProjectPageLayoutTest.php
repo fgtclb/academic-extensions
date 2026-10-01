@@ -10,6 +10,7 @@ use FGTCLB\TestingHelper\FunctionalTestCase\ResponsiveImageAssertionTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
+use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -31,7 +32,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCase
 {
-    use FrontendPluginRenderingTrait;
+    use FrontendPluginRenderingTrait {
+        frontendPluginTestConfiguration as sharedFrontendPluginTestConfiguration;
+    }
     use ResponsiveImageAssertionTrait;
     use SiteBasedTestTrait;
 
@@ -59,6 +62,33 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
     {
         $this->removeWrittenSiteConfiguration();
         parent::tearDown();
+    }
+
+    /**
+     * The Extbase class schema cache stays in memory for this class. TYPO3 core writes it
+     * from the destructor of the reflection service, and when the garbage collector runs that
+     * destructor inside another serialize(), the outer payload ends up with back-references
+     * it cannot be read back with. On TYPO3 v14 with PHP 8.5 and MariaDB this class hit it
+     * once the test classes of ACE-795 changed which classes run before it in the same
+     * process (the defect is recorded with ACE-725, the same workaround with ACE-729, ACE-740
+     * and ACE-744). An in-memory cache is never serialized.
+     *
+     * @param array<string, mixed> $additionalConfiguration
+     * @return array<string, mixed>
+     */
+    protected function frontendPluginTestConfiguration(array $additionalConfiguration = []): array
+    {
+        return $this->sharedFrontendPluginTestConfiguration(array_replace_recursive([
+            'SYS' => [
+                'caching' => [
+                    'cacheConfigurations' => [
+                        'extbase' => [
+                            'backend' => TransientMemoryBackend::class,
+                        ],
+                    ],
+                ],
+            ],
+        ], $additionalConfiguration));
     }
 
     /**
