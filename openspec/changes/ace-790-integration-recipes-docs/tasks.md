@@ -69,13 +69,23 @@
 - [x] 5.3 Add `Important-PageLinkKeepsItsDefinitionOnTypo3V14.rst` and the
   link requirement of `academic-partners/core-page-fields`.
 
-## 6. Definition of done
+## 6. ACE-793: the page description
 
-- [ ] 6.1 `lintPhp` green.
-- [ ] 6.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [x] 6.1 Stop defining `description`, and label it for partner pages through
+  `columnsOverrides`.
+- [x] 6.2 Test the definition of TYPO3 and the partner label. Shown red on v13
+  and v14 by restoring the old override.
+- [x] 6.3 Add `Breaking-PageDescriptionIsAnExcludeFieldAgain.rst`, list the
+  field in the partner permission set, and add the description requirement
+  of `academic-partners/core-page-fields`.
+
+## 7. Definition of done
+
+- [ ] 7.1 `lintPhp` green.
+- [ ] 7.2 After `-t 13 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 13`.
-- [ ] 6.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
+- [ ] 7.3 After `-t 14 -s composerUpdate`: `cgl -n`, `phpstan`, `unit` and
   `functional` green with `-t 14`.
-- [ ] 6.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [x] 6.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
-- [ ] 6.6 Archive the change as the last commit of the pull request.
+- [ ] 7.4 `lintMarkdown -n` and `checkRstRenderingAll` green.
+- [x] 7.5 `README.md` and `CONTRIBUTING.md` still only summarize and link.
+- [ ] 7.6 Archive the change as the last commit of the pull request.

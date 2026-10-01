@@ -196,9 +196,11 @@ academic_bite_jobs
 academic_partners
 =================
 
-A partner is a page of the page type 40. The other fields the extension
-defines on :sql:`pages` are not :php:`exclude` fields, and the column
-:sql:`link` it adds on TYPO3 v13 is shown in no form.
+A partner is a page of the page type 40, and its description is the field
+:sql:`description` of TYPO3, which EXT:seo renders as the meta description.
+The other fields the extension defines on :sql:`pages` are not
+:php:`exclude` fields, and the column :sql:`link` it adds on TYPO3 v13 is
+shown in no form.
 
 ..  code-block:: yaml
 
@@ -207,6 +209,7 @@ defines on :sql:`pages` are not :php:`exclude` fields, and the column
       pages:
         types: [40]
         fields:
+          - description
           - tx_academicpartners_partnerships
       tt_content:
         types:
