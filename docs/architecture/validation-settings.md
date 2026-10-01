@@ -6,11 +6,10 @@ disabled. It is the **single source of truth for both editing contexts**: the
 TYPO3 backend FormEngine and the editing frontend of `EXT:academic_persons_edit`.
 
 This page describes the `academic_persons` graph and the shared classes in
-`academic_base` it is built on since ACE-501. **`academic_jobs` ships a second,
-unrelated implementation** of the same idea, with its own file, its own loader
-and a different keyword vocabulary — see
-[The second implementation](#the-second-implementation-in-academic_jobs) at the
-end. The two share no code yet; moving jobs onto the shared classes is ACE-508.
+`academic_base` it is built on since ACE-501. **`academic_jobs` reads its own,
+much smaller file through the same classes** since ACE-508, with the same flags
+and the same merge, see
+[The jobs settings](#the-jobs-settings-in-academic_jobs) at the end.
 
 That is why the file ships in **`academic_persons`** and not in the edit
 extension. `academic_persons` owns the domain models and their TCA, so it must
@@ -177,12 +176,14 @@ The ViewHelper `FGTCLB\AcademicBase\ViewHelpers\ValidationEnsureViewHelper`
 sits next to them, declared in a template as
 `xmlns:p="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`.
 
-**Nothing in this repository consumes it any more.** Its only callers were the
-`Partials/Profile/Forms/` templates of `academic_persons_edit`, which the
-editing rewrite of 3.0 deleted; no template here declares that namespace and no
-test references the class. It is kept for site packages that overrode one of
-those partials and repointed the namespace, and it is `@internal` — do not build
-new code on it without deciding first whether it is public API.
+Its callers are the partials `Job/Forms/FieldWrapper.html` and
+`Job/Forms/Textfield.html` of `academic_jobs` (ACE-508). Its earlier callers,
+the `Partials/Profile/Forms/` templates of `academic_persons_edit`, went with the
+editing rewrite of 3.0. The class is `@internal`, but its tag name and arguments
+are public API from the moment a shipped template calls it: the extension points
+page of `academic_base` makes the ViewHelpers a template calls part of what a
+site package may override, and the Breaking entry of ACE-508 tells a site
+package to call it in place of the removed jobs ViewHelpers.
 
 `Validation` carries, beyond the flags' effects, the normalised `flags` list
 itself and a `characterLimit` (ACE-503). `normalizeValidation()` takes the
@@ -695,41 +696,44 @@ the frontend together. Re-enabling the profile name fields for the frontend edit
 form therefore also makes those columns writable again in the backend record
 editor. That is usually what is wanted, but it is worth being deliberate about.
 
-## The second implementation, in `academic_jobs`
+## The jobs settings, in `academic_jobs`
 
-`academic_jobs` has its own `Configuration/AcademicJobs/Settings.yaml`, read by
-`AcademicJobsSettingsLoader` into `AcademicJobsSettingsRegistry`. The package
-walk is the same, but the merge is not: jobs still folds its files with a
-top-level `array_merge()`, so an override there restates the whole top-level
-map, and nothing else matches either — the two systems share no code.
+`academic_jobs` ships `Configuration/AcademicJobs/Settings.yaml` with one flat
+set, `validations.job`, a flag list per property of the job. Until ACE-508 it
+had a loader, a registry and two ViewHelpers of its own, with a top-level
+`array_merge()` and three readers that understood three keyword sets (ACE-429).
+They are gone, and the file is read by the shared classes:
 
-|                         | `academic_persons`                                | `academic_jobs`                                       |
-|-------------------------|---------------------------------------------------|-------------------------------------------------------|
-| Normalisation           | once, at load, into `Validation` objects          | none — three readers reinterpret the raw array        |
-| Keyword case            | lowercased before matching                        | case sensitive                                        |
-| Backend TCA             | merged after the overrides by a TCA listener      | `getValidationsForTca()` exists but **has no caller** |
-| Frontend rendering      | `disabled` / `readonly` / `required` / input type | required asterisk and input type only                 |
-| Transformation guard    | yes — locked properties are never written         | none                                                  |
-| `disabled` / `readonly` | supported                                         | **understood by none of the three readers**           |
-| `url`                   | validator and input type, no TCA                  | validator only, no TCA                                |
-| `number`                | TCA and input type, no validator                  | TCA and input type, no validator                      |
-| `date`                  | input type only, TCA untouched                    | not understood                                        |
+| Piece                                           | What it does                                                                                                        |
+|-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| `Settings\AcademicJobsSettingsFactory`          | `SettingsFileLoader::load()` with the cache identifier `AcademicJobs_Settings_v3`, `normalizeValidationSets()`      |
+| `Settings\AcademicJobsSettings`                 | The sets by identifier, `getValidationSet()` answers an empty set for an unknown one. A service through the factory |
+| `Domain\Validator\JobValidator`                 | Runs the `validatorClassNames` of the `job` set, skipping a field the job has no gettable property for              |
+| `Job/Forms/FieldWrapper.html`, `Textfield.html` | `p:validationEnsure`, then `required` for the asterisk and `inputType` for the input                                |
+| `EventListener\ApplySettingsToTca`              | `academic-jobs/apply-settings-to-tca`, the `job` set merged into the job table after the overrides                  |
 
-Two of those deserve emphasis because they are traps rather than gaps:
+The listener is the persons one in small: one table, `TcaValidationMerger::merge()`
+over the fields the table has a column for, the `email[subst]` soft reference
+for a column the `email` flag creates, and `after: 'content-blocks-tca'`. Its
+consequences are the persons ones listed in
+[Why a listener after the overrides](#why-a-listener-after-the-overrides): the
+settings win over a TCA override of `required` and `readOnly`, and a site
+package that has to differ orders a listener after the identifier.
+`JobValidationSettingsAfterTcaOverridesTest` pins each of them.
 
-- `FieldTypeFromValidationViewHelper` returns **the first non-`required` list
-  entry verbatim as the HTML `type` attribute**. An unknown keyword is therefore
-  not ignored — `disabled` renders `<input type="disabled">`. It is the only
-  place in either system where a typo produces output instead of silence.
-- The jobs `Settings.yaml` carries a copy of the old persons comment block, so it
-  documents `disabled` and `readonly`, which do nothing there, and omits `url`
-  and `number`, which it actually uses.
+Three things differ from persons on purpose:
 
-The divergence between its three readers is tracked as ACE-429. Adopting the
-shared `academic_base` classes — which replaces the loader, the three readers
-and the two duplicate exceptions, and turns the dead `getValidationsForTca()`
-into a real TCA merge — is ACE-508, a behaviour change for jobs and therefore a
-change of its own.
+- **The form does not lock a field.** `readonly` and `disabled` cancel
+  `required` and lock the backend column, while the new-job form keeps offering
+  the field and stores what is submitted. The form only creates jobs, so it has
+  no stored value a lock could protect and no transformation guard either. What
+  the lock protects is the submitted value, against later backend edits.
+- **The shipped file uses `tel` for the phone.** With the TCA merge, `number`
+  would turn `contact_phone` into a number column, and saving a record would
+  store `+49 30 123` as `49`.
+- **ACE-429 is half open.** `required` still accepts `0` for the job type and
+  the employment type, both `int` properties defaulting to `0`, because
+  `NotEmptyValidator` treats `0` as a value. `JobValidatorTest` pins it.
 
 ## Documentation state
 
@@ -743,9 +747,9 @@ Integrator-facing documentation exists:
 - `academic-persons/Documentation/Configuration/ManagedFields/Index.rst`:
   the `managedFields` map, which records it locks and how it combines with the
   flags.
-- `academic-jobs/Documentation/Configuration/Validations/Index.rst` — the second
-  implementation, documenting only what actually takes effect, with the
-  `disabled`/`readonly` trap called out.
+- `academic-jobs/Documentation/Configuration/Validations/Index.rst`: the jobs
+  flags in the form, the check of a submitted job and the backend, the merge
+  per field and the listener identifier.
 - `academic-persons-edit/Documentation/Configuration/General/Index.rst` — a
   *Which fields can be edited* section pointing at the persons manual, since that
   is where integrators meet the locked name fields.
@@ -758,9 +762,6 @@ deliberate — no FGTCLB extension registers an intersphinx inventory in its
 `guides.xml`, and adding one would make the render depend on a sibling's
 published inventory being reachable, which `--fail-on-log --fail-on-error` would
 turn red.
-
-Still open: the jobs file's copied comment block is wrong for that extension, as
-above.
 
 ## See also
 

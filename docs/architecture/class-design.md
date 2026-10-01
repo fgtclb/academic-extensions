@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 318 PHP files declaring 279
+rather than describing an intention as a rule — 344 PHP files declaring 303
 classes, 11 interfaces, 17 traits and 13 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -16,21 +16,20 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-162 of the 279 classes are `final` (58 %). The distribution is not random: it
+191 of the 303 classes are `final` (63 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
-| Directory                                  | final   | plain   | abstract | % final  |
-|--------------------------------------------|---------|---------|----------|----------|
-| `Classes/Upgrades/`                        | 15      | 0       | 0        | 100 %    |
-| `Classes/Service/` and `Classes/Services/` | 28      | 2       | 0        | 93 %     |
-| `Classes/EventListener/`                   | 11      | 1       | 0        | 92 %     |
-| `Classes/Controller/`                      | 4       | 5       | 0        | 44 %     |
-| `Classes/Domain/Model/Dto/`                | 7       | 10      | 1        | 39 %     |
-| `Classes/ViewHelpers/`                     | 5       | 8       | 0        | 38 %     |
-| `Classes/Domain/Model/` (excluding `Dto/`) | 1       | 23      | 0        | 4 %      |
-| `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 92      | 47      | 4        | 64 %     |
-| **Total**                                  | **162** | **112** | **5**    | **58 %** |
+| Directory                                  | final | plain | abstract | % final |
+|--------------------------------------------|-------|-------|----------|---------|
+| `Classes/Upgrades/`                        | 16    | 0     | 0        | 100 %   |
+| `Classes/Service/` and `Classes/Services/` | 32    | 2     | 0        | 94 %    |
+| `Classes/EventListener/`                   | 12    | 1     | 0        | 92 %    |
+| `Classes/Controller/`                      | 4     | 5     | 0        | 44 %    |
+| `Classes/Domain/Model/Dto/`                | 8     | 10    | 1        | 42 %    |
+| `Classes/ViewHelpers/`                     | 5     | 6     | 0        | 45 %    |
+| `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
+| `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
+| Everything else                            | 113   | 44    | 4        | 70 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -73,7 +72,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 57:
+nothing**, and of an immutable data object. There are 59:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -246,19 +245,22 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Thirteen sites
+  sit under an excluded path. Twenty sites
   (`grep -rn '#\[Exclude\]' --include='*.php' packages/fgtclb/*/Classes`):
-  `academic-base/Classes/Settings/Validation.php:23`,
-  `academic-base/Classes/Settings/ValidationSet.php:15`, nine classes under
-  `academic-persons/Classes/Settings/` — the eight of the settings graph
-  (`ProfileSection`, `ProfileField`, `SpecialField`, `ContractField`,
-  `ContractContactSection`, `ContractContactField`, `DocumentSection`,
-  `PublicProfileSettings`) plus `LegacySettingsMigration` — and the two value
+  `Validation` and `ValidationSet` in `academic-base/Classes/Settings/`, fourteen
+  classes under `academic-persons/Classes/Settings/` (the value objects of the
+  settings graph, of the frontend user synchronisation and of the managed
+  fields, plus `LegacySettingsMigration` and `SettingsOverride`), the two value
   objects of the contract selection, `ContractSelection` and
-  `ContractSelectionResult` in `academic-persons/Classes/Service/`.
+  `ContractSelectionResult` in `academic-persons/Classes/Service/`, the
+  upgrade wizard of `academic-persons` that a site package registers itself,
+  and the routing aspect `CategoryFilterMapper` of `typo3-category-types`,
+  which the core builds itself.
   `LegacySettingsMigration` is not a settings value object but the result of
-  the legacy settings overlay; it is excluded for the same reason — it is data
-  the factory produces, not a service the container builds.
+  the legacy settings overlay. It is excluded for the same reason: it is data
+  the factory produces, not a service the container builds. A settings object
+  that is itself a service built by a factory, `AcademicPersonsSettings` or
+  `AcademicJobsSettings`, carries no `#[Exclude]`.
 
 The `Settings/` classes show why the attribute is needed: they are immutable
 data objects that happen to live outside `Domain/Model/`, so the package's
