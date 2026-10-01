@@ -56,6 +56,12 @@
       <trans-unit id="flexform.showHiddenRecords.description">
         <source>If enabled, hidden (disabled) records are shown in the frontend, independent of the backend preview settings.</source>
       </trans-unit>
+      <trans-unit id="flexform.showActiveStateBadge.label">
+        <source>Show active state badge</source>
+      </trans-unit>
+      <trans-unit id="flexform.showActiveStateBadge.description">
+        <source>Shows on every project whether it is active or completed, read from its end date.</source>
+      </trans-unit>
       <trans-unit id="flexform.hideFilter.label">
         <source>Show filter options</source>
       </trans-unit>

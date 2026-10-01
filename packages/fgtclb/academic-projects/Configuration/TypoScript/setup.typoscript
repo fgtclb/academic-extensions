@@ -22,6 +22,10 @@ plugin.tx_academicprojects {
       hideDisabledOptions = {$plugin.tx_academicprojects.filter.hideDisabledOptions}
     }
 
+    # The state badge of the project cards, switched on per content element. A content
+    # element saved before the option existed carries no value for it and stays without.
+    showActiveStateBadge = 0
+
     # The content element layout renders the header of every content element, so the
     # templates render it only for a site whose layout leaves it out. The header partial
     # falls back to the type of the header layout "Default" through the setting below,

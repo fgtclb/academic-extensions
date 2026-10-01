@@ -49,13 +49,12 @@ None.
 - A badge on the project page template; candidate `listings-22` gives that
   template partials a project can extend.
 - Changing the list filter rule. The "Active" filter misses projects whose
-  end date is stored as `NULL`; that is fixed in a separate bugfix change,
-  and this change pins the gap with a test (see `design.md`).
+  end date is stored as `NULL`. That is fixed in a separate bugfix change
+  (ACE-433), and this change pins the gap with a test (see `design.md`).
 - Backporting to branch `2`.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-21`). Two of the six analysed projects carry their own code for this
-today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-<slug>` when the issue is filed after implementation.
+today. Filed as ACE-796 after the implementation.

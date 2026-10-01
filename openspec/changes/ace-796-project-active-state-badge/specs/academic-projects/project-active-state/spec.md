@@ -23,6 +23,11 @@ SHALL never be empty.
 - **WHEN** a project's end date was yesterday
 - **THEN** its state is completed
 
+#### Scenario: A template prints the state
+- **WHEN** a template of a site package prints a project's state in a text,
+  an attribute or a label key, on TYPO3 v13 or v14
+- **THEN** it renders `active` or `completed`, and the content element renders
+
 ### Requirement: The state agrees with the list filter
 Every project that the list filter "Active" shows SHALL be in the state
 active, and every project that the list filter "Completed" shows SHALL be in

@@ -8,6 +8,7 @@ use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
 use FGTCLB\AcademicProjects\Domain\Model\Project;
 use FGTCLB\AcademicProjects\Domain\Repository\ProjectRepository;
 use FGTCLB\AcademicProjects\Tests\Functional\AbstractAcademicProjectsTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 
@@ -99,7 +100,8 @@ final class ProjectRepositoryTest extends AbstractAcademicProjectsTestCase
      * it keeps `NULL` - a page created before the extension was installed, or by an import.
      * Such a project is in neither state: `NULL = 0` and `NULL > <now>` are both unknown in
      * SQL, so it disappears from a list that filters at all while being visible in the
-     * unfiltered one. Uid 13 of the fixture is that row.
+     * unfiltered one. Uid 13 of the fixture is that row. ACE-433 is the bugfix that decides
+     * which list it belongs to.
      */
     #[Test]
     public function aProjectWithoutAnyEndDateValueIsNeitherActiveNorCompleted(): void
@@ -111,6 +113,58 @@ final class ProjectRepositoryTest extends AbstractAcademicProjectsTestCase
 
         $this->assertNotContains(13, $this->resultUids($active));
         $this->assertNotContains(13, $this->resultUids($completed));
+    }
+
+    /**
+     * A template shows the state of a project, `Project::getActiveState()`, and a visitor
+     * filters by the query above. Both implement one rule, so every project a filter lists
+     * has to be in the state of that filter. The projects come through the Extbase date
+     * mapping here: an end date of `0` has to arrive as no end date, or the open ended
+     * project would read as completed.
+     *
+     * @param array<int, string> $expected
+     */
+    #[Test]
+    #[DataProvider('filteredStates')]
+    public function everyProjectAFilterListsIsInTheStateOfThatFilter(string $activeState, array $expected): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/ProjectRepository/projectsWithEndDates.csv');
+
+        $states = [];
+        foreach ($this->getProjectRepository()->findByDemand($this->createDemandForActiveState($activeState)) as $project) {
+            $states[(int)$project->getUid()] = $project->getActiveState();
+        }
+        ksort($states);
+
+        $this->assertSame($expected, $states);
+    }
+
+    /**
+     * @return \Generator<string, array{0: string, 1: array<int, string>}>
+     */
+    public static function filteredStates(): \Generator
+    {
+        yield 'active' => ['active', [10 => 'active', 11 => 'active']];
+        yield 'completed' => ['completed', [12 => 'completed']];
+    }
+
+    /**
+     * The one place where the two disagree today. A project whose end date column holds
+     * `NULL` has no end date for the model, so it is active, while the "Active" filter
+     * misses it, see `aProjectWithoutAnyEndDateValueIsNeitherActiveNorCompleted()` and the
+     * "active" case above. ACE-433 puts it into that filter and turns those around.
+     */
+    #[Test]
+    public function aProjectWithoutAnyEndDateValueIsActive(): void
+    {
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/ProjectRepository/projectsWithEndDates.csv');
+
+        $states = [];
+        foreach ($this->getProjectRepository()->findByDemand(new ProjectDemand()) as $project) {
+            $states[(int)$project->getUid()] = $project->getActiveState();
+        }
+
+        $this->assertSame('active', $states[13] ?? null);
     }
 
     /**

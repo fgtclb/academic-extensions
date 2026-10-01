@@ -75,6 +75,35 @@ final class ActiveStateTest extends UnitTestCase
     }
 
     /**
+     * The state of one project, for a template. It is the rule of the list filter in
+     * `ProjectRepository::findByDemand()`: no end date or one still ahead is active, one
+     * that has passed is completed. A project is never in the state "all", so a template
+     * that reads it always gets a label to show.
+     */
+    #[Test]
+    #[DataProvider('endDates')]
+    public function theEndDateDecidesBetweenActiveAndCompleted(?\DateTimeInterface $endDate, ActiveState $expected): void
+    {
+        $now = new \DateTimeImmutable('2026-10-01 12:00:00');
+
+        $this->assertSame($expected, ActiveState::fromEndDate($endDate, $now));
+    }
+
+    /**
+     * @return \Generator<string, array{0: ?\DateTimeInterface, 1: ActiveState}>
+     */
+    public static function endDates(): \Generator
+    {
+        yield 'no end date' => [null, ActiveState::ACTIVE];
+        yield 'ending tomorrow' => [new \DateTimeImmutable('2026-10-02 12:00:00'), ActiveState::ACTIVE];
+        yield 'ended yesterday' => [new \DateTimeImmutable('2026-09-30 12:00:00'), ActiveState::COMPLETED];
+        // The "Active" filter asks for an end date after now, so the very moment
+        // itself is not active any more.
+        yield 'ending right now' => [new \DateTimeImmutable('2026-10-01 12:00:00'), ActiveState::COMPLETED];
+        yield 'a mutable end date' => [new \DateTime('2026-10-02 12:00:00'), ActiveState::ACTIVE];
+    }
+
+    /**
      * Guards the pair above against drifting apart: every value the enum offers has to
      * be resolvable again, or `values()` would advertise something `tryFrom()` rejects.
      */

@@ -430,6 +430,47 @@ template that renders the partial.
     away and with one "All" label, and anything else needed an override of the
     partial.
 
+..  _configuration-active-state:
+
+The state of a project
+======================
+
+A project is active while it has no end date or its end date is still ahead,
+and completed once its end date has passed. The :guilabel:`Active state`
+filter of the project lists selects by that rule, and a template reads the same
+state from every project as :html:`{project.activeState}`: `active` or
+`completed`, never empty.
+
+..  _configuration-active-state-badge:
+
+The state on the project cards
+------------------------------
+
+The option :guilabel:`Show active state badge` of the :guilabel:`Projects` and
+the :guilabel:`Projects (selected)` content elements shows the state on every
+project card, with the labels :xml:`activeState.active` and
+:xml:`activeState.completed` of this extension. It is off by default, and a
+content element saved before the option existed stays without the badge.
+
+The partial :file:`Project/Item.html` renders it above the title:
+
+..  code-block:: html
+
+    <p class="mb-2">
+        <span class="badge text-bg-secondary academic-projects-item__state academic-projects-item__state--completed">Completed</span>
+    </p>
+
+An active project gets :html:`text-bg-success` instead. The modifier class
+names the state in every language, so a site styles the two states by it. A
+site package with a :file:`Project/Item.html` of its own shows the badge only
+once it takes over that block.
+
+A project whose end date column was never written, a page created before the
+extension was installed or by an import that left the column out, has no end
+date and is active. The :guilabel:`Active` filter does not list it yet, and
+saving the page in the backend does not change that: the column keeps its
+empty value as long as no end date is entered.
+
 ..  _configuration-crop-variants:
 
 The crop variants of the project page media
