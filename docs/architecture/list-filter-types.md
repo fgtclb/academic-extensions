@@ -74,18 +74,16 @@ The shipped `DemandCategories.html` partials and the finder's `Finder.html`
 pass `settings.filter.hideDisabledOptions` to it.
 
 The resolver is stateless, autowired and `@internal`. `PartnerController`,
-`ProjectController` and `ProgramController` receive it through a `final`
-`inject*()` method rather than their constructor, because the controllers are
-not final and project subclasses call the constructor. The partner, program and
+`ProjectController` and `ProgramController` receive it as a constructor
+argument. The partner, program and
 project actions resolve the categories the list event handed back, so a listener
 that changes them changes the filters too.
 
 The partial loops `filterTypes.visible` when `filterTypes` reaches it, and falls
-back to the loop it had before when it does not: a subclass that overrides
-`listAction()` without assigning it, or a project template that renders the
-partial with its own arguments instead of `{_all}`, would otherwise lose every
-filter on the update. The fallback ignores the setting, which is the one thing
-such a project has to change to use it.
+back to the loop it had before when it does not: a project template that
+renders the partial with its own arguments instead of `{_all}` would otherwise
+lose every filter on the update. The fallback ignores the setting, which is the
+one thing such a project has to change to use it.
 
 ## Visible count and options without results
 

@@ -13,13 +13,13 @@ use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
-class BiteJobsController extends ActionController
+final class BiteJobsController extends ActionController
 {
     use DispatchModifyPluginViewEventMethodTrait;
     use GetCurrentContentRecordMethodTrait;
 
     public function __construct(
-        protected readonly BiteJobsService $biteJobsService
+        private readonly BiteJobsService $biteJobsService,
     ) {}
 
     /**

@@ -1,6 +1,7 @@
 ## Context
 
-Measured on main:
+Measured on main on 2026-09-12, and again on 2026-10-02 when the change was
+implemented:
 
 - `academic-partners/Classes/Controller/PartnerController.php` is a plain
   `class` with four `protected` promoted collaborators and the actions
@@ -9,8 +10,9 @@ Measured on main:
   `class` with three `protected readonly` promoted collaborators and one
   `list` action, registered for both project list plugins.
 - `academic-programs/Classes/Controller/ProgramController.php` is a plain
-  `class` with three `protected` promoted collaborators and one `list`
-  action (plugin `ProgramList`).
+  `class` with three `protected` promoted collaborators, the `list` action
+  of the plugin `ProgramList` and, since `ace-91-program-finder-element`,
+  the `finder` action of the plugin `ProgramFinder`.
 - `academic-programs/Classes/Controller/DetailsController.php` is a plain
   `class` with two `protected` promoted collaborators and one `show` action
   (plugin `ProgramDetails`), which assigns the content element record and
@@ -25,12 +27,22 @@ Measured on main:
   `ContactsController`. They run and are functionally tested on TYPO3 v13
   and v14 alike, so the container and Extbase dispatch accept a final
   controller on both versions.
-- No class in `packages/` or `packages-dev/` extends one of the five. None
-  of them implements an interface, has a DI alias or is documented as a
-  subclassing point; the manuals of `academic_programs` and
-  `academic_bite_jobs` name `ProgramController` once, in the route enhancer
-  configuration, by class name. A project reaches them only through a
-  `configurePlugin()` call or an XCLASS pointing at its own subclass.
+- Seven `final` `inject*()` methods exist only for subclasses: the three
+  list controllers take the `ExtensionService` of the filter redirect
+  (`ace-723-list-filter-get-urls`) and the `FilterTypeResolver` that way,
+  and `DetailsController` its `ProgramFactsBuilder`. The docblocks say
+  that the method keeps the constructor a subclass calls unchanged.
+  `redirectFilterSubmission()` and `pluginControllerActionContext()` of the
+  list controllers are `protected` for the same reason.
+- No class in `packages/` or `packages-dev/` extends one of the five, and
+  none of them implements an interface or has a DI alias. A project reaches
+  them only through a `configurePlugin()` call or an XCLASS pointing at its
+  own subclass. The analysis of 2026-09-12 found them documented nowhere as
+  a subclassing point. That no longer held when the change was implemented:
+  the configuration chapters of the three list extensions, the filter type
+  and filter URL entries of 3.0 and the filter partials told a project
+  controller that overrides the list action to call the parent action.
+  Those passages are rewritten in this change.
 - Functional plugin tests exist for every affected extension, among them
   `academic-programs/Tests/Functional/Plugins/AcademicProgramsPluginTest.php`
   (list and details) and
@@ -40,7 +52,7 @@ Measured on main:
   remap a visitor's sorting choice onto another field, and points the
   plugin registration at its subclass. One project subclasses
   `ProgramController` to add a finder action next to the list. None
-  subclasses `DetailsController` or `BiteJobsController`; one project runs
+  subclasses `DetailsController` or `BiteJobsController`, and one project runs
   a fork of `academic_bite_jobs` instead.
 
 ## Goals / Non-Goals
@@ -60,7 +72,7 @@ Measured on main:
 ### Decided: all five controllers become final
 
 Decided by the maintainer. `PartnerController` and `ProjectController` were
-the first two; `ProgramController`, `DetailsController` and
+the first two, and `ProgramController`, `DetailsController` and
 `BiteJobsController` follow in the same change. The reason is one rule for
 every plugin controller once it has events: a plugin controller is `final`,
 and its plugin is extended through events. Closing only the partner and
@@ -86,7 +98,7 @@ about a subclass of a class tagged that way, so the tag reaches nobody who
 does not read the source, and the break lands in a major version that has no
 other reason to touch these classes.
 
-### Collaborators become `private readonly`
+### Collaborators become `private readonly` constructor arguments
 
 With no subclass possible, `protected` only widens what a reader has to
 consider. `private readonly` is the rule of
@@ -99,26 +111,33 @@ observable to it. `readonly class` stays out of reach, because
 private property it would be reported by PHPStan as written but never read,
 and with no subclass left nothing can rely on the argument.
 
-### One architecture test for every plugin controller
+The seven `inject*()` methods move into the constructor, and
+`redirectFilterSubmission()` and `pluginControllerActionContext()` become
+`private`. Each of them exists only so that a subclass keeps working, and
+`docs/architecture/class-design.md` already announced the move for the
+moment the controllers are final.
 
-A unit test in a `packages-dev/` package covered by the phpunit glob scans
-`packages/fgtclb/*/Classes/Controller/`, reflects every non-abstract class
-extending Extbase's `ActionController`, and asserts that it is `final`. It
-also asserts that it found the nine controllers of main, so a changed scan
-path cannot turn it into a test of nothing. It is shown red on main, naming
-exactly the five open controllers, before the keyword is added. It sits in
-`packages-dev/` for the reason `ace-749-extension-point-policy` gives for
-its event test: it spans all extensions and must not travel into a split
-repository. When that change has landed, both tests live side by side.
+### One test for every plugin controller, in the extension point test
+
+`ExtensionPointTest` of `packages-dev/monorepo-shared`, which
+`ace-749-extension-point-policy` added, reflects every class it reads below
+`packages/fgtclb/*/Classes/`. Two test methods join it: every class that is
+not abstract and extends Extbase's `ActionController` is `final`, and there
+are nine of them, so a broken scan cannot turn it into a test of nothing.
+It is shown red on main, naming exactly the five open controllers, before
+the keyword is added. It sits in `packages-dev/` because it spans all
+extensions and must not travel into a split repository.
 
 The existing functional plugin tests of the four extensions are the
 regression check that the container still builds the controllers.
 
 Rejected: one reflection test per controller below each extension's
 `Tests/Unit/Controller/`. Five tests for one rule, and a controller added
-later would be open until someone remembers to write a sixth. Rejected:
-widening the event test of `ace-749-extension-point-policy`. That test is
-about events and may land in a different order.
+later would be open until someone remembers to write a sixth. Rejected: a
+test class of its own next to the extension point test. The policy this
+rule belongs to is the one that test holds, and it already reads every
+class. The earlier reason against it, a different landing order, no longer
+applies.
 
 ### Migration from a subclass, per controller
 
@@ -127,9 +146,10 @@ The `Breaking-` entries map each subclass purpose to its replacement.
 `PartnerController` and `ProjectController`, through the events of
 `ace-717-partners-projects-list-events`:
 
-- Changing the filter or sorting before the query, including remapping a
-  sorting choice onto another field: a listener of the demand event, which
-  replaces or adjusts the demand.
+- Changing the filter or sorting before the query: a listener of the
+  demand event, which replaces or adjusts the demand. The partner demand
+  accepts only the sorting options of the extension, so the remap of the
+  ACE demo onto `tstamp` has no replacement, and the entry says so.
 - Additional view variables, or a replaced or reduced result: a listener of
   the list event.
 - The partnership list and teaser actions, which that change gives no
@@ -146,9 +166,7 @@ The `Breaking-` entries map each subclass purpose to its replacement.
   categories, or adding view variables: a listener of
   `ModifyProgramListEvent`.
 - An own finder action next to the list: the finder element of
-  `ace-91-program-finder-element` where it has shipped; until then a
-  project keeps its own plugin with its own controller class, which is
-  unaffected by this change.
+  `ace-91-program-finder-element`, which has shipped.
 
 `DetailsController`:
 
@@ -182,15 +200,15 @@ Hard dependencies, which have to be merged first, because closing a class
 without an event removes the only extension point:
 
 - `ace-717-partners-projects-list-events` for `PartnerController` and
-  `ProjectController`;
-- `ace-766-program-psr14-events` for `ProgramController`;
-- `ace-102-bite-jobs-request-result-events` for `BiteJobsController`;
+  `ProjectController`,
+- `ace-766-program-psr14-events` for `ProgramController`,
+- `ace-102-bite-jobs-request-result-events` for `BiteJobsController`,
 - `ace-750-generic-plugin-view-event` for `DetailsController`, the two
   partnership actions of `PartnerController` and additional view variables
   of `BiteJobsController`. None of the three changes above dispatches an
   event there, so without it the rule of every finalised controller having
   an event-based extension point does not hold. The alternative is a
-  details event in `ace-766-program-psr14-events`; the precondition task
+  details event in `ace-766-program-psr14-events`, and the precondition task
   accepts either.
 
 Because `ace-750-generic-plugin-view-event` lands after
@@ -198,7 +216,7 @@ Because `ace-750-generic-plugin-view-event` lands after
 documentation can name the policy page.
 
 The pagination and filter URL changes, and the program finder element, are
-an ordering constraint, not a technical one; they land first so the
+an ordering constraint, not a technical one. They land first so the
 changelog can point at shipped features.
 
 ### Identical on TYPO3 v13 and v14
@@ -212,22 +230,20 @@ the same way on both versions. There is no core version switch.
   the class it cannot extend, which leads straight to the `Breaking-` entry.
 - [A subclass does something no event covers] → the events expose the
   demand, the result, the categories, the B-ITE request and postings, and
-  the view, which covers every purpose of the analysed subclasses; anything
+  the view, which covers every purpose of the analysed subclasses, and anything
   else is a request for a new event, not a reason to keep the class open.
 - [A program finder subclass predates the upstream finder element] → it is
-  a subclass of `ProgramController` and stops loading; the entry shows the
-  project moving its finder action into a controller of its own until the
-  upstream element ships, which is why that element is an ordering
-  constraint.
+  a subclass of `ProgramController` and stops loading. The upstream element
+  has shipped, and the entry points at it.
 - [A dependency slips out of 3.0.0] → the controller it would cover cannot
-  be closed without removing its only extension point; the change then
+  be closed without removing its only extension point. The change then
   waits, or the controller is dropped from it and closed in 4.0.
 
 ## Migration Plan
 
 - Remove the subclass and its plugin or XCLASS registration, move each
   override to the replacement named above, and flush the caches.
-- Rollback: none needed upstream; a project that cannot migrate stays on
+- Rollback: none needed upstream. A project that cannot migrate stays on
   2.x until it can.
 
 ## Open Questions

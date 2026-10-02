@@ -19,12 +19,15 @@ are `final` already.
   `ProjectController` becomes `final`. It serves both project list plugins.
 - **BREAKING** `academic_programs` (`packages/fgtclb/academic-programs`):
   `ProgramController` and `DetailsController` become `final`. They serve
-  the program list and the program details plugin.
+  the program list, the program finder and the program details plugin.
 - **BREAKING** `academic_bite_jobs` (`packages/fgtclb/academic-bite-jobs`):
   `BiteJobsController` becomes `final`. It serves the B-ITE job list plugin.
-- Their injected collaborators become `private readonly`, as the class
-  design rules ask for a class nobody can extend. `DetailsController` drops
-  the `DemandFactory` it injects and never reads.
+- Their injected collaborators become `private readonly` constructor
+  arguments, as the class design rules ask for a class nobody can extend.
+  The seven `inject*()` methods, which exist only so that a subclass keeps
+  calling the old constructor, move into the constructor, and the helper
+  methods that are `protected` for subclasses become `private`.
+  `DetailsController` drops the `DemandFactory` it injects and never reads.
 - A project that subclasses or XCLASSes one of these controllers gets a
   fatal error when the class is loaded, and has to move to the events of
   its plugin: `ace-717-partners-projects-list-events` for partners and
@@ -33,7 +36,8 @@ are `final` already.
   `ace-750-generic-plugin-view-event` for the actions none of those covers.
   Pagination and GET filter URLs of the partner list move to
   `ace-727-partner-list-pagination` and `ace-723-list-filter-get-urls`.
-- An architecture test asserts that every plugin controller is `final`.
+- The extension point test of `packages-dev/monorepo-shared` asserts that
+  every plugin controller is `final`.
 - A `Breaking-` changelog entry per extension with a migration example from
   a subclass to an event listener.
 - Rendering, templates, plugin registration and settings are unchanged. The
@@ -44,7 +48,7 @@ are `final` already.
 ### New Capabilities
 
 None. A visitor, an editor and an integrator who configures the plugins
-observe no difference; the only observable effect is that a PHP subclass no
+observe no difference. The only observable effect is that a PHP subclass no
 longer loads, which is a statement about PHP API, not plugin behaviour. The
 extension points that replace the subclass are specified by the event
 changes this one depends on. The change sets `skip_specs: true`.
@@ -59,9 +63,10 @@ None.
   (`packages/fgtclb/academic-partners`), `academic_projects`
   (`packages/fgtclb/academic-projects`), `academic_programs`
   (`packages/fgtclb/academic-programs`) and `academic_bite_jobs`
-  (`packages/fgtclb/academic-bite-jobs`); their constructor property
+  (`packages/fgtclb/academic-bite-jobs`), their constructor property
   visibility, and one constructor argument less in `DetailsController`.
-- One architecture test in a `packages-dev/` package.
+- Two test methods in the extension point test of a `packages-dev/`
+  package.
 - Projects with a subclass, an XCLASS or a plugin re-registration pointing
   at a subclass of one of these controllers must migrate in the same
   upgrade.
@@ -91,6 +96,4 @@ None.
 
 Follows from the maintainer's decisions on
 `ace-717-partners-projects-list-events` and on this change (project
-differences analysis of 2026-09-12). No YouTrack issue is filed yet; the
-change is renamed to `ace-<NNN>-final-partner-project-controllers` when the
-issue is filed after implementation.
+differences analysis of 2026-09-12). Filed as ACE-803.

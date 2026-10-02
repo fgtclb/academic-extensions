@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 /**
  * The extension point policy of the academic extensions, as far as a test can hold it.
@@ -30,6 +31,12 @@ use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
  * XCLASS as a notice rather than a warning. The page and the check therefore have to agree
  * on which classes are models, so each class implementing Extbase's
  * `DomainObjectInterface` carries `@api`. And no class is both `@api` and `@internal`.
+ *
+ * Every plugin controller - a class that is not abstract and extends Extbase's
+ * `ActionController` - is `final`. A project extends a plugin through its events, never
+ * through a subclass of its controller.
+ * The number of controllers found is asserted as well, so a scan that finds nothing cannot
+ * pass.
  *
  * The rules are documented in `docs/architecture/class-design.md`, section
  * "Extension points".
@@ -131,6 +138,44 @@ final class ExtensionPointTest extends TestCase
                 $className,
                 self::PAGE,
             ),
+        );
+    }
+
+    /**
+     * @return \Generator<string, array{class-string}>
+     */
+    public static function pluginControllersDataProvider(): \Generator
+    {
+        foreach (self::pluginControllers() as $className) {
+            yield $className => [$className];
+        }
+    }
+
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('pluginControllersDataProvider')]
+    #[Test]
+    public function pluginControllerIsFinal(string $className): void
+    {
+        $this->assertTrue(
+            (new \ReflectionClass($className))->isFinal(),
+            sprintf(
+                '%s is a plugin controller and has to be final: a project extends its plugin through events,'
+                . ' see "Extension points" in docs/architecture/class-design.md.',
+                $className,
+            ),
+        );
+    }
+
+    #[Test]
+    public function everyPluginControllerIsFound(): void
+    {
+        $this->assertCount(
+            9,
+            self::pluginControllers(),
+            'The number of plugin controllers below packages/fgtclb/*/Classes changed. Adjust it when a'
+            . ' controller was added or removed, otherwise the scan is broken.',
         );
     }
 
@@ -236,6 +281,23 @@ final class ExtensionPointTest extends TestCase
         }
         ksort($declarations);
         return self::$declarations = $declarations;
+    }
+
+    /**
+     * Every class below `packages/fgtclb/*\/Classes` that Extbase can dispatch a plugin
+     * action to: not abstract, and extending `ActionController`.
+     *
+     * @return list<class-string<ActionController>>
+     */
+    private static function pluginControllers(): array
+    {
+        $controllers = [];
+        foreach (array_keys(self::declarations()) as $className) {
+            if (is_subclass_of($className, ActionController::class) && !(new \ReflectionClass($className))->isAbstract()) {
+                $controllers[] = $className;
+            }
+        }
+        return $controllers;
     }
 
     /**

@@ -388,6 +388,10 @@ classes below `packages/fgtclb/*/Classes/` with PHP's tokenizer and asserts:
 - every class implementing Extbase's `DomainObjectInterface` carries `@api`,
   because the upgrade check treats an XCLASS of a model as supported, and no
   class carries both `@api` and `@internal`;
+- every plugin controller - a class that is not abstract and extends Extbase's
+  `ActionController` - is `final`, and there are nine of them. The count fails
+  the test when the scan finds nothing, and is adjusted when a controller is
+  added or removed;
 - the classes whose declaration carries `@api` in its docblock and the
   `\FGTCLB\…` names of the `:php:` role on the extension points page of
   `academic_base` are the same set. The page therefore names a class that is
