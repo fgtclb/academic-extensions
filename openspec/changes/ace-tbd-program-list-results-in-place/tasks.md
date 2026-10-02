@@ -19,8 +19,8 @@
 ## 3. Frontend module
 
 - [ ] 3.1 Add `Resources/Private/TypeScript/frontend/program-list.ts` with an
-  exported initialiser, `Configuration/JavaScriptModules.php` if not present,
-  and load it with `f:asset.module`.
+  exported initialiser, published through the existing
+  `Configuration/JavaScriptModules.php`, and load it with `f:asset.module`.
 - [ ] 3.2 Add `Tests/JavaScript/program-list.test.ts` (jsdom, a stubbed
   `fetch`): a change posts the form, replaces the results and the selects of
   the matching list only, keeps focus, pushes `response.url`, and writes the

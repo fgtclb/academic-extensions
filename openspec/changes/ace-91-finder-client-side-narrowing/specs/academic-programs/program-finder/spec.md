@@ -5,7 +5,8 @@ The program finder SHALL disable every option that, combined with the values
 already selected in the other selects of the same finder, matches no program
 in the element's storage. It SHALL enable such an option again as soon as the
 selection that excluded it is cleared or changed. This SHALL happen without a
-page reload.
+page reload. The option a select shows SHALL stay selectable, and an option no
+program in storage carries SHALL stay disabled.
 
 #### Scenario: A selection excludes an option of another type
 - **WHEN** a visitor selects the degree "Master" and the topic "Robotics" is
@@ -16,6 +17,18 @@ page reload.
 - **WHEN** the visitor resets the degree select to its empty value
 - **THEN** the option "Robotics" is selectable again
 
+#### Scenario: The site hides options without results
+- **WHEN** the site hides options without results
+- **AND** a visitor selects the degree "Master" and the topic "Robotics" is
+  carried only by Bachelor programs
+- **THEN** the option "Robotics" stays in the topic select, disabled
+
+#### Scenario: Two preselections exclude each other
+- **WHEN** the editor preselected "Bachelor" and "Robotics", and no program
+  carries both
+- **THEN** both stay selectable once the page has loaded, and the finder
+  states that no program matches
+
 #### Scenario: A program carries a subcategory of the option
 - **WHEN** the finder includes subcategories
 - **AND** a visitor selects the topic "Robotics"
@@ -24,8 +37,8 @@ page reload.
 - **THEN** the option "Master" stays selectable
 
 ### Requirement: The finder states how many programs match
-The program finder SHALL show the number of programs that match all current
-selections and SHALL update it on every change of a selection.
+The program finder SHALL show the number of programs in its storage that match
+all current selections and SHALL update it on every change of a selection.
 
 #### Scenario: Count follows the selection
 - **WHEN** three programs are in storage, two of them carry the degree

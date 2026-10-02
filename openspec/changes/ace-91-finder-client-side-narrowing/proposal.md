@@ -5,7 +5,7 @@ reloading". Three projects, the ACE demo among them, get there today by
 reloading the whole finder through a topwire turbo frame on every change: a
 dependency and a request per selection, for data that fits into one
 attribute. A fourth plans the same. The finder element itself is proposed
-separately as `ace-91-program-finder-element`; this change adds the
+separately as `ace-91-program-finder-element`, and this change adds the
 narrowing on top of it.
 
 ## What Changes
@@ -23,7 +23,7 @@ narrowing on top of it.
   like the modules of the other extensions and published through an import
   map.
 
-Behaviour is identical on TYPO3 v13 and v14; the change is frontend only.
+Behaviour is identical on TYPO3 v13 and v14, and the change is frontend only.
 
 ## Capabilities
 
@@ -34,15 +34,15 @@ None.
 ### Modified Capabilities
 
 - `academic-programs/program-finder`: introduced by
-  `ace-91-program-finder-element`; gains the requirements for narrowing the
+  `ace-91-program-finder-element`. It gains the requirements for narrowing the
   options, for the match count and for announcing it.
 
 ## Impact
 
 - New TypeScript source, committed build output and import map in
   `academic_programs`.
-- The finder action and template hand a program-to-category map to the page
-  as a data attribute, and the template gains a visually hidden status
+- The finder action and template hand the categories of each program to the
+  page as one data attribute, and the template gains a visually hidden status
   region.
 - New `testJs` coverage below
   `packages/fgtclb/academic-programs/Tests/JavaScript/`.
@@ -52,16 +52,16 @@ None.
 
 - A server round trip per selection (topwire, a JSON endpoint).
 - Narrowing the filter of the program list element itself.
-- OR within a category type; the finder keeps one value per type.
+- OR within a category type. The finder keeps one value per type.
 - Backporting to branch `2`, which has no finder.
 
 ## Source
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `programs-studyplan-11`). Three of the six analysed projects carry their own
-code for this today, and a fourth plans the same. No YouTrack issue is filed
-yet; the change is renamed to `ace-<NNN>-finder-client-side-narrowing` when
-the issue is filed after implementation.
+code for this today, and a fourth plans the same.
 
-Relates to ACE-91 (its "only possible combinations" criterion; the element
-itself is `ace-91-program-finder-element`).
+Implements the rest of ACE-91, its criteria "works without reloading content"
+and "offers only possible combinations". The element itself was
+`ace-91-program-finder-element`, and ACE-91 names this change as its follow-up,
+so no issue of its own was filed.

@@ -18,15 +18,15 @@ packages/fgtclb/<extension>/
 
 The same applies to `packages-dev/*`. Nothing is required to exist: an extension
 without those directories contributes nothing to the build, and adding one is
-picked up without touching any configuration. Five extensions carry sources
-today: `academic-jobs` ships TypeScript only, and `academic-partners`,
-`academic-persons`, `academic-persons-edit` and `academic-study-plan` ship
-TypeScript and SCSS. `academic-persons` carries the public profile's
-`frontend/profile.ts` and `frontend/profile-detail.scss`, loaded by
-`Templates/Profile/Detail.html`, plus the `frontend/sticky-offset.ts` the
-editing view of `academic-persons-edit` shares with it through the import map.
-`academic-persons-edit` is the largest by a wide margin — nineteen TypeScript
-modules, one `_dependencies.d.ts` type declaration and
+picked up without touching any configuration. Six extensions carry sources
+today: `academic-jobs` and `academic-programs` ship TypeScript only, and
+`academic-partners`, `academic-persons`, `academic-persons-edit` and
+`academic-study-plan` ship TypeScript and SCSS. `academic-persons` carries the
+public profile's `frontend/profile.ts` and `frontend/profile-detail.scss`,
+loaded by `Templates/Profile/Detail.html`, plus the `frontend/sticky-offset.ts`
+the editing view of `academic-persons-edit` shares with it through the import
+map. `academic-persons-edit` is the largest by a wide margin — nineteen
+TypeScript modules, one `_dependencies.d.ts` type declaration and
 `frontend/profile-editing.scss`. Count them with
 `find packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript -name '*.ts' ! -name '*.d.ts' | wc -l`.
 
@@ -311,6 +311,33 @@ The configuration attributes follow the rule of the previous section. The
 parts of the map predate it: the module still finds them by id and by the class
 `map-partner`, and reads `data-lat`, `data-lng`, `data-name` and `data-link`.
 Moving those would be a change of its own, with a deprecation.
+
+## Data a module computes with arrives as one JSON attribute
+
+Configuration is a value per attribute, data is not. The program finder of
+`academic_programs` narrows its options to the combinations that find a
+program, and for that it needs the categories of every program of its
+storage. The finder action hands them over as one JSON list in
+`data-academic-programs-finder-programs` on the form, one list of category uids
+per program, and `Resources/Private/TypeScript/frontend/program-finder.ts`
+computes from it on every change, without a request. The uids of the programs
+stay out of the page: the module does not need them, and they differ between
+the two page trees `LegacyDeliveryTest` compares.
+
+- **The data comes from the query the element renders with.** The finder takes
+  the programs the list event hands back, so hidden programs, programs outside
+  the storage and programs a listener removed are not part of it, and the
+  browser cannot offer what the server would not.
+- **The server rules travel with the data, not with the module.** With
+  subcategories included, a program carries every ancestor of its categories in
+  the list. The module knows nothing of the category tree.
+- **An attribute that is no list disables nothing.** The module then does not
+  start and leaves the form as the server rendered it, which is the form a
+  visitor without JavaScript gets.
+- **The rendered page and the fixture are pinned to each other.**
+  `AcademicProgramsFinderTest` asserts the attributes and the programs of its
+  fixture on the rendered page, and `Tests/JavaScript/program-finder.test.ts`
+  drives the module on a copy of that markup with the same programs.
 
 ## Libraries come from the core
 
