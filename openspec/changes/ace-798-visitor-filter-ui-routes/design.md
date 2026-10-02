@@ -39,6 +39,16 @@ action validates the choices against `filterOptions` and answers with a 303
 redirect to the list URL, which the URI builder generates with a cHash or as
 a routed URL.
 
+The list keeps its demand in the cHash, so the redirect signs whatever it
+carries. Every carried value is therefore limited first: the filters to their
+options, the view mode to the allowed modes, the letter to the letters of the
+navigation, and the page is dropped. A hand-made submission gets no signed URL
+the list would not link itself.
+
+The redirect is thrown as a `PropagateResponseException`. A returned redirect
+reaches the browser on TYPO3 v13 only through `header()`, while the page
+renders all the same.
+
 Rejected: a GET form, as the candidate proposed. A browser-built GET URL
 carries no cHash, so TYPO3 renders it uncached, or rejects it where cHash
 validation is enforced. The Extbase hidden fields would also end up in the
@@ -49,30 +59,55 @@ CSP.
 ### Slug columns on both filter records
 
 `slug` is added to both tables (`type => slug`, generated from
-`function_name` or `unit_name`, `eval => uniqueInSite`). The routes map it
-with `PersistedAliasMapper`. For a record without a slug the mapper cannot
-generate, so the URI builder falls back to query parameters.
+`function_name` or `unit_name`, `eval => unique`). It is not an exclude
+field: the DataHandler generates the slug of a new record only when the user
+may write the field.
+
+The routes map it with `PersonsFilterSlugMapper`, a `PersistedAliasMapper`
+that returns no segment for an empty slug or one with a slash. The core mapper
+returns such a slug as it is stored, and Symfony's URL generator then throws an
+`InvalidParameterException` for the requirement of the route, which
+`PageRouter` does not catch. Without a segment the route is skipped and the URI
+builder falls back to query parameters.
+
+The frontend user synchronisation creates function types and units through
+Extbase, which knows no slug, so it generates the slug itself right after it
+persisted the record.
+
+Each translation has a slug of its own, generated from its translated name,
+so a German list reads `/funktion/professorin`. `unique` applies per
+language, and the mapper resolves a slug in the language of the request and
+its fallbacks.
+
+Changed from `uniqueInSite` during implementation: with `uniqueInSite` the
+mapper keeps only records stored inside the site that resolves the URL
+(`SiteAccessorTrait::filterContainedInSite()`), while generation does not
+check the site. A list whose records live in a folder of another site would
+link to a URL that answers 404. `unique` makes the slug unambiguous across the
+installation, so the mapper never has to choose.
 
 Rejected: `unique_name` of the organisational unit, which is not guaranteed
 URL safe and does not exist on function types. Also rejected: the uid without
 an aspect, which yields `/function/12?cHash=...`.
 
-### Decided: a console command fills existing slugs, no upgrade wizard
+### Decided: a repeatable upgrade wizard fills existing slugs
 
-A console command in the `academic:persons:*` namespace, registered in
-`Services.yaml` like the existing persons commands, fills the slug of every
-function type and organisational unit whose slug is empty. It generates each
-slug with the core `SlugHelper` from the field's TCA, so it produces what a
-save would, including `uniqueInSite`, and it leaves existing slugs untouched.
-Running it twice changes nothing. The upgrade chapter and the changelog tell
-integrators to run it once.
+A repeatable upgrade wizard, `academicPersons_fillFilterSlugs`, fills the slug
+of every live function type and organisational unit whose slug is empty. It
+writes through the DataHandler with an empty slug, which makes the DataHandler
+generate the slug from the name with the field's TCA, so it produces exactly
+what a save would, including `unique`. Existing slugs are untouched. It
+requires the database update first.
 
-Without a migration the mapper falls back to query parameters for every
-existing record until someone saves it, which may never happen. An upgrade
-wizard is not added while the branch supports TYPO3 v13: each wizard is a
-call site of the v15-blocking `Install\Attribute\UpgradeWizard` API
-(ACE-294), and the same rule applies to every change of this round. A console
-command is not such a call site. It is revisited with ACE-294.
+It is repeatable because a record can lose its slug after the upgrade: a
+workspace version made before it is published with an empty slug, and an
+import that writes the table directly leaves it empty. The wizard is offered
+again whenever a live record has no slug, and changes nothing otherwise.
+
+The first draft chose a console command, because every wizard is a call site
+of the v15-blocking `Install\Attribute\UpgradeWizard` API (ACE-294). The
+maintainer decided for the wizard: the upgrade module is where an integrator
+looks after an update, and the call site is one more for ACE-294 to migrate.
 
 Rejected: filling slugs only on save, which leaves the fallback in place
 indefinitely.
@@ -92,8 +127,10 @@ Both enhancers get these routes:
 
 That is eighteen explicit routes per enhancer. The filter key segments are
 `LocaleModifier` aspects (for example `function` and `funktion`, `unit` and
-`einheit`). Every variable gets explicit `requirements` of `[^/]+`, which
-also keeps the two-segment filter routes apart from `/{profile_name}`.
+`einheit`). Every variable gets explicit `requirements` of `[^/]+`.
+`/{profile_name}` of ListAndDetail has no requirement and matches any path. It
+stays apart from the filter routes because its mapper finds no profile for a
+path like `function/professor`, and the matcher then tries the next route.
 Pagination is off under a letter today; the follow-up change that allows it,
 decided with `ace-734-list-links-keep-state`, extends this route set with the
 letter and page combinations.
@@ -127,16 +164,25 @@ The documentation shows extending `routeEnhancers.ProfileListPlugin` in the
 site configuration. In one project, a second enhancer on the same plugin is
 what broke its routing.
 
+### The lists flush when a filter record changes
+
+The options of the form are read when the list is cached. A DataHandler run
+that writes a function type or an organisational unit, a save, a hide, a
+delete, a restore, a copy, a move or a translation, flushes the
+`profile_list_view` tag once, from the datamap and from the command map.
+Records the frontend user synchronisation creates through Extbase flush
+nothing, as the profiles it writes do not.
+
 ## Risks / Trade-offs
 
-- [Existing records have no slug until the command runs] → Their URL uses
-  query parameters and still works; the upgrade chapter names the command.
+- [Existing records have no slug until the wizard runs] → Their URL uses
+  query parameters and still works. The upgrade chapter names the wizard.
 - [Symfony omits only trailing defaults (ACE-623)] → Explicit routes per
   combination instead of optional segments; a routing test per route.
 - [One more request per filter submission] → The redirect target is cached,
   and the POST itself is cheap.
-- [Upgrade wizards are a TYPO3 v15 blocker (ACE-294)] → No wizard is added;
-  the console command carries the migration.
+- [Upgrade wizards are a TYPO3 v15 blocker (ACE-294)] → One more call site
+  for ACE-294, accepted for the upgrade module.
 - [Eighteen routes per enhancer] → Each gets a generation and a resolution
   test; the number follows from ACE-623, not from a choice.
 

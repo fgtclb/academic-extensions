@@ -80,7 +80,7 @@ The letter links drop `currentPage`, as they do today.
 Pagination while a letter is active will be allowed, but not in this change,
 which stays a pure refactoring of the links. A separate follow-up change lifts
 the rule in `listAction()` and adds the letter and page combinations to the
-route set of `ace-tbd-visitor-filter-ui-routes`.
+route set of `ace-798-visitor-filter-ui-routes`.
 
 Once links keep the letter, the switch-off has no technical reason left.
 Lifting it here would mix a behaviour change into the refactoring and change
@@ -103,7 +103,7 @@ stays off under a letter.
   value is carried only when it is a property of the demand on the visitor
   list. `ace-tbd-list-view-modes` states this for the view mode.
 - [Values without a route enhancer entry show up as query parameters] →
-  Accepted; `ace-tbd-visitor-filter-ui-routes` adds routes for the filters.
+  Accepted; `ace-798-visitor-filter-ui-routes` adds routes for the filters.
 
 ## Open Questions
 

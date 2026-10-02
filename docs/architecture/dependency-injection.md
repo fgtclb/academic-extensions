@@ -129,7 +129,7 @@ Measured with
 | `#[Autoconfigure]`   | 15    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
 | `#[Autowire]`        | 5     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
-| `#[Exclude]`         | 21    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
+| `#[Exclude]`         | 22    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
 | `#[AsEventListener]` | 8     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
@@ -146,7 +146,7 @@ attribute (see below): the `RegisterAcademicPageDoktype` and the
 extension to the compiled TCA.
 `#[AsTaggedItem]` and `#[AsController]` have zero sites.
 
-For the twenty-one `#[Exclude]` sites and why `LegacySettingsMigration` is among
+For the twenty-two `#[Exclude]` sites and why `LegacySettingsMigration` is among
 them, see [Class design](class-design.md#keep-data-objects-out-of-the-container).
 
 The `#[Autowire]` example is the clearest illustration of the two styles working
@@ -281,7 +281,7 @@ versions diverge:
 | `TYPO3\CMS\Backend\Attribute\AsAvatarProvider`, `AsSidebarComponent` | **no**   | yes             | no                             |
 
 `TYPO3\CMS\Extbase\Attribute\*` does not exist on v13 at all. The
-`Install\Attribute\UpgradeWizard` row is the one all sixteen upgrade wizards use:
+`Install\Attribute\UpgradeWizard` row is the one all seventeen upgrade wizards use:
 on v14 it survives as a deprecated subclass shim in
 `cms-core/DeprecatedClasses/ext-install/`, so it still works, but its
 replacement `Core\Attribute\UpgradeWizard` is absent on v13. Wizards were

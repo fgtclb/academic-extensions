@@ -17,7 +17,7 @@ upstream request.
 - Values outside the editor's restriction, unknown values and non-integer
   values are ignored.
 - The list view receives the filter options, ordered by name, for the form
-  that `ace-tbd-visitor-filter-ui-routes` adds. The page and letter links keep
+  that `ace-798-visitor-filter-ui-routes` adds. The page and letter links keep
   an active filter.
 - The card plugin, which shares the list FlexForm, hides both options.
 
@@ -53,7 +53,7 @@ None.
 ## Non-goals
 
 - The filter form and route enhancer entries
-  (`ace-tbd-visitor-filter-ui-routes`).
+  (`ace-798-visitor-filter-ui-routes`).
 - Multi-value filters and filters by other relations.
 - Filters for the card, selected profiles and selected contracts plugins.
 - A backport to branch `2`.
