@@ -11,8 +11,8 @@ See `proposal.md` for the motivation. On main:
   part of the cache hash.
 - `Program/ItemList.html` renders the results; there is no wrapper that
   identifies one list element on a page with several.
-- `academic_programs` ships no frontend module and no import map. The finder
-  narrowing change `ace-tbd-finder-client-side-narrowing` plans the first one.
+- `academic_programs` ships one frontend module, the finder module of
+  `ace-91-finder-client-side-narrowing`, and the import map it added.
 - Pull request #516 (ACE-91) replaced `#studyfinder-results` from a `fetch()`
   POST, removed the inline handlers without a replacement for a visitor
   without JavaScript, and did not update the address bar.
@@ -98,8 +98,8 @@ from the reload except by its speed.
 `Resources/Private/TypeScript/frontend/program-list.ts`, free of `enum`,
 `namespace`, parameter properties and decorators so `testJs` can run it,
 loaded by `SortingAndFilters.html` through `f:asset.module`, and published
-through `Configuration/JavaScriptModules.php`, which this change or the finder
-narrowing change adds, whichever lands first.
+through `Configuration/JavaScriptModules.php`, which the finder narrowing
+change added.
 
 ## Risks / Trade-offs
 

@@ -46,10 +46,9 @@ the list only requests them without a page reload.
 
 ## Impact
 
-- New TypeScript module, committed build output and import map in
-  `academic_programs`, which ships no frontend module today (the finder
-  narrowing change `ace-tbd-finder-client-side-narrowing` adds one too;
-  whichever lands first adds the import map).
+- New TypeScript module and committed build output in `academic_programs`,
+  next to the finder module and the import map the finder narrowing change
+  `ace-91-finder-client-side-narrowing` added.
 - The partials `Program/SortingAndFilters.html`, `Program/DemandCategories.html`,
   `Program/DemandSorting.html` and `Program/ItemList.html`.
 - New `testJs` coverage and functional tests for the markup contract.
@@ -61,7 +60,7 @@ the list only requests them without a page reload.
   can adopt the module once it exists.
 - A JSON endpoint or a page type of its own; see `design.md`.
 - The program finder; see `ace-91-program-finder-element` and
-  `ace-tbd-finder-client-side-narrowing`.
+  `ace-91-finder-client-side-narrowing`.
 - Backporting to branch `2`.
 
 ## Source
