@@ -599,6 +599,19 @@ Two consequences to keep in mind when adding a condition on a relation:
 two different contracts is not listed, and one with two matching contracts is
 listed once.
 
+The validity of "only contracts valid today" is a condition on the same alias
+(ACE-800). It is added only while the list has another condition on contracts,
+because on its own it would drop every profile whose contracts have all ended
+or not started yet, which the list keeps by design. A list whose result depends
+on the date that way caps its page cache lifetime with a query of its own over
+the contracts of its storage pages, the next day a matching contract starts or
+ends: `ProfileRepository::findNextContractValidityChange()`, which sees the
+demand after `ModifyProfileDemandEvent` like the list does. It cannot take the
+boundaries from the rendered profiles, because the contract that starts
+tomorrow belongs to a profile that is not listed today.
+`Tests/Functional/Plugins/AcademicPersonsFilterOnlyValidContractsTest.php` pins
+both.
+
 ## Asking a question about a list — reuse its query, not its rules
 
 The letter navigation of the persons list has to know which letters lead to a
