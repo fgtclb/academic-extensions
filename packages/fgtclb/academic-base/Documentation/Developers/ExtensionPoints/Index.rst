@@ -222,6 +222,10 @@ describe their events in detail, with examples.
             and by the profile editing of :guilabel:`academic_persons_edit`
         -   react to it; the profile, its site and the origin of the update
             are read only
+    *   -   :php:`\FGTCLB\AcademicPersons\Event\BeforeImportedRecordWriteEvent`
+        -   in the import writer of :guilabel:`academic_persons`, once for
+            every record of a person it is about to write
+        -   change the values that are written, veto the record
     *   -   :php:`\FGTCLB\AcademicPersons\Event\ChooseProfileFactoryEvent`
         -   in the commands :bash:`academic:createprofiles` and
             :bash:`academic:updateprofiles`, once per frontend user
@@ -436,6 +440,21 @@ them as they are; they are not meant to be subclassed or replaced.
     *   -   :php:`\FGTCLB\AcademicPersons\Import\ImportedRecordFinder`
         -   injected into import code, to find the person record that carries
             an import identifier, so the next run updates it
+    *   -   :php:`\FGTCLB\AcademicPersons\Import\ProfileImportWriter`
+        -   injected into import code, to create and update the persons of a
+            source and to retire the ones it no longer supplies
+    *   -   :php:`\FGTCLB\AcademicPersons\Import\ImportedProfile`,
+            :php:`\FGTCLB\AcademicPersons\Import\ImportedContract`,
+            :php:`\FGTCLB\AcademicPersons\Import\ImportedContact`
+        -   created by import code, one person each, and handed to the
+            import writer
+    *   -   :php:`\FGTCLB\AcademicPersons\Import\RetirePolicy`
+        -   handed to the import writer, to hide or to delete what a source
+            no longer supplies
+    *   -   :php:`\FGTCLB\AcademicPersons\Import\ImportResult`,
+            :php:`\FGTCLB\AcademicPersons\Import\ImportedRecordResult`,
+            :php:`\FGTCLB\AcademicPersons\Import\ImportedRecordOutcome`
+        -   returned by the import writer, what happened to each record
 
 ..  _developers-extension-points-base-classes:
 

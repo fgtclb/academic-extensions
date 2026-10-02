@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 350 PHP files declaring 308
-classes, 11 interfaces, 18 traits and 13 enums do not follow one style yet.
+rather than describing an intention as a rule: 359 PHP files declaring 315
+classes, 11 interfaces, 18 traits and 15 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-201 of the 308 classes are `final` (65 %). The distribution is not random: it
+208 of the 315 classes are `final` (66 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
@@ -29,7 +29,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 6     | 6     | 0        | 50 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
-| Everything else                            | 116   | 44    | 4        | 71 %    |
+| Everything else                            | 123   | 44    | 4        | 72 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 369 modifiers, of
-which 356 are constructor-promoted, across 110 files. The thirteen non-promoted
+`readonly` is used heavily, mostly on individual properties: 373 modifiers, of
+which 360 are constructor-promoted, across 111 files. The thirteen non-promoted
 declarations are the nine documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php`, the three
 fields `typo3-category-types/Classes/Routing/Aspect/CategoryFilterMapper.php`
@@ -74,7 +74,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 62:
+nothing**, and of an immutable data object. There are 68:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -98,7 +98,7 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 229   | An injected collaborator                          |
+| `private readonly`   | 233   | An injected collaborator                          |
 | `public readonly`    | 122   | A field of an immutable data object               |
 | `protected readonly` | 18    | Either, in classes with subclasses or older style |
 
@@ -119,8 +119,8 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 94 files declare
-308 promoted `readonly` parameters. The fullest example by a wide margin is
+Constructor injection with promoted properties is the default: 95 files declare
+312 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.
@@ -245,7 +245,7 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Twenty-two sites
+  sit under an excluded path. Twenty-seven sites
   (`grep -rn '#\[Exclude\]' --include='*.php' packages/fgtclb/*/Classes`):
   `Validation` and `ValidationSet` in `academic-base/Classes/Settings/`,
   `AfterSaveDecision` in `academic-base/Classes/Form/`, fourteen
@@ -253,7 +253,8 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
   settings graph, of the frontend user synchronisation and of the managed
   fields, plus `LegacySettingsMigration` and `SettingsOverride`), the two value
   objects of the contract selection, `ContractSelection` and
-  `ContractSelectionResult` in `academic-persons/Classes/Service/`, the
+  `ContractSelectionResult` in `academic-persons/Classes/Service/`, the five
+  data objects of the import writer in `academic-persons/Classes/Import/`, the
   upgrade wizard of `academic-persons` that a site package registers itself,
   and the two routing aspects the core builds itself, `CategoryFilterMapper`
   of `typo3-category-types` and `PersonsFilterSlugMapper` of
@@ -275,7 +276,7 @@ referenced it.
 
 ### Enums
 
-Thirteen, all backed, none pure
+Fifteen, all backed, none pure
 (`grep -rl '^enum' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes`):
 
 | Enum                                                                   | Backing  |
@@ -289,6 +290,8 @@ Thirteen, all backed, none pure
 | `academic-persons-edit/Classes/Event/ProfileEditingAction.php:25`      | `string` |
 | `academic-persons/Classes/DataHandling/ProfileWriteCorrelation.php:35` | `string` |
 | `academic-persons/Classes/Event/ProfileUpdateOrigin.php:21`            | `string` |
+| `academic-persons/Classes/Import/ImportedRecordOutcome.php:20`         | `string` |
+| `academic-persons/Classes/Import/RetirePolicy.php:20`                  | `string` |
 | `academic-persons/Classes/Profile/ProfileActionType.php:17`            | `string` |
 | `academic-persons/Classes/Service/ContractDisplay.php:15`              | `string` |
 | `academic-programs/Classes/Enumeration/ProgramFactsPlace.php:11`       | `string` |
