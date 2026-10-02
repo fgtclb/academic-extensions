@@ -1,6 +1,6 @@
 # The route enhancers of the academic extensions.
 #
-# None of the five files is loaded by TYPO3 on its own - a "Routes.yaml" or a
+# None of the seven files is loaded by TYPO3 on its own - a "Routes.yaml" or a
 # "Configuration/Routes/*.yaml" is inert until a site configuration imports it -
 # so without this block every detail page below is reachable only through a raw
 # "tx_...[...]" argument, and half of the seeded tree looks broken for a reason
@@ -14,12 +14,14 @@ imports:
   - resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
   - resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
   - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
-  - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
+  - resource: 'EXT:academic_partners/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_projects/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_programs/Configuration/Routes/List.yaml'
 
 # Bind every one of those enhancers to the pages that carry the plugin it
 # belongs to.
 #
-# Without this block TYPO3 offers all five to every page of the site, and the
+# Without this block TYPO3 offers all of them to every page of the site, and the
 # matcher takes the first candidate route whose path matches and whose aspects
 # also resolve. "ListAndDetail.yaml" and "Detail.yaml" declare a byte identical
 # "/{profile_name}" over the same slug mapper, so the one that is imported
@@ -49,6 +51,18 @@ routeEnhancers:
   # "/programs/list", "/programs/list-preset"
   AcademicPrograms:
     limitToPages: [1251, 1252]
+  # "/projects/list", "/projects/list-active"
+  AcademicProjectsList:
+    limitToPages: [1261, 1262]
+  # "/projects/selected"
+  AcademicProjectsListSingle:
+    limitToPages: [1263]
+  # "/partners/list", "/partners/list-preset"
+  AcademicPartnersList:
+    limitToPages: [1271, 1272]
+  # "/partners/map"
+  AcademicPartnersMap:
+    limitToPages: [1273]
 
 # Site of the "/legacy/" page tree - the 56 content pages of "academics",
 # delivered the way an installation that predates site sets delivers them. The

@@ -118,5 +118,7 @@ filter URL into a 404.
 
 - [List filter URLs](list-filter-urls.md): the filter argument this aspect
   maps, and why the demand is not part of the cache hash.
+- [List route enhancers](list-route-enhancers.md): the route files of the
+  lists that use the aspect.
 - [Database queries](database-queries.md): the quoting rules the queries of
   the aspect follow.

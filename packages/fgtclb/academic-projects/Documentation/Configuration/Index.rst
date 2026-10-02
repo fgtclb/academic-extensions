@@ -683,4 +683,5 @@ wizard.
    :titlesonly:
 
    General/Index
+   RouteEnhancers/Index
    Labels/Index

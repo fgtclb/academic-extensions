@@ -274,11 +274,12 @@ So each list extension appends its demand to
 makes it a prefix, so every key below `demand` is excluded. The actions are not
 cacheable, so nothing the cached page holds depends on the demand, and every
 filter URL of a list shares one page cache entry. The URL still carries a
-`cHash` — over `action` and `controller`. Behind the program route enhancer
-`academic_programs` ships, which maps those and puts the sorting into the path,
-it carries none, and each of the six sorting paths is a page cache entry of its
-own: those segments are static route arguments, and the page cache identifier
-contains them.
+`cHash`, over `action` and `controller`. Behind the route enhancers the three
+lists ship, which map those and put the demand into the path, it carries none,
+and each sorting path is a page cache entry of its own: those segments are
+static route arguments, like the `action` and `controller` the route maps,
+and the page cache identifier contains them. See
+[List route enhancers](list-route-enhancers.md#static-values-and-the-page-cache).
 
 The `CategoryFilterMapper` aspect of `category_types` puts the filter into a
 readable path without changing any of this: it is not static mappable, so the
@@ -333,15 +334,17 @@ renders as usual, with the demand of the URL.
 Symfony routing leaves a variable that equals its default out of a generated
 path. An enhancer with `defaults` for the sorting therefore turns the redirect
 for the default sorting and no filter into the bare page URL — and the preset
-is back. The enhancer `academic_programs` ships in
-`Configuration/Yaml/Routes.yaml` declares none for that reason, so
-`/title/asc` is always part of the path, and
-`Routing/ProgramListRouteEnhancerTest` asserts it. The same holds for any
-enhancer a site writes itself.
+is back. The enhancers the partner, project and program lists ship in
+`Configuration/Routes/List.yaml` declare none for that reason, so
+`/title/asc` is always part of the path, and each extension's
+`Unit/Configuration/ListRoutesTest` and `Routing/*ListRouteEnhancerTest` assert
+it. The same holds for any enhancer a site writes itself.
 
-The price: a link to the list that carries no sorting, such as the form's own
-action URL, does not enter the route and keeps its plugin arguments in the query
-string, and a path with the sorting field alone does not resolve.
+The price is one route per combination of the arguments, see
+[List route enhancers](list-route-enhancers.md#one-route-per-combination). A
+link to the list that carries no argument at all, such as the form's own
+action URL, enters no route and keeps its plugin arguments in the query string,
+and a path with the sorting field alone does not resolve.
 
 ## Why the actions stay non-cacheable
 
