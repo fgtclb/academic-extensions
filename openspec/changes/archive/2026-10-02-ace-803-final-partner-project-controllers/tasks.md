@@ -92,4 +92,4 @@
   only summarize and link.
 - [x] 6.6 The commit message follows the TYPO3 Core format with the verified
   `ACE-803` key in subject and footer.
-- [ ] 6.7 Archive the change as the last commit of the pull request.
+- [x] 6.7 Archive the change as the last commit of the pull request.
