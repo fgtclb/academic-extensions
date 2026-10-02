@@ -57,8 +57,8 @@ identifier lists such as `CType` values or category type keys.
 
 ### Why this works — verified in the pinned core trees
 
-Verified against the two development instances, which their tracked
-`composer.lock` pins: `core-13/vendor/` carries **TYPO3 v13.4.34** and
+Verified against the two development instances, at the versions their tracked
+`composer.lock` pinned then: `core-13/vendor/` carried **TYPO3 v13.4.34** and
 `core-14/vendor/` **v14.3.6**, both with `doctrine/dbal` 4.4.4. The line
 numbers below are keyed to those two trees rather than to `.Build/vendor/`,
 which carries whichever version the last `composerUpdate -t 13|14` installed.

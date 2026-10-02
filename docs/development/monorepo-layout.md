@@ -310,12 +310,11 @@ rather than once per consuming package. Every `typo3/cms-*` entry in
 `packages-dev/monorepo-shared/composer.json:27-50` reads:
 
 ```
-"typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev",
+"typo3/cms-core": "~13.4.35 || ~14.3.7",
 ```
 
-Raising the supported v14 patch level, or adding v15 later, is one edit in that
-file. The individual extensions declare only the system extensions they
-themselves use, and adding a system extension for a test only needs it added
+The lower bound of each range is the latest patch release when it was last
+raised (ACE-471). Adding a system extension for a test only needs it added
 here.
 
 Its `Tests/Unit/` holds the checks that concern all extensions at once: every
@@ -326,6 +325,36 @@ tags have to match the extension points page, no file may name an issue key of
 a customer project, and the links of every manual have to lead to its own
 package. See
 [Unit tests](../testing/unit-tests.md#the-ext_emconfphp-dependency-keys).
+
+### Raising the supported core patch level
+
+The same range is not declared in that file alone. Every extension and every
+fixture extension repeats it for the system extensions it names, and so does
+the `academics_dev_site` seed package. A raise therefore touches all of them
+together:
+
+1. `packages-dev/monorepo-shared/composer.json`, the `composer.json` of every
+   package below `packages/fgtclb/`, fixture extensions included, and
+   `packages-dev/dev-site/composer.json`: every `typo3/cms-*` entry of
+   `require` and `require-dev`, set in the package directory with
+   `composer require --no-update "typo3/cms-…:~13.4.<patch> || ~14.3.<patch>"`.
+   Every TYPO3 extension requires `typo3/cms-core` at least.
+2. Every `ext_emconf.php` below `packages/fgtclb/`: `typo3`, `core` and every
+   other system extension in `depends` and `suggests` carry the range
+   `13.4.<patch>-14.3.99`. Set it with `pkw extemconf:constraints:set`, which
+   moves the key it sets to the end of its list. Set `typo3` and `core` first and
+   everything after them in its existing order, so the academic keys stay last
+   (see [Unit tests](../testing/unit-tests.md#the-form-binset-version-writes)).
+3. `core-13/composer.json` and `core-14/composer.json` with `ddev composer
+   require --no-update`, then a `ddev composer update 'typo3/*' 'fgtclb/*' -W
+   --minimal-changes` inside each instance, so the tracked `composer.lock`
+   moves only as far as the raise needs.
+4. The committed database templates, when the patch release changes the core
+   schema: `ddev composer sqlite:apply`, `vendor/bin/typo3 extension:setup` and
+   `ddev composer sqlite:backup` in each instance, see
+   [Database backup and restore](instances.md#database-backup-and-restore).
+5. An `Important-*.rst` changelog entry in every extension naming the new
+   lower bounds.
 
 ## `packages-dev/testing-helper/` — shared test traits
 

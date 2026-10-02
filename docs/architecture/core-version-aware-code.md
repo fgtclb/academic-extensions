@@ -438,8 +438,9 @@ carries whichever version the last `composerUpdate -t 13|14` installed
 (`.Build/vendor/typo3/cms-core/Classes/Information/Typo3Version.php`, the
 `VERSION` constant), so only one half of each claim is verifiable at a time.
 The other half is checked against the development instances `core-13/vendor/`
-and `core-14/vendor/`, which their tracked `composer.lock` pins to **v13.4.34**
-and **v14.3.6** — the two versions the table below names.
+and `core-14/vendor/`, which their tracked `composer.lock` pinned to
+**v13.4.34** and **v14.3.6** when the table below was verified. Those are the
+two versions it names.
 
 In all three cases the old name still works on v14 — deprecated, not removed —
 so the code compiles and runs on both versions today. What blocks the migration

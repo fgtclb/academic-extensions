@@ -9,8 +9,8 @@
         "fgtclb/environment-state-manager": "^2.0.1@dev",
         "symfony/serializer": "^6.4.26 || ^7.3.4",
         "symfony/yaml": "^6.4.26 || ^7.3.4",
-        "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev",
-        "typo3/cms-extbase": "~13.4.0@dev || ~14.3.6@dev"
+        "typo3/cms-core": "~13.4.35 || ~14.3.7",
+        "typo3/cms-extbase": "~13.4.35 || ~14.3.7"
     },
     "config": {
         "sort-packages": true
