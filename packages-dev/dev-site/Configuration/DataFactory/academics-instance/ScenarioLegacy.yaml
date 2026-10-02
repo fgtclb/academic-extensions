@@ -122,6 +122,7 @@ entities:
                       demand.sortBy = lastName
                       demand.sortByDirection = asc
                       pagination.resultsPerPage = 10
+                      alphabet.activeLetterResets = 1
                   }
 
                   plugin.tx_academicjobs {
@@ -131,6 +132,20 @@ entities:
                       saveForm.fallbackRedirectPageId = 1235
                       email.from = seed-noreply@example.org
                       email.recipientEmail = jobs@example.org
+                  }
+
+                  plugin.tx_academicprograms {
+                      page.listPid = 1251
+                      facts.mostSpecificOnly = 1
+                      filter.visibleCount = 4
+                  }
+
+                  plugin.tx_academicprojects {
+                      filter.hideDisabledOptions = 1
+                  }
+
+                  plugin.tx_academicstudyplan {
+                      filter.collapsible = 1
                   }
         content:
           - self:
@@ -308,13 +323,22 @@ entities:
                                               <value index="vDEF">list</value>
                                           </field>
                                           <field index="settings.showFields">
-                                              <value index="vDEF">contracts.position,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
+                                              <value index="vDEF">contracts.position,contracts.functionType,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
                                           </field>
                                           <field index="settings.fallbackForNonTranslated">
                                               <value index="vDEF">1</value>
                                           </field>
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">0</value>
+                                          </field>
+                                          <field index="settings.filter.functionType">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                          <field index="settings.filter.organisationalUnit">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                          <field index="settings.contracts.onlyValid">
+                                              <value index="vDEF">1</value>
                                           </field>
                                       </language>
                                   </sheet>
@@ -359,13 +383,22 @@ entities:
                                                   <value index="vDEF">list</value>
                                               </field>
                                               <field index="settings.showFields">
-                                                  <value index="vDEF">contracts.position,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
+                                                  <value index="vDEF">contracts.position,contracts.functionType,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
                                               </field>
                                               <field index="settings.fallbackForNonTranslated">
                                                   <value index="vDEF">1</value>
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                              <field index="settings.filter.functionType">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.filter.organisationalUnit">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.contracts.onlyValid">
+                                                  <value index="vDEF">1</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -513,6 +546,9 @@ entities:
                                           <field index="settings.fallbackForNonTranslated">
                                               <value index="vDEF">0</value>
                                           </field>
+                                          <field index="settings.contracts.matchFilter">
+                                              <value index="vDEF">1</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -561,6 +597,9 @@ entities:
                                               <field index="settings.fallbackForNonTranslated">
                                                   <value index="vDEF">0</value>
                                               </field>
+                                              <field index="settings.contracts.matchFilter">
+                                                  <value index="vDEF">1</value>
+                                              </field>
                                           </language>
                                       </sheet>
                                   </data>
@@ -604,6 +643,9 @@ entities:
                                           <field index="settings.fallbackForNonTranslated">
                                               <value index="vDEF">1</value>
                                           </field>
+                                          <field index="settings.filter.organisationalUnit">
+                                              <value index="vDEF">1</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -635,6 +677,9 @@ entities:
                                                   <value index="vDEF">list</value>
                                               </field>
                                               <field index="settings.fallbackForNonTranslated">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.filter.organisationalUnit">
                                                   <value index="vDEF">1</value>
                                               </field>
                                           </language>
@@ -732,6 +777,9 @@ entities:
                                           <field index="settings.fallbackForNonTranslated">
                                               <value index="vDEF">1</value>
                                           </field>
+                                          <field index="settings.contracts.display">
+                                              <value index="vDEF">first</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -760,6 +808,9 @@ entities:
                                               </field>
                                               <field index="settings.fallbackForNonTranslated">
                                                   <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.contracts.display">
+                                                  <value index="vDEF">first</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -1391,6 +1442,9 @@ entities:
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">1</value>
                                           </field>
+                                          <field index="settings.groupByRole">
+                                              <value index="vDEF">0</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -1410,6 +1464,9 @@ entities:
                                           <language index="lDEF">
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.groupByRole">
+                                                  <value index="vDEF">0</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -1492,6 +1549,16 @@ entities:
                                           </field>
                                       </language>
                                   </sheet>
+                                  <sheet index="pagination">
+                                      <language index="lDEF">
+                                          <field index="settings.paginationEnabled">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                          <field index="settings.pagination.resultsPerPage">
+                                              <value index="vDEF">3</value>
+                                          </field>
+                                      </language>
+                                  </sheet>
                               </data>
                           </T3FlexForms>
                     languageVariants:
@@ -1512,6 +1579,16 @@ entities:
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                          </language>
+                                      </sheet>
+                                      <sheet index="pagination">
+                                          <language index="lDEF">
+                                              <field index="settings.paginationEnabled">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.pagination.resultsPerPage">
+                                                  <value index="vDEF">3</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -1985,7 +2062,7 @@ entities:
               - self:
                     id: 214
                     label: 'Reflection seminar'
-                    credit_points: 2
+                    credit_points: 1.5
                     categories: '3'
                 languageVariants:
                   - self:
@@ -1995,7 +2072,7 @@ entities:
               - self:
                     id: 215
                     label: 'Career workshop'
-                    credit_points: 2
+                    credit_points: 2.5
                     categories: '2'
                 languageVariants:
                   - self:
@@ -2040,6 +2117,8 @@ entities:
                     CType: 'academic_study_plan'
                     header: 'Bachelor of Engineering, study plan'
                     header_layout: 1
+                    frame_class: 'ruler-before'
+                    space_before_class: 'medium'
                     tx_academicstudyplan_semesters: '201,202,203,204,205,206'
                     tx_academicstudyplan_footer_note: 'Subject to change. The module handbook is the binding document.'
                 languageVariants:
@@ -2049,6 +2128,8 @@ entities:
                         CType: 'academic_study_plan'
                         header: 'Bachelor of Engineering, Studienplan'
                         header_layout: 1
+                        frame_class: 'ruler-before'
+                        space_before_class: 'medium'
                         tx_academicstudyplan_semesters: '701,702,703,704,705,706'
                         tx_academicstudyplan_footer_note: 'Änderungen vorbehalten. Verbindlich ist das Modulhandbuch.'
         - self:
@@ -2138,6 +2219,9 @@ entities:
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">0</value>
                                           </field>
+                                          <field index="settings.filter.includeSubcategories">
+                                              <value index="vDEF">1</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -2171,6 +2255,9 @@ entities:
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                              <field index="settings.filter.includeSubcategories">
+                                                  <value index="vDEF">1</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -2327,10 +2414,12 @@ entities:
                   lastUpdated: 1748779200
                   doktype: 20
                   backend_layout: 'pagets__AcademicProgram'
-                  categories: '1,3,5,7,9,10,11,12,13'
+                  categories: '1,3,5,7,9,10,11,12,13,29'
                   subtitle: 'Six semesters, full time'
                   abstract: 'An engineering degree with a focus on web technologies.'
                   credit_points: 180
+                  application_link: 'https://example.org/apply/bachelor-of-engineering'
+                  application_link_label: 'Apply for this programme'
                   job_profile: '<p>Software engineering, systems integration, technical consulting.</p>'
                   performance_scope: '<p>180 credit points over six semesters, including a practical semester.</p>'
                   prerequisites: '<p>University entrance qualification, no admission restriction.</p>'
@@ -2344,10 +2433,12 @@ entities:
                       lastUpdated: 1748779200
                       doktype: 20
                       backend_layout: 'pagets__AcademicProgram'
-                      categories: '1,3,5,7,9,10,11,12,13'
+                      categories: '1,3,5,7,9,10,11,12,13,29'
                       subtitle: 'Six semesters, full time'
                       abstract: 'An engineering degree with a focus on web technologies.'
                       credit_points: 180
+                      application_link: 'https://example.org/apply/bachelor-of-engineering'
+                      application_link_label: 'Für diesen Studiengang bewerben'
                       job_profile: '<p>Software engineering, systems integration, technical consulting.</p>'
                       performance_scope: '<p>180 credit points over six semesters, including a practical semester.</p>'
                       prerequisites: '<p>University entrance qualification, no admission restriction.</p>'
@@ -2440,10 +2531,11 @@ entities:
                   lastUpdated: 1748692800
                   doktype: 20
                   backend_layout: 'pagets__AcademicProgram'
-                  categories: '2,4,6,8'
+                  categories: '2,4,6,8,30'
                   subtitle: 'Four semesters, full time'
                   abstract: 'A research oriented master programme.'
                   credit_points: 120
+                  application_link: 'https://example.org/apply/master-of-science'
                   job_profile: '<p>Research, data engineering, software architecture.</p>'
                   prerequisites: '<p>A bachelor degree in a related subject.</p>'
               languageVariants:
@@ -2455,10 +2547,11 @@ entities:
                       lastUpdated: 1748692800
                       doktype: 20
                       backend_layout: 'pagets__AcademicProgram'
-                      categories: '2,4,6,8'
+                      categories: '2,4,6,8,30'
                       subtitle: 'Four semesters, full time'
                       abstract: 'A research oriented master programme.'
                       credit_points: 120
+                      application_link: 'https://example.org/apply/master-of-science'
                       job_profile: '<p>Research, data engineering, software architecture.</p>'
                       prerequisites: '<p>A bachelor degree in a related subject.</p>'
               entities:
@@ -2811,6 +2904,9 @@ entities:
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">0</value>
                                           </field>
+                                          <field index="settings.showActiveStateBadge">
+                                              <value index="vDEF">1</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -2849,6 +2945,9 @@ entities:
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                              <field index="settings.showActiveStateBadge">
+                                                  <value index="vDEF">1</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -3036,9 +3135,10 @@ entities:
                   slug: '/projects/accessible-learning-platform'
                   doktype: 30
                   backend_layout: 'pagets__AcademicProject'
+                  subtitle: 'Learning without barriers'
                   categories: '17,19,21'
                   tx_academicprojects_project_title: 'Accessible learning platform (ALP)'
-                  tx_academicprojects_short_description: '<p>A learning platform built against WCAG 2.2 from the first commit.</p>'
+                  tx_academicprojects_short_description: '<p>A learning platform built against <a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> from the first commit.</p>'
                   tx_academicprojects_start_date: 1640995200
                   tx_academicprojects_end_date: 2082758400
                   tx_academicprojects_budget: '450000.00'
@@ -3052,9 +3152,10 @@ entities:
                       slug: '/projekte/barrierefreie-lernplattform'
                       doktype: 30
                       backend_layout: 'pagets__AcademicProject'
+                      subtitle: 'Lernen ohne Barrieren'
                       categories: '17,19,21'
                       tx_academicprojects_project_title: 'Accessible learning platform (ALP)'
-                      tx_academicprojects_short_description: '<p>A learning platform built against WCAG 2.2 from the first commit.</p>'
+                      tx_academicprojects_short_description: '<p>A learning platform built against <a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> from the first commit.</p>'
                       tx_academicprojects_start_date: 1640995200
                       tx_academicprojects_end_date: 2082758400
                       tx_academicprojects_budget: '450000.00'
@@ -3339,6 +3440,16 @@ entities:
                                           </field>
                                       </language>
                                   </sheet>
+                                  <sheet index="pagination">
+                                      <language index="lDEF">
+                                          <field index="settings.paginationEnabled">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                          <field index="settings.pagination.resultsPerPage">
+                                              <value index="vDEF">2</value>
+                                          </field>
+                                      </language>
+                                  </sheet>
                               </data>
                           </T3FlexForms>
                     languageVariants:
@@ -3370,6 +3481,16 @@ entities:
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                          </language>
+                                      </sheet>
+                                      <sheet index="pagination">
+                                          <language index="lDEF">
+                                              <field index="settings.paginationEnabled">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.pagination.resultsPerPage">
+                                                  <value index="vDEF">2</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -3642,6 +3763,7 @@ entities:
                   lastUpdated: 1748260800
                   doktype: 40
                   backend_layout: 'pagets__AcademicPartner'
+                  subtitle: 'The association behind TYPO3'
                   categories: '22,24,25'
                   abbreviation: 'T3A'
                   address_street: 'Sihlbruggstrasse'
@@ -3666,6 +3788,7 @@ entities:
                       lastUpdated: 1748260800
                       doktype: 40
                       backend_layout: 'pagets__AcademicPartner'
+                      subtitle: 'Der Verein hinter TYPO3'
                       categories: '22,24,25'
                       abbreviation: 'T3A'
                       address_street: 'Sihlbruggstrasse'
