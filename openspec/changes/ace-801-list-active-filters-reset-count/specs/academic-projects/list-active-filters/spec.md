@@ -20,17 +20,37 @@ that selection removed and every other selection kept.
 - **AND** the "completed" tag links to the list with the competence field kept
   and the default active state
 
+#### Scenario: The state select is hidden
+
+- **WHEN** active filter tags are enabled and the content element hides the
+  state select and presets the state "completed"
+- **THEN** no tag is shown for the state
+- **AND** a category tag keeps the state "completed" in its link
+
 ### Requirement: A reset link clears every filter
 
-When the integrator enables the reset link and at least one selection
-differs from the default, the project lists SHALL render a link to the same
-list without any filter argument.
+When the integrator enables the reset link, the list shows a selection the
+visitor made and a category or an active state other than "all" is selected or
+preset by the content element, the project lists SHALL render a link to the
+same page without any filter argument.
 
 #### Scenario: Visitor resets the filters
 
 - **WHEN** the reset link is enabled and the visitor follows it
-- **THEN** the project list is shown as the content element presets it, with
-  the default active state
+- **THEN** the project list is shown as the content element presets it,
+  categories and active state included
+
+#### Scenario: Nothing to reset
+
+- **WHEN** the reset link is enabled, the content element presets no category
+  and the state "all", and the visitor changed the sorting only
+- **THEN** no reset link is shown
+
+#### Scenario: The list shows the preset state
+
+- **WHEN** the reset link is enabled and a visitor opens a list whose content
+  element presets the state "completed", without selecting anything
+- **THEN** a tag "Completed" is shown and no reset link
 
 ### Requirement: The number of results is shown
 
@@ -44,8 +64,8 @@ the total number of matching projects with a singular or plural label.
 
 ### Requirement: The additions are off by default
 
-Without explicit configuration the project lists MUST render exactly the
-markup they rendered before this change.
+Without explicit configuration the project lists MUST render none of the
+tags, the reset link and the count.
 
 #### Scenario: Site without the new settings
 

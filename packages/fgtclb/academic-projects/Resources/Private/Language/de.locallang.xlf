@@ -24,6 +24,18 @@
         <source>More filters</source>
         <target>Weitere Filter</target>
       </trans-unit>
+      <trans-unit id="filter.activeFilters.label">
+        <source>Active filters</source>
+        <target>Aktive Filter</target>
+      </trans-unit>
+      <trans-unit id="filter.activeFilters.remove">
+        <source>Remove filter: %s</source>
+        <target>Filter entfernen: %s</target>
+      </trans-unit>
+      <trans-unit id="filter.reset">
+        <source>Reset all filters</source>
+        <target>Alle Filter zurücksetzen</target>
+      </trans-unit>
       <trans-unit id="sys_category.projects.project_department">
         <source>Department</source>
         <target>Organisationseinheit</target>
@@ -173,6 +185,14 @@
       <trans-unit id="list.noProjectsFound">
         <source>No projects found.</source>
         <target>Keine Projekte gefunden.</target>
+      </trans-unit>
+      <trans-unit id="list.resultCount.singular">
+        <source>%d project found</source>
+        <target>%d Projekt gefunden</target>
+      </trans-unit>
+      <trans-unit id="list.resultCount.plural">
+        <source>%d projects found</source>
+        <target>%d Projekte gefunden</target>
       </trans-unit>
     </body>
   </file>

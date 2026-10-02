@@ -80,10 +80,42 @@ override and need no plural support from the label parser; whether
 `f:translate` offers plural selection on both core versions is therefore not
 a dependency of this change.
 
+### Decided during implementation
+
+- **The reset link follows the visitor's selection and what can be reset.** On
+  the bare page the list shows the content element's preselection, and the
+  reset link would lead to the page shown. After the visitor removed a
+  preselected category no filter is active, and the reset link is the one way
+  back to it. With nothing selected and nothing preselected it would reset no
+  more than the sorting or the page. Each list action assigns
+  `visitorSelection` (`$demand !== null`, the factories' own test for applying
+  the preselection), and the link is offered while it is true and a category
+  (projects: or a state other than `all`) is selected or preset.
+  Rejected: comparing the selection with the preselection, which needs the
+  preselection loaded a second time for a link.
+- **Tags and the reset link follow the filter's visibility.** Where the
+  content element hides the filter (projects: the state select), the visitor
+  cannot change it, and a tag would let them. The count is shown regardless.
+- **The partner map shows the count too.** It renders the same partial as the
+  list, and on the map it counts the partners drawn.
+- **The tag links of the map name `map`.** Extbase gives a template no access to
+  the action it runs in, so `Templates/Partner/Map.html` sets `filterAction`.
+  Without it the partial links to `list`, which the map plugin answers with its
+  default action under a second URL.
+- **The tags loop over `allCategoriesByType`.** `CategoryCollection` is an
+  `\Iterator` with a single position, and the ViewHelper walks the same
+  collection inside the template's loop, which ended the loop after the first
+  tag. The arrays per type also put the tags in the order of the filters.
+- **`CategoryFilterNormalizer::toFilterArgument()` takes the category to leave
+  out** as an optional second argument. The ViewHelper only adapts its
+  arguments to it.
+- **Settings in TypoScript and site settings, as decided.** The site settings
+  are declared with each aggregate set next to the other filter settings.
+
 ## Risks / Trade-offs
 
-- [`listings-08` lands later or with another namespace] → this change adopts
-  whatever namespace it settles on; the three keys are named here only.
+- [`listings-08` lands later or with another namespace] → it landed as
+  ACE-739 with `settings.filter`, which this change uses.
 - [Tag titles come from the default language in a strict-fallback site] →
   the titles are those of the resolved filter categories, which the factory
   loads in the current language; covered by a test in a translated fixture.

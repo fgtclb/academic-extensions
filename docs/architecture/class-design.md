@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 348 PHP files declaring 307
-classes, 11 interfaces, 17 traits and 13 enums do not follow one style yet.
+rather than describing an intention as a rule — 350 PHP files declaring 308
+classes, 11 interfaces, 18 traits and 13 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-195 of the 307 classes are `final` (64 %). The distribution is not random: it
+196 of the 308 classes are `final` (64 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
@@ -26,7 +26,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/EventListener/`                   | 12    | 1     | 0        | 92 %    |
 | `Classes/Controller/`                      | 4     | 5     | 0        | 44 %    |
 | `Classes/Domain/Model/Dto/`                | 8     | 10    | 1        | 42 %    |
-| `Classes/ViewHelpers/`                     | 5     | 6     | 0        | 45 %    |
+| `Classes/ViewHelpers/`                     | 6     | 6     | 0        | 50 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
 | Everything else                            | 116   | 44    | 4        | 71 %    |
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 353 modifiers, of
-which 340 are constructor-promoted, across 106 files. The thirteen non-promoted
+`readonly` is used heavily, mostly on individual properties: 354 modifiers, of
+which 341 are constructor-promoted, across 107 files. The thirteen non-promoted
 declarations are the nine documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php`, the three
 fields `typo3-category-types/Classes/Routing/Aspect/CategoryFilterMapper.php`
@@ -391,8 +391,8 @@ The four traits under `packages/fgtclb/*/Classes/` follow the rule:
 | `GetSelectItemsForTcaManagedTableFieldMethodTrait` | the request, the localization utility, the extension key, the table, the field and the values to drop, and hands `$this` to the item provider as the calling object |
 | `TtContentListTypeColumnTrait`                     | the connection pool                                                                                                                                                 |
 
-The thirteen traits of `packages-dev/testing-helper/` are the exception. They
-are used only in test cases, twelve of them only in functional ones, so they
+The fourteen traits of `packages-dev/testing-helper/` are the exception. They
+are used only in test cases, thirteen of them only in functional ones, so they
 call `$this->get()`, the assertions and the other helpers of the test case, and
 two declare properties: one keeps a backup of the TCA, one a fixed map of
 retired core labels. See [Testing helper](../testing/testing-helper.md).

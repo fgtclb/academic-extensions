@@ -20,6 +20,15 @@
       <trans-unit id="filter.moreFilters">
         <source>More filters</source>
       </trans-unit>
+      <trans-unit id="filter.activeFilters.label">
+        <source>Active filters</source>
+      </trans-unit>
+      <trans-unit id="filter.activeFilters.remove">
+        <source>Remove filter: %s</source>
+      </trans-unit>
+      <trans-unit id="filter.reset">
+        <source>Reset all filters</source>
+      </trans-unit>
       <trans-unit id="sys_category.projects.project_department">
         <source>Department</source>
       </trans-unit>
@@ -124,6 +133,12 @@
 
       <trans-unit id="list.noProjectsFound">
         <source>No projects found.</source>
+      </trans-unit>
+      <trans-unit id="list.resultCount.singular">
+        <source>%d project found</source>
+      </trans-unit>
+      <trans-unit id="list.resultCount.plural">
+        <source>%d projects found</source>
       </trans-unit>
     </body>
   </file>

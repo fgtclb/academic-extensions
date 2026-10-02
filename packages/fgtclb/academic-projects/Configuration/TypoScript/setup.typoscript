@@ -20,6 +20,9 @@ plugin.tx_academicprojects {
       categoryTypes = {$plugin.tx_academicprojects.filter.categoryTypes}
       visibleCount = {$plugin.tx_academicprojects.filter.visibleCount}
       hideDisabledOptions = {$plugin.tx_academicprojects.filter.hideDisabledOptions}
+      showActiveFilters = {$plugin.tx_academicprojects.filter.showActiveFilters}
+      showReset = {$plugin.tx_academicprojects.filter.showReset}
+      showResultCount = {$plugin.tx_academicprojects.filter.showResultCount}
     }
 
     # The state badge of the project cards, switched on per content element. A content

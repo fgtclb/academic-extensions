@@ -4,8 +4,8 @@ The filter and sorting forms of the partner, project and program lists submit
 by POST. Each list plugin answers that submission with a `303 See Other` to
 itself, carrying the selection as GET arguments — so a filtered list has a URL
 of its own that can be bookmarked, shared and reloaded, and that a link can
-carry. The pagination of the partner list builds on it, and so do the planned
-active filter and route enhancer changes.
+carry. The pagination of the partner list, the active filter tags and the
+route enhancers build on it.
 
 This page is about the **shape** of that URL and the reasons behind it. What an
 integrator sees is documented in each extension's changelog.
@@ -107,6 +107,64 @@ The pattern is the one of the profile list of `academic_persons` -
 `QueryResultPaginator`, `NumberedPagination` when `numbered_pagination` is
 loaded and `SimplePagination` otherwise - whose page argument sits in the
 demand too, and whose links are built as the next section describes.
+
+## Active filter tags and the reset link
+
+The partner, project and program lists can show the active filters as tags,
+a reset link and the number of results, each switched on per site
+(`settings.filter.showActiveFilters`, `showReset`, `showResultCount`, all off
+by default). The partials are `<Extension>/ActiveFilters.html` and
+`<Extension>/ResultCount.html`, rendered by `SortingAndFilters.html`.
+
+- **A tag links to the list without its selection**, in the shape above. The
+  filter argument comes from `ct:filterArgument` of `category_types`, which
+  returns `CategoryFilterNormalizer::toFilterArgument()` of the demand's filter
+  collection with one category left out, so a tag and a submitted form lead to
+  the same URL. The template adds the sorting and, for projects, the active
+  state. An active state other than `all` is a tag of its own and links to
+  `all`.
+- **The tags read the demand after the demand event**, unlike the pagination
+  links: they show what the selects of the form show, which is the demand the
+  list was found with. A category a listener adds to every request is a tag the
+  visitor cannot remove, because the listener adds it again on the page the tag
+  leads to, and the other tag links carry it.
+- **Every selected category is a tag**, also one of a type the form does not
+  offer, a preset one for example. The tags read `allCategoriesByType`, which
+  holds the categories of the types the collection was created for: all of them
+  for the collections the factories build, none for a collection a listener
+  creates without type identifiers.
+- **A tag without a category left still carries the sorting.** Removing the
+  last category must not lead to the bare page, which would apply the editor's
+  preselection again, the reason the sorting is always carried at all.
+- **An empty filter is left out of a link**, not sent as an empty value: a
+  route enhancer cannot generate one (`createDemandArguments()` omits it for
+  the same reason). Fluid cannot drop a key from an array literal, so the
+  partials choose between two literals.
+- **The reset link is the bare page**, `f:link.page` without arguments, where
+  the content element's preselection applies. It is offered when the request
+  carried a demand argument and a category is selected or preselected (for
+  projects also a state other than `all`): each list action assigns
+  `visitorSelection` (`$demand !== null`, the factories' own test for applying
+  the preselection), and the partial checks the demand and the element's
+  `settings.categories` and `settings.activeState`. On the bare page the link
+  would lead to the page shown, after the visitor removed a preselected
+  category it is the one way back to it, and with nothing selected and nothing
+  preselected it would reset no more than the sorting or the page.
+- **The tag links name their action.** The partner map renders the partial of
+  the list, whose form says `action="list"`, and Extbase gives a template no
+  access to the action it runs in. `Templates/Partner/Map.html` sets the
+  variable `filterAction` to `map` before it renders the partial. A template
+  without it links to `list`, which the map plugin answers with its default
+  action, under a second URL.
+- **The tags loop over `allCategoriesByType`**, arrays per category type,
+  never over the category collection itself. `CategoryCollection` is an
+  `\Iterator` with the one internal array pointer as its position, and
+  `toFilterArgument()` walks the same collection inside the loop: a loop over
+  the collection ended after its first tag. It also puts the tags in the type
+  order of the group, the order of the filters.
+- **The count counts the result the list event handed back**, with
+  `f:count`. On a `QueryResultInterface` that is the whole result, not the
+  page a paginated partner list shows.
 
 ## The links of the profile list
 
