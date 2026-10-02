@@ -40,9 +40,15 @@ site: German sites SHALL use German keys, English sites English keys.
 - **WHEN** the partner list of a German site is paged
 - **THEN** the page key in the path is `seite`
 
+#### Scenario: A value of the other language
+
+- **WHEN** a visitor opens a German partner list with an English sorting
+  value in the path
+- **THEN** the page answers 404 instead of showing the list a second time
+
 ### Requirement: Import is opt-in
 
-The route configuration SHALL take effect only when a site imports it; a
+The route configuration SHALL take effect only when a site imports it, and a
 site that does not import it MUST keep its current URLs.
 
 #### Scenario: Site without the import

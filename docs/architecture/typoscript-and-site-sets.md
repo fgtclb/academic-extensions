@@ -445,13 +445,15 @@ perfectly well on `core-13` while nothing offered it any more.
 
 ## Route enhancers are not loaded by anything
 
-Five files ship route enhancers and **none of them is read by TYPO3 on its own**:
+Seven files ship route enhancers and **none of them is read by TYPO3 on its own**:
 
 | Extension           | Files                                                   |
 |---------------------|---------------------------------------------------------|
 | `academic_persons`  | `Configuration/Routes/{List,ListAndDetail,Detail}.yaml` |
 | `academic_jobs`     | `Configuration/Routes/Detail.yaml`                      |
-| `academic_programs` | `Configuration/Yaml/Routes.yaml`                        |
+| `academic_partners` | `Configuration/Routes/List.yaml`                        |
+| `academic_projects` | `Configuration/Routes/List.yaml`                        |
+| `academic_programs` | `Configuration/Routes/List.yaml`                        |
 
 A site configuration has to `imports:` them, or every detail page is reachable
 only through a raw `tx_…[…]` argument. Both instance site configurations do:
@@ -462,8 +464,14 @@ imports:
   - resource: 'EXT:academic_persons/Configuration/Routes/ListAndDetail.yaml'
   - resource: 'EXT:academic_persons/Configuration/Routes/Detail.yaml'
   - resource: 'EXT:academic_jobs/Configuration/Routes/Detail.yaml'
-  - resource: 'EXT:academic_programs/Configuration/Yaml/Routes.yaml'
+  - resource: 'EXT:academic_partners/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_projects/Configuration/Routes/List.yaml'
+  - resource: 'EXT:academic_programs/Configuration/Routes/List.yaml'
 ```
+
+`academic_programs` also still ships `Configuration/Yaml/Routes.yaml`, which
+only imports its `Configuration/Routes/List.yaml`, see
+[List route enhancers](list-route-enhancers.md#the-former-program-file).
 
 Not through a site set: a set may carry a `route-enhancers.yaml` only from TYPO3
 v14.1, and this branch supports v13 as well, so `imports:` is the form that
@@ -471,7 +479,7 @@ works on both.
 
 ### Importing is half of it — the enhancers have to be limited to their pages
 
-Importing all five is not enough, and the distinct enhancer keys do not make it
+Importing all seven is not enough, and the distinct enhancer keys do not make it
 safe. TYPO3 offers **every** enhancer of a site to **every** page unless the
 enhancer carries `limitToPages`, and `PageUriMatcher::matchCollection()` takes
 the first candidate route whose path matches *and* whose aspects resolve. The
@@ -496,11 +504,15 @@ while `/persons/list-and-detail/<slug>` kept working. Only *resolving* is
 ambiguous — generation is scoped to the plugin namespace being linked, so the
 links look right and the defect surfaces as a broken page instead.
 
-The jobs and programs enhancers are not caught by this even though
-`/{job_title}` compiles to the same greedy `.+` — an aspect variable without an
-explicit `requirements` entry always does. Their mappers read other tables, so
-a persons route that matched the path is skipped when the slug is not a profile
-slug and the matcher falls through. That is a thin guarantee, not a design.
+The jobs enhancer is not caught by this even though `/{job_title}` compiles to
+the same greedy `.+`, as an aspect variable without an explicit `requirements`
+entry always does. Its mapper reads another table, so a persons route that
+matched the path is skipped when the slug is not a profile slug and the matcher
+falls through. That is a thin guarantee, not a design. The list enhancers of
+partners, projects and programs pin every variable to one segment, and their
+sorting routes start without a static key. What keeps them apart from a two
+segment route of another enhancer is `limitToPages`, and otherwise their
+mappers, which reject a value they do not know, so the matcher falls through.
 
 All four instance site configurations therefore pin every enhancer:
 
@@ -516,6 +528,14 @@ routeEnhancers:
     limitToPages: [233]
   AcademicPrograms:
     limitToPages: [251, 252]
+  AcademicProjectsList:
+    limitToPages: [261, 262]
+  AcademicProjectsListSingle:
+    limitToPages: [263]
+  AcademicPartnersList:
+    limitToPages: [271, 272]
+  AcademicPartnersMap:
+    limitToPages: [273]
 ```
 
 The uids are the ones the seed declares, `+1000` in the `academics-legacy`

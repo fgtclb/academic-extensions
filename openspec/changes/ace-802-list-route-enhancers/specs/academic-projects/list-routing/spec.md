@@ -23,9 +23,20 @@ content elements, on TYPO3 v13 and v14.
 - **WHEN** a visitor filtered by a competence field and selected "active"
 - **THEN** the URL carries both as path segments and resolves to that list
 
+### Requirement: Path keys and values follow the site language
+
+Static path keys, active states and sorting values SHALL be rendered in the
+language of the site: German sites SHALL use German values, English sites
+English values.
+
+#### Scenario: German site
+
+- **WHEN** a visitor on a German site selects the active state "completed"
+- **THEN** the path carries `status/abgeschlossen`
+
 ### Requirement: Import is opt-in
 
-The route configuration SHALL take effect only when a site imports it; a
+The route configuration SHALL take effect only when a site imports it, and a
 site that does not import it MUST keep its current URLs.
 
 #### Scenario: Site without the import

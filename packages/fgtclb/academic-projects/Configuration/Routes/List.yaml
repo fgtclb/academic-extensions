@@ -1,0 +1,155 @@
+# Route enhancers for the two project list plugins.
+#
+# TYPO3 does not read this file on its own. Import it from the configuration of
+# the site that shows the plugins, and limit each enhancer to its pages:
+#
+#   imports:
+#     - resource: 'EXT:academic_projects/Configuration/Routes/List.yaml'
+#   routeEnhancers:
+#     AcademicProjectsList:
+#       limitToPages: [21]
+#     AcademicProjectsListSingle:
+#       limitToPages: [22]
+#
+# A list URL carries the category filter, the active state and the sorting.
+# They become path segments, in this order:
+#
+#   /projects/filter/physics-4/status/completed/start-date/desc
+#   /de/projekte/filter/physik-4/status/abgeschlossen/startdatum/absteigend
+#
+# Symfony leaves out trailing defaults only, so a single route with defaults
+# cannot spell "only a filter" or "only a sorting": it generates a broken path
+# for one and query arguments for the other. Every combination is a route of
+# its own instead. Of the routes whose variables a link carries, TYPO3 takes
+# the one with the most of them, so the order below, from the most specific
+# route to the least, is for reading only.
+#
+# Deliberately no "defaults": a link with the default sorting or state keeps it
+# in the path. The bare page is where the content element's preset categories,
+# state and sorting apply, and a visitor who cleared a preset must not get it
+# back.
+routeEnhancers:
+  AcademicProjectsList:
+    type: Extbase
+    extension: AcademicProjects
+    plugin: ProjectList
+    routes: &routes
+      - routePath: '/{filter_key}/{categories}/{state_key}/{active_state}/{sorting_field}/{sorting_direction}'
+        _controller: 'Project::list'
+        _arguments:
+          categories: 'demand/filterCollection/categories'
+          active_state: 'demand/activeState'
+          sorting_field: 'demand/sortingField'
+          sorting_direction: 'demand/sortingDirection'
+      - routePath: '/{filter_key}/{categories}/{state_key}/{active_state}'
+        _controller: 'Project::list'
+        _arguments:
+          categories: 'demand/filterCollection/categories'
+          active_state: 'demand/activeState'
+      - routePath: '/{filter_key}/{categories}/{sorting_field}/{sorting_direction}'
+        _controller: 'Project::list'
+        _arguments:
+          categories: 'demand/filterCollection/categories'
+          sorting_field: 'demand/sortingField'
+          sorting_direction: 'demand/sortingDirection'
+      - routePath: '/{state_key}/{active_state}/{sorting_field}/{sorting_direction}'
+        _controller: 'Project::list'
+        _arguments:
+          active_state: 'demand/activeState'
+          sorting_field: 'demand/sortingField'
+          sorting_direction: 'demand/sortingDirection'
+      - routePath: '/{filter_key}/{categories}'
+        _controller: 'Project::list'
+        _arguments:
+          categories: 'demand/filterCollection/categories'
+      - routePath: '/{state_key}/{active_state}'
+        _controller: 'Project::list'
+        _arguments:
+          active_state: 'demand/activeState'
+      - routePath: '/{sorting_field}/{sorting_direction}'
+        _controller: 'Project::list'
+        _arguments:
+          sorting_field: 'demand/sortingField'
+          sorting_direction: 'demand/sortingDirection'
+    defaultController: 'Project::list'
+    # An aspect makes its variable match anything, slashes included, so every
+    # variable is pinned to one segment. The value mappers check the values in
+    # the language of the site, and a path whose values they do not know falls
+    # through to the next route. A site that adds a language therefore adds
+    # "localeMap" items to the aspects and nothing else.
+    requirements: &requirements
+      categories: '[^/]+'
+      active_state: '[^/]+'
+      sorting_field: '[^/]+'
+      sorting_direction: '[^/]+'
+    aspects: &aspects
+      filter_key:
+        type: LocaleModifier
+        default: 'filter'
+        localeMap:
+          - locale: 'de.*'
+            value: 'filter'
+      # Not static mappable: the filter stays a dynamic argument, excluded from the
+      # cache hash with the rest of the demand, so every filter shares one page
+      # cache entry. A category that cannot be mapped keeps its query argument.
+      categories:
+        type: CategoryFilterMapper
+        group: projects
+      state_key:
+        type: LocaleModifier
+        default: 'status'
+        localeMap:
+          - locale: 'de.*'
+            value: 'status'
+      # Static, so each combination of state and sorting in a path is a page
+      # cache entry of its own, per page and language. The values are those of
+      # FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState and
+      # FGTCLB\AcademicProjects\Enumeration\SortingOptions.
+      active_state:
+        type: StaticValueMapper
+        map:
+          all: 'all'
+          active: 'active'
+          completed: 'completed'
+        localeMap:
+          - locale: 'de.*'
+            map:
+              alle: 'all'
+              aktiv: 'active'
+              abgeschlossen: 'completed'
+      sorting_field:
+        type: StaticValueMapper
+        map:
+          title: 'title'
+          last-updated: 'lastUpdated'
+          sorting: 'sorting'
+          budget: 'tx_academicprojects_budget'
+          start-date: 'tx_academicprojects_start_date'
+        localeMap:
+          - locale: 'de.*'
+            map:
+              titel: 'title'
+              zuletzt-aktualisiert: 'lastUpdated'
+              sortierung: 'sorting'
+              budget: 'tx_academicprojects_budget'
+              startdatum: 'tx_academicprojects_start_date'
+      sorting_direction:
+        type: StaticValueMapper
+        map:
+          asc: 'asc'
+          desc: 'desc'
+        localeMap:
+          - locale: 'de.*'
+            map:
+              aufsteigend: 'asc'
+              absteigend: 'desc'
+
+  # The second list plugin answers the same action with the same demand.
+  AcademicProjectsListSingle:
+    type: Extbase
+    extension: AcademicProjects
+    plugin: ProjectListSingle
+    routes: *routes
+    defaultController: 'Project::list'
+    requirements: *requirements
+    aspects: *aspects
