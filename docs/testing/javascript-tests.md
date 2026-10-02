@@ -211,6 +211,14 @@ one the test settles by hand — a prepared response otherwise resolves in the
 same microtask as the call that takes it, so two "overlapping" requests would in
 truth run one after the other.
 
+Two things a browser request has and a constructed `Response` lacks are
+modelled as well. `respondWithPage()` queues an HTML page with the url a
+followed redirect ended at, because a constructed response reports an empty
+`url`. And a request started with a `signal` is rejected with the abort reason
+when the signal aborts, also while its response is held open by
+`respondLater()`. The recorded call keeps the signal, so a test can assert
+that a request was aborted.
+
 What a test asserts on a recorded call is the method, the url, the headers and
 the decoded body. The `X-Requested-With` header is asserted everywhere it is
 sent: it is the guard every writing endpoint checks, because a custom header
@@ -233,12 +241,23 @@ not on `globalThis`, and nothing but a test constructs one.
 | `getBoundingClientRect`           | `setBoundingRect()`, per element and per test.                                       |
 | `clientWidth` / `clientHeight`    | `setClientSize()`, shadowed on the instance because both are prototype getters.      |
 | `<dialog>` show/showModal/close   | The reflected `open` attribute, the `close` event, and the modality.                 |
+| `form.submit()`                   | A count on the form, `data-test-submitted`, without a `submit` event.                |
+| Navigation to another document    | Recorded by `recordedNavigations()` with the url of the document, not printed.       |
 
 `settle()` drains microtasks and never reaches a timer, which is what makes it
 useful — but the document editor reports its finished close one animation frame
 after the leave transition, deliberately, so that its owner does not tear it out
 of the document from inside its own update. A test that is about a close
 therefore waits with `nextFrame()`.
+
+jsdom navigates to a fragment and to nothing else: `location.reload()`,
+`location.assign()` to another url and `form.submit()` report "not
+implemented" on its console and leave the document as it is. A module that
+falls back to a reload would look as if it did nothing. The console report
+carries no target, so `recordedNavigations()` holds the url of the document
+that navigated, which for a reload is the url it reloads. A module whose
+target matters navigates by submitting a form, which the count on the form
+records. `AbortController` is the window's, like every other global here.
 
 The object urls are modelled rather than delegated because the two realms
 disagree: node's `URL.createObjectURL` takes only a node `Blob`, jsdom's

@@ -339,6 +339,52 @@ the two page trees `LegacyDeliveryTest` compares.
   fixture on the rendered page, and `Tests/JavaScript/program-finder.test.ts`
   drives the module on a copy of that markup with the same programs.
 
+## A module that updates part of the page asks for the whole page
+
+The program list of `academic_programs` updates in place when a filter or the
+sorting changes, see
+[List filter URLs](../architecture/list-filter-urls.md#the-program-list-requests-its-urls-without-a-reload).
+`Resources/Private/TypeScript/frontend/program-list.ts` asks the server for
+the page a reload would show and takes the lists out of it, so the server
+stays the only place that renders a program or builds a URL.
+
+- **A list is found by the uid of its content element.**
+  `data-academic-programs-list` on the wrapper in `Program/List.html` carries
+  it. Every list of the page is replaced, not only the one that changed: the
+  lists share one plugin namespace, so the filter URL filters each of them,
+  and the page has to show what a reload of that URL shows, a list without a
+  form included. Only the list the visitor changed announces its number.
+- **One region is replaced as a whole.**
+  `data-academic-programs-list-content` holds the form, the active filters,
+  the result count and the results, and its `data-academic-programs-list-total`
+  the number of programs. Part of it may be missing for one selection and
+  present for the next, so a region per part would need placeholders. What the
+  replacement would take from the visitor is put back: the focus, by the name
+  of the select, and an open "More filters".
+- **The status element sits outside that region.** A live region that is
+  replaced together with its text is a new element, which a screen reader does
+  not announce. `data-academic-programs-list-status` is therefore a sibling of
+  the region and keeps its identity, and loading the page writes nothing into
+  it. The sentence patterns are `data-academic-programs-list-count-one` and
+  `-count-other`, named like the ones of the program finder.
+- **The form is found through the region, not by its class.** An override of
+  the form partial written before the module existed has no attribute of its
+  own and is still updated in place. A form outside a region carries
+  `data-academic-programs-list-form`, or its selects carry
+  `data-academic-programs-list-select`, and submits itself on a change. A
+  select that keeps an inline handler is left to it, decided per select: an
+  override of one filter partial leaves the selects of the other working.
+- **Every template that can stand alone loads the module.** The list template,
+  the form partial and both filter partials, so that it runs whichever of them
+  a project overrides: the new filter partials no longer submit on a change,
+  and an old form partial has no submit button. The asset collector loads it
+  once.
+- **The hidden button sits in a column the module hides.** `hidden` on the
+  button itself loses against a theme rule that gives `.btn` a `display`, and
+  hiding the column also removes its gap from the grid.
+- **One request at a time for the page.** All lists share one address bar, so
+  a new change aborts the request still running, whichever list started it.
+
 ## Libraries come from the core
 
 Two libraries are shipped, Leaflet and its marker cluster plugin for the map of

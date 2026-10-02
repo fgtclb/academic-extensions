@@ -17,11 +17,18 @@ filter URL shows, including the options it offers disabled.
   list
 - **THEN** the list shows only the Master programs without a page reload
 - **AND** the degree filter shows "Master" as selected
+- **AND** the degree filter keeps the focus
+
+#### Scenario: A request fails
+- **WHEN** the list cannot be requested in place after a change
+- **THEN** the page reloads with the filtered list
 
 #### Scenario: Two lists on one page
 - **WHEN** a page carries two program list elements and a visitor changes the
   filter of one of them
-- **THEN** only that list is updated
+- **THEN** both lists show the selection, as a reload of the filter URL shows
+  them, also when one of them hides its filter and its sorting
+- **AND** only the changed list announces its result
 
 ### Requirement: The address bar follows the list
 After an update the address bar SHALL show the filter URL of the selection,
@@ -55,10 +62,32 @@ button SHALL be hidden.
 - **THEN** the page reloads with the filtered list
 
 ### Requirement: Overrides keep working
-A project override of the list templates that lacks the results region SHALL
-keep submitting the form with a page reload.
+A project override of the list templates that lacks the parts the in-place
+update needs SHALL keep updating the list on a change, with a page reload
+where it cannot be done in place.
 
-#### Scenario: Results partial overridden
-- **WHEN** a project overrides the results partial with a copy of the one of
+#### Scenario: List template overridden
+- **WHEN** a project overrides the list template with a copy of the one of
   version 3.0 before this change and a visitor changes a filter
 - **THEN** the page reloads with the filtered list
+
+#### Scenario: Filter partials overridden with their inline handlers
+- **WHEN** a project overrides the filter partials with copies that keep the
+  inline handlers and a visitor changes a filter
+- **THEN** the page reloads with the filtered list
+
+#### Scenario: One filter partial overridden with its inline handlers
+- **WHEN** a project overrides the sorting partial with a copy that keeps the
+  inline handlers and a visitor changes a category filter
+- **THEN** the list shows the filtered programs without a page reload
+
+#### Scenario: List template and form partial overridden
+- **WHEN** a project overrides the list template and the partial of the form
+  with copies of the ones of version 3.0 before this change and a visitor
+  changes a filter
+- **THEN** the page reloads with the filtered list
+
+#### Scenario: Form partial overridden
+- **WHEN** a project overrides the partial of the form with a copy of the one
+  of version 3.0 before this change and a visitor changes a filter
+- **THEN** the list shows the filtered programs without a page reload

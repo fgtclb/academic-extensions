@@ -22,9 +22,10 @@
  *
  * See "docs/testing/javascript-tests.md".
  */
-import { JSDOM } from 'jsdom';
+import { JSDOM, VirtualConsole } from 'jsdom';
 
 const browserGlobals = [
+    'AbortController',
     'Blob',
     'CustomEvent',
     'DOMParser',
@@ -279,6 +280,57 @@ const installObjectUrls = () => {
 /** Whether the object url is still registered, i.e. was not revoked. */
 export const isObjectUrlAlive = (url) => objectUrls.has(url);
 
+/**
+ * "form.submit()", which jsdom declares and does not implement: it reports
+ * "not implemented" and submits nothing, so a module that falls back to a
+ * plain submission would look as if it did nothing at all.
+ *
+ * Modelled as a count on the form, like the stubs report through the DOM. The
+ * method skips the "submit" event and the validation, as in a browser, and so
+ * does the model:
+ *
+ *   data-test-submitted="<n>"   how often "submit()" was called on the form
+ */
+const installFormSubmission = (window) => {
+    window.HTMLFormElement.prototype.submit = function submit() {
+        const count = Number.parseInt(this.getAttribute('data-test-submitted') ?? '0', 10);
+        this.setAttribute('data-test-submitted', String(count + 1));
+    };
+};
+
+/**
+ * Navigations to another document, which jsdom does not perform either.
+ * "location.reload()", "location.assign()" to another url and a link to
+ * another page each end in a "not implemented" report on the virtual console
+ * and leave the document as it is.
+ *
+ * Recorded instead of printed, with the url of the document that started it,
+ * which for a reload is the url it reloads. The report does not carry the
+ * target, so a module whose navigation a test has to assert by its target
+ * navigates by a form submission, which the model above records on the form.
+ * Every other report of jsdom is printed as before.
+ */
+const navigations = [];
+
+const createVirtualConsole = (currentWindow) => {
+    const virtualConsole = new VirtualConsole();
+    virtualConsole.forwardTo(console, { jsdomErrors: 'none' });
+    virtualConsole.on('jsdomError', (error) => {
+        if (error.type === 'not-implemented' && error.message === 'Not implemented: navigation to another Document') {
+            navigations.push(currentWindow().location.href);
+
+            return;
+        }
+        // What "forwardTo()" does with a report when it is not told to leave them out.
+        console.error(error.type === 'unhandled-exception' ? error.cause.stack : error.message);
+    });
+
+    return virtualConsole;
+};
+
+/** The urls of the documents that started a navigation since the last "resetBody()". */
+export const recordedNavigations = () => [...navigations];
+
 let installed = null;
 
 export const installDom = () => {
@@ -288,9 +340,11 @@ export const installDom = () => {
 
     // "pretendToBeVisual" is what gives the window requestAnimationFrame; the
     // url gives it an origin, which "credentials: same-origin" requests need.
+    // The console reads the window only when a report arrives, after the construction.
     const dom = new JSDOM('<!doctype html><html lang="en"><body></body></html>', {
         pretendToBeVisual: true,
         url: 'https://example.test/profile',
+        virtualConsole: createVirtualConsole(() => dom.window),
     });
 
     globalThis.window = dom.window;
@@ -306,6 +360,7 @@ export const installDom = () => {
     globalThis.matchMedia = matchMedia;
     installScrollIntoView(dom.window);
     installDialog(dom.window);
+    installFormSubmission(dom.window);
     installObjectUrls();
 
     installed = dom;
@@ -320,6 +375,7 @@ export const installDom = () => {
 export const resetBody = (html = '') => {
     const dom = installDom();
     dom.window.document.body.innerHTML = html;
+    navigations.length = 0;
 
     return dom.window.document.body;
 };
