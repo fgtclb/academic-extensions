@@ -1,0 +1,33 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:comment>
+    A select of the element's "options", read through "optionValueField" and
+    "optionLabelField", with an optional first option of "prependOptionValue" and
+    "prependOptionLabel". The arguments are those of "Academic/Form/Textfield".
+</f:comment>
+
+<f:variable name="elementId" value="{objectName}.{element.identifier}"/>
+
+<f:render
+    partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
+    arguments="{element: element, elementId: elementId, class: 'form-select-wrap', extensionName: extensionName}"
+    contentAs="elementContent"
+>
+    <f:form.select
+        property="{element.identifier}"
+        id="{elementId}"
+        class="form-select"
+        options="{element.options}"
+        optionValueField="{element.optionValueField}"
+        optionLabelField="{element.optionLabelField}"
+        prependOptionValue="{element.prependOptionValue}"
+        prependOptionLabel="{element.prependOptionLabel}"
+        disabled="{element.disabled}"
+    />
+</f:render>
+
+</html>

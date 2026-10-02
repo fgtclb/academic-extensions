@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 344 PHP files declaring 303
+rather than describing an intention as a rule — 346 PHP files declaring 305
 classes, 11 interfaces, 17 traits and 13 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-191 of the 303 classes are `final` (63 %). The distribution is not random: it
+193 of the 305 classes are `final` (63 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
@@ -29,7 +29,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 5     | 6     | 0        | 45 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
-| Everything else                            | 113   | 44    | 4        | 70 %    |
+| Everything else                            | 115   | 44    | 4        | 71 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,10 +55,12 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 302 modifiers, of
-which 293 are constructor-promoted, across 93 files. The ten non-promoted
+`readonly` is used heavily, mostly on individual properties: 353 modifiers, of
+which 340 are constructor-promoted, across 106 files. The thirteen non-promoted
 declarations are the nine documented fields of
-`academic-persons/Classes/Settings/AcademicPersonsSettings.php` and
+`academic-persons/Classes/Settings/AcademicPersonsSettings.php`, the three
+fields `typo3-category-types/Classes/Routing/Aspect/CategoryFilterMapper.php`
+sets in its constructor, and
 `typo3-category-types/Classes/Collection/FilterCollection.php` line 17.
 
 ```bash
@@ -72,7 +74,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 59:
+nothing**, and of an immutable data object. There are 61:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -96,9 +98,9 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 175   | An injected collaborator                          |
-| `public readonly`    | 112   | A field of an immutable data object               |
-| `protected readonly` | 23    | Either, in classes with subclasses or older style |
+| `private readonly`   | 209   | An injected collaborator                          |
+| `public readonly`    | 122   | A field of an immutable data object               |
+| `protected readonly` | 22    | Either, in classes with subclasses or older style |
 
 Use `private readonly` for every constructor-injected dependency. It states that
 the service does not rebind it, which is the property half of the stateless rule
@@ -245,9 +247,10 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Twenty sites
+  sit under an excluded path. Twenty-one sites
   (`grep -rn '#\[Exclude\]' --include='*.php' packages/fgtclb/*/Classes`):
-  `Validation` and `ValidationSet` in `academic-base/Classes/Settings/`, fourteen
+  `Validation` and `ValidationSet` in `academic-base/Classes/Settings/`,
+  `AfterSaveDecision` in `academic-base/Classes/Form/`, fourteen
   classes under `academic-persons/Classes/Settings/` (the value objects of the
   settings graph, of the frontend user synchronisation and of the managed
   fields, plus `LegacySettingsMigration` and `SettingsOverride`), the two value
@@ -278,11 +281,11 @@ Thirteen, all backed, none pure
 
 | Enum                                                                   | Backing  |
 |------------------------------------------------------------------------|----------|
+| `academic-base/Classes/Form/FlashMessageCreationMode.php:10`           | `int`    |
 | `academic-base/Classes/Upgrade/ConfigurationFindingKind.php:13`        | `string` |
 | `academic-base/Classes/Upgrade/TemplateOverrideFindingKind.php:14`     | `string` |
 | `academic-bite-jobs/Classes/Enumeration/ListView.php:10`               | `string` |
 | `academic-contact4pages/Classes/Event/PageContactsOutput.php:14`       | `string` |
-| `academic-jobs/Classes/SaveForm/FlashMessageCreationMode.php:10`       | `int`    |
 | `academic-persons-edit/Classes/Attributes/ListSortingMode.php:12`      | `string` |
 | `academic-persons-edit/Classes/Event/ProfileEditingAction.php:25`      | `string` |
 | `academic-persons/Classes/DataHandling/ProfileWriteCorrelation.php:35` | `string` |

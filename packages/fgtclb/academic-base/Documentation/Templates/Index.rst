@@ -5,9 +5,10 @@
 Templates
 =========
 
-This extension ships one Fluid partial: the responsive image the academic
-extensions render their images through. Its path, its arguments and its four
-presets are public API, and change only with a breaking changelog entry.
+This extension ships Fluid partials the academic extensions share: the
+responsive image they render their images through, and the fields of a
+frontend form. Their paths and arguments are public API, and change only with
+a breaking changelog entry.
 
 ..  _templates-image:
 
@@ -152,3 +153,73 @@ has to list the academic_base path itself:
     }
 
 Without it, the plugin fails on the partial it cannot resolve.
+
+..  _templates-form:
+
+The form partials
+=================
+
+The partials below
+:file:`EXT:academic_base/Resources/Private/Partials/Academic/Form/` render the
+fields of an Extbase form with a label, a required mark, the validation state
+and a help text. :guilabel:`EXT:academic_jobs` renders its new job form through
+them.
+
+..  list-table::
+    :header-rows: 1
+    :widths: 25 75
+
+    *   -   Partial
+        -   Renders
+    *   -   `Textfield`
+        -   A text field of the input type its validation settings name.
+    *   -   `Textarea`
+        -   A text area, with the class `rich-text` when the element sets
+            `richtext`.
+    *   -   `Select`
+        -   A select of the element's `options`, read through
+            `optionValueField` and `optionLabelField`, with an optional first
+            option of `prependOptionValue` and `prependOptionLabel`.
+    *   -   `Checkbox`
+        -   A checkbox with the value `1`.
+    *   -   `DateTime`
+        -   A date field showing the element's `value` as `d.m.Y`.
+    *   -   `Upload`
+        -   A file upload.
+    *   -   `FieldWrapper`
+        -   The label, the required mark, the validation state and the help
+            text around a field. Every field partial renders it.
+    *   -   `Errors`
+        -   One alert above the form when any field failed validation.
+
+A field partial takes these arguments:
+
+..  list-table::
+    :header-rows: 1
+    :widths: 25 75
+
+    *   -   Argument
+        -   Meaning
+    *   -   `element`
+        -   The field: `identifier` and `validations`, the validation set of
+            the form, and per field `disabled`, `help` and the options of the
+            select.
+    *   -   `objectName`
+        -   The name of the form object, `job` for example. The id of a field
+            is `<objectName>.<identifier>`.
+    *   -   `extensionName`
+        -   The extension of the label `create.<objectName>.<identifier>.label`
+            and the placeholder `edit.<objectName>.<identifier>.placeholder`.
+    *   -   `fieldWrapperPartial`
+        -   The partial around the field, `Academic/Form/FieldWrapper` when it
+            is not given. It receives `element`, `elementId`, `class`,
+            `elementContent` and `extensionName`.
+
+`Errors` takes the form object as `object`, and `objectName` and
+`extensionName` for the message `create.<objectName>.incorrectValues`.
+
+An extension that renders the fields under partial names of its own passes its
+own wrapper name as `fieldWrapperPartial`, so a project that overrides that
+wrapper changes every field. The new job form does so with
+:file:`Job/Forms/FieldWrapper.html`, and a project overrides the names below
+:file:`Job/Forms/` of :guilabel:`EXT:academic_jobs`, not these.

@@ -1,0 +1,29 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:comment>
+    A text area, with the class "rich-text" when the element sets "richtext". The
+    arguments are those of "Academic/Form/Textfield".
+</f:comment>
+
+<f:variable name="elementId" value="{objectName}.{element.identifier}"/>
+
+<f:render
+    partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
+    arguments="{element: element, elementId: elementId, class: 'form-textarea-wrap', extensionName: extensionName}"
+    contentAs="elementContent"
+>
+    <f:form.textarea
+        property="{element.identifier}"
+        id="{elementId}"
+        class="form-control {f:if(condition: element.richtext, then: 'rich-text')}"
+        disabled="{element.disabled}"
+        placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: extensionName)}"
+        rows="5"
+    />
+</f:render>
+
+</html>

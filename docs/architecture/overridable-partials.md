@@ -109,6 +109,17 @@ A field in such a slot is named outside the argument the action maps, here
 `job`: Extbase leaves a value it has no argument for alone, while a field bound
 to a property the model does not have fails the property mapping.
 
+## A partial that moves keeps its name
+
+When markup moves into `academic_base` so another extension can share it, the
+partial of the extension stays, under its old name, and renders the shared one.
+A project overrides the name it knows, and a copy made before the move keeps
+rendering. A shared partial that renders a further partial takes that name as
+an argument, so the extension can pass on its own name and an override of it
+still applies. The form fields of `academic_jobs` are the case: each
+`Job/Forms/*.html` renders its counterpart below `Academic/Form/` and passes
+`Job/Forms/FieldWrapper` as the wrapper. See [Frontend forms](frontend-forms.md).
+
 ## A list renders its items through a partial of its own
 
 A list template that arranges records — groups them, sorts them into columns —

@@ -176,8 +176,9 @@ The ViewHelper `FGTCLB\AcademicBase\ViewHelpers\ValidationEnsureViewHelper`
 sits next to them, declared in a template as
 `xmlns:p="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`.
 
-Its callers are the partials `Job/Forms/FieldWrapper.html` and
-`Job/Forms/Textfield.html` of `academic_jobs` (ACE-508). Its earlier callers,
+Its callers are the shared form partials `Academic/Form/FieldWrapper.html` and
+`Academic/Form/Textfield.html` of `academic_base`, which the jobs partials of
+the same name render (ACE-508, ACE-797). Its earlier callers,
 the `Partials/Profile/Forms/` templates of `academic_persons_edit`, went with the
 editing rewrite of 3.0. The class is `@internal`, but its tag name and arguments
 are public API from the moment a shipped template calls it: the extension points
@@ -704,13 +705,13 @@ had a loader, a registry and two ViewHelpers of its own, with a top-level
 `array_merge()` and three readers that understood three keyword sets (ACE-429).
 They are gone, and the file is read by the shared classes:
 
-| Piece                                           | What it does                                                                                                        |
-|-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| `Settings\AcademicJobsSettingsFactory`          | `SettingsFileLoader::load()` with the cache identifier `AcademicJobs_Settings_v3`, `normalizeValidationSets()`      |
-| `Settings\AcademicJobsSettings`                 | The sets by identifier, `getValidationSet()` answers an empty set for an unknown one. A service through the factory |
-| `Domain\Validator\JobValidator`                 | Runs the `validatorClassNames` of the `job` set, skipping a field the job has no gettable property for              |
-| `Job/Forms/FieldWrapper.html`, `Textfield.html` | `p:validationEnsure`, then `required` for the asterisk and `inputType` for the input                                |
-| `EventListener\ApplySettingsToTca`              | `academic-jobs/apply-settings-to-tca`, the `job` set merged into the job table after the overrides                  |
+| Piece                                               | What it does                                                                                                        |
+|-----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| `Settings\AcademicJobsSettingsFactory`              | `SettingsFileLoader::load()` with the cache identifier `AcademicJobs_Settings_v3`, `normalizeValidationSets()`      |
+| `Settings\AcademicJobsSettings`                     | The sets by identifier, `getValidationSet()` answers an empty set for an unknown one. A service through the factory |
+| `Domain\Validator\JobValidator`                     | Runs the `validatorClassNames` of the `job` set, skipping a field the job has no gettable property for              |
+| `Academic/Form/FieldWrapper.html`, `Textfield.html` | `p:validationEnsure`, then `required` for the asterisk and `inputType` for the input, rendered by the jobs partials |
+| `EventListener\ApplySettingsToTca`                  | `academic-jobs/apply-settings-to-tca`, the `job` set merged into the job table after the overrides                  |
 
 The listener is the persons one in small: one table, `TcaValidationMerger::merge()`
 over the fields the table has a column for, the `email[subst]` soft reference
