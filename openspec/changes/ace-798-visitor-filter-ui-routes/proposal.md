@@ -16,8 +16,8 @@ and the separate enhancer collided with the shipped one.
   without JavaScript and is cacheable.
 - New `slug` fields on function types and organisational units, generated
   from their names, so filter URLs can be speaking.
-- A console command fills the slugs of existing function types and
-  organisational units once after the upgrade. No upgrade wizard is added.
+- A repeatable upgrade wizard fills the slugs of existing function types and
+  organisational units.
 - The `ProfileListPlugin` and `ProfileListAndDetailPlugin` enhancers get
   filter routes: each filter alone, both filters, each with a page and each
   with a letter. Every one of them also exists with the view mode segment of
@@ -44,10 +44,10 @@ None.
   and a small non-cacheable filter action of the list and listanddetail
   plugins. It also touches `Configuration/Routes/List.yaml` and
   `Configuration/Routes/ListAndDetail.yaml`, the function type and
-  organisational unit TCA (new `slug` columns), one console command, labels,
+  organisational unit TCA (new `slug` columns), one upgrade wizard, labels,
   the route enhancer and upgrade documentation and the 3.0 changelog.
 - Database: two new columns. Existing records get their slug from the
-  command, or on their next save; until then their filter URL uses query
+  wizard, or on their next save. Until then their filter URL uses query
   parameters.
 - Depends on `ace-779-visitor-filter-demand-query` and
   `ace-734-list-links-keep-state`. Combines with `ace-735-list-view-modes`:
@@ -60,8 +60,6 @@ None.
   change that allows
   pagination under an active letter, decided with
   `ace-734-list-links-keep-state`, extends this route set.
-- An upgrade wizard for the slugs: every wizard is a TYPO3 v15 blocker call
-  site (ACE-294), and none is added while v13 is supported.
 - Automatic submission on selection.
 - A backport to branch `2`.
 
@@ -69,8 +67,6 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `persons-display-13`). One of the six analysed projects carries its own code
-for this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-visitor-filter-ui-routes` when the issue is filed after
-implementation.
+for this today. Implemented as ACE-798.
 
-Relates to ACE-18 and ACE-623.
+Relates to ACE-18, ACE-623 and ACE-779.

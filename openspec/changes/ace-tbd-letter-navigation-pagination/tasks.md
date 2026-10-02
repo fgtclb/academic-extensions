@@ -1,7 +1,7 @@
 ## 1. Prerequisites
 
 - [ ] 1.1 Confirm that `ace-734-list-links-keep-state` and
-  `ace-tbd-visitor-filter-ui-routes`, or their renamed successors, are merged
+  `ace-798-visitor-filter-ui-routes`, or their renamed successors, are merged
   on `main` (`ace-597-letter-navigation-availability` is). Re-read
   `listAction()`, both route files and both pagination partials in the merged
   sources, and note every difference to `design.md` in this file before

@@ -53,7 +53,7 @@ None.
 
 - Pagination while a letter is active; it stays switched off here. A
   separate follow-up change allows it, and extends the route set of
-  `ace-tbd-visitor-filter-ui-routes` with the letter and page combinations.
+  `ace-798-visitor-filter-ui-routes` with the letter and page combinations.
 - The view mode and filter values themselves, which belong to the changes
   named above.
 - Route enhancer entries for further values.

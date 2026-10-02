@@ -477,7 +477,8 @@ enhancer carries `limitToPages`, and `PageUriMatcher::matchCollection()` takes
 the first candidate route whose path matches *and* whose aspects resolve. The
 insertion order is the `imports:` order.
 
-Six persons routes are declared twice, byte identical down to the mapper:
+Twenty-four persons routes are declared twice, byte identical down to the
+mapper:
 
 | Route                                                   | Declared in                         |
 |---------------------------------------------------------|-------------------------------------|
@@ -485,6 +486,7 @@ Six persons routes are declared twice, byte identical down to the mapper:
 | `{localized_page}-{page}`                               | `List.yaml`, `ListAndDetail.yaml`   |
 | `/{letter}`                                             | `List.yaml`, `ListAndDetail.yaml`   |
 | `/view-mode/{viewMode}`, alone, with page, with letter  | `List.yaml`, `ListAndDetail.yaml`   |
+| the eighteen filter routes, see below                   | `List.yaml`, `ListAndDetail.yaml`   |
 
 So the file imported first takes those URLs on every page of the site, and the
 plugin on the other page never receives its argument. That is ACE-470: the
@@ -523,6 +525,41 @@ page as `l10n_parent ?: uid`, so one list covers `/persons/detail` and
 uid, which is the default-language uid too — naming a translated page's own uid
 would work for neither direction. Plain uids work on v13 and v14; the
 ExpressionLanguage form of `limitToPages` is v14.2 and later only.
+
+### A filter form reaches a route through a redirect
+
+The visitor filter form of the persons list posts to a non-cacheable `filter`
+action of the list plugins, which throws a `303` to the list URL the URI builder
+generates. Behind the enhancers that URL is a route, without them a query string
+with a cHash. A plain GET form would not do: the browser builds the URL itself,
+so it carries no cHash, which the cacheable list action needs, and it carries
+the hidden fields of an Extbase form. The redirect is thrown as a
+`PropagateResponseException`, for the reason in
+[List filter URLs](list-filter-urls.md#thrown-not-returned).
+
+The filter routes follow three rules that every multi-segment route of these
+files follows:
+
+- **One explicit route per combination.** Symfony leaves out trailing defaults
+  only, so an optional segment in the middle of a path cannot be expressed. The
+  function type, the unit and both, each alone, with a page, with a letter, and
+  each of these with the view mode segment, make eighteen routes per enhancer.
+- **Every variable is pinned to `[^/]+`.** An aspect makes its variable match
+  `.+`, slashes included, unless `requirements` names it. The requirements are
+  enhancer-wide, so they pin the existing routes as well.
+- **A mapper that cannot map returns `null`, never a value the requirement
+  rejects.** The URL generator checks a mapped value against the requirement
+  and throws an `InvalidParameterException` for one that does not match, which
+  takes the page down: `PageRouter::generateUri()` catches only a missing
+  parameter. The core `PersistedAliasMapper` returns the slug of a record as it
+  is stored, empty or with a slash, which the core keeps in a slug. So the
+  filter routes use `PersonsFilterSlugMapper`, which returns `null` for both.
+  The route is then skipped, and the filter stays a query argument.
+
+The slugs of the filter records are `eval => unique` rather than
+`uniqueInSite`. With `uniqueInSite` the mapper keeps only records stored in the
+site that resolves the URL, while generation checks no site, so a list showing
+records of a folder in another site would link to a URL that answers 404.
 
 ## The integrator chapter
 

@@ -41,6 +41,31 @@ handler attribute.
 - **WHEN** a visitor without JavaScript chooses a function type and submits
 - **THEN** the browser shows the list filtered by that function type
 
+### Requirement: A submission keeps the other choices of the visitor
+Submitting the form SHALL keep the view mode and the letter of the list it was
+on and SHALL show the first page of the filtered list. A value that is not one
+of the options SHALL lead to the list without that filter, and a value the list
+would never link, such as an unknown letter, SHALL NOT be carried.
+
+#### Scenario: Filtering a table under a letter
+- **WHEN** a visitor views page 2 of the table under the letter B and filters
+  by a function type
+- **THEN** the browser shows the first page of the filtered table under the
+  letter B
+
+#### Scenario: A value that is no option
+- **WHEN** a submission carries a function type the content element does not
+  offer
+- **THEN** the browser shows the list without a function type filter
+
+### Requirement: The form offers what the records say
+A change of a function type or an organisational unit in the backend SHALL
+reach the form of every cached list.
+
+#### Scenario: Hidden function type
+- **WHEN** an editor hides a function type that a cached list offers
+- **THEN** the next visitor of that list no longer finds it in the form
+
 ### Requirement: Filtered lists have speaking URLs
 With the shipped route enhancer imported, the URL of a filtered list SHALL
 contain the filter's name and the slug of the chosen record, also together
@@ -58,6 +83,13 @@ without a slug SHALL remain reachable through a URL with query parameters.
 - **THEN** the URL carries the function type segment, "professor" and the
   letter, and resolves to the filtered list of last names starting with B
 
+#### Scenario: German list
+- **WHEN** a visitor filters the German list by the function type
+  "Professorin", the translation of "Professor"
+- **THEN** the URL carries the German function type segment followed by the
+  slug of the translation, and a record without a translation the slug of its
+  default language
+
 #### Scenario: Filter in the table view
 - **WHEN** a visitor switched the list to the table and filters it by the
   function type "professor"
@@ -69,22 +101,28 @@ without a slug SHALL remain reachable through a URL with query parameters.
 - **THEN** the site answers with its page-not-found response
 
 #### Scenario: Record without a slug
-- **WHEN** a visitor filters by a record whose slug is empty
+- **WHEN** a visitor filters by a record whose slug is empty or holds a slash
 - **THEN** the filtered list is shown under a URL with query parameters
 
-### Requirement: Existing filter records get their slugs in one step
-The system SHALL offer a console command that gives every function type and
-organisational unit without a slug the slug a save would generate from its
-name. It MUST NOT change a slug that is already set, and running it again
-SHALL change nothing. The upgrade itself SHALL NOT require an upgrade wizard.
+#### Scenario: Record stored in another site
+- **WHEN** a list shows records of a folder in another site and a visitor
+  filters by one of them
+- **THEN** the URL is speaking and resolves to the filtered list
 
-#### Scenario: Command run after the upgrade
-- **WHEN** an integrator runs the command on an installation whose function
+### Requirement: Existing filter records get their slugs in one step
+The upgrade module SHALL offer a wizard that gives every function type and
+organisational unit without a slug the slug a save would generate from its
+name. It MUST NOT change a slug that is already set. It SHALL be offered again
+whenever a record has no slug, and running it with nothing to do SHALL change
+nothing.
+
+#### Scenario: Wizard run after the upgrade
+- **WHEN** an integrator runs the wizard on an installation whose function
   types have no slugs
 - **THEN** every function type has a slug, and its filtered list has a
   speaking URL
 
 #### Scenario: Slug already set
 - **WHEN** an editor already set the slug of an organisational unit and the
-  integrator runs the command
+  integrator runs the wizard
 - **THEN** that slug is unchanged

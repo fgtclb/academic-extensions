@@ -74,7 +74,7 @@
   generation, resolution and the pattern check, and record the outcome in
   `design.md`.
   Outcome: it can; recorded in `design.md`, no dedicated mapper.
-- [x] 4.4 If `ace-tbd-visitor-filter-ui-routes` is already merged, add the
+- [x] 4.4 If `ace-798-visitor-filter-ui-routes` is already merged, add the
   view mode variants of its filter routes here, with a routing test each.
   Not merged: its own task 1.2 adds the combined routes.
 

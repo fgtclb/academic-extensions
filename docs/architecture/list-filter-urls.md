@@ -110,16 +110,18 @@ demand too, and whose links are built as the next section describes.
 
 ## The links of the profile list
 
-The profile list of `academic_persons` has no filter form and no redirect: its
-page and its letter are chosen through links, the pagination and the letter
-navigation. It carries only what the visitor chose, built from the demand as
-above, but two of the rules above do not hold for it: the sorting is not
-carried, because the content element sets it, and the demand stays in the cache
-hash, because the list action is cacheable. The mechanism is its own.
+The profile list of `academic_persons` chooses its page, its letter and its
+view mode through links, the pagination, the letter navigation and the view
+mode switch. Its two visitor filters have a form, which posts to an action of
+its own, see the last item. Its links carry only what the visitor chose, built
+from the demand as above, but two of the rules above do not hold for it: the
+sorting is not carried, because the content element sets it, and the demand
+stays in the cache hash, because the list action is cacheable. The mechanism is
+its own.
 
 - **One list of visitor values.** `ProfileController` names the demand
-  properties a visitor sets, today `currentPage`, `alphabetFilter` and
-  `viewMode`. The
+  properties a visitor sets, today `currentPage`, `alphabetFilter`,
+  `viewMode`, `functionTypeFilter` and `organisationalUnitFilter`. The
   property mapping accepts exactly those, plus the keys of `settings.demand`,
   whose values the controller writes over the request's — so the sorting cannot
   be set from a URL however it is spelled. A change that lets a visitor set a
@@ -154,6 +156,21 @@ hash, because the list action is cacheable. The mechanism is its own.
 - **No pagination under a letter.** `listAction()` still switches pagination
   off while a letter is selected. Lifting that, and the route set that goes
   with it, is a change of its own.
+- **The filter form posts to `filterAction()`, not to the list.** The list
+  action is cacheable, and a POST to it would render the page. The `filter`
+  action is non-cacheable, maps the demand as the list does, resets a value
+  that is not an option, and throws a `303` to the list action with
+  `activeListArguments` minus the page: a new filter starts on page one and
+  keeps the view mode and the letter. With nothing left to carry it redirects
+  to the page itself, which is the list as it starts. The target keeps its
+  demand in the cache hash like every other link of this list, so the redirect
+  signs what it carries. It may do so only because every value is limited
+  first: the filters to their options, the view mode to the allowed modes, the
+  letter to the letters of the navigation. A hand-made submission therefore
+  gets no signed URL the list would not link itself, which is the risk the
+  section below describes for the other lists. See
+  [TypoScript and site sets](typoscript-and-site-sets.md#a-filter-form-reaches-a-route-through-a-redirect)
+  for its routes.
 
 ## The links of the job list
 

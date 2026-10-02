@@ -577,7 +577,7 @@ in use here: `Core\Attribute\AsEventListener` on eight listeners - the
 `RegisterAcademicPageDoktype` and the `AddPageModuleCategorySummary` listener of
 `academic-partners`, `academic-programs` and `academic-projects`, and
 `ApplySettingsToTca` of `academic-persons` and `academic-jobs` - and
-`Install\Attribute\UpgradeWizard` on the sixteen upgrade wizards. That
+`Install\Attribute\UpgradeWizard` on the seventeen upgrade wizards. That
 distinction is what the `#[AsEventListener]` rule above turns on — TYPO3 ships
 its own, Symfony's must never stand in for it, and Symfony's fails silently
 rather than loudly: it registers nothing, so the listener simply never fires.
@@ -595,7 +595,7 @@ replacement does not exist there. Verified against both vendor trees:
 | API                                                    | Replacement                                       | Present on v13.4.34?                                                                  | Call sites                 |
 |--------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------------|----------------------------|
 | `Extbase\Annotation\*`                                 | `Extbase\Attribute\*`                             | no — `cms-extbase/Classes/Attribute/` absent                                          | 10 in 6 files              |
-| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent                                              | 16 wizards in 7 extensions |
+| `Install\Updates\*`, `Install\Attribute\UpgradeWizard` | `Core\Upgrades\*`, `Core\Attribute\UpgradeWizard` | no — `cms-core/Classes/Upgrades/` absent                                              | 17 wizards in 7 extensions |
 | `Core\Service\FlexFormService`                         | `Core\Configuration\FlexForm\FlexFormTools`       | class exists on v13, but without `convertFlexFormContentToArray()` on `FlexFormTools` | 1 file                     |
 
 They are tracked as **ACE-294** (epic) with ACE-295, ACE-296 and ACE-297.
@@ -604,7 +604,7 @@ ignore them here. A "helpful" import rewrite is a fatal error on v13.
 
 Two ways out, and the choice belongs to the epic, not to an individual change:
 drop v13 support first (expected), or introduce the `Core13/Core14` split
-described above — disproportionate for 27 call sites.
+described above — disproportionate for 28 call sites.
 
 **Not on this list:** references to core labels marked `x-unused-since="14.0"`.
 They look the same — the replacements are v14-only XLIFF 2.0 files — but they

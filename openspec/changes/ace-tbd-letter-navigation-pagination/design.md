@@ -17,7 +17,7 @@ See `proposal.md` for the motivation. State on `main`:
   same on v13 and v14; the differences between the two files are type
   declarations and redundant conditions.
 - `ace-734-list-links-keep-state` keeps the letter in page links and drops the
-  page from letter links. `ace-tbd-visitor-filter-ui-routes` adds the filter
+  page from letter links. `ace-798-visitor-filter-ui-routes` adds the filter
   routes with explicit `requirements` and states that this change extends its
   route set.
 
@@ -58,7 +58,7 @@ letter when it has fewer pages, which looks like a random jump.
 ### One explicit route per enhancer: `/{letter}/{localized_page}-{page}`
 
 Both enhancers get the route with the aspects they already have. As in
-`ace-tbd-visitor-filter-ui-routes`, every variable gets `requirements` of
+`ace-798-visitor-filter-ui-routes`, every variable gets `requirements` of
 `[^/]+`. That keeps the two-segment route apart from `/{profile_name}` in
 ListAndDetail. No existing route changes, so `/persons/m` and
 `/persons/page-2` stay as they are.
@@ -98,7 +98,7 @@ calculation. The cache entry would then be shared by different result pages.
   filter and page route, or with this one, and the value not in the path stays
   a query argument with a cHash. It resolves to the same list. Routes for
   letter plus filter follow the open question of
-  `ace-tbd-visitor-filter-ui-routes`.
+  `ace-798-visitor-filter-ui-routes`.
 - [Two URLs for the first page of a letter] → `/persons/m` and
   `/persons/m/page-1`, just as `/persons` and `/persons/page-1` exist today.
   Accepted here; it is a matter of the pagination links, with or without a

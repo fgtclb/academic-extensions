@@ -166,7 +166,7 @@ The view mode requirement is deliberately looser than the partial-name
 pattern, which the controller enforces anyway: a site may map a segment such
 as `contact-cards`.
 
-The filter routes of `ace-tbd-visitor-filter-ui-routes` combine with this
+The filter routes of `ace-798-visitor-filter-ui-routes` combine with this
 segment. Whichever of the two changes lands second adds the combined routes.
 
 Rejected: keeping the mode a query argument. It works, but leaves the list

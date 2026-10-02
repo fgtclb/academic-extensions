@@ -48,7 +48,7 @@ None.
   enabled show fewer profiles per letter page than before.
 - No schema change, no new setting, no template change.
 - Depends on `ace-734-list-links-keep-state` for page links that keep the
-  letter, on `ace-tbd-visitor-filter-ui-routes` for the route set it extends,
+  letter, on `ace-798-visitor-filter-ui-routes` for the route set it extends,
   and on `ace-597-letter-navigation-availability` for the letter navigation it
   pages under.
 
@@ -56,7 +56,7 @@ None.
 
 - An option to keep the old "one page per letter" behaviour.
 - Routes for a letter combined with a visitor filter, with or without a page.
-  They follow the open question of `ace-tbd-visitor-filter-ui-routes`, and such
+  They follow the open question of `ace-798-visitor-filter-ui-routes`, and such
   URLs keep query parameters.
 - A single URL for the first page of a letter. The first page link keeps its
   page number, as it does for a list without a letter.

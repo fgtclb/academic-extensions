@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule — 346 PHP files declaring 305
+rather than describing an intention as a rule — 348 PHP files declaring 307
 classes, 11 interfaces, 17 traits and 13 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -16,12 +16,12 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-193 of the 305 classes are `final` (63 %). The distribution is not random: it
+195 of the 307 classes are `final` (64 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
 |--------------------------------------------|-------|-------|----------|---------|
-| `Classes/Upgrades/`                        | 16    | 0     | 0        | 100 %   |
+| `Classes/Upgrades/`                        | 17    | 0     | 0        | 100 %   |
 | `Classes/Service/` and `Classes/Services/` | 32    | 2     | 0        | 94 %    |
 | `Classes/EventListener/`                   | 12    | 1     | 0        | 92 %    |
 | `Classes/Controller/`                      | 4     | 5     | 0        | 44 %    |
@@ -29,7 +29,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 5     | 6     | 0        | 45 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
-| Everything else                            | 115   | 44    | 4        | 71 %    |
+| Everything else                            | 116   | 44    | 4        | 71 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -74,7 +74,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 61:
+nothing**, and of an immutable data object. There are 62:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -247,7 +247,7 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
 - The `exclude:` key in `Configuration/Services.yaml`, which is how the Extbase
   models are excluded in most packages.
 - Symfony's `#[Exclude]` attribute on the class, for data objects that do not
-  sit under an excluded path. Twenty-one sites
+  sit under an excluded path. Twenty-two sites
   (`grep -rn '#\[Exclude\]' --include='*.php' packages/fgtclb/*/Classes`):
   `Validation` and `ValidationSet` in `academic-base/Classes/Settings/`,
   `AfterSaveDecision` in `academic-base/Classes/Form/`, fourteen
@@ -257,8 +257,9 @@ a service from a data object. Two mechanisms keep them out, and both are in use:
   objects of the contract selection, `ContractSelection` and
   `ContractSelectionResult` in `academic-persons/Classes/Service/`, the
   upgrade wizard of `academic-persons` that a site package registers itself,
-  and the routing aspect `CategoryFilterMapper` of `typo3-category-types`,
-  which the core builds itself.
+  and the two routing aspects the core builds itself, `CategoryFilterMapper`
+  of `typo3-category-types` and `PersonsFilterSlugMapper` of
+  `academic-persons`.
   `LegacySettingsMigration` is not a settings value object but the result of
   the legacy settings overlay. It is excluded for the same reason: it is data
   the factory produces, not a service the container builds. A settings object
