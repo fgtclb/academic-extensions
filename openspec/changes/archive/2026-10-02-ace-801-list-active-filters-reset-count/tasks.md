@@ -53,4 +53,4 @@
 - [x] 6.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 6.4 `docs/` and every affected extension's `Documentation/` changelog
   updated; `README.md` and `CONTRIBUTING.md` still only link.
-- [ ] 6.5 Archive the change as the last commit of the pull request.
+- [x] 6.5 Archive the change as the last commit of the pull request.
