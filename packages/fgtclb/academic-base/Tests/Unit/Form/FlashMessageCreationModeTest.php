@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicJobs\Tests\Unit\SaveForm;
+namespace FGTCLB\AcademicBase\Tests\Unit\Form;
 
-use FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode;
+use FGTCLB\AcademicBase\Form\FlashMessageCreationMode;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
 /**
- * The single decision behind `Controller\JobController::createAction()`: whether the
- * "job created" confirmation is put into the Extbase flash message queue at all.
+ * The single decision behind `Form\AfterSaveResolver::decide()`: whether the
+ * confirmation of a frontend form plugin, "job created" in EXT:academic_jobs, is put into
+ * the Extbase flash message queue at all.
  *
  * It exists because the queue is keyed per plugin and lives in the session. A message
  * created on the form page and then redirected away is not consumed by the target page,
@@ -20,17 +21,19 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
  * shown to the wrong person at the wrong time.
  *
  * The mode is integrator configurable (plugin FlexForm, TypoScript fallback) and a
- * listener of `Event\AfterSaveJobEvent` may replace both the mode and the redirect page
- * before the decision is taken, so every combination below is reachable in production.
+ * listener of the after-save event of a plugin, `AfterSaveJobEvent` of EXT:academic_jobs,
+ * may replace both the mode and the redirect page before the decision is taken, so every
+ * combination below is reachable in production.
  */
 final class FlashMessageCreationModeTest extends UnitTestCase
 {
     /**
      * The backing values are persisted: they are what a plugin FlexForm and the TypoScript
-     * setting `saveForm.fallbackFlashMessageCreationMode` store, and `resolveFlashMessage
-     * CreationMode()` casts that stored string through `from()`. Reordering the cases would
-     * silently reinterpret every existing installation's configuration, which is why they
-     * are pinned here rather than treated as an implementation detail.
+     * setting `saveForm.fallbackFlashMessageCreationMode` store, and
+     * `AfterSaveResolver::flashMessageCreationMode()` casts that stored string through
+     * `tryFrom()`. Reordering the cases would silently reinterpret every existing
+     * installation's configuration, which is why they are pinned here rather than treated
+     * as an implementation detail.
      */
     #[Test]
     public function theBackingValuesAreStable(): void
@@ -43,7 +46,7 @@ final class FlashMessageCreationModeTest extends UnitTestCase
 
     /**
      * An installation that configures nothing gets the conditional mode, not `ALWAYS`.
-     * `resolveFlashMessageCreationMode()` falls through to this for every unset, non
+     * `AfterSaveResolver::flashMessageCreationMode()` falls through to this for every unset, non
      * numeric or out-of-range setting, so it is the behaviour the majority of sites run.
      */
     #[Test]
@@ -104,7 +107,7 @@ final class FlashMessageCreationModeTest extends UnitTestCase
         // The only combination that suppresses.
         yield 'conditional, redirect to another page' => [FlashMessageCreationMode::SUPPRESS_WITH_CONFIGURED_REDIRECT_PAGE, 10, 11, false];
 
-        // `determineCurrentPageId()` returns an int and is not guaranteed to be positive in
+        // The current page id of a plugin is an int and is not guaranteed to be positive in
         // every context, so the two page ids being equal at zero must not be mistaken for a
         // redirect - the `> 0` guard decides this row before the equality does.
         yield 'conditional, current page zero and redirect page zero' => [FlashMessageCreationMode::SUPPRESS_WITH_CONFIGURED_REDIRECT_PAGE, 0, 0, true];

@@ -358,8 +358,9 @@ packages are not listed; their own documentation applies.
     *   -   :php:`\FGTCLB\AcademicPersons\Profile\ProfileActionType`
         -   the profile factory event and the two events of the frontend user
             synchronisation
-    *   -   :php:`\FGTCLB\AcademicJobs\SaveForm\FlashMessageCreationMode`
-        -   the job save event
+    *   -   :php:`\FGTCLB\AcademicBase\Form\FlashMessageCreationMode`
+        -   the job save event (its old name in :guilabel:`EXT:academic_jobs`,
+            :php:`SaveForm\FlashMessageCreationMode`, is a deprecated alias)
     *   -   :php:`\FGTCLB\AcademicPersonsEdit\Event\ProfileEditingAction`
         -   the write event of the profile editing
     *   -   :php:`\FGTCLB\AcademicContacts4pages\Event\PageContactsOutput`

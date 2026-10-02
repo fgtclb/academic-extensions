@@ -35,10 +35,11 @@ This is a proposal only. It creates no extension.
 
 The move is identical on TYPO3 v13 and v14.
 
-Two premises of the candidate did not hold. The jobs settings loader is not
-marked internal (only the `academic_base` loader is), so any public class
-that moves needs a deprecated alias. Moving jobs onto the shared settings
-layer is not free of behaviour change, which is why it is split off.
+Two premises of the candidate did not hold when it was written. Moving jobs
+onto the shared settings layer is not free of behaviour change, which is why
+it was split off as ACE-508, merged before this change. And a public class
+that moves needs a deprecated alias: `FlashMessageCreationMode` is `@api`,
+because `AfterSaveJobEvent` hands it to listeners in project code.
 
 ## Capabilities
 
@@ -72,7 +73,4 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-23`). One of the six analysed projects carries its own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-<slug>` when the issue is filed after implementation.
-
-Relates to ACE-508.
+this today. Filed as ACE-797, which relates to ACE-508 and ACE-435.

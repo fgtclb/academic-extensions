@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 138 unit test classes: 123 across the twelve extensions, three in
-`packages-dev/dev-site`, seven in `packages-dev/monorepo-shared` and five in
+There are 141 unit test classes: 125 across the twelve extensions, three in
+`packages-dev/dev-site`, eight in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -88,8 +88,9 @@ that every translation names its extension without an underscore, see
 see [below](#the-extension-points), the check that no source file names an
 issue of a customer project, see [below](#customer-issue-keys), the checks
 of the manual links and the branch alias key, see
-[below](#the-links-of-the-manuals), and the check of the form
-`bin/set-version` writes, see [below](#the-form-binset-version-writes).
+[below](#the-links-of-the-manuals), the check of the form
+`bin/set-version` writes, see [below](#the-form-binset-version-writes), and the
+check that a class alias map ships, see [below](#class-alias-maps-ship).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -489,6 +490,21 @@ rewrote 22 files on `main`, and every release carried them into its commits.
 The test cannot run the tools themselves, `pkw` and `tailor` are not part of
 the container, so the pre-release checklist asks for that run, see
 [Releasing](../workflow/releasing.md#pre-release-checklist).
+
+## Class alias maps ship
+
+[`ClassAliasMapExportTest`](../../packages-dev/monorepo-shared/Tests/Unit/ClassAliasMapExportTest.php)
+reads the `extra.typo3/class-alias-loader.class-alias-maps` of every package
+below `packages/fgtclb/` and asserts that each map exists and that no
+`export-ignore` line of the package's `.gitattributes` covers it.
+
+Composer installs a split package from the archive of its split repository,
+which leaves out every `export-ignore` path, and several packages mark
+`/Migrations` that way. A map below it would be missing from every composer
+installation, the class alias loader only reports the missing file, and the
+deprecated names it keeps would stop resolving. Here the packages are installed
+from their directories, so no other test sees it. `academic_jobs` carried the
+line when it gained its first map (ACE-797).
 
 ## See also
 

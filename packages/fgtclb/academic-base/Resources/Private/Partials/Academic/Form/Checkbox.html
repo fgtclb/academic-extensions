@@ -1,0 +1,32 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:comment>
+    A checkbox with the value 1. The arguments are those of "Academic/Form/Textfield".
+</f:comment>
+
+<f:variable name="elementId" value="{objectName}.{element.identifier}"/>
+
+<f:render
+    partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
+    arguments="{
+        element: element,
+        elementId: elementId,
+        class: 'form-check-wrap',
+        extensionName: extensionName,
+    }"
+    contentAs="elementContent"
+>
+    <f:form.checkbox
+        property="{element.identifier}"
+        id="{elementId}"
+        value="1"
+        disabled="{element.disabled}"
+        class="form-check-input"
+    />
+</f:render>
+
+</html>

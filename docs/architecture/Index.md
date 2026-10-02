@@ -29,6 +29,10 @@ describing an intention as if it were the state.
   `academic_base`, registered in each plugin view with the root path key `-1`
   — below every key of the extension and of the project, so a project
   override always wins.
+- The generic pieces of a frontend form live **once**, in `academic_base`:
+  the flash message mode, the decision after a save and the field partials.
+  The jobs partials keep their names and pass their own wrapper partial on, so
+  a project override of the wrapper still reaches every field.
 - A template a project customises in pieces is **built from pieces**, and the
   entry partial keeps its name and its arguments so an existing copy of it is
   not broken. A partial that renders a *value* rather than markup renders it
@@ -130,6 +134,7 @@ describing an intention as if it were the state.
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and the `clear = 3` trap.                                                                                     |
 | [Translation synchronization](translation-synchronization.md)   | Why profile translations are written through the DataHandler, the event chain that triggers it, and the contact4pages policy on top of it.                                                                   |
 | [Shared partials](shared-partials.md)                           | The Fluid partials `academic_base` ships for every extension, the root path key `-1` they are registered with, and which views register it.                                                                  |
+| [Frontend forms](frontend-forms.md)                             | The form pieces `academic_base` shares with the jobs form: the flash message mode, the decision after a save, the field partials, and why the jobs partials keep their names.                                |
 | [Crop variants](crop-variants.md)                               | The named crop variants of the profile image and the program and project page media, where they are configured, and why `default` is written out.                                                            |
 | [Overridable partials](overridable-partials.md)                 | How a template is cut into partials a project overrides one at a time, the escaping contract of a partial that renders a value, and where the classes go.                                                    |
 | [Page type rendering](page-type-rendering.md)                   | How the page types refine the site's page object: `FLUIDTEMPLATE` against `PAGEVIEW`, the content variable, the path keys, the layout contract and its fallback.                                             |

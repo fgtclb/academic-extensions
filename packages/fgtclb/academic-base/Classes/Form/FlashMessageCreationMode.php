@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FGTCLB\AcademicJobs\SaveForm;
+namespace FGTCLB\AcademicBase\Form;
 
 /**
  * @api

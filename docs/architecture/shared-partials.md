@@ -2,10 +2,12 @@
 
 `academic_base` ships Fluid partials that several academic extensions render,
 so a project overrides a piece of markup once instead of once per extension.
-Today there is one: the responsive image partial
+This page is about the responsive image partial
 `Resources/Private/Partials/Academic/Image.html`. Its arguments and presets
 are public API and are documented in the `Templates` chapter of
-`academic_base`, not here; this page is about how the partial is wired.
+`academic_base`, not here; this page is about how the partial is wired. The
+form partials below `Academic/Form/`, which the jobs form renders, use the same
+root path key and are described in [Frontend forms](frontend-forms.md).
 
 ## Why a partial and not a ViewHelper
 
@@ -178,6 +180,8 @@ is still found.
   types write into `page.10`, and why the program page uses `50`.
 - [Crop variants](crop-variants.md) — the variant names the images offer
   for the `cropVariant` argument of the partial.
+- [Frontend forms](frontend-forms.md): the form partials of `academic_base`
+  and why the jobs partials keep their names.
 - [Overridable partials](overridable-partials.md) — how a template is cut
   into partials a project overrides one at a time.
 - [TypoScript and site sets](typoscript-and-site-sets.md) — where the plugin
