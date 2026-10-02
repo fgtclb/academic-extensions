@@ -2683,9 +2683,8 @@ entities:
                 content:
                   # The full list: both visitor filters, the view mode switch and only the
                   # contracts valid today, each with its function type. Greta Lindqvist's
-                  # only contract ended in 2024, so she is listed without one, and the
-                  # filters still find her through it: the list query reads every contract,
-                  # while the valid-today option only decides which ones render (ACE-800).
+                  # only contract ended in 2024, so she is listed without one, and a filter
+                  # by its function type or unit does not find her (ACE-800).
                   - self:
                         id: 6
                         CType: 'academicpersons_list'
