@@ -48,10 +48,8 @@ as no trait of the extensions does, see [Class design](class-design.md#traits).
   `validations` after the event, so a listener cannot take the configured
   validations off the form.
 - **Not hidden in an override of `htmlResponse()`.** That would run after every
-  assignment, the protected ones included. Nor would it protect the event
-  from a project subclass of one of the controllers that are not `final` yet:
-  a subclass that overrides `htmlResponse()` or an action without calling the
-  parent drops the dispatch either way.
+  assignment, the protected ones included, and it would hide from a reader of
+  the action that the action dispatches an event at all.
 - **One context per rendering.** Every action builds its context once, before
   its first event and after its settings are settled, and hands the same object
   to every event it dispatches: the demand and list events of the partner,

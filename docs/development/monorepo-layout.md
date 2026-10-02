@@ -57,9 +57,9 @@ installation:
   `library`. It centralizes the TYPO3 core dependency constraints, and checks
   the `ext_emconf.php` dependency keys of every extension, the extension name
   of every translation, in templates and in PHP, and the extension point
-  policy: final and used event classes, and the `@api` tags against the page
-  that lists them. It also keeps the issue keys of customer projects out of
-  the sources of this public repository.
+  policy: final and used event classes, final plugin controllers, and the
+  `@api` tags against the page that lists them. It also keeps the issue keys
+  of customer projects out of the sources of this public repository.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`,
   type `library`. Shared functional-test traits.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key
@@ -320,7 +320,8 @@ here.
 Its `Tests/Unit/` holds the checks that concern all extensions at once: every
 key an `ext_emconf.php` names in `depends`, `suggests` or `conflicts` has to
 name an extension that exists, every translation, in a template or in PHP,
-has to name its extension without an underscore, the event classes and `@api`
+has to name its extension without an underscore, the event classes and the
+plugin controllers have to follow the extension point policy and the `@api`
 tags have to match the extension points page, no file may name an issue key of
 a customer project, and the links of every manual have to lead to its own
 package. See

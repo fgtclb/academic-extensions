@@ -82,23 +82,14 @@ What is not public API
 
 Everything else. In particular:
 
-*   **Controllers.** The controllers of :guilabel:`academic_contacts4pages`,
-    :guilabel:`academic_jobs`, :guilabel:`academic_persons` and
-    :guilabel:`academic_persons_edit` are :php:`final`. Five controllers are not
-    final yet: :php:`BiteJobsController` of :guilabel:`academic_bite_jobs`,
-    :php:`PartnerController` of :guilabel:`academic_partners`,
-    :php:`ProgramController` and :php:`DetailsController` of
-    :guilabel:`academic_programs`, and :php:`ProjectController` of
-    :guilabel:`academic_projects`. They are left open so that an existing
-    subclass keeps working for now, not as an invitation: a subclass breaks
-    whenever an action or a constructor changes, and they may become final in
-    the next major version. Each of their actions dispatches the
-    :ref:`plugin view event <developers-extension-points-plugin-view>`, and the
-    partner, program and project lists and the program finder a demand and a
-    list event as well, and the B-ITE job list a request and a result event,
-    which replace such a subclass. A subclass that
-    overrides an action without calling the parent action drops those events
-    for its plugin.
+*   **Controllers.** Every plugin controller is :php:`final`, so neither a
+    subclass nor an XCLASS of one loads. A plugin is extended through its
+    events: every plugin action that renders a view dispatches the
+    :ref:`plugin view event <developers-extension-points-plugin-view>`, except
+    the profile editing of :guilabel:`academic_persons_edit`, which offers
+    each of its writes to an event instead. The partner, program and project
+    lists and the program finder dispatch a demand and a list event as well,
+    and the B-ITE job list a request and a result event.
 *   **Repositories.** A condition a plugin should apply belongs in a demand or
     a query event, not in an XCLASS of the repository.
 *   **Services, data processors, ViewHelper classes, backend item providers,
@@ -577,7 +568,7 @@ unnecessary. Not every extension offers all three yet:
     *   -   A demand event per repository query a plugin runs, to change what
             is queried
         -   :guilabel:`academic_persons`, :guilabel:`academic_partners`,
-            :guilabel:`academic_projects`
+            :guilabel:`academic_programs`, :guilabel:`academic_projects`
         -   the list plugins of the other extensions
     *   -   An after-save event per write, to react to a saved record
         -   the profile of :guilabel:`academic_persons`, the job form of

@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-196 of the 308 classes are `final` (64 %). The distribution is not random: it
+201 of the 308 classes are `final` (65 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
@@ -24,7 +24,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/Upgrades/`                        | 17    | 0     | 0        | 100 %   |
 | `Classes/Service/` and `Classes/Services/` | 32    | 2     | 0        | 94 %    |
 | `Classes/EventListener/`                   | 12    | 1     | 0        | 92 %    |
-| `Classes/Controller/`                      | 4     | 5     | 0        | 44 %    |
+| `Classes/Controller/`                      | 9     | 0     | 0        | 100 %   |
 | `Classes/Domain/Model/Dto/`                | 8     | 10    | 1        | 42 %    |
 | `Classes/ViewHelpers/`                     | 6     | 6     | 0        | 50 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 354 modifiers, of
-which 341 are constructor-promoted, across 107 files. The thirteen non-promoted
+`readonly` is used heavily, mostly on individual properties: 369 modifiers, of
+which 356 are constructor-promoted, across 110 files. The thirteen non-promoted
 declarations are the nine documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php`, the three
 fields `typo3-category-types/Classes/Routing/Aspect/CategoryFilterMapper.php`
@@ -98,9 +98,9 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 209   | An injected collaborator                          |
+| `private readonly`   | 229   | An injected collaborator                          |
 | `public readonly`    | 122   | A field of an immutable data object               |
-| `protected readonly` | 22    | Either, in classes with subclasses or older style |
+| `protected readonly` | 18    | Either, in classes with subclasses or older style |
 
 Use `private readonly` for every constructor-injected dependency. It states that
 the service does not rebind it, which is the property half of the stateless rule
@@ -119,18 +119,18 @@ required, not a deviation.
 
 ## Constructor injection, and the abstract class exception
 
-Constructor injection with promoted properties is the default: 91 files declare
-293 promoted `readonly` parameters. The fullest example by a wide margin is
+Constructor injection with promoted properties is the default: 94 files declare
+308 promoted `readonly` parameters. The fullest example by a wide margin is
 `academic-persons-edit/Classes/Controller/ProfileController.php` — 36 promoted
 `private readonly` dependencies and an empty constructor body. That number is a
 known problem rather than a model: splitting the controller is ACE-507.
 
 **Method injection is used where a constructor is not available to take
-dependencies.** There are 17 `inject*()` methods across 10 files and **zero**
+dependencies.** There are 11 `inject*()` methods across 7 files and **zero**
 `@inject` annotations — the annotation form is not used at all, which is worth
 keeping true.
 
-The first legitimate case is an abstract base class. Its constructor is part of
+The legitimate case is an abstract base class. Its constructor is part of
 the API of every class extending it, including classes in projects outside this
 repository, so adding a dependency there breaks all of them. Method injection
 keeps the constructor free:
@@ -159,27 +159,25 @@ The 5 abstract classes and what each is for:
 | `academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php:21` | Extbase validator base pulling `AcademicPersonsSettings` |
 | `academic-persons-edit/Classes/Domain/Model/Dto/AbstractFormData.php:10`          | Base for the form-data DTOs                              |
 
-The second legitimate case is a concrete class that projects subclass while it
-is not `final` yet. The list controllers of `academic_partners`,
-`academic_projects` and `academic_programs` take the `ExtensionService` through
-`injectFilterRedirectExtensionService()` for that reason: a project's controller
-subclass calls `parent::__construct()` with the arguments it knows, and a new
-constructor argument would break it. The method is `final` and named after its
-purpose, as core's own `injectInternalExtensionService()` of `ActionController`
-is, so a subclass cannot declare one of the same name by accident. The details
-controller of `academic_programs` takes its `ProgramFactsBuilder` through
-`injectProgramFactsBuilder()` for the same reason, and all three list
-controllers take the `FilterTypeResolver` through `injectFilterTypeResolver()`.
-Once the controllers are `final`, the services move to the constructor.
+The plugin controllers of `academic_partners`, `academic_projects` and
+`academic_programs` took the `ExtensionService`, the `FilterTypeResolver` and
+the `ProgramFactsBuilder` through `final` `inject*()` methods while projects
+could still subclass them, so that a subclass calling `parent::__construct()`
+kept working. Since every plugin controller is `final` (ACE-803), those
+services are constructor arguments like any other.
 
-Apart from that, method injection on a **concrete** class does not have this
-justification.
-`academic-persons-edit/Classes/Service/ListSortingService.php` line 29 is
-existing code, not a template for new code — it is also cited in
+Method injection on a **concrete** class does not have this justification. Six
+of the eleven methods are on concrete classes all the same: one each on
+`ContactsController` of `academic_contacts4pages`, `JobValidator` of
+`academic_jobs`, `ProgramRepository` of `academic_programs` and
+`ListSortingService` of `academic_persons_edit`, and two on `ProfileRepository`
+of `academic_persons`. They are existing code, not a template for new code.
+`academic-persons-edit/Classes/Service/ListSortingService.php` line 29 is also
+cited in
 [Dependency injection](dependency-injection.md#where-the-codebase-does-not-comply)
 because its injected property is nullable and therefore mutable state.
-`academic-persons/Classes/Controller/ProfileController.php` used to be the
-other example, with three `inject*()` methods and no constructor; the moment
+`academic-persons/Classes/Controller/ProfileController.php` used to be
+another example, with three `inject*()` methods and no constructor. The moment
 it needed a fourth collaborator, the four became a constructor with promoted
 `private readonly` properties — an Extbase `ActionController` has no
 constructor of its own, so nothing has to be forwarded. The `ProfileController`
@@ -449,10 +447,11 @@ for integrators, who read the manual rather than this repository.
   `GeneralUtility::getClassName()`. `academic:upgrade:check` reports that
   XCLASS as a notice rather than a warning, see
   [Upgrade checks](upgrade-checks.md). Repositories are not API.
-- **The five controllers that are not `final` yet are not API either.** They
-  stay open so that existing project subclasses keep working; that is why
-  their new collaborators arrive through method injection (see above). Do not
-  make them more open, and point a project at an event instead.
+- **Every plugin controller is `final`, and none is API.** A project extends a
+  plugin through the events the
+  [extension points page](../../packages/fgtclb/academic-base/Documentation/Developers/ExtensionPoints/Index.rst)
+  lists, never through a subclass or an XCLASS of its controller, and a new
+  controller is `final` from the start (ACE-803).
 - **Every plugin action that renders a view dispatches the plugin view
   event**, `ModifyPluginViewEvent` of `academic_base`, through the trait
   method `dispatchModifyPluginViewEvent()`, once on every path that renders.
@@ -500,7 +499,8 @@ Events follow one shape:
 [`ExtensionPointTest`](../testing/unit-tests.md#the-extension-points) in
 `packages-dev/monorepo-shared` holds what a test can: every event class is
 `final` and created by production code, every domain model carries `@api`,
-and the page and the tags name the same classes.
+every plugin controller is `final`, and the page and the tags name the same
+classes.
 
 ## Static analysis
 

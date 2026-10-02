@@ -24,10 +24,8 @@ deprecates any of it says so in a :guilabel:`Breaking` or a
 
 Everything the chapter does not list is not public API, whether it is
 :php:`final` or not, and may change in any release without a changelog entry.
-That includes every repository and the five controllers of
-:guilabel:`academic_bite_jobs`, :guilabel:`academic_partners`,
-:guilabel:`academic_programs` and :guilabel:`academic_projects` that are not
-final yet.
+That includes every repository and every plugin controller. The plugin
+controllers are all :php:`final` in 3.0.
 
 Subclassing or XCLASSing a class is unsupported, listed or not, with one
 exception: a subclass of a domain model, which is how a project adds fields to
@@ -43,8 +41,11 @@ Nothing changes for a visitor or an editor. An installation that extends a
 domain model through an XCLASS sees a notice instead of a warning from the
 upgrade check, and the command exits with :bash:`0` if nothing else is found.
 
-A project that subclasses a controller or XCLASSes a class the chapter does
-not list keeps working as before, but should move that code to the events the
-chapter names before the next update.
+A project that XCLASSes a class the chapter does not list keeps working as
+before, but should move that code to the events the chapter names before the
+next update. A subclass or an XCLASS of a plugin controller no longer loads in
+3.0, see the :guilabel:`Breaking` entries of :guilabel:`academic_bite_jobs`,
+:guilabel:`academic_partners`, :guilabel:`academic_programs` and
+:guilabel:`academic_projects`.
 
 ..  index:: PHP-API, ext:academic_base
