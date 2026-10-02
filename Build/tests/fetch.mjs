@@ -15,7 +15,11 @@
  * The responses themselves are real "Response" objects, so "response.ok",
  * "response.status" and "response.json()" behave exactly as they do in a
  * browser - including the rejection on a body that is not JSON, which
- * "requestJson()" catches.
+ * "requestJson()" catches. A constructed response has an empty "url", so a
+ * response that stands for a followed redirect is given the url it ended at.
+ *
+ * A request carries its "signal" like a browser request does: aborting it
+ * rejects the call with the abort reason, also while its response is held open.
  *
  * See "docs/testing/javascript-tests.md".
  */
@@ -43,8 +47,16 @@ export const installFetch = () => {
     const calls = [];
     const responses = [];
 
-    const makeResponse = (body, { status = 200, headers = { 'Content-Type': 'application/json' }, raw = false } = {}) =>
-        new Response(raw ? body : JSON.stringify(body), { status, headers });
+    const makeResponse = (body, { status = 200, headers = { 'Content-Type': 'application/json' }, raw = false, url = '' } = {}) => {
+        const response = new Response(raw ? body : JSON.stringify(body), { status, headers });
+        if (url !== '') {
+            // "url" is a getter of the prototype that a constructed response answers with an
+            // empty string. A browser reports the url the response came from, after redirects.
+            Object.defineProperty(response, 'url', { value: url });
+        }
+
+        return response;
+    };
 
     const respond = (body, options) => {
         responses.push(Promise.resolve(makeResponse(body, options)));
@@ -69,6 +81,7 @@ export const installFetch = () => {
 
     globalThis.fetch = (url, options = {}) => {
         const headers = { ...(options.headers ?? {}) };
+        const signal = options.signal ?? null;
         calls.push({
             url: String(url),
             method: options.method ?? 'GET',
@@ -76,6 +89,7 @@ export const installFetch = () => {
             credentials: options.credentials,
             body: decodeBody(options.body),
             rawBody: options.body ?? null,
+            signal,
         });
         const response = responses.shift();
         if (response === undefined) {
@@ -83,8 +97,17 @@ export const installFetch = () => {
             // is a test that does not describe what it is exercising.
             return Promise.reject(new Error(`No response was queued for the request to "${String(url)}".`));
         }
+        if (signal === null) {
+            return response;
+        }
+        if (signal.aborted) {
+            return Promise.reject(signal.reason);
+        }
 
-        return response;
+        return new Promise((resolve, reject) => {
+            signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+            response.then(resolve, reject);
+        });
     };
 
     return {
@@ -97,6 +120,8 @@ export const installFetch = () => {
         respondWithError: (body, status = 400) => respond(body, { status }),
         /** Queues a body that is not JSON at all, for the "no decodable result" path. */
         respondWithText: (body, status = 200) => respond(body, { status, headers: { 'Content-Type': 'text/html' }, raw: true }),
+        /** Queues an HTML page, as the url a followed redirect ended at returns it. */
+        respondWithPage: (body, url, status = 200) => respond(body, { status, headers: { 'Content-Type': 'text/html' }, raw: true, url }),
         /** The single call a test expects, with the assertion that there was exactly one. */
         lastCall: () => calls[calls.length - 1],
         restore: () => {

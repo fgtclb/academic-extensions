@@ -29,6 +29,33 @@ shape of the list's own form, `demand[filterCollection][<type>]`, and the
 list's redirect answers it. That shape is therefore a contract the finder
 depends on; see [List filter types](list-filter-types.md#the-program-finder).
 
+## The program list requests its URLs without a reload
+
+The program list of `academic_programs` takes a filter URL without reloading
+the page. Its module `frontend/program-list.js` posts the form with `fetch()`
+exactly as the browser would, `fetch()` follows the `303`, and the response is
+the page of the filter URL with `response.url` set to that URL. The module
+replaces every program list of the page with the one of the same content
+element uid from that page, and pushes the URL into the history. Every list,
+because all of them share the plugin namespace and the filter URL filters each
+of them: the page shows what a reload of the URL shows. Back and forward request the URL of the history
+entry with a GET and replace the list again.
+
+- **Nothing about the URL moves into the browser.** The redirect still
+  normalises the selection and computes the cache hash, so the address bar
+  shows exactly the URL a reload would have shown, and the route enhancers
+  apply unchanged.
+- **The response is a whole page.** There is no endpoint or page type of its
+  own, so routing, access and caching are the page's own. It costs the server
+  what the reload cost and saves the browser the assets of a new page.
+- **A failure ends in the reload it replaced.** A failed request, an error
+  status or a page without the list submits the form the normal way.
+
+The partner and project lists still submit on a change through inline
+handlers. Their templates and the module would need the same parts. See
+[Frontend assets](../development/frontend-assets.md#a-module-that-updates-part-of-the-page-asks-for-the-whole-page)
+for the markup contract.
+
 ## The demand in the URL
 
 ```text

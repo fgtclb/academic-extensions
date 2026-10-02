@@ -88,3 +88,10 @@ export declare const setBoundingRect: (
  * register can observe that it did.
  */
 export declare const isObjectUrlAlive: (url: string) => boolean;
+
+/**
+ * The urls of the documents that started a navigation to another document
+ * since the last "resetBody()", a reload for example. jsdom performs none of
+ * them and reports each as "not implemented", which the harness records here.
+ */
+export declare const recordedNavigations: () => string[];
