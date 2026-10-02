@@ -255,10 +255,15 @@ entities:
                       slug: '/data/persons'
                       doktype: 254
               entities:
+                # Function types and units declare an empty "slug". DataHandler then
+                # generates it from the name, as a backend save does, and the seed
+                # manifest measures the generated value. The filter routes of the
+                # persons lists read it: "/persons/list/function/professor".
                 organisationalUnit:
                   - self:
                         id: 1
                         unit_name: 'TYPO3 University'
+                        slug: ''
                         unique_name: 'typo3-university'
                         display_text: 'TYPO3 University'
                     languageVariants:
@@ -266,12 +271,14 @@ entities:
                             id: 501
                             language: 1
                             unit_name: 'TYPO3 Universität'
+                            slug: ''
                             unique_name: 'typo3-university'
                             display_text: 'TYPO3 Universität'
                   - self:
                         id: 2
                         parent: 1
                         unit_name: 'Department of Web Engineering'
+                        slug: ''
                         unique_name: 'web-engineering'
                         display_text: 'Department of Web Engineering'
                     languageVariants:
@@ -280,12 +287,14 @@ entities:
                             language: 1
                             parent: 1
                             unit_name: 'Fachbereich Web Engineering'
+                            slug: ''
                             unique_name: 'web-engineering'
                             display_text: 'Fachbereich Web Engineering'
                   - self:
                         id: 3
                         parent: 1
                         unit_name: 'Department of Data Science'
+                        slug: ''
                         unique_name: 'data-science'
                         display_text: 'Department of Data Science'
                     languageVariants:
@@ -294,12 +303,14 @@ entities:
                             language: 1
                             parent: 1
                             unit_name: 'Fachbereich Data Science'
+                            slug: ''
                             unique_name: 'data-science'
                             display_text: 'Fachbereich Data Science'
                   - self:
                         id: 4
                         parent: 1
                         unit_name: 'Department of Media Studies'
+                        slug: ''
                         unique_name: 'media-studies'
                         display_text: 'Department of Media Studies'
                     languageVariants:
@@ -308,12 +319,14 @@ entities:
                             language: 1
                             parent: 1
                             unit_name: 'Fachbereich Medienwissenschaften'
+                            slug: ''
                             unique_name: 'media-studies'
                             display_text: 'Fachbereich Medienwissenschaften'
                   - self:
                         id: 5
                         parent: 2
                         unit_name: 'Institute of Accessibility'
+                        slug: ''
                         unique_name: 'accessibility'
                         display_text: 'Institute of Accessibility'
                     languageVariants:
@@ -322,12 +335,14 @@ entities:
                             language: 1
                             parent: 2
                             unit_name: 'Institut für Barrierefreiheit'
+                            slug: ''
                             unique_name: 'accessibility'
                             display_text: 'Institut für Barrierefreiheit'
                   - self:
                         id: 6
                         parent: 3
                         unit_name: 'Institute of Applied Statistics'
+                        slug: ''
                         unique_name: 'applied-statistics'
                         display_text: 'Institute of Applied Statistics'
                     languageVariants:
@@ -336,12 +351,14 @@ entities:
                             language: 1
                             parent: 3
                             unit_name: 'Institut für Angewandte Statistik'
+                            slug: ''
                             unique_name: 'applied-statistics'
                             display_text: 'Institut für Angewandte Statistik'
                 functionType:
                   - self:
                         id: 1
                         function_name: 'Professor'
+                        slug: ''
                         function_name_male: 'Professor'
                         function_name_female: 'Professor'
                     languageVariants:
@@ -349,11 +366,13 @@ entities:
                             id: 501
                             language: 1
                             function_name: 'Professur'
+                            slug: ''
                             function_name_male: 'Professor'
                             function_name_female: 'Professorin'
                   - self:
                         id: 2
                         function_name: 'Lecturer'
+                        slug: ''
                         function_name_male: 'Lecturer'
                         function_name_female: 'Lecturer'
                     languageVariants:
@@ -361,24 +380,29 @@ entities:
                             id: 502
                             language: 1
                             function_name: 'Lehrkraft'
+                            slug: ''
                             function_name_male: 'Dozent'
                             function_name_female: 'Dozentin'
                   - self:
                         id: 3
                         function_name: 'Research assistant'
+                        slug: ''
                     languageVariants:
                       - self:
                             id: 503
                             language: 1
                             function_name: 'Wissenschaftliche Mitarbeit'
+                            slug: ''
                   - self:
                         id: 4
                         function_name: 'Guest lecturer'
+                        slug: ''
                     languageVariants:
                       - self:
                             id: 504
                             language: 1
                             function_name: 'Lehrbeauftragung'
+                            slug: ''
                 location:
                   - self:
                         id: 1
@@ -2197,25 +2221,53 @@ entities:
               # "CategoryVariantTypeTest" of this package checks it.
               entities:
                 category:
+                  # The two degree levels above the degrees, so a programme can be found by its
+                  # level ("includeSubcategories" of the programme list) and its facts can name
+                  # the most specific degree only ("facts.mostSpecificOnly"). They come first
+                  # because a child names its parent by uid, and the parent has to exist then.
+                  - self:
+                        id: 29
+                        type: 'degree'
+                        title: 'Bachelor'
+                    languageVariants:
+                      - self:
+                            id: 529
+                            language: 1
+                            type: 'degree'
+                            title: 'Bachelor'
+                  - self:
+                        id: 30
+                        type: 'degree'
+                        title: 'Master'
+                    languageVariants:
+                      - self:
+                            id: 530
+                            language: 1
+                            type: 'degree'
+                            title: 'Master'
                   - self:
                         id: 1
                         type: 'degree'
+                        parent: 29
                         title: 'Bachelor of Engineering'
                     languageVariants:
                       - self:
                             id: 501
                             language: 1
                             type: 'degree'
+                            parent: 29
                             title: 'Bachelor of Engineering'
                   - self:
                         id: 2
                         type: 'degree'
+                        parent: 30
                         title: 'Master of Science'
                     languageVariants:
                       - self:
                             id: 502
                             language: 1
                             type: 'degree'
+                            parent: 30
                             title: 'Master of Science'
                   - self:
                         id: 3
@@ -2629,6 +2681,11 @@ entities:
                       slug: '/personal/liste'
               entities:
                 content:
+                  # The full list: both visitor filters, the view mode switch and only the
+                  # contracts valid today, each with its function type. Greta Lindqvist's
+                  # only contract ended in 2024, so she is listed without one, and the
+                  # filters still find her through it: the list query reads every contract,
+                  # while the valid-today option only decides which ones render (ACE-800).
                   - self:
                         id: 6
                         CType: 'academicpersons_list'
@@ -2666,13 +2723,22 @@ entities:
                                               <value index="vDEF">list</value>
                                           </field>
                                           <field index="settings.showFields">
-                                              <value index="vDEF">contracts.position,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
+                                              <value index="vDEF">contracts.position,contracts.functionType,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
                                           </field>
                                           <field index="settings.fallbackForNonTranslated">
                                               <value index="vDEF">1</value>
                                           </field>
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">0</value>
+                                          </field>
+                                          <field index="settings.filter.functionType">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                          <field index="settings.filter.organisationalUnit">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                          <field index="settings.contracts.onlyValid">
+                                              <value index="vDEF">1</value>
                                           </field>
                                       </language>
                                   </sheet>
@@ -2717,13 +2783,22 @@ entities:
                                                   <value index="vDEF">list</value>
                                               </field>
                                               <field index="settings.showFields">
-                                                  <value index="vDEF">contracts.position,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
+                                                  <value index="vDEF">contracts.position,contracts.functionType,contracts.organisationalUnit,contracts.emailAddresses,contracts.phoneNumbers</value>
                                               </field>
                                               <field index="settings.fallbackForNonTranslated">
                                                   <value index="vDEF">1</value>
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                              <field index="settings.filter.functionType">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.filter.organisationalUnit">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.contracts.onlyValid">
+                                                  <value index="vDEF">1</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -2880,6 +2955,9 @@ entities:
                                           <field index="settings.fallbackForNonTranslated">
                                               <value index="vDEF">0</value>
                                           </field>
+                                          <field index="settings.contracts.matchFilter">
+                                              <value index="vDEF">1</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -2928,6 +3006,9 @@ entities:
                                               <field index="settings.fallbackForNonTranslated">
                                                   <value index="vDEF">0</value>
                                               </field>
+                                              <field index="settings.contracts.matchFilter">
+                                                  <value index="vDEF">1</value>
+                                              </field>
                                           </language>
                                       </sheet>
                                   </data>
@@ -2974,6 +3055,9 @@ entities:
                                           <field index="settings.fallbackForNonTranslated">
                                               <value index="vDEF">1</value>
                                           </field>
+                                          <field index="settings.filter.organisationalUnit">
+                                              <value index="vDEF">1</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -3005,6 +3089,9 @@ entities:
                                                   <value index="vDEF">list</value>
                                               </field>
                                               <field index="settings.fallbackForNonTranslated">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.filter.organisationalUnit">
                                                   <value index="vDEF">1</value>
                                               </field>
                                           </language>
@@ -3109,6 +3196,9 @@ entities:
                                           <field index="settings.fallbackForNonTranslated">
                                               <value index="vDEF">1</value>
                                           </field>
+                                          <field index="settings.contracts.display">
+                                              <value index="vDEF">first</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -3137,6 +3227,9 @@ entities:
                                               </field>
                                               <field index="settings.fallbackForNonTranslated">
                                                   <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.contracts.display">
+                                                  <value index="vDEF">first</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -3790,6 +3883,9 @@ entities:
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">1</value>
                                           </field>
+                                          <field index="settings.groupByRole">
+                                              <value index="vDEF">0</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -3809,6 +3905,9 @@ entities:
                                           <language index="lDEF">
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.groupByRole">
+                                                  <value index="vDEF">0</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -3898,6 +3997,16 @@ entities:
                                           </field>
                                       </language>
                                   </sheet>
+                                  <sheet index="pagination">
+                                      <language index="lDEF">
+                                          <field index="settings.paginationEnabled">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                          <field index="settings.pagination.resultsPerPage">
+                                              <value index="vDEF">3</value>
+                                          </field>
+                                      </language>
+                                  </sheet>
                               </data>
                           </T3FlexForms>
                     languageVariants:
@@ -3918,6 +4027,16 @@ entities:
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                          </language>
+                                      </sheet>
+                                      <sheet index="pagination">
+                                          <language index="lDEF">
+                                              <field index="settings.paginationEnabled">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.pagination.resultsPerPage">
+                                                  <value index="vDEF">3</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -4407,7 +4526,7 @@ entities:
               - self:
                     id: 14
                     label: 'Reflection seminar'
-                    credit_points: 2
+                    credit_points: 1.5
                     categories: '3'
                 languageVariants:
                   - self:
@@ -4417,7 +4536,7 @@ entities:
               - self:
                     id: 15
                     label: 'Career workshop'
-                    credit_points: 2
+                    credit_points: 2.5
                     categories: '2'
                 languageVariants:
                   - self:
@@ -4462,6 +4581,8 @@ entities:
                     CType: 'academic_study_plan'
                     header: 'Bachelor of Engineering, study plan'
                     header_layout: 1
+                    frame_class: 'ruler-before'
+                    space_before_class: 'medium'
                     tx_academicstudyplan_semesters: '1,2,3,4,5,6'
                     tx_academicstudyplan_footer_note: 'Subject to change. The module handbook is the binding document.'
                 languageVariants:
@@ -4471,6 +4592,8 @@ entities:
                         CType: 'academic_study_plan'
                         header: 'Bachelor of Engineering, Studienplan'
                         header_layout: 1
+                        frame_class: 'ruler-before'
+                        space_before_class: 'medium'
                         tx_academicstudyplan_semesters: '501,502,503,504,505,506'
                         tx_academicstudyplan_footer_note: 'Änderungen vorbehalten. Verbindlich ist das Modulhandbuch.'
         # "settings.sorting" must never be written empty. "DemandFactory" guards it
@@ -4569,6 +4692,9 @@ entities:
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">0</value>
                                           </field>
+                                          <field index="settings.filter.includeSubcategories">
+                                              <value index="vDEF">1</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -4602,6 +4728,9 @@ entities:
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                              <field index="settings.filter.includeSubcategories">
+                                                  <value index="vDEF">1</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -4791,10 +4920,12 @@ entities:
                   lastUpdated: 1748779200
                   doktype: 20
                   backend_layout: 'pagets__AcademicProgram'
-                  categories: '1,3,5,7,9,10,11,12,13'
+                  categories: '1,3,5,7,9,10,11,12,13,29'
                   subtitle: 'Six semesters, full time'
                   abstract: 'An engineering degree with a focus on web technologies.'
                   credit_points: 180
+                  application_link: 'https://example.org/apply/bachelor-of-engineering'
+                  application_link_label: 'Apply for this programme'
                   job_profile: '<p>Software engineering, systems integration, technical consulting.</p>'
                   performance_scope: '<p>180 credit points over six semesters, including a practical semester.</p>'
                   prerequisites: '<p>University entrance qualification, no admission restriction.</p>'
@@ -4808,10 +4939,12 @@ entities:
                       lastUpdated: 1748779200
                       doktype: 20
                       backend_layout: 'pagets__AcademicProgram'
-                      categories: '1,3,5,7,9,10,11,12,13'
+                      categories: '1,3,5,7,9,10,11,12,13,29'
                       subtitle: 'Six semesters, full time'
                       abstract: 'An engineering degree with a focus on web technologies.'
                       credit_points: 180
+                      application_link: 'https://example.org/apply/bachelor-of-engineering'
+                      application_link_label: 'Für diesen Studiengang bewerben'
                       job_profile: '<p>Software engineering, systems integration, technical consulting.</p>'
                       performance_scope: '<p>180 credit points over six semesters, including a practical semester.</p>'
                       prerequisites: '<p>University entrance qualification, no admission restriction.</p>'
@@ -4904,10 +5037,11 @@ entities:
                   lastUpdated: 1748692800
                   doktype: 20
                   backend_layout: 'pagets__AcademicProgram'
-                  categories: '2,4,6,8'
+                  categories: '2,4,6,8,30'
                   subtitle: 'Four semesters, full time'
                   abstract: 'A research oriented master programme.'
                   credit_points: 120
+                  application_link: 'https://example.org/apply/master-of-science'
                   job_profile: '<p>Research, data engineering, software architecture.</p>'
                   prerequisites: '<p>A bachelor degree in a related subject.</p>'
               languageVariants:
@@ -4919,10 +5053,11 @@ entities:
                       lastUpdated: 1748692800
                       doktype: 20
                       backend_layout: 'pagets__AcademicProgram'
-                      categories: '2,4,6,8'
+                      categories: '2,4,6,8,30'
                       subtitle: 'Four semesters, full time'
                       abstract: 'A research oriented master programme.'
                       credit_points: 120
+                      application_link: 'https://example.org/apply/master-of-science'
                       job_profile: '<p>Research, data engineering, software architecture.</p>'
                       prerequisites: '<p>A bachelor degree in a related subject.</p>'
               entities:
@@ -5288,6 +5423,9 @@ entities:
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">0</value>
                                           </field>
+                                          <field index="settings.showActiveStateBadge">
+                                              <value index="vDEF">1</value>
+                                          </field>
                                       </language>
                                   </sheet>
                               </data>
@@ -5326,6 +5464,9 @@ entities:
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                              <field index="settings.showActiveStateBadge">
+                                                  <value index="vDEF">1</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -5518,9 +5659,10 @@ entities:
                   slug: '/projects/accessible-learning-platform'
                   doktype: 30
                   backend_layout: 'pagets__AcademicProject'
+                  subtitle: 'Learning without barriers'
                   categories: '17,19,21'
                   tx_academicprojects_project_title: 'Accessible learning platform (ALP)'
-                  tx_academicprojects_short_description: '<p>A learning platform built against WCAG 2.2 from the first commit.</p>'
+                  tx_academicprojects_short_description: '<p>A learning platform built against <a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> from the first commit.</p>'
                   tx_academicprojects_start_date: 1640995200
                   tx_academicprojects_end_date: 2082758400
                   tx_academicprojects_budget: '450000.00'
@@ -5534,9 +5676,10 @@ entities:
                       slug: '/projekte/barrierefreie-lernplattform'
                       doktype: 30
                       backend_layout: 'pagets__AcademicProject'
+                      subtitle: 'Lernen ohne Barrieren'
                       categories: '17,19,21'
                       tx_academicprojects_project_title: 'Accessible learning platform (ALP)'
-                      tx_academicprojects_short_description: '<p>A learning platform built against WCAG 2.2 from the first commit.</p>'
+                      tx_academicprojects_short_description: '<p>A learning platform built against <a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> from the first commit.</p>'
                       tx_academicprojects_start_date: 1640995200
                       tx_academicprojects_end_date: 2082758400
                       tx_academicprojects_budget: '450000.00'
@@ -5827,6 +5970,16 @@ entities:
                                           </field>
                                       </language>
                                   </sheet>
+                                  <sheet index="pagination">
+                                      <language index="lDEF">
+                                          <field index="settings.paginationEnabled">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                          <field index="settings.pagination.resultsPerPage">
+                                              <value index="vDEF">2</value>
+                                          </field>
+                                      </language>
+                                  </sheet>
                               </data>
                           </T3FlexForms>
                     languageVariants:
@@ -5858,6 +6011,16 @@ entities:
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">0</value>
+                                              </field>
+                                          </language>
+                                      </sheet>
+                                      <sheet index="pagination">
+                                          <language index="lDEF">
+                                              <field index="settings.paginationEnabled">
+                                                  <value index="vDEF">1</value>
+                                              </field>
+                                              <field index="settings.pagination.resultsPerPage">
+                                                  <value index="vDEF">2</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -6137,6 +6300,7 @@ entities:
                   lastUpdated: 1748260800
                   doktype: 40
                   backend_layout: 'pagets__AcademicPartner'
+                  subtitle: 'The association behind TYPO3'
                   categories: '22,24,25'
                   abbreviation: 'T3A'
                   address_street: 'Sihlbruggstrasse'
@@ -6161,6 +6325,7 @@ entities:
                       lastUpdated: 1748260800
                       doktype: 40
                       backend_layout: 'pagets__AcademicPartner'
+                      subtitle: 'Der Verein hinter TYPO3'
                       categories: '22,24,25'
                       abbreviation: 'T3A'
                       address_street: 'Sihlbruggstrasse'

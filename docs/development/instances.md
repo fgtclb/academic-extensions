@@ -191,13 +191,13 @@ second profile, a second group and an unconnected account can be looked at.
 | Username | `jane.doe`                                                  |
 | Password | `Frontend-User-1701D.`                                      |
 | Group    | `Website users` (`fe_groups` uid 1)                         |
-| Storage  | the `Data` folder, page uid 2                               |
+| Storage  | the `Data · frontend users` folder, page uid 170            |
 | Profile  | `Jane Doe`, `tx_academicpersons_domain_model_profile` uid 1 |
 
 To use it:
 
 1. open `/login`, which carries the `felogin_login` plugin — its
-   `settings.pages` names page 2, the folder the user record sits on, and a
+   `settings.pages` names page 170, the folder the user record sits on, and a
    value naming the wrong folder makes a correct password fail silently;
 2. log in; the plugin redirects to `/my-profile`
    (`settings.redirectMode = login`);
@@ -210,27 +210,32 @@ The editing form locks `firstName`, `middleName` and `lastName`: the shipped
 by the connected frontend user record. That is deliberate, not a defect — see
 [Validation settings](../architecture/validation-settings.md).
 
-The other two seeded profiles (`Erik Mustermann`, `Alina Sorge`) have **no**
-connected frontend user. That is not an oversight either: it is what the
-"logged in user without a profile" case looks like, and the plugin renders its
-empty state for it.
+Two more of the fourteen seeded profiles are connected, `Erik Mustermann` to
+`erik.mustermann` and `Liam Rhodes` to `liam.rhodes`. `sam.tester` has **no**
+profile. That is not an oversight either: it is what the "logged in user
+without a profile" case looks like, and the plugin renders its empty state for
+it.
 
 ## What the instances contain
 
 The page tree is written from the seed set
-`packages-dev/dev-site/Configuration/DataFactory/academics-instance/` — one
-section per extension, one page per plugin:
+`packages-dev/dev-site/Configuration/DataFactory/academics-instance/`, one
+section per extension and one page per plugin. Every page and record has a
+German translation below `/de/`:
 
-| Page                    | What is on it                                                                                                                                                                               |
-|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `/`                     | start page                                                                                                                                                                                  |
-| `/data`                 | storage folder: frontend user and group, organisational units, function types, a location, three profiles with contracts, addresses, phone numbers, e-mail addresses, vita and publications |
-| `/academic-persons/*`   | one page per plugin of `EXT:academic_persons`: list, list and detail, detail, card, selected profiles, selected contracts                                                                   |
-| `/login`, `/my-profile` | `EXT:felogin` and the editing form of `EXT:academic_persons_edit`                                                                                                                           |
-| `/data-categories`      | storage folder: `sys_category` records carrying a `category_types` type                                                                                                                     |
-| `/academic-programs`    | the list plugin of `EXT:academic_programs`, and three program pages (`doktype: 20`), each carrying the details plugin                                                                       |
-| `/data-partners`        | storage folder: partner roles                                                                                                                                                               |
-| `/academic-partners/*`  | the four plugins of `EXT:academic_partners`, and two partner pages (`doktype: 40`)                                                                                                          |
+| Page                    | What is on it                                                                                                                                                                                                                                                                                                                                                                                |
+|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `/data/*`               | Storage folders: persons (organisational units and function types with their slugs, profiles, contracts and their children), external persons, jobs, partner roles, contact roles, study plan categories, `sys_category` records with a `category_types` type (two of them parents of a degree), frontend users and groups                                                                   |
+| `/persons/*`            | One page per plugin of `EXT:academic_persons`. The list offers both visitor filters, the view mode switch, pagination, only valid contracts and the function type of each contract. The letter navigation lets the active letter reset. The filtered list shows only the contracts that match its filter, list and detail offers the unit filter, and the cards show the first contract only |
+| `/login`, `/my-profile` | `EXT:felogin` and the editing form of `EXT:academic_persons_edit`                                                                                                                                                                                                                                                                                                                            |
+| `/contacts/*`           | The contacts list of `EXT:academic_contacts4pages`, grouped by role, and a second one with hidden contacts and without the grouping                                                                                                                                                                                                                                                          |
+| `/jobs/*`               | The job lists (the full one paginated), the detail page, the new job form and its confirmation, and the b-ite list of `EXT:academic_bite_jobs`                                                                                                                                                                                                                                               |
+| `/study-plan`           | A study plan with a collapsible filter, decimal credit points, and the frame and spacing of the Appearance tab                                                                                                                                                                                                                                                                               |
+| `/programs/*`           | The programme list (four filters shown, subcategories included), a preset list, the programme finder, and six programme pages (`doktype: 20`) with their facts, the back link to the list and application links                                                                                                                                                                              |
+| `/projects/*`           | The project lists, with the active state badge on the full one, and six project pages (`doktype: 30`), the accessible learning platform with a subtitle and a link in its text                                                                                                                                                                                                               |
+| `/partners/*`           | The partner list (paginated), a preset list, the map, the partnerships plugins, and six partner pages (`doktype: 40`), the TYPO3 Association with a subtitle                                                                                                                                                                                                                                 |
+| `/draft`, `/members`    | A hidden page and a page for a frontend user group                                                                                                                                                                                                                                                                                                                                           |
+| `/legacy/*`             | The same tree again, delivered by a `sys_template` record instead of site sets                                                                                                                                                                                                                                                                                                               |
 
 Changing that content is a change to the seed set, not a click path — see
 [Seeding an instance](environment.md#seeding-an-instance).

@@ -31,6 +31,9 @@ plugin:
     pagination:
       # The set ships 1.
       resultsPerPage: 10
+    alphabet:
+      # The active letter of the letter navigation links back to the whole list.
+      activeLetterResets: true
   tx_academicjobs:
     persistence:
       # "/data/jobs". The jobs are storage pid addressed, so both page trees of
@@ -48,3 +51,24 @@ plugin:
       # the middle of a frontend request rather than a warning in a log.
       from: seed-noreply@example.org
       recipientEmail: jobs@example.org
+  tx_academicprograms:
+    page:
+      # The programme list, which the back link of a programme page leads to.
+      listPid: 251
+    facts:
+      # Two programme pages carry a degree and the degree level above it. Only
+      # the degree is a fact.
+      mostSpecificOnly: true
+    filter:
+      # The programme list offers twelve filters. Four are shown, the others
+      # are behind "More filters".
+      visibleCount: 4
+  tx_academicprojects:
+    filter:
+      # An option that would empty the project list is left out rather than
+      # shown disabled. The programme list keeps showing the disabled ones.
+      hideDisabledOptions: true
+  tx_academicstudyplan:
+    filter:
+      # The filter of the study plan starts folded.
+      collapsible: true

@@ -465,6 +465,7 @@ function templateRecord(): array
             demand.sortBy = lastName
             demand.sortByDirection = asc
             pagination.resultsPerPage = 10
+            alphabet.activeLetterResets = 1
         }
 
         plugin.tx_academicjobs {
@@ -474,6 +475,20 @@ function templateRecord(): array
             saveForm.fallbackRedirectPageId = 1235
             email.from = seed-noreply@example.org
             email.recipientEmail = jobs@example.org
+        }
+
+        plugin.tx_academicprograms {
+            page.listPid = 1251
+            facts.mostSpecificOnly = 1
+            filter.visibleCount = 4
+        }
+
+        plugin.tx_academicprojects {
+            filter.hideDisabledOptions = 1
+        }
+
+        plugin.tx_academicstudyplan {
+            filter.collapsible = 1
         }
         TYPOSCRIPT;
 
