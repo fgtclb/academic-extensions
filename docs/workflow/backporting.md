@@ -18,7 +18,7 @@ This page is about deciding which of the two it is, cheaply and with evidence.
 
 The core constraints come from `packages-dev/monorepo-shared/composer.json`,
 which is where every extension's TYPO3 requirement is centralised: `main`
-declares `~13.4.0@dev || ~14.3.6@dev`, branch `2` declares
+declares `~13.4.35 || ~14.3.7`, branch `2` declares
 `^12.4.22 || ^13.4`. The PHP floor comes from each extension's own
 `composer.json` (`^8.2 || …` versus `^8.1 || …`).
 

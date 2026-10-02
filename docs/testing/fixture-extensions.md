@@ -101,7 +101,7 @@ A minimal one, complete:
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
     "require": {
-        "typo3/cms-core": "~13.4.0@dev || ~14.3.6@dev",
+        "typo3/cms-core": "~13.4.35 || ~14.3.7",
         "fgtclb/academic-persons": "~3.0.0@dev"
     },
     "extra": {
@@ -336,9 +336,9 @@ prefer the narrower tool.
    manifest unless both are declared, and its constraints then override the
    composer `require`. The upgrade check tests of `academic_base` failed on v14
    alone that way.
-3. Write `ext_emconf.php`. The `version` and the `constraints.depends.typo3`
-   range are read from it by TYPO3, so keep them consistent with the composer
-   file. It carries no comment, `bin/set-version` rewrites the file through
+3. Write `ext_emconf.php`. The `version` and the `constraints.depends` ranges
+   of `typo3` and `core` are read from it by TYPO3, so keep them consistent
+   with the composer file. It carries no comment, `bin/set-version` rewrites the file through
    packwright and drops every comment, and a unit test fails on one, see
    [Unit tests](unit-tests.md#the-form-binset-version-writes). Write it in
    packwright's form with `pkw extemconf:normalize <file>`.

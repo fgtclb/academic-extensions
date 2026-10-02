@@ -344,7 +344,8 @@ Three extensions name a core extension in one file and not in the other —
 `composer.json`, and `academic_partners` suggests `scheduler` only there — and
 an equality check would fail today for no defect.
 `academic_jobs` carries that stricter check for itself,
-`academic-jobs/Tests/Unit/ExtEmConfDependenciesTest.php`.
+`academic-jobs/Tests/Unit/ExtEmConfDependenciesTest.php`. It expects
+`typo3/cms-core` twice in `ext_emconf.php`, as `typo3` and as `core`.
 
 ## The extension name of translations
 
