@@ -118,6 +118,8 @@ address table has one now, `ImportIdentifierIndexTest` checks all eight.
 
 - [Frontend-user contact import](frontend-user-contact-import.md) — the
   synchronisation that writes the identifiers of frontend users.
+- [Import writer](import-writer.md): the writer that matches the records of
+  an import by their identifiers.
 - [Validation settings](validation-settings.md#managed-fields-a-lock-per-record)
   — the managed fields, which a record with an identifier locks.
 - [Database queries](database-queries.md) — the ordering and quoting rules the

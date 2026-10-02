@@ -173,7 +173,8 @@ Three kinds of run are not announced:
 - **A run in a workspace.** Only live saves are announced.
 
 `ProfileWriteCorrelation::Import` marks an import instead: it is announced,
-with the origin `Import`. The mark is an **aspect** of the correlation id, and
+with the origin `Import`. The [import writer](import-writer.md) sets it on
+every run it starts. The mark is an **aspect** of the correlation id, and
 the scope stays random per run as the DataHandler makes it — the shape the
 core's redirects extension uses to recognise its own nested runs
 (`DataHandlerSlugUpdateHook::isNestedHookInvocation()`). A fixed scope was

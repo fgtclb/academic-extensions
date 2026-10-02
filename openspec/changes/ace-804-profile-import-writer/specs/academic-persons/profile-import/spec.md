@@ -33,8 +33,8 @@ records unchanged and SHALL report the person as skipped.
 ### Requirement: Existing records receive only managed fields
 The system SHALL store every supplied field on a new record, and on an
 existing record only the supplied fields declared as managed for its record
-type. Without a managed-field declaration an existing record SHALL NOT be
-changed.
+type. Without a managed-field declaration no field of an existing record SHALL
+change.
 
 #### Scenario: Local field survives
 - **WHEN** `position` is managed for contracts, an editor changed the room of
@@ -53,7 +53,7 @@ is hidden.
 
 ### Requirement: Listeners can change or veto a record write
 The system SHALL let a registered listener change the values of each record
-write or veto it; a vetoed record SHALL NOT be written and SHALL be reported.
+write or veto it. A vetoed record SHALL NOT be written and SHALL be reported.
 
 #### Scenario: Vetoed contract
 - **WHEN** a listener vetoes a contract of an imported person
@@ -64,7 +64,8 @@ write or veto it; a vetoed record SHALL NOT be written and SHALL be reported.
 The system SHALL hide or delete, as the caller chooses, the records of one
 source whose identifiers the caller does not keep, and SHALL NOT touch
 records without an identifier, records of another source, or records of
-profiles excluded from the synchronisation.
+profiles excluded from the synchronisation, except that deleting a profile or
+a contract deletes the records that belong to it.
 
 #### Scenario: Retiring a vanished contract
 - **WHEN** import code retires the source `his` keeping only `his:4711`, and a
@@ -72,16 +73,23 @@ profiles excluded from the synchronisation.
 - **THEN** that contract is hidden, and a manually created contract of the
   same profile is unchanged
 
+#### Scenario: Retiring with the delete policy
+- **WHEN** import code retires the source `his` with the delete policy, keeping
+  only `his:4711`, and a contract carries `his:0815`
+- **THEN** that contract is deleted
+
 ### Requirement: Imported profiles are synchronised afterwards
-The system SHALL synchronise the translations and the slug of every profile
-the writer created or changed, in the same run and once per person, in CLI
-and scheduler runs as well. Listeners of profile updates SHALL learn that the
-update came from an import.
+The system SHALL announce every profile the writer created or changed once
+per person, in the same run, in CLI and scheduler runs as well, and listeners
+of profile updates SHALL learn that the update came from an import. With
+academic_persons_edit installed, the translations and the slug of the profile
+SHALL follow.
 
 #### Scenario: Import from the command line
-- **WHEN** import code writes a changed person from a CLI command
+- **WHEN** academic_persons_edit is installed, and import code writes a
+  changed person with a new contract from a CLI command
 - **THEN** the translations of the profile carry the new values of their
-  non-translatable fields
+  non-translatable fields and a translation of the new contract
 
 #### Scenario: Listeners recognise an import
 - **WHEN** import code writes a changed person
