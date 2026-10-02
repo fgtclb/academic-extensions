@@ -51,5 +51,5 @@
   v13.
 - [x] 4.2 The same for v14 after `composerUpdate -t 14`.
 - [x] 4.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
-- [ ] 4.4 Commit as `[BUGFIX] ACE-800: <subject>` in TYPO3 Core format, with no
+- [x] 4.4 Commit as `[BUGFIX] ACE-800: <subject>` in TYPO3 Core format, with no
   attribution, and archive the change as the last commit of the pull request.
