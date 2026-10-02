@@ -19,17 +19,31 @@ with exactly that category removed and every other selection kept.
 - **AND** the degree tag links to the list filtered by the teaching language
   only
 
+#### Scenario: The filter is hidden
+
+- **WHEN** active filter tags are enabled and the content element hides the
+  filter
+- **THEN** no tag is shown, whatever the list is filtered by
+
 ### Requirement: A reset link clears every filter
 
-When the integrator enables the reset link and at least one filter is active,
-the program list SHALL render a link to the same list without any filter
-argument.
+When the integrator enables the reset link, the list shows a selection the
+visitor made and a category is selected or preselected by the content element,
+the program list SHALL render a link to the same page without any filter
+argument. Where the content element hides the filter, no reset link SHALL be
+rendered.
 
 #### Scenario: Visitor resets the filters
 
 - **WHEN** the reset link is enabled and the visitor follows it
 - **THEN** the program list is shown as the content element presets it,
   without any visitor selection
+
+#### Scenario: Nothing to reset
+
+- **WHEN** the reset link is enabled, the content element preselects nothing
+  and the visitor changed the sorting only
+- **THEN** no reset link is shown
 
 ### Requirement: The number of results is shown
 
@@ -43,8 +57,8 @@ the total number of matching programs with a singular or plural label.
 
 ### Requirement: The additions are off by default
 
-Without explicit configuration the program list MUST render exactly the
-markup it rendered before this change.
+Without explicit configuration the program list MUST render none of the
+tags, the reset link and the count.
 
 #### Scenario: Site without the new settings
 

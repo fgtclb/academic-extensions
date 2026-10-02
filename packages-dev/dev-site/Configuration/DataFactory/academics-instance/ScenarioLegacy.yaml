@@ -134,14 +134,26 @@ entities:
                       email.recipientEmail = jobs@example.org
                   }
 
+                  plugin.tx_academicpartners {
+                      filter.showActiveFilters = 1
+                      filter.showReset = 1
+                      filter.showResultCount = 1
+                  }
+
                   plugin.tx_academicprograms {
                       page.listPid = 1251
                       facts.mostSpecificOnly = 1
                       filter.visibleCount = 4
+                      filter.showActiveFilters = 1
+                      filter.showReset = 1
+                      filter.showResultCount = 1
                   }
 
                   plugin.tx_academicprojects {
                       filter.hideDisabledOptions = 1
+                      filter.showActiveFilters = 1
+                      filter.showReset = 1
+                      filter.showResultCount = 1
                   }
 
                   plugin.tx_academicstudyplan {

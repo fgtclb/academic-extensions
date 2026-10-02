@@ -63,13 +63,17 @@ or the code fills in, a category type or a field name for example.
     *   - Key
         - Shown by
     *   - :xml:`activeState.<state>`
-        - :file:`Partials/Project/DemandActiveState.html`, :file:`Partials/Project/Item.html`
+        - :file:`Partials/Project/DemandActiveState.html`, :file:`Partials/Project/ActiveFilters.html`, :file:`Partials/Project/Item.html`
     *   - :xml:`activeState.label`
         - :file:`Partials/Project/DemandActiveState.html`
+    *   - :xml:`filter.activeFilters.label`, :xml:`filter.activeFilters.remove`, :xml:`filter.reset`
+        - :file:`Partials/Project/ActiveFilters.html`
     *   - :xml:`filter.moreFilters`
         - :file:`Partials/Project/DemandCategories.html`
     *   - :xml:`list.noProjectsFound`
         - :file:`Partials/Project/ItemList.html`
+    *   - :xml:`list.resultCount.singular`, :xml:`list.resultCount.plural`
+        - :file:`Partials/Project/ResultCount.html`
     *   - :xml:`project.budget`
         - :file:`Partials/Project/Page/Facts.html`
     *   - :xml:`project.funders`

@@ -331,11 +331,12 @@ package. See
 
 `fgtclb/academics-monorepo-testing-helper` autoloads
 `FGTCLB\TestingHelper\` from `Classes/` and is required as a dev dependency of
-the root. It ships thirteen functional-test traits in
+the root. It ships fourteen functional-test traits in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/`:
 
 | Trait                                  | Purpose                                                                             |
 |----------------------------------------|-------------------------------------------------------------------------------------|
+| `ActiveFiltersAssertionTrait`          | Reads the active filter tags, the reset link and the result count of a list.        |
 | `CategoryFilterFormAssertionTrait`     | Reads the category filters of a list's filter form, and where they render.          |
 | `ColourSchemeAwareIconsTrait`          | Asserts a record icon follows the backend colour scheme.                            |
 | `ContentElementHeaderAssertionTrait`   | Counts where the header of a content element rendered, and how often.               |

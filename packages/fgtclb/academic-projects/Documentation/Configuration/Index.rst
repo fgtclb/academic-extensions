@@ -430,6 +430,83 @@ template that renders the partial.
     away and with one "All" label, and anything else needed an override of the
     partial.
 
+..  _configuration-active-filters:
+
+Active filters, reset link and result count
+===========================================
+
+Three switches add to the filter form of the
+:guilabel:`Projects` and :guilabel:`Projects (selected)` content elements, for the whole site. All
+three are off by default.
+
+..  list-table::
+    :header-rows: 1
+
+    *   -   Site setting and constant
+        -   Default
+        -   Meaning
+    *   -   :typoscript:`plugin.tx_academicprojects.filter.showActiveFilters`
+        -   0
+        -   One tag per selected category and one for an active
+            state other than "All", below the form. Each tag links to the list
+            without that selection, every other selection and the sorting
+            kept. The state tag links to the state "All".
+    *   -   :typoscript:`plugin.tx_academicprojects.filter.showReset`
+        -   0
+        -   A :guilabel:`Reset all filters` link to the page without any list
+            argument, so the list shows what the content element presets.
+            Offered after the visitor selected something, while a category or an active state other than "All"
+            is selected or preset by the content element, also once the
+            visitor removed the preset. On the page as the editor preset it,
+            the link would lead to the page shown.
+    *   -   :typoscript:`plugin.tx_academicprojects.filter.showResultCount`
+        -   0
+        -   The number of projects found, for example "12 projects found".
+
+..  code-block:: yaml
+    :caption: config/sites/my-site/settings.yaml
+
+    plugin:
+      tx_academicprojects:
+        filter:
+          showActiveFilters: true
+          showReset: true
+          showResultCount: true
+
+The settings are site settings of the aggregate set `fgtclb/academic-projects` and constants of
+the same names, like the filter settings above.
+
+*   A tag shows a category in the language of the page.
+*   A tag stays a tag when the editor preset its category or state: removing it
+    shows the list without it, and the reset link brings the preset back.
+*   The category tags are shown only while the category filter is, and the state
+    tag only while the state select is: a tag removes what the visitor could
+    change. Where the content element hides both, neither tags nor the reset link
+    are shown. The count is.
+*   Every selected category is a tag, also one whose type the form does not
+    offer (see the filter types above), for example a preset one. Removing it
+    works like for any other tag.
+*   The tags and the reset link come from the partial
+    :file:`Project/ActiveFilters.html`, the count from
+    :file:`Project/ResultCount.html`. Both are rendered by
+    :file:`Project/SortingAndFilters.html`, so a project that overrides that
+    partial does not show them until it renders them as well. The partials use
+    the classes `academic-projects-active-filters` (with `__tags`, `__tag`, `__remove` and
+    `__reset`) and `academic-projects-result-count`, and bring no styles.
+*   The reset link needs the variable :html:`{visitorSelection}`, which the list
+    action assigns. A project controller that overrides the action without
+    calling the parent action has to assign it, or the list offers no reset
+    link.
+*   The labels are :xml:`filter.activeFilters.label`,
+    :xml:`filter.activeFilters.remove`, :xml:`filter.reset`,
+    :xml:`list.resultCount.singular` and :xml:`list.resultCount.plural` of this
+    extension. The count labels take the number as `%d`, the remove label the
+    category title as `%s`.
+
+..  versionadded:: 3.0
+
+    The three settings and the two partials.
+
 ..  _configuration-active-state:
 
 The state of a project

@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but thirteen PHP traits — the parts of the test setup that were being copied
+but fourteen PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -13,6 +13,7 @@ necessary.
 | [`FrontendPluginRenderingTrait`](#frontendpluginrenderingtrait)                 | The scaffolding every frontend plugin rendering test needs.         |
 | [`ContentElementHeaderAssertionTrait`](#contentelementheaderassertiontrait)     | Counts where the header of a content element rendered, how often.   |
 | [`CategoryFilterFormAssertionTrait`](#categoryfilterformassertiontrait)         | Reads the category filters of a list's filter form, and where.      |
+| [`ActiveFiltersAssertionTrait`](#activefiltersassertiontrait)                   | Reads the active filter tags, reset link and count of a list.       |
 | [`ResponsiveImageAssertionTrait`](../architecture/shared-partials.md)           | Asserts what the shared image partial of `academic_base` rendered.  |
 | [`PluginFlexFormDataStructureTrait`](#pluginflexformdatastructuretrait)         | Resolves a plugin FlexForm the way FormEngine does.                 |
 | [`DeprecatedCoreLabelsTrait`](#deprecatedcorelabelstrait)                       | Guards TCA against core labels TYPO3 v14 retired.                   |
@@ -296,6 +297,37 @@ $this->assertSame(
 rendered in the wrong place, and for a disclosure that is open when it should be
 closed; a select found by its `id` alone does not tell a category filter from a
 sorting select.
+
+---
+
+## `ActiveFiltersAssertionTrait`
+
+[`Classes/FunctionalTestCase/ActiveFiltersAssertionTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/ActiveFiltersAssertionTrait.php)
+
+**What it does.** Reads the active filter tags, the reset link and the result
+count of a partner, project or program list out of a rendered page, selected by
+the class prefix of the extension, `academic-<extension>`.
+`activeFilterTags()` returns the tags in document order, keyed by their title,
+with the link and the accessible label of each. `activeFiltersResetLink()` and
+`activeFiltersResultCount()` return the link target and the text, or `null`
+when the page renders none, and `activeFiltersDemand()` the demand a link
+carries, keys sorted.
+
+**When to use it.** In every test of the tags, the reset link or the count.
+
+```php
+$content = $this->renderFrontendPage('https://www.acme.com/home?…');
+$tags = $this->activeFilterTags($content, 'academic-partners');
+$this->assertSame(['Europe', 'University'], array_keys($tags));
+$this->assertSame(
+    ['filterCollection' => ['categories' => '3'], 'sortingDirection' => 'asc', 'sortingField' => 'title'],
+    $this->activeFiltersDemand($tags['Europe']['href'], 'tx_academicpartners_list'),
+);
+```
+
+**The trap it exists for.** A string assertion on the page cannot tell which
+tag a link belongs to, and passes on a reset link or a count that renders
+twice. The helpers assert both.
 
 ## `PluginFlexFormDataStructureTrait`
 

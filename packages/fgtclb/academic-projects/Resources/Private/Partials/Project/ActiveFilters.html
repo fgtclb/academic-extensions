@@ -1,0 +1,146 @@
+<html
+    lang="en"
+    xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+    xmlns:ct="http://typo3.org/ns/FGTCLB/CategoryTypes/ViewHelpers"
+    data-namespace-typo3-fluid="true"
+>
+
+<f:comment>
+    The active filters of a project list, as tags, and the link that resets them.
+
+    Every category tag links to the list with its category removed, every other category,
+    the active state and the sorting kept. An active state other than "all" is a tag as
+    well, which links to the list with the state "all" and keeps the categories. A link
+    always carries the sorting and the active state, which still counts as a selection: only
+    a request without any demand argument applies what the content element presets, so the
+    visitor does not get back a preset they removed.
+
+    The category tags follow the category filter, the state tag follows the state select: a
+    tag is shown only while the visitor can change what it removes. The category tags
+    follow the type order of the category group, the order of the filters. The loop reads
+    `allCategoriesByType` rather than the category collection itself: the collection is
+    an iterator with a single position, and `ct:filterArgument` walks the same collection
+    inside the loop, which would end the loop after the first tag.
+
+    The reset link leads to the page without any argument, so the list shows what the
+    content element presets. It is offered while the list shows a visitor's selection,
+    `visitorSelection`, and a category or an active state other than "all" is selected or
+    preset by the content element, also once the visitor removed the preset. On the bare
+    page it would lead to what is already shown, and with nothing selected and nothing
+    preset it would reset nothing but the sorting.
+
+    Only categories of the types the collection was built for get a tag, which are all of
+    them for the collections the demand factory builds. A collection a demand listener
+    builds by hand without type identifiers gets no tags.
+
+    Arguments: the "SortingAndFilters" partial renders it with "{_all}".
+    - demand:            the demand of the list shown
+    - settings:          for `hideFilter`, `hideActiveState`, `filter.showActiveFilters` and
+                         `filter.showReset`
+    - visitorSelection:  whether the request carried a demand
+</f:comment>
+<f:variable name="categoryTags" value="0" />
+<f:if condition="{settings.filter.showActiveFilters} && !{settings.hideFilter} && {demand.filterCollection.filterCategories}">
+    <f:for each="{demand.filterCollection.filterCategories.allCategoriesByType}" as="categoriesOfType">
+        <f:if condition="{categoriesOfType}">
+            <f:variable name="categoryTags" value="1" />
+        </f:if>
+    </f:for>
+</f:if>
+<f:variable name="stateTag" value="0" />
+<f:if condition="{settings.filter.showActiveFilters} && !{settings.hideActiveState} && {demand.activeState} != 'all'">
+    <f:variable name="stateTag" value="1" />
+</f:if>
+<f:variable name="resettable" value="0" />
+<f:if condition="{demand.filterCollection.filterCategories}">
+    <f:variable name="resettable" value="1" />
+</f:if>
+<f:if condition="{demand.activeState} != 'all'">
+    <f:variable name="resettable" value="1" />
+</f:if>
+<f:if condition="{settings.categories}">
+    <f:variable name="resettable" value="1" />
+</f:if>
+<f:if condition="{settings.activeState} && {settings.activeState} != 'all'">
+    <f:variable name="resettable" value="1" />
+</f:if>
+<f:variable name="showResetLink" value="0" />
+<f:if condition="{settings.filter.showReset} && {visitorSelection} && {resettable}">
+    <f:variable name="showResetLink" value="1" />
+</f:if>
+
+<f:if condition="{categoryTags} || {stateTag} || {showResetLink}">
+    <div class="academic-projects-active-filters">
+        <f:if condition="{categoryTags} || {stateTag}">
+            <ul
+                class="academic-projects-active-filters__tags"
+                aria-label="{f:translate(key: 'filter.activeFilters.label', extensionName: 'AcademicProjects')}"
+            >
+                <f:if condition="{categoryTags}">
+                    <f:for each="{demand.filterCollection.filterCategories.allCategoriesByType}" as="categoriesOfType">
+                        <f:for each="{categoriesOfType}" as="category">
+                            <f:variable name="remainingFilter" value="{ct:filterArgument(filterCollection: demand.filterCollection, without: category)}" />
+                            <f:render section="Tag" arguments="{
+                                title: category.title,
+                                filter: remainingFilter,
+                                activeState: demand.activeState,
+                                demand: demand
+                            }" />
+                        </f:for>
+                    </f:for>
+                </f:if>
+                <f:if condition="{stateTag}">
+                    <f:variable name="stateTitle" value="{f:translate(key: 'activeState.{demand.activeState}', extensionName: 'AcademicProjects')}" />
+                    <f:variable name="wholeFilter" value="{ct:filterArgument(filterCollection: demand.filterCollection)}" />
+                    <f:render section="Tag" arguments="{
+                        title: stateTitle,
+                        filter: wholeFilter,
+                        activeState: 'all',
+                        demand: demand
+                    }" />
+                </f:if>
+            </ul>
+        </f:if>
+        <f:if condition="{showResetLink}">
+            <f:link.page class="academic-projects-active-filters__reset">
+                {f:translate(key: 'filter.reset', extensionName: 'AcademicProjects')}
+            </f:link.page>
+        </f:if>
+    </div>
+</f:if>
+
+<f:comment>
+    One tag: its title, and a link to the list with the category filter `filter` and the
+    active state `activeState`, the sorting of `demand` kept. An empty filter is left out of
+    the link, because a list route enhancer cannot generate one.
+</f:comment>
+<f:section name="Tag">
+    <f:if condition="{filter}">
+        <f:then>
+            <f:variable name="tagDemand" value="{
+                filterCollection: {categories: filter},
+                activeState: activeState,
+                sortingField: demand.sortingField,
+                sortingDirection: demand.sortingDirection
+            }" />
+        </f:then>
+        <f:else>
+            <f:variable name="tagDemand" value="{
+                activeState: activeState,
+                sortingField: demand.sortingField,
+                sortingDirection: demand.sortingDirection
+            }" />
+        </f:else>
+    </f:if>
+    <f:variable name="removeLabel" value="{f:translate(key: 'filter.activeFilters.remove', extensionName: 'AcademicProjects', arguments: {0: title})}" />
+    <li class="academic-projects-active-filters__tag">
+        <f:link.action
+            action="list"
+            arguments="{demand: tagDemand}"
+            class="academic-projects-active-filters__remove"
+            additionalAttributes="{'aria-label': removeLabel}"
+        >{title}<span aria-hidden="true"> ×</span></f:link.action>
+    </li>
+</f:section>
+
+</html>

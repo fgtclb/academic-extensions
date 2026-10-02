@@ -51,6 +51,12 @@ plugin:
       # the middle of a frontend request rather than a warning in a log.
       from: seed-noreply@example.org
       recipientEmail: jobs@example.org
+  tx_academicpartners:
+    filter:
+      # Active filter tags, the reset link and the result count of the list.
+      showActiveFilters: true
+      showReset: true
+      showResultCount: true
   tx_academicprograms:
     page:
       # The programme list, which the back link of a programme page leads to.
@@ -63,11 +69,19 @@ plugin:
       # The programme list offers twelve filters. Four are shown, the others
       # are behind "More filters".
       visibleCount: 4
+      # Active filter tags, the reset link and the result count of the list.
+      showActiveFilters: true
+      showReset: true
+      showResultCount: true
   tx_academicprojects:
     filter:
       # An option that would empty the project list is left out rather than
       # shown disabled. The programme list keeps showing the disabled ones.
       hideDisabledOptions: true
+      # Active filter tags, the reset link and the result count of the list.
+      showActiveFilters: true
+      showReset: true
+      showResultCount: true
   tx_academicstudyplan:
     filter:
       # The filter of the study plan starts folded.

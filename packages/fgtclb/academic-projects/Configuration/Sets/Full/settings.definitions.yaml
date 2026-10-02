@@ -45,6 +45,24 @@ settings:
     category: academic.projects
     type: bool
     default: false
+  plugin.tx_academicprojects.filter.showActiveFilters:
+    label: 'Project lists | Active filter tags'
+    description: 'Shows one tag per selected filter above a project list. Each tag links to the list without that filter and keeps every other selection and the sorting.'
+    category: academic.projects
+    type: bool
+    default: false
+  plugin.tx_academicprojects.filter.showReset:
+    label: 'Project lists | Reset link'
+    description: 'Shows a link that resets every filter, back to the list as the content element presets it. Shown while the visitor has filtered.'
+    category: academic.projects
+    type: bool
+    default: false
+  plugin.tx_academicprojects.filter.showResultCount:
+    label: 'Project lists | Result count'
+    description: 'Shows the number of projects found.'
+    category: academic.projects
+    type: bool
+    default: false
   plugin.tx_academicprojects.renderContentElementHeader:
     label: 'Project lists | Render the content element header'
     description: 'Only for a site whose content element layout renders no header. The layouts of EXT:fluid_styled_content and of the bootstrap package render it, and switched on there the header appears twice.'

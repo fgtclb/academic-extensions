@@ -36,6 +36,10 @@ class ProjectController extends ActionController
     ) {}
 
     /**
+     * `visitorSelection` tells the template whether the request carried a demand. Only a
+     * request without one shows the selection the content element presets, so a link back
+     * to that selection is useful only while it is `true`.
+     *
      * @param array<string, mixed>|null $demand
      * @return ResponseInterface
      */
@@ -73,6 +77,7 @@ class ProjectController extends ActionController
             'demand' => $demandObject,
             'categories' => $categories,
             'filterTypes' => $this->filterTypeResolver->resolveFromSettings($categories, $this->settings),
+            'visitorSelection' => $demand !== null,
             'data' => $contentElementData,
             'record' => $this->getCurrentContentRecord($this->getCurrentContentObjectRenderer()),
         ];

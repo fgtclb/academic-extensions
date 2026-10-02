@@ -44,6 +44,8 @@ None.
 - New partials `<Extension>/ActiveFilters.html` and `<Extension>/ResultCount.html`
   per extension, rendered from `SortingAndFilters.html`; an overridden
   `SortingAndFilters.html` simply does not show them.
+- A new template variable `visitorSelection` in the four list actions, and
+  `filterAction` set by the partner map template.
 - New labels in the three extensions' `locallang.xlf` (English and German).
 - New TypoScript and site settings defaults (all `0`).
 - No schema or dependency changes.
@@ -61,8 +63,5 @@ None.
 
 Derived from the project differences analysis of 2026-09-12 (candidate
 `listings-10`). Three of the six analysed projects carry their own code for
-this today. No YouTrack issue is filed yet; the change is renamed to
-`ace-<NNN>-list-active-filters-reset-count` when the issue is filed after
-implementation.
-
-Relates to ACE-580 and ACE-612.
+this today. Filed as ACE-801, which relates to ACE-580 and ACE-612, the
+tasks of the demo site that built this in its own templates.
