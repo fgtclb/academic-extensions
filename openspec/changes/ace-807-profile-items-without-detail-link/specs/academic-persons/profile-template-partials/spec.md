@@ -4,7 +4,8 @@
 
 The system SHALL offer a site wide setting with the choices "link" and "no
 link" that decides whether the name of a profile item of the list, card,
-selected profiles and selected contracts elements links to the detail view.
+selected profiles and selected contracts elements links to the detail view,
+in every view mode of those elements.
 It SHALL default to "link", so that every site links its items as before.
 Each of those four elements SHALL offer the same choice in its plugin options,
 empty by default. An empty choice SHALL use the site setting, and a chosen
@@ -18,6 +19,12 @@ apply on TYPO3 v13 and v14.
 - **WHEN** a site sets the site setting to "no link" and a persons list with
   an empty choice shows a profile
 - **THEN** the profile's name is shown without a link
+
+#### Scenario: A list shown as a table
+
+- **WHEN** a site sets the site setting to "no link" and a persons list with
+  an empty choice shows its profiles as a table
+- **THEN** the name column shows the names without a link
 
 #### Scenario: Nothing is configured
 

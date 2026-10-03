@@ -391,6 +391,18 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertStringContainsString('href="/profiles?tx_academicpersons_detail', $this->renderHomePage());
     }
 
+    /**
+     * The persons setting is for the persons elements. The contacts plugin maps the detail
+     * page of the persons constants, not that setting, so its contacts keep their link.
+     */
+    #[Test]
+    public function listPluginLinksEachContactWhileThePersonsElementsShowNamesWithoutLink(): void
+    {
+        $this->setUpTestCase('contactsListPage', ['EXT:academic_contacts4pages/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/PersonsDetailLinkNone.typoscript']);
+
+        $this->assertStringContainsString('href="/profiles?tx_academicpersons_detail', $this->renderHomePage());
+    }
+
     #[Test]
     public function listPluginOnlyRendersContactsOfItsOwnPage(): void
     {

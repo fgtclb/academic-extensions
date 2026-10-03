@@ -255,6 +255,38 @@ because `image.placeholder.mr`, `.ms` and `.diverse` sit next to it. The
 constant keeps the same name, since both mechanisms must declare the same
 paths.
 
+## A site value an element overrides in both directions
+
+A setting a content element can override needs three states in the element:
+follow the site, on and off. `ignoreFlexFormSettingsIfEmpty` gives the first
+one: it drops an empty FlexForm value before Extbase merges the FlexForm over
+the TypoScript value. It drops `'0'` as well as `''`
+(`FrontendConfigurationManager::removeIgnoredFlexFormSettingsIfEmpty()`, v13
+and v14 alike), so a checkbox or a boolean select cannot say "off" against a
+site that says "on": its `0` is dropped and the site value wins. See also
+[List filter types](list-filter-types.md#two-levels-one-key).
+
+Such a setting therefore takes string values, and the empty value of the
+FlexForm field means "use the site setting". `plugin.tx_academicpersons.detailLink`
+of `academic-persons` is the model:
+
+- `link` and `none` for the site, declared as an `enum`, so the settings editor
+  offers a select. `enum` exists since TYPO3 13.3, below the floor.
+- `''`, `link` and `none` in the FlexForm field `settings.detailLink`, and
+  `detailLink` in the `ignoreFlexFormSettingsIfEmpty` list of the extension.
+- The template checks only the value that switches something off,
+  `{settings.detailLink} != 'none'`, so a caller whose settings do not carry
+  the key, the contacts plugin of `academic_contacts4pages` among them, keeps
+  the old behaviour.
+
+The list-and-detail element shares the data structure of the list and ignores
+the field, so the field carries
+`<displayCond>FIELD:parentRec.CType:!=:academicpersons_listanddetail</displayCond>`.
+That resolves on v13 and v14 alike. The card hides the list fields it ignores
+through the page TSconfig of its set instead. A condition in the data structure
+hides the field wherever the element exists, also below a page that does not
+include that page TSconfig.
+
 ## Hide by default, enable per component
 
 An extension registers its content elements in TCA for the whole installation —

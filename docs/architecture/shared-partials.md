@@ -67,8 +67,9 @@ on the `Academic/Image` it renders.
 
 The contacts plugin renders `Profile/Item` with its own settings, so its setup
 also maps the list crop variant and the placeholders from the persons
-constants, the same way it maps `detailPid`. See
-[below](#crop-variant-and-placeholder-are-chosen-by-the-caller).
+constants, the same way it maps `detailPid`. It does not map `detailLink`, so
+the contacts of a page keep linking their names whatever the persons setting
+says. See [below](#crop-variant-and-placeholder-are-chosen-by-the-caller).
 
 A view that renders the partial without the path fails with a Fluid
 `InvalidTemplateResourceException`. That applies to a project that replaces the

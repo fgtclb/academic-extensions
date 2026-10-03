@@ -59,6 +59,13 @@ emits stored values unescaped, and the profile fields it reads are ones a
 profile owner can write through `academic_persons_edit`. Both partials and the
 extension's `Templates` chapter say so.
 
+`Profile/Item/DetailLink.html` also decides whether there is a link at all. It
+renders nothing while `settings.detailLink` is `none`, and the header partials
+then render the name without an anchor, because `f:link.typolink` returns its
+content unchanged for an empty `parameter`. The decision sits in the value
+partial rather than in the item or the header partials, so a project that
+overrides those keeps it.
+
 Decoding the extra layer in the caller instead does **not** work:
 `f:format.htmlentitiesDecode` maps its `keepQuotes` argument to `ENT_NOQUOTES`
 or `ENT_COMPAT` and has no way to reach `ENT_QUOTES`, while Fluid's
