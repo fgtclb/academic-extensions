@@ -1,0 +1,2 @@
+# A site that shows the names in the persons elements without a link.
+plugin.tx_academicpersons.detailLink = none

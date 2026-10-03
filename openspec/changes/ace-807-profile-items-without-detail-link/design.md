@@ -19,7 +19,8 @@ See `proposal.md` for the motivation. On `main`:
   (`renderContentElementHeader` is the model).
 - The list, list-and-detail and card elements share
   `Configuration/FlexForms/Core13|Core14/List.xml`, the selection elements use
-  `SelectedProfiles.xml` and `SelectedContracts.xml`.
+  `SelectedProfiles.xml` and `SelectedContracts.xml`: three data structures in
+  four files.
 - `ignoreFlexFormSettingsIfEmpty` of Extbase drops a FlexForm value that is
   `''` **or** `'0'` and keeps the TypoScript value then
   (`FrontendConfigurationManager::removeIgnoredFlexFormSettingsIfEmpty()`, the
@@ -57,7 +58,7 @@ Fluid, which Extbase already does for `detailPid`.
 
 ### The element choice falls back through `ignoreFlexFormSettingsIfEmpty`
 
-`settings.detailLink` is a select in the three FlexForms with the items
+`settings.detailLink` is a select in the four FlexForm files with the items
 "Use the site setting" (`''`, the default), "Link to the detail view"
 (`link`) and "No link" (`none`), and `detailLink` is added to
 `ignoreFlexFormSettingsIfEmpty` next to `detailPid`. An element with an empty
@@ -73,9 +74,11 @@ settings editor offers a select.
 
 The field in `List.xml` carries a `displayCond` on the CType of the record
 (`FIELD:parentRec.CType:!=:academicpersons_listanddetail`), because that
-element links whatever is chosen. If the condition does not resolve on one of
-the core versions, the field stays visible with a description that says it has
-no effect there. Task 2.3 decides which, on both versions.
+element links whatever is chosen. The condition resolves on v13 and v14, so
+the field is hidden there on both versions, and `DetailLinkFieldTest` pins it.
+The card hides the list fields it ignores through the page TSconfig of its
+set instead. The condition in the data structure hides the field also below a
+page that does not include the page TSconfig of the list-and-detail set.
 
 ### Decided in the detail link partial
 
