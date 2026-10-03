@@ -74,6 +74,11 @@ What is public API
     category_types
     <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/Routing/Index.html>`__.
     The class behind it is not public API.
+*   The view helper ``ct:categoryTypeTitle`` of :guilabel:`category_types`,
+    by tag name and arguments, which names a category type in a template by
+    its registered title, see `naming a type in a template
+    <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/CategoryTypes/Index.html#developers-category-types-title>`__.
+    The class behind it is not public API.
 
 ..  _developers-extension-points-not-api:
 

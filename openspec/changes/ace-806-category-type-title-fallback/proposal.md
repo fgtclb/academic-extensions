@@ -33,7 +33,9 @@ registered title for the same reason (`ace-687-page-module-category-summary`).
   - `academic_projects` (`packages/fgtclb/academic-projects`): the categories
     of the project page and of the project card, and the filter selects of the
     project list.
-- TYPO3 v13 and v14 behave the same.
+- TYPO3 v13 and v14 behave the same, except for a label a site blanks: it
+  falls back to the registered title, but on TYPO3 v13 a shipped partner or
+  project type stays unlabelled, see the design.
 
 ## Non-goals
 

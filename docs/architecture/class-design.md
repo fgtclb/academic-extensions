@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule: 359 PHP files declaring 315
+rather than describing an intention as a rule: 360 PHP files declaring 316
 classes, 11 interfaces, 18 traits and 15 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -26,7 +26,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/EventListener/`                   | 12    | 1     | 0        | 92 %    |
 | `Classes/Controller/`                      | 9     | 0     | 0        | 100 %   |
 | `Classes/Domain/Model/Dto/`                | 8     | 10    | 1        | 42 %    |
-| `Classes/ViewHelpers/`                     | 6     | 6     | 0        | 50 %    |
+| `Classes/ViewHelpers/`                     | 7     | 6     | 0        | 54 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
 | Everything else                            | 123   | 44    | 4        | 72 %    |
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 373 modifiers, of
-which 360 are constructor-promoted, across 111 files. The thirteen non-promoted
+`readonly` is used heavily, mostly on individual properties: 375 modifiers, of
+which 362 are constructor-promoted, across 112 files. The thirteen non-promoted
 declarations are the nine documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php`, the three
 fields `typo3-category-types/Classes/Routing/Aspect/CategoryFilterMapper.php`

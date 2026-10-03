@@ -60,7 +60,7 @@
     <f:variable name="allOptionsLabel" value="{f:translate(key: 'sys_category.projects.allOptions', extensionName: 'AcademicProjects')}"/>
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
         <label for="{categoryKey}" class="form-label">
-            {f:translate(key: 'sys_category.projects.{categoryKey}', extensionName: 'AcademicProjects')}
+            {f:translate(key: 'sys_category.projects.{categoryKey}', extensionName: 'AcademicProjects') -> ct:categoryTypeTitle(group: 'projects', identifier: categoryKey)}
         </label>
 
         <ct:form.filterSelect

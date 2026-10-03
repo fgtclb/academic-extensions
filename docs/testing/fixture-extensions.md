@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Sixty such fixture extensions exist, in ten of the twelve extensions.
+Sixty-four such fixture extensions exist, in ten of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -30,6 +30,7 @@ They sit next to the tests that use them, under
 | `test_category_types_group`                 | `tests/category-types-group`                      | `typo3-category-types`   | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.           |
 | `test_category_types_icons`                 | `tests/category-types-icons`                      | `typo3-category-types`   | Four category types, one per branch of the icon registrar, and three groups.  |
 | `test_category_types_summary_override`      | `tests/category-types-summary-override`           | `typo3-category-types`   | A page TSconfig override of the page module category summary template.        |
+| `test_category_types_titles`                | `tests/category-types-titles`                     | `typo3-category-types`   | Two types of an undeclared group, one titled literally, one translated.       |
 | `test_category_types_undeclared_group`      | `tests/category-types-undeclared-group`           | `typo3-category-types`   | A type in a group no package declares, then one in a group the file declares. |
 | `test_contract_contact_actions`             | `tests/test-contract-contact-actions`             | `academic-persons-edit`  | A `Settings.yaml` narrowing the actions of the contracts section.             |
 | `test_contract_publish_column`              | `tests/test-contract-publish-column`              | `academic-persons`       | The contract column `publish` of 2.x, as before the database compare.         |
@@ -56,6 +57,7 @@ They sit next to the tests that use them, under
 | `test_page_contacts_listener`               | `tests/test-page-contacts-listener`               | `academic-contact4pages` | A listener of the page contacts event, removing the contact a test names.     |
 | `test_partner_list_events`                  | `tests/test-partner-list-events`                  | `academic-partners`      | Two listeners on the partner demand and list events, and a list template.     |
 | `test_partners_stub`                        | `tests/test-partners-stub`                        | `academic-partners`      | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
+| `test_partners_titled_category_type`        | `tests/partners-titled-category-type`             | `academic-partners`      | A partner type with a translated title, and the shipped region retitled.      |
 | `test_plugin_action_context`                | `tests/test-plugin-action-context`                | `academic-persons`       | A listener recording the content element of an event's plugin context.        |
 | `test_plugin_templates`                     | `tests/plugin-templates`                          | `academic-persons`       | Simplified Fluid templates and the TypoScript pointing at them.               |
 | `test_plugin_view_event`                    | `tests/test-plugin-view-event`                    | `academic-base`          | Listeners recording the view event and every context, a leftover, probes.     |
@@ -69,9 +71,11 @@ They sit next to the tests that use them, under
 | `test_programs_category_type_priority`      | `tests/programs-category-type-priority`           | `academic-programs`      | A `CategoryTypes.yaml` raising the priority of a type of the programs group.  |
 | `test_programs_extra_category_type`         | `tests/programs-extra-category-type`              | `academic-programs`      | A `CategoryTypes.yaml` adding one type to the programs group.                 |
 | `test_programs_removed_category_type`       | `tests/programs-removed-category-type`            | `academic-programs`      | A `CategoryTypes.yaml` removing a type from the programs group.               |
+| `test_programs_titled_category_type`        | `tests/programs-titled-category-type`             | `academic-programs`      | A program type with a translated title, and the shipped degree retitled.      |
 | `test_project_list_events`                  | `tests/test-project-list-events`                  | `academic-projects`      | Two listeners on the project demand and list events, and a list template.     |
 | `test_project_profile_column_removed`       | `tests/project-column-removed`                    | `academic-persons-edit`  | A listener after the persons settings removing a project column.              |
 | `test_project_profile_fields`               | `tests/test-project-profile-fields`               | `academic-persons-edit`  | Project columns of every type a project field takes, one managed, a listener. |
+| `test_projects_titled_category_type`        | `tests/projects-titled-category-type`             | `academic-projects`      | A project type with a translated title, a shipped type retitled.              |
 | `test_public_profile_settings`              | `tests/test-public-profile-settings`              | `academic-persons`       | A `Settings.yaml` overriding the public profile layout.                       |
 | `test_settings_copy`                        | `tests/test-settings-copy`                        | `academic-persons`       | A copy of the contract fields that leaves the room out, removes one with `~`. |
 | `test_settings_removal`                     | `tests/test-settings-removal`                     | `academic-persons`       | A delta removing one profile field with `~` and copying nothing.              |
