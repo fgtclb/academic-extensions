@@ -50,14 +50,14 @@
 
 ## 5. Definition of done
 
-- [ ] 5.1 After `composerUpdate` for TYPO3 v13: `lintPhp`, `cgl -n`,
+- [x] 5.1 After `composerUpdate` for TYPO3 v13: `lintPhp`, `cgl -n`,
   `phpstan`, `unit` and `functional` green.
-- [ ] 5.2 After `composerUpdate` for TYPO3 v14: `lintPhp`, `cgl -n`,
+- [x] 5.2 After `composerUpdate` for TYPO3 v14: `lintPhp`, `cgl -n`,
   `phpstan`, `unit` and `functional` green.
-- [ ] 5.3 `lintMarkdown -n`, `checkRstRenderingAll`, and the JavaScript suites
+- [x] 5.3 `lintMarkdown -n`, `checkRstRenderingAll`, and the JavaScript suites
   of 3.5 green.
-- [ ] 5.4 `docs/` and the `Documentation/` changelog entries are part of the
+- [x] 5.4 `docs/` and the `Documentation/` changelog entries are part of the
   change, and `README.md` and `CONTRIBUTING.md` still only summarize.
-- [ ] 5.5 File the ACE issue after implementation, rename the change, commit
+- [x] 5.5 File the ACE issue after implementation, rename the change, commit
   in TYPO3 Core format, and archive the change as the last commit of the pull
   request.
