@@ -9,6 +9,7 @@ order (ace-demo, ACE-450, ACE-601), Symfony's `#[AsEventListener]` that
 registers nothing (one project), profile editor overrides whose 3.0
 replacement is an undocumented setting (ACE-367), and program integrations
 with their own finder or category type names.
+Two projects still run TYPO3 v12, one before 2.1.
 
 ## What Changes
 
@@ -36,6 +37,7 @@ with their own finder or category type names.
   (`packages/fgtclb/academic-persons`) is linked as the persons chapter.
 - Every chapter describing a change that is not released yet says so and
   names the change. The guide is written last, after those changes land.
+- A "Before you start" part for sites on TYPO3 v12 or older than 2.4.
 - Every extension manual links the guide.
 
 The steps are the same on TYPO3 v13 and v14, except the plugin migration,

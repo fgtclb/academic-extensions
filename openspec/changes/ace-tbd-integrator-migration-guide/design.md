@@ -163,6 +163,33 @@ entries, which own the detail:
  The first draft asked whether to deprecate the sets for removal in
 4.0; removing them in the unreleased 3.0 spares projects a second migration.
 
+### Decided: the guide starts where the site is
+
+The steps assume a site on 2.4 and TYPO3 v13. Two of the analysed projects are
+further back: one on 2.2.1 with TYPO3 v12, one on unreleased `dev-main`
+revisions of the split packages between 2.0.1 and 2.1.0, also on v12 and
+installed with the constraint `2.0.x-dev`, which no branch answers any more
+(branch `2` is `2.4.x-dev`, `main` is `3.0.x-dev`). The entry point therefore
+opens with a part "Before you start":
+
+- **TYPO3 v12**: update the academic extensions to 2.4 on v12 first (branch
+  `2` supports v12 and v13), then the core to v13 with 2.4, then 3.0. The core
+  update itself stays a non-goal, the part only orders the three moves.
+- **A release older than 2.4**: read the changelogs of each minor version after
+  the installed one, `Breaking-` and `Important-` entries first. 2.1 carries the
+  removed partials of persons and programs, the changed backend layout
+  identifier of programs and the moved programs translations.
+- **An unreleased revision**: find the last release before it (the
+  `ext_emconf.php` version of the installed package names it) and read from
+  the minor version after that. Some entries are then already installed, which
+  the template override check of step 13 sorts out.
+- **A `2.0.x-dev` or `2.x-dev` constraint**: replace it with a released
+  constraint (`^2.4`, then `^3.0`), because the branch aliases moved.
+
+Rejected: chapters per starting version. They would repeat the changelogs the
+guide links, and the order of the three moves is the only thing a changelog
+does not say.
+
 ### Category type rename by SQL
 
 `UPDATE sys_category SET type = 'program_type' WHERE type = 'course_type'`,
