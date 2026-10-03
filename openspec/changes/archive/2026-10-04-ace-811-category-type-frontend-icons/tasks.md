@@ -136,6 +136,6 @@
 - [x] 7.3 `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 7.4 `docs/` is updated, and `README.md` and `CONTRIBUTING.md` still only
   summarize.
-- [ ] 7.5 Commit as `[FEATURE] ACE-<NNN>: Frontend icons for category types`
+- [x] 7.5 Commit as `[FEATURE] ACE-<NNN>: Frontend icons for category types`
   in TYPO3 Core format, and archive the change as the last commit of the
   pull request.
