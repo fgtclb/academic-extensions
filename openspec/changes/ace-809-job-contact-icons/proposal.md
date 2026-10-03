@@ -49,16 +49,19 @@ None.
 
 ## Impact
 
-- `academic_jobs`: `Resources/Private/Partials/Job/Contact.html`, a functional
-  test, the `Important-` changelog entry. `Configuration/Icons.php` is not
-  changed, both identifiers are registered already.
-- `docs/architecture/icons.md`.
+- `academic_jobs`: `Resources/Private/Partials/Job/Contact.html`, new tests in
+  `AcademicJobsListAndDetailPluginTest`, a test class of its own with the
+  fixture extension `test_job_contact_icon` for the replacement, the
+  `Important-` changelog entry. `Configuration/Icons.php` is not changed, both
+  identifiers are registered already.
+- `docs/architecture/icons.md`, `docs/testing/fixture-extensions.md`.
 - Behaviour is the same on TYPO3 v13 and v14.
 - Integrators: a stock site needs nothing. A site package that registered
   `phone` or `mail` to give this block an icon now sees the shipped artwork in
   the block. To keep its own, it registers its file under
   `academic_jobs-contactPhone` or `academic_jobs-contactEmail` instead, and a
-  stylesheet that selects the old identifiers in this block follows them. A site
+  stylesheet that selects the old identifiers in this block has to select the
+  new ones. A site
   that overrides `Partials/Job/Contact.html` keeps its own output unchanged.
 - Origin: the frontend icon analysis of 2026-10-03, side finding. Three analysed
   projects register `phone` in their site package, two of them `mail` as

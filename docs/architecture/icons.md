@@ -115,9 +115,9 @@ grep -rl "<core:icon" packages/fgtclb/*/Resources/Private --include=*.html \
 | Extension               | `alternativeMarkupIdentifier="inline"`   | Without (default markup)                                        |
 |-------------------------|------------------------------------------|-----------------------------------------------------------------|
 | `academic-persons-edit` | 35 sites in 13 files                     | —                                                               |
-| `academic-persons`      | 6 sites in 2 files, `academic-persons-*` | —                                                               |
+| `academic-persons`      | 7 sites in 2 files, `academic-persons-*` | —                                                               |
 | `academic-study-plan`   | 3 sites, its `plus`/`minus`/`close`      | —                                                               |
-| `academic-jobs`         | 2 sites, core `phone`/`mail`             | `Job/Item.html`, `Job/Information.html`                         |
+| `academic-jobs`         | —                                        | `Job/Item.html`, `Job/Information.html`, `Job/Contact.html`     |
 | `academic-partners`     | —                                        | 4 files, `category_types.partners.*` only                       |
 | `academic-programs`     | —                                        | `Program/Facts/Item.html`, `category_types.*` and credit points |
 | `academic-projects`     | —                                        | `Project/Page/Categories.html`, `Project/Item.html`             |
@@ -374,7 +374,10 @@ alone would also pass, since the placeholder replaces the identifier. Every
 plugin or content element rendering test that renders icons should carry both;
 `academic-persons/Tests/Functional/Plugins/AcademicPersonsPublicProfilePluginTest.php`,
 `profileRendersOnlyResolvableIcons()`, does so for the seven icons of the public
-profile.
+profile, and
+`academic-jobs/Tests/Functional/Plugins/AcademicJobsListAndDetailPluginTest.php`,
+`detailPluginRendersTheShippedContactIcons()`, for the two icons of the job
+contact block, through the helpers of `JobContactIconAssertionTrait`.
 
 The registry is asserted on its own beside that:
 [`academic-persons-edit/Tests/Functional/Imaging/ProfileEditingIconsTest.php`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Imaging/ProfileEditingIconsTest.php)
