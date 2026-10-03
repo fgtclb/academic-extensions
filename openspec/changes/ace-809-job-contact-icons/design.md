@@ -92,7 +92,7 @@ wrapper of each row carries the shipped identifier and an `<img>` of
 the same response.
 
 The replacement needs a package that loads after `academic_jobs`, which only a
-fixture extension provides: `test_job_contact_icon` (`tests/job-contact-icon`),
+fixture extension provides: `test_job_contact_icon` (`tests/test-job-contact-icon`),
 requiring `fgtclb/academic-jobs`, with a `Configuration/Icons.php` that
 registers its own SVG under `academic_jobs-contactPhone`. It is loaded by a
 class of its own, because a fixture extension applies to every test of the

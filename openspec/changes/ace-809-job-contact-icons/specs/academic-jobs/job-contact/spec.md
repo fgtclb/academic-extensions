@@ -8,7 +8,7 @@ extension in front of the contact e-mail address, on an installation that
 registers no icons of its own. It MUST NOT show TYPO3's "icon not found"
 placeholder in the contact block. The two icons SHALL be shown at the size of
 the property icons of the same detail view. An integrator SHALL be able to
-replace either icon by registering an own file under the identifier the
+replace either icon by registering their own file under the identifier the
 extension uses for it, `academic_jobs-contactPhone` or
 `academic_jobs-contactEmail`. This applies on TYPO3 v13 and v14 alike.
 
@@ -36,7 +36,7 @@ extension uses for it, `academic_jobs-contactPhone` or
 
 #### Scenario: A site package replaces the phone icon
 
-- **WHEN** a site package registers its own file under
-  `academic_jobs-contactPhone`
+- **WHEN** a site package that depends on the extension registers its own file
+  under `academic_jobs-contactPhone`
 - **THEN** the phone row of the contact block shows that file
 - **AND** the e-mail row still shows the shipped e-mail icon

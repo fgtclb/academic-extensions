@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Sixty-four such fixture extensions exist, in ten of the twelve extensions.
+Sixty-five such fixture extensions exist, in ten of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -45,6 +45,7 @@ They sit next to the tests that use them, under
 | `test_frontend_user_sync_relations`         | `tests/test-frontend-user-sync-relations`         | `academic-persons`       | A synchronisation map assigning the organisational unit and function type.    |
 | `test_frontend_user_sync_relations_by_name` | `tests/test-frontend-user-sync-relations-by-name` | `academic-persons`       | A synchronisation map matching units by name and creating function types.     |
 | `test_hidden_content_types`                 | `tests/hidden-content-types`                      | `academic-base`          | Two content types hidden by page TSconfig, one in the academic group.         |
+| `test_job_contact_icon`                     | `tests/test-job-contact-icon`                     | `academic-jobs`          | An `Icons.php` that replaces the phone icon of the job contact block.         |
 | `test_job_validation_override`              | `tests/job-validation-override`                   | `academic-jobs`          | A jobs `Settings.yaml` naming nine fields, a TCA override, two TCA listeners. |
 | `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
 | `test_language_files`                       | `tests/language-files`                            | `academic-persons`       | An XLF pair with awkward label keys (dots, dashes).                           |
@@ -90,11 +91,11 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty of the fifty-nine have a `Classes/` folder with a `TESTS\…` PSR-4 root.
-The other thirty-nine are pure resources. The `ext_emconf.php` is checked like
-every other one: its `depends` names extension keys, and a fixture extension
-may name another fixture extension, which a real extension may not — see
-[Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
+Twenty-one of the sixty-five have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other forty-four are pure resources. The `ext_emconf.php` is checked
+like every other one: its `depends` names extension keys, and a fixture
+extension may name another fixture extension, which a real extension may not —
+see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
 
 A minimal one, complete:
 
@@ -309,9 +310,11 @@ The existing ones show the cases that justify one:
 - **Registered configuration.** `test_category_types_group` ships a
   `Configuration/CategoryTypes.yaml` so the registry is filled the way an
   installing extension fills it, `test_current_color_icons` registers icons
-  with the `currentColor` icon provider the same way,
-  `test_public_profile_settings` ships a `Configuration/AcademicPersons/Settings.yaml`
-  that overrides the `profile` map exactly as a site package would,
+  with the `currentColor` icon provider the same way, `test_job_contact_icon`
+  replaces an icon of `academic_jobs`, which only a package that loads after it
+  can, `test_public_profile_settings` ships a
+  `Configuration/AcademicPersons/Settings.yaml` that overrides the `profile`
+  map exactly as a site package would,
   `test_contract_contact_actions` ships one that narrows the `actions` of the
   contracts section, `test_legacy_settings` ships one in the pre-3.0
   shape, and `test_frontend_user_sync` and the two
