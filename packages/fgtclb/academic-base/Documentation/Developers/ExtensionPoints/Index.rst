@@ -74,6 +74,16 @@ What is public API
     category_types
     <https://docs.typo3.org/p/fgtclb/category-types/main/en-us/Developers/Routing/Index.html>`__.
     The class behind it is not public API.
+*   The format of :file:`Configuration/FrontendIcons.php`, the frontend icon
+    registry of :guilabel:`academic_base`: the format of
+    :file:`Configuration/Icons.php`, read from every active package, and a
+    package loaded later replaces an identifier, see
+    :ref:`configuration-frontend-icons`.
+*   The view helper ``icon`` of :guilabel:`academic_base`, in the namespace
+    ``http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers``, by tag name and
+    arguments, which renders an icon of the frontend icon registry, and the
+    identifier ``default-not-found`` of the icon it renders for an unknown
+    identifier. The class behind it is not public API.
 *   The view helper ``ct:categoryTypeTitle`` of :guilabel:`category_types`,
     by tag name and arguments, which names a category type in a template by
     its registered title, see `naming a type in a template
@@ -152,6 +162,12 @@ describe their events in detail, with examples.
             assigned its own variables
         -   assign further view variables, see
             :ref:`developers-extension-points-plugin-view`
+    *   -   :php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent`
+        -   once each time the frontend icon registry is built, when the
+            system caches are built or warmed up, not per request
+        -   contribute icons from code, see :ref:`configuration-frontend-icons`.
+            An entry of a :file:`Configuration/FrontendIcons.php` with the
+            same identifier replaces a contributed icon
     *   -   :php:`\FGTCLB\AcademicBiteJobs\Event\ModifyBiteJobPostingsRequestEvent`
         -   in the job list of :guilabel:`academic_bite_jobs`, after the
             request to the B-ITE API is built from the plugin settings and
@@ -419,8 +435,9 @@ them as they are; they are not meant to be subclassed or replaced.
     *   -   Class
         -   Named
     *   -   :php:`\FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`
-        -   as the :php:`provider` of an icon in :file:`Configuration/Icons.php`,
-            for an SVG drawn in ``currentColor``
+        -   as the :php:`provider` of an icon in :file:`Configuration/Icons.php`
+            or :file:`Configuration/FrontendIcons.php`, for an SVG drawn in
+            ``currentColor``
     *   -   :php:`\FGTCLB\AcademicContacts4pages\DataProcessing\ContactsProcessor`
         -   as a data processor of a page template, for the contacts of the
             page, by its identifier `academic-page-contacts` or by class name

@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Sixty-five such fixture extensions exist, in ten of the twelve extensions.
+Sixty-seven such fixture extensions exist, in ten of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -39,6 +39,8 @@ They sit next to the tests that use them, under
 | `test_current_color_icons`                  | `tests/current-color-icons`                       | `academic-base`          | Icons registered through the `currentColor` icon provider.                    |
 | `test_editor_write_listener`                | `tests/test-editor-write-listener`                | `academic-persons-edit`  | A listener of the editor write event, refusing or replacing as a test says.   |
 | `test_exclude_file_column`                  | `tests/test-exclude-file-column`                  | `academic-persons`       | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
+| `test_frontend_icons`                       | `tests/frontend-icons`                            | `academic-base`          | Frontend icons from a file and a listener, one also in `Icons.php`.           |
+| `test_frontend_icons_override`              | `tests/frontend-icons-override`                   | `academic-base`          | A `FrontendIcons.php` replacing an icon of the above and the placeholder.     |
 | `test_frontend_readonly`                    | `tests/test-frontend-readonly`                    | `academic-persons`       | Frontend-only field locks, also loaded by the `academic-persons-edit` tests.  |
 | `test_frontend_user_sync`                   | `tests/test-frontend-user-sync`                   | `academic-persons`       | A `Settings.yaml` synchronisation map and the `fe_users` columns it reads.    |
 | `test_frontend_user_sync_events`            | `tests/test-frontend-user-sync-events`            | `academic-persons`       | Listeners of both synchronisation events, and a factory creating no profile.  |
@@ -91,8 +93,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-one of the sixty-five have a `Classes/` folder with a `TESTS\…` PSR-4
-root. The other forty-four are pure resources. The `ext_emconf.php` is checked
+Twenty-two of the sixty-seven have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other forty-five are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
 see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
@@ -201,6 +203,30 @@ The block contains a documented workaround —
 correct path is injected by reflection.
 See [PHPUnit configuration](phpunit-configuration.md#the-functional-bootstrap)
 before touching it.
+
+### The loading order in a test instance
+
+A fixture that replaces something of an extension, an icon or a settings key,
+has to load after it, and in a test instance that order is not always the one
+a site gets. The testing framework sorts the packages of a classic mode
+instance from their dependencies, and the dependencies come from the
+`depends` of `ext_emconf.php` on TYPO3 v13, which names every academic
+extension, and from the `require` of `composer.json` on TYPO3 v14, because
+every package here declares `version` and `providesPackages`. TYPO3 v14 then
+drops every requirement on a package the root composer install knows
+(`PackageManager::isComposerDependency()` checks the names of
+`InstalledVersions`, `Package::ignoreDependencyInPackageConstraint()` drops
+them), which is every `fgtclb/*` package and none of the `tests/*` ones. A
+v14 test instance therefore orders the academic extensions and the fixtures
+by nothing but their keys, plus whatever edge a requirement on another
+fixture adds, and such an edge moved `academic_base` behind the two
+`test_frontend_icons*` fixtures until it was dropped.
+
+A site is not affected, composer orders its packages. A fixture that has to
+load after an extension therefore gets a key that sorts after it, requires no
+other fixture, and its test asserts the order before it asserts the
+replacement, as `IconViewHelperOverrideTest::theSitePackageLoadsAfterTheExtensionAndAcademicBase()`
+does. `test_job_contact_icon` sorts after `academic_jobs` the same way.
 
 ## Using one in a test
 
@@ -312,7 +338,12 @@ The existing ones show the cases that justify one:
   installing extension fills it, `test_current_color_icons` registers icons
   with the `currentColor` icon provider the same way, `test_job_contact_icon`
   replaces an icon of `academic_jobs`, which only a package that loads after it
-  can, `test_public_profile_settings` ships a
+  can, `test_frontend_icons` registers icons for the frontend icon registry of
+  `academic_base` in a `Configuration/FrontendIcons.php` and from a listener,
+  with one icon in its `Configuration/Icons.php` as well and one backend-only
+  icon there, and
+  `test_frontend_icons_override` replaces two of them, which again takes a
+  package that loads later, `test_public_profile_settings` ships a
   `Configuration/AcademicPersons/Settings.yaml` that overrides the `profile`
   map exactly as a site package would,
   `test_contract_contact_actions` ships one that narrows the `actions` of the

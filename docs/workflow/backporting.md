@@ -167,8 +167,9 @@ on `main` and was not backported wholesale:
 | `CropVariantsAssertionTrait`           | yes    | no  |
 | `ActiveFiltersAssertionTrait`          | yes    | no  |
 | `StaticTemplateTypoScriptTrait`        | yes    | yes |
+| `FrontendIconsAssertionTrait`          | yes    | no  |
 
-All fourteen live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`
+All fifteen live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`
 on `main`; branch `2` has seven of them, the last since the backport of
 ACE-745. It exists on both, but not as the same code: TYPO3 v12 has no
 `FrontendTypoScriptFactory`, so the copy on branch `2` builds the TypoScript

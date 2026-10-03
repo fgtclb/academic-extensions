@@ -261,6 +261,12 @@ Rejected:
 - Reusing `IconFactory` with another registry. Its constructor takes the
   concrete `IconRegistry` (no interface), whose constructor loads the backend
   icon set.
+- A tagged service locator instead of the container, as the repository rule
+  "Do not inject the container" asks. The providers are named by class in
+  configuration files, the `icon.provider` tag exists on v14 only, and core's
+  own `SvgIconProvider` comes from a service provider factory rather than a
+  tag. The container lookup is the one core uses, and `dependency-injection.md`
+  records it as the exception.
 
 ### `FrontendIcon` inherits the core wrapper unchanged
 
@@ -369,6 +375,12 @@ definition (report 09, 3.3).
   so.
 - [Performance is reasoned, not measured] → Task 8.1 measures the profile
   editing page with both ViewHelpers before the follow-up changes rely on it.
+- [A TYPO3 v14 test instance ignores the order between our packages] → Found
+  while implementing: v14 drops every requirement on a package the root
+  composer install knows, so a test instance orders `fgtclb/*` packages and
+  fixtures by key. A site is unaffected, composer orders it. A fixture that
+  replaces an icon gets a key that sorts after the extension, requires no other
+  fixture, and its test asserts the order first.
 
 ## Migration Plan
 

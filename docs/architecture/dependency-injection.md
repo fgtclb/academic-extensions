@@ -126,11 +126,11 @@ Measured with
 
 | Attribute            | Sites | Examples                                                                     |
 |----------------------|-------|------------------------------------------------------------------------------|
-| `#[Autoconfigure]`   | 16    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
-| `#[Autowire]`        | 5     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
+| `#[Autoconfigure]`   | 18    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
+| `#[Autowire]`        | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
 | `#[Exclude]`         | 27    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
-| `#[AsEventListener]` | 8     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
+| `#[AsEventListener]` | 9     | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
@@ -141,9 +141,11 @@ the other three commands in `academic-persons` are still registered with
 `console.command` tags in YAML. The `#[AsEventListener]` sites are TYPO3's
 attribute (see below): the `RegisterAcademicPageDoktype` and the
 `AddPageModuleCategorySummary` listener of each of `academic-partners`,
-`academic-programs` and `academic-projects`, and `ApplySettingsToTca` of
+`academic-programs` and `academic-projects`, `ApplySettingsToTca` of
 `academic-persons` and of `academic-jobs`, which apply the settings of their
-extension to the compiled TCA.
+extension to the compiled TCA, and `WarmUpFrontendIconRegistry` of
+`academic-base`, which builds the frontend icon registry when the system caches
+are warmed up.
 `#[AsTaggedItem]` and `#[AsController]` have zero sites.
 
 For the twenty-two `#[Exclude]` sites and why `LegacySettingsMigration` is among
@@ -331,11 +333,12 @@ Both spellings are in use here: five listener classes are registered by YAML
 tag (`academic-jobs/Configuration/Services.yaml`,
 `academic-persons/Configuration/Services.yaml` and
 `academic-persons-edit/Configuration/Services.yaml`, which carry one, two and
-two), and eight carry `#[AsEventListener]` on the class: the
+two), and nine carry `#[AsEventListener]` on the class: the
 `RegisterAcademicPageDoktype` and `AddPageModuleCategorySummary` listeners of
 `academic-partners`, `academic-programs` and `academic-projects`, for example
-`#[AsEventListener(identifier: '…/register-page-doktype')]`, and
-`ApplySettingsToTca` of `academic-persons` and `academic-jobs`. The
+`#[AsEventListener(identifier: '…/register-page-doktype')]`,
+`ApplySettingsToTca` of `academic-persons` and `academic-jobs`, and
+`WarmUpFrontendIconRegistry` of `academic-base`. The
 two are equivalent — the attribute is only a shorter spelling of the same tag —
 and new listeners should prefer the attribute. Note that `academic-persons`' own
 user manual already documents the TYPO3 attribute as the way integrators register
@@ -479,7 +482,13 @@ declaration.
 ## Other rules
 
 - **Do not inject the container.** Inject the concrete collaborator, or a
-  tagged locator/iterator when the set of implementations is open.
+  tagged locator/iterator when the set of implementations is open. The one
+  exception is `FrontendIconFactory` of `academic-base`, which takes an icon
+  provider from the container exactly as core's `IconFactory` does,
+  `has() ? get() : makeInstance()`. A locator does not fit: the providers are
+  named by class in configuration files, the `icon.provider` tag exists on
+  TYPO3 v14 only, and core's own `SvgIconProvider` is built by a service
+  provider rather than tagged. See [Icons](icons.md#the-frontend-icon-registry).
 - **Keep services private.** `public: false` is the default in every
   `Services.yaml` header here. Publish only what has to be fetched from the
   container — TYPO3 API entry points and, occasionally, functional tests — and
