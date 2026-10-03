@@ -32,7 +32,7 @@ See `proposal.md` for the motivation. On `main` (`428cf1a32`), in
   `category_types.group.<identifier>` (`CategoryTypeGroup.php:73-76`). It came
   with ACE-364 (`c1ddb3a01`, 2026-09-27), is on no tag and not on branch `2`.
   No template renders a group icon.
-- `ace-tbd-frontend-icon-registry` gives `academic_base` the frontend registry:
+- `ace-810-frontend-icon-registry` gives `academic_base` the frontend registry:
   `Configuration/FrontendIcons.php` per package, the event
   `CollectFrontendIconsEvent::addIcon(string $identifier, string $providerClass,
   array $options)` dispatched while the registry is built and cached, file

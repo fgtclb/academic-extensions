@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Tests\Functional\Imaging;
 
+use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
 use FGTCLB\AcademicProjects\Tests\Functional\AbstractAcademicProjectsTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\ColourSchemeAwareIconsTrait;
+use FGTCLB\TestingHelper\FunctionalTestCase\FrontendIconsAssertionTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -21,6 +23,7 @@ use PHPUnit\Framework\Attributes\Test;
 final class RecordIconsTest extends AbstractAcademicProjectsTestCase
 {
     use ColourSchemeAwareIconsTrait;
+    use FrontendIconsAssertionTrait;
 
     /**
      * @return \Generator<string, array{0: string}>
@@ -36,6 +39,31 @@ final class RecordIconsTest extends AbstractAcademicProjectsTestCase
         foreach ($identifiers as $identifier) {
             yield $identifier => [$identifier];
         }
+    }
+
+    /**
+     * @return \Generator<string, array{0: string}>
+     */
+    public static function categoryTypeIconIdentifiers(): \Generator
+    {
+        foreach (self::recordIconIdentifiers() as $name => $arguments) {
+            if (str_starts_with($arguments[0], 'category_types.')) {
+                yield $name => $arguments;
+            }
+        }
+    }
+
+    /**
+     * The frontend renders the category type icons too, from the frontend icon registry,
+     * with the file and the provider of the backend.
+     */
+    #[Test]
+    #[DataProvider('categoryTypeIconIdentifiers')]
+    public function categoryTypeIconIsTheSameFrontendIcon(string $identifier): void
+    {
+        $this->assertIconIsRegisteredInBothRegistries($identifier);
+        $this->assertFrontendIconIsRegisteredWithProvider($identifier, CurrentColorSvgIconProvider::class);
+        $this->assertFrontendIconMarkupFollowsTheTextColour($identifier);
     }
 
     #[Test]

@@ -7,12 +7,15 @@ namespace FGTCLB\AcademicProjects\Tests\Functional\CategoryTypes;
 use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
 use FGTCLB\AcademicProjects\Tests\Functional\AbstractAcademicProjectsTestCase;
 use FGTCLB\CategoryTypes\Registry\CategoryTypeRegistry;
+use FGTCLB\TestingHelper\FunctionalTestCase\FrontendIconsAssertionTrait;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class CategoryTypesTest extends AbstractAcademicProjectsTestCase
 {
+    use FrontendIconsAssertionTrait;
+
     #[Test]
     public function extensionCategoryTypesYamlIsLoaded(): void
     {
@@ -39,7 +42,8 @@ final class CategoryTypesTest extends AbstractAcademicProjectsTestCase
     }
 
     /**
-     * The declared group icon exists and is registered for inlining.
+     * The declared group icon exists and is registered for inlining, with the same file in
+     * the icon registry of the backend and in the frontend icon registry.
      */
     #[Test]
     public function groupIconIsShippedAndRegistered(): void
@@ -51,7 +55,8 @@ final class CategoryTypesTest extends AbstractAcademicProjectsTestCase
         $iconRegistry = $this->get(IconRegistry::class);
         $this->assertSame(
             CurrentColorSvgIconProvider::class,
-            $iconRegistry->getIconConfigurationByIdentifier('category_types.group.projects')['provider'] ?? null,
+            $iconRegistry->getIconConfigurationByIdentifier('category_types_group.projects')['provider'] ?? null,
         );
+        $this->assertIconIsRegisteredInBothRegistries('category_types_group.projects');
     }
 }

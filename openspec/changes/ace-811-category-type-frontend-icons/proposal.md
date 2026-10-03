@@ -5,7 +5,7 @@ of every declared category type and group in the core icon registry only. The
 frontend reaches them through that backend registry, and a project cannot
 replace one for the frontend, because the registration overwrites any
 `Icons.php` entry. With the frontend icon registry of `academic_base`
-(`ace-tbd-frontend-icon-registry`) the category type icons need a second home,
+(`ace-810-frontend-icon-registry`, ACE-810) the category type icons need a second home,
 and an extension author needs a way to give the frontend another drawing than
 the backend. The unreleased group icon identifier
 `category_types.group.<group>` collides with the type icons of a group named
@@ -75,4 +75,4 @@ the backend. The unreleased group icon identifier
   `category_types_group.<group>`. An override that replaces `frontendIcon` and
   wants it inlined says `frontendInlineIcon: true` again. A frontend only replacement goes
   into `Configuration/FrontendIcons.php`.
-- Depends on `ace-tbd-frontend-icon-registry`.
+- Depends on `ace-810-frontend-icon-registry`.
