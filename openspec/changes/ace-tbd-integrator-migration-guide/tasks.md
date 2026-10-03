@@ -19,7 +19,13 @@
   `ace-721-program-page-content-without-getcontent` (programs set),
   `ace-733-program-facts-field-list` (`Partials/Program/Categories.html`) and
   `ace-785-page-templates-sections-subtitle` (partners and projects sets).
-- [ ] 2.2 Link the guide from the index of every other manual
+- [ ] 2.2 Open the entry point with "Before you start" (design: the guide
+  starts where the site is): the order 2.4 on v12, core to v13, 3.0, where a
+  site on a release older than 2.4 or on an unreleased revision starts reading
+  the changelogs, and replacing a `2.0.x-dev` or `2.x-dev` constraint. Verify
+  the 2.1 entries it names against `Documentation/Changelog/2.1/` of persons,
+  programs and category types.
+- [ ] 2.3 Link the guide from the index of every other manual
   (`academic-bite-jobs`, `academic-contact4pages`, `academic-jobs`,
   `academic-partners`, `academic-persons`, `academic-persons-edit`,
   `academic-persons-sync`, `academic-programs`, `academic-projects`,
