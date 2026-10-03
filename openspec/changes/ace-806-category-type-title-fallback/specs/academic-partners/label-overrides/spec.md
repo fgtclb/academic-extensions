@@ -2,12 +2,13 @@
 
 ### Requirement: A category type without a label of the extension is labelled with its registered title
 
-Wherever the partner page, the partner card or the filter of the partner list names a
-category type, the system SHALL use the label `sys_category.partners.<identifier>`
-of the extension when the extension or the site provides one. When neither
-does, the system SHALL use the title the type is registered with, translated
-into the language of the page when the title is a translation reference and
-shown as written otherwise. This SHALL apply on TYPO3 v13 and v14.
+Wherever the partner page, the partner card, the partnerships list and teaser or
+the filter of the partner list names a category type, the system SHALL use the
+label `sys_category.partners.<identifier>` of the extension when the extension
+or the site provides one. When neither does, the system SHALL use the title the
+type is registered with, translated into the language of the page when the title
+is a translation reference and shown as written otherwise. This SHALL apply on
+TYPO3 v13 and v14.
 
 #### Scenario: A project type on the partner page
 

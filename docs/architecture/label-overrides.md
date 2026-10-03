@@ -94,6 +94,48 @@ are stripped, a short key falls back to the name of the request - so no case can
 that there either. After the first translation of a file, `TranslationExtensionNameTest`
 holds a call.
 
+## A category type without a label
+
+The label of a category type is `sys_category.<group>.<identifier>`, and the language
+files only carry the types the extension ships. Every template that names a type hands
+that label to `ct:categoryTypeTitle` of `category_types` (ACE-806), which renders it when
+it is not empty and the title the type is registered with otherwise:
+
+```html
+{f:translate(key: 'sys_category.partners.{type}', extensionName: 'AcademicPartners')
+    -> ct:categoryTypeTitle(group: 'partners', identifier: type)}
+```
+
+The order is therefore the label set for the plugin, the label set for the extension,
+the label of the language file, and the registered title. The lookup itself is not
+touched, which is why the title follows it rather than a view helper replacing
+`f:translate`. An empty label counts as none: a site that sets a label to an empty
+string gets the title. The shipped partner and project types on v13 are the exception,
+see below.
+
+**The title is not the `default` of `f:translate`.** That was the first design, and it
+broke the overrides of shipped types on v13. Fluid evaluates an argument before the view
+helper runs, so the title was resolved first, with `LanguageService::sL()`. v13's `sL()`
+caches a resolved label in the runtime cache for the whole request, keyed by the locale
+and the reference alone. The shipped titles of partners and projects are
+`LLL:EXT:academic_<ext>/Resources/Private/Language/locallang.xlf:sys_category.<group>.<type>`,
+the very reference `LocalizationUtility::translate()` hands `sL()` after it applied the
+`_LOCAL_LANG` overrides, so it got the cached label without them. The label tests of
+both extensions caught it, in the cases that override a category type label. Programs
+was not affected only because its titles point to `locallang_be.xlf`. Resolving the
+title only after the lookup found nothing keeps any title out of the way of a label.
+
+The same cache decides what a blanked label of such a type shows on v13: the lookup
+leaves the blanked label in the cache under the reference that is the title, so the title
+is empty too and the type stays unlabelled. On v14, and for programs, the title is shown.
+`CategoryTypeTitleTest` of partners pins both, with a test per core version.
+
+The view helper resolves the title with `sL()` for the site language of the request, for
+the same reason the page module summary does: `f:translate` answers an empty string for
+a literal title, see
+[The page module category summary](page-module-category-summary.md#labels-come-from-the-registry-not-from-a-key-convention).
+The content and the title are escaped once, by the view helper.
+
 ## How it is tested
 
 - **One functional test per extension**, `*LabelOverrideTest`, renders each kind of
@@ -107,6 +149,12 @@ holds a call.
   all, and on a `translate()` call in PHP that passes an underscored one. The profile
   editor translates through one method that defaults to its name, so its calls cannot
   diverge.
+- **`CategoryTypeTitleTest`** of programs, partners and projects registers a type with a
+  translated title through a fixture extension and renders every place that names it, in
+  English and German, with a label of the extension and of a plugin winning over the
+  title. The fixture also retitles a shipped type, so the test sees that its label still
+  wins. `CategoryTypeTitleViewHelperTest` of `category_types` covers a literal title, an
+  `LLL:` title, an unknown type and the single escaping.
 - **`aLiteralHelpTextOfTheFormsIsShownAsItIs`** of the editor's label test, with the fixture
   extension `test_literal_helptext`, shows that a help text configured as literal text
   rather than as a label reference is shown as it is in the document and contact forms.
@@ -136,4 +184,6 @@ each core version: `$GLOBALS['TYPO3_CONF_VARS']['SYS']['locallangXMLOverride']` 
 - [List filter types](list-filter-types.md) - the per-type "All" label of the filters,
   the first templates that were changed
 - [Unit tests](../testing/unit-tests.md#the-extension-name-of-translations)
+- [The page module category summary](page-module-category-summary.md) - the registered
+  title in the backend
 - [Core version aware code](core-version-aware-code.md)
