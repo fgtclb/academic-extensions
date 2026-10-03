@@ -1,13 +1,21 @@
 # Icons
 
-How icons are registered and consumed across the extensions, which provider to
-register an icon with, and how a template's icons are kept resolvable. Where a
+How icons are registered and consumed across the extensions, the two icon
+registries, which provider to register an icon with, and how a template's icons
+are kept resolvable. Where a
 count is quoted with a command next to it, that count is the output of the
 command, run over the repository at the commit that last touched this page —
 re-run it rather than adjusting the number by hand. The counts without a command
 were read off the files named beside them.
 
 ## Registration today
+
+There are two registries. The icon registry of TYPO3 reads
+`Configuration/Icons.php` and serves the backend and, so far, every frontend
+template, through `<core:icon>`. The frontend icon registry of `academic_base`
+reads `Configuration/FrontendIcons.php` and serves `<ab:icon>`, see
+[The frontend icon registry](#the-frontend-icon-registry). Neither reads the
+other.
 
 ```bash
 grep -c "'provider'" packages/fgtclb/*/Configuration/Icons.php
@@ -46,7 +54,16 @@ first identifier in the `tx-<extkey>-<group>-<name>` scheme of the icon
 consolidation that is still in review (ACE-584 to ACE-594).
 
 `academic-base`, `academic-projects`, `academic-persons-sync` and the three
-`packages-dev/` packages register nothing.
+`packages-dev/` packages register nothing there.
+
+```bash
+ls packages/fgtclb/*/Configuration/FrontendIcons.php
+```
+
+One package ships a `Configuration/FrontendIcons.php`: `academic-base`, with
+one registration, the placeholder `default-not-found` with the core
+`SvgIconProvider`. No other extension has moved an icon to the frontend
+registry yet, and no template renders `<ab:icon>`.
 
 One registration is programmatic: `typo3-category-types` registers
 `category_types.<group>.<type>` per configured category type on
@@ -121,6 +138,102 @@ grep -rl "<core:icon" packages/fgtclb/*/Resources/Private --include=*.html \
 | `academic-partners`     | —                                        | 4 files, `category_types.partners.*` only                       |
 | `academic-programs`     | —                                        | `Program/Facts/Item.html`, `category_types.*` and credit points |
 | `academic-projects`     | —                                        | `Project/Page/Categories.html`, `Project/Item.html`             |
+
+## The frontend icon registry
+
+`academic_base` keeps the icons a visitor sees apart from the icon registry of
+TYPO3. That registry is a backend service: building it loads about 790 core
+icons, the TCA record icons and the flags, and its wrapper markup is styled by
+`backend.css` only. Five classes and one listener in
+[`academic-base/Classes/`](../../packages/fgtclb/academic-base/Classes), the
+same on 13.4.35 and 14.3.7 without a version switch:
+
+| Class                                      | Role                                                                                     |
+|--------------------------------------------|------------------------------------------------------------------------------------------|
+| `Imaging\FrontendIconRegistry`             | Builds, caches and answers the registry. `@internal`, public in the container for tests. |
+| `Imaging\FrontendIconFactory`              | Creates a prepared icon, like `IconFactory::getIcon()`. `@internal`, public for tests.   |
+| `Imaging\FrontendIcon`                     | Extends core's `Icon` and overrides nothing. `@internal`.                                |
+| `Event\CollectFrontendIconsEvent`          | Lets code contribute icons while the registry is built. `@api`.                          |
+| `ViewHelpers\IconViewHelper`               | `ab:icon`, the arguments of `core:icon`. `@internal`, the tag is API.                    |
+| `EventListener\WarmUpFrontendIconRegistry` | Builds the registry on `cache:warmup`. `@internal`.                                      |
+
+**Discovery and merge order.** The registry dispatches
+`CollectFrontendIconsEvent` first, then requires
+`Configuration/FrontendIcons.php` of every package of
+`PackageManager::getActivePackages()`, in loading order, inside a static
+closure, and `array_merge()`s each array result onto what it has. A later
+package therefore replaces an identifier wholesale, as core's
+`AbstractServiceProvider::configureIcons()` does for `Icons.php`, and a file
+entry replaces a contributed icon whatever the order of the two packages. A
+file that returns no array is ignored. The result is normalised the way
+`ServiceProvider::configureIconRegistry()` normalises `Icons.php`: `provider`
+is taken out of the options, a missing one is detected from `source` with the
+suffix rule of `IconRegistry::detectIconProvider()` (copied, so the backend
+registry is never built for it), an entry with neither is skipped, and a
+provider that is not an `IconProviderInterface` throws
+`\InvalidArgumentException` 1791061901 naming the identifier.
+`CollectFrontendIconsEvent::addIcon()` throws 1791061902 for the same mistake.
+
+**Cache, key and invalidation.** The normalised array is written to
+`cache.core` as `return <var_export>;`, the shape core and
+`SettingsFileLoader` write, under
+`PackageDependentCacheIdentifier->withPrefix('AcademicFrontendIcons')`. That
+class is `@internal` but byte identical on both cores and the key core uses for
+its own `Icons_` entry: the TYPO3 version, the project path and the package
+manager's cache identifier, so an activated or removed package reads another
+entry without a flush. An edited file is read after a flush of group `system`.
+`WarmUpFrontendIconRegistry` listens to `CacheWarmupEvent` and builds the entry
+for group `system`, as `IconRegistry::warmupCaches()` does for the backend.
+`cache:warmup` boots the whole container first, so the listeners of the collect
+event are registered by then. The registry holds no state: each lookup is one
+`require` of an OPcache'd file.
+
+**Providers come from the container.** `FrontendIconFactory` resolves the
+provider as core does, `$container->has($p) ? $container->get($p) :
+GeneralUtility::makeInstance($p)`. On v14 that is not a detail: core tags
+every `IconProviderInterface` as `icon.provider` and publishes it, so the
+container calls the `inject*()` setters of `AbstractSvgIconProvider`. A
+provider created with `new` fails its first inline render there with
+"Typed property `AbstractSvgIconProvider::$svgDocumentService` must not be
+accessed before initialization", which is what `FrontendIconFactoryTest`
+shows when the lookup is replaced by `new`. v13 renders either way.
+
+**The markup is core's.** `FrontendIcon` overrides nothing, so `render()` and
+the protected `wrappedIcon()`, byte identical on both cores, produce exactly the
+`<core:icon>` wrapper, and every provider accepts it because they type hint
+`Icon`. The class exists for two reasons: the factory creates it with `new`, so
+an XCLASS of core's `Icon` never reaches the frontend, and a leaner frontend
+markup, should one come, overrides `wrappedIcon()` there as a change of its
+own. `IconViewHelperTest` renders one icon registered identically in both
+files through `ab:icon` and `core:icon` and compares the strings for every
+argument, and spells the wrapper out once, so an upstream change of it shows
+before it reaches a site stylesheet.
+
+**A copy per call.** The factory keeps the prepared icon in `cache.runtime`, so
+an icon repeated in every row of a page reads and sanitises its file once, and
+returns a clone. `core:icon` returns the shared instance and sets the title on
+it, so the next rendering of the same icon without a title still carries the
+earlier one. `ab:icon` does not.
+
+**The placeholder, and no fallback.** An identifier the frontend registry does
+not know renders `default-not-found`, which `academic-base` registers in its
+own `Configuration/FrontendIcons.php` with the core `SvgIconProvider` and the
+core file `EXT:core/Resources/Public/Icons/T3Icons/svgs/default/default-not-found.svg`,
+byte identical on both cores. It is core's drawing, but not core's markup: the
+backend renders its placeholder from the sprite set, whose markup differs
+between v13 and v14, the frontend one is an `<img>` on both. There is no
+fallback to the backend registry for any identifier, a frontend template that
+needs a core icon registers its file in `FrontendIcons.php`. A site package
+that replaced `default-not-found` without provider and source leaves the
+factory without a placeholder, which is the one case of the
+`\LogicException` 1791061903.
+
+**Namespace prefix.** The view helper lives in
+`http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers`, declared per template,
+there is no global namespace (it would take `SYS.fluid.namespaces` on v13 and
+`Configuration/Fluid/Namespaces.php` on v14). The two form partials of
+`academic-base` that already declare the namespace keep their prefix `p`,
+every other template declares `ab`.
 
 ## The two markups, and which provider produces what
 
@@ -353,8 +466,9 @@ end, like the two `TcaManipulator` switches it is listed next to in
 
 ## Keeping a template's icons resolvable
 
-`<core:icon>` never fails on an unknown identifier: `IconFactory` answers with
-the `default-not-found` placeholder — the small red "broken" icon — and the
+The rule below holds for both view helpers. `<core:icon>` and `<ab:icon>` never
+fail on an unknown identifier, both factories answer with the
+`default-not-found` placeholder — the small red "broken" icon — and the
 identifier that was asked for is gone from the markup. A renamed registration
 or a typo in a template therefore ships silently. The one test that guards
 against it is
@@ -448,3 +562,5 @@ container and is measured functionally only.
   load the provider stays inside, and the attribute-first style for new code.
 - [Fixture extensions](../testing/fixture-extensions.md) — the mechanism the
   provider test's icons are registered through.
+- [Testing helper](../testing/testing-helper.md): `ColourSchemeAwareIconsTrait`
+  for the backend registry, `FrontendIconsAssertionTrait` for the frontend one.

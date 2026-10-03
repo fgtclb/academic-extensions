@@ -2,7 +2,7 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but fourteen PHP traits — the parts of the test setup that were being copied
+but fifteen PHP traits — the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -20,6 +20,7 @@ necessary.
 | [`EnsureTtContentListTypeColumnTrait`](#ensurettcontentlisttypecolumntrait)     | Re-creates `tt_content.list_type` where v14 removed it.             |
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
 | [`ColourSchemeAwareIconsTrait`](#colourschemeawareiconstrait)                   | Asserts a record icon follows the backend colour scheme.            |
+| [`FrontendIconsAssertionTrait`](#frontendiconsassertiontrait)                   | Asserts a frontend icon, and how it relates to the backend one.     |
 | [`CropVariantsAssertionTrait`](#cropvariantsassertiontrait)                     | Reads the crop variants the image cropper offers for a record.      |
 | [`StaticTemplateTypoScriptTrait`](#statictemplatetyposcripttrait)               | Builds the TypoScript a record delivers, and what its form keeps.   |
 
@@ -736,6 +737,48 @@ also asserts that the walk found something, so it cannot pass by finding nothing
 The identifiers are listed per extension rather than read out of
 `Configuration/Icons.php`, so a rename has to be made twice instead of silently
 agreeing with itself.
+
+## `FrontendIconsAssertionTrait`
+
+Five assertions for one icon identifier of the frontend icon registry of
+`academic_base`, the registry `Configuration/FrontendIcons.php` feeds and
+`ab:icon` reads (see [Icons](../architecture/icons.md#the-frontend-icon-registry)).
+Used by the registry tests of `academic-base`, and meant for the tests of the
+extensions that move their frontend icons there:
+
+```php
+use FrontendIconsAssertionTrait;
+
+#[Test]
+public function anIconOfTheFrontendRegistryIsUnknownToTheBackendRegistry(): void
+{
+    $this->assertFrontendIconIsNotABackendIcon('test-frontend-current-color');
+    $this->assertIconIsRegisteredInBothRegistries('test-frontend-both');
+}
+```
+
+From [`academic-base/Tests/Functional/Imaging/FrontendIconRegistryTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/FrontendIconRegistryTest.php).
+
+| Method                                             | Asserts                                                                       |
+|----------------------------------------------------|-------------------------------------------------------------------------------|
+| `assertFrontendIconIsRegisteredWithProvider()`     | In the frontend registry, with the given provider.                            |
+| `assertFrontendIconIsNotABackendIcon()`            | In the frontend registry and unknown to the core `IconRegistry`.              |
+| `assertIconIsRegisteredInBothRegistries()`         | In both registries, with the same provider and the same options.              |
+| `assertFrontendIconMarkupFollowsTheTextColour()`   | `currentColor`, no hex colour, no `<style>`, no `id`, from the frontend path. |
+| `assertRenderedFrontendIconCarriesItsIdentifier()` | Rendered by the frontend factory: `data-identifier`, no `default-not-found`.  |
+
+**The trap it exists for.** The two registries do not read each other, so an
+icon that moved keeps working in the backend registry until somebody deletes it
+there, and a site that replaced it in `Configuration/Icons.php` keeps seeing its
+own drawing in the backend and the shipped one in the frontend. The second
+method catches the icon that was copied instead of moved, the third the one that
+was changed in one file only. The frontend factory answers an unknown identifier
+with `default-not-found` exactly like core's, so the last method checks the
+identifier that came back.
+
+It is a trait of its own rather than a registry parameter on
+`ColourSchemeAwareIconsTrait`, whose fifth method walks the TCA and is about the
+backend by definition.
 
 ## `CropVariantsAssertionTrait`
 

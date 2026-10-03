@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 375 modifiers, of
-which 362 are constructor-promoted, across 112 files. The thirteen non-promoted
+`readonly` is used heavily, mostly on individual properties: 376 modifiers, of
+which 363 are constructor-promoted, across 113 files. The thirteen non-promoted
 declarations are the nine documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php`, the three
 fields `typo3-category-types/Classes/Routing/Aspect/CategoryFilterMapper.php`
@@ -74,7 +74,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 68:
+nothing**, and of an immutable data object. There are 71:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -98,7 +98,7 @@ The split by visibility says what each is for:
 
 | Modifier             | Count | Means                                             |
 |----------------------|-------|---------------------------------------------------|
-| `private readonly`   | 233   | An injected collaborator                          |
+| `private readonly`   | 236   | An injected collaborator                          |
 | `public readonly`    | 122   | A field of an immutable data object               |
 | `protected readonly` | 18    | Either, in classes with subclasses or older style |
 
@@ -392,8 +392,8 @@ The four traits under `packages/fgtclb/*/Classes/` follow the rule:
 | `GetSelectItemsForTcaManagedTableFieldMethodTrait` | the request, the localization utility, the extension key, the table, the field and the values to drop, and hands `$this` to the item provider as the calling object |
 | `TtContentListTypeColumnTrait`                     | the connection pool                                                                                                                                                 |
 
-The fourteen traits of `packages-dev/testing-helper/` are the exception. They
-are used only in test cases, thirteen of them only in functional ones, so they
+The fifteen traits of `packages-dev/testing-helper/` are the exception. They
+are used only in test cases, fourteen of them only in functional ones, so they
 call `$this->get()`, the assertions and the other helpers of the test case, and
 two declare properties: one keeps a backup of the TCA, one a fixed map of
 retired core labels. See [Testing helper](../testing/testing-helper.md).

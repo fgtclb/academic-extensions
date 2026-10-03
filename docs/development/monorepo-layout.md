@@ -361,7 +361,7 @@ together:
 
 `fgtclb/academics-monorepo-testing-helper` autoloads
 `FGTCLB\TestingHelper\` from `Classes/` and is required as a dev dependency of
-the root. It ships fourteen functional-test traits in
+the root. It ships fifteen functional-test traits in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/`:
 
 | Trait                                  | Purpose                                                                             |
@@ -375,6 +375,7 @@ the root. It ships fourteen functional-test traits in
 | `EnsureTtContentListTypeColumnTrait`   | Ensures the `tt_content` list type column exists for a test.                        |
 | `ExtensionCoreVersionCompatTestsTrait` | Proves a suite really ran against the core version it was asked for.                |
 | `ExtensionsLoadedTestsTrait`           | Asserts the extension set under test is loaded.                                     |
+| `FrontendIconsAssertionTrait`          | Asserts a frontend icon of `academic_base`, and how it relates to the backend one.  |
 | `FrontendPluginRenderingTrait`         | Renders a frontend plugin through a real request.                                   |
 | `PluginFlexFormDataStructureTrait`     | Resolves and asserts a plugin's FlexForm data structure.                            |
 | `ResponsiveImageAssertionTrait`        | Asserts what the shared image partial of `academic_base` rendered.                  |

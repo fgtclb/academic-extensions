@@ -151,7 +151,7 @@ together.
 
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable. Raising the supported patch level touches every extension, fixture extension, instance and database template as well, see [Raising the supported core patch level](docs/development/monorepo-layout.md#raising-the-supported-core-patch-level). Its eight unit tests check that every `ext_emconf.php` names its dependencies by extension key, that every translation, in a template or in PHP, names its extension without an underscore, that every event class is final and used, that every plugin controller is final and the `@api` tags match the extension points page of `academic_base`, that no source file names an issue key of a customer project, that the edit, repository and extension links of every `Documentation/guides.xml` lead to its own package and branch, that every `extra.branch-alias` is keyed to the version name composer gives the branch (`dev-main`, `2.x-dev`, never `dev-2`), that no package's `.gitattributes` leaves a class alias map it declares out of its archive, and that the files `bin/set-version` writes are stored in its tools' form, so a run with an unchanged version changes nothing: no comment in `ext_emconf.php`, `"providesPackages": []`, sorted `require`.
-- `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Fourteen of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
+- `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Fifteen of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed set `Configuration/DataFactory/academics-instance/` the DDEV instances are built from. Content, not code, apart from one page object it ships twice (as a static template and as a site set) because the `/legacy/` tree cannot be themed. Written into an empty instance with `ddev composer instance:seed`, which runs the `data-factory:import academics-instance` command of `sbuerk/data-factory`. `ScenarioLegacy.yaml` is **generated** by `Build/Scripts/generateLegacyScenario.php` from `Scenario.yaml` — change the generator, never the generated file, and `--check` reports a stale one. The seed is verified by tests of its own, see [Seed verification](docs/testing/seed-verification.md).
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
 - `.Build/` — generated composer install target (`vendor-dir`, `bin-dir`, `Web/`). Not committed.
@@ -573,10 +573,11 @@ in use in production code alongside it, so the two styles coexist.
 Keep the two vendors apart when you use them. `#[Autoconfigure]`, `#[Autowire]`,
 `#[AsAlias]` and `#[Exclude]` are **Symfony's**, from
 `Symfony\Component\DependencyInjection\Attribute`. Two **TYPO3** attributes are
-in use here: `Core\Attribute\AsEventListener` on eight listeners - the
+in use here: `Core\Attribute\AsEventListener` on nine listeners - the
 `RegisterAcademicPageDoktype` and the `AddPageModuleCategorySummary` listener of
-`academic-partners`, `academic-programs` and `academic-projects`, and
-`ApplySettingsToTca` of `academic-persons` and `academic-jobs` - and
+`academic-partners`, `academic-programs` and `academic-projects`,
+`ApplySettingsToTca` of `academic-persons` and `academic-jobs`, and
+`WarmUpFrontendIconRegistry` of `academic-base` - and
 `Install\Attribute\UpgradeWizard` on the seventeen upgrade wizards. That
 distinction is what the `#[AsEventListener]` rule above turns on — TYPO3 ships
 its own, Symfony's must never stand in for it, and Symfony's fails silently

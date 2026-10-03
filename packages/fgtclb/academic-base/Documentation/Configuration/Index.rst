@@ -176,7 +176,9 @@ Opting in
 ---------
 
 Register the icon in :file:`Configuration/Icons.php` of the extension that
-ships it, with this provider instead of the core one:
+ships it, or in its :file:`Configuration/FrontendIcons.php` for an icon only
+the frontend shows (see :ref:`configuration-frontend-icons`), with this
+provider instead of the core one:
 
 ..  code-block:: php
     :caption: EXT:my_extension/Configuration/Icons.php
@@ -240,3 +242,141 @@ has to be drawn for that:
 
 A file that does not exist renders empty markup rather than a broken image,
 so check a new registration once in the backend or with a rendering test.
+
+..  _configuration-frontend-icons:
+
+Frontend icons
+==============
+
+This extension keeps a registry of its own for the icons a visitor sees. The
+icon registry of TYPO3 is built for the backend: it loads every core icon,
+the record icons and the flags with it, and its icons are styled by the
+backend stylesheet. The frontend registry holds only what extensions and site
+packages register for the frontend. Neither registry reads the other.
+
+..  _configuration-frontend-icons-register:
+
+Registering an icon
+-------------------
+
+Every active extension and site package can ship
+:file:`Configuration/FrontendIcons.php`. It has the format of
+:file:`Configuration/Icons.php`: an array of icon identifiers to the icon
+provider and its options. Every icon provider of TYPO3 can be used, and
+:php:`\FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider`
+for an SVG drawn in `currentColor`. An entry without a provider gets the one
+TYPO3 derives from the file name, the SVG provider for a file ending in `svg`
+and the bitmap provider for every other file.
+
+..  code-block:: php
+    :caption: EXT:my_sitepackage/Configuration/FrontendIcons.php
+
+    return [
+        'my-sitepackage-download' => [
+            'provider' => \FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider::class,
+            'source' => 'EXT:my_sitepackage/Resources/Public/Icons/download.svg',
+        ],
+    ];
+
+The files are read in the loading order of the packages, and a package loaded
+later replaces the whole configuration of an identifier an earlier one
+registered. A site package replaces an icon of an academic extension by
+registering the same identifier, provided it loads after that extension: it
+requires the extension in its :file:`composer.json`, and in classic mode names
+it under `depends` in its :file:`ext_emconf.php` as well.
+
+An icon the backend shows as well, a record icon a frontend template renders
+for example, is registered in both files, with the same configuration. A site
+that replaces it replaces it in both.
+
+An entry whose provider is not an icon provider makes every icon of the view
+helper fail with an error that names the entry, so a typo in a class name is
+found on the first page rather than shipped.
+
+..  _configuration-frontend-icons-render:
+
+Rendering an icon
+-----------------
+
+The view helper ``icon`` of this extension renders an icon of the frontend
+registry. It takes the arguments of :html:`<core:icon>` with the same
+defaults: `identifier`, `size` (default `small`), `overlay`, `state` (default
+`default`), `alternativeMarkupIdentifier`, for example `inline`, and `title`.
+The markup is the one :html:`<core:icon>` renders for an icon registered with
+the same provider and options, so a stylesheet written for one fits the other.
+
+..  code-block:: html
+    :caption: EXT:my_sitepackage/Resources/Private/Partials/Download.html
+
+    <html xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
+          data-namespace-typo3-fluid="true">
+
+    <ab:icon identifier="my-sitepackage-download" alternativeMarkupIdentifier="inline" />
+
+    </html>
+
+Unlike :html:`<core:icon>`, a `title` appears only on the icon rendered with
+it, also when the same icon is rendered several times on one page.
+
+The view helper reads the frontend registry only. An icon registered in
+:file:`Configuration/Icons.php` alone, or one of TYPO3's own icons, is unknown
+to it. An unknown identifier renders the placeholder `default-not-found`, the
+red drawing TYPO3 shows for an unknown icon, marked
+`data-identifier="default-not-found"`. This extension registers it in its own
+:file:`Configuration/FrontendIcons.php`, so a site package replaces it like
+any other icon.
+
+..  _configuration-frontend-icons-code:
+
+Icons from code
+---------------
+
+An extension that computes its icons, from a configuration file of its own for
+example, contributes them through the event
+:php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent`. It is
+dispatched while the registry is built, before the files are read, so an entry
+of a :file:`Configuration/FrontendIcons.php` with the same identifier replaces
+a contributed icon whatever the order of the two packages.
+
+..  code-block:: php
+    :caption: EXT:my_extension/Classes/EventListener/ContributeFrontendIcons.php
+
+    namespace MyVendor\MyExtension\EventListener;
+
+    use FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent;
+    use TYPO3\CMS\Core\Attribute\AsEventListener;
+    use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
+
+    #[AsEventListener(identifier: 'my-extension/contribute-frontend-icons')]
+    final readonly class ContributeFrontendIcons
+    {
+        public function __invoke(CollectFrontendIconsEvent $event): void
+        {
+            $event->addIcon(
+                'my-extension-badge',
+                SvgIconProvider::class,
+                ['source' => 'EXT:my_extension/Resources/Public/Icons/badge.svg'],
+            );
+        }
+    }
+
+:php:`addIcon()` rejects a provider that is not an icon provider with an error
+that names the icon.
+
+..  _configuration-frontend-icons-cache:
+
+Caching
+-------
+
+The registry is built once and kept with the system caches. A change to a
+:file:`Configuration/FrontendIcons.php`, or to what a listener contributes,
+takes effect after the system caches are flushed, as a change to
+:file:`Configuration/Icons.php` does:
+
+..  code-block:: bash
+
+    vendor/bin/typo3 cache:flush --group system
+
+Installing or removing an extension needs no flush, the registry is kept per
+set of active packages. :bash:`vendor/bin/typo3 cache:warmup` builds it, so the
+first frontend request after a deployment does not.
