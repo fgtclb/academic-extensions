@@ -743,8 +743,10 @@ agreeing with itself.
 Five assertions for one icon identifier of the frontend icon registry of
 `academic_base`, the registry `Configuration/FrontendIcons.php` feeds and
 `ab:icon` reads (see [Icons](../architecture/icons.md#the-frontend-icon-registry)).
-Used by the registry tests of `academic-base`, and meant for the tests of the
-extensions that move their frontend icons there:
+Used by the registry tests of `academic-base`, by the category type icon tests
+of `typo3-category-types`, `academic-partners`, `academic-programs` and
+`academic-projects`, and meant for the tests of the extensions that move their
+frontend icons there:
 
 ```php
 use FrontendIconsAssertionTrait;

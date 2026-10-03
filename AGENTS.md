@@ -573,11 +573,12 @@ in use in production code alongside it, so the two styles coexist.
 Keep the two vendors apart when you use them. `#[Autoconfigure]`, `#[Autowire]`,
 `#[AsAlias]` and `#[Exclude]` are **Symfony's**, from
 `Symfony\Component\DependencyInjection\Attribute`. Two **TYPO3** attributes are
-in use here: `Core\Attribute\AsEventListener` on nine listeners - the
+in use here: `Core\Attribute\AsEventListener` on ten listeners - the
 `RegisterAcademicPageDoktype` and the `AddPageModuleCategorySummary` listener of
 `academic-partners`, `academic-programs` and `academic-projects`,
-`ApplySettingsToTca` of `academic-persons` and `academic-jobs`, and
-`WarmUpFrontendIconRegistry` of `academic-base` - and
+`ApplySettingsToTca` of `academic-persons` and `academic-jobs`,
+`WarmUpFrontendIconRegistry` of `academic-base` and
+`AddCategoryTypeFrontendIcons` of `typo3-category-types` - and
 `Install\Attribute\UpgradeWizard` on the seventeen upgrade wizards. That
 distinction is what the `#[AsEventListener]` rule above turns on — TYPO3 ships
 its own, Symfony's must never stand in for it, and Symfony's fails silently

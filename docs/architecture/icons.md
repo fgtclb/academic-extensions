@@ -62,15 +62,18 @@ ls packages/fgtclb/*/Configuration/FrontendIcons.php
 
 One package ships a `Configuration/FrontendIcons.php`: `academic-base`, with
 one registration, the placeholder `default-not-found` with the core
-`SvgIconProvider`. No other extension has moved an icon to the frontend
-registry yet, and no template renders `<ab:icon>`.
+`SvgIconProvider`. `typo3-category-types` contributes every category type and
+group icon from code, see below. No other extension has moved an icon to the
+frontend registry yet, and no template renders `<ab:icon>`.
 
 One registration is programmatic: `typo3-category-types` registers
 `category_types.<group>.<type>` per configured category type on
 `BootCompletedEvent`
 ([`Classes/ServiceProvider.php`](../../packages/fgtclb/typo3-category-types/Classes/ServiceProvider.php),
-`addIcons()`). It asks `IconRegistry::detectIconProvider()`, which knows bitmap
-versus SVG by file extension and nothing else. Those icons are `sys_category`
+`addIcons()`). The provider comes from
+[`Imaging/CategoryTypeIconProviderResolver`](../../packages/fgtclb/typo3-category-types/Classes/Imaging/CategoryTypeIconProviderResolver.php),
+which repeats the rule of `IconRegistry::detectIconProvider()`: bitmap versus
+SVG by file extension and nothing else. Those icons are `sys_category`
 record icons, so the same rule applies to them as to the rest — but the set of
 them is whatever the *loaded* extensions declare in their
 `Configuration/CategoryTypes.yaml`, site packages this repository never sees
@@ -83,16 +86,37 @@ keeps what core detected either way. Twenty icons ship with the flag set today,
 from `academic-partners` (4), `academic-programs` (12) and `academic-projects`
 (4) — every category type of this repository.
 
-The same method registers `category_types.group.<group>` for every group
+The same method registers `category_types_group.<group>` for every group
 declared with an icon in the `groups:` section of that file (ACE-364), with the
-same choice of provider. No backend view renders them — the option groups of
-the type select carry a label only — so they are icons for templates. The three
-groups of this repository declare one each, drawn in `currentColor` and with
-`inlineIcon: true`: `academic-partners`, `academic-programs` and
-`academic-projects`, in `Resources/Public/Icons/CategoryGroups/`. The type
-icons of a group named `group` would share their identifiers with the group
-icons, which is why the developer documentation of `category_types` rules the
-name out.
+same choice of provider. No backend view renders them, because the option
+groups of the type select carry a label only, so they are icons for templates.
+The three groups of this repository declare one each, drawn in `currentColor`
+and with `inlineIcon: true`: `academic-partners`, `academic-programs` and
+`academic-projects`, in `Resources/Public/Icons/CategoryGroups/`. The prefix
+differs from the `category_types.` of the type icons in its fifteenth
+character, so no group and type name can make the two identifiers equal, dots
+included (ACE-811). The earlier `category_types.group.<group>` collided with
+the type icons of a group named `group` and was never released.
+
+The frontend icon registry receives the same identifiers from
+[`EventListener/AddCategoryTypeFrontendIcons`](../../packages/fgtclb/typo3-category-types/Classes/EventListener/AddCategoryTypeFrontendIcons.php),
+a listener on `CollectFrontendIconsEvent` (ACE-811). It adds one entry per type
+and per group with the file the frontend shows, `frontendIcon` or else `icon`,
+and the provider the same resolver answers for the frontend flag: a declared
+`frontendInlineIcon`, or else `inlineIcon` while the frontend shows `icon`, and
+an image for a `frontendIcon` nobody opted in for. A type or group without a
+file contributes nothing, so the frontend renders its placeholder where the
+backend renders an empty bitmap that throws 1440754980. The values come from the
+models, `CategoryType::getFrontendIcon()` and `isFrontendInlineIcon()`, and the
+loader resets the frontend flag only: a `useExisting` override or a later group
+declaration that names a new `frontendIcon` without `frontendInlineIcon` shows
+it as an image, while a new `icon` keeps the earlier `inlineIcon`, the rule of
+ACE-523. Since the event entries come before the files, a
+`Configuration/FrontendIcons.php` of a site package replaces a category type
+icon in the frontend whatever the loading order, which `Icons.php` cannot do in
+the backend. The templates still render these icons with `<core:icon>`, from
+the backend registry, until the templates of partners, programs and projects
+switch to `<ab:icon>`.
 
 ### Where the identifiers are consumed
 
@@ -366,7 +390,8 @@ by construction — the defaults are literally `id="SVGID_1_"` and `.st0`/`.st1`
 and the observable result is one icon painted in the other's colour, or clipped by
 the other's `clipPath`. So the sources stay what they were: files an extension
 ships and registers in its own `Configuration/Icons.php`, drawn for inlining, and
-for a category type the extension has to say `inlineIcon: true` as well.
+for a category type the extension has to say `inlineIcon: true` as well, or
+`frontendInlineIcon: true` for a `frontendIcon` of its own.
 
 **A file the provider cannot inline yields no markup, and never an error.** The
 guarantee holds for every reason a source can be unusable — missing,
@@ -540,6 +565,17 @@ and keeps `BitmapIconProvider` all the same; and a type naming a file that does
 not exist renders empty markup rather than throwing. All four are needed — the
 first alone would pass for a registrar that inlines everything, which is the
 defect the opt-in exists for.
+
+The frontend contribution is covered next to it, in
+[`typo3-category-types/Tests/Functional/Imaging/CategoryTypeFrontendIconsTest.php`](../../packages/fgtclb/typo3-category-types/Tests/Functional/Imaging/CategoryTypeFrontendIconsTest.php),
+against the `test_category_types_frontend_icons` fixture extension: one type
+per case of the inline rule with provider and file in both registries, a
+bitmap, a type without a file rendering the placeholder, a group with a
+frontend file of its own, the group `group` next to a group named like one of
+its types, and a `Configuration/FrontendIcons.php` replacing one type icon in
+the frontend only. The `RecordIconsTest` of partners, programs and projects
+asserts every shipped type icon in both registries with the `currentColor`
+provider, through `FrontendIconsAssertionTrait`.
 
 The provider itself is covered the same way it is used:
 [`academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php)

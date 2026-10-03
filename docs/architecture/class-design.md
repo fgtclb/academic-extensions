@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule: 360 PHP files declaring 316
-classes, 11 interfaces, 18 traits and 15 enums do not follow one style yet.
+rather than describing an intention as a rule: 369 PHP files declaring 324
+classes, 11 interfaces, 19 traits and 15 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -16,20 +16,20 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-208 of the 315 classes are `final` (66 %). The distribution is not random: it
+217 of the 324 classes are `final` (67 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
 |--------------------------------------------|-------|-------|----------|---------|
 | `Classes/Upgrades/`                        | 17    | 0     | 0        | 100 %   |
 | `Classes/Service/` and `Classes/Services/` | 32    | 2     | 0        | 94 %    |
-| `Classes/EventListener/`                   | 12    | 1     | 0        | 92 %    |
+| `Classes/EventListener/`                   | 14    | 1     | 0        | 93 %    |
 | `Classes/Controller/`                      | 9     | 0     | 0        | 100 %   |
 | `Classes/Domain/Model/Dto/`                | 8     | 10    | 1        | 42 %    |
-| `Classes/ViewHelpers/`                     | 7     | 6     | 0        | 54 %    |
+| `Classes/ViewHelpers/`                     | 8     | 6     | 0        | 57 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
-| Everything else                            | 123   | 44    | 4        | 72 %    |
+| Everything else                            | 128   | 44    | 4        | 73 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -55,8 +55,8 @@ this and is the pattern to copy:
 
 ## `readonly` on properties, and on stateless service classes
 
-`readonly` is used heavily, mostly on individual properties: 376 modifiers, of
-which 363 are constructor-promoted, across 113 files. The thirteen non-promoted
+`readonly` is used heavily, mostly on individual properties: 378 modifiers, of
+which 365 are constructor-promoted, across 113 files. The thirteen non-promoted
 declarations are the nine documented fields of
 `academic-persons/Classes/Settings/AcademicPersonsSettings.php`, the three
 fields `typo3-category-types/Classes/Routing/Aspect/CategoryFilterMapper.php`
@@ -74,7 +74,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 71:
+nothing**, and of an immutable data object. There are 73:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
@@ -100,7 +100,7 @@ The split by visibility says what each is for:
 |----------------------|-------|---------------------------------------------------|
 | `private readonly`   | 236   | An injected collaborator                          |
 | `public readonly`    | 122   | A field of an immutable data object               |
-| `protected readonly` | 18    | Either, in classes with subclasses or older style |
+| `protected readonly` | 20    | Either, in classes with subclasses or older style |
 
 Use `private readonly` for every constructor-injected dependency. It states that
 the service does not rebind it, which is the property half of the stateless rule

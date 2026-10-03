@@ -10,6 +10,8 @@ return [
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/CompetenceField.svg',
             'priority' => 0,
             'inlineIcon' => true,
+            'frontendIcon' => '',
+            'frontendInlineIcon' => null,
         ],
         1 =>  [
             'identifier' => 'cooperation',
@@ -19,6 +21,8 @@ return [
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Cooperation.svg',
             'priority' => 0,
             'inlineIcon' => true,
+            'frontendIcon' => '',
+            'frontendInlineIcon' => null,
         ],
         2 =>  [
             'identifier' => 'funding_partner',
@@ -28,6 +32,8 @@ return [
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/FundingPartner.svg',
             'priority' => 0,
             'inlineIcon' => true,
+            'frontendIcon' => '',
+            'frontendInlineIcon' => null,
         ],
         3 =>  [
             'identifier' => 'project_department',
@@ -37,6 +43,8 @@ return [
             'icon' => 'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/Department.svg',
             'priority' => 0,
             'inlineIcon' => true,
+            'frontendIcon' => '',
+            'frontendInlineIcon' => null,
         ],
     ],
 ];

@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Sixty-seven such fixture extensions exist, in ten of the twelve extensions.
+Sixty-eight such fixture extensions exist, in ten of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -27,6 +27,7 @@ They sit next to the tests that use them, under
 | `test_base_dependency_injection`            | `tests/base-test-dependency-injection`            | `academic-base`          | Two services to resolve through the container, plus `Services.yaml`.          |
 | `test_bitejobs_listener`                    | `tests/test-bitejobs-listener`                    | `academic-bite-jobs`     | Listeners of the B-ITE request and result events, and a recorder.             |
 | `test_bitejobs_stub`                        | `tests/test-bitejobs-stub`                        | `academic-bite-jobs`     | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
+| `test_category_types_frontend_icons`        | `tests/category-types-frontend-icons`             | `typo3-category-types`   | Types and groups per frontend icon case, and a `FrontendIcons.php` entry.     |
 | `test_category_types_group`                 | `tests/category-types-group`                      | `typo3-category-types`   | A `CategoryTypes.yaml` registering a group, plus a test ViewHelper.           |
 | `test_category_types_icons`                 | `tests/category-types-icons`                      | `typo3-category-types`   | Four category types, one per branch of the icon registrar, and three groups.  |
 | `test_category_types_summary_override`      | `tests/category-types-summary-override`           | `typo3-category-types`   | A page TSconfig override of the page module category summary template.        |
@@ -93,8 +94,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-two of the sixty-seven have a `Classes/` folder with a `TESTS\…` PSR-4
-root. The other forty-five are pure resources. The `ext_emconf.php` is checked
+Twenty-two of the sixty-eight have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other forty-six are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
 see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
@@ -227,6 +228,10 @@ load after an extension therefore gets a key that sorts after it, requires no
 other fixture, and its test asserts the order before it asserts the
 replacement, as `IconViewHelperOverrideTest::theSitePackageLoadsAfterTheExtensionAndAcademicBase()`
 does. `test_job_contact_icon` sorts after `academic_jobs` the same way.
+`test_category_types_frontend_icons` needs no order: the category type icons
+reach the frontend registry through its collect event, which is applied before
+any `Configuration/FrontendIcons.php`, so its own file replaces one of them in
+any position.
 
 ## Using one in a test
 
@@ -341,9 +346,11 @@ The existing ones show the cases that justify one:
   can, `test_frontend_icons` registers icons for the frontend icon registry of
   `academic_base` in a `Configuration/FrontendIcons.php` and from a listener,
   with one icon in its `Configuration/Icons.php` as well and one backend-only
-  icon there, and
-  `test_frontend_icons_override` replaces two of them, which again takes a
-  package that loads later, `test_public_profile_settings` ships a
+  icon there, and `test_frontend_icons_override` replaces two of them, which
+  again takes a package that loads later, `test_category_types_frontend_icons`
+  declares category types and groups for every frontend icon case and replaces
+  one of their icons in its own `Configuration/FrontendIcons.php`,
+  `test_public_profile_settings` ships a
   `Configuration/AcademicPersons/Settings.yaml` that overrides the `profile`
   map exactly as a site package would,
   `test_contract_contact_actions` ships one that narrows the `actions` of the
