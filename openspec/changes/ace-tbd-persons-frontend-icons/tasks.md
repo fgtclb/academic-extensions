@@ -128,6 +128,10 @@
   `docs/architecture/profile-editing-contract.md:928-940` names the frontend
   registry and the ViewHelper, `docs/testing/javascript-tests.md:89` the new
   tag, `docs/testing/fixture-extensions.md` the two fixtures and the count.
+- [ ] 5.6 The migration guide change `ace-tbd-integrator-migration-guide`, while
+  it is still active: its `design.md` maps the profile editor override intent
+  "icons" to `Icons.php`. Change it to `FrontendIcons.php` and add this change
+  to its list of changes the guide names.
 
 ## 6. File the issue
 
