@@ -1,0 +1,72 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+<f:comment>
+    Every icon the academic extensions register, in both icon registries, as the
+    registries list them at render time - see IconOverviewProcessor. Each icon is a
+    tile with its identifier and its registry, rendered three times: at 1em inside a
+    line of text, at 2rem, and in the text colour of a dark ground, so an icon that
+    is not drawn in currentColor stands out on the dark ground.
+
+    The frontend registry is rendered the way a frontend template of the extensions
+    renders an icon, with ab:icon and the inline markup. The backend registry is only
+    reachable through core:icon, rendered in its default markup, the one the backend
+    shows: an icon of the core SVG provider is an <img> there and stays dark.
+
+    Style attributes only: the frontend Content Security Policy of both cores allows
+    them and blocks an inline style element without a nonce.
+</f:comment>
+<div class="academics-dev-site-icon-overview">
+    <f:if condition="{data.header}">
+        <h2>{data.header}</h2>
+    </f:if>
+    <p>
+        The group of an identifier decides its registry: <code>action</code>, <code>state</code>
+        and <code>info</code> icons are frontend icons, <code>record</code>, <code>plugin</code>
+        and <code>doktype</code> icons backend icons. Only the icons of the category types are in
+        both. A placeholder in a tile, or an icon that stays dark on the dark ground, is the
+        defect to look for.
+    </p>
+    <f:for each="{iconRegistries}" as="registry">
+        <section data-icon-registry="{registry.name}">
+            <f:if condition="{registry.name} == 'frontend'">
+                <f:then>
+                    <h3>Frontend registry ({registry.count} icons)</h3>
+                    <p>
+                        <code>Configuration/FrontendIcons.php</code> and the category types, rendered with
+                        <code>&lt;ab:icon … alternativeMarkupIdentifier="inline" /&gt;</code>.
+                    </p>
+                </f:then>
+                <f:else>
+                    <h3>Backend registry ({registry.count} icons)</h3>
+                    <p>
+                        <code>Configuration/Icons.php</code> and the category types, rendered with
+                        <code>&lt;core:icon … /&gt;</code> in its default markup.
+                    </p>
+                </f:else>
+            </f:if>
+            <f:for each="{registry.sections}" as="section">
+                <h4>{section.title}</h4>
+                <f:for each="{section.groups}" as="group">
+                    <h5>{group.name}</h5>
+                    <ul style="list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.75rem">
+                        <f:for each="{group.icons}" as="icon">
+                            <li data-icon-identifier="{icon.identifier}" data-icon-in-both="{f:if(condition: icon.inBoth, then: 'yes', else: 'no')}" style="border: 1px solid #c8c8c8; border-radius: 0.25rem; padding: 0.75rem">
+                                <code style="display: block; overflow-wrap: anywhere">{icon.identifier}</code>
+                                <small style="display: block; margin-bottom: 0.5rem">{registry.name} registry<f:if condition="{icon.inBoth}">, also in the {registry.otherName} registry</f:if></small>
+                                <div>Text <f:render section="Icon" arguments="{registry: registry.name, identifier: icon.identifier, size: 'small'}" /> text</div>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem">
+                                    <span style="font-size: 2rem; line-height: 1; padding: 0.25rem"><f:render section="Icon" arguments="{registry: registry.name, identifier: icon.identifier, size: 'large'}" /></span>
+                                    <span style="color: #f5f5f5; background-color: #1f1f1f; font-size: 2rem; line-height: 1; padding: 0.25rem"><f:render section="Icon" arguments="{registry: registry.name, identifier: icon.identifier, size: 'large'}" /></span>
+                                </div>
+                            </li>
+                        </f:for>
+                    </ul>
+                </f:for>
+            </f:for>
+        </section>
+    </f:for>
+</div>
+
+<f:section name="Icon"><f:if condition="{registry} == 'frontend'"><f:then><ab:icon identifier="{identifier}" size="{size}" alternativeMarkupIdentifier="inline" /></f:then><f:else><core:icon identifier="{identifier}" size="{size}" /></f:else></f:if></f:section>
+</html>

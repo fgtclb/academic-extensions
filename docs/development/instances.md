@@ -266,6 +266,7 @@ German translation below `/de/`:
 | `/projects/*`           | The project lists, with active filter tags, reset link and result count, filter, state and sorting in the path, and the active state badge on the full one, and six project pages (`doktype: 30`), the accessible learning platform with a subtitle and a link in its text                                                                                                                   |
 | `/partners/*`           | The partner list (paginated, with active filter tags, reset link and result count, filter, sorting and page in the path), a preset list, the map, the partnerships plugins, and six partner pages (`doktype: 40`), the TYPO3 Association with a subtitle                                                                                                                                     |
 | `/draft`, `/members`    | A hidden page and a page for a frontend user group                                                                                                                                                                                                                                                                                                                                           |
+| `/icons`                | Every icon the academic extensions register, in both icon registries, see [below](#the-icon-overview-page)                                                                                                                                                                                                                                                                                   |
 | `/legacy/*`             | The same tree again, delivered by a `sys_template` record instead of site sets                                                                                                                                                                                                                                                                                                               |
 
 Three pages of that tree have **nothing to show by design** and are therefore
@@ -284,6 +285,39 @@ page.
 
 Changing that content is a change to the seed set, not a click path — see
 [Seeding an instance](environment.md#seeding-an-instance).
+
+### The icon overview page
+
+`/icons` (German `/de/symbole`, and both again below `/legacy/`) carries one
+content element of the seed package, `academicsdevsite_icons`. It lists every
+icon of the academic extensions as the two icon registries hold them when the
+page renders, one section per registry:
+
+| Section  | Registry                                                                         | Rendered with                                              |
+|----------|----------------------------------------------------------------------------------|------------------------------------------------------------|
+| Frontend | the frontend icon registry of `academic_base`, `Configuration/FrontendIcons.php` | `<ab:icon … alternativeMarkupIdentifier="inline" />`       |
+| Backend  | the icon registry of TYPO3, `Configuration/Icons.php`                            | `<core:icon … />` in its default markup, the backend's own |
+
+Both sections hold the `tx-academic*` identifiers, grouped by extension prefix
+and group, and the `category_types.*` and `category_types_group.*` identifiers of
+the category types, grouped by category type group. Each icon is a tile with its
+identifier and its registry, rendered at 1em in a line of text, at 2rem and on a
+dark ground. A tile says when the other registry holds the identifier as well,
+which by the rule in [Icons](../architecture/icons.md) is true for the category
+type and group icons only.
+
+| Instance  | `/` tree                                      | `/legacy/` tree                                      |
+|-----------|-----------------------------------------------|------------------------------------------------------|
+| `core-13` | <https://core13-academics-v3.ddev.site/icons> | <https://core13-academics-v3.ddev.site/legacy/icons> |
+| `core-14` | <https://core14-academics-v3.ddev.site/icons> | <https://core14-academics-v3.ddev.site/legacy/icons> |
+
+Nothing on it is configured. An icon an extension adds or renames is on the page
+after a cache flush, without a change to the seed. A tile showing the
+`default-not-found` placeholder, an icon in the wrong section, or one that stays
+dark on the dark ground is the defect to look for. The rendering definition
+comes from the `ext_localconf.php` of the seed package rather than from a set,
+so it reaches both trees without a change to the site configurations, see
+[TypoScript and site sets](../architecture/typoscript-and-site-sets.md).
 
 The records the seed writes reference **files**, and those cannot live in the
 instance: `core-*/public/` is git-ignored. They are committed in the seed
@@ -354,5 +388,6 @@ with them: [Seed verification](../testing/seed-verification.md).
   package sit in the repository.
 - [Validation settings](../architecture/validation-settings.md) — why the name
   fields of a profile are read only in the editing form.
+- [Icons](../architecture/icons.md) — the rules the icons on `/icons` follow.
 - [Seed verification](../testing/seed-verification.md) — the checks that keep the
   seed definition, the committed snapshots and the manifest in agreement.

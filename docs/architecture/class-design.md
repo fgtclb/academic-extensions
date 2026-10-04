@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule: 371 PHP files declaring 325
+rather than describing an intention as a rule: 372 PHP files declaring 326
 classes, 11 interfaces, 20 traits and 15 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-217 of the 325 classes are `final` (67 %). The distribution is not random: it
+218 of the 326 classes are `final` (67 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
@@ -29,7 +29,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 8     | 6     | 0        | 57 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
-| Everything else                            | 128   | 44    | 5        | 72 %    |
+| Everything else                            | 129   | 44    | 5        | 72 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -74,7 +74,7 @@ The second command counts the promoted ones: a promoted parameter never ends
 the line with a semicolon and a declared property always does.
 
 `final readonly class` is the shape of a **stateless service that extends
-nothing**, and of an immutable data object. There are 73:
+nothing**, and of an immutable data object. There are 74:
 
 ```bash
 grep -rh '^final readonly class' --include='*.php' \
