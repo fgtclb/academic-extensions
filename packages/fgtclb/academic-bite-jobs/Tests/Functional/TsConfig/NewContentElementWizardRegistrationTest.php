@@ -87,11 +87,31 @@ final class NewContentElementWizardRegistrationTest extends AbstractAcademicBite
             'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.description',
             $elements['academicbitejobs_list.']['description'] ?? null,
         );
-        $this->assertSame('bitejobs_list', $elements['academicbitejobs_list.']['iconIdentifier'] ?? null);
+        $this->assertSame('tx-academicbitejobs-plugin-bite-jobs', $elements['academicbitejobs_list.']['iconIdentifier'] ?? null);
         $this->assertSame(
             ['CType' => 'academicbitejobs_list'],
             $elements['academicbitejobs_list.']['tt_content_defValues.'] ?? null,
         );
+    }
+
+    /**
+     * The wizard reads its icon from page TSconfig, the page module from TCA
+     * `typeicon_classes`. Both name the same identifier, so the content element looks the
+     * same where it is chosen and where it is placed.
+     */
+    #[Test]
+    public function wizardItemShowsTheIconOfTheContentElement(): void
+    {
+        $this->importCSVDataSet(
+            __DIR__ . '/Fixtures/NewContentElementWizardRegistration/pagesWithRegisteredPageTsConfig.csv'
+        );
+
+        $elements = BackendUtility::getPagesTSconfig(2)['mod.']['wizards.']['newContentElement.']['wizardItems.']['academic.']['elements.'] ?? [];
+
+        $contentElementIcon = $GLOBALS['TCA']['tt_content']['ctrl']['typeicon_classes']['academicbitejobs_list'] ?? null;
+
+        $this->assertIsString($contentElementIcon, 'The content element has no icon in TCA.');
+        $this->assertSame($contentElementIcon, $elements['academicbitejobs_list.']['iconIdentifier'] ?? null);
     }
 
     /**
