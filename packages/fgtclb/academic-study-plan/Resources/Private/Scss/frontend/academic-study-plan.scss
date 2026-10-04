@@ -42,9 +42,10 @@
     }
 
     // The control icons, rendered inline by the icon ViewHelper of academic_base
-    // as a span around a span around the svg. The svg files carry a viewBox only
-    // and the core stylesheet that sizes the wrapper exists in the backend alone,
-    // so without these rules every icon is drawn 0 x 0 in the frontend.
+    // as a span around a span around the svg. The core stylesheet that sizes the
+    // wrapper exists in the backend alone, and a file that replaces a shipped one
+    // may carry a viewBox but no size, which draws it 0 x 0 in the frontend. These
+    // rules give every icon of the element one size, shipped or replaced.
     .icon {
         display: inline-block;
         flex-shrink: 0;
@@ -106,16 +107,16 @@
         .col {
             padding: 0;
 
-            .icon-academic-study-plan-minus {
+            .icon-tx-academicbase-action-collapse {
                 display: none;
             }
 
             &.open {
-                .icon-academic-study-plan-plus {
+                .icon-tx-academicbase-action-expand {
                     display: none;
                 }
 
-                .icon-academic-study-plan-minus {
+                .icon-tx-academicbase-action-collapse {
                     display: block;
                 }
 

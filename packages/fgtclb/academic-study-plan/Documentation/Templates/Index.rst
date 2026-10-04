@@ -195,27 +195,32 @@ The glyphs of a semester header
 ===============================
 
 The semester partial renders two glyphs into the header,
-``academic-study-plan-plus`` and ``academic-study-plan-minus``, and the dialog
-partial renders ``academic-study-plan-close`` into its close button. All three
-are inlined SVGs drawn in :css:`currentColor`, rendered with the ``ab:icon``
-ViewHelper of :guilabel:`EXT:academic_base` from its frontend icon registry. An
-override that renders them declares
-``xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`` in its
-:html:`<html>` tag. With ``core:icon`` it shows TYPO3's not-found icon, see
+``tx-academicbase-action-expand`` and ``tx-academicbase-action-collapse``, and
+the dialog partial renders ``tx-academicbase-action-close`` into its close
+button. All three are shared action icons of :guilabel:`EXT:academic_base`:
+inlined SVGs drawn in :css:`currentColor`, rendered with its ``ab:icon``
+ViewHelper from its frontend icon registry. An override that renders them
+declares ``xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`` in
+its :html:`<html>` tag. With ``core:icon`` it shows TYPO3's not-found icon, see
 :ref:`breaking-study-plan-control-icons-moved-to-the-frontend-icon-registry`.
 
 The script does not look at the glyphs, the shipped stylesheet does. It selects
-the classes the ViewHelper writes: :css:`icon-academic-study-plan-minus` is
-hidden in a closed semester, :css:`icon-academic-study-plan-plus` in an open
-one, and every :css:`.icon` in the header from 768 pixels on. An override of
-:file:`StudyPlan/Semester.html` that keeps the shipped stylesheet therefore
-keeps rendering the two identifiers, with ``ab:icon``. One that renders
-glyphs of its own brings the rules for them.
+the classes the ViewHelper writes: :css:`icon-tx-academicbase-action-collapse`
+is hidden in a closed semester, :css:`icon-tx-academicbase-action-expand` in an
+open one, and every :css:`.icon` in the header from 768 pixels on. It also
+sizes every :css:`.icon` of the element to `1.25rem` and the drawing inside it
+to the full icon, so a drawing without a size of its own stays visible. An
+override of :file:`StudyPlan/Semester.html` that keeps the shipped stylesheet
+therefore keeps rendering the two identifiers, with ``ab:icon``. One that
+renders glyphs of its own brings the rules for them.
 
 To draw a glyph differently, register a file of your own under its identifier
 in the :file:`Configuration/FrontendIcons.php` of your site package, which has
-to depend on the extension so that its entry is read last. An entry in
-:file:`Configuration/Icons.php` does not reach the study plan.
+to depend on :guilabel:`EXT:academic_base` so that its entry is read last. The
+identifiers belong to :guilabel:`EXT:academic_base`, so the replacement shows
+in every academic extension that renders the glyph, not in the study plan
+alone. An entry in :file:`Configuration/Icons.php` does not reach the study
+plan.
 
 ..  _templates-module-as-trigger:
 

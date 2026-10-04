@@ -6,8 +6,10 @@ namespace FGTCLB\AcademicStudyPlan\Tests\Functional\ContentElement;
 
 use FGTCLB\AcademicStudyPlan\Tests\Functional\AbstractAcademicStudyPlanTestCase;
 use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Renders the `academic_study_plan` content element in the frontend.
@@ -588,22 +590,84 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         // The glyphs are frontend icons, rendered by `ab:icon` from the frontend icon
         // registry. It never fails on an unknown identifier: it renders the
         // `default-not-found` placeholder, and the identifier that was asked for is gone
-        // from the markup. A glyph missing from `Configuration/FrontendIcons.php`, or a
-        // tag left on `core:icon`, which asks the registry of the backend, ends there.
+        // from the markup. A glyph missing from the `Configuration/FrontendIcons.php` of
+        // academic_base, or a tag left on `core:icon`, which asks the registry of the
+        // backend, ends there.
         $this->assertStringNotContainsString('default-not-found', $content);
-        // The three identifiers the element actually asks for, so a rename in
-        // `Configuration/FrontendIcons.php` without one in the template is caught here too.
-        $this->assertStringContainsString('data-identifier="academic-study-plan-plus"', $content);
-        $this->assertStringContainsString('data-identifier="academic-study-plan-minus"', $content);
-        $this->assertStringContainsString('data-identifier="academic-study-plan-close"', $content);
+        // The three shared identifiers the element actually asks for, so a rename in
+        // academic_base without one in the partials is caught here too.
+        $this->assertStringContainsString('data-identifier="tx-academicbase-action-expand"', $content);
+        $this->assertStringContainsString('data-identifier="tx-academicbase-action-collapse"', $content);
+        $this->assertStringContainsString('data-identifier="tx-academicbase-action-close"', $content);
+    }
+
+    /**
+     * @return \Generator<string, array{0: string}>
+     */
+    public static function controlIconIdentifiers(): \Generator
+    {
+        yield 'accordion expand' => ['tx-academicbase-action-expand'];
+        yield 'accordion collapse' => ['tx-academicbase-action-collapse'];
+        yield 'dialog close' => ['tx-academicbase-action-close'];
+    }
+
+    /**
+     * An inline SVG with a `viewBox` and no size collapses to 0 px inside the flex header
+     * of a semester and inside the shrink-to-fit close button of the dialog, which is how
+     * the three controls were invisible before 3.0. Asserted on the rendered page: the
+     * icon is inlined, drawn in the text colour, and carries a size of its own. The
+     * stylesheet sizes it as well, see `stylesheetSelectsTheRenderedControlIcons()`.
+     */
+    #[Test]
+    #[DataProvider('controlIconIdentifiers')]
+    public function contentElementRendersControlIconsInlineWithASize(string $identifier): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $content = $this->renderHomePage();
+
+        $pattern = '#<span class="[^"]*\bicon-' . preg_quote($identifier, '#') . '\b[^"]*" data-identifier="'
+            . preg_quote($identifier, '#') . '"[^>]*>\s*<span class="icon-markup">\s*(<svg\b[^>]*>)#';
+        $this->assertMatchesRegularExpression($pattern, $content, sprintf('Icon "%s" is not rendered as inline SVG.', $identifier));
+        preg_match($pattern, $content, $matches);
+        $svg = $matches[1] ?? '';
+        $this->assertStringContainsString('width="1em"', $svg);
+        $this->assertStringContainsString('height="1em"', $svg);
+        $this->assertStringContainsString('fill="currentColor"', $svg);
+    }
+
+    /**
+     * The stylesheet selects the accordion glyphs by the class the icon markup derives from
+     * the identifier, so a renamed identifier leaves the stylesheet selecting nothing: both
+     * glyphs show, or neither. It also sizes every inlined icon of the element, so a site
+     * that registers a drawing without a size does not bring the 0 px icons back.
+     */
+    #[Test]
+    public function stylesheetSelectsTheRenderedControlIcons(): void
+    {
+        $css = (string)file_get_contents(
+            GeneralUtility::getFileAbsFileName('EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css')
+        );
+
+        $this->assertStringContainsString('.col .icon-tx-academicbase-action-collapse {', $css);
+        $this->assertStringContainsString('.col.open .icon-tx-academicbase-action-expand {', $css);
+        $this->assertStringContainsString('.col.open .icon-tx-academicbase-action-collapse {', $css);
+        $this->assertMatchesRegularExpression(
+            '#\.academic-study-plan \.icon \{[^}]*\bwidth: 1\.25rem;[^}]*\bheight: 1\.25rem;#',
+            $css,
+        );
+        $this->assertMatchesRegularExpression(
+            '#\.academic-study-plan \.icon svg \{[^}]*\bwidth: 100%;[^}]*\bheight: 100%;#',
+            $css,
+        );
     }
 
     /**
      * The shipped stylesheet switches the glyphs of a semester header through the classes
-     * of their wrappers: `.icon-academic-study-plan-minus` is hidden in a closed semester,
-     * `.icon-academic-study-plan-plus` in an open one, and every `.icon` of the header on a
-     * wide viewport. The script never looks at them, so nothing else notices when the
-     * classes are gone.
+     * of their wrappers: `.icon-tx-academicbase-action-collapse` is hidden in a closed
+     * semester, `.icon-tx-academicbase-action-expand` in an open one, and every `.icon` of
+     * the header on a wide viewport. The script never looks at them, so nothing else
+     * notices when the classes are gone.
      */
     #[Test]
     public function contentElementGivesTheGlyphsTheClassesTheStylesheetSelects(): void
@@ -615,7 +679,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertInstanceOf(\DOMNodeList::class, $headers);
         $this->assertGreaterThan(0, $headers->count());
         foreach ($headers as $header) {
-            foreach (['icon-academic-study-plan-plus', 'icon-academic-study-plan-minus'] as $glyphClass) {
+            foreach (['icon-tx-academicbase-action-expand', 'icon-tx-academicbase-action-collapse'] as $glyphClass) {
                 $glyphs = $xpath->query(
                     sprintf(
                         './/*[contains(concat(" ", normalize-space(@class), " "), " icon ")'

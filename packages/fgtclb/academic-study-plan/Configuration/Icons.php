@@ -3,35 +3,39 @@
 declare(strict_types=1);
 
 use FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider;
-use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 
+/*
+ * The backend icons of this extension: Font Awesome Free solid, drawn in `currentColor`
+ * and inlined by the provider of EXT:academic_base in both markups, so they take the
+ * colour of the surrounding text in both backend colour schemes. Licence and origin of
+ * the files: Resources/Public/Icons/LICENSE-font-awesome.txt.
+ *
+ * Identifiers follow `tx-<extension key without underscores>-<group>-<name>`, files
+ * `Icons/<group>/<name>.svg`: `plugin` for the content element (TCA and new content
+ * element wizard), `record` for the three record types. The extension icon of the TER
+ * and the extension manager is Extension.svg.
+ *
+ * The controls of the element in the frontend, expand, collapse and close, are the
+ * shared action icons of EXT:academic_base in its frontend icon registry, so this
+ * extension registers no frontend icon of its own. A site package replaces one of them,
+ * for every academic extension that renders it, in its own
+ * Configuration/FrontendIcons.php.
+ */
 return [
-    // Icon of the study plan content element. A placeholder until a dedicated icon
-    // is drawn; the extension icon of the TER and the extension manager is Extension.svg.
-    // The controls of the element are frontend icons and registered in
-    // `Configuration/FrontendIcons.php`.
-    'academic-study-plan' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/content-element.svg',
-    ],
-    /*
-     * The record icons of the three tables this extension ships. They are registered
-     * with the provider of EXT:academic_base, which inlines the file in both markups
-     * instead of rendering an <img>. An <img> is opaque to CSS and keeps the colours
-     * of its file, so a record icon drawn in a dark ink stays dark on the dark cards
-     * of the backend colour scheme. Inlined and drawn in `currentColor` it follows the
-     * text colour.
-     */
-    'academic-study-plan-category' => [
+    'tx-academicstudyplan-plugin-study-plan' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/category.svg',
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/plugin/study-plan.svg',
     ],
-    'academic-study-plan-semester' => [
+    'tx-academicstudyplan-record-category' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/semester.svg',
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/record/category.svg',
     ],
-    'academic-study-plan-module' => [
+    'tx-academicstudyplan-record-semester' => [
         'provider' => CurrentColorSvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/module.svg',
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/record/semester.svg',
+    ],
+    'tx-academicstudyplan-record-module' => [
+        'provider' => CurrentColorSvgIconProvider::class,
+        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/record/module.svg',
     ],
 ];
