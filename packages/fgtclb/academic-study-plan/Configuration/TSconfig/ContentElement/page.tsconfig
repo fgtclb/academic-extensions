@@ -12,7 +12,7 @@ TCEFORM.tt_content.CType.removeItems := removeFromList(academic_study_plan)
 mod.wizards.newContentElement.wizardItems.academic {
   elements {
     academic_study_plan {
-      iconIdentifier = academic-study-plan
+      iconIdentifier = tx-academicstudyplan-plugin-study-plan
       title = LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:tt_content.CType.academic_study_plan.title
       description = LLL:EXT:academic_study_plan/Resources/Private/Language/locallang_be.xlf:tt_content.CType.academic_study_plan.description
       tt_content_defValues {

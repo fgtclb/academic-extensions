@@ -12,16 +12,19 @@ use TYPO3\CMS\Core\Imaging\IconRegistry;
 use TYPO3\CMS\Core\Package\PackageManager;
 
 /**
- * A site package replaces a glyph of the study plan in its own
+ * A site package replaces a glyph the study plan renders in its own
  * `Configuration/FrontendIcons.php`, and the study plan shows its drawing without a
  * template override. A replacement left in `Configuration/Icons.php` does not reach the
  * study plan, which shows the shipped glyph.
  *
+ * The glyphs are the shared action icons of academic_base, so a replacement changes them
+ * in every academic extension that renders them, not in the study plan alone.
+ *
  * The fixture `tests/study-plan-icons` is that site package: it replaces
- * `academic-study-plan-close` in the file of the frontend and `academic-study-plan-plus`
- * in the file of the backend, both with a rectangle. A TYPO3 v14 test instance orders the
- * packages by their keys, so the first test asserts that the fixture loads after
- * academic_study_plan.
+ * `tx-academicbase-action-close` in the file of the frontend and
+ * `tx-academicbase-action-expand` in the file of the backend, both with a rectangle. A
+ * TYPO3 v14 test instance orders the packages by their keys, so the first test asserts
+ * that the fixture loads after academic_base and academic_study_plan.
  */
 final class AcademicStudyPlanIconReplacementTest extends AbstractAcademicStudyPlanTestCase
 {
@@ -38,9 +41,9 @@ final class AcademicStudyPlanIconReplacementTest extends AbstractAcademicStudyPl
     private const REPLACED_DRAWING = 'x="2" y="5" width="12" height="6"';
 
     /**
-     * The path of the shipped `plus.svg`.
+     * The start of the path of the shipped `action/expand.svg` of academic_base.
      */
-    private const SHIPPED_PLUS = 'd="M8 3v10M3 8h10"';
+    private const SHIPPED_EXPAND = 'd="M352 128C352 110.3 337.7 96 320 96';
 
     protected function setUp(): void
     {
@@ -81,6 +84,10 @@ final class AcademicStudyPlanIconReplacementTest extends AbstractAcademicStudyPl
         $packageKeys = array_keys($this->get(PackageManager::class)->getActivePackages());
 
         $this->assertGreaterThan(
+            array_search('academic_base', $packageKeys, true),
+            array_search('test_study_plan_icons', $packageKeys, true),
+        );
+        $this->assertGreaterThan(
             array_search('academic_study_plan', $packageKeys, true),
             array_search('test_study_plan_icons', $packageKeys, true),
         );
@@ -89,7 +96,7 @@ final class AcademicStudyPlanIconReplacementTest extends AbstractAcademicStudyPl
     #[Test]
     public function aFrontendIconOfTheSitePackageReplacesTheCloseGlyph(): void
     {
-        $glyphs = $this->renderedIconMarkups($this->renderFrontendPage('https://www.acme.com/home'), 'academic-study-plan-close');
+        $glyphs = $this->renderedIconMarkups($this->renderFrontendPage('https://www.acme.com/home'), 'tx-academicbase-action-close');
 
         $this->assertNotSame([], $glyphs);
         foreach ($glyphs as $markup) {
@@ -98,17 +105,17 @@ final class AcademicStudyPlanIconReplacementTest extends AbstractAcademicStudyPl
     }
 
     #[Test]
-    public function aReplacementInTheBackendFileDoesNotReachThePlusGlyph(): void
+    public function aReplacementInTheBackendFileDoesNotReachTheExpandGlyph(): void
     {
-        // The extension no longer registers the identifier there, so this is the
+        // academic_base registers the identifier for the frontend only, so this is the
         // replacement of the fixture, read by the backend registry.
-        $this->assertTrue($this->get(IconRegistry::class)->isRegistered('academic-study-plan-plus'));
-        $glyphs = $this->renderedIconMarkups($this->renderFrontendPage('https://www.acme.com/home'), 'academic-study-plan-plus');
+        $this->assertTrue($this->get(IconRegistry::class)->isRegistered('tx-academicbase-action-expand'));
+        $glyphs = $this->renderedIconMarkups($this->renderFrontendPage('https://www.acme.com/home'), 'tx-academicbase-action-expand');
 
         $this->assertNotSame([], $glyphs);
         foreach ($glyphs as $markup) {
             $this->assertStringNotContainsString(self::REPLACED_DRAWING, $markup);
-            $this->assertStringContainsString(self::SHIPPED_PLUS, $markup);
+            $this->assertStringContainsString(self::SHIPPED_EXPAND, $markup);
         }
     }
 

@@ -77,13 +77,13 @@
 .academic-study-plan .semesters .col {
   padding: 0;
 }
-.academic-study-plan .semesters .col .icon-academic-study-plan-minus {
+.academic-study-plan .semesters .col .icon-tx-academicbase-action-collapse {
   display: none;
 }
-.academic-study-plan .semesters .col.open .icon-academic-study-plan-plus {
+.academic-study-plan .semesters .col.open .icon-tx-academicbase-action-expand {
   display: none;
 }
-.academic-study-plan .semesters .col.open .icon-academic-study-plan-minus {
+.academic-study-plan .semesters .col.open .icon-tx-academicbase-action-collapse {
   display: block;
 }
 .academic-study-plan .semesters .col.open ul {

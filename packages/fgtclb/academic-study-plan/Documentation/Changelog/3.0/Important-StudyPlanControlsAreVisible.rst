@@ -10,7 +10,7 @@ Description
 The plus, minus and close icons of the study plan content element were drawn
 with a size of zero in the frontend. The templates render them inline with the
 icon ViewHelper of :composer:`fgtclb/academic-base`, the shipped SVG files
-carry a :html:`viewBox` only, and the core stylesheet that sizes the icon
+carried a :html:`viewBox` only, and the core stylesheet that sizes the icon
 wrapper is loaded in the backend alone. The close button of a module dialog
 was therefore invisible, and the semester headers of the narrow accordion
 layout showed no marker.
