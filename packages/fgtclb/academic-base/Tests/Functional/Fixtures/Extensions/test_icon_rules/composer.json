@@ -1,0 +1,20 @@
+{
+    "name": "tests/icon-rules",
+    "description": "An extension whose icons follow every icon rule of the academic extensions, in both registries",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "typo3/cms-core": "~13.4.35 || ~14.3.7",
+        "fgtclb/academic-base": "~3.0.0@dev",
+        "fgtclb/category-types": "~3.0.0@dev"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "test_icon_rules",
+            "version": "3.0.0-dev",
+            "Package": {
+                "providesPackages": []
+            }
+        }
+    }
+}

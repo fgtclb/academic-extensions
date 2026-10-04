@@ -3,7 +3,7 @@
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds the
 [base class every functional test case extends](#the-base-class-of-every-functional-test)
-and sixteen PHP traits, the parts of the test setup that were being copied
+and seventeen PHP traits, the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -20,8 +20,9 @@ necessary.
 | [`DeprecatedCoreLabelsTrait`](#deprecatedcorelabelstrait)                       | Guards TCA against core labels TYPO3 v14 retired.                   |
 | [`EnsureTtContentListTypeColumnTrait`](#ensurettcontentlisttypecolumntrait)     | Re-creates `tt_content.list_type` where v14 removed it.             |
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
-| [`ColourSchemeAwareIconsTrait`](#colourschemeawareiconstrait)                   | Asserts a record icon follows the backend colour scheme.            |
+| [`ColourSchemeAwareIconsTrait`](#colourschemeawareiconstrait)                   | Asserts a backend icon follows the colour scheme and icon rules.    |
 | [`FrontendIconsAssertionTrait`](#frontendiconsassertiontrait)                   | Asserts a frontend icon, and how it relates to the backend one.     |
+| [`IconFilesAssertionTrait`](#iconfilesassertiontrait)                           | Asserts every icon file is registered and attributed.               |
 | [`CropVariantsAssertionTrait`](#cropvariantsassertiontrait)                     | Reads the crop variants the image cropper offers for a record.      |
 | [`StaticTemplateTypoScriptTrait`](#statictemplatetyposcripttrait)               | Builds the TypoScript a record delivers, and what its form keeps.   |
 | [`LabelReferencesResolveTestsTrait`](#labelreferencesresolveteststrait)         | Asserts every label the TCA and its FlexForms name resolves.        |
@@ -741,10 +742,13 @@ done; the trait is used by one test class today.
 
 ## `ColourSchemeAwareIconsTrait`
 
-Four assertions for one icon identifier, plus one that derives the whole set
-from the TCA. Used by the `Tests/Functional/Imaging/RecordIconsTest.php` of every
-extension that ships record icons and by the category type registration test
-of `typo3-category-types`:
+Five assertions for one icon identifier of the icon registry of the backend,
+plus three that check the icons of a whole extension against the
+[icon rules](../architecture/icons.md#the-icon-rules-checked) and one that
+derives the record icons from the TCA. Used by the
+`Tests/Functional/Imaging/RecordIconsTest.php` of every extension that ships
+record icons, by the category type registration test of `typo3-category-types`
+and by the icon rules test of `academic-base`:
 
 ```php
 use ColourSchemeAwareIconsTrait;
@@ -759,25 +763,32 @@ public function recordIconIsRegisteredWithTheColourSchemeAwareProvider(string $i
 
 — [`academic-persons/Tests/Functional/Imaging/RecordIconsTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Imaging/RecordIconsTest.php)
 
-| Method                                             | Asserts                                                                  |
-|----------------------------------------------------|--------------------------------------------------------------------------|
-| `assertIconIsRegisteredWithCurrentColorProvider()` | Registered, and with `CurrentColorSvgIconProvider` rather than core's.   |
-| `assertIconIsInlinedInBothMarkups()`               | Default markup is the inlined file, and equals the `inline` alternative. |
-| `assertIconMarkupFollowsTheTextColour()`           | `currentColor`, no hex colour, no `<style>`, no `id`.                    |
-| `assertRenderedIconCarriesItsIdentifier()`         | `data-identifier`, no `default-not-found`, no `<img>`.                   |
-| `assertEveryRecordTypeIconIsColourSchemeAware()`   | Same, for every record icon the TCA of one extension names.              |
+| Method                                               | Asserts                                                                        |
+|------------------------------------------------------|--------------------------------------------------------------------------------|
+| `assertIconIsRegisteredWithCurrentColorProvider()`   | Registered, and with `CurrentColorSvgIconProvider` rather than core's.         |
+| `assertIconIsInlinedInBothMarkups()`                 | Default markup is the inlined file, and equals the `inline` alternative.       |
+| `assertIconMarkupFollowsTheTextColour()`             | `currentColor`, no hex colour, no `<style>`, no `id`.                          |
+| `assertRenderedIconCarriesItsIdentifier()`           | `data-identifier`, no `default-not-found`, no `<img>`.                         |
+| `assertIconIsInTheHouseFormat()`                     | Root element: 640 grid, `1em`, `fill="currentColor"`. No `style` attribute.    |
+| `assertEveryRecordTypeIconIsColourSchemeAware()`     | Same, for every record icon the TCA of one extension names.                    |
+| `assertEveryTypeOfTheExtensionNamesAnIconOfItsOwn()` | Every type the extension owns names a registered icon of its own, see below.   |
+| `assertIconIdentifiersFollowTheNamingScheme()`       | Each `Icons.php` entry: scheme, backend group, provider, an existing file.     |
+| `assertEveryIconOfTheExtensionIsInTheHouseFormat()`  | Every backend icon drawn from a file of the extension: provider, house format. |
 
 **The trap it exists for.** `IconFactory::getIcon()` answers an unknown
 identifier with the `default-not-found` placeholder instead of failing, so a
-registration that no longer resolves ships silently — which is why the first and
-the last method both check the identifier that came back. And the provider is
+registration that no longer resolves ships silently — which is why
+`assertIconIsRegisteredWithCurrentColorProvider()` and
+`assertRenderedIconCarriesItsIdentifier()` check the identifier that came back.
+And the provider is
 not visible in the rendered page at all until the colour scheme is dark: a
 record icon left with the core `SvgIconProvider` renders as an `<img>`, keeps
 the ink of its file, and only then turns into a dark glyph on a dark card
 (ACE-523).
 
-**Why the fifth method exists.** The other four take an identifier, and the
-identifiers are spelled out per extension so a rename has to be made twice. A
+**Why `assertEveryRecordTypeIconIsColourSchemeAware()` exists.** The other
+five take an identifier, and the identifiers are spelled out per extension so a
+rename has to be made twice. A
 hand written list is good at catching a change to what is on it and structurally
 unable to catch what was never added, so
 `assertEveryRecordTypeIconIsColourSchemeAware('academic_persons')` derives the set
@@ -790,21 +801,64 @@ with `CurrentColorSvgIconProvider`. `tt_content` is exempt from the last check,
 because its `typeicon_classes` entries are the content element brand marks. It
 also asserts that the walk found something, so it cannot pass by finding nothing.
 
-The identifiers are listed per extension rather than read out of
-`Configuration/Icons.php`, so a rename has to be made twice instead of silently
-agreeing with itself.
+**Why `assertEveryTypeOfTheExtensionNamesAnIconOfItsOwn()` exists.** The walk
+above attributes an icon to an extension by its source, so a type that names a
+core icon, a foreign icon or none at all is invisible to it. This one decides
+by *type* what belongs to the extension:
+
+```php
+$this->assertEveryTypeOfTheExtensionNamesAnIconOfItsOwn(
+    'test_icon_rules',
+    contentTypes: ['testiconrules_items'],
+    pageTypes: [1791061950],
+);
+```
+
+— [`academic-base/Tests/Functional/Imaging/IconRulesTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconRulesTest.php)
+
+Every `ctrl.typeicon_classes` entry of a table `tx_<key without underscores>_*`
+is owned, and so are the `tt_content` types in `$contentTypes` and the `pages`
+types in `$pageTypes`, with their `<doktype>-<variant>` entries. The two lists
+are passed in because `tt_content` and `pages` are shared by every extension
+and a CType carries no reliable mark of its owner, `academic_study_plan` is
+one. An owned table needs a `default` entry and every named type an entry,
+because an empty `icon` of a content element registration leaves none behind
+(`addPlugin()` and `TcaManipulator::addRecordType()` write nothing for it). Each
+owned entry is an identifier, not a file path, in the extension's own prefix
+and the group of its kind, `tx-<key>-record-` for a table, `-plugin-` for a
+content element, `-doktype-` for a page type, registered and not deprecated,
+on `CurrentColorSvgIconProvider`, inlined in both markups and drawn in
+`currentColor`. What it cannot see is a content element or page type the test
+does not name, and two types that swapped their icons, which is why the icon
+tests also pin the identifier each type names. It is a method of its own rather
+than two parameters of the walk above because it is stricter: an extension
+calls it once its own icons follow the scheme.
+
+**The extension-wide checks.** `assertIconIdentifiersFollowTheNamingScheme()`
+reads the extension's `Configuration/Icons.php`, because the registry cannot
+tell which package registered an identifier, and fails an identifier outside
+`tx-<key>-(record|plugin|doktype)-<name>`, an `action`, `state` or `info`
+identifier with a message that sends it to `FrontendIcons.php`, a group the
+optional `$groups` does not name, another provider, and a source that is not
+an existing SVG file below `Resources/Public/Icons/<directory>/` of the
+extension or of `academic_base`.
+`assertEveryIconOfTheExtensionIsInTheHouseFormat()` walks the registry instead,
+so it reaches the category type and group icons drawn from files of the
+extension, and for `academic_base` the record icons of other extensions that
+draw a file of the shared set. Both fail when they find nothing to check.
 
 ## `FrontendIconsAssertionTrait`
 
-Five assertions for one icon identifier of the frontend icon registry of
+Six assertions for one icon identifier of the frontend icon registry of
 `academic_base`, the registry `Configuration/FrontendIcons.php` feeds and
 `ab:icon` reads (see [Icons](../architecture/icons.md#the-frontend-icon-registry)).
 Used by the registry tests of `academic-base`, by the category type icon tests
 of `typo3-category-types`, `academic-partners`, `academic-programs` and
 `academic-projects`, by the control icon tests of `academic-persons` and
 `academic-persons-edit`, by the job and control icon tests of `academic-jobs`
-and `academic-study-plan`, and by the credit points icon test of
-`academic-programs`:
+and `academic-study-plan`, by the credit points icon test of
+`academic-programs`, and by the shared set and icon rules tests of
+`academic-base`:
 
 ```php
 use FrontendIconsAssertionTrait;
@@ -826,6 +880,7 @@ From [`academic-base/Tests/Functional/Imaging/FrontendIconRegistryTest.php`](../
 | `assertIconIsRegisteredInBothRegistries()`         | In both registries, with the same provider and the same options.              |
 | `assertFrontendIconMarkupFollowsTheTextColour()`   | `currentColor`, no hex colour, no `<style>`, no `id`, from the frontend path. |
 | `assertRenderedFrontendIconCarriesItsIdentifier()` | Rendered by the frontend factory: `data-identifier`, no `default-not-found`.  |
+| `assertFrontendIconIsInTheHouseFormat()`           | Root element: 640 grid, `1em`, `fill="currentColor"`. No `style` attribute.   |
 
 **The trap it exists for.** The two registries do not read each other, so an
 icon that moved keeps working in the backend registry until somebody deletes it
@@ -836,9 +891,71 @@ was changed in one file only. The frontend factory answers an unknown identifier
 with `default-not-found` exactly like core's, so the last method checks the
 identifier that came back.
 
+Two more check the frontend icons of a whole extension, the same checks
+`ColourSchemeAwareIconsTrait` has for the backend registry:
+
+| Method                                                      | Asserts                                                                          |
+|-------------------------------------------------------------|----------------------------------------------------------------------------------|
+| `assertFrontendIconIdentifiersFollowTheNamingScheme()`      | Each `FrontendIcons.php` entry: scheme, frontend group, provider, existing file. |
+| `assertEveryFrontendIconOfTheExtensionIsInTheHouseFormat()` | Every frontend icon drawn from a file of the extension: provider, house format.  |
+
+The naming check reads the extension's `Configuration/FrontendIcons.php` and
+fails an identifier outside `tx-<key>-(action|state|info)-<name>`, a `record`,
+`plugin` or `doktype` identifier with a message that sends it to `Icons.php`,
+a group the optional `$groups` does not name, another provider, and a source
+that is neither the file named after the identifier,
+`EXT:<key>/Resources/Public/Icons/<group>/<name>.svg`, nor a file of
+the shared set of `academic_base`. The house format check walks the registry
+through `FrontendIconRegistry::getAllRegisteredIconIdentifiers()`, so it reaches
+the category type and group icons `typo3-category-types` contributes as well.
+`default-not-found` of `academic_base` is exempt from both: it is core's
+identifier, file and provider, and the placeholder a site package replaces
+under that name.
+
 It is a trait of its own rather than a registry parameter on
-`ColourSchemeAwareIconsTrait`, whose fifth method walks the TCA and is about the
-backend by definition.
+`ColourSchemeAwareIconsTrait`, whose TCA walks are about the backend by
+definition, and the extension-wide checks follow that split: one method per
+registry, each reading the file of its registry, rather than one method with a
+registry parameter that would have to know both files and both group sets.
+
+## `IconFilesAssertionTrait`
+
+Two checks of the files below `Resources/Public/Icons/` of an extension, which
+belong to neither registry. Used by the shared set and icon rules tests of
+`academic-base`:
+
+```php
+use IconFilesAssertionTrait;
+
+#[Test]
+public function everyIconFileIsTheSourceOfARegisteredIcon(): void
+{
+    $this->assertEveryIconFileIsRegistered('academic_base');
+}
+```
+
+— [`academic-base/Tests/Functional/Imaging/SharedIconsTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/SharedIconsTest.php)
+
+| Method                                                         | Asserts                                                                            |
+|----------------------------------------------------------------|------------------------------------------------------------------------------------|
+| `assertEveryIconFileIsRegistered($extensionKey, $exemptFiles)` | Every SVG file is the source of an identifier of the backend or frontend registry. |
+| `assertEveryIconFileIsAttributedInTheNotice($extensionKey, …)` | Every SVG file has the Font Awesome comment and a line in the notice, and back.    |
+
+**The trap it exists for.** Every other assertion walks registrations, and a
+file nothing registers is not one, so it is never looked at until the day it
+is registered. The orphan check asks both registries, because a file of the
+shared set of `academic_base` may be drawn only by a frontend icon, only by a
+record icon another extension registers for the backend, or only by a category
+type. A category group icon counts like a type icon: `typo3-category-types`
+registers it as `category_types_group.<group>`, so no group file needs an
+exemption. The notice check fails a file without the Font Awesome comment, a
+file the notice does not list with its Font Awesome name, and a listed file
+that does not exist. `$exemptFiles` defaults to `['Extension.svg']`, the icon of
+the extension manager, which is read as a file and never registered, and an
+exempt file has to exist.
+
+It is a trait of its own because both checks are about files: a test of either
+registry can use it, and neither registry trait has to know the other one.
 
 ## `CropVariantsAssertionTrait`
 

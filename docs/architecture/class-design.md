@@ -2,8 +2,8 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule: 370 PHP files declaring 325
-classes, 11 interfaces, 19 traits and 15 enums do not follow one style yet.
+rather than describing an intention as a rule: 371 PHP files declaring 325
+classes, 11 interfaces, 20 traits and 15 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/` together, unless a section says otherwise:
@@ -397,8 +397,8 @@ The four traits under `packages/fgtclb/*/Classes/` follow the rule:
 | `GetSelectItemsForTcaManagedTableFieldMethodTrait` | the request, the localization utility, the extension key, the table, the field and the values to drop, and hands `$this` to the item provider as the calling object |
 | `TtContentListTypeColumnTrait`                     | the connection pool                                                                                                                                                 |
 
-The sixteen traits of `packages-dev/testing-helper/` are the exception. They
-are used only in test cases, fifteen of them only in functional ones, so they
+The seventeen traits of `packages-dev/testing-helper/` are the exception. They
+are used only in test cases, sixteen of them only in functional ones, so they
 call `$this->get()`, the assertions and the other helpers of the test case, and
 two declare properties: one keeps a backup of the TCA, one a fixed map of
 retired core labels. See [Testing helper](../testing/testing-helper.md).

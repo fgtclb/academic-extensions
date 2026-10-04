@@ -357,14 +357,14 @@ the root. It ships the base class every functional test case extends,
 `Classes/TestCase/FunctionalTestCase.php`, which keeps the Extbase class schema
 cache of every test instance in memory, see
 [Functional tests](../testing/functional-tests.md#the-shared-base-class), and
-sixteen functional-test traits in
+seventeen functional-test traits in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/`:
 
 | Trait                                  | Purpose                                                                             |
 |----------------------------------------|-------------------------------------------------------------------------------------|
 | `ActiveFiltersAssertionTrait`          | Reads the active filter tags, the reset link and the result count of a list.        |
 | `CategoryFilterFormAssertionTrait`     | Reads the category filters of a list's filter form, and where they render.          |
-| `ColourSchemeAwareIconsTrait`          | Asserts a record icon follows the backend colour scheme.                            |
+| `ColourSchemeAwareIconsTrait`          | Asserts a backend icon follows the colour scheme and the icon rules.                |
 | `ContentElementHeaderAssertionTrait`   | Counts where the header of a content element rendered, and how often.               |
 | `CropVariantsAssertionTrait`           | Reads the crop variants the image cropper offers for a record.                      |
 | `DeprecatedCoreLabelsTrait`            | Asserts that no TCA label points at a core label deprecated on the running version. |
@@ -373,6 +373,7 @@ sixteen functional-test traits in
 | `ExtensionsLoadedTestsTrait`           | Asserts the extension set under test is loaded.                                     |
 | `FrontendIconsAssertionTrait`          | Asserts a frontend icon of `academic_base`, and how it relates to the backend one.  |
 | `FrontendPluginRenderingTrait`         | Renders a frontend plugin through a real request.                                   |
+| `IconFilesAssertionTrait`              | Asserts every icon file of an extension is registered and attributed.               |
 | `LabelReferencesResolveTestsTrait`     | Asserts every label the TCA and its FlexForms name resolves.                        |
 | `PluginFlexFormDataStructureTrait`     | Resolves and asserts a plugin's FlexForm data structure.                            |
 | `ResponsiveImageAssertionTrait`        | Asserts what the shared image partial of `academic_base` rendered.                  |

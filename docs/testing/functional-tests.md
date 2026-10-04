@@ -6,7 +6,7 @@ through the same code paths production uses. It is the only suite here that
 sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
-It is also by far the larger suite: 469 functional test classes against 130 unit
+It is also by far the larger suite: 471 functional test classes against 130 unit
 test classes, and 585 CSV fixtures. Measured with
 
 ```bash
@@ -17,7 +17,7 @@ find packages -path '*Tests*' -name '*.csv' | wc -l
 
 | Extension                | Functional | Unit |
 |--------------------------|------------|------|
-| `academic-base`          | 29         | 19   |
+| `academic-base`          | 31         | 19   |
 | `academic-bite-jobs`     | 12         | 3    |
 | `academic-contact4pages` | 24         | 3    |
 | `academic-jobs`          | 37         | 3    |

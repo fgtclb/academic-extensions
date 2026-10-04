@@ -54,6 +54,11 @@ extensions.
 
         Configure the extension and its site sets for your installation.
 
+    ..  card:: :ref:`Icons <icons>`
+
+        The icon set the academic extensions share, how a template renders
+        one and how a site package replaces it.
+
     ..  card:: :ref:`Templates <templates>`
 
         The responsive image partial the academic extensions render their
@@ -91,6 +96,7 @@ extensions.
     Introduction/Index
     Installation/Index
     Configuration/Index
+    Icons/Index
     Templates/Index
     Integration/Index
     UpgradeCheck/Index

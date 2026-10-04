@@ -18,16 +18,18 @@ The core provider :php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`
 renders the default markup as an `<img>` tag. An image is opaque to CSS, so
 such an icon keeps the colours of its file and stays dark on a dark backend.
 
-An icon opts in from :file:`Configuration/Icons.php` of the extension that
-ships it:
+An icon opts in where the extension that ships it registers it: in
+:file:`Configuration/FrontendIcons.php` for an icon a frontend template renders
+(see :ref:`feature-1791061865`), in :file:`Configuration/Icons.php` for an icon
+the backend shows, such as a record icon:
 
 ..  code-block:: php
-    :caption: EXT:my_extension/Configuration/Icons.php
+    :caption: EXT:my_extension/Configuration/FrontendIcons.php
 
     return [
-        'my-extension-add' => [
+        'tx-myextension-action-add' => [
             'provider' => \FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider::class,
-            'source' => 'EXT:my_extension/Resources/Public/Icons/add.svg',
+            'source' => 'EXT:my_extension/Resources/Public/Icons/action/add.svg',
         ],
     ];
 
@@ -62,17 +64,14 @@ rendering one icon less. An icon is decoration and must not be able to fail the
 request that renders it.
 
 The provider needs no configuration of its own and changes nothing until an
-icon is registered with it. Two groups of icons of this release are registered
-with it. Twenty-three control icons: the seven of the public profile of
-`EXT:academic_persons` and the sixteen of the profile editing view of
-`EXT:academic_persons_edit`, registered in their
-:file:`Configuration/FrontendIcons.php`. And every icon a TCA record type
-resolves - the record icons of the academic extensions, the two academic page
-type icons and the twenty category type icons of the three academic extensions
-that ship category types, which ask for it with `inlineIcon: true` in their
-:file:`Configuration/CategoryTypes.yaml`. Brand icons, which are drawn in fixed
-colours and are meant to look the same on every background, stay with the core
-:php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`.
+icon is registered with it. In this release the academic extensions register
+every icon they ship with it: the shared icon set of this extension (see
+:ref:`feature-shared-icon-set`), their record, content element and page type
+icons, and the category type and group icons, which ask for it with
+`inlineIcon: true` in the :file:`Configuration/CategoryTypes.yaml` that
+declares them. The one exception is the placeholder `default-not-found` of the
+frontend icon registry, the drawing of TYPO3 with the provider of TYPO3. The
+extension icons (:file:`Extension.svg`) are not registered as icon identifiers.
 
 Impact
 ======

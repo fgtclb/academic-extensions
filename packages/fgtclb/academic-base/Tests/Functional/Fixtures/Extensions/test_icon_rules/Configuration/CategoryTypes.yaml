@@ -1,0 +1,16 @@
+groups:
+  - identifier: testiconrules
+    title: 'Testing icon rules'
+    icon: 'EXT:test_icon_rules/Resources/Public/Icons/category-group/rules.svg'
+    inlineIcon: true
+types:
+  - identifier: topic
+    title: 'Topic'
+    group: testiconrules
+    icon: 'EXT:test_icon_rules/Resources/Public/Icons/category-type/topic.svg'
+    inlineIcon: true
+  - identifier: role
+    title: 'Role, drawn from the shared set'
+    group: testiconrules
+    icon: 'EXT:academic_base/Resources/Public/Icons/info/role.svg'
+    inlineIcon: true

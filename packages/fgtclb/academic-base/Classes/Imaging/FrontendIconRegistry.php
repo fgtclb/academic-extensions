@@ -69,6 +69,19 @@ final readonly class FrontendIconRegistry
     }
 
     /**
+     * Every identifier the registry knows, in the order the registry was built:
+     * contributed icons first, then the files in package loading order. An identifier
+     * a later package replaced keeps the position of its first registration, which
+     * is how `array_merge()` treats a string key.
+     *
+     * @return list<string>
+     */
+    public function getAllRegisteredIconIdentifiers(): array
+    {
+        return array_keys($this->getIcons());
+    }
+
+    /**
      * Builds the registry and writes it to the cache, whether or not an entry exists.
      */
     public function warmup(): void

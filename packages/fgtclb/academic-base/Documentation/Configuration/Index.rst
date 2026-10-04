@@ -161,37 +161,39 @@ drawn in fixed colours and meant to look the same on every background, and
 wrong for anything that should match the text next to it - a record icon in
 the record list as much as an action icon in a button.
 
-Two groups of icons of the academic extensions use it. The control icons of the
-public profile and of the profile editing view, which sit inside buttons whose
-colour has to reach the glyph. And every icon a TCA record type resolves -
-the record icons of the extensions, the two academic page type icons, and the
-category type icons of the extensions that ship category types, which are
-registered programmatically by :php:`EXT:category_types` and ask for it with
-`inlineIcon: true` in their :file:`Configuration/CategoryTypes.yaml`. Brand
-icons stay with the core provider.
+The academic extensions register every icon they ship with it, starting with
+the shared icon set of this extension, see :ref:`Icons <icons>`. Category type
+and group icons are registered programmatically by `EXT:category_types` and ask
+for it with `inlineIcon: true` in the :file:`Configuration/CategoryTypes.yaml`
+that declares them.
 
 ..  _configuration-icon-provider-opt-in:
 
 Opting in
 ---------
 
-Register the icon in :file:`Configuration/Icons.php` of the extension that
-ships it, or in its :file:`Configuration/FrontendIcons.php` for an icon only
-the frontend shows (see :ref:`configuration-frontend-icons`), with this
-provider instead of the core one:
+Register the icon with this provider instead of the core one, in the file of
+the registry that shows it: :file:`Configuration/FrontendIcons.php` of the
+extension that ships it for an icon a frontend template renders (see
+:ref:`configuration-frontend-icons`), :file:`Configuration/Icons.php` for an
+icon the backend shows. The academic extensions decide by the group of the
+identifier, see :ref:`icons-naming`: an action, a state or the glyph in front
+of a piece of information is a frontend icon, the icon of a record type, a
+content element or a page type a backend icon.
 
 ..  code-block:: php
-    :caption: EXT:my_extension/Configuration/Icons.php
+    :caption: EXT:my_extension/Configuration/FrontendIcons.php
 
     return [
-        'my-extension-add' => [
+        'tx-myextension-action-add' => [
             'provider' => \FGTCLB\AcademicBase\Imaging\IconProvider\CurrentColorSvgIconProvider::class,
-            'source' => 'EXT:my_extension/Resources/Public/Icons/add.svg',
+            'source' => 'EXT:my_extension/Resources/Public/Icons/action/add.svg',
         ],
     ];
 
-Nothing else changes: the icon is rendered as before, with the
-:html:`<core:icon identifier="my-extension-add" />` ViewHelper, with
+Nothing else changes: the icon is rendered as before, in a frontend template
+with :html:`<ab:icon identifier="tx-myextension-action-add" />`, and a backend
+icon with the :html:`<core:icon>` ViewHelper, with
 :php:`IconFactory::getIcon()`, or as a `typeicon_classes` entry of a TCA
 table. Whether the `inline` alternative markup is requested or not, the
 markup is the inlined file.
@@ -243,6 +245,10 @@ has to be drawn for that:
 A file that does not exist renders empty markup rather than a broken image,
 so check a new registration once in the backend or with a rendering test.
 
+The icons of the academic extensions follow a stricter house format on top of
+these rules: Font Awesome Free solid, one 640 unit grid for every icon and
+`fill="currentColor"` on the root element, see :ref:`Icons <icons>`.
+
 ..  _configuration-frontend-icons:
 
 Frontend icons
@@ -285,9 +291,9 @@ registering the same identifier, provided it loads after that extension: it
 requires the extension in its :file:`composer.json`, and in classic mode names
 it under `depends` in its :file:`ext_emconf.php` as well.
 
-An icon the backend shows as well, a record icon a frontend template renders
-for example, is registered in both files, with the same configuration. A site
-that replaces it replaces it in both.
+An icon that both the frontend and the backend show, such as a category type
+icon, is registered in both files with the same configuration. A site that
+replaces it replaces it in both.
 
 An entry whose provider is not an icon provider makes every icon of the view
 helper fail with an error that names the entry, so a typo in a class name is
