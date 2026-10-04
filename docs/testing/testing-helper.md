@@ -745,10 +745,12 @@ done; the trait is used by one test class today.
 Five assertions for one icon identifier of the icon registry of the backend,
 plus three that check the icons of a whole extension against the
 [icon rules](../architecture/icons.md#the-icon-rules-checked) and one that
-derives the record icons from the TCA. Used by the
-`Tests/Functional/Imaging/RecordIconsTest.php` of every extension that ships
-record icons, by the category type registration test of `typo3-category-types`
-and by the icon rules test of `academic-base`:
+derives the record icons from the TCA. Used by the icon tests of every
+extension that ships backend icons, the `RecordIconsTest`, `PluginIconsTest`,
+`ContentElementIconsTest` or `ProfileEditingIconsTest` that spell out its
+identifiers and the `IconRulesTest` that runs the extension-wide checks, by the
+category type registration test of `typo3-category-types` and by the icon rules
+test of `academic-base`:
 
 ```php
 use ColourSchemeAwareIconsTrait;
@@ -797,9 +799,11 @@ keeps what the source path of the registered icon attributes to that extension,
 and fails on a `ctrl.iconfile` (which bypasses the registry), on a file path where
 an identifier belongs (`registerTCAIcons()` registers `ctrl.iconfile` only, so the
 backend renders `default-not-found`) and on any identifier that is not registered
-with `CurrentColorSvgIconProvider`. `tt_content` is exempt from the last check,
-because its `typeicon_classes` entries are the content element brand marks. It
-also asserts that the walk found something, so it cannot pass by finding nothing.
+with `CurrentColorSvgIconProvider`, content element icons of `tt_content`
+included. It skips a deprecated identifier, whose configuration raises
+`E_USER_DEPRECATED` when it is read, and no icon of the academic extensions is
+deprecated. It also asserts that the walk found something, so it cannot pass by
+finding nothing.
 
 **Why `assertEveryTypeOfTheExtensionNamesAnIconOfItsOwn()` exists.** The walk
 above attributes an icon to an extension by its source, so a type that names a
@@ -831,8 +835,11 @@ on `CurrentColorSvgIconProvider`, inlined in both markups and drawn in
 `currentColor`. What it cannot see is a content element or page type the test
 does not name, and two types that swapped their icons, which is why the icon
 tests also pin the identifier each type names. It is a method of its own rather
-than two parameters of the walk above because it is stricter: an extension
-calls it once its own icons follow the scheme.
+than two parameters of the walk above because the walk keeps a job of its own:
+the category type icons of `sys_category` belong to no table of the extension
+and are found by their source only. The `IconRulesTest` of every extension that
+ships backend icons calls both, with the content element and page types the
+extension registers.
 
 **The extension-wide checks.** `assertIconIdentifiersFollowTheNamingScheme()`
 reads the extension's `Configuration/Icons.php`, because the registry cannot
@@ -857,8 +864,10 @@ of `typo3-category-types`, `academic-partners`, `academic-programs` and
 `academic-projects`, by the control icon tests of `academic-persons` and
 `academic-persons-edit`, by the job and control icon tests of `academic-jobs`
 and `academic-study-plan`, by the credit points icon test of
-`academic-programs`, and by the shared set and icon rules tests of
-`academic-base`:
+`academic-programs`, by the shared set and icon rules tests of `academic-base`,
+and by the icon rules tests of `academic-jobs`, `academic-partners`,
+`academic-programs` and `academic-projects`, the extensions with frontend icons
+of their own or category type icons:
 
 ```php
 use FrontendIconsAssertionTrait;
@@ -922,7 +931,10 @@ registry parameter that would have to know both files and both group sets.
 
 Two checks of the files below `Resources/Public/Icons/` of an extension, which
 belong to neither registry. Used by the shared set and icon rules tests of
-`academic-base`:
+`academic-base` and by the `IconRulesTest` of every other extension that ships
+icons. `academic-jobs` and `academic-persons-sync`, which ship `Extension.svg`
+only, run the orphan check without the notice check, so a file added there has
+to be registered:
 
 ```php
 use IconFilesAssertionTrait;

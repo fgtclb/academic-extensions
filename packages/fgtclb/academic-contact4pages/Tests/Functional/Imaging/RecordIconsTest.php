@@ -103,7 +103,7 @@ final class RecordIconsTest extends AbstractAcademicContacts4PagesTestCase
     /**
      * The new content element wizard names its icon on its own, in page TSconfig, so it
      * can drift from the icon the page module shows for the same content element. It did:
-     * the wizard showed the core icon `actions-user`. Compared with the TCA and with the
+     * the wizard showed a core icon. Compared with the TCA and with the
      * literal, so the two have to be changed together and neither can drift alone.
      */
     #[Test]

@@ -6,8 +6,8 @@ through the same code paths production uses. It is the only suite here that
 sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
-It is also by far the larger suite: 474 functional test classes against 130 unit
-test classes, and 590 CSV fixtures. Measured with
+It is also by far the larger suite: 533 functional test classes against 136 unit
+test classes, and 620 CSV fixtures. Measured with
 
 ```bash
 find packages/fgtclb/*/Tests/Functional -name '*Test.php' | wc -l
@@ -17,18 +17,18 @@ find packages -path '*Tests*' -name '*.csv' | wc -l
 
 | Extension                | Functional | Unit |
 |--------------------------|------------|------|
-| `academic-base`          | 31         | 19   |
-| `academic-bite-jobs`     | 13         | 3    |
-| `academic-contact4pages` | 24         | 3    |
-| `academic-jobs`          | 38         | 3    |
-| `academic-partners`      | 51         | 8    |
-| `academic-persons`       | 126        | 38   |
-| `academic-persons-edit`  | 64         | 24   |
-| `academic-persons-sync`  | 2          | 1    |
-| `academic-programs`      | 51         | 8    |
-| `academic-projects`      | 35         | 8    |
-| `academic-study-plan`    | 17         | 1    |
-| `typo3-category-types`   | 22         | 14   |
+| `academic-base`          | 32         | 19   |
+| `academic-bite-jobs`     | 16         | 3    |
+| `academic-contact4pages` | 29         | 4    |
+| `academic-jobs`          | 48         | 3    |
+| `academic-partners`      | 58         | 9    |
+| `academic-persons`       | 139        | 40   |
+| `academic-persons-edit`  | 67         | 24   |
+| `academic-persons-sync`  | 4          | 1    |
+| `academic-programs`      | 57         | 8    |
+| `academic-projects`      | 40         | 10   |
+| `academic-study-plan`    | 19         | 1    |
+| `typo3-category-types`   | 24         | 14   |
 
 `packages-dev/dev-site` adds four functional and three unit classes on top, and
 `packages-dev/testing-helper` the two functional classes of the

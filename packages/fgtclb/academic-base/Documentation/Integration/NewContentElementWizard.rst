@@ -166,12 +166,12 @@ description it should show:
 
     mod.wizards.newContentElement.wizardItems.academic.elements {
       academicpersons_listanddetail {
-        iconIdentifier = persons_icon
+        iconIdentifier = tx-academicpersons-plugin-persons
         title = LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:plugin.listAndDetail.label
         tt_content_defValues.CType = academicpersons_listanddetail
       }
       academicpersons_list {
-        iconIdentifier = persons_icon
+        iconIdentifier = tx-academicpersons-plugin-persons
         title = LLL:EXT:academic_persons/Resources/Private/Language/locallang_be.xlf:plugin.list.label
         tt_content_defValues.CType = academicpersons_list
       }

@@ -98,6 +98,18 @@ extension is renamed. A fixture extension, `test_icon_rules`, holds every shape
 the rules allow, so each check is shown to accept them before any extension
 relies on it.
 
+**Specs only where a requirement already speaks about icons.** A delta spec
+modifies a requirement whose text names an identifier, a file, a provider or
+markup this change alters, with the full requirement. The page type, content
+element and record icons of the backend get no requirement of their own:
+every extension follows the same rules, one identifier of its own per type,
+the same one in the CType item, `typeicon_classes` and the wizard entry, drawn
+in `currentColor`, and the icon tests of every extension check them, so a
+requirement per extension would repeat one rule nine times. Rejected: an
+`ADDED` requirement per extension, which would sit in capabilities about
+frontend pages, and for which four extensions without an icon capability would
+need new capabilities.
+
 **One Breaking entry per extension.** Where ACE-812 to ACE-814 already wrote
 one about the move to `FrontendIcons.php`, the rename is folded into it, with a
 table of 2.x identifier, 3.0 identifier and registry. Otherwise a new entry.

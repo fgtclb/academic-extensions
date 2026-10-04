@@ -659,10 +659,10 @@ Its public surface is small and is API from the moment it ships:
 | `pe:status`                               | The event a descendant dispatches, `{ type, message? }`, to have that written for it. |
 
 **The prefix is the extension key**, `academic-persons-edit-`, with its
-underscores replaced — the same token the icon identifiers and the import map
-specifier use. A custom element name is global and has no scoping mechanism of
-any kind, so the prefix has to be one this extension provably owns, and the
-extension key is the only such token. Every element the profile editor adds
+underscores replaced — the same token the import map specifier uses. A custom
+element name is global and has no scoping mechanism of any kind, so the
+prefix has to be one this extension provably owns, and the extension key is
+the only such token. Every element the profile editor adds
 carries it.
 
 The element defines itself with a plain `customElements.define()` and no
@@ -750,8 +750,8 @@ that says so.
 whole answer for a screen reader and was, for a while, the whole answer for
 everybody: an eye captioned `View` stood above a panel that was already open,
 and pressing it a second time looked like asking for the same thing twice. So
-the button carries **both** icons — `academic-persons-edit-view` and
-`academic-persons-edit-view-close` — each in its own wrapper, one of them
+the button carries **both** icons — `tx-academicbase-action-view` and
+`tx-academicbase-action-view-close` — each in its own wrapper, one of them
 `hidden`, and **both** labels, as `data-pe-label-collapsed` and
 `data-pe-label-expanded`. `setExpanded()` of `profile/common.ts` is the single
 writer: it sets `aria-expanded`, flips the two wrappers and rewrites
@@ -831,8 +831,8 @@ and the fields of the editor all come from the `documentForm` and
 `contractContactForm` responses.
 
 **The visibility toggle of a row names the press, and Fluid draws both of its
-states.** The button carries `academic-persons-edit-visible` and
-`academic-persons-edit-hidden` in two wrappers, one of them `hidden`, and both
+states.** The button carries `tx-academicbase-state-visible` and
+`tx-academicbase-state-hidden` in two wrappers, one of them `hidden`, and both
 labels as `data-pe-label-visible` and `data-pe-label-hidden`; `setHiddenState()`
 of `profile/common.ts` is the single writer of the wrappers and the label. It
 sets no `aria-pressed`: the label changes with the state ("Hide in frontend",
@@ -927,16 +927,16 @@ promise for exactly that.
 
 ## Where the icons come from
 
-The action icons are frontend icons: `Configuration/FrontendIcons.php` of the
-extension registers them, and `<ab:icon>` of `academic_base` resolves an
-identifier through the frontend icon registry, which knows the set the
-extension registers and whatever a site package replaced in its own
-`FrontendIcons.php` (ACE-812). A browser can ask neither. Under the prototype
-design that is not a problem to solve: an icon is rendered by Fluid **inside
-the prototype that draws it**, in the help button, the six row controls of a
-contact, the add control of a section and the edit button of a field without
-a value. So it is part of the markup an override reaches, and no module ever
-looks one up.
+The action and state icons are the shared frontend icons of `academic_base`:
+its `Configuration/FrontendIcons.php` registers them, the extension registers
+none of its own (ACE-586), and `<ab:icon>` resolves an identifier through the
+frontend icon registry, which knows the shared set and whatever a site package
+replaced in its own `FrontendIcons.php` (ACE-812). A browser can ask neither.
+Under the prototype design that is not a problem to solve: an icon is rendered
+by Fluid **inside the prototype that draws it**, in the help button, the six
+row controls of a contact, the add control of a section and the edit button of
+a field without a value. So it is part of the markup an override reaches, and
+no module ever looks one up.
 There is no icon lookup in TypeScript, no icon module and no
 `<template data-pe-icon>` block. An override of one of those partials that
 still renders `<core:icon>` asks the icon registry of the backend, which does
@@ -946,7 +946,7 @@ builds.
 A control whose glyph depends on its state is drawn the same way, twice over:
 the view control renders both eyes, one of them `hidden`, and the browser flips
 the attribute rather than resolving a second identifier. That is why
-`academic-persons-edit-view-close` is a registration like any other and not a
+`tx-academicbase-action-view-close` is a registration like any other and not a
 string any module knows.
 
 ## The transition the editors open and close with
