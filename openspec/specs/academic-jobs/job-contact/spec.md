@@ -38,10 +38,14 @@ front of the contact phone number, and the e-mail icon shipped with the
 extension in front of the contact e-mail address, on an installation that
 registers no icons of its own. It MUST NOT show TYPO3's "icon not found"
 placeholder in the contact block. The two icons SHALL be shown at the size of
-the property icons of the same detail view. An integrator SHALL be able to
-replace either icon by registering their own file under the identifier the
-extension uses for it, `academic_jobs-contactPhone` or
-`academic_jobs-contactEmail`. This applies on TYPO3 v13 and v14 alike.
+the property icons of the same detail view, with the same markup as before
+this change. The two icons SHALL come from the frontend icon registration,
+under the identifiers `academic_jobs-contactPhone` and
+`academic_jobs-contactEmail`. An integrator SHALL be able to replace either
+icon by registering their own file under its identifier in the frontend icon
+registration of their site package. A registration of the same identifier in
+the backend icon registration SHALL NOT change what the contact block
+renders. This applies on TYPO3 v13 and v14 alike.
 
 #### Scenario: Job with a contact phone number and e-mail address
 
@@ -68,6 +72,18 @@ extension uses for it, `academic_jobs-contactPhone` or
 #### Scenario: A site package replaces the phone icon
 
 - **WHEN** a site package that depends on the extension registers its own file
-  under `academic_jobs-contactPhone`
+  under `academic_jobs-contactPhone` in its frontend icon registration
 - **THEN** the phone row of the contact block shows that file
 - **AND** the e-mail row still shows the shipped e-mail icon
+
+#### Scenario: A replacement in the backend registration
+
+- **WHEN** a site package registers its own file for
+  `academic_jobs-contactEmail` in its backend icon registration only
+- **THEN** the e-mail row shows the icon the extension ships
+
+#### Scenario: An override still asks the backend registry
+
+- **WHEN** a template override of the contact block renders
+  `academic_jobs-contactPhone` through the backend icon registry
+- **THEN** it shows the "icon not found" placeholder
