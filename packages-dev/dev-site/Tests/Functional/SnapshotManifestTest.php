@@ -7,8 +7,8 @@ namespace FGTCLB\AcademicsDevSite\Tests\Functional;
 use FGTCLB\AcademicsDevSite\Tests\Functional\Support\SeedDefinition;
 use FGTCLB\AcademicsDevSite\Tests\Functional\Support\SeedManifest;
 use FGTCLB\AcademicsDevSite\Tests\Functional\Support\SqliteFileRowReader;
+use FGTCLB\TestingHelper\TestCase\FunctionalTestCase;
 use PHPUnit\Framework\Attributes\Test;
-use SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase;
 use TYPO3\CMS\Core\Information\Typo3Version;
 
 /**

@@ -12,7 +12,6 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 use TESTS\TestPluginViewEvent\EventListener\LeftoverListProfilesListener;
 use TESTS\TestPluginViewEvent\EventListener\RecordPluginContextListener;
 use TESTS\TestPluginViewEvent\EventListener\RecordPluginViewListener;
-use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Page\CacheHashCalculator;
 
@@ -29,9 +28,7 @@ use TYPO3\CMS\Frontend\Page\CacheHashCalculator;
  */
 final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
 {
-    use FrontendPluginRenderingTrait {
-        frontendPluginTestConfiguration as sharedFrontendPluginTestConfiguration;
-    }
+    use FrontendPluginRenderingTrait;
     use SiteBasedTestTrait;
 
     protected const LANGUAGE_PRESETS = [
@@ -83,29 +80,6 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
         LeftoverListProfilesListener::$calls = 0;
         $this->removeWrittenSiteConfiguration();
         parent::tearDown();
-    }
-
-    /**
-     * The Extbase class schema cache stays in memory for this class, like in every other
-     * test class that renders many plugins: TYPO3 core writes it from a destructor, and a
-     * garbage collection inside another serialize() corrupts it (ACE-725, ACE-729, ACE-740).
-     *
-     * @param array<string, mixed> $additionalConfiguration
-     * @return array<string, mixed>
-     */
-    protected function frontendPluginTestConfiguration(array $additionalConfiguration = []): array
-    {
-        return $this->sharedFrontendPluginTestConfiguration(array_replace_recursive([
-            'SYS' => [
-                'caching' => [
-                    'cacheConfigurations' => [
-                        'extbase' => [
-                            'backend' => TransientMemoryBackend::class,
-                        ],
-                    ],
-                ],
-            ],
-        ], $additionalConfiguration));
     }
 
     /**

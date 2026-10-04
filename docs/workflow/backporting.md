@@ -175,6 +175,15 @@ ACE-745. It exists on both, but not as the same code: TYPO3 v12 has no
 `FrontendTypoScriptFactory`, so the copy on branch `2` builds the TypoScript
 from `SysTemplateTreeBuilder` itself.
 
+The base class every functional test case extends on `main`,
+`FGTCLB\TestingHelper\TestCase\FunctionalTestCase`, does not exist on branch
+`2`. The setting it carries, the Extbase class schema cache kept in memory, is
+there the default of `frontendPluginTestConfiguration()` of
+`FrontendPluginRenderingTrait` (ACE-742), so it reaches the plugin rendering
+tests only. A test backported from `main` extends the abstract test case of its
+extension as before, and a test class on `2` that hits the defect without that
+trait configures the backend itself.
+
 Count the directory rather than trusting this table, and check the individual
 extension too: a trait being on both branches does not mean the test directory
 that uses it is. Backporting a change whose test has no home means one of three

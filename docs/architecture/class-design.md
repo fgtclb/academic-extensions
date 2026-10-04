@@ -2,7 +2,7 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule: 369 PHP files declaring 324
+rather than describing an intention as a rule: 370 PHP files declaring 325
 classes, 11 interfaces, 19 traits and 15 enums do not follow one style yet.
 
 The counts on this page are measured over `packages/fgtclb/*/Classes/` and
@@ -16,7 +16,7 @@ grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
 
 ## `final` by default, and where it is impossible
 
-217 of the 324 classes are `final` (67 %). The distribution is not random: it
+217 of the 325 classes are `final` (67 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final | plain | abstract | % final |
@@ -29,7 +29,7 @@ tracks whether the framework instantiates the class or the container does.
 | `Classes/ViewHelpers/`                     | 8     | 6     | 0        | 57 %    |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 1     | 23    | 0        | 4 %     |
 | `Classes/Domain/Repository/`               | 0     | 16    | 0        | 0 %     |
-| Everything else                            | 128   | 44    | 4        | 73 %    |
+| Everything else                            | 128   | 44    | 5        | 72 %    |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -149,7 +149,7 @@ public function injectContext(Context $context): void
 does it once, for the settings graph an Extbase validator cannot take through a
 constructor.
 
-The 5 abstract classes and what each is for:
+The 6 abstract classes and what each is for:
 
 | Class                                                                             | Purpose                                                  |
 |-----------------------------------------------------------------------------------|----------------------------------------------------------|
@@ -158,6 +158,7 @@ The 5 abstract classes and what each is for:
 | `academic-persons/Classes/Profile/AbstractProfileFactory.php:28`                  | Shared profile factory state and collaborators           |
 | `academic-persons-edit/Classes/Domain/Validator/AbstractFormDataValidator.php:21` | Extbase validator base pulling `AcademicPersonsSettings` |
 | `academic-persons-edit/Classes/Domain/Model/Dto/AbstractFormData.php:10`          | Base for the form-data DTOs                              |
+| `packages-dev/testing-helper/Classes/TestCase/FunctionalTestCase.php:31`          | Base of every functional test case of the repository     |
 
 The plugin controllers of `academic_partners`, `academic_projects` and
 `academic_programs` took the `ExtensionService`, the `FilterTypeResolver` and
@@ -513,9 +514,10 @@ nullability of a property meaningful, so a `?Foo $foo = null` that is really
 always set has to be justified rather than assumed.
 
 Note that `paths` is `../../../packages` only: **`packages-dev/` is not analysed
-by PHPStan**. All three packages there, including the functional test traits in
-`packages-dev/testing-helper/`, are outside the gate. Keep that in mind when
-changing them — lint and the tests themselves are the only checks they get.
+by PHPStan**. All three packages there, including the functional test base
+class and traits in `packages-dev/testing-helper/`, are outside the gate. Keep
+that in mind when changing them. Lint and the tests themselves are the only
+checks they get.
 
 ## See also
 

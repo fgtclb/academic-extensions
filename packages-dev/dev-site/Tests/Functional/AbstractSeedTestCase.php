@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace FGTCLB\AcademicsDevSite\Tests\Functional;
 
 use FGTCLB\AcademicsDevSite\Tests\Functional\Support\SeedDefinition;
+use FGTCLB\TestingHelper\TestCase\FunctionalTestCase;
 use SBUERK\DataFactory\Seeding\DataHandling\FileReferenceSeeder;
 use SBUERK\DataFactory\Seeding\DataHandling\FileSeeder;
 use SBUERK\DataFactory\Seeding\DataHandling\ScenarioSeeder;
 use SBUERK\DataFactory\Seeding\DataHandling\ScenarioSeedResult;
 use SBUERK\DataFactory\Seeding\Parser\SeedDefinitionParser;
 use SBUERK\DataFactory\Seeding\Scenario\ScenarioComposer;
-use SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Core\Configuration\SiteWriter;
 use TYPO3\CMS\Core\Database\ConnectionPool;
