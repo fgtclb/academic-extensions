@@ -22,7 +22,7 @@ return [
             'disabled' => 'hidden',
         ],
         'typeicon_classes' => [
-            'default' => 'tx_academiccontacts4pages_domain_model_role',
+            'default' => 'tx-academiccontacts4pages-record-role',
         ],
     ],
     'types' => [

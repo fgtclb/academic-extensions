@@ -40,7 +40,7 @@ return [
         'languageField' => 'sys_language_uid',
         'translationSource' => 'l10n_source',
         'typeicon_classes' => [
-            'default' => 'tx_academiccontacts4pages_domain_model_contact',
+            'default' => 'tx-academiccontacts4pages-record-contact',
         ],
         'security' => [
             'ignorePageTypeRestriction' => true,
