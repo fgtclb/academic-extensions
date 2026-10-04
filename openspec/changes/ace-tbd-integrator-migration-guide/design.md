@@ -91,7 +91,8 @@ A table maps each 2.x override intent to its 3.0 setting:
 - hiding the synchronisation toggle: remove `special.skipSync`;
 - hiding a field: remove it from the profile map;
 - labels: the `profileEditing.*` keys;
-- icons: `Icons.php`.
+- icons: `FrontendIcons.php` of a site package that depends on the extension
+  (`ace-812-persons-frontend-icons`).
 
 It names the gaps without a replacement (`ace-760-managed-fields-editor`,
 `ace-762-editor-before-write-event`, `ace-764-editor-custom-profile-fields`)
@@ -108,7 +109,8 @@ A chapter that depends on a change not released when the guide is written
 `ace-721-program-page-content-without-getcontent`,
 `ace-785-page-templates-sections-subtitle`,
 `ace-712-upgrade-check-template-overrides`,
-`ace-713-upgrade-check-configuration`) carries a note naming it as not yet
+`ace-713-upgrade-check-configuration`,
+`ace-812-persons-frontend-icons`) carries a note naming it as not yet
 available.
 
 ### Decided: the static template step names the 2.x paths as deprecated

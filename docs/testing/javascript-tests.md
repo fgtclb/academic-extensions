@@ -86,10 +86,11 @@ refuses what it says it does.
 Fixtures carry the markup the modules are driven against, and it is **extracted
 from the Fluid partials rather than invented**, with the partial and its lines
 named at each block: `f:translate` becomes the text it resolves to and
-`core:icon` becomes nothing. Everything a module queries — the `data-pe-*`
-hooks, the ids, the toggled class names, the structure the `closest()` calls
-walk — is kept verbatim, so a template that drops one of them turns the tests
-red.
+`ab:icon` becomes nothing, or a marker element inside a prototype, so a test
+can see which icon a control cloned. Everything a module queries — the
+`data-pe-*` hooks, the ids, the toggled class names, the structure the
+`closest()` calls walk — is kept verbatim, so a template that drops one of
+them turns the tests red.
 
 That is a copy, and a copy drifts. The rule that keeps it honest: **a fixture
 that stands in for a Fluid prototype is accompanied by a functional test that
