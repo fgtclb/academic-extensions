@@ -328,6 +328,94 @@ page type icons of the academic extensions are the other way round: they are
 backend icons, and a site package replaces them in its
 :file:`Configuration/Icons.php`.
 
+..  _icons-frontend-javascript:
+
+Icons in frontend JavaScript
+============================
+
+The backend JavaScript icon API of TYPO3 cannot be used on a frontend page: it
+asks a backend route that answers a logged-in backend user only, and it serves
+the icon registry of TYPO3. Frontend JavaScript therefore takes the markup of
+an icon of the frontend icon registry from the server.
+
+..  note::
+
+    The contracts this section documents are public API of this extension,
+    as the :ref:`extension points page <developers-extension-points-api>`
+    lists them. They change only in a major release, with a Breaking
+    changelog entry. The PHP classes behind them are not public API.
+
+Where the JavaScript stamps out a piece of markup anyway, a list item or a row
+with its buttons, render the icon with ``ab:icon`` into a :html:`<template>`
+element and clone it. Where it picks an icon by its identifier at runtime,
+hand it the icons it may need as a JSON map:
+
+..  code-block:: html
+
+    <html xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
+          data-namespace-typo3-fluid="true">
+
+    <ab:frontendIconMap identifiers="{0: 'tx-academicbase-action-add', 1: 'tx-academicbase-action-delete'}" />
+
+This renders a JSON data block that the browser neither executes nor checks
+against the Content Security Policy:
+
+..  code-block:: html
+    :caption: Shortened
+
+    <script type="application/json" data-academic-icons data-academic-icons-size="small">{"tx-academicbase-action-add":"\u003Cspan class=\u0022t3js-icon icon icon-size-small ...\u0022 ...\u003E...\u003C/span\u003E","tx-academicbase-action-delete":"..."}</script>
+
+Each value is the markup `<ab:icon identifier="..."
+alternativeMarkupIdentifier="inline" />` renders, so the replacement of an icon
+in a site package arrives in the JavaScript as it does in a template. The JSON
+escapes `<`, `>`, `&` and both quotes as unicode escapes, so no markup can end
+the element, and :js:`JSON.parse()` returns the plain markup.
+
+Arguments:
+
+`identifiers` (array, required)
+    The identifiers to render. One that is not served is left out of the map,
+    see below.
+
+`size` (string, default `small`)
+    `default`, `small`, `medium`, `large` or `mega`. It sets the `icon-size-*`
+    class of the markup. The icons of the academic extensions size themselves
+    by the font size.
+
+..  _icons-frontend-served:
+
+Which icons are served
+----------------------
+
+The icons of the frontend icon registry, and no other: what the
+:file:`Configuration/FrontendIcons.php` of an extension or a site package
+registers, what a listener of
+:php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent` contributes, and
+the icons of category types and category groups. The icon registry of TYPO3 is
+never read, so a core icon or the backend icon of a record type is not served,
+even when a template asks for its identifier. A site package hands an icon of
+its own to its JavaScript by registering it in its
+:file:`Configuration/FrontendIcons.php`, see
+:ref:`Frontend icons <configuration-frontend-icons>`.
+
+Of the frontend icons, three kinds are left out of the answer rather than
+answered with the placeholder of an unknown icon:
+
+*   the placeholder `default-not-found` itself, and an identifier the frontend
+    registry does not know,
+*   an icon whose provider does not inline an SVG file: a bitmap icon, a
+    sprite icon or a font icon. Served are the icons of
+    :php:`CurrentColorSvgIconProvider` and of the core
+    :php:`\TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider`,
+*   an identifier that is longer than 100 characters, holds anything but
+    lowercase letters, digits, `_`, `.` and `-`, or starts with `.` or `-`.
+
+The markup is what the provider of the icon renders, sanitised as far as that
+provider sanitises. :php:`CurrentColorSvgIconProvider` sanitises on TYPO3 v13
+and v14, the inline markup of the core :php:`SvgIconProvider` is sanitised on
+TYPO3 v14 only. That is the same markup, with the same exposure, as the icon
+rendered inline by a template.
+
 ..  _icons-licence:
 
 Third-party icons

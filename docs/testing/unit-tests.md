@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 148 unit test classes: 130 across the twelve extensions, three in
-`packages-dev/dev-site`, ten in `packages-dev/monorepo-shared` and five in
+There are 156 unit test classes: 137 across the twelve extensions, three in
+`packages-dev/dev-site`, eleven in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with

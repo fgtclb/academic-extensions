@@ -545,6 +545,49 @@ there is no global namespace (it would take `SYS.fluid.namespaces` on v13 and
 `academic-base` that already declare the namespace keep their prefix `p`,
 every other template declares `ab`.
 
+## Icons for frontend JavaScript
+
+A public API hands icons of the frontend registry to frontend JavaScript that
+picks an identifier at runtime. Its contract is what the extension points page
+of the manual lists for it, and each part is announced by a Feature entry of
+its own. It changes only in a major release, with a Breaking entry. The PHP
+classes behind it are `@internal`. Integrators read the
+[`academic_base` manual](../../packages/fgtclb/academic-base/Documentation/Icons/Index.rst).
+
+**It serves the frontend registry and nothing else.**
+`Imaging\FrontendIconRenderer` asks `FrontendIconRegistry` whether an
+identifier may be served and `FrontendIconFactory` for its markup,
+`render('inline')`, the markup of `<ab:icon … alternativeMarkupIdentifier="inline">`.
+Core's `IconRegistry` and `IconFactory` are never touched, so a core icon or a
+backend record icon cannot leave the server through it, whatever a template or
+a request names. The registry is the allow-list: there is no prefix list and no
+event to widen one, a site package serves an icon of its own by registering it
+in its `FrontendIcons.php`, which it needs for `<ab:icon>` anyway. What the
+registry holds is still filtered:
+
+- the identifier has to match `IDENTIFIER_PATTERN`,
+  `\A[a-z0-9_][a-z0-9_.-]{0,99}\z`. `\A` and `\z` because `$` also matches
+  before a trailing line feed. Category type and group identifiers
+  (`category_types.<group>.<type>`, `category_types_group.<group>`) match it;
+- `default-not-found` is never served. The factory renders it for an unknown
+  identifier, the renderer leaves an unknown identifier out instead, so a
+  script can tell the two apart;
+- the provider has to inline an SVG file: a subclass of core's
+  `AbstractSvgIconProvider` other than `SvgSpriteIconProvider`. The registry
+  normalises any `IconProviderInterface`, so a bitmap, a sprite or a font icon
+  can be registered, and is refused here.
+
+**The JSON map.** `ab:frontendIconMap identifiers="{…}" size="small"` renders
+the served icons into `<script type="application/json" data-academic-icons>`,
+encoded with `JSON_HEX_TAG|AMP|APOS|QUOT` so no markup can end the element, and
+with `JSON_INVALID_UTF8_SUBSTITUTE` so a broken file degrades instead of failing
+the content element.
+
+The functional tests load the fixture `test_frontend_icon_api`, which replaces
+a shared icon, registers the category type and group identifier shapes and one
+icon per provider to serve or refuse, see
+[Fixture extensions](../testing/fixture-extensions.md).
+
 ## The two markups, and which provider produces what
 
 An `Icon` carries two markups, both prepared by the provider in
