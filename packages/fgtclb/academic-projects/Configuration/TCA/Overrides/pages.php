@@ -29,7 +29,7 @@ if (!defined('TYPO3')) {
         [
             'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:pages.doktype.item.academic_project',
             'value' => PageTypes::TYPE_ACEDEMIC_PROJECT,
-            'icon' => 'actions-code-merge',
+            'icon' => 'tx-academicprojects-doktype-project',
             'group' => 'academic',
         ],
         '254',
@@ -41,7 +41,7 @@ if (!defined('TYPO3')) {
         [
             'ctrl' => [
                 'typeicon_classes' => [
-                    PageTypes::TYPE_ACEDEMIC_PROJECT => 'actions-code-merge',
+                    PageTypes::TYPE_ACEDEMIC_PROJECT => 'tx-academicprojects-doktype-project',
                 ],
             ],
             'types' => [

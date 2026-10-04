@@ -44,10 +44,11 @@ final class CategoryTypeFrontendIconsTest extends AbstractAcademicProjectsTestCa
     private const TYPE_FRONTEND = 'x="4" y="4" width="8" height="8"';
 
     /**
-     * Parts of the shipped `CompetenceField.svg` and `Cooperation.svg`.
+     * Parts of the shipped `category-type/competence-field.svg` of this extension and of
+     * `info/partnership.svg` of academic_base, the drawing of the cooperation.
      */
-    private const SHIPPED_COMPETENCE_FIELD = 'd="M13.25 6c0-.474';
-    private const SHIPPED_COOPERATION = 'd="M12.5 11a1.5';
+    private const SHIPPED_COMPETENCE_FIELD = 'd="M341.9 38.1C328.5 29.9';
+    private const SHIPPED_COOPERATION = 'd="M300.9 149.2L184.3 278.8';
 
     protected function setUp(): void
     {
@@ -157,7 +158,7 @@ final class CategoryTypeFrontendIconsTest extends AbstractAcademicProjectsTestCa
             $iconRegistry->getIconConfigurationByIdentifier('category_types.projects.consortium')['options']['source'] ?? null,
         );
         $this->assertSame(
-            'EXT:academic_projects/Resources/Public/Icons/CategoryTypes/CompetenceField.svg',
+            'EXT:academic_projects/Resources/Public/Icons/category-type/competence-field.svg',
             $iconRegistry->getIconConfigurationByIdentifier('category_types.projects.competence_field')['options']['source'] ?? null,
         );
     }

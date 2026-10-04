@@ -7,7 +7,7 @@ sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
 It is also by far the larger suite: 474 functional test classes against 130 unit
-test classes, and 588 CSV fixtures. Measured with
+test classes, and 589 CSV fixtures. Measured with
 
 ```bash
 find packages/fgtclb/*/Tests/Functional -name '*Test.php' | wc -l

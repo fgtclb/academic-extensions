@@ -59,4 +59,22 @@ final class CategoryTypesTest extends AbstractAcademicProjectsTestCase
         );
         $this->assertIconIsRegisteredInBothRegistries('category_types_group.projects');
     }
+
+    /**
+     * An icon path of a category type is only a string: EXT:category_types registers
+     * whatever it names, and a missing file renders as an empty icon instead of failing.
+     */
+    #[Test]
+    public function everyTypeIconIsShipped(): void
+    {
+        $types = $this->get(CategoryTypeRegistry::class)->toArray()['projects'] ?? [];
+        $this->assertCount(4, $types);
+
+        foreach ($types as $type) {
+            $this->assertFileExists(
+                GeneralUtility::getFileAbsFileName($type['icon']),
+                sprintf('The category type "%s" names the icon "%s", which does not exist.', $type['identifier'], $type['icon']),
+            );
+        }
+    }
 }
