@@ -19,4 +19,7 @@ it, and the file was renamed after its purpose in this extension. The drawing
 is unchanged and the original attribution comment is kept inside every file.
 
 File (below Resources/Public/Icons/)  Font Awesome icon (solid)
-  CategoryGroups/Projects.svg              microscope
+  category-group/projects.svg         microscope
+  category-type/competence-field.svg  award
+  category-type/funding-partner.svg   wallet
+  plugin/projects.svg                 microscope

@@ -21,7 +21,7 @@ defined('TYPO3') or die;
         [
             'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_list.name',
             'value' => 'academicprojects_projectlist',
-            'icon' => 'actions-code-merge',
+            'icon' => 'tx-academicprojects-plugin-projects',
             'group' => 'academic',
         ],
         'academic_projects'
@@ -54,7 +54,7 @@ defined('TYPO3') or die;
         [
             'label' => 'LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:plugin.project_selected.name',
             'value' => 'academicprojects_projectlistsingle',
-            'icon' => 'actions-code-merge',
+            'icon' => 'tx-academicprojects-plugin-projects',
             'group' => 'academic',
         ],
         'academic_projects'
