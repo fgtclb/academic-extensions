@@ -92,6 +92,11 @@ What is public API
     :ref:`icons-frontend-javascript`. Which icons it serves is part of the
     contract, see :ref:`icons-frontend-served`. The class behind it is not
     public API.
+*   The icon endpoint of :guilabel:`academic_base`, ``_academic/icons.json``
+    below the base of every site and site language: its path, its
+    parameters, the JSON object it answers, its status codes and its caching
+    headers, see :ref:`icons-frontend-endpoint`. The middleware behind it is
+    not public API.
 *   The view helper ``ct:categoryTypeTitle`` of :guilabel:`category_types`,
     by tag name and arguments, which names a category type in a template by
     its registered title, see `naming a type in a template

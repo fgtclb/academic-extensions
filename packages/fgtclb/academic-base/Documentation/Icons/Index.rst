@@ -382,12 +382,89 @@ Arguments:
     class of the markup. The icons of the academic extensions size themselves
     by the font size.
 
+`endpoint` (bool, default `false`)
+    Adds `data-academic-icons-url` and `data-academic-icons-version` to the
+    element: the :ref:`icon endpoint <icons-frontend-endpoint>` of the current
+    site language and the version token of the served icons. Outside a site
+    both are left out.
+
+..  _icons-frontend-endpoint:
+
+The icon endpoint
+-----------------
+
+Where the JavaScript learns an identifier only after the page was rendered,
+from data it loads or from a choice of the visitor, it asks the icon endpoint
+of the site:
+
+..  code-block:: text
+
+    GET https://example.com/_academic/icons.json?i=tx-academicbase-action-add,tx-academicbase-info-phone&s=small&v=<token>
+
+The answer is a JSON object in the same shape as the JSON map, for the
+identifiers that are served, in the order asked for. The endpoint is available
+below the base of every site and site language, for example
+`https://example.com/de/_academic/icons.json`. Its path, its parameters, its
+answer and its caching are public API like the rest of this section.
+
+`i` (required)
+    Up to 32 icon identifiers, separated by commas.
+
+`s` (optional, default `small`)
+    `default`, `small`, `medium`, `large` or `mega`.
+
+`v` (optional)
+    The version token of the served icons, as `data-academic-icons-version`
+    of the JSON map carries it. With the current token the answer may be
+    cached for a year (`Cache-Control: public, max-age=31536000, immutable`),
+    otherwise for five minutes. The answer carries an `ETag` and answers a
+    matching `If-None-Match` with `304 Not Modified`. The `ETag` only helps
+    the five-minute answers, an immutable one is never revalidated.
+
+A malformed identifier, more than 32 of them or an unknown size are answered
+with `400 Bad Request`, any method other than `GET` and `HEAD` with
+`405 Method Not Allowed`. The endpoint answers before the frontend user
+authentication: it never starts a session and never sets a cookie, so a proxy
+or a CDN can cache it like a file. A site in maintenance mode answers it with
+`503`, like every page.
+
+The token covers what decides the markup of a served icon:
+
+*   the identifiers the frontend icon registry serves and their
+    registrations, so a site package that replaces an icon changes it once the
+    system caches are flushed,
+*   the modification time of each source file,
+*   the modification time of the class files of each provider and of the
+    classes it extends, so a provider changed in place changes it as well,
+*   TYPO3's package dependent cache identifier: the TYPO3 version, the project
+    path and, in composer mode, the content of :file:`composer.lock`.
+
+A deployment that writes the files anew therefore changes the token, and the
+browsers fetch the icons once more. Not covered is other rendering code
+changed in place without any of these, the icon markup of TYPO3 or the SVG
+sanitiser library edited on the server. Touch the SVG files of the affected
+icons then.
+
+Each web node computes the token from its own file times and project path, so
+nodes that do not share one build compute different tokens, and a page
+rendered on one node gets the five-minute answer from another.
+
+..  important::
+
+    **Web server requirement.** The path ends in `.json`. A web server or CDN
+    rule that serves `*.json` as static files, in nginx for example a
+    :code:`location ~* \.(...|json)$` with :code:`try_files $uri =404`,
+    answers the endpoint with a `404` before TYPO3 sees it. Exclude
+    `_academic/icons.json` from such a rule, the way `sitemap.xml` is usually
+    excluded.
+
 ..  _icons-frontend-served:
 
 Which icons are served
 ----------------------
 
-The icons of the frontend icon registry, and no other: what the
+The JSON map and the endpoint serve the same icons. The icons of the frontend
+icon registry, and no other: what the
 :file:`Configuration/FrontendIcons.php` of an extension or a site package
 registers, what a listener of
 :php:`\FGTCLB\AcademicBase\Event\CollectFrontendIconsEvent` contributes, and
