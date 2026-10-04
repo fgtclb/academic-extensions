@@ -12,7 +12,7 @@ the round:
   rendered above the page module grid by `Backend\PageCategorySummaryRenderer`
   and replaceable through page TSconfig. It stays on the core registry.
 - One Fluid comment names `core:icon` in text,
-  `academic-persons/Resources/Private/Partials/Profile/PublicProfile/Contact.html:12`.
+  `academic-persons/Resources/Private/Partials/Profile/PublicProfile/Contact.html`.
 - No package has a `Resources/Private/Backend/` directory or any template
   below a `Backend/` directory. The templates live in `Templates/`,
   `Partials/`, `Pages/` (page types), `PageLayoutFallback/Layouts/` and
@@ -96,7 +96,9 @@ is global, and any prefix a template declares for
 `{namespace …=TYPO3\CMS\Core\ViewHelpers}`. Two notations are matched: a tag
 start `<prefix:icon…` and an inline call `prefix:icon…(`, which also covers a
 call inside the argument of another ViewHelper and a `->` chain. A mention in
-plain text outside a comment is not a call and is not matched.
+plain text outside a comment is not a call and is not matched. The name is
+matched in any letter case, because Fluid finds the ViewHelper for `Icon` as
+well.
 
 `iconForRecord` and `iconForResource` are included because they ask the same
 `IconFactory`. None is used today.
@@ -120,8 +122,10 @@ functional test that reaches that branch notices. The rule:
   for the academic_base namespace, as tag (read up to its closing `>` with a
   quote aware scan, tags span lines) and as inline call (balanced
   parentheses, the scanner of the model),
-- reads the `identifier` and `overlay` arguments, and checks the ones whose
-  value holds no `{`,
+- reads the `identifier` and `overlay` arguments, with `:` or `=` between
+  name and value as Fluid accepts both, and without the backslashes of quotes
+  escaped inside the argument of another ViewHelper, and checks the ones whose
+  value holds no `{`, except an empty `overlay`, which asks for no overlay,
 - accepts an identifier that is a key of a `Configuration/FrontendIcons.php`
   of `packages/fgtclb/*`, loaded with `require`, or the identifier
   category_types contributes for a type or group with an icon in a
@@ -190,7 +194,9 @@ None. Nothing is shipped.
 
 ## Open Questions
 
-- The identifier forms are taken from the drafts of
-  `ace-811-category-type-frontend-icons`. Task 1.1 reads them from the merged
-  change. A different form changes one line of the accepted set, and no
-  template renders a category type icon literally today.
+None left. The identifier forms were taken from the drafts of
+`ace-811-category-type-frontend-icons`, and the merged change contributes
+exactly those: `category_types.<group>.<type>` and
+`category_types_group.<group>`, for a type or group whose frontend file,
+`frontendIcon` or else `icon`, is not empty. No template renders a category
+type icon literally.

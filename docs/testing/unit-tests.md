@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 144 unit test classes: 128 across the twelve extensions, three in
-`packages-dev/dev-site`, eight in `packages-dev/monorepo-shared` and five in
+There are 147 unit test classes: 130 across the twelve extensions, three in
+`packages-dev/dev-site`, nine in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -86,11 +86,13 @@ by extension key, see [below](#the-ext_emconfphp-dependency-keys), the one
 that every translation names its extension without an underscore, see
 [below](#the-extension-name-of-translations), the extension point checks,
 see [below](#the-extension-points), the check that no source file names an
-issue of a customer project, see [below](#customer-issue-keys), the checks
-of the manual links and the branch alias key, see
-[below](#the-links-of-the-manuals), the check of the form
-`bin/set-version` writes, see [below](#the-form-binset-version-writes), and the
-check that a class alias map ships, see [below](#class-alias-maps-ship).
+issue of a customer project, see [below](#customer-issue-keys), the check
+of the manual links, see [below](#the-links-of-the-manuals), the check of
+the branch alias key, see [below](#the-branch-alias-key), the check of the form
+`bin/set-version` writes, see [below](#the-form-binset-version-writes), the
+check that a class alias map ships, see [below](#class-alias-maps-ship), and
+the check of the icons of frontend templates, see
+[below](#icons-of-frontend-templates).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -510,6 +512,49 @@ installation, the class alias loader only reports the missing file, and the
 deprecated names it keeps would stop resolving. Here the packages are installed
 from their directories, so no other test sees it. `academic_jobs` carried the
 line when it gained its first map (ACE-797).
+
+## Icons of frontend templates
+
+[`FrontendTemplateIconTest`](../../packages-dev/monorepo-shared/Tests/Unit/FrontendTemplateIconTest.php)
+reads every Fluid template below `packages/fgtclb/*/Resources/Private/` and
+checks two rules (ACE-815):
+
+- No template renders an icon with a ViewHelper of the core namespace,
+  `core:icon`, `core:iconForRecord` or `core:iconForResource`, as a tag or as
+  an inline call, also under another prefix a template declares for that
+  namespace and in any letter case. Frontend icons come from the frontend
+  icon registry of academic_base, see
+  [Icons](../architecture/icons.md#the-frontend-icon-registry).
+- Every identifier a template passes literally to the icon ViewHelper of
+  academic_base, as `identifier` or as a non-empty `overlay`, is a key of a
+  `Configuration/FrontendIcons.php` of the repository, or the icon of a
+  category type or group that a `Configuration/CategoryTypes.yaml` there
+  declares with `icon` or `frontendIcon`.
+
+Neither mistake fails a rendering. `core:icon` asks the backend registry and
+shows the backend drawing, or the `default-not-found` placeholder for an icon
+registered for the frontend only. The icon ViewHelper of academic_base answers
+an identifier it does not know with the same placeholder, and its registry
+does not fall back to `Configuration/Icons.php`. A functional test sees either
+only when its fixture reaches the branch that renders the icon.
+
+Every template counts as a frontend template unless it is listed in the
+test's `BACKEND_TEMPLATES`, keyed by its path below `packages/fgtclb/` and with
+the reason. The one entry is the category summary of `category_types` above
+the page module grid. A template rendered in a backend module is added there
+the same way, and a second test fails when a listed file no longer exists, so
+an entry cannot exempt a different file created at its path later.
+
+The content of `<f:comment>` is skipped, because Fluid never renders it. An
+HTML comment is not, because Fluid parses and renders a ViewHelper inside it.
+Plain text templates are not read.
+
+An identifier built from a variable, such as `academic_jobs-{item}` or
+`category_types.partners.{type}`, is not checked: which identifier it becomes
+is decided at runtime, and the functional icon tests of each extension render
+it. The test fails as well when it finds no literal identifier at all, so a
+renamed namespace or ViewHelper cannot turn it into a check of nothing. It
+reads no template of a test fixture or a project.
 
 ## See also
 
