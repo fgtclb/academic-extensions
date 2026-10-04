@@ -63,8 +63,8 @@
 
 ## 12. `[TASK] ACE-594: Add an icon overview page`
 
-- [ ] 12.1 Add a page of the development seed that lists every icon of both registries, the frontend ones through `ab:icon` and the list method of the frontend registry, verified by its functional test and `LegacyDeliveryTest`, shown red by an identifier missing from the page
-- [ ] 12.2 Regenerate the seed manifests with `seedManifest` for both cores and the SQLite snapshots, verified by the seed verification tests
+- [x] 12.1 Add a page of the development seed that lists every icon of both registries, the frontend ones through `ab:icon` and the list method of the frontend registry, verified by its functional test and `LegacyDeliveryTest`, shown red by an identifier missing from the page
+- [x] 12.2 Regenerate the seed manifests with `seedManifest` for both cores and the SQLite snapshots, verified by the seed verification tests
 
 ## 13. `[TASK] ACE-816: Archive the icon consolidation`
 

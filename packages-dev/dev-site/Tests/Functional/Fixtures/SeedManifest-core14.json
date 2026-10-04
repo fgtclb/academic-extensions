@@ -70,7 +70,7 @@
             "checksum": "29722b68cbf6ecc46dfbbebe8251df58d511a146"
         },
         "pages": {
-            "rows": 250,
+            "rows": 254,
             "columns": [
                 "abbreviation",
                 "abstract",
@@ -120,7 +120,7 @@
                 "tx_academicprojects_start_date",
                 "uid"
             ],
-            "checksum": "7acaf85892da4bb8f8e6e3955bd32a5b6991f7c9"
+            "checksum": "2b2dc68c77b2f2b203800d0bf0cb98e39696b537"
         },
         "sys_category": {
             "rows": 60,
@@ -192,7 +192,7 @@
             "checksum": "06d831d027b09b2de067b2d3b08e6fb050f08f42"
         },
         "tt_content": {
-            "rows": 260,
+            "rows": 264,
             "columns": [
                 "CType",
                 "bodytext",
@@ -214,7 +214,7 @@
                 "tx_academicstudyplan_semesters",
                 "uid"
             ],
-            "checksum": "54ad6aa28e82804d9e01b2b2c9f0fa64763a3d8b"
+            "checksum": "4bbcd906dc632e00c32d75db3ed8bf9495d20697"
         },
         "tx_academiccontacts4pages_domain_model_contact": {
             "rows": 44,

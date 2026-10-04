@@ -7,7 +7,7 @@ Extension key `academics_dev_site`, composer package
 
 This package carries the **seed sets** for the development instances of this
 mono repository, [`core-13/`](../../core-13) and [`core-14/`](../../core-14). It
-holds content, no code: the YAML files below `Configuration/DataFactory/`
+is mostly content: the YAML files below `Configuration/DataFactory/`
 describe the page tree, the records and the content elements a freshly set up
 instance is filled with, so that an instance can be rebuilt from nothing and
 still look the same on every machine.
@@ -114,6 +114,26 @@ therefore renders the `core-13` instance and renders nothing in `core-14`. The
 legacy tree gets this instead: the smallest page object that puts the content of
 a page on the page. The set form is what `LegacyDeliveryTest` puts in the place
 of the theme on the `/` side, so that both trees are rendered by the same text.
+
+## The icon overview page
+
+The seed puts a page `Icons` (`/icons`, German `/de/symbole`) into both trees.
+It carries the one content element this package defines,
+`academicsdevsite_icons`, and the only code it ships:
+
+| File                                               | Does                                                                                       |
+|----------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `Classes/DataProcessing/IconOverviewProcessor.php` | Reads both icon registries and keeps the identifiers of the academic extensions, grouped.  |
+| `Resources/Private/Templates/IconOverview.html`    | Renders each one as a tile, frontend icons with `ab:icon`, backend icons with `core:icon`. |
+| `ext_localconf.php`                                | The `FLUIDTEMPLATE` rendering definition, added after the content rendering definitions.   |
+| `Configuration/TCA/Overrides/tt_content.php`       | Registers the CType, with the fields of a header element.                                  |
+| `Configuration/Services.php`                       | Loads `Classes/`, the processor tags itself with `#[AutoconfigureTag]`.                    |
+
+The processor reads the frontend icon registry of `academic_base`, which is why
+the package requires `fgtclb/academic-base`. The lists are read when the page
+renders, so an icon an extension adds is on the page without a change here. See
+[The icon overview page](../../docs/development/instances.md#the-icon-overview-page)
+for what the page shows and what to look for on it.
 
 ## See also
 

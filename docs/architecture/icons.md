@@ -1069,3 +1069,5 @@ show up in the extension that adds it.
   `IconFilesAssertionTrait` for the files.
 - [The `academic_base` manual, Icons](../../packages/fgtclb/academic-base/Documentation/Icons/Index.rst)
   for integrators: the shared set and how to replace one of its icons.
+- [The icon overview page](../development/instances.md#the-icon-overview-page)
+  of the development instances: every icon of both registries, rendered.

@@ -58,9 +58,10 @@ abstract class AbstractSeedTestCase extends FunctionalTestCase
         'fgtclb/academic-programs',
         'fgtclb/academic-projects',
         'fgtclb/academic-study-plan',
-        // Loaded although it ships no PHP: `SeedDefinitionParser::parseFile()`
-        // resolves through `GeneralUtility::getFileAbsFileName()`, which answers
-        // an `EXT:academics_dev_site/...` path only for an *active* package.
+        // Loaded for the seed rather than for its one class:
+        // `SeedDefinitionParser::parseFile()` resolves through
+        // `GeneralUtility::getFileAbsFileName()`, which answers an
+        // `EXT:academics_dev_site/...` path only for an *active* package.
         'fgtclb/academics-monorepo-dev-site',
     ];
 

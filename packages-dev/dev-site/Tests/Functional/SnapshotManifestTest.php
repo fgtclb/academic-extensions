@@ -32,12 +32,16 @@ use TYPO3\CMS\Core\Information\Typo3Version;
 final class SnapshotManifestTest extends FunctionalTestCase
 {
     /**
-     * Nothing is loaded and nothing is imported: the subject is a file next to
-     * the repository, not this instance. The instance exists because the class
-     * needs a `PACKAGE_ROOT` to find that file from, and because reading YAML
-     * through `GeneralUtility::getFileAbsFileName()` needs a booted core.
+     * Nothing is imported: the subject is a file next to the repository, not
+     * this instance. The instance exists because the class needs a
+     * `PACKAGE_ROOT` to find that file from, and because reading YAML through
+     * `GeneralUtility::getFileAbsFileName()` needs a booted core. The seed
+     * package is loaded for that path, and the two packages it requires because
+     * TYPO3 refuses to load it without them.
      */
     protected array $testExtensionsToLoad = [
+        'fgtclb/environment-state-manager',
+        'fgtclb/academic-base',
         'fgtclb/academics-monorepo-dev-site',
     ];
 

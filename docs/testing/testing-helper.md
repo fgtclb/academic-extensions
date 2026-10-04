@@ -108,9 +108,9 @@ writes the settings of the instance, so what a test class sets there wins. It
 keeps the Extbase class schema cache in a `TransientMemoryBackend`.
 
 **When to use it.** Always, and it is already in place: the twelve abstract test
-cases of the extensions, `AbstractSeedTestCase` and `SnapshotManifestTest` of
-`packages-dev/dev-site` extend it, and a new abstract test case or a test class
-without one extends it too. `FunctionalTestBaseClassTest` in
+cases of the extensions, `AbstractSeedTestCase`, `AbstractIconOverviewTestCase`
+and `SnapshotManifestTest` of `packages-dev/dev-site` extend it, and a new
+abstract test case or a test class without one extends it too. `FunctionalTestBaseClassTest` in
 `packages-dev/monorepo-shared` fails for a functional test case that does not,
 see [Unit tests](unit-tests.md#functional-tests-extend-the-shared-base-class).
 

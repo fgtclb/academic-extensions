@@ -109,7 +109,7 @@ checkout — see
 ### `LegacyDeliveryTest` — the two trees against each other
 
 Renders every mirrored page of `/` and of `/legacy/`, in both languages, and
-compares the markup — 106 page pairs, which is the 57 pages of the mirror minus
+compares the markup — 110 page pairs, which is the 59 pages of the mirror minus
 the four the seed hides, times two languages.
 
 This is the only thing that catches the failure mode the `/legacy/` tree exists

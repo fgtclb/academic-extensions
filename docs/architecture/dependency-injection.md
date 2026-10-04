@@ -15,7 +15,7 @@ description.
 
 | Package                                  | `Services.php` | `Services.yaml` |
 |------------------------------------------|----------------|-----------------|
-| `packages/fgtclb/academic-base`          | –              | yes             |
+| `packages/fgtclb/academic-base`          | **yes**        | yes             |
 | `packages/fgtclb/academic-bite-jobs`     | –              | yes             |
 | `packages/fgtclb/academic-contact4pages` | –              | yes             |
 | `packages/fgtclb/academic-jobs`          | –              | yes             |
@@ -29,13 +29,23 @@ description.
 | `packages/fgtclb/typo3-category-types`   | –              | yes             |
 | `packages-dev/monorepo-shared`           | –              | –               |
 | `packages-dev/testing-helper`            | –              | –               |
-| `packages-dev/dev-site`                  | –              | –               |
+| `packages-dev/dev-site`                  | **yes**        | –               |
 
-So: **11 `Services.yaml`, 1 `Services.php`**, and `academic-persons` is the only
-package carrying both. Four packages have neither — `academic-persons-sync`
-ships only domain models under `Classes/Domain/`, and none of the three
-`packages-dev/` packages has a `Classes/` folder requiring registration at all.
-`packages-dev/dev-site/` ships no PHP at all.
+So: **11 `Services.yaml`, 3 `Services.php`**, and `academic-base` and
+`academic-persons` carry both. Three packages have neither:
+`academic-persons-sync` ships only domain models under `Classes/Domain/`, and
+neither `monorepo-shared` nor `testing-helper` below `packages-dev/` has a
+class requiring registration. `packages-dev/dev-site/` has one, the data
+processor of the icon overview page of the seed (ACE-594). Its `Services.php`
+is the boilerplate `defaults()` + `load()` and nothing else, and the processor
+carries its `data.processor` tag as an `#[AutoconfigureTag]` attribute. That is
+safe because the class is `final`: the subclass problem an attribute tag has,
+described for `ContactsProcessor` below, needs a subclass. The processor has
+two collaborators and is still not published, unlike what
+[A data processor with a collaborator has to be published](#a-data-processor-with-a-collaborator-has-to-be-published)
+asks for. Only the rendering definition of the package names it, by its
+identifier, and the package is never released and is installed only in the
+development and test instances of this repository.
 
 ### What the YAML files contain
 
@@ -74,7 +84,7 @@ compiled, so omitting it breaks nothing and warns about nothing — until someon
 type hints the model, and the container then fails to build with an error
 pointing at the model rather than at the code that referenced it.
 
-### The one `Services.php`
+### The `Services.php` next to a `Services.yaml`
 
 [`packages/fgtclb/academic-persons/Configuration/Services.php`](../../packages/fgtclb/academic-persons/Configuration/Services.php)
 is not the boilerplate `defaults()` + `load()` file the preference implies. It
@@ -112,6 +122,10 @@ untagged even with `setAutoconfigured(true)`. The class is excluded from the
 `resource` load of `Services.yaml` for the same reason it needs the pass —
 the interface it implements does not exist without EXT:reports.
 
+[`packages/fgtclb/academic-base/Configuration/Services.php`](../../packages/fgtclb/academic-base/Configuration/Services.php)
+holds the same kind of compiler pass and nothing else: it registers
+`Report\UpgradeConfigurationStatus` only when EXT:reports is active (ACE-713).
+
 ### Attributes are already in use
 
 Contrary to the note in `AGENTS.md` that these extensions do not use attributes,
@@ -124,14 +138,15 @@ they are used in production code across ten of the twelve packages
 Measured with
 `grep -rhoP '#\[<name>[(\]]' --include='*.php' packages/fgtclb/*/Classes packages-dev/*/Classes | wc -l`:
 
-| Attribute            | Sites | Examples                                                                     |
-|----------------------|-------|------------------------------------------------------------------------------|
-| `#[Autoconfigure]`   | 22    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
-| `#[Autowire]`        | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
-| `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
-| `#[Exclude]`         | 27    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
-| `#[AsEventListener]` | 17    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
-| `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
+| Attribute             | Sites | Examples                                                                     |
+|-----------------------|-------|------------------------------------------------------------------------------|
+| `#[Autoconfigure]`    | 23    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
+| `#[Autowire]`         | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
+| `#[AsAlias]`          | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
+| `#[Exclude]`          | 27    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
+| `#[AsEventListener]`  | 17    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
+| `#[AsCommand]`        | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
+| `#[AutoconfigureTag]` | 1     | `dev-site/Classes/DataProcessing/IconOverviewProcessor.php:38`               |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
 (`Symfony\Component\Console\Attribute\AsCommand`), not a DI one, on the
