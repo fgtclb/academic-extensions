@@ -128,11 +128,13 @@ trait ColourSchemeAwareIconsTrait
      * (ACE-523).
      *
      * And the identifier uses the colour scheme aware provider, because `typeicon_classes`
-     * is read through the *default* markup everywhere it matters.
+     * is read through the *default* markup everywhere it matters. That holds for the
+     * content element icons of `tt_content` as for every other table.
      *
-     * `tt_content` is out of the last check on purpose. Its `typeicon_classes` entries are
-     * the content element icons, which are plugin brand marks drawn in fixed colours and
-     * meant to look the same on every background. The path check still applies to them.
+     * An identifier drawn from a file of another extension, a record icon on a file of the
+     * shared set of `academic_base` for one, is not attributed to `$extensionKey` here.
+     * {@see self::assertEveryTypeOfTheExtensionNamesAnIconOfItsOwn()} covers it, because
+     * it decides by type rather than by file.
      */
     private function assertEveryRecordTypeIconIsColourSchemeAware(string $extensionKey): void
     {
@@ -178,7 +180,9 @@ trait ColourSchemeAwareIconsTrait
                     );
                     continue;
                 }
-                if ($table === 'tt_content' || !$iconRegistry->isRegistered($identifier)) {
+                // Reading the configuration of a deprecated icon raises E_USER_DEPRECATED, and
+                // no icon of the academic extensions is deprecated.
+                if (!$iconRegistry->isRegistered($identifier) || $iconRegistry->isDeprecated($identifier)) {
                     continue;
                 }
                 $configuration = $iconRegistry->getIconConfigurationByIdentifier($identifier);

@@ -1,11 +1,11 @@
 ## Why
 
 The icons of the academic extensions come from four sets and hand-made files,
-in fixed colours and under names that follow no scheme
-(`persons_icon`, `academic-persons-envelope`, `academic_jobs-starttime`). The
-same concept is drawn up to three times and replaced up to three times. The
-frontend icon registry of ACE-808 gives frontend icons a home of their own, so
-names, sets and registries are settled now, before 3.0 is released.
+in fixed colours and under names that follow no scheme: table names, plugin
+names and extension keys with a suffix, in three spellings. The same concept
+is drawn up to three times and replaced up to three times. The frontend icon
+registry of ACE-808 gives frontend icons a home of their own, so names, sets
+and registries are settled now, before 3.0 is released.
 
 ## What Changes
 
@@ -63,17 +63,16 @@ and `academic_persons_sync` (`academic-persons-sync`) ship no icon change.
   in `currentColor`.
 - `academic-jobs/job-contact`: the contact icons are renamed and render
   inline.
-- `academic-partners/partner-page`: the category type icons draw new files, and
-  page type, content element and records carry icons of their own.
+- `academic-partners/partner-page`: the category type icons draw new files.
 - `academic-projects/project-page`: the category type icons draw new files.
 - `academic-study-plan/frontend-markup-contract`: the controls are icons of the
   shared set, and the stylesheet selects their new classes.
 
+Renamed page type, content element and record icons are specified only where a
+requirement already names them. The rules they follow are the same in every
+extension and checked there, see `design.md`.
+
 ## Impact
 
-- Identifiers, files and `icon-<identifier>` classes of every extension above,
-  migrated by a site package per the Breaking entries.
-- `packages-dev/testing-helper`: checks per registry and for the icon files.
-- `packages-dev/dev-site`: the icon overview page and the seed manifests.
-- `docs/architecture/icons.md`, `docs/testing/testing-helper.md` and the
-  manual of every extension.
+The extensions above, the checks in `packages-dev/testing-helper`, the
+overview page in `packages-dev/dev-site`, `docs/` and every manual.

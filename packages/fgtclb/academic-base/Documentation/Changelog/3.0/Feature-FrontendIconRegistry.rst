@@ -57,10 +57,11 @@ Impact
 ======
 
 Nothing changes for an existing site through this extension alone.
-`EXT:academic_persons`, `EXT:academic_persons_edit`, `EXT:academic_jobs`,
-`EXT:academic_study_plan` and `EXT:academic_programs` register their frontend
-icons in the new registry and render them with the new view helper, each with a
-Breaking entry in its own changelog. `EXT:academic_partners` and
+`EXT:academic_jobs` and `EXT:academic_programs` register their frontend icons
+in the new registry, and `EXT:academic_persons`, `EXT:academic_persons_edit`
+and `EXT:academic_study_plan` render the shared icon set of this extension (see
+:ref:`feature-shared-icon-set`), all of them with the new view helper and each
+with a Breaking entry in its own changelog. `EXT:academic_partners` and
 `EXT:academic_projects` render the category type icons with it, with an
 Important entry each. No frontend template of the academic extensions renders
 an icon with :html:`<core:icon>` any more. Each changelog entry says what a
