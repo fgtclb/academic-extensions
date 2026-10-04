@@ -319,6 +319,18 @@ comes from the `ext_localconf.php` of the seed package rather than from a set,
 so it reaches both trees without a change to the site configurations, see
 [TypoScript and site sets](../architecture/typoscript-and-site-sets.md).
 
+Above the two registry sections, a section "Frontend icon API" demonstrates the
+frontend icon API of `academic_base` (ACE-595) with the module
+`Resources/Private/TypeScript/frontend/icon-demo.ts` of the seed package, in
+the browser only. One list is filled from a JSON icon map on the page, without
+a request. The other one is filled from the icon endpoint in a single request,
+and the core icon `actions-add` in it is left out and shown as "not
+available", because only the backend registry knows it. Each slot says what
+happened in `data-icon-demo-state`, `rendered` or `failed`. The network panel
+shows exactly one request to `_academic/icons.json`, answered with
+`Cache-Control: public, max-age=31536000, immutable` and without
+`Set-Cookie`, see [Icons](../architecture/icons.md#icons-for-frontend-javascript).
+
 The records the seed writes reference **files**, and those cannot live in the
 instance: `core-*/public/` is git-ignored. They are committed in the seed
 package below `packages-dev/dev-site/Resources/Public/SeedFiles/`, drawn by

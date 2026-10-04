@@ -121,13 +121,15 @@ The seed puts a page `Icons` (`/icons`, German `/de/symbole`) into both trees.
 It carries the one content element this package defines,
 `academicsdevsite_icons`, and the only code it ships:
 
-| File                                               | Does                                                                                       |
-|----------------------------------------------------|--------------------------------------------------------------------------------------------|
-| `Classes/DataProcessing/IconOverviewProcessor.php` | Reads both icon registries and keeps the identifiers of the academic extensions, grouped.  |
-| `Resources/Private/Templates/IconOverview.html`    | Renders each one as a tile, frontend icons with `ab:icon`, backend icons with `core:icon`. |
-| `ext_localconf.php`                                | The `FLUIDTEMPLATE` rendering definition, added after the content rendering definitions.   |
-| `Configuration/TCA/Overrides/tt_content.php`       | Registers the CType, with the fields of a header element.                                  |
-| `Configuration/Services.php`                       | Loads `Classes/`, the processor tags itself with `#[AutoconfigureTag]`.                    |
+| File                                                 | Does                                                                                       |
+|------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `Classes/DataProcessing/IconOverviewProcessor.php`   | Reads both icon registries and keeps the identifiers of the academic extensions, grouped.  |
+| `Resources/Private/Templates/IconOverview.html`      | Renders each one as a tile, frontend icons with `ab:icon`, backend icons with `core:icon`. |
+| `ext_localconf.php`                                  | The `FLUIDTEMPLATE` rendering definition, added after the content rendering definitions.   |
+| `Configuration/TCA/Overrides/tt_content.php`         | Registers the CType, with the fields of a header element.                                  |
+| `Configuration/Services.php`                         | Loads `Classes/`, the processor tags itself with `#[AutoconfigureTag]`.                    |
+| `Resources/Private/TypeScript/frontend/icon-demo.ts` | Fills the "Frontend icon API" section with the frontend icon factory of `academic_base`.   |
+| `Configuration/JavaScriptModules.php`                | Publishes that module, naming `academic_base` so its import map entry reaches the page.    |
 
 The processor reads the frontend icon registry of `academic_base`, which is why
 the package requires `fgtclb/academic-base`. The lists are read when the page
