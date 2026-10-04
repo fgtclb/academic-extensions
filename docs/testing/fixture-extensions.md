@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Seventy-five such fixture extensions exist, in eleven of the twelve extensions.
+Seventy-seven such fixture extensions exist, in eleven of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -41,6 +41,7 @@ They sit next to the tests that use them, under
 | `test_editor_icon_replacement`              | `tests/editor-icon-replacement`                   | `academic-persons-edit`  | A shared editor icon replaced in `FrontendIcons.php`, another in `Icons.php`. |
 | `test_editor_write_listener`                | `tests/test-editor-write-listener`                | `academic-persons-edit`  | A listener of the editor write event, refusing or replacing as a test says.   |
 | `test_exclude_file_column`                  | `tests/test-exclude-file-column`                  | `academic-persons`       | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
+| `test_frontend_icon_api`                    | `tests/frontend-icon-api`                         | `academic-base`          | A shared icon replaced, and one frontend icon per case the icon API decides.  |
 | `test_frontend_icons`                       | `tests/frontend-icons`                            | `academic-base`          | Frontend icons from a file and a listener, one also in `Icons.php`.           |
 | `test_frontend_icons_override`              | `tests/frontend-icons-override`                   | `academic-base`          | A `FrontendIcons.php` replacing an icon of the above and the placeholder.     |
 | `test_frontend_readonly`                    | `tests/test-frontend-readonly`                    | `academic-persons`       | Frontend-only field locks, also loaded by the `academic-persons-edit` tests.  |
@@ -101,8 +102,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-two of the seventy-four have a `Classes/` folder with a `TESTS\…` PSR-4
-root. The other fifty-two are pure resources. The `ext_emconf.php` is checked
+Twenty-two of the seventy-seven have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other fifty-five are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
 see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
@@ -234,8 +235,9 @@ A site is not affected, composer orders its packages. A fixture that has to
 load after an extension therefore gets a key that sorts after it, requires no
 other fixture, and its test asserts the order before it asserts the
 replacement, as `IconViewHelperOverrideTest::theSitePackageLoadsAfterTheExtensionAndAcademicBase()`
-does. `test_job_icons` sorts after `academic_jobs` the same way, and so does
-`test_programs_frontend_icons` after `academic_programs`. The icons
+does. `test_job_icons` sorts after `academic_jobs` the same way, and so do
+`test_programs_frontend_icons` after `academic_programs` and
+`test_frontend_icon_api` after `academic_base`. The icons
 `test_profile_icon_replacement`, `test_editor_icon_replacement` and
 `test_study_plan_icons` replace are shared icons of `academic_base`, so each
 sorts after `academic_base` and after the extension that renders them,
@@ -359,7 +361,9 @@ The existing ones show the cases that justify one:
   `Configuration/FrontendIcons.php` and from a listener, with one icon in its
   `Configuration/Icons.php` as well and one backend-only icon there, and
   `test_frontend_icons_override` replaces two of them, which takes a package
-  that loads later, `test_category_types_frontend_icons` declares
+  that loads later, `test_frontend_icon_api` replaces a shared icon and
+  registers one frontend icon per case the frontend icon API serves or
+  refuses, `test_category_types_frontend_icons` declares
   category types and groups for every frontend icon case and replaces one of
   their icons in its own `Configuration/FrontendIcons.php`,
   `test_profile_icon_replacement`, `test_editor_icon_replacement`,

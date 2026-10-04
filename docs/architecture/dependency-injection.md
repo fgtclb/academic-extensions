@@ -140,7 +140,7 @@ Measured with
 
 | Attribute             | Sites | Examples                                                                     |
 |-----------------------|-------|------------------------------------------------------------------------------|
-| `#[Autoconfigure]`    | 23    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
+| `#[Autoconfigure]`    | 24    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
 | `#[Autowire]`         | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`          | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
 | `#[Exclude]`          | 27    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |

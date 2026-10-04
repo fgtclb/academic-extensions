@@ -84,6 +84,14 @@ What is public API
     arguments, which renders an icon of the frontend icon registry, and the
     identifier ``default-not-found`` of the icon it renders for an unknown
     identifier. The class behind it is not public API.
+*   The view helper ``frontendIconMap`` of :guilabel:`academic_base`, in the
+    same namespace, by tag name and arguments, and the JSON data block it
+    renders: the element :html:`<script type="application/json"
+    data-academic-icons>`, its ``data-academic-icons-*`` attributes and the
+    object of identifier and markup it holds, see
+    :ref:`icons-frontend-javascript`. Which icons it serves is part of the
+    contract, see :ref:`icons-frontend-served`. The class behind it is not
+    public API.
 *   The view helper ``ct:categoryTypeTitle`` of :guilabel:`category_types`,
     by tag name and arguments, which names a category type in a template by
     its registered title, see `naming a type in a template

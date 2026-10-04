@@ -1,0 +1,19 @@
+{
+    "name": "tests/frontend-icon-api",
+    "description": "Frontend icons the frontend icon API of academic_base serves or refuses, and an override of a shared icon",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "typo3/cms-core": "~13.4.35 || ~14.3.7",
+        "fgtclb/academic-base": "~3.0.0@dev"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "test_frontend_icon_api",
+            "version": "3.0.0-dev",
+            "Package": {
+                "providesPackages": []
+            }
+        }
+    }
+}
