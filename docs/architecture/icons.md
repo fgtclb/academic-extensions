@@ -583,6 +583,40 @@ encoded with `JSON_HEX_TAG|AMP|APOS|QUOT` so no markup can end the element, and
 with `JSON_INVALID_UTF8_SUBSTITUTE` so a broken file degrades instead of failing
 the content element.
 
+**The endpoint.** `Middleware\FrontendIconEndpoint` answers
+`<site language base>/_academic/icons.json?i=<id,…>&s=<size>&v=<token>` with
+the same renderer. GET and HEAD only (405 otherwise), at most 32 identifiers,
+each matching the pattern, a size of `IconSize` without `overlay` (400
+otherwise, `no-store`), no `Vary`, no database. Its place in
+`Configuration/RequestMiddlewares.php` is the point of it, checked with core's
+`DependencyOrderingService` over every `RequestMiddlewares.php` of the installed
+vendor tree on 13.4.35 and 14.3.7: after `typo3/cms-frontend/site` (site,
+language, route tail) and `maintenance-mode` (a site in maintenance answers
+503), before `request-token-middleware`, both authenticators and the page
+resolver. So no session is started, no `Set-Cookie` is sent and the path is
+never resolved as a slug. It must not name `base-redirect-resolver` or
+`static-route-resolver`: EXT:redirects sits between the authenticators and
+those two, and "after `base-redirect-resolver`, before `authentication`" is a
+dependency cycle on both cores. `tsfe` exists on v13 only, so it is not
+named either. On both cores the endpoint sorts directly after
+`maintenance-mode`.
+
+**The token and the caching.** `FrontendIconRenderer::getVersion()` hashes,
+per served identifier sorted by name, the registration and the `filemtime()` of
+its source, per provider the `filemtime()` of its class file and of every
+parent class, and `PackageDependentCacheIdentifier::toString()`. The answer for
+the current token is `public, max-age=31536000, immutable`, any other
+`public, max-age=300`, both with a body hash as `ETag` and 304 for a matching
+`If-None-Match`. An immutable answer is never revalidated, so the token, not
+the `ETag`, has to see every change of the markup. In composer mode the package
+identifier hashes the lock data (`PackageArtifactBuilder`), which changes when
+composer writes a new lock, not when the code of a path package or of a
+checkout changes in place. The provider class times close that gap for the
+providers. What stays uncovered is code edited in place that is neither a
+provider class nor a parent of one: the wrapper of core's `Icon`,
+`FrontendIcon`, the `enshrined/svg-sanitize` library. `getVersion()` stats
+files and reads none.
+
 The functional tests load the fixture `test_frontend_icon_api`, which replaces
 a shared icon, registers the category type and group identifier shapes and one
 icon per provider to serve or refuse, see
