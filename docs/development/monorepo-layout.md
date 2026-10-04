@@ -353,7 +353,11 @@ together:
 
 `fgtclb/academics-monorepo-testing-helper` autoloads
 `FGTCLB\TestingHelper\` from `Classes/` and is required as a dev dependency of
-the root. It ships fifteen functional-test traits in
+the root. It ships the base class every functional test case extends,
+`Classes/TestCase/FunctionalTestCase.php`, which keeps the Extbase class schema
+cache of every test instance in memory, see
+[Functional tests](../testing/functional-tests.md#the-shared-base-class), and
+fifteen functional-test traits in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/`:
 
 | Trait                                  | Purpose                                                                             |
@@ -374,9 +378,10 @@ the root. It ships fifteen functional-test traits in
 | `StaticTemplateTypoScriptTrait`        | Builds the TypoScript a TypoScript record delivers, and what its form keeps.        |
 | `TcaHelperMethodsTrait`                | Shared TCA lookup helpers for assertions.                                           |
 
-They live in a package rather than in one extension's `Tests/` folder because
-every extension needs them and no extension may depend on another extension's
-test code. The package is development-only and is never part of a release.
+The base class and the traits live in a package rather than in one
+extension's `Tests/` folder because every extension needs them and no extension
+may depend on another extension's test code. The package is development-only
+and is never part of a release.
 
 ## `packages-dev/dev-site/` — the seed the instances are built from
 

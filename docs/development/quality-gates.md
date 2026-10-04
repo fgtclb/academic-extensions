@@ -241,7 +241,8 @@ extension in the mono repository in one run — twelve of them under
 `packages/fgtclb/` today — and would pick up another vendor directory as well.
 The second collects `packages-dev/`, where all three packages carry tests of
 their own: the seed definition of `packages-dev/dev-site`, the scripts behind
-`runTests.sh -j` in `packages-dev/testing-helper`, and the repository checks of
+`runTests.sh -j` and the functional test base class in
+`packages-dev/testing-helper`, and the repository checks of
 `packages-dev/monorepo-shared`, which
 [Discovery](../testing/unit-tests.md#discovery) of the unit tests page lists.
 

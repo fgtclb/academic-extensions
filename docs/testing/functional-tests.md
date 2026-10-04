@@ -6,8 +6,8 @@ through the same code paths production uses. It is the only suite here that
 sees the database, the TCA that TYPO3 actually compiled, dependency injection,
 and — for the plugin tests — a rendered frontend page.
 
-It is also by far the larger suite: 443 functional test classes against 128 unit
-test classes, and 574 CSV fixtures. Measured with
+It is also by far the larger suite: 469 functional test classes against 130 unit
+test classes, and 585 CSV fixtures. Measured with
 
 ```bash
 find packages/fgtclb/*/Tests/Functional -name '*Test.php' | wc -l
@@ -17,21 +17,23 @@ find packages -path '*Tests*' -name '*.csv' | wc -l
 
 | Extension                | Functional | Unit |
 |--------------------------|------------|------|
-| `academic-base`          | 24         | 17   |
+| `academic-base`          | 29         | 19   |
 | `academic-bite-jobs`     | 12         | 3    |
 | `academic-contact4pages` | 24         | 3    |
-| `academic-jobs`          | 35         | 3    |
-| `academic-partners`      | 49         | 8    |
-| `academic-persons`       | 119        | 38   |
-| `academic-persons-edit`  | 62         | 24   |
+| `academic-jobs`          | 37         | 3    |
+| `academic-partners`      | 51         | 8    |
+| `academic-persons`       | 125        | 38   |
+| `academic-persons-edit`  | 64         | 24   |
 | `academic-persons-sync`  | 2          | 1    |
-| `academic-programs`      | 48         | 8    |
-| `academic-projects`      | 33         | 8    |
-| `academic-study-plan`    | 15         | 1    |
-| `typo3-category-types`   | 20         | 14   |
+| `academic-programs`      | 51         | 8    |
+| `academic-projects`      | 35         | 8    |
+| `academic-study-plan`    | 17         | 1    |
+| `typo3-category-types`   | 22         | 14   |
 
-`packages-dev/dev-site` adds four functional and three unit classes on top; both
-suites collect it, see [Unit tests](unit-tests.md#discovery).
+`packages-dev/dev-site` adds four functional and three unit classes on top, and
+`packages-dev/testing-helper` the two functional classes of the
+[shared base class](#the-shared-base-class). Both suites collect them, see
+[Unit tests](unit-tests.md#discovery).
 
 ## Running them
 
@@ -157,11 +159,13 @@ four of the defects above were fixed rather than skipped.
 
 ## Declaring what a test loads
 
-Functional tests here extend
-`SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase` (from
+Functional tests here extend `FGTCLB\TestingHelper\TestCase\FunctionalTestCase`,
+by way of one abstract test case per extension. That class is the
+[shared base class](#the-shared-base-class) of `packages-dev/testing-helper`. It
+extends `SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase` (from
 `sbuerk/typo3-site-based-test-trait`, a thin subclass of the testing framework's
 own `FunctionalTestCase` that adds a `constants`/`setup` aware
-`setUpFrontendRootPage()`), by way of one abstract test case per extension.
+`setUpFrontendRootPage()`).
 
 Each extension's abstract test case names the extensions the whole extension's
 suite needs:
@@ -217,6 +221,58 @@ Both do the same thing — merge instead of replace.
 
 Everything appended must be done **before** `parent::setUp()`, because that call
 is what builds the instance.
+
+## The shared base class
+
+[`FGTCLB\TestingHelper\TestCase\FunctionalTestCase`](../../packages-dev/testing-helper/Classes/TestCase/FunctionalTestCase.php)
+is the configuration every test instance of the repository starts from. Its
+`setUp()` merges its defaults under `$configurationToUseInTestInstance` before
+the testing framework writes the settings of the instance. What a test class
+sets there wins, so a class that needs another value says so in its own
+`setUp()` or in the property, as it always did.
+
+Today it sets one thing: the Extbase class schema cache, `extbase`, uses a
+`TransientMemoryBackend`, where core uses a `SimpleFileBackend`.
+
+**The defect it exists for.** TYPO3 core writes the class schemata from the
+destructor of the Extbase `ReflectionService`. When the garbage collector runs
+that destructor inside another `serialize()` call, the inner call continues the
+reference table of the outer one, and the cache entry is written with back
+references into a payload it is not part of, under a valid signature. The next
+read fails with `unserialize(): Error at offset …` in
+`AuthenticatedMessageDeserializer`, a warning that fails the run. Whether the
+collector runs at that moment depends on everything the process did before, so
+it hit whichever test class ran after a certain set of classes in the same
+chunk, and every change of the test set moved it. ACE-725 found it, seven
+classes carried their own copy of the setting since, and the next hit,
+`ContactsProcessorTest` in CI, led to the shared default (ACE-817). The defect is
+reported to TYPO3 core as
+[forge #110909](https://forge.typo3.org/issues/110909), with a reproduction, and
+a patch is under review. Once both supported core versions ship the fix, the
+default can go. A transient backend is never serialized, and a test process
+gains nothing from a class schema that outlives it.
+
+**A test that needs another backend** sets it, and the replacement should be
+transient too, `NullBackend` for instance:
+
+```php
+protected array $configurationToUseInTestInstance = [
+    'SYS' => ['caching' => ['cacheConfigurations' => ['extbase' => [
+        'backend' => NullBackend::class,
+    ]]]],
+];
+```
+
+Two checks keep it in place:
+
+- [`FunctionalTestBaseClassTest`](unit-tests.md#functional-tests-extend-the-shared-base-class)
+  in `packages-dev/monorepo-shared` fails for a class below `Tests/Functional/`
+  that extends the functional test case of the testing framework without the
+  shared base class. A new abstract test case cannot miss it.
+- `FunctionalTestCaseTest` and `FunctionalTestCaseConfigurationTest` in
+  `packages-dev/testing-helper/Tests/Functional/TestCase/` assert the backend of
+  the `extbase` cache in a test instance: transient by default, the one the
+  class configured otherwise.
 
 ## Worked examples
 

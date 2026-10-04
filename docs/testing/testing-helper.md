@@ -1,8 +1,9 @@
 # Testing helper
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
-composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but fifteen PHP traits — the parts of the test setup that were being copied
+composer package `fgtclb/academics-monorepo-testing-helper`. It holds the
+[base class every functional test case extends](#the-base-class-of-every-functional-test)
+and fifteen PHP traits, the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -60,15 +61,19 @@ see [Unit tests](unit-tests.md#discovery).
 **It declares no dependencies.** `packages-dev/testing-helper/composer.json` has
 no `require` and no `require-dev` at all — not on `phpunit/phpunit`, not on
 `typo3/testing-framework`, not on `typo3/cms-core`, although every trait uses
-all three. Nothing enforces that a consuming class actually provides
+all three, and not on `sbuerk/typo3-site-based-test-trait`, whose test case the
+base class extends. Nothing enforces that a consuming class actually provides
 `$this->get()`, `$this->instancePath`, `$this->coreExtensionsToLoad` or the
 assertion methods a trait calls. Using a trait in a class that does not extend a
 functional test case fails at runtime, not at install time or in static
 analysis.
 
 **The traits have no tests of their own.** They are covered only through the
-extensions that use them. The package's `Tests/Unit/Build/` holds tests, but for
-something else: the three scripts behind `runTests.sh -j`,
+extensions that use them. The base class has two, in
+`Tests/Functional/TestCase/`, see
+[below](#the-base-class-of-every-functional-test). The package's
+`Tests/Unit/Build/` holds tests, but for something else: the three scripts
+behind `runTests.sh -j`,
 `Build/Scripts/splitFunctionalTests.php`,
 `Build/Scripts/checkFunctionalTestCount.php` and
 `Build/Scripts/recordFunctionalTestTimes.php` (ACE-692), and
@@ -82,7 +87,53 @@ scripts as subprocesses and are collected because the suites glob
 A namespace quirk follows from the same history: every trait lives under
 `FGTCLB\TestingHelper\FunctionalTestCase\`, but
 `ExtensionCoreVersionCompatTestsTrait` is used from **unit** tests too. The
-namespace records where the traits started, not where they are usable.
+namespace records where the traits started, not where they are usable. The base
+class lives under `FGTCLB\TestingHelper\TestCase\`, next to them rather than
+among them, named like the class of `sbuerk/typo3-site-based-test-trait` it
+extends.
+
+---
+
+## The base class of every functional test
+
+[`Classes/TestCase/FunctionalTestCase.php`](../../packages-dev/testing-helper/Classes/TestCase/FunctionalTestCase.php)
+
+**What it does.** An abstract `FunctionalTestCase` between
+`SBUERK\TYPO3\Testing\TestCase\FunctionalTestCase` and the test cases of the
+repository. Its `setUp()` merges the configuration every test instance starts
+from under `$configurationToUseInTestInstance`, before the testing framework
+writes the settings of the instance, so what a test class sets there wins. It
+keeps the Extbase class schema cache in a `TransientMemoryBackend`.
+
+**When to use it.** Always, and it is already in place: the twelve abstract test
+cases of the extensions, `AbstractSeedTestCase` and `SnapshotManifestTest` of
+`packages-dev/dev-site` extend it, and a new abstract test case or a test class
+without one extends it too. `FunctionalTestBaseClassTest` in
+`packages-dev/monorepo-shared` fails for a functional test case that does not,
+see [Unit tests](unit-tests.md#functional-tests-extend-the-shared-base-class).
+
+**The trap it exists for.** TYPO3 core writes the class schemata from the
+destructor of the Extbase reflection service, and a garbage collector run inside
+another `serialize()` writes them with back references that cannot be read back.
+The read fails with `unserialize(): Error at offset` in whichever test class ran
+after a certain set of classes in the same process, and the next change of the
+test set moved it elsewhere. Seven classes carried their own copy of the setting
+before it moved here. The core report is
+[forge #110909](https://forge.typo3.org/issues/110909). The defect, and why a
+transient backend is the fix, are described in
+[Functional tests](functional-tests.md#the-shared-base-class).
+
+It is a class, not a trait, because the merge has to run after the `setUp()` of
+the test class assigned its configuration and before the testing framework reads
+it, which is the place of a method in the class hierarchy. A trait `setUp()` is
+silently replaced by the `setUp()` of a class that declares its own, and two
+abstract test cases do. A `#[Before]` method runs before every `setUp()`, so the
+assignment of a test class would replace the default again.
+
+**Its tests.** `FunctionalTestCaseTest` asserts that the `extbase` cache of an
+instance has a `TransientMemoryBackend`, `FunctionalTestCaseConfigurationTest`
+that a class configuring `NullBackend` gets that one. Without the merge the
+first fails, with the merge the wrong way round the second.
 
 ---
 

@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 147 unit test classes: 130 across the twelve extensions, three in
-`packages-dev/dev-site`, nine in `packages-dev/monorepo-shared` and five in
+There are 148 unit test classes: 130 across the twelve extensions, three in
+`packages-dev/dev-site`, ten in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -90,9 +90,11 @@ issue of a customer project, see [below](#customer-issue-keys), the check
 of the manual links, see [below](#the-links-of-the-manuals), the check of
 the branch alias key, see [below](#the-branch-alias-key), the check of the form
 `bin/set-version` writes, see [below](#the-form-binset-version-writes), the
-check that a class alias map ships, see [below](#class-alias-maps-ship), and
-the check of the icons of frontend templates, see
-[below](#icons-of-frontend-templates).
+check that a class alias map ships, see [below](#class-alias-maps-ship), the
+check of the icons of frontend templates, see
+[below](#icons-of-frontend-templates), and the check that every functional test
+case extends the shared base class, see
+[below](#functional-tests-extend-the-shared-base-class).
 
 **Test classes are autoloaded, not included.** Each extension registers its own
 `Tests/` namespace as `autoload-dev`, for example
@@ -108,7 +110,7 @@ them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
 `TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
-unit test case, and no unit test extends another test class. The five below
+unit test case, and no unit test extends another test class. The eighteen below
 `packages-dev/` are the exception to the base class: they need nothing of
 TYPO3 and extend PHPUnit's `TestCase` directly.
 
@@ -555,6 +557,26 @@ is decided at runtime, and the functional icon tests of each extension render
 it. The test fails as well when it finds no literal identifier at all, so a
 renamed namespace or ViewHelper cannot turn it into a check of nothing. It
 reads no template of a test fixture or a project.
+
+## Functional tests extend the shared base class
+
+[`FunctionalTestBaseClassTest`](../../packages-dev/monorepo-shared/Tests/Unit/FunctionalTestBaseClassTest.php)
+reads every PHP file below `Tests/Functional/` of each package in
+`packages/fgtclb/` and `packages-dev/`, outside of `Fixtures/`, loads the class
+it declares and fails for each one that extends the functional test case of the
+testing framework without
+[the shared base class](functional-tests.md#the-shared-base-class) of
+`packages-dev/testing-helper` (ACE-817). The data set names the package, the
+failure the file and the class.
+
+The base class keeps the Extbase class schema cache of the test instance in
+memory. A class without it would persist the class schemata again, and the core
+defect behind that fails a test only when a certain set of classes ran before
+it in the same process, usually weeks later and in CI. A class that does not
+autoload is reported as well, because PHPUnit would skip it without a word. The
+test also fails when a package yields no functional test case at all, and a
+second one asserts that the packages with functional tests are found, so a moved
+directory cannot turn it into a check of nothing.
 
 ## See also
 
