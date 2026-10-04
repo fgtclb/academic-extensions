@@ -17,7 +17,7 @@ import { createKeyboardEvent, resetBody, settle } from "../../../../../Build/tes
  * The markup is extracted from the partials below
  * "Resources/Private/Frontend/Default/Partials/StudyPlan/", reduced to the
  * elements this module selects: "f:translate" becomes the text it resolves to
- * and "core:icon" becomes nothing. The functional test
+ * and the "ab:icon" of academic_base becomes nothing. The functional test
  * "AcademicStudyPlanContentElementTest::contentElementCarriesTheDataAttributeContract()"
  * asserts the same inventory against the really rendered page, which is what
  * keeps this copy from drifting.

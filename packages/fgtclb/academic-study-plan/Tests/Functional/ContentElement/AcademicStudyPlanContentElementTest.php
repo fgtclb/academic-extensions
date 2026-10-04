@@ -138,8 +138,9 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
     /**
      * @return string[] The class attribute of every element below the study plan, in
-     *         document order, without the ones `core:icon` writes - those are the core's
-     *         markup and differ between TYPO3 versions.
+     *         document order, without the ones the icon ViewHelper of academic_base
+     *         writes - those are the markup of the TYPO3 icon API and differ between
+     *         TYPO3 versions.
      */
     private function classInventoryOf(string $html): array
     {
@@ -559,15 +560,49 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->setUpTestCase('studyPlanPage');
 
         $content = $this->renderHomePage();
-        // `core:icon` never fails on an unknown identifier: it renders the
-        // `default-not-found` placeholder, the small red "broken" icon, and the
-        // identifier that was asked for is gone from the markup.
+        // The glyphs are frontend icons, rendered by `ab:icon` from the frontend icon
+        // registry. It never fails on an unknown identifier: it renders the
+        // `default-not-found` placeholder, and the identifier that was asked for is gone
+        // from the markup. A glyph missing from `Configuration/FrontendIcons.php`, or a
+        // tag left on `core:icon`, which asks the registry of the backend, ends there.
         $this->assertStringNotContainsString('default-not-found', $content);
         // The three identifiers the element actually asks for, so a rename in
-        // `Configuration/Icons.php` without one in the template is caught here too.
+        // `Configuration/FrontendIcons.php` without one in the template is caught here too.
         $this->assertStringContainsString('data-identifier="academic-study-plan-plus"', $content);
         $this->assertStringContainsString('data-identifier="academic-study-plan-minus"', $content);
         $this->assertStringContainsString('data-identifier="academic-study-plan-close"', $content);
+    }
+
+    /**
+     * The shipped stylesheet switches the glyphs of a semester header through the classes
+     * of their wrappers: `.icon-academic-study-plan-minus` is hidden in a closed semester,
+     * `.icon-academic-study-plan-plus` in an open one, and every `.icon` of the header on a
+     * wide viewport. The script never looks at them, so nothing else notices when the
+     * classes are gone.
+     */
+    #[Test]
+    public function contentElementGivesTheGlyphsTheClassesTheStylesheetSelects(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $xpath = $this->parseHtml($this->renderHomePage());
+        $headers = $xpath->query('//*[@data-study-plan-semester-header]');
+        $this->assertInstanceOf(\DOMNodeList::class, $headers);
+        $this->assertGreaterThan(0, $headers->count());
+        foreach ($headers as $header) {
+            foreach (['icon-academic-study-plan-plus', 'icon-academic-study-plan-minus'] as $glyphClass) {
+                $glyphs = $xpath->query(
+                    sprintf(
+                        './/*[contains(concat(" ", normalize-space(@class), " "), " icon ")'
+                        . ' and contains(concat(" ", normalize-space(@class), " "), " %s ")]',
+                        $glyphClass,
+                    ),
+                    $header,
+                );
+                $this->assertInstanceOf(\DOMNodeList::class, $glyphs);
+                $this->assertSame(1, $glyphs->count(), sprintf('A semester header renders not exactly one "%s" glyph.', $glyphClass));
+            }
+        }
     }
 
     #[Test]

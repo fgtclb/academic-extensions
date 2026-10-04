@@ -25,16 +25,16 @@ grep -c "'provider' => CurrentColorSvgIconProvider" \
   packages/fgtclb/*/Configuration/Icons.php
 ```
 
-Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **47
-registrations in total: 27 with the core `SvgIconProvider` and 20 with
+Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **27
+registrations in total: 7 with the core `SvgIconProvider` and 20 with
 `CurrentColorSvgIconProvider`**:
 
 | Package                  | Registrations | `CurrentColorSvgIconProvider` |
 |--------------------------|---------------|-------------------------------|
-| `academic-jobs`          | 19            | 1                             |
+| `academic-jobs`          | 2             | 1                             |
 | `academic-persons`       | 10            | 9                             |
 | `academic-persons-edit`  | 1             | –                             |
-| `academic-study-plan`    | 7             | 3                             |
+| `academic-study-plan`    | 4             | 3                             |
 | `academic-contact4pages` | 4             | 2                             |
 | `academic-partners`      | 3             | 3                             |
 | `academic-bite-jobs`     | 1             | –                             |
@@ -59,15 +59,20 @@ ls packages/fgtclb/*/Configuration/FrontendIcons.php
 grep -c "'provider'" packages/fgtclb/*/Configuration/FrontendIcons.php
 ```
 
-Three packages ship a `Configuration/FrontendIcons.php`, with **24
+Five packages ship a `Configuration/FrontendIcons.php`, with **44
 registrations**. `academic-base` registers one, the placeholder
-`default-not-found` with the core `SvgIconProvider`. The other 23 are the
-**control icons** of `academic-persons` and `academic-persons-edit` (ACE-812),
-all Bootstrap Icons with `CurrentColorSvgIconProvider`: the seven of the public
-profile and the sixteen of the profile editing view. No backend view renders
-them, so they are frontend icons only, and their templates render them through
-`<ab:icon>`. `typo3-category-types` contributes every category type and group
-icon from code, see below.
+`default-not-found` with the core `SvgIconProvider`. The other 43 are frontend
+icons of four extensions, and their templates render them through `<ab:icon>`.
+No backend view renders them, so none of them is registered in `Icons.php`:
+
+- The 23 **control icons** of `academic-persons` and `academic-persons-edit`
+  (ACE-812), all Bootstrap Icons with `CurrentColorSvgIconProvider`: the seven
+  of the public profile and the sixteen of the profile editing view.
+- The 17 `academic_jobs-*` icons of the job views and the three controls of
+  `academic-study-plan` (ACE-813), with the core `SvgIconProvider`, see below.
+
+`typo3-category-types` contributes every category type and group icon from
+code, see below.
 
 One registration is programmatic: `typo3-category-types` registers
 `category_types.<group>.<type>` per configured category type on
@@ -136,16 +141,18 @@ by `default-not-found` — and through
 `category-types/Resources/Private/Templates/PageCategorySummary.html`, which
 draws both the category type icon and the core `overlay-hidden` overlay.
 
-The frontend consumes them through `<core:icon>` as well, except the control
-icons of `academic-persons` and `academic-persons-edit`, which their templates
-render through `<ab:icon>`. `core` is a global
-Fluid namespace on both core versions — through `SYS.fluid.namespaces` of
-`cms-core/Configuration/DefaultConfiguration.php` on v13, and through
-`cms-core/Configuration/Fluid/Namespaces.php` on v14, where the setting is
-empty by default since 14.1 — so the ViewHelper needs no `xmlns` declaration
-in a frontend template. The
-ViewHelper is byte identical on 13.4.34 and 14.3.6. Which markup a template
-gets depends on one argument, and the templates on `main` are split on it:
+The frontend consumes them through `<core:icon>` as well, except the icons of
+`academic-persons`, `academic-persons-edit`, `academic-jobs` and
+`academic-study-plan`, which their templates render through `<ab:icon>`.
+`core` is a global Fluid namespace on both core versions, through
+`SYS.fluid.namespaces` of `cms-core/Configuration/DefaultConfiguration.php` on
+v13 and through `cms-core/Configuration/Fluid/Namespaces.php` on v14, where the
+setting is empty by default since 14.1. Its ViewHelper therefore needs no
+`xmlns` declaration in a frontend template, and it is byte identical on
+13.4.34 and 14.3.6. Which markup a template
+gets depends on one argument. The `<core:icon>` tags left in frontend templates
+all go without it, the `<ab:icon>` tags are split on it, see the paragraph
+below the table:
 
 A `<core:icon>` is regularly written across several lines, so the argument has
 to be counted per tag rather than per line:
@@ -160,17 +167,18 @@ grep -rl "<core:icon" packages/fgtclb/*/Resources/Private --include=*.html \
 
 | Extension               | `alternativeMarkupIdentifier="inline"`   | Without (default markup)                                        |
 |-------------------------|------------------------------------------|-----------------------------------------------------------------|
-| `academic-study-plan`   | 3 sites, its `plus`/`minus`/`close`      | —                                                               |
-| `academic-jobs`         | —                                        | `Job/Item.html`, `Job/Information.html`, `Job/Contact.html`     |
 | `academic-partners`     | —                                        | 4 files, `category_types.partners.*` only                       |
 | `academic-programs`     | —                                        | `Program/Facts/Item.html`, `category_types.*` and credit points |
 | `academic-projects`     | —                                        | `Project/Page/Categories.html`, `Project/Item.html`             |
 
 The same command with `ab:icon` counts the tags of the frontend registry: 35
-in 13 files of `academic-persons-edit` and 7 in 2 files of `academic-persons`,
-all with `alternativeMarkupIdentifier="inline"`. They switched from
-`<core:icon>` with every argument kept, so the markup is the one they had, and
-32 of the 35 still pass `size="small"`, the default of the argument.
+in 13 files of `academic-persons-edit`, 7 in 2 files of `academic-persons` and
+3 in 2 files of `academic-study-plan`, all with
+`alternativeMarkupIdentifier="inline"`, and 4 in 3 files of `academic-jobs`
+without it, `Job/Item.html`, `Job/Information.html` and `Job/Contact.html`.
+They switched from `<core:icon>` with every argument kept, so the markup is the
+one they had, and 32 of the 35 of `academic-persons-edit` still pass
+`size="small"`, the default of the argument.
 
 ## The frontend icon registry
 
@@ -310,16 +318,17 @@ sizes both shapes the same.
 - An **icon of a value** in the frontend is registered the same way, so it takes
   the colour of the text it stands in: `tx-academicprograms-info-credit-points`,
   the last of the 20 in `Icons.php`.
-- Everything else stays with the core `SvgIconProvider` — 27 registrations: the
-  seventeen `academic_jobs-*` icons of the job detail fields, the three frontend
-  controls of `academic-study-plan` (asked for with
-  `alternativeMarkupIdentifier="inline"`, so they get the same markup either
-  way), six **brand icons** — the plugin and extension marks
+- Everything else stays with the core `SvgIconProvider`. In `Icons.php` that is
+  7 registrations: six **brand icons**, the plugin and extension marks
   `academic_jobs_icon`, `persons_icon`, `persons_edit_icon`, `bitejobs_list`,
   `academic_contacts4pages` and `academic-study-plan`, drawn in fixed colours
-  and meant to look the same on every background — and one orphan,
+  and meant to look the same on every background, and one orphan,
   `tx_academiccontacts4pages_domain_model_contract`, which names a table that
-  does not exist.
+  does not exist. In `FrontendIcons.php` it is 21: the seventeen
+  `academic_jobs-*` icons of the job views, which render as an `<img>` of 16
+  pixels, the three frontend controls of `academic-study-plan` (asked for with
+  `alternativeMarkupIdentifier="inline"`, so they get the same markup either
+  way), and the placeholder `default-not-found`.
 - A frontend template that already asks for `inline` gets the same markup from
   both providers. Switching such an icon's provider changes nothing in the
   frontend; it changes its default markup, i.e. how it looks in the backend
@@ -529,7 +538,14 @@ profile and writes the wrapper of one of them out in full, `theRenderedEditorRes
 of `AcademicPersonsEditProfileEditingTest` does the same for the editor, and
 `academic-jobs/Tests/Functional/Plugins/AcademicJobsListAndDetailPluginTest.php`,
 `detailPluginRendersTheShippedContactIcons()`, for the two icons of the job
-contact block, through the helpers of `JobContactIconAssertionTrait`.
+contact block, through the helpers of `JobContactIconAssertionTrait`, and
+`listPluginRendersAResolvableIconForEveryProperty()` and
+`detailPluginRendersAResolvableIconForEveryProperty()` for the twelve property
+icons, on a job that carries every property. The glyphs of the study plan carry
+one more contract: the shipped stylesheet switches them through the
+`icon-academic-study-plan-plus` and `-minus` classes of their wrappers, which
+`contentElementGivesTheGlyphsTheClassesTheStylesheetSelects()` asserts in every
+semester header.
 
 The registry is asserted on its own beside that:
 [`academic-persons/Tests/Functional/Imaging/PublicProfileIconsTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Imaging/PublicProfileIconsTest.php)
@@ -542,7 +558,11 @@ it, so `IconFactory` answers `default-not-found`. The inverse holds for the
 record icons, `persons_icon` and `persons_edit_icon`: in the backend registry,
 not in the frontend one. The identifiers are spelled out in the tests rather
 than read back out of `Configuration/FrontendIcons.php`, so a rename has to be
-made twice instead of silently agreeing with itself. The Fluid scan of
+made twice instead of silently agreeing with itself. The `FrontendIconsTest`
+of `academic-jobs` and `academic-study-plan` assert the same for the seventeen
+job icons and the three study plan controls, with the core `SvgIconProvider`
+and the shipped file, and the record, plugin and content element icons the
+other way round. The Fluid scan of
 `AcademicPersonsEditProfileEditingTest` reads the identifiers of every
 `<ab:icon>` of the editor's templates, requires each in
 `Configuration/FrontendIcons.php` and each registered action icon in a
@@ -553,7 +573,10 @@ covered by `AcademicPersonsPublicProfileIconReplacementTest` and
 `AcademicPersonsEditIconReplacementTest`, against the fixture extensions
 `test_profile_icon_replacement` and `test_editor_icon_replacement`: an icon
 replaced in `FrontendIcons.php` reaches every control, cloned ones included,
-and one replaced in `Icons.php` reaches none.
+and one replaced in `Icons.php` reaches none. `AcademicJobsIconReplacementTest`
+and `AcademicStudyPlanIconReplacementTest` prove the same against
+`test_job_icons` and `test_study_plan_icons`, in the job list, the detail view
+with its contact block, and the study plan.
 
 The record icons are covered by one `Tests/Functional/Imaging/RecordIconsTest.php`
 per extension that ships them — `academic-contact4pages`, `academic-jobs`,

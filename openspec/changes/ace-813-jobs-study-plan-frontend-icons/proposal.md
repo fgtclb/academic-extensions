@@ -13,7 +13,7 @@ clean.
   leave the backend registry and are registered for the frontend only: the
   twelve job property icons of the list and the detail view, the contact
   phone and e-mail icons the contact block renders since
-  `ace-tbd-job-contact-icons` (#111), and `academic_jobs-starttime`,
+  `ace-809-job-contact-icons` (#111), and `academic_jobs-starttime`,
   `-contactName` and `-contactAdditionalInformation`, which no shipped
   template renders and which are kept as the documented spares of the
   `academic_jobs-<property>` naming the property list follows.

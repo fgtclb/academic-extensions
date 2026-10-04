@@ -8,6 +8,8 @@ use TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider;
 return [
     // Icon of the study plan content element. A placeholder until a dedicated icon
     // is drawn; the extension icon of the TER and the extension manager is Extension.svg.
+    // The controls of the element are frontend icons and registered in
+    // `Configuration/FrontendIcons.php`.
     'academic-study-plan' => [
         'provider' => SvgIconProvider::class,
         'source' => 'EXT:academic_study_plan/Resources/Public/Icons/content-element.svg',
@@ -31,19 +33,5 @@ return [
     'academic-study-plan-module' => [
         'provider' => CurrentColorSvgIconProvider::class,
         'source' => 'EXT:academic_study_plan/Resources/Public/Icons/module.svg',
-    ],
-    // Frontend controls of the study plan element, unlike the record icons above:
-    // drawn in `currentColor` so they take the colour of the surrounding text.
-    'academic-study-plan-plus' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/plus.svg',
-    ],
-    'academic-study-plan-minus' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/minus.svg',
-    ],
-    'academic-study-plan-close' => [
-        'provider' => SvgIconProvider::class,
-        'source' => 'EXT:academic_study_plan/Resources/Public/Icons/close.svg',
     ],
 ];

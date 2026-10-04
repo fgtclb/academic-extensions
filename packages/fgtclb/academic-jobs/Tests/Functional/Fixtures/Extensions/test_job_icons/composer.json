@@ -1,0 +1,19 @@
+{
+    "name": "tests/job-icons",
+    "description": "A site package that replaces job icons, two in the right file and two in the wrong one, for the functional tests of the job icons",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "typo3/cms-core": "~13.4.35 || ~14.3.7",
+        "fgtclb/academic-jobs": "~3.0.0@dev"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "test_job_icons",
+            "version": "3.0.0-dev",
+            "Package": {
+                "providesPackages": []
+            }
+        }
+    }
+}
