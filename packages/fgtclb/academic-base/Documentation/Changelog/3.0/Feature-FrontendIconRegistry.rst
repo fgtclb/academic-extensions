@@ -57,13 +57,14 @@ Impact
 ======
 
 Nothing changes for an existing site through this extension alone.
-`EXT:academic_persons`, `EXT:academic_persons_edit`, `EXT:academic_jobs` and
-`EXT:academic_study_plan` register their frontend icons in the new registry and
-render them with the new view helper, each with a Breaking entry in its own
-changelog. The other academic extensions keep their
-:file:`Configuration/Icons.php` and :html:`<core:icon>` for now. Every
-extension that moves its frontend icons to the new registry says so in its own
-changelog, with what a site package has to move.
+`EXT:academic_persons`, `EXT:academic_persons_edit`, `EXT:academic_jobs`,
+`EXT:academic_study_plan` and `EXT:academic_programs` register their frontend
+icons in the new registry and render them with the new view helper, each with a
+Breaking entry in its own changelog. `EXT:academic_partners` and
+`EXT:academic_projects` render the category type icons with it, with an
+Important entry each. No frontend template of the academic extensions renders
+an icon with :html:`<core:icon>` any more. Each changelog entry says what a
+site package has to move.
 
 A site package may ship :file:`Configuration/FrontendIcons.php` already. It
 takes effect for every template that renders an icon with the new view helper.

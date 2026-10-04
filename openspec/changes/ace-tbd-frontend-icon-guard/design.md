@@ -27,7 +27,7 @@ the round:
   handling for `<!-- -->`, so a ViewHelper inside an HTML comment is parsed
   and rendered. `f:comment` renders an empty string, so a ViewHelper inside it
   never runs.
-- After `ace-tbd-frontend-icon-registry`, the frontend icon ViewHelper lives in
+- After `ace-810-frontend-icon-registry`, the frontend icon ViewHelper lives in
   the namespace `http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers`, declared
   per template (prefix `p` where the template already uses it, `ab`
   otherwise). It takes the same arguments as `core:icon` (`identifier`,
@@ -35,7 +35,7 @@ the round:
   unknown identifier with the `default-not-found` drawing. Identifiers come
   from `Configuration/FrontendIcons.php` files (a plain array, the format of
   `Configuration/Icons.php`) and from category_types. As drafted in
-  `ace-tbd-category-type-frontend-icons`, it contributes
+  `ace-811-category-type-frontend-icons`, it contributes
   `category_types.<group>.<type>` for every type of a
   `Configuration/CategoryTypes.yaml` that declares an icon, and
   `category_types_group.<group>` for every group that declares one.
@@ -191,6 +191,6 @@ None. Nothing is shipped.
 ## Open Questions
 
 - The identifier forms are taken from the drafts of
-  `ace-tbd-category-type-frontend-icons`. Task 1.1 reads them from the merged
+  `ace-811-category-type-frontend-icons`. Task 1.1 reads them from the merged
   change. A different form changes one line of the accepted set, and no
   template renders a category type icon literally today.

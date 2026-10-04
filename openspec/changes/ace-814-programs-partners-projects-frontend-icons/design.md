@@ -1,11 +1,11 @@
 ## Context
 
 See `proposal.md` for the motivation. This change applies the API of
-`ace-tbd-frontend-icon-registry` (`Configuration/FrontendIcons.php`, the
+`ace-810-frontend-icon-registry` (`Configuration/FrontendIcons.php`, the
 `IconViewHelper` of `academic_base` under
 `http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers`, markup byte identical
 to `core:icon`, an unknown identifier answered with core's `default-not-found`
-drawing) and relies on `ace-tbd-category-type-frontend-icons` registering every
+drawing) and relies on `ace-811-category-type-frontend-icons` registering every
 `category_types.<group>.<type>` icon in both registries, with `frontendIcon`
 and `frontendInlineIcon` in `CategoryTypes.yaml` and a `FrontendIcons.php`
 entry winning over the contributed one. On `main` (verified 2026-10-03):
@@ -88,8 +88,8 @@ own namespace here.
 ### No `FrontendIcons.php` for partners and projects
 
 Their only frontend icons are category type icons, which `category_types`
-contributes. Their `Icons.php` (partners) and the core icon of projects are
-backend icons and stay. The change is therefore an Important entry for them,
+contributes. The `Icons.php` of partners holds backend icons only, projects
+has none. The change is therefore an Important entry for them,
 a Breaking one for programs.
 
 ### Tests prove the registry, not the markup
@@ -110,17 +110,21 @@ files that carry a distinct marker:
 
 The tests assert the frontend marker in every place of the specs and the
 absence of the backend marker, and that the core registry still answers the
-declared `icon` source for the type. `FactIconsTest` moves to the frontend
-registry trait of `ace-tbd-frontend-icon-registry` and asserts that the core
+declared `icon` source for the type. The shipped type no site package replaces
+is one the fixture leaves alone in the same test instance, `standard_period`,
+`partner_type` and `cooperation`, rather than the replaced type in a second
+instance without the fixture. `FactIconsTest` moves to the frontend
+registry trait of `ace-810-frontend-icon-registry` and asserts that the core
 registry no longer knows the identifier. A new fixture is preferred over the
 titled fixtures, which keep their single purpose.
 
 ## Risks / Trade-offs
 
-- [The not-found answer of `ace-tbd-frontend-icon-registry` keeps the requested
+- [The not-found answer of `ace-810-frontend-icon-registry` keeps the requested
   identifier in `data-identifier`] → then `ProgramFactsTest` does not notice a
-  missing `FrontendIcons.php` entry. Task 1.1 checks it, and task 4.1 asserts
-  the drawing in that case.
+  missing `FrontendIcons.php` entry. Checked in task 1.1: it does not, the
+  answer carries `default-not-found`, so `ProgramFactsTest` goes red without
+  the entry.
 - [An override of `Facts/Item.html` on `core:icon` silently shows the
   not-found placeholder for credit points] → the Breaking entry names the
   file and the migration, and `ace-tbd-frontend-icon-guard` catches it in the
@@ -130,6 +134,6 @@ titled fixtures, which keep their single purpose.
 
 ## Open Questions
 
-- The fixture icon path that exists on neither core (see Context) is left as
-  it is here, because those tests anchor on the wrapper only. Fixing it is a
-  one line change per fixture and can ride along if the maintainer wants.
+- None left. The fixture icon path that exists on neither core (see Context)
+  is left as it is: those tests anchor on the wrapper only, and the new
+  fixtures of this change ship their own files.

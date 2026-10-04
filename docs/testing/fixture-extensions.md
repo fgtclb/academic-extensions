@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Seventy-one such fixture extensions exist, in eleven of the twelve extensions.
+Seventy-four such fixture extensions exist, in eleven of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -61,6 +61,7 @@ They sit next to the tests that use them, under
 | `test_messy_profile_factory`                | `tests/test-messy-profile-factory`                | `academic-persons`       | A deliberately misbehaving profile factory and two event listeners.           |
 | `test_page_contacts_listener`               | `tests/test-page-contacts-listener`               | `academic-contact4pages` | A listener of the page contacts event, removing the contact a test names.     |
 | `test_partner_list_events`                  | `tests/test-partner-list-events`                  | `academic-partners`      | Two listeners on the partner demand and list events, and a list template.     |
+| `test_partners_frontend_icons`              | `tests/partners-frontend-icons`                   | `academic-partners`      | A region icon replaced in `FrontendIcons.php`, a type with a `frontendIcon`.  |
 | `test_partners_stub`                        | `tests/test-partners-stub`                        | `academic-partners`      | An `ext_localconf.php` replacing the Guzzle handler stack.                    |
 | `test_partners_titled_category_type`        | `tests/partners-titled-category-type`             | `academic-partners`      | A partner type with a translated title, and the shipped region retitled.      |
 | `test_plugin_action_context`                | `tests/test-plugin-action-context`                | `academic-persons`       | A listener recording the content element of an event's plugin context.        |
@@ -76,11 +77,13 @@ They sit next to the tests that use them, under
 | `test_program_events`                       | `tests/test-program-events`                       | `academic-programs`      | Listeners on the program demand, list and page data events, a list template.  |
 | `test_programs_category_type_priority`      | `tests/programs-category-type-priority`           | `academic-programs`      | A `CategoryTypes.yaml` raising the priority of a type of the programs group.  |
 | `test_programs_extra_category_type`         | `tests/programs-extra-category-type`              | `academic-programs`      | A `CategoryTypes.yaml` adding one type to the programs group.                 |
+| `test_programs_frontend_icons`              | `tests/programs-frontend-icons`                   | `academic-programs`      | Fact icons replaced in `FrontendIcons.php` and `Icons.php`, a `frontendIcon`. |
 | `test_programs_removed_category_type`       | `tests/programs-removed-category-type`            | `academic-programs`      | A `CategoryTypes.yaml` removing a type from the programs group.               |
 | `test_programs_titled_category_type`        | `tests/programs-titled-category-type`             | `academic-programs`      | A program type with a translated title, and the shipped degree retitled.      |
 | `test_project_list_events`                  | `tests/test-project-list-events`                  | `academic-projects`      | Two listeners on the project demand and list events, and a list template.     |
 | `test_project_profile_column_removed`       | `tests/project-column-removed`                    | `academic-persons-edit`  | A listener after the persons settings removing a project column.              |
 | `test_project_profile_fields`               | `tests/test-project-profile-fields`               | `academic-persons-edit`  | Project columns of every type a project field takes, one managed, a listener. |
+| `test_projects_frontend_icons`              | `tests/projects-frontend-icons`                   | `academic-projects`      | Competence field icon in `FrontendIcons.php`, a type with a `frontendIcon`.   |
 | `test_projects_titled_category_type`        | `tests/projects-titled-category-type`             | `academic-projects`      | A project type with a translated title, a shipped type retitled.              |
 | `test_public_profile_settings`              | `tests/test-public-profile-settings`              | `academic-persons`       | A `Settings.yaml` overriding the public profile layout.                       |
 | `test_settings_copy`                        | `tests/test-settings-copy`                        | `academic-persons`       | A copy of the contract fields that leaves the room out, removes one with `~`. |
@@ -97,8 +100,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-two of the seventy-one have a `Classes/` folder with a `TESTS\…` PSR-4
-root. The other forty-nine are pure resources. The `ext_emconf.php` is checked
+Twenty-two of the seventy-four have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other fifty-two are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
 see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
@@ -232,12 +235,14 @@ other fixture, and its test asserts the order before it asserts the
 replacement, as `IconViewHelperOverrideTest::theSitePackageLoadsAfterTheExtensionAndAcademicBase()`
 does. `test_job_icons` sorts after `academic_jobs`,
 `test_profile_icon_replacement` after `academic_persons`,
-`test_editor_icon_replacement` after `academic_persons_edit` and
-`test_study_plan_icons` after `academic_study_plan` the same way.
+`test_editor_icon_replacement` after `academic_persons_edit`,
+`test_study_plan_icons` after `academic_study_plan` and
+`test_programs_frontend_icons` after `academic_programs` the same way.
 `test_category_types_frontend_icons` needs no order: the category type icons
 reach the frontend registry through its collect event, which is applied before
 any `Configuration/FrontendIcons.php`, so its own file replaces one of them in
-any position.
+any position. `test_partners_frontend_icons` and `test_projects_frontend_icons`
+replace category type icons only and need no order for the same reason.
 
 ## Using one in a test
 
@@ -356,11 +361,14 @@ The existing ones show the cases that justify one:
   category types and groups for every frontend icon case and replaces one of
   their icons in its own `Configuration/FrontendIcons.php`,
   `test_profile_icon_replacement`, `test_editor_icon_replacement`,
-  `test_job_icons` and `test_study_plan_icons` replace icons of the public
-  profile, the profile editor, the job views and the study plan in their
-  `Configuration/FrontendIcons.php`, which only a package that loads after the
-  extension can, and others in their `Configuration/Icons.php`, which the
-  frontend does not read, `test_public_profile_settings` ships a
+  `test_job_icons`, `test_study_plan_icons` and `test_programs_frontend_icons`
+  replace icons of the public profile, the profile editor, the job views, the
+  study plan and the program facts in their `Configuration/FrontendIcons.php`,
+  which only a package that loads after the extension can, and others in their
+  `Configuration/Icons.php`, which the frontend does not read,
+  `test_partners_frontend_icons` and `test_projects_frontend_icons` replace a
+  shipped category type icon for the frontend and declare a type with a
+  `frontendIcon` of its own, `test_public_profile_settings` ships a
   `Configuration/AcademicPersons/Settings.yaml` that overrides the `profile`
   map exactly as a site package would, `test_contract_contact_actions` ships
   one that narrows the `actions` of the contracts section,
