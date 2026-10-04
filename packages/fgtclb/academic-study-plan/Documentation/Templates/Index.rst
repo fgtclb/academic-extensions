@@ -189,6 +189,34 @@ substituted wherever they appear in the item, in an attribute value or in text.
 Keep them in an override of the filter, in the attributes above and wherever the
 label is to be read.
 
+..  _templates-glyphs:
+
+The glyphs of a semester header
+===============================
+
+The semester partial renders two glyphs into the header,
+``academic-study-plan-plus`` and ``academic-study-plan-minus``, and the dialog
+partial renders ``academic-study-plan-close`` into its close button. All three
+are inlined SVGs drawn in :css:`currentColor`, rendered with the ``ab:icon``
+ViewHelper of :guilabel:`EXT:academic_base` from its frontend icon registry. An
+override that renders them declares
+``xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`` in its
+:html:`<html>` tag. With ``core:icon`` it shows TYPO3's not-found icon, see
+:ref:`breaking-study-plan-control-icons-moved-to-the-frontend-icon-registry`.
+
+The script does not look at the glyphs, the shipped stylesheet does. It selects
+the classes the ViewHelper writes: :css:`icon-academic-study-plan-minus` is
+hidden in a closed semester, :css:`icon-academic-study-plan-plus` in an open
+one, and every :css:`.icon` in the header from 768 pixels on. An override of
+:file:`StudyPlan/Semester.html` that keeps the shipped stylesheet therefore
+keeps rendering the two identifiers, with ``ab:icon``. One that renders
+glyphs of its own brings the rules for them.
+
+To draw a glyph differently, register a file of your own under its identifier
+in the :file:`Configuration/FrontendIcons.php` of your site package, which has
+to depend on the extension so that its entry is read last. An entry in
+:file:`Configuration/Icons.php` does not reach the study plan.
+
 ..  _templates-module-as-trigger:
 
 The module element as the trigger

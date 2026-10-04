@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Sixty-eight such fixture extensions exist, in ten of the twelve extensions.
+Seventy-one such fixture extensions exist, in eleven of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -49,7 +49,7 @@ They sit next to the tests that use them, under
 | `test_frontend_user_sync_relations`         | `tests/test-frontend-user-sync-relations`         | `academic-persons`       | A synchronisation map assigning the organisational unit and function type.    |
 | `test_frontend_user_sync_relations_by_name` | `tests/test-frontend-user-sync-relations-by-name` | `academic-persons`       | A synchronisation map matching units by name and creating function types.     |
 | `test_hidden_content_types`                 | `tests/hidden-content-types`                      | `academic-base`          | Two content types hidden by page TSconfig, one in the academic group.         |
-| `test_job_contact_icon`                     | `tests/test-job-contact-icon`                     | `academic-jobs`          | An `Icons.php` that replaces the phone icon of the job contact block.         |
+| `test_job_icons`                            | `tests/job-icons`                                 | `academic-jobs`          | Job icons replaced in `FrontendIcons.php`, and without effect in `Icons.php`. |
 | `test_job_validation_override`              | `tests/job-validation-override`                   | `academic-jobs`          | A jobs `Settings.yaml` naming nine fields, a TCA override, two TCA listeners. |
 | `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
 | `test_language_files`                       | `tests/language-files`                            | `academic-persons`       | An XLF pair with awkward label keys (dots, dashes).                           |
@@ -85,6 +85,7 @@ They sit next to the tests that use them, under
 | `test_public_profile_settings`              | `tests/test-public-profile-settings`              | `academic-persons`       | A `Settings.yaml` overriding the public profile layout.                       |
 | `test_settings_copy`                        | `tests/test-settings-copy`                        | `academic-persons`       | A copy of the contract fields that leaves the room out, removes one with `~`. |
 | `test_settings_removal`                     | `tests/test-settings-removal`                     | `academic-persons`       | A delta removing one profile field with `~` and copying nothing.              |
+| `test_study_plan_icons`                     | `tests/study-plan-icons`                          | `academic-study-plan`    | A glyph replaced in `FrontendIcons.php`, another in `Icons.php`.              |
 | `test_tca_override_after_settings`          | `tests/tca-override-after-settings`               | `academic-persons`       | TCA overrides and listeners changing columns and a type the settings set.     |
 | `test_upgrade_check`                        | `tests/test-upgrade-check`                        | `academic-base`          | The extension whose templates the upgrade check compares an override with.    |
 | `test_upgrade_check_project`                | `tests/test-upgrade-check-project`                | `academic-base`          | A project site package overriding templates of the fixture above.             |
@@ -96,8 +97,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-two of the seventy have a `Classes/` folder with a `TESTS\…` PSR-4
-root. The other forty-eight are pure resources. The `ext_emconf.php` is checked
+Twenty-two of the seventy-one have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other forty-nine are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
 see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
@@ -229,9 +230,10 @@ A site is not affected, composer orders its packages. A fixture that has to
 load after an extension therefore gets a key that sorts after it, requires no
 other fixture, and its test asserts the order before it asserts the
 replacement, as `IconViewHelperOverrideTest::theSitePackageLoadsAfterTheExtensionAndAcademicBase()`
-does. `test_job_contact_icon` sorts after `academic_jobs`,
-`test_profile_icon_replacement` after `academic_persons` and
-`test_editor_icon_replacement` after `academic_persons_edit` the same way.
+does. `test_job_icons` sorts after `academic_jobs`,
+`test_profile_icon_replacement` after `academic_persons`,
+`test_editor_icon_replacement` after `academic_persons_edit` and
+`test_study_plan_icons` after `academic_study_plan` the same way.
 `test_category_types_frontend_icons` needs no order: the category type icons
 reach the frontend registry through its collect event, which is applied before
 any `Configuration/FrontendIcons.php`, so its own file replaces one of them in
@@ -345,29 +347,29 @@ The existing ones show the cases that justify one:
 - **Registered configuration.** `test_category_types_group` ships a
   `Configuration/CategoryTypes.yaml` so the registry is filled the way an
   installing extension fills it, `test_current_color_icons` registers icons
-  with the `currentColor` icon provider the same way, `test_job_contact_icon`
-  replaces an icon of `academic_jobs`, which only a package that loads after it
-  can, `test_frontend_icons` registers icons for the frontend icon registry of
-  `academic_base` in a `Configuration/FrontendIcons.php` and from a listener,
-  with one icon in its `Configuration/Icons.php` as well and one backend-only
-  icon there, and `test_frontend_icons_override` replaces two of them, which
-  again takes a package that loads later, `test_category_types_frontend_icons`
-  declares category types and groups for every frontend icon case and replaces
-  one of their icons in its own `Configuration/FrontendIcons.php`,
-  `test_profile_icon_replacement` and `test_editor_icon_replacement` replace one
-  icon of the public profile and of the profile editor in their
-  `Configuration/FrontendIcons.php` and another one in their
-  `Configuration/Icons.php`, which the frontend does not read,
-  `test_public_profile_settings` ships a
+  with the `currentColor` icon provider the same way, `test_frontend_icons`
+  registers icons for the frontend icon registry of `academic_base` in a
+  `Configuration/FrontendIcons.php` and from a listener, with one icon in its
+  `Configuration/Icons.php` as well and one backend-only icon there, and
+  `test_frontend_icons_override` replaces two of them, which takes a package
+  that loads later, `test_category_types_frontend_icons` declares
+  category types and groups for every frontend icon case and replaces one of
+  their icons in its own `Configuration/FrontendIcons.php`,
+  `test_profile_icon_replacement`, `test_editor_icon_replacement`,
+  `test_job_icons` and `test_study_plan_icons` replace icons of the public
+  profile, the profile editor, the job views and the study plan in their
+  `Configuration/FrontendIcons.php`, which only a package that loads after the
+  extension can, and others in their `Configuration/Icons.php`, which the
+  frontend does not read, `test_public_profile_settings` ships a
   `Configuration/AcademicPersons/Settings.yaml` that overrides the `profile`
-  map exactly as a site package would,
-  `test_contract_contact_actions` ships one that narrows the `actions` of the
-  contracts section, `test_legacy_settings` ships one in the pre-3.0
-  shape, and `test_frontend_user_sync` and the two
-  `test_frontend_user_sync_relations*` one each with a `frontendUserSync` map
-  plus the `ext_tables.sql` for the `fe_users` columns that map reads. The
-  settings are collected from every loaded package, so nothing smaller than a
-  package can take part in that merge.
+  map exactly as a site package would, `test_contract_contact_actions` ships
+  one that narrows the `actions` of the contracts section,
+  `test_legacy_settings` ships one in the pre-3.0 shape, and
+  `test_frontend_user_sync` and the two `test_frontend_user_sync_relations*`
+  one each with a `frontendUserSync` map plus the `ext_tables.sql` for the
+  `fe_users` columns that map reads. The settings are collected from every
+  loaded package, so nothing smaller than a package can take part in that
+  merge.
 
 Anything that does *not* need one should not have one. Records go into a CSV
 fixture and are imported with `importCSVDataSet()`; TypoScript that is only read

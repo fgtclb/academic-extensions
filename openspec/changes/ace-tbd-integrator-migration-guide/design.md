@@ -110,7 +110,8 @@ A chapter that depends on a change not released when the guide is written
 `ace-785-page-templates-sections-subtitle`,
 `ace-712-upgrade-check-template-overrides`,
 `ace-713-upgrade-check-configuration`,
-`ace-812-persons-frontend-icons`) carries a note naming it as not yet
+`ace-812-persons-frontend-icons`,
+`ace-813-jobs-study-plan-frontend-icons`) carries a note naming it as not yet
 available.
 
 ### Decided: the static template step names the 2.x paths as deprecated

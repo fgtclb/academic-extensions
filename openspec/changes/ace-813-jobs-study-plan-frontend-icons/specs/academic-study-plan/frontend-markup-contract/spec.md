@@ -31,8 +31,8 @@ TYPO3 v13 and v14 alike.
 #### Scenario: A replacement in the backend registration
 
 - **WHEN** a site package registers its own drawing for
-  `academic-study-plan-close` in its backend icon registration only
-- **THEN** the module dialogs show the glyph the extension ships
+  `academic-study-plan-plus` in its backend icon registration only
+- **THEN** the semester headers show the plus glyph the extension ships
 
 #### Scenario: An override still asks the backend registry
 

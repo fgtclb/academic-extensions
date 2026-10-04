@@ -37,8 +37,9 @@ icon registry. This applies on TYPO3 v13 and v14 alike.
 #### Scenario: A replacement in the backend registration
 
 - **WHEN** a site package registers its own drawing for
-  `academic_jobs-companyName` in its backend icon registration only
-- **THEN** the job views show the drawing the extension ships
+  `academic_jobs-workLocation` in its backend icon registration only
+- **THEN** the job views show the drawing the extension ships in front of the
+  work location
 
 #### Scenario: An override extends the property list
 
