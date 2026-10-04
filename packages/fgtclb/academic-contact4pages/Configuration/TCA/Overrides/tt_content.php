@@ -15,7 +15,7 @@ if (!defined('TYPO3')) {
         [
             'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.title',
             'value' => 'academiccontacts4pages_list',
-            'icon' => 'academic_contacts4pages',
+            'icon' => 'tx-academiccontacts4pages-plugin-contacts',
             'group' => 'academic',
             'description' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_be.xlf:plugin.contacts_list.description',
         ],
