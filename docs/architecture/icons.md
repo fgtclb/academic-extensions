@@ -11,8 +11,8 @@ were read off the files named beside them.
 ## Registration today
 
 There are two registries. The icon registry of TYPO3 reads
-`Configuration/Icons.php` and serves the backend and, so far, every frontend
-template, through `<core:icon>`. The frontend icon registry of `academic_base`
+`Configuration/Icons.php` and serves the backend and the frontend templates
+that still render `<core:icon>`. The frontend icon registry of `academic_base`
 reads `Configuration/FrontendIcons.php` and serves `<ab:icon>`, see
 [The frontend icon registry](#the-frontend-icon-registry). Neither reads the
 other.
@@ -25,24 +25,22 @@ grep -c "'provider' => CurrentColorSvgIconProvider" \
   packages/fgtclb/*/Configuration/Icons.php
 ```
 
-Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **70
-registrations in total: 27 with the core `SvgIconProvider` and 43 with
+Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **47
+registrations in total: 27 with the core `SvgIconProvider` and 20 with
 `CurrentColorSvgIconProvider`**:
 
 | Package                  | Registrations | `CurrentColorSvgIconProvider` |
 |--------------------------|---------------|-------------------------------|
 | `academic-jobs`          | 19            | 1                             |
-| `academic-persons`       | 17            | 16                            |
-| `academic-persons-edit`  | 17            | 16                            |
+| `academic-persons`       | 10            | 9                             |
+| `academic-persons-edit`  | 1             | –                             |
 | `academic-study-plan`    | 7             | 3                             |
 | `academic-contact4pages` | 4             | 2                             |
 | `academic-partners`      | 3             | 3                             |
 | `academic-bite-jobs`     | 1             | –                             |
 | `academic-programs`      | 2             | 2                             |
 
-The 43 are of three kinds. Twenty-three are control icons, the seven of the public
-profile of `academic-persons` and the sixteen of the profile editing view of
-`academic-persons-edit`, all Bootstrap Icons. Nineteen are **record icons**:
+The 20 are of two kinds. Nineteen are **record icons**:
 every identifier a TCA record type resolves through `ctrl.typeicon_classes`,
 including the two page type icons `academic-partners` and `academic-programs`
 (ACE-523). One is a frontend icon of a value that is no record:
@@ -58,13 +56,18 @@ consolidation that is still in review (ACE-584 to ACE-594).
 
 ```bash
 ls packages/fgtclb/*/Configuration/FrontendIcons.php
+grep -c "'provider'" packages/fgtclb/*/Configuration/FrontendIcons.php
 ```
 
-One package ships a `Configuration/FrontendIcons.php`: `academic-base`, with
-one registration, the placeholder `default-not-found` with the core
-`SvgIconProvider`. `typo3-category-types` contributes every category type and
-group icon from code, see below. No other extension has moved an icon to the
-frontend registry yet, and no template renders `<ab:icon>`.
+Three packages ship a `Configuration/FrontendIcons.php`, with **24
+registrations**. `academic-base` registers one, the placeholder
+`default-not-found` with the core `SvgIconProvider`. The other 23 are the
+**control icons** of `academic-persons` and `academic-persons-edit` (ACE-812),
+all Bootstrap Icons with `CurrentColorSvgIconProvider`: the seven of the public
+profile and the sixteen of the profile editing view. No backend view renders
+them, so they are frontend icons only, and their templates render them through
+`<ab:icon>`. `typo3-category-types` contributes every category type and group
+icon from code, see below.
 
 One registration is programmatic: `typo3-category-types` registers
 `category_types.<group>.<type>` per configured category type on
@@ -133,7 +136,9 @@ by `default-not-found` — and through
 `category-types/Resources/Private/Templates/PageCategorySummary.html`, which
 draws both the category type icon and the core `overlay-hidden` overlay.
 
-The frontend consumes them through `<core:icon>` as well. `core` is a global
+The frontend consumes them through `<core:icon>` as well, except the control
+icons of `academic-persons` and `academic-persons-edit`, which their templates
+render through `<ab:icon>`. `core` is a global
 Fluid namespace on both core versions — through `SYS.fluid.namespaces` of
 `cms-core/Configuration/DefaultConfiguration.php` on v13, and through
 `cms-core/Configuration/Fluid/Namespaces.php` on v14, where the setting is
@@ -155,13 +160,17 @@ grep -rl "<core:icon" packages/fgtclb/*/Resources/Private --include=*.html \
 
 | Extension               | `alternativeMarkupIdentifier="inline"`   | Without (default markup)                                        |
 |-------------------------|------------------------------------------|-----------------------------------------------------------------|
-| `academic-persons-edit` | 35 sites in 13 files                     | —                                                               |
-| `academic-persons`      | 7 sites in 2 files, `academic-persons-*` | —                                                               |
 | `academic-study-plan`   | 3 sites, its `plus`/`minus`/`close`      | —                                                               |
 | `academic-jobs`         | —                                        | `Job/Item.html`, `Job/Information.html`, `Job/Contact.html`     |
 | `academic-partners`     | —                                        | 4 files, `category_types.partners.*` only                       |
 | `academic-programs`     | —                                        | `Program/Facts/Item.html`, `category_types.*` and credit points |
 | `academic-projects`     | —                                        | `Project/Page/Categories.html`, `Project/Item.html`             |
+
+The same command with `ab:icon` counts the tags of the frontend registry: 35
+in 13 files of `academic-persons-edit` and 7 in 2 files of `academic-persons`,
+all with `alternativeMarkupIdentifier="inline"`. They switched from
+`<core:icon>` with every argument kept, so the markup is the one they had, and
+32 of the 35 still pass `size="small"`, the default of the argument.
 
 ## The frontend icon registry
 
@@ -287,19 +296,20 @@ sizes both shapes the same.
   resolves — is drawn in `currentColor` and registered with
   `CurrentColorSvgIconProvider`. The record list, the page tree and FormEngine
   all take the *default* markup, so an `<img>` there keeps the ink of its file
-  on the dark cards of a dark backend colour scheme. That is 19 of the 43
-  registrations today, plus the 20 programmatic `category_types.*` ones that ask
-  for it with `inlineIcon: true` (ACE-523).
+  on the dark cards of a dark backend colour scheme. That is 19 of the 20
+  registrations in `Icons.php` today, plus the 20 programmatic
+  `category_types.*` ones that ask for it with `inlineIcon: true` (ACE-523).
 - An **action or control icon** — an arrow, a pencil, a bin, a fold-out chevron —
-  is registered the same way, for the same reason: it follows the text colour in
-  the backend *and* in the frontend, with or without the `inline` argument. That
-  is 23 registrations, all Bootstrap Icons: the seven
-  `academic-persons-*` icons of the public profile (envelope, phone, address,
-  room, clock and the plus and minus of the fold-out entries) and the sixteen
-  `academic-persons-edit-*` controls of the profile editing view.
+  is registered the same way, for the same reason: it follows the text colour,
+  with or without the `inline` argument. That is 23 registrations, all
+  Bootstrap Icons and all in `FrontendIcons.php`, because only the frontend
+  shows them (ACE-812): the seven `academic-persons-*` icons of the public
+  profile (envelope, phone, address, room, clock and the plus and minus of the
+  fold-out entries) and the sixteen `academic-persons-edit-*` controls of the
+  profile editing view.
 - An **icon of a value** in the frontend is registered the same way, so it takes
   the colour of the text it stands in: `tx-academicprograms-info-credit-points`,
-  the last of the 43.
+  the last of the 20 in `Icons.php`.
 - Everything else stays with the core `SvgIconProvider` — 27 registrations: the
   seventeen `academic_jobs-*` icons of the job detail fields, the three frontend
   controls of `academic-study-plan` (asked for with
@@ -507,24 +517,43 @@ $this->assertStringContainsString('data-identifier="academic-study-plan-plus"', 
 ```
 
 Two assertions per template, for two different mistakes: the first catches an
-identifier that no longer resolves, the second catches a rename in
-`Configuration/Icons.php` that the template did not follow — which the first
-alone would also pass, since the placeholder replaces the identifier. Every
-plugin or content element rendering test that renders icons should carry both;
+identifier that no longer resolves, the second catches a rename in the
+registration that the template did not follow, which the first alone would
+also pass, since the placeholder replaces the identifier. For an icon of the
+frontend registry the first also catches a tag left on `<core:icon>`, which
+asks the backend registry and gets the placeholder. Every plugin or content
+element rendering test that renders icons should carry both;
 `academic-persons/Tests/Functional/Plugins/AcademicPersonsPublicProfilePluginTest.php`,
 `profileRendersOnlyResolvableIcons()`, does so for the seven icons of the public
-profile, and
+profile and writes the wrapper of one of them out in full, `theRenderedEditorResolvesEveryIconItAsksFor()`
+of `AcademicPersonsEditProfileEditingTest` does the same for the editor, and
 `academic-jobs/Tests/Functional/Plugins/AcademicJobsListAndDetailPluginTest.php`,
 `detailPluginRendersTheShippedContactIcons()`, for the two icons of the job
 contact block, through the helpers of `JobContactIconAssertionTrait`.
 
 The registry is asserted on its own beside that:
+[`academic-persons/Tests/Functional/Imaging/PublicProfileIconsTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Imaging/PublicProfileIconsTest.php)
+and
 [`academic-persons-edit/Tests/Functional/Imaging/ProfileEditingIconsTest.php`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Imaging/ProfileEditingIconsTest.php)
-asks the `IconFactory` for each of the sixteen action identifiers and asserts
-that the answer is that identifier and not `default-not-found`, and that its
-default markup is the inlined file. The identifiers are spelled out in the test
-rather than read back out of `Configuration/Icons.php`, so a rename has to be
-made twice instead of silently agreeing with itself.
+assert, for each of the seven and sixteen identifiers, the frontend
+registration with `CurrentColorSvgIconProvider`, the inlined file in both
+markups, the rendered identifier, and that the backend registry does not know
+it, so `IconFactory` answers `default-not-found`. The inverse holds for the
+record icons, `persons_icon` and `persons_edit_icon`: in the backend registry,
+not in the frontend one. The identifiers are spelled out in the tests rather
+than read back out of `Configuration/FrontendIcons.php`, so a rename has to be
+made twice instead of silently agreeing with itself. The Fluid scan of
+`AcademicPersonsEditProfileEditingTest` reads the identifiers of every
+`<ab:icon>` of the editor's templates, requires each in
+`Configuration/FrontendIcons.php` and each registered action icon in a
+template, and fails on any `<core:icon>` left there.
+`AcademicPersonsEditProfileEditingPrototypesTest` asserts the icons of the
+templates the editor clones in the browser. A site package replacement is
+covered by `AcademicPersonsPublicProfileIconReplacementTest` and
+`AcademicPersonsEditIconReplacementTest`, against the fixture extensions
+`test_profile_icon_replacement` and `test_editor_icon_replacement`: an icon
+replaced in `FrontendIcons.php` reaches every control, cloned ones included,
+and one replaced in `Icons.php` reaches none.
 
 The record icons are covered by one `Tests/Functional/Imaging/RecordIconsTest.php`
 per extension that ships them — `academic-contact4pages`, `academic-jobs`,

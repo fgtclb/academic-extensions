@@ -38,6 +38,7 @@ They sit next to the tests that use them, under
 | `test_contract_publish_renamed`             | `tests/test-contract-publish-renamed`             | `academic-persons`       | The contract column `publish` as the database compare renames it.             |
 | `test_contract_publish_wizard`              | `tests/test-contract-publish-wizard`              | `academic-persons`       | The `publish` upgrade wizard registered in a site package's `Services.yaml`.  |
 | `test_current_color_icons`                  | `tests/current-color-icons`                       | `academic-base`          | Icons registered through the `currentColor` icon provider.                    |
+| `test_editor_icon_replacement`              | `tests/editor-icon-replacement`                   | `academic-persons-edit`  | An editor icon replaced in `FrontendIcons.php`, another in `Icons.php`.       |
 | `test_editor_write_listener`                | `tests/test-editor-write-listener`                | `academic-persons-edit`  | A listener of the editor write event, refusing or replacing as a test says.   |
 | `test_exclude_file_column`                  | `tests/test-exclude-file-column`                  | `academic-persons`       | A TCA override adding an `l10n_mode=exclude` file column to profiles.         |
 | `test_frontend_icons`                       | `tests/frontend-icons`                            | `academic-base`          | Frontend icons from a file and a listener, one also in `Icons.php`.           |
@@ -66,6 +67,7 @@ They sit next to the tests that use them, under
 | `test_plugin_templates`                     | `tests/plugin-templates`                          | `academic-persons`       | Simplified Fluid templates and the TypoScript pointing at them.               |
 | `test_plugin_view_event`                    | `tests/test-plugin-view-event`                    | `academic-base`          | Listeners recording the view event and every context, a leftover, probes.     |
 | `test_position_fields`                      | `tests/test-position-fields`                      | `academic-persons`       | A `Settings.yaml` listing every field of the position line.                   |
+| `test_profile_icon_replacement`             | `tests/profile-icon-replacement`                  | `academic-persons`       | A profile icon replaced in `FrontendIcons.php`, another in `Icons.php`.       |
 | `test_profile_partial_overrides`            | `tests/test-profile-partial-overrides`            | `academic-persons`       | Partial overrides in two paths, a card passing a page, an old list template.  |
 | `test_profile_placeholders`                 | `tests/test-profile-placeholders`                 | `academic-persons`       | Profile image placeholders of a site package, one per gender.                 |
 | `test_profile_query_constraints`            | `tests/test-profile-query-constraints`            | `academic-persons`       | Listeners narrowing and counting the queries, and one replacing the demand.   |
@@ -94,8 +96,8 @@ They sit next to the tests that use them, under
 
 Each is a real, complete TYPO3 extension: a `composer.json` of type
 `typo3-cms-extension`, an `ext_emconf.php`, and whatever it exists to provide.
-Twenty-two of the sixty-eight have a `Classes/` folder with a `TESTS\…` PSR-4
-root. The other forty-six are pure resources. The `ext_emconf.php` is checked
+Twenty-two of the seventy have a `Classes/` folder with a `TESTS\…` PSR-4
+root. The other forty-eight are pure resources. The `ext_emconf.php` is checked
 like every other one: its `depends` names extension keys, and a fixture
 extension may name another fixture extension, which a real extension may not —
 see [Unit tests](unit-tests.md#the-ext_emconfphp-dependency-keys).
@@ -227,7 +229,9 @@ A site is not affected, composer orders its packages. A fixture that has to
 load after an extension therefore gets a key that sorts after it, requires no
 other fixture, and its test asserts the order before it asserts the
 replacement, as `IconViewHelperOverrideTest::theSitePackageLoadsAfterTheExtensionAndAcademicBase()`
-does. `test_job_contact_icon` sorts after `academic_jobs` the same way.
+does. `test_job_contact_icon` sorts after `academic_jobs`,
+`test_profile_icon_replacement` after `academic_persons` and
+`test_editor_icon_replacement` after `academic_persons_edit` the same way.
 `test_category_types_frontend_icons` needs no order: the category type icons
 reach the frontend registry through its collect event, which is applied before
 any `Configuration/FrontendIcons.php`, so its own file replaces one of them in
@@ -350,6 +354,10 @@ The existing ones show the cases that justify one:
   again takes a package that loads later, `test_category_types_frontend_icons`
   declares category types and groups for every frontend icon case and replaces
   one of their icons in its own `Configuration/FrontendIcons.php`,
+  `test_profile_icon_replacement` and `test_editor_icon_replacement` replace one
+  icon of the public profile and of the profile editor in their
+  `Configuration/FrontendIcons.php` and another one in their
+  `Configuration/Icons.php`, which the frontend does not read,
   `test_public_profile_settings` ships a
   `Configuration/AcademicPersons/Settings.yaml` that overrides the `profile`
   map exactly as a site package would,

@@ -927,13 +927,21 @@ promise for exactly that.
 
 ## Where the icons come from
 
-`<core:icon>` resolves an identifier through the icon registry, which knows the
-set the extension registers and whatever a site overrode, and a browser can ask
-neither. Under the prototype design that is not a problem to solve: an icon is
-rendered by Fluid **inside the prototype that draws it** — the help button, the
-five row controls of a contact, the add control of a section — so it is part of
-the markup an override reaches, and no module ever looks one up. There is no
-icon registry, no icon module and no `<template data-pe-icon>` block.
+The action icons are frontend icons: `Configuration/FrontendIcons.php` of the
+extension registers them, and `<ab:icon>` of `academic_base` resolves an
+identifier through the frontend icon registry, which knows the set the
+extension registers and whatever a site package replaced in its own
+`FrontendIcons.php` (ACE-812). A browser can ask neither. Under the prototype
+design that is not a problem to solve: an icon is rendered by Fluid **inside
+the prototype that draws it**, in the help button, the six row controls of a
+contact, the add control of a section and the edit button of a field without
+a value. So it is part of the markup an override reaches, and no module ever
+looks one up.
+There is no icon lookup in TypeScript, no icon module and no
+`<template data-pe-icon>` block. An override of one of those partials that
+still renders `<core:icon>` asks the icon registry of the backend, which does
+not know the action icons, and clones TYPO3's not-found icon into every row it
+builds.
 
 A control whose glyph depends on its state is drawn the same way, twice over:
 the view control renders both eyes, one of them `hidden`, and the browser flips

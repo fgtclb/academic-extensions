@@ -56,11 +56,13 @@ well.
 Impact
 ======
 
-Nothing changes for an existing site. No template of this release renders an
-icon through the new view helper yet, every academic extension keeps its
-:file:`Configuration/Icons.php` and :html:`<core:icon>`. The extensions that
-move their frontend icons to the new registry say so in their own changelog,
-with what a site package has to move.
+Nothing changes for an existing site through this extension alone.
+`EXT:academic_persons` and `EXT:academic_persons_edit` register their frontend
+icons in the new registry and render them with the new view helper, each with a
+Breaking entry in its own changelog. The other academic extensions keep their
+:file:`Configuration/Icons.php` and :html:`<core:icon>` for now. Every
+extension that moves its frontend icons to the new registry says so in its own
+changelog, with what a site package has to move.
 
 A site package may ship :file:`Configuration/FrontendIcons.php` already. It
 takes effect for every template that renders an icon with the new view helper.

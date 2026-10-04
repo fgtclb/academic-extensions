@@ -30,9 +30,9 @@ shows it, without a template override. This SHALL apply on TYPO3 v13 and v14.
 #### Scenario: A site package replaces an icon
 
 - **WHEN** a site package that depends on `academic_persons_edit` registers
-  `academic-persons-edit-save` with its own file in its
+  `academic-persons-edit-edit` with its own file in its
   `Configuration/FrontendIcons.php`
-- **THEN** every save button of the editor shows the drawing of that file
+- **THEN** every edit button of the editor shows the drawing of that file
 
 ### Requirement: The profile editing icons are no backend icons
 
