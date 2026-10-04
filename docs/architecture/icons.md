@@ -1,12 +1,257 @@
 # Icons
 
-How icons are registered and consumed across the extensions, the two icon
-registries, which provider to register an icon with, and how a template's icons
-are kept resolvable. Where a
-count is quoted with a command next to it, that count is the output of the
-command, run over the repository at the commit that last touched this page —
-re-run it rather than adjusting the number by hand. The counts without a command
-were read off the files named beside them.
+What an icon of the academic extensions is called, which registry it belongs
+in, where its file lives and where the file comes from, how it is registered
+and rendered, and how the rules are checked. Where a count is quoted with a
+command next to it, that count is the output of the command, run over the
+repository at the commit that last touched this page. Re-run it rather than
+adjusting the number by hand. The counts without a command were read off the
+files named beside them.
+
+## The rules in short
+
+- Identifiers are `tx-<extension key without underscores>-<group>-<name>`,
+  files `Resources/Public/Icons/<group>/<name>.svg`, unless the identifier
+  draws a file it shares with another one.
+- **The group decides the registry.** An `action`, `state` or `info` icon is
+  a frontend icon: registered in `Configuration/FrontendIcons.php` only and
+  rendered with `<ab:icon>`. A `record`, `plugin` or `doktype` icon is a
+  backend icon: registered in `Configuration/Icons.php` only. Category type and
+  group icons reach both registries through `typo3-category-types`.
+- An icon that means the same in several extensions, an action, a state or the
+  glyph in front of a piece of information, exists once, in the shared set of
+  `academic_base`. Look there before adding one.
+- Every icon is a **Font Awesome Free solid** icon in the house format. Never
+  Font Awesome Pro, never another set.
+- Every icon is registered with `CurrentColorSvgIconProvider`. A category type
+  asks for it with `inlineIcon: true`. The one exception is the placeholder
+  `default-not-found` of `academic_base`, core's drawing with core's provider.
+- A renamed identifier is renamed, not aliased: 3.0 ships no deprecated
+  identifiers, and each extension documents old and new identifiers in one
+  `Breaking-*.rst` about its icons.
+- An icon is `1em` by `1em`, everywhere. No stylesheet enlarges an icon box to
+  make up for the glyph being smaller than its box.
+- A content element names one identifier in its CType item, its
+  `typeicon_classes` entry and its wizard entry.
+
+## Identifiers
+
+### The scheme
+
+`tx-<extension key without underscores>-<group>-<name>`, everything lowercase,
+the name in kebab case: `tx-academicbase-action-move-up`,
+`tx-academicpersonsedit-plugin-profile-editing`. The groups:
+
+| Group     | For                                                | Registry, file                | Lives in                                                 |
+|-----------|----------------------------------------------------|-------------------------------|----------------------------------------------------------|
+| `action`  | something a control does: add, edit, move up, save | frontend, `FrontendIcons.php` | `academic_base`                                          |
+| `state`   | a state a control shows: visible, hidden           | frontend, `FrontendIcons.php` | `academic_base`                                          |
+| `info`    | the glyph in front of a piece of information       | frontend, `FrontendIcons.php` | `academic_base`, or the extension for a value of its own |
+| `record`  | the icon of a TCA record type (`typeicon_classes`) | backend, `Icons.php`          | the extension of the table                               |
+| `plugin`  | a content element: the CType and its wizard entry  | backend, `Icons.php`          | the extension of the plugin                              |
+| `doktype` | a page type                                        | backend, `Icons.php`          | the extension of the page type                           |
+
+**Why the group decides the registry.** The two registries do not read each
+other, see [The frontend icon registry](#the-frontend-icon-registry). An icon
+registered in both is two registrations a site has to replace twice, and one
+registered in the wrong one renders the `default-not-found` placeholder where
+it is shown. The group already says where an icon is shown: an action, a state
+and an information glyph are shown by a frontend template, a record, content
+element or page type icon by the backend. So the group is the decision, and the
+checks fail an identifier of one group in the file of the other. An info icon
+an extension needs for a value of its own lives in that extension:
+`tx-academicprograms-info-credit-points`, and the per-property icons of
+`academic-jobs`, which draw files of the shared set under identifiers of the
+extension, so a site package can replace the icon of one job property.
+
+**Why this shape.** Every part of it answers a property of both registries on
+both core versions:
+
+- **A duplicate registration wins silently.** Every package's
+  `Configuration/Icons.php` is merged into one array with `array_merge()` in
+  `AbstractServiceProvider::configureIcons()`, in the order of the active
+  packages, and `IconRegistry::registerIcon()` assigns without looking. The
+  frontend registry merges `Configuration/FrontendIcons.php` the same way.
+  Nothing throws and nothing is logged, and an `Icons.php` entry overrides even
+  a core identifier. The extension key is the only token that is unique across
+  an installation, so it is in every identifier.
+- **The key is written without underscores**, the way core derives the
+  `tx_<key>` prefix of table names. Written dashed it would be ambiguous in this
+  family: `academic_persons` with `edit-print` and `academic_persons_edit` with
+  `print` would both read `academic-persons-edit-print`. Without underscores
+  the key is exactly the second segment.
+- **`tx-` keeps us out of core's namespace.** Core names its icons
+  `<category>-<name>`, `actions-`, `content-`, `apps-` and so on, and adds new
+  ones with every release, so an `actions-*` name that is free today may be
+  taken tomorrow. `tx-` is not a core category.
+- **The identifier becomes markup.** `Icon::wrappedIcon()` emits it as the CSS
+  class `icon-<identifier>` and as `data-identifier`, for `<core:icon>` and
+  `<ab:icon>` alike. `[a-z0-9-]` gives a class a selector can name without
+  escaping, and the group keeps an `info-contract` apart from a
+  `record-contract` of the same name.
+
+### Category type identifiers
+
+`category_types.<group>.<type>` and `category_types_group.<group>` are derived
+by `typo3-category-types` from the `Configuration/CategoryTypes.yaml` of
+whichever extension declares the type or group, and registered in both
+registries, see [Registration today](#registration-today). They stay as they
+are. What the scheme governs there is the file the `icon:` key points at,
+`Icons/category-type/<name>.svg` or `Icons/category-group/<name>.svg`, or a
+file of the shared set.
+
+### Renames
+
+The consolidation renamed every identifier of the extensions apart from the
+category type and group identifiers and
+`tx-academicprograms-info-credit-points`, and registers none of the old ones
+under its old name. The backend registry could: an `Icons.php` entry takes a
+`deprecated` key (Feature #98130, since 12.0), and rendering such an
+identifier raises `E_USER_DEPRECATED`. The frontend registry
+has no such key. It was left out on purpose, because it does not carry over
+what matters. A template of ours emits the new identifier either way, so a
+project's `.icon-<old>` selector and its replacement of an old identifier stop
+working at the same moment, deprecation or not, and 3.0 is the release that
+introduced the frontend registry anyway. What an integrator has to change is in
+the `Breaking-*.rst` changelog entry about the icons of each extension, one per
+extension.
+
+## Files
+
+### Layout
+
+`Resources/Public/Icons/<group>/<name>.svg`, lowercase kebab case. The groups
+of the identifiers are directories, and so are `category-type` and
+`category-group` for the files a `CategoryTypes.yaml` names. Next to them:
+
+- `Extension.svg`, the icon of the extension manager and the TER, read as a
+  file and never registered. Every extension keeps its own.
+- `LICENSE-font-awesome.txt`, the attribution notice, see [Licence](#licence).
+- `BackendLayout.png` (partners, programs, projects), the preview of a backend
+  layout, not an icon.
+
+Several identifiers may draw one file, and that includes a file of another
+extension as long as it is a file of `academic_base`: every package in
+`packages/fgtclb/` requires `fgtclb/academic-base`, so an
+`EXT:academic_base/Resources/Public/Icons/…` source always resolves. A record
+icon that is the same glyph as a shared info icon draws the shared file rather
+than copying it. A file of any other extension would be a dependency nobody
+declared, and the checks fail it.
+
+### The shared set
+
+`academic_base` ships 38 icons in `Configuration/FrontendIcons.php`: 17
+actions, 2 states and 19 information glyphs, the files in
+`Resources/Public/Icons/{action,state,info}/`. The
+[`academic_base` manual](../../packages/fgtclb/academic-base/Documentation/Icons/Index.rst)
+lists every one with its meaning and its Font Awesome name.
+
+```bash
+grep -oE "'tx-academicbase-[a-z]+-" packages/fgtclb/academic-base/Configuration/FrontendIcons.php \
+  | sort | uniq -c
+```
+
+The shared set is the default. An action, a state or an information glyph goes
+there, even when only one extension uses it today, because the second one will,
+and a copy in each extension is how the icons drifted apart before 3.0. What
+only makes sense for one extension, its record types, its plugins, its page
+types and its category types, belongs to that extension. A site package that
+replaces a shared icon in its own `Configuration/FrontendIcons.php` replaces it
+in every extension that renders it.
+
+The set registers every glyph it ships, also where no template of ours renders
+the identifier. Templates render five of the nineteen `info` identifiers under
+their own name: `-info-email`, `-info-phone`, `-info-location`, `-info-room`
+and `-info-time`. The other fourteen stay registered on purpose, as part of the
+set a project can render and replace. The job views render identifiers of
+`academic_jobs` that draw the same files, and several files are also the
+drawings of record and category type icons, which other extensions register
+under identifiers of their own. A replacement of one of the fourteen therefore
+reaches neither the job views nor those record and category type icons.
+
+`expand` and `add` are the same drawing in two files, so a project can replace
+one without the other.
+
+### Font Awesome Free solid, and nothing else
+
+Every icon comes from `@fortawesome/fontawesome-free`, the **solid** style of
+the fixed width set `svgs-full/solid/`. The shipped files are from version
+7.3.1. One source, one style and one grid keep a row of icons in one visual
+language: regular exists in Free for a small subset only, and mixing it with
+solid, or an outline set with a filled one, is what the icons looked like
+before 3.0. The fixed width grid (`viewBox="0 0 640 640"` for every icon) keeps
+icons of different natural widths at one scale, where a natural width viewBox
+would draw a narrow glyph larger than a wide one in the same square box.
+
+Font Awesome **Pro** is never used: it is a commercial licence and does not
+cover shipping its files in a package anyone can download. Neither is a brand
+icon of the Free set, which is a trademark of its owner and only to be used
+for the brand it represents.
+
+### The house format
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="1em" height="1em" fill="currentColor"><!--! Font Awesome Free 7.3.1 by @fontawesome … --><path d="…"/></svg>
+```
+
+- `viewBox="0 0 640 640"`, as shipped in `svgs-full/`.
+- `width="1em" height="1em"`, so the icon follows the font size on a frontend
+  page, which has no stylesheet sizing `.icon svg`, see
+  [What the file has to look like](#what-the-file-has-to-look-like).
+- `fill="currentColor"` on the root element, so the icon takes the colour of
+  the text around it. The paths carry `d` only.
+- No `id`, no `class`, no `style`, no `<style>`: the markup is inlined, maybe
+  many times in one document, where an `id` must be unique and a style rule is
+  global.
+- Font Awesome's attribution comment stays in the file. It never reaches the
+  page, the sanitiser of the provider removes it, but it keeps the attribution
+  attached to a file copied out of the package, and Font Awesome asks for it.
+
+### Adding an icon
+
+1. Look for it in the shared set first.
+2. Pick the icon on fontawesome.com (Free, solid) and take its file from the
+   package, which is on npm:
+   <https://registry.npmjs.org/@fortawesome/fontawesome-free/-/fontawesome-free-7.3.1.tgz>,
+   `package/svgs-full/solid/<name>.svg`. Use the canonical name, not one of
+   the aliases of older versions that the package ships as duplicate files.
+3. Normalise it into the house format. Run from the unpacked tarball, this
+   produces the files of the shared set byte for byte:
+
+   ```bash
+   { sed -e 's#^<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">#<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="1em" height="1em" fill="currentColor">#' \
+         -e 's#<path fill="currentColor" #<path #g' \
+         package/svgs-full/solid/plus.svg; echo; } \
+     > packages/fgtclb/academic-base/Resources/Public/Icons/action/add.svg
+   ```
+
+4. List the file with its Font Awesome name in the extension's
+   `Resources/Public/Icons/LICENSE-font-awesome.txt`, creating the notice from
+   the one in `academic_base` if the extension has none yet.
+5. Register it in the file its group names, see [The scheme](#the-scheme), with
+   `CurrentColorSvgIconProvider`, and add the identifier to the extension's icon
+   test.
+
+### Licence
+
+Font Awesome Free icons are licensed CC BY 4.0, which requires attribution
+wherever the icons are shared: creator, copyright notice, licence and its URI
+with its disclaimer of warranties, a link to the material, and an indication of
+what was modified. The comment in each file does not do that on a rendered
+page, because the sanitiser removes it. Every extension that ships Font Awesome
+files therefore carries `Resources/Public/Icons/LICENSE-font-awesome.txt`:
+version, creator, copyright, licence URI, the modifications (the `fill` moved to
+the root element, `width` and `height` added, the file renamed) and every file
+it covers with its Font Awesome name. It is one notice per extension rather
+than one for the repository, because every package is split out into a
+repository of its own and released on its own, and a notice at the root of this
+repository would ship with none of them. An extension that only draws files of
+`academic_base` ships no Font Awesome file and needs no notice.
+
+Every extension that ships Font Awesome files names them in a section
+"Third-party icons" of its manual, in the same wording, and its `README.md`
+points at the notice in its licence section. The manual is where an integrator
+looks, the README is what the split repository shows.
 
 ## Registration today
 
@@ -52,11 +297,13 @@ ls packages/fgtclb/*/Configuration/FrontendIcons.php
 grep -c "'provider'" packages/fgtclb/*/Configuration/FrontendIcons.php
 ```
 
-Six packages ship a `Configuration/FrontendIcons.php`, with **45
-registrations**. `academic-base` registers one, the placeholder
-`default-not-found` with the core `SvgIconProvider`. The other 44 are frontend
-icons of five extensions, and their templates render them through `<ab:icon>`.
-No backend view renders them, so none of them is registered in `Icons.php`:
+Six packages ship a `Configuration/FrontendIcons.php`, with **83
+registrations**. `academic-base` registers 39: the placeholder
+`default-not-found` with the core `SvgIconProvider`, and the 38 icons of
+[the shared set](#the-shared-set) with `CurrentColorSvgIconProvider`. The other
+44 are frontend icons of five extensions, and their templates render them
+through `<ab:icon>`. No backend view renders them, so none of them is
+registered in `Icons.php`:
 
 - The 23 **control icons** of `academic-persons` and `academic-persons-edit`
   (ACE-812), all Bootstrap Icons with `CurrentColorSvgIconProvider`: the seven
@@ -67,8 +314,7 @@ No backend view renders them, so none of them is registered in `Icons.php`:
   `tx-academicprograms-info-credit-points`, the credit points fact of a program
   (ACE-814), with `CurrentColorSvgIconProvider`. It is the first Font Awesome
   Free 7 drawing, the first with a `LICENSE-font-awesome.txt` next to it and
-  the first identifier in the `tx-<extkey>-<group>-<name>` scheme of the icon
-  consolidation that is still in review (ACE-584 to ACE-594). Eight record
+  the first identifier in the [scheme](#the-scheme). Eight record
   icons of `academic-jobs` and `academic-persons` carry Font Awesome Free 6.4.2
   attributions.
 
@@ -187,14 +433,14 @@ icons, the TCA record icons and the flags, and its wrapper markup is styled by
 [`academic-base/Classes/`](../../packages/fgtclb/academic-base/Classes), the
 same on 13.4.35 and 14.3.7 without a version switch:
 
-| Class                                      | Role                                                                                     |
-|--------------------------------------------|------------------------------------------------------------------------------------------|
-| `Imaging\FrontendIconRegistry`             | Builds, caches and answers the registry. `@internal`, public in the container for tests. |
-| `Imaging\FrontendIconFactory`              | Creates a prepared icon, like `IconFactory::getIcon()`. `@internal`, public for tests.   |
-| `Imaging\FrontendIcon`                     | Extends core's `Icon` and overrides nothing. `@internal`.                                |
-| `Event\CollectFrontendIconsEvent`          | Lets code contribute icons while the registry is built. `@api`.                          |
-| `ViewHelpers\IconViewHelper`               | `ab:icon`, the arguments of `core:icon`. `@internal`, the tag is API.                    |
-| `EventListener\WarmUpFrontendIconRegistry` | Builds the registry on `cache:warmup`. `@internal`.                                      |
+| Class                                      | Role                                                                                   |
+|--------------------------------------------|----------------------------------------------------------------------------------------|
+| `Imaging\FrontendIconRegistry`             | Builds, caches, answers and lists the registry. `@internal`, public for tests.         |
+| `Imaging\FrontendIconFactory`              | Creates a prepared icon, like `IconFactory::getIcon()`. `@internal`, public for tests. |
+| `Imaging\FrontendIcon`                     | Extends core's `Icon` and overrides nothing. `@internal`.                              |
+| `Event\CollectFrontendIconsEvent`          | Lets code contribute icons while the registry is built. `@api`.                        |
+| `ViewHelpers\IconViewHelper`               | `ab:icon`, the arguments of `core:icon`. `@internal`, the tag is API.                  |
+| `EventListener\WarmUpFrontendIconRegistry` | Builds the registry on `cache:warmup`. `@internal`.                                    |
 
 **Discovery and merge order.** The registry dispatches
 `CollectFrontendIconsEvent` first, then requires
@@ -226,6 +472,15 @@ for group `system`, as `IconRegistry::warmupCaches()` does for the backend.
 `cache:warmup` boots the whole container first, so the listeners of the collect
 event are registered by then. The registry holds no state: each lookup is one
 `require` of an OPcache'd file.
+
+**Listing the registry.** `getAllRegisteredIconIdentifiers()` answers every
+identifier in the order the registry was built, contributed icons first, then
+the files in loading order, a replaced identifier at the place of its first
+registration. It has the name of the method of core's `IconRegistry` that
+answers the same question for the backend. The checks of the shared set and
+the orphan check of the files use it, and it is the list a page showing every
+frontend icon, or an API serving them to a script, reads instead of a list of
+its own.
 
 **Providers come from the container.** `FrontendIconFactory` resolves the
 provider as core does, `$container->has($p) ? $container->get($p) :
@@ -296,7 +551,10 @@ backend that is `--icon-color-primary: currentColor` on `.icon`, defined in
 `backend.css` on both cores, and `.icon img, .icon svg { width: 100%; height: 100% }`
 sizes both shapes the same.
 
-**Which provider when:**
+**Which provider when.** The rule is
+[`CurrentColorSvgIconProvider` for every icon](#the-rules-in-short), with
+`default-not-found` as the one exception. The reasons, per kind of icon, and
+the registrations of the extensions that still differ:
 
 - A **record or page type icon** — anything a TCA `ctrl.typeicon_classes` entry
   resolves — is drawn in `currentColor` and registered with
@@ -356,8 +614,8 @@ Inlined markup is part of the document, possibly several times, so the file is
 drawn for that: a `viewBox`, `fill="currentColor"` or `stroke="currentColor"`
 on every shape, no hardcoded colour as attribute or in a `<style>`, no `id`
 attributes (a duplicated `id` is invalid HTML), no `<script>` and no event
-handler attributes. The shipped `academic-study-plan`
-`plus.svg`/`minus.svg`/`close.svg` are the reference shape.
+handler attributes. [The house format](#the-house-format) is the reference
+shape, and every file of the shared set is in it.
 
 **Converting an existing drawing.** Most of the record icons here were not drawn
 for inlining, and three shapes recur. An Adobe Illustrator export carries
@@ -667,6 +925,72 @@ to it covers the provider's own `source` guards on both cores and the v13
 pipeline on a bare instance; the v14 pipeline cannot be built without the
 container and is measured functionally only.
 
+## The icon rules, checked
+
+The rules above are checked by assertions of the testing helper, each of which
+takes an extension key and derives the set it checks, so an icon added later
+cannot slip past a hand written list. They live in three traits, one per
+registry and one for the files, see
+[Testing helper](../testing/testing-helper.md#colourschemeawareiconstrait):
+
+| Rule                                                          | Backend registry (`ColourSchemeAwareIconsTrait`)     | Frontend registry (`FrontendIconsAssertionTrait`)           |
+|---------------------------------------------------------------|------------------------------------------------------|-------------------------------------------------------------|
+| Scheme, group of the registry, provider, file                 | `assertIconIdentifiersFollowTheNamingScheme()`       | `assertFrontendIconIdentifiersFollowTheNamingScheme()`      |
+| House format of every icon drawn from a file of the extension | `assertEveryIconOfTheExtensionIsInTheHouseFormat()`  | `assertEveryFrontendIconOfTheExtensionIsInTheHouseFormat()` |
+| House format of one identifier                                | `assertIconIsInTheHouseFormat()`                     | `assertFrontendIconIsInTheHouseFormat()`                    |
+| Every owned type names an icon of its own                     | `assertEveryTypeOfTheExtensionNamesAnIconOfItsOwn()` | –                                                           |
+
+`IconFilesAssertionTrait` adds the two checks of the files:
+`assertEveryIconFileIsRegistered()`, which fails an SVG file below
+`Resources/Public/Icons/` that no identifier of either registry draws, and
+`assertEveryIconFileIsAttributedInTheNotice()`, which fails a file without the
+Font Awesome comment, a file the notice does not list, and a listed file that
+does not exist. `Extension.svg` is exempt from both by default.
+
+What the checks accept is what the rules allow, and nothing else:
+
+- A naming check reads the extension's own file, `Icons.php` or
+  `FrontendIcons.php`, because neither registry can tell which package
+  registered what. An identifier of a group of the other registry fails, so
+  the group rule is enforced where the identifier is written down.
+- A backend icon may draw any file of the extension below
+  `Icons/<directory>/`, so a content element and its record or page type can
+  share one, or a file of the shared set. A frontend icon draws the file named
+  after it, `Icons/<group>/<name>.svg` of the extension, or a file of the
+  shared set.
+- The house format walks the registry, not the file, so it also reaches the
+  category type and group icons `typo3-category-types` registers from a
+  `CategoryTypes.yaml`, and for `academic_base` every icon another extension
+  draws from a file of the shared set.
+- The orphan check asks both registries, because a file of the shared set may
+  be drawn only by a frontend icon, only by a backend icon of another
+  extension, or only by a category type. A group icon counts like a type icon,
+  `typo3-category-types` registers it as `category_types_group.<group>`.
+- `default-not-found` of `academic_base` is exempt from the naming check and
+  from the house format walk. It is core's identifier, core's file and core's
+  provider, and a site package replaces it under that name.
+
+[`academic-base/Tests/Functional/Imaging/SharedIconsTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/SharedIconsTest.php)
+covers the shared set on both cores. Per identifier, spelled out in the test:
+in the frontend registry with `CurrentColorSvgIconProvider` and unknown to the
+backend one, drawn in `currentColor` without a hardcoded colour, `id` or
+`<style>`, in the house format, rendered under its own identifier, and rendered
+by `<ab:icon>` as core's wrapper around the inlined file, with and without
+`alternativeMarkupIdentifier="inline"` and without the attribution comment. For
+the whole set: the registered `tx-academicbase-*` identifiers equal the list in
+the test, which reads them through the list method of the frontend registry,
+and the naming, house format, orphan and notice checks pass for
+`academic_base`.
+
+[`academic-base/Tests/Functional/Imaging/IconRulesTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconRulesTest.php)
+runs every check against the fixture extension `test_icon_rules`, which uses
+every shape the rules allow: a record icon of its own and one drawn from the
+shared set, a content element and a page type sharing a file, a frontend icon
+of its own and one drawn from the shared set, a category type, a category type
+drawn from the shared set and a category group. No extension of this
+repository has all of them, and a check that rejects one of them would only
+show up in the extension that adds it.
+
 ## See also
 
 - [Core version aware code](core-version-aware-code.md) — the switch
@@ -676,4 +1000,7 @@ container and is measured functionally only.
 - [Fixture extensions](../testing/fixture-extensions.md) — the mechanism the
   provider test's icons are registered through.
 - [Testing helper](../testing/testing-helper.md): `ColourSchemeAwareIconsTrait`
-  for the backend registry, `FrontendIconsAssertionTrait` for the frontend one.
+  for the backend registry, `FrontendIconsAssertionTrait` for the frontend one,
+  `IconFilesAssertionTrait` for the files.
+- [The `academic_base` manual, Icons](../../packages/fgtclb/academic-base/Documentation/Icons/Index.rst)
+  for integrators: the shared set and how to replace one of its icons.

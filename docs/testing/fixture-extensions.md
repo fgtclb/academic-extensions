@@ -6,7 +6,7 @@ injection, a template override that TypoScript must be able to find, an
 `ext_localconf.php` that has to run during bootstrap. For those, the test ships
 a small TYPO3 extension of its own.
 
-Seventy-four such fixture extensions exist, in eleven of the twelve extensions.
+Seventy-five such fixture extensions exist, in eleven of the twelve extensions.
 That is the whole population — this is a mechanism used sparingly and only
 where nothing smaller works. Measured with
 
@@ -49,6 +49,7 @@ They sit next to the tests that use them, under
 | `test_frontend_user_sync_relations`         | `tests/test-frontend-user-sync-relations`         | `academic-persons`       | A synchronisation map assigning the organisational unit and function type.    |
 | `test_frontend_user_sync_relations_by_name` | `tests/test-frontend-user-sync-relations-by-name` | `academic-persons`       | A synchronisation map matching units by name and creating function types.     |
 | `test_hidden_content_types`                 | `tests/hidden-content-types`                      | `academic-base`          | Two content types hidden by page TSconfig, one in the academic group.         |
+| `test_icon_rules`                           | `tests/icon-rules`                                | `academic-base`          | Icons following every icon rule, in both registries and category types.       |
 | `test_job_icons`                            | `tests/job-icons`                                 | `academic-jobs`          | Job icons replaced in `FrontendIcons.php`, and without effect in `Icons.php`. |
 | `test_job_validation_override`              | `tests/job-validation-override`                   | `academic-jobs`          | A jobs `Settings.yaml` naming nine fields, a TCA override, two TCA listeners. |
 | `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |

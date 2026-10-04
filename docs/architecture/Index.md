@@ -43,17 +43,20 @@ describing an intention as if it were the state.
   whichever package provides `lib.contentElement`. On TYPO3 v14 that header
   partial needs a `record` view variable, which `lib.contentElement` supplies
   itself and an Extbase plugin view does not.
-- A **brand** icon — an extension or plugin mark — stays with the core
-  `SvgIconProvider` and keeps the colours of its file. A record, category or
-  action icon is drawn in `currentColor` and registered with the
-  `academic_base` provider that inlines it, so it follows the text colour in
-  the backend and the frontend, on the dark cards of a dark colour scheme
-  included.
+- Every icon is a **Font Awesome Free solid** icon named
+  `tx-<key without underscores>-<group>-<name>`, drawn in `currentColor` and
+  registered with the `academic_base` provider that inlines it, so it follows
+  the text colour in the backend and the frontend, on the dark cards of a dark
+  colour scheme included. A glyph several extensions show exists once, in the
+  shared set of `academic_base`.
 - The frontend has an **icon registry of its own**: `Configuration/FrontendIcons.php`
   of every package, read by `academic_base` and rendered by `ab:icon` with the
   markup of `core:icon`. It never falls back to the icon registry of TYPO3,
-  which serves the backend, and that one never reads it. An icon both render
-  is registered in both files.
+  which serves the backend, and that one never reads it. **The group decides
+  the registry**: an `action`, `state` or `info` icon is registered in
+  `FrontendIcons.php` only, a `record`, `plugin` or `doktype` icon in
+  `Icons.php` only. Category type and group icons reach both through
+  `typo3-category-types`.
 - Category types are ordered **in one place**,
   `CategoryTypeRegistry::attach()`: by priority, the highest first, and in
   declaration order where priorities are equal. No consumer sorts types, so the
@@ -155,7 +158,7 @@ describing an intention as if it were the state.
 | [Page contacts](page-contacts.md)                               | The one provider behind the contacts content element and the page contacts data processor, the event it dispatches, why it copies the contacts, and the processor identifier.                                |
 | [Subcategory matching](subcategory-matching.md)                 | How a selected category matches its subtree in the program list, why each selection is widened on its own, how a parent is offered, and the finder field.                                                    |
 | [Label overrides](label-overrides.md)                           | How a site overrides a label through `_LOCAL_LANG`, the extension name that decides the path on v13 and v14, the PHP places that hand the request on, and the title of a type without a label.               |
-| [Icons](icons.md)                                               | Where icons are registered and consumed, the frontend icon registry, the two markups, when to use the `currentColor` provider, and keeping a template's icons resolvable.                                    |
+| [Icons](icons.md)                                               | The naming scheme, the group that decides the registry, the shared set, the files and their licence, the frontend icon registry, the two markups, and the checks of the rules.                               |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                                                              |
 | [Category type order](category-type-order.md)                   | Where the priority order of category types is decided, why in the registry, what the flat list and the cache do, and which outputs follow it.                                                                |
 | [Category type identifiers](category-type-identifiers.md)       | Why an identifier is unique across groups, where the loader checks it, the renamed projects department and the command that moves its categories.                                                            |

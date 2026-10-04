@@ -1,0 +1,14 @@
+Font Awesome Free icons
+=======================
+
+The SVG files listed below are icons of Font Awesome Free 7.3.1
+by Fonticons, Inc. - https://fontawesome.com, licensed under the Creative
+Commons Attribution 4.0 International license (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+
+File (below Resources/Public/Icons/)  Font Awesome icon (solid)
+  action/sort.svg              arrow-up
+  category-group/rules.svg     user-tag
+  category-type/topic.svg      graduation-cap
+  plugin/items.svg             link
+  record/item.svg              circle-info

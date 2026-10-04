@@ -168,9 +168,10 @@ on `main` and was not backported wholesale:
 | `ActiveFiltersAssertionTrait`          | yes    | no  |
 | `StaticTemplateTypoScriptTrait`        | yes    | yes |
 | `FrontendIconsAssertionTrait`          | yes    | no  |
+| `IconFilesAssertionTrait`              | yes    | no  |
 | `LabelReferencesResolveTestsTrait`     | yes    | yes |
 
-All sixteen live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`
+All seventeen live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`
 on `main`; branch `2` has eight of them. `StaticTemplateTypoScriptTrait` came
 with the backport of ACE-745, `LabelReferencesResolveTestsTrait` with ACE-853 on
 branch `2` and ACE-877 on `main`. `StaticTemplateTypoScriptTrait` exists on

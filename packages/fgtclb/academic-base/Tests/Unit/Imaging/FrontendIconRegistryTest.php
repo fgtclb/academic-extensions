@@ -146,6 +146,43 @@ final class FrontendIconRegistryTest extends UnitTestCase
         $subject->isRegistered('example-phone');
     }
 
+    /**
+     * Contributed icons first, then the files in loading order, a replaced identifier
+     * at the place of its first registration, and nothing a normalisation skipped.
+     */
+    #[Test]
+    public function allRegisteredIconIdentifiersAreListedInRegistrationOrder(): void
+    {
+        $subject = $this->subject(['first', 'skipping', 'second'], $this->dispatcherContributing('example-contributed'));
+
+        $this->assertSame(
+            ['example-contributed', 'example-phone', 'example-only-first', 'example-kept'],
+            $subject->getAllRegisteredIconIdentifiers(),
+        );
+    }
+
+    #[Test]
+    public function aCachedEntryIsListedWithoutBuilding(): void
+    {
+        $cache = $this->createMock(PhpFrontend::class);
+        $cache->method('require')->willReturn([
+            'example-cached' => ['provider' => SvgIconProvider::class, 'options' => ['source' => 'cached.svg']],
+            'example-also-cached' => ['provider' => SvgIconProvider::class, 'options' => ['source' => 'also.svg']],
+        ]);
+        $cache->expects($this->never())->method('set');
+        $packageManager = $this->createMock(PackageManager::class);
+        $packageManager->expects($this->never())->method('getActivePackages');
+
+        $subject = new FrontendIconRegistry(
+            $cache,
+            $packageManager,
+            $this->dispatcherContributing(null),
+            new PackageDependentCacheIdentifier($this->packageManagerWithCacheIdentifier('packages')),
+        );
+
+        $this->assertSame(['example-cached', 'example-also-cached'], $subject->getAllRegisteredIconIdentifiers());
+    }
+
     #[Test]
     public function aCachedEntryIsReturnedWithoutBuilding(): void
     {
