@@ -155,6 +155,6 @@
   `checkRstRenderingAll` green.
 - [x] 7.4 `docs/` is updated, and `README.md` and `CONTRIBUTING.md` still only
   summarize.
-- [ ] 7.5 Commit as `[!!!][TASK] ACE-<NNN>: Move jobs and study plan icons`
+- [x] 7.5 Commit as `[!!!][TASK] ACE-<NNN>: Move jobs and study plan icons`
   in TYPO3 Core format, with a verified key and no attribution, and archive the
   change as the last commit of the pull request.
