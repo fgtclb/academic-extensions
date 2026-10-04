@@ -241,10 +241,9 @@ extension in the mono repository in one run — twelve of them under
 `packages/fgtclb/` today — and would pick up another vendor directory as well.
 The second collects `packages-dev/`, where all three packages carry tests of
 their own: the seed definition of `packages-dev/dev-site`, the scripts behind
-`runTests.sh -j` in `packages-dev/testing-helper`, and the `ext_emconf.php`
-dependency key check, the extension name check of translations, the
-extension point checks, the customer issue key check and the check of the
-manual links in `packages-dev/monorepo-shared`.
+`runTests.sh -j` in `packages-dev/testing-helper`, and the repository checks of
+`packages-dev/monorepo-shared`, which
+[Discovery](../testing/unit-tests.md#discovery) of the unit tests page lists.
 
 **There is no per-extension PHPUnit configuration**, and adding one would be a
 step backwards: the extensions depend on each other, and a test suite that only

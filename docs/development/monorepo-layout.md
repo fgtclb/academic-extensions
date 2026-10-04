@@ -54,12 +54,10 @@ Three packages that are never released as extensions and never shipped to an
 installation:
 
 - `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`, type
-  `library`. It centralizes the TYPO3 core dependency constraints, and checks
-  the `ext_emconf.php` dependency keys of every extension, the extension name
-  of every translation, in templates and in PHP, and the extension point
-  policy: final and used event classes, final plugin controllers, and the
-  `@api` tags against the page that lists them. It also keeps the issue keys
-  of customer projects out of the sources of this public repository.
+  `library`. It centralizes the TYPO3 core dependency constraints, and its
+  unit tests check the whole repository at once, which a split extension
+  cannot. [Discovery](../testing/unit-tests.md#discovery) of the unit tests
+  page lists the checks.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`,
   type `library`. Shared functional-test traits.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key
@@ -317,15 +315,9 @@ The lower bound of each range is the latest patch release when it was last
 raised (ACE-471). Adding a system extension for a test only needs it added
 here.
 
-Its `Tests/Unit/` holds the checks that concern all extensions at once: every
-key an `ext_emconf.php` names in `depends`, `suggests` or `conflicts` has to
-name an extension that exists, every translation, in a template or in PHP,
-has to name its extension without an underscore, the event classes and the
-plugin controllers have to follow the extension point policy and the `@api`
-tags have to match the extension points page, no file may name an issue key of
-a customer project, and the links of every manual have to lead to its own
-package. See
-[Unit tests](../testing/unit-tests.md#the-ext_emconfphp-dependency-keys).
+Its `Tests/Unit/` holds the checks that concern all extensions at once.
+[Discovery](../testing/unit-tests.md#discovery) of the unit tests page lists
+them and links the section of each.
 
 ### Raising the supported core patch level
 

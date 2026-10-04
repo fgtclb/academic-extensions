@@ -513,8 +513,8 @@ The rule below holds for both view helpers. `<core:icon>` and `<ab:icon>` never
 fail on an unknown identifier, both factories answer with the
 `default-not-found` placeholder — the small red "broken" icon — and the
 identifier that was asked for is gone from the markup. A renamed registration
-or a typo in a template therefore ships silently. The one test that guards
-against it is
+or a typo in a template therefore ships silently. The model of a rendering
+test that guards against it is
 [`academic-study-plan/Tests/Functional/ContentElement/AcademicStudyPlanContentElementTest.php`](../../packages/fgtclb/academic-study-plan/Tests/Functional/ContentElement/AcademicStudyPlanContentElementTest.php),
 `contentElementRendersOnlyResolvableIcons()`:
 
@@ -545,6 +545,17 @@ one more contract: the shipped stylesheet switches them through the
 `icon-academic-study-plan-plus` and `-minus` classes of their wrappers, which
 `contentElementGivesTheGlyphsTheClassesTheStylesheetSelects()` asserts in every
 semester header.
+
+These mistakes are caught for every literal identifier before anything is
+rendered. `FrontendTemplateIconTest` of `packages-dev/monorepo-shared` fails a
+`unit` run, with file and line, for a frontend template that renders an icon
+through a core icon ViewHelper, and for an identifier a template passes
+literally to `<ab:icon>` that no `Configuration/FrontendIcons.php` and no
+category type or group of the repository registers. It reads the files and
+boots no TYPO3, so it covers every literal identifier of every template, also
+in the branches no fixture reaches. An identifier built from a variable stays
+with the rendering tests. See
+[Unit tests](../testing/unit-tests.md#icons-of-frontend-templates).
 
 The registry is asserted on its own beside that:
 [`academic-persons/Tests/Functional/Imaging/PublicProfileIconsTest.php`](../../packages/fgtclb/academic-persons/Tests/Functional/Imaging/PublicProfileIconsTest.php)
