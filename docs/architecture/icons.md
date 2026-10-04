@@ -617,6 +617,30 @@ provider class nor a parent of one: the wrapper of core's `Icon`,
 `FrontendIcon`, the `enshrined/svg-sanitize` library. `getVersion()` stats
 files and reads none.
 
+**The factory.** `@fgtclb/academic-base/frontend/icons.js`, the first
+TypeScript module of `academic_base`, published through its
+`Configuration/JavaScriptModules.php` for the `frontend/` prefix only, is the
+client half, modelled on core's `@typo3/backend/icons.js`. `IconFactory`
+answers `getIcon()`, `getIconElement()` and `prefetch()` from every JSON map of
+the document first, read lazily on a miss so a map inserted later counts, and
+asks the endpoint `endpointFrom(root)` names for the rest. The calls of one
+microtask become one request per endpoint and size, sorted by identifier and
+split at 32, so a set of icons always has one URL and one cache entry. One
+promise per icon and size lives at module level for the page, shared by every
+factory, which is why the maps are read from the whole document and not from
+the root of a factory. The first map that carries an icon wins. A left-out
+identifier rejects and stays rejected unless a map read later carries it: the
+maps are read again before a refusal is handed out or cached. A failed request
+rejects and is retried on the next call. An identifier that does not match
+the server's pattern rejects at once and is never sent, because the endpoint
+answers a request with one malformed entry with 400 as a whole. Requests go
+out with `credentials: 'omit'` and are aborted after ten seconds. No
+`localStorage`: the browser cache holds the immutable answer, and web storage
+would be one more place injected script could plant markup.
+`Tests/JavaScript/icons.test.ts` reads `IDENTIFIER_PATTERN` and
+`MAX_IDENTIFIERS` out of the PHP sources and fails when the module drifts from
+them.
+
 The functional tests load the fixture `test_frontend_icon_api`, which replaces
 a shared icon, registers the category type and group identifier shapes and one
 icon per provider to serve or refuse, see

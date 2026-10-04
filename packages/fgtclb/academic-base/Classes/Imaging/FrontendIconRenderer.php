@@ -60,7 +60,7 @@ final readonly class FrontendIconRenderer
 
     /**
      * `\A` and `\z` rather than `^` and `$`: `$` also matches before a trailing line
-     * feed.
+     * feed. The TypeScript icon factory of this extension carries the same pattern.
      */
     public const IDENTIFIER_PATTERN = '/\A[a-z0-9_][a-z0-9_.-]{0,99}\z/';
 

@@ -97,6 +97,10 @@ What is public API
     parameters, the JSON object it answers, its status codes and its caching
     headers, see :ref:`icons-frontend-endpoint`. The middleware behind it is
     not public API.
+*   The JavaScript module ``@fgtclb/academic-base/frontend/icons.js`` of
+    :guilabel:`academic_base` and its exports, :js:`IconFactory`,
+    :js:`endpointFrom()`, :js:`Sizes`, :js:`Size`, :js:`IconEndpoint` and
+    :js:`IDENTIFIER_PATTERN`, see :ref:`icons-frontend-factory`.
 *   The view helper ``ct:categoryTypeTitle`` of :guilabel:`category_types`,
     by tag name and arguments, which names a category type in a template by
     its registered title, see `naming a type in a template
