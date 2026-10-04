@@ -26,9 +26,13 @@ keeps the core provider.
 Impact
 ======
 
-The four icons reach the **frontend**, through
-:html:`<core:icon identifier="category_types.projects.{type}" />` in
-:file:`Pages/AcademicProject.html` and :file:`Partials/Project/Item.html`.
+The four icons reach the **frontend**, through the icon ViewHelper of
+:guilabel:`academic_base`,
+:html:`<ab:icon identifier="category_types.projects.{type}" />`, in
+:file:`Partials/Project/Page/Categories.html` and
+:file:`Partials/Project/Item.html`. :guilabel:`category_types` registers them
+in the frontend icon registry as well, with the same provider, see
+:ref:`important-projects-category-icons-come-from-the-frontend-icon-registry`.
 Neither call asks for the `inline` markup, so their rendered markup changes: an
 :html:`<img>` of a fixed pixel size becomes an inlined :html:`<svg>` with
 :html:`width="1em" height="1em"`, which follows the font size and the colour of

@@ -2,7 +2,7 @@
     lang="en"
     xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
     xmlns:ct="http://typo3.org/ns/FGTCLB/CategoryTypes/ViewHelpers"
-    xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+    xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"
     data-namespace-typo3-fluid="true"
 >
 
@@ -39,7 +39,7 @@
                 <f:for each="{project.attributes.allCategoriesByType}" as="attributes" key="category">
                     <f:if condition="{attributes}">
                         <li class="list-group-item">
-                            <core:icon identifier="category_types.projects.{category}"/>
+                            <ab:icon identifier="category_types.projects.{category}"/>
 
                             <b>
                                 {f:translate(

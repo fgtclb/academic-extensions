@@ -687,8 +687,8 @@ done; the trait is used by one test class today.
 
 Four assertions for one icon identifier, plus one that derives the whole set
 from the TCA. Used by the `Tests/Functional/Imaging/RecordIconsTest.php` of every
-extension that ships record icons, by the category type registration test of
-`typo3-category-types` and by the `FactIconsTest.php` of `academic-programs`:
+extension that ships record icons and by the category type registration test
+of `typo3-category-types`:
 
 ```php
 use ColourSchemeAwareIconsTrait;
@@ -747,8 +747,8 @@ Used by the registry tests of `academic-base`, by the category type icon tests
 of `typo3-category-types`, `academic-partners`, `academic-programs` and
 `academic-projects`, by the control icon tests of `academic-persons` and
 `academic-persons-edit`, by the job and control icon tests of `academic-jobs`
-and `academic-study-plan`, and meant for the tests of the extensions that move
-their frontend icons there:
+and `academic-study-plan`, and by the credit points icon test of
+`academic-programs`:
 
 ```php
 use FrontendIconsAssertionTrait;

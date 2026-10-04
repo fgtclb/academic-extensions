@@ -20,10 +20,10 @@ v14.
 - **AND** the category type select of a category record shows the icon
 
 #### Scenario: A shipped type without a frontend icon
-- **WHEN** a project carries a category of the shipped type
-  `competence_field` and no site package replaces its icon
+- **WHEN** a project carries a category of the shipped type `cooperation` and
+  no site package replaces its icon
 - **THEN** the project page and the project card show the icon the extension
-  declares for the competence field
+  declares for the cooperation
 
 #### Scenario: A site package replaces a shipped type icon for the frontend
 - **WHEN** a site package registers its own drawing for

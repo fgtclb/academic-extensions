@@ -11,10 +11,10 @@ were read off the files named beside them.
 ## Registration today
 
 There are two registries. The icon registry of TYPO3 reads
-`Configuration/Icons.php` and serves the backend and the frontend templates
-that still render `<core:icon>`. The frontend icon registry of `academic_base`
-reads `Configuration/FrontendIcons.php` and serves `<ab:icon>`, see
-[The frontend icon registry](#the-frontend-icon-registry). Neither reads the
+`Configuration/Icons.php` and serves the backend, and a template override that
+still renders `<core:icon>` in the frontend. The frontend icon registry of
+`academic_base` reads `Configuration/FrontendIcons.php` and serves `<ab:icon>`,
+see [The frontend icon registry](#the-frontend-icon-registry). Neither reads the
 other.
 
 ```bash
@@ -25,8 +25,8 @@ grep -c "'provider' => CurrentColorSvgIconProvider" \
   packages/fgtclb/*/Configuration/Icons.php
 ```
 
-Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **27
-registrations in total: 7 with the core `SvgIconProvider` and 20 with
+Eight of the twelve extension packages ship a `Configuration/Icons.php`, with **26
+registrations in total: 7 with the core `SvgIconProvider` and 19 with
 `CurrentColorSvgIconProvider`**:
 
 | Package                  | Registrations | `CurrentColorSvgIconProvider` |
@@ -38,18 +38,11 @@ registrations in total: 7 with the core `SvgIconProvider` and 20 with
 | `academic-contact4pages` | 4             | 2                             |
 | `academic-partners`      | 3             | 3                             |
 | `academic-bite-jobs`     | 1             | –                             |
-| `academic-programs`      | 2             | 2                             |
+| `academic-programs`      | 1             | 1                             |
 
-The 20 are of two kinds. Nineteen are **record icons**:
-every identifier a TCA record type resolves through `ctrl.typeicon_classes`,
-including the two page type icons `academic-partners` and `academic-programs`
-(ACE-523). One is a frontend icon of a value that is no record:
-`tx-academicprograms-info-credit-points`, the credit points fact of a program.
-It is the first Font Awesome Free 7 drawing and the first with a
-`LICENSE-font-awesome.txt` next to it - eight record icons of `academic-jobs`
-and `academic-persons` carry Font Awesome Free 6.4.2 attributions - and the
-first identifier in the `tx-<extkey>-<group>-<name>` scheme of the icon
-consolidation that is still in review (ACE-584 to ACE-594).
+The 19 are **record icons**: every identifier a TCA record type resolves
+through `ctrl.typeicon_classes`, including the two page type icons
+`academic-partners` and `academic-programs` (ACE-523).
 
 `academic-base`, `academic-projects`, `academic-persons-sync` and the three
 `packages-dev/` packages register nothing there.
@@ -59,10 +52,10 @@ ls packages/fgtclb/*/Configuration/FrontendIcons.php
 grep -c "'provider'" packages/fgtclb/*/Configuration/FrontendIcons.php
 ```
 
-Five packages ship a `Configuration/FrontendIcons.php`, with **44
+Six packages ship a `Configuration/FrontendIcons.php`, with **45
 registrations**. `academic-base` registers one, the placeholder
-`default-not-found` with the core `SvgIconProvider`. The other 43 are frontend
-icons of four extensions, and their templates render them through `<ab:icon>`.
+`default-not-found` with the core `SvgIconProvider`. The other 44 are frontend
+icons of five extensions, and their templates render them through `<ab:icon>`.
 No backend view renders them, so none of them is registered in `Icons.php`:
 
 - The 23 **control icons** of `academic-persons` and `academic-persons-edit`
@@ -70,6 +63,14 @@ No backend view renders them, so none of them is registered in `Icons.php`:
   of the public profile and the sixteen of the profile editing view.
 - The 17 `academic_jobs-*` icons of the job views and the three controls of
   `academic-study-plan` (ACE-813), with the core `SvgIconProvider`, see below.
+- The icon of a value that is no record,
+  `tx-academicprograms-info-credit-points`, the credit points fact of a program
+  (ACE-814), with `CurrentColorSvgIconProvider`. It is the first Font Awesome
+  Free 7 drawing, the first with a `LICENSE-font-awesome.txt` next to it and
+  the first identifier in the `tx-<extkey>-<group>-<name>` scheme of the icon
+  consolidation that is still in review (ACE-584 to ACE-594). Eight record
+  icons of `academic-jobs` and `academic-persons` carry Font Awesome Free 6.4.2
+  attributions.
 
 `typo3-category-types` contributes every category type and group icon from
 code, see below.
@@ -122,9 +123,9 @@ it as an image, while a new `icon` keeps the earlier `inlineIcon`, the rule of
 ACE-523. Since the event entries come before the files, a
 `Configuration/FrontendIcons.php` of a site package replaces a category type
 icon in the frontend whatever the loading order, which `Icons.php` cannot do in
-the backend. The templates still render these icons with `<core:icon>`, from
-the backend registry, until the templates of partners, programs and projects
-switch to `<ab:icon>`.
+the backend. The frontend templates of partners, programs and projects render
+these icons with `<ab:icon>` (ACE-814), the page module summary of
+`typo3-category-types`, a backend view, with `<core:icon>`.
 
 ### Where the identifiers are consumed
 
@@ -141,41 +142,38 @@ by `default-not-found` — and through
 `category-types/Resources/Private/Templates/PageCategorySummary.html`, which
 draws both the category type icon and the core `overlay-hidden` overlay.
 
-The frontend consumes them through `<core:icon>` as well, except the icons of
-`academic-persons`, `academic-persons-edit`, `academic-jobs` and
-`academic-study-plan`, which their templates render through `<ab:icon>`.
-`core` is a global Fluid namespace on both core versions, through
-`SYS.fluid.namespaces` of `cms-core/Configuration/DefaultConfiguration.php` on
-v13 and through `cms-core/Configuration/Fluid/Namespaces.php` on v14, where the
-setting is empty by default since 14.1. Its ViewHelper therefore needs no
-`xmlns` declaration in a frontend template, and it is byte identical on
-13.4.34 and 14.3.6. Which markup a template
-gets depends on one argument. The `<core:icon>` tags left in frontend templates
-all go without it, the `<ab:icon>` tags are split on it, see the paragraph
-below the table:
+The frontend consumes them through `<ab:icon>` only. Since ACE-814 no frontend
+template of the extensions renders `<core:icon>`. A template override of a site
+may still do so: `core` is a global Fluid namespace on both core versions,
+through `SYS.fluid.namespaces` of `cms-core/Configuration/DefaultConfiguration.php`
+on v13 and through `cms-core/Configuration/Fluid/Namespaces.php` on v14, where
+the setting is empty by default since 14.1. Its ViewHelper therefore needs no
+`xmlns` declaration, and it is byte identical on 13.4.34 and 14.3.6. It reads
+the backend registry, so an override on it shows the placeholder for an icon
+of `FrontendIcons.php`, and the backend drawing for a category type icon.
 
-A `<core:icon>` is regularly written across several lines, so the argument has
-to be counted per tag rather than per line:
+Which markup a template gets depends on one argument,
+`alternativeMarkupIdentifier="inline"`. An `<ab:icon>` is regularly written
+across several lines, so the argument has to be counted per tag rather than per
+line:
 
 ```bash
-grep -rl "<core:icon" packages/fgtclb/*/Resources/Private --include=*.html \
-  | grep -v /Backend/ \
-  | xargs perl -0777 -ne 'while (/<core:icon\b[^>]*>/gs) {
+grep -rl "<ab:icon" packages/fgtclb/*/Resources/Private --include=*.html \
+  | xargs perl -0777 -ne 'while (/<ab:icon\b[^>]*>/gs) {
       print /alternativeMarkupIdentifier="inline"/ ? "inline\t$ARGV\n" : "default\t$ARGV\n" }' \
   | sort | uniq -c
 ```
 
-| Extension               | `alternativeMarkupIdentifier="inline"`   | Without (default markup)                                        |
-|-------------------------|------------------------------------------|-----------------------------------------------------------------|
-| `academic-partners`     | —                                        | 4 files, `category_types.partners.*` only                       |
-| `academic-programs`     | —                                        | `Program/Facts/Item.html`, `category_types.*` and credit points |
-| `academic-projects`     | —                                        | `Project/Page/Categories.html`, `Project/Item.html`             |
+| Extension               | `alternativeMarkupIdentifier="inline"` | Without (default markup)                                                    |
+|-------------------------|----------------------------------------|-----------------------------------------------------------------------------|
+| `academic-persons-edit` | 35 in 13 files                         | –                                                                           |
+| `academic-persons`      | 7 in 2 files                           | –                                                                           |
+| `academic-study-plan`   | 3 in 2 files                           | –                                                                           |
+| `academic-jobs`         | –                                      | 4 in `Job/Item.html`, `Job/Information.html` and `Job/Contact.html`         |
+| `academic-partners`     | –                                      | 4 in 4 files, `category_types.partners.*` only                              |
+| `academic-programs`     | –                                      | 1 in `Program/Facts/Item.html`, `category_types.*` and credit points        |
+| `academic-projects`     | –                                      | 2 in `Project/Page/Categories.html` and `Project/Item.html`                 |
 
-The same command with `ab:icon` counts the tags of the frontend registry: 35
-in 13 files of `academic-persons-edit`, 7 in 2 files of `academic-persons` and
-3 in 2 files of `academic-study-plan`, all with
-`alternativeMarkupIdentifier="inline"`, and 4 in 3 files of `academic-jobs`
-without it, `Job/Item.html`, `Job/Information.html` and `Job/Contact.html`.
 They switched from `<core:icon>` with every argument kept, so the markup is the
 one they had, and 32 of the 35 of `academic-persons-edit` still pass
 `size="small"`, the default of the argument.
@@ -304,9 +302,10 @@ sizes both shapes the same.
   resolves — is drawn in `currentColor` and registered with
   `CurrentColorSvgIconProvider`. The record list, the page tree and FormEngine
   all take the *default* markup, so an `<img>` there keeps the ink of its file
-  on the dark cards of a dark backend colour scheme. That is 19 of the 20
-  registrations in `Icons.php` today, plus the 20 programmatic
-  `category_types.*` ones that ask for it with `inlineIcon: true` (ACE-523).
+  on the dark cards of a dark backend colour scheme. That is all 19
+  `CurrentColorSvgIconProvider` registrations in `Icons.php` today, plus the 20
+  programmatic `category_types.*` ones that ask for it with `inlineIcon: true`
+  (ACE-523).
 - An **action or control icon** — an arrow, a pencil, a bin, a fold-out chevron —
   is registered the same way, for the same reason: it follows the text colour,
   with or without the `inline` argument. That is 23 registrations, all
@@ -317,7 +316,7 @@ sizes both shapes the same.
   profile editing view.
 - An **icon of a value** in the frontend is registered the same way, so it takes
   the colour of the text it stands in: `tx-academicprograms-info-credit-points`,
-  the last of the 20 in `Icons.php`.
+  in `FrontendIcons.php` since ACE-814.
 - Everything else stays with the core `SvgIconProvider`. In `Icons.php` that is
   7 registrations: six **brand icons**, the plugin and extension marks
   `academic_jobs_icon`, `persons_icon`, `persons_edit_icon`, `bitejobs_list`,
@@ -604,7 +603,10 @@ test without anyone remembering to extend a list.
 
 The one icon of a value, the credit points fact, has no record type behind it
 and therefore no TCA assertion: `academic-programs/Tests/Functional/Imaging/FactIconsTest.php`
-asserts it with the first three methods of the same trait.
+asserts it through `FrontendIconsAssertionTrait`, with `CurrentColorSvgIconProvider`
+and the shipped file in the frontend registry, inlined in both markups, drawn in
+`currentColor`, rendered under its own identifier and unknown to the backend
+registry, and the page type icon `academic-programs` the other way round.
 
 The programmatic registration is covered separately, in
 [`typo3-category-types/Tests/Functional/Imaging/CategoryTypeIconsTest.php`](../../packages/fgtclb/typo3-category-types/Tests/Functional/Imaging/CategoryTypeIconsTest.php),
@@ -627,7 +629,19 @@ frontend file of its own, the group `group` next to a group named like one of
 its types, and a `Configuration/FrontendIcons.php` replacing one type icon in
 the frontend only. The `RecordIconsTest` of partners, programs and projects
 asserts every shipped type icon in both registries with the `currentColor`
-provider, through `FrontendIconsAssertionTrait`.
+provider, through `FrontendIconsAssertionTrait`. The templates that render them
+are covered per extension, against the fixture extensions
+`test_programs_frontend_icons`, `test_partners_frontend_icons` and
+`test_projects_frontend_icons`: `ProgramFactsFrontendIconsTest` on the program
+page, in the details content element and on the card, and the
+`CategoryTypeFrontendIconsTest` of partners, on the partner page, the partner
+card, the partnerships list and teaser, and of projects, on the project page
+and card. Each fixture replaces a shipped type icon in its
+`FrontendIcons.php` and declares a type with a separate `frontendIcon`, and the
+tests assert the frontend drawing in every place, the absence of the backend
+drawing, a shipped type nobody replaces, and the declared `icon` still in the
+backend registry. The programs fixture also replaces the credit points icon in
+both files, so its `Icons.php` entry has to stay out of the facts.
 
 The provider itself is covered the same way it is used:
 [`academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Imaging/IconProvider/CurrentColorSvgIconProviderTest.php)

@@ -111,7 +111,11 @@ partials existed too; the published classes, a category title escaped once and
 the rich text rendered raw are asserted on their own.
 `Tests/Unit/Service/ProgramFactsBuilderTest.php` covers the list rules, a type
 order that is not the registry's included, and
-`Tests/Functional/Imaging/FactIconsTest.php` the credit points icon.
+`Tests/Functional/Imaging/FactIconsTest.php` the credit points icon, a frontend
+icon (ACE-814). `Tests/Functional/Facts/ProgramFactsFrontendIconsTest.php`
+renders the three places with a site package that replaces the credit points
+and the degree icon in its `FrontendIcons.php` and declares a type with a
+`frontendIcon`, and asserts the frontend drawings in every place.
 `Tests/Functional/Facts/ProgramFactsMostSpecificCategoryTest.php` renders the
 three places with a parent and a child degree assigned, with the setting off
 and on, as a constant and as a site setting, renders a translated program page,

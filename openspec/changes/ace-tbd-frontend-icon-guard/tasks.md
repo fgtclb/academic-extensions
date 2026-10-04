@@ -1,15 +1,15 @@
 ## 1. Verify the premises
 
-- [ ] 1.1 On `main` after `ace-tbd-persons-frontend-icons`,
-  `ace-tbd-jobs-study-plan-frontend-icons` and
-  `ace-tbd-programs-partners-projects-frontend-icons` are merged, confirm
+- [ ] 1.1 On `main` after `ace-812-persons-frontend-icons`,
+  `ace-813-jobs-study-plan-frontend-icons` and
+  `ace-814-programs-partners-projects-frontend-icons` are merged, confirm
   with a scan over `packages/fgtclb/*/Resources/Private/**/*.html` that
   `typo3-category-types/Resources/Private/Templates/PageCategorySummary.html`
   is the only file with a core icon ViewHelper outside `<f:comment>`, in tag
   and inline notation. Confirm from the merged
-  `ace-tbd-frontend-icon-registry` the namespace URI of the frontend icon
+  `ace-810-frontend-icon-registry` the namespace URI of the frontend icon
   ViewHelper, its tag name and the names of its `identifier` and `overlay`
-  arguments, and from `ace-tbd-category-type-frontend-icons` the identifier
+  arguments, and from `ace-811-category-type-frontend-icons` the identifier
   forms category_types contributes to the frontend registry (types, and
   groups if any). If anything differs from `design.md`, stop and update this
   change.
@@ -68,7 +68,7 @@
   `monorepo-shared` checks with a link to *Discovery* of
   `docs/testing/unit-tests.md`.
 - [ ] 4.4 `docs/architecture/icons.md`: in the section on keeping a
-  template's icons resolvable, as `ace-tbd-frontend-icon-registry` left it, a
+  template's icons resolvable, as `ace-810-frontend-icon-registry` left it, a
   paragraph naming the check and linking its section.
 - [ ] 4.5 No changelog entry: nothing an installation observes changes, and
   `packages-dev/monorepo-shared` is never released.

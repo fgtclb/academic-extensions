@@ -1,7 +1,7 @@
 ## Why
 
-`ace-tbd-frontend-icon-registry` adds a frontend icon registry and its icon
-ViewHelper to `academic_base`, and `ace-tbd-category-type-frontend-icons`
+`ace-810-frontend-icon-registry` adds a frontend icon registry and its icon
+ViewHelper to `academic_base`, and `ace-811-category-type-frontend-icons`
 registers every category type icon in it. Seven frontend partials of three
 extensions still render their icons from the backend icon registry of TYPO3
 through `core:icon`, so a frontend icon a site package registers never reaches
@@ -71,5 +71,5 @@ None.
   type and is switched to see a frontend only replacement. An analysed project
   that registers its own credit points identifier for its own override is not
   affected.
-- Depends on `ace-tbd-frontend-icon-registry` and
-  `ace-tbd-category-type-frontend-icons`. 3.0.0, `main` only.
+- Depends on `ace-810-frontend-icon-registry` and
+  `ace-811-category-type-frontend-icons`. 3.0.0, `main` only.

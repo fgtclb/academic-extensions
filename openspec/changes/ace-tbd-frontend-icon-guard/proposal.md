@@ -1,9 +1,9 @@
 ## Why
 
-After `ace-tbd-persons-frontend-icons`, `ace-tbd-jobs-study-plan-frontend-icons`
-and `ace-tbd-programs-partners-projects-frontend-icons`, every frontend template
+After `ace-812-persons-frontend-icons`, `ace-813-jobs-study-plan-frontend-icons`
+and `ace-814-programs-partners-projects-frontend-icons`, every frontend template
 renders its icons through the frontend icon registry of
-`ace-tbd-frontend-icon-registry`, and the core icon registry serves the
+`ace-810-frontend-icon-registry`, and the core icon registry serves the
 backend only. Nothing keeps it that way. A template that uses `core:icon`
 again still renders, from the backend registry the round decouples from, or
 as the `default-not-found` placeholder. The same placeholder answers an
