@@ -20,18 +20,18 @@
                         and whose labels "create.required" and the error messages of
                         "Academic/Form/ErrorMessage" are read.
 
-    The field partials mark a field that failed validation with "is-invalid" and point
+    The field partials mark a field that failed validation with "change-me" and point
     "aria-describedby" to the element "<elementId>-error", which holds its messages. It
-    follows the field as its sibling, so a Bootstrap theme shows it with
-    ".is-invalid ~ .invalid-feedback".
+    follows the field as its sibling.
 </f:comment>
 
 <f:variable name="validation" value="{p:validationEnsure(validations: element.validations, identifier: element.identifier)}"/>
 
 <f:form.validationResults for="{elementId}" as="validationResults">
-    <div class="{f:if(condition:'{validationResults.flattenedErrors}', then:' is-invalid')} {class}">
-        <label class="form-label" for="{elementId}">
+    <div class="{f:if(condition:'{validationResults.flattenedErrors}', then:'change-me')} {class}">
+        <label for="{elementId}">
             {f:translate(key:'create.{elementId}.label', extensionName: extensionName)}
+
             <f:if condition="{validation.required}">
                 <abbr title="{f:translate(key: 'create.required', default: 'required', extensionName: extensionName)}">*</abbr>
             </f:if>
@@ -40,7 +40,7 @@
         {elementContent->f:format.raw()}
 
         <f:if condition="{validationResults.flattenedErrors}">
-            <div id="{elementId}-error" class="invalid-feedback">
+            <div id="{elementId}-error">
                 <f:for each="{validationResults.flattenedErrors}" as="errors">
                     <f:for each="{errors}" as="error">
                         <div>
@@ -55,7 +55,7 @@
         </f:if>
 
         <f:if condition="{element.help}">
-            <div class="form-text">{element.help->f:format.raw()}</div>
+            <div>{element.help->f:format.raw()}</div>
         </f:if>
     </div>
 </f:form.validationResults>

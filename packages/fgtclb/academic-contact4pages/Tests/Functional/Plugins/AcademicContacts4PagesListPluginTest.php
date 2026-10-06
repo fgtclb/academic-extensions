@@ -140,7 +140,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $document = new \DOMDocument();
         $document->loadHTML($content, LIBXML_NOERROR);
         $headings = [];
-        foreach ($this->nodes(new \DOMXPath($document), "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages ')]//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6][not(@class) or normalize-space(@class) = '']") as $heading) {
+        foreach ($this->nodes(new \DOMXPath($document), "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6][not(@class) or normalize-space(@class) = '']") as $heading) {
             $headings[] = trim($heading->textContent);
         }
 
@@ -490,7 +490,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $content = $this->renderHomePage();
         $this->assertSame(['Dean\'s Office', 'Student Advisors'], $this->roleHeadings($content));
         $this->assertSame(['Müllermann', 'Nebenan', 'Huber', 'Beispiel'], $this->renderedLastNames($content));
-        $this->assertStringNotContainsString('academic-contacts4pages__role', $content);
+        $this->assertSame(0, $this->countRoleParagraphs($content));
     }
 
     /**
@@ -538,9 +538,10 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $xpath = new \DOMXPath($document);
         $roleOfContact = [];
         // One grid column per contact, holding the role name and the card.
-        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages ')]/div[@class='row']/div") as $item) {
+        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]/div[@class='row']/div") as $item) {
             preg_match('#(Müllermann|Huber|Beispiel|Nebenan)#u', $item->textContent, $name);
-            $role = $this->nodes($xpath, ".//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages__role ')]", $item)->item(0);
+            // The role is the paragraph in front of the card.
+            $role = $this->nodes($xpath, './p', $item)->item(0);
             $roleOfContact[$name[1] ?? '?'] = $role === null ? null : trim($role->textContent);
         }
 
@@ -650,6 +651,21 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertSame(
             'RECORD-UID[1]',
             trim((string)$this->nodes($xpath, "//div[@class = 'list-override']/p")->item(0)?->textContent),
+        );
+    }
+
+    /**
+     * The paragraphs naming the role of a contact in front of its card, which only the list
+     * that is not grouped renders.
+     */
+    private function countRoleParagraphs(string $content): int
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML($content, LIBXML_NOERROR);
+
+        return $this->countNodes(
+            new \DOMXPath($document),
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]/div[@class='row']/div/p",
         );
     }
 
@@ -935,7 +951,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
     public static function viewsAndHeaderLayouts(): \Generator
     {
         $views = [
-            'contacts list' => ['contactsListPage', 'https://www.acme.com/home', 1, 'academic-contacts4pages'],
+            'contacts list' => ['contactsListPage', 'https://www.acme.com/home', 1, 'academic-contacts4pages-list'],
         ];
         $headerLayouts = [
             'header layout "Default"' => [0, 1],

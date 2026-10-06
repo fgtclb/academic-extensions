@@ -99,7 +99,7 @@ rather than `academic-persons-list__…`. A class is a published contract from t
 release on, so this is decided before it ships, not after.
 
 Where a class belongs to a heading that a shared partial renders, it is passed
-through that partial's existing `positionClass` argument rather than wrapped in
+through that partial's existing `class` argument rather than wrapped in
 a new element.
 
 ## An empty partial is a legitimate partial

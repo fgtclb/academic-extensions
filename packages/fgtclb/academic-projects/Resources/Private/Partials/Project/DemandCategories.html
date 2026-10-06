@@ -28,7 +28,7 @@
                     <f:variable name="moreFiltersActive" value="1"/>
                 </f:if>
             </f:for>
-            <details class="col-12 academic-projects-more-filters"{f:if(condition: moreFiltersActive, then: ' open')}>
+            <details class="col-12" {f:if(condition: moreFiltersActive, then: 'open')}>
                 <summary>{f:translate(key: 'filter.moreFilters', extensionName: 'AcademicProjects')}</summary>
                 <div class="row">
                     <f:for each="{filterTypes.more}" as="categoryKey">
@@ -59,7 +59,7 @@
 <f:section name="Filter">
     <f:variable name="allOptionsLabel" value="{f:translate(key: 'sys_category.projects.allOptions', extensionName: 'AcademicProjects')}"/>
     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-        <label for="{categoryKey}" class="form-label">
+        <label for="{categoryKey}">
             {f:translate(key: 'sys_category.projects.{categoryKey}', extensionName: 'AcademicProjects') -> ct:categoryTypeTitle(group: 'projects', identifier: categoryKey)}
         </label>
 
@@ -78,7 +78,6 @@
             prependOptionValue=""
             hideDisabledOptions="{settings.filter.hideDisabledOptions}"
             additionalAttributes="{'onchange': 'this.form.submit()'}"
-            class="form-select"
         />
     </div>
 </f:section>

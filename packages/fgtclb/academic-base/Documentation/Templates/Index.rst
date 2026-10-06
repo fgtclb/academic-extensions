@@ -174,7 +174,7 @@ them.
     *   -   `Textfield`
         -   A text field of the input type its validation settings name.
     *   -   `Textarea`
-        -   A text area, with the class `rich-text` when the element sets
+        -   A text area, with the class `change-me` when the element sets
             `richtext`.
     *   -   `Select`
         -   A select of the element's `options`, read through

@@ -18,12 +18,12 @@
 </f:comment>
 
 <dialog id="popup-{module.uid}" data-study-plan-dialog>
-    <div class="wrapper">
+    <div>
         <div>
-            <span class="h6" aria-hidden="true"><b>{module.label}</b></span>
+            <span aria-hidden="true"><b>{module.label}</b></span>
 
             <f:if condition="{module.credit_points}">
-                <span class="credits small" aria-hidden="true">
+                <span aria-hidden="true">
                     {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
                 </span>
             </f:if>
@@ -35,7 +35,7 @@
     </div>
 
     <f:if condition="{module.note}">
-        <span class="note small text-muted" aria-hidden="true">{module.note}</span>
+        <span aria-hidden="true">{module.note}</span>
     </f:if>
 
     <f:if condition="{module.description}">

@@ -325,8 +325,8 @@ not see them.
 [`Classes/FunctionalTestCase/CategoryFilterFormAssertionTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/CategoryFilterFormAssertionTrait.php)
 
 **What it does.** Reads the category filters out of the filter form of a
-partner, project or program list, or of the program finder, selected by the
-class of the form. `renderedCategoryFilters()` returns the category types of
+partner, project or program list, or of the program finder, selected by an
+XPath expression. `renderedCategoryFilters()` returns the category types of
 the filters in document order, split into those shown right away and those in
 the "More filters" disclosure, together with the state of the disclosure and its
 label. `categoryFilterOptions()` returns the option labels of one filter, a
@@ -343,7 +343,7 @@ comes from the field name, `…[demand][filterCollection][<type>]`, not from the
 $content = $this->renderFrontendPage('https://www.acme.com/home');
 $this->assertSame(
     ['visible' => ['sdg'], 'more' => ['region'], 'disclosure' => 'closed', 'summary' => 'More filters'],
-    $this->renderedCategoryFilters($content, 'academic-partners-filtersorting'),
+    $this->renderedCategoryFilters($content, '//form[@name="demand"]'),
 );
 ```
 
@@ -359,19 +359,21 @@ sorting select.
 [`Classes/FunctionalTestCase/ActiveFiltersAssertionTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/ActiveFiltersAssertionTrait.php)
 
 **What it does.** Reads the active filter tags, the reset link and the result
-count of a partner, project or program list out of a rendered page, selected by
-the class prefix of the extension, `academic-<extension>`.
-`activeFilterTags()` returns the tags in document order, keyed by their title,
-with the link and the accessible label of each. `activeFiltersResetLink()` and
-`activeFiltersResultCount()` return the link target and the text, or `null`
-when the page renders none, and `activeFiltersDemand()` the demand a link
-carries, keys sorted.
+count of a partner, project or program list out of a rendered page. The test
+names the element with an XPath expression: `activeFilterTags()` and
+`activeFiltersResetLink()` take the element of the active filters, whose list
+holds the tags and whose link is the reset link, `activeFiltersResultCount()`
+the element of the count. `activeFilterTags()` returns the tags in document
+order, keyed by their title, with the link and the accessible label of each.
+`activeFiltersResetLink()` and `activeFiltersResultCount()` return the link
+target and the text, or `null` when the page renders none, and
+`activeFiltersDemand()` the demand a link carries, keys sorted.
 
 **When to use it.** In every test of the tags, the reset link or the count.
 
 ```php
 $content = $this->renderFrontendPage('https://www.acme.com/home?…');
-$tags = $this->activeFilterTags($content, 'academic-partners');
+$tags = $this->activeFilterTags($content, '//div[@class="academic-partners-list"]/div[ul or a]');
 $this->assertSame(['Europe', 'University'], array_keys($tags));
 $this->assertSame(
     ['filterCollection' => ['categories' => '3'], 'sortingDirection' => 'asc', 'sortingField' => 'title'],

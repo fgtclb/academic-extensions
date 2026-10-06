@@ -242,7 +242,8 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $this->assertSame(
             ['30 CP', '2.5 CP', '2.5 CP', '12.75 CP', '12.75 CP'],
-            $this->textsOf($this->renderHomePage(), '//span[contains(@class, "credits")]'),
+            // A credit points span holds the number and the unit and nothing else.
+            $this->textsOf($this->renderHomePage(), '//span[not(*)][substring(normalize-space(), string-length(normalize-space()) - 2) = " CP"]'),
         );
     }
 
@@ -292,7 +293,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     {
         return array_map(
             static fn(string $text): string => preg_replace('#\\s+#', ' ', $text) ?? '',
-            $this->textsOf($html, '//button[contains(@class, "modal-trigger")]/span'),
+            $this->textsOf($html, '//button[@data-study-plan-dialog-trigger]/span'),
         );
     }
 
@@ -437,8 +438,8 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $html = $this->renderHomePage();
 
-        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@class="filter"]/li'));
-        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@class="filter"]/li[@hidden]'));
+        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li'));
+        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li[@hidden]'));
         // The placeholders themselves stay: they are what the module substitutes.
         $this->assertStringContainsString('category-label-placeholder', $html);
     }
@@ -487,14 +488,13 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     }
 
     /**
-     * The split into partials and the attributes added with it are the whole change:
-     * what a visitor reads and what a stylesheet selects are the same as before. Both
-     * halves are pinned against the output of the unsplit template, recorded from this
-     * very fixture, so a partial that loses an element or a class fails here rather than
-     * in an installation.
+     * What a visitor reads is pinned against the output of the unsplit template, recorded
+     * from this very fixture, and what a stylesheet selects against the classes the
+     * templates render, so a partial that loses an element or a class fails here rather
+     * than in an installation.
      */
     #[Test]
-    public function contentElementRendersTheSameTextAndClassesAsTheUnsplitTemplate(): void
+    public function contentElementRendersTheTextOfTheUnsplitTemplateAndItsClasses(): void
     {
         $this->setUpTestCase('studyPlanPage');
 
@@ -511,42 +511,16 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         );
         $this->assertSame(
             [
-                'filter',
-                'semesters row',
+                'row',
                 'col',
-                'header',
-                'wrapper',
-                'h6',
-                'credits small',
-                'note small text-muted',
-                'module clickable',
-                'h6',
-                'credits small',
-                'note small text-muted',
-                'modal-trigger',
+                'change-me',
                 'visually-hidden',
-                'wrapper',
-                'h6',
-                'credits small',
-                'note small text-muted',
-                // The module without content: the trailing space is what the condition
-                // that adds `clickable` leaves behind, and it was there before as well.
-                'module ',
-                'h6',
-                'credits small',
+                // The module without content: the condition that adds the class leaves the
+                // attribute empty.
+                '',
                 'col',
-                'header',
-                'wrapper',
-                'h6',
-                'credits small',
-                'module clickable',
-                'h6',
-                'credits small',
-                'modal-trigger',
+                'change-me',
                 'visually-hidden',
-                'wrapper',
-                'h6',
-                'credits small',
             ],
             $this->classInventoryOf($html),
         );
@@ -561,7 +535,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         // A module with a description is clickable and gets its own dialog.
         $this->assertStringContainsString('<dialog id="popup-1" data-study-plan-dialog>', $content);
         $this->assertStringContainsString('Linear algebra and analysis.', $content);
-        $this->assertStringContainsString('class="module clickable"', $content);
+        $this->assertStringContainsString('class="change-me"', $content);
     }
 
     #[Test]
@@ -757,6 +731,6 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $content = $this->renderHomePage();
         // The element still renders, only the semester list is skipped.
         $this->assertStringContainsString('academic-study-plan', $content);
-        $this->assertStringNotContainsString('<ul class="semesters row">', $content);
+        $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]/ul[not(@data-study-plan-filter)]'));
     }
 }
