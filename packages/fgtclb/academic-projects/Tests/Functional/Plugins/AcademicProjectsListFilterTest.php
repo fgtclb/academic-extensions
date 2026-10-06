@@ -32,7 +32,7 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
     use SiteBasedTestTrait;
 
     private const LIST_NAMESPACE = 'tx_academicprojects_projectlist';
-    private const FORM_CLASS = 'academic-projects-filtersorting';
+    private const FORM = '//form[@name="demand"]';
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8', 'iso' => 'en', 'hrefLang' => 'en-US', 'direction' => ''],
@@ -166,9 +166,9 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $this->assertSame(
             ['visible' => ['competence_field', 'cooperation', 'project_department'], 'more' => [], 'disclosure' => 'none', 'summary' => null],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
-        $this->assertSame(self::DEFAULT_FILTER_CELLS, $this->categoryFilterCellMarkup($content, self::FORM_CLASS));
+        $this->assertSame(self::DEFAULT_FILTER_CELLS, $this->categoryFilterCellMarkup($content, self::FORM));
     }
 
     #[Test]
@@ -178,7 +178,7 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $content = $this->renderFrontendPage('https://www.acme.com/home');
 
-        $this->assertSame(['project_department', 'competence_field'], $this->renderedCategoryFilters($content, self::FORM_CLASS)['visible']);
+        $this->assertSame(['project_department', 'competence_field'], $this->renderedCategoryFilters($content, self::FORM)['visible']);
     }
 
     /**
@@ -193,7 +193,7 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $content = $this->renderFrontendPage('https://www.acme.com/home');
 
-        $this->assertSame(['competence_field'], $this->renderedCategoryFilters($content, self::FORM_CLASS)['visible']);
+        $this->assertSame(['competence_field'], $this->renderedCategoryFilters($content, self::FORM)['visible']);
     }
 
     /**
@@ -209,7 +209,7 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $this->assertSame(
             ['visible' => ['project_department'], 'more' => ['competence_field', 'cooperation'], 'disclosure' => 'closed', 'summary' => 'More filters'],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
     }
 
@@ -222,7 +222,7 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $this->assertSame(
             ['visible' => ['competence_field', 'cooperation', 'project_department'], 'more' => [], 'disclosure' => 'none', 'summary' => null],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
     }
 
@@ -247,7 +247,7 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $content = $this->renderFilteredList($filterCollection);
 
-        $this->assertSame($disclosure, $this->renderedCategoryFilters($content, self::FORM_CLASS)['disclosure']);
+        $this->assertSame($disclosure, $this->renderedCategoryFilters($content, self::FORM)['disclosure']);
     }
 
     /**
@@ -273,8 +273,8 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $content = $this->renderFrontendPage($url);
 
-        $this->assertSame(['All competence fields', 'Quantum Physics', 'Energy Research'], $this->categoryFilterOptions($content, self::FORM_CLASS, 'competence_field'));
-        $this->assertSame(['All options', 'Physics', 'Agriculture (disabled)'], $this->categoryFilterOptions($content, self::FORM_CLASS, 'project_department'));
+        $this->assertSame(['All competence fields', 'Quantum Physics', 'Energy Research'], $this->categoryFilterOptions($content, self::FORM, 'competence_field'));
+        $this->assertSame(['All options', 'Physics', 'Agriculture (disabled)'], $this->categoryFilterOptions($content, self::FORM, 'project_department'));
     }
 
     #[Test]
@@ -284,7 +284,7 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $content = $this->renderFrontendPage('https://www.acme.com/home');
 
-        $this->assertSame(['All options', 'Physics'], $this->categoryFilterOptions($content, self::FORM_CLASS, 'project_department'));
+        $this->assertSame(['All options', 'Physics'], $this->categoryFilterOptions($content, self::FORM, 'project_department'));
     }
 
     #[Test]
@@ -300,9 +300,9 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $this->assertSame(
             ['visible' => ['project_department'], 'more' => ['competence_field'], 'disclosure' => 'closed', 'summary' => 'More filters'],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
-        $this->assertSame(['All options', 'Physics'], $this->categoryFilterOptions($content, self::FORM_CLASS, 'project_department'));
+        $this->assertSame(['All options', 'Physics'], $this->categoryFilterOptions($content, self::FORM, 'project_department'));
     }
 
     /**
@@ -319,17 +319,17 @@ final class AcademicProjectsListFilterTest extends AbstractAcademicProjectsTestC
 
         $this->assertSame(
             ['visible' => ['competence_field', 'cooperation', 'project_department'], 'more' => [], 'disclosure' => 'none', 'summary' => null],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
-        $this->assertSame(self::DEFAULT_FILTER_CELLS, $this->categoryFilterCellMarkup($content, self::FORM_CLASS));
+        $this->assertSame(self::DEFAULT_FILTER_CELLS, $this->categoryFilterCellMarkup($content, self::FORM));
     }
 
     /**
      * The cells of the filters before the settings existed.
      */
     private const DEFAULT_FILTER_CELLS = [
-        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="competence_field" class="form-label"> Competence field </label><select onchange="this.form.submit()" id="competence_field" class="form-select" name="tx_academicprojects_projectlist[demand][filterCollection][competence_field]"><option value="">All options</option><option value="1" class="level-0">Quantum Physics</option><option value="2" class="level-0">Energy Research</option></select></div>',
-        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="cooperation" class="form-label"> Cooperation </label><select onchange="this.form.submit()" id="cooperation" class="form-select" name="tx_academicprojects_projectlist[demand][filterCollection][cooperation]"><option value="">All options</option><option value="3" class="level-0">Industry</option></select></div>',
-        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="project_department" class="form-label"> Department </label><select onchange="this.form.submit()" id="project_department" class="form-select" name="tx_academicprojects_projectlist[demand][filterCollection][project_department]"><option value="">All options</option><option value="4" class="level-0">Physics</option><option value="5" class="level-0" disabled>Agriculture</option></select></div>',
+        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="competence_field"> Competence field </label><select onchange="this.form.submit()" id="competence_field" name="tx_academicprojects_projectlist[demand][filterCollection][competence_field]"><option value="">All options</option><option value="1" class="level-0">Quantum Physics</option><option value="2" class="level-0">Energy Research</option></select></div>',
+        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="cooperation"> Cooperation </label><select onchange="this.form.submit()" id="cooperation" name="tx_academicprojects_projectlist[demand][filterCollection][cooperation]"><option value="">All options</option><option value="3" class="level-0">Industry</option></select></div>',
+        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="project_department"> Department </label><select onchange="this.form.submit()" id="project_department" name="tx_academicprojects_projectlist[demand][filterCollection][project_department]"><option value="">All options</option><option value="4" class="level-0">Physics</option><option value="5" class="level-0" disabled>Agriculture</option></select></div>',
     ];
 }

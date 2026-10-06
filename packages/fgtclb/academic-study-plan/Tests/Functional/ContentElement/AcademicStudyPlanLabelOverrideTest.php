@@ -82,7 +82,7 @@ final class AcademicStudyPlanLabelOverrideTest extends AbstractAcademicStudyPlan
     public static function translationDataProvider(): \Generator
     {
         yield 'attribute of the template' => ['filter.label', 'Filter by category', 'data-filter-label="%s"'];
-        yield 'credit points of a semester' => ['credits', 'CP', '<span class="credits small"> 30 %s </span>'];
+        yield 'credit points of a semester' => ['credits', 'CP', '<span> 30 %s </span>'];
         yield 'attribute of the module dialog' => ['modal.close', 'Close', '<button aria-label="%s">'];
     }
 

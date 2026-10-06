@@ -34,10 +34,14 @@ final class ProjectListRouteEnhancerTest extends AbstractAcademicProjectsTestCas
     use FrontendPluginRenderingTrait;
     use SiteBasedTestTrait;
 
-    private const PREFIX = 'academic-projects';
+    /**
+     * The list and the element of the active filters below it.
+     */
+    private const LIST = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]';
+    private const ACTIVE_FILTERS = self::LIST . '/div[ul or a]';
     private const LIST_NAMESPACE = 'tx_academicprojects_projectlist';
     private const SELECTED_NAMESPACE = 'tx_academicprojects_projectlistsingle';
-    private const FORM_CLASS = 'academic-projects-filtersorting';
+    private const FORM = '//form[@name="demand"]';
     private const PROJECTS = ['Quantum Research', 'Solar fields', 'Wind lab'];
 
     protected const LANGUAGE_PRESETS = [
@@ -210,7 +214,7 @@ final class ProjectListRouteEnhancerTest extends AbstractAcademicProjectsTestCas
         $this->assertSame('https://www.acme.com' . $path, $uri);
 
         $content = $this->renderFrontendPage($uri);
-        $this->assertSame($tags, array_keys($this->activeFilterTags($content, self::PREFIX)));
+        $this->assertSame($tags, array_keys($this->activeFilterTags($content, self::ACTIVE_FILTERS)));
         if ($projects !== null) {
             $this->assertProjects($projects, $content);
         }
@@ -227,11 +231,11 @@ final class ProjectListRouteEnhancerTest extends AbstractAcademicProjectsTestCas
     {
         $content = $this->renderFrontendPage('https://www.acme.com/home/filter/quantum-physics-1/status/completed/title/desc');
 
-        $tags = $this->activeFilterTags($content, self::PREFIX);
+        $tags = $this->activeFilterTags($content, self::ACTIVE_FILTERS);
         $this->assertSame('/home/status/completed/title/desc', $tags['Quantum Physics']['href']);
         $this->assertSame('/home/filter/quantum-physics-1/status/all/title/desc', $tags['Completed']['href']);
 
-        $response = $this->submitFrontendForm('https://www.acme.com/home', self::FORM_CLASS, [
+        $response = $this->submitFrontendForm('https://www.acme.com/home', self::FORM, [
             self::LIST_NAMESPACE => ['demand' => ['filterCollection' => ['competence_field' => '2'], 'activeState' => 'completed']],
         ]);
         $this->assertSame(303, $response->getStatusCode());
@@ -258,7 +262,7 @@ final class ProjectListRouteEnhancerTest extends AbstractAcademicProjectsTestCas
     {
         $content = $this->renderFrontendPage('https://www.acme.com/completed');
 
-        $this->assertSame(['Completed'], array_keys($this->activeFilterTags($content, self::PREFIX)));
+        $this->assertSame(['Completed'], array_keys($this->activeFilterTags($content, self::ACTIVE_FILTERS)));
         $this->assertProjects(['Solar fields', 'Wind lab'], $content);
     }
 

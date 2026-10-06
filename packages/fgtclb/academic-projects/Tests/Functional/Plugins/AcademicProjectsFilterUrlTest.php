@@ -30,7 +30,7 @@ final class AcademicProjectsFilterUrlTest extends AbstractAcademicProjectsTestCa
 
     private const LIST_NAMESPACE = 'tx_academicprojects_projectlist';
     private const SINGLE_NAMESPACE = 'tx_academicprojects_projectlistsingle';
-    private const FORM_CLASS = 'academic-projects-filtersorting';
+    private const FORM = '//form[@name="demand"]';
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8', 'iso' => 'en', 'hrefLang' => 'en-US', 'direction' => ''],
@@ -91,7 +91,7 @@ final class AcademicProjectsFilterUrlTest extends AbstractAcademicProjectsTestCa
     #[Test]
     public function submittingACategoryAndAnActiveStateRedirectsToAUrlCarryingThem(): void
     {
-        $response = $this->submitFrontendForm('https://www.acme.com/home', self::FORM_CLASS, [
+        $response = $this->submitFrontendForm('https://www.acme.com/home', self::FORM, [
             self::LIST_NAMESPACE => ['demand' => [
                 'filterCollection' => ['competence_field' => '2'],
                 'activeState' => 'completed',
@@ -127,7 +127,7 @@ final class AcademicProjectsFilterUrlTest extends AbstractAcademicProjectsTestCa
     #[Test]
     public function onlyTheNormalisedSelectionReachesTheUrl(): void
     {
-        $response = $this->submitFrontendForm('https://www.acme.com/home', self::FORM_CLASS, [
+        $response = $this->submitFrontendForm('https://www.acme.com/home', self::FORM, [
             self::LIST_NAMESPACE => ['demand' => [
                 'filterCollection' => ['competence_field' => '1,7'],
                 'activeState' => 'someday',
@@ -145,7 +145,7 @@ final class AcademicProjectsFilterUrlTest extends AbstractAcademicProjectsTestCa
     #[Test]
     public function theSelectedProjectsPluginRedirectsToItself(): void
     {
-        $response = $this->submitFrontendForm('https://www.acme.com/selected', self::FORM_CLASS, [
+        $response = $this->submitFrontendForm('https://www.acme.com/selected', self::FORM, [
             self::SINGLE_NAMESPACE => ['demand' => ['activeState' => 'active']],
         ]);
 
@@ -172,7 +172,7 @@ final class AcademicProjectsFilterUrlTest extends AbstractAcademicProjectsTestCa
         $this->assertStringContainsString('Wind Parks', $content);
         $this->assertStringNotContainsString('Quantum Research', $content);
 
-        $response = $this->submitFrontendForm('https://www.acme.com/energy', self::FORM_CLASS, [
+        $response = $this->submitFrontendForm('https://www.acme.com/energy', self::FORM, [
             self::LIST_NAMESPACE => ['demand' => ['filterCollection' => ['competence_field' => '']]],
         ]);
 
@@ -302,7 +302,7 @@ final class AcademicProjectsFilterUrlTest extends AbstractAcademicProjectsTestCa
 
     private function filteredListUrl(string $uid): string
     {
-        return $this->assertSeeOtherWithCacheHash($this->submitFrontendForm('https://www.acme.com/home', self::FORM_CLASS, [
+        return $this->assertSeeOtherWithCacheHash($this->submitFrontendForm('https://www.acme.com/home', self::FORM, [
             self::LIST_NAMESPACE => ['demand' => ['filterCollection' => ['competence_field' => $uid]]],
         ]));
     }

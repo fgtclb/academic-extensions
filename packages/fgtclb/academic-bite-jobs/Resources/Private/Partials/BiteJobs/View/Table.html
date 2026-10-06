@@ -4,8 +4,8 @@
     xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
 >
 
-<table class="table table-striped academic-bite-jobs-itemtable">
-    <thead class="table-primary">
+<table>
+    <thead>
         <tr>
             <f:for
                 each="{
@@ -20,11 +20,11 @@
             </f:for>
         </tr>
     </thead>
-    <tbody class="table-group-divider table-secondary">
+    <tbody>
         <f:for each="{jobs}" as="job">
-            <tr class="academic-bite-jobs-item">
+            <tr>
                 <td>
-                    <a href="{job.url}" target="_blank" class="card-link">{job.title}</a>
+                    <a href="{job.url}" target="_blank">{job.title}</a>
                 </td>
 
                 <td>

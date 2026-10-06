@@ -40,6 +40,12 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
         'DE' => ['id' => 1, 'title' => 'Deutsch', 'locale' => 'de_DE.UTF8', 'iso' => 'de', 'hrefLang' => 'de-DE', 'direction' => ''],
     ];
 
+    /**
+     * The header of the project page, the element around its heading, and the subtitle,
+     * the paragraph right after the heading. The short description follows it.
+     */
+    private const HEADER = '//div[h1]';
+    private const SUBTITLE = self::HEADER . '/h1/following-sibling::*[1][self::p]';
     private const FIXTURES = 'EXT:academic_projects/Tests/Functional/Pages/Fixtures/';
     private const PROJECT_PAGE = 'https://www.acme.com/quantum-optics';
     private const CONTENT_ELEMENT = 'The project builds a photon source.';
@@ -326,8 +332,8 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
         $this->setUpSite($sitePackage);
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage(self::PROJECT_PAGE));
-        $header = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail__header ')]");
-        $subtitle = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail__header ')]/h1/following-sibling::*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail__subtitle ')]");
+        $header = $this->nodesMatching($xpath, self::HEADER);
+        $subtitle = $this->nodesMatching($xpath, self::SUBTITLE);
 
         $this->assertCount(1, $header);
         $this->assertCount(1, $subtitle);
@@ -351,7 +357,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
         $this->setUpSite($sitePackage);
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/de/quantum-optics'));
-        $subtitle = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail__subtitle ')]");
+        $subtitle = $this->nodesMatching($xpath, self::SUBTITLE);
 
         $this->assertCount(1, $subtitle);
         $this->assertSame('Gefördert bis 2027', trim((string)$subtitle->item(0)?->textContent));
@@ -371,7 +377,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
         $content = $this->renderFrontendPage(self::PROJECT_PAGE);
 
         $this->assertStringContainsString('<h1>Entangled photon sources</h1>', $content);
-        $this->assertStringContainsString('<p class="academic-projects-detail__subtitle">Funded until 2027</p>', $content);
+        $this->assertStringContainsString('<p>Funded until 2027</p>', $content);
     }
 
     #[Test]
@@ -383,7 +389,8 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
         $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
 
         $this->assertStringContainsString('<h1>Dark Matter</h1>', $content);
-        $this->assertStringNotContainsString('academic-projects-detail__subtitle', $content);
+        $this->assertCount(1, $this->nodesMatching($this->parseRenderedPage($content), self::HEADER));
+        $this->assertCount(0, $this->nodesMatching($this->parseRenderedPage($content), self::SUBTITLE));
     }
 
     /**
