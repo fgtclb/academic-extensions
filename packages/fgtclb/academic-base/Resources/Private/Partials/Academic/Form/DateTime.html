@@ -18,15 +18,18 @@
 
 <f:render
     partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
-    arguments="{element: element, elementId: elementId, class: 'form-date-wrap', extensionName: extensionName}"
+    arguments="{
+        element: element,
+        elementId: elementId,
+        extensionName: extensionName
+    }"
     contentAs="elementContent"
 >
     <f:form.textfield
         property="{element.identifier}"
         value="{element.value -> f:format.date(format:'Y-m-d')}"
         id="{elementId}"
-        class="form-control"
-        errorClass="is-invalid"
+        errorClass="change-me"
         aria="{fieldAria}"
         disabled="{element.disabled}"
         data="{render:'datepicker'}"

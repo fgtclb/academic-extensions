@@ -6,13 +6,13 @@
     data-namespace-typo3-fluid="true"
 >
 
-<div class="card flex-column-reverse academic-projects-item mt-4">
-    <div class="card-content">
-        <div class="card-body">
+<div>
+    <div>
+        <div>
             <f:if condition="{settings.showActiveStateBadge}">
                 <f:variable name="activeState" value="{project.activeState}"/>
-                <p class="mb-2">
-                    <span class="badge {f:if(condition: '{activeState} == \'active\'', then: 'text-bg-success', else: 'text-bg-secondary')} academic-projects-item__state academic-projects-item__state--{activeState}">{f:translate(key: 'activeState.{activeState}', extensionName: 'AcademicProjects')}</span>
+                <p>
+                    <span class="{f:if(condition: '{activeState} == \'active\'', then: 'active')} change-me-{activeState}">{f:translate(key: 'activeState.{activeState}', extensionName: 'AcademicProjects')}</span>
                 </p>
             </f:if>
 
@@ -21,24 +21,23 @@
                 arguments="{
                     header: '{f:if(condition: project.projectTitle, then: project.projectTitle, else: project.title)}',
                     layout: '{data.header_layout}',
-                    positionClass: 'card-title',
                     link: '{f:uri.page(pageUid: project.uid)}',
                     subheader: '{data.subheader}'
                 }"
             />
 
             <f:if condition="{project.shortDescription}">
-                <div class="card-text">
+                <div>
                     <f:format.html>{project.shortDescription}</f:format.html>
                 </div>
             </f:if>
         </div>
 
         <f:if condition="{project.attributes}">
-            <ul class="list-group list-group-flush">
+            <ul>
                 <f:for each="{project.attributes.allCategoriesByType}" as="attributes" key="category">
                     <f:if condition="{attributes}">
-                        <li class="list-group-item">
+                        <li>
                             <ab:icon identifier="category_types.projects.{category}"/>
 
                             <b>
@@ -68,7 +67,6 @@
                 arguments="{
                     image: image,
                     preset: 'card',
-                    class: 'card-img-top img-fluid'
                 }"
             />
         </f:if>

@@ -300,7 +300,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
             $detail,
             3,
             800,
-            'img-fluid',
+            '',
             'The laboratory of the Quantum Optics project',
         );
     }
@@ -312,7 +312,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/dark-matter'));
         $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail ')]");
-        $this->assertRendersNoImage($xpath, $detail, 'img-fluid');
+        $this->assertRendersNoImage($xpath, $detail, '');
     }
 
     /**
@@ -357,7 +357,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
             $detail,
             3,
             800,
-            'img-fluid',
+            '',
             'The laboratory of the Quantum Optics project',
         );
     }

@@ -347,14 +347,14 @@ test per way a request is refused, so a new endpoint family is one line.
 
 A test of an Extbase form submits the form the page rendered, not a body
 assembled by hand. `FrontendPluginRenderingTrait::submitFrontendForm()` requests
-the page, finds the form by a class and collects its fields for the controls
-these forms use — checked boxes only, the selected and enabled options, no
-disabled controls or buttons, and `__referrer` and `__trustedProperties` as
-rendered, so Extbase checks the request hash as it does in production. The
-test replaces single values:
+the page, finds the form by an XPath expression and collects its fields for the
+controls these forms use — checked boxes only, the selected and enabled options,
+no disabled controls or buttons, and `__referrer` and `__trustedProperties` as
+rendered, so Extbase checks the request hash as it does in production. The test
+replaces single values:
 
 ```php
-$response = $this->submitFrontendForm('https://www.acme.com/home', 'academic-partners-filtersorting', [
+$response = $this->submitFrontendForm('https://www.acme.com/home', '//form[@name="demand"]', [
     'tx_academicpartners_list' => ['demand' => ['filterCollection' => ['region' => '2']]],
 ]);
 $location = $this->assertSeeOtherWithCacheHash($response);

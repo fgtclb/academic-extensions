@@ -122,7 +122,7 @@ Wrapping any of them would be a markup change, which is what the first
 requirement forbids.
 
 Where the class belongs on a heading a shared partial renders, it is passed
-through that partial's existing `positionClass` argument - `card-title` becomes
+through that partial's existing `class` argument - `card-title` becomes
 `academic-persons-item__name card-title`, and the group header's empty
 `class=""` becomes `academic-persons-list__group-header`. That keeps the change
 to an attribute value.

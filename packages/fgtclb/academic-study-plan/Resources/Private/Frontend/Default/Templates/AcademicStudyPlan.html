@@ -28,7 +28,7 @@
         <f:render partial="StudyPlan/Filter" arguments="{collapsible: settings.filter.collapsible}" />
 
         <f:if condition="{semesters}">
-            <ul class="semesters row">
+            <ul class="row">
                 <f:for each="{semesters}" as="semester">
                     <f:render partial="StudyPlan/Semester" arguments="{semester: semester}" />
                 </f:for>

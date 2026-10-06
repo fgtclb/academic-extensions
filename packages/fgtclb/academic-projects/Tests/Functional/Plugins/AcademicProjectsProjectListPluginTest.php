@@ -127,7 +127,7 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
         $this->setUpTestCase('projectListPage');
 
         $content = $this->renderHomePage();
-        $this->assertStringContainsString('academic-projects-filtersorting', $content);
+        $this->assertSame(1, $this->countContentElementHeaderNodes($content, '//form[@name="demand"]'));
         // The options are written by `CategoryTypes\ViewHelpers\Form\AbstractSelectViewHelper`,
         // which `ViewHelpers\Form\SortingSelectViewHelper` no longer overrides - this is what
         // covers that here, the class has no test of its own.
@@ -215,8 +215,8 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
         ], $this->stateBadgesByProjectTitle($content));
         // The colour follows the state through a string comparison in the template, which
         // would fall through to its "else" for every card if it stopped matching.
-        $this->assertSame(3, substr_count($content, 'badge text-bg-success academic-projects-item__state '));
-        $this->assertSame(1, substr_count($content, 'badge text-bg-secondary academic-projects-item__state '));
+        $this->assertSame(3, substr_count($content, 'class="active change-me-active"'));
+        $this->assertSame(1, substr_count($content, 'class=" change-me-completed"'));
     }
 
     /**
@@ -234,16 +234,18 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
         $xpath = new \DOMXPath($document);
 
         $badges = [];
-        $cards = $xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " academic-projects-item ")]');
+        // A card is the element in a grid column of the list, its title is its heading and
+        // its badge the element whose class names the state.
+        $cards = $xpath->query('//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]/div[@class="row"]/div/div');
         foreach ($cards ?: [] as $card) {
-            $title = trim((string)$xpath->evaluate('string(.//*[contains(concat(" ", normalize-space(@class), " "), " card-title ")])', $card));
+            $title = trim((string)$xpath->evaluate('string(.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6])', $card));
             $badge = '';
-            $badgeNodes = $xpath->query('.//*[contains(concat(" ", normalize-space(@class), " "), " academic-projects-item__state ")]', $card);
+            $badgeNodes = $xpath->query('.//span[contains(@class, "change-me-")]', $card);
             foreach ($badgeNodes ?: [] as $badgeNode) {
                 if (!$badgeNode instanceof \DOMElement) {
                     continue;
                 }
-                preg_match('/academic-projects-item__state--(\S+)/', $badgeNode->getAttribute('class'), $matches);
+                preg_match('/change-me-(\S+)/', $badgeNode->getAttribute('class'), $matches);
                 $badge = ($matches[1] ?? '?') . ': ' . trim($badgeNode->textContent);
             }
             $badges[$title] = $badge;

@@ -17,13 +17,13 @@
 </f:comment>
 
 <li class="col" data-study-plan-semester>
-    <div class="header" aria-hidden="true" inert data-study-plan-semester-header>
-        <div class="wrapper">
+    <div aria-hidden="true" inert data-study-plan-semester-header>
+        <div>
             <div>
-                <h3 class="h6"><b>{semester.label}</b></h3>
+                <h3><b>{semester.label}</b></h3>
 
                 <f:if condition="{semester.credit_points}">
-                    <span class="credits small">
+                    <span>
                         {semester.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
                     </span>
                 </f:if>
@@ -34,7 +34,7 @@
         </div>
 
         <f:if condition="{semester.note}">
-            <span class="note small text-muted">{semester.note}</span>
+            <span>{semester.note}</span>
         </f:if>
     </div>
 

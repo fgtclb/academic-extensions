@@ -146,7 +146,7 @@ final class AcademicProjectsLabelOverrideTest extends AbstractAcademicProjectsTe
     {
         yield 'label of the sorting partial' => [
             'https://www.acme.com/home', 'sorting.field.label', 'Sorting field',
-            '<label for="sortingField" class="form-label"> %s </label>',
+            '<label for="sortingField"> %s </label>',
         ];
         yield 'sorting option, translated by the view helper' => [
             'https://www.acme.com/home', 'sorting.field.title', 'Title',
