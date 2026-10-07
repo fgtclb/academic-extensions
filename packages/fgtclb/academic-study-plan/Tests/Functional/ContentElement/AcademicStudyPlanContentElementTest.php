@@ -521,6 +521,8 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
                 'col',
                 'change-me',
                 'visually-hidden',
+                // The footer note, rich text.
+                'ce-bodytext',
             ],
             $this->classInventoryOf($html),
         );
