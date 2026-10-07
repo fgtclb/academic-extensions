@@ -245,27 +245,27 @@ final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestC
     }
 
     /**
-     * The title of every job of the view. The list and the card view render the same
-     * markup, a `div` per job inside a `div`, so the expression tells the table from the
-     * other two only.
+     * The title of every job of the view, found below the element that names the view.
      *
      * @return array<string, array{0: string|null, 1: string}>
      */
     public static function storedViewValues(): array
     {
-        $items = self::LIST_WRAPPER . '/div/div[ul]/*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]';
-        $rows = self::LIST_WRAPPER . '/table/tbody/tr/td[1]';
+        $headings = '//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]';
+        $list = self::LIST_WRAPPER . '/div[contains(concat(" ", normalize-space(@class), " "), " ace-list-view ")]' . $headings;
+        $cards = self::LIST_WRAPPER . '/div[contains(concat(" ", normalize-space(@class), " "), " ace-card-view ")]' . $headings;
+        $table = self::LIST_WRAPPER . '/table[contains(concat(" ", normalize-space(@class), " "), " ace-table ")]/tbody/tr/td[1]';
 
         return [
-            'List' => ['List', $items],
-            'Card' => ['Card', $items],
-            'Table' => ['Table', $rows],
-            'ListView before 2.1' => ['ListView', $items],
-            'CardView before 2.1' => ['CardView', $items],
-            'TableView before 2.1' => ['TableView', $rows],
-            'empty value' => ['', $items],
-            'unknown value' => ['Grid', $items],
-            'no view field' => [null, $items],
+            'List' => ['List', $list],
+            'Card' => ['Card', $cards],
+            'Table' => ['Table', $table],
+            'ListView before 2.1' => ['ListView', $list],
+            'CardView before 2.1' => ['CardView', $cards],
+            'TableView before 2.1' => ['TableView', $table],
+            'empty value' => ['', $list],
+            'unknown value' => ['Grid', $list],
+            'no view field' => [null, $list],
         ];
     }
 

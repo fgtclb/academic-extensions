@@ -134,7 +134,7 @@ final class ImagePartialTest extends AbstractImagePartialTestCase
         $this->assertSame(0, $this->countNodes($xpath, '//source'));
         $this->assertSame(1, $this->countNodes($xpath, '//img'));
         $this->assertStringEndsWith('Icons/Extension.svg', $this->attribute($xpath, '//img', 'src'));
-        $this->assertSame('card-img-top', $this->attribute($xpath, '//img', 'class'));
+        $this->assertSame('ace-image card-img-top', $this->attribute($xpath, '//img', 'class'));
     }
 
     #[Test]
@@ -158,7 +158,7 @@ final class ImagePartialTest extends AbstractImagePartialTestCase
         ]));
 
         $this->assertSame('Given alternative', $this->attribute($xpath, '//picture/img', 'alt'));
-        $this->assertSame('card-img-top img-fluid', $this->attribute($xpath, '//picture/img', 'class'));
+        $this->assertSame('ace-image card-img-top img-fluid', $this->attribute($xpath, '//picture/img', 'class'));
     }
 
     #[Test]

@@ -633,7 +633,7 @@ describe("the collapsible filter", () => {
     await start(collapsibleMarkup());
 
     const list = document.querySelector<HTMLElement>(".filter");
-    const toggle = document.querySelector<HTMLButtonElement>(".filter-toggle");
+    const toggle = document.querySelector<HTMLButtonElement>(".ace-toggle");
     assert.ok(list !== null, "the filter list is gone");
     assert.ok(toggle !== null, "no toggle was inserted");
 
@@ -666,7 +666,7 @@ describe("the collapsible filter", () => {
 
     // The list is empty, so there is nothing a toggle could expand.
     assert.equal(document.querySelectorAll(".filter button").length, 0);
-    assert.equal(document.querySelector(".filter-toggle"), null);
+    assert.equal(document.querySelector(".ace-toggle"), null);
     assert.equal(document.querySelector<HTMLElement>(".filter")?.hidden, false);
   });
 
@@ -675,7 +675,7 @@ describe("the collapsible filter", () => {
 
     // An unnamed button is worse than the filter everybody can already see.
     assert.deepEqual(labelsOf(".filter button"), ["Mandatory"]);
-    assert.equal(document.querySelector(".filter-toggle"), null);
+    assert.equal(document.querySelector(".ace-toggle"), null);
     assert.equal(document.querySelector<HTMLElement>(".filter")?.hidden, false);
   });
 
@@ -686,7 +686,7 @@ describe("the collapsible filter", () => {
     await start(one + one);
 
     const lists = Array.from(document.querySelectorAll<HTMLElement>(".filter"));
-    const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>(".filter-toggle"));
+    const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>(".ace-toggle"));
     assert.equal(lists.length, 2);
     assert.equal(toggles.length, 2);
     assert.notEqual(lists[0].id, lists[1].id);
@@ -706,7 +706,7 @@ describe("the collapsible filter", () => {
   it("inserts no toggle for a filter the site did not switch on", async () => {
     await start(layoutMarkup());
 
-    assert.equal(document.querySelector(".filter-toggle"), null);
+    assert.equal(document.querySelector(".ace-toggle"), null);
     assert.equal(document.querySelector<HTMLElement>(".filter")?.hidden, false);
   });
 });

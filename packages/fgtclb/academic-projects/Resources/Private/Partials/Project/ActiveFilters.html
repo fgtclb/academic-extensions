@@ -70,9 +70,10 @@
 </f:if>
 
 <f:if condition="{categoryTags} || {stateTag} || {showResetLink}">
-    <div>
+    <div class="ace-filters">
         <f:if condition="{categoryTags} || {stateTag}">
             <ul
+                class="ace-tags"
                 aria-label="{f:translate(key: 'filter.activeFilters.label', extensionName: 'AcademicProjects')}"
             >
                 <f:if condition="{categoryTags}">
@@ -101,7 +102,7 @@
             </ul>
         </f:if>
         <f:if condition="{showResetLink}">
-            <f:link.page>
+            <f:link.page class="ace-reset">
                 {f:translate(key: 'filter.reset', extensionName: 'AcademicProjects')}
             </f:link.page>
         </f:if>
@@ -132,12 +133,13 @@
         </f:else>
     </f:if>
     <f:variable name="removeLabel" value="{f:translate(key: 'filter.activeFilters.remove', extensionName: 'AcademicProjects', arguments: {0: title})}" />
-    <li>
+    <li class="ace-tag">
         <f:link.action
             action="list"
             arguments="{demand: tagDemand}"
+            class="ace-remove"
             additionalAttributes="{'aria-label': removeLabel}"
-        >{title}<span aria-hidden="true"> ×</span></f:link.action>
+        >{title}<span class="ace-icon" aria-hidden="true"> ×</span></f:link.action>
     </li>
 </f:section>
 

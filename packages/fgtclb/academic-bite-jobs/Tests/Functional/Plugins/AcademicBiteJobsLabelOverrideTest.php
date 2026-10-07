@@ -111,16 +111,16 @@ final class AcademicBiteJobsLabelOverrideTest extends AbstractAcademicBiteJobsTe
      */
     public static function pluginTranslationDataProvider(): \Generator
     {
-        yield 'message of an empty list' => ['List', 'no-postings', 'no-jobs', '<span> %s </span>'];
-        yield 'table view, column heading, key from a variable' => ['Table', 'test-key', 'jobs.bite.title', '<th> %s </th>'];
-        yield 'list view, field label' => ['List', 'test-key', 'jobs.bite.endsOn', '<b>%s:</b>'];
+        yield 'message of an empty list' => ['List', 'no-postings', 'no-jobs', '<span class="ace-empty"> %s </span>'];
+        yield 'table view, column heading, key from a variable' => ['Table', 'test-key', 'jobs.bite.title', '<th class="ace-label"> %s </th>'];
+        yield 'list view, field label' => ['List', 'test-key', 'jobs.bite.endsOn', '<b class="ace-label">%s:</b>'];
     }
 
     #[Test]
     public function thePluginRendersTheLabelOfTheLanguageFile(): void
     {
         $this->assertStringContainsString(
-            '<span> There are currently no job vacancies. </span>',
+            '<span class="ace-empty"> There are currently no job vacancies. </span>',
             $this->renderListPage('List', 'no-postings', ''),
         );
     }

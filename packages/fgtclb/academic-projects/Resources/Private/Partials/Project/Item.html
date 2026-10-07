@@ -6,13 +6,13 @@
     data-namespace-typo3-fluid="true"
 >
 
-<div>
-    <div>
-        <div>
+<article class="ace-card">
+    <div class="ace-content">
+        <header class="ace-header">
             <f:if condition="{settings.showActiveStateBadge}">
                 <f:variable name="activeState" value="{project.activeState}"/>
-                <p>
-                    <span class="{f:if(condition: '{activeState} == \'active\'', then: 'active')} change-me-{activeState}">{f:translate(key: 'activeState.{activeState}', extensionName: 'AcademicProjects')}</span>
+                <p class="ace-status">
+                    <span class="ace-state {activeState}">{f:translate(key: 'activeState.{activeState}', extensionName: 'AcademicProjects')}</span>
                 </p>
             </f:if>
 
@@ -27,27 +27,27 @@
             />
 
             <f:if condition="{project.shortDescription}">
-                <div class="ce-bodytext">
+                <div class="ace-richtext ce-bodytext">
                     <f:format.html>{project.shortDescription}</f:format.html>
                 </div>
             </f:if>
-        </div>
+        </header>
 
         <f:if condition="{project.attributes}">
-            <ul>
+            <ul class="ace-properties">
                 <f:for each="{project.attributes.allCategoriesByType}" as="attributes" key="category">
                     <f:if condition="{attributes}">
-                        <li>
-                            <ab:icon identifier="category_types.projects.{category}"/>
+                        <li class="ace-property">
+                            <span class="ace-icon"><ab:icon identifier="category_types.projects.{category}"/></span>
 
-                            <b>
+                            <b class="ace-label">
                                 {f:translate(
                                     key: 'sys_category.projects.{category}',
                                     extensionName: 'AcademicProjects'
                                 ) -> ct:categoryTypeTitle(group: 'projects', identifier: category)}:
                             </b>
 
-                            <span>
+                            <span class="ace-value">
                                 <f:for each="{attributes}" as="attribute" iteration="i">
                                     {attribute.title}{f:if(condition: '!{i.isLast}', then: ', ')}
                                 </f:for>
@@ -62,15 +62,17 @@
     <f:for each="{project.media}" as="image" iteration="i">
         <f:if condition="{i.isFirst}">
             <f:comment>The shared partial of EXT:academic_base.</f:comment>
-            <f:render
-                partial="Academic/Image"
-                arguments="{
-                    image: image,
-                    preset: 'card',
-                }"
-            />
+            <div class="ace-media">
+                <f:render
+                    partial="Academic/Image"
+                    arguments="{
+                        image: image,
+                        preset: 'card',
+                    }"
+                />
+            </div>
         </f:if>
     </f:for>
-</div>
+</article>
 
 </html>

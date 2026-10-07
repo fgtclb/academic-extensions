@@ -470,7 +470,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
             $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li[@data-study-plan-filter-template]'),
         );
         // Two semesters, each with its header.
-        $this->assertSame(2, $this->nodeCountOf($html, '//div[@data-study-plan]/div[@role="list"]/div[@role="listitem"][@data-study-plan-semester]'));
+        $this->assertSame(2, $this->nodeCountOf($html, '//div[@data-study-plan]/div[contains(concat(" ", normalize-space(@class), " "), " ace-semesters ")]/div[@role="list"]/div[@role="listitem"]/div[@data-study-plan-semester]'));
         $this->assertSame(
             2,
             $this->nodeCountOf($html, '//div[@data-study-plan-semester]/div[@data-study-plan-semester-header]'),
@@ -511,18 +511,63 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         );
         $this->assertSame(
             [
+                'ace-filter',
+                'ace-list',
+                'ace-item',
+                'ace-control',
+                'ace-semesters',
                 'row',
                 'col',
-                'change-me',
+                'ace-semester',
+                'ace-header',
+                'ace-content',
+                'ace-heading',
+                'ace-title',
+                'ace-credits',
+                'ace-actions',
+                'ace-note',
+                'ace-modules',
+                'ace-module ace-interactive',
+                'ace-title',
+                'ace-credits',
+                'ace-note',
+                'ace-trigger',
                 'visually-hidden',
-                // The module without content: the condition that adds the class leaves the
-                // attribute empty.
-                '',
+                'ace-dialog',
+                'ace-header',
+                'ace-content',
+                'ace-title',
+                'ace-credits',
+                'ace-close',
+                'ace-note',
+                'ace-description',
+                // The module without content: the trailing space is what the condition
+                // that adds `ace-interactive` leaves behind.
+                'ace-module ',
+                'ace-title',
+                'ace-credits',
                 'col',
-                'change-me',
+                'ace-semester',
+                'ace-header',
+                'ace-content',
+                'ace-heading',
+                'ace-title',
+                'ace-credits',
+                'ace-actions',
+                'ace-modules',
+                'ace-module ace-interactive',
+                'ace-title',
+                'ace-credits',
+                'ace-trigger',
                 'visually-hidden',
-                // The footer note, rich text.
-                'ce-bodytext',
+                'ace-dialog',
+                'ace-header',
+                'ace-content',
+                'ace-title',
+                'ace-credits',
+                'ace-close',
+                'ace-description',
+                'ace-footer ace-richtext ce-bodytext',
             ],
             $this->classInventoryOf($html),
         );
@@ -535,9 +580,9 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $content = $this->renderHomePage();
         // A module with a description is clickable and gets its own dialog.
-        $this->assertStringContainsString('<dialog id="popup-1" data-study-plan-dialog>', $content);
+        $this->assertStringContainsString('<dialog id="popup-1" class="ace-dialog" data-study-plan-dialog>', $content);
         $this->assertStringContainsString('Linear algebra and analysis.', $content);
-        $this->assertStringContainsString('class="change-me"', $content);
+        $this->assertStringContainsString('class="ace-module ace-interactive"', $content);
     }
 
     #[Test]
@@ -733,6 +778,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $content = $this->renderHomePage();
         // The element still renders, only the semester list is skipped.
         $this->assertStringContainsString('academic-study-plan', $content);
-        $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]/div[@role="list"]'));
+        $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]/div[contains(concat(" ", normalize-space(@class), " "), " ace-semesters ")]'));
+        $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]//div[@role="list"]'));
     }
 }

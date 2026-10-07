@@ -34,14 +34,14 @@
 
         <f:if condition="{caption} || {copyright}">
             <f:then>
-                <figure>
+                <figure class="ace-figure">
                     <f:render section="Image" arguments="{_all}" />
-                    <figcaption>
+                    <figcaption class="ace-caption">
                         <f:if condition="{caption}">
-                            <span>{caption}</span>
+                            <span class="ace-description">{caption}</span>
                         </f:if>
                         <f:if condition="{copyright}">
-                            <small>© {copyright}</small>
+                            <small class="ace-copyright">© {copyright}</small>
                         </f:if>
                     </figcaption>
                 </figure>
@@ -52,7 +52,7 @@
         </f:if>
     </f:then>
     <f:else if="{placeholder}">
-        <f:image src="{placeholder}" alt="{alt}" class="{class}" loading="lazy" />
+        <f:image src="{placeholder}" alt="{alt}" class="ace-image {class}" loading="lazy" />
     </f:else>
 </f:if>
 
@@ -63,12 +63,12 @@
             <img
                 src="{resource.publicUrl}"
                 alt="{f:if(condition: alt, then: alt, else: resource.alternative)}"
-                class="{class}"
+                class="ace-image {class}"
                 loading="lazy"
             />
         </f:then>
         <f:else>
-            <picture>
+            <picture class="ace-picture">
                 <f:render section="Preset-{preset}" arguments="{_all}" />
             </picture>
         </f:else>
@@ -104,7 +104,7 @@
 </f:section>
 
 <f:section name="Fallback">
-    <f:image image="{image}" cropVariant="{cropVariant}" maxWidth="{maxWidth}" alt="{alt}" class="{class}" loading="lazy" />
+    <f:image image="{image}" cropVariant="{cropVariant}" maxWidth="{maxWidth}" alt="{alt}" class="ace-image {class}" loading="lazy" />
 </f:section>
 
 </html>

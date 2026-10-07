@@ -17,7 +17,7 @@
                             when it is not given.
 
     The placeholder is "edit.<objectName>.<identifier>.placeholder". A field that failed
-    validation gets the class "change-me" in place of "f3-form-error", "aria-invalid" and
+    validation gets the class "invalid" in place of "f3-form-error", "aria-invalid" and
     "aria-describedby" naming the messages "Academic/Form/FieldWrapper" renders after it.
 </f:comment>
 
@@ -42,8 +42,9 @@
         type="{validation.inputType}"
         property="{element.identifier}"
         id="{elementId}"
+        class="ace-control ace-text"
         placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: extensionName)}"
-        errorClass="change-me"
+        errorClass="invalid"
         aria="{fieldAria}"
         disabled="{element.disabled}"
         autocomplete="{element.autocomplete}"

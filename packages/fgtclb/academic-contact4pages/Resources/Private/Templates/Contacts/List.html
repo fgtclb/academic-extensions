@@ -11,73 +11,85 @@
     <f:if condition="{settings.groupByRole} && {roles}">
         <f:then>
             <f:for each="{roles}" as="role">
-                <div class="row">
-                    <f:render
-                        partial="Profile/Header"
-                        arguments="{
-                            header: '{role.name}',
-                            layout: '{data.header_layout}',
-                            subheader: '{data.subheader}'
-                        }"
-                    />
+                <div class="ace-group">
+                    <div class="row">
+                        <f:render
+                            partial="Profile/Header"
+                            arguments="{
+                                header: '{role.name}',
+                                layout: '{data.header_layout}',
+                                subheader: '{data.subheader}'
+                            }"
+                        />
 
-                    <f:for each="{contacts}" as="contact">
-                        <f:if condition="{contact.role.uid} == {role.uid}">
-                            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                                <f:render
-                                    partial="Contacts/Item"
-                                    arguments="{
-                                        contact: contact,
-                                        role: role,
-                                        profile: contact.contract.profile,
-                                        contract: contact.contract,
-                                        settings: settings,
-                                        data: data,
-                                        grouped: 1
-                                    }"
-                                />
-                            </div>
-                        </f:if>
-                    </f:for>
+                        <f:for each="{contacts}" as="contact">
+                            <f:if condition="{contact.role.uid} == {role.uid}">
+                                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                    <div class="ace-item">
+                                        <f:render
+                                            partial="Contacts/Item"
+                                            arguments="{
+                                                contact: contact,
+                                                role: role,
+                                                profile: contact.contract.profile,
+                                                contract: contact.contract,
+                                                settings: settings,
+                                                data: data,
+                                                grouped: 1
+                                            }"
+                                        />
+                                    </div>
+                                </div>
+                            </f:if>
+                        </f:for>
+                    </div>
                 </div>
             </f:for>
 
             <f:if condition="{contactsWithoutRole}">
-                <div class="row">
-                    <f:for each="{contactsWithoutRole}" as="contact">
-                        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                            <f:render
-                                partial="Contacts/Item"
-                                arguments="{
-                                    contact: contact,
-                                    profile: contact.contract.profile,
-                                    contract: contact.contract,
-                                    settings: settings,
-                                    data: data
-                                }"
-                            />
-                        </div>
-                    </f:for>
+                <div class="ace-list">
+                    <div class="row">
+                        <f:for each="{contactsWithoutRole}" as="contact">
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                <div class="ace-item">
+                                    <f:render
+                                        partial="Contacts/Item"
+                                        arguments="{
+                                            contact: contact,
+                                            profile: contact.contract.profile,
+                                            contract: contact.contract,
+                                            settings: settings,
+                                            data: data
+                                        }"
+                                    />
+                                </div>
+                            </div>
+                        </f:for>
+                    </div>
                 </div>
             </f:if>
         </f:then>
         <f:else>
-            <div class="row">
-                <f:for each="{contacts}" as="contact">
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <f:render
-                            partial="Contacts/Item"
-                            arguments="{
-                                contact: contact,
-                                role: contact.role,
-                                profile: contact.contract.profile,
-                                contract: contact.contract,
-                                settings: settings,
-                                data: data
-                            }"
-                        />
-                    </div>
-                </f:for>
+            <div class="ace-list">
+                <div class="row">
+                    <f:for each="{contacts}" as="contact">
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                            <div class="ace-item">
+                                <f:render
+                                    partial="Contacts/Item"
+                                    arguments="{
+                                        contact: contact,
+                                        role: contact.role,
+                                        profile: contact.contract.profile,
+                                        contract: contact.contract,
+                                        settings: settings,
+                                        data: data
+                                    }"
+                                />
+                            </div>
+                        </div>
+                    </f:for>
+                </div>
             </div>
         </f:else>
     </f:if>

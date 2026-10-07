@@ -5,7 +5,7 @@
 >
 
 <f:comment>
-    A text area, with the class "change-me" when the element sets "richtext". The
+    A text area, with the class "ace-ckeditor" when the element sets "richtext". The
     arguments are those of "Academic/Form/Textfield".
 </f:comment>
 
@@ -28,8 +28,8 @@
     <f:form.textarea
         property="{element.identifier}"
         id="{elementId}"
-        class="{f:if(condition: element.richtext, then: 'change-me')}"
-        errorClass="change-me"
+        class="ace-control ace-textarea {f:if(condition: element.richtext, then: 'ace-ckeditor')}"
+        errorClass="invalid"
         aria="{fieldAria}"
         disabled="{element.disabled}"
         placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: extensionName)}"

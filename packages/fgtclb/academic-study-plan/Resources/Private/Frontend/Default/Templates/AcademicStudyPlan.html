@@ -28,15 +28,17 @@
         <f:render partial="StudyPlan/Filter" arguments="{collapsible: settings.filter.collapsible}" />
 
         <f:if condition="{semesters}">
-            <div role="list" class="row">
-                <f:for each="{semesters}" as="semester">
-                    <f:render partial="StudyPlan/Semester" arguments="{semester: semester}" />
-                </f:for>
+            <div class="ace-semesters">
+                <div role="list" class="row">
+                    <f:for each="{semesters}" as="semester">
+                        <f:render partial="StudyPlan/Semester" arguments="{semester: semester}" />
+                    </f:for>
+                </div>
             </div>
         </f:if>
 
         <f:if condition="{data.tx_academicstudyplan_footer_note}">
-            <div class="ce-bodytext">
+            <div class="ace-footer ace-richtext ce-bodytext">
                 <f:format.html>{data.tx_academicstudyplan_footer_note}</f:format.html>
             </div>
         </f:if>
