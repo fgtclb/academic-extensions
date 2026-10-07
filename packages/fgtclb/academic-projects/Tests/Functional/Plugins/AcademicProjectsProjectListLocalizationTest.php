@@ -140,7 +140,7 @@ final class AcademicProjectsProjectListLocalizationTest extends AbstractAcademic
         $content = $this->renderGermanPage();
         $this->assertStringContainsString('[DE] Solarfelder Projekt', $content);
         $this->assertMatchesRegularExpression(
-            '#<span class="[^"]*\\bchange-me-completed\\b[^"]*">\\s*Abgeschlossen\\s*</span>#',
+            '#<span class="ace-state completed">\\s*Abgeschlossen\\s*</span>#',
             $content,
         );
     }

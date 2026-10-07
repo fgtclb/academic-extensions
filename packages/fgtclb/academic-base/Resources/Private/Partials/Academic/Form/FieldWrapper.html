@@ -20,30 +20,30 @@
                         and whose labels "create.required" and the error messages of
                         "Academic/Form/ErrorMessage" are read.
 
-    The field partials mark a field that failed validation with "change-me" and point
-    "aria-describedby" to the element "<elementId>-error", which holds its messages. It
-    follows the field as its sibling.
+    The field partials mark a field that failed validation with "invalid" and point
+    "aria-describedby" to the element "<elementId>-error", "ace-field-errors", which holds
+    its messages, each in an "ace-field-error". It follows the field as its sibling.
 </f:comment>
 
 <f:variable name="validation" value="{p:validationEnsure(validations: element.validations, identifier: element.identifier)}"/>
 
 <f:form.validationResults for="{elementId}" as="validationResults">
-    <div class="{f:if(condition:'{validationResults.flattenedErrors}', then:'change-me')} {class}">
-        <label for="{elementId}">
+    <div class="ace-field {f:if(condition:'{validationResults.flattenedErrors}', then:'invalid')} {class}">
+        <label class="ace-label" for="{elementId}">
             {f:translate(key:'create.{elementId}.label', extensionName: extensionName)}
 
             <f:if condition="{validation.required}">
-                <abbr title="{f:translate(key: 'create.required', default: 'required', extensionName: extensionName)}">*</abbr>
+                <abbr class="ace-required" title="{f:translate(key: 'create.required', default: 'required', extensionName: extensionName)}">*</abbr>
             </f:if>
         </label>
 
         {elementContent->f:format.raw()}
 
         <f:if condition="{validationResults.flattenedErrors}">
-            <div id="{elementId}-error">
+            <div id="{elementId}-error" class="ace-field-errors">
                 <f:for each="{validationResults.flattenedErrors}" as="errors">
                     <f:for each="{errors}" as="error">
-                        <div>
+                        <div class="ace-field-error">
                             <f:render
                                 partial="Academic/Form/ErrorMessage"
                                 arguments="{error: error, elementId: elementId, extensionName: extensionName}"
@@ -55,7 +55,7 @@
         </f:if>
 
         <f:if condition="{element.help}">
-            <div>{element.help->f:format.raw()}</div>
+            <div class="ace-help">{element.help->f:format.raw()}</div>
         </f:if>
     </div>
 </f:form.validationResults>

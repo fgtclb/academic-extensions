@@ -56,6 +56,15 @@ trait ResponsiveImageAssertionTrait
     }
 
     /**
+     * The class attribute of an image the partial renders: its own class `ace-image`, followed
+     * by the class it takes as an argument.
+     */
+    private function imageClassAttribute(string $class): string
+    {
+        return 'ace-image ' . $class;
+    }
+
+    /**
      * @param string $class the class of the fallback image, which the partial takes as an argument
      * @param string|null $alt the alternative text the file carries, null to assert nothing about it.
      *                         The partial passes no `alt` of its own here, and the image view helper
@@ -84,7 +93,7 @@ trait ResponsiveImageAssertionTrait
         }
         $image = $this->elementMatching($xpath, './img', $picture);
         self::assertSame((string)$expectedFallbackWidth, $image->getAttribute('width'));
-        self::assertSame($class, $image->getAttribute('class'));
+        self::assertSame($this->imageClassAttribute($class), $image->getAttribute('class'));
         self::assertSame('lazy', $image->getAttribute('loading'));
         if ($alt !== null) {
             self::assertSame($alt, $image->getAttribute('alt'));
@@ -103,7 +112,7 @@ trait ResponsiveImageAssertionTrait
         ?string $alt = null,
     ): void {
         self::assertSame(0, $this->countNodesMatching($xpath, './/picture', $context));
-        $image = $this->elementMatching($xpath, sprintf('.//img[@class="%s"]', $class), $context);
+        $image = $this->elementMatching($xpath, sprintf('.//img[@class="%s"]', $this->imageClassAttribute($class)), $context);
         self::assertStringEndsWith($fileName, $image->getAttribute('src'));
         self::assertStringNotContainsString('.webp', $image->getAttribute('src'));
         self::assertSame('lazy', $image->getAttribute('loading'));
@@ -120,6 +129,6 @@ trait ResponsiveImageAssertionTrait
     private function assertRendersNoImage(\DOMXPath $xpath, \DOMNode $context, string $class): void
     {
         self::assertSame(0, $this->countNodesMatching($xpath, './/picture', $context));
-        self::assertSame(0, $this->countNodesMatching($xpath, sprintf('.//img[@class="%s"]', $class), $context));
+        self::assertSame(0, $this->countNodesMatching($xpath, sprintf('.//img[@class="%s"]', $this->imageClassAttribute($class)), $context));
     }
 }
