@@ -9,7 +9,8 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Every package of this repository points the links of its rendered manual at itself.
+ * Every package of this repository points the links of its rendered manual at itself and names
+ * its manual for other manuals.
  *
  * The renderer reads `Documentation/guides.xml` of a package, and docs.typo3.org builds
  * three links of every page from it: "Edit on GitHub" from `edit-on-github`,
@@ -30,6 +31,10 @@ use PHPUnit\Framework\TestCase;
  * - The repository link names the split repository, which is named after the package
  *   directory, not after the composer package: `fgtclb/typo3-category-types`.
  * - The extension link names the extension key.
+ * - The interlink shortcode is the composer name of the package. It gives the manual its
+ *   permalinks, and other manuals link to it through it. The renderer logs a warning for a
+ *   manual without one since its release of October 2026, which fails every render that
+ *   runs with `--fail-on-log`, the documentation job of CI among them.
  * - No `guides.xml` sits outside `Documentation/`, where the renderer never reads it and
  *   `bin/set-version` never updates it.
  */
@@ -55,6 +60,8 @@ final class DocumentationGuidesTest extends TestCase
         $packageDirectory = basename($directory);
         $extensionKey = self::extensionKey($directory);
         $this->assertNotSame('', $extensionKey, 'composer.json declares no "extra.typo3/cms.extension-key".');
+        $composerName = self::composerName($directory);
+        $this->assertNotSame('', $composerName, 'composer.json declares no "name".');
 
         $this->assertSame(
             [
@@ -63,6 +70,7 @@ final class DocumentationGuidesTest extends TestCase
                 'edit-on-github-directory' => 'packages/fgtclb/' . $packageDirectory . '/Documentation',
                 'project-repository' => 'https://github.com/fgtclb/' . $packageDirectory,
                 'project-home' => 'https://extensions.typo3.org/extension/' . $extensionKey . '/',
+                'interlink-shortcode' => $composerName,
             ],
             [
                 'edit-on-github' => $attributes['edit-on-github'] ?? null,
@@ -70,6 +78,7 @@ final class DocumentationGuidesTest extends TestCase
                 'edit-on-github-directory' => $attributes['edit-on-github-directory'] ?? null,
                 'project-repository' => $attributes['project-repository'] ?? null,
                 'project-home' => $attributes['project-home'] ?? null,
+                'interlink-shortcode' => $attributes['interlink-shortcode'] ?? null,
             ],
         );
     }
@@ -167,5 +176,12 @@ final class DocumentationGuidesTest extends TestCase
         $manifest = json_decode((string)file_get_contents($directory . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
         $key = is_array($manifest) ? ($manifest['extra']['typo3/cms']['extension-key'] ?? '') : '';
         return is_string($key) ? $key : '';
+    }
+
+    private static function composerName(string $directory): string
+    {
+        $manifest = json_decode((string)file_get_contents($directory . '/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        $name = is_array($manifest) ? ($manifest['name'] ?? '') : '';
+        return is_string($name) ? $name : '';
     }
 }

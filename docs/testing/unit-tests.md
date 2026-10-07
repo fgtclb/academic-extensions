@@ -435,7 +435,7 @@ directory is outside the directory the test container mounts.
 [`DocumentationGuidesTest`](../../packages-dev/monorepo-shared/Tests/Unit/DocumentationGuidesTest.php)
 reads the `Documentation/guides.xml` of every package below `packages/fgtclb/`
 and asserts that the links docs.typo3.org builds from it lead to the package
-itself:
+itself, and that the manual declares the shortcode other manuals link to it by:
 
 | Attribute                  | Has to be                                                               |
 |----------------------------|-------------------------------------------------------------------------|
@@ -444,6 +444,7 @@ itself:
 | `edit-on-github-directory` | `packages/fgtclb/<package directory>/Documentation`                     |
 | `project-repository`       | `https://github.com/fgtclb/<package directory>`, the split repository   |
 | `project-home`             | `https://extensions.typo3.org/extension/<extension key>/`               |
+| `interlink-shortcode`      | the composer `name` of the package, for permalinks and interlinks       |
 
 A third test fails on a `guides.xml` outside a `Documentation/` directory. The
 renderer reads `Documentation/guides.xml` only (`--config=Documentation`), and
@@ -453,6 +454,12 @@ The files were copied from one another, and nothing else notices a copy that
 kept the wrong value: the render succeeds, and a link only fails when somebody
 follows it. The manuals of `category_types` and `academic_study_plan` sent
 every "Edit on GitHub" link into the manual of `academic_base` until ACE-773.
+
+The interlink shortcode is checked for a different reason. The renderer logs a
+warning for a manual without one since its release of October 2026, and the
+documentation job renders with `--fail-on-log`, so a manual without it fails CI
+on every branch at once. The shortcode is the composer name, which is what the
+renderer suggests and what other manuals use in `:ref:` links to it.
 
 The edit branch is read from the branch alias because the branch name is not
 in the files of a checkout, and a git call does not work in a worktree, see

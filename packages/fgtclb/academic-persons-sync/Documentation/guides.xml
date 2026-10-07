@@ -5,6 +5,7 @@
         links-are-relative="true"
         default-code-language="php">
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               interlink-shortcode="fgtclb/academic-persons-sync"
                project-home="https://extensions.typo3.org/extension/academic_persons_sync/"
                project-repository="https://github.com/fgtclb/academic-persons-sync"
                project-issues="https://github.com/fgtclb/academic-extensions/issues"
