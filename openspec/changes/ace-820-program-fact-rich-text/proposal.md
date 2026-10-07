@@ -10,7 +10,7 @@ Pull request #850 (ACE-818) marks rich text output with the class
 `ce-bodytext` so the content styles of a site apply to it. For the facts it
 names the three identifiers in the partial, which repeats in a template what
 the TCA of the program page type already says, and is wrong for the same
-project. A fact should say itself whether its value is rich text, and the
+project. A fact should state whether its value is rich text, and the
 partial should only ask.
 
 ## What Changes

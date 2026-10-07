@@ -78,11 +78,11 @@ It owns a private map from fact identifier to column:
 | `prerequisites`    | `prerequisites`     |
 
 For a text fact it takes the schema of `pages`, the sub-schema of the program
-page type when the schema has one and the base schema otherwise, and calls the
-fact rich text when that schema has the column and the field is a
-`TextFieldType` whose `isRichText()` is true. Anything else, a missing table,
-a missing column or another field type, is not rich text. Credit points and
-category type facts never ask.
+page type when the schema has one and that sub-schema has the column, and the
+base schema otherwise, and calls the fact rich text when that schema has the
+column and the field is a `TextFieldType` whose `isRichText()` is true.
+Anything else, a missing table, a column removed from `pages` or another field
+type, is not rich text. Credit points and category type facts never ask.
 
 The lookup happens in `builtInFact()`, on every build. `TcaSchemaFactory`
 keeps its schemata in memory and in the core cache, so the lookup is an array
@@ -114,14 +114,16 @@ conditioned on it (see Context).
 When `pages` has no sub-schema for the program page type, which happens only
 when a project removes the type entry, the base schema decides. The base
 column is what FormEngine would then show, so the output still matches the
-backend.
+backend. A sub-schema holds only the fields its `showitem` names, palettes
+included, so a field a project leaves out of the program page form is read from
+the base column too. A value stored while the field had the editor then still
+renders as HTML.
 
 ### Rendering in the partial
 
-The value `span` becomes
-`<span class="{f:if(condition: fact.isRichText, then: 'ce-bodytext')}">`, and
-the value is rendered in three branches: categories as today, a rich text
-value with `f:format.raw()`, any other value with `f:format.nl2br()`, whose
+A rich text fact renders its value in `<span class="ce-bodytext">` with
+`f:format.raw()`. Every other fact keeps the plain `<span>` and renders in two
+branches: categories as today, any other value with `f:format.nl2br()`, whose
 children are escaped before the line breaks are added. Fluid's
 `Nl2brViewHelper` sets `escapeOutput = false` and leaves `escapeChildren`
 unset, which Fluid reads as "escape the children", on v13 and v14 alike.
@@ -136,8 +138,11 @@ off and relied on stored HTML being interpreted has stored HTML in a field
 that does not offer it, and either switches the editor on again or overrides
 the partial. The `Feature` changelog entry says so.
 
-The empty `class=""` on a fact that is not rich text is accepted. It is what
-#850 renders too, and avoiding it needs a second `span` per branch.
+The partial chooses between two `span` elements rather than computing the
+class attribute inline: an inline `f:if` leaves an empty `class=""` on every
+fact that is not rich text, as #850 renders it, and markup without meaning
+is not wanted in the output. The value element of those facts stays the plain
+`<span>` it was before.
 
 ### Relation to pull request #850 (ACE-818)
 
@@ -161,8 +166,8 @@ argument is a concrete core class. The three callers receive the builder from
 the container already, so none of them changes, and the unit test constructs
 the builder with a `TcaSchemaFactory` double.
 
-The schema API is the same on v13 and v14 for every call used here (`get()`,
-`hasSubSchema()`, `getSubSchema()`, `hasField()`, `getField()`,
+The schema API is the same on v13 and v14 for every call used here (`has()`,
+`get()`, `hasSubSchema()`, `getSubSchema()`, `hasField()`, `getField()`,
 `TextFieldType::isRichText()`), so there is no version switch.
 
 ## Risks / Trade-offs
