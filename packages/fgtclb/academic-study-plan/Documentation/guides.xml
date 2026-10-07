@@ -12,6 +12,7 @@
         copyright="since 2025 by FGTCLB GmbH"
     />
     <extension class="\T3Docs\Typo3DocsTheme\DependencyInjection\Typo3DocsThemeExtension"
+               interlink-shortcode="fgtclb/academic-study-plan"
                project-home="https://extensions.typo3.org/extension/academic_study_plan/"
                project-repository="https://github.com/fgtclb/academic-study-plan"
                project-issues="https://github.com/fgtclb/academic-extensions/issues"

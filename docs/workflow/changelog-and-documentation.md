@@ -123,6 +123,16 @@ fails. A broken cross-reference, an unknown directive or a malformed table is
 therefore a red pull request, not a cosmetic remark. The comment above the step
 says so in the workflow itself.
 
+The tag `latest` also means a new release of the renderer can turn every
+pull request and the nightly run of both branches red at once, without a change
+here. A pulled image that is newer than the local one is the first thing to
+check when the documentation job of an unrelated change fails: pull it locally
+(`podman pull ghcr.io/typo3-documentation/render-guides:latest`, or `docker
+pull`) and render again. The release of October 2026 started to warn about a
+manual without an interlink shortcode, which every `guides.xml` now declares
+and a repository check keeps (see
+[the links of the manuals](../testing/unit-tests.md#the-links-of-the-manuals)).
+
 The job is independent of the source gates — it has no `needs:` — so a
 documentation-only change gets its answer without waiting for `cgl`, `phpstan`,
 `lint`, `unit` and the functional matrix. It also runs no `composerUpdate`,
