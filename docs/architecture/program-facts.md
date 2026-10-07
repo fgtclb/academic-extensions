@@ -91,9 +91,49 @@ project that changes how a fact looks overrides the row once, for all three
 places. The card passes `listClass` and `itemClass` for its Bootstrap list
 group; the facts markup is otherwise the same everywhere.
 
-A program field value is rendered raw, as the page rendered it before: the
-three text fields are rich text edited in the backend. Credit points are an
-integer, and `0` counts as no value.
+Credit points are an integer, and `0` counts as no value.
+
+## Rich text facts
+
+A program field fact states whether its value is rich text:
+`ProgramFact::$isRichText`. The partial renders a rich text value in
+`<span class="ce-bodytext">` with `f:format.raw()`, and every other fact in a
+plain `<span>`, a program field value with `f:format.nl2br()`, which escapes its
+children before it adds the line breaks. It chooses between the two elements
+rather than computing the attribute inline, which would leave an empty
+`class=""` on every other fact. The partial holds no list of identifiers, so an
+override of it does not have to repeat one either.
+
+The builder decides per build, from the TCA schema of `pages`:
+`TcaSchemaFactory::get('pages')`, the sub-schema of the program page type
+(doktype 20) when the schema has one and it holds the column behind the fact
+(`jobProfile` is `job_profile`, `performanceScope` `performance_scope`,
+`prerequisites` `prerequisites`), the base schema otherwise. A sub-schema holds
+only the fields its form shows. A field a project leaves out of the program page
+form is therefore read from the base column, as it is when the program page type
+is removed. A `TextFieldType` whose `isRichText()` is true is rich text,
+anything else is not, a column removed from `pages` included. Credit points and
+category type facts never ask.
+
+The sub-schema carries the `columnsOverrides` of the program page type merged
+into the base columns, so a project that switches the editor off for the
+field, or only for program pages, or off for the field and on again for program
+pages, gets the matching output. Reading `$GLOBALS['TCA']` instead would mean
+merging those overrides by hand. A fixed map in the builder, or the identifier
+condition the partial would otherwise need, ignores exactly the project that
+changed the field. The program page type is chosen by its constant rather than
+by the doktype of the source, because `ProgramFactsSourceInterface` exposes
+none and every source is a program page: the list repository constrains on
+doktype 20, and the page object block of the processor is conditioned on it.
+
+On TYPO3 v13 the schema classes still carry an `@internal` note from before the
+LTS release. The API used here is the same on v14, where it is public, and other
+extensions of this repository inject `TcaSchemaFactory` already.
+
+A field without the editor is a plain textarea in the backend, so what an
+editor types there is text: escaping it is the correct output. Before the flag,
+such a field was printed raw, and an editor could put markup into the frontend
+that the backend never offered as markup.
 
 The partial `Program/Categories.html` that rendered the categories on the page
 and in the details element is removed rather than deprecated: an override of
@@ -108,7 +148,17 @@ three places with and without the settings, on a `FLUIDTEMPLATE` and a
 the removed partial renders nowhere. It asserts the order by labels and values,
 not by markup, so its cases without configuration held before the facts
 partials existed too; the published classes, a category title escaped once and
-the rich text rendered raw are asserted on their own.
+the rich text rendered raw are asserted on their own, and so is the class
+`ce-bodytext` on the three text facts and on none of the others.
+`Tests/Functional/Facts/ProgramFactsBuilderRichTextTest.php` changes the TCA
+of `pages` in each of the ways a project does, rebuilds the schema and asserts
+the flag of every fact, a removed program page type, a field left out of the
+program page form and a removed column included.
+`Tests/Functional/Facts/ProgramFactsPlainTextTest.php` renders the three places
+with a site package whose `Configuration/TCA/Overrides/pages.php` switches the
+editor off for one field on program pages, off for another on every page type,
+and off and on again for the third, and asserts an escaped value with its line
+breaks next to rendered HTML.
 `Tests/Unit/Service/ProgramFactsBuilderTest.php` covers the list rules, a type
 order that is not the registry's included, and
 `Tests/Functional/Imaging/FactIconsTest.php` the credit points icon, a frontend
