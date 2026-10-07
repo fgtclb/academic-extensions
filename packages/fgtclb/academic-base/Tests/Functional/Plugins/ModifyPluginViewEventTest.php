@@ -297,7 +297,7 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
         $content = $this->renderFrontendPage($this->pageUrl(22, 'jobs-new'));
 
         $this->assertSame(['AcademicJobs/NewJobForm/new'], RecordPluginViewListener::$renderings);
-        $this->assertMatchesRegularExpression('#<label for="job\.title">\s*[^<]*\s*<abbr title="required">\*</abbr>#', $content);
+        $this->assertMatchesRegularExpression('#<label class="ace-label" for="job\.title">\s*[^<]*\s*<abbr class="ace-required" title="required">\*</abbr>#', $content);
         $this->assertMatchesRegularExpression('#<input[^>]+type="email"[^>]+name="tx_academicjobs_newjobform\[job\]\[contactEmail\]"#', $content);
     }
 

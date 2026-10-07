@@ -509,7 +509,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
 
-        $this->assertStringContainsString('<h1>Quantum Optics</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Quantum Optics</h1>', $content);
         $this->assertMainColumnInManualOrder($content);
         $this->assertStringNotContainsString('A note in the side column.', $content);
     }

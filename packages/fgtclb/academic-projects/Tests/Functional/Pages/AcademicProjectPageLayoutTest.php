@@ -41,10 +41,10 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
     ];
 
     /**
-     * The header of the project page, the element around its heading, and the subtitle,
-     * the paragraph right after the heading. The short description follows it.
+     * The header of the project page, and the subtitle, the paragraph right after its
+     * heading. The short description follows it.
      */
-    private const HEADER = '//div[h1]';
+    private const HEADER = '//header[h1]';
     private const SUBTITLE = self::HEADER . '/h1/following-sibling::*[1][self::p]';
     private const FIXTURES = 'EXT:academic_projects/Tests/Functional/Pages/Fixtures/';
     private const PROJECT_PAGE = 'https://www.acme.com/quantum-optics';
@@ -189,7 +189,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $compiled = $this->renderFrontendPage('https://www.acme.com/dark-matter');
         $header = strpos($compiled, 'site-layout-wide-header');
-        $title = strpos($compiled, '<h1>Dark Matter</h1>');
+        $title = strpos($compiled, '<h1 class="ace-title">Dark Matter</h1>');
         $footer = strpos($compiled, 'site-layout-wide-footer');
         $this->assertIsInt($header, 'The layout is missing on the second project page.');
         $this->assertIsInt($title, 'The project content is missing on the second project page.');
@@ -255,7 +255,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $content = $this->renderFrontendPage(self::PROJECT_PAGE);
 
-        $this->assertStringContainsString('<h1>Entangled photon sources</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Entangled photon sources</h1>', $content);
         $this->assertStringContainsString(self::CONTENT_ELEMENT, $content);
         $this->assertStringNotContainsString('site-package-default-template', $content);
     }
@@ -283,7 +283,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $this->assertStringContainsString('<div class="project-project-facts">', $content);
         $this->assertStringNotContainsString('Budget', $content);
-        $this->assertStringContainsString('<h1>Entangled photon sources</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Entangled photon sources</h1>', $content);
         $this->assertStringContainsString('<picture', $content);
         $this->assertStringContainsString(self::CONTENT_ELEMENT, $content);
     }
@@ -318,7 +318,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
 
-        $this->assertStringContainsString('<h1>Dark Matter</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Dark Matter</h1>', $content);
     }
 
     /**
@@ -376,8 +376,8 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $content = $this->renderFrontendPage(self::PROJECT_PAGE);
 
-        $this->assertStringContainsString('<h1>Entangled photon sources</h1>', $content);
-        $this->assertStringContainsString('<p>Funded until 2027</p>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Entangled photon sources</h1>', $content);
+        $this->assertStringContainsString('<p class="ace-subtitle">Funded until 2027</p>', $content);
     }
 
     #[Test]
@@ -388,7 +388,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
 
-        $this->assertStringContainsString('<h1>Dark Matter</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Dark Matter</h1>', $content);
         $this->assertCount(1, $this->nodesMatching($this->parseRenderedPage($content), self::HEADER));
         $this->assertCount(0, $this->nodesMatching($this->parseRenderedPage($content), self::SUBTITLE));
     }

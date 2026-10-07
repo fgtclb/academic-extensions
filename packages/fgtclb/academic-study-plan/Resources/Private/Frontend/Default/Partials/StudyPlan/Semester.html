@@ -16,33 +16,37 @@
     both as soon as it turns the column into an accordion.
 </f:comment>
 
-<div role="listitem" class="col" data-study-plan-semester>
-    <div aria-hidden="true" inert data-study-plan-semester-header>
-        <div>
-            <div>
-                <h3><b>{semester.label}</b></h3>
+<div role="listitem" class="col">
+    <div class="ace-semester" data-study-plan-semester>
+        <div class="ace-header" aria-hidden="true" inert data-study-plan-semester-header>
+            <div class="ace-content">
+                <div class="ace-heading">
+                    <h3 class="ace-title"><b>{semester.label}</b></h3>
 
-                <f:if condition="{semester.credit_points}">
-                    <span>
-                        {semester.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
-                    </span>
-                </f:if>
+                    <f:if condition="{semester.credit_points}">
+                        <span class="ace-credits">
+                            {semester.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
+                        </span>
+                    </f:if>
+                </div>
+
+                <span class="ace-actions">
+                    <ab:icon identifier="tx-academicbase-action-expand" alternativeMarkupIdentifier="inline"/>
+                    <ab:icon identifier="tx-academicbase-action-collapse" alternativeMarkupIdentifier="inline"/>
+                </span>
             </div>
 
-            <ab:icon identifier="tx-academicbase-action-expand" alternativeMarkupIdentifier="inline"/>
-            <ab:icon identifier="tx-academicbase-action-collapse" alternativeMarkupIdentifier="inline"/>
+            <f:if condition="{semester.note}">
+                <span class="ace-note">{semester.note}</span>
+            </f:if>
         </div>
 
-        <f:if condition="{semester.note}">
-            <span>{semester.note}</span>
-        </f:if>
+        <ul class="ace-modules">
+            <f:for each="{semester.modules}" as="module">
+                <f:render partial="StudyPlan/Module" arguments="{module: module, semester: semester}" />
+            </f:for>
+        </ul>
     </div>
-
-    <ul>
-        <f:for each="{semester.modules}" as="module">
-            <f:render partial="StudyPlan/Module" arguments="{module: module, semester: semester}" />
-        </f:for>
-    </ul>
 </div>
 
 </html>

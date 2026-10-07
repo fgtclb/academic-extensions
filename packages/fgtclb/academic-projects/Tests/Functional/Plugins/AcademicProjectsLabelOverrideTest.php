@@ -146,7 +146,7 @@ final class AcademicProjectsLabelOverrideTest extends AbstractAcademicProjectsTe
     {
         yield 'label of the sorting partial' => [
             'https://www.acme.com/home', 'sorting.field.label', 'Sorting field',
-            '<label for="sortingField"> %s </label>',
+            '<label class="ace-label" for="sortingField"> %s </label>',
         ];
         yield 'sorting option, translated by the view helper' => [
             'https://www.acme.com/home', 'sorting.field.title', 'Title',
@@ -159,11 +159,11 @@ final class AcademicProjectsLabelOverrideTest extends AbstractAcademicProjectsTe
         ];
         yield 'category type of a project, key from a variable, over several lines' => [
             'https://www.acme.com/home', 'sys_category.projects.competence_field', 'Competence field',
-            '<b> %s: </b> <span> Photonics </span>',
+            '<b class="ace-label"> %s: </b> <span class="ace-value"> Photonics </span>',
         ];
         yield 'message of an empty list' => [
             'https://www.acme.com/empty', 'list.noProjectsFound', 'No projects found.',
-            '<span>%s</span>',
+            '<span class="ace-empty">%s</span>',
         ];
     }
 
@@ -218,11 +218,11 @@ final class AcademicProjectsLabelOverrideTest extends AbstractAcademicProjectsTe
     public static function pageTranslationDataProvider(): \Generator
     {
         yield 'category type, key from a variable' => [
-            'sys_category.projects.competence_field', 'Competence field', '<b>%s:</b> <span> Photonics </span>',
+            'sys_category.projects.competence_field', 'Competence field', '<b class="ace-label">%s:</b> <span class="ace-value"> Photonics </span>',
         ];
-        yield 'label of the runtime' => ['project.runtime', 'Runtime', '<b>%s:</b> <span> Since'];
-        yield 'runtime without an end' => ['project.since', 'Since', '<span> %s 01.2020 </span>'];
-        yield 'label of the budget' => ['project.budget', 'Budget', '<b>%s:</b> <span>2.500,00'];
+        yield 'label of the runtime' => ['project.runtime', 'Runtime', '<b class="ace-label">%s:</b> <span class="ace-value"> Since'];
+        yield 'runtime without an end' => ['project.since', 'Since', '<span class="ace-value"> %s 01.2020 </span>'];
+        yield 'label of the budget' => ['project.budget', 'Budget', '<b class="ace-label">%s:</b> <span class="ace-value">2.500,00'];
     }
 
     #[DataProvider('pageTranslationDataProvider')]

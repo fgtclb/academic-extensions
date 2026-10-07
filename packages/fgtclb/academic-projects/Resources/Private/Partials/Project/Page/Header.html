@@ -13,18 +13,18 @@
     first in the document.
 </f:comment>
 
-<div>
-    <h1>{f:if(condition: '{project.projectTitle}', then: '{project.projectTitle}', else: '{pageRecord.title}')}</h1>
+<header class="ace-header">
+    <h1 class="ace-title">{f:if(condition: '{project.projectTitle}', then: '{project.projectTitle}', else: '{pageRecord.title}')}</h1>
 
     <f:if condition="{pageRecord.subtitle}">
-        <p>{pageRecord.subtitle}</p>
+        <p class="ace-subtitle">{pageRecord.subtitle}</p>
     </f:if>
 
     <f:if condition="{project.shortDescription}">
-        <div class="ce-bodytext">
+        <div class="ace-richtext ce-bodytext">
             <f:format.html>{project.shortDescription}</f:format.html>
         </div>
     </f:if>
-</div>
+</header>
 
 </html>

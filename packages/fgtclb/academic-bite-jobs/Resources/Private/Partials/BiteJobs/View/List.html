@@ -4,9 +4,9 @@
     xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
 >
 
-<div>
+<div class="ace-list ace-list-view">
     <f:for each="{jobs}" as="job">
-        <div>
+        <article class="ace-item">
             <f:render
                 partial="BiteJobs/Header"
                 arguments="{
@@ -18,16 +18,16 @@
                 }"
             />
 
-            <ul>
-                <li>
-                    <b>{f:translate(key: 'jobs.bite.endsOn', extensionName: 'AcademicBiteJobs')}:</b>
+            <ul class="ace-properties">
+                <li class="ace-property">
+                    <b class="ace-label">{f:translate(key: 'jobs.bite.endsOn', extensionName: 'AcademicBiteJobs')}:</b>
 
-                    <span>{job.endsOn -> f:format.date(format: 'd.m.Y')}</span>
+                    <span class="ace-value">{job.endsOn -> f:format.date(format: 'd.m.Y')}</span>
                 </li>
 
                 <!-- Add custom fields here -->
             </ul>
-        </div>
+        </article>
     </f:for>
 </div>
 

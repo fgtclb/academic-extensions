@@ -4,9 +4,9 @@
     xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
 >
 
-<table>
-    <thead>
-        <tr>
+<table class="ace-table">
+    <thead class="ace-head">
+        <tr class="ace-item">
             <f:for
                 each="{
                     0: 'title',
@@ -14,20 +14,20 @@
                 }"
                 as="column"
             >
-                <th>
+                <th class="ace-label">
                     {f:translate(key: 'jobs.bite.{column}', extensionName: 'AcademicBiteJobs')}
                 </th>
             </f:for>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="ace-body">
         <f:for each="{jobs}" as="job">
-            <tr>
-                <td>
-                    <a href="{job.url}" target="_blank">{job.title}</a>
+            <tr class="ace-item">
+                <td class="ace-value">
+                    <a class="ace-link" href="{job.url}" target="_blank">{job.title}</a>
                 </td>
 
-                <td>
+                <td class="ace-value">
                     {job.endsOn -> f:format.date(format: 'd.m.Y')}
                 </td>
 

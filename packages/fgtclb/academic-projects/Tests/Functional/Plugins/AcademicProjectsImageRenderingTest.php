@@ -26,9 +26,9 @@ final class AcademicProjectsImageRenderingTest extends AbstractAcademicProjectsT
     use SiteBasedTestTrait;
 
     /**
-     * The items of the list, each the element in a grid column of the result list.
+     * The items of the list.
      */
-    private const ITEMS = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]/div[@class="row"]/div/div';
+    private const ITEMS = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]//div[contains(concat(" ", normalize-space(@class), " "), " ace-item ")]';
 
     private const FIXTURES = __DIR__ . '/Fixtures/AcademicProjectsImage/';
 

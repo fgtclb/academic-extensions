@@ -538,10 +538,9 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $xpath = new \DOMXPath($document);
         $roleOfContact = [];
         // One grid column per contact, holding the role name and the card.
-        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]/div[@class='row']/div") as $item) {
+        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]/div[contains(concat(' ', normalize-space(@class), ' '), ' ace-list ')]/div[@class='row']/div/div[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]") as $item) {
             preg_match('#(Müllermann|Huber|Beispiel|Nebenan)#u', $item->textContent, $name);
-            // The role is the paragraph in front of the card.
-            $role = $this->nodes($xpath, './p', $item)->item(0);
+            $role = $this->nodes($xpath, "./p[contains(concat(' ', normalize-space(@class), ' '), ' ace-role ')]", $item)->item(0);
             $roleOfContact[$name[1] ?? '?'] = $role === null ? null : trim($role->textContent);
         }
 
@@ -665,7 +664,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
 
         return $this->countNodes(
             new \DOMXPath($document),
-            "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]/div[@class='row']/div/p",
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]//p[contains(concat(' ', normalize-space(@class), ' '), ' ace-role ')]",
         );
     }
 

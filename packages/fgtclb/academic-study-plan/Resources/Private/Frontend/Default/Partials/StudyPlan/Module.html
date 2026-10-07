@@ -24,21 +24,21 @@
     value="{f:if(condition: '{module.description} || {module.audioFiles}', then: '1', else: '0')}"
 />
 
-<li class="{f:if(condition: hasContent, then: 'change-me')}" data-study-plan-module data-categories="{f:format.json(value: module.categories) -> f:format.htmlspecialchars()}">
-    <h4>{module.label}</h4>
+<li class="ace-module {f:if(condition: hasContent, then: 'ace-interactive')}" data-study-plan-module data-categories="{f:format.json(value: module.categories) -> f:format.htmlspecialchars()}">
+    <h4 class="ace-title">{module.label}</h4>
 
     <f:if condition="{module.credit_points}">
-        <span>
+        <span class="ace-credits">
             {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
         </span>
     </f:if>
 
     <f:if condition="{module.note}">
-        <span>{module.note}</span>
+        <span class="ace-note">{module.note}</span>
     </f:if>
 
     <f:if condition="{hasContent}">
-        <button data-study-plan-dialog-trigger data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
+        <button class="ace-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
             <span class="visually-hidden">
                 {semester.label}<f:if condition="{semester.note}">, {semester.note}</f:if><f:if condition="{semester.credit_points}">, {semester.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}</f:if>.
                 {f:translate(key: 'modal.open', extensionName: 'AcademicStudyPlan')}: {module.label}
