@@ -29,18 +29,20 @@
         <f:variable name="pageRecord" value="{data}" />
     </f:if>
 
-    <div class="academic-projects-detail container">
-        <div>
-            <f:render partial="Project/Page/Header" arguments="{_all}" />
-            <f:render partial="Project/Page/Media" arguments="{_all}" />
+    <div class="container">
+        <div class="academic-projects-detail">
+            <div>
+                <f:render partial="Project/Page/Header" arguments="{_all}" />
+                <f:render partial="Project/Page/Media" arguments="{_all}" />
+            </div>
+
+            <f:render partial="Project/Page/Categories" arguments="{_all}" />
+
+            <f:render partial="Project/Page/Facts" arguments="{_all}" />
         </div>
-
-        <f:render partial="Project/Page/Categories" arguments="{_all}" />
-
-        <f:render partial="Project/Page/Facts" arguments="{_all}" />
-
-        <f:render partial="Project/Page/Content" arguments="{_all}" />
     </div>
+
+    <f:render partial="Project/Page/Content" arguments="{_all}" />
 </f:section>
 
 </html>
