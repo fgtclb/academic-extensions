@@ -21,18 +21,18 @@
     </f:comment>
 
     <div
-        class="academic-study-plan container"
+        class="academic-study-plan"
         data-study-plan="{data.uid}"
         data-filter-label="{f:translate(key: 'filter.label', extensionName: 'AcademicStudyPlan')}"
     >
         <f:render partial="StudyPlan/Filter" arguments="{collapsible: settings.filter.collapsible}" />
 
         <f:if condition="{semesters}">
-            <ul class="row">
+            <div role="list" class="row">
                 <f:for each="{semesters}" as="semester">
                     <f:render partial="StudyPlan/Semester" arguments="{semester: semester}" />
                 </f:for>
-            </ul>
+            </div>
         </f:if>
 
         <f:if condition="{data.tx_academicstudyplan_footer_note}">
