@@ -16,7 +16,7 @@
     both as soon as it turns the column into an accordion.
 </f:comment>
 
-<li class="col" data-study-plan-semester>
+<div role="listitem" class="col" data-study-plan-semester>
     <div aria-hidden="true" inert data-study-plan-semester-header>
         <div>
             <div>
@@ -43,6 +43,6 @@
             <f:render partial="StudyPlan/Module" arguments="{module: module, semester: semester}" />
         </f:for>
     </ul>
-</li>
+</div>
 
 </html>

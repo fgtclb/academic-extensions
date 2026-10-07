@@ -470,10 +470,10 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
             $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li[@data-study-plan-filter-template]'),
         );
         // Two semesters, each with its header.
-        $this->assertSame(2, $this->nodeCountOf($html, '//li[@data-study-plan-semester]'));
+        $this->assertSame(2, $this->nodeCountOf($html, '//div[@data-study-plan]/div[@role="list"]/div[@role="listitem"][@data-study-plan-semester]'));
         $this->assertSame(
             2,
-            $this->nodeCountOf($html, '//li[@data-study-plan-semester]/div[@data-study-plan-semester-header]'),
+            $this->nodeCountOf($html, '//div[@data-study-plan-semester]/div[@data-study-plan-semester-header]'),
         );
         // Three modules, of which the two with content carry a trigger and a dialog.
         $this->assertSame(3, $this->nodeCountOf($html, '//li[@data-study-plan-module]'));
@@ -731,6 +731,6 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $content = $this->renderHomePage();
         // The element still renders, only the semester list is skipped.
         $this->assertStringContainsString('academic-study-plan', $content);
-        $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]/ul[not(@data-study-plan-filter)]'));
+        $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]/div[@role="list"]'));
     }
 }
