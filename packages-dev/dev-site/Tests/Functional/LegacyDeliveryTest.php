@@ -59,10 +59,11 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
     private const PAGE_OFFSET = 1000;
 
     /**
-     * The profile detail page of the seed, which hosts the detail plugin and
-     * nothing else.
+     * The profile detail pages of the seed, which host the detail plugin and
+     * nothing else: the one of every profile list, and the one of the hidden
+     * profiles.
      */
-    private const PROFILE_DETAIL_PAGE = 205;
+    private const PROFILE_DETAIL_PAGES = [205, 209];
 
     /**
      * The strings the two sites are *supposed* to disagree about, as
@@ -168,7 +169,7 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
      *
      * `200`, except for the two pages the seed puts behind a frontend user
      * group, which answer `403` to a visitor who is not logged in - that is
-     * what those pages are in the seed for - and the profile detail page, which
+     * what those pages are in the seed for - and the profile detail pages, which
      * this harness sees as `404` on TYPO3 v14 only, for the reason given at
      * {@see self::mirroredPages()}.
      */
@@ -259,7 +260,7 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
                 'status' => trim((string)$row['fe_group'], ' ,0') !== '' ? 403 : 200,
             ];
 
-            // The profile detail page, asked without a profile. The plugin
+            // The profile detail pages, asked without a profile. The plugin
             // answers `ErrorController::pageNotFoundAction()` by design in that
             // case - `ProfileController::detailAction()` opens with exactly that
             // - and a real request answers `404` on BOTH cores; measured against
@@ -273,7 +274,7 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
             // instead - the `@todo: Remove when ContentObjectRenderer is
             // response aware` that v13 carries, implemented. So the expectation
             // is version dependent while the behaviour is not.
-            if ($uid === self::PROFILE_DETAIL_PAGE && (new Typo3Version())->getMajorVersion() >= 14) {
+            if (in_array($uid, self::PROFILE_DETAIL_PAGES, true) && (new Typo3Version())->getMajorVersion() >= 14) {
                 $pages[$uid]['status'] = 404;
             }
         }

@@ -26,14 +26,16 @@
                 "tables_modify",
                 "tables_select",
                 "title",
-                "uid"
+                "uid",
+                "workspace_perms"
             ],
-            "checksum": "240082324c1d41734f110834c14f356316f2d1ab"
+            "checksum": "d2030ddbb583e414bdabfab83a897cc3250bb6e4"
         },
         "be_users": {
             "rows": 1,
             "columns": [
                 "admin",
+                "disable",
                 "email",
                 "pid",
                 "realName",
@@ -41,7 +43,7 @@
                 "usergroup",
                 "username"
             ],
-            "checksum": "10b86dc14e353b61eaffabdae5e508eeb464f77d"
+            "checksum": "ebd8dfd7832e5169e3a16f536904dfc994091047"
         },
         "fe_groups": {
             "rows": 2,
@@ -68,7 +70,7 @@
             "checksum": "29722b68cbf6ecc46dfbbebe8251df58d511a146"
         },
         "pages": {
-            "rows": 246,
+            "rows": 250,
             "columns": [
                 "abbreviation",
                 "abstract",
@@ -96,6 +98,7 @@
                 "l10n_source",
                 "lastUpdated",
                 "link",
+                "nav_hide",
                 "performance_scope",
                 "perms_group",
                 "perms_groupid",
@@ -117,7 +120,7 @@
                 "tx_academicprojects_start_date",
                 "uid"
             ],
-            "checksum": "010f634defcf9a79dd175ab3060ae934aa59b118"
+            "checksum": "7acaf85892da4bb8f8e6e3955bd32a5b6991f7c9"
         },
         "sys_category": {
             "rows": 60,
@@ -189,7 +192,7 @@
             "checksum": "06d831d027b09b2de067b2d3b08e6fb050f08f42"
         },
         "tt_content": {
-            "rows": 256,
+            "rows": 260,
             "columns": [
                 "CType",
                 "bodytext",
@@ -211,7 +214,7 @@
                 "tx_academicstudyplan_semesters",
                 "uid"
             ],
-            "checksum": "9d38a3893d4eb8392d10bbde8c5d2e99ba3ca209"
+            "checksum": "54ad6aa28e82804d9e01b2b2c9f0fa64763a3d8b"
         },
         "tx_academiccontacts4pages_domain_model_contact": {
             "rows": 44,
@@ -497,7 +500,7 @@
                 "sys_language_uid",
                 "uid"
             ],
-            "checksum": "0f0247fade270d078e2a21664530fd50e5b04368"
+            "checksum": "e4eec5e0007b11ae9230a8fa497da00a5015c899"
         },
         "tx_academicstudyplan_domain_model_semester": {
             "rows": 32,
