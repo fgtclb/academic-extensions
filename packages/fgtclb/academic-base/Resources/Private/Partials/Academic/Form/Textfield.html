@@ -16,10 +16,17 @@
         fieldWrapperPartial The partial around the field, "Academic/Form/FieldWrapper"
                             when it is not given.
 
-    The placeholder is "edit.<objectName>.<identifier>.placeholder".
+    The placeholder is "edit.<objectName>.<identifier>.placeholder". A field that failed
+    validation gets the class "is-invalid" in place of "f3-form-error", "aria-invalid" and
+    "aria-describedby" naming the messages "Academic/Form/FieldWrapper" renders after it.
 </f:comment>
 
 <f:variable name="elementId" value="{objectName}.{element.identifier}"/>
+<f:form.validationResults for="{elementId}" as="fieldValidationResults">
+    <f:if condition="{fieldValidationResults.flattenedErrors}">
+        <f:variable name="fieldAria" value="{invalid: 'true', describedby: '{elementId}-error'}"/>
+    </f:if>
+</f:form.validationResults>
 <f:variable name="validation" value="{p:validationEnsure(validations: element.validations, identifier: element.identifier)}"/>
 
 <f:render
@@ -33,6 +40,8 @@
         id="{elementId}"
         placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: extensionName)}"
         class="form-control"
+        errorClass="is-invalid"
+        aria="{fieldAria}"
         disabled="{element.disabled}"
         autocomplete="{element.autocomplete}"
     />
