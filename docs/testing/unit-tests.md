@@ -279,6 +279,20 @@ the other — `academic_base` depends on `backend` only in `ext_emconf.php`,
 defect. `academic_jobs` carries that stricter
 check for itself, `academic-jobs/Tests/Unit/ExtEmConfDependenciesTest.php`.
 
+## The description of upgrade wizards
+
+[`UpgradeWizardDescriptionTest`](../../packages-dev/monorepo-shared/Tests/Unit/UpgradeWizardDescriptionTest.php)
+creates every class below `packages/fgtclb/*/Classes/Upgrades/` that carries
+the `#[UpgradeWizard]` attribute, without its constructor, and fails on an
+empty title or an empty description. The upgrade module shows both, and the
+description is what an administrator reads before a wizard writes to the
+database. Eight of the fourteen wizards had an empty one until ACE-847.
+
+Whether a wizard reports itself as necessary only when there is something to
+migrate is not a static property, and this check cannot see it. A new wizard is
+expected to cover it with a functional test of its own, next to the one for
+what it writes. Not every existing wizard has one yet.
+
 ## The extension name of translations
 
 [`TranslationExtensionNameTest`](../../packages-dev/monorepo-shared/Tests/Unit/TranslationExtensionNameTest.php)

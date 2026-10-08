@@ -38,6 +38,139 @@ final class FlexFormUpgradeWizardTest extends AbstractAcademicProjectsTestCase
         $this->assertTrue($this->subject()->updateNecessary());
     }
 
+    /**
+     * Every project list created since 2.0 stores the new settings only. Such a list
+     * made the wizard show up as necessary on every installation (ACE-847).
+     */
+    #[Test]
+    public function updateIsNotNecessaryForContentElementsWithoutOldSettings(): void
+    {
+        $this->createContentElement(1, 'academicprojects_projectlist', $this->flexForm([
+            'settings.activeState' => 'active',
+            'settings.hideFilter' => '1',
+            'settings.hideSorting' => '0',
+        ]));
+        $this->createContentElement(2, 'academicprojects_projectlistsingle', '');
+        $this->createContentElement(3, 'unrelated_plugin', $this->flexForm([
+            'settings.hideCompletedProjects' => '1',
+        ]));
+
+        $this->assertFalse($this->subject()->updateNecessary());
+    }
+
+    #[Test]
+    public function updateIsNotNecessaryAnyMoreOnceMigrated(): void
+    {
+        $this->createContentElement(1, 'academicprojects_projectlist', $this->flexForm([
+            'settings.sorting.options' => '1',
+        ]));
+        $this->assertTrue($this->subject()->updateNecessary());
+
+        $this->subject()->executeUpdate();
+
+        $this->assertFalse($this->subject()->updateNecessary());
+    }
+
+    #[Test]
+    public function contentElementWithoutOldSettingsIsNotRewritten(): void
+    {
+        $current = $this->flexForm(['settings.activeState' => 'completed']);
+        $this->createContentElement(1, 'academicprojects_projectlist', $current);
+        $this->createContentElement(2, 'academicprojects_projectlist', $this->flexForm([
+            'settings.hideCompletedProjects' => '1',
+        ]));
+
+        $this->assertTrue($this->subject()->executeUpdate());
+
+        $this->assertSame($current, $this->flexFormOf(1));
+        $this->assertSame(['settings.activeState' => 'active'], $this->settingsOf(2));
+    }
+
+    /**
+     * 1.x stored the checkbox as `settings.hide_completed_projects`, the wizard only knew
+     * the camel case name no released version stored (ACE-847).
+     */
+    #[Test]
+    public function updateIsNecessaryForTheSettingNameOf1x(): void
+    {
+        $this->createContentElement(1, 'academicprojects_projectlist', $this->flexForm([
+            'settings.hide_completed_projects' => '0',
+        ]));
+
+        $this->assertTrue($this->subject()->updateNecessary());
+    }
+
+    /**
+     * 1.x: a checked box (`1`) hid completed projects, which is the active-only listing.
+     * `settings.filter.options` of 1.x hid the filter when checked, as `settings.hideFilter`.
+     */
+    #[Test]
+    public function completedProjectsSettingOf1xBecomesTheActiveState(): void
+    {
+        $this->createContentElement(1, 'academicprojects_projectlist', $this->flexForm([
+            'settings.filter.options' => '1',
+            'settings.hide_completed_projects' => '1',
+        ]));
+        $this->createContentElement(2, 'academicprojects_projectlistsingle', $this->flexForm([
+            'settings.filter.options' => '0',
+            'settings.hide_completed_projects' => '0',
+        ]));
+
+        $this->assertTrue($this->subject()->executeUpdate());
+
+        $this->assertSame(['settings.activeState' => 'active', 'settings.hideFilter' => '1'], $this->settingsOf(1));
+        $this->assertSame(['settings.activeState' => 'all', 'settings.hideFilter' => '0'], $this->settingsOf(2));
+        $this->assertFalse($this->subject()->updateNecessary());
+    }
+
+    /**
+     * A backend save keeps stored FlexForm keys the form no longer shows, so a list an
+     * editor saved in 2.x carries the 1.x setting next to the 2.x one. The 2.4 run is the
+     * first effective one after an upgrade from 1.x, and must not overwrite what the editor
+     * chose since (ACE-847).
+     */
+    #[Test]
+    public function aStoredNewSettingIsKeptAndTheOldOneRemoved(): void
+    {
+        $this->createContentElement(1, 'academicprojects_projectlist', $this->flexForm([
+            'settings.hide_completed_projects' => '1',
+            'settings.activeState' => 'completed',
+            'settings.filter.options' => '1',
+            'settings.hideFilter' => '0',
+        ]));
+        $this->createContentElement(2, 'academicprojects_projectlist', $this->flexForm([
+            'settings.hide_completed_projects' => '0',
+            'settings.activeState' => 'active',
+            'settings.sorting.options' => '1',
+            'settings.hideSorting' => '0',
+        ]));
+        $this->assertTrue($this->subject()->updateNecessary());
+
+        $this->assertTrue($this->subject()->executeUpdate());
+
+        $this->assertSame(['settings.activeState' => 'completed', 'settings.hideFilter' => '0'], $this->settingsOf(1));
+        $this->assertSame(['settings.activeState' => 'active', 'settings.hideSorting' => '0'], $this->settingsOf(2));
+        $this->assertFalse($this->subject()->updateNecessary());
+    }
+
+    /**
+     * Both old names of the active state in one FlexForm: the first one creates the
+     * target, the second one is removed without overwriting it.
+     */
+    #[Test]
+    public function bothOldNamesOfTheActiveStateAreRemoved(): void
+    {
+        $this->createContentElement(1, 'academicprojects_projectlist', $this->flexForm([
+            'settings.hide_completed_projects' => '1',
+            'settings.hideCompletedProjects' => '0',
+        ]));
+
+        $this->assertTrue($this->subject()->executeUpdate());
+
+        $this->assertSame(['settings.activeState' => 'active'], $this->settingsOf(1));
+        $this->assertFalse($this->subject()->updateNecessary());
+    }
+
     #[Test]
     public function completedProjectsFlagBecomesTheActiveState(): void
     {
