@@ -387,3 +387,46 @@ a frontend user. In that case no empty profile SHALL be saved.
 - **WHEN** a custom factory returns no profile for a frontend user
 - **THEN** `academic:createprofiles` saves nothing for that user and reports
   no error
+
+### Requirement: The page options take page uids only
+The system SHALL read `--include-pids` and `--exclude-pids` of
+`academic:createprofiles` and `academic:updateprofiles` as a comma-separated
+list of page uids, the way `academic:cleanupprofiles` reads them. Spaces around
+the commas and empty parts SHALL be accepted. A list with any other part SHALL
+be refused with an error message and the exit code for invalid input, before
+anything is created or updated. This applies to TYPO3 v13 and v14.
+
+#### Scenario: A mistyped separator
+- **WHEN** an integrator runs `academic:updateprofiles` with
+  `--exclude-pids=110;1100`
+- **THEN** the command prints that the page options take a comma-separated
+  list of page uids, exits with the code for invalid input and updates no
+  profile
+
+#### Scenario: A page list that is no number
+- **WHEN** an integrator runs `academic:createprofiles` with
+  `--include-pids=abc`
+- **THEN** the command exits with the code for invalid input and creates no
+  profile
+
+### Requirement: The commands report what they did
+The system SHALL print the number of profiles `academic:createprofiles`
+created and the number of frontend users whose profiles
+`academic:updateprofiles` updated, a run that changed nothing included. When
+`academic:createprofiles` created no profile and the automatic profile
+creation is disabled in the extension configuration, it SHALL name that
+option.
+
+#### Scenario: Profiles are created
+- **WHEN** `academic:createprofiles` creates profiles for two frontend users
+- **THEN** it prints `2 profile(s) created.`
+
+#### Scenario: Automatic creation is disabled
+- **WHEN** `academic:createprofiles` runs while the automatic profile creation
+  is disabled
+- **THEN** it prints `0 profile(s) created.` and names the option
+  `profile.autoCreateProfiles` that enables it
+
+#### Scenario: Profiles are updated
+- **WHEN** `academic:updateprofiles` updates the profiles of two frontend users
+- **THEN** it prints `Profiles of 2 frontend user(s) updated.`
