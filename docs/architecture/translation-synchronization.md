@@ -18,10 +18,10 @@ the column.
 ],
 ```
 
-## What it does, and the two things it does not
+## What it does, and what it does not
 
 It is handled by `DataMapProcessor`, which runs **only on the DataHandler write
-path**. Three consequences follow, and every one of them has cost a defect:
+path**. Four consequences follow, and every one of them has cost a defect:
 
 1. **It repairs nothing that is already stored.** A translation created before
    the default record had a value keeps its own — usually empty — value until
@@ -37,6 +37,22 @@ path**. Three consequences follow, and every one of them has cost a defect:
    deliberate exception becomes impossible. Synchronization keeps the field
    visible and lets an editor detach it, which writes `custom` into
    `l10n_state`.
+4. **On an inline field, `exclude` synchronizes the list of children.** For an
+   inline relation with `foreign_field`, `DataMapProcessor` treats the list as
+   the value to synchronize: every save of the parent, or of one of its
+   translations, writes the translated children into the list of the
+   translation, and `RelationHandler::writeForeignField()` then points them at
+   the parent translation and renumbers their sort column. That is right for a
+   child its parent owns. It is wrong for a second parent the child names in a
+   select of its own that is `exclude` as well: the two declarations rewrite
+   each other with every save. The contacts role and the partner role were in
+   that position until ACE-850. Their lists now carry no `l10n_mode` and a
+   `displayCond` of `FIELD:sys_language_uid:<=:0`, so FormEngine never submits
+   them for a translation. What stays is the `localize` command:
+   `DataHandler::copyRecord()` localizes every inline child of a localized
+   parent, and no TCA option prevents it, so localizing a role still creates
+   translations of its children, or copies of the ones that are translated
+   already.
 
 Nothing has to be written into `l10n_state` for synchronization to start:
 `Localization\State` treats a field with no stored state as `parent`, which is

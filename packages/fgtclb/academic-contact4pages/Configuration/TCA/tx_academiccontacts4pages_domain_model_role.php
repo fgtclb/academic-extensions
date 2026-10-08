@@ -111,7 +111,13 @@ return [
         ],
         'contacts' => [
             'exclude' => true,
-            'l10n_mode' => 'exclude',
+            // A translated contact keeps the role of its default language record
+            // (the "role" select of the contact is l10n_mode "exclude"), so the
+            // list belongs to the default language role only. "l10n_mode" must
+            // stay unset: with "exclude" the DataHandler synchronized the list
+            // into every translation of the role on each save, which wrote the
+            // uid of the role translation into the translated contacts.
+            'displayCond' => 'FIELD:sys_language_uid:<=:0',
             'label' => 'LLL:EXT:academic_contacts4pages/Resources/Private/Language/locallang_db.xlf:tx_academiccontacts4pages_domain_model_role.contacts',
             'config' => [
                 'type' => 'inline',
