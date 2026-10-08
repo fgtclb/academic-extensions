@@ -83,7 +83,8 @@ choose: `email` an e-mail input, `url` a URL input, `number` a number input,
 ### Requirement: A submitted job is checked against the flags
 
 The system SHALL refuse a submitted job whose value of a field breaks a flag:
-an empty value of a required field, a value of an `email` field that is not
+an empty value of a required field, where `0` counts as empty for a field the
+job stores as a whole number, a value of an `email` field that is not
 an e-mail address, a value of a `url` field that is not a URL. Every broken
 flag of one submission SHALL be reported on its own field. An empty value of
 a field that is not required SHALL be accepted. `number`, `tel` and the lock
@@ -94,6 +95,13 @@ left out of the check.
 
 - **WHEN** a visitor submits a job without a title
 - **THEN** the form is shown again with an error on the title, and no job is
+  created
+
+#### Scenario: Required select left on "Please choose"
+
+- **WHEN** a visitor submits a job with the working hours or the job type left
+  on "Please choose", which submits `0`
+- **THEN** the form is shown again with an error on that field, and no job is
   created
 
 #### Scenario: Invalid e-mail address
