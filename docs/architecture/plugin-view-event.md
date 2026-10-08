@@ -17,10 +17,10 @@ do. What a listener may rely on is documented on the extension points page of
 
 Eighteen actions in eight controllers of seven extensions: `academic_bite_jobs`,
 `academic_contacts4pages`, `academic_jobs`, `academic_partners`,
-`academic_persons`, `academic_programs` and `academic_projects`. Three of them
-have a second rendering path, an early return for an empty or not found state:
-the job detail without a job, and the selected profiles and selected contracts
-elements without a selection. Each of those paths dispatches as well.
+`academic_persons`, `academic_programs` and `academic_projects`. Two of them
+have a second rendering path, an early return for an empty state: the selected
+profiles and selected contracts elements without a selection. Each of those
+paths dispatches as well.
 
 Not covered, on purpose:
 
@@ -29,8 +29,9 @@ Not covered, on purpose:
   project.
 - `academic_persons_edit` edits a profile through forms that need events on the
   data they write, not on the view.
-- The persons detail action answers a missing profile with a page not found
-  response; it renders no view, so it dispatches nothing.
+- The persons and the job detail action end a request without a record with
+  the page not found handling of the site. They render no view, so they
+  dispatch nothing.
 
 ## How it is dispatched
 

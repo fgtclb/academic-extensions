@@ -271,9 +271,9 @@ German translation below `/de/`:
 Three pages of that tree have **nothing to show by design** and are therefore
 hidden from the menus (`nav_hide`): `/persons/detail`, `/persons/detail-hidden`
 and `/jobs/detail`, in both trees and both languages. Each carries a detail
-plugin, and without its argument the two profile detail pages answer 404 and the
-job detail shows nothing. The pages exist so the plugins have a home when a
-detail URL is built for them from a list.
+plugin, and without its argument each of them answers 404 on TYPO3 v13 and v14.
+The pages exist so the plugins have a home when a detail URL is built for them
+from a list.
 
 `/persons/detail-hidden` is the detail page of the "selected profiles" element
 that lists the two hidden profiles: its detail element shows hidden records as

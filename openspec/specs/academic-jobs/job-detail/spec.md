@@ -149,3 +149,27 @@ keep its own title. This applies to TYPO3 v13 and v14 alike.
   with an empty paragraph only
 - **THEN** the title of the page names the job
 - **AND** the page carries no empty description
+
+### Requirement: A detail page without a job answers not found
+
+The job detail view SHALL end a request without a job it can show, because no
+job was requested, the job does not exist or the job is hidden, with the
+"page not found" handling of the site and the status 404, instead of the page.
+A job list that shows hidden jobs SHALL list a job the detail view cannot show
+without a link to the detail view. This applies to TYPO3 v13 and v14 alike.
+
+#### Scenario: Detail page without a job
+
+- **WHEN** a visitor opens the job detail page without a job
+- **THEN** the answer has the status 404 and is the error page of the site
+
+#### Scenario: Job hidden after its link was published
+
+- **WHEN** a visitor follows the detail link of a job that has been hidden since
+- **THEN** the answer has the status 404 and does not show the job
+
+#### Scenario: Hidden job in a list with "Show hidden records"
+
+- **WHEN** a job list with "Show hidden records" lists a hidden job
+- **THEN** the job is listed with its title and without a link to the detail
+  view

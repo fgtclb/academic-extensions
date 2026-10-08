@@ -59,11 +59,11 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
     private const PAGE_OFFSET = 1000;
 
     /**
-     * The profile detail pages of the seed, which host the detail plugin and
-     * nothing else: the one of every profile list, and the one of the hidden
-     * profiles.
+     * The profile and the job detail pages of the seed, which host their
+     * detail plugin and nothing else: the profile detail of every profile list,
+     * the one of the hidden profiles, and the job detail.
      */
-    private const PROFILE_DETAIL_PAGES = [205, 209];
+    private const DETAIL_PAGES = [205, 209, 233];
 
     /**
      * The strings the two sites are *supposed* to disagree about, as
@@ -169,9 +169,8 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
      *
      * `200`, except for the two pages the seed puts behind a frontend user
      * group, which answer `403` to a visitor who is not logged in - that is
-     * what those pages are in the seed for - and the profile detail pages, which
-     * this harness sees as `404` on TYPO3 v14 only, for the reason given at
-     * {@see self::mirroredPages()}.
+     * what those pages are in the seed for - and the three detail pages, which
+     * answer `404`, for the reason given at {@see self::mirroredPages()}.
      */
     #[Test]
     public function everyMirroredPageAnswersItsExpectedStatusInBothTrees(): void
@@ -260,21 +259,10 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
                 'status' => trim((string)$row['fe_group'], ' ,0') !== '' ? 403 : 200,
             ];
 
-            // The profile detail pages, asked without a profile. The plugin
-            // answers `ErrorController::pageNotFoundAction()` by design in that
-            // case - `ProfileController::detailAction()` opens with exactly that
-            // - and a real request answers `404` on BOTH cores; measured against
-            // the development instances of each (ACE-465).
-            //
-            // Only this harness sees a difference, and it is an artifact of how
-            // the two Extbase bootstraps publish the status of a plugin
-            // response. TYPO3 v13 sets it with a bare `header()` call, guarded
-            // by `headers_sent()`, which never reaches the PSR-7 response a
-            // functional test reads; v14 writes it into `frontend.response.data`
-            // instead - the `@todo: Remove when ContentObjectRenderer is
-            // response aware` that v13 carries, implemented. So the expectation
-            // is version dependent while the behaviour is not.
-            if (in_array($uid, self::PROFILE_DETAIL_PAGES, true) && (new Typo3Version())->getMajorVersion() >= 14) {
+            // A detail page, asked without a record. The plugins of profiles
+            // and jobs end the request with the "page not found" handling of
+            // the site in that case, on TYPO3 v13 and v14 alike.
+            if (in_array($uid, self::DETAIL_PAGES, true)) {
                 $pages[$uid]['status'] = 404;
             }
         }
