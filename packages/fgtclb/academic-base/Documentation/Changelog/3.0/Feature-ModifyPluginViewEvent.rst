@@ -13,8 +13,8 @@ every plugin of :guilabel:`academic_bite_jobs`,
 :guilabel:`academic_partners`, :guilabel:`academic_persons`,
 :guilabel:`academic_programs` and :guilabel:`academic_projects` dispatches,
 once each time an action renders its view. It is dispatched after the action
-assigned its own variables, including the renderings of an empty or not found
-state, like the job detail without a job.
+assigned its own variables, including the renderings of an empty state, like
+the selected profiles without a selection.
 
 The event hands a listener the view and a plugin action context typed against
 the :guilabel:`academic_base` interface: the request, the site and its language,

@@ -127,12 +127,10 @@ attribute values and query strings, and four values drawn per request (the CSP
 nonce, a cHash, an error page request id, the login form's request token).
 
 A second test asserts what each page *owes* a visitor: `200`, `403` for the two
-pages the seed puts behind a frontend user group, and `404` on TYPO3 v14 for the
-profile detail page — `ProfileController::detailAction()` answers
-`ErrorController::pageNotFoundAction()` when it is called without a profile, and
-v13 still renders the page as `200` where v14 lets that 404 reach the response.
-Stated rather than asserted away: it is a difference between the two cores over
-the same seed and the same extension.
+pages the seed puts behind a frontend user group, and `404` for the three detail
+pages, of all profiles, of the hidden profiles and of the jobs. Their plugins end
+a request without a record with the "page not found" handling of the site, on
+TYPO3 v13 and v14 alike.
 
 The theme is substituted on **both** sides. The `/` tree of a development
 instance is themed by EXT:bootstrap_package and the `/legacy/` tree cannot be —

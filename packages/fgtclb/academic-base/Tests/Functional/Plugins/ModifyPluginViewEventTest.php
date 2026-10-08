@@ -66,6 +66,7 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
         RecordPluginViewListener::$assignedBefore = [];
         RecordPluginViewListener::$replaceValidations = false;
         RecordPluginViewListener::$replaceData = false;
+        RecordPluginViewListener::$jobsFetched = [];
         LeftoverListProfilesListener::$calls = 0;
         RecordPluginContextListener::$contexts = [];
     }
@@ -77,6 +78,7 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
         RecordPluginViewListener::$assignedBefore = [];
         RecordPluginViewListener::$replaceValidations = false;
         RecordPluginViewListener::$replaceData = false;
+        RecordPluginViewListener::$jobsFetched = [];
         LeftoverListProfilesListener::$calls = 0;
         $this->removeWrittenSiteConfiguration();
         parent::tearDown();
@@ -127,8 +129,8 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
     }
 
     /**
-     * Every plugin and action that renders a view, and the three renderings of an empty or
-     * not found state that return early. Where a row names a text, the page shows it, so the
+     * Every plugin and action that renders a view, and the two renderings of an empty
+     * selection that return early. Where a row names a text, the page shows it, so the
      * row took the path it names: the job, the profile and the contract of the data set are
      * rendered on the main paths, and not on the early returns. The last column is a variable
      * the action assigns last on that path, so the listener finds it assigned.
@@ -151,8 +153,7 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
             'persons selected contracts' => [16, 'persons-selected-contracts', [], 'AcademicPersons/SelectedContracts/selectedContracts', 'Adams', '', 'contracts'],
             'persons selected contracts without a selection' => [17, 'persons-no-selected-contracts', [], 'AcademicPersons/SelectedContracts/selectedContracts', '', 'Adams', 'record'],
             'jobs list' => [20, 'jobs-list', [], 'AcademicJobs/List/list', '', '', 'jobs'],
-            'jobs detail' => [21, 'jobs-detail', ['tx_academicjobs_detail' => ['job' => 1]], 'AcademicJobs/Detail/show', 'Research Assistant', 'No job advert could be found.', 'job'],
-            'jobs detail without a job' => [21, 'jobs-detail', [], 'AcademicJobs/Detail/show', 'No job advert could be found.', 'Research Assistant', 'record'],
+            'jobs detail' => [21, 'jobs-detail', ['tx_academicjobs_detail' => ['job' => 1]], 'AcademicJobs/Detail/show', 'Research Assistant', '', 'job'],
             'jobs new job form' => [22, 'jobs-new', [], 'AcademicJobs/NewJobForm/new', '', '', 'typeOptions'],
             'partners list' => [30, 'partners-list', [], 'AcademicPartners/List/list', '', '', 'filterTypes'],
             'partners map' => [31, 'partners-map', [], 'AcademicPartners/Map/map', '', '', 'filterTypes'],
@@ -166,6 +167,48 @@ final class ModifyPluginViewEventTest extends AbstractAcademicBaseTestCase
             'contacts for pages' => [60, 'contacts', [], 'AcademicContacts4pages/List/list', '', '', 'contactsWithoutRole'],
             'BITE jobs' => [70, 'bite-jobs', [], 'AcademicBiteJobs/List/list', '', '', 'jobs'],
         ];
+    }
+
+    /**
+     * A job list with "Show hidden records" looks up which listed jobs have a hidden
+     * default record. It takes them from the page of the paginator when the list is
+     * paginated, so the result of all jobs is not fetched for that, and from the result
+     * itself when it is not. The listener reads the state of the result when the action
+     * dispatches the event.
+     *
+     * @return array<string, array{bool, list<bool>}>
+     */
+    public static function hiddenJobListings(): array
+    {
+        return [
+            'paginated' => [true, [false]],
+            'not paginated' => [false, [true]],
+        ];
+    }
+
+    /**
+     * @param list<bool> $expectedFetched
+     */
+    #[DataProvider('hiddenJobListings')]
+    #[Test]
+    public function aJobListShowingHiddenJobsFetchesOnlyWhatItLists(bool $paginated, array $expectedFetched): void
+    {
+        $this->setUpTestCase();
+        $this->getConnectionPool()->getConnectionForTable('tt_content')->update(
+            'tt_content',
+            ['pi_flexform' => '<?xml version="1.0" encoding="utf-8" standalone="yes" ?><T3FlexForms><data>'
+                . '<sheet index="sDEF"><language index="lDEF"><field index="settings.showHiddenRecords"><value index="vDEF">1</value></field></language></sheet>'
+                . '<sheet index="pagination"><language index="lDEF">'
+                . '<field index="settings.paginationEnabled"><value index="vDEF">' . ($paginated ? '1' : '0') . '</value></field>'
+                . '<field index="settings.pagination.resultsPerPage"><value index="vDEF">1</value></field>'
+                . '</language></sheet></data></T3FlexForms>'],
+            ['uid' => 20],
+        );
+
+        $content = $this->renderFrontendPage($this->pageUrl(20, 'jobs-list'));
+
+        $this->assertStringContainsString('Research Assistant', $content);
+        $this->assertSame($expectedFetched, RecordPluginViewListener::$jobsFetched);
     }
 
     /**
