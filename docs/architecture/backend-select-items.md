@@ -97,7 +97,7 @@ depends on the render type:
 
 | Render type                | Value not among the items                                                 |
 |----------------------------|---------------------------------------------------------------------------|
-| `selectSingle`             | An `[ INVALID VALUE ]` *item* is added, but the row value is not restored |
+| `selectSingle`             | An `[ MISSING LABEL ]` *item* is added, but the row value is not restored |
 | `selectMultipleSideBySide` | Nothing — the value is dropped silently                                   |
 
 In both cases the rendered form no longer has the value selected, so the next
@@ -108,6 +108,33 @@ into the items, or the narrowing is a data loss.
 `ContractSelectScopeResolver` of `academic_persons` is the worked example: it
 reads the referenced uids out of the row and the repository returns them
 alongside the restricted ones, so their label comes from the same query.
+
+## A handler appends to the declared items
+
+`$parameters['items']` arrives holding the items the field declares itself,
+such as the empty item of value `0` of the contract select of a page contact.
+A handler adds its own items after them. Merging with
+`ArrayUtility::mergeRecursiveWithOverrule()` is wrong for a list: both lists
+are indexed from 0, so the handler's first item replaces the declared one.
+`ContractItems` did that until ACE-868, and a new page contact, whose default
+`0` then had no item, showed `[ MISSING LABEL ("0") ]`, `[ Missing label ("0") ]`
+on TYPO3 v14. That is the label `TcaSelectItems` gives a `selectSingle` value it
+finds no item for, the item it puts back in the list so the value survives the
+render. A test that looks for it compares without case for that reason.
+`EmploymentTypeItems`, `TypeItems` and `ProfileShowFieldsItems` still merge and
+are deliberately left as they are: their fields declare no items, so there is
+nothing to replace.
+
+## A `###REC_FIELD_…###` marker needs a value in the row
+
+A `foreign_table_where` can read the record being edited through
+`###REC_FIELD_<column>###`, which `AbstractItemProvider` replaces by the quoted
+value of that column. A column without a value becomes `''`, and a comparison
+of an integer column with `''` is rejected by PostgreSQL, while the default
+SQLite run accepts it without an error. That happens to every column of a new
+record that has no TCA `default`. The profile select of a profile information
+reads `###REC_FIELD_sys_language_uid###` since ACE-868, which is why its
+language column declares `'default' => 0`.
 
 ## What the page list expansion does besides expanding
 

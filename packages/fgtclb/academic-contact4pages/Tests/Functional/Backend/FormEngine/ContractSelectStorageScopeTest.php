@@ -85,6 +85,30 @@ final class ContractSelectStorageScopeTest extends AbstractAcademicContacts4Page
     }
 
     /**
+     * The field declares an empty item of value 0, which is also its default. The
+     * handler used to merge its contracts over the declared items by index, which
+     * replaced that item with the first contract, so a new contact, and contact 4,
+     * which has no contract, showed `[ MISSING LABEL ("0") ]` in its contract select
+     * (ACE-868). The form of a new contact is not compiled here: the record label of
+     * a contact still looks the `NEW…` placeholder up as a uid, which PostgreSQL
+     * rejects (ACE-872).
+     */
+    #[Test]
+    public function theEmptyItemIsKept(): void
+    {
+        $result = $this->compile(4);
+        $items = array_map(
+            static fn($item): array => is_array($item) ? $item : $item->toArray(),
+            array_values($result['processedTca']['columns']['contract']['config']['items'] ?? []),
+        );
+
+        $this->assertSame(['0'], $result['databaseRow']['contract']);
+        $this->assertSame([0, 1, 2, 3], array_map(static fn(array $item): int => (int)$item['value'], $items));
+        // FormEngine puts a value without an item back as `[ MISSING LABEL ("0") ]`.
+        $this->assertSame('', $items[0]['label']);
+    }
+
+    /**
      * @return int[]
      */
     private function offeredContractUids(int $contactUid): array
@@ -97,10 +121,7 @@ final class ContractSelectStorageScopeTest extends AbstractAcademicContacts4Page
                 array_values($items),
             ),
         );
-        // The field declares an empty placeholder item with value 0, but it does not
-        // survive: `ContractItems::itemsProcFunc()` merges with
-        // `ArrayUtility::mergeRecursiveWithOverrule()`, which overwrites index 0 with the
-        // first contract. The filter is a guard against that changing, not a fact.
+        // The empty item the field declares, see `theEmptyItemIsKept()`.
         $uids = array_values(array_filter($uids, static fn(int $uid): bool => $uid > 0));
         sort($uids);
 
