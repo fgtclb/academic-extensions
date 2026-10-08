@@ -12,6 +12,9 @@
 			<trans-unit id="plugin.bite.list.label">
 				<source>Bite Jobs List</source>
 			</trans-unit>
+			<trans-unit id="plugin.bite.list.description">
+				<source>Lists the job postings of a b-ite job listing</source>
+			</trans-unit>
 
 			<trans-unit id="plugin.bite.list.configuration">
 				<source>Configuration</source>

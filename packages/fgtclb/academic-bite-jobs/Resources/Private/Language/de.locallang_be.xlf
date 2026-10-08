@@ -14,6 +14,10 @@
 				<source>Bite Jobs List</source>
 				<target>Bite Jobs Liste</target>
 			</trans-unit>
+			<trans-unit id="plugin.bite.list.description">
+				<source>Lists the job postings of a b-ite job listing</source>
+				<target>Listet die Stellenangebote einer b-ite-Stellenliste</target>
+			</trans-unit>
 
 			<trans-unit id="plugin.bite.list.configuration">
 				<source>Configuration</source>
