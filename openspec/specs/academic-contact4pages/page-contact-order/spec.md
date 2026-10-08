@@ -33,6 +33,13 @@ and v14 alike.
 - **THEN** every translated contact keeps the contacts role of its default
   language record and its position in that role's list
 
+#### Scenario: Localizing a contacts role
+
+- **WHEN** an editor localizes a contacts role, or copies it into a language,
+  and saves the translation
+- **THEN** every page renders exactly the contacts it had, each once, in the
+  order arranged on it
+
 #### Scenario: A contract and a contacts role keep their own arrangements
 
 - **WHEN** an editor rearranges the contacts listed in a contract, and

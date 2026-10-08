@@ -28,6 +28,13 @@ v13 and v14 alike.
 - **THEN** every translated partnership keeps the role of its default
   language record and its position in that role's list
 
+#### Scenario: Localizing a role
+
+- **WHEN** an editor localizes a role, or copies it into a language, and saves
+  the translation
+- **THEN** every partner page renders exactly the partnerships it had, each
+  once, in the order arranged on it
+
 #### Scenario: A role keeps its own arrangement
 
 - **WHEN** an editor rearranges the partnerships listed in a role and saves it

@@ -450,10 +450,41 @@ carry no `l10n_mode` and a `displayCond` of `FIELD:sys_language_uid:<=:0`, so
 FormEngine never offers or submits them for a translation, on v13 and v14
 alike.
 
-What stays is the `localize` command: `DataHandler::copyRecord()` localizes
-every inline child of a localized parent, and no TCA option prevents it, so
-localizing a role still creates translations of its children, or copies of the
-ones that are translated already (ACE-874).
+## Localizing a parent that does not own its children
+
+The `localize` command is the other half. `DataHandler::localize()` copies every
+inline child of a localized record through `copyRecord_processRelation()`, and
+no TCA option prevents it, on v13 and v14 alike. For a parent that lists
+children another record owns, that is wrong: localizing a contacts role created
+a translation of every page contact it lists, attached to the role translation,
+and one more copy of a contact that was translated or valid in all languages
+already. The organisational unit of `academic_persons` lists the contracts of
+its people the same way, and a profile valid in all languages then showed a
+contract twice (ACE-874).
+
+`SecondaryParentLocalizationGuard` of `academic_base` removes them. A
+`processCmdmap_afterFinish` hook per relation hands it the parent table and the
+inline field: `ContactsRoleLocalizationHook` of `academic_contacts4pages`,
+`PartnerRoleLocalizationHook` of `academic_partners` and
+`OrganisationalUnitLocalizationHook` of `academic_persons`. The guard runs after
+`remapListedDBRecords()`, reads what the run created from
+`DataHandler::$copyMappingArray_merged`, and deletes every created child of the
+relation that points at a parent created in another language than its source,
+by `localize` or by `copyToLanguage`. It deletes through `deleteAction()` of
+the running DataHandler with `$forceHardDelete`, so the child and its own
+localized inline children leave no row behind, the reference index and the
+caches follow with the rest of the run, and in a workspace the new record is
+discarded. The system log and the history still show the creation and the
+deletion. The inline column of the parent translation, which counts its
+children, is set to the children it still has. A plain copy of the parent in
+its own language still copies its children.
+
+What the guard cannot prevent is the attempt. The core still tries to localize a
+default language child that is translated already and logs that the
+localization failed, which the editor sees as an error message while nothing is
+created. TYPO3 v14 offers `BeforeRemoveNonCopyableFieldsEvent`, which could keep
+the field out of the localization altogether. v13 has nothing comparable, so
+the guard is the one mechanism for both versions until v13 support ends.
 
 ## Named gaps
 
