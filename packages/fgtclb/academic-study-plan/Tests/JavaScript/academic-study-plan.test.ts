@@ -263,6 +263,57 @@ const withMobileViewport = async (body: () => Promise<void>): Promise<void> => {
   }
 };
 
+/**
+ * jsdom lays nothing out, so a dialog is given the box a browser would compute.
+ * Its backdrop is everything outside of it.
+ */
+const layOut = (dialog: HTMLDialogElement): void => {
+  dialog.getBoundingClientRect = (): DOMRect => ({
+    x: 100,
+    y: 100,
+    width: 400,
+    height: 300,
+    top: 100,
+    right: 500,
+    bottom: 400,
+    left: 100,
+    toJSON: (): object => ({}),
+  });
+};
+
+const pointer = (target: Element, type: string, x: number, y: number): void => {
+  target.dispatchEvent(new window.MouseEvent(type, { bubbles: true, clientX: x, clientY: y }));
+};
+
+/** A press and a release at one position, as a click of a pointer device. */
+const clickAt = (target: Element, x: number, y: number): void => {
+  pointer(target, "mousedown", x, y);
+  pointer(target, "mouseup", x, y);
+  pointer(target, "click", x, y);
+};
+
+/**
+ * Puts an audio element into the dialog that records what is done to it.
+ * jsdom implements no media playback, so pausing and seeking are observed on
+ * the element itself.
+ */
+const playingAudioIn = (dialog: HTMLDialogElement): { paused: boolean; currentTime: number } => {
+  const state = { paused: false, currentTime: 42 };
+  const audio = document.createElement("audio");
+  audio.pause = (): void => {
+    state.paused = true;
+  };
+  Object.defineProperty(audio, "currentTime", {
+    get: () => state.currentTime,
+    set: (value: number) => {
+      state.currentTime = value;
+    },
+  });
+  dialog.append(audio);
+
+  return state;
+};
+
 describe("the study plan inside the content element layout", () => {
   it("filters by category and leaves the layout header alone", async () => {
     await start(layoutMarkup());
@@ -343,6 +394,60 @@ describe("the study plan inside the content element layout", () => {
     press(document.querySelector(".modal-trigger") as HTMLElement, "Enter");
     await settle();
     assert.equal(dialog.open, true);
+  });
+
+  it("closes a module dialog on a click on its backdrop, and only there", async () => {
+    await start(layoutMarkup());
+
+    const dialog = document.querySelector<HTMLDialogElement>("#popup-1");
+    assert.ok(dialog !== null, "the dialog is gone");
+    layOut(dialog);
+
+    click(document.querySelector(".modal-trigger") as HTMLElement);
+    await settle();
+    assert.equal(dialog.open, true);
+
+    // A click on the padding of the dialog reaches the dialog itself, exactly
+    // as one on the backdrop does. Inside the box it must not close.
+    clickAt(dialog, 120, 120);
+    await settle();
+    assert.equal(dialog.open, true, "a click inside the dialog closed it");
+
+    // Text selected inside the dialog and released over the backdrop ends in a
+    // click on the dialog outside its box. The press started inside, so it
+    // stays open.
+    pointer(dialog.querySelector("button") as HTMLElement, "mousedown", 150, 150);
+    pointer(dialog, "mouseup", 20, 20);
+    pointer(dialog, "click", 20, 20);
+    await settle();
+    assert.equal(dialog.open, true, "a selection released on the backdrop closed the dialog");
+
+    const audio = playingAudioIn(dialog);
+    clickAt(dialog, 20, 20);
+    await settle();
+    assert.equal(dialog.open, false, "a click on the backdrop left the dialog open");
+    assert.deepEqual(audio, { paused: true, currentTime: 0 }, "the audio kept playing");
+  });
+
+  it("stops the audio of a dialog the browser closed itself", async () => {
+    await start(layoutMarkup());
+
+    const dialog = document.querySelector<HTMLDialogElement>("#popup-1");
+    assert.ok(dialog !== null, "the dialog is gone");
+
+    click(document.querySelector(".modal-trigger") as HTMLElement);
+    await settle();
+    assert.equal(dialog.open, true);
+    const audio = playingAudioIn(dialog);
+
+    // Escape closes a modal dialog in the browser, without a listener of the
+    // module being asked. The model of the test window has no Escape key, so
+    // the dialog is closed the way the browser does it, through its own
+    // "close()", which fires the close event.
+    dialog.close();
+    await settle();
+
+    assert.deepEqual(audio, { paused: true, currentTime: 0 }, "the audio kept playing");
   });
 
   it("toggles a semester by keyboard on a narrow viewport", async () => {
@@ -510,6 +615,16 @@ describe("the markup contract", () => {
     await settle();
 
     assert.equal(second.open, false);
+
+    // Neither may a click on the backdrop, which the dialog receives as well.
+    layOut(second);
+    click(modules[1]);
+    await settle();
+    assert.equal(second.open, true);
+
+    clickAt(second, 20, 20);
+    await settle();
+    assert.equal(second.open, false, "a click on the backdrop reopened the dialog");
   });
 });
 

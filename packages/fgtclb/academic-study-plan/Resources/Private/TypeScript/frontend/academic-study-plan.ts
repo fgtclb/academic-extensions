@@ -116,6 +116,38 @@ const colourOf = (value: string): string =>
     /^(#[0-9a-fA-F]{3,8}|[a-zA-Z]{1,32}|rgba?\([0-9.,%\s]+\))$/.test(value) ? value : '';
 
 /**
+ * Whether a pointer event of a modal dialog happened on its backdrop.
+ *
+ * The backdrop is no element of its own: a click on it is dispatched to the
+ * dialog, exactly as a click on the padding of the dialog is. Only the position
+ * tells the two apart, so an event counts when it targets the dialog itself and
+ * lies outside the box of the dialog.
+ */
+const isOnBackdrop = (dialog: HTMLDialogElement, event: MouseEvent): boolean => {
+    if (event.target !== dialog) {
+        return false;
+    }
+
+    const box = dialog.getBoundingClientRect();
+
+    return event.clientX < box.left
+        || event.clientX > box.right
+        || event.clientY < box.top
+        || event.clientY > box.bottom;
+};
+
+/**
+ * Stops whatever a dialog was playing. A paused audio element that keeps its
+ * position would resume mid sentence the next time the dialog is opened.
+ */
+const stopAudioOf = (dialog: HTMLDialogElement): void => {
+    dialog.querySelectorAll('audio').forEach((audio): void => {
+        audio.pause();
+        audio.currentTime = 0;
+    });
+};
+
+/**
  * Replaces the placeholders of the rendered filter item in the clone that is
  * about to become a real filter button.
  *
@@ -481,7 +513,34 @@ class StudyPlan {
         return findAll(module, DIALOG_TRIGGER, LEGACY_DIALOG_TRIGGER);
     }
 
+    /**
+     * Wires the three ways a visitor closes a dialog: its close button, a click on
+     * its backdrop and the Escape key.
+     */
     private initDialogClose(dialog: HTMLDialogElement): void {
+        // Escape closes a modal dialog without asking this module, so stopping the
+        // audio has to hang on the close event, which every way of closing fires.
+        dialog.addEventListener('close', (): void => {
+            stopAudioOf(dialog);
+        });
+
+        // Only a press that also started on the backdrop closes the dialog. Text
+        // selected inside it and released outside ends in a click on the dialog
+        // as well, and must leave it open. The click stops here, like the one on
+        // the close button: a module element that is the trigger itself would
+        // open the dialog again.
+        let pressedOnBackdrop = false;
+        dialog.addEventListener('mousedown', (event: MouseEvent): void => {
+            pressedOnBackdrop = isOnBackdrop(dialog, event);
+        });
+        dialog.addEventListener('click', (event: MouseEvent): void => {
+            if (pressedOnBackdrop && isOnBackdrop(dialog, event)) {
+                this.closeModal(dialog);
+                event.stopPropagation();
+            }
+            pressedOnBackdrop = false;
+        });
+
         const button = dialog.querySelector('button');
         if (button === null) {
             return;
@@ -494,16 +553,11 @@ class StudyPlan {
     }
 
     /**
-     * Closing the dialog stops whatever it was playing. A paused audio element
-     * that keeps its position would resume mid sentence the next time the
-     * dialog is opened.
+     * Closing the dialog stops whatever it was playing, right away rather than
+     * when the close event arrives, which a browser queues as a task.
      */
     private closeModal(dialog: HTMLDialogElement): void {
-        dialog.querySelectorAll('audio').forEach((audio): void => {
-            audio.pause();
-            audio.currentTime = 0;
-        });
-
+        stopAudioOf(dialog);
         dialog.close();
     }
 

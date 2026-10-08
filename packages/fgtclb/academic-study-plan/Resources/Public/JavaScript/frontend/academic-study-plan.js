@@ -39,6 +39,19 @@ const categoriesOf = (module) => {
   }
 };
 const colourOf = (value) => /^(#[0-9a-fA-F]{3,8}|[a-zA-Z]{1,32}|rgba?\([0-9.,%\s]+\))$/.test(value) ? value : "";
+const isOnBackdrop = (dialog, event) => {
+  if (event.target !== dialog) {
+    return false;
+  }
+  const box = dialog.getBoundingClientRect();
+  return event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
+};
+const stopAudioOf = (dialog) => {
+  dialog.querySelectorAll("audio").forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+};
 const substitutePlaceholders = (node, apply) => {
   if (node instanceof Element) {
     Array.from(node.attributes).forEach((attribute) => {
@@ -305,7 +318,25 @@ class StudyPlan {
     }
     return findAll(module, DIALOG_TRIGGER, LEGACY_DIALOG_TRIGGER);
   }
+  /**
+   * Wires the three ways a visitor closes a dialog: its close button, a click on
+   * its backdrop and the Escape key.
+   */
   initDialogClose(dialog) {
+    dialog.addEventListener("close", () => {
+      stopAudioOf(dialog);
+    });
+    let pressedOnBackdrop = false;
+    dialog.addEventListener("mousedown", (event) => {
+      pressedOnBackdrop = isOnBackdrop(dialog, event);
+    });
+    dialog.addEventListener("click", (event) => {
+      if (pressedOnBackdrop && isOnBackdrop(dialog, event)) {
+        this.closeModal(dialog);
+        event.stopPropagation();
+      }
+      pressedOnBackdrop = false;
+    });
     const button = dialog.querySelector("button");
     if (button === null) {
       return;
@@ -316,15 +347,11 @@ class StudyPlan {
     });
   }
   /**
-   * Closing the dialog stops whatever it was playing. A paused audio element
-   * that keeps its position would resume mid sentence the next time the
-   * dialog is opened.
+   * Closing the dialog stops whatever it was playing, right away rather than
+   * when the close event arrives, which a browser queues as a task.
    */
   closeModal(dialog) {
-    dialog.querySelectorAll("audio").forEach((audio) => {
-      audio.pause();
-      audio.currentTime = 0;
-    });
+    stopAudioOf(dialog);
     dialog.close();
   }
   handleResize() {

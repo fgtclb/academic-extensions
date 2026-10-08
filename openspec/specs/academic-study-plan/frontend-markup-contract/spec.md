@@ -89,6 +89,8 @@ TYPO3 v13 and v14 alike.
 - **WHEN** a visitor opens a page with a study plan element
 - **THEN** every semester header carries the plus and the minus glyph and
   every module dialog the close glyph
+- **AND** every glyph is drawn with a visible size, and the close button of a
+  module dialog is visible
 - **AND** the page shows no "icon not found" placeholder
 
 #### Scenario: A site package replaces the close glyph
@@ -140,3 +142,35 @@ the two identifiers from the frontend icon registration.
 - **WHEN** an integrator overrides the semester part and renders the two
   glyphs from the frontend icon registration under their identifiers
 - **THEN** the glyph switch works as with the shipped part
+
+### Requirement: A module dialog closes in every expected way
+
+A module dialog SHALL close when a visitor activates its close button, clicks
+on its backdrop or presses Escape, and closing it in any of these ways SHALL
+stop the audio of the dialog and rewind it to its start. A click inside the
+dialog, and a text selection that starts inside the dialog and is released
+over the backdrop, SHALL leave it open. This applies on TYPO3 v13 and v14
+alike, and to a module override that makes the module element itself the
+dialog trigger.
+
+#### Scenario: A click on the backdrop
+
+- **WHEN** a visitor clicks on the backdrop of an open module dialog
+- **THEN** the dialog closes and its audio stops
+
+#### Scenario: Escape while the audio plays
+
+- **WHEN** a visitor plays the audio of a module dialog and presses Escape
+- **THEN** the dialog closes and its audio stops
+
+#### Scenario: A selection released over the backdrop
+
+- **WHEN** a visitor selects text inside a module dialog and releases the
+  pointer over the backdrop
+- **THEN** the dialog stays open
+
+#### Scenario: The module element is the trigger
+
+- **WHEN** a module override makes the module element itself the dialog
+  trigger and a visitor clicks on the backdrop of its open dialog
+- **THEN** the dialog closes and does not open again
