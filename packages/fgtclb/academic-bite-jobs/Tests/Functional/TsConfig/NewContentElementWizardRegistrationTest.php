@@ -64,8 +64,9 @@ final class NewContentElementWizardRegistrationTest extends AbstractAcademicBite
     }
 
     /**
-     * The element definition carries the title, the icon and the CType the wizard
-     * preselects.
+     * The element definition carries the title, the description, the icon and the
+     * CType the wizard preselects. The description was missing, which made this the
+     * only element of the group without one (ACE-859).
      */
     #[Test]
     public function wizardItemIsRegisteredWithTheRegisteredPageTsConfig(): void
@@ -81,6 +82,10 @@ final class NewContentElementWizardRegistrationTest extends AbstractAcademicBite
         $this->assertSame(
             'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label',
             $elements['academicbitejobs_list.']['title'] ?? null,
+        );
+        $this->assertSame(
+            'LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.description',
+            $elements['academicbitejobs_list.']['description'] ?? null,
         );
         $this->assertSame('bitejobs_list', $elements['academicbitejobs_list.']['iconIdentifier'] ?? null);
         $this->assertSame(

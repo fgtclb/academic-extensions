@@ -139,43 +139,43 @@
 
       <!-- Combined sorting options -->
 
-      <trans-unit id="filter.sorting.lastUpdated.asc">
+      <trans-unit id="sorting.lastUpdated.asc">
+        <source>Last updated (latest last)</source>
+        <target>Zuletzt aktualisiert (älteste zuerst)</target>
+      </trans-unit>
+      <trans-unit id="sorting.lastUpdated.desc">
         <source>Last updated (latest first)</source>
         <target>Zuletzt aktualisiert (neueste zuerst)</target>
       </trans-unit>
-      <trans-unit id="filter.sorting.lastUpdated.desc">
-        <source>Last updated (latest last)</source>
-        <target>Zuletzt aktualisiert (neueste zuletzt)</target>
-      </trans-unit>
-      <trans-unit id="filter.sorting.sorting.asc">
+      <trans-unit id="sorting.sorting.asc">
         <source>Page sorting (Result may be unexpected)</source>
         <target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
       </trans-unit>
-      <trans-unit id="filter.sorting.sorting.desc">
-        <source>Page sorting (Result may be unexpected)</source>
-        <target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
+      <trans-unit id="sorting.sorting.desc">
+        <source>Page sorting, reversed (Result may be unexpected)</source>
+        <target>Seitensortierung umgekehrt (Ergebnis kann unerwartet sein)</target>
       </trans-unit>
-      <trans-unit id="filter.sorting.title.asc">
+      <trans-unit id="sorting.title.asc">
         <source>Title A-Z</source>
         <target>Titel A-Z</target>
       </trans-unit>
-      <trans-unit id="filter.sorting.title.desc">
+      <trans-unit id="sorting.title.desc">
         <source>Title Z-A</source>
         <target>Titel Z-A</target>
       </trans-unit>
-      <trans-unit id="filter.sorting.tx_academicprojects_budget.asc">
+      <trans-unit id="sorting.tx_academicprojects_budget.asc">
         <source>Budget (low to high)</source>
         <target>Budget (niedrig bis hoch)</target>
       </trans-unit>
-      <trans-unit id="filter.sorting.tx_academicprojects_budget.desc">
+      <trans-unit id="sorting.tx_academicprojects_budget.desc">
         <source>Budget (high to low)</source>
         <target>Budget (hoch bis niedrig)</target>
       </trans-unit>
-      <trans-unit id="filter.sorting.tx_academicprojects_start_date.asc">
+      <trans-unit id="sorting.tx_academicprojects_start_date.asc">
         <source>Start date (oldest first)</source>
         <target>Startdatum (älteste zuerst)</target>
       </trans-unit>
-      <trans-unit id="filter.sorting.tx_academicprojects_start_date.desc">
+      <trans-unit id="sorting.tx_academicprojects_start_date.desc">
         <source>Start date (newest first)</source>
         <target>Startdatum (neueste zuerst)</target>
       </trans-unit>
