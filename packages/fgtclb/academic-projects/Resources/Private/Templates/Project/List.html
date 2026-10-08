@@ -4,20 +4,26 @@
     data-namespace-typo3-fluid="true"
 >
 
-<div class="academic-projects-list">
+<div class="academic-projects-list container">
+
     <f:if condition="{settings.renderContentElementHeader}">
-        <f:render partial="Header/All" arguments="{_all}" />
+        <f:render
+            partial="Header/All"
+            arguments="{_all}"
+        />
     </f:if>
 
-    <f:render
-        partial="Project/SortingAndFilters"
-        arguments="{_all}"
-    />
+    <div class="ace-content">
+        <f:render
+            partial="Project/SortingAndFilters"
+            arguments="{_all}"
+        />
 
-    <f:render
-        partial="Project/ItemList"
-        arguments="{_all}"
-    />
+        <f:render
+            partial="Project/ItemList"
+            arguments="{_all}"
+        />
+    </div>
 </div>
 
 </html>
