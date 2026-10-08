@@ -28,7 +28,7 @@ final class AcademicProjectsImageRenderingTest extends AbstractAcademicProjectsT
     /**
      * The items of the list.
      */
-    private const ITEMS = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]//div[contains(concat(" ", normalize-space(@class), " "), " ace-item ")]';
+    private const ITEMS = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]//div[contains(concat(" ", normalize-space(@class), " "), " ace-itemlist ")]/div[@class="row"]/div/article[contains(concat(" ", normalize-space(@class), " "), " ace-item ")]';
 
     private const FIXTURES = __DIR__ . '/Fixtures/AcademicProjectsImage/';
 

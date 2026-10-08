@@ -5,13 +5,13 @@
 >
 
 <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-    <div class="ace-field ace-state-filter">
+    <div class="ace-filter ace-field ace-select-wrap">
         <label class="ace-label" for="activeState">
             {f:translate(key: 'activeState.label', extensionName: 'AcademicProjects')}
         </label>
 
         <f:form.select
-            class="ace-control"
+            class="ace-control ace-select"
             id="activeState"
             property="activeState"
             value="{demand.activeState}"

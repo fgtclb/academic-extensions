@@ -391,7 +391,8 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertSame(['Study plan B.Sc.'], $this->textsOf($html, '//div[@id="c1"]/header/h2'));
         $this->assertSame(
             [],
-            $this->textsOf($html, '//div[contains(@class, "academic-study-plan")]//header'),
+            // The dialogs of the modules carry headers of their own, deeper down.
+            $this->textsOf($html, '//div[contains(@class, "academic-study-plan")]/header'),
         );
     }
 
@@ -470,7 +471,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
             $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li[@data-study-plan-filter-template]'),
         );
         // Two semesters, each with its header.
-        $this->assertSame(2, $this->nodeCountOf($html, '//div[@data-study-plan]/div[contains(concat(" ", normalize-space(@class), " "), " ace-semesters ")]/div[@role="list"]/div[@role="listitem"]/div[@data-study-plan-semester]'));
+        $this->assertSame(2, $this->nodeCountOf($html, '//div[@data-study-plan]/div[contains(concat(" ", normalize-space(@class), " "), " ace-semesters ")]/div[@role="list"]/div[@role="listitem"][@data-study-plan-semester]'));
         $this->assertSame(
             2,
             $this->nodeCountOf($html, '//div[@data-study-plan-semester]/div[@data-study-plan-semester-header]'),
@@ -513,60 +514,56 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
             [
                 'ace-filter',
                 'ace-list',
-                'ace-item',
+                'ace-list-item',
                 'ace-control',
                 'ace-semesters',
                 'row',
-                'col',
-                'ace-semester',
-                'ace-header',
-                'ace-content',
-                'ace-heading',
+                'ace-semester col',
+                'ace-semester-header',
+                'ace-semester-content',
+                'ace-semester-heading',
                 'ace-title',
-                'ace-credits',
+                'ace-semester-credits',
                 'ace-actions',
-                'ace-note',
-                'ace-modules',
-                'ace-module ace-interactive',
+                'ace-semester-note',
+                'ace-list ace-modules',
+                'ace-list-item ace-module ace-interactive',
                 'ace-title',
-                'ace-credits',
-                'ace-note',
-                'ace-trigger',
+                'ace-module-credits',
+                'ace-module-note',
+                'ace-module-trigger',
                 'visually-hidden',
                 'ace-dialog',
                 'ace-header',
-                'ace-content',
                 'ace-title',
-                'ace-credits',
+                'ace-dialog-credits',
                 'ace-close',
-                'ace-note',
-                'ace-description',
+                'ace-dialog-note',
+                'ace-dialog-description',
                 // The module without content: the trailing space is what the condition
                 // that adds `ace-interactive` leaves behind.
-                'ace-module ',
+                'ace-list-item ace-module ',
                 'ace-title',
-                'ace-credits',
-                'col',
-                'ace-semester',
-                'ace-header',
-                'ace-content',
-                'ace-heading',
+                'ace-module-credits',
+                'ace-semester col',
+                'ace-semester-header',
+                'ace-semester-content',
+                'ace-semester-heading',
                 'ace-title',
-                'ace-credits',
+                'ace-semester-credits',
                 'ace-actions',
-                'ace-modules',
-                'ace-module ace-interactive',
+                'ace-list ace-modules',
+                'ace-list-item ace-module ace-interactive',
                 'ace-title',
-                'ace-credits',
-                'ace-trigger',
+                'ace-module-credits',
+                'ace-module-trigger',
                 'visually-hidden',
                 'ace-dialog',
                 'ace-header',
-                'ace-content',
                 'ace-title',
-                'ace-credits',
+                'ace-dialog-credits',
                 'ace-close',
-                'ace-description',
+                'ace-dialog-description',
                 'ce-bodytext',
             ],
             $this->classInventoryOf($html),
@@ -582,7 +579,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         // A module with a description is clickable and gets its own dialog.
         $this->assertStringContainsString('<dialog id="popup-1" class="ace-dialog" data-study-plan-dialog>', $content);
         $this->assertStringContainsString('Linear algebra and analysis.', $content);
-        $this->assertStringContainsString('class="ace-module ace-interactive"', $content);
+        $this->assertStringContainsString('class="ace-list-item ace-module ace-interactive"', $content);
     }
 
     #[Test]
