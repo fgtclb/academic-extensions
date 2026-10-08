@@ -21,9 +21,17 @@ and detail element runs the same actions and carries the same tags.
 
 | Write                                           | Flushed by                                        |
 |-------------------------------------------------|---------------------------------------------------|
-| An existing profile saved in the backend        | `Hook\DataHandlerHooks`, after the database write |
+| A profile created or saved in the backend       | `Hook\DataHandlerHooks`, after the database write |
 | A profile deleted or restored in the backend    | `Hook\DataHandlerHooks`, after the command        |
 | Any record of a profile written through Extbase | `EventListener\FlushProfileViewCaches`            |
+
+The hooks flush the tags in every cache, the listener in the caches of the `pages`
+group only. The hooks flush the detail tag of the parent of a translation as well. A created
+profile, a localized one included, reaches the hook with its `NEW…` id, which the
+DataHandler has replaced by the uid in `substNEWwithIDs` by then. Before ACE-844 the
+hook reacted to `update` only, so a profile created in the backend appeared on a cached
+list only once the page cache expired, and the save of a translation flushed the detail
+tag of the translation, which no page carries.
 
 A DataHandler hook never sees an Extbase write. The automatic cache clearing of Extbase
 flushes `pageId_<pid>` of the storage folder of a written record and of every numeric
@@ -39,9 +47,6 @@ runs in a CLI command, so the profile synchronisation of the create and update p
 commands flushed nothing at all before. This is why the listener flushes immediately,
 per record, instead of pushing its tags onto the tag stack of the Extbase
 `CacheService`: that stack exists on TYPO3 v13 only and is not processed on the CLI.
-
-A profile created in the backend flushes nothing on this branch: the hook reacts to
-`update` only.
 
 `FlushProfileViewCaches` listens to the three persistence events of Extbase: an entity
 added, updated or removed. It resolves the profile of the written entity and flushes
