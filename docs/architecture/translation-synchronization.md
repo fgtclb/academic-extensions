@@ -423,11 +423,12 @@ other endpoints, so the synchronizer still runs where it is configured.
 
 The editor reaches a hidden profile through
 `ProfileRepository::findByFrontendUserIncludingHidden()`. Extbase overlays the
-translation through `PageRepository`, which reads the visibility aspect of the
-context and not the query settings, so that lookup lifts the aspect to hidden
-content while its query runs. Without it a hidden profile would come back in
-its default language in a translated site language, and every text edit made
-there would write the default record.
+translation through `PageRepository`, which on TYPO3 v13 reads the visibility
+aspect of the context and not the query settings, so that lookup fetches its
+result through `HiddenRecordsFetcher`, see [Hidden records](hidden-records.md).
+Without it a hidden profile would come back in its default language in a
+translated site language, and every text edit made there would write the
+default record. TYPO3 v14.3.7 overlays with the query settings itself.
 
 ## Named gaps
 

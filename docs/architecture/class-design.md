@@ -126,7 +126,7 @@ Constructor injection with promoted properties is the default: 95 files declare
 known problem rather than a model: splitting the controller is ACE-507.
 
 **Method injection is used where a constructor is not available to take
-dependencies.** There are 11 `inject*()` methods across 7 files and **zero**
+dependencies.** There are 13 `inject*()` methods across 7 files and **zero**
 `@inject` annotations — the annotation form is not used at all, which is worth
 keeping true.
 
@@ -167,12 +167,16 @@ could still subclass them, so that a subclass calling `parent::__construct()`
 kept working. Since every plugin controller is `final` (ACE-803), those
 services are constructor arguments like any other.
 
-Method injection on a **concrete** class does not have this justification. Six
-of the eleven methods are on concrete classes all the same: one each on
+Method injection on a **concrete** class does not have this justification. Eight
+of the thirteen methods are on concrete classes all the same: one each on
 `ContactsController` of `academic_contacts4pages`, `JobValidator` of
-`academic_jobs`, `ProgramRepository` of `academic_programs` and
-`ListSortingService` of `academic_persons_edit`, and two on `ProfileRepository`
-of `academic_persons`. They are existing code, not a template for new code.
+`academic_jobs` and `ListSortingService` of `academic_persons_edit`, two on
+`ProgramRepository` of `academic_programs` and three on `ProfileRepository` of
+`academic_persons`. They are existing code, not a template for new code. The
+second and third method of those two repositories follow the first of their
+own file. The repositories of jobs, partners, projects and contacts take the
+same collaborator through a constructor that calls `parent::__construct()`,
+the Extbase `Repository` constructor that derives the model class.
 `academic-persons-edit/Classes/Service/ListSortingService.php` line 29 is also
 cited in
 [Dependency injection](dependency-injection.md#where-the-codebase-does-not-comply)

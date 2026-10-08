@@ -66,7 +66,7 @@ parameters:
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			message: "#^Method FGTCLB\\\\AcademicPartners\\\\Domain\\\\Repository\\\\PartnerRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\<int, FGTCLB\\\\AcademicPartners\\\\Domain\\\\Model\\\\Partner\\>\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-partners/Classes/Domain/Repository/PartnerRepository.php
 
@@ -141,7 +141,7 @@ parameters:
 			path: ../../../packages/fgtclb/academic-persons/Tests/Functional/ExtensionLoadedTest.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Repository\\\\ProgramRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			message: "#^Method FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Repository\\\\ProgramRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\<int, FGTCLB\\\\AcademicPrograms\\\\Domain\\\\Model\\\\Program\\>\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-programs/Classes/Domain/Repository/ProgramRepository.php
 
@@ -166,7 +166,7 @@ parameters:
 			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Model/Project.php
 
 		-
-			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Repository\\\\ProjectRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\.$#"
+			message: "#^Method FGTCLB\\\\AcademicProjects\\\\Domain\\\\Repository\\\\ProjectRepository\\:\\:findByDemand\\(\\) should return TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\Generic\\\\QueryResult\\<FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\> but returns TYPO3\\\\CMS\\\\Extbase\\\\Persistence\\\\QueryResultInterface\\<int, FGTCLB\\\\AcademicProjects\\\\Domain\\\\Model\\\\Project\\>\\.$#"
 			count: 1
 			path: ../../../packages/fgtclb/academic-projects/Classes/Domain/Repository/ProjectRepository.php
 

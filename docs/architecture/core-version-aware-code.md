@@ -26,7 +26,7 @@ preference:
 
 | Mechanism                                  | Used in                                                           | Count               |
 |--------------------------------------------|-------------------------------------------------------------------|---------------------|
-| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`                                      | 2 files, 3 switches |
+| Version switch inside a PHP class          | `packages/fgtclb/*/Classes/`                                      | 3 files, 4 switches |
 | Version switch inside a configuration file | `packages/fgtclb/*/Configuration/`                                | 13 files            |
 | Version switch inside an event listener    | `packages/fgtclb/*/Classes/EventListener/`                        | 3 files             |
 | Version dependent constant                 | `packages/fgtclb/*/EXT_CONSTANTS.php`                             | 2 files             |
@@ -38,11 +38,13 @@ The last checks for the API itself.
 
 ### A switch inside a class
 
-Two classes under a `Classes/` directory carry a version switch, both in
+Three classes under a `Classes/` directory carry a version switch, all in
 `academic-base`:
 [`Classes/TcaManipulator.php`](../../packages/fgtclb/academic-base/Classes/TcaManipulator.php)
-with two, and
+with two,
 [`Classes/Imaging/IconProvider/CurrentColorSvgIconProvider.php`](../../packages/fgtclb/academic-base/Classes/Imaging/IconProvider/CurrentColorSvgIconProvider.php)
+with one, and
+[`Classes/Persistence/HiddenRecordsFetcher.php`](../../packages/fgtclb/academic-base/Classes/Persistence/HiddenRecordsFetcher.php)
 with one. The two in `TcaManipulator` exist because the two core versions want
 incompatible input for the same job.
 
@@ -124,6 +126,15 @@ that renders it.
 The whole method carries a `@todo` naming the v13 support end as its exit — the
 shape the rule below asks for. What it guards is measured in
 [Icons](icons.md#how-the-provider-is-wired-per-core-version).
+
+**`HiddenRecordsFetcher::fetch()`.** TYPO3 v14.3.7 overlays a translation with
+the enable fields the query settings ignore, v13 overlays with the visibility
+of the context. On v13 the fetcher returns a lazy result that marks the context
+while it is fetched, and a listener lifts the visibility for the overlay of that
+query. On v14 the fetcher returns the result of the core, so the listener never
+finds a marker. The fetcher, the lazy result and the listener carry a `@todo`
+naming the v13 support end as their exit.
+See [Hidden records](hidden-records.md).
 
 ### An API only one version has
 

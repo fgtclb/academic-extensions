@@ -163,6 +163,7 @@ describing an intention as if it were the state.
 | [Backend select items](backend-select-items.md)                 | What an `itemsProcFunc` handler is handed on each core version, the page TSconfig path of a FlexForm field, the narrowing that drops a relation, and a category tree by site setting and group.              |
 | [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, who renders a plugin's header, and the `record` variable TYPO3 v14 needs for it.                                                                |
 | [Upgrade checks](upgrade-checks.md)                             | The `academic:upgrade:check` command: the stored configuration it reads, what it compares template overrides with, and which root paths are a project's.                                                     |
+| [Hidden records](hidden-records.md)                             | What the plugin option "Show hidden records" needs beyond the query settings on a translated page on v13, and the fetcher that provides it.                                                                  |
 
 ## See also
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Repository;
 
+use FGTCLB\AcademicBase\Persistence\HiddenRecordsFetcher;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
 use FGTCLB\AcademicProjects\Domain\Model\Project;
@@ -19,6 +20,12 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
  */
 class ProjectRepository extends Repository
 {
+    public function __construct(
+        private readonly HiddenRecordsFetcher $hiddenRecordsFetcher,
+    ) {
+        parent::__construct();
+    }
+
     /**
      * @return QueryResult<Project>
      * @throws InvalidEnumerationValueException
@@ -91,7 +98,7 @@ class ProjectRepository extends Repository
             ]
         );
 
-        return $query->execute();
+        return $this->hiddenRecordsFetcher->execute($query);
     }
 
     /**
