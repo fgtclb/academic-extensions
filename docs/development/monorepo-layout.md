@@ -357,7 +357,7 @@ the root. It ships the base class every functional test case extends,
 `Classes/TestCase/FunctionalTestCase.php`, which keeps the Extbase class schema
 cache of every test instance in memory, see
 [Functional tests](../testing/functional-tests.md#the-shared-base-class), and
-fifteen functional-test traits in
+sixteen functional-test traits in
 `packages-dev/testing-helper/Classes/FunctionalTestCase/`:
 
 | Trait                                  | Purpose                                                                             |
@@ -373,6 +373,7 @@ fifteen functional-test traits in
 | `ExtensionsLoadedTestsTrait`           | Asserts the extension set under test is loaded.                                     |
 | `FrontendIconsAssertionTrait`          | Asserts a frontend icon of `academic_base`, and how it relates to the backend one.  |
 | `FrontendPluginRenderingTrait`         | Renders a frontend plugin through a real request.                                   |
+| `LabelReferencesResolveTestsTrait`     | Asserts every label the TCA and its FlexForms name resolves.                        |
 | `PluginFlexFormDataStructureTrait`     | Resolves and asserts a plugin's FlexForm data structure.                            |
 | `ResponsiveImageAssertionTrait`        | Asserts what the shared image partial of `academic_base` rendered.                  |
 | `StaticTemplateTypoScriptTrait`        | Builds the TypoScript a TypoScript record delivers, and what its form keeps.        |

@@ -3,7 +3,7 @@
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds the
 [base class every functional test case extends](#the-base-class-of-every-functional-test)
-and fifteen PHP traits, the parts of the test setup that were being copied
+and sixteen PHP traits, the parts of the test setup that were being copied
 between extensions, each one carrying the memory of a defect that made the copy
 necessary.
 
@@ -24,6 +24,7 @@ necessary.
 | [`FrontendIconsAssertionTrait`](#frontendiconsassertiontrait)                   | Asserts a frontend icon, and how it relates to the backend one.     |
 | [`CropVariantsAssertionTrait`](#cropvariantsassertiontrait)                     | Reads the crop variants the image cropper offers for a record.      |
 | [`StaticTemplateTypoScriptTrait`](#statictemplatetyposcripttrait)               | Builds the TypoScript a record delivers, and what its form keeps.   |
+| [`LabelReferencesResolveTestsTrait`](#labelreferencesresolveteststrait)         | Asserts every label the TCA and its FlexForms name resolves.        |
 
 ## How an extension gets access
 
@@ -572,7 +573,7 @@ with *"has keys "label", "value", but TYPO3 v13 reads "0", "1""*.
 [`Classes/FunctionalTestCase/DeprecatedCoreLabelsTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/DeprecatedCoreLabelsTrait.php)
 
 **What it does.** Walks the compiled `$GLOBALS['TCA']` recursively for the tables
-matching the given prefixes and reports every reference to one of seven core
+matching the given prefixes and reports every reference to one of ten core
 label keys that TYPO3 v14 retired, together with the replacement key shipped in
 `EXT:academic_base/Resources/Private/Language/locallang_tca.xlf`.
 
@@ -595,7 +596,11 @@ raises `E_USER_DEPRECATED` on every backend form render — and with
 `failOnDeprecation="true"` that would turn the first backend-form test red on
 v14 and leave it green on v13. The v14 language packs also no longer ship
 translations for them, so a German backend fell back to English. ACE-298 shipped
-21 replacement labels; this trait guards against the next one.
+21 replacement labels; this trait guards against the next one. The start, stop
+and access labels of the time and group restriction fields were retired as well
+and missing from its list, until
+[`LabelReferencesResolveTestsTrait`](#labelreferencesresolveteststrait) raised
+their deprecation on v14 (ACE-877).
 
 **It must be scoped to TYPO3 v14.** The trait's own docblock is explicit:
 
@@ -929,6 +934,47 @@ mark `@internal`; it is the one place that turns records into frontend
 TypoScript, and a test is the right place to depend on it. The form drops a
 stored value that is not among the items of the field, which is what makes an
 unregistered static template disappear on the next save.
+
+## `LabelReferencesResolveTestsTrait`
+
+[`Classes/FunctionalTestCase/LabelReferencesResolveTestsTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/LabelReferencesResolveTestsTrait.php)
+
+**What it does.** One test. It collects every `LLL:EXT:` reference in
+`$GLOBALS['TCA']`, a column label as much as an item, a description, a palette
+or a `showitem` override such as `--div--;LLL:…` or `field;LLL:…`, reads every
+FlexForm file a `FILE:EXT:` value names and collects its references too, and
+resolves each one with the `LanguageService` of the default language. A
+reference that resolves to an empty string fails the test, with the place it
+was found first, and so does a FlexForm file that cannot be read.
+
+**When to use it.** Already everywhere: every extension carries a
+`Tests/Functional/Language/LabelReferencesTest.php` whose entire body is
+`use LabelReferencesResolveTestsTrait;`. A new extension gets one as well.
+
+**The trap it exists for.** `LanguageService::sL()` returns an empty string for
+a missing file and for a missing key alike, and the backend then renders a
+field, a tab, an item or a palette without a label, without any message
+(ACE-877). Three ways of getting there were found at once:
+
+- A core key that does not exist: `LGL.l10n_parent` instead of the label of
+  `academic_base`, `sys_language_uid_formlabel` of the frontend extension, and
+  `fe_users.tabs.options`, which TYPO3 v13 removed together with the field it
+  labelled. The test runs on both core versions, against the core that is
+  installed, so a key one version lacks fails there.
+- A file of an extension that is not a dependency. The test instance loads the
+  extension under test and what it requires, nothing else, so a label read from
+  an extension that merely happens to be installed next to it fails here.
+- A key that was never declared, in the TCA or in a FlexForm file of the
+  running core version.
+
+Only the TCA and the FlexForm files are covered. Labels that templates, page
+TSconfig or the extension configuration template name are not.
+
+The whole TCA is checked, the core's own included. A core label that a release
+of TYPO3 breaks therefore turns every `LabelReferencesTest` red at once, and
+the message names the core file, not one of this repository.
+[`DeprecatedCoreLabelsTrait`](#deprecatedcorelabelstrait) is its counterpart for
+core labels that still resolve but are retired.
 
 ## See also
 

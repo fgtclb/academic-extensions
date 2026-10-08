@@ -24,10 +24,8 @@ $GLOBALS['TCA']['fe_users']['types']['Tx_Academicpersonssync_Domain_Model_Fronte
     'showitem' => '
         --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:general,
             username,usergroup,lastlogin,
-        --div--;LLL:EXT:academic_persons_edit/Resources/Private/Language/locallang_tca.xlf:fe_users.tabs.tx_academicpersons_profiles.label,
+        --div--;LLL:EXT:academic_persons/Resources/Private/Language/locallang_tca.xlf:fe_users.tabs.tx_academicpersons_profiles.label,
             tx_academicpersons_profiles,
-        --div--;LLL:EXT:frontend/Resources/Private/Language/locallang_tca.xlf:fe_users.tabs.options,
-            TSconfig,
         --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:access,
             disable,--palette--;;timeRestriction,
         --div--;LLL:EXT:core/Resources/Private/Language/Form/locallang_tabs.xlf:notes,
