@@ -88,8 +88,7 @@ method in `category_types`, extending it later costs a setting per extension.
 `Partials/Program/Facts.html` renders the list and `Partials/Program/Facts/Item.html`
 one fact, the rule of [Overridable partials](overridable-partials.md): a
 project that changes how a fact looks overrides the row once, for all three
-places. The card passes `listClass` and `itemClass` for its Bootstrap list
-group; the facts markup is otherwise the same everywhere.
+places.
 
 Credit points are an integer, and `0` counts as no value.
 
