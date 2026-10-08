@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use FGTCLB\AcademicContacts4pages\Controller\ContactsController;
 use FGTCLB\AcademicContacts4pages\Hook\ContactSortingHook;
+use FGTCLB\AcademicContacts4pages\Hook\ContactsRoleLocalizationHook;
 use FGTCLB\AcademicContacts4pages\Hook\DataHandlerHooks;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 
@@ -26,4 +27,6 @@ defined('TYPO3') or die;
         = ContactSortingHook::class;
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass']['academicContacts4pagesContactSorting']
         = ContactSortingHook::class;
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass']['academicContacts4pagesRoleLocalization']
+        = ContactsRoleLocalizationHook::class;
 })();

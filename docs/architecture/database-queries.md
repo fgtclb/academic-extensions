@@ -426,9 +426,10 @@ What to order by, learned from the ACE-482/ACE-491 sweeps:
   so a translated child keeps the default language role. Their inline lists
   therefore carry no `l10n_mode` and are shown on the default language role
   only, with `'displayCond' => 'FIELD:sys_language_uid:<=:0'` (ACE-873). Why an
-  `exclude` list rewrites the children, and the `localize` cascade that stays,
-  is explained in
-  [Translation synchronization](translation-synchronization.md#an-inline-list-that-is-exclude).
+  `exclude` list rewrites the children is explained in
+  [Translation synchronization](translation-synchronization.md#an-inline-list-that-is-exclude),
+  and how the children a localized role drags along are removed again in
+  [the section after it](translation-synchronization.md#localizing-a-parent-that-does-not-own-its-children) (ACE-874).
   The contract relation of the page contacts,
   `tx_academiccontacts4pages_contacts` on contracts, carries neither
   `l10n_mode` nor `displayCond` and has not been checked on translations.
