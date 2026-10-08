@@ -246,6 +246,52 @@ Test the tree through that controller, as `CategoryTreeRootTest` of
 of the items, tree items carry an `identifier` instead, and the category field
 is removed from the result.
 
+## A category tree offers the categories of one group
+
+A field of `type` `category` has no `itemsProcFunc`: `TcaCategory` builds the
+tree from `foreign_table` and `foreign_table_where` alone, on v13 and v14
+alike. The five category fields of the plugins of `academic_partners` (list
+and map), `academic_programs` (list and finder) and `academic_projects`
+therefore name the category type group of their plugin with a marker in that
+clause:
+
+```xml
+<foreign_table_where>AND {#sys_category}.{#uid} IN (###CATEGORY_TYPE_GROUP:partners###) AND {#sys_category}.{#sys_language_uid} IN (-1, 0)</foreign_table_where>
+```
+
+`ResolveCategoryTypeGroupMarker` of `category_types`, a listener on
+`AfterFlexFormDataStructureParsedEvent`, replaces it with a subselect of the
+categories that carry a type of the group, and of their ancestors (ACE-876).
+The ancestors are needed because the tree shows a category only together with
+every parent above it, and a category of the group below a parent of another
+type is a structure the filters support with `groupByParent`. Such a parent is
+selectable in the tree, and the plugin ignores it, as before.
+
+The listener must not query the database. TYPO3 v13 and v14 parse every data
+structure while `TcaSchemaFactory` builds the schema during bootstrap, before a
+table may exist, and cache the result: the branch `2` fix found that a version
+that looked the uids up broke the bootstrap of every functional test. The
+ancestors are therefore a recursive common table expression the tree query
+evaluates, run on SQLite, MariaDB, MySQL and PostgreSQL.
+
+A literal list of types in the FlexForm file is not an option: the types of a
+group come from the `CategoryTypes.yaml` of every installed extension, and an
+integrator adds and removes them. The demand reads the selection with
+`CategoryRepository::getByDatabaseFields(<group>, …)`, which drops every
+category of another type, so a tree that offers them lets an editor pick a
+filter the frontend never applies. That was the state before, with
+`{#type} != ''`.
+
+The group narrows what the tree offers, the site setting of the previous
+section decides where it starts. `CategoryTreeRoot` touches `startingPoints`
+only, so the two combine: below a configured root the tree offers the
+categories of the group and the root itself as their ancestor.
+
+The `CategoryTreeTypeGroupTest` of each of the three extensions fetches the
+tree through `FormSelectTreeAjaxController::fetchDataAction()`, the request the
+backend sends when the field is opened. The one of `academic_programs` covers
+the combination with a configured root as well.
+
 ## Five of the eleven dispatch an event, six do not
 
 `FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent` carries the whole
