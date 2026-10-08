@@ -65,7 +65,7 @@ defined('TYPO3') or die;
         implode(',', [
             '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.tab.configuration',
             'pi_flexform',
-            'pages',
+            'pages;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.field.pages.selected',
         ]),
         'academicprojects_projectlistsingle',
         'after:header'
@@ -76,16 +76,5 @@ defined('TYPO3') or die;
     (new TcaManipulator())->addContentElementPluginFlexForm(
         'academicprojects_projectlistsingle',
         'FILE:EXT:academic_projects/Configuration/FlexForms/ProjectSettings.xml',
-    );
-
-    ExtensionManagementUtility::addToAllTCAtypes(
-        'tt_content',
-        implode(',', [
-            '--div--;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.tab.configuration',
-            'pi_flexform',
-            'pages;LLL:EXT:academic_projects/Resources/Private/Language/locallang_be.xlf:element.field.pages.selected',
-        ]),
-        'academicprojects_projectlistsingle',
-        'after:header'
     );
 })();

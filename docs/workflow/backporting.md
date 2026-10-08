@@ -168,12 +168,15 @@ on `main` and was not backported wholesale:
 | `ActiveFiltersAssertionTrait`          | yes    | no  |
 | `StaticTemplateTypoScriptTrait`        | yes    | yes |
 | `FrontendIconsAssertionTrait`          | yes    | no  |
+| `LabelReferencesResolveTestsTrait`     | yes    | yes |
 
-All fifteen live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`
-on `main`; branch `2` has seven of them, the last since the backport of
-ACE-745. It exists on both, but not as the same code: TYPO3 v12 has no
-`FrontendTypoScriptFactory`, so the copy on branch `2` builds the TypoScript
-from `SysTemplateTreeBuilder` itself.
+All sixteen live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`
+on `main`; branch `2` has eight of them. `StaticTemplateTypoScriptTrait` came
+with the backport of ACE-745, `LabelReferencesResolveTestsTrait` with ACE-853 on
+branch `2` and ACE-877 on `main`. `StaticTemplateTypoScriptTrait` exists on
+both, but not as the same code: TYPO3 v12 has no `FrontendTypoScriptFactory`,
+so the copy on branch `2` builds the TypoScript from `SysTemplateTreeBuilder`
+itself.
 
 The base class every functional test case extends on `main`,
 `FGTCLB\TestingHelper\TestCase\FunctionalTestCase`, does not exist on branch

@@ -30,6 +30,18 @@
         <source>__Usergroups:__</source>
         <target>__Benutzergruppen:__</target>
       </trans-unit>
+      <trans-unit id="starttime">
+        <source>Start</source>
+        <target>Start</target>
+      </trans-unit>
+      <trans-unit id="endtime">
+        <source>Stop</source>
+        <target>Stopp</target>
+      </trans-unit>
+      <trans-unit id="fe_group">
+        <source>Access</source>
+        <target>Zugriff</target>
+      </trans-unit>
       <trans-unit id="palette.general">
         <source>Content Element</source>
         <target>Inhaltselement</target>
