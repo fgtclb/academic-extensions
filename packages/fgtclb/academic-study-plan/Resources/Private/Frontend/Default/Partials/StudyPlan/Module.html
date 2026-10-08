@@ -10,7 +10,8 @@
 
     - module: the module record.
     - semester: the semester it belongs to, for the label the dialog trigger
-      announces to a screen reader.
+      announces to a screen reader. The label names the note and the credit
+      points of the semester only when it has them.
 
     A module with neither a description nor an audio file has nothing to show, so
     it carries no trigger and no dialog. An override may move
@@ -39,8 +40,7 @@
     <f:if condition="{hasContent}">
         <button class="modal-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
             <span class="visually-hidden">
-                {semester.label}, {semester.note}, {semester.credit_points}
-                {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}.
+                {semester.label}<f:if condition="{semester.note}">, {semester.note}</f:if><f:if condition="{semester.credit_points}">, {semester.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}</f:if>.
                 {f:translate(key: 'modal.open', extensionName: 'AcademicStudyPlan')}: {module.label}
             </span>
         </button>
