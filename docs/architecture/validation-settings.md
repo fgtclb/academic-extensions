@@ -158,6 +158,18 @@ versus `Configuration/TCA/Overrides/` — not a doubt about the coupling itself.
    ones included, are never written to the model, whatever the request
    contains — see [Form data transformation](form-data-transformation.md),
    which is where that rule and the traps around it are documented.
+4. **Feedback.** A rejected argument is forwarded to the action that rendered
+   the form, which renders it again with the submitted values.
+   `Partials/Profile/Forms/FieldWrapper.html` shows the messages of its field,
+   read from the validation results under the path of the form object,
+   `emailAddressFormData.email`. The partial does not know that name, the
+   `element.form` it receives is the label prefix `emailAddress`, so
+   `pe:form.propertyPath` takes it from the surrounding `f:form`, the way the
+   core form fields resolve their `property`. `Partials/Profile/Forms/Errors.html`
+   above the form needs the name passed as a string, because it is rendered
+   outside the form. The message text is looked up per field and error code,
+   then per error code, then taken from the validator, see the labels page of
+   the extension manual.
 
 An unknown identifier yields an empty `ValidationSet`, so every property falls
 through as unconfigured.
