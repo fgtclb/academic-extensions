@@ -421,6 +421,17 @@ What to order by, learned from the ACE-482/ACE-491 sweeps:
   `foreign_sortby` is not derived from TCA the way `ctrl.sortby` is. Three
   tables in this repository are in that position, and the partnership, contract
   and page contact relations are the worked examples.
+  The contacts role and the partner role relations do not follow a
+  translation either: the child's own `role` select is `l10n_mode` `exclude`,
+  so a translated child keeps the default language role. Their inline lists
+  therefore carry no `l10n_mode` and are shown on the default language role
+  only, with `'displayCond' => 'FIELD:sys_language_uid:<=:0'` (ACE-873). Why an
+  `exclude` list rewrites the children, and the `localize` cascade that stays,
+  is explained in
+  [Translation synchronization](translation-synchronization.md#an-inline-list-that-is-exclude).
+  The contract relation of the page contacts,
+  `tx_academiccontacts4pages_contacts` on contracts, carries neither
+  `l10n_mode` nor `displayCond` and has not been checked on translations.
 - **A demanded ordering** (a plugin's sort option) gets `uid` appended as a
   tiebreaker — records equal in the demanded ordering must keep a stable
   relative order.
