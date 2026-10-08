@@ -168,8 +168,8 @@ surroundings; do not reformat the file.
 ### The test harness is not at parity
 
 `packages-dev/testing-helper/` — the shared functional-test traits — has grown
-on `main` and was not backported wholesale. This branch has seven of the
-thirteen:
+on `main` and was not backported wholesale. This branch has eight of the
+fourteen:
 
 | Trait                                  | `2` — this branch | `main` |
 |----------------------------------------|-------------------|--------|
@@ -180,6 +180,7 @@ thirteen:
 | `ContentElementHeaderAssertionTrait`   | yes               | yes    |
 | `CategoryFilterFormAssertionTrait`     | yes               | yes    |
 | `StaticTemplateTypoScriptTrait`        | yes               | yes    |
+| `LabelReferencesResolveTestsTrait`     | yes               | no     |
 | `ColourSchemeAwareIconsTrait`          | no                | yes    |
 | `DeprecatedCoreLabelsTrait`            | no                | yes    |
 | `EnsureTtContentListTypeColumnTrait`   | no                | yes    |
@@ -188,7 +189,7 @@ thirteen:
 | `CropVariantsAssertionTrait`           | no                | yes    |
 
 All of them live in `packages-dev/testing-helper/Classes/FunctionalTestCase/`;
-here that directory holds the seven marked for this branch. Count it rather than
+here that directory holds the eight marked for this branch. Count it rather than
 trusting this table — it has been wrong before. `StaticTemplateTypoScriptTrait`
 is on both, but not as the same code: TYPO3 v12 has no
 `FrontendTypoScriptFactory`, so the copy here builds the TypoScript from

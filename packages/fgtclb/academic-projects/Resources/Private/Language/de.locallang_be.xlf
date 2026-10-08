@@ -33,7 +33,7 @@
 			</trans-unit>
 			<trans-unit id="element.field.pages.selected">
 				<source>Selected projects to display</source>
-				<target>Ausgewählte Projekte zum anzeigen</target>
+				<target>Anzuzeigende Projekte</target>
 			</trans-unit>
 			<trans-unit id="flexform.hideActiveState.label">
 				<source>Show active state options</source>
