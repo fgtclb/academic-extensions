@@ -7,7 +7,7 @@ Defines how `academic_persons` transfers telephone and fax data from TYPO3 front
 ## Requirements
 
 ### Requirement: Integrators can configure imported telephone and fax types independently
-The system SHALL provide separate extension configuration options for the type assigned to telephone and fax numbers imported from frontend users. Both options SHALL default to `business` on TYPO3 v13 and v14.
+The system SHALL provide separate extension configuration options for the type assigned to telephone and fax numbers imported from frontend users. Both options SHALL default to `business` on TYPO3 v12 and v13.
 
 #### Scenario: Default import configuration
 - **WHEN** an integrator does not customize either imported phone-number type
