@@ -85,6 +85,27 @@ final class ContractSelectStorageScopeTest extends AbstractAcademicContacts4Page
     }
 
     /**
+     * The field declares an empty item of value 0, which is also its default. The
+     * handler used to merge its contracts over the declared items by index, which
+     * replaced that item with the first contract, so a new contact showed
+     * `[ MISSING LABEL ("0") ]` in its contract select (ACE-842).
+     */
+    #[Test]
+    public function theEmptyItemIsKept(): void
+    {
+        $result = $this->compile(40, 'new');
+        $items = array_map(
+            static fn($item): array => is_array($item) ? $item : $item->toArray(),
+            array_values($result['processedTca']['columns']['contract']['config']['items'] ?? []),
+        );
+
+        $this->assertSame(['0'], $result['databaseRow']['contract']);
+        $this->assertSame([0, 1, 2, 3], array_map(static fn(array $item): int => (int)$item['value'], $items));
+        // FormEngine puts a value without an item back as `[ MISSING LABEL ("0") ]`.
+        $this->assertSame('', $items[0]['label']);
+    }
+
+    /**
      * @return int[]
      */
     private function offeredContractUids(int $contactUid): array
@@ -97,10 +118,7 @@ final class ContractSelectStorageScopeTest extends AbstractAcademicContacts4Page
                 array_values($items),
             ),
         );
-        // The field declares an empty placeholder item with value 0, but it does not
-        // survive: `ContractItems::itemsProcFunc()` merges with
-        // `ArrayUtility::mergeRecursiveWithOverrule()`, which overwrites index 0 with the
-        // first contract. The filter is a guard against that changing, not a fact.
+        // The empty item the field declares, see `theEmptyItemIsKept()`.
         $uids = array_values(array_filter($uids, static fn(int $uid): bool => $uid > 0));
         sort($uids);
 
@@ -110,7 +128,7 @@ final class ContractSelectStorageScopeTest extends AbstractAcademicContacts4Page
     /**
      * @return array<string, mixed>
      */
-    private function compile(int $contactUid): array
+    private function compile(int $uid, string $command = 'edit'): array
     {
         $request = (new ServerRequest('https://localhost/typo3/record/edit'))
             ->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_BE);
@@ -121,8 +139,8 @@ final class ContractSelectStorageScopeTest extends AbstractAcademicContacts4Page
             [
                 'request' => $request,
                 'tableName' => self::TABLE,
-                'vanillaUid' => $contactUid,
-                'command' => 'edit',
+                'vanillaUid' => $uid,
+                'command' => $command,
             ],
             // Not `$this->get()`: on TYPO3 v12 `TcaDatabaseRecord` is not a public
             // service, so the test container cannot hand it over.
