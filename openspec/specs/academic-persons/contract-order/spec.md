@@ -21,6 +21,13 @@ and v13 alike.
 - **THEN** the profile still renders its contracts in the order arranged on
   the profile
 
+#### Scenario: Localizing an organisational unit
+
+- **WHEN** an editor localizes an organisational unit, or copies it into a
+  language, and saves the translation
+- **THEN** the profile renders exactly the contracts it had, each once, in the
+  order arranged on the profile, whatever the language of a contract
+
 #### Scenario: An organisational unit keeps its own arrangement
 
 - **WHEN** an editor rearranges the contracts listed in an organisational unit

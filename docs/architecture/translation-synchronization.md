@@ -48,15 +48,46 @@ path**. Four consequences follow, and every one of them has cost a defect:
    each other with every save. The contacts role and the partner role were in
    that position until ACE-850. Their lists now carry no `l10n_mode` and a
    `displayCond` of `FIELD:sys_language_uid:<=:0`, so FormEngine never submits
-   them for a translation. What stays is the `localize` command:
-   `DataHandler::copyRecord()` localizes every inline child of a localized
-   parent, and no TCA option prevents it, so localizing a role still creates
-   translations of its children, or copies of the ones that are translated
-   already.
+   them for a translation. The `localize` command is the other half, see
+   [Localizing a parent that does not own its children](#localizing-a-parent-that-does-not-own-its-children).
 
 Nothing has to be written into `l10n_state` for synchronization to start:
 `Localization\State` treats a field with no stored state as `parent`, which is
 the state a newly synchronized field needs.
+
+## Localizing a parent that does not own its children
+
+`DataHandler::localize()` copies every inline child of a localized record
+through `copyRecord_processRelation()`, and no TCA option prevents it, on v12
+and v13 alike. For a parent that lists children another record owns, that is
+wrong: localizing a contacts role created a translation of every page contact
+it lists, attached to the role translation, and one more copy of a contact that
+was translated or valid in all languages already. The organisational unit of
+`academic_persons` lists the contracts of its people the same way, and a
+profile valid in all languages then showed a contract twice (ACE-874).
+
+`SecondaryParentLocalizationGuard` of `academic_base` removes them. A
+`processCmdmap_afterFinish` hook per relation hands it the parent table and the
+inline field: `ContactsRoleLocalizationHook` of `academic_contacts4pages`,
+`PartnerRoleLocalizationHook` of `academic_partners` and
+`OrganisationalUnitLocalizationHook` of `academic_persons`. The guard runs after
+`remapListedDBRecords()`, reads what the run created from
+`DataHandler::$copyMappingArray_merged`, and deletes every created child of the
+relation that points at a parent created in another language than its source,
+by `localize` or by `copyToLanguage`, with a nested DataHandler `delete`
+command. That is a soft delete, which takes the child's own inline children
+along. In a workspace it discards the new record: the page contacts and the
+partnerships are workspace aware on this branch. The organisational units and
+contracts are not, and the core refuses to localize an organisational unit in a
+workspace. A forced hard
+delete is not used: on v12 it leaves the inline children of the deleted record
+behind. A plain copy of the parent in its own language still copies its
+children.
+
+What the guard cannot prevent is the attempt. The core still tries to localize a
+default language child that is translated already and logs that the
+localization failed, which the editor sees as an error message while nothing is
+created.
 
 ## Writing from the CLI
 
