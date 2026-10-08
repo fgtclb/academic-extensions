@@ -65,6 +65,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Label overrides](label-overrides.md)                           | How a site overrides a label through `_LOCAL_LANG`, and the extension name that decides the path.                                                                   |
 | [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, why a template needs it, and who renders a plugin's header.                                            |
 | [Page type rendering](page-type-rendering.md)                   | How the program, partner and project page types refine the site's page object, and where their page record comes from on `FLUIDTEMPLATE` and `PAGEVIEW`.            |
+| [Hidden records](hidden-records.md)                             | What the plugin option "Show hidden records" needs beyond the query settings on a translated page, on v12 and v13, and the trait that provides it.                  |
 
 ## See also
 

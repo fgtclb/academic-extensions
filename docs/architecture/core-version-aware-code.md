@@ -17,7 +17,7 @@ They differ by *where* the difference sits, not by preference:
 | Class folder split                         | `academic-base/Classes/Core12/` and `Classes/Core13/`                                                  | 4 files per version    |
 | Version dependent resource path            | `packages/fgtclb/*/Configuration/TCA/Overrides/tt_content.php`                                         | 5 files, 12 call sites |
 | Version switch inside a configuration file | `packages/fgtclb/*/ext_localconf.php`                                                                  | 3 files                |
-| Version switch inside a PHP class          | `academic-base/Classes/Extbase/Property/TypeConverter/`                                                | 1 file, 1 switch       |
+| Version switch inside a PHP class          | `academic-base/Classes/Extbase/Property/TypeConverter/`, `academic-base/Classes/Domain/Repository/`    | 2 files, 2 switches    |
 | Check for the API instead of the version   | the page data processors, `academic-base/Classes/Environment/`, `academic-persons/Classes/Controller/` | 5 files, 6 checks      |
 
 The first four switch on `(new Typo3Version())->getMajorVersion()`, the fifth
@@ -169,7 +169,7 @@ the page TSconfig.
 
 ## A switch inside a class
 
-Exactly one class under any `Classes/` directory carries a version switch:
+Two files under any `Classes/` directory carry a version switch. The first is
 [`packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php`](../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php)
 line 350, in `configureProperties()`:
 
@@ -187,6 +187,14 @@ service tag, which `academic-base/Configuration/Services.yaml` lines 20–25
 provides. The properties are still set on v12 because code there may read them
 back through the deprecated accessors. The method carries a `@todo` naming its
 exit condition — dropping it together with the call when v12 support ends.
+
+The second is the trait
+[`packages/fgtclb/academic-base/Classes/Domain/Repository/HiddenRecordsQueryTrait.php`](../../packages/fgtclb/academic-base/Classes/Domain/Repository/HiddenRecordsQueryTrait.php),
+in `matchTranslationsOfHiddenRecords()`. The language statement of Extbase
+excludes hidden default records on v12 whatever the query settings say, and the
+method replaces it there for a query that includes hidden records. v13 applies
+the query settings itself, so the method returns early. It carries a `@todo` to
+remove it with v12 support. See [Hidden records](hidden-records.md).
 
 ## A check for the API instead of the version
 

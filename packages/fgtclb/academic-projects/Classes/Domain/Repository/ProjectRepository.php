@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicProjects\Domain\Repository;
 
+use FGTCLB\AcademicBase\Domain\Repository\HiddenRecordsQueryTrait;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ActiveState;
 use FGTCLB\AcademicProjects\Domain\Model\Dto\ProjectDemand;
 use FGTCLB\AcademicProjects\Domain\Model\Project;
@@ -19,6 +20,8 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
  */
 class ProjectRepository extends Repository
 {
+    use HiddenRecordsQueryTrait;
+
     /**
      * @return QueryResult<Project>
      * @throws InvalidEnumerationValueException
@@ -29,10 +32,7 @@ class ProjectRepository extends Repository
         $query->getQuerySettings()->setRespectStoragePage(false);
 
         if ($demand->getShowHiddenRecords() === true) {
-            // Include hidden (disabled) records; other enable fields
-            // (deleted, start-/endtime, fe_group) stay in effect.
-            $query->getQuerySettings()->setIgnoreEnableFields(true);
-            $query->getQuerySettings()->setEnableFieldsToBeIgnored(['disabled']);
+            $this->includeHiddenRecords($query);
         }
 
         $constraints = [];
@@ -91,7 +91,10 @@ class ProjectRepository extends Repository
             ]
         );
 
-        return $query->execute();
+        $this->matchTranslationsOfHiddenRecords($query);
+        $projects = $query->execute();
+        $this->fetchIncludingHiddenRecords($projects);
+        return $projects;
     }
 
     /**
