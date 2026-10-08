@@ -22,8 +22,8 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
  * that needed the rendered content element, and covers what that change is about: the
  * settings of the `Appearance` tab, which the `Default` content element layout renders and
  * a template without that layout silently dropped. Since ACE-722 it covers the credit
- * points as well. `main` carries the full coverage of the element, which was never
- * backported.
+ * points as well, and since ACE-836 the label a dialog trigger announces. `main` carries
+ * the full coverage of the element, which was never backported.
  */
 final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPlanTestCase
 {
@@ -182,17 +182,43 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     {
         $this->setUpTestCase('studyPlanPage_decimalCreditPoints');
 
-        $labels = array_map(
-            static fn(string $text): string => preg_replace('#\\s+#', ' ', $text) ?? '',
-            $this->textsOf($this->renderHomePage(), '//button[contains(@class, "modal-trigger")]/span'),
+        $this->assertSame(
+            [
+                'First Semester, 30 CP. Show module details: Mathematics I',
+                'Second Semester, 0 CP. Show module details: Thesis',
+            ],
+            $this->dialogTriggerLabelsOf($this->renderHomePage()),
         );
+    }
+
+    /**
+     * The label the dialog trigger announces names the note of the semester only when
+     * there is one. A semester without a note must not leave an empty item behind,
+     * which a screen reader reads out as "Second Semester, comma, 30 CP".
+     */
+    #[Test]
+    public function contentElementAnnouncesTheNoteOfASemesterOnlyWhenItHasOne(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
 
         $this->assertSame(
             [
-                'First Semester, , 30 CP. Show module details: Mathematics I',
-                'Second Semester, , 0 CP. Show module details: Thesis',
+                'First Semester, Foundation courses, 30 CP. Show module details: Mathematics I',
+                'Second Semester, 30 CP. Show module details: Statistics',
             ],
-            $labels,
+            $this->dialogTriggerLabelsOf($this->renderHomePage()),
+        );
+    }
+
+    /**
+     * @return string[] The visually hidden label of every dialog trigger, whitespace collapsed
+     *                  as a screen reader reads it.
+     */
+    private function dialogTriggerLabelsOf(string $html): array
+    {
+        return array_map(
+            static fn(string $text): string => preg_replace('#\\s+#', ' ', $text) ?? '',
+            $this->textsOf($html, '//button[contains(@class, "modal-trigger")]/span'),
         );
     }
 

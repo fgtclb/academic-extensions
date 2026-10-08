@@ -75,7 +75,9 @@
                                     <f:if condition="{hasContent}">
                                         <button class="modal-trigger" data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
                                             <span class="visually-hidden">
-                                                {semester.label}, {semester.note}, {semester.credit_points}
+                                                {semester.label},
+                                                <f:if condition="{semester.note}">{semester.note},</f:if>
+                                                {semester.credit_points}
                                                 {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}.
                                                 {f:translate(key: 'modal.open', extensionName: 'AcademicStudyPlan')}: {module.label}
                                             </span>
