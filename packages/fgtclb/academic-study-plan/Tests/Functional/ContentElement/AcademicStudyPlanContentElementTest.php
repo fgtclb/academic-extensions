@@ -22,8 +22,8 @@ use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
  * that needed the rendered content element, and covers what that change is about: the
  * settings of the `Appearance` tab, which the `Default` content element layout renders and
  * a template without that layout silently dropped. Since ACE-722 it covers the credit
- * points as well, and since ACE-836 the label a dialog trigger announces. `main` carries
- * the full coverage of the element, which was never backported.
+ * points as well, and since ACE-836 and ACE-863 the label a dialog trigger announces.
+ * `main` carries the full coverage of the element, which was never backported.
  */
 final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPlanTestCase
 {
@@ -172,20 +172,19 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     }
 
     /**
-     * The label the dialog trigger announces prints the credit points of the semester
-     * without a condition, so a semester without them reads "0 CP" there - as it did
-     * with the former integer column, and not "0.00 CP", because the template receives
-     * a number.
+     * The label the dialog trigger announces names the credit points of the semester
+     * only when it has them. A semester without them is not announced as "0 CP", the
+     * same as the column header shows none for it (ACE-863).
      */
     #[Test]
-    public function contentElementAnnouncesTheCreditPointsOfASemesterWithoutThemAsZero(): void
+    public function contentElementAnnouncesNoCreditPointsForASemesterWithoutThem(): void
     {
         $this->setUpTestCase('studyPlanPage_decimalCreditPoints');
 
         $this->assertSame(
             [
                 'First Semester, 30 CP. Show module details: Mathematics I',
-                'Second Semester, 0 CP. Show module details: Thesis',
+                'Second Semester. Show module details: Thesis',
             ],
             $this->dialogTriggerLabelsOf($this->renderHomePage()),
         );
