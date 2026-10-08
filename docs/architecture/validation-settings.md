@@ -215,7 +215,7 @@ rules match — but nothing else does, and the two systems share no code.
 | Normalisation           | once, at load, into `Validation` objects          | none — three readers reinterpret the raw array        |
 | Keyword case            | lowercased before matching                        | case sensitive                                        |
 | Backend TCA             | merged by all six TCA files                       | `getValidationsForTca()` exists but **has no caller** |
-| Frontend rendering      | `disabled` / `readonly` / `required` / input type | required asterisk and input type only                 |
+| Frontend rendering      | `disabled` / `readonly` / `required` / input type | required asterisk, input type, messages at the field  |
 | Transformation guard    | yes — locked properties are never written         | none                                                  |
 | `disabled` / `readonly` | supported                                         | **understood by none of the three readers**           |
 | `url`                   | not understood                                    | validator only, no TCA                                |
@@ -232,6 +232,17 @@ Two of those deserve emphasis because they are traps rather than gaps:
   and `number`, which it actually uses.
 
 The divergence between its three readers is tracked as ACE-429.
+
+A rejected job comes back the way a rejected profile form does: Extbase forwards
+it to `newAction()`, and the form renders again with the submitted values. The
+field partials set `errorClass="is-invalid"` on the field itself, and
+`Partials/Job/Forms/FieldWrapper.html` renders the messages of its field in
+`invalid-feedback` elements right after it. The results are read under
+`job.<property>`, which is both the name of the form object and the prefix of
+the field labels, so unlike the profile editor no ViewHelper has to find the
+path. `Partials/Job/Forms/ErrorMessage.html` looks the text up per field and
+error code, then per error code, then takes the message of the validator, see
+[the labels page of the jobs manual](../../packages/fgtclb/academic-jobs/Documentation/Configuration/Labels/Index.rst).
 
 ## Documentation state
 
