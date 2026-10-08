@@ -278,6 +278,32 @@ is the example, and its test classes cover a failing transport, an empty
 recipient and sender, a recipient that cannot be parsed, and the warning the
 visitor sees.
 
+## A file upload
+
+`ResourceStorage::assureFileUploadPermissions()` refuses every file for which
+`is_uploaded_file()` is false, on TYPO3 v12 and v13. A file that was never
+posted to a web server never passes that check, so a functional test cannot
+store an upload through the storage as it is.
+
+- **The storage is replaced** for the test class with an XCLASS that skips
+  only the `is_uploaded_file()` step for the files below one directory of the
+  test instance. The upload size limit and `assureFileAddPermissions()`, which
+  checks the file extension, the user and the target folder, still run for
+  them, and every other file is checked as before. The XCLASS is part of the
+  configuration of the test instance, under `SYS.Objects`, so every frontend
+  request of the class uses it.
+- **`makeInstance()` remembers** the class it resolved for the whole process.
+  The test class flushes that with `GeneralUtility::flushInternalRuntimeCaches()`
+  before and after `parent::setUp()` and in `tearDown()`, so a class that ran
+  before does not hide the XCLASS and the next one does not inherit it.
+- **The file is posted** as an `UploadedFile` with `withUploadedFiles()` on the
+  `InternalRequest`, next to the parsed body of the form. The storage moves a
+  stored upload away, so the test hands in a copy of the fixture.
+
+[`AcademicJobsNewJobFormImageUploadTest`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/AcademicJobsNewJobFormImageUploadTest.php)
+is the example, with its storage in
+[`Fixtures/Classes/SimulatedUploadResourceStorage.php`](../../packages/fgtclb/academic-jobs/Tests/Functional/Plugins/Fixtures/Classes/SimulatedUploadResourceStorage.php).
+
 ## Version-gated tests
 
 Three mechanisms coexist, and they are not interchangeable:

@@ -10,7 +10,8 @@ use TYPO3\CMS\Core\Http\UploadedFile;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
-use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\DuplicationBehavior as LegacyDuplicationBehavior;
+use TYPO3\CMS\Core\Resource\Enum\DuplicationBehavior as NativeDuplicationBehavior;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference as CoreFileReference;
@@ -137,7 +138,8 @@ final class FileUploadConverter extends AbstractTypeConverter
             return null;
         }
         $targetFileName = $source['name'];
-        if (is_string($targetFileNameWithoutExtension) && $targetFileNameWithoutExtension !== '') {
+        $isTargetFileNameConfigured = is_string($targetFileNameWithoutExtension) && $targetFileNameWithoutExtension !== '';
+        if ($isTargetFileNameConfigured) {
             $targetFileName = strtolower(sprintf(
                 '%s.%s',
                 $targetFileNameWithoutExtension,
@@ -147,7 +149,12 @@ final class FileUploadConverter extends AbstractTypeConverter
 
         try {
             $this->validateUploadedFile($source, $maxFileSize, $allowedMimeTypes);
-            return $this->importUploadedResource($source, $targetFolderIdentifier, $targetFileName);
+            return $this->importUploadedResource(
+                $source,
+                $targetFolderIdentifier,
+                $targetFileName,
+                $isTargetFileNameConfigured,
+            );
         } catch (TypeConverterException $e) {
             return GeneralUtility::makeInstance(
                 Error::class,
@@ -165,25 +172,44 @@ final class FileUploadConverter extends AbstractTypeConverter
      *      error: int|null,
      *      type: string|null,
      *  } $uploadedFileInformation
+     * @param bool $replaceExistingFile Whether a file of the same name is replaced. Only a name the
+     *                                  caller determined may replace a file. A name the client sent
+     *                                  could be the name of any file in the folder, so the upload is
+     *                                  renamed instead.
      * @throws TypeConverterException
      */
     private function importUploadedResource(
         array $uploadedFileInformation,
         string $targetFolderIdentifier,
-        ?string $targetFileName
+        ?string $targetFileName,
+        bool $replaceExistingFile,
     ): ExtbaseFileReference {
         if (!GeneralUtility::makeInstance(FileNameValidator::class)->isValid((string)$uploadedFileInformation['name'])) {
             throw new TypeConverterException('Uploading files with PHP file extensions is not allowed!', 1753712929);
         }
 
         $targetFolder = $this->getOrCreateTargetFolder($targetFolderIdentifier);
-        /** @var File $uploadedFile */
-        $uploadedFile = $targetFolder->getStorage()->addUploadedFile(
-            $uploadedFileInformation,
-            $targetFolder,
-            $targetFileName,
-            DuplicationBehavior::REPLACE
-        );
+        $storage = $targetFolder->getStorage();
+        // TYPO3 v13 deprecates the enumeration class of TYPO3 v12 and takes its native enum,
+        // which does not exist on TYPO3 v12.
+        // @todo Remove the else branch when TYPO3 v12 support is dropped.
+        if (class_exists(NativeDuplicationBehavior::class)) {
+            /** @var File $uploadedFile */
+            $uploadedFile = $storage->addUploadedFile(
+                $uploadedFileInformation,
+                $targetFolder,
+                $targetFileName,
+                $replaceExistingFile ? NativeDuplicationBehavior::REPLACE : NativeDuplicationBehavior::RENAME,
+            );
+        } else {
+            /** @var File $uploadedFile */
+            $uploadedFile = $storage->addUploadedFile(
+                $uploadedFileInformation,
+                $targetFolder,
+                $targetFileName,
+                $replaceExistingFile ? LegacyDuplicationBehavior::REPLACE : LegacyDuplicationBehavior::RENAME,
+            );
+        }
 
         return $this->createFileReferenceFromFalFileObject($uploadedFile);
     }
