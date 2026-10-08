@@ -173,3 +173,23 @@ without a link to the detail view. This applies to TYPO3 v13 and v14 alike.
 - **WHEN** a job list with "Show hidden records" lists a hidden job
 - **THEN** the job is listed with its title and without a link to the detail
   view
+
+### Requirement: A cached job detail ends with the job
+
+The page cache entry of a page that shows a job in the job detail view SHALL
+end no later than the next start or end time of that job or of a translation
+of it, whether or not the installation enables the automatic frontend cache
+tagging of the core. A job without a start or end time in the future SHALL
+leave the cache lifetime of the page as it is. This applies to TYPO3 v13 and
+v14 alike.
+
+#### Scenario: Job that ends in two hours
+
+- **WHEN** a visitor opens the detail page of a job that ends in two hours
+- **THEN** the page is cached for no longer than two hours
+
+#### Scenario: Job without start and end time
+
+- **WHEN** a visitor opens the detail page of a job without a start or end
+  time
+- **THEN** the page is cached for the lifetime the page has
