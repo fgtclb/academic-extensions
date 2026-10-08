@@ -89,6 +89,27 @@ const hexToRgba = (hex: string, alpha: number): string => {
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
 
+/**
+ * Whether a pointer event of a modal dialog happened on its backdrop.
+ *
+ * The backdrop is no element of its own: a click on it is dispatched to the
+ * dialog, exactly as a click on the padding of the dialog is. Only the position
+ * tells the two apart, so an event counts when it targets the dialog itself and
+ * lies outside the box of the dialog.
+ */
+const isOnBackdrop = (dialog: HTMLDialogElement, event: MouseEvent): boolean => {
+    if (event.target !== dialog) {
+        return false;
+    }
+
+    const box = dialog.getBoundingClientRect();
+
+    return event.clientX < box.left
+        || event.clientX > box.right
+        || event.clientY < box.top
+        || event.clientY > box.bottom;
+};
+
 class StudyPlan {
     private readonly container: HTMLElement;
     private readonly modules: NodeListOf<HTMLElement>;
@@ -317,6 +338,20 @@ class StudyPlan {
                     event.preventDefault();
                     close(event);
                 }
+            });
+
+            // Only a press that also started on the backdrop closes the dialog.
+            // Text selected inside it and released outside ends in a click on
+            // the dialog as well, and must leave it open.
+            let pressedOnBackdrop = false;
+            dialog.addEventListener('mousedown', (event: MouseEvent): void => {
+                pressedOnBackdrop = isOnBackdrop(dialog, event);
+            });
+            dialog.addEventListener('click', (event: MouseEvent): void => {
+                if (pressedOnBackdrop && isOnBackdrop(dialog, event)) {
+                    this.closeModal(dialog);
+                }
+                pressedOnBackdrop = false;
             });
         });
     }

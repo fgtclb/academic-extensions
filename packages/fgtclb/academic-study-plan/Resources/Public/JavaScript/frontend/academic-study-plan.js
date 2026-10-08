@@ -41,6 +41,13 @@
     const blue = parseInt(hex.slice(5, 7), 16);
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
   };
+  var isOnBackdrop = (dialog, event) => {
+    if (event.target !== dialog) {
+      return false;
+    }
+    const box = dialog.getBoundingClientRect();
+    return event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
+  };
   var StudyPlan = class {
     container;
     modules;
@@ -226,6 +233,16 @@
             event.preventDefault();
             close(event);
           }
+        });
+        let pressedOnBackdrop = false;
+        dialog.addEventListener("mousedown", (event) => {
+          pressedOnBackdrop = isOnBackdrop(dialog, event);
+        });
+        dialog.addEventListener("click", (event) => {
+          if (pressedOnBackdrop && isOnBackdrop(dialog, event)) {
+            this.closeModal(dialog);
+          }
+          pressedOnBackdrop = false;
         });
       });
     }
