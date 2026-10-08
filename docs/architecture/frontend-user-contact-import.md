@@ -125,7 +125,10 @@ all the same.
 
 Page lists are checked before anything is read: a part that is no page uid
 stops the command with exit code 2, because `intExplode()` would silently turn
-`12;13` into `12` and exclude less than was meant.
+`12;13` into `12` and exclude less than was meant. `academic:createprofiles` and
+`academic:updateprofiles` refuse such a list the same way since ACE-845, and
+since ACE-870 all three commands are handed the one stateless
+`Command\PageListParser` instead of a copy of the reading each.
 
 The command never shows a profile again, and nothing records that it hid one
 (ACE-229). A frontend user that is deleted and imported again gets a new uid,
