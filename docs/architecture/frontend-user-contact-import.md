@@ -30,6 +30,18 @@ a profile outside its window stays invisible in the frontend. The display paths
 — the "show hidden records" option, the selected profiles and the detail view —
 share a different helper, which lifts the hidden flag only.
 
+## New records are stored on the page of their profile
+
+`academic:createprofiles` stores the profile and its contract on the page of the
+frontend user, because there is no profile yet whose page could be asked.
+`academic:updateprofiles` stores a contract it adds to an existing profile on the
+page of that profile, and the address, email address and phone numbers it adds to
+a contract on the page of that contract, which for a new contract is the page of
+the profile again. The profile may have been moved into a folder of its own, and
+until ACE-843 the update stored the new records on the frontend user folder
+instead. An editor with access to the profile folder only could then no longer
+open the profile. Records stored that way are not moved by a later run.
+
 ## Cleaning up profiles of inactive frontend users
 
 `academic:cleanupprofiles` (ACE-215) is the one command that changes whether a
