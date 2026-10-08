@@ -258,6 +258,22 @@ Note that a genuinely configurable service is possible, but it must be declared
 `#[Autoconfigure(shared: false)]` so each retrieval returns a fresh instance.
 No service in this repository is declared that way today.
 
+### Page title providers are the allowed exception
+
+A page title provider of the core page title API holds state by design. The
+plugin of a detail view writes the title into the provider, and the core reads
+it from there when it renders the `<title>` of the page, so both have to get one
+shared instance. `AbstractPageTitleProvider` implements `SingletonInterface`,
+which the core container makes public and shared, and `shared: false` would
+break it: the core would read an empty provider of its own. The providers of the
+core work the same way.
+
+The two providers in this repository are
+`academic-persons/Classes/PageTitle/ProfileTitleProvider.php` and
+`academic-jobs/Classes/PageTitle/JobTitleProvider.php`. They hold the title and
+nothing else. A provider is the place for that one value, not a precedent for
+state in other services.
+
 ## Attributes safe on both core versions
 
 Not every attribute exists in every supported version, so an attribute has to be
