@@ -110,6 +110,18 @@
 
       <!-- Combined sorting options -->
 
+      <trans-unit id="sorting.lastUpdated.asc">
+        <source>Last updated (latest last)</source>
+      </trans-unit>
+      <trans-unit id="sorting.lastUpdated.desc">
+        <source>Last updated (latest first)</source>
+      </trans-unit>
+      <trans-unit id="sorting.sorting.asc">
+        <source>Page sorting (Result may be unexpected)</source>
+      </trans-unit>
+      <trans-unit id="sorting.sorting.desc">
+        <source>Page sorting, reversed (Result may be unexpected)</source>
+      </trans-unit>
       <trans-unit id="sorting.title.asc">
         <source>Title A-Z</source>
       </trans-unit>

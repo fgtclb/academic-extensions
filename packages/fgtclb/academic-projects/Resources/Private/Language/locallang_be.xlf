@@ -72,16 +72,16 @@
         <source>Sorting</source>
       </trans-unit>
       <trans-unit id="flexform.sorting.lastUpdated.asc">
-        <source>Last updated (latest first)</source>
+        <source>Last updated (latest last)</source>
       </trans-unit>
       <trans-unit id="flexform.sorting.lastUpdated.desc">
-        <source>Last updated (latest last)</source>
+        <source>Last updated (latest first)</source>
       </trans-unit>
       <trans-unit id="flexform.sorting.sorting.asc">
         <source>Page sorting (Result may be unexpected)</source>
       </trans-unit>
       <trans-unit id="flexform.sorting.sorting.desc">
-        <source>Page sorting (Result may be unexpected)</source>
+        <source>Page sorting, reversed (Result may be unexpected)</source>
       </trans-unit>
       <trans-unit id="flexform.sorting.title.asc">
         <source>Title A-Z</source>

@@ -92,20 +92,20 @@
         <target>Sortierung</target>
       </trans-unit>
       <trans-unit id="flexform.sorting.lastUpdated.asc">
-        <source>Last updated (latest first)</source>
-        <target>Zuletzt aktualisiert (neueste zuerst)</target>
+        <source>Last updated (latest last)</source>
+        <target>Zuletzt aktualisiert (älteste zuerst)</target>
       </trans-unit>
       <trans-unit id="flexform.sorting.lastUpdated.desc">
-        <source>Last updated (latest last)</source>
-        <target>Zuletzt aktualisiert (neueste zuletzt)</target>
+        <source>Last updated (latest first)</source>
+        <target>Zuletzt aktualisiert (neueste zuerst)</target>
       </trans-unit>
       <trans-unit id="flexform.sorting.sorting.asc">
         <source>Page sorting (Result may be unexpected)</source>
         <target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
       </trans-unit>
       <trans-unit id="flexform.sorting.sorting.desc">
-        <source>Page sorting (Result may be unexpected)</source>
-        <target>Seitensortierung (Ergebnis kann unerwartet sein)</target>
+        <source>Page sorting, reversed (Result may be unexpected)</source>
+        <target>Seitensortierung umgekehrt (Ergebnis kann unerwartet sein)</target>
       </trans-unit>
       <trans-unit id="flexform.sorting.title.asc">
         <source>Title A-Z</source>
