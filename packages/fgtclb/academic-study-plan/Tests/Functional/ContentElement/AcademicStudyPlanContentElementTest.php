@@ -220,9 +220,9 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $this->assertSame(
             'category-label-placeholder First Semester 30 CP Mathematics I 2.5 CP '
-            . 'First Semester, , 30 CP. Show module details: Mathematics I Mathematics I 2.5 CP '
+            . 'First Semester, 30 CP. Show module details: Mathematics I Mathematics I 2.5 CP '
             . 'Linear algebra and analysis. Colloquium Second Semester Thesis 12.75 CP '
-            . 'Second Semester, , 0 CP. Show module details: Thesis Thesis 12.75 CP Final project.',
+            . 'Second Semester. Show module details: Thesis Thesis 12.75 CP Final project.',
             $this->visibleTextOf($this->renderHomePage()),
         );
     }
@@ -245,27 +245,52 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     }
 
     /**
-     * The label the dialog trigger announces prints the credit points of the semester
-     * without a condition, so a semester without them reads "0 CP" there - as it did
-     * with the former integer column, and not "0.00 CP", because the template receives
-     * a number.
+     * The label the dialog trigger announces names the credit points of the semester
+     * only when it has them. A semester without them is not announced as "0 CP", the
+     * same as the column header shows none for it (ACE-863).
      */
     #[Test]
-    public function contentElementAnnouncesTheCreditPointsOfASemesterWithoutThemAsZero(): void
+    public function contentElementAnnouncesNoCreditPointsForASemesterWithoutThem(): void
     {
         $this->setUpTestCase('studyPlanPage_decimalCreditPoints');
 
-        $labels = array_map(
-            static fn(string $text): string => preg_replace('#\\s+#', ' ', $text) ?? '',
-            $this->textsOf($this->renderHomePage(), '//button[contains(@class, "modal-trigger")]/span'),
+        $this->assertSame(
+            [
+                'First Semester, 30 CP. Show module details: Mathematics I',
+                'Second Semester. Show module details: Thesis',
+            ],
+            $this->dialogTriggerLabelsOf($this->renderHomePage()),
         );
+    }
+
+    /**
+     * The label the dialog trigger announces names the note of the semester only when
+     * there is one. A semester without a note must not leave an empty item behind,
+     * which a screen reader reads out as "Second Semester, comma, 30 CP" (ACE-863).
+     */
+    #[Test]
+    public function contentElementAnnouncesTheNoteOfASemesterOnlyWhenItHasOne(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
 
         $this->assertSame(
             [
-                'First Semester, , 30 CP. Show module details: Mathematics I',
-                'Second Semester, , 0 CP. Show module details: Thesis',
+                'First Semester, Foundation courses, 30 CP. Show module details: Mathematics I',
+                'Second Semester, 30 CP. Show module details: Statistics',
             ],
-            $labels,
+            $this->dialogTriggerLabelsOf($this->renderHomePage()),
+        );
+    }
+
+    /**
+     * @return string[] The visually hidden label of every dialog trigger, whitespace collapsed
+     *                  as a screen reader reads it.
+     */
+    private function dialogTriggerLabelsOf(string $html): array
+    {
+        return array_map(
+            static fn(string $text): string => preg_replace('#\\s+#', ' ', $text) ?? '',
+            $this->textsOf($html, '//button[contains(@class, "modal-trigger")]/span'),
         );
     }
 
@@ -477,7 +502,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
             'category-label-placeholder First Semester 30 CP Foundation courses Mathematics I 10 CP '
             . 'Mandatory attendance First Semester, Foundation courses, 30 CP. Show module details: '
             . 'Mathematics I Mathematics I 10 CP Mandatory attendance Linear algebra and analysis. '
-            . 'Programming Basics 5 CP Second Semester 30 CP Statistics 8 CP Second Semester, , 30 CP. '
+            . 'Programming Basics 5 CP Second Semester 30 CP Statistics 8 CP Second Semester, 30 CP. '
             . 'Show module details: Statistics Statistics 8 CP Descriptive and inductive. '
             . 'All modules are subject to change.',
             $this->visibleTextOf($html),
