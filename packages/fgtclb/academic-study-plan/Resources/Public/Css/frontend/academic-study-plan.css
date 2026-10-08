@@ -5,6 +5,19 @@
     display: none;
   }
 }
+.academic-study-plan .icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  line-height: 0;
+}
+.academic-study-plan .icon .icon-markup,
+.academic-study-plan .icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .academic-study-plan .filter {
   display: flex;
   justify-content: flex-start;
@@ -97,6 +110,8 @@
   margin-top: 0.5rem;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
 }
 @media screen and (min-width: 768px) {
   .academic-study-plan .semesters .col .header .wrapper {
@@ -148,8 +163,14 @@
   align-items: flex-start;
 }
 .academic-study-plan .semesters .col ul .module dialog .wrapper button {
+  flex-shrink: 0;
+  margin-left: 1rem;
+  padding: 0.25rem;
   background: none;
   border: none;
+  color: inherit;
+  line-height: 0;
+  cursor: pointer;
 }
 .academic-study-plan .semesters .col ul .module dialog p {
   margin-top: 0.5rem;

@@ -184,6 +184,61 @@ describe("the study plan inside the content element layout", () => {
     assert.equal(dialog.open, true);
   });
 
+  it("closes a module dialog on a click on its backdrop, and only there", async () => {
+    await start(layoutMarkup("2"));
+
+    const dialog = document.querySelector<HTMLDialogElement>("#popup-1");
+    assert.ok(dialog !== null, "the dialog is gone");
+
+    // jsdom lays nothing out, so the dialog is given the box a browser would
+    // compute. The backdrop is everything outside of it.
+    dialog.getBoundingClientRect = () => ({
+      x: 100,
+      y: 100,
+      width: 400,
+      height: 300,
+      top: 100,
+      right: 500,
+      bottom: 400,
+      left: 100,
+      toJSON: () => ({}),
+    });
+
+    const pointer = (target: Element, type: string, x: number, y: number): void => {
+      target.dispatchEvent(
+        new window.MouseEvent(type, { bubbles: true, clientX: x, clientY: y }),
+      );
+    };
+    const clickAt = (target: Element, x: number, y: number): void => {
+      pointer(target, "mousedown", x, y);
+      pointer(target, "mouseup", x, y);
+      pointer(target, "click", x, y);
+    };
+
+    click(document.querySelector(".modal-trigger") as HTMLElement);
+    await settle();
+    assert.equal(dialog.open, true);
+
+    // A click on the padding of the dialog reaches the dialog itself, exactly
+    // as one on the backdrop does. Inside the box it must not close.
+    clickAt(dialog, 120, 120);
+    await settle();
+    assert.equal(dialog.open, true, "a click inside the dialog closed it");
+
+    // Text selected inside the dialog and released over the backdrop ends in a
+    // click on the dialog outside its box. The press started inside, so it
+    // stays open.
+    pointer(dialog.querySelector("button") as HTMLElement, "mousedown", 150, 150);
+    pointer(dialog, "mouseup", 20, 20);
+    pointer(dialog, "click", 20, 20);
+    await settle();
+    assert.equal(dialog.open, true, "a selection released on the backdrop closed the dialog");
+
+    clickAt(dialog, 20, 20);
+    await settle();
+    assert.equal(dialog.open, false, "a click on the backdrop left the dialog open");
+  });
+
   it("toggles a semester by keyboard on a narrow viewport", async () => {
     const wide = window.innerWidth;
     setViewportWidth(500);
