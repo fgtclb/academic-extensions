@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicContacts4pages\Backend\FormEngine;
 
 use FGTCLB\AcademicContacts4pages\Domain\Repository\ContactRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
 
 class ContactLabels
 {
@@ -14,12 +15,15 @@ class ContactLabels
      */
     public function getTitle(array &$parameters): void
     {
-        if (!isset($parameters['row']['uid'])) {
+        // A record the backend cannot load comes without a uid, a new one with its
+        // `NEW…` placeholder, which an integer column comparison rejects on PostgreSQL.
+        $uid = $parameters['row']['uid'] ?? null;
+        if (!MathUtility::canBeInterpretedAsInteger($uid) || (int)$uid <= 0) {
             return;
         }
 
         $contactRepository = GeneralUtility::makeInstance(ContactRepository::class);
-        $contact = $contactRepository->findByUid($parameters['row']['uid']);
+        $contact = $contactRepository->findByUid((int)$uid);
 
         if ($contact) {
             $parameters['title'] = $contact->getLabel();
