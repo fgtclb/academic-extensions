@@ -20,6 +20,10 @@ backdrop of an open module dialog closes it as well, as the close button and
 the :kbd:`Escape` key already did. A click inside the dialog, and a text
 selection that is released over the backdrop, leave it open.
 
+Closing a module dialog with :kbd:`Escape` closed it without stopping its
+audio, which kept playing behind the page. The audio now stops and rewinds
+however the dialog is closed.
+
 Impact
 ======
 
@@ -31,7 +35,7 @@ Affected Installations
 ======================
 
 Every installation that renders the study plan content element with the
-shipped stylesheet. Nothing has to be done on update.
+shipped stylesheet and script. Nothing has to be done on update.
 
 A site package that sized the icons itself keeps working: the new rules are
 scoped to :html:`.academic-study-plan .icon`, and a rule of the site package

@@ -322,6 +322,13 @@ class StudyPlan {
 
     private initModal(): void {
         document.querySelectorAll<HTMLDialogElement>('.module dialog').forEach((dialog): void => {
+            // Escape closes a modal dialog without asking this module, so stopping
+            // the audio has to hang on the close event, which every way of closing
+            // fires.
+            dialog.addEventListener('close', (): void => {
+                this.stopAudio(dialog);
+            });
+
             const button = dialog.querySelector('button');
             if (button === null) {
                 return;
@@ -357,17 +364,23 @@ class StudyPlan {
     }
 
     /**
-     * Closing the dialog stops whatever it was playing. A paused audio element
-     * that keeps its position would resume mid sentence the next time the
-     * dialog is opened.
+     * Closing the dialog stops whatever it was playing, right away rather than
+     * when the close event arrives, which a browser queues as a task.
      */
     private closeModal(dialog: HTMLDialogElement): void {
+        this.stopAudio(dialog);
+        dialog.close();
+    }
+
+    /**
+     * Stops whatever a dialog was playing. A paused audio element that keeps its
+     * position would resume mid sentence the next time the dialog is opened.
+     */
+    private stopAudio(dialog: HTMLDialogElement): void {
         dialog.querySelectorAll('audio').forEach((audio): void => {
             audio.pause();
             audio.currentTime = 0;
         });
-
-        dialog.close();
     }
 
     public handleResize(): void {
