@@ -125,3 +125,27 @@ icon registry. This applies on TYPO3 v13 and v14 alike.
   content element wizard
 - **THEN** the job records and the three job plugins show their icons as
   before
+
+### Requirement: The job detail names the job in the head of the page
+
+The page that shows a job in the job detail view SHALL carry the title of the
+job as the title of the page, with the site title around it the way the site
+configures it. It SHALL describe the job with the text of its description,
+without markup, with entities decoded and white space reduced to single
+spaces. A job without a description text SHALL leave the description of the
+page as it is, without an empty description. A page that shows no job SHALL
+keep its own title. This applies to TYPO3 v13 and v14 alike.
+
+#### Scenario: Job with a description
+
+- **WHEN** a visitor opens the detail view of the job "International Research
+  Fellowship" with the description "Join our quantum optics group."
+- **THEN** the title of the page names the job
+- **AND** the page is described as "Join our quantum optics group."
+
+#### Scenario: Job without a description
+
+- **WHEN** a visitor opens the detail view of a job without a description, or
+  with an empty paragraph only
+- **THEN** the title of the page names the job
+- **AND** the page carries no empty description
