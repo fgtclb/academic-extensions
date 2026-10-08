@@ -80,7 +80,7 @@ final class ShippedFrontendAssetNamesTest extends UnitTestCase
             $offending,
             sprintf(
                 "A frontend asset is named after CKEditor itself, which takes the editor's base path"
-                . " away from the content delivery network:\n - %s\n\nRename it - \"change-me\" is what"
+                . " away from the content delivery network:\n - %s\n\nRename it - \"ace-ckeditor\" is what"
                 . ' the two extensions doing this use - and address the module under the new name in the'
                 . ' template and in the changelog entry.',
                 implode("\n - ", array_map(
