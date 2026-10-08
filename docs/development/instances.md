@@ -175,6 +175,36 @@ The **install tool password** is not that one. `typo3 setup` writes it into
 `config/system/settings.php`, but that file is tracked and is restored from git
 at the end of a rebuild, so what stays is the hash committed in the repository.
 
+### Backend editor
+
+The seed writes a second backend account, an editor, so that the backend can be
+looked at the way an editor sees it rather than the way an administrator does:
+
+|          |                                                      |
+|----------|------------------------------------------------------|
+| Username | `erika-editor`                                       |
+| Password | `Erika-Editor-1701D.`                                |
+| Group    | `Academic editors` (`be_groups` uid 10)              |
+| Mounts   | `/`, the `Data` folder and, on `core-13`, `/legacy/` |
+
+The group is the point, not the user: it allows every academic content element,
+table and page type, and the columns the academic extensions mark `exclude`,
+plus three core columns a plugin or a page type cannot do without:
+`tt_content:pages` and `tt_content:recursive`, the record storage of the plugins,
+and `pages:doktype`, which turns a page into a program, project or partner page.
+
+Three defaults of the core would otherwise lock the account out, and the seed
+sets each of them explicitly:
+
+- `be_users.disable` defaults to `1`, so the user is written with `disable: 0`.
+- `be_groups.workspace_perms` defaults to `0` in the core TCA, and
+  EXT:workspaces, which `fgtclb/academics-monorepo-shared` requires, sets the
+  default of `be_users.workspace_perms` to `0` as well. Without access to the
+  live workspace the login ends in a `NoAccessibleModuleException`, so the
+  group carries `workspace_perms: 1`.
+- The file list module is `media_management` on v12 and v13, not
+  `file_filelist`, and `groupMods` names that identifier.
+
 ### Frontend
 
 The seed creates one frontend user, and it exists for a reason: **`EXT:academic_persons_edit`
@@ -225,21 +255,29 @@ section per extension, one page per plugin:
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `/`                     | start page                                                                                                                                                                                  |
 | `/data`                 | storage folder: frontend user and group, organisational units, function types, a location, three profiles with contracts, addresses, phone numbers, e-mail addresses, vita and publications |
-| `/academic-persons/*`   | one page per plugin of `EXT:academic_persons`: list, list and detail, detail, card, selected profiles, selected contracts                                                                   |
+| `/persons/*`            | one page per plugin of `EXT:academic_persons`: list, list and detail, detail, card, selected profiles, selected contracts                                                                   |
 | `/login`, `/my-profile` | `EXT:felogin` and the editing form of `EXT:academic_persons_edit`                                                                                                                           |
 | `/data-categories`      | storage folder: `sys_category` records carrying a `category_types` type                                                                                                                     |
-| `/academic-programs`    | the list plugin of `EXT:academic_programs`, and three program pages (`doktype: 20`), each carrying the details plugin                                                                       |
+| `/programs`             | the list plugin of `EXT:academic_programs`, and three program pages (`doktype: 20`), each carrying the details plugin                                                                       |
 | `/data-partners`        | storage folder: partner roles                                                                                                                                                               |
-| `/academic-partners/*`  | the four plugins of `EXT:academic_partners`, and two partner pages (`doktype: 40`)                                                                                                          |
+| `/partners/*`           | the four plugins of `EXT:academic_partners`, and two partner pages (`doktype: 40`)                                                                                                          |
 
-One page of that tree answers **404 by design**: `/academic-persons/detail`
-carries the detail plugin with no profile argument, and
-`ProfileController::detailAction()` returns a page-not-found response when the
-argument is absent
-(`packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php:243-251`).
-The page exists so the plugin has a home when a detail URL is built for it from
-`/academic-persons/list`; on its own it is supposed to be a 404, not a bug to
+Three pages of that tree have **nothing to show by design** and are therefore
+hidden from the menus (`nav_hide`): `/persons/detail`, `/persons/detail-hidden`
+and `/jobs/detail`. Each carries a detail plugin and nothing to show without its
+argument. `ProfileController::detailAction()` returns a page-not-found response
+when the profile argument is absent
+(`packages/fgtclb/academic-persons/Classes/Controller/ProfileController.php`),
+so the two profile detail pages answer 404 on their own. The pages exist so the
+plugins have a home when a detail URL is built for them from a list. Visited
+without an argument they are supposed to be empty or a 404, not a bug to
 report.
+
+`/persons/detail-hidden` is the detail page of the "selected profiles" element
+that lists the two hidden profiles: its detail element shows hidden records as
+well, so the links of that element lead to a profile rather than to a 404. The
+links keep their query arguments, because the slug aspect of the route does not
+resolve a hidden profile.
 
 Changing that content is a change to the definition, not a click path — see
 [Seeding an instance](environment.md#seeding-an-instance).
@@ -248,9 +286,31 @@ Changing that content is a change to the definition, not a click path — see
 
 Both instances are wired through **one root `sys_template` record** the seed
 writes — identifier `site-template`, uid 1, `root: 1`, `clear: 3` — whose
-`include_static_file` lists `bootstrap_package`, the academic extensions and the
-instance's own static template, and whose `constants` field carries the handful
-of values a development instance has to correct.
+`include_static_file` lists the instance's own static template,
+`bootstrap_package` and the academic extensions, in that order, and whose
+`constants` field carries the handful of values a development instance has to
+correct.
+
+**The order is load-bearing.** The program, project and partner page types (20,
+30 and 40) clear `page.10.templateName` and set their own, while the theme
+assigns `page.10.templateName.cObject`. Included after the extensions, the theme
+puts its cObject back, the template name is derived from the backend layout
+again, and every page of those types answers 500 with an
+`InvalidTemplateResourceException`. The own static template comes first so that
+the theme replaces its page object. An entry of an extension that is not loaded
+is skipped on its own and costs no other entry, so the theme may sit in the
+middle of the list in the functional test instances, which do not install it.
+
+On `core-13` the `/` tree is delivered by site sets instead, and one more file
+belongs to that delivery: `config/sites/academics/constants.typoscript`. The two
+theme switches `page.theme.googleFont.enable` and
+`page.theme.cookieconsent.enable` are site settings of the type `bool`, and TYPO3
+v13 writes a disabled one into the constants as the empty string. The theme
+reads the second one in the condition `[{$page.theme.cookieconsent.enable} == 1]`,
+which then reads `[ == 1]` and fails to parse on every uncached page. The site's
+own `constants.typoscript` is read after the site settings and states both as
+`0`. `settings.yaml` keeps them, because the backend and PHP code read the
+settings rather than the constants.
 
 Site sets would be the obvious mechanism today, and they are not available here:
 they arrived in TYPO3 v13.1 and this branch also supports v12, where a site
@@ -272,6 +332,20 @@ It carried two pieces of glue for a while — the page template name of the cust
 page types and the backend layout of the `EXT:academic_partners` page type — and
 both were workarounds for defects of those extensions rather than instance
 configuration. Both are fixed at the source now (ACE-450, ACE-451).
+
+## Mail and images
+
+Both instances send mail over SMTP to `127.0.0.1:1025`
+(`config/system/settings.php`), which is the Mailpit that DDEV runs inside the
+web container. `ddev launch -m` opens its inbox. The web container of DDEV 1.25
+has no `/usr/sbin/sendmail`, so the `sendmail` transport `typo3 setup` writes
+fails on the first mail, the notification of the job form among them. An
+instance served by a host stack instead puts a different transport into a
+git-ignored `config/system/additional/*.php`.
+
+`core-12` adds `webp` to `GFX/imagefile_ext`. TYPO3 v13 has it in its default
+list, TYPO3 v12 does not, and the profile view of `EXT:academic_persons_edit`
+renders its image as `webp` (see the installation chapter of that extension).
 
 ## Database backup and restore
 

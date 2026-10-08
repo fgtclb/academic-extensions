@@ -1,0 +1,15 @@
+# The two theme switches of "settings.yaml", once more as plain constants.
+#
+# Both settings are of the type "bool", and TYPO3 v13 writes a site setting of
+# that type into the TypoScript constants as "1" or as the empty string. The
+# theme reads "page.theme.cookieconsent.enable" in a condition,
+# "[{$page.theme.cookieconsent.enable} == 1]", which becomes "[ == 1]" for a
+# disabled setting and fails to parse on every uncached page.
+#
+# This file is the TypoScript of the site itself. It is read after the
+# constants of the sets and of "settings.yaml", so the "0" written here is the
+# value the conditions see. "settings.yaml" keeps both switches, because the
+# backend settings module and PHP code read the settings rather than the
+# constants.
+page.theme.googleFont.enable = 0
+page.theme.cookieconsent.enable = 0

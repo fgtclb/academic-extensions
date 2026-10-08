@@ -31,7 +31,7 @@
 #
 # The storage folders of "/data" are not mirrored at all. Mirroring a folder
 # whose records are shared leaves an empty folder in the backend that looks like
-# it should hold something, so "/" has 65 pages and "/legacy/" has 56.
+# it should hold something, so "/" has 66 pages and "/legacy/" has 57.
 #
 # UIDS
 #
@@ -49,8 +49,8 @@
 # page 1, becomes 1501, and 1501 is 1001 plus 500.
 #
 # A note on the ranges: the header of "Scenario.yaml" reserves "tt_content"
-# 500-999 for this tree. It cannot have it - the German variants of the 63
-# elements of the "/" tree occupy 501-563 under the plus-500 rule, and that rule
+# 500-999 for this tree. It cannot have it - the German variants of the 64
+# elements of the "/" tree occupy 501-564 under the plus-500 rule, and that rule
 # wins. This tree takes the 1000 block in "tt_content" as well, which is also
 # what makes the two tables read alike: the legacy tree is the 1000 block.
 #
@@ -108,7 +108,7 @@ entities:
                 title: 'Academic extensions (static template delivery)'
                 root: 1
                 clear: 3
-                include_static_file: 'EXT:academics_dev_site/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Full,EXT:academic_persons_edit/Configuration/TypoScript/Full,EXT:academic_contacts4pages/Configuration/TypoScript/Full,EXT:academic_jobs/Configuration/TypoScript/Full,EXT:academic_bite_jobs/Configuration/TypoScript/Full,EXT:academic_partners/Configuration/TypoScript/Full,EXT:academic_programs/Configuration/TypoScript/Full,EXT:academic_projects/Configuration/TypoScript/Full,EXT:academic_study_plan/Configuration/TypoScript/Full,EXT:bootstrap_package/Configuration/TypoScript'
+                include_static_file: 'EXT:academics_dev_site/Configuration/TypoScript,EXT:bootstrap_package/Configuration/TypoScript,EXT:academic_persons/Configuration/TypoScript/Full,EXT:academic_persons_edit/Configuration/TypoScript/Full,EXT:academic_contacts4pages/Configuration/TypoScript/Full,EXT:academic_jobs/Configuration/TypoScript/Full,EXT:academic_bite_jobs/Configuration/TypoScript/Full,EXT:academic_partners/Configuration/TypoScript/Full,EXT:academic_programs/Configuration/TypoScript/Full,EXT:academic_projects/Configuration/TypoScript/Full,EXT:academic_study_plan/Configuration/TypoScript/Full'
                 constants: |-
                   # What a site's "settings.yaml" says through site settings, said the way a
                   # site without site sets has to say it. On TYPO3 v12 a site provides no
@@ -654,12 +654,14 @@ entities:
                   id: 1205
                   title: 'Profile detail'
                   slug: '/persons/detail'
+                  nav_hide: 1
               languageVariants:
                 - self:
                       id: 1705
                       language: 1
                       title: 'Profil-Detailansicht'
                       slug: '/personal/detail'
+                      nav_hide: 1
               entities:
                 content:
                   - self:
@@ -907,7 +909,7 @@ entities:
                                               <value index="vDEF">6,13</value>
                                           </field>
                                           <field index="settings.detailPid">
-                                              <value index="vDEF">1205</value>
+                                              <value index="vDEF">1209</value>
                                           </field>
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">1</value>
@@ -933,7 +935,7 @@ entities:
                                                   <value index="vDEF">6,13</value>
                                               </field>
                                               <field index="settings.detailPid">
-                                                  <value index="vDEF">1205</value>
+                                                  <value index="vDEF">1209</value>
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">1</value>
@@ -1055,6 +1057,64 @@ entities:
                                               </field>
                                               <field index="settings.viewMode.default">
                                                   <value index="vDEF">table</value>
+                                              </field>
+                                          </language>
+                                      </sheet>
+                                  </data>
+                              </T3FlexForms>
+            - self:
+                  id: 1209
+                  title: 'Profile detail, hidden profiles'
+                  slug: '/persons/detail-hidden'
+                  nav_hide: 1
+              languageVariants:
+                - self:
+                      id: 1709
+                      language: 1
+                      title: 'Profil-Detailansicht, versteckte Profile'
+                      slug: '/personal/detail-versteckt'
+                      nav_hide: 1
+              entities:
+                content:
+                  - self:
+                        id: 1064
+                        CType: 'academicpersons_detail'
+                        header: 'Hidden profile'
+                        header_layout: 2
+                        pi_flexform: |-
+                          <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                          <T3FlexForms>
+                              <data>
+                                  <sheet index="sDEF">
+                                      <language index="lDEF">
+                                          <field index="settings.pageTitleFormat">
+                                              <value index="vDEF">%%LAST_NAME%%, %%FIRST_NAME%% %%MIDDLE_NAME%%</value>
+                                          </field>
+                                          <field index="settings.showHiddenRecords">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                      </language>
+                                  </sheet>
+                              </data>
+                          </T3FlexForms>
+                    languageVariants:
+                      - self:
+                            id: 1564
+                            language: 1
+                            CType: 'academicpersons_detail'
+                            header: 'Verstecktes Profil'
+                            header_layout: 2
+                            pi_flexform: |-
+                              <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                              <T3FlexForms>
+                                  <data>
+                                      <sheet index="sDEF">
+                                          <language index="lDEF">
+                                              <field index="settings.pageTitleFormat">
+                                                  <value index="vDEF">%%LAST_NAME%%, %%FIRST_NAME%% %%MIDDLE_NAME%%</value>
+                                              </field>
+                                              <field index="settings.showHiddenRecords">
+                                                  <value index="vDEF">1</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -1586,12 +1646,14 @@ entities:
                   id: 1233
                   title: 'Job detail'
                   slug: '/jobs/detail'
+                  nav_hide: 1
               languageVariants:
                 - self:
                       id: 1733
                       language: 1
                       title: 'Stellendetail'
                       slug: '/stellen/detail'
+                      nav_hide: 1
               entities:
                 content:
                   - self:
@@ -1859,14 +1921,14 @@ entities:
                     id: 201
                     label: 'Programming I'
                     credit_points: 6
-                    description: '<p>Imperative programming, data types, control flow.</p>'
+                    description: 'Imperative programming, data types, control flow.'
                     categories: '1'
                 languageVariants:
                   - self:
                         id: 701
                         language: 1
                         label: 'Programmierung I'
-                        description: '<p>Imperative Programmierung, Datentypen, Kontrollfluss.</p>'
+                        description: 'Imperative Programmierung, Datentypen, Kontrollfluss.'
               - self:
                     id: 202
                     label: 'Mathematics I'
@@ -1891,14 +1953,14 @@ entities:
                     id: 204
                     label: 'Programming II'
                     credit_points: 6
-                    description: '<p>Object orientation, testing, refactoring.</p>'
+                    description: 'Object orientation, testing, refactoring.'
                     categories: '1'
                 languageVariants:
                   - self:
                         id: 704
                         language: 1
                         label: 'Programmierung II'
-                        description: '<p>Objektorientierung, Testen, Refactoring.</p>'
+                        description: 'Objektorientierung, Testen, Refactoring.'
               - self:
                     id: 205
                     label: 'Databases'
@@ -1923,14 +1985,14 @@ entities:
                     id: 207
                     label: 'Web engineering'
                     credit_points: 6
-                    description: '<p>HTTP, templating, accessibility.</p>'
+                    description: 'HTTP, templating, accessibility.'
                     categories: '1'
                 languageVariants:
                   - self:
                         id: 707
                         language: 1
                         label: 'Web Engineering'
-                        description: '<p>HTTP, Templating, Barrierefreiheit.</p>'
+                        description: 'HTTP, Templating, Barrierefreiheit.'
               - self:
                     id: 208
                     label: 'Accessibility lab'
