@@ -223,7 +223,7 @@
                 "sys_language_uid",
                 "uid"
             ],
-            "checksum": "d70a2bbbe1e33c811a59d30347a68d61e1c20e33"
+            "checksum": "c7b3558430f10cd111799c923c2fe691fe25ce7c"
         },
         "tx_academiccontacts4pages_domain_model_role": {
             "rows": 8,
@@ -280,7 +280,7 @@
                 "sys_language_uid",
                 "uid"
             ],
-            "checksum": "d5bbfd01e4e621570cb1f79074d46ffe575ec16c"
+            "checksum": "3620a7af92eafa4db7c89905fbb4838aff5cf148"
         },
         "tx_academicpartners_domain_model_role": {
             "rows": 8,
