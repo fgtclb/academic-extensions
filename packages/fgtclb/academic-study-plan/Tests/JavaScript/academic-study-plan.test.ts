@@ -239,6 +239,41 @@ describe("the study plan inside the content element layout", () => {
     assert.equal(dialog.open, false, "a click on the backdrop left the dialog open");
   });
 
+  it("stops the audio of a dialog the browser closed itself", async () => {
+    await start(layoutMarkup("2"));
+
+    const dialog = document.querySelector<HTMLDialogElement>("#popup-1");
+    assert.ok(dialog !== null, "the dialog is gone");
+
+    click(document.querySelector(".modal-trigger") as HTMLElement);
+    await settle();
+    assert.equal(dialog.open, true);
+
+    // jsdom implements no media playback, so pausing and seeking are observed
+    // on the element itself.
+    const state = { paused: false, currentTime: 42 };
+    const audio = document.createElement("audio");
+    audio.pause = (): void => {
+      state.paused = true;
+    };
+    Object.defineProperty(audio, "currentTime", {
+      get: (): number => state.currentTime,
+      set: (value: number): void => {
+        state.currentTime = value;
+      },
+    });
+    dialog.append(audio);
+
+    // Escape closes a modal dialog in the browser, without a listener of the
+    // module being asked. The model of the test window has no Escape key, so
+    // the dialog is closed the way the browser does it, through its own
+    // "close()", which fires the close event.
+    dialog.close();
+    await settle();
+
+    assert.deepEqual(state, { paused: true, currentTime: 0 }, "the audio kept playing");
+  });
+
   it("toggles a semester by keyboard on a narrow viewport", async () => {
     const wide = window.innerWidth;
     setViewportWidth(500);

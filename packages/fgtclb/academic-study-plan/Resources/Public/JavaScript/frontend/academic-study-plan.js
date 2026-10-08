@@ -219,6 +219,9 @@
     }
     initModal() {
       document.querySelectorAll(".module dialog").forEach((dialog) => {
+        dialog.addEventListener("close", () => {
+          this.stopAudio(dialog);
+        });
         const button = dialog.querySelector("button");
         if (button === null) {
           return;
@@ -247,16 +250,22 @@
       });
     }
     /**
-     * Closing the dialog stops whatever it was playing. A paused audio element
-     * that keeps its position would resume mid sentence the next time the
-     * dialog is opened.
+     * Closing the dialog stops whatever it was playing, right away rather than
+     * when the close event arrives, which a browser queues as a task.
      */
     closeModal(dialog) {
+      this.stopAudio(dialog);
+      dialog.close();
+    }
+    /**
+     * Stops whatever a dialog was playing. A paused audio element that keeps its
+     * position would resume mid sentence the next time the dialog is opened.
+     */
+    stopAudio(dialog) {
       dialog.querySelectorAll("audio").forEach((audio) => {
         audio.pause();
         audio.currentTime = 0;
       });
-      dialog.close();
     }
     handleResize() {
       if (window.innerWidth > MOBILE_BREAKPOINT) {
