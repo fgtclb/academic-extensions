@@ -15,7 +15,7 @@ the disagreement was found by somebody wondering why a page was missing. The
 manifest is the third artifact that makes it loud: the definition is measured
 against it, and so is every snapshot.
 
-Four test classes carry that, all in
+Five test classes carry that, all in
 [`packages-dev/dev-site/Tests/Functional/`](../../packages-dev/dev-site/Tests/Functional).
 They are collected because `Build/phpunit/*.xml` globs `packages-dev/*/Tests/`
 as well as `packages/*/*/Tests/` — see
@@ -113,7 +113,14 @@ chomping in any file of either set. The second one reads the files as text,
 because the parser is what it guards against, see
 [The YAML parser](#the-yaml-parser).
 
-## The four checks
+`CategoryVariantTypeTest` asserts that every language variant of a category
+states the `type` of its original. `sys_category.type` is not
+`l10n_mode: exclude`, so a variant without it is stored as `default`, and the
+category repository of `category_types` then reads that type in German: no
+German list offered a category filter, and the manifest recorded the defect as
+the expected state (ACE-834).
+
+## The checks
 
 ### `SeedManifestTest` — the definition against the manifest
 
@@ -140,7 +147,7 @@ checkout — see
 ### `LegacyDeliveryTest` — the two trees against each other
 
 Renders every mirrored page of `/` and of `/legacy/`, in both languages, and
-compares the markup — 104 page pairs, which is the 56 pages of the mirror minus
+compares the markup: 106 page pairs, which is the 57 pages of the mirror minus
 the four the seed hides, times two languages.
 
 This is the only thing that catches the failure mode the `/legacy/` tree exists
@@ -148,8 +155,8 @@ to expose. `include_static_file` and `tsconfig_includes` are comma separated
 lists read with `trimExplode`; an entry that resolves to nothing contributes
 nothing, raises nothing, and the page still answers `200` with a piece of its
 configuration missing. No assertion on one tree can see that. Removing a single
-entry from the seeded `sys_template` record makes 84 of the 104 rendered page
-pairs differ.
+entry from the seeded `sys_template` record made 84 of the then 104 rendered
+page pairs differ.
 
 What is normalised away is listed in the test, one comment per rule, and it is
 only what a mirror differs in by being one: the `/legacy` path segment, the
@@ -173,13 +180,38 @@ package in the two delivery forms. Everything academic is delivered exactly as
 the seed declares it, through both mechanisms, which is what the comparison is
 about.
 
-> **Skipped on this branch (ACE-468).** It reports 84 of 104 page pairs
+> **Skipped on this branch (ACE-468).** It reported 84 of the then 104 page pairs
 > differing here, and the seed is not what is wrong with it: the real `core-13`
 > instance renders both trees correctly. Inside the harness the mirror keeps its
 > page object but loses the plugin definitions of the `Full` aggregates, which
 > points at the nested static include chain and the `addStaticFile()` calls a
 > functional test with a warm TCA cache never executes. The skip carries that
 > reason in its message, so every run says so.
+
+### `SeedTranslationParentTest`: the translations against their originals
+
+Imports the seed and asserts three things the manifest cannot see, because the
+manifest is generated from an import and records whatever that import wrote:
+
+- every translation points at its original through its language pointers, the
+  uid of the original plus 500 as the header of `Scenario.yaml` numbers them;
+- every column with `l10n_mode: exclude` holds the value of the original,
+  because the frontend overlay reads it from the translation;
+- the import deletes nothing.
+
+It exists because the TYPO3 v12 snapshot carried German partnerships and page
+contacts that pointed at one unrelated uid, and translations of the partner,
+program and project pages that had been deleted and localized again under new
+uids (ACE-834). Their tables declared no `l10n_parent` column in their TCA.
+TYPO3 v13 creates a missing one as a select of the table itself, TYPO3 v12 adds
+it as `passthrough`, and a `NEW` placeholder in a passthrough language pointer
+goes to the remap stack of `DataHandler` in an entry without a function:
+`processRemapStack()` then writes whatever value the entry before it computed.
+Both tables declare the columns since ACE-854. Stating the pointers as plain
+uids in the seed does not work around it: the localization data map processor
+looks the parent up in the database, finds nothing because it is written in
+the same run, and stores every excluded column of the translation empty, which
+the second assertion reports.
 
 ### `DeliveryRegistrationTest` — the drift gate
 

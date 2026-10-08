@@ -27,8 +27,8 @@ declare(strict_types=1);
  * The storage folders of "/data" are the one thing it does not mirror. Their
  * records are shared - every plugin of the mirror names the pids of the "/"
  * tree - so a mirrored folder would be an empty folder in the backend that
- * looks like it should hold something (ACE-460, S3-3). 65 pages of "/" become
- * 56 pages of "/legacy/".
+ * looks like it should hold something (ACE-460, S3-3). 66 pages of "/" become
+ * 57 pages of "/legacy/".
  *
  *   php Build/Scripts/generateLegacyScenario.php
  *   php Build/Scripts/generateLegacyScenario.php --check   # exit 1 if it would change
@@ -462,12 +462,6 @@ function scalar(mixed $value): string
 function templateRecord(int $offset): array
 {
     $staticFiles = implode(',', [
-        // The theme, and it is available here - unlike on the "main" branch,
-        // where "/legacy/" renders unstyled. EXT:bootstrap_package 15 ships
-        // "Configuration/TypoScript/" and registers it with addStaticFile(),
-        // and it ships "Configuration/Sets/" as well, so both delivery
-        // mechanisms reach the same theme on this branch. Version 16, which
-        // dropped the static template, needs TYPO3 v14 and is out of reach here.
         // The minimal page object of the seed package comes first and the theme
         // after it, so the theme wins where it is installed. It is not decoration
         // either: the functional suite loads this repository's packages and not
@@ -476,6 +470,22 @@ function templateRecord(int $offset): array
         // there, which would make the markup comparison of "LegacyDeliveryTest"
         // pass by comparing two empty pages.
         'EXT:academics_dev_site/Configuration/TypoScript',
+        // The theme, and it is available here - unlike on the "main" branch,
+        // where "/legacy/" renders unstyled. EXT:bootstrap_package 15 ships
+        // "Configuration/TypoScript/" and registers it with addStaticFile(),
+        // and it ships "Configuration/Sets/" as well, so both delivery
+        // mechanisms reach the same theme on this branch. Version 16, which
+        // dropped the static template, needs TYPO3 v14 and is out of reach here.
+        //
+        // Before the academic extensions, and that position is load-bearing:
+        // their page types 20, 30 and 40 clear "page.10.templateName" and set
+        // their own, and the theme assigns "page.10.templateName.cObject".
+        // Included after them, the theme puts its cObject back and every
+        // program, project and partner page dies with an
+        // InvalidTemplateResourceException. An entry of an extension that is
+        // not loaded - the theme in the functional suite - is skipped on its
+        // own and costs no other entry.
+        'EXT:bootstrap_package/Configuration/TypoScript',
         // The nine academic extensions that ship TypoScript, each through the
         // aggregate folder that names every component of the extension.
         // "academic_base" has none - it ships page TSconfig only - and neither
@@ -493,12 +503,6 @@ function templateRecord(int $offset): array
         'EXT:academic_programs/Configuration/TypoScript/Full',
         'EXT:academic_projects/Configuration/TypoScript/Full',
         'EXT:academic_study_plan/Configuration/TypoScript/Full',
-        // The theme last, and that position is load-bearing twice over. It has to
-        // come after the page object of the seed package so that it wins where it
-        // is installed - and it has to come after everything else because the
-        // functional suite does not install it at all: an "include_static_file"
-        // entry naming an absent extension costs every entry after it, silently.
-        'EXT:bootstrap_package/Configuration/TypoScript',
     ]);
 
     // The page uids the plugins point at. A tree points at its own pages, so
@@ -750,7 +754,7 @@ function legacyFileHeader(): string
         #
         # The storage folders of "/data" are not mirrored at all. Mirroring a folder
         # whose records are shared leaves an empty folder in the backend that looks like
-        # it should hold something, so "/" has 65 pages and "/legacy/" has 56.
+        # it should hold something, so "/" has 66 pages and "/legacy/" has 57.
         #
         # UIDS
         #
@@ -768,8 +772,8 @@ function legacyFileHeader(): string
         # page 1, becomes 1501, and 1501 is 1001 plus 500.
         #
         # A note on the ranges: the header of "Scenario.yaml" reserves "tt_content"
-        # 500-999 for this tree. It cannot have it - the German variants of the 63
-        # elements of the "/" tree occupy 501-563 under the plus-500 rule, and that rule
+        # 500-999 for this tree. It cannot have it - the German variants of the 64
+        # elements of the "/" tree occupy 501-564 under the plus-500 rule, and that rule
         # wins. This tree takes the 1000 block in "tt_content" as well, which is also
         # what makes the two tables read alike: the legacy tree is the 1000 block.
         #
