@@ -34,7 +34,6 @@ defined('TYPO3') or die;
         implode(',', [
             '--div--;LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.configuration',
             'pi_flexform',
-            'pages',
         ]),
         'academicbitejobs_list',
         'after:subheader',
