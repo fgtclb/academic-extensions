@@ -193,7 +193,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
 
-        $this->assertStringContainsString('academic-projects-detail-page', $content);
+        $this->assertStringContainsString('academic-projects-page', $content);
         $this->assertStringNotContainsString('site-package-default-template', $content);
     }
 
@@ -237,7 +237,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
 
-        $this->assertStringContainsString('academic-projects-detail-page', $content);
+        $this->assertStringContainsString('academic-projects-page', $content);
         $this->assertStringNotContainsString('Competence field', $content);
         $this->assertStringNotContainsString('Photonics', $content);
         $this->assertStringNotContainsString('Institute of Physics', $content);
@@ -277,7 +277,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
 
-        $this->assertStringContainsString('academic-projects-detail-page', $content);
+        $this->assertStringContainsString('academic-projects-page', $content);
         $this->assertStringContainsString('<a href="/dark-matter">the dark matter project</a>', $content);
         $this->assertStringContainsString('<a href="/dark-matter">the dark matter consortium</a>', $content);
         $this->assertStringNotContainsString('t3://', $content);
@@ -294,7 +294,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         $this->setUpTestCase();
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/quantum-optics'));
-        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail-page ')]");
+        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-page ')]");
         $this->assertRendersResponsivePicture(
             $xpath,
             $detail,
@@ -311,7 +311,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         $this->setUpTestCase();
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/dark-matter'));
-        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail-page ')]");
+        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-page ')]");
         $this->assertRendersNoImage($xpath, $detail, '');
     }
 
@@ -351,7 +351,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         $this->setUpPageViewTestCase();
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/quantum-optics'));
-        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail-page ')]");
+        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-page ')]");
         $this->assertRendersResponsivePicture(
             $xpath,
             $detail,
