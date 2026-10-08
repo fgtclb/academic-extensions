@@ -176,6 +176,81 @@ final class ShippedFlexFormsTest extends UnitTestCase
     }
 
     /**
+     * The `<default>` of a select or radio field whose items are all written in the
+     * FlexForm has to be one of their values.
+     *
+     * TYPO3 does not validate it. A default that matches no item is preselected as
+     * `[ MISSING LABEL ("asc") ]` and stored with a new content element. The
+     * `Core12` copies of `SelectedProfiles.xml` and `SelectedContracts.xml` of
+     * `academic_persons` defaulted their view mode to `asc`, a value of a sorting
+     * field, after the `Core13` copies had been corrected (ACE-830).
+     *
+     * A field that takes items from a table, an `itemsProcFunc`, a `special`
+     * source or a `fileFolderConfig` is skipped, because its values are only
+     * known at runtime. A multiple select may name several values, separated
+     * by commas.
+     */
+    #[Test]
+    public function everyShippedFlexFormSelectDefaultsToOneOfItsItems(): void
+    {
+        $scanRoot = $this->determineScanRoot();
+        $files = $this->collectFlexFormFiles($scanRoot);
+
+        $failures = [];
+        $checked = 0;
+        foreach ($files as $file) {
+            $document = new \DOMDocument();
+            if (!@$document->loadXML((string)file_get_contents($file))) {
+                $failures[] = sprintf(' - %s: not well formed XML', substr($file, strlen($scanRoot) + 1));
+                continue;
+            }
+
+            $xpath = new \DOMXPath($document);
+            $configs = $xpath->query(
+                '//config[(type="select" or type="radio") and items and default'
+                . ' and not(foreign_table) and not(itemsProcFunc) and not(special) and not(fileFolderConfig)]',
+            );
+            foreach ($configs === false ? [] : $configs as $config) {
+                if (!$config instanceof \DOMElement) {
+                    continue;
+                }
+                $checked++;
+                $values = [];
+                $valueNodes = $xpath->query('items/*/value | items/*/numIndex[@index="1"]', $config);
+                foreach ($valueNodes === false ? [] : $valueNodes as $valueNode) {
+                    $values[] = trim((string)$valueNode->textContent);
+                }
+                $default = trim((string)$xpath->evaluate('string(default)', $config));
+                foreach (explode(',', $default) as $defaultValue) {
+                    if (!in_array($defaultValue, $values, true)) {
+                        $failures[] = sprintf(
+                            ' - %s: <%s> defaults to "%s", the items offer "%s"',
+                            substr($file, strlen($scanRoot) + 1),
+                            $config->parentNode instanceof \DOMElement ? $config->parentNode->nodeName : '?',
+                            $default,
+                            implode('", "', $values),
+                        );
+                    }
+                }
+            }
+        }
+
+        $this->assertGreaterThan(0, $checked, sprintf('No select field with a default found below "%s".', $scanRoot));
+        $this->assertSame(
+            [],
+            $failures,
+            sprintf(
+                '%d select fields of the %d shipped FlexForms below "%s" default to a value'
+                . " none of their items offers:\n%s",
+                count($failures),
+                count($files),
+                $scanRoot,
+                implode("\n", $failures),
+            ),
+        );
+    }
+
+    /**
      * Text nodes of an element that also has element children, which is where
      * character data can only be an accident.
      *
