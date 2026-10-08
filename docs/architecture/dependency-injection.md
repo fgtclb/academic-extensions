@@ -130,7 +130,7 @@ Measured with
 | `#[Autowire]`        | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
 | `#[Exclude]`         | 27    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
-| `#[AsEventListener]` | 13    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
+| `#[AsEventListener]` | 14    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
@@ -146,7 +146,9 @@ attribute (see below): the `RegisterAcademicPageDoktype` and the
 extension to the compiled TCA, `WarmUpFrontendIconRegistry` of
 `academic-base`, which builds the frontend icon registry when the system caches
 are warmed up, `AddCategoryTypeFrontendIcons` of `typo3-category-types`,
-which contributes the category type icons to that registry, and
+which contributes the category type icons to that registry,
+`ResolveCategoryTypeGroupMarker` of the same extension, which narrows a
+category tree to the categories of one group, and
 `FlushProfileViewCaches` of `academic-persons`, which carries the attribute on
 each of its three methods, one per persistence event of Extbase.
 `#[AsTaggedItem]` and `#[AsController]` have zero sites.
@@ -210,7 +212,7 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     ) {}
 ```
 
-The sixteen event listener classes follow the same shape, promoted
+The seventeen event listener classes follow the same shape, promoted
 `private readonly` dependencies (or a `readonly class`) and a single
 `__invoke()`, apart from `AssignContractOrganisationalUnitSorting` and
 `FlushProfileViewCaches`, which have one method per persistence event. Five are
@@ -219,13 +221,13 @@ registered by YAML tag:
 `academic-persons/Classes/EventListener/UpdateProfileImageMetadata.php`,
 `.../AssignContractOrganisationalUnitSorting.php`,
 `academic-persons-edit/Classes/EventListener/GenerateSlugForProfile.php` and
-`.../SyncChangesToTranslations.php`. Eleven are registered by attribute: the
+`.../SyncChangesToTranslations.php`. Twelve are registered by attribute: the
 `RegisterAcademicPageDoktype` and the `AddPageModuleCategorySummary` of
 `academic-partners`, `academic-programs` and `academic-projects`,
 `ApplySettingsToTca` of `academic-persons` and `academic-jobs`,
 `WarmUpFrontendIconRegistry` of `academic-base`,
-`AddCategoryTypeFrontendIcons` of `typo3-category-types` and
-`FlushProfileViewCaches` of `academic-persons`.
+`AddCategoryTypeFrontendIcons` and `ResolveCategoryTypeGroupMarker` of
+`typo3-category-types` and `FlushProfileViewCaches` of `academic-persons`.
 
 ### Where the codebase does not comply
 
@@ -340,13 +342,14 @@ Both spellings are in use here: five listener classes are registered by YAML
 tag (`academic-jobs/Configuration/Services.yaml`,
 `academic-persons/Configuration/Services.yaml` and
 `academic-persons-edit/Configuration/Services.yaml`, which carry one, two and
-two), ten carry `#[AsEventListener]` on the class: the
+two), eleven carry `#[AsEventListener]` on the class: the
 `RegisterAcademicPageDoktype` and `AddPageModuleCategorySummary` listeners of
 `academic-partners`, `academic-programs` and `academic-projects`, for example
 `#[AsEventListener(identifier: '…/register-page-doktype')]`,
 `ApplySettingsToTca` of `academic-persons` and `academic-jobs`,
 `WarmUpFrontendIconRegistry` of `academic-base` and
-`AddCategoryTypeFrontendIcons` of `typo3-category-types`, and
+`AddCategoryTypeFrontendIcons` and `ResolveCategoryTypeGroupMarker` of
+`typo3-category-types`, and
 `FlushProfileViewCaches` of `academic-persons` carries it on each of its three
 methods, the method name and the event then come from the method itself. The
 two are equivalent — the attribute is only a shorter spelling of the same tag —
