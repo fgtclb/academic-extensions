@@ -13,14 +13,22 @@ the configured recipient one mail with the configured sender and subject,
 rendered from a mail template into an HTML and a plain-text part, unless the
 mail format of the installation, or on TYPO3 v14 of the site, selects one of
 them. Every part MUST name the submitted job by its title and MUST contain a
-link that opens the new job record in the TYPO3 backend. This SHALL behave the
-same on TYPO3 v13 and v14.
+link that opens the new job record in the TYPO3 backend. The link MUST carry no
+security token and no return URL, so that a backend user who opens it is taken
+to the record editor of the job, through the backend login when not logged in.
+This SHALL behave the same on TYPO3 v13 and v14.
 
 #### Scenario: Visitor submits a job
 
 - **WHEN** a visitor submits the new-job form with the title "Research assistant"
 - **THEN** the configured recipient receives one mail with the configured sender and subject
 - **AND** its HTML and its plain-text part both contain "Research assistant" and a link to the backend edit form of the new job record
+
+#### Scenario: Editor opens the link of the mail
+
+- **WHEN** a backend editor opens the link of the mail about a submitted job
+- **THEN** the backend shows the record editor of that job, after the login when the editor was not logged in
+- **AND** not the dashboard
 
 ### Requirement: Integrators choose the mail template
 
