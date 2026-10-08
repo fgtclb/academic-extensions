@@ -179,6 +179,45 @@ parameters themselves:
 the three controllers pass no `TSconfig` key at all, which a handler has to read
 as "no setting" rather than as an error.
 
+## A category tree offers the categories of one group
+
+A field of `type` `category` has no `itemsProcFunc`: `TcaCategory` builds the
+tree from `foreign_table` and `foreign_table_where` alone, on v12 and v13 alike.
+The category fields of the list plugins of `academic_partners`,
+`academic_programs` and `academic_projects` therefore name the category type
+group of their plugin with a marker in that clause:
+
+```xml
+<foreign_table_where>AND {#sys_category}.{#uid} IN (###CATEGORY_TYPE_GROUP:partners###) AND {#sys_category}.{#sys_language_uid} IN (-1, 0)</foreign_table_where>
+```
+
+`ResolveCategoryTypeGroupMarker` of `category_types`, a listener on
+`AfterFlexFormDataStructureParsedEvent`, replaces it with a subselect of the
+categories that carry a type of the group, and of their ancestors (ACE-852).
+The ancestors are needed because the tree shows a category only together with
+every parent above it, and a category of the group below a parent of another
+type is a structure the filters support with `groupByParent`. Such a parent is
+selectable in the tree, and the plugin ignores it, as before.
+
+The listener must not query the database. TYPO3 v13 parses every data
+structure while `TcaSchemaFactory` builds the schema during bootstrap, before a
+table may exist, and caches the result: a first version that looked the uids up
+broke the bootstrap of every functional test on v13. The ancestors are
+therefore a recursive common table expression the tree query evaluates,
+verified on SQLite, MariaDB 10.4, MySQL 8.0 and PostgreSQL 10.
+
+A literal list of types in the FlexForm file is not an option: the types of a
+group come from the `CategoryTypes.yaml` of every installed extension, and an
+integrator adds and removes them. The demand reads the selection with
+`CategoryRepository::getByDatabaseFields(<group>, …)`, which drops every
+category of another type, so a tree that offers them lets an editor pick a
+filter the frontend never applies. That was the state before, with
+`{#type} != ''`.
+
+The `CategoryTreeTypeGroupTest` of each of the three extensions fetches the
+tree through `FormSelectTreeAjaxController::fetchDataAction()`, the request the
+backend sends when the field is opened.
+
 ## See also
 
 - [Database queries](database-queries.md) — quoting a uid list, and ordering
