@@ -20,9 +20,12 @@ introduced and registered for the plugin (a "Configuration" tab with the
 can be configured per plugin instance.
 
 When the option is enabled, the frontend contacts listing includes hidden
-(disabled) records, independent of the Context API visibility settings.
+(disabled) records, also for visitors without a preview of hidden records.
 Only the `hidden` enable column (`disabled`) is ignored; the `deleted`
 restriction stays in effect.
+
+On a translated page the listing shows the translation of a hidden
+contact, like for a visible one.
 
 Impact
 ======

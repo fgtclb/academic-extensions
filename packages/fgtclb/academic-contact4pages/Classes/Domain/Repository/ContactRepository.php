@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicContacts4pages\Domain\Repository;
 
+use FGTCLB\AcademicBase\Persistence\HiddenRecordsFetcher;
 use FGTCLB\AcademicContacts4pages\Domain\Model\Contact;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\LanguageAspect;
@@ -23,6 +24,12 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
 class ContactRepository extends Repository
 {
     private const CONTACT_TABLE = 'tx_academiccontacts4pages_domain_model_contact';
+
+    public function __construct(
+        private readonly HiddenRecordsFetcher $hiddenRecordsFetcher,
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Finds the contacts pointing at the given page through their `page` column,
@@ -93,7 +100,7 @@ class ContactRepository extends Repository
             $query->matching($query->in('uid', $contactUids));
         }
 
-        return $query->execute();
+        return $this->hiddenRecordsFetcher->execute($query);
     }
 
     /**
