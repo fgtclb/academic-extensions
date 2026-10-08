@@ -14,7 +14,7 @@ FlexForm options of following plugins has changed:
 
 Changed options:
 
-* `settings.hideCompletedProjects` => `settings.activeState`
+* `settings.hide_completed_projects` => `settings.activeState`
 * `settings.filter.options` => `settings.hideFilter`
 * `settings.sorting.options` => `settings.hideSorting`
 
