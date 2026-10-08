@@ -39,7 +39,7 @@ the default template and in template overrides that print the value.
 #### Scenario: No credit points
 - **WHEN** a semester or module stores 0.00 credit points
 - **THEN** the study plan shows no credit points for it, and the dialog
-  trigger of a module in that semester announces "0" credit points
+  trigger of a module in that semester announces no credit points
 
 ### Requirement: Existing values survive the update
 Credit points stored before the update SHALL keep their value after the
