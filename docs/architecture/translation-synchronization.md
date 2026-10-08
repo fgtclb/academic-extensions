@@ -430,6 +430,31 @@ Without it a hidden profile would come back in its default language in a
 translated site language, and every text edit made there would write the
 default record. TYPO3 v14.3.7 overlays with the query settings itself.
 
+## An inline list that is `exclude`
+
+For an inline relation with `foreign_field`, `l10n_mode` `exclude` makes
+`DataMapProcessor` treat the list of children as the value to synchronize:
+every save of the parent, or of one of its translations, writes the translated
+children into the list of the translation, and
+`RelationHandler::writeForeignField()` then points them at the parent
+translation and renumbers their sort column. That is right for a child its
+parent owns. It is wrong for a second parent the child names in a select of its
+own that is `exclude` as well: the two declarations rewrite each other with
+every save.
+
+The contacts role of `academic_contacts4pages` and the partner role of
+`academic_partners` were in that position until ACE-873. Saving a role, in its
+default language or as a translation, wrote the uid of the role translation
+into the `role` of every translated contact or partnership. Their lists now
+carry no `l10n_mode` and a `displayCond` of `FIELD:sys_language_uid:<=:0`, so
+FormEngine never offers or submits them for a translation, on v13 and v14
+alike.
+
+What stays is the `localize` command: `DataHandler::copyRecord()` localizes
+every inline child of a localized parent, and no TCA option prevents it, so
+localizing a role still creates translations of its children, or copies of the
+ones that are translated already (ACE-874).
+
 ## Named gaps
 
 Stated so they are decisions, not surprises:

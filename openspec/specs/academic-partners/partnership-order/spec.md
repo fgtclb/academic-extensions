@@ -21,6 +21,13 @@ v13 and v14 alike.
 - **THEN** the partner page still renders its partnerships in the order
   arranged on the partner page
 
+#### Scenario: Saving a role or its translation
+
+- **WHEN** an editor saves a role, in its default language or as a
+  translation, while some of its partnerships are translated
+- **THEN** every translated partnership keeps the role of its default
+  language record and its position in that role's list
+
 #### Scenario: A role keeps its own arrangement
 
 - **WHEN** an editor rearranges the partnerships listed in a role and saves it
