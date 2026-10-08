@@ -83,6 +83,8 @@ own — they are exercised only through the extensions that use them.
 [`packages-dev/monorepo-shared/`](../../packages-dev/monorepo-shared) carries
 the check that every `ext_emconf.php` of the repository names its dependencies
 by extension key, see [below](#the-ext_emconfphp-dependency-keys), the one
+that every upgrade wizard has a title and a description, see
+[below](#the-description-of-upgrade-wizards), the one
 that every translation names its extension without an underscore, see
 [below](#the-extension-name-of-translations), the extension point checks,
 see [below](#the-extension-points), the check that no source file names an
@@ -350,6 +352,20 @@ an equality check would fail today for no defect.
 `academic_jobs` carries that stricter check for itself,
 `academic-jobs/Tests/Unit/ExtEmConfDependenciesTest.php`. It expects
 `typo3/cms-core` twice in `ext_emconf.php`, as `typo3` and as `core`.
+
+## The description of upgrade wizards
+
+[`UpgradeWizardDescriptionTest`](../../packages-dev/monorepo-shared/Tests/Unit/UpgradeWizardDescriptionTest.php)
+creates every class below `packages/fgtclb/*/Classes/Upgrades/` that carries
+the `#[UpgradeWizard]` attribute, without its constructor, and fails on an
+empty title or an empty description. The upgrade module shows both, and the
+description is what an administrator reads before a wizard writes to the
+database. Eight of the seventeen wizards had an empty one until ACE-871.
+
+Whether a wizard reports itself as necessary only when there is something to
+migrate is not a static property, and this check cannot see it. A new wizard is
+expected to cover it with a functional test of its own, next to the one for
+what it writes. Not every existing wizard has one yet.
 
 ## The extension name of translations
 

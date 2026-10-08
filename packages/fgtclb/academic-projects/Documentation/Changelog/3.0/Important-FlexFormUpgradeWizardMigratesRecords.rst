@@ -52,8 +52,9 @@ Impact
 ======
 
 The wizard now performs the FlexForm migration it announces:
-`settings.hideCompletedProjects` becomes `settings.activeState` (value `1` maps
-to `active`, anything else to `all`), `settings.filter.options` becomes
+`settings.hide_completed_projects`, the name 1.x stored, becomes
+`settings.activeState` (value `1` maps to `active`, anything else to `all`),
+see :ref:`important-ace-871-academic-projects`, `settings.filter.options` becomes
 `settings.hideFilter` and `settings.sorting.options` becomes
 `settings.hideSorting`, each keeping its value.
 
