@@ -171,7 +171,7 @@ the page TSconfig.
 
 Exactly one class under any `Classes/` directory carries a version switch:
 [`packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php`](../../packages/fgtclb/academic-base/Classes/Extbase/Property/TypeConverter/FileUploadConverter.php)
-line 350, in `configureProperties()`:
+line 376, in `configureProperties()`:
 
 ```php
 if ((new Typo3Version())->getMajorVersion() < 13) {
@@ -191,8 +191,8 @@ exit condition — dropping it together with the call when v12 support ends.
 ## A check for the API instead of the version
 
 Some code does not need to know the version, only whether an object offers a
-method or a class exists. Five files ask for it, four with `method_exists()`
-and one with `class_exists()`:
+method or a class exists. Six files ask for it, four with `method_exists()`
+and two with `class_exists()`:
 
 - `StateManagerRootStateInterfaceHelperMethodsTrait.php` in
   `academic-base/Classes/Environment/` hands the request to the configuration
@@ -202,6 +202,10 @@ and one with `class_exists()`:
 - `ProfileController::addCacheTags()` in `academic-persons/Classes/Controller/`
   adds the cache tags through the cache data collector when its class exists
   (v13), and through the frontend controller otherwise (v12).
+- `FileUploadConverter` in `academic-base/Classes/Extbase/Property/TypeConverter/`
+  hands the storage the native `DuplicationBehavior` enum when it exists
+  (v13), where the enumeration class of v12 is deprecated, and that class
+  otherwise (v12).
 - The page data processors of `academic_programs`, `academic_partners` and
   `academic_projects` take the page record from `page` when it is an object
   with `getPageRecord()`, the page information object of a `PAGEVIEW` page
