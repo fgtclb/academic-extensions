@@ -130,7 +130,7 @@ Measured with
 | `#[Autowire]`        | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`         | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
 | `#[Exclude]`         | 27    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
-| `#[AsEventListener]` | 10    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
+| `#[AsEventListener]` | 13    | `academic-partners/Classes/EventListener/RegisterAcademicPageDoktype.php:33` |
 | `#[AsCommand]`       | 3     | `academic-partners/Classes/Command/GeocodeCommand.php:23`                    |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
@@ -145,8 +145,10 @@ attribute (see below): the `RegisterAcademicPageDoktype` and the
 `academic-persons` and of `academic-jobs`, which apply the settings of their
 extension to the compiled TCA, `WarmUpFrontendIconRegistry` of
 `academic-base`, which builds the frontend icon registry when the system caches
-are warmed up, and `AddCategoryTypeFrontendIcons` of `typo3-category-types`,
-which contributes the category type icons to that registry.
+are warmed up, `AddCategoryTypeFrontendIcons` of `typo3-category-types`,
+which contributes the category type icons to that registry, and
+`FlushProfileViewCaches` of `academic-persons`, which carries the attribute on
+each of its three methods, one per persistence event of Extbase.
 `#[AsTaggedItem]` and `#[AsController]` have zero sites.
 
 For the twenty-two `#[Exclude]` sites and why `LegacySettingsMigration` is among
@@ -208,20 +210,22 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     ) {}
 ```
 
-The fifteen event listener classes follow the same shape, promoted
+The sixteen event listener classes follow the same shape, promoted
 `private readonly` dependencies (or a `readonly class`) and a single
-`__invoke()`, apart from `AssignContractOrganisationalUnitSorting`, which has
-one method per persistence event. Five are registered by YAML tag:
+`__invoke()`, apart from `AssignContractOrganisationalUnitSorting` and
+`FlushProfileViewCaches`, which have one method per persistence event. Five are
+registered by YAML tag:
 `academic-jobs/Classes/EventListener/GenerateJobSlug.php`,
 `academic-persons/Classes/EventListener/UpdateProfileImageMetadata.php`,
 `.../AssignContractOrganisationalUnitSorting.php`,
 `academic-persons-edit/Classes/EventListener/GenerateSlugForProfile.php` and
-`.../SyncChangesToTranslations.php`. Ten are registered by attribute: the
+`.../SyncChangesToTranslations.php`. Eleven are registered by attribute: the
 `RegisterAcademicPageDoktype` and the `AddPageModuleCategorySummary` of
 `academic-partners`, `academic-programs` and `academic-projects`,
 `ApplySettingsToTca` of `academic-persons` and `academic-jobs`,
-`WarmUpFrontendIconRegistry` of `academic-base` and
-`AddCategoryTypeFrontendIcons` of `typo3-category-types`.
+`WarmUpFrontendIconRegistry` of `academic-base`,
+`AddCategoryTypeFrontendIcons` of `typo3-category-types` and
+`FlushProfileViewCaches` of `academic-persons`.
 
 ### Where the codebase does not comply
 
@@ -336,13 +340,15 @@ Both spellings are in use here: five listener classes are registered by YAML
 tag (`academic-jobs/Configuration/Services.yaml`,
 `academic-persons/Configuration/Services.yaml` and
 `academic-persons-edit/Configuration/Services.yaml`, which carry one, two and
-two), and ten carry `#[AsEventListener]` on the class: the
+two), ten carry `#[AsEventListener]` on the class: the
 `RegisterAcademicPageDoktype` and `AddPageModuleCategorySummary` listeners of
 `academic-partners`, `academic-programs` and `academic-projects`, for example
 `#[AsEventListener(identifier: '…/register-page-doktype')]`,
 `ApplySettingsToTca` of `academic-persons` and `academic-jobs`,
 `WarmUpFrontendIconRegistry` of `academic-base` and
-`AddCategoryTypeFrontendIcons` of `typo3-category-types`. The
+`AddCategoryTypeFrontendIcons` of `typo3-category-types`, and
+`FlushProfileViewCaches` of `academic-persons` carries it on each of its three
+methods, the method name and the event then come from the method itself. The
 two are equivalent — the attribute is only a shorter spelling of the same tag —
 and new listeners should prefer the attribute. Note that `academic-persons`' own
 user manual already documents the TYPO3 attribute as the way integrators register
