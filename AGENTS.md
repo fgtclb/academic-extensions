@@ -604,7 +604,7 @@ rule is to use it and never Symfony's. It cannot be followed here —
 `TYPO3\CMS\Core\Attribute\AsEventListener` does not exist on v12 at all, where
 `Core\Attribute\` holds only `AsAllowedCallable` and `WebhookMessage`. Register
 event listeners with the `event.listener` tag in `Services.yaml` instead, which
-is what the three listeners in this repository already do. Symfony's attribute
+is what the listeners in this repository already do. Symfony's attribute
 is not the fallback: it registers nothing in TYPO3, so the listener silently
 never fires.
 

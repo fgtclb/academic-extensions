@@ -202,9 +202,10 @@ class RecordSynchronizer implements RecordSynchronizerInterface
     ) {}
 ```
 
-The three event listeners follow the same shape — a single `__invoke()` and
-promoted `private readonly` dependencies:
+The event listeners follow the same shape, a single `__invoke()` and
+promoted `private readonly` dependencies, for example
 `academic-jobs/Classes/EventListener/GenerateJobSlug.php`,
+`academic-jobs/Classes/EventListener/LimitJobDetailCacheLifetime.php`,
 `academic-persons-edit/Classes/EventListener/GenerateSlugForProfile.php` and
 `.../SyncChangesToTranslations.php`.
 
@@ -319,7 +320,7 @@ TYPO3's". On this branch the second half of that rule is not available: TYPO3's
 attribute does not exist on v12, so a listener registered with it would simply
 be a fatal error there.
 
-**Register event listeners with the `event.listener` YAML tag.** All three
+**Register event listeners with the `event.listener` YAML tag.** The
 production listeners do
 (`academic-jobs/Configuration/Services.yaml` lines 11–15 and
 `academic-persons-edit/Configuration/Services.yaml` lines 10–20):
