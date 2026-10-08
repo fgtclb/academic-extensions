@@ -235,13 +235,15 @@ The divergence between its three readers is tracked as ACE-429.
 
 A rejected job comes back the way a rejected profile form does: Extbase forwards
 it to `newAction()`, and the form renders again with the submitted values. The
-field partials set `errorClass="is-invalid"` on the field itself, and
-`Partials/Job/Forms/FieldWrapper.html` renders the messages of its field in
-`invalid-feedback` elements right after it. The results are read under
+field partials set `errorClass="is-invalid"` on the field itself, and on a
+rejected field `aria-invalid` and `aria-describedby`, which names the element
+`<elementId>-error`. `Partials/Job/Forms/FieldWrapper.html` renders the messages
+of its field in that `invalid-feedback` element right after it. The results are read under
 `job.<property>`, which is both the name of the form object and the prefix of
 the field labels, so unlike the profile editor no ViewHelper has to find the
 path. `Partials/Job/Forms/ErrorMessage.html` looks the text up per field and
-error code, then per error code, then takes the message of the validator, see
+error code, then per error code, then takes the message of the validator, each
+given the arguments of the error, see
 [the labels page of the jobs manual](../../packages/fgtclb/academic-jobs/Documentation/Configuration/Labels/Index.rst).
 
 ## Documentation state
