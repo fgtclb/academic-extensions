@@ -38,7 +38,7 @@ final class ProjectListRouteEnhancerTest extends AbstractAcademicProjectsTestCas
      * The list and the element of the active filters below it.
      */
     private const LIST = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]';
-    private const ACTIVE_FILTERS = self::LIST . '/div[ul or a]';
+    private const ACTIVE_FILTERS = self::LIST . '//div[contains(concat(" ", normalize-space(@class), " "), " ace-filters ")][not(ancestor::form)]';
     private const LIST_NAMESPACE = 'tx_academicprojects_projectlist';
     private const SELECTED_NAMESPACE = 'tx_academicprojects_projectlistsingle';
     private const FORM = '//form[@name="demand"]';

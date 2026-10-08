@@ -302,6 +302,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $this->assertStringContainsString('<div class="project-project-page">Quantum Optics</div>', $content);
         $this->assertStringNotContainsString('academic-projects-detail', $content);
+        $this->assertStringNotContainsString('academic-projects-page', $content);
     }
 
     /**
@@ -399,7 +400,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
     private function assertProjectBetween(string $content, string $headerMarker, string $footerMarker): void
     {
         $header = strpos($content, $headerMarker);
-        $project = strpos($content, 'academic-projects-detail-page');
+        $project = strpos($content, 'academic-projects-page');
         $element = strpos($content, self::CONTENT_ELEMENT);
         $footer = strpos($content, $footerMarker);
         $this->assertIsInt($header, sprintf('The layout marker "%s" is missing.', $headerMarker));

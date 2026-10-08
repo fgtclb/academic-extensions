@@ -35,8 +35,8 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
      * The list, the elements of the active filters and of the result count below it.
      */
     private const LIST = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]';
-    private const ACTIVE_FILTERS = self::LIST . '/div[ul or a]';
-    private const RESULT_COUNT = self::LIST . '/p[1]';
+    private const ACTIVE_FILTERS = self::LIST . '//div[contains(concat(" ", normalize-space(@class), " "), " ace-filters ")][not(ancestor::form)]';
+    private const RESULT_COUNT = self::LIST . '//p[contains(concat(" ", normalize-space(@class), " "), " ace-count ")]';
     private const LIST_NAMESPACE = 'tx_academicprojects_projectlist';
     private const SELECTED_NAMESPACE = 'tx_academicprojects_projectlistsingle';
     private const ALL_ON = "plugin.tx_academicprojects.filter.showActiveFilters = 1\n"

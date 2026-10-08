@@ -538,7 +538,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $xpath = new \DOMXPath($document);
         $roleOfContact = [];
         // One grid column per contact, holding the role name and the card.
-        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]/div[contains(concat(' ', normalize-space(@class), ' '), ' ace-list ')]/div[@class='row']/div/div[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]") as $item) {
+        foreach ($this->nodes($xpath, "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]//div[contains(concat(' ', normalize-space(@class), ' '), ' ace-itemlist ')]/div[@class='row']/div/div[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]") as $item) {
             preg_match('#(Müllermann|Huber|Beispiel|Nebenan)#u', $item->textContent, $name);
             $role = $this->nodes($xpath, "./p[contains(concat(' ', normalize-space(@class), ' '), ' ace-role ')]", $item)->item(0);
             $roleOfContact[$name[1] ?? '?'] = $role === null ? null : trim($role->textContent);

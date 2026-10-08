@@ -567,7 +567,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
                 'ace-credits',
                 'ace-close',
                 'ace-description',
-                'ace-footer ace-richtext ce-bodytext',
+                'ce-bodytext',
             ],
             $this->classInventoryOf($html),
         );
