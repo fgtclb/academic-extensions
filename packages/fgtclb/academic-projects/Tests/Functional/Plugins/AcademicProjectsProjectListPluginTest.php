@@ -235,11 +235,11 @@ final class AcademicProjectsProjectListPluginTest extends AbstractAcademicProjec
         $badges = [];
         // A card is an item of the list, its title is its heading and its badge the
         // element whose class names the state.
-        $cards = $xpath->query('//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]//div[contains(concat(" ", normalize-space(@class), " "), " ace-item ")]');
+        $cards = $xpath->query('//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]//div[contains(concat(" ", normalize-space(@class), " "), " ace-itemlist ")]/div[@class="row"]/div/article[contains(concat(" ", normalize-space(@class), " "), " ace-item ")]');
         foreach ($cards ?: [] as $card) {
             $title = trim((string)$xpath->evaluate('string(.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6])', $card));
             $badge = '';
-            $badgeNodes = $xpath->query('.//span[contains(concat(" ", normalize-space(@class), " "), " ace-state ")]', $card);
+            $badgeNodes = $xpath->query('.//p[contains(concat(" ", normalize-space(@class), " "), " ace-state ")]', $card);
             foreach ($badgeNodes ?: [] as $badgeNode) {
                 if (!$badgeNode instanceof \DOMElement) {
                     continue;

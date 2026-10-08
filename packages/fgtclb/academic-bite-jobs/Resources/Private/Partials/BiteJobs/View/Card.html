@@ -4,10 +4,10 @@
     xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
 >
 
-<div class="ace-list ace-card-view">
+<div class="ace-itemlist ace-card-view">
     <f:for each="{jobs}" as="job">
-        <article class="ace-card">
-            <div class="ace-content">
+        <article class="ace-item">
+            <div class="ace-item-content">
                 <f:render
                     partial="BiteJobs/Header"
                     arguments="{
@@ -19,8 +19,8 @@
                     }"
                 />
 
-                <ul class="ace-properties">
-                    <li class="ace-property">
+                <ul class="ace-list">
+                    <li class="ace-list-item">
                         <b class="ace-label">{f:translate(key: 'jobs.bite.endsOn', extensionName: 'AcademicBiteJobs')}:</b>
 
                         <span class="ace-value">{job.endsOn -> f:format.date(format: 'd.m.Y')}</span>

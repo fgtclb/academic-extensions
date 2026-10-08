@@ -6,38 +6,37 @@
     data-namespace-typo3-fluid="true"
 >
 
-<article class="ace-card">
-    <div class="ace-content">
-        <header class="ace-header">
-            <f:if condition="{settings.showActiveStateBadge}">
-                <f:variable name="activeState" value="{project.activeState}"/>
-                <p class="ace-status">
-                    <span class="ace-state {activeState}">{f:translate(key: 'activeState.{activeState}', extensionName: 'AcademicProjects')}</span>
-                </p>
-            </f:if>
+<article class="ace-item">
+    <div class="ace-item-content">
+        <f:render
+            partial="Project/Header"
+            arguments="{
+                header: '{f:if(condition: project.projectTitle, then: project.projectTitle, else: project.title)}',
+                layout: '{data.header_layout}',
+                link: '{f:uri.page(pageUid: project.uid)}',
+                subheader: '{data.subheader}'
+            }"
+        />
 
-            <f:render
-                partial="Project/Header"
-                arguments="{
-                    header: '{f:if(condition: project.projectTitle, then: project.projectTitle, else: project.title)}',
-                    layout: '{data.header_layout}',
-                    link: '{f:uri.page(pageUid: project.uid)}',
-                    subheader: '{data.subheader}'
-                }"
-            />
+        <f:if condition="{settings.showActiveStateBadge}">
+            <f:variable name="activeState" value="{project.activeState}"/>
 
-            <f:if condition="{project.shortDescription}">
-                <div class="ace-richtext ce-bodytext">
-                    <f:format.html>{project.shortDescription}</f:format.html>
-                </div>
-            </f:if>
-        </header>
+            <p class="ace-state {activeState}">
+                {f:translate(key: 'activeState.{activeState}', extensionName: 'AcademicProjects')}
+            </p>
+        </f:if>
+
+        <f:if condition="{project.shortDescription}">
+            <div class="ce-bodytext">
+                <f:format.html>{project.shortDescription}</f:format.html>
+            </div>
+        </f:if>
 
         <f:if condition="{project.attributes}">
-            <ul class="ace-properties">
+            <ul class="ace-list ace-attributes">
                 <f:for each="{project.attributes.allCategoriesByType}" as="attributes" key="category">
                     <f:if condition="{attributes}">
-                        <li class="ace-property">
+                        <li class="ace-list-item ace-attribute">
                             <span class="ace-icon"><ab:icon identifier="category_types.projects.{category}"/></span>
 
                             <b class="ace-label">
@@ -62,15 +61,13 @@
     <f:for each="{project.media}" as="image" iteration="i">
         <f:if condition="{i.isFirst}">
             <f:comment>The shared partial of EXT:academic_base.</f:comment>
-            <div class="ace-media">
-                <f:render
-                    partial="Academic/Image"
-                    arguments="{
-                        image: image,
-                        preset: 'card',
-                    }"
-                />
-            </div>
+            <f:render
+                partial="Academic/Image"
+                arguments="{
+                    image: image,
+                    preset: 'card',
+                }"
+            />
         </f:if>
     </f:for>
 </article>

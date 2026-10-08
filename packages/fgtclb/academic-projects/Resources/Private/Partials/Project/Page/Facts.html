@@ -9,9 +9,9 @@
     is filled.
 </f:comment>
 
-<ul class="ace-properties ace-facts">
+<ul class="ace-list ace-attributes">
     <f:if condition="{project.startDate} || {project.endDate}">
-        <li class="ace-property">
+        <li class="ace-list-item ace-attribute">
             <b class="ace-label">{f:translate(key: 'project.runtime', extensionName: 'AcademicProjects')}:</b>
 
             <span class="ace-value">
@@ -37,7 +37,7 @@
     </f:if>
 
     <f:if condition="{project.budget}">
-        <li class="ace-property">
+        <li class="ace-attribute">
             <b class="ace-label">{f:translate(key: 'project.budget', extensionName: 'AcademicProjects')}:</b>
 
             <span class="ace-value">{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</span>
@@ -45,10 +45,10 @@
     </f:if>
 
     <f:if condition="{project.funders}">
-        <li class="ace-property">
+        <li class="ace-attribute">
             <b class="ace-label">{f:translate(key: 'project.funders', extensionName: 'AcademicProjects')}:</b>
 
-            <div class="ace-value ace-richtext ce-bodytext">
+            <div class="ace-value ce-bodytext">
                 <f:format.html>{project.funders}</f:format.html>
             </div>
         </li>

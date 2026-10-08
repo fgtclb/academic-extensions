@@ -12,10 +12,10 @@
 </f:comment>
 
 <f:if condition="{project.attributes.allCategoriesByType}">
-    <ul class="ace-properties ace-categories">
+    <ul class="ace-list ace-attributes">
         <f:for each="{project.attributes.allCategoriesByType}" as="categories" key="type">
             <f:if condition="{categories}">
-                <li class="ace-property">
+                <li class="ace-list-item ace-attribute">
                     <span class="ace-icon"><ab:icon identifier="category_types.projects.{type}"/></span>
 
                     <b class="ace-label">{f:translate(key: 'sys_category.projects.{type}', extensionName: 'AcademicProjects') -> ct:categoryTypeTitle(group: 'projects', identifier: type)}:</b>

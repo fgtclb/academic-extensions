@@ -74,9 +74,6 @@
     flex-direction: column;
   }
 }
-.academic-study-plan .semesters .col {
-  padding: 0;
-}
 .academic-study-plan .semesters .col .icon-tx-academicbase-action-collapse {
   display: none;
 }

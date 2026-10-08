@@ -4,29 +4,31 @@
     xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
 >
 
-<div class="ace-list ace-list-view">
+<div class="ace-itemlist ace-list-view">
     <f:for each="{jobs}" as="job">
         <article class="ace-item">
-            <f:render
-                partial="BiteJobs/Header"
-                arguments="{
-                    header: job.title,
-                    layout: data.header_layout,
-                    subheader: data.subheader,
-                    link: job.url,
-                    grouped: grouped
-                }"
-            />
+            <div class="ace-item-content">
+                <f:render
+                    partial="BiteJobs/Header"
+                    arguments="{
+                        header: job.title,
+                        layout: data.header_layout,
+                        subheader: data.subheader,
+                        link: job.url,
+                        grouped: grouped
+                    }"
+                />
 
-            <ul class="ace-properties">
-                <li class="ace-property">
-                    <b class="ace-label">{f:translate(key: 'jobs.bite.endsOn', extensionName: 'AcademicBiteJobs')}:</b>
+                <ul class="ace-list">
+                    <li class="ace-list-item">
+                        <b class="ace-label">{f:translate(key: 'jobs.bite.endsOn', extensionName: 'AcademicBiteJobs')}:</b>
 
-                    <span class="ace-value">{job.endsOn -> f:format.date(format: 'd.m.Y')}</span>
-                </li>
+                        <span class="ace-value">{job.endsOn -> f:format.date(format: 'd.m.Y')}</span>
+                    </li>
 
-                <!-- Add custom fields here -->
-            </ul>
+                    <!-- Add custom fields here -->
+                </ul>
+            </div>
         </article>
     </f:for>
 </div>
