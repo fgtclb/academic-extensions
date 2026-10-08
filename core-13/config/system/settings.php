@@ -159,11 +159,11 @@ return [
         'processor_path' => '/usr/bin/',
     ],
     'MAIL' => [
-        'transport' => 'sendmail',
-        'transport_sendmail_command' => '/usr/sbin/sendmail -t -i',
-        'transport_smtp_encrypt' => '',
+        'transport' => 'smtp',
+        'transport_sendmail_command' => '',
+        'transport_smtp_encrypt' => false,
         'transport_smtp_password' => '',
-        'transport_smtp_server' => '',
+        'transport_smtp_server' => '127.0.0.1:1025',
         'transport_smtp_username' => '',
     ],
     'SYS' => [

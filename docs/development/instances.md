@@ -175,6 +175,37 @@ The **install tool password** is not that one. `typo3 setup` writes it into
 `config/system/settings.php`, but that file is tracked and is restored from git
 at the end of a rebuild, so what stays is the hash committed in the repository.
 
+### Backend editor
+
+The seed writes a second backend account, an editor, so that the backend can be
+looked at the way an editor sees it rather than the way an administrator does:
+
+|          |                                                                        |
+|----------|------------------------------------------------------------------------|
+| Username | `erika-editor`                                                         |
+| Password | `Erika-Editor-1701D.`                                                  |
+| Group    | `Academic editors` (`be_groups` uid 10)                                |
+| Mounts   | `/`, the storage container, `/legacy/` and the `Seed files` file mount |
+
+The group is the point, not the user: it allows every academic content element,
+table and page type, and the columns the academic extensions mark `exclude`,
+plus three core columns a plugin or a page type cannot do without:
+`tt_content:pages` and `tt_content:recursive`, the record storage of the plugins,
+and `pages:doktype`, which turns a page into a programme, project or partner
+page.
+
+Three defaults of the core would otherwise lock the account out, and the seed
+sets each of them explicitly:
+
+- `be_users.disable` defaults to `1`, so the user is written with `disable: 0`.
+- `be_groups.workspace_perms` defaults to `0` in the core TCA, and
+  EXT:workspaces, which `fgtclb/academics-monorepo-shared` requires, sets the
+  default of `be_users.workspace_perms` to `0` as well. Without access to the
+  live workspace the login ends in a `NoAccessibleModuleException`, so the
+  group carries `workspace_perms: 1`.
+- The file list module is `media_management` on v13 and v14, not
+  `file_filelist`, and `groupMods` names that identifier.
+
 ### Frontend
 
 The seed set creates four frontend users in two groups, and the first of them
@@ -237,6 +268,20 @@ German translation below `/de/`:
 | `/draft`, `/members`    | A hidden page and a page for a frontend user group                                                                                                                                                                                                                                                                                                                                           |
 | `/legacy/*`             | The same tree again, delivered by a `sys_template` record instead of site sets                                                                                                                                                                                                                                                                                                               |
 
+Three pages of that tree have **nothing to show by design** and are therefore
+hidden from the menus (`nav_hide`): `/persons/detail`, `/persons/detail-hidden`
+and `/jobs/detail`, in both trees and both languages. Each carries a detail
+plugin, and without its argument the two profile detail pages answer 404 and the
+job detail shows nothing. The pages exist so the plugins have a home when a
+detail URL is built for them from a list.
+
+`/persons/detail-hidden` is the detail page of the "selected profiles" element
+that lists the two hidden profiles: its detail element shows hidden records as
+well, so the links of that element lead to a profile rather than to a 404. The
+links keep their query arguments, because the slug aspect of the route does not
+resolve a hidden profile, and the route enhancers of the site do not name the
+page.
+
 Changing that content is a change to the seed set, not a click path — see
 [Seeding an instance](environment.md#seeding-an-instance).
 
@@ -248,6 +293,28 @@ package below `packages-dev/dev-site/Resources/Public/SeedFiles/`, drawn by
 database template — so a fresh clone gets the database and the files it points
 at together. See
 [Seed files, and how they reach an instance](environment.md#seed-files-and-how-they-reach-an-instance).
+
+## Mail and site constants
+
+Both instances send mail over SMTP to `127.0.0.1:1025`
+(`config/system/settings.php`), which is the Mailpit that DDEV runs inside the
+web container. `ddev launch -m` opens its inbox. The web container of DDEV has
+no `/usr/sbin/sendmail`, so the `sendmail` transport `typo3 setup` writes fails
+on the first mail, the notification of the job form among them. An instance
+served by a host stack instead puts a different transport into a git-ignored
+`config/system/additional/*.php`.
+
+The `/` tree is delivered by site sets, and one more file belongs to that
+delivery: `config/sites/academics/constants.typoscript`. The two theme switches
+`page.theme.googleFont.enable` and `page.theme.cookieconsent.enable` are site
+settings of the type `bool`, and TYPO3 v13 and v14 write a disabled one into the
+constants as the empty string. The theme reads the second one in the condition
+`[{$page.theme.cookieconsent.enable} == 1]`, which then reads `[ == 1]`, an
+expression that is no valid condition. TYPO3 v14 logs it as an error on every
+uncached page, and the backend module "Active TypoScript" shows it on both
+versions. The site's own `constants.typoscript` is read
+after the site settings and states both as `0`. `settings.yaml` keeps them,
+because the backend and PHP code read the settings rather than the constants.
 
 ## Database backup and restore
 

@@ -3100,17 +3100,21 @@ entities:
             # The target of "settings.detailPid" on pages 201, 202, 203, 206, 207
             # and 208, and of "plugin.tx_academicpersons.detailPid" in the site
             # settings. EXT:academic_contacts4pages reads that same setting for its
-            # profile links and has no detail page setting of its own.
+            # profile links and has no detail page setting of its own. Hidden from
+            # the menus: without a profile it is a 404, and a menu entry would lead
+            # there.
             - self:
                   id: 205
                   title: 'Profile detail'
                   slug: '/persons/detail'
+                  nav_hide: 1
               languageVariants:
                 - self:
                       id: 705
                       language: 1
                       title: 'Profil-Detailansicht'
                       slug: '/personal/detail'
+                      nav_hide: 1
               entities:
                 content:
                   - self:
@@ -3281,7 +3285,8 @@ entities:
             # Profile 13 lives on folder 111 and is hidden. The first element
             # selects across both folders, the second one selects the two hidden
             # profiles and switches "showHiddenRecords" on - so both halves of that
-            # toggle are visible next to each other.
+            # toggle are visible next to each other. The second one links to page
+            # 209, whose detail element shows hidden records as well.
             - self:
                   id: 207
                   title: 'Selected profiles'
@@ -3371,7 +3376,7 @@ entities:
                                               <value index="vDEF">6,13</value>
                                           </field>
                                           <field index="settings.detailPid">
-                                              <value index="vDEF">205</value>
+                                              <value index="vDEF">209</value>
                                           </field>
                                           <field index="settings.showHiddenRecords">
                                               <value index="vDEF">1</value>
@@ -3397,7 +3402,7 @@ entities:
                                                   <value index="vDEF">6,13</value>
                                               </field>
                                               <field index="settings.detailPid">
-                                                  <value index="vDEF">205</value>
+                                                  <value index="vDEF">209</value>
                                               </field>
                                               <field index="settings.showHiddenRecords">
                                                   <value index="vDEF">1</value>
@@ -3521,6 +3526,71 @@ entities:
                                               </field>
                                               <field index="settings.viewMode.default">
                                                   <value index="vDEF">table</value>
+                                              </field>
+                                          </language>
+                                      </sheet>
+                                  </data>
+                              </T3FlexForms>
+            # The target of "settings.detailPid" of the hidden profiles on page 207. A
+            # detail element that does not show hidden records answers 404 for them,
+            # so the element that lists them links here instead - the other half of
+            # the "showHiddenRecords" toggle, on the detail plugin. Hidden from the
+            # menus for the reason page 205 is: without a profile it is a 404. The
+            # route enhancers of the site do not name it, a hidden profile has no
+            # speaking URL, so its links keep their query arguments.
+            - self:
+                  id: 209
+                  title: 'Profile detail, hidden profiles'
+                  slug: '/persons/detail-hidden'
+                  nav_hide: 1
+              languageVariants:
+                - self:
+                      id: 709
+                      language: 1
+                      title: 'Profil-Detailansicht, versteckte Profile'
+                      slug: '/personal/detail-versteckt'
+                      nav_hide: 1
+              entities:
+                content:
+                  - self:
+                        id: 65
+                        CType: 'academicpersons_detail'
+                        header: 'Hidden profile'
+                        header_layout: 2
+                        pi_flexform: |-
+                          <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                          <T3FlexForms>
+                              <data>
+                                  <sheet index="sDEF">
+                                      <language index="lDEF">
+                                          <field index="settings.pageTitleFormat">
+                                              <value index="vDEF">%%LAST_NAME%%, %%FIRST_NAME%% %%MIDDLE_NAME%%</value>
+                                          </field>
+                                          <field index="settings.showHiddenRecords">
+                                              <value index="vDEF">1</value>
+                                          </field>
+                                      </language>
+                                  </sheet>
+                              </data>
+                          </T3FlexForms>
+                    languageVariants:
+                      - self:
+                            id: 565
+                            language: 1
+                            CType: 'academicpersons_detail'
+                            header: 'Verstecktes Profil'
+                            header_layout: 2
+                            pi_flexform: |-
+                              <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+                              <T3FlexForms>
+                                  <data>
+                                      <sheet index="sDEF">
+                                          <language index="lDEF">
+                                              <field index="settings.pageTitleFormat">
+                                                  <value index="vDEF">%%LAST_NAME%%, %%FIRST_NAME%% %%MIDDLE_NAME%%</value>
+                                              </field>
+                                              <field index="settings.showHiddenRecords">
+                                                  <value index="vDEF">1</value>
                                               </field>
                                           </language>
                                       </sheet>
@@ -4103,17 +4173,20 @@ entities:
             # The target of "plugin.tx_academicjobs.detailPid". The plugin has no
             # FlexForm; it resolves the job from the route argument, and the route
             # enhancer of "Configuration/Routes/Detail.yaml" resolves that from the
-            # generated "slug" column.
+            # generated "slug" column. Hidden from the menus: without a job it is a
+            # 404, and a menu entry would lead there.
             - self:
                   id: 233
                   title: 'Job detail'
                   slug: '/jobs/detail'
+                  nav_hide: 1
               languageVariants:
                 - self:
                       id: 733
                       language: 1
                       title: 'Stellendetail'
                       slug: '/stellen/detail'
+                      nav_hide: 1
               entities:
                 content:
                   - self:
@@ -4390,14 +4463,14 @@ entities:
                     id: 1
                     label: 'Programming I'
                     credit_points: 6
-                    description: '<p>Imperative programming, data types, control flow.</p>'
+                    description: 'Imperative programming, data types, control flow.'
                     categories: '1'
                 languageVariants:
                   - self:
                         id: 501
                         language: 1
                         label: 'Programmierung I'
-                        description: '<p>Imperative Programmierung, Datentypen, Kontrollfluss.</p>'
+                        description: 'Imperative Programmierung, Datentypen, Kontrollfluss.'
               - self:
                     id: 2
                     label: 'Mathematics I'
@@ -4422,14 +4495,14 @@ entities:
                     id: 4
                     label: 'Programming II'
                     credit_points: 6
-                    description: '<p>Object orientation, testing, refactoring.</p>'
+                    description: 'Object orientation, testing, refactoring.'
                     categories: '1'
                 languageVariants:
                   - self:
                         id: 504
                         language: 1
                         label: 'Programmierung II'
-                        description: '<p>Objektorientierung, Testen, Refactoring.</p>'
+                        description: 'Objektorientierung, Testen, Refactoring.'
               - self:
                     id: 5
                     label: 'Databases'
@@ -4454,14 +4527,14 @@ entities:
                     id: 7
                     label: 'Web engineering'
                     credit_points: 6
-                    description: '<p>HTTP, templating, accessibility.</p>'
+                    description: 'HTTP, templating, accessibility.'
                     categories: '1'
                 languageVariants:
                   - self:
                         id: 507
                         language: 1
                         label: 'Web Engineering'
-                        description: '<p>HTTP, Templating, Barrierefreiheit.</p>'
+                        description: 'HTTP, Templating, Barrierefreiheit.'
               - self:
                     id: 8
                     label: 'Accessibility lab'
@@ -6717,7 +6790,12 @@ entities:
     #
     # "non_exclude_fields" is derived from the TCA rather than typed: the academic
     # extensions mark 105 columns "exclude", and a column that is excluded and not
-    # listed here is invisible in the form with no error anywhere.
+    # listed here is invisible in the form with no error anywhere. Three core
+    # columns join them because the plugins and page types depend on them:
+    # "tt_content:pages" and "tt_content:recursive" are the record storage of
+    # every plugin that reads one (the selected projects plugin cannot select
+    # anything without it), and "pages:doktype" is what turns a page into a
+    # program, project or partner page.
     #
     # "db_mountpoints" names the "/" root, the storage container and the "/legacy/"
     # root. The legacy root is declared in "ScenarioLegacy.yaml" and is named here
@@ -6737,8 +6815,14 @@ entities:
           tables_select: 'pages,tt_content,sys_category,sys_file_reference,tx_academiccontacts4pages_domain_model_contact,tx_academiccontacts4pages_domain_model_role,tx_academicjobs_domain_model_job,tx_academicpartners_domain_model_partnership,tx_academicpartners_domain_model_role,tx_academicpersons_domain_model_address,tx_academicpersons_domain_model_contract,tx_academicpersons_domain_model_email,tx_academicpersons_domain_model_function_type,tx_academicpersons_domain_model_location,tx_academicpersons_domain_model_organisational_unit,tx_academicpersons_domain_model_phone_number,tx_academicpersons_domain_model_profile,tx_academicpersons_domain_model_profile_information,tx_academicstudyplan_domain_model_category,tx_academicstudyplan_domain_model_module,tx_academicstudyplan_domain_model_semester'
           tables_modify: 'pages,tt_content,sys_category,sys_file_reference,tx_academiccontacts4pages_domain_model_contact,tx_academiccontacts4pages_domain_model_role,tx_academicjobs_domain_model_job,tx_academicpartners_domain_model_partnership,tx_academicpartners_domain_model_role,tx_academicpersons_domain_model_address,tx_academicpersons_domain_model_contract,tx_academicpersons_domain_model_email,tx_academicpersons_domain_model_function_type,tx_academicpersons_domain_model_location,tx_academicpersons_domain_model_organisational_unit,tx_academicpersons_domain_model_phone_number,tx_academicpersons_domain_model_profile,tx_academicpersons_domain_model_profile_information,tx_academicstudyplan_domain_model_category,tx_academicstudyplan_domain_model_module,tx_academicstudyplan_domain_model_semester'
           explicit_allowdeny: 'tt_content:CType:academicbitejobs_list,tt_content:CType:academiccontacts4pages_list,tt_content:CType:academicjobs_detail,tt_content:CType:academicjobs_list,tt_content:CType:academicjobs_newjobform,tt_content:CType:academicpartners_list,tt_content:CType:academicpartners_map,tt_content:CType:academicpartners_partnershipslist,tt_content:CType:academicpartners_partnershipsteaser,tt_content:CType:academicpersons_card,tt_content:CType:academicpersons_detail,tt_content:CType:academicpersons_list,tt_content:CType:academicpersons_listanddetail,tt_content:CType:academicpersons_selectedcontracts,tt_content:CType:academicpersons_selectedprofiles,tt_content:CType:academicpersonsedit_profileediting,tt_content:CType:academicprograms_programdetails,tt_content:CType:academicprograms_programfinder,tt_content:CType:academicprograms_programlist,tt_content:CType:academicprojects_projectlist,tt_content:CType:academicprojects_projectlistsingle,tt_content:CType:academic_study_plan'
-          non_exclude_fields: 'pages:link,pages:tx_academiccontacts4pages_contacts,pages:tx_academicpartners_partnerships,pages:tx_academicprojects_budget,pages:tx_academicprojects_end_date,pages:tx_academicprojects_funders,pages:tx_academicprojects_project_title,pages:tx_academicprojects_short_description,pages:tx_academicprojects_start_date,tx_academiccontacts4pages_domain_model_contact:contract,tx_academiccontacts4pages_domain_model_contact:email_address,tx_academiccontacts4pages_domain_model_contact:hidden,tx_academiccontacts4pages_domain_model_contact:page,tx_academiccontacts4pages_domain_model_contact:phone_number,tx_academiccontacts4pages_domain_model_contact:physical_address,tx_academiccontacts4pages_domain_model_contact:sys_language_uid,tx_academiccontacts4pages_domain_model_role:contacts,tx_academiccontacts4pages_domain_model_role:description,tx_academiccontacts4pages_domain_model_role:hidden,tx_academiccontacts4pages_domain_model_role:sys_language_uid,tx_academicjobs_domain_model_job:alumni_recommend,tx_academicjobs_domain_model_job:company_name,tx_academicjobs_domain_model_job:contact_additional_information,tx_academicjobs_domain_model_job:contact_email,tx_academicjobs_domain_model_job:contact_name,tx_academicjobs_domain_model_job:contact_phone,tx_academicjobs_domain_model_job:contractual_relationship,tx_academicjobs_domain_model_job:description,tx_academicjobs_domain_model_job:employment_start_date,tx_academicjobs_domain_model_job:employment_type,tx_academicjobs_domain_model_job:endtime,tx_academicjobs_domain_model_job:hidden,tx_academicjobs_domain_model_job:image,tx_academicjobs_domain_model_job:internationals_welcome,tx_academicjobs_domain_model_job:link,tx_academicjobs_domain_model_job:required_degree,tx_academicjobs_domain_model_job:sector,tx_academicjobs_domain_model_job:slug,tx_academicjobs_domain_model_job:starttime,tx_academicjobs_domain_model_job:sys_language_uid,tx_academicjobs_domain_model_job:title,tx_academicjobs_domain_model_job:type,tx_academicjobs_domain_model_job:work_location,tx_academicpartners_domain_model_partnership:hidden,tx_academicpartners_domain_model_partnership:page,tx_academicpartners_domain_model_partnership:partner,tx_academicpartners_domain_model_partnership:sys_language_uid,tx_academicpartners_domain_model_role:description,tx_academicpartners_domain_model_role:hidden,tx_academicpartners_domain_model_role:partnerships,tx_academicpartners_domain_model_role:sys_language_uid,tx_academicpersons_domain_model_address:hidden,tx_academicpersons_domain_model_address:sys_language_uid,tx_academicpersons_domain_model_contract:email_addresses,tx_academicpersons_domain_model_contract:hidden,tx_academicpersons_domain_model_contract:location,tx_academicpersons_domain_model_contract:office_hours,tx_academicpersons_domain_model_contract:phone_numbers,tx_academicpersons_domain_model_contract:physical_addresses,tx_academicpersons_domain_model_contract:position,tx_academicpersons_domain_model_contract:room,tx_academicpersons_domain_model_contract:sys_language_uid,tx_academicpersons_domain_model_contract:tx_academiccontacts4pages_contacts,tx_academicpersons_domain_model_email:hidden,tx_academicpersons_domain_model_email:sys_language_uid,tx_academicpersons_domain_model_function_type:hidden,tx_academicpersons_domain_model_function_type:sys_language_uid,tx_academicpersons_domain_model_location:hidden,tx_academicpersons_domain_model_location:sys_language_uid,tx_academicpersons_domain_model_organisational_unit:contracts,tx_academicpersons_domain_model_organisational_unit:hidden,tx_academicpersons_domain_model_organisational_unit:sys_language_uid,tx_academicpersons_domain_model_phone_number:hidden,tx_academicpersons_domain_model_phone_number:sys_language_uid,tx_academicpersons_domain_model_profile:contracts,tx_academicpersons_domain_model_profile:cooperation,tx_academicpersons_domain_model_profile:core_competences,tx_academicpersons_domain_model_profile:endtime,tx_academicpersons_domain_model_profile:fe_group,tx_academicpersons_domain_model_profile:frontend_users,tx_academicpersons_domain_model_profile:hidden,tx_academicpersons_domain_model_profile:lectures,tx_academicpersons_domain_model_profile:memberships,tx_academicpersons_domain_model_profile:miscellaneous,tx_academicpersons_domain_model_profile:press_media,tx_academicpersons_domain_model_profile:publications,tx_academicpersons_domain_model_profile:publications_link,tx_academicpersons_domain_model_profile:publications_link_title,tx_academicpersons_domain_model_profile:scientific_research,tx_academicpersons_domain_model_profile:slug,tx_academicpersons_domain_model_profile:starttime,tx_academicpersons_domain_model_profile:supervised_doctoral_thesis,tx_academicpersons_domain_model_profile:supervised_thesis,tx_academicpersons_domain_model_profile:sys_language_uid,tx_academicpersons_domain_model_profile:teaching_area,tx_academicpersons_domain_model_profile:vita,tx_academicpersons_domain_model_profile_information:hidden,tx_academicpersons_domain_model_profile_information:sys_language_uid,tx_academicstudyplan_domain_model_category:hidden,tx_academicstudyplan_domain_model_category:sys_language_uid,tx_academicstudyplan_domain_model_module:hidden,tx_academicstudyplan_domain_model_module:sys_language_uid,tx_academicstudyplan_domain_model_semester:hidden,tx_academicstudyplan_domain_model_semester:sys_language_uid'
-          groupMods: 'web_layout,web_list,web_info,file_filelist'
+          non_exclude_fields: 'pages:doktype,pages:link,pages:tx_academiccontacts4pages_contacts,pages:tx_academicpartners_partnerships,pages:tx_academicprojects_budget,pages:tx_academicprojects_end_date,pages:tx_academicprojects_funders,pages:tx_academicprojects_project_title,pages:tx_academicprojects_short_description,pages:tx_academicprojects_start_date,tt_content:pages,tt_content:recursive,tx_academiccontacts4pages_domain_model_contact:contract,tx_academiccontacts4pages_domain_model_contact:email_address,tx_academiccontacts4pages_domain_model_contact:hidden,tx_academiccontacts4pages_domain_model_contact:page,tx_academiccontacts4pages_domain_model_contact:phone_number,tx_academiccontacts4pages_domain_model_contact:physical_address,tx_academiccontacts4pages_domain_model_contact:sys_language_uid,tx_academiccontacts4pages_domain_model_role:contacts,tx_academiccontacts4pages_domain_model_role:description,tx_academiccontacts4pages_domain_model_role:hidden,tx_academiccontacts4pages_domain_model_role:sys_language_uid,tx_academicjobs_domain_model_job:alumni_recommend,tx_academicjobs_domain_model_job:company_name,tx_academicjobs_domain_model_job:contact_additional_information,tx_academicjobs_domain_model_job:contact_email,tx_academicjobs_domain_model_job:contact_name,tx_academicjobs_domain_model_job:contact_phone,tx_academicjobs_domain_model_job:contractual_relationship,tx_academicjobs_domain_model_job:description,tx_academicjobs_domain_model_job:employment_start_date,tx_academicjobs_domain_model_job:employment_type,tx_academicjobs_domain_model_job:endtime,tx_academicjobs_domain_model_job:hidden,tx_academicjobs_domain_model_job:image,tx_academicjobs_domain_model_job:internationals_welcome,tx_academicjobs_domain_model_job:link,tx_academicjobs_domain_model_job:required_degree,tx_academicjobs_domain_model_job:sector,tx_academicjobs_domain_model_job:slug,tx_academicjobs_domain_model_job:starttime,tx_academicjobs_domain_model_job:sys_language_uid,tx_academicjobs_domain_model_job:title,tx_academicjobs_domain_model_job:type,tx_academicjobs_domain_model_job:work_location,tx_academicpartners_domain_model_partnership:hidden,tx_academicpartners_domain_model_partnership:page,tx_academicpartners_domain_model_partnership:partner,tx_academicpartners_domain_model_partnership:sys_language_uid,tx_academicpartners_domain_model_role:description,tx_academicpartners_domain_model_role:hidden,tx_academicpartners_domain_model_role:partnerships,tx_academicpartners_domain_model_role:sys_language_uid,tx_academicpersons_domain_model_address:hidden,tx_academicpersons_domain_model_address:sys_language_uid,tx_academicpersons_domain_model_contract:email_addresses,tx_academicpersons_domain_model_contract:hidden,tx_academicpersons_domain_model_contract:location,tx_academicpersons_domain_model_contract:office_hours,tx_academicpersons_domain_model_contract:phone_numbers,tx_academicpersons_domain_model_contract:physical_addresses,tx_academicpersons_domain_model_contract:position,tx_academicpersons_domain_model_contract:room,tx_academicpersons_domain_model_contract:sys_language_uid,tx_academicpersons_domain_model_contract:tx_academiccontacts4pages_contacts,tx_academicpersons_domain_model_email:hidden,tx_academicpersons_domain_model_email:sys_language_uid,tx_academicpersons_domain_model_function_type:hidden,tx_academicpersons_domain_model_function_type:sys_language_uid,tx_academicpersons_domain_model_location:hidden,tx_academicpersons_domain_model_location:sys_language_uid,tx_academicpersons_domain_model_organisational_unit:contracts,tx_academicpersons_domain_model_organisational_unit:hidden,tx_academicpersons_domain_model_organisational_unit:sys_language_uid,tx_academicpersons_domain_model_phone_number:hidden,tx_academicpersons_domain_model_phone_number:sys_language_uid,tx_academicpersons_domain_model_profile:contracts,tx_academicpersons_domain_model_profile:cooperation,tx_academicpersons_domain_model_profile:core_competences,tx_academicpersons_domain_model_profile:endtime,tx_academicpersons_domain_model_profile:fe_group,tx_academicpersons_domain_model_profile:frontend_users,tx_academicpersons_domain_model_profile:hidden,tx_academicpersons_domain_model_profile:lectures,tx_academicpersons_domain_model_profile:memberships,tx_academicpersons_domain_model_profile:miscellaneous,tx_academicpersons_domain_model_profile:press_media,tx_academicpersons_domain_model_profile:publications,tx_academicpersons_domain_model_profile:publications_link,tx_academicpersons_domain_model_profile:publications_link_title,tx_academicpersons_domain_model_profile:scientific_research,tx_academicpersons_domain_model_profile:slug,tx_academicpersons_domain_model_profile:starttime,tx_academicpersons_domain_model_profile:supervised_doctoral_thesis,tx_academicpersons_domain_model_profile:supervised_thesis,tx_academicpersons_domain_model_profile:sys_language_uid,tx_academicpersons_domain_model_profile:teaching_area,tx_academicpersons_domain_model_profile:vita,tx_academicpersons_domain_model_profile_information:hidden,tx_academicpersons_domain_model_profile_information:sys_language_uid,tx_academicstudyplan_domain_model_category:hidden,tx_academicstudyplan_domain_model_category:sys_language_uid,tx_academicstudyplan_domain_model_module:hidden,tx_academicstudyplan_domain_model_module:sys_language_uid,tx_academicstudyplan_domain_model_semester:hidden,tx_academicstudyplan_domain_model_semester:sys_language_uid'
+          groupMods: 'web_layout,web_list,web_info,media_management'
+          # Access to the live workspace. "be_groups.workspace_perms" defaults to 0
+          # in the core TCA, and EXT:workspaces, which
+          # "fgtclb/academics-monorepo-shared" requires, sets the default of
+          # "be_users.workspace_perms" to 0 as well. A user without access to any
+          # workspace has no backend at all: NoAccessibleModuleException on login.
+          workspace_perms: 1
 
   beUser:
     - self:
@@ -6748,6 +6832,9 @@ entities:
           email: 'erika.editor@example.org'
           realName: 'Erika Editor'
           admin: 0
+          # "be_users.disable" defaults to 1, so a user written without it exists
+          # and cannot log in.
+          disable: 0
           usergroup: '10'
 
   fileMount:
