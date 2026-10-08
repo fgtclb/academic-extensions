@@ -20,6 +20,10 @@ This branch supports **TYPO3 v12 and v13**.
 - One YAML in `academic_persons` drives field validation for **both** the backend
   FormEngine and the frontend edit form. It ships there, not in
   `academic_persons_edit`, because the TCA needs it.
+- Every action of the frontend profile editor works on records of the logged
+  in user's **own** profiles only. The check runs for every model argument
+  before Extbase maps it, the default language profile decides, and an action
+  taking a plain uid checks it itself.
 - In the frontend edit forms, a `disabled` or `readOnly` property is **never**
   written, whatever the request carries. The shipped `profile` set locks the
   three name fields that way, which is intended and regularly misread.
@@ -58,6 +62,7 @@ This branch supports **TYPO3 v12 and v13**.
 | [Profile view caching](profile-view-caching.md)                 | The cache tags of the persons list and detail plugin, the backend and the Extbase write paths that flush them, and the views without a tag.                         |
 | [Validation settings](validation-settings.md)                   | The one YAML that drives both the backend FormEngine and the frontend edit form, its flags, and how an installation overrides it.                                   |
 | [Form data transformation](form-data-transformation.md)         | How a submitted value reaches the model, why `disabled` wins over everything, and the shipped defaults that surprise people.                                        |
+| [Profile editor access](profile-editor-access.md)               | Which records of the profile editor a user owns, the check before the arguments are mapped, and the actions taking a plain uid.                                     |
 | [Page module category summary](page-module-category-summary.md) | The listener and the shared renderer behind the category table of the page module, the override key, and why the labels come from the registry.                     |
 | [Category type order](category-type-order.md)                   | Where the priority order of category types is decided, why in the registry, and what the flat list and the cache do.                                                |
 | [TypoScript and site sets](typoscript-and-site-sets.md)         | The layout that serves site sets and static templates from one physical copy, hide-by-default, and why v12 only ever sees the static half.                          |
