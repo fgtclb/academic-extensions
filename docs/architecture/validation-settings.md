@@ -63,6 +63,12 @@ The recognised flags, all matched case-insensitively
 Anything else in the list is ignored. There is no `url` flag yet; the source
 carries a `@todo` for it.
 
+`number` belongs on integer columns only. The TCA `number` type it sets stores
+an integer, so the DataHandler casts whatever is entered: a postcode `01067`
+became `1067` and a street number `12a` became `12`. The shipped set listed it
+for both `zip` and `streetNumber` until ACE-841 removed it there. The one
+shipped use left is the `year` of a profile information, an `int` column.
+
 ## Normalisation
 
 The factory turns each flag list into one `Validation` value object:
