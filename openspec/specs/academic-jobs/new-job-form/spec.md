@@ -3,7 +3,8 @@
 ## Purpose
 Defines what the new-job form of `academic_jobs` offers a visitor, how it
 stores the two job flags "internationals welcome" and "recommended by
-alumni", and where an integrator adds a field of their own.
+alumni" and the dates a visitor enters, and where an integrator adds a field
+of their own.
 
 ## Requirements
 
@@ -55,6 +56,28 @@ or mapping error.
   empty
 - **THEN** the form is shown again with the error, and the flag is still
   checked
+
+### Requirement: Dates are stored as whole days
+
+The form SHALL store the day a submitted job is shown from, the field "When",
+at the start of that day and the application deadline at the last second of
+its day, both in the time zone of the server, whatever the time of day of the
+submission. The employment start date SHALL be stored as the chosen day. A date
+left empty SHALL stay empty. This applies to TYPO3 v13 and v14 alike.
+
+#### Scenario: Shown from, deadline and employment start date
+
+- **WHEN** a visitor submits the form with "When" 2027-03-01, the application
+  deadline 2027-03-31 and the employment start date 2027-04-01
+- **THEN** the job is shown from 2027-03-01 00:00:00 and through
+  2027-03-31 23:59:59, in the time zone of the server
+- **AND** its employment start date is 2027-04-01
+
+#### Scenario: No dates
+
+- **WHEN** a visitor submits the form without "When" and an application
+  deadline
+- **THEN** the job is stored without either
 
 ### Requirement: The form has a slot for additional fields
 
