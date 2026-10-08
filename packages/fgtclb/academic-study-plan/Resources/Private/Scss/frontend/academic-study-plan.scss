@@ -41,6 +41,25 @@
         }
     }
 
+    // The control icons, rendered inline by the icon ViewHelper of academic_base
+    // as a span around a span around the svg. The svg files carry a viewBox only
+    // and the core stylesheet that sizes the wrapper exists in the backend alone,
+    // so without these rules every icon is drawn 0 x 0 in the frontend.
+    .icon {
+        display: inline-block;
+        flex-shrink: 0;
+        width: 1.25rem;
+        height: 1.25rem;
+        line-height: 0;
+
+        .icon-markup,
+        svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
     .filter {
         display: flex;
         justify-content: flex-start;
@@ -147,6 +166,8 @@
                     margin-top: 0.5rem;
                     display: flex;
                     justify-content: space-between;
+                    align-items: center;
+                    gap: 0.5rem;
 
                     @media screen and (min-width: 768px) {
                         display: block;
@@ -205,8 +226,14 @@
                             align-items: flex-start;
 
                             button {
+                                flex-shrink: 0;
+                                margin-left: 1rem;
+                                padding: 0.25rem;
                                 background: none;
                                 border: none;
+                                color: inherit;
+                                line-height: 0;
+                                cursor: pointer;
                             }
                         }
 
