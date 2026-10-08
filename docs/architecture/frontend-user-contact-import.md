@@ -324,7 +324,13 @@ all the same.
 
 Page lists are checked before anything is read: a part that is no page uid
 stops the command with exit code 2, because `intExplode()` would silently turn
-`12;13` into `12` and exclude less than was meant.
+`12;13` into `12` and exclude less than was meant. `academic:createprofiles` and
+`academic:updateprofiles` read their page lists the same way since ACE-870,
+through the one stateless `Command\PageListParser` all three commands are
+handed. Before, the two read them with `intExplode()`, ended with exit code 0
+and printed nothing. They now print the number of created profiles, and of
+frontend users whose profiles were updated, and the create command names
+`profile.autoCreateProfiles` when it created nothing while that option is off.
 
 The command never shows a profile again, and nothing records that it hid one
 (ACE-229). A frontend user that is deleted and imported again gets a new uid, so
