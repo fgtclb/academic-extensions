@@ -13,3 +13,7 @@ services:
   # resolves a public service from the container - constructor injection needs it.
   FGTCLB\AcademicContacts4pages\Hook\ContactSortingHook:
     public: true
+
+  # Instantiated by the DataHandler through GeneralUtility::makeInstance() as well.
+  FGTCLB\AcademicContacts4pages\Hook\ContactsRoleLocalizationHook:
+    public: true

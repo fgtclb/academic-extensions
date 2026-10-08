@@ -26,6 +26,13 @@ and v13 alike.
 - **WHEN** an editor saves a contacts role that lists contacts of several pages
 - **THEN** every page still renders its contacts in the order arranged on it
 
+#### Scenario: Localizing a contacts role
+
+- **WHEN** an editor localizes a contacts role, or copies it into a language,
+  and saves the translation
+- **THEN** every page renders exactly the contacts it had, each once, in the
+  order arranged on it
+
 #### Scenario: A contract and a contacts role keep their own arrangements
 
 - **WHEN** an editor rearranges the contacts listed in a contract, and
