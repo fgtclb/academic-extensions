@@ -320,11 +320,14 @@ file. The individual extensions declare only the system extensions they
 themselves use, and adding a system extension for a test only needs it added
 here.
 
-Its `Tests/Unit/` holds three checks that concern all extensions at once: every
+Its `Tests/Unit/` holds six checks that concern all extensions at once: every
 translation, in a template or in PHP, has to name its extension without an
 underscore, every key an `ext_emconf.php` names in `depends`, `suggests` or
-`conflicts` has to name an extension that exists, and the links of every
-manual have to lead to its own package and to this branch. See
+`conflicts` has to name an extension that exists, the links of every manual
+have to lead to its own package and to this branch, the branch alias has to be
+keyed to composer's name of the branch, the files `bin/set-version` writes have
+to be stored in its tools' form, and every upgrade wizard has to have a title
+and a description. See
 [Unit tests](../testing/unit-tests.md#the-ext_emconfphp-dependency-keys).
 
 ## `packages-dev/testing-helper/` — shared test traits

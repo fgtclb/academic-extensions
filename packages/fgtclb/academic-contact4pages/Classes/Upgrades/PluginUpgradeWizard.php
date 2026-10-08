@@ -27,7 +27,8 @@ final class PluginUpgradeWizard implements UpgradeWizardInterface
 
     public function getDescription(): string
     {
-        return '';
+        return 'Renames the content element type "academiccontact4pages_contactslist" to'
+            . ' "academiccontacts4pages_list", the name the page contacts plugin is registered with.';
     }
 
     public function executeUpdate(): bool

@@ -150,7 +150,7 @@ together.
 ## Layout
 
 - `packages/fgtclb/<name>/` — the real extensions (one composer `typo3-cms-extension` each). Edit code here.
-- `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable. Its five unit tests check that every `ext_emconf.php` names its dependencies by extension key, that every translation, in a template or in PHP, names its extension without an underscore, that the edit, repository and extension links of every `Documentation/guides.xml` lead to its own package and branch and that it declares the package's composer name as its interlink shortcode, that every `extra.branch-alias` is keyed to the version name composer gives the branch (`2.x-dev`, `dev-main`, never `dev-2`), and that the files `bin/set-version` writes are stored in its tools' form, so a run with an unchanged version changes nothing: no comment in `ext_emconf.php`, sorted `require`.
+- `packages-dev/monorepo-shared/` — `fgtclb/academics-monorepo-shared`: a meta-package centralizing the TYPO3 core dependency constraints for all extensions, root, and DDEV instances. Change TYPO3 version constraints here, not per-extension where avoidable. Its six unit tests check that every `ext_emconf.php` names its dependencies by extension key, that every upgrade wizard has a title and a description, that every translation, in a template or in PHP, names its extension without an underscore, that the edit, repository and extension links of every `Documentation/guides.xml` lead to its own package and branch and that it declares the package's composer name as its interlink shortcode, that every `extra.branch-alias` is keyed to the version name composer gives the branch (`2.x-dev`, `dev-main`, never `dev-2`), and that the files `bin/set-version` writes are stored in its tools' form, so a run with an unchanged version changes nothing: no comment in `ext_emconf.php`, sorted `require`.
 - `packages-dev/testing-helper/` — `fgtclb/academics-monorepo-testing-helper`: shared functional-test traits. Seven of them; see [Testing helper](docs/testing/testing-helper.md) rather than a list here that goes stale.
 - `packages-dev/dev-site/` — `fgtclb/academics-monorepo-dev-site`, extension key `academics_dev_site`: the seed set `Configuration/DataFactory/academics-instance/` the DDEV instances are built from. Content and instance configuration, not code. Written into an empty instance with `ddev composer instance:seed`, which runs the `data-factory:import` command of `sbuerk/data-factory`. The seed set delivers the instance TypoScript through one root `sys_template` record rather than through site sets, because site sets arrived in TYPO3 v13.1 and this branch also supports v12.
 - `Build/` — test harness, phpunit/phpstan/php-cs-fixer configs, docs build.
@@ -325,11 +325,12 @@ across everything at once (`Build/phpunit/*.xml`) — there is no per-extension
 test config. `packages-dev/` is in the glob for the tests of the development
 seed, of the scripts behind `runTests.sh -j` and of the branch version name
 script, and for the checks that every `ext_emconf.php` names its dependencies
-by extension key, that every translation names its extension without an
-underscore, that the manual links in `guides.xml` lead to the package and its
-interlink shortcode is the composer name, that the branch alias is keyed to
-composer's name of the branch and that the files `bin/set-version` writes are
-in the form it writes them.
+by extension key, that every upgrade wizard has a title and a description,
+that every translation names its extension without an underscore, that the
+manual links in `guides.xml` lead to the package and its interlink shortcode is
+the composer name, that the branch alias is keyed to composer's name of the
+branch and that the files `bin/set-version` writes are in the form it writes
+them.
 
 ## CI (`.github/workflows/`)
 
