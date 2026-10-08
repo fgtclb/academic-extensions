@@ -9,6 +9,11 @@
 </f:comment>
 
 <f:variable name="elementId" value="{objectName}.{element.identifier}"/>
+<f:form.validationResults for="{elementId}" as="fieldValidationResults">
+    <f:if condition="{fieldValidationResults.flattenedErrors}">
+        <f:variable name="fieldAria" value="{invalid: 'true', describedby: '{elementId}-error'}"/>
+    </f:if>
+</f:form.validationResults>
 
 <f:render
     partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
@@ -26,6 +31,8 @@
         value="1"
         disabled="{element.disabled}"
         class="form-check-input"
+        errorClass="is-invalid"
+        aria="{fieldAria}"
     />
 </f:render>
 

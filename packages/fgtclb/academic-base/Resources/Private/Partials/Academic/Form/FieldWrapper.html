@@ -16,7 +16,14 @@
         elementId       The id of the field, "<objectName>.<identifier>".
         class           The class of the wrapping element.
         elementContent  The rendered field.
-        extensionName   The extension whose label "create.<elementId>.label" is shown.
+        extensionName   The extension whose label "create.<elementId>.label" is shown,
+                        and whose labels "create.required" and the error messages of
+                        "Academic/Form/ErrorMessage" are read.
+
+    The field partials mark a field that failed validation with "is-invalid" and point
+    "aria-describedby" to the element "<elementId>-error", which holds its messages. It
+    follows the field as its sibling, so a Bootstrap theme shows it with
+    ".is-invalid ~ .invalid-feedback".
 </f:comment>
 
 <f:variable name="validation" value="{p:validationEnsure(validations: element.validations, identifier: element.identifier)}"/>
@@ -26,11 +33,26 @@
         <label class="form-label" for="{elementId}">
             {f:translate(key:'create.{elementId}.label', extensionName: extensionName)}
             <f:if condition="{validation.required}">
-                <abbr title="required">*</abbr>
+                <abbr title="{f:translate(key: 'create.required', default: 'required', extensionName: extensionName)}">*</abbr>
             </f:if>
         </label>
 
         {elementContent->f:format.raw()}
+
+        <f:if condition="{validationResults.flattenedErrors}">
+            <div id="{elementId}-error" class="invalid-feedback">
+                <f:for each="{validationResults.flattenedErrors}" as="errors">
+                    <f:for each="{errors}" as="error">
+                        <div>
+                            <f:render
+                                partial="Academic/Form/ErrorMessage"
+                                arguments="{error: error, elementId: elementId, extensionName: extensionName}"
+                            />
+                        </div>
+                    </f:for>
+                </f:for>
+            </div>
+        </f:if>
 
         <f:if condition="{element.help}">
             <div class="form-text">{element.help->f:format.raw()}</div>

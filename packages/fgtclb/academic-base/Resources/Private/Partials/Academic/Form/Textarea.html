@@ -10,6 +10,11 @@
 </f:comment>
 
 <f:variable name="elementId" value="{objectName}.{element.identifier}"/>
+<f:form.validationResults for="{elementId}" as="fieldValidationResults">
+    <f:if condition="{fieldValidationResults.flattenedErrors}">
+        <f:variable name="fieldAria" value="{invalid: 'true', describedby: '{elementId}-error'}"/>
+    </f:if>
+</f:form.validationResults>
 
 <f:render
     partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
@@ -20,6 +25,8 @@
         property="{element.identifier}"
         id="{elementId}"
         class="form-control {f:if(condition: element.richtext, then: 'rich-text')}"
+        errorClass="is-invalid"
+        aria="{fieldAria}"
         disabled="{element.disabled}"
         placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: extensionName)}"
         rows="5"

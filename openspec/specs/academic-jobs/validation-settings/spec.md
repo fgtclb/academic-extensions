@@ -115,6 +115,31 @@ left out of the check.
   required
 - **THEN** a job with every other required field filled is created
 
+### Requirement: A rejected field shows its message
+
+When the new-job form is shown again after a refused submission, every refused
+field SHALL be marked as invalid, for sighted visitors and for assistive
+technology, and SHALL be followed by its message in the language of the site
+language. A label an integrator sets for the field and the error SHALL take
+precedence over the shipped one and SHALL be able to name the refused value. A
+field that was accepted SHALL carry no mark and no message. The form SHALL keep
+the values the visitor entered. This SHALL behave the same on TYPO3 v13 and
+v14.
+
+#### Scenario: Invalid e-mail address on a German site language
+
+- **WHEN** a visitor submits a job with `not-an-email` as the contact e-mail on
+  a German site language
+- **THEN** the contact e-mail field is marked invalid and announced as invalid
+- **AND** it is followed by "Bitte geben Sie eine gültige E-Mail-Adresse ein."
+
+#### Scenario: Label of a field and an error naming the value
+
+- **WHEN** an integrator sets the label for the employment start date and the
+  error of a date that cannot be read to `"%s" is no date.`, and a visitor
+  enters `soon`
+- **THEN** the field is followed by `"soon" is no date.`
+
 ### Requirement: The backend record editor applies the same flags
 
 The system SHALL apply the flags of the jobs settings to the backend record

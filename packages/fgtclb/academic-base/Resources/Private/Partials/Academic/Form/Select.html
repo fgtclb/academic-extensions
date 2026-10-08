@@ -11,6 +11,11 @@
 </f:comment>
 
 <f:variable name="elementId" value="{objectName}.{element.identifier}"/>
+<f:form.validationResults for="{elementId}" as="fieldValidationResults">
+    <f:if condition="{fieldValidationResults.flattenedErrors}">
+        <f:variable name="fieldAria" value="{invalid: 'true', describedby: '{elementId}-error'}"/>
+    </f:if>
+</f:form.validationResults>
 
 <f:render
     partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
@@ -21,6 +26,8 @@
         property="{element.identifier}"
         id="{elementId}"
         class="form-select"
+        errorClass="is-invalid"
+        aria="{fieldAria}"
         options="{element.options}"
         optionValueField="{element.optionValueField}"
         optionLabelField="{element.optionLabelField}"

@@ -183,12 +183,16 @@ them.
     *   -   `Checkbox`
         -   A checkbox with the value `1`.
     *   -   `DateTime`
-        -   A date field showing the element's `value` as `d.m.Y`.
+        -   A date field showing the element's `value` as `Y-m-d`, the only
+            format a date input accepts.
     *   -   `Upload`
         -   A file upload.
     *   -   `FieldWrapper`
-        -   The label, the required mark, the validation state and the help
-            text around a field. Every field partial renders it.
+        -   The label, the required mark, the validation state, the messages of
+            a rejected field and the help text around a field. Every field
+            partial renders it.
+    *   -   `ErrorMessage`
+        -   The message of one validation error of a field, see below.
     *   -   `Errors`
         -   One alert above the form when any field failed validation.
 
@@ -217,6 +221,19 @@ A field partial takes these arguments:
 
 `Errors` takes the form object as `object`, and `objectName` and
 `extensionName` for the message `create.<objectName>.incorrectValues`.
+
+A field that failed validation gets the class `is-invalid`, in place of the
+class `f3-form-error` the form field ViewHelpers set by default, and the
+attributes `aria-invalid="true"` and `aria-describedby="<elementId>-error"`.
+`FieldWrapper` renders the messages of the field right after it, in the element
+`<div id="<elementId>-error" class="invalid-feedback">`, one `<div>` per
+message, the sibling a Bootstrap theme shows next to an invalid field. The
+title of the required mark is the label `create.required` of the extension.
+
+`ErrorMessage` shows the first of these that exists, each given the arguments
+of the error, so a label can name the rejected value with `%s`: the label
+`create.<elementId>.error.<code>` for the field and the error code, the label
+`create.error.<code>` for the error code, the message of the validator.
 
 An extension that renders the fields under partial names of its own passes its
 own wrapper name as `fieldWrapperPartial`, so a project that overrides that

@@ -9,13 +9,18 @@
 </f:comment>
 
 <f:variable name="elementId" value="{objectName}.{element.identifier}"/>
+<f:form.validationResults for="{elementId}" as="fieldValidationResults">
+    <f:if condition="{fieldValidationResults.flattenedErrors}">
+        <f:variable name="fieldAria" value="{invalid: 'true', describedby: '{elementId}-error'}"/>
+    </f:if>
+</f:form.validationResults>
 
 <f:render
     partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
     arguments="{element: element, elementId: elementId, class: 'form-upload-wrap', extensionName: extensionName}"
     contentAs="elementContent"
 >
-    <f:form.upload property="{element.identifier}" class="form-control" id="{elementId}"/>
+    <f:form.upload property="{element.identifier}" class="form-control" errorClass="is-invalid" aria="{fieldAria}" id="{elementId}"/>
 </f:render>
 
 </html>
