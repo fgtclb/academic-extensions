@@ -154,16 +154,13 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
     }
 
     /**
-     * The item partial composes the heading from first, middle and last name, so an empty
-     * middle name leaves two spaces in the markup. Matching on `\s+` asserts the rendered
-     * name without depending on that spacing.
+     * The item partial composes the heading from first, middle and last name. None of the
+     * fixture profiles has a middle name, so exactly one space separates the first from the
+     * last name: an empty middle name must not leave a second one behind.
      */
     private function assertRendersProfileName(string $content, string $first, string $last): void
     {
-        $this->assertMatchesRegularExpression(
-            sprintf('#%s\s+%s#u', preg_quote($first, '#'), preg_quote($last, '#')),
-            $content,
-        );
+        $this->assertStringContainsString(sprintf('%s %s', $first, $last), $content);
     }
 
     /**
@@ -252,7 +249,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->setUpTestCase('contactsListPage');
 
         $this->assertMatchesRegularExpression(
-            '#<h3 class="card-title">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h3>#',
+            '#<h3 class="card-title">\s*<a href="[^"]*">Max Müllermann</a>\s*</h3>#',
             $this->renderHomePage(),
         );
     }
@@ -266,7 +263,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertSame([], $this->roleHeadings($content));
         $this->assertStringNotContainsString('academic-contacts4pages__role', $content);
         $this->assertMatchesRegularExpression(
-            '#<h2 class="card-title">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h2>#',
+            '#<h2 class="card-title">\s*<a href="[^"]*">Max Müllermann</a>\s*</h2>#',
             $content,
         );
     }

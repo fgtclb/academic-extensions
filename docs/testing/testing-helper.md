@@ -2,8 +2,8 @@
 
 [`packages-dev/testing-helper/`](../../packages-dev/testing-helper) is the
 composer package `fgtclb/academics-monorepo-testing-helper`. It holds nothing
-but seven PHP traits — the parts of the test setup that were being copied
-between extensions, each one carrying the memory of a defect that made the copy
+but eight PHP traits, the parts of the test setup that were being copied
+between extensions. Each one carries the memory of a defect that made the copy
 necessary.
 
 | Trait                                                                           | Purpose                                                             |
@@ -15,6 +15,7 @@ necessary.
 | [`CategoryFilterFormAssertionTrait`](#categoryfilterformassertiontrait)         | Reads the category filters of a list's filter form, and where.      |
 | [`TcaHelperMethodsTrait`](#tcahelpermethodstrait)                               | Backs up and restores `$GLOBALS['TCA']` *and* the schema factory.   |
 | [`StaticTemplateTypoScriptTrait`](#statictemplatetyposcripttrait)               | Builds the TypoScript a record delivers, and what its form keeps.   |
+| [`LabelReferencesResolveTestsTrait`](#labelreferencesresolveteststrait)         | Asserts every label the TCA and its FlexForms name resolves.        |
 
 ## How an extension gets access
 
@@ -414,6 +415,45 @@ the same classes run inside `FrontendTypoScriptFactory`. Conditions are not
 evaluated; none of the compared trees has one. The form drops a stored value
 that is not among the items of the field, which is what makes an unregistered
 static template disappear on the next save.
+
+## `LabelReferencesResolveTestsTrait`
+
+[`Classes/FunctionalTestCase/LabelReferencesResolveTestsTrait.php`](../../packages-dev/testing-helper/Classes/FunctionalTestCase/LabelReferencesResolveTestsTrait.php)
+
+**What it does.** One test. It collects every `LLL:EXT:` reference in
+`$GLOBALS['TCA']`, a column label as much as an item, a description, a palette
+or a `showitem` override such as `--div--;LLL:…` or `field;LLL:…`, reads every
+FlexForm file a `FILE:EXT:` value names and collects its references too, and
+resolves each one with the `LanguageService` of the default language. A
+reference that resolves to an empty string fails the test, with the place it
+was found first, and so does a FlexForm file that cannot be read.
+
+**When to use it.** Already everywhere: every extension carries a
+`Tests/Functional/Language/LabelReferencesTest.php` whose entire body is
+`use LabelReferencesResolveTestsTrait;`. A new extension gets one as well.
+
+**The trap it exists for.** `LanguageService::sL()` returns an empty string for
+a missing file and for a missing key alike, and the backend then renders a
+field, a tab, an item or a palette without a label, without any message
+(ACE-853). Three ways of getting there were found at once:
+
+- A core key that does not exist, or no longer does: `LGL.l10n_parent` instead
+  of `LGL.l18n_parent`, `sys_language_uid_formlabel` of the frontend extension,
+  and `fe_users.tabs.options`, which TYPO3 v13 removed together with the field
+  it labelled. The test runs on both core versions, against the core that is
+  installed, so a key the other version dropped fails there.
+- A file of an extension that is not a dependency. The test instance loads the
+  extension under test and what it requires, nothing else, so a label read from
+  an extension that merely happens to be installed next to it fails here.
+- A key that was never declared, in the TCA or in a FlexForm file of the
+  running core version.
+
+Only the TCA and the FlexForm files are covered. Labels that templates, page
+TSconfig or the extension configuration template name are not.
+
+The whole TCA is checked, the core's own included. A core label that a patch
+release of TYPO3 breaks therefore turns every `LabelReferencesTest` red at once,
+and the message names the core file, not one of this repository.
 
 ## See also
 
