@@ -15,6 +15,7 @@ mod.wizards.newContentElement.wizardItems.academic {
     academicbitejobs_list {
       iconIdentifier = bitejobs_list
       title = LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.label
+      description = LLL:EXT:academic_bite_jobs/Resources/Private/Language/locallang_be.xlf:plugin.bite.list.description
       tt_content_defValues {
         CType = academicbitejobs_list
       }
