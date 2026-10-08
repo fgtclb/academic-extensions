@@ -65,3 +65,23 @@ v12 and v13 alike.
   link to a page of the site
 - **THEN** the job's entry shows both flag labels without the value `1`, and
   an anchor to the page's URL with the link text and no `t3://` reference
+
+### Requirement: A cached job detail ends with the job
+
+The page cache entry of a page that shows a job in the job detail view SHALL
+end no later than the next start or end time of that job or of a translation
+of it, whether or not the installation enables the automatic frontend cache
+tagging of TYPO3 v13. A job without a start or end time in the future SHALL
+leave the cache lifetime of the page as it is. This applies to TYPO3 v12 and
+v13 alike.
+
+#### Scenario: Job that ends in two hours
+
+- **WHEN** a visitor opens the detail page of a job that ends in two hours
+- **THEN** the page is cached for no longer than two hours
+
+#### Scenario: Job without start and end time
+
+- **WHEN** a visitor opens the detail page of a job without a start or end
+  time
+- **THEN** the page is cached for the lifetime the page has
