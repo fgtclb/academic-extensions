@@ -391,8 +391,9 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertSame(['Study plan B.Sc.'], $this->textsOf($html, '//div[@id="c1"]/header/h2'));
         $this->assertSame(
             [],
-            // The dialogs of the modules carry headers of their own, deeper down.
-            $this->textsOf($html, '//div[contains(@class, "academic-study-plan")]/header'),
+            // The dialogs of the modules carry headers of their own, the ace-header, a header
+            // of the content element would be another one.
+            $this->textsOf($html, '//div[contains(@class, "academic-study-plan")]//header[not(contains(concat(" ", normalize-space(@class), " "), " ace-header "))]'),
         );
     }
 
