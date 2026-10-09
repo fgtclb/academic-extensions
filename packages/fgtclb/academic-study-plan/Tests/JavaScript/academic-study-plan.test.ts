@@ -38,26 +38,41 @@ const SPECIFIER = "@fgtclb/academic-study-plan/frontend/academic-study-plan.js";
 const layoutMarkup = (): string =>
   '<div id="c1" class="frame frame-ruler-before frame-type-academic_study_plan frame-layout-0">' +
   "<header><h2>Study plan B.Sc.</h2></header>" +
-  '<div class="academic-study-plan container" data-study-plan="1" data-filter-label="Filter by category">' +
-  '<nav><ul class="filter" data-study-plan-filter><li hidden data-study-plan-filter-template>' +
-  '<button data-category-id="category-id-placeholder"' +
+  '<div class="academic-study-plan" data-study-plan="1" data-filter-label="Filter by category">' +
+  '<nav class="ace-filter" role="navigation" aria-label="Filter by category">' +
+  '<ul class="ace-list" data-study-plan-filter>' +
+  '<li class="ace-list-item" hidden data-study-plan-filter-template>' +
+  '<button class="ace-control" data-category-id="category-id-placeholder"' +
   ' data-category-color="category-color-placeholder"' +
+  ' aria-label="Filter by category: category-label-placeholder"' +
   ' style="--category-color: category-color-placeholder;">category-label-placeholder</button>' +
   "</li></ul></nav>" +
-  '<ul class="semesters row">' +
-  '<li class="col" data-study-plan-semester>' +
-  '<div class="header" aria-hidden="true" inert data-study-plan-semester-header>First Semester</div>' +
-  "<ul>" +
-  '<li class="module clickable" data-study-plan-module' +
-  " data-categories='[{\"uid\":1,\"label\":\"Mandatory\",\"colour\":\"#cc0000\"}]'>Mathematics I" +
-  '<button class="modal-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-1"></button>' +
-  '<dialog id="popup-1" data-study-plan-dialog><button>Close</button></dialog>' +
+  '<div class="ace-semesters"><div role="list" class="row">' +
+  '<div role="listitem" class="ace-semester col" data-study-plan-semester>' +
+  '<div class="ace-semester-header" aria-hidden="true" inert data-study-plan-semester-header>' +
+  '<div class="ace-semester-content"><div class="ace-semester-heading">' +
+  '<span class="ace-title"><b>First Semester</b></span>' +
+  '</div><span class="ace-actions"></span></div>' +
+  "</div>" +
+  '<ul class="ace-list ace-modules">' +
+  '<li class="ace-list-item ace-module ace-interactive" data-study-plan-module' +
+  " data-categories='[{\"uid\":1,\"label\":\"Mandatory\",\"colour\":\"#cc0000\"}]'>" +
+  '<span class="ace-title">Mathematics I</span>' +
+  '<button class="ace-module-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-1" aria-haspopup="dialog">' +
+  '<span class="visually-hidden">First Semester. Show module details: Mathematics I</span>' +
+  "</button>" +
+  '<dialog id="popup-1" class="ace-dialog" data-study-plan-dialog>' +
+  '<header class="ace-header"><span class="ace-title" aria-hidden="true"><b>Mathematics I</b></span>' +
+  '<button class="ace-close" aria-label="Close"></button></header>' +
+  "</dialog>" +
   "</li>" +
-  '<li class="module" data-study-plan-module' +
-  " data-categories='[{\"uid\":2,\"label\":\"Elective\",\"colour\":\"#0066cc\"}]'>Programming Basics</li>" +
-  "</ul>" +
+  '<li class="ace-list-item ace-module " data-study-plan-module' +
+  " data-categories='[{\"uid\":2,\"label\":\"Elective\",\"colour\":\"#0066cc\"}]'>" +
+  '<span class="ace-title">Programming Basics</span>' +
   "</li>" +
   "</ul>" +
+  "</div>" +
+  "</div></div>" +
   "</div>" +
   "</div>";
 
@@ -137,31 +152,36 @@ const moduleAsTriggerMarkup = (): string =>
  * would break.
  */
 const mixedMarkup = (): string =>
-  '<div class="academic-study-plan container" data-study-plan="5" data-filter-label="Filter by category">' +
-  '<nav><ul class="filter" data-study-plan-filter><li hidden data-study-plan-filter-template>' +
-  '<button data-category-id="category-id-placeholder"' +
+  '<div class="academic-study-plan" data-study-plan="5" data-filter-label="Filter by category">' +
+  '<nav class="ace-filter" role="navigation" aria-label="Filter by category">' +
+  '<ul class="ace-list" data-study-plan-filter>' +
+  '<li class="ace-list-item" hidden data-study-plan-filter-template>' +
+  '<button class="ace-control" data-category-id="category-id-placeholder"' +
   ' data-category-color="category-color-placeholder">category-label-placeholder</button>' +
   "</li></ul></nav>" +
-  '<ul class="semesters row">' +
-  '<li class="col" data-study-plan-semester>' +
-  '<div class="header" aria-hidden="true" inert data-study-plan-semester-header>First Semester</div>' +
-  "<ul>" +
+  '<div class="ace-semesters"><div role="list" class="row">' +
+  '<div role="listitem" class="ace-semester col" data-study-plan-semester>' +
+  '<div class="ace-semester-header" aria-hidden="true" inert data-study-plan-semester-header>' +
+  '<span class="ace-title"><b>First Semester</b></span>' +
+  "</div>" +
+  '<ul class="ace-list ace-modules">' +
   '<section class="course card" data-study-plan-module' +
   " data-categories='[{\"uid\":1,\"label\":\"Mandatory\",\"colour\":\"#cc0000\"}]'>Mathematics I" +
   '<a href="#" class="details" data-study-plan-dialog-trigger data-dialog-id="popup-1"></a>' +
   '<dialog id="popup-1" data-study-plan-dialog><button>Close</button></dialog>' +
   "</section>" +
   "</ul>" +
-  "</li>" +
-  "</ul>" +
+  "</div>" +
+  "</div></div>" +
   "</div>";
 
 /** The filter of a site that switched the collapsible filter on. */
 const collapsibleMarkup = (): string =>
   '<div class="academic-study-plan" data-study-plan="4" data-filter-label="Filter by category">' +
-  '<nav><ul class="filter" data-study-plan-filter data-study-plan-filter-collapsible>' +
-  '<li hidden data-study-plan-filter-template>' +
-  '<button data-category-id="category-id-placeholder"' +
+  '<nav class="ace-filter" role="navigation" aria-label="Filter by category">' +
+  '<ul class="ace-list" data-study-plan-filter data-study-plan-filter-collapsible>' +
+  '<li class="ace-list-item" hidden data-study-plan-filter-template>' +
+  '<button class="ace-control" data-category-id="category-id-placeholder"' +
   ' data-category-color="category-color-placeholder">category-label-placeholder</button>' +
   "</li></ul></nav>" +
   '<div data-study-plan-semester><div data-study-plan-semester-header>First Semester</div>' +
@@ -176,9 +196,11 @@ const collapsibleMarkup = (): string =>
  * the title has to arrive as text and never as markup.
  */
 const hostileCategoryMarkup = (): string =>
-  '<div class="academic-study-plan container" data-study-plan="6">' +
-  '<nav><ul class="filter" data-study-plan-filter><li hidden data-study-plan-filter-template>' +
-  '<button data-category-id="category-id-placeholder"' +
+  '<div class="academic-study-plan" data-study-plan="6">' +
+  '<nav class="ace-filter" role="navigation" aria-label="Filter by category">' +
+  '<ul class="ace-list" data-study-plan-filter>' +
+  '<li class="ace-list-item" hidden data-study-plan-filter-template>' +
+  '<button class="ace-control" data-category-id="category-id-placeholder"' +
   ' data-category-color="category-color-placeholder"' +
   ' aria-label="Filter by category: category-label-placeholder"' +
   ' style="--category-color: category-color-placeholder;">category-label-placeholder</button>' +
@@ -209,9 +231,10 @@ const focusableModuleTriggerMarkup = (): string =>
 /** A collapsible filter on a plan whose modules carry no category at all. */
 const collapsibleWithoutCategoriesMarkup = (): string =>
   '<div class="academic-study-plan" data-study-plan="8" data-filter-label="Filter by category">' +
-  '<nav><ul class="filter" data-study-plan-filter data-study-plan-filter-collapsible>' +
-  '<li hidden data-study-plan-filter-template>' +
-  '<button data-category-id="category-id-placeholder">category-label-placeholder</button>' +
+  '<nav class="ace-filter" role="navigation" aria-label="Filter by category">' +
+  '<ul class="ace-list" data-study-plan-filter data-study-plan-filter-collapsible>' +
+  '<li class="ace-list-item" hidden data-study-plan-filter-template>' +
+  '<button class="ace-control" data-category-id="category-id-placeholder">category-label-placeholder</button>' +
   "</li></ul></nav>" +
   '<div data-study-plan-semester><div data-study-plan-semester-header>First Semester</div>' +
   '<div data-study-plan-module>Mathematics I</div>' +
@@ -320,14 +343,14 @@ describe("the study plan inside the content element layout", () => {
 
     // The filter was rebuilt from the categories the modules carry, which only
     // works when the container was found through the frame wrapper.
-    assert.deepEqual(labelsOf(".filter button"), ["Mandatory", "Elective"]);
+    assert.deepEqual(labelsOf(".ace-filter .ace-control"), ["Mandatory", "Elective"]);
 
     // The item Fluid renders is "hidden", so that its placeholder text is not on
     // screen on a page this module never reaches. The clones built from it are
     // real filter buttons, so the attribute must be gone from every one of them -
     // and so must the attribute that says the item is the template.
     assert.deepEqual(
-      Array.from(document.querySelectorAll<HTMLElement>(".filter li")).map((item) => [
+      Array.from(document.querySelectorAll<HTMLElement>(".ace-filter .ace-list-item")).map((item) => [
         item.hasAttribute("hidden"),
         item.hasAttribute("data-study-plan-filter-template"),
       ]),
@@ -348,26 +371,26 @@ describe("the study plan inside the content element layout", () => {
     // ran and wrote these two attributes. Asserting them rather than the mere
     // presence of the element is what proves the module reached it through the
     // container.
-    const semesterHeader = document.querySelector(".academic-study-plan .header");
+    const semesterHeader = document.querySelector(".academic-study-plan .ace-semester-header");
     assert.ok(semesterHeader !== null, "the semester header is gone");
     assert.equal(semesterHeader.getAttribute("role"), "");
     assert.equal(semesterHeader.getAttribute("tabindex"), "-1");
 
     // Activating a category highlights the modules that carry it, and the
     // column they sit in.
-    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(".filter button"));
+    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(".ace-filter .ace-control"));
     click(buttons[0]);
     await settle();
 
-    assert.deepEqual(highlighted(".module"), [true, false]);
-    assert.ok(document.querySelector(".col")?.classList.contains("highlighted"));
+    assert.deepEqual(highlighted(".ace-module"), [true, false]);
+    assert.ok(document.querySelector(".ace-semester")?.classList.contains("highlighted"));
 
     // The same by keyboard, which is the half of the interaction a pointer
     // test never reaches.
     press(buttons[1], "Enter");
     await settle();
 
-    assert.deepEqual(highlighted(".module"), [false, true]);
+    assert.deepEqual(highlighted(".ace-module"), [false, true]);
   });
 
   it("opens and closes a module dialog, by pointer and by keyboard", async () => {
@@ -377,7 +400,7 @@ describe("the study plan inside the content element layout", () => {
     assert.ok(dialog !== null, "the dialog is gone");
     assert.equal(dialog.open, false);
 
-    click(document.querySelector(".modal-trigger") as HTMLElement);
+    click(document.querySelector(".ace-module-trigger") as HTMLElement);
     await settle();
     assert.equal(dialog.open, true);
     // As a modal, not as an inline panel: a "show()" would leave the rest of the
@@ -391,7 +414,7 @@ describe("the study plan inside the content element layout", () => {
     await settle();
     assert.equal(dialog.open, false);
 
-    press(document.querySelector(".modal-trigger") as HTMLElement, "Enter");
+    press(document.querySelector(".ace-module-trigger") as HTMLElement, "Enter");
     await settle();
     assert.equal(dialog.open, true);
   });
@@ -403,7 +426,7 @@ describe("the study plan inside the content element layout", () => {
     assert.ok(dialog !== null, "the dialog is gone");
     layOut(dialog);
 
-    click(document.querySelector(".modal-trigger") as HTMLElement);
+    click(document.querySelector(".ace-module-trigger") as HTMLElement);
     await settle();
     assert.equal(dialog.open, true);
 
@@ -435,7 +458,7 @@ describe("the study plan inside the content element layout", () => {
     const dialog = document.querySelector<HTMLDialogElement>("#popup-1");
     assert.ok(dialog !== null, "the dialog is gone");
 
-    click(document.querySelector(".modal-trigger") as HTMLElement);
+    click(document.querySelector(".ace-module-trigger") as HTMLElement);
     await settle();
     assert.equal(dialog.open, true);
     const audio = playingAudioIn(dialog);
@@ -454,7 +477,7 @@ describe("the study plan inside the content element layout", () => {
     await withMobileViewport(async () => {
       await start(layoutMarkup());
 
-      const header = document.querySelector<HTMLElement>(".header");
+      const header = document.querySelector<HTMLElement>(".ace-semester-header");
       assert.ok(header !== null, "the semester header is gone");
       // Below the breakpoint the header is the accordion control.
       assert.equal(header.getAttribute("role"), "button");
@@ -465,13 +488,13 @@ describe("the study plan inside the content element layout", () => {
       await settle();
 
       assert.equal(header.getAttribute("aria-expanded"), "true");
-      assert.ok(document.querySelector(".col")?.classList.contains("open"));
+      assert.ok(document.querySelector(".ace-semester")?.classList.contains("open"));
 
       press(header, " ");
       await settle();
 
       assert.equal(header.getAttribute("aria-expanded"), "false");
-      assert.equal(document.querySelector(".col")?.classList.contains("open"), false);
+      assert.equal(document.querySelector(".ace-semester")?.classList.contains("open"), false);
     });
   });
 });
@@ -528,14 +551,14 @@ describe("the markup contract", () => {
     await start(mixedMarkup());
 
     // The filter is upstream markup and was built from the overridden module.
-    assert.deepEqual(labelsOf(".filter button"), ["Mandatory"]);
+    assert.deepEqual(labelsOf(".ace-filter .ace-control"), ["Mandatory"]);
 
-    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(".filter button"));
+    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(".ace-filter .ace-control"));
     click(buttons[0]);
     await settle();
 
     assert.deepEqual(highlighted(".course"), [true]);
-    assert.ok(document.querySelector(".col")?.classList.contains("highlighted"));
+    assert.ok(document.querySelector(".ace-semester")?.classList.contains("highlighted"));
 
     // The trigger of the overridden module is not a button at all, and it opens
     // the dialog the upstream partial would have rendered.
@@ -550,7 +573,7 @@ describe("the markup contract", () => {
   it("renders a category title as text, whatever it contains", async () => {
     await start(hostileCategoryMarkup());
 
-    const button = document.querySelector<HTMLButtonElement>(".filter button");
+    const button = document.querySelector<HTMLButtonElement>(".ace-filter .ace-control");
     assert.ok(button !== null, "the filter was not built");
 
     // The title is the button's text, with its angle brackets intact - and it
@@ -632,7 +655,7 @@ describe("the collapsible filter", () => {
   it("hides the filter behind a toggle and expands it by keyboard", async () => {
     await start(collapsibleMarkup());
 
-    const list = document.querySelector<HTMLElement>(".filter");
+    const list = document.querySelector<HTMLElement>(".ace-filter .ace-list");
     const toggle = document.querySelector<HTMLButtonElement>(".ace-toggle");
     assert.ok(list !== null, "the filter list is gone");
     assert.ok(toggle !== null, "no toggle was inserted");
@@ -646,7 +669,7 @@ describe("the collapsible filter", () => {
     assert.equal(toggle.getAttribute("aria-expanded"), "false");
     assert.equal(list.hidden, true);
     // The filter itself was built either way.
-    assert.deepEqual(labelsOf(".filter button"), ["Mandatory"]);
+    assert.deepEqual(labelsOf(".ace-filter .ace-control"), ["Mandatory"]);
 
     press(toggle, "Enter");
     await settle();
@@ -665,18 +688,18 @@ describe("the collapsible filter", () => {
     await start(collapsibleWithoutCategoriesMarkup());
 
     // The list is empty, so there is nothing a toggle could expand.
-    assert.equal(document.querySelectorAll(".filter button").length, 0);
+    assert.equal(document.querySelectorAll(".ace-filter .ace-control").length, 0);
     assert.equal(document.querySelector(".ace-toggle"), null);
-    assert.equal(document.querySelector<HTMLElement>(".filter")?.hidden, false);
+    assert.equal(document.querySelector<HTMLElement>(".ace-filter .ace-list")?.hidden, false);
   });
 
   it("inserts no toggle for markup that carries no label for it", async () => {
     await start(collapsibleMarkup().replace(' data-filter-label="Filter by category"', ""));
 
     // An unnamed button is worse than the filter everybody can already see.
-    assert.deepEqual(labelsOf(".filter button"), ["Mandatory"]);
+    assert.deepEqual(labelsOf(".ace-filter .ace-control"), ["Mandatory"]);
     assert.equal(document.querySelector(".ace-toggle"), null);
-    assert.equal(document.querySelector<HTMLElement>(".filter")?.hidden, false);
+    assert.equal(document.querySelector<HTMLElement>(".ace-filter .ace-list")?.hidden, false);
   });
 
   it("gives the two filters of one page ids of their own", async () => {
@@ -685,7 +708,7 @@ describe("the collapsible filter", () => {
     // left as it is - which is what an insert-records page produces.
     await start(one + one);
 
-    const lists = Array.from(document.querySelectorAll<HTMLElement>(".filter"));
+    const lists = Array.from(document.querySelectorAll<HTMLElement>(".ace-filter .ace-list"));
     const toggles = Array.from(document.querySelectorAll<HTMLButtonElement>(".ace-toggle"));
     assert.equal(lists.length, 2);
     assert.equal(toggles.length, 2);
@@ -707,6 +730,6 @@ describe("the collapsible filter", () => {
     await start(layoutMarkup());
 
     assert.equal(document.querySelector(".ace-toggle"), null);
-    assert.equal(document.querySelector<HTMLElement>(".filter")?.hidden, false);
+    assert.equal(document.querySelector<HTMLElement>(".ace-filter .ace-list")?.hidden, false);
   });
 });
