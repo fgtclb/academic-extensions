@@ -233,14 +233,21 @@ Verified present on TYPO3 13.4.34 and 14.3.6: the `f:asset.module` ViewHelper,
 A template that registers its assets itself is the reason an installation
 overrides the whole template to restyle one element — and then either loses the
 script or copies it, after which the copy stops following the original. The way
-out is a switch per asset, and it has a shape:
+out is **one switch per extension** for all of its scripts, and it has a shape.
+[Frontend JavaScript loading](../architecture/frontend-javascript-loading.md)
+holds the decision and which extension declares it where:
 
-| Layer                                                       | What it holds                                                              |
-|-------------------------------------------------------------|----------------------------------------------------------------------------|
-| `Configuration/Sets/<Component>/settings.definitions.yaml`  | `plugin.tx_<ext>.assets.js`, `type: bool`, `default: true`                 |
-| `Configuration/TypoScript/<Component>/constants.typoscript` | the same path, `= 1`, for an installation without site sets                |
-| `Configuration/TypoScript/<Component>/setup.typoscript`     | `settings.assets.js = {$plugin.tx_<ext>.assets.js}` on the content object  |
-| the template                                                | `<f:if condition="{settings.assets.js}">` around the `f:asset.module` line |
+| Layer                                                                           | What it holds                                                                            |
+|---------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| `settings.definitions.yaml` of the set the extension declares its settings with | `plugin.tx_<ext>.assets.js`, `type: bool`, `default: true`                               |
+| `constants.typoscript` of the shared or the component block                     | the same path, `= 1`, for an installation without site sets                              |
+| `setup.typoscript` next to it                                                   | `settings.assets.js = {$plugin.tx_<ext>.assets.js}`, on the plugin or the content object |
+| the template                                                                    | `<f:if condition="{settings.assets.js}">` around every `f:asset.module` line             |
+
+The set is the aggregate one for `academic_jobs`, `academic_persons` and
+`academic_programs`, where they declare every setting, and a component set for
+`academic_partners` (the map), `academic_persons_edit` (profile editing) and
+`academic_study_plan` (the content element).
 
 Four things about it are worth knowing before copying it:
 
@@ -276,7 +283,9 @@ guarding it in the template.
 
 `academic_study_plan` is the worked example:
 `Tests/Functional/ContentElement/AcademicStudyPlanSiteSettingsTest.php` covers
-both delivery mechanisms and every switch.
+both delivery mechanisms and every switch. Every other extension that loads a
+script has the same `assets.js` switch, see
+[Frontend JavaScript loading](../architecture/frontend-javascript-loading.md).
 
 ## A module finds its parts by attribute, never by class
 
@@ -631,6 +640,8 @@ in `git status`.
 
 ## See also
 
+- [Frontend JavaScript loading](../architecture/frontend-javascript-loading.md) -
+  the switch every extension that loads a script has.
 - [Development environment](environment.md) — the harness these suites run in.
 - [Quality gates](quality-gates.md) — where they sit among the other gates.
 - [Monorepo layout](monorepo-layout.md) — the packages and their

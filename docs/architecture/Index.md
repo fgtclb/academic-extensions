@@ -120,6 +120,11 @@ describing an intention as if it were the state.
   `academic_base`, and the `@api` tags name the same classes. Everything else
   is not API, `final` or not. The one supported XCLASS is a subclass of a
   domain model, to add fields to it.
+- Every extension that loads a frontend script has **one switch** for it,
+  `plugin.tx_<plugin namespace>.assets.js`, a boolean site setting and a
+  constant of the same path, on by default. It is checked where the script is
+  registered and nowhere else, and switching it off leaves the markup exactly
+  as it is.
 - The profile editor is five custom elements over Fluid's markup, and **none of
   them renders any**: the two whose content comes out of a response clone
   `<template>` prototypes Fluid emitted. They are plain custom elements with
@@ -166,6 +171,7 @@ describing an intention as if it were the state.
 | [Backend select items](backend-select-items.md)                 | What an `itemsProcFunc` handler is handed on each core version, the page TSconfig path of a FlexForm field, the narrowing that drops a relation, and a category tree by site setting and group.              |
 | [Content element rendering](content-element-rendering.md)       | The two rendering shapes, what the `Default` layout renders, who renders a plugin's header, and the `record` variable TYPO3 v14 needs for it.                                                                |
 | [Upgrade checks](upgrade-checks.md)                             | The `academic:upgrade:check` command: the stored configuration it reads, what it compares template overrides with, and which root paths are a project's.                                                     |
+| [Frontend JavaScript loading](frontend-javascript-loading.md)   | The one switch per extension for its frontend scripts: name, default, the set that declares it, where it is checked, what each extension loads, and what a new script has to do.                             |
 | [Hidden records](hidden-records.md)                             | What the plugin option "Show hidden records" needs beyond the query settings on a translated page on v13, and the fetcher that provides it.                                                                  |
 
 ## See also
