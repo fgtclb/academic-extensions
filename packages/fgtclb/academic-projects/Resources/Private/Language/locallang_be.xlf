@@ -108,13 +108,13 @@
         <source>Projects</source>
       </trans-unit>
       <trans-unit id="plugin.project_list.description">
-        <source>List of academic projects with sorting and filtering</source>
+        <source>Lists projects in a tile layout with sorting and filtering</source>
       </trans-unit>
       <trans-unit id="plugin.project_selected.name">
-        <source>Projects (selected)</source>
+        <source>Selected Projects</source>
       </trans-unit>
       <trans-unit id="plugin.project_selected.description">
-        <source>List of selected academic projects with sorting and filtering</source>
+        <source>List of selected academic projects with sorting and filtering options</source>
       </trans-unit>
 
       <!-- Doktype -->

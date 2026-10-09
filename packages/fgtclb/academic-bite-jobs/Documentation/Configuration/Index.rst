@@ -28,7 +28,7 @@ aggregate set that depends on it.
     *   -   Set
         -   Delivers
     *   -   `fgtclb/academic-bite-jobs-list`
-        -   The :guilabel:`Job list` content element: its TypoScript
+        -   The :guilabel:`Job List b-ite` content element: its TypoScript
             (`plugin.tx_academicbitejobs`) and the page TSconfig that makes the
             content element selectable in the backend.
     *   -   `fgtclb/academic-bite-jobs`
@@ -46,9 +46,9 @@ The content element is hidden by default
 
 :guilabel:`EXT:academic_bite_jobs` hides its content element for the whole
 installation and brings it back per component. Whichever of the two mechanisms
-below you use, it is what makes :guilabel:`Job list` selectable in the backend
-again — without one of them the content element is not offered, and existing
-records keep rendering.
+below you use, it is what makes :guilabel:`Job List b-ite` selectable in the
+backend again — without one of them the content element is not offered, and
+existing records keep rendering.
 
 ..  _site-set:
 
@@ -102,7 +102,7 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
     *   -   Entry
         -   Delivers
     *   -   :guilabel:`Academic Bite Jobs: Job list (academic_bite_jobs)`
-        -   The TypoScript of the :guilabel:`Job list` content element.
+        -   The TypoScript of the :guilabel:`Job List b-ite` content element.
     *   -   :guilabel:`Academic Bite Jobs: All components (academic_bite_jobs)`
         -   Every component this extension ships, in one entry.
     *   -   :guilabel:`Academic Bite Jobs: Path up to 2.3 (deprecated, use All
@@ -125,7 +125,7 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
     *   -   Entry
         -   Delivers
     *   -   :guilabel:`Academic Bite Jobs: Job list (academic_bite_jobs)`
-        -   Makes the :guilabel:`Job list` content element selectable, and
+        -   Makes the :guilabel:`Job List b-ite` content element selectable, and
             configures its entry in the new content element wizard.
     *   -   :guilabel:`Academic Bite Jobs: All components (academic_bite_jobs)`
         -   Every component this extension ships, in one entry.

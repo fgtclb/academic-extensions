@@ -12,12 +12,12 @@
 
       <!-- Content Element -->
       <trans-unit id="tt_content.CType.academic_study_plan.title">
-        <source>Academic Study Plan</source>
-        <target>Akademischer Studienplan</target>
+        <source>Study Plan</source>
+        <target>Studienplan</target>
       </trans-unit>
       <trans-unit id="tt_content.CType.academic_study_plan.description">
-        <source>Display academic study plans with semesters and modules</source>
-        <target>Akademische Studienpläne mit Semestern und Modulen anzeigen</target>
+        <source>Study and teaching plans with modules, groupings and semesters</source>
+        <target>Studien- und Lehrpläne mit Modulen, Gruppierungen und Semester</target>
       </trans-unit>
       <trans-unit id="tt_content.footer_note">
         <source>Footer Note</source>

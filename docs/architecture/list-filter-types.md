@@ -18,7 +18,7 @@ the rules that are easy to get wrong.
 | Level               | Where it is set                                                                                                 |
 |---------------------|-----------------------------------------------------------------------------------------------------------------|
 | The site            | Constant or site setting `plugin.tx_academic<partners\|projects\|programs>.filter.categoryTypes`                |
-| One content element | FlexForm field `settings.filter.categoryTypes` of the `Program List` or `Program Finder` element, programs only |
+| One content element | FlexForm field `settings.filter.categoryTypes` of the `Course List` or `Course Finder` element, programs only   |
 
 The constant is mapped to `settings.filter.categoryTypes` in `setup.typoscript`,
 and Extbase merges the FlexForm over it. An element that leaves its field empty
@@ -157,7 +157,7 @@ Until then the resolver ignores it.
 
 ## The program finder
 
-The `Program Finder` element of `academic_programs` renders the same selects as
+The `Course Finder` element of `academic_programs` renders the same selects as
 a form of its own, one per filter type, and posts them to the list plugin of
 another page, see [List filter URLs](list-filter-urls.md#which-plugins). It
 reads the same key at both levels, through the same

@@ -10,10 +10,10 @@
     <header/>
     <body>
       <trans-unit id="plugin.bite.list.label">
-        <source>Bite Jobs List</source>
+        <source>Job List b-ite</source>
       </trans-unit>
       <trans-unit id="plugin.bite.list.description">
-        <source>Lists the job postings of a b-ite job listing</source>
+        <source>List of job vacancies from b-ite. Displayed as tiles, a list or a table.</source>
       </trans-unit>
 
       <trans-unit id="plugin.bite.list.configuration">

@@ -1,8 +1,8 @@
 # academic-persons/profile-detail Specification
 
 ## Purpose
-Defines how the detail view of the "Persons Detail" and "Persons List and
-Detail" content elements answers a visitor who asks for a profile it cannot
+Defines how the detail view of the "Person Details" and "Person List and
+Details" content elements answers a visitor who asks for a profile it cannot
 show.
 
 ## Requirements

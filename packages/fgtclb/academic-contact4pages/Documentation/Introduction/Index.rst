@@ -47,7 +47,7 @@ Frontend output
 ---------------
 
 The contacts of a page are rendered either with the content element
-:guilabel:`Contacts for this page`, which can be placed anywhere on the page,
+:guilabel:`Person’s Contacts on the Page`, which can be placed anywhere on the page,
 or directly in a page template through the data processor
 `academic-page-contacts`, which adds the contacts, their roles and the contacts
 without a role to the page rendering, see :ref:`configuration-page-contacts`.

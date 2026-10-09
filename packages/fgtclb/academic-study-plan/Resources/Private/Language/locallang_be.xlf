@@ -11,10 +11,10 @@
 
       <!-- Content Element -->
       <trans-unit id="tt_content.CType.academic_study_plan.title">
-        <source>Academic Study Plan</source>
+        <source>Study Plan</source>
       </trans-unit>
       <trans-unit id="tt_content.CType.academic_study_plan.description">
-        <source>Display academic study plans with semesters and modules</source>
+        <source>Study and teaching plans with modules, groupings and semesters</source>
       </trans-unit>
       <trans-unit id="tt_content.footer_note">
         <source>Footer Note</source>

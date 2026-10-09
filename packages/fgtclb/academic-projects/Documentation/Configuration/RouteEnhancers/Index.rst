@@ -6,7 +6,7 @@ Route enhancers
 ===============
 
 This extension ships route enhancers for the :guilabel:`Projects` and the
-:guilabel:`Projects (selected)` content elements in
+:guilabel:`Selected Projects` content elements in
 :file:`Configuration/Routes/List.yaml`. They turn the category filter, the
 active state and the sorting of a list into path segments in the language of
 the site:

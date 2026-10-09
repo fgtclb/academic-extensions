@@ -36,7 +36,7 @@ the backend offers, not how much TypoScript is loaded.
     *   -   `fgtclb/academic-projects-project-list`
         -   The :guilabel:`Projects` content element.
     *   -   `fgtclb/academic-projects-project-list-single`
-        -   The :guilabel:`Projects (selected)` content element.
+        -   The :guilabel:`Selected Projects` content element.
     *   -   `fgtclb/academic-projects`
         -   Everything above. This is the set to use unless you deliberately
             want a subset, and it is the name this extension published before
@@ -293,7 +293,7 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
     *   -   :guilabel:`Academic Projects: Projects (academic_projects)`
         -   The TypoScript of the :guilabel:`Projects` content element.
     *   -   :guilabel:`Academic Projects: Projects (selected) (academic_projects)`
-        -   The same for :guilabel:`Projects (selected)`.
+        -   The same for :guilabel:`Selected Projects`.
     *   -   :guilabel:`Academic Projects: All components (academic_projects)`
         -   Every component this extension ships, in one entry.
     *   -   :guilabel:`Academic Projects: Shared plugin settings and page
@@ -321,7 +321,7 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
         -   Makes the :guilabel:`Projects` content element selectable, and
             configures its entry in the new content element wizard.
     *   -   :guilabel:`Academic Projects: Projects (selected) (academic_projects)`
-        -   The same for :guilabel:`Projects (selected)`.
+        -   The same for :guilabel:`Selected Projects`.
     *   -   :guilabel:`Academic Projects: All components (academic_projects)`
         -   Every component this extension ships, in one entry.
 
@@ -332,10 +332,10 @@ The setting is inherited by every page below the one it is set on.
 The category filters
 ====================
 
-The filter form of the :guilabel:`Projects` and the :guilabel:`Projects
-(selected)` content elements offers one select per category type of the group
-`projects`. Three settings change which of them it offers and how, for the whole
-site:
+The filter form of the :guilabel:`Projects` and the
+:guilabel:`Selected Projects` content elements offers one select per category
+type of the group `projects`. Three settings change which of them it offers and
+how, for the whole site:
 
 ..  list-table::
     :header-rows: 1
@@ -433,9 +433,9 @@ pass :html:`filterTypes` on in a template that renders the partial.
 Active filters, reset link and result count
 ===========================================
 
-Three switches add to the filter form of the
-:guilabel:`Projects` and :guilabel:`Projects (selected)` content elements, for the whole site. All
-three are off by default.
+Three switches add to the filter form of the :guilabel:`Projects` and
+:guilabel:`Selected Projects` content elements, for the whole site. All three
+are off by default.
 
 ..  list-table::
     :header-rows: 1
@@ -521,7 +521,7 @@ The state on the project cards
 ------------------------------
 
 The option :guilabel:`Show active state badge` of the :guilabel:`Projects` and
-the :guilabel:`Projects (selected)` content elements shows the state on every
+the :guilabel:`Selected Projects` content elements shows the state on every
 project card, with the labels :xml:`activeState.active` and
 :xml:`activeState.completed` of this extension. It is off by default, and a
 content element saved before the option existed stays without the badge.
@@ -611,7 +611,7 @@ The header of the content elements
 ==================================
 
 The header and the subheader an editor enters on a :guilabel:`Projects` or
-:guilabel:`Projects (selected)` content element are rendered by the content
+:guilabel:`Selected Projects` content element are rendered by the content
 element layout of the site, as for any other content element. The layouts of
 :guilabel:`EXT:fluid_styled_content` and of the bootstrap package do that, and
 the plugins render no header of their own.

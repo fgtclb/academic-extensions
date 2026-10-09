@@ -11,12 +11,12 @@
     <header/>
     <body>
       <trans-unit id="plugin.contacts_list.title">
-        <source>Contacts for this Page</source>
-        <target>Kontakte für diese Seite</target>
+        <source>Person’s Contacts on the Page</source>
+        <target>Personen Kontakte der Seite</target>
       </trans-unit>
       <trans-unit id="plugin.contacts_list.description">
-        <source>List the contacts assigned to this page</source>
-        <target>Liste der Kontakte, die dieser Seite zugeordnet sind</target>
+        <source>List of contacts linked to a page</source>
+        <target>Liste der Kontakte, die mit einer Seite verknüpft sind</target>
       </trans-unit>
       <trans-unit id="element.tab.configuration">
         <source>Configuration</source>

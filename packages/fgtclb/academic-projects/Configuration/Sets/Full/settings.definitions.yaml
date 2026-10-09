@@ -8,7 +8,7 @@
 # what the integrator configured, silently.
 #
 # Declared with the aggregate set rather than with a component set: both content
-# elements, "Projects" and "Projects (selected)", render the filter and the
+# elements, "Projects" and "Selected Projects", render the filter and the
 # header, every component delivers the page type, and a set can only declare
 # settings next to its own "config.yaml". A site that depends on a component set
 # alone still gets the defaults of the constants, but the site settings editor

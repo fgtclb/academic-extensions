@@ -11,12 +11,12 @@
     <header/>
     <body>
       <trans-unit id="plugin.bite.list.label">
-        <source>Bite Jobs List</source>
-        <target>Bite Jobs Liste</target>
+        <source>Job List b-ite</source>
+        <target>Job Liste b-ite</target>
       </trans-unit>
       <trans-unit id="plugin.bite.list.description">
-        <source>Lists the job postings of a b-ite job listing</source>
-        <target>Listet die Stellenangebote einer b-ite-Stellenliste</target>
+        <source>List of job vacancies from b-ite. Displayed as tiles, a list or a table.</source>
+        <target>Liste von Job Angeboten aus b-ite. Darstellung als Kachel, Liste oder Tabelle.</target>
       </trans-unit>
 
       <trans-unit id="plugin.bite.list.configuration">

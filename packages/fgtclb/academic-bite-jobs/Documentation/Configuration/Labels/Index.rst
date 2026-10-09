@@ -33,7 +33,7 @@ under its language key, :typoscript:`de` for German.
 
     *   - Content element
         - Path
-    *   - :guilabel:`b-ite job list` (:typoscript:`academicbitejobs_list`)
+    *   - :guilabel:`Job List b-ite` (:typoscript:`academicbitejobs_list`)
         - :typoscript:`plugin.tx_academicbitejobs_list._LOCAL_LANG`
 
 A language file override works as well, and replaces the label of the file

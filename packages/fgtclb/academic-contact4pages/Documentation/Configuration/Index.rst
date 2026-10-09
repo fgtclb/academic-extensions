@@ -28,7 +28,7 @@ aggregate set that depends on it.
     *   -   Set
         -   Delivers
     *   -   `fgtclb/academic-contacts4pages-list`
-        -   The :guilabel:`Contact list` content element: its TypoScript
+        -   The :guilabel:`Person’s Contacts on the Page` content element: its TypoScript
             (`plugin.tx_academiccontacts4pages`), the data processor that
             assigns the contacts of a page to the page template, and the page
             TSconfig that makes the content element selectable in the backend.
@@ -74,9 +74,9 @@ The content element is hidden by default
 
 :guilabel:`EXT:academic_contacts4pages` hides its content element for the whole
 installation and brings it back per component. Whichever of the two mechanisms
-below you use, it is what makes :guilabel:`Contact list` selectable in the
-backend again — without one of them the content element is not offered, and
-existing records keep rendering.
+below you use, it is what makes :guilabel:`Person’s Contacts on the Page`
+selectable in the backend again — without one of them the content element is
+not offered, and existing records keep rendering.
 
 ..  _site-set:
 
@@ -130,7 +130,7 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
     *   -   Entry
         -   Delivers
     *   -   :guilabel:`Academic Contacts4Pages: Contact list (academic_contacts4pages)`
-        -   The TypoScript of the :guilabel:`Contact list` content element.
+        -   The TypoScript of the :guilabel:`Person’s Contacts on the Page` content element.
     *   -   :guilabel:`Academic Contacts4Pages: All components (academic_contacts4pages)`
         -   Every component this extension ships, in one entry.
     *   -   :guilabel:`Academic Contacts4Pages: Path up to 2.3 (deprecated, use All
@@ -154,7 +154,7 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
     *   -   Entry
         -   Delivers
     *   -   :guilabel:`Academic Contacts4Pages: Contact list (academic_contacts4pages)`
-        -   Makes the :guilabel:`Contact list` content element selectable, and
+        -   Makes the :guilabel:`Person’s Contacts on the Page` content element selectable, and
             configures its entry in the new content element wizard.
     *   -   :guilabel:`Academic Contacts4Pages: All components (academic_contacts4pages)`
         -   Every component this extension ships, in one entry.
@@ -389,11 +389,11 @@ identifier existed.
 The header of the content elements
 ==================================
 
-The header and the subheader an editor enters on a :guilabel:`Contacts for this
-page` content element are rendered by the content element layout of the site, as
-for any other content element. The layouts of
-:guilabel:`EXT:fluid_styled_content` and of the bootstrap package do that, and
-the plugins render no header of their own.
+The header and the subheader an editor enters on a
+:guilabel:`Person’s Contacts on the Page` content element are rendered by the
+content element layout of the site, as for any other content element. The
+layouts of :guilabel:`EXT:fluid_styled_content` and of the bootstrap package do
+that, and the plugins render no header of their own.
 
 A site whose content element layout renders no header, because its element
 templates render it instead, lets the plugins render it:
