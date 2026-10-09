@@ -153,7 +153,8 @@ Style the element
 
 The extension ships no stylesheet. The content element renders the classes and
 data attributes :ref:`Templates <templates>` documents, and the stylesheet of
-the site package styles them.
+the site package styles them. How the markup is built up, class by class, is
+described in :ref:`Styling <styling-markup>`.
 
 The mono repository the extension is developed in carries an example to start
 from, the stylesheet of its development instances:

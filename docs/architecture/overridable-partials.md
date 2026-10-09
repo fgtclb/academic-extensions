@@ -186,3 +186,7 @@ and that second registration gets a test of its own in that extension.
   plugin's output.
 - [Fixture extensions](../testing/fixture-extensions.md) — how an override
   fixture is wired.
+- [Styling](../../packages/fgtclb/academic-base/Documentation/Styling/Index.rst)
+  in the manual of `academic_base`: the class system of the frontend markup
+  for integrators, with a chapter of the same name in the manual of every
+  extension that renders frontend markup.

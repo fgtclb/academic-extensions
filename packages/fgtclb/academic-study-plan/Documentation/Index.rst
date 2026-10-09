@@ -60,6 +60,11 @@ modules, and categorization features.
         The partials of the content element and the data attributes its script
         drives, for an installation that renders its own markup.
 
+    ..  card:: :ref:`Styling <styling-markup>`
+
+        The classes of the study plan, the classes its script writes, and how a
+        site package styles them.
+
     ..  card:: :ref:`Frequently Asked Questions (FAQ) <faq>`
 
         These questions have been frequently asked.
@@ -86,6 +91,7 @@ modules, and categorization features.
     Installation/Index
     Configuration/Index
     Templates/Index
+    Styling/Index
     Faq/Index
     GetHelp/Index
     KnownProblems/Index

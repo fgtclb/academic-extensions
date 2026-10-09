@@ -64,6 +64,11 @@ extensions.
         The responsive image partial the academic extensions render their
         images through, and how a project overrides it.
 
+    ..  card:: :ref:`Styling <styling>`
+
+        The class system of the frontend markup of every academic extension,
+        and how a site package styles it.
+
     ..  card:: :ref:`Integration <integration>`
 
         The new content element wizard, EXT:solr and permission sets with
@@ -98,6 +103,7 @@ extensions.
     Configuration/Index
     Icons/Index
     Templates/Index
+    Styling/Index
     Integration/Index
     UpgradeCheck/Index
     Developers/Index
