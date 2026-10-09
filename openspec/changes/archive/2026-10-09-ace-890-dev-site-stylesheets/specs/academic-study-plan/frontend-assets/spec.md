@@ -1,10 +1,4 @@
-# academic-study-plan/frontend-assets Specification
-
-## Purpose
-Defines which script the study plan content element brings to a page, how an
-integrator switches it off, and that the element brings no stylesheet.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: The element brings its assets by default
 A page that carries a study plan element SHALL load the element's script when
@@ -27,32 +21,6 @@ any configuration. A page without the element SHALL NOT load the script.
 - **THEN** the page loads the study plan script and no stylesheet of the
   element, as without the setting
 
-### Requirement: The script can be switched off
-When the integrator switches the script off, a page carrying the element
-SHALL NOT load the study plan script and SHALL still render the element's
-markup.
-
-#### Scenario: Script switched off in the site settings
-- **WHEN** the site setting for the script is off
-- **THEN** the page contains the study plan markup but does not load the
-  script
-
-### Requirement: The filter shows nothing until a script builds it
-The filter list item the element renders is a template rather than a control,
-so a page on which no script runs SHALL show no filter button at all. This
-holds whether the script was switched off, failed to load or was never
-shipped, and it does not depend on the stylesheet.
-
-#### Scenario: No script runs on the page
-- **WHEN** a page carries the element and no script runs on it
-- **THEN** the page shows no filter button, and in particular none carrying
-  the placeholder text of the template item
-
-#### Scenario: The shipped script runs
-- **WHEN** a page carries the element and the shipped script runs
-- **THEN** the page shows one filter button per category its modules carry,
-  all of them visible
-
 ### Requirement: The switch works without site sets
 An installation that includes the static template instead of the site set
 SHALL be able to switch off the script through the TypoScript constant of the
@@ -68,3 +36,17 @@ either way.
 - **WHEN** a site includes the static template and configures nothing
 - **THEN** the page loads the study plan script and no stylesheet of the
   element
+
+## RENAMED Requirements
+
+- FROM: `### Requirement: The switches work without site sets`
+- TO: `### Requirement: The switch works without site sets`
+
+## REMOVED Requirements
+
+### Requirement: The stylesheet can be switched off
+**Reason**: The element ships no stylesheet any more, so there is nothing to
+switch off. The site styles the element.
+**Migration**: Remove the site setting or the TypoScript constant of the
+stylesheet and style the element in the site package, starting from the
+stylesheet of the development instances.
