@@ -37,7 +37,7 @@
     </f:if>
 
     <f:if condition="{project.budget}">
-        <li class="ace-attribute">
+        <li class="ace-list-item ace-attribute">
             <b class="ace-label">{f:translate(key: 'project.budget', extensionName: 'AcademicProjects')}:</b>
 
             <span class="ace-value">{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</span>
@@ -45,7 +45,7 @@
     </f:if>
 
     <f:if condition="{project.funders}">
-        <li class="ace-attribute">
+        <li class="ace-list-item ace-attribute">
             <b class="ace-label">{f:translate(key: 'project.funders', extensionName: 'AcademicProjects')}:</b>
 
             <div class="ace-value ce-bodytext">

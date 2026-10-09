@@ -266,6 +266,36 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
     }
 
     /**
+     * Runtime, budget and funders are the attributes of one list, each an item with the
+     * classes the attributes of every other template carry.
+     */
+    #[Test]
+    public function projectPageRendersEveryFactAsAnItemOfItsAttributes(): void
+    {
+        $this->setUpTestCase();
+        $this->getConnectionPool()->getConnectionForTable('pages')->update(
+            'pages',
+            ['tx_academicprojects_start_date' => 1704067200, 'tx_academicprojects_budget' => '150000.00'],
+            ['uid' => 10],
+        );
+
+        $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/quantum-optics'));
+        $facts = [];
+        foreach ($this->nodesMatching($xpath, '//ul[li/b[normalize-space() = "Funders:"]]/li') as $fact) {
+            $this->assertInstanceOf(\DOMElement::class, $fact);
+            $facts[trim((string)$this->nodesMatching($xpath, './b', $fact)->item(0)?->textContent)] = $fact->getAttribute('class');
+        }
+        $this->assertSame(
+            [
+                'Runtime:' => 'ace-list-item ace-attribute',
+                'Budget:' => 'ace-list-item ace-attribute',
+                'Funders:' => 'ace-list-item ace-attribute',
+            ],
+            $facts,
+        );
+    }
+
+    /**
      * TYPO3 defines "lib.parseFunc_RTE" for every site in the default TypoScript of
      * EXT:frontend, so the links resolve without fluid_styled_content and without any
      * TypoScript of the site's own.
