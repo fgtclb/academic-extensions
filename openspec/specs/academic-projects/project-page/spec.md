@@ -139,9 +139,11 @@ when it declares one, its icon otherwise, and a drawing a site package
 registers for that type in its frontend icons
 (`Configuration/FrontendIcons.php`) in place of either. The backend SHALL keep
 showing the declared icon of the type. The icon SHALL keep the wrapper markup
-it had before, with the identifier `category_types.projects.<type>`. No icon
-of the extension changes its registration. This SHALL hold on TYPO3 v13 and
-v14.
+it had before, with the identifier `category_types.projects.<type>`. The
+shipped type icons SHALL be drawn in the colour of the surrounding text, and
+the cooperation and the project department SHALL show the drawings the
+academic base extension ships for a partnership and for a department. This
+SHALL hold on TYPO3 v13 and v14.
 
 #### Scenario: A type with a frontend icon of its own
 - **WHEN** a site package declares a type of the group `projects` with an icon
@@ -154,7 +156,7 @@ v14.
 - **WHEN** a project carries a category of the shipped type `cooperation` and
   no site package replaces its icon
 - **THEN** the project page and the project card show the icon the extension
-  declares for the cooperation
+  declares for the cooperation, the shared partnership drawing
 
 #### Scenario: A site package replaces a shipped type icon for the frontend
 - **WHEN** a site package registers its own drawing for

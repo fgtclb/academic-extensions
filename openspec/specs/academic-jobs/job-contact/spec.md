@@ -37,23 +37,27 @@ The job detail view MUST show the phone icon shipped with the extension in
 front of the contact phone number, and the e-mail icon shipped with the
 extension in front of the contact e-mail address, on an installation that
 registers no icons of its own. It MUST NOT show TYPO3's "icon not found"
-placeholder in the contact block. The two icons SHALL be shown at the size of
-the property icons of the same detail view, with the same markup as before
-this change. The two icons SHALL come from the frontend icon registration,
-under the identifiers `academic_jobs-contactPhone` and
-`academic_jobs-contactEmail`. An integrator SHALL be able to replace either
-icon by registering their own file under its identifier in the frontend icon
-registration of their site package. A registration of the same identifier in
-the backend icon registration SHALL NOT change what the contact block
-renders. This applies on TYPO3 v13 and v14 alike.
+placeholder in the contact block. The two icons SHALL be the shared Font
+Awesome Free phone and e-mail glyphs of the base extension, inlined into the
+page and drawn in the colour of the surrounding text, and SHALL be shown at
+the size of the property icons of the same detail view, with the same markup.
+The two icons SHALL come from the frontend icon registration, under the
+identifiers `tx-academicjobs-info-contact-phone` and
+`tx-academicjobs-info-contact-email`. An integrator SHALL be able to replace
+either icon by registering their own file under its identifier in the
+frontend icon registration of their site package. A registration of the same
+identifier in the backend icon registration SHALL NOT change what the contact
+block renders. This applies on TYPO3 v13 and v14 alike.
 
 #### Scenario: Job with a contact phone number and e-mail address
 
 - **WHEN** a visitor opens the detail view of a job with the contact phone
   number `+49 89 1234` and the contact e-mail address `ada@example.org` on an
   installation without icons of its own
-- **THEN** the phone row shows the shipped phone icon
-- **AND** the e-mail row shows the shipped e-mail icon
+- **THEN** the phone row shows the shipped phone glyph, inlined in the colour
+  of the text
+- **AND** the e-mail row shows the shipped e-mail glyph, inlined in the colour
+  of the text
 - **AND** the contact block shows no "icon not found" placeholder
 
 #### Scenario: Job with a contact e-mail address only
@@ -72,18 +76,18 @@ renders. This applies on TYPO3 v13 and v14 alike.
 #### Scenario: A site package replaces the phone icon
 
 - **WHEN** a site package that depends on the extension registers its own file
-  under `academic_jobs-contactPhone` in its frontend icon registration
+  under `tx-academicjobs-info-contact-phone` in its frontend icon registration
 - **THEN** the phone row of the contact block shows that file
-- **AND** the e-mail row still shows the shipped e-mail icon
+- **AND** the e-mail row still shows the shipped e-mail glyph
 
 #### Scenario: A replacement in the backend registration
 
 - **WHEN** a site package registers its own file for
-  `academic_jobs-contactEmail` in its backend icon registration only
-- **THEN** the e-mail row shows the icon the extension ships
+  `tx-academicjobs-info-contact-email` in its backend icon registration only
+- **THEN** the e-mail row shows the glyph the extension ships
 
 #### Scenario: An override still asks the backend registry
 
 - **WHEN** a template override of the contact block renders
-  `academic_jobs-contactPhone` through the backend icon registry
+  `tx-academicjobs-info-contact-phone` through the backend icon registry
 - **THEN** it shows the "icon not found" placeholder
