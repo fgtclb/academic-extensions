@@ -44,7 +44,7 @@ Impact
 
     <div id="c1" class="frame frame-default frame-type-academic_study_plan frame-layout-0">
         <header><h2>Study plan B.Sc.</h2></header>
-        <div class="academic-study-plan container" data-study-plan="1">
+        <div class="academic-study-plan" data-study-plan="1">
             <nav>...</nav>
         </div>
     </div>

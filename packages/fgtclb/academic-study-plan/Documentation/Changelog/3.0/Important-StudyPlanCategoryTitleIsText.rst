@@ -38,7 +38,7 @@ Every installation that renders the study plan content element with categories
 on its modules. Nothing has to be done on update.
 
 An installation that deliberately put markup in a category title to style the
-filter button loses it, and should style :html:`.filter button` - or the
+filter button loses it, and should style :html:`.ace-filter button` - or the
 :html:`data-category-id` of that one category - instead.
 
 .. index:: Frontend, JavaScript, ext:academic_study_plan

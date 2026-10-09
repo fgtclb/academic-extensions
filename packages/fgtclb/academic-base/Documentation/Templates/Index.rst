@@ -75,7 +75,9 @@ Arguments
         -   The alternative text. Empty uses the alternative text of the file.
     *   -   `class`
         -   The class of the image element: the fallback :html:`<img>`, the SVG
-            or the placeholder.
+            or the placeholder. The partial puts its own class `ace-image` in
+            front of it.
+
     *   -   `showCaption`
         -   Renders the description of the file in a :html:`<figcaption>`.
     *   -   `showCopyright`
@@ -84,7 +86,9 @@ Arguments
             it, nothing is rendered and no error is raised.
 
 The :html:`<figure>` around the image is rendered only when a caption or a
-copyright is requested and the file has one.
+copyright is requested and the file has one. The partial gives its elements
+the classes `ace-picture`, `ace-figure`, `ace-caption`, `ace-description` and
+`ace-copyright`.
 
 ..  _templates-image-presets:
 
@@ -222,13 +226,22 @@ A field partial takes these arguments:
 `Errors` takes the form object as `object`, and `objectName` and
 `extensionName` for the message `create.<objectName>.incorrectValues`.
 
-A field that failed validation gets the class `is-invalid`, in place of the
+A field that failed validation gets the class `invalid`, in place of the
 class `f3-form-error` the form field ViewHelpers set by default, and the
 attributes `aria-invalid="true"` and `aria-describedby="<elementId>-error"`.
 `FieldWrapper` renders the messages of the field right after it, in the element
-`<div id="<elementId>-error" class="invalid-feedback">`, one `<div>` per
-message, the sibling a Bootstrap theme shows next to an invalid field. The
-title of the required mark is the label `create.required` of the extension.
+`<div id="<elementId>-error" class="ace-field-errors">`, one
+`<div class="ace-field-error">` per message. The title of the required mark is
+the label `create.required` of the extension.
+
+The elements of a field carry these classes: the wrapper `ace-field`, `invalid`
+when the field failed validation, and the class of its type the field partial
+passes, `ace-text-wrap`, `ace-textarea-wrap`, `ace-select-wrap`,
+`ace-checkbox-wrap`, `ace-date-wrap` or `ace-upload-wrap`, the label
+`ace-label`, the required mark `ace-required`, the field `ace-control` and its
+type, `ace-text`, `ace-textarea`, `ace-select`, `ace-checkbox`, `ace-date` or
+`ace-upload`, and the help text `ace-help`. `Errors` renders its message in an
+`ace-errors`.
 
 `ErrorMessage` shows the first of these that exists, each given the arguments
 of the error, so a label can name the rejected value with `%s`: the label

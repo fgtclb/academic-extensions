@@ -27,9 +27,9 @@ From 3.0 on:
     :file:`Project/Page/Media.html`, :file:`Project/Page/Categories.html`,
     :file:`Project/Page/Facts.html` and :file:`Project/Page/Content.html`.
 *   The header renders the subtitle of the page between the title and the
-    short description, in an element with the class
-    `academic-projects-detail__subtitle`. The element around title and short
-    description gets the class `academic-projects-detail__header`.
+    short description, in an element with the class `ace-subtitle`. The
+    element around title and short description is a
+    :html:`<header class="ace-header">`.
 *   Without a project title, the heading shows the title of the page on a
     :typoscript:`PAGEVIEW` page object as well. It stayed empty there, because
     the template read the page from :html:`{data}`, which only a

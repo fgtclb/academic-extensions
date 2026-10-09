@@ -96,12 +96,13 @@ Credit points are an integer, and `0` counts as no value.
 
 A program field fact states whether its value is rich text:
 `ProgramFact::$isRichText`. The partial renders a rich text value in
-`<span class="ce-bodytext">` with `f:format.raw()`, and every other fact in a
-plain `<span>`, a program field value with `f:format.nl2br()`, which escapes its
-children before it adds the line breaks. It chooses between the two elements
-rather than computing the attribute inline, which would leave an empty
-`class=""` on every other fact. The partial holds no list of identifiers, so an
-override of it does not have to repeat one either.
+`<span class="ace-value ce-bodytext">` with `f:format.raw()`, and every other
+fact in a `<span class="ace-value">`, a program field value with
+`f:format.nl2br()`, which escapes its children before it adds the line breaks.
+It chooses between the two elements rather than computing the class inline, so
+the other facts carry no trailing space or empty class token. The partial holds
+no list of identifiers, so an override of it does not have to repeat one
+either.
 
 The builder decides per build, from the TCA schema of `pages`:
 `TcaSchemaFactory::get('pages')`, the sub-schema of the program page type

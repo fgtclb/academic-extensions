@@ -318,9 +318,10 @@ Why it is done this way, and what the module has to get right:
   exported initialiser.
 
 The configuration attributes follow the rule of the previous section. The
-parts of the map predate it: the module still finds them by id and by the class
-`map-partner`, and reads `data-lat`, `data-lng`, `data-name` and `data-link`.
-Moving those would be a change of its own, with a deprecation.
+parts of the map predate it: the module still finds the map and the list of
+partners by id, every partner by the attribute
+`data-academic-partners-map-partner`, and reads `data-lat`, `data-lng`,
+`data-name` and `data-link`.
 
 ## Data a module computes with arrives as one JSON attribute
 

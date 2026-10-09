@@ -194,8 +194,8 @@ on its own:
         -   Renders
     *   -   :file:`Project/Page/Header.html`
         -   The project title, or the title of the page without one, the
-            subtitle of the page and the short description, in one element with
-            the class `academic-projects-detail__header`.
+            subtitle of the page and the short description, in one element
+            :html:`<header class="ace-header">`.
     *   -   :file:`Project/Page/Media.html`
         -   The first image of the page, through the shared image partial of
             :guilabel:`EXT:academic_base`.
@@ -489,8 +489,9 @@ the same names, like the filter settings above.
     :file:`Project/ResultCount.html`. Both are rendered by
     :file:`Project/SortingAndFilters.html`, so a project that overrides that
     partial does not show them until it renders them as well. The partials use
-    the classes `academic-projects-active-filters` (with `__tags`, `__tag`, `__remove` and
-    `__reset`) and `academic-projects-result-count`, and bring no styles.
+    the classes `ace-active-filters` on the list of tags, `ace-active-filter` on
+    a tag, `ace-link` on the links and `ace-count` on the count, and bring no
+    styles.
 *   The reset link needs the variable :html:`{visitorSelection}`, which the list
     action assigns. A template that renders the partials with arguments of its
     own has to pass it on, or the list offers no reset link.
@@ -530,12 +531,10 @@ The partial :file:`Project/Item.html` renders it above the title:
 
 ..  code-block:: html
 
-    <p class="mb-2">
-        <span class="badge text-bg-secondary academic-projects-item__state academic-projects-item__state--completed">Completed</span>
-    </p>
+    <p class="ace-state completed">Completed</p>
 
-An active project gets :html:`text-bg-success` instead. The modifier class
-names the state in every language, so a site styles the two states by it. A
+An active project gets :html:`active` instead. That class names the state in
+every language, so a site styles the two states by it. A
 site package with a :file:`Project/Item.html` of its own shows the badge only
 once it takes over that block.
 

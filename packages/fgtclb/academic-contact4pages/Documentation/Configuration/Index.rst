@@ -198,7 +198,7 @@ default.
     renders one list without headings.
 *   **Off** – all contacts in one list, in the order they are sorted on the
     page. A contact with a role shows its role name above its card, in an
-    element with the class `academic-contacts4pages__role`.
+    element with the class `ace-role`.
 
 A content element saved before the option existed stores no value for it and
 reads the TypoScript default, so it keeps grouping:

@@ -14,19 +14,19 @@ theme does not style, assistive technology learned nothing about the field,
 and the title of the mark of a required field was the English word "required"
 on every page.
 
-Now a rejected field carries ``is-invalid`` itself, in place of the class
+Now a rejected field carries ``invalid`` itself, in place of the class
 ``f3-form-error`` the form field ViewHelpers set by default, names its messages
 with ``aria-describedby`` and ``aria-invalid``, and is followed by them:
 
 ..  code-block:: html
 
-    <input type="email" class="form-control is-invalid" id="job.contactEmail"
+    <input type="email" class="ace-control ace-text invalid" id="job.contactEmail"
         aria-invalid="true" aria-describedby="job.contactEmail-error" ... />
-    <div id="job.contactEmail-error" class="invalid-feedback">
-        <div>Please enter a valid email address.</div>
+    <div id="job.contactEmail-error" class="ace-field-errors">
+        <div class="ace-field-error">Please enter a valid email address.</div>
     </div>
 
-The element around the field keeps its ``is-invalid``. A rich text field gets
+The element around the field carries ``invalid`` as well. A rich text field gets
 its message, but no red border: CKEditor hides the textarea that carries the
 class and shows an editor of its own instead. The labels for the errors of the
 shipped validation settings, and the title of the required mark, are new and
@@ -52,7 +52,7 @@ the plugin view event fills from an assigned job now gets its date as
 stayed empty. The dates a visitor entered were and are kept when the form is
 shown again. TYPO3 v13 and v14 behave alike here.
 
-An installation that styles ``f3-form-error`` styles ``is-invalid`` instead.
+An installation that styles ``f3-form-error`` styles ``invalid`` instead.
 One that overrides a partial below :file:`Partials/Job/Forms/` in its own site
 package keeps its own output until it adopts the changes.
 

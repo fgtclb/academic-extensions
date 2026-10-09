@@ -373,7 +373,7 @@ target and the text, or `null` when the page renders none, and
 
 ```php
 $content = $this->renderFrontendPage('https://www.acme.com/home?…');
-$tags = $this->activeFilterTags($content, '//div[@class="academic-partners-list"]/div[ul or a]');
+$tags = $this->activeFilterTags($content, '//div[@class="academic-partners-list"]/div[@class="ace-content"]');
 $this->assertSame(['Europe', 'University'], array_keys($tags));
 $this->assertSame(
     ['filterCollection' => ['categories' => '3'], 'sortingDirection' => 'asc', 'sortingField' => 'title'],
