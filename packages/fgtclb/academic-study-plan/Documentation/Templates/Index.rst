@@ -141,9 +141,9 @@ the semesters and the modules. Style them, do not rely on them being absent.
 
 The script also writes :html:`hidden` on the filter list while it is collapsed.
 That attribute only hides anything because the shipped stylesheet says
-:css:`.filter[hidden] { display: none }` - the browser's own rule for it loses
-to any author rule that gives the list a :css:`display`. An installation that
-replaces the stylesheet has to carry a rule of its own.
+:css:`.ace-filter .ace-list[hidden] { display: none }` - the browser's own rule
+for it loses to any author rule that gives the list a :css:`display`. An
+installation that replaces the stylesheet has to carry a rule of its own.
 
 ..  _templates-attribute-values:
 
@@ -194,14 +194,15 @@ label is to be read.
 The glyphs of a semester header
 ===============================
 
-The semester partial renders two glyphs into the header,
-``tx-academicbase-action-expand`` and ``tx-academicbase-action-collapse``, and
-the dialog partial renders ``tx-academicbase-action-close`` into its close
-button. All three are shared action icons of :guilabel:`EXT:academic_base`:
-inlined SVGs drawn in :css:`currentColor`, rendered with its ``ab:icon``
-ViewHelper from its frontend icon registry. An override that renders them
-declares ``xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`` in
-its :html:`<html>` tag. With ``core:icon`` it shows TYPO3's not-found icon, see
+The semester partial renders two glyphs into the header, inside a
+:html:`<span class="ace-actions">`, ``tx-academicbase-action-expand`` and
+``tx-academicbase-action-collapse``, and the dialog partial renders
+``tx-academicbase-action-close`` into its close button. All three are shared
+action icons of :guilabel:`EXT:academic_base`: inlined SVGs drawn in
+:css:`currentColor`, rendered with its ``ab:icon`` ViewHelper from its
+frontend icon registry. An override that renders them declares
+``xmlns:ab="http://typo3.org/ns/FGTCLB/AcademicBase/ViewHelpers"`` in its
+:html:`<html>` tag. With ``core:icon`` it shows TYPO3's not-found icon, see
 :ref:`breaking-study-plan-control-icons-moved-to-the-frontend-icon-registry`.
 
 The script does not look at the glyphs, the shipped stylesheet does. It selects

@@ -100,6 +100,11 @@ and the template is then a failure of that functional test rather than a
 silently green JavaScript suite. A fixture without such a counterpart is a
 fixture nobody is checking.
 
+The counterpart asserts what a module reads, not every class around it. A
+class the module does not read can drift without turning anything red, so a
+change that renames the classes of a template renames them in the copies as
+well.
+
 ## The runner
 
 Node's own `node --test`, with [jsdom](https://github.com/jsdom/jsdom) for the

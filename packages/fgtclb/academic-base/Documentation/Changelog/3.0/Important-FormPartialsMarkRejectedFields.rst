@@ -12,13 +12,15 @@ The shared form partials below
 a field, but showed no message, and the class ``is-invalid`` sat on the element
 around the field only.
 
-A field that failed validation now gets ``is-invalid`` itself, in place of the
+A field that failed validation now gets ``invalid`` itself, in place of the
 default class ``f3-form-error`` of the form field ViewHelpers, and the
 attributes ``aria-invalid="true"`` and
 ``aria-describedby="<objectName>.<identifier>-error"``. :file:`FieldWrapper.html`
 renders the messages of the field right after it in the element of that id,
-with the class ``invalid-feedback``. The new partial :file:`ErrorMessage.html`
-looks each message up as the label ``create.<objectName>.<identifier>.error.<code>``,
+with the class ``ace-field-errors``, each in an ``ace-field-error``. The element
+around the field carries ``invalid`` as well. The new partial
+:file:`ErrorMessage.html` looks each message up as the label
+``create.<objectName>.<identifier>.error.<code>``,
 then ``create.error.<code>``, of the extension passed as ``extensionName``, and
 falls back to the message of the validator. All three get the arguments of the
 error. The title of the required mark is the label ``create.required`` of that

@@ -258,8 +258,8 @@ worse than none. Two consequences follow:
     at all rather than an unnamed button, and the filter stays expanded.
 *   The collapsed state is the :html:`hidden` attribute, and the shipped
     stylesheet is what gives it an effect
-    (:css:`.filter[hidden] { display: none }`) - the browser's own rule for it
-    loses to any author rule that gives the list a :css:`display`. An
+    (:css:`.ace-filter .ace-list[hidden] { display: none }`) - the browser's own
+    rule for it loses to any author rule that gives the list a :css:`display`. An
     installation that switches
     :typoscript:`plugin.tx_academicstudyplan.assets.css` off needs that rule in
     its own stylesheet.
