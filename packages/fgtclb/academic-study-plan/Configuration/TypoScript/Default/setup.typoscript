@@ -6,6 +6,7 @@
 # "Academic Study Plan: All components", or depend on the site set, instead.
 #
 # In version 2.3 this folder also added the stylesheet and the script of the
-# content element to every page. The content element template registers them
-# itself now, switchable with "plugin.tx_academicstudyplan.assets.*".
+# content element to every page. The content element template registers the
+# script itself now, switchable with "plugin.tx_academicstudyplan.assets.js",
+# and the extension ships no stylesheet any more.
 @import 'EXT:academic_study_plan/Configuration/TypoScript/ContentElement/setup.typoscript'

@@ -1,10 +1,6 @@
-// The profile editing frontend (`Templates/Profile/Index.html`, the partials
-// below `Partials/Profile/` and the TypeScript modules below
+// The profile editing frontend of academic_persons_edit (`Templates/Profile/Index.html`,
+// the partials below `Partials/Profile/` and the TypeScript modules below
 // `TypeScript/frontend/profile/`).
-//
-// Built by the repository's esbuild pipeline into
-// `Resources/Public/Css/frontend/profile-editing.css`, which is committed and
-// loaded by the template through the asset collector. Do not edit the CSS.
 //
 // The grid and buttons remain Bootstrap contracts. Everything else is styled
 // through the semantic `ace-*` vocabulary or the states JavaScript toggles.

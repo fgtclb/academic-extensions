@@ -1,0 +1,15 @@
+// The stylesheet of the development instances.
+//
+// The academic extensions ship markup and no styling of their own: a site
+// package styles them through their classes. This is the site package part of
+// the development instances, one partial per extension, compiled by the
+// frontend build into "Resources/Public/Css/frontend/academic-extensions.css"
+// and included on every page of both page trees, see the TypoScript below
+// "Configuration/TypoScript/" of this package. It is an example to copy from,
+// written against the markup of the extensions and the Bootstrap 5 classes it
+// carries, and it is never shipped with an extension.
+@use 'academic-partners';
+@use 'academic-persons';
+@use 'academic-persons-list';
+@use 'academic-persons-edit';
+@use 'academic-study-plan';

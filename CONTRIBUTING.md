@@ -90,10 +90,11 @@ growing baseline is a defect — prefer fixing the finding.
 
 ## Frontend assets
 
-TypeScript and SCSS sources live in the extension they belong to, below
+TypeScript and SCSS sources live in the package they belong to, below
 `Resources/Private/TypeScript/` and `Resources/Private/Scss/`, and compile into
-its `Resources/Public/`. Neither directory has to exist; adding one is picked up
-without any configuration change.
+its `Resources/Public/`. The extensions ship no stylesheet, the only SCSS is the
+one of the development instances in `packages-dev/dev-site`. Neither directory
+has to exist; adding one is picked up without any configuration change.
 
 ```bash
 Build/Scripts/runTests.sh -s buildJs             # compile, then commit the result

@@ -17,10 +17,13 @@ The script is an **ES module** now. It is registered in
 :file:`Configuration/JavaScriptModules.php` and addressed by the bare specifier
 :code:`@fgtclb/academic-study-plan/frontend/academic-study-plan.js`. TypoScript
 has no counterpart for loading an ES module, so the template of the content
-element loads both assets now, and only pages that render a study plan request
-them. The TypoScript of the extension, the deprecated path of version 2.3
-included, no longer adds them to the page. Both can be switched off, see
+element loads the script now, and only pages that render a study plan request
+it. The TypoScript of the extension, the deprecated path of version 2.3
+included, no longer adds it to the page. It can be switched off, see
 :ref:`feature-study-plan-assets-can-be-switched-off`.
+
+The stylesheet of the study plan is not shipped any more, see
+:ref:`breaking-study-plan-ships-no-stylesheet`.
 
 Impact
 ======
@@ -42,11 +45,11 @@ Migration
 =========
 
 Drop own :typoscript:`includeCSS` or :typoscript:`includeJSFooter` entries for
-these files. In an overridden template, load them the way the shipped one does:
+these files. In an overridden template, load the script the way the shipped one
+does:
 
 ..  code-block:: html
 
-    <f:asset.css identifier="academicStudyPlan" href="EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css" />
     <f:asset.module identifier="@fgtclb/academic-study-plan/frontend/academic-study-plan.js" />
 
 :html:`<f:asset.script>` cannot be used for the script any more, because a

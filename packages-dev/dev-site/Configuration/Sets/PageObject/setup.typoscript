@@ -1,4 +1,5 @@
 # Imported rather than repeated. The set half and the static template half of
 # this package have to deliver the same text, or a comparison of the two
-# delivery mechanisms would be comparing this file with itself.
-@import 'EXT:academics_dev_site/Configuration/TypoScript/setup.typoscript'
+# delivery mechanisms would be comparing this file with itself. The page object
+# only: the stylesheet is a set of its own, see the static template.
+@import 'EXT:academics_dev_site/Configuration/TypoScript/PageObject.typoscript'

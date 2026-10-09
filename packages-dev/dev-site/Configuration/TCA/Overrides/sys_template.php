@@ -14,6 +14,6 @@ defined('TYPO3') or die();
     ExtensionManagementUtility::addStaticFile(
         'academics_dev_site',
         'Configuration/TypoScript',
-        'Academics development site page object',
+        'Academics development site page object and stylesheet',
     );
 })();

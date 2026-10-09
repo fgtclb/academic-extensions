@@ -10,14 +10,14 @@ use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
 
 /**
- * The settings an integrator configures the study plan content element with: the two
- * switches that decide which assets it brings to a page, and the one that puts its
+ * The settings an integrator configures the study plan content element with: the
+ * switch that decides whether it brings its module to a page, and the one that puts its
  * category filter behind a toggle button.
  *
- * The element registers its stylesheet and its module from inside its own template, so
- * an installation that styles the element itself has to override that template - and
- * then either loses the module or ships a copy of it. Both assets are switchable
- * instead, once per site.
+ * The element registers its module from inside its own template, so an installation
+ * that brings its own script would have to override that template. The module is
+ * switchable instead, once per site. The element brings no stylesheet at all: the site
+ * styles it, and nothing about that is configured here.
  *
  * Every one of them exists twice, under one name: as a site setting declared by the
  * content element set, and as a TypoScript constant of the same path for an installation
@@ -35,8 +35,9 @@ final class AcademicStudyPlanSiteSettingsTest extends AbstractAcademicStudyPlanT
     ];
 
     /**
-     * The file name of the shipped stylesheet, as `f:asset.css` renders it into the
-     * `<link>` of the page. It carries a cache buster, so it is asserted by name.
+     * The file name of the stylesheet the element shipped up to version 3.0. It is
+     * asserted absent by name, and every page is asserted to link no stylesheet at all,
+     * so that a stylesheet registered under another name is caught as well.
      */
     private const STYLESHEET = 'academic-study-plan.css';
 
@@ -69,48 +70,49 @@ final class AcademicStudyPlanSiteSettingsTest extends AbstractAcademicStudyPlanT
     }
 
     #[Test]
-    public function elementBringsBothAssetsWhenTheSiteConfiguresNothing(): void
+    public function elementBringsItsModuleAndNoStylesheetWhenTheSiteConfiguresNothing(): void
     {
         $this->setUpSiteSetSite();
 
         $html = $this->renderStudyPlanPage();
 
-        $this->assertStringContainsString(self::STYLESHEET, $html);
         $this->assertStringContainsString(self::MODULE, $html);
+        $this->assertLinksNoStylesheet($html);
     }
 
     /**
-     * The assets belong to the element, not to the site: a page of the same site that
+     * The module belongs to the element, not to the site: a page of the same site that
      * carries no study plan must not pay for it.
      */
     #[Test]
-    public function pageWithoutTheElementBringsNeitherAsset(): void
+    public function pageWithoutTheElementDoesNotBringTheModule(): void
     {
         $this->setUpSiteSetSite();
 
         $html = $this->renderFrontendPage(self::FRONTEND_PLUGIN_TEST_BASE);
 
-        $this->assertStringNotContainsString(self::STYLESHEET, $html);
         $this->assertStringNotContainsString(self::MODULE, $html);
-        // Two absences alone would also be satisfied by a site that delivered nothing
-        // at all, which is the failure the site set delivery test exists for. The page
-        // that does carry the element proves the delivery, on the very same site.
-        $withElement = $this->renderStudyPlanPage();
-        $this->assertStringContainsString(self::STYLESHEET, $withElement);
-        $this->assertStringContainsString(self::MODULE, $withElement);
+        // An absence alone would also be satisfied by a site that delivered nothing at
+        // all, which is the failure the site set delivery test exists for. The page that
+        // does carry the element proves the delivery, on the very same site.
+        $this->assertStringContainsString(self::MODULE, $this->renderStudyPlanPage());
     }
 
+    /**
+     * The setting that switched the stylesheet off until version 3.0 is gone with the
+     * stylesheet. A site configuration that still carries it renders the element as one
+     * that does not, module included.
+     */
     #[Test]
-    public function stylesheetIsSkippedWhenTheSiteSettingIsOff(): void
+    public function aLeftoverStylesheetSettingChangesNothing(): void
     {
         $this->setUpSiteSetSite(['plugin.tx_academicstudyplan.assets.css' => false]);
 
         $html = $this->renderStudyPlanPage();
 
-        $this->assertStringNotContainsString(self::STYLESHEET, $html);
-        // Only this one switch was thrown.
         $this->assertStringContainsString(self::MODULE, $html);
         $this->assertStringContainsString('First Semester', $html);
+        $this->assertLinksNoStylesheet($html);
     }
 
     #[Test]
@@ -121,7 +123,6 @@ final class AcademicStudyPlanSiteSettingsTest extends AbstractAcademicStudyPlanT
         $html = $this->renderStudyPlanPage();
 
         $this->assertStringNotContainsString(self::MODULE, $html);
-        $this->assertStringContainsString(self::STYLESHEET, $html);
         // The markup is unchanged - an integrator who switches the module off brings
         // their own and needs everything it reads.
         $this->assertStringContainsString('First Semester', $html);
@@ -135,17 +136,6 @@ final class AcademicStudyPlanSiteSettingsTest extends AbstractAcademicStudyPlanT
      * together.
      */
     #[Test]
-    public function stylesheetIsSkippedWhenTheTypoScriptConstantIsOff(): void
-    {
-        $this->setUpStaticTemplateSite(['EXT:academic_study_plan/Tests/Functional/ContentElement/Fixtures/TypoScript/Constants/NoStylesheet.typoscript']);
-
-        $html = $this->renderStudyPlanPage();
-
-        $this->assertStringNotContainsString(self::STYLESHEET, $html);
-        $this->assertStringContainsString(self::MODULE, $html);
-    }
-
-    #[Test]
     public function moduleIsSkippedWhenTheTypoScriptConstantIsOff(): void
     {
         $this->setUpStaticTemplateSite(['EXT:academic_study_plan/Tests/Functional/ContentElement/Fixtures/TypoScript/Constants/NoModule.typoscript']);
@@ -153,18 +143,18 @@ final class AcademicStudyPlanSiteSettingsTest extends AbstractAcademicStudyPlanT
         $html = $this->renderStudyPlanPage();
 
         $this->assertStringNotContainsString(self::MODULE, $html);
-        $this->assertStringContainsString(self::STYLESHEET, $html);
+        $this->assertStringContainsString('First Semester', $html);
     }
 
     #[Test]
-    public function staticTemplateBringsBothAssetsWithoutAnOverride(): void
+    public function staticTemplateBringsTheModuleAndNoStylesheetWithoutAnOverride(): void
     {
         $this->setUpStaticTemplateSite();
 
         $html = $this->renderStudyPlanPage();
 
-        $this->assertStringContainsString(self::STYLESHEET, $html);
         $this->assertStringContainsString(self::MODULE, $html);
+        $this->assertLinksNoStylesheet($html);
     }
 
     #[Test]
@@ -208,6 +198,17 @@ final class AcademicStudyPlanSiteSettingsTest extends AbstractAcademicStudyPlanT
         $this->setUpStaticTemplateSite();
 
         $this->assertStringNotContainsString(self::COLLAPSIBLE, $this->renderStudyPlanPage());
+    }
+
+    /**
+     * Neither the stylesheet the element shipped up to version 3.0 nor any other: the
+     * test sites bring no stylesheet of their own, so every `<link rel="stylesheet">` on
+     * the page would be one the element registered.
+     */
+    private function assertLinksNoStylesheet(string $html): void
+    {
+        $this->assertStringNotContainsString(self::STYLESHEET, $html);
+        $this->assertDoesNotMatchRegularExpression('#<link[^>]+rel="stylesheet"#', $html);
     }
 
     private function renderStudyPlanPage(): string
