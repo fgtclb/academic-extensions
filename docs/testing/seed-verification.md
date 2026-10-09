@@ -21,6 +21,12 @@ They are collected because `Build/phpunit/*.xml` globs `packages-dev/*/Tests/`
 as well as `packages/*/*/Tests/` — see
 [PHPUnit configuration](phpunit-configuration.md).
 
+The other test classes of the package check what it ships besides the seed:
+the three `IconOverview*` classes the icon overview page, and
+`StylesheetClassesTest` (functional) and `StudyPlanControlIconRulesTest` (unit)
+the stylesheet of the instances, see
+[Frontend assets](../development/frontend-assets.md#the-stylesheet-of-the-development-instances).
+
 ## The manifest
 
 `SeedManifest-core13.json` and `SeedManifest-core14.json` hold, per table the
@@ -176,6 +182,9 @@ look at the definition without importing it:
 - `SeedBlockScalarChompingTest` rejects a literal or folded block without strip
   chomping in any file of a seed set. It reads the files as text, because the
   parser is what it guards against, see [The YAML parser](#the-yaml-parser).
+
+The fourth unit test of the directory, `StudyPlanControlIconRulesTest`, belongs
+to the stylesheet of the instances, not to the seed.
 
 ## Why the manifest and the snapshot can agree at all
 

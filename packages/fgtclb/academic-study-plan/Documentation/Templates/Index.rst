@@ -28,8 +28,8 @@ Where they live
     *   -   File
         -   Renders
     *   -   :file:`Frontend/Default/Templates/AcademicStudyPlan.html`
-        -   The container, and the assets of
-            :ref:`Skip the stylesheet or the script <asset-switches>`.
+        -   The container, and the script of
+            :ref:`Skip the script <asset-switches>`.
     *   -   :file:`Frontend/Default/Partials/StudyPlan/Filter.html`
         -   The category filter.
     *   -   :file:`Frontend/Default/Partials/StudyPlan/Semester.html`
@@ -140,10 +140,10 @@ rather than looked up: :html:`highlighted` and :html:`open`, on the container,
 the semesters and the modules. Style them, do not rely on them being absent.
 
 The script also writes :html:`hidden` on the filter list while it is collapsed.
-That attribute only hides anything because the shipped stylesheet says
+That attribute only hides anything when the stylesheet of the site says
 :css:`.ace-filter .ace-list[hidden] { display: none }` - the browser's own rule
-for it loses to any author rule that gives the list a :css:`display`. An
-installation that replaces the stylesheet has to carry a rule of its own.
+for it loses to any author rule that gives the list a :css:`display`. The
+extension ships no stylesheet, see :ref:`Style the element <styling>`.
 
 ..  _templates-attribute-values:
 
@@ -205,15 +205,16 @@ frontend icon registry. An override that renders them declares
 :html:`<html>` tag. With ``core:icon`` it shows TYPO3's not-found icon, see
 :ref:`breaking-study-plan-control-icons-moved-to-the-frontend-icon-registry`.
 
-The script does not look at the glyphs, the shipped stylesheet does. It selects
-the classes the ViewHelper writes: :css:`icon-tx-academicbase-action-collapse`
-is hidden in a closed semester, :css:`icon-tx-academicbase-action-expand` in an
-open one, and every :css:`.icon` in the header from 768 pixels on. It also
-sizes every :css:`.icon` of the element to `1.25rem` and the drawing inside it
-to the full icon, so a drawing without a size of its own stays visible. An
-override of :file:`StudyPlan/Semester.html` that keeps the shipped stylesheet
-therefore keeps rendering the two identifiers, with ``ab:icon``. One that
-renders glyphs of its own brings the rules for them.
+The script does not look at the glyphs, the stylesheet of the site does. The
+example of :ref:`Style the element <styling>` selects the classes the
+ViewHelper writes: :css:`icon-tx-academicbase-action-collapse` is hidden in a
+closed semester, :css:`icon-tx-academicbase-action-expand` in an open one, and
+every :css:`.icon` in the header from 768 pixels on. It also sizes every
+:css:`.icon` of the element to `1.25rem` and the drawing inside it to the full
+icon, so a drawing without a size of its own stays visible. An override of
+:file:`StudyPlan/Semester.html` for a stylesheet like that one therefore keeps
+rendering the two identifiers, with ``ab:icon``. One that renders glyphs of its
+own brings the rules for them.
 
 To draw a glyph differently, register a file of your own under its identifier
 in the :file:`Configuration/FrontendIcons.php` of your site package, which has

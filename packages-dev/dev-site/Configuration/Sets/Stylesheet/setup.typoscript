@@ -1,0 +1,3 @@
+# Imported rather than repeated, for the same reason as the page object: the
+# static template of this package includes the same file for the "/legacy/" tree.
+@import 'EXT:academics_dev_site/Configuration/TypoScript/Stylesheet.typoscript'

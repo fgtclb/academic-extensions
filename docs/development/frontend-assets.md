@@ -1,7 +1,9 @@
 # Frontend assets
 
-TypeScript and SCSS sources live in the extension they belong to, are compiled
-by one build for the whole repository, and the result is committed.
+TypeScript and SCSS sources live in the package they belong to, are compiled by
+one build for the whole repository, and the result is committed. The
+extensions ship TypeScript only: their markup is styled by the site package,
+and the one stylesheet here is the one of the development instances.
 
 ## Layout
 
@@ -19,25 +21,26 @@ packages/fgtclb/<extension>/
 The same applies to `packages-dev/*`. Nothing is required to exist: an extension
 without those directories contributes nothing to the build, and adding one is
 picked up without touching any configuration. Seven extensions carry sources
-today: `academic-base`, `academic-jobs` and `academic-programs` ship TypeScript
-only, and `academic-partners`, `academic-persons`, `academic-persons-edit` and
-`academic-study-plan` ship TypeScript and SCSS. `academic-base` carries
-`frontend/icons.ts`, the public frontend icon factory every extension and
-site package can import as `@fgtclb/academic-base/frontend/icons.js`, see
+today, TypeScript only: `academic-base`, `academic-jobs`, `academic-programs`,
+`academic-partners`, `academic-persons`, `academic-persons-edit` and
+`academic-study-plan`. No extension ships a stylesheet, see
+[The stylesheet of the development instances](#the-stylesheet-of-the-development-instances).
+`academic-base` carries `frontend/icons.ts`, the public frontend icon factory
+every extension and site package can import as
+`@fgtclb/academic-base/frontend/icons.js`, see
 [Icons](../architecture/icons.md#icons-for-frontend-javascript). Of the
-`packages-dev/` packages only `dev-site` carries a module,
+`packages-dev/` packages only `dev-site` carries sources: the SCSS of the
+stylesheet of the development instances and one module,
 `frontend/icon-demo.ts`, the demonstration of that factory on the icon overview
 page of the seed. It is published by the package's own
 `Configuration/JavaScriptModules.php` as `@fgtclb/academics-dev-site/frontend/`,
 a prefix the build does not derive, so the JavaScript tests cannot import it.
 Its markup is covered by a functional test of the package instead.
-`academic-persons` carries the
-public profile's `frontend/profile.ts` and `frontend/profile-detail.scss`,
-loaded by `Templates/Profile/Detail.html`, plus the `frontend/sticky-offset.ts`
-the editing view of `academic-persons-edit` shares with it through the import
-map. `academic-persons-edit` is the largest by a wide margin — nineteen
-TypeScript modules, one `_dependencies.d.ts` type declaration and
-`frontend/profile-editing.scss`. Count them with
+`academic-persons` carries the public profile's `frontend/profile.ts`, loaded
+by `Templates/Profile/Detail.html`, plus the `frontend/sticky-offset.ts` the
+editing view of `academic-persons-edit` shares with it through the import map.
+`academic-persons-edit` is the largest by a wide margin — nineteen TypeScript
+modules and one `_dependencies.d.ts` type declaration. Count them with
 `find packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript -name '*.ts' ! -name '*.d.ts' | wc -l`.
 
 The `backend/` and `frontend/` split is a convention rather than a mechanism —
@@ -154,7 +157,72 @@ and its templates load a module rather than a script:
 ```
 
 CSS is unaffected and keeps loading through `f:asset.css` or
-`page.includeCSS`.
+`page.includeCSS`. The extensions register only the stylesheets of a library
+their script cannot work without, the ones of Leaflet next to the partner map.
+
+## The stylesheet of the development instances
+
+The extensions ship no stylesheet of their own (ACE-890). Their markup carries
+speaking classes and data attributes, and styling it is the job of the site
+package. Until 3.0 the study plan, the partner map, the public profile, the
+profile lists and the profile editor each brought one, registered by their
+templates.
+
+Those rules live on as the site package part of the development instances, in
+`packages-dev/dev-site`:
+
+```
+packages-dev/dev-site/Resources/Private/Scss/frontend/
+  academic-extensions.scss       the entry, one @use per partial
+  _academic-partners.scss        the partner map
+  _academic-persons.scss         the public profile
+  _academic-persons-list.scss    the profile lists and cards
+  _academic-persons-edit.scss    the profile editor
+  _academic-study-plan.scss      the study plan
+        ->  Resources/Public/Css/frontend/academic-extensions.css
+```
+
+One partial per extension, named after its directory, two for
+`academic-persons` whose lists and detail view are styled apart, and one
+compiled file, built by `buildJs` and guarded by `checkJsBuildClean` like every
+other artifact.
+A new extension that needs styling in the instances gets a partial and a `@use`
+line, never a stylesheet of its own.
+
+It is included on every page of both page trees, by two routes with one file
+behind them, `Configuration/TypoScript/Stylesheet.typoscript`:
+
+| Tree       | Delivered by                                                                                   |
+|------------|------------------------------------------------------------------------------------------------|
+| `/`        | the set `fgtclb/academics-dev-site-stylesheet`, named last in `core-*/config/sites/academics/` |
+| `/legacy/` | the static template of `academics_dev_site`, which the root `sys_template` record includes     |
+
+The `/` tree is themed by `bk2k/bootstrap-package`, so the set comes after the
+theme and its rules after the theme's. The page object set that
+`LegacyDeliveryTest` puts in the place of the theme imports the page object
+alone, so the `/` side of that test only links the stylesheet while the
+committed site configuration names the set.
+`LegacyDeliveryTest::bothTreesLinkTheStylesheetOfTheDevelopmentInstancesOnce()`
+asserts both routes.
+
+It is an example, written against the markup and the Bootstrap 5 classes it
+carries, and the manual of each extension links its partial for an integrator
+to copy from. It is never released, see
+[Monorepo layout](monorepo-layout.md). Tests of the extensions do not read it:
+their packages are split out without `packages-dev/`. The package checks it
+against the extensions instead. `StylesheetClassesTest` covers the partials of
+the study plan, the public profile and the profile lists: it fails for a class
+a partial selects that the extension neither renders in the seed, nor names in
+a `class` attribute of its templates, nor writes from its module. It checks the
+map partial against the stylesheets of Leaflet, because every class it selects
+is one Leaflet writes. A template of those extensions that renames a class
+therefore cannot leave its rule behind unnoticed. The partial of the profile
+editor is **not** covered: the editor needs a logged in owner, its partial also corrects classes of the
+theme, and it styles the widget CropperJS builds and the transition classes
+the editor derives from a prefix, none of which a template or a module names
+as written. A rule of it that outlives its class
+is found by reading only. `StudyPlanControlIconRulesTest` pins the icon rules
+of the study plan in the compiled file.
 
 Verified present on TYPO3 13.4.34 and 14.3.6: the `f:asset.module` ViewHelper,
 `AssetCollector::addJavaScriptModule()`, and `ImportMap` reading
@@ -167,12 +235,12 @@ overrides the whole template to restyle one element — and then either loses th
 script or copies it, after which the copy stops following the original. The way
 out is a switch per asset, and it has a shape:
 
-| Layer                                                       | What it holds                                                               |
-|-------------------------------------------------------------|-----------------------------------------------------------------------------|
-| `Configuration/Sets/<Component>/settings.definitions.yaml`  | `plugin.tx_<ext>.assets.css` / `.js`, `type: bool`, `default: true`         |
-| `Configuration/TypoScript/<Component>/constants.typoscript` | the same two paths, `= 1`, for an installation without site sets            |
-| `Configuration/TypoScript/<Component>/setup.typoscript`     | `settings.assets.css = {$plugin.tx_<ext>.assets.css}` on the content object |
-| the template                                                | `<f:if condition="{settings.assets.css}">` around the `f:asset.*` line      |
+| Layer                                                       | What it holds                                                              |
+|-------------------------------------------------------------|----------------------------------------------------------------------------|
+| `Configuration/Sets/<Component>/settings.definitions.yaml`  | `plugin.tx_<ext>.assets.js`, `type: bool`, `default: true`                 |
+| `Configuration/TypoScript/<Component>/constants.typoscript` | the same path, `= 1`, for an installation without site sets                |
+| `Configuration/TypoScript/<Component>/setup.typoscript`     | `settings.assets.js = {$plugin.tx_<ext>.assets.js}` on the content object  |
+| the template                                                | `<f:if condition="{settings.assets.js}">` around the `f:asset.module` line |
 
 Four things about it are worth knowing before copying it:
 
@@ -200,10 +268,10 @@ Four things about it are worth knowing before copying it:
   clones.
 
 One thing the switch cannot reach: an installation that overrides the template
-keeps whatever that copy does, so its own `f:asset` lines load unconditionally
-until they are wrapped as well. The same holds for a hand-written content
-object — it assigns no `settings.assets.` block, both conditions are false, and
-the element loses *both* assets. Say so in the changelog entry rather than
+keeps whatever that copy does, so its own `f:asset` line loads unconditionally
+until it is wrapped as well. The same holds for a hand-written content object —
+it assigns no `settings.assets.` block, the condition is false, and the element
+loses its script. Say so in the changelog entry rather than
 guarding it in the template.
 
 `academic_study_plan` is the worked example:
@@ -261,9 +329,9 @@ Two more, neither of them specific to the study plan:
 - **`hidden` does not hide anything the stylesheet gives a `display` to.** The
   rule that makes the attribute work is the *user agent's*, and any author rule
   beats it. A module that collapses a part by setting `hidden` needs
-  `.part[hidden] { display: none }` in the extension's own stylesheet, next to
-  the rule it undoes — and neither jsdom nor either PHP suite computes style, so
-  nothing but reading catches its absence. `bk2k/bootstrap-package` carries
+  `.part[hidden] { display: none }` in the site stylesheet, next to the rule it
+  undoes, and the manual of the extension has to say so — and neither jsdom nor
+  either PHP suite computes style, so nothing but reading catches its absence. `bk2k/bootstrap-package` carries
   `[hidden] { display: none !important }`, which is why the dev instances hide
   it and a plain site does not.
 - **A record's text substituted into markup is an injection.** Cloning a
@@ -437,10 +505,12 @@ What follows from taking a library from the core:
   suite.
 - **A stylesheet is not part of the deal.** The core delivers CropperJS's
   JavaScript to any page, and its CSS only inside the backend's own bundle. The
-  cropper's appearance is therefore written in
-  `packages/fgtclb/academic-persons-edit/Resources/Private/Scss/frontend/profile-editing.scss`,
+  cropper's appearance is therefore the site's, and the development instances
+  write it in
+  `packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons-edit.scss`,
   scoped to the editor's stage so it cannot reach a `cropper-` class another
-  extension brought along. Check for the stylesheet as well as for the module.
+  extension brought along. Check for the stylesheet as well as for the module,
+  and name a missing one in the manual.
 - **A version the core ships is not automatically the right one** — but it is
   the first candidate, and the API difference has to be a real obstacle before
   a copy is shipped instead. Check the version, not the presence of a mapping.
@@ -486,9 +556,10 @@ What the vendor build does, and why:
   line endings (Leaflet ships CRLF, which git stores differently depending on a
   machine's attributes), and every file is written with mode `0644` (the marker
   cluster package ships its files executable). A change a site needs goes into
-  the extension's own files: the `width: auto !important` of
-  `academic_partners/.../frontend/map.scss`, and the extension's own marker
-  icon, whose URL the map module reads from
+  the site stylesheet, as the `width: auto !important` of
+  `_academic-partners.scss` in the development instances does, or into the
+  extension's own files, as the marker icon does, whose URL the map module
+  reads from
   `data-academic-partners-marker-icon`, and whose directory it hands to every
   marker as `Icon.Default({ imagePath })`.
 
