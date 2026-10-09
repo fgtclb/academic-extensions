@@ -126,8 +126,10 @@ one, its icon otherwise, and a drawing a site package registers for that type
 in its frontend icons (`Configuration/FrontendIcons.php`) in place of either.
 The backend SHALL keep showing the declared icon of the type. The icon SHALL
 keep the wrapper markup it had before, with the identifier
-`category_types.partners.<type>`. No icon of the extension changes its
-registration. This SHALL hold on TYPO3 v13 and v14.
+`category_types.partners.<type>`. The four shipped types SHALL show a Font
+Awesome Free solid drawing, inlined and drawn in the colour of the surrounding
+text, the collaboration type the shared partnership drawing of the academic
+base extension. This SHALL hold on TYPO3 v13 and v14.
 
 #### Scenario: A type with a frontend icon of its own
 - **WHEN** a site package declares a type of the group `partners` with an icon
@@ -140,7 +142,7 @@ registration. This SHALL hold on TYPO3 v13 and v14.
 - **WHEN** a partner carries a category of the shipped type `partner_type` and
   no site package replaces its icon
 - **THEN** the four places show the icon the extension declares for the
-  partner type
+  partner type, inlined and in the text colour
 
 #### Scenario: A site package replaces a shipped type icon for the frontend
 - **WHEN** a site package registers its own drawing for

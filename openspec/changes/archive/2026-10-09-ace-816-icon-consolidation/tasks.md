@@ -68,12 +68,12 @@
 
 ## 13. `[TASK] ACE-816: Archive the icon consolidation`
 
-- [ ] 13.1 Archive this change with `openspec archive ace-816-icon-consolidation` as the last commit of the pull request, verified by `openspec validate --specs --strict` and the delta specs merged into `openspec/specs/`
+- [x] 13.1 Archive this change with `openspec archive ace-816-icon-consolidation` as the last commit of the pull request, verified by `openspec validate --specs --strict` and the delta specs merged into `openspec/specs/`
 
 ## 14. Definition of done
 
-- [ ] 14.1 `lintPhp`, `cgl -n`, `phpstan` and `unit` green for TYPO3 v13 and v14, each after its own `composerUpdate`
-- [ ] 14.2 `functional` green for TYPO3 v13 and v14 on SQLite, MariaDB, MySQL and PostgreSQL
-- [ ] 14.3 Every new or changed assertion shown red by breaking what it covers, listed per commit
-- [ ] 14.4 `docs/` updated and `lintMarkdown -n` green, every extension's `Documentation/` with its Breaking entry about icons, `checkRstRenderingAll` green
-- [ ] 14.5 Every commit message in TYPO3 Core format with its verified ACE issue, no attribution to a tool
+- [x] 14.1 `lintPhp`, `cgl -n`, `phpstan` and `unit` green for TYPO3 v13 and v14, each after its own `composerUpdate`
+- [x] 14.2 `functional` green for TYPO3 v13 and v14 on SQLite, MariaDB, MySQL and PostgreSQL
+- [x] 14.3 Every new or changed assertion shown red by breaking what it covers, listed per commit
+- [x] 14.4 `docs/` updated and `lintMarkdown -n` green, every extension's `Documentation/` with its Breaking entry about icons, `checkRstRenderingAll` green
+- [x] 14.5 Every commit message in TYPO3 Core format with its verified ACE issue, no attribution to a tool

@@ -9,51 +9,69 @@ markup the controls built in the browser and a site stylesheet can rely on.
 
 ### Requirement: The profile editing icons are frontend icons
 The profile editor and the profile overview SHALL render their sixteen action
-icons from the frontend icon registration of `academic_persons_edit`
-(`Configuration/FrontendIcons.php`), under the identifiers
-`academic-persons-edit-add`, `-back`, `-clear`, `-delete`, `-edit`, `-help`,
+and state icons from the shared frontend icon set of `academic_base`, under the
+identifiers `tx-academicbase-action-add`, `-back`, `-clear`, `-delete`,
+`-drag`, `-edit`, `-help`, `-move-down`, `-move-up`, `-save`, `-undo`,
+`-upload-image`, `-view` and `-view-close`, and `tx-academicbase-state-visible`
+and `-hidden`. `academic_persons_edit` SHALL register no frontend icon of its
+own, and the identifiers of 2.x and of the 3.0 development
+(`academic-persons-edit-add`, `-back`, `-clear`, `-delete`, `-edit`, `-help`,
 `-move-down`, `-move-up`, `-save`, `-sort-handle`, `-undo`, `-upload-image`,
-`-view`, `-view-close`, `-visible` and `-hidden`. Every identifier a shipped
-template asks for SHALL be registered there, and every registered action icon
-SHALL be used by a shipped template. A site package that loads after
-`academic_persons_edit` and registers one of these identifiers in its own
+`-view`, `-view-close`, `-visible` and `-hidden`) SHALL be registered nowhere,
+without an alias. Every identifier a shipped template asks for SHALL be
+registered, and the templates SHALL ask for exactly these sixteen. Each of them
+SHALL be drawn in the colour of the surrounding text. A site package that loads
+after `academic_base` and registers one of these identifiers in its own
 `Configuration/FrontendIcons.php` SHALL replace that icon everywhere the editor
-shows it, without a template override. This SHALL apply on TYPO3 v13 and v14.
+shows it, without a template override, and in every other academic extension
+that shows the same identifier. This SHALL apply on TYPO3 v13 and v14.
 
 #### Scenario: The shipped icons resolve
 - **WHEN** the owner of a profile opens the profile editor with documents,
   contracts and contacts
 - **THEN** every action icon of the page is shown with its own identifier
 - **AND** the page contains no not-found icon
+- **AND** no icon of the page carries an `academic-persons-edit-` identifier
 
 #### Scenario: A site package replaces an icon
-- **WHEN** a site package that depends on `academic_persons_edit` registers
-  `academic-persons-edit-edit` with its own file in its
+- **WHEN** a site package that depends on `academic_base` registers
+  `tx-academicbase-action-edit` with its own file in its
   `Configuration/FrontendIcons.php`
 - **THEN** every edit button of the editor shows the drawing of that file
 
+#### Scenario: An old identifier in a template override
+- **WHEN** an overridden partial of the editor renders
+  `academic-persons-edit-save`
+- **THEN** that button shows the not-found icon
+
 ### Requirement: The profile editing icons are no backend icons
-The sixteen action icons SHALL NOT be registered in TYPO3's backend icon
-registry, so a registration of one of their identifiers in a
+The sixteen action and state icons SHALL NOT be registered in TYPO3's backend
+icon registry, so a registration of one of their identifiers in a
 `Configuration/Icons.php` SHALL NOT change what the editor shows. The icon of
-the profile editing content element SHALL stay in the backend icon registry and
-SHALL NOT be offered by the frontend icon registration. This SHALL apply on
-TYPO3 v13 and v14.
+the profile editing content element SHALL be registered in the backend icon
+registry only, under `tx-academicpersonsedit-plugin-profile-editing`, and the
+page module and the new content element wizard SHALL show it for the profile
+editing content element. It SHALL be drawn in the colour of the surrounding
+text, so it follows the backend colour scheme. The former identifier
+`persons_edit_icon` SHALL be registered nowhere. This SHALL apply on TYPO3 v13
+and v14.
 
 #### Scenario: A replacement left in the backend file
-- **WHEN** a site package registers `academic-persons-edit-delete` with its own
-  file in its `Configuration/Icons.php` only
+- **WHEN** a site package registers `tx-academicbase-action-delete` with its
+  own file in its `Configuration/Icons.php` only
 - **THEN** the delete buttons of the editor show the shipped drawing
 
 #### Scenario: An override that still asks the backend registry
 - **WHEN** an overridden partial of the editor renders
-  `academic-persons-edit-edit` through TYPO3's backend icon registry
+  `tx-academicbase-action-edit` through TYPO3's backend icon registry
 - **THEN** that button shows TYPO3's not-found icon
 
 #### Scenario: The content element keeps its backend icon
 - **WHEN** an editor opens the new content element wizard or the page module
   with a profile editing content element
-- **THEN** the content element shows the same icon as before
+- **THEN** the content element shows the icon
+  `tx-academicpersonsedit-plugin-profile-editing` in both places
+- **AND** the icon takes the text colour of the backend colour scheme
 
 ### Requirement: Controls built in the browser carry the same icons
 The controls the editor builds in the browser from the markup the page ships,
@@ -70,7 +88,7 @@ This SHALL apply on TYPO3 v13 and v14.
 - **AND** none of them shows a not-found icon
 
 #### Scenario: A replaced icon in a built control
-- **WHEN** a site package replaces `academic-persons-edit-edit` in its
+- **WHEN** a site package replaces `tx-academicbase-action-edit` in its
   `Configuration/FrontendIcons.php` and the owner adds a document row
 - **THEN** the edit button of the new row shows the drawing of the site
   package
