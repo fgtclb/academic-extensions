@@ -35,7 +35,7 @@ under its language key, :typoscript:`de` for German.
         - Path
     *   - :guilabel:`Projects` (:typoscript:`academicprojects_projectlist`)
         - :typoscript:`plugin.tx_academicprojects_projectlist._LOCAL_LANG`
-    *   - :guilabel:`Projects (selected)` (:typoscript:`academicprojects_projectlistsingle`)
+    *   - :guilabel:`Selected Projects` (:typoscript:`academicprojects_projectlistsingle`)
         - :typoscript:`plugin.tx_academicprojects_projectlistsingle._LOCAL_LANG`
 
 The page template of a project page is not rendered by a plugin: a site sets

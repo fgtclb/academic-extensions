@@ -139,15 +139,15 @@
         <target>Projekte</target>
       </trans-unit>
       <trans-unit id="plugin.project_list.description">
-        <source>List of academic projects with sorting and filtering</source>
-        <target>Liste akademischer Projekte mit Sortierung und Filterung</target>
+        <source>Lists projects in a tile layout with sorting and filtering</source>
+        <target>Listet Projekte als Kacheldarstellung mit Sortierung und Filterung auf</target>
       </trans-unit>
       <trans-unit id="plugin.project_selected.name">
-        <source>Projects (selected)</source>
-        <target>Projekte (ausgewählte)</target>
+        <source>Selected Projects</source>
+        <target>Projekte selektiert</target>
       </trans-unit>
       <trans-unit id="plugin.project_selected.description">
-        <source>List of selected academic projects with sorting and filtering</source>
+        <source>List of selected academic projects with sorting and filtering options</source>
         <target>Liste ausgewählter akademischer Projekte mit Sortierung und Filterung</target>
       </trans-unit>
 

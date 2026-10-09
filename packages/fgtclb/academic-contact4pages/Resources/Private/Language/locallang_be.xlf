@@ -10,10 +10,10 @@
     <header/>
     <body>
       <trans-unit id="plugin.contacts_list.title">
-        <source>Contacts for this page</source>
+        <source>Person’s Contacts on the Page</source>
       </trans-unit>
       <trans-unit id="plugin.contacts_list.description">
-        <source>List the contacts assigned to the page</source>
+        <source>List of contacts linked to a page</source>
       </trans-unit>
       <trans-unit id="element.tab.configuration">
         <source>Configuration</source>

@@ -10,7 +10,7 @@ General configuration
 The view of the job list
 ========================
 
-The plugin settings of a :guilabel:`Job list` content element select one of
+The plugin settings of a :guilabel:`Job List b-ite` content element select one of
 three views: :guilabel:`List`, :guilabel:`Card` or :guilabel:`Table`. The stored
 values are `List`, `Card` and `Table`.
 
@@ -52,7 +52,7 @@ its own, which wins over the TypoScript. The upgrade wizard
 The header of the content element
 =================================
 
-The header and the subheader an editor enters on a :guilabel:`Job list`
+The header and the subheader an editor enters on a :guilabel:`Job List b-ite`
 content element are rendered by the content element layout of the site, as for
 any other content element. The layouts of :guilabel:`EXT:fluid_styled_content`
 and of the bootstrap package do that, and the plugin renders no header of its

@@ -28,7 +28,7 @@ aggregate set that depends on it.
     *   -   Set
         -   Delivers
     *   -   `fgtclb/academic-study-plan-content-element`
-        -   The :guilabel:`Academic Study Plan` content element: its TypoScript
+        -   The :guilabel:`Study Plan` content element: its TypoScript
             (:typoscript:`tt_content.academic_study_plan`, the Fluid root paths
             and the data processor that assigns the semesters and modules to the
             template) and the page TSconfig that makes the content element
@@ -53,7 +53,7 @@ The content element is hidden by default
 
 :guilabel:`EXT:academic_study_plan` hides its content element for the whole
 installation and brings it back per component. Whichever of the two mechanisms
-below you use, it is what makes :guilabel:`Academic Study Plan` selectable in the
+below you use, it is what makes :guilabel:`Study Plan` selectable in the
 backend again — without one of them the content element is not offered, and
 existing records keep rendering.
 
@@ -115,7 +115,7 @@ Edit the :sql:`sys_template` record of the site root and add the entry to
     *   -   Entry
         -   Delivers
     *   -   :guilabel:`Academic Study Plan: Content element (academic_study_plan)`
-        -   The TypoScript of the :guilabel:`Academic Study Plan` content
+        -   The TypoScript of the :guilabel:`Study Plan` content
             element.
     *   -   :guilabel:`Academic Study Plan: All components (academic_study_plan)`
         -   Every component this extension ships, in one entry.
@@ -139,7 +139,7 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
     *   -   Entry
         -   Delivers
     *   -   :guilabel:`Academic Study Plan: Content element (academic_study_plan)`
-        -   Makes the :guilabel:`Academic Study Plan` content element selectable,
+        -   Makes the :guilabel:`Study Plan` content element selectable,
             and configures its entry in the new content element wizard.
     *   -   :guilabel:`Academic Study Plan: All components (academic_study_plan)`
         -   Every component this extension ships, in one entry.
