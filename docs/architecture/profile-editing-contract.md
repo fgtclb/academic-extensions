@@ -600,7 +600,8 @@ No element opens a shadow root. Five independent reasons, any one of which
 decides it: the theme's Bootstrap stylesheet has to reach the controls;
 CKEditor 5 does not support a classic editor inside a shadow root; Bootstrap's
 own popover JavaScript positions against `document`; the class names are the
-integrator contract; and the SCSS pipeline emits one stylesheet per extension.
+integrator contract; and the stylesheet is the site package's, written against
+the rendered markup.
 
 ### No framework, and what that buys
 
@@ -771,7 +772,7 @@ carry `text-break`, and the group carries `col-md-auto flex-shrink-0` with
 `justify-content-center` below `md` and `justify-content-md-end ms-md-auto`
 from `md` up — so it stacks centred under the text on a phone and stands at the
 right edge of the row on a desktop. The one part Bootstrap has no utility for is
-the automatic minimum size, and `profile-editing.scss` takes it away with a
+the automatic minimum size, and the stylesheet of the site takes it away with a
 `min-width: 0` keyed on the three hooks the header, the document rows and the
 contact rows already carry.
 
@@ -953,8 +954,10 @@ string any module knows.
 
 The document editor and the image editor open and close with a CSS transition,
 and the classes that drive it — `-enter-from`, `-enter-active`, `-leave-active`,
-`-leave-to` — are declared in
-`Resources/Private/Scss/frontend/profile-editing.scss` and applied by the runner
+`-leave-to` — are declared by the stylesheet of the site, in the development
+instances by
+[`_academic-persons-edit.scss`](../../packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons-edit.scss),
+and applied by the runner
 `createElementTransition()` builds
 ([`profile/elements/transition.ts`](../../packages/fgtclb/academic-persons-edit/Resources/Private/TypeScript/frontend/profile/elements/transition.ts)).
 One runner per editor, because the two differ only in the class name prefix.
@@ -975,6 +978,12 @@ and tearing the tree out from inside its own `updated()` is how an element ends
 up writing into detached nodes.
 
 ## The focus ring the editor draws itself
+
+The extension ships no stylesheet (ACE-890). This section describes the one of
+the development instances,
+[`_academic-persons-edit.scss`](../../packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons-edit.scss)
+of `packages-dev/dev-site`, which the markup is tested against and which a site
+package copies.
 
 The stylesheet takes exactly one appearance away from the surrounding theme: the
 focus ring of the controls and the buttons. Bootstrap draws that ring with
@@ -1109,8 +1118,10 @@ TYPO3: CKEditor 5 by `EXT:rte_ckeditor`, and CropperJS by `EXT:core`, which maps
 `cropperjs` to the 1.6.1 build the backend's image manipulation is written
 against — the same file on 13.4.34 and 14.3.6. What the frontend does not get
 from the core is that library's stylesheet, which exists only inside the
-backend's bundle, so the cropper's appearance is written in
-`Resources/Private/Scss/frontend/profile-editing.scss` and scoped to the stage.
+backend's bundle, so the cropper's appearance is the site's, scoped to the
+stage. Without it the cropper cannot be dragged. The development instances
+write it in
+[`_academic-persons-edit.scss`](../../packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-persons-edit.scss).
 See [Frontend assets](../development/frontend-assets.md#libraries-come-from-the-core).
 
 The five element names, the `pe:*` events, the `data-pe-*` hooks, the root's

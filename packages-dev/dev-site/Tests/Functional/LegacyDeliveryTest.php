@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace FGTCLB\AcademicsDevSite\Tests\Functional;
 
+use FGTCLB\AcademicsDevSite\Tests\Functional\Support\CommittedSiteTrait;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Component\Yaml\Yaml;
-use TYPO3\CMS\Core\Configuration\SiteWriter;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
@@ -48,6 +47,8 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestCon
  */
 final class LegacyDeliveryTest extends AbstractSeedTestCase
 {
+    use CommittedSiteTrait;
+
     private const BASE = 'https://academics.test';
 
     private const LEGACY_SEGMENT = '/legacy';
@@ -197,6 +198,84 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
         }
 
         $this->assertSame([], $failures, "Pages of the seed do not render:\n  " . implode("\n  ", $failures));
+    }
+
+    /**
+     * Both trees link the stylesheet of the development instances, once, on every page.
+     *
+     * The academic extensions ship no stylesheet of their own, so this one is what styles
+     * them in an instance. The two trees get it from two places: the `/legacy/` tree from
+     * the static template of this package, the `/` tree from the set
+     * `fgtclb/academics-dev-site-stylesheet` its committed site configuration names. The
+     * page object set that stands in for the theme here does not bring it, so the `/`
+     * side of this test only passes while that configuration does.
+     *
+     * Asserted on the root page and on the first page with a study plan and the first
+     * with the partner map, because "on every page" is the claim and the stylesheet has
+     * to reach the pages it styles. The profile pages answer 404 without a record and 403
+     * without a login, so they are left to the instance check of
+     * `docs/development/instances.md`.
+     */
+    #[Test]
+    public function bothTreesLinkTheStylesheetOfTheDevelopmentInstancesOnce(): void
+    {
+        $this->importSeed();
+        $this->writeSiteConfigurations();
+
+        $paths = ['/', ...$this->pathsOfPagesWith(['academic_study_plan', 'academicpartners_map'])];
+        $this->assertCount(3, $paths, 'The seed lost the study plan or the partner map page.');
+
+        $failures = [];
+        foreach ($paths as $path) {
+            foreach ([$path, self::LEGACY_SEGMENT . $path] as $requested) {
+                $url = self::BASE . $requested;
+                $body = (string)$this->executeFrontendSubRequest(new InternalRequest($url), new InternalRequestContext())->getBody();
+                $count = preg_match_all('#<link rel="stylesheet" href="([^"?]*/Css/frontend/academic-extensions\.css)#', $body, $matches);
+                if ($count !== 1) {
+                    $failures[] = sprintf('"%s" links the stylesheet %d times', $requested, $count);
+                }
+            }
+        }
+
+        $this->assertSame([], $failures, "The stylesheet of the development instances is not linked once:\n  " . implode("\n  ", $failures));
+        $this->assertFileExists(
+            GeneralUtility::getFileAbsFileName('EXT:academics_dev_site/Resources/Public/Css/frontend/academic-extensions.css'),
+        );
+    }
+
+    /**
+     * The paths of the pages of the `/` tree that carry a content element of one of the
+     * given types, one page per type, in the order of the types.
+     *
+     * @param list<string> $cTypes
+     * @return list<string>
+     */
+    private function pathsOfPagesWith(array $cTypes): array
+    {
+        $paths = [];
+        foreach ($cTypes as $cType) {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tt_content');
+            $queryBuilder->getRestrictions()->removeAll();
+            $slug = $queryBuilder
+                ->select('pages.slug')
+                ->from('tt_content')
+                ->join('tt_content', 'pages', 'pages', $queryBuilder->expr()->eq('pages.uid', $queryBuilder->quoteIdentifier('tt_content.pid')))
+                ->where(
+                    $queryBuilder->expr()->eq('tt_content.CType', $queryBuilder->createNamedParameter($cType)),
+                    $queryBuilder->expr()->eq('tt_content.sys_language_uid', $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)),
+                    $queryBuilder->expr()->lt('tt_content.pid', $queryBuilder->createNamedParameter(self::PAGE_OFFSET, Connection::PARAM_INT)),
+                )
+                ->orderBy('tt_content.pid')
+                ->addOrderBy('tt_content.uid')
+                ->setMaxResults(1)
+                ->executeQuery()
+                ->fetchOne();
+            if (is_string($slug) && $slug !== '') {
+                $paths[] = $slug;
+            }
+        }
+
+        return $paths;
     }
 
     /**
@@ -389,19 +468,9 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
      */
     private function writeSiteConfigurations(): void
     {
-        $instance = sprintf('%s/core-%d/config/sites', dirname(__DIR__, 4), (new Typo3Version())->getMajorVersion());
+        $academics = $this->writeAcademicsSite(self::BASE . '/');
 
-        $academics = $this->committedSite($instance . '/academics/config.yaml');
-        $academics['base'] = self::BASE . '/';
-        $academics['dependencies'] = array_map(
-            static fn(string $set): string => $set === 'bootstrap-package/full'
-                ? 'fgtclb/academics-dev-site-page-object'
-                : $set,
-            $academics['dependencies'] ?? [],
-        );
-        $this->writeSite('academics', $academics, $instance . '/academics/settings.yaml');
-
-        $legacy = $this->committedSite($instance . '/academics-legacy/config.yaml');
+        $legacy = $this->committedSite($this->instanceSitesDirectory() . '/academics-legacy/config.yaml');
         $legacy['base'] = self::BASE . self::LEGACY_SEGMENT . '/';
         $this->writeSite('academics-legacy', $legacy, null);
 
@@ -455,41 +524,5 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
         }
 
         return $titles;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function committedSite(string $file): array
-    {
-        $this->assertFileExists($file);
-        /** @var array<string, mixed> $configuration */
-        $configuration = Yaml::parseFile($file);
-
-        // Taken as it stands, including its "imports" of the route enhancers and
-        // its "fallbackType: strict". The language bases are relative in the
-        // committed file already, so only the site base has to be rewritten, and
-        // the caller does that.
-        return $configuration;
-    }
-
-    /**
-     * Written through `SiteWriter` rather than into a directory of this test's
-     * choosing: the writer knows where the installation reads site
-     * configurations from and flushes the caches that would otherwise answer
-     * with the site list of a moment ago.
-     *
-     * @param array<string, mixed> $configuration
-     */
-    private function writeSite(string $identifier, array $configuration, ?string $settingsFile): void
-    {
-        $writer = $this->get(SiteWriter::class);
-        $writer->write($identifier, $configuration);
-
-        if ($settingsFile !== null && is_file($settingsFile)) {
-            /** @var array<string, mixed> $settings */
-            $settings = Yaml::parseFile($settingsFile);
-            $writer->writeSettings($identifier, $settings);
-        }
     }
 }

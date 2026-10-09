@@ -1,0 +1,12 @@
+# The stylesheet of the development instances, on every page.
+#
+# The academic extensions ship no stylesheet of their own. Their markup is styled
+# by the site package, and this is that part of the development instances: one
+# file compiled from "Resources/Private/Scss/frontend/" of this package, with a
+# partial per extension. An installation copies what it needs into its own site
+# package.
+#
+# Included by the static template of this package for the "/legacy/" tree, and by
+# the set "fgtclb/academics-dev-site-stylesheet" for the "/" tree, where it comes
+# after the stylesheets of the theme.
+page.includeCSS.academicsDevSite = EXT:academics_dev_site/Resources/Public/Css/frontend/academic-extensions.css

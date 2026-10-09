@@ -404,7 +404,10 @@ set references in `Resources/Public/SeedFiles/`, one page object shipped twice
 (`Configuration/TypoScript/` and `Configuration/Sets/PageObject/`, because the
 `/legacy/` tree cannot be themed), the `Configuration/TCA/Overrides/sys_template.php`
 that registers the first of those, the content element of the icon overview
-page, its own `Tests/`, a `composer.json`, a `VERSION` file, a `LICENSE` and a
+page, the stylesheet of the instances (`Resources/Private/Scss/`, its compiled
+`Resources/Public/Css/` and the set `Configuration/Sets/Stylesheet/`, see
+[Frontend assets](frontend-assets.md#the-stylesheet-of-the-development-instances)),
+its own `Tests/`, a `composer.json`, a `VERSION` file, a `LICENSE` and a
 `README.md`. The content element (ACE-594) is a data processor in `Classes/`,
 its template, its CType in `Configuration/TCA/Overrides/tt_content.php` and its
 rendering definition in `ext_localconf.php`, see

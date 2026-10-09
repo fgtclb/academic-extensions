@@ -70,13 +70,13 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
     private const COMPONENT_SUBSTITUTED = '<div id="substituted">EXT:academic_study_plan/Resources/Private/Frontend/Default/Partials/</div>';
 
     /**
-     * The two asset switches, which `constants.typoscript` assigns and
-     * `settings.definitions.yaml` declares, with the same default in both. Rendering them
+     * The asset switch of the script, which `constants.typoscript` assigns and
+     * `settings.definitions.yaml` declares, with the same default in both. Rendering it
      * is what asserts that agreement where it matters - in what the frontend ends up
      * with, through either mechanism. A boolean site setting reaches the constants as
      * `1`, and as the empty string when it is off.
      */
-    private const COMPONENT_ASSET_SWITCHES = '<div id="assets">1|1</div>';
+    private const COMPONENT_ASSET_SWITCHES = '<div id="assets">1</div>';
 
     /**
      * The collapsible filter, off by default - and the one place where the two
@@ -311,7 +311,6 @@ final class SiteSetDeliveryTest extends AbstractAcademicStudyPlanTestCase
 
         $this->assertSame(
             [
-                'plugin.tx_academicstudyplan.assets.css' => true,
                 'plugin.tx_academicstudyplan.assets.js' => true,
                 'plugin.tx_academicstudyplan.filter.collapsible' => false,
             ],

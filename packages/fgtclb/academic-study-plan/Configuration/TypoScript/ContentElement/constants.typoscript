@@ -4,7 +4,7 @@
 # until version 2.4. They are constants now, so an installation can point the
 # content element at its own templates without overriding the whole object.
 #
-# The two "assets" switches and the "filter.collapsible" switch are declared a
+# The "assets.js" switch and the "filter.collapsible" switch are declared a
 # second time, as site settings, in
 # "Configuration/Sets/ContentElement/settings.definitions.yaml". The defaults
 # have to stay identical in both files - see the comment there.
@@ -19,8 +19,6 @@ plugin.tx_academicstudyplan {
     }
 
     assets {
-        # cat=plugin.tx_academicstudyplan/enable; type=boolean; label=Load the stylesheet of the content element
-        css = 1
         # cat=plugin.tx_academicstudyplan/enable; type=boolean; label=Load the script of the content element
         js = 1
     }

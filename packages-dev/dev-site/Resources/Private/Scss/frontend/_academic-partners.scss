@@ -1,8 +1,9 @@
-// Layout of the partner map.
+// Layout of the partner map of academic_partners.
 //
 // The stylesheets of Leaflet and of the marker cluster plugin are the ones of
 // their npm packages, written next to the modules below
-// "Resources/Public/JavaScript/vendor/" by the asset build. This file sizes the
+// "Resources/Public/JavaScript/vendor/" of the extension by the asset build, and
+// the map loads them together with its script. This file sizes the
 // map, puts its panes behind the site chrome, and keeps a site's image rules
 // off the map images.
 
@@ -10,18 +11,22 @@
     height: 500px;
 }
 
-.leaflet-top,
-.leaflet-bottom {
+// The stylesheets of the libraries are registered by the partial of the map
+// and come after this one, which is included by the page. Leaflet gives every
+// pane and the control corners a z-index of their own with one class, so the
+// rules below name the container as well to win regardless of that order.
+.leaflet-container .leaflet-top,
+.leaflet-container .leaflet-bottom {
     z-index: 0;
 }
 
-.leaflet-pane {
+.leaflet-container .leaflet-pane {
     z-index: 0;
 }
 
 // Leaflet sets "width: auto" on tiles and markers, and a site rule such as
 // "img { width: 100% }" of a theme wins over it on specificity alone. The copy
-// of the stylesheet this extension shipped before carried "!important" here,
+// of the stylesheet the extension shipped before carried "!important" here,
 // and this keeps it.
 .leaflet-container .leaflet-marker-pane img,
 .leaflet-container .leaflet-shadow-pane img,
