@@ -689,6 +689,38 @@ alone passes when both sides are wrong the same way.
 does both, with one fixture profile per rule of the list query so that a rule
 the question misses shows up as one wrong letter.
 
+## A migration reads every record, and a removed table has no restrictions
+
+An upgrade wizard runs once, at a moment nobody chooses with the frontend in
+mind. Read with the default restrictions of the query builder (deleted, hidden,
+start time and end time), it leaves out every record that is hidden, scheduled
+or expired at that moment, and then reports nothing left to do for good.
+`ContactTcaUpgradeWizard` of `academic_jobs` did exactly that until ACE-887.
+
+The rule is therefore: **a wizard never keeps the hidden, start time and end
+time restrictions.** Whether it migrates deleted records as well is decided per
+wizard. Most wizards here remove every restriction, so a record restored from
+the recycler later is already in the new shape. `ContactTcaUpgradeWizard` is one
+of them since ACE-887:
+
+```php
+$queryBuilder->getRestrictions()->removeAll();
+```
+
+`FillFilterSlugsUpgradeWizard` of `academic_persons` keeps the deleted
+restriction.
+
+The restrictions are applied per table, from the TCA of that table. A table an
+extension has removed has no TCA in an installation, so no restriction reaches
+it, not even the deleted one. A wizard states every condition on such a table in
+the query itself, `ContactTcaUpgradeWizard` with `contact.deleted = 0` and
+`contact.hidden = 0`. A test fixture that gives the table TCA again hides exactly
+that difference, which is why `test_jobcontact_schema` declares the table in
+`ext_tables.sql` only, see [Fixture extensions](../testing/fixture-extensions.md).
+
+An `UPDATE` or a `DELETE` is not affected. `executeQuery()` and `getSQL()` add
+the restrictions to a `SELECT`, `executeStatement()` adds none, on both cores.
+
 ## Testing this class of defect
 
 Rules 1 and 2 fail in the direction the default test run cannot see: rule 1
@@ -741,6 +773,8 @@ other asserting that the empty result still has the shape a template expects.
   — the ACE-349 changelog entry, including the per-DBMS analysis for TYPO3 v12.
 - `packages/fgtclb/academic-projects/Documentation/Changelog/3.0/Important-FlexFormUpgradeWizardMigratesRecords.rst`
   — the ACE-356 changelog entry, including how to re-run the repaired wizard.
+- `packages/fgtclb/academic-jobs/Documentation/Changelog/3.0/Important-JobContactWizardMigratesInvisibleJobs.rst`:
+  the ACE-887 changelog entry, including how to run the repaired wizard again.
 - `.Build/vendor/typo3/cms-core/Classes/Database/Query/QueryBuilder.php` and
   `.../Query/Expression/ExpressionBuilder.php` — the authoritative source for
   both mechanisms; read the installed version, not the documentation of another.
