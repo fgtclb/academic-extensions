@@ -10,10 +10,10 @@ Description
 The contacts content element renders every contact through the profile card
 of `EXT:academic_persons`, :file:`Partials/Profile/Item.html`, which renders
 the profile image through the responsive image partial of `EXT:academic_base`
-from 3.0 on. The image of a contact is therefore a :html:`<picture>` with WebP
-sources and a fallback :html:`<img>` with the classes `card-img-top img-fluid`,
-and a contact whose profile has no image shows the placeholder of the persons
-plugins.
+from 3.0 on. The image of a contact is therefore a
+:html:`<picture class="ace-picture">` with WebP sources and a fallback
+:html:`<img class="ace-image">`, and a contact whose profile has no image
+shows the placeholder of the persons plugins.
 
 The plugin view registers
 :file:`EXT:academic_base/Resources/Private/Partials/` with the partial root

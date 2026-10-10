@@ -101,22 +101,20 @@ and every label of the two editors is authored in Fluid. That is not the same as
 because an override that renames one of these breaks the editor silently. They
 are part of the contract and are listed in the extension's manual as well.
 
-The feature modules below the elements toggle *state* classes on markup that
-already exists — `d-none`, `d-md-flex`, `is-invalid`, `text-danger`,
-`text-body-secondary`, `active`, the four `bg-*` severities of the toast, the
-five `is-drag-*`/`is-drop-*` classes of the drag sort, `is-image-closing`, the
-three `col-lg-*` widths of the image column, and the transition classes derived
-from a prefix — and they select nodes by class in eleven places:
+The feature modules below the elements show and hide markup that already
+exists through its `hidden` attribute, and toggle *state* classes on it:
+`is-invalid`, `active`, `ace-empty` and `ce-bodytext` on a preview,
+`ace-limit-exceeded` on a counter, `show` and `showing` with the four
+`ace-message-*` severities of the toast, the five `is-drag-*`/`is-drop-*`
+classes of the drag sort, `is-image-closing`, the three `col-lg-*` widths of the
+image column, and the transition classes derived from a prefix. They select
+nodes by `data-pe-*` attributes, and with three class selectors:
 
-| Selector                                                   | Read by                                  |
-|------------------------------------------------------------|------------------------------------------|
-| `.academic-persons-profile-editing__field`                 | `fields.ts`, every editable control      |
-| `.academic-persons-profile-editing__sync-checkbox`         | `sync.ts`                                |
-| `.academic-persons-profile-editing__profile-fields-column` | `image.ts`, `elements/image-editor.ts`   |
-| `.status-title`, `.status-message`                         | `common.ts`, the toast                   |
-| `.invalid-feedback`, `.form-check`, `.mb-3`                | `fields.ts`, the validation message      |
-| `.ck`                                                      | `fields.ts`, the CKEditor `Escape` guard |
-| `.alert[role="alert"]`, `.spinner-border`                  | the two editor elements                  |
+| Selector                                     | Read by                                                   |
+|----------------------------------------------|-----------------------------------------------------------|
+| `.ace-message`                               | `fields.ts`, the validation message of a field or a group |
+| `.is-drop-before`, `.is-drop-after`          | `documents.ts`, its own drop markers                      |
+| `.ck`                                        | `fields.ts`, the CKEditor `Escape` guard                  |
 
 `sticky-image.ts` adds `#page-header.navbar-fixed-top`, which belongs to the
 site's theme rather than to this extension.
@@ -127,7 +125,7 @@ prototype, all of them outside the two editors and each a leaf:
 depending on whether the record carries an allowed link, and puts an em dash
 where the value is empty — the same placeholder the `contact-summary-cell`
 prototype carries; and `profile/rich-text.ts` writes the empty-state label of
-a rich text preview as `<span class="text-body-secondary">`. The remaining
+a rich text preview as `<span class="ace-empty">`. The remaining
 `document.createElement()` calls make a custom element host, which carries no
 markup of its own until it is filled from a prototype, or the detached render
 root of `elements/base.ts`. Anything larger than a leaf is a prototype.
@@ -228,16 +226,16 @@ is no record for the panel to stand in.
 **A pencil does nothing at all while the form is open.** Every editable field
 is already open there, so there is nothing for it to open, and it is silent
 about it: nothing is on its way to the server, and the bar is the way out. In
-the shipped markup that pencil cannot be reached — it sits inside the
-`[data-pe-field-preview]` that carries `d-none` while the editor is open — but
-that is a Bootstrap class in an overridable partial, and the rule does not rest
-on it.
+the shipped markup that pencil cannot be reached, because it sits inside the
+`[data-pe-field-preview]` that carries `hidden` while the editor is open. That
+is markup of an overridable partial, though, and the rule does not rest on it.
 
-The open editors are read off the DOM — the `d-none` of the editor element —
-rather than tracked in a variable. Openness already has one source of truth, and
-it is written from more places than the two pencils: `closeFields()`,
-`performSave()` and `leaveFormEditing()` all close editors without one being
-pressed, so a second copy would be wrong the first time one of them was missed.
+The open editors are read off the DOM, from the `hidden` attribute of the
+editor element, rather than tracked in a variable. Openness already has one
+source of truth, and it is written from more places than the two pencils:
+`closeFields()`, `performSave()` and `leaveFormEditing()` all close editors
+without one being pressed, so a second copy would be wrong the first time one
+of them was missed.
 
 That reading has one condition: it must not run while full form editing is
 active, where every editor is open and the whole profile would be thrown away.
@@ -995,18 +993,24 @@ the order they are written, so the black one covers all four pixels while the
 white one covers the inner two, and the accent ring on top is translucent: the
 outer half of the ring reads as a hard black rectangle tight around the control
 (ACE-521). Rendered and read back pixel by pixel, that band is `#161e18` on the
-theme's light body background.
+theme's light body background. The measurements on this page were taken on the
+markup of the development versions of 3.0, which carried those form classes.
+The controls carry `ace-control` and no form class of Bootstrap since ACE-818,
+so of the two theme rules only the one for `.btn` still reaches the view, and
+the ring below applies to every control and every button regardless.
 
 Three things are wrong with drawing a focus ring that way, and only the first is
 cosmetic.
 
 **A shadow is painted outside the border box, and two of the editor's panels clip
-exactly there.** `__document-collapse-content` and `__image-editor-content` carry
-`overflow: hidden` for the `grid-template-rows` collapse. The `.row` inside them
-pulls itself out with `margin: -1rem -0.5rem 0` and every `.row > *` puts the
-gutter back as padding, so a full width control lands with its left and its right
-border edge *on* the clipping rectangle — and on all four edges when it is the
-only row. Everything painted outside the border box there is cut away: a
+exactly there.** The `ace-content` of the `ace-document-editor` and of the
+`ace-image-editor` carry `overflow: hidden` for the `grid-template-rows`
+collapse. In the document editor the fields sit in a plain `.row`, which pulls
+itself out by half the gutter of Bootstrap on either side while every
+`.row > *` puts it back as padding, and the file input of the image editor
+fills the `ace-content` without a row. Either way a full width control lands
+with its left and its right border edge *on* the clipping rectangle.
+Everything painted outside the border box there is cut away: a
 `box-shadow`, and an `outline` with a positive `outline-offset` just the same.
 Measured in Chrome against the real theme stylesheet, a focused field of a
 document panel and the file input of the image editor — the one `image.ts`
@@ -1055,13 +1059,15 @@ Five decisions in it are worth keeping:
 - **The colour is `currentcolor`.** It is the colour the control draws its own
   text in, so it contrasts with the control by construction, in any palette and
   in either colour mode — a colour that did not would make the control
-  unreadable first. `.form-check-input` is the exception and the reasoning does
-  not carry there: Bootstrap paints the tick and the switch knob as a
-  background image with a hardcoded `#ffffff` rather than in `currentcolor`, so
-  the ring takes the inherited body colour. Measured against the shipped theme,
-  `#212121` on the `#577760` of a checked control is 3.23:1 — over the 3:1 of
-  WCAG 2.1 SC 1.4.11 and not by much, and a darker `$primary` drops below it. A
-  Bootstrap custom property does not manage even that much:
+  unreadable first. The checkbox is the exception the reasoning does not cover.
+  The view renders it as a native `ace-control ace-checkbox`, which the
+  stylesheet leaves to the browser with `appearance: auto`: the browser draws
+  the tick in its own accent colour, and the ring takes the text colour of the
+  control. When it was Bootstrap's `.form-check-input`, with the tick painted
+  as a background image in a hardcoded `#ffffff`, the ring measured 3.23:1
+  against the `#577760` of a checked control, over the 3:1 of WCAG 2.1
+  SC 1.4.11 and not by much. A site that draws the checkbox itself checks that
+  contrast again. A Bootstrap custom property does not manage even that much:
   `--bs-primary-text-emphasis` is dark by design and measures 1.6:1 against the
   green of a focused `.btn-success`. It is also why there is no
   `prefers-color-scheme` block: that media query reports the operating system
@@ -1069,17 +1075,17 @@ Five decisions in it are worth keeping:
   the two disagree in two of their four combinations.
 - **`:focus-visible`, not `:focus`.** It is the pseudo-class the theme's two
   rules use, so it is exactly where the defect is, and it is what Bootstrap
-  itself uses for buttons. Pointer focus on a checkbox or a switch then keeps
-  the soft glow Bootstrap has always drawn for it rather than gaining a hard
-  ring it never had — measured in Chrome, a click on those two does not match
-  `:focus-visible`, a click on a text input or a select does.
+  itself uses for buttons. Pointer focus on a checkbox then keeps the focus
+  appearance of the browser rather than gaining a hard ring: measured in
+  Chrome, a click on a checkbox does not match `:focus-visible`, a click on a
+  text input or a select does.
 - **The plugin root stands three times for specificity, not for scope.** One is
   not enough: at two class selectors and a pseudo-class the rule ties
   `.form-control.is-invalid:focus` and loses outright to
   `.form-group input[type=file]:focus-visible`, which is what the theme's compat
-  layer `@extend`s `.form-control` into. Three puts it at four class selectors
-  and a tag name, above every rule of `bootstrap5-theme.css` that can match
-  markup these templates produce.
+  layer `@extend`s `.form-control` into, measured on the markup with the form
+  classes. Three puts it at four class selectors and a tag name, above every
+  rule of `bootstrap5-theme.css` that could match the markup of the templates.
 
 It reaches `input`, `select`, `textarea` and `button` rather than a list of
 Bootstrap classes, because those four tags are every control and every button
@@ -1087,8 +1093,9 @@ the templates render and an override can strip an element of a class but not of
 its tag name.
 [`AcademicPersonsEditProfileEditingFocusRingTest`](../../packages/fgtclb/academic-persons-edit/Tests/Functional/Plugins/AcademicPersonsEditProfileEditingFocusRingTest.php)
 asserts the other direction — that the view renders no focusable widget outside
-those four, and that every control and button still carries the Bootstrap class
-that gives it the border the inset ring sits on.
+those four, that every control still carries `ace-control`, the class the
+stylesheet gives the border the inset ring sits on, and that every button
+carries `btn` or `btn-close`.
 
 Plain links are deliberately outside it. The back link of
 `Templates/Profile/Index.html` is the only anchor the view renders, no theme

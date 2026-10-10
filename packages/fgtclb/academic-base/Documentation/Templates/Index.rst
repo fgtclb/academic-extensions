@@ -26,9 +26,9 @@ renders one image of a record for the frontend:
 *   the placeholder as one :html:`<img>` when there is no image, and nothing
     when there is no placeholder either.
 
-A template of an academic extension renders it like this, here with the
-settings of :guilabel:`EXT:academic_persons` that choose the crop variant and
-the placeholder of its card:
+A template of an academic extension renders it like this, here the card of
+:guilabel:`EXT:academic_persons`, :file:`Partials/Profile/Item/Image.html`,
+with the settings that choose the crop variant of its view and the placeholder:
 
 ..  code-block:: html
 
@@ -37,15 +37,32 @@ the placeholder of its card:
         arguments="{
             image: profile.image,
             preset: 'card',
-            cropVariant: settings.image.card.cropVariant,
-            placeholder: settings.image.placeholder.default,
-            class: 'academic-persons-item__image card-img-top img-fluid'
+            cropVariant: '{settings.image.{imageView}.cropVariant}',
+            placeholder: placeholder
         }"
     />
 
-The template of the persons card itself picks the crop variant of its view and
-a placeholder per gender first, see the :guilabel:`Profile image` chapter of
-:guilabel:`EXT:academic_persons`.
+For a raster image of the development instances, that renders, shortened to
+the elements and their attributes:
+
+..  code-block:: html
+
+    <picture class="ace-picture">
+        <source srcset="/fileadmin/_processed_/0/5/csm_profile-01_1d3403aae7.webp" type="image/webp" media="(min-width: 992px)" />
+        <source srcset="/fileadmin/_processed_/0/5/csm_profile-01_99f8b09a62.webp" type="image/webp" media="(min-width: 768px)" />
+        <source srcset="/fileadmin/_processed_/0/5/csm_profile-01_395eaf11e8.webp" type="image/webp" media="(min-width: 576px)" />
+        <source srcset="/fileadmin/_processed_/0/5/csm_profile-01_dfbfe7773a.webp" type="image/webp" />
+        <img class="ace-image " loading="lazy" src="/fileadmin/…/profile-01.png" width="600" height="800" alt="Portrait of Jane Doe" title="Jane Doe" />
+    </picture>
+
+The fallback :html:`<img>` is the original file here, because it is narrower
+than the 690 pixels of the preset, and an image is never scaled up. The card
+passes no class of its own, so the image carries `ace-image` alone, followed by
+the space the empty argument leaves. The alternative text and the title are
+those of the file reference. The
+template of the persons card picks the crop variant of its view and a
+placeholder per gender before it renders the partial, see the
+:guilabel:`Profile image` chapter of :guilabel:`EXT:academic_persons`.
 
 ..  _templates-image-arguments:
 
