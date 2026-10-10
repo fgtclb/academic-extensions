@@ -91,15 +91,35 @@ within the window, right after building the paginator. The full result the
 repository returned stays unfetched, `JobRepositoryHiddenTranslationTest` pins
 that.
 
+## The detail of a hidden profile
+
+The detail plugin of `academic_persons` resolves the profile of the request
+itself while the option is on, with `findByUidIncludingHidden()` of
+`ProfileRepository`, because the argument mapping of Extbase respects the
+hidden flag. A link carries the uid of the default record, and a query that
+keeps the language restriction does not select a default record in a
+translated language: `fallbackType: strict` selects translations only,
+`fallback` selects a default record only while it has no translation, and
+`free` selects the rows of the requested language only. The lookup found
+nothing in a translated language on v13 and v14, for a visible profile as well
+(ACE-884). The plugin then fell back to the argument mapping, so a visible
+profile was still shown, and a hidden one answered `404`.
+
+The finder therefore matches the uid the way the argument mapping does in
+`Backend::getObjectByIdentifier()`: it lifts the language restriction, so the
+default record is selected, and lets the overlay replace it with its
+translation. `fallbackType: free` is lifted to `OVERLAYS_MIXED`, as v14 does,
+so an untranslated profile is shown in the default language there. The
+argument mapping of v13 lifts it to `OVERLAYS_ON_WITH_FLOATING`, which drops an
+untranslated record on v14. `findByUidsWithContext()` keeps
+`OVERLAYS_ON_WITH_FLOATING` for a manual selection, so there an untranslated
+profile is not shown in free mode on v14.
+
 ## What it does not cover
 
 - **A result executed elsewhere.** A listener of a list event that replaces the
   result with one of its own query has to execute it through the fetcher the
   same way.
-- **The detail lookup of a hidden profile.** `findByUidIncludingHidden()` of
-  `ProfileRepository` matches the uid of the default record, which a translated
-  language statement does not select, measured on v13.4.35. That is a lookup
-  question, not an overlay one, and is left to an issue of its own.
 
 ## See also
 
