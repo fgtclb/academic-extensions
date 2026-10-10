@@ -28,7 +28,7 @@ What the extensions ship
     below.
 *   **Behaviour.** The JavaScript modules that make a list filter in place,
     open a dialog of the study plan or run the profile editor. They find their
-    elements by `data-*` attributes, with one exception, and each extension
+    elements by `data-*` attributes, with two exceptions, and each extension
     can switch its scripts off per site, see :ref:`styling-scripts`.
 *   **No styling.** No extension ships a stylesheet for its markup. The
     stylesheets an extension loads are those of a library one of its scripts
@@ -330,10 +330,14 @@ The JavaScript modules of the extensions find the elements they work with by
 class in a template override without breaking a script. An override has to
 keep the `data-*` attributes and ids of the elements it copies.
 
-The one exception is the rich text editor of the new job form of
-:guilabel:`EXT:academic_jobs`: its script starts the editor on every text area
-with the class `ace-ckeditor`. An override of the form keeps that class on the
-text areas that get the editor.
+Two scripts find an element by its class, and an override keeps that class:
+
+*   The rich text editor of the new job form of :guilabel:`EXT:academic_jobs`
+    starts on every text area with the class `ace-ckeditor`.
+*   The profile editor of :guilabel:`EXT:academic_persons_edit` writes the
+    message of a refused field into the `ace-message` of the field or its
+    group.
+
 A few classes are written by a script, to mark a state a stylesheet should
 show. The chapter of the extension names them.
 

@@ -441,10 +441,20 @@ body:has(.academic-persons-profile-editing) .ace-sticky-image {
 // where that rule still reaches, the band is `#161e18` on the light body
 // background - the theme accent at 25% over opaque black.
 //
-// The theme has no `:focus` rule for a form control at all. What draws a
-// pointer click on a checkbox or a switch is Bootstrap's own
+// The controls of this view carry `ace-control` and no form class of Bootstrap,
+// so of the two theme rules only the `.btn` one still reaches the view. The
+// form rule reached the controls of the development versions of 3.0, which
+// carried `.form-control`, `.form-select` and `.form-check-input`, and the
+// measurements in this comment were taken on them. The rule below keeps one
+// ring for every control and every button regardless, so the view does not
+// depend on which classes a theme styles.
+//
+// The theme has no `:focus` rule for a form control at all. What drew a pointer
+// click on a checkbox or a switch was Bootstrap's own
 // `.form-check-input:focus`, a soft `border-color` and a translucent glow that
-// never showed the black rectangle. The rule below therefore keys on
+// never showed the black rectangle. The checkbox of this view is a native one,
+// `ace-control ace-checkbox` with `appearance: auto` above, and a pointer click
+// on it shows the browser's own focus appearance. The rule below keys on
 // `:focus-visible`, the pseudo-class the two theme rules use: it is where the
 // defect is, and it is what Bootstrap does for buttons.
 //
@@ -456,18 +466,20 @@ body:has(.academic-persons-profile-editing) .ace-sticky-image {
 //
 // A `box-shadow` is also the wrong mechanism for the job, twice over.
 //
-// It is clipped. `__document-collapse-content` and `__image-editor-content`
-// carry `overflow: hidden` for the grid-rows collapse, the `.row` inside them
-// pulls itself out by `margin: -1rem -0.5rem 0` and every `.row > *` puts the
-// gutter back as padding, so a full width control lands with its left and its
-// right border edge exactly on the clipping rectangle. Anything painted
-// outside the border box there - a `box-shadow`, or an `outline` with a
-// positive `outline-offset` - is cut away on those two sides, and on all four
-// when the field is the only row. Measured before this rule was written to
-// draw inside the box: the left and right bands of a document panel field, of
-// a document panel button and of the image editor's file input carried no ring
-// pixel at all, only Bootstrap's `#abbbb0` border at about 2:1 on white - and
-// `image.ts` focuses that file input on every open of the image editor.
+// It is clipped. The `.ace-content` of `.ace-document-editor` and of
+// `.ace-image-editor` carries `overflow: hidden` for the grid-rows collapse. In
+// the document editor the fields sit in a plain `.row`, which pulls itself out
+// by half the gutter of Bootstrap on either side while every `.row > *` puts it
+// back as padding, and the file input of the image editor fills the
+// `.ace-content` without a row. Either way a full width control lands with its
+// left and its right border edge exactly on the clipping rectangle. Anything
+// painted outside the border box there - a `box-shadow`, or an `outline` with a
+// positive `outline-offset` - is cut away on those two sides. Measured before
+// this rule was written to draw inside the box: the left and right bands of a
+// document panel field, of a document panel button and of the image editor's
+// file input carried no ring pixel at all, only Bootstrap's `#abbbb0` border at
+// about 2:1 on white - and `image.ts` focuses that file input on every open of
+// the image editor.
 //
 // And forced colours drops shadows entirely, while every rule that draws a
 // ring this way also sets `outline: 0`. What a high contrast user saw was
@@ -493,14 +505,16 @@ body:has(.academic-persons-profile-editing) .ace-sticky-image {
 //
 // The colour is `currentcolor`. It is the one value that contrasts with the
 // control it sits on by construction, whatever the site's palette and whatever
-// the colour mode: it is the colour the control draws its own text or its own
-// tick in, so a value that were too close to the control's background would
-// make the control unreadable first. A Bootstrap custom property would not do
-// that - `--bs-primary-text-emphasis` is dark by design and measures 1.6:1 on
-// the green of a focused `.btn-success` - and it is why there is no
-// `prefers-color-scheme` block here: that media query reports the operating
-// system setting, while Bootstrap's colour mode is the `data-bs-theme`
-// attribute, and the two disagree in two of their four combinations.
+// the colour mode: it is the colour the control draws its own text in, so a
+// value that were too close to the control's background would make the control
+// unreadable first. A native checkbox draws its tick in the accent colour of
+// the browser and takes the ring in the text colour of the control. A Bootstrap
+// custom property would not do that - `--bs-primary-text-emphasis` is dark by
+// design and measures 1.6:1 on the green of a focused `.btn-success` - and it
+// is why there is no `prefers-color-scheme` block here: that media query
+// reports the operating system setting, while Bootstrap's colour mode is the
+// `data-bs-theme` attribute, and the two disagree in two of their four
+// combinations.
 //
 // The rule reaches `input`, `select`, `textarea` and `button` rather than a
 // list of Bootstrap classes. Those four are every control and every button the
@@ -511,16 +525,18 @@ body:has(.academic-persons-profile-editing) .ace-sticky-image {
 // name the way an override can strip it of a class.
 // `AcademicPersonsEditProfileEditingFocusRingTest` asserts the other
 // direction, that the plugin renders no focusable widget outside those four
-// tags and that every one of them still carries the Bootstrap class that gives
-// it the border the inset ring sits on.
+// tags, that every control carries `ace-control`, the class this stylesheet
+// gives the border the inset ring sits on, and every button `btn` or
+// `btn-close`.
 //
-// The plugin root stands three times for specificity, not for scope. One is
-// not enough: at two class selectors and a pseudo-class the rule ties
-// `.form-control.is-invalid:focus` and loses outright to
-// `.form-group input[type=file]:focus-visible`, which is what the theme's
-// compat layer `@extend`s `.form-control` into and which measured (0,3,1)
-// against the rule's (0,3,0). Three puts it at (0,4,1), above every rule in
-// `bootstrap5-theme.css` that can match markup these templates produce. The
+// The plugin root stands three times for specificity, not for scope. One is not
+// enough: at two class selectors and a pseudo-class the rule ties
+// `.form-control.is-invalid:focus` and loses outright to `.form-group
+// input[type=file]:focus-visible`, which is what the theme's compat layer
+// `@extend`s `.form-control` into and which measured (0,3,1) against the rule's
+// (0,3,0), measured on the markup of the development versions of 3.0 with its
+// form classes. Three puts it at (0,4,1), above every rule in
+// `bootstrap5-theme.css` that could match markup these templates produced. The
 // two it does not beat, `.form-group input.is-invalid[type=file]:focus` and
 // `.was-validated .form-group input[type=file]:invalid:focus`, both need a
 // wrapper the templates never render.
