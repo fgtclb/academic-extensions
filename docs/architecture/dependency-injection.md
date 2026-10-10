@@ -140,7 +140,7 @@ Measured with
 
 | Attribute             | Sites | Examples                                                                     |
 |-----------------------|-------|------------------------------------------------------------------------------|
-| `#[Autoconfigure]`    | 24    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
+| `#[Autoconfigure]`    | 25    | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)    |
 | `#[Autowire]`         | 7     | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`      |
 | `#[AsAlias]`          | 3     | `academic-persons/Classes/Service/RecordSynchronizer.php:49`                 |
 | `#[Exclude]`          | 27    | `academic-base/Classes/Settings/Validation.php:23` and the settings graph    |
@@ -274,7 +274,14 @@ them as precedent, and do not add state to them.
 
 Note that a genuinely configurable service is possible, but it must be declared
 `#[Autoconfigure(shared: false)]` so each retrieval returns a fresh instance.
-No service in this repository is declared that way today.
+Two classes are declared that way. `academic-base/Classes/Persistence/HiddenRecordsQueryResult.php`
+is an Extbase query result, which holds its query and its rows by nature.
+`academic-jobs/Classes/Upgrades/RepairNewJobFormValuesUpgradeWizard.php` is an
+upgrade wizard that implements the core's `ChattyInterface`, which hands it the
+output of its run through a setter before it runs, the console on the command
+line and a stream in the upgrade module. The setter is the only way to receive
+it, so the output is the one value the wizard keeps, and it does not reach the
+next retrieval.
 
 ### Page title providers are the allowed exception
 
@@ -330,14 +337,16 @@ versions diverge:
 | `TYPO3\CMS\Backend\Attribute\AsAvatarProvider`, `AsSidebarComponent` | **no**   | yes             | no                             |
 
 `TYPO3\CMS\Extbase\Attribute\*` does not exist on v13 at all. The
-`Install\Attribute\UpgradeWizard` row is the one all seventeen upgrade wizards use:
+`Install\Attribute\UpgradeWizard` row is the one all eighteen upgrade wizards use:
 on v14 it survives as a deprecated subclass shim in
 `cms-core/DeprecatedClasses/ext-install/`, so it still works, but its
 replacement `Core\Attribute\UpgradeWizard` is absent on v13. Wizards were
 added since anyway, each a deliberate exception to "do not add new uses" and
-migrated together with the others under ACE-294. Two examples:
+migrated together with the others under ACE-294. Three examples:
 `academic-bite-jobs/Classes/Upgrades/ListViewFlexFormUpgradeWizard.php` repairs
-content elements a 2.1 rename broke, and
+content elements a 2.1 rename broke,
+`academic-jobs/Classes/Upgrades/RepairNewJobFormValuesUpgradeWizard.php`
+repairs jobs it can only recognise by a fingerprint of their values, and
 `academic-persons/Classes/Upgrades/MigrateContractPublishToHiddenUpgradeWizard.php`
 is shipped unregistered, see
 [A service a site package registers](#a-service-a-site-package-registers). See

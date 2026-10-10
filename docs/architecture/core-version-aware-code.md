@@ -494,7 +494,7 @@ Details, so each row can be re-checked rather than trusted:
   (line 298); on v13 the class exists without it. One call site:
   `packages/fgtclb/academic-bite-jobs/Classes/Services/BiteJobsService.php`
   lines 15 and 35.
-- **Upgrade wizards** — mechanism 2. 17 wizards in 7 extensions import
+- **Upgrade wizards** — mechanism 2. 18 wizards in 7 extensions import
   `TYPO3\CMS\Install\Attribute\UpgradeWizard`,
   `TYPO3\CMS\Install\Updates\UpgradeWizardInterface` and
   `TYPO3\CMS\Install\Updates\DatabaseUpdatedPrerequisite`. On v14 these classes
@@ -527,8 +527,8 @@ build will raise it.
 
 There are two ways out of the epic, and the choice belongs to it rather than to
 an individual change: drop v13 support first (expected), or introduce the
-folder split above — disproportionate for 28 call sites (10 `Extbase\Annotation`
-uses in 6 files, 17 upgrade wizards, 1 `FlexFormService`), measured with:
+folder split above — disproportionate for 29 call sites (10 `Extbase\Annotation`
+uses in 6 files, 18 upgrade wizards, 1 `FlexFormService`), measured with:
 
 ```bash
 grep -rc 'Extbase\\Annotation' --include='*.php' packages/fgtclb/*/Classes
