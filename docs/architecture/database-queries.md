@@ -721,6 +721,38 @@ that difference, which is why `test_jobcontact_schema` declares the table in
 An `UPDATE` or a `DELETE` is not affected. `executeQuery()` and `getSQL()` add
 the restrictions to a `SELECT`, `executeStatement()` adds none, on both cores.
 
+## A removed table or field keeps its data under another name
+
+The database analyzer does not drop a table or a field the schema no longer
+declares right away. Its "remove" step first renames it with the prefix
+`zzz_deleted_` (`ConnectionMigrator::$deletedPrefix` on v12, v13 and v14, the
+same prefix back to TYPO3 6.2), shortened to the identifier length of the
+platform, 63 characters on MySQL, MariaDB and PostgreSQL. Only a second pass
+drops the renamed one. One "remove" step renames every table and field the
+schema no longer declares at once.
+
+An installation that applied that step before it ran a wizard still has the
+data, under the new name. A wizard that reads a removed table or field
+therefore looks for both names, each on its own:
+
+- `MigrateContractPublishToHiddenUpgradeWizard` of `academic_persons` reads the
+  contract field `publish` or `zzz_deleted_publish`.
+- `ContactTcaUpgradeWizard` of `academic_jobs` reads the old contact table and
+  the relation field of the job under either name since ACE-895. Until then it
+  looked for `zzz_tx_academicjobs_domain_model_contact`, a name no TYPO3
+  version ever produced, and found nothing after the analyzer ran.
+
+Once the analyzer has dropped the renamed table or field, there is nothing left
+to read, and the wizard has nothing to do.
+
+A test proves the name with the analyzer of the core under test rather than
+with a name typed into the test.
+`ContactTcaUpgradeWizardAfterDatabaseAnalyzerTest` compares the database with
+the schema of every loaded extension except the fixture that declares the old
+table, and executes the renames `SchemaMigrator::getUpdateSuggestions()`
+suggests for removal, as the Install Tool does. The renames stay in the
+database of the test case class, so such a class holds one test.
+
 ## Testing this class of defect
 
 Rules 1 and 2 fail in the direction the default test run cannot see: rule 1
@@ -775,6 +807,9 @@ other asserting that the empty result still has the shape a template expects.
   — the ACE-356 changelog entry, including how to re-run the repaired wizard.
 - `packages/fgtclb/academic-jobs/Documentation/Changelog/3.0/Important-JobContactWizardMigratesInvisibleJobs.rst`:
   the ACE-887 changelog entry, including how to run the repaired wizard again.
+- `packages/fgtclb/academic-jobs/Documentation/Changelog/3.0/Important-JobContactWizardFindsRenamedTable.rst`:
+  the ACE-895 changelog entry, for installations that let the analyzer rename
+  the old contact table first.
 - `.Build/vendor/typo3/cms-core/Classes/Database/Query/QueryBuilder.php` and
   `.../Query/Expression/ExpressionBuilder.php` — the authoritative source for
   both mechanisms; read the installed version, not the documentation of another.
