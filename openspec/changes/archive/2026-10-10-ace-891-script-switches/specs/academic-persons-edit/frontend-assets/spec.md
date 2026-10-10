@@ -1,10 +1,4 @@
-# academic-persons-edit/frontend-assets Specification
-
-## Purpose
-Defines what the profile editor brings to a page besides its markup, and what
-it leaves to the stylesheet of the site.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: The profile editor brings no stylesheet
 A page that carries the profile editing plugin SHALL NOT load a stylesheet of

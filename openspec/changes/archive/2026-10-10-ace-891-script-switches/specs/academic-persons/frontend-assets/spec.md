@@ -1,11 +1,4 @@
-# academic-persons/frontend-assets Specification
-
-## Purpose
-Defines what the views of profiles, the public profile and the lists, bring to
-a page besides their markup, and what they leave to the stylesheet of the
-site.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: The public profile brings no stylesheet
 A page that carries the detail view of a profile SHALL load the script of the
@@ -32,13 +25,3 @@ TYPO3 v13 and v14.
   script of the extension to off
 - **THEN** the page does not load the script of the view and renders the same
   profile
-
-### Requirement: The profile lists bring no stylesheet
-A page that carries a list, a card, a selected profiles or a selected
-contracts element of the extension SHALL NOT load a stylesheet of the
-extension. The site styles the lists through their classes.
-
-#### Scenario: A page with a profile list
-- **WHEN** a visitor opens a page with the list of profiles
-- **THEN** the page lists the profiles and loads no stylesheet of the
-  extension
