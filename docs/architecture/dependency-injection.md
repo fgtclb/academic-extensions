@@ -129,7 +129,7 @@ they are used in production code across nine packages:
 | `#[Autoconfigure]`   | 10      | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)   |                                                |
 | `#[Autowire]`        | 7       | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`     |                                                |
 | `#[AsAlias]`         | 2       | `academic-persons/Classes/Service/RecordSynchronizer.php:21`                |                                                |
-| `#[AsCommand]`       | 1       | `academic-partners/Classes/Command/GeocodeCommand.php:23`                   |                                                |
+| `#[AsCommand]`       | 1       | `academic-partners/Classes/Command/GeocodeCommand.php:28`                   |                                                |
 
 `#[AsCommand]` there is Symfony's **Console** attribute
 (`Symfony\Component\Console\Attribute\AsCommand`), not a DI one; the two
