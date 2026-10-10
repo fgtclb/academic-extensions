@@ -26,8 +26,9 @@ TYPO3 13.4.35 and 14.3.7, see `design.md`.
 The behaviour is the same on TYPO3 v13 and v14, with one code path.
 
 **Blocked by pull request #850 (ACE-818)**, a task without specs that
-rewrites the classes of the same template and partials. This change is built on
-its markup: after #850 is merged, or as a pull request stacked on its branch.
+rewrites the classes of the same template and partials, and by the stack #929
+it grew into. This change is built on the top of that stack and merged after
+it.
 
 ## Capabilities
 

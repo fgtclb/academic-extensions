@@ -262,4 +262,46 @@ final class AcademicStudyPlanContentElementLocalizationTest extends AbstractAcad
         $this->assertStringContainsString('Shared Module', $german);
         $this->assertStringContainsString('[DE] Erstes Semester', $german);
     }
+
+    /**
+     * @return string[] The id of every study plan dialog of the page, in document order.
+     */
+    private function dialogIdsOf(string $html): array
+    {
+        $document = new \DOMDocument();
+        $previous = libxml_use_internal_errors(true);
+        $document->loadHTML($html);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        $dialogs = (new \DOMXPath($document))->query('//div[@data-study-plan]//dialog[@data-study-plan-dialog]');
+        $this->assertInstanceOf(\DOMNodeList::class, $dialogs);
+
+        $ids = [];
+        foreach ($dialogs as $dialog) {
+            $this->assertInstanceOf(\DOMElement::class, $dialog);
+            $ids[] = $dialog->getAttribute('id');
+        }
+
+        return $ids;
+    }
+
+    /**
+     * A translated "Insert records" element renders the translated plan with dialog ids
+     * of its own as well. The prefix is the uid of the "Insert records" element after the
+     * overlay, so the translated page carries the ids of its default language page.
+     */
+    #[Test]
+    public function translatedInsertedPlanRendersTheDialogIdsOfTheDefaultLanguage(): void
+    {
+        $this->setUpTestCase('localizedStudyPlan_insertedTwice');
+
+        $expected = ['popup-1', 'popup-3', 'popup-c3-1', 'popup-c3-3'];
+        $this->assertSame($expected, $this->dialogIdsOf($this->renderEnglishPage()));
+
+        // Both copies show the translated plan, the inserted one included.
+        $german = $this->renderGermanPage();
+        $this->assertSame(2, substr_count($german, 'data-study-plan="'));
+        $this->assertStringNotContainsString('Mathematics I', $german);
+        $this->assertSame($expected, $this->dialogIdsOf($german));
+    }
 }

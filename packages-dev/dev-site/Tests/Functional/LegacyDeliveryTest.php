@@ -407,6 +407,14 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
         // all, so this masks both without having to know which is which.
         $markup = (string)preg_replace('#(=|%5D=)\d+#', '$1*', $markup);
 
+        // The dialog id of a study plan shown by an "Insert records" element,
+        // "id=\"popup-c1069-225\"": it carries the uid of that element and of
+        // the module, both mirrored with an offset of their own. The rule below
+        // leaves it alone, because it only masks a number with nothing numeric
+        // in front of it, so this one names the shape exactly rather than
+        // masking every value with two numbers in it.
+        $markup = (string)preg_replace('#="([^"\d]*-c)\d+(-)\d+"#', '="$1*$2*"', $markup);
+
         // An attribute whose value ends in a number, with nothing numeric in
         // front of it: "id=\"c1003\"" of a content element, "id=\"partner-1342\""
         // of the partner map, "data-study-plan=\"1031\"" of the study plan. Every

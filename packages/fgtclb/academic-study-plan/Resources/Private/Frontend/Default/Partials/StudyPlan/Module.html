@@ -12,6 +12,9 @@
     - semester: the semester it belongs to, for the label the dialog trigger
       announces to a screen reader. The label names the note and the credit
       points of the semester only when it has them.
+    - idPrefix: what the dialog id starts with, `c<uid>-` when the plan is
+      rendered inside another content element such as "Insert records", empty
+      otherwise. Passed on to the dialog.
 
     A module with neither a description nor an audio file has nothing to show, so
     it carries no trigger and no dialog. An override may move
@@ -38,7 +41,7 @@
     </f:if>
 
     <f:if condition="{hasContent}">
-        <button class="ace-module-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
+        <button class="ace-module-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-{idPrefix}{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
             <span class="visually-hidden">
                 {semester.label}<f:if condition="{semester.note}">, {semester.note}</f:if><f:if condition="{semester.credit_points}">, {semester.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}</f:if>.
                 {f:translate(key: 'modal.open', extensionName: 'AcademicStudyPlan')}: {module.label}
@@ -47,7 +50,10 @@
 
         <f:render
             partial="StudyPlan/ModuleDialog"
-            arguments="{module: module}"
+            arguments="{
+                module: module,
+                idPrefix: idPrefix
+            }"
         />
     </f:if>
 </li>

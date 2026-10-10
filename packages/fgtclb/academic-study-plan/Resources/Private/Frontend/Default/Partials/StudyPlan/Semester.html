@@ -10,6 +10,8 @@
     Arguments:
 
     - semester: the semester record, with its `modules`.
+    - idPrefix: what the dialog ids of the plan start with, passed on to the
+      modules. Empty for a plan placed on the page.
 
     The header is the accordion control on a narrow viewport and inert on a wide
     one, which is why it is rendered `aria-hidden` and `inert`: the script removes
@@ -46,7 +48,8 @@
                 partial="StudyPlan/Module"
                 arguments="{
                     module: module,
-                    semester: semester
+                    semester: semester,
+                    idPrefix: idPrefix
                 }"
             />
         </f:for>

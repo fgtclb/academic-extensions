@@ -10,6 +10,7 @@
     Arguments:
 
     - module: the module record.
+    - idPrefix: what the dialog id starts with, see the module partial.
 
     The first `<button>` of the dialog is its close control - the script wires that
     one and stops whatever the dialog was playing when it closes. The dialog is
@@ -17,7 +18,7 @@
     when a trigger carries no `data-dialog-id`.
 </f:comment>
 
-<dialog id="popup-{module.uid}" class="ace-dialog" data-study-plan-dialog>
+<dialog id="popup-{idPrefix}{module.uid}" class="ace-dialog" data-study-plan-dialog>
     <header class="ace-header">
         <span class="ace-title" aria-hidden="true"><b>{module.label}</b></span>
 

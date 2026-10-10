@@ -27,8 +27,8 @@ declare(strict_types=1);
  * The storage folders of "/data" are the one thing it does not mirror. Their
  * records are shared - every plugin of the mirror names the pids of the "/"
  * tree - so a mirrored folder would be an empty folder in the backend that
- * looks like it should hold something (ACE-460, S3-3). 68 pages of "/" become
- * 59 pages of "/legacy/".
+ * looks like it should hold something (ACE-460, S3-3). 69 pages of "/" become
+ * 60 pages of "/legacy/".
  *
  *   php Build/Scripts/generateLegacyScenario.php
  *   php Build/Scripts/generateLegacyScenario.php --check   # exit 1 if it would change
@@ -223,6 +223,9 @@ function mapValue(string $entity, string $key, mixed $value): mixed
     if ($entity === 'content' && $key === 'pages') {
         return mapUidList((string)$value, mapPageUid(...));
     }
+    if ($entity === 'content' && $key === 'records') {
+        return mapRecordReferences((string)$value);
+    }
     if ($entity === 'content' && $key === 'pi_flexform') {
         return mapFlexForm((string)$value);
     }
@@ -234,6 +237,30 @@ function mapValue(string $entity, string $key, mixed $value): mixed
     }
 
     return $value;
+}
+
+/**
+ * The records an "Insert records" element shows: `tt_content_<uid>` or a bare uid,
+ * which the core reads as a content element - the field allows no other table. A
+ * content element of the mirror shows the content of the mirror, so the uid moves
+ * with the tree. Without it the "/legacy/" copy of an "Insert records" element
+ * would show a record of the "/" tree.
+ */
+function mapRecordReferences(string $list): string
+{
+    $mapped = [];
+    foreach (explode(',', $list) as $part) {
+        $part = trim($part);
+        if ($part === '') {
+            continue;
+        }
+        if (preg_match('/^(?:tt_content_)?(\d+)$/', $part, $matches) !== 1) {
+            throw new \UnexpectedValueException(sprintf('Cannot map the record reference "%s".', $part), 1791656113);
+        }
+        $mapped[] = 'tt_content_' . ((int)$matches[1] + CONTENT_OFFSET);
+    }
+
+    return implode(',', $mapped);
 }
 
 /**
@@ -602,7 +629,7 @@ function fileHeader(): string
         #
         # The storage folders of "/data" are not mirrored at all. Mirroring a folder
         # whose records are shared leaves an empty folder in the backend that looks like
-        # it should hold something, so "/" has 68 pages and "/legacy/" has 59.
+        # it should hold something, so "/" has 69 pages and "/legacy/" has 60.
         #
         # UIDS
         #
