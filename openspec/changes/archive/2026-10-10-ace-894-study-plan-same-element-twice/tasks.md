@@ -137,6 +137,6 @@
 - [x] 8.3 `testJs`, `lintMarkdown -n` and `checkRstRenderingAll` green.
 - [x] 8.4 `docs/` is updated, and `README.md` and `CONTRIBUTING.md` still
   only summarize.
-- [ ] 8.5 Commit as `[BUGFIX] ACE-<NNN>: Open study plan dialogs per copy`
+- [x] 8.5 Commit as `[BUGFIX] ACE-<NNN>: Open study plan dialogs per copy`
   in TYPO3 Core format, and archive the change as the last commit of the pull
   request. Merge only after #850, never ahead of it.
