@@ -6,6 +6,7 @@ namespace FGTCLB\AcademicsDevSite\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * The committed `ScenarioLegacy.yaml` is what `Scenario.yaml` produces today.
@@ -50,5 +51,57 @@ final class GeneratedLegacyScenarioTest extends TestCase
                 implode("\n  ", $output),
             ),
         );
+    }
+
+    /**
+     * An "Insert records" element of the mirror shows a content element of the mirror.
+     *
+     * Its `records` field names the elements it shows. Were it copied as it is, the
+     * `/legacy/` copy would render a content element of the `/` tree, which
+     * `LegacyDeliveryTest` does not notice: both trees render the same markup then.
+     */
+    #[Test]
+    public function insertRecordsElementsOfTheMirrorShowTheMirror(): void
+    {
+        $directory = dirname(__DIR__, 2) . '/Configuration/DataFactory/academics-instance/';
+        $this->assertFileExists($directory . 'Scenario.yaml');
+        $this->assertFileExists($directory . 'ScenarioLegacy.yaml');
+
+        $source = [];
+        $this->collectRecordReferences(Yaml::parseFile($directory . 'Scenario.yaml'), $source);
+        $mirror = [];
+        $this->collectRecordReferences(Yaml::parseFile($directory . 'ScenarioLegacy.yaml'), $mirror);
+        $this->assertNotSame([], $source, 'The seed has no "Insert records" element to check');
+
+        // The mirror keeps the order of the "/" tree, and a content element of the
+        // mirror is its original plus 1000.
+        $expected = array_map(
+            static fn(string $reference): string => 'tt_content_' . ((int)preg_replace('/^tt_content_/', '', $reference) + 1000),
+            $source,
+        );
+        $this->assertSame(
+            $expected,
+            $mirror,
+            'An "Insert records" element of the mirror does not show the mirror of the record its original shows',
+        );
+    }
+
+    /**
+     * @param list<string> $references
+     */
+    private function collectRecordReferences(mixed $node, array &$references): void
+    {
+        if (!is_array($node)) {
+            return;
+        }
+        $self = $node['self'] ?? null;
+        if (is_array($self) && ($self['CType'] ?? null) === 'shortcut' && is_string($self['records'] ?? null)) {
+            foreach (explode(',', $self['records']) as $reference) {
+                $references[] = trim($reference);
+            }
+        }
+        foreach ($node as $child) {
+            $this->collectRecordReferences($child, $references);
+        }
     }
 }

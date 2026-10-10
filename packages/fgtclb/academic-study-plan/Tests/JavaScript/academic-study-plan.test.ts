@@ -618,6 +618,89 @@ describe("the markup contract", () => {
     assert.equal(dialog.open, true);
   });
 
+  it("opens the dialog of its own copy when one plan is on the page twice", async () => {
+    // An "Insert records" element renders the same content element a second
+    // time. An override that does not pass the id prefix gives both copies a
+    // dialog "popup-1", and a lookup by id across the document answers with the
+    // first copy's.
+    await start(layoutMarkup() + layoutMarkup());
+
+    const plans = Array.from(document.querySelectorAll<HTMLElement>("[data-study-plan]"));
+    const dialogs = Array.from(document.querySelectorAll<HTMLDialogElement>("dialog"));
+    const triggers = Array.from(document.querySelectorAll<HTMLElement>("[data-study-plan-dialog-trigger]"));
+    assert.equal(plans.length, 2);
+    assert.equal(dialogs.length, 2);
+    assert.ok(plans[1].contains(triggers[1]) && plans[1].contains(dialogs[1]), "the second plan lost its parts");
+
+    click(triggers[1]);
+    await settle();
+
+    assert.deepEqual(dialogs.map((dialog) => dialog.open), [false, true]);
+
+    click(dialogs[1].querySelector(".ace-close") as HTMLElement);
+    await settle();
+
+    assert.deepEqual(dialogs.map((dialog) => dialog.open), [false, false]);
+
+    // And the first copy still opens its own.
+    press(triggers[0], "Enter");
+    await settle();
+
+    assert.deepEqual(dialogs.map((dialog) => dialog.open), [true, false]);
+  });
+
+  it("opens the dialog of the visible copy when the theme hides the first one", async () => {
+    // A tab or an accordion of a theme that hides the first copy: its dialog
+    // would open as a modal nobody can see, and the page would not react.
+    await start('<div class="tab-pane" hidden>' + layoutMarkup() + "</div>" + layoutMarkup());
+
+    const dialogs = Array.from(document.querySelectorAll<HTMLDialogElement>("dialog"));
+    const triggers = Array.from(document.querySelectorAll<HTMLElement>("[data-study-plan-dialog-trigger]"));
+    assert.equal(dialogs.length, 2);
+
+    click(triggers[1]);
+    await settle();
+
+    assert.deepEqual(dialogs.map((dialog) => dialog.open), [false, true]);
+
+    click(dialogs[1].querySelector(".ace-close") as HTMLElement);
+    await settle();
+
+    assert.deepEqual(dialogs.map((dialog) => dialog.open), [false, false]);
+  });
+
+  it("opens the dialog of its own plan when another dialog of the page carries the same id", async () => {
+    // "popup-1" is a generic id, and a dialog of some other extension that comes
+    // first in the document must not answer for the module.
+    await start('<dialog id="popup-1" class="foreign"><button>Close</button></dialog>' + layoutMarkup());
+
+    const foreign = document.querySelector<HTMLDialogElement>("dialog.foreign");
+    const own = document.querySelector<HTMLDialogElement>("[data-study-plan] dialog");
+    assert.ok(foreign !== null && own !== null, "a dialog is gone");
+
+    click(document.querySelector("[data-study-plan-dialog-trigger]") as HTMLElement);
+    await settle();
+
+    assert.equal(foreign.open, false);
+    assert.equal(own.open, true);
+  });
+
+  it("still finds a dialog an override renders outside the plan", async () => {
+    // The plan is asked first, the document only when the plan has no dialog of
+    // that id, so moving the dialogs elsewhere keeps working.
+    const markup = layoutMarkup();
+    const dialog = markup.slice(markup.indexOf("<dialog"), markup.indexOf("</dialog>") + "</dialog>".length);
+    await start(markup.replace(dialog, "") + dialog);
+
+    const outside = document.querySelector<HTMLDialogElement>("body > dialog#popup-1");
+    assert.ok(outside !== null, "the dialog did not move out of the plan");
+
+    click(document.querySelector("[data-study-plan-dialog-trigger]") as HTMLElement);
+    await settle();
+
+    assert.equal(outside.open, true);
+  });
+
   it("opens the dialog of the module that was activated, not the first one", async () => {
     await start(moduleAsTriggerMarkup());
 

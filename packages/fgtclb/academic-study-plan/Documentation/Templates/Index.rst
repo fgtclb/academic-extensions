@@ -67,12 +67,24 @@ in scope.
             filter, see
             :ref:`Collapse the category filter <collapsible-filter>`.
     *   -   :file:`StudyPlan/Semester`
-        -   :html:`semester` - the semester, with its :html:`modules`.
+        -   :html:`semester` - the semester, with its :html:`modules`, and
+            :html:`idPrefix`, which it passes on to the modules.
     *   -   :file:`StudyPlan/Module`
         -   :html:`module` and the :html:`semester` it belongs to, the latter
-            only for the label the dialog trigger announces.
+            only for the label the dialog trigger announces, and
+            :html:`idPrefix`, which the dialog id starts with.
     *   -   :file:`StudyPlan/ModuleDialog`
-        -   :html:`module`.
+        -   :html:`module` and :html:`idPrefix`.
+
+:html:`idPrefix` is empty for a plan placed on the page, so its dialog ids are
+:html:`popup-<module uid>`. A plan rendered inside another content element - an
+"Insert records" element, or a grid element that renders its children through
+:typoscript:`RECORDS`, :typoscript:`CONTENT`, :html:`f:cObject` or, on TYPO3
+v14, :html:`f:render.record` - gets :html:`c<uid>-` of that element, so its
+dialogs are :html:`popup-c<uid>-<module uid>` and no copy of a plan repeats the
+dialog ids of another. An override that does not pass :html:`idPrefix` on
+renders the ids without it and keeps working, see
+:ref:`data-dialog-id <templates-attribute-values>`.
 
 The :html:`credit_points` of a semester and of a module are a number, not the
 value the database returns: printed as they are, they read "2.5", "30" and
@@ -128,8 +140,8 @@ The data attributes
         -   The control that opens the dialog of a module, inside that module -
             or the module element itself, see below.
         -   Opens the dialog of that module, by pointer and by keyboard. The
-            dialog is the one named by :html:`data-dialog-id`, and the module's
-            own when the trigger names none.
+            dialog is the one named by :html:`data-dialog-id`, looked up inside
+            the plan first, and the module's own when the trigger names none.
     *   -   :html:`data-study-plan-dialog`
         -   The :html:`<dialog>` of a module, inside that module.
         -   Opens it as a modal and closes it again from the first
@@ -180,8 +192,12 @@ an override that renders modules or filter buttons itself has to produce them:
             or an :css:`rgb()` / :css:`rgba()` function is dropped.
     *   -   :html:`data-dialog-id`
         -   A dialog trigger.
-        -   The :html:`id` of the dialog it opens. Without it the trigger opens
-            the dialog inside its own module.
+        -   The :html:`id` of the dialog it opens. The script looks for it
+            among the dialogs of its own plan first, and in the whole document
+            only when the plan has none, so the same plan shown twice opens the
+            dialog of each copy even with repeated ids, and a dialog an override
+            renders outside the plan is still found. Without it the trigger
+            opens the dialog inside its own module.
 
 The three placeholder strings - :html:`category-id-placeholder`,
 :html:`category-color-placeholder` and :html:`category-label-placeholder` - are

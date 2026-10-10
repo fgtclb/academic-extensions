@@ -333,6 +333,15 @@ it calls `preventDefault()`; and the module does not make that element
 focusable, so the manual has to say that the override supplies `tabindex` and
 `role` itself.
 
+An id a part names by attribute, `data-dialog-id` of a trigger for example, is
+resolved inside its own container (the plan) first and in the document only when
+the container has none. An id is not unique on a page that shows the same
+content element twice through an "Insert records" element: both copies render
+the same record, and `getElementById()` answers with the first copy for both.
+The study plan prefixes the dialog ids of a copy with the inserting element as
+well (`popup-c69-25`, ACE-894), but the lookup must not depend on that, because
+an override that does not pass the prefix renders its previous ids.
+
 Two more, neither of them specific to the study plan:
 
 - **`hidden` does not hide anything the stylesheet gives a `display` to.** The

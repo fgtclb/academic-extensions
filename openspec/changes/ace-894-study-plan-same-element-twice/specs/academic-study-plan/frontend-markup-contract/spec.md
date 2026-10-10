@@ -18,7 +18,7 @@ than once on the page or another dialog of the page carries the same id.
 - **WHEN** an editor places a study plan on a page and shows the same plan a
   second time through an "Insert records" element
 - **THEN** activating a module in either copy opens the dialog in that copy,
-  by mouse and by keyboard, and closing it returns to that copy
+  by mouse and by keyboard, and closing it leaves the other copy as it was
 
 #### Scenario: The first copy is hidden
 - **WHEN** the same plan is shown twice on a page and the theme hides the first
