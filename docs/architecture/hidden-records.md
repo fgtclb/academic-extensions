@@ -73,14 +73,14 @@ The repositories of jobs, partners, projects and contacts take it through their
 constructor, `ProgramRepository` and `ProfileRepository` through an `inject*()`
 method like their other collaborators:
 
-| Repository                                       | Finders                                                                            |
-|--------------------------------------------------|------------------------------------------------------------------------------------|
-| `JobRepository` of `academic_jobs`               | `findByJobType()`, `findAllJobs()`                                                 |
-| `PartnerRepository` of `academic_partners`       | `findByDemand()`                                                                   |
-| `ProgramRepository` of `academic_programs`       | `findByDemand()`                                                                   |
-| `ProjectRepository` of `academic_projects`       | `findByDemand()`                                                                   |
-| `ProfileRepository` of `academic_persons`        | `findByDemand()`, `findByUidsWithContext()`, `findByFrontendUserIncludingHidden()` |
-| `ContactRepository` of `academic_contacts4pages` | `findByPid()`                                                                      |
+| Repository                                       | Finders                                                                                                          |
+|--------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| `JobRepository` of `academic_jobs`               | `findByJobType()`, `findAllJobs()`                                                                               |
+| `PartnerRepository` of `academic_partners`       | `findByDemand()`                                                                                                 |
+| `ProgramRepository` of `academic_programs`       | `findByDemand()`                                                                                                 |
+| `ProjectRepository` of `academic_projects`       | `findByDemand()`                                                                                                 |
+| `ProfileRepository` of `academic_persons`        | `findByDemand()`, `findByUidsWithContext()`, `findByFrontendUserIncludingHidden()`, `findByUidIncludingHidden()` |
+| `ContactRepository` of `academic_contacts4pages` | `findByPid()`                                                                                                    |
 
 ### A paginated list
 
@@ -114,6 +114,12 @@ argument mapping of v13 lifts it to `OVERLAYS_ON_WITH_FLOATING`, which drops an
 untranslated record on v14. `findByUidsWithContext()` keeps
 `OVERLAYS_ON_WITH_FLOATING` for a manual selection, so there an untranslated
 profile is not shown in free mode on v14.
+
+That lookup is all v14 needs. On v13 the overlay of the selected default record
+then misses a hidden translation like every other query here, and the profile
+was shown in the default language (ACE-883). The finder therefore executes its
+query through the fetcher as well, `getFirst()` of the lazy result fetches
+within the window.
 
 ## What it does not cover
 
