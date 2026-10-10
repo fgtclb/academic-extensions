@@ -53,7 +53,7 @@ They sit next to the tests that use them, under
 | `test_icon_rules`                           | `tests/icon-rules`                                | `academic-base`          | Icons following every icon rule, in both registries and category types.       |
 | `test_job_icons`                            | `tests/job-icons`                                 | `academic-jobs`          | Job icons replaced in `FrontendIcons.php`, and without effect in `Icons.php`. |
 | `test_job_validation_override`              | `tests/job-validation-override`                   | `academic-jobs`          | A jobs `Settings.yaml` naming nine fields, a TCA override, two TCA listeners. |
-| `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.       |
+| `test_jobcontact_schema`                    | `tests/test-jobcontact-schema`                    | `academic-jobs`          | `ext_tables.sql` without TCA for a removed table an upgrade wizard reads.     |
 | `test_language_files`                       | `tests/language-files`                            | `academic-persons`       | An XLF pair with awkward label keys (dots, dashes).                           |
 | `test_legacy_settings`                      | `tests/test-legacy-settings`                      | `academic-persons`       | A `Settings.yaml` in the pre-3.0 shape, the 2.x manual's override.            |
 | `test_literal_helptext`                     | `tests/test-literal-helptext`                     | `academic-persons-edit`  | A `Settings.yaml` with literal help texts for a contract and a contact field. |
@@ -309,9 +309,13 @@ The existing ones show the cases that justify one:
   `$GLOBALS['TYPO3_CONF_VARS']['HTTP']['handler']` in `ext_localconf.php` so no
   functional test ever reaches the b-ite API. There is no other point at which
   that assignment happens early enough.
-- **Schema and TCA.** `test_jobcontact_schema` ships `ext_tables.sql` and TCA for
-  a table the upgrade wizard tests migrate away from. The table has to exist when
-  the instance is built.
+- **Schema.** `test_jobcontact_schema` ships an `ext_tables.sql` for the table
+  and the field the upgrade wizard tests migrate away from. They have to exist
+  when the instance is built. It deliberately ships no TCA for them: an
+  installation has none for a removed table, and TCA would let the default
+  restrictions of the query builder reach the table and hide what the wizard
+  does there, see
+  [A migration reads every record](../architecture/database-queries.md#a-migration-reads-every-record-and-a-removed-table-has-no-restrictions).
 - **Dependency injection.** `test_base_dependency_injection` and
   `test_messy_profile_factory` ship `Services.yaml` plus classes, so the
   container really wires them. `test_profile_query_constraints` is the same
