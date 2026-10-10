@@ -33,7 +33,10 @@
                     <f:for each="{semesters}" as="semester">
                         <f:render
                             partial="StudyPlan/Semester"
-                            arguments="{semester: semester}"
+                            arguments="{
+                                semester: semester,
+                                idPrefix: idPrefix
+                            }"
                         />
                     </f:for>
                 </div>

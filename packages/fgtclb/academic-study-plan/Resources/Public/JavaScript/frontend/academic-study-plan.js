@@ -286,8 +286,7 @@ class StudyPlan {
     this.modules.forEach((module) => {
       const dialogs = findAll(module, DIALOG, LEGACY_DIALOG).filter((element) => element instanceof HTMLDialogElement);
       this.triggersOf(module).forEach((trigger) => {
-        const referenced = document.getElementById(trigger.dataset.dialogId ?? "");
-        const dialog = referenced instanceof HTMLDialogElement ? referenced : dialogs[0];
+        const dialog = this.dialogNamed(trigger.dataset.dialogId ?? "") ?? dialogs[0];
         if (dialog === void 0) {
           return;
         }
@@ -307,6 +306,30 @@ class StudyPlan {
         }
       });
     });
+  }
+  /**
+   * The dialog a trigger names by id, looked up in this plan first.
+   *
+   * An id is not unique on a page that carries one plan twice: an "Insert
+   * records" element renders the same content element again, and a template
+   * override that does not pass the id prefix gives both copies the same
+   * dialog ids. "getElementById()" would answer with the first copy for both,
+   * which opens a dialog nobody sees when a theme hides that copy. A dialog of
+   * this plan wins for that reason, and so it does over a dialog of another
+   * extension that happens to carry the same id. The document is asked only
+   * when this plan has no dialog of that id, which keeps an override working
+   * that renders its dialogs outside the plan.
+   */
+  dialogNamed(id) {
+    if (id === "") {
+      return void 0;
+    }
+    const own = Array.from(this.container.querySelectorAll("dialog[id]")).find((element) => element.id === id);
+    if (own instanceof HTMLDialogElement) {
+      return own;
+    }
+    const referenced = document.getElementById(id);
+    return referenced instanceof HTMLDialogElement ? referenced : void 0;
   }
   /**
    * The triggers of one module: the module element itself when it carries the

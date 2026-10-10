@@ -70,7 +70,7 @@
             "checksum": "29722b68cbf6ecc46dfbbebe8251df58d511a146"
         },
         "pages": {
-            "rows": 254,
+            "rows": 258,
             "columns": [
                 "abbreviation",
                 "abstract",
@@ -120,7 +120,7 @@
                 "tx_academicprojects_start_date",
                 "uid"
             ],
-            "checksum": "2b2dc68c77b2f2b203800d0bf0cb98e39696b537"
+            "checksum": "380166d16ac7f6c236cd3d49ae9e2388fac69267"
         },
         "sys_category": {
             "rows": 60,
@@ -192,7 +192,7 @@
             "checksum": "06d831d027b09b2de067b2d3b08e6fb050f08f42"
         },
         "tt_content": {
-            "rows": 264,
+            "rows": 280,
             "columns": [
                 "CType",
                 "bodytext",
@@ -207,6 +207,7 @@
                 "pages",
                 "pi_flexform",
                 "pid",
+                "records",
                 "recursive",
                 "space_before_class",
                 "sys_language_uid",
@@ -214,7 +215,7 @@
                 "tx_academicstudyplan_semesters",
                 "uid"
             ],
-            "checksum": "4bbcd906dc632e00c32d75db3ed8bf9495d20697"
+            "checksum": "df3a409e849aa9f43668709789e9ae61fc65d54d"
         },
         "tx_academiccontacts4pages_domain_model_contact": {
             "rows": 44,
@@ -487,7 +488,7 @@
             "checksum": "db4e6a02d0d5fe2fda7169f6e6bb7c7af66573ed"
         },
         "tx_academicstudyplan_domain_model_module": {
-            "rows": 96,
+            "rows": 112,
             "columns": [
                 "categories",
                 "credit_points",
@@ -500,10 +501,10 @@
                 "sys_language_uid",
                 "uid"
             ],
-            "checksum": "e4eec5e0007b11ae9230a8fa497da00a5015c899"
+            "checksum": "85e77305c1699a6b80224c0aaaa39f9686d9e399"
         },
         "tx_academicstudyplan_domain_model_semester": {
-            "rows": 32,
+            "rows": 40,
             "columns": [
                 "credit_points",
                 "hidden",
@@ -516,7 +517,7 @@
                 "sys_language_uid",
                 "uid"
             ],
-            "checksum": "7d49893417524e2333469b6b31eb4e9c48282df5"
+            "checksum": "834716933e293b82db547b205d1b56f5ea668439"
         }
     }
 }

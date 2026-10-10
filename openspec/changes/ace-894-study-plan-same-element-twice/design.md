@@ -1,6 +1,7 @@
 ## Context
 
-See `proposal.md` for the defect. What the code does on `main` at `f02deaa6d`:
+See `proposal.md` for the defect. What the code did before this change, on the
+top of the ACE-818 stack at `c5498dae1`:
 
 - `Partials/StudyPlan/ModuleDialog.html` renders
   `<dialog id="popup-{module.uid}">`, `Partials/StudyPlan/Module.html` the
@@ -9,7 +10,7 @@ See `proposal.md` for the defect. What the code does on `main` at `f02deaa6d`:
   inline chain), so two different plans never collide.
 - `academic-study-plan.ts` starts one instance per plan container (ACE-704) and
   scopes everything to it, except the dialog of a trigger:
-  `document.getElementById(trigger.dataset.dialogId)` (line 439), with the
+  `document.getElementById(trigger.dataset.dialogId)`, with the
   module's own dialog as fallback only when no element of the page has that
   id.
 - An "Insert records" element (`CType` `shortcut`) renders the referenced
@@ -28,10 +29,11 @@ lookup. The semester partial gets a new structure (`role="listitem"` around
 attributes are unchanged. Building this change on today's markup would
 conflict with it in every partial both edit.
 
-This change is therefore implemented on the markup of #850: on `main` once
-#850 is merged, or as a pull request stacked on its branch
-`ace-818-speaking-classes` while it is open. The prefix and the script lookup
-are added to #850's version of each file, its classes and structure stay as
+#850 has since grown into the stack #929 (#850, #924, #926, #927, #928), and
+four of its layers touch files of this change (see task 1.1). This change is
+therefore built on the top of that stack, `ace-892-class-docs` at `c5498dae1`,
+as a further layer, and merged after it. The prefix and the script lookup are
+added to the stack's version of each file, its classes and structure stay as
 they are. Nothing of this change's spec depends on #850's classes.
 
 ### Evidence
@@ -89,34 +91,35 @@ site that addresses a dialog by id reaches the first copy only.
 `StudyPlanProcessor` asks the request of its content object for the
 `currentContentObject` attribute. `AbstractContentObject` sets it to the
 renderer that owns the content object, and `RECORDS` and `CONTENT` hand that
-request to every record they render, and `f:cObject` and `f:render.record`
-the request of their Fluid view. So the processor of a plan sees the renderer
-it is rendered from:
+request to every record they render, and `f:cObject` (and on TYPO3 v14
+`f:render.record`) the request of their Fluid view. So the processor of a plan
+sees the renderer it is rendered from:
 
 | Rendered by                                           | `currentRecord`    | Prefix    |
 |-------------------------------------------------------|--------------------|-----------|
 | a column through `f:cObject` without a table (theme)  | `''`               | none      |
-| a column through `styles.content.get` (from the code) | `pages:<uid>`      | none      |
+| a column through `styles.content.get`                 | `pages:<uid>`      | none      |
 | an "Insert records" element                           | `tt_content:<uid>` | `c<uid>-` |
 
 Probed on both cores (`/` tree of the seed, rendered through `f:cObject` by the
 theme): no prefix for the plans on the page, `c67-`, `c68-` and `c69-` for the
-inserted ones, the same as reading the parent record. The `styles.content.get`
-row is read from the code, the probed `/legacy/` page held no dialog. A grid
-element that renders its children through `RECORDS`, `CONTENT` or a Fluid
-record ViewHelper gives them its prefix as well. One that does not hand on the
+inserted ones of the prototype page, the same as reading the parent record. The
+`styles.content.get` row is proven by the functional tests, which render through
+it, and by `LegacyDeliveryTest`, whose `/legacy/` tree does. A grid element that
+renders its children through `RECORDS`, `CONTENT`, `f:cObject` or, on TYPO3 v14,
+`f:render.record` gives them its prefix as well. One that does not hand on the
 request gives none, and decision 1 still opens the right dialog.
 
 The processor hands the template `idPrefix`, `c<uid>-` for a `tt_content`
 renderer and `''` otherwise. The template passes it to the semester partial,
 the semester partial to the module partial, the module partial to the dialog
 partial, and both ids become `popup-{idPrefix}{module.uid}`: `popup-25` on
-the page, `popup-c67-25` inside element 67.
+the page, `popup-c69-25` inside "Insert records" element 69 of the seed.
 
 - The prefix follows the core's `c<uid>` anchor, so it is readable.
-- An empty prefix renders the ids of before this change, which keeps a plan
-  on the page byte identical and an override that does not pass the variable
-  on its ids.
+- An empty prefix renders the ids a plan rendered before this change, which
+  keeps a plan on the page byte identical and an override that does not pass
+  the variable on its previous ids.
 - The uid is that of the "Insert records" record after the overlay. In
   connected mode (`fallbackType` `strict` or `fallback`, as in the seed) a
   translated page carries the same ids as its default language page, in free
@@ -124,14 +127,15 @@ the page, `popup-c67-25` inside element 67.
 
 `getRequest()` and the attribute are the same on v13 and v14, and `data` and
 `currentRecord` are public properties on both, so there is one code path and
-no version switch. With a request set, which `RECORDS`, `CONTENT`,
-`f:cObject` and `f:render.record` always do, `getRequest()` raises nothing on
-v14. Its fallback to `$GLOBALS['TYPO3_REQUEST']` would already have been raised
-by the core on the same renderer before the processor runs.
+no version switch. `RECORDS`, `CONTENT`, `f:cObject` and `f:render.record`
+set a request, and where none is set the core has already called
+`getRequest()` on the same renderer before the processor runs, so the
+processor adds no deprecation of its own on v14.
 
 `getRequest()` is marked `@internal` on both cores, and a `@todo` on both
-plans to deprecate it. This is accepted: the functional tests render through a real "Insert records" element
-on both cores and fail the moment the access breaks, and decision 1 keeps the
+says it may be deprecated. This is accepted: the functional tests render
+through a real "Insert records" element on both cores and fail the moment the
+access breaks, and decision 1 keeps the
 dialogs right even when the prefix is lost.
 
 *Rejected*:
@@ -157,21 +161,21 @@ A page `/study-plan/several-plans` below the study plan page, with German and
 records" elements of A. The legacy generator maps the `records` field of a
 content element to the legacy uids, otherwise the `/legacy/` copy would show
 records of the `/` tree. `LegacyDeliveryTest` masks a uid in an attribute
-value with one number today (`popup-25`), and learns a value with two
-(`popup-c67-25`). The content uids are the next free ones on `main` at
-implementation time.
+value with one number (`popup-25`), and learns the dialog id of an inserted
+copy (`popup-c1069-225`). Content uids 65 and 66 are taken on the stack, so the
+seed uses 67 to 70.
 
 ## Risks / Trade-offs
 
-- [`getRequest()` is deprecated, which its `@todo` plans on both cores] →
+- [`getRequest()` may be deprecated, as its `@todo` says on both cores] →
   `failOnDeprecation` turns the suites red on the first core raise, and
   decision 1 keeps the dialogs right meanwhile.
 - [A theme or grid extension renders content without handing on the request]
-  → the plan sees no `tt_content` renderer, renders the ids of before, and
+  → the plan sees no `tt_content` renderer, renders its previous ids, and
   decision 1 still opens the right dialog.
-- [A project override drops `idPrefix`] → the ids of before plus decision 1.
+- [A project override drops `idPrefix`] → the previous ids plus decision 1.
   The changelog names the variable.
-- [#850 changes again before it is merged] → the stacked pull request is
+- [A layer of stack #929 changes before it is merged] → this pull request is
   rebased on it, the spec does not depend on its classes.
 
 ## Migration Plan

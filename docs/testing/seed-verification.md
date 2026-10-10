@@ -115,7 +115,7 @@ checkout — see
 ### `LegacyDeliveryTest` — the two trees against each other
 
 Renders every mirrored page of `/` and of `/legacy/`, in both languages, and
-compares the markup — 110 page pairs, which is the 59 pages of the mirror minus
+compares the markup — 112 page pairs, which is the 60 pages of the mirror minus
 the four the seed hides, times two languages.
 
 This is the only thing that catches the failure mode the `/legacy/` tree exists
@@ -130,7 +130,11 @@ What is normalised away is listed in the test, one comment per rule, and it is
 only what a mirror differs in by being one: the `/legacy` path segment, the
 `websiteTitle` of the two sites, the titles of the two root pages, uids in
 attribute values and query strings, and four values drawn per request (the CSP
-nonce, a cHash, an error page request id, the login form's request token).
+nonce, a cHash, an error page request id, the login form's request token). An
+attribute value may carry two uids, the dialog id of a study plan shown by an
+"Insert records" element names that element and the module
+(`popup-c1069-225`), and a rule of its own masks exactly that shape,
+`-c<uid>-<uid>`, rather than every value with two numbers.
 
 A second test asserts what each page *owes* a visitor: `200`, `403` for the two
 pages the seed puts behind a frontend user group, and `404` for the three detail

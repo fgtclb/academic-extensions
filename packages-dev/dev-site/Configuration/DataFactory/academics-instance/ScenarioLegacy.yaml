@@ -31,7 +31,7 @@
 #
 # The storage folders of "/data" are not mirrored at all. Mirroring a folder
 # whose records are shared leaves an empty folder in the backend that looks like
-# it should hold something, so "/" has 68 pages and "/legacy/" has 59.
+# it should hold something, so "/" has 69 pages and "/legacy/" has 60.
 #
 # UIDS
 #
@@ -2206,6 +2206,141 @@ entities:
                         space_before_class: 'medium'
                         tx_academicstudyplan_semesters: '701,702,703,704,705,706'
                         tx_academicstudyplan_footer_note: 'Änderungen vorbehalten. Verbindlich ist das Modulhandbuch.'
+          children:
+            - self:
+                  id: 1241
+                  title: 'Several study plans'
+                  slug: '/study-plan/several-plans'
+                  backend_layout: 'pagets__default'
+              languageVariants:
+                - self:
+                      id: 1741
+                      language: 1
+                      title: 'Mehrere Studienpläne'
+                      slug: '/studienplan/mehrere-plaene'
+                      backend_layout: 'pagets__default'
+              entities:
+                semester:
+                  - self:
+                        id: 209
+                        label: 'Semester 1'
+                        credit_points: 12
+                        modules: '225,226'
+                    languageVariants:
+                      - self:
+                            id: 709
+                            language: 1
+                            label: '1. Semester'
+                            modules: '725,726'
+                  - self:
+                        id: 210
+                        label: 'Semester 1'
+                        credit_points: 10
+                        modules: '227,228'
+                    languageVariants:
+                      - self:
+                            id: 710
+                            language: 1
+                            label: '1. Semester'
+                            modules: '727,728'
+                module:
+                  - self:
+                        id: 225
+                        label: 'Signals and systems'
+                        credit_points: 6
+                        description: '<p>Linear systems, convolution, Fourier analysis.</p>'
+                        categories: '1'
+                    languageVariants:
+                      - self:
+                            id: 725
+                            language: 1
+                            label: 'Signale und Systeme'
+                            description: '<p>Lineare Systeme, Faltung, Fourier-Analyse.</p>'
+                  - self:
+                        id: 226
+                        label: 'Technical English'
+                        credit_points: 6
+                        categories: '2'
+                    languageVariants:
+                      - self:
+                            id: 726
+                            language: 1
+                            label: 'Technisches Englisch'
+                  - self:
+                        id: 227
+                        label: 'Didactics'
+                        credit_points: 5
+                        description: '<p>Planning and evaluating lessons.</p>'
+                        categories: '1'
+                    languageVariants:
+                      - self:
+                            id: 727
+                            language: 1
+                            label: 'Didaktik'
+                            description: '<p>Unterricht planen und auswerten.</p>'
+                  - self:
+                        id: 228
+                        label: 'School law'
+                        credit_points: 5
+                        categories: '3'
+                    languageVariants:
+                      - self:
+                            id: 728
+                            language: 1
+                            label: 'Schulrecht'
+                content:
+                  - self:
+                        id: 1067
+                        CType: 'academic_study_plan'
+                        header: 'Electrical engineering, first semester'
+                        header_layout: 2
+                        tx_academicstudyplan_semesters: '209'
+                    languageVariants:
+                      - self:
+                            id: 1567
+                            language: 1
+                            CType: 'academic_study_plan'
+                            header: 'Elektrotechnik, erstes Semester'
+                            header_layout: 2
+                            tx_academicstudyplan_semesters: '709'
+                  - self:
+                        id: 1068
+                        CType: 'academic_study_plan'
+                        header: 'Teacher training, first semester'
+                        header_layout: 2
+                        tx_academicstudyplan_semesters: '210'
+                    languageVariants:
+                      - self:
+                            id: 1568
+                            language: 1
+                            CType: 'academic_study_plan'
+                            header: 'Lehramt, erstes Semester'
+                            header_layout: 2
+                            tx_academicstudyplan_semesters: '710'
+                  - self:
+                        id: 1069
+                        CType: 'shortcut'
+                        header: 'Electrical engineering again, as inserted records'
+                        records: 'tt_content_1067'
+                    languageVariants:
+                      - self:
+                            id: 1569
+                            language: 1
+                            CType: 'shortcut'
+                            header: 'Elektrotechnik noch einmal, als Datensatz eingefügt'
+                            records: 'tt_content_1067'
+                  - self:
+                        id: 1070
+                        CType: 'shortcut'
+                        header: 'Electrical engineering a third time'
+                        records: 'tt_content_1067'
+                    languageVariants:
+                      - self:
+                            id: 1570
+                            language: 1
+                            CType: 'shortcut'
+                            header: 'Elektrotechnik ein drittes Mal'
+                            records: 'tt_content_1067'
         - self:
               id: 1250
               title: 'Academic programs'
