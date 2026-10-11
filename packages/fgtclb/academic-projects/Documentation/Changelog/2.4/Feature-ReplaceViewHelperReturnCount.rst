@@ -1,4 +1,4 @@
-.. _feature-1785882300:
+..  _feature-1785882300:
 
 ===============================================================
 Feature: The replace view helper can return the number of edits
@@ -7,9 +7,9 @@ Feature: The replace view helper can return the number of edits
 Description
 ===========
 
-`FGTCLB\\AcademicProjects\\ViewHelpers\\Format\\ReplaceViewHelper` counted its
+:php:`FGTCLB\AcademicProjects\ViewHelpers\Format\ReplaceViewHelper` counted its
 replacements and returned the count instead of the replaced content when a
-`returnCount` argument was set:
+:html:`returnCount` argument was set:
 
 ..  code-block:: php
 
@@ -18,8 +18,8 @@ replacements and returned the count instead of the replaced content when a
     }
 
 That argument was never registered, and Fluid rejects an argument a view helper
-does not declare while it parses the template - so no template could reach the
-branch:
+does not declare while it parses the template. No template could therefore
+reach the branch:
 
 ..  code-block:: text
 
@@ -27,34 +27,44 @@ branch:
     FGTCLB\AcademicProjects\ViewHelpers\Format\ReplaceViewHelper: returnCount.
     Valid arguments are: content, substring, replacement, caseSensitive
 
-`returnCount` is a registered boolean argument now, defaulting to `false`:
+:html:`returnCount` is a registered boolean argument now, defaulting to
+:php:`false`:
 
 ..  code-block:: html
 
+    <html xmlns:ap="http://typo3.org/ns/FGTCLB/AcademicProjects/ViewHelpers"
+          data-namespace-typo3-fluid="true">
     <ap:format.replace
         content="A research project of the research group"
         substring="research"
         replacement="teaching"
         returnCount="true"
     />
+    </html>
 
-renders `2`.
+renders ``2``.
 
 Impact
 ======
 
-Nothing changes for a template that does not pass the argument - the default
-returns the replaced content, as before. A template that passed `returnCount`
-used to raise the parse error above and renders the count now.
+Nothing changes for a template that does not pass the argument. The default
+returns the replaced content, as before. A template that passed
+:html:`returnCount` used to raise the parse error above and renders the count
+now.
 
-The count is the one `str_replace()` and `str_ireplace()` report, so it counts
-occurrences rather than distinct substrings, and it is `0` for a substring that
-does not occur.
+The count is the one :php:`str_replace()` and :php:`str_ireplace()` report, so
+it counts occurrences rather than distinct substrings, and it is ``0`` for a
+substring that does not occur.
+
+Affected Installations
+======================
+
+Installations with templates that use the view helper. No action is required.
 
 References
 ==========
 
-*   `str_replace <https://www.php.net/manual/en/function.str-replace.php>`__ -
-    the `$count` parameter this returns.
+*   `str_replace <https://www.php.net/manual/en/function.str-replace.php>`__,
+    the :php:`$count` parameter this returns.
 
-.. index:: Fluid, Frontend, NotScanned
+..  index:: Fluid, Frontend, NotScanned, ext:academic_projects

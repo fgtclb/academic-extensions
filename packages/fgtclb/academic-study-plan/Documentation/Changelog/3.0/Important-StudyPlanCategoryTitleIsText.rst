@@ -1,4 +1,4 @@
-..  _important-study-plan-category-title-is-text:
+..  _important-study-plan-category-title-is-text-3-0:
 
 ==========================================================
 Important: A study plan category title is text, not markup

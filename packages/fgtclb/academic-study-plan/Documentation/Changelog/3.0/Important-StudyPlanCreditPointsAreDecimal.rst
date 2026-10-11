@@ -1,4 +1,4 @@
-..  _important-study-plan-credit-points-are-decimal:
+..  _important-study-plan-credit-points-are-decimal-3-0:
 
 =================================================
 Important: Study plan credit points take decimals

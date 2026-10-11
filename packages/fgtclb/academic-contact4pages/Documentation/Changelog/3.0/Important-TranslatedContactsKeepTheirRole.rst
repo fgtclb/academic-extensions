@@ -1,4 +1,4 @@
-..  _important-translated-contacts-keep-their-role:
+..  _important-translated-contacts-keep-their-role-3-0:
 
 =======================================================
 Important: Translated contacts keep their contacts role

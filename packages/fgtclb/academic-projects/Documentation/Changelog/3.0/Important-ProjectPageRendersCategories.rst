@@ -1,4 +1,4 @@
-.. _important-project-page-renders-categories:
+.. _important-project-page-renders-categories-3-0:
 
 =======================================================
 Important: The project page type renders its categories

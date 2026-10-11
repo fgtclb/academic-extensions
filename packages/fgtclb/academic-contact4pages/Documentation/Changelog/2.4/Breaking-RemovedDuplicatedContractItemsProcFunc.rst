@@ -9,8 +9,8 @@ Description
 
 `EXT:academic_contacts4pages` shipped its own
 :php:`\FGTCLB\AcademicContacts4pages\Backend\FormEngine\ContractItemsProcFunc`,
-which basically duplicated the contract `itemsProcFunc` of the hard-depended
-`EXT:academic_persons`.
+which duplicated the contract `itemsProcFunc` of `EXT:academic_persons`, a
+required dependency of this extension.
 
 The duplicated class has been removed. The contract selection field now uses
 the `itemsProcFunc` shipped by `EXT:academic_persons`,
@@ -20,7 +20,8 @@ easier to maintain, especially when changes to the `itemsProcFunc` are made.
 Impact
 ======
 
-Referencing the removed class throws a PHP error. The shipped TCA of
+Referencing the removed class fails with a PHP error, because the class no
+longer exists. The shipped TCA of
 `tx_academiccontacts4pages_domain_model_contact` has been switched to the
 `EXT:academic_persons` handler.
 
@@ -45,4 +46,4 @@ Projects that need to adjust the available contract items should use the
 :php:`\FGTCLB\AcademicBase\Event\ModifyTcaSelectFieldItemsEvent` event listener
 instead of a custom `itemsProcFunc`.
 
-.. index:: Backend, PHP, TCA, ext:academic_contacts4pages
+.. index:: Backend, PHP-API, TCA, ext:academic_contacts4pages

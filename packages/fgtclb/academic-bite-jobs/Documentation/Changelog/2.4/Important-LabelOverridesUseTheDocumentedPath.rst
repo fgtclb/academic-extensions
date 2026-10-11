@@ -7,14 +7,14 @@ Important: Label overrides are read from the documented path
 Description
 ===========
 
-The templates of this extension translate their labels with the extension name
-:html:`AcademicBiteJobs` instead of the extension key
-:html:`academic_bite_jobs`. TYPO3 v12 and v13 build the TypoScript path of
-:typoscript:`_LOCAL_LANG` from that name as it is given, so they read label
-overrides from :typoscript:`plugin.tx_academic_bite_jobs`. They now read them
-from :typoscript:`plugin.tx_academicbitejobs` and
+The templates of this extension translated their labels with the extension key
+:html:`academic_bite_jobs` as the extension name. TYPO3 v12 and v13 build the
+TypoScript path of :typoscript:`_LOCAL_LANG` from that name as it is given, so
+they read label overrides from :typoscript:`plugin.tx_academic_bite_jobs`. The
+templates now use the extension name :html:`AcademicBiteJobs`, so the overrides
+are read from :typoscript:`plugin.tx_academicbitejobs` and
 :typoscript:`plugin.tx_academicbitejobs_<plugin>`, the paths the TYPO3
-documentation names and TYPO3 v14 reads anyway.
+documentation names.
 
 Every label of the extension, and where it is shown, is listed in
 :ref:`configuration-labels`.

@@ -8,24 +8,20 @@ Description
 ===========
 
 A new boolean plugin option **Show hidden records**
-(:typoscript:`settings.showHiddenRecords`, checkbox/toggle, default off)
-was added to the following plugin:
+(:typoscript:`settings.showHiddenRecords`, a toggle, off by default) was added
+to the following plugin:
 
 * **Contacts for this page** (:php:`academiccontacts4pages_list`)
 
-This plugin previously had no flexform at all. A new
-:file:`Configuration/FlexForms/ContactsList.xml` data structure is
-introduced and registered for the plugin (a "Configuration" tab with the
-:sql:`pi_flexform` field is added to the content element), so the option
-can be configured per plugin instance.
+This plugin previously had no flexform at all. The new data structure
+:file:`Configuration/FlexForms/ContactsList.xml` is registered for it, and the
+content element gains a :guilabel:`Configuration` tab with the
+:sql:`pi_flexform` field, so the option can be configured per plugin instance.
 
 When the option is enabled, the frontend contacts listing includes hidden
-(disabled) records, also for visitors without a preview of hidden records.
-Only the `hidden` enable column (`disabled`) is ignored; the `deleted`
-restriction stays in effect.
-
-On a translated page the listing shows the translation of a hidden
-contact, like for a visible one.
+(disabled) records, also for visitors without a preview of hidden records. Only
+the `hidden` enable column (`disabled`) is ignored. Deleted records stay
+excluded.
 
 Impact
 ======

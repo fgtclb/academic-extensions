@@ -7,13 +7,13 @@ Important: Label overrides are read from the documented path
 Description
 ===========
 
-The templates of this extension translate their labels with the extension name
-:html:`AcademicStudyPlan` instead of the extension key
-:html:`academic_study_plan`. TYPO3 v12 and v13 build the TypoScript path of
-:typoscript:`_LOCAL_LANG` from that name as it is given, so they read label
-overrides from :typoscript:`plugin.tx_academic_study_plan`. They now read them
-from :typoscript:`plugin.tx_academicstudyplan`, the path the TYPO3
-documentation names and TYPO3 v14 reads anyway.
+The templates of this extension translated their labels with the extension key
+:html:`academic_study_plan` as the extension name. TYPO3 v12 and v13 build the
+TypoScript path of :typoscript:`_LOCAL_LANG` from that name as it is given, so
+they read label overrides from :typoscript:`plugin.tx_academic_study_plan`. The
+templates now use the extension name :html:`AcademicStudyPlan`, so the overrides
+are read from :typoscript:`plugin.tx_academicstudyplan`, the path the TYPO3
+documentation names.
 
 The study plan is a content element, not a plugin, so only the path of the
 extension applies to it.
