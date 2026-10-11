@@ -126,7 +126,7 @@ they are used in production code across nine packages:
 | Attribute            | Sites   | Examples                                                                    |                                                |
 | -------------------- | ------- | --------------------------------------------------------------------------- |                                                |
 | `#[Exclude]`         | 12      | the eight `Classes/Core12                                                   | Core13/` types and `EnvironmentBuilderFactory` |
-| `#[Autoconfigure]`   | 10      | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)   |                                                |
+| `#[Autoconfigure]`   | 11      | `academic-base/Classes/Service/ArrayObjectMapper.php:24` (`public: true`)   |                                                |
 | `#[Autowire]`        | 7       | same file, line 28 — `#[Autowire(service: 'academic-base.serializer')]`     |                                                |
 | `#[AsAlias]`         | 2       | `academic-persons/Classes/Service/RecordSynchronizer.php:21`                |                                                |
 | `#[AsCommand]`       | 1       | `academic-partners/Classes/Command/GeocodeCommand.php:28`                   |                                                |
@@ -233,7 +233,13 @@ them as precedent, and do not add state to them.
 
 Note that a genuinely configurable service is possible, but it must be declared
 `#[Autoconfigure(shared: false)]` so each retrieval returns a fresh instance.
-No service in this repository is declared that way today.
+One class is declared that way.
+`academic-jobs/Classes/Upgrades/RepairNewJobFormValuesUpgradeWizard.php` is an
+upgrade wizard that implements the core's `ChattyInterface`, which hands it the
+output of its run through a setter before it runs, the console on the command
+line and a stream in the upgrade module. The setter is the only way to receive
+it, so the output is the one value the wizard keeps, and it does not reach the
+next retrieval.
 
 ### Page title providers are the allowed exception
 
