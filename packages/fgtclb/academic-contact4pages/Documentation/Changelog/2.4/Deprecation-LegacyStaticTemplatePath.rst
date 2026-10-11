@@ -22,10 +22,9 @@ components (academic_contacts4pages)` delivers, and an import of the two files
 gets what an import of the files in :file:`Configuration/TypoScript/List/`
 gets.
 
-Unlike :guilabel:`Academic Contacts4Pages: All components
-(academic_contacts4pages)`, the path does not bring the TypoScript of
-EXT:academic_persons along. A record of version 2.3 stores the entry of that
-extension next to the path, and keeps reading it from there, once.
+Unlike the new entries, the path does not bring the TypoScript of
+EXT:academic_persons along. In version 2.3 a record selected the static template
+of that extension next to this path, so it keeps reading that TypoScript once.
 
 The path is offered in the static template list again, as :guilabel:`Academic
 Contacts4Pages: Path up to 2.3 (deprecated, use All components)
@@ -40,8 +39,8 @@ will be removed in version 4.0.
     :file:`EXT:academic_contacts4pages/Configuration/TypoScript/setup.typoscript`
     has to import
     :file:`EXT:academic_contacts4pages/Configuration/TypoScript/constants.typoscript`
-    into its constants as well — otherwise the three Fluid root paths keep
-    their unresolved :typoscript:`{$…}` value.
+    into its constants as well. Otherwise the three Fluid root paths keep their
+    unresolved :typoscript:`{$…}` value.
 
 Impact
 ======
@@ -73,12 +72,12 @@ path up to 2.3, or, on TYPO3 v13, depend on the set
 :yaml:`fgtclb/academic-contacts4pages` in the site configuration.
 
 :guilabel:`All components` brings the TypoScript of EXT:academic_persons along,
-for the plugins of that extension as well. Remove the separate entry
-:guilabel:`Academic Persons: Shared plugin settings (academic_persons)` —
-called :guilabel:`Academic Persons Settings (academic_persons)` in version 2.3
-and stored as `EXT:academic_persons/Configuration/TypoScript/Default` — from
-the record when you select :guilabel:`All components`, or that TypoScript is
-read twice.
+for the plugins of that extension as well. When you select it, remove the
+separate entry :guilabel:`Academic Persons: Shared plugin settings
+(academic_persons)` from the record, or that TypoScript is read twice. In
+version 2.3 that entry was called :guilabel:`Academic Persons Settings
+(academic_persons)`, stored as
+`EXT:academic_persons/Configuration/TypoScript/Default`.
 
 Replace an import of the old files with the files in
 `EXT:academic_contacts4pages/Configuration/TypoScript/List/`, or remove it when

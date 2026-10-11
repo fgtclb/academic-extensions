@@ -37,7 +37,7 @@ will be removed in version 4.0.
     :file:`EXT:academic_study_plan/Configuration/TypoScript/Default/setup.typoscript`
     has to import
     :file:`EXT:academic_study_plan/Configuration/TypoScript/Default/constants.typoscript`
-    into its constants as well — otherwise the template paths stay unresolved,
+    into its constants as well. Otherwise the template paths stay unresolved,
     and the content element cannot find its template.
 
 Impact
