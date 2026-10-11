@@ -40,6 +40,11 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
         'DE' => ['id' => 1, 'title' => 'Deutsch', 'locale' => 'de_DE.UTF8', 'iso' => 'de', 'hrefLang' => 'de-DE', 'direction' => ''],
     ];
 
+    /**
+     * The header of the partner page, and the subtitle that follows its heading.
+     */
+    private const HEADER = '//header[h1]';
+    private const SUBTITLE = self::HEADER . '/h1/following-sibling::p';
     private const FIXTURES = 'EXT:academic_partners/Tests/Functional/Pages/Fixtures/';
     private const PARTNER_PAGE = 'https://www.acme.com/web-vision';
     private const CONTENT_ELEMENT = 'The partnership covers joint research.';
@@ -183,7 +188,7 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
 
         $compiled = $this->renderFrontendPage('https://www.acme.com/acme-ag');
         $header = strpos($compiled, 'site-layout-wide-header');
-        $title = strpos($compiled, '<h1>Acme AG</h1>');
+        $title = strpos($compiled, '<h1 class="ace-title">Acme AG</h1>');
         $footer = strpos($compiled, 'site-layout-wide-footer');
         $this->assertIsInt($header, 'The layout is missing on the second partner page.');
         $this->assertIsInt($title, 'The partner content is missing on the second partner page.');
@@ -249,7 +254,7 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
 
         $content = $this->renderFrontendPage(self::PARTNER_PAGE);
 
-        $this->assertStringContainsString('<h1>web-vision GmbH</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">web-vision GmbH</h1>', $content);
         $this->assertStringContainsString(self::CONTENT_ELEMENT, $content);
         $this->assertStringNotContainsString('site-package-default-template', $content);
     }
@@ -276,7 +281,7 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
         $content = $this->renderFrontendPage(self::PARTNER_PAGE);
 
         $this->assertStringContainsString('<div class="project-partner-header">web-vision GmbH</div>', $content);
-        $this->assertStringNotContainsString('<h1>web-vision GmbH</h1>', $content);
+        $this->assertStringNotContainsString('<h1 class="ace-title">web-vision GmbH</h1>', $content);
         $this->assertStringContainsString('<picture', $content);
         $this->assertStringContainsString(self::CONTENT_ELEMENT, $content);
     }
@@ -295,6 +300,7 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
 
         $this->assertStringContainsString('<div class="project-partner-page">web-vision GmbH</div>', $content);
         $this->assertStringNotContainsString('academic-partners-detail', $content);
+        $this->assertStringNotContainsString('academic-partners-page', $content);
     }
 
     /**
@@ -308,8 +314,8 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
         $this->setUpSite($sitePackage);
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage(self::PARTNER_PAGE));
-        $header = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-partners-detail__header ')]");
-        $subtitle = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-partners-detail__header ')]/h1/following-sibling::*[contains(concat(' ', normalize-space(@class), ' '), ' academic-partners-detail__subtitle ')]");
+        $header = $this->nodesMatching($xpath, self::HEADER);
+        $subtitle = $this->nodesMatching($xpath, self::SUBTITLE);
 
         $this->assertCount(1, $header);
         $this->assertCount(1, $subtitle);
@@ -327,7 +333,7 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
         $this->setUpSite($sitePackage);
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/de/web-vision'));
-        $subtitle = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-partners-detail__subtitle ')]");
+        $subtitle = $this->nodesMatching($xpath, self::SUBTITLE);
 
         $this->assertCount(1, $subtitle);
         $this->assertSame('Partnerhochschule seit 2019', trim((string)$subtitle->item(0)?->textContent));
@@ -346,8 +352,8 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
 
         $content = $this->renderFrontendPage(self::PARTNER_PAGE);
 
-        $this->assertStringContainsString('<h1>web-vision GmbH</h1>', $content);
-        $this->assertStringContainsString('<p class="academic-partners-detail__subtitle">Partner university since 2019</p>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">web-vision GmbH</h1>', $content);
+        $this->assertStringContainsString('<p class="ace-subtitle">Partner university since 2019</p>', $content);
     }
 
     #[Test]
@@ -358,8 +364,9 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
 
         $content = $this->renderFrontendPage('https://www.acme.com/acme-ag');
 
-        $this->assertStringContainsString('<h1>Acme AG</h1>', $content);
-        $this->assertStringNotContainsString('academic-partners-detail__subtitle', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Acme AG</h1>', $content);
+        $this->assertCount(1, $this->nodesMatching($this->parseRenderedPage($content), self::HEADER));
+        $this->assertCount(0, $this->nodesMatching($this->parseRenderedPage($content), self::SUBTITLE));
     }
 
     /**
@@ -368,7 +375,7 @@ final class AcademicPartnerPageLayoutTest extends AbstractAcademicPartnersTestCa
     private function assertPartnerBetween(string $content, string $headerMarker, string $footerMarker): void
     {
         $header = strpos($content, $headerMarker);
-        $partner = strpos($content, 'academic-partners-detail');
+        $partner = strpos($content, 'academic-partners-page');
         $element = strpos($content, self::CONTENT_ELEMENT);
         $footer = strpos($content, $footerMarker);
         $this->assertIsInt($header, sprintf('The layout marker "%s" is missing.', $headerMarker));

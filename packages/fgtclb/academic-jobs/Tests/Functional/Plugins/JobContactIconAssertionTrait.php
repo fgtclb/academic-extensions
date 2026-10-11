@@ -16,13 +16,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 trait JobContactIconAssertionTrait
 {
+    private function contactBlockQuery(): string
+    {
+        return '//div[contains(concat(" ", normalize-space(@class), " "), " ace-contact ")]';
+    }
+
     private function contactBlock(string $content): \DOMElement
     {
         $document = new \DOMDocument();
         $document->loadHTML('<?xml encoding="UTF-8">' . $content, LIBXML_NOERROR | LIBXML_NOWARNING);
-        $blocks = (new \DOMXPath($document))->query(
-            '//div[contains(concat(" ", normalize-space(@class), " "), " academic-jobs-contact ")]'
-        );
+        $blocks = (new \DOMXPath($document))->query($this->contactBlockQuery());
         $this->assertNotFalse($blocks);
         $this->assertSame(1, $blocks->length, 'The detail view renders not exactly one contact block.');
         $block = $blocks->item(0);

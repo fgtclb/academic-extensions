@@ -168,7 +168,7 @@ final class CategoryTypeTitleTest extends AbstractAcademicProjectsTestCase
      */
     private function categoryLabel(string $content, string $type): string
     {
-        $pattern = '#data-identifier="category_types\.projects\.' . preg_quote($type, '#') . '".*?<b>(.*?)</b>#s';
+        $pattern = '#data-identifier="category_types\.projects\.' . preg_quote($type, '#') . '".*?<b class="ace-label">(.*?)</b>#s';
         if (preg_match($pattern, $content, $matches) !== 1) {
             $this->fail(sprintf('No categories of the type "%s" are rendered.', $type));
         }
@@ -177,7 +177,7 @@ final class CategoryTypeTitleTest extends AbstractAcademicProjectsTestCase
 
     private function selectLabel(string $content, string $selectId): string
     {
-        $pattern = '#<label for="' . preg_quote($selectId, '#') . '"[^>]*>(.*?)</label>#s';
+        $pattern = '#<label class="ace-label" for="' . preg_quote($selectId, '#') . '"[^>]*>(.*?)</label>#s';
         if (preg_match($pattern, $content, $matches) !== 1) {
             $this->fail(sprintf('No select "%s" is labelled.', $selectId));
         }

@@ -147,14 +147,6 @@ final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestC
         return $texts;
     }
 
-    /**
-     * An XPath predicate matching an element carrying the class as a whole token.
-     */
-    private function hasClass(string $class): string
-    {
-        return sprintf('contains(concat(" ", normalize-space(@class), " "), " %s ")', $class);
-    }
-
     #[Test]
     public function biteJobsListPluginIsRendered(): void
     {
@@ -248,44 +240,47 @@ final class AcademicBiteJobsListPluginTest extends AbstractAcademicBiteJobsTestC
         );
         $this->assertSame(
             ['Stubbed job posting', 'Second stubbed job posting'],
-            $this->textsOf($html, '//div[contains(@class, "academic-bite-jobs-itemlist")]//h3'),
+            $this->textsOf($html, self::LIST_WRAPPER . '/div//h3'),
         );
     }
 
     /**
+     * The title of every job of the view, found below the element that names the view.
+     *
      * @return array<string, array{0: string|null, 1: string}>
      */
     public static function storedViewValues(): array
     {
+        $headings = '//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]';
+        $list = self::LIST_WRAPPER . '/div[contains(concat(" ", normalize-space(@class), " "), " ace-list-view ")]' . $headings;
+        $cards = self::LIST_WRAPPER . '/div[contains(concat(" ", normalize-space(@class), " "), " ace-card-view ")]' . $headings;
+        $table = self::LIST_WRAPPER . '/table[contains(concat(" ", normalize-space(@class), " "), " ace-table ")]/tbody/tr/td[1]';
+
         return [
-            'List' => ['List', 'academic-bite-jobs-itemlist'],
-            'Card' => ['Card', 'academic-bite-jobs-itemcards'],
-            'Table' => ['Table', 'academic-bite-jobs-itemtable'],
-            'ListView before 2.1' => ['ListView', 'academic-bite-jobs-itemlist'],
-            'CardView before 2.1' => ['CardView', 'academic-bite-jobs-itemcards'],
-            'TableView before 2.1' => ['TableView', 'academic-bite-jobs-itemtable'],
-            'empty value' => ['', 'academic-bite-jobs-itemlist'],
-            'unknown value' => ['Grid', 'academic-bite-jobs-itemlist'],
-            'no view field' => [null, 'academic-bite-jobs-itemlist'],
+            'List' => ['List', $list],
+            'Card' => ['Card', $cards],
+            'Table' => ['Table', $table],
+            'ListView before 2.1' => ['ListView', $list],
+            'CardView before 2.1' => ['CardView', $cards],
+            'TableView before 2.1' => ['TableView', $table],
+            'empty value' => ['', $list],
+            'unknown value' => ['Grid', $list],
+            'no view field' => [null, $list],
         ];
     }
 
     #[DataProvider('storedViewValues')]
     #[Test]
-    public function storedViewValueSelectsTheView(?string $view, string $expectedViewClass): void
+    public function storedViewValueSelectsTheView(?string $view, string $expectedTitles): void
     {
         $this->setUpTestCase();
         $this->storeViewValue($view);
 
         $html = $this->renderHomePage();
 
-        $this->assertCount(
-            2,
-            $this->textsOf($html, sprintf(
-                '//*[%s]//*[%s]',
-                $this->hasClass($expectedViewClass),
-                $this->hasClass('academic-bite-jobs-item'),
-            )),
+        $this->assertSame(
+            ['Stubbed job posting', 'Second stubbed job posting'],
+            $this->textsOf($html, $expectedTitles),
         );
     }
 }

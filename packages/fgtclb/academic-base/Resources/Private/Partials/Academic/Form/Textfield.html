@@ -17,7 +17,7 @@
                             when it is not given.
 
     The placeholder is "edit.<objectName>.<identifier>.placeholder". A field that failed
-    validation gets the class "is-invalid" in place of "f3-form-error", "aria-invalid" and
+    validation gets the class "invalid" in place of "f3-form-error", "aria-invalid" and
     "aria-describedby" naming the messages "Academic/Form/FieldWrapper" renders after it.
 </f:comment>
 
@@ -31,16 +31,21 @@
 
 <f:render
     partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
-    arguments="{element: element, elementId: elementId, class: 'form-textfield-wrap', extensionName: extensionName}"
+    arguments="{
+        element: element,
+        elementId: elementId,
+        class: 'ace-text-wrap',
+        extensionName: extensionName
+    }"
     contentAs="elementContent"
 >
     <f:form.textfield
         type="{validation.inputType}"
         property="{element.identifier}"
         id="{elementId}"
+        class="ace-control ace-text"
         placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: extensionName)}"
-        class="form-control"
-        errorClass="is-invalid"
+        errorClass="invalid"
         aria="{fieldAria}"
         disabled="{element.disabled}"
         autocomplete="{element.autocomplete}"

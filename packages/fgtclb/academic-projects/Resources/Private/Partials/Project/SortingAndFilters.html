@@ -5,28 +5,30 @@
 >
 
 <f:if condition="!{settings.hideSorting} || !{settings.hideFilter} || !{settings.hideActiveState}">
-    <f:form action="list" name="demand" object="{demand}" class="academic-projects-filtersorting">
-        <div class="row">
-            <f:if condition="!{settings.hideSorting}">
-                <f:render
-                    partial="Project/DemandSorting"
-                    arguments="{_all}"
-                />
-            </f:if>
+    <f:form action="list" name="demand" object="{demand}" class="ace-form">
+        <div class="ace-filters">
+            <div class="row">
+                <f:if condition="!{settings.hideSorting}">
+                    <f:render
+                        partial="Project/DemandSorting"
+                        arguments="{_all}"
+                    />
+                </f:if>
 
-            <f:if condition="!{settings.hideFilter}">
-                <f:render
-                    partial="Project/DemandCategories"
-                    arguments="{_all}"
-                />
-            </f:if>
+                <f:if condition="!{settings.hideFilter}">
+                    <f:render
+                        partial="Project/DemandCategories"
+                        arguments="{_all}"
+                    />
+                </f:if>
 
-            <f:if condition="!{settings.hideActiveState}">
-                <f:render
-                    partial="Project/DemandActiveState"
-                    arguments="{_all}"
-                />
-            </f:if>
+                <f:if condition="!{settings.hideActiveState}">
+                    <f:render
+                        partial="Project/DemandActiveState"
+                        arguments="{_all}"
+                    />
+                </f:if>
+            </div>
         </div>
     </f:form>
 </f:if>
@@ -36,6 +38,7 @@
     `settings.filter.showActiveFilters`, `showReset` and `showResultCount`. The first two
     belong to the filter and the state select, so a list that hides both shows neither.
 </f:comment>
+
 <f:if condition="!{settings.hideFilter} || !{settings.hideActiveState}">
     <f:if condition="{settings.filter.showActiveFilters} || {settings.filter.showReset}">
         <f:render

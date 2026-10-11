@@ -21,10 +21,9 @@
 </f:comment>
 
 <nav
-    class="academic-jobs-list__pagination"
     aria-label="{f:translate(key: 'list.pagination.label', extensionName: 'AcademicJobs')}"
 >
-    <ul class="pagination justify-content-center mt-4">
+    <ul class="f3-widget-paginator">
         <f:if condition="{pagination.previousPageNumber} && {pagination.previousPageNumber} >= {pagination.firstPageNumber}">
             <li class="page-item first">
                 <f:render
@@ -85,11 +84,16 @@
 </nav>
 
 <f:section name="PageLink">
-    <f:link.action
-        action="list"
-        arguments="{currentPage: page}"
-        class="page-link"
-    ><f:if condition="{labelKey}"><f:then><f:translate key="{labelKey}" extensionName="fluid" /></f:then><f:else>{page}</f:else></f:if></f:link.action>
+    <f:link.action action="list" arguments="{currentPage: page}" class="page-link">
+        <f:if condition="{labelKey}">
+            <f:then>
+                {f:translate(key: labelKey, extensionName: 'fluid')}
+            </f:then>
+            <f:else>
+                {page}
+            </f:else>
+        </f:if>
+    </f:link.action>
 </f:section>
 
 </html>

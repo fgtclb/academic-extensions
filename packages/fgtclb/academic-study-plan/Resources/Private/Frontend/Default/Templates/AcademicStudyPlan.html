@@ -10,6 +10,7 @@
     <f:if condition="{settings.assets.css}">
         <f:asset.css identifier="academicStudyPlan" href="EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css" />
     </f:if>
+
     <f:if condition="{settings.assets.js}">
         <f:asset.module identifier="@fgtclb/academic-study-plan/frontend/academic-study-plan.js" />
     </f:if>
@@ -21,22 +22,32 @@
     </f:comment>
 
     <div
-        class="academic-study-plan container"
+        class="academic-study-plan"
         data-study-plan="{data.uid}"
         data-filter-label="{f:translate(key: 'filter.label', extensionName: 'AcademicStudyPlan')}"
     >
-        <f:render partial="StudyPlan/Filter" arguments="{collapsible: settings.filter.collapsible}" />
+        <f:render
+            partial="StudyPlan/Filter"
+            arguments="{collapsible: settings.filter.collapsible}"
+        />
 
         <f:if condition="{semesters}">
-            <ul class="semesters row">
-                <f:for each="{semesters}" as="semester">
-                    <f:render partial="StudyPlan/Semester" arguments="{semester: semester}" />
-                </f:for>
-            </ul>
+            <div class="ace-semesters">
+                <div role="list" class="row">
+                    <f:for each="{semesters}" as="semester">
+                        <f:render
+                            partial="StudyPlan/Semester"
+                            arguments="{semester: semester}"
+                        />
+                    </f:for>
+                </div>
+            </div>
         </f:if>
 
         <f:if condition="{data.tx_academicstudyplan_footer_note}">
-            <f:format.html>{data.tx_academicstudyplan_footer_note}</f:format.html>
+            <div class="ce-bodytext">
+                <f:format.html>{data.tx_academicstudyplan_footer_note}</f:format.html>
+            </div>
         </f:if>
     </div>
 

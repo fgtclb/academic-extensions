@@ -15,7 +15,7 @@
 
 <f:form.validationResults for="{object}">
     <f:if condition="{validationResults.flattenedErrors}">
-        <div class="alert alert-danger">
+        <div class="ace-errors">
             {f:translate(key: 'create.{objectName}.incorrectValues', extensionName: extensionName)}
         </div>
     </f:if>

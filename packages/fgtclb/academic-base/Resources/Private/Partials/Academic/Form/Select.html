@@ -19,14 +19,19 @@
 
 <f:render
     partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
-    arguments="{element: element, elementId: elementId, class: 'form-select-wrap', extensionName: extensionName}"
+    arguments="{
+        element: element,
+        elementId: elementId,
+        class: 'ace-select-wrap',
+        extensionName: extensionName
+    }"
     contentAs="elementContent"
 >
     <f:form.select
         property="{element.identifier}"
         id="{elementId}"
-        class="form-select"
-        errorClass="is-invalid"
+        class="ace-control ace-select"
+        errorClass="invalid"
         aria="{fieldAria}"
         options="{element.options}"
         optionValueField="{element.optionValueField}"

@@ -141,8 +141,8 @@ final class AcademicPartnersMapConfigurationTest extends AbstractAcademicPartner
 
         $content = $this->renderFrontendPage('https://www.acme.com/home');
 
-        $this->assertStringContainsString('<div class="academic-partners-map">', $content);
-        $this->assertStringNotContainsString('academic-partners-map--full-width', $content);
+        $this->assertStringContainsString('<div class="academic-partners-map ">', $content);
+        $this->assertStringNotContainsString('layout-fullWidth', $content);
     }
 
     #[Test]
@@ -155,14 +155,17 @@ final class AcademicPartnersMapConfigurationTest extends AbstractAcademicPartner
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/home'));
         $container = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-partners-map ')]");
 
-        $this->assertSame(
-            $fullWidth,
-            in_array('academic-partners-map--full-width', explode(' ', $container->getAttribute('class')), true),
-        );
+        $classes = explode(' ', $container->getAttribute('class'));
+        $this->assertSame($fullWidth, in_array('layout-fullWidth', $classes, true));
+        // The width of the content is left to the layout of the content element.
+        $this->assertNotContains('container', $classes);
         // The layout changes the class and nothing else: the map is drawn either way.
         $partners = $xpath->query('//*[@id="map-partners"]/li');
         $this->assertInstanceOf(\DOMNodeList::class, $partners);
         $this->assertSame(2, $partners->length);
+        // The list hands the partners to the script, the map shows them: the list itself is
+        // hidden without a class a theme has to provide.
+        $this->assertTrue($this->elementMatching($xpath, '//*[@id="map-partners"]')->hasAttribute('hidden'));
         // The FlexForm adds "layout" to "settings.map", and the settings of the TypoScript
         // next to it have to survive that merge.
         $this->assertSame('18', $this->elementMatching($xpath, '//*[@id="map"]')->getAttribute('data-academic-partners-max-zoom'));

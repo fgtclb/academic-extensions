@@ -84,11 +84,24 @@ so it renders that one and is not affected either way.)
 
 ## Classes are added, never moved
 
-Every new partial that renders an element of its own gets a BEM class next to
-the classes that were already there, never instead of one: project stylesheets
-build on `card`, `card-title`, `card-img-top` and the extension's own list
-classes. A partial that renders no element — a value partial, an empty hook —
-gets no class, because a wrapper element would be a markup change.
+Every new partial that renders an element of its own gets a class next to the
+classes that were already there, never instead of one, because project
+stylesheets build on them. The frontend partials of jobs, b-ite jobs, contacts,
+partners, programs, projects and the study plan carry speaking classes with the
+prefix `ace-`, named after what an element is (`ace-item`, `ace-list`,
+`ace-attribute`, `ace-label`, `ace-value`), the persons partials their BEM
+classes and `card`, `card-title` and `card-img-top`. A partial that renders no
+element, a value partial or an empty hook, gets no class, because a wrapper
+element would be a markup change.
+
+Four systems of Bootstrap stay in the speaking markup on purpose, because a
+site builds on them and has nothing to gain from a renamed copy: the
+`container` of the partner, program and project pages, the grid (`row`,
+`col-*`), the buttons (`btn`, `btn-primary`) and `visually-hidden`. A
+speaking class sits next to them where an element needs telling apart, such as
+`btn btn-primary ace-apply` on the application link of a program page or
+`ace-status visually-hidden` on the status line of the program finder. A site
+without Bootstrap provides these classes itself.
 
 The block the class names is the block the element is **in**, which is not
 always the partial's folder. `Profile/List/Items.html` and
@@ -99,7 +112,7 @@ rather than `academic-persons-list__…`. A class is a published contract from t
 release on, so this is decided before it ships, not after.
 
 Where a class belongs to a heading that a shared partial renders, it is passed
-through that partial's existing `positionClass` argument rather than wrapped in
+through that partial's existing `class` argument rather than wrapped in
 a new element.
 
 ## An empty partial is a legitimate partial

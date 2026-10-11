@@ -9,12 +9,12 @@
     is filled.
 </f:comment>
 
-<ul>
+<ul class="ace-list ace-attributes">
     <f:if condition="{project.startDate} || {project.endDate}">
-        <li>
-            <b>{f:translate(key: 'project.runtime', extensionName: 'AcademicProjects')}:</b>
+        <li class="ace-list-item ace-attribute">
+            <b class="ace-label">{f:translate(key: 'project.runtime', extensionName: 'AcademicProjects')}:</b>
 
-            <span>
+            <span class="ace-value">
                 <f:if condition="{project.startDate}">
                     <f:if condition="!{project.endDate}">
                         {f:translate(key: 'project.since', extensionName: 'AcademicProjects')}
@@ -37,18 +37,20 @@
     </f:if>
 
     <f:if condition="{project.budget}">
-        <li>
-            <b>{f:translate(key: 'project.budget', extensionName: 'AcademicProjects')}:</b>
+        <li class="ace-list-item ace-attribute">
+            <b class="ace-label">{f:translate(key: 'project.budget', extensionName: 'AcademicProjects')}:</b>
 
-            <span>{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</span>
+            <span class="ace-value">{project.budget -> f:format.currency(thousandsSeparator: '.', currencySign: 'EURO')}</span>
         </li>
     </f:if>
 
     <f:if condition="{project.funders}">
-        <li>
-            <b>{f:translate(key: 'project.funders', extensionName: 'AcademicProjects')}:</b>
+        <li class="ace-list-item ace-attribute">
+            <b class="ace-label">{f:translate(key: 'project.funders', extensionName: 'AcademicProjects')}:</b>
 
-            <f:format.html>{project.funders}</f:format.html>
+            <div class="ace-value ce-bodytext">
+                <f:format.html>{project.funders}</f:format.html>
+            </div>
         </li>
     </f:if>
 </ul>

@@ -40,6 +40,8 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
     private const HEADER = 'Open positions';
     private const SUBHEADER = 'Apply by the end of the month';
     private const LIST_WRAPPER = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-jobs-list ")]';
+    private const ITEM_LIST = self::LIST_WRAPPER . '/div[contains(concat(" ", normalize-space(@class), " "), " ace-content ")]/div[contains(concat(" ", normalize-space(@class), " "), " ace-itemlist ")]';
+    private const ITEMS = self::ITEM_LIST . '/article[contains(concat(" ", normalize-space(@class), " "), " ace-item ")]';
     private const DETAIL_WRAPPER = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-jobs-detail ")]';
     private const RENDER_HEADER_CONSTANTS = 'EXT:academic_jobs/Tests/Functional/Plugins/Fixtures/TypoScript/Constants/RenderContentElementHeader.typoscript';
     private const LAYOUT_WITHOUT_HEADER_SETUP = 'EXT:academic_jobs/Tests/Functional/Plugins/Fixtures/TypoScript/Setup/LayoutWithoutHeader.typoscript';
@@ -224,7 +226,7 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
 
         $content = $this->renderListPage();
         $this->assertStringContainsString('academic-jobs-list', $content);
-        $this->assertStringContainsString('academic-jobs-itemlist', $content);
+        $this->assertSame(3, $this->countContentElementHeaderNodes($content, self::ITEMS));
         $this->assertStringContainsString('Research Assistant Position', $content);
         $this->assertStringContainsString('Student Assistant Sidejob', $content);
         $this->assertStringContainsString('Master Thesis Topic', $content);
@@ -241,7 +243,9 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         $content = $this->renderListPage();
         $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::HEADER));
         $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::SUBHEADER));
-        $this->assertSame(0, $this->countHeaderElements($content, self::LIST_WRAPPER));
+        // Every job renders its title in an ace-header, any other header inside the list would
+        // be the one of the content element.
+        $this->assertSame(0, $this->countContentElementHeaderNodes($content, self::LIST_WRAPPER . '//header[not(contains(concat(" ", normalize-space(@class), " "), " ace-header "))]'));
     }
 
     #[Test]
@@ -340,8 +344,8 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         $content = $this->renderListPage();
         // This extension has no "nothing found" label — the item list stays empty, and the
         // plugin still has to render rather than fail.
-        $this->assertStringContainsString('academic-jobs-itemlist', $content);
-        $this->assertStringNotContainsString('academic-jobs-item"', $content);
+        $this->assertSame(1, $this->countContentElementHeaderNodes($content, self::ITEM_LIST));
+        $this->assertSame(0, $this->countContentElementHeaderNodes($content, self::ITEMS));
     }
 
     #[Test]
@@ -364,7 +368,7 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         // Header layout 1 without a subheader is the "one level up" case of the heading
         // partial, so the item title has to be an `h2`.
         $this->assertMatchesRegularExpression(
-            '#<h2 class="card-title">\s*<a href="[^"]*tx_academicjobs_detail[^"]*">Research Assistant Position</a>\s*</h2>#',
+            '#<h2 class="ace-title ">\s*<a href="[^"]*tx_academicjobs_detail[^"]*">Research Assistant Position</a>\s*</h2>#',
             $this->renderListPage(),
         );
     }
@@ -405,7 +409,9 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         $content = $this->renderDetailPageOfJob($this->renderListPage(), 1);
         $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::HEADER));
         $this->assertSame($expectedHeadings, $this->countHeadingsReading($content, self::SUBHEADER));
-        $this->assertSame(0, $this->countHeaderElements($content, self::DETAIL_WRAPPER));
+        // The header of the job title is the ace-header, a header of the content element
+        // would be another one, wherever it renders inside the detail.
+        $this->assertSame(0, $this->countContentElementHeaderNodes($content, self::DETAIL_WRAPPER . '//header[not(contains(concat(" ", normalize-space(@class), " "), " ace-header "))]'));
     }
 
     #[Test]
@@ -432,7 +438,7 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         $this->setUpTestCase('jobPages');
 
         $content = $this->renderDetailPageOfJob($this->renderListPage(), 1);
-        $this->assertStringContainsString('academic-jobs-contact', $content);
+        $this->assertSame(1, $this->countContentElementHeaderNodes($content, $this->contactBlockQuery()));
         $this->assertStringContainsString('Dr. Ada Lovelace', $content);
         // A `tel:` URI carries no spaces, while the stored number is written for a reader —
         // so the link target drops them and the label keeps them.
@@ -460,9 +466,53 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         // left out. `detailPluginOmitsContactBlockForJobWithoutContact()` covers the case
         // where there is no contact at all and therefore no block either.
         $content = $this->renderDetailPageOfJob($this->renderListPage(), 2);
-        $this->assertStringContainsString('academic-jobs-contact', $content);
+        $this->assertSame(1, $this->countContentElementHeaderNodes($content, $this->contactBlockQuery()));
         $this->assertStringContainsString('grace@example.org', $content);
         $this->assertStringNotContainsString('tel:', $content);
+    }
+
+    /**
+     * The additional contact information is rich text from the editor of the backend or
+     * of the new job form. It is rendered below the contact data, in the rich text element
+     * of the site, through the rich text parsing of the site, so markup an editor may not
+     * enter is not rendered.
+     */
+    #[Test]
+    public function detailPluginRendersTheAdditionalContactInformationInTheContactBlock(): void
+    {
+        $this->setUpTestCase('jobPages_contactAdditionalInformation');
+
+        $block = $this->contactBlock($this->renderDetailPageOfJob($this->renderListPage(), 1));
+        $document = $block->ownerDocument;
+        $this->assertInstanceOf(\DOMDocument::class, $document);
+        $xpath = new \DOMXPath($document);
+        $texts = $xpath->query('./div[@class="ce-bodytext"]', $block);
+        $this->assertNotFalse($texts);
+        $this->assertSame(1, $texts->length, 'The contact block renders not exactly one rich text element.');
+        $text = $texts->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $text);
+        $this->assertStringStartsWith('Office hours Monday to Thursday.', trim((string)preg_replace('#\s+#', ' ', $text->textContent)));
+        $bold = $xpath->query('.//b', $text);
+        $this->assertNotFalse($bold);
+        $this->assertSame('Monday', trim((string)$bold->item(0)?->textContent));
+        // A script element is markup an editor may not enter, rendered as text at most.
+        $scripts = $xpath->query('.//script', $block);
+        $this->assertNotFalse($scripts);
+        $this->assertSame(0, $scripts->length);
+    }
+
+    #[Test]
+    public function detailPluginRendersNoAdditionalContactInformationElementWithoutAValue(): void
+    {
+        $this->setUpTestCase('jobPages_contactAdditionalInformation');
+
+        $block = $this->contactBlock($this->renderDetailPageOfJob($this->renderListPage(), 2));
+        $document = $block->ownerDocument;
+        $this->assertInstanceOf(\DOMDocument::class, $document);
+        $elements = (new \DOMXPath($document))->query('./div', $block);
+        $this->assertNotFalse($elements);
+        $this->assertSame(0, $elements->length);
+        $this->assertStringContainsString('grace@example.org', (string)$block->textContent);
     }
 
     #[Test]
@@ -545,7 +595,7 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
 
         $content = $this->renderDetailPageOfJob($this->renderListPage(), 2);
         $this->assertStringContainsString('Student Assistant Sidejob', $content);
-        $this->assertStringNotContainsString('academic-jobs-contact', $content);
+        $this->assertSame(0, $this->countContentElementHeaderNodes($content, $this->contactBlockQuery()));
     }
 
     #[Test]
@@ -557,7 +607,7 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         // Header layout 1 without a subheader renders the section heading as `h3` — one
         // level below the `h2` of the default layout.
         $this->assertMatchesRegularExpression(
-            '#<h3 class="contact-title">\s*Contact\s*</h3>#',
+            '#<h3 class="ace-title ">\s*Contact\s*</h3>#',
             $content,
         );
     }
@@ -569,7 +619,7 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
 
         $content = $this->renderDetailPageOfJob($this->renderListPage(), 1);
         $this->assertMatchesRegularExpression(
-            '#<a href="/home">\s*Back to job list\s*</a>#',
+            '#<a class="ace-link" href="/home">\s*Back to job list\s*</a>#',
             $content,
         );
     }
@@ -597,15 +647,15 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         // label alone: the closing `</li>` right behind it is what proves the stored `1`
         // is gone.
         $this->assertMatchesRegularExpression(
-            '#<b>International applicants welcome</b>\s*</li>#',
+            '#<b class="ace-label">International applicants welcome</b>\s*</li>#',
             $content,
         );
         $this->assertMatchesRegularExpression(
-            '#<b>Recommended by alumni</b>\s*</li>#',
+            '#<b class="ace-label">Recommended by alumni</b>\s*</li>#',
             $content,
         );
         // An untranslated key renders as an empty label, which is the shape of the defect.
-        $this->assertStringNotContainsString('<b>:</b>', $content);
+        $this->assertStringNotContainsString('<b class="ace-label">:</b>', $content);
     }
 
     #[Test]
@@ -624,7 +674,7 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         $this->setUpTestCase('jobPages_flagsAndLink');
 
         $content = $this->renderDetailPageOfJob($this->renderListPage(), 1);
-        $this->assertStringContainsString('<b>Link:</b>', $content);
+        $this->assertStringContainsString('<b class="ace-label">Link:</b>', $content);
         $this->assertMatchesRegularExpression(
             '#<a href="https://jobs\.example\.org/fellowship"[^>]*>\s*To the job posting\s*</a>#',
             $content,
@@ -656,11 +706,11 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
             1,
         );
         $this->assertMatchesRegularExpression(
-            '#<b>Internationale Bewerbungen willkommen</b>\s*</li>#',
+            '#<b class="ace-label">Internationale Bewerbungen willkommen</b>\s*</li>#',
             $content,
         );
         $this->assertMatchesRegularExpression(
-            '#<b>Von Alumni empfohlen</b>\s*</li>#',
+            '#<b class="ace-label">Von Alumni empfohlen</b>\s*</li>#',
             $content,
         );
         $this->assertMatchesRegularExpression(
@@ -679,13 +729,13 @@ final class AcademicJobsListAndDetailPluginTest extends AbstractAcademicJobsTest
         $content = $this->renderListPage();
         $this->assertSame(
             2,
-            preg_match_all('#<b>International applicants welcome</b>\s*</li>#', $content),
+            preg_match_all('#<b class="ace-label">International applicants welcome</b>\s*</li>#', $content),
         );
         $this->assertSame(
             2,
-            preg_match_all('#<b>Recommended by alumni</b>\s*</li>#', $content),
+            preg_match_all('#<b class="ace-label">Recommended by alumni</b>\s*</li>#', $content),
         );
-        $this->assertStringNotContainsString('<b>:</b>', $content);
+        $this->assertStringNotContainsString('<b class="ace-label">:</b>', $content);
         $this->assertMatchesRegularExpression(
             '#<a href="https://jobs\.example\.org/fellowship"[^>]*>\s*To the job posting\s*</a>#',
             $content,

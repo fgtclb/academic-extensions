@@ -114,7 +114,7 @@ final class AcademicProgramsPluginTest extends AbstractAcademicProgramsTestCase
 
         $content = $this->renderHomePage();
         $this->assertStringContainsString('academic-programs-list', $content);
-        $this->assertStringContainsString('academic-programs-itemlist', $content);
+        $this->assertSame(4, $this->countContentElementHeaderNodes($content, '//*[@data-academic-programs-list-content]//div[contains(concat(" ", normalize-space(@class), " "), " ace-itemlist ")]/div[@class="row"]/div/article[contains(concat(" ", normalize-space(@class), " "), " ace-item ")]'));
         $this->assertStringContainsString('Applied Physics', $content);
         $this->assertStringContainsString('Molecular Chemistry', $content);
         // Programs are collected across the whole site, not only below the current page.
@@ -129,7 +129,7 @@ final class AcademicProgramsPluginTest extends AbstractAcademicProgramsTestCase
         $this->setUpTestCase('programListPage');
 
         $this->assertMatchesRegularExpression(
-            '#<h2 class="card-title">\s*<a href="/applied-physics">Applied Physics</a>\s*</h2>#',
+            '#<h2 class="ace-title ">\s*<a href="/applied-physics">Applied Physics</a>\s*</h2>#',
             $this->renderHomePage(),
         );
     }
@@ -145,7 +145,7 @@ final class AcademicProgramsPluginTest extends AbstractAcademicProgramsTestCase
         $this->assertStringContainsString('Bachelor of Science', $content);
         $this->assertStringContainsString('Master of Science', $content);
         // Assigned to a program, but of a type the item partial does not render.
-        $this->assertStringNotContainsString('<b>Type of program:</b>', $content);
+        $this->assertStringNotContainsString('<b class="ace-label">Type of program:</b>', $content);
     }
 
     #[Test]
@@ -154,7 +154,7 @@ final class AcademicProgramsPluginTest extends AbstractAcademicProgramsTestCase
         $this->setUpTestCase('programListPage');
 
         $content = $this->renderHomePage();
-        $this->assertStringContainsString('academic-programs-filtersorting', $content);
+        $this->assertSame(1, $this->countContentElementHeaderNodes($content, '//form[@name="demand"]'));
         $this->assertStringContainsString('Sorting field', $content);
         $this->assertStringContainsString('Sorting direction', $content);
         // The filter selects are built from the category types applicable to the listed
@@ -176,7 +176,7 @@ final class AcademicProgramsPluginTest extends AbstractAcademicProgramsTestCase
         $this->setUpTestCase('programListPage_hideFilterAndSorting');
 
         $content = $this->renderHomePage();
-        $this->assertStringNotContainsString('academic-programs-filtersorting', $content);
+        $this->assertSame(0, $this->countContentElementHeaderNodes($content, '//form[@name="demand"]'));
         // The list itself is unaffected by hiding the form.
         $this->assertStringContainsString('Applied Physics', $content);
     }
@@ -320,7 +320,12 @@ final class AcademicProgramsPluginTest extends AbstractAcademicProgramsTestCase
 
         // The details plugin sits on the program page, so that page is the one to request.
         $content = $this->renderFrontendPage('https://www.acme.com/applied-physics');
-        $this->assertStringContainsString('academic-programs-detail-categories', $content);
+        // The program page around the element carries the class of the block as well, so the
+        // element is looked for inside the content element of the plugin.
+        $this->assertSame(1, $this->countContentElementHeaderNodes(
+            $content,
+            '//*[@id = "c1"]//div[contains(concat(" ", normalize-space(@class), " "), " academic-programs-detail ")]',
+        ));
         $this->assertStringContainsString('Degree', $content);
         $this->assertStringContainsString('Bachelor of Science', $content);
         $this->assertStringContainsString('Type of program', $content);
@@ -354,7 +359,7 @@ final class AcademicProgramsPluginTest extends AbstractAcademicProgramsTestCase
         $views = [
             'program list' => ['programListPage', 'https://www.acme.com/home', 1, 'academic-programs-list'],
             // The details element sits on the program page, so that page is the one to request.
-            'program details' => ['programDetailsPage', 'https://www.acme.com/applied-physics', 1, 'academic-programs-detail-categories'],
+            'program details' => ['programDetailsPage', 'https://www.acme.com/applied-physics', 1, 'academic-programs-detail'],
         ];
         $headerLayouts = [
             'header layout "Default"' => [0, 1],

@@ -6,40 +6,24 @@
     data-namespace-typo3-fluid="true"
 >
 
-<div class="card flex-column-reverse academic-partnerships-teaser-item">
-    <div>
-        <div class="card-body">
-            <f:render
-                partial="Partner/Header"
-                arguments="{
-                    header: '{partner.title}',
-                    layout: '{data.header_layout}',
-                    positionClass: 'card-title',
-                    link: '{f:uri.page(pageUid: partner.uid)}',
-                    grouped: '{grouped}',
-                    subheader: '{data.subheader}'
-                }"
-            />
-        </div>
+<article class="ace-item">
+    <div class="ace-item-content">
+        <f:render
+            partial="Partner/Header"
+            arguments="{
+                header: '{partner.title}',
+                layout: '{data.header_layout}',
+                link: '{f:uri.page(pageUid: partner.uid)}',
+                grouped: '{grouped}',
+                subheader: '{data.subheader}'
+            }"
+        />
 
         <f:if condition="{partner.attributes}">
-            <ul class="list-group-flush list-group">
-                <f:for each="{partner.attributes.allCategoriesByType}" as="categories" key="type">
-                    <f:if condition="{categories}">
-                        <li class="list-group-item">
-                            <ab:icon identifier="category_types.partners.{type}"/>
-
-                            <b>{f:translate(key: 'sys_category.partners.{type}', extensionName: 'AcademicPartners') -> ct:categoryTypeTitle(group: 'partners', identifier: type)}:</b>
-
-                            <span>
-                                <f:for each="{categories}" as="category" iteration="i">
-                                    {category.title}{f:if(condition: '!{i.isLast}', then: ', ')}
-                                </f:for>
-                            </span>
-                        </li>
-                    </f:if>
-                </f:for>
-            </ul>
+            <f:render
+                partial="Partner/Categories"
+                arguments="{_all}"
+            />
         </f:if>
     </div>
 
@@ -55,11 +39,10 @@
                 arguments="{
                     image: image,
                     preset: 'logo',
-                    class: 'card-img-top img-fluid'
                 }"
             />
         </f:if>
     </f:for>
-</div>
+</article>
 
 </html>

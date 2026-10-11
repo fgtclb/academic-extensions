@@ -125,7 +125,7 @@ final class ProgramFactsPlainTextTest extends AbstractAcademicProgramsTestCase
 
         $item = $this->factItem($this->renderPlace($url), 'jobProfile');
 
-        $this->assertStringContainsString('<span>', $item);
+        $this->assertStringContainsString('<span class="ace-value">', $item);
         $this->assertStringContainsString('Research &amp; teaching<br />', $item);
         $this->assertStringContainsString('&lt;b&gt;Industry&lt;/b&gt;', $item);
         $this->assertStringNotContainsString('<b>Industry</b>', $item);
@@ -154,7 +154,7 @@ final class ProgramFactsPlainTextTest extends AbstractAcademicProgramsTestCase
 
         $item = $this->factItem($this->renderPlace($url), 'prerequisites');
 
-        $this->assertStringContainsString('<span class="ce-bodytext">', $item);
+        $this->assertStringContainsString('<span class="ace-value ce-bodytext">', $item);
         $this->assertStringContainsString('<p>Good <strong>maths</strong></p>', $item);
     }
 
@@ -168,7 +168,7 @@ final class ProgramFactsPlainTextTest extends AbstractAcademicProgramsTestCase
 
         foreach (['degree' => 'Bachelor of Science', 'creditPoints' => '180'] as $identifier => $value) {
             $item = $this->factItem($content, $identifier);
-            $this->assertStringContainsString('<span>', $item);
+            $this->assertStringContainsString('<span class="ace-value">', $item);
             $this->assertStringContainsString($value, $item);
             $this->assertStringNotContainsString('ce-bodytext', $item);
         }
@@ -184,7 +184,7 @@ final class ProgramFactsPlainTextTest extends AbstractAcademicProgramsTestCase
         if ($url !== self::LIST_PAGE) {
             return $content;
         }
-        foreach (explode('academic-programs-item ', $content) as $card) {
+        foreach (explode('<div class="col-12 col-md-6 col-lg-4 col-xl-3">', $content) as $card) {
             if (str_contains($card, '>Applied Physics</a>')) {
                 return $card;
             }
@@ -197,7 +197,7 @@ final class ProgramFactsPlainTextTest extends AbstractAcademicProgramsTestCase
      */
     private function factItem(string $content, string $identifier): string
     {
-        $pattern = '#<li class="academic-programs-facts__item academic-programs-facts__item--' . preg_quote($identifier, '#') . '[ "].*?</li>#s';
+        $pattern = '#<li\s+class="[^"]*"\s+data-academic-programs-fact="' . preg_quote($identifier, '#') . '"\s*>.*?</li>#s';
         $this->assertSame(1, preg_match($pattern, $content, $matches), sprintf('No fact "%s" is rendered.', $identifier));
         return $matches[0];
     }

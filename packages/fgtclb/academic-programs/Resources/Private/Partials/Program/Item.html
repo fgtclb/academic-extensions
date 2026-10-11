@@ -5,34 +5,35 @@
     data-namespace-typo3-fluid="true"
 >
 
-<div class="card flex-column-reverse academic-programs-item mt-4">
-    <div class="card-content">
-        <div class="card-body">
-            <f:render
-                partial="Program/Header"
-                arguments="{
-                    header: '{program.title}',
-                    layout: '{data.header_layout}',
-                    positionClass: 'card-title',
-                    link: '{f:uri.page(pageUid: program.uid)}',
-                    subheader: '{data.subheader}'
-                }"
-            />
-        </div>
+<article class="ace-item">
+    <div class="ace-item-content">
+        <f:render
+            partial="Program/Header"
+            arguments="{
+                header: '{program.title}',
+                layout: '{data.header_layout}',
+                link: '{f:uri.page(pageUid: program.uid)}',
+                subheader: '{data.subheader}'
+            }"
+        />
 
         <f:comment>
             The facts of the card, from the setting "plugin.tx_academicprograms.card.fields":
             the degree unless the setting names others. "facts.mostSpecificOnly" leaves out
             a category whose descendant the program carries as well.
         </f:comment>
-        <f:variable name="cardFacts" value="{ace:program.facts(program: program, fields: settings.card.fields, mostSpecificOnly: settings.facts.mostSpecificOnly)}" />
+        <f:variable
+            name="cardFacts"
+            value="{ace:program.facts(
+                program: program,
+                fields: settings.card.fields,
+                mostSpecificOnly: settings.facts.mostSpecificOnly
+            )}"
+        />
+
         <f:render
             partial="Program/Facts"
-            arguments="{
-                facts: cardFacts,
-                listClass: 'list-group list-group-flush',
-                itemClass: 'list-group-item'
-            }"
+            arguments="{facts: cardFacts}"
         />
     </div>
 
@@ -44,11 +45,10 @@
                 arguments="{
                     image: image,
                     preset: 'card',
-                    class: 'card-img-top img-fluid'
                 }"
             />
         </f:if>
     </f:for>
-</div>
+</article>
 
 </html>

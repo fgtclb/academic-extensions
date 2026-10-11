@@ -24,28 +24,31 @@
     value="{f:if(condition: '{module.description} || {module.audioFiles}', then: '1', else: '0')}"
 />
 
-<li class="module {f:if(condition: hasContent, then: 'clickable')}" data-study-plan-module data-categories="{f:format.json(value: module.categories) -> f:format.htmlspecialchars()}">
-    <h4 class="h6">{module.label}</h4>
+<li class="ace-list-item ace-module {f:if(condition: hasContent, then: 'ace-interactive')}" data-study-plan-module data-categories="{f:format.json(value: module.categories) -> f:format.htmlspecialchars()}">
+    <span class="ace-title">{module.label}</span>
 
     <f:if condition="{module.credit_points}">
-        <span class="credits small">
+        <span class="ace-module-credits">
             {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
         </span>
     </f:if>
 
     <f:if condition="{module.note}">
-        <span class="note small text-muted">{module.note}</span>
+        <span class="ace-module-note">{module.note}</span>
     </f:if>
 
     <f:if condition="{hasContent}">
-        <button class="modal-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
+        <button class="ace-module-trigger" data-study-plan-dialog-trigger data-dialog-id="popup-{module.uid}" aria-haspopup="{f:if(condition: hasContent, then: 'dialog', else: 'false')}">
             <span class="visually-hidden">
                 {semester.label}<f:if condition="{semester.note}">, {semester.note}</f:if><f:if condition="{semester.credit_points}">, {semester.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}</f:if>.
                 {f:translate(key: 'modal.open', extensionName: 'AcademicStudyPlan')}: {module.label}
             </span>
         </button>
 
-        <f:render partial="StudyPlan/ModuleDialog" arguments="{module: module}" />
+        <f:render
+            partial="StudyPlan/ModuleDialog"
+            arguments="{module: module}"
+        />
     </f:if>
 </li>
 

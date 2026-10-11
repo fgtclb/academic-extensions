@@ -183,7 +183,7 @@ class StudyPlan {
     }
     const toggle = document.createElement("button");
     toggle.type = "button";
-    toggle.className = "filter-toggle";
+    toggle.className = "ace-toggle";
     toggle.textContent = label;
     toggle.setAttribute("aria-controls", filterList.id);
     toggle.setAttribute("aria-expanded", "false");

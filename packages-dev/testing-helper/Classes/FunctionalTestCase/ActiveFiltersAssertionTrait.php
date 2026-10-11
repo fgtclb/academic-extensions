@@ -8,10 +8,10 @@ namespace FGTCLB\TestingHelper\FunctionalTestCase;
  * Reads the active filter tags, the reset link and the result count of a partner, project or
  * program list out of a rendered page.
  *
- * Every helper takes the class prefix of the extension, `academic-<extension>`: the tags are
- * the links of `<prefix>-active-filters__tags`, the reset link is
- * `<prefix>-active-filters__reset` and the count is `<prefix>-result-count`. A page renders
- * each of them at most once, which the helpers assert.
+ * Every helper takes an XPath expression selecting the element it reads, which the test of
+ * an extension knows: the element of the active filters, whose list holds the tags and whose
+ * link is the reset link, or the element of the result count. A page renders each of them at
+ * most once, which the helpers assert.
  */
 trait ActiveFiltersAssertionTrait
 {
@@ -21,10 +21,10 @@ trait ActiveFiltersAssertionTrait
      *
      * @return array<string, array{href: string, label: string}>
      */
-    private function activeFilterTags(string $html, string $prefix): array
+    private function activeFilterTags(string $html, string $activeFilters): array
     {
         $tags = [];
-        foreach ($this->activeFiltersQuery($html, sprintf('//ul[contains(concat(" ", normalize-space(@class), " "), " %s-active-filters__tags ")]/li/a', $prefix)) as $link) {
+        foreach ($this->activeFiltersQuery($html, $activeFilters . '/ul/li/a') as $link) {
             $this->assertInstanceOf(\DOMElement::class, $link);
             // The first child is the title, the second the hidden "×".
             $title = trim((string)$link->firstChild?->textContent);
@@ -38,9 +38,9 @@ trait ActiveFiltersAssertionTrait
     /**
      * The link target of the reset link, `null` when the page renders none.
      */
-    private function activeFiltersResetLink(string $html, string $prefix): ?string
+    private function activeFiltersResetLink(string $html, string $activeFilters): ?string
     {
-        $link = $this->activeFiltersSingle($html, sprintf('//a[contains(concat(" ", normalize-space(@class), " "), " %s-active-filters__reset ")]', $prefix));
+        $link = $this->activeFiltersSingle($html, $activeFilters . '/a');
 
         return $link?->getAttribute('href');
     }
@@ -48,9 +48,9 @@ trait ActiveFiltersAssertionTrait
     /**
      * The text of the result count, `null` when the page renders none.
      */
-    private function activeFiltersResultCount(string $html, string $prefix): ?string
+    private function activeFiltersResultCount(string $html, string $resultCount): ?string
     {
-        $paragraph = $this->activeFiltersSingle($html, sprintf('//p[contains(concat(" ", normalize-space(@class), " "), " %s-result-count ")]', $prefix));
+        $paragraph = $this->activeFiltersSingle($html, $resultCount);
 
         return $paragraph === null ? null : trim($paragraph->textContent);
     }

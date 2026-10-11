@@ -40,6 +40,12 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
         'DE' => ['id' => 1, 'title' => 'Deutsch', 'locale' => 'de_DE.UTF8', 'iso' => 'de', 'hrefLang' => 'de-DE', 'direction' => ''],
     ];
 
+    /**
+     * The header of the project page, and the subtitle, the paragraph right after its
+     * heading. The short description follows it.
+     */
+    private const HEADER = '//header[h1]';
+    private const SUBTITLE = self::HEADER . '/h1/following-sibling::*[1][self::p]';
     private const FIXTURES = 'EXT:academic_projects/Tests/Functional/Pages/Fixtures/';
     private const PROJECT_PAGE = 'https://www.acme.com/quantum-optics';
     private const CONTENT_ELEMENT = 'The project builds a photon source.';
@@ -183,7 +189,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $compiled = $this->renderFrontendPage('https://www.acme.com/dark-matter');
         $header = strpos($compiled, 'site-layout-wide-header');
-        $title = strpos($compiled, '<h1>Dark Matter</h1>');
+        $title = strpos($compiled, '<h1 class="ace-title">Dark Matter</h1>');
         $footer = strpos($compiled, 'site-layout-wide-footer');
         $this->assertIsInt($header, 'The layout is missing on the second project page.');
         $this->assertIsInt($title, 'The project content is missing on the second project page.');
@@ -249,7 +255,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $content = $this->renderFrontendPage(self::PROJECT_PAGE);
 
-        $this->assertStringContainsString('<h1>Entangled photon sources</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Entangled photon sources</h1>', $content);
         $this->assertStringContainsString(self::CONTENT_ELEMENT, $content);
         $this->assertStringNotContainsString('site-package-default-template', $content);
     }
@@ -277,7 +283,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $this->assertStringContainsString('<div class="project-project-facts">', $content);
         $this->assertStringNotContainsString('Budget', $content);
-        $this->assertStringContainsString('<h1>Entangled photon sources</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Entangled photon sources</h1>', $content);
         $this->assertStringContainsString('<picture', $content);
         $this->assertStringContainsString(self::CONTENT_ELEMENT, $content);
     }
@@ -296,6 +302,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $this->assertStringContainsString('<div class="project-project-page">Quantum Optics</div>', $content);
         $this->assertStringNotContainsString('academic-projects-detail', $content);
+        $this->assertStringNotContainsString('academic-projects-page', $content);
     }
 
     /**
@@ -312,7 +319,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
 
-        $this->assertStringContainsString('<h1>Dark Matter</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Dark Matter</h1>', $content);
     }
 
     /**
@@ -326,8 +333,8 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
         $this->setUpSite($sitePackage);
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage(self::PROJECT_PAGE));
-        $header = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail__header ')]");
-        $subtitle = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail__header ')]/h1/following-sibling::*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail__subtitle ')]");
+        $header = $this->nodesMatching($xpath, self::HEADER);
+        $subtitle = $this->nodesMatching($xpath, self::SUBTITLE);
 
         $this->assertCount(1, $header);
         $this->assertCount(1, $subtitle);
@@ -351,7 +358,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
         $this->setUpSite($sitePackage);
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/de/quantum-optics'));
-        $subtitle = $this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail__subtitle ')]");
+        $subtitle = $this->nodesMatching($xpath, self::SUBTITLE);
 
         $this->assertCount(1, $subtitle);
         $this->assertSame('Gefördert bis 2027', trim((string)$subtitle->item(0)?->textContent));
@@ -370,8 +377,8 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $content = $this->renderFrontendPage(self::PROJECT_PAGE);
 
-        $this->assertStringContainsString('<h1>Entangled photon sources</h1>', $content);
-        $this->assertStringContainsString('<p class="academic-projects-detail__subtitle">Funded until 2027</p>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Entangled photon sources</h1>', $content);
+        $this->assertStringContainsString('<p class="ace-subtitle">Funded until 2027</p>', $content);
     }
 
     #[Test]
@@ -382,8 +389,9 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
 
         $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
 
-        $this->assertStringContainsString('<h1>Dark Matter</h1>', $content);
-        $this->assertStringNotContainsString('academic-projects-detail__subtitle', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Dark Matter</h1>', $content);
+        $this->assertCount(1, $this->nodesMatching($this->parseRenderedPage($content), self::HEADER));
+        $this->assertCount(0, $this->nodesMatching($this->parseRenderedPage($content), self::SUBTITLE));
     }
 
     /**
@@ -392,7 +400,7 @@ final class AcademicProjectPageLayoutTest extends AbstractAcademicProjectsTestCa
     private function assertProjectBetween(string $content, string $headerMarker, string $footerMarker): void
     {
         $header = strpos($content, $headerMarker);
-        $project = strpos($content, 'academic-projects-detail');
+        $project = strpos($content, 'academic-projects-page');
         $element = strpos($content, self::CONTENT_ELEMENT);
         $footer = strpos($content, $footerMarker);
         $this->assertIsInt($header, sprintf('The layout marker "%s" is missing.', $headerMarker));

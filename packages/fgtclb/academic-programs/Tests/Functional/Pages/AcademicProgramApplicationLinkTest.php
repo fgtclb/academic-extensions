@@ -32,7 +32,11 @@ final class AcademicProgramApplicationLinkTest extends AbstractAcademicProgramsT
         'DE' => ['id' => 1, 'title' => 'Deutsch', 'locale' => 'de_DE.UTF8', 'iso' => 'de', 'hrefLang' => 'de-DE', 'direction' => ''],
     ];
 
-    private const APPLICATION_LINK = "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-programs-application ')]";
+    /**
+     * The link, a button the page renders below the header, told from the link back to
+     * the list by its own class.
+     */
+    private const APPLICATION_LINK = "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-programs-page ')]/a[contains(concat(' ', normalize-space(@class), ' '), ' ace-apply ')]";
 
     protected function setUp(): void
     {
@@ -77,9 +81,7 @@ final class AcademicProgramApplicationLinkTest extends AbstractAcademicProgramsT
     private function applicationLinkOf(string $url): \DOMElement
     {
         $xpath = $this->parseRenderedPage($this->renderFrontendPage($url));
-        $container = $this->elementMatching($xpath, self::APPLICATION_LINK);
-
-        return $this->elementMatching($xpath, './/a', $container);
+        return $this->elementMatching($xpath, self::APPLICATION_LINK);
     }
 
     #[Test]
@@ -141,7 +143,7 @@ final class AcademicProgramApplicationLinkTest extends AbstractAcademicProgramsT
         $this->assertSame('/apply', $link->getAttribute('href'));
         $this->assertSame('_blank', $link->getAttribute('target'));
         $this->assertSame('Apply here', $link->getAttribute('title'));
-        $this->assertStringContainsString('btn btn-primary', $link->getAttribute('class'));
+        $this->assertSame('btn btn-primary ace-apply', $link->getAttribute('class'));
         $this->assertSame('<b>Apply</b> & enrol', trim($link->textContent));
         $this->assertSame(0, $link->getElementsByTagName('b')->length);
     }
@@ -153,8 +155,8 @@ final class AcademicProgramApplicationLinkTest extends AbstractAcademicProgramsT
 
         $content = $this->renderFrontendPage('https://www.acme.com/mathematics');
 
-        $this->assertStringContainsString('<h1>Mathematics</h1>', $content);
-        $this->assertStringNotContainsString('academic-programs-application', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Mathematics</h1>', $content);
+        $this->assertSame(0, $this->countNodesMatching($this->parseRenderedPage($content), self::APPLICATION_LINK));
         $this->assertStringNotContainsString('Apply online', $content);
     }
 
@@ -169,8 +171,8 @@ final class AcademicProgramApplicationLinkTest extends AbstractAcademicProgramsT
 
         $content = $this->renderFrontendPage('https://www.acme.com/history');
 
-        $this->assertStringContainsString('<h1>History</h1>', $content);
-        $this->assertStringNotContainsString('academic-programs-application', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">History</h1>', $content);
+        $this->assertSame(0, $this->countNodesMatching($this->parseRenderedPage($content), self::APPLICATION_LINK));
         $this->assertStringNotContainsString('Apply online', $content);
     }
 
@@ -189,7 +191,7 @@ final class AcademicProgramApplicationLinkTest extends AbstractAcademicProgramsT
 
         $this->assertStringContainsString('<div class="project-program-header">Applied Physics</div>', $content);
         $xpath = $this->parseRenderedPage($content);
-        $link = $this->elementMatching($xpath, './/a', $this->elementMatching($xpath, self::APPLICATION_LINK));
+        $link = $this->elementMatching($xpath, self::APPLICATION_LINK);
         $this->assertSame('/apply', $link->getAttribute('href'));
     }
 }

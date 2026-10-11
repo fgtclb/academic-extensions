@@ -111,7 +111,11 @@ final class AcademicProjectsListEventsTest extends AbstractAcademicProjectsTestC
         $content = $this->renderHomePage();
         // Both content elements rendered, and only one of them has items.
         $this->assertSame(2, substr_count($content, 'academic-projects-list'));
-        $this->assertSame(1, substr_count($content, 'academic-projects-itemlist'));
+        $document = new \DOMDocument();
+        $document->loadHTML('<?xml encoding="UTF-8">' . $content, LIBXML_NOERROR);
+        $itemLists = (new \DOMXPath($document))->query('//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]//div[contains(concat(" ", normalize-space(@class), " "), " ace-itemlist ")]');
+        $this->assertInstanceOf(\DOMNodeList::class, $itemLists);
+        $this->assertSame(1, $itemLists->length);
         // The regular list keeps the completed project, the single-selection one does not.
         $this->assertSame(1, substr_count($content, 'Solar fields'));
         $this->assertStringContainsString('No projects found', $content);

@@ -193,7 +193,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
 
-        $this->assertStringContainsString('academic-projects-detail', $content);
+        $this->assertStringContainsString('academic-projects-page', $content);
         $this->assertStringNotContainsString('site-package-default-template', $content);
     }
 
@@ -237,7 +237,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/dark-matter');
 
-        $this->assertStringContainsString('academic-projects-detail', $content);
+        $this->assertStringContainsString('academic-projects-page', $content);
         $this->assertStringNotContainsString('Competence field', $content);
         $this->assertStringNotContainsString('Photonics', $content);
         $this->assertStringNotContainsString('Institute of Physics', $content);
@@ -266,6 +266,36 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
     }
 
     /**
+     * Runtime, budget and funders are the attributes of one list, each an item with the
+     * classes the attributes of every other template carry.
+     */
+    #[Test]
+    public function projectPageRendersEveryFactAsAnItemOfItsAttributes(): void
+    {
+        $this->setUpTestCase();
+        $this->getConnectionPool()->getConnectionForTable('pages')->update(
+            'pages',
+            ['tx_academicprojects_start_date' => 1704067200, 'tx_academicprojects_budget' => '150000.00'],
+            ['uid' => 10],
+        );
+
+        $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/quantum-optics'));
+        $facts = [];
+        foreach ($this->nodesMatching($xpath, '//ul[li/b[normalize-space() = "Funders:"]]/li') as $fact) {
+            $this->assertInstanceOf(\DOMElement::class, $fact);
+            $facts[trim((string)$this->nodesMatching($xpath, './b', $fact)->item(0)?->textContent)] = $fact->getAttribute('class');
+        }
+        $this->assertSame(
+            [
+                'Runtime:' => 'ace-list-item ace-attribute',
+                'Budget:' => 'ace-list-item ace-attribute',
+                'Funders:' => 'ace-list-item ace-attribute',
+            ],
+            $facts,
+        );
+    }
+
+    /**
      * TYPO3 defines "lib.parseFunc_RTE" for every site in the default TypoScript of
      * EXT:frontend, so the links resolve without fluid_styled_content and without any
      * TypoScript of the site's own.
@@ -277,7 +307,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
 
-        $this->assertStringContainsString('academic-projects-detail', $content);
+        $this->assertStringContainsString('academic-projects-page', $content);
         $this->assertStringContainsString('<a href="/dark-matter">the dark matter project</a>', $content);
         $this->assertStringContainsString('<a href="/dark-matter">the dark matter consortium</a>', $content);
         $this->assertStringNotContainsString('t3://', $content);
@@ -294,13 +324,13 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         $this->setUpTestCase();
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/quantum-optics'));
-        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail ')]");
+        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-page ')]");
         $this->assertRendersResponsivePicture(
             $xpath,
             $detail,
             3,
             800,
-            'img-fluid',
+            '',
             'The laboratory of the Quantum Optics project',
         );
     }
@@ -311,8 +341,8 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         $this->setUpTestCase();
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/dark-matter'));
-        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail ')]");
-        $this->assertRendersNoImage($xpath, $detail, 'img-fluid');
+        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-page ')]");
+        $this->assertRendersNoImage($xpath, $detail, '');
     }
 
     /**
@@ -351,13 +381,13 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
         $this->setUpPageViewTestCase();
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/quantum-optics'));
-        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-detail ')]");
+        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-page ')]");
         $this->assertRendersResponsivePicture(
             $xpath,
             $detail,
             3,
             800,
-            'img-fluid',
+            '',
             'The laboratory of the Quantum Optics project',
         );
     }
@@ -509,7 +539,7 @@ final class AcademicProjectPageTemplateTest extends AbstractAcademicProjectsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/quantum-optics');
 
-        $this->assertStringContainsString('<h1>Quantum Optics</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Quantum Optics</h1>', $content);
         $this->assertMainColumnInManualOrder($content);
         $this->assertStringNotContainsString('A note in the side column.', $content);
     }

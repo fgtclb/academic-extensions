@@ -5,7 +5,7 @@
 >
 
 <f:comment>
-    A text area, with the class "rich-text" when the element sets "richtext". The
+    A text area, with the class "ace-ckeditor" when the element sets "richtext". The
     arguments are those of "Academic/Form/Textfield".
 </f:comment>
 
@@ -18,14 +18,19 @@
 
 <f:render
     partial="{fieldWrapperPartial -> f:or(alternative: 'Academic/Form/FieldWrapper')}"
-    arguments="{element: element, elementId: elementId, class: 'form-textarea-wrap', extensionName: extensionName}"
+    arguments="{
+        element: element,
+        elementId: elementId,
+        class: 'ace-textarea-wrap',
+        extensionName: extensionName
+    }"
     contentAs="elementContent"
 >
     <f:form.textarea
         property="{element.identifier}"
         id="{elementId}"
-        class="form-control {f:if(condition: element.richtext, then: 'rich-text')}"
-        errorClass="is-invalid"
+        class="ace-control ace-textarea {f:if(condition: element.richtext, then: 'ace-ckeditor')}"
+        errorClass="invalid"
         aria="{fieldAria}"
         disabled="{element.disabled}"
         placeholder="{f:translate(key:'edit.{elementId}.placeholder', extensionName: extensionName)}"

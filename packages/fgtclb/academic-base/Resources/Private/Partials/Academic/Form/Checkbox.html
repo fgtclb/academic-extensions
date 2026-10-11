@@ -20,7 +20,7 @@
     arguments="{
         element: element,
         elementId: elementId,
-        class: 'form-check-wrap',
+        class: 'ace-checkbox-wrap',
         extensionName: extensionName,
     }"
     contentAs="elementContent"
@@ -28,10 +28,10 @@
     <f:form.checkbox
         property="{element.identifier}"
         id="{elementId}"
+        class="ace-control ace-checkbox"
         value="1"
         disabled="{element.disabled}"
-        class="form-check-input"
-        errorClass="is-invalid"
+        errorClass="invalid"
         aria="{fieldAria}"
     />
 </f:render>

@@ -168,11 +168,11 @@ trait FrontendPluginRenderingTrait
      * way, a field it does not have cannot, so a test fails when the form's field names
      * change. A request with fields of its own goes through `frontendPostRequest()`.
      *
-     * @param string $formClass A class of the `<form>` element; exactly one form of the
-     *        page must carry it.
+     * @param string $formQuery An XPath expression selecting the `<form>` element; it has
+     *        to select exactly one form of the page.
      * @param array<string, mixed> $values
      */
-    protected function submitFrontendForm(string $pageUrl, string $formClass, array $values = []): ResponseInterface
+    protected function submitFrontendForm(string $pageUrl, string $formQuery, array $values = []): ResponseInterface
     {
         $document = new \DOMDocument();
         $document->loadHTML(
@@ -180,11 +180,9 @@ trait FrontendPluginRenderingTrait
             LIBXML_NOERROR | LIBXML_NOWARNING,
         );
         $xpath = new \DOMXPath($document);
-        $forms = $xpath->query(
-            sprintf('//form[contains(concat(" ", normalize-space(@class), " "), " %s ")]', $formClass),
-        );
+        $forms = $xpath->query($formQuery);
         $this->assertNotFalse($forms);
-        $this->assertCount(1, $forms, sprintf('The page "%s" has no single form of class "%s".', $pageUrl, $formClass));
+        $this->assertCount(1, $forms, sprintf('The page "%s" has no single form "%s".', $pageUrl, $formQuery));
         $form = $forms->item(0);
         $this->assertInstanceOf(\DOMElement::class, $form);
         $this->assertSame('post', strtolower($form->getAttribute('method')), 'Only a POST form can be submitted.');

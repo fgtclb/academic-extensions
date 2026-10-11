@@ -209,9 +209,9 @@ final class ProgramFactsTest extends AbstractAcademicProgramsTestCase
 
         $content = $this->renderFrontendPage(self::PROGRAM_PAGE);
 
-        $this->assertSame(1, substr_count($content, '<ul class="academic-programs-facts">'));
-        $this->assertStringContainsString('<li class="academic-programs-facts__item academic-programs-facts__item--degree">', $content);
-        $this->assertStringContainsString('<li class="academic-programs-facts__item academic-programs-facts__item--creditPoints">', $content);
+        $this->assertSame(1, substr_count($content, '<ul class="ace-list ace-attributes">'));
+        $this->assertSame(1, preg_match('#<li\s+class="ace-list-item ace-attribute"\s+data-academic-programs-fact="degree"\s*>#', $content));
+        $this->assertSame(1, preg_match('#<li\s+class="ace-list-item ace-attribute"\s+data-academic-programs-fact="creditPoints"\s*>#', $content));
         $this->assertStringContainsString('Optics &amp; Photonics', $content);
         $this->assertStringNotContainsString('&amp;amp;', $content);
         $this->assertStringContainsString('<p>Research and development in industry.</p>', $content);
@@ -341,8 +341,8 @@ final class ProgramFactsTest extends AbstractAcademicProgramsTestCase
 
         foreach (['Applied Physics', 'Chemistry'] as $title) {
             $card = $this->programCard($content, $title);
-            $this->assertStringContainsString('<ul class="academic-programs-facts list-group list-group-flush">', $card);
-            $this->assertStringContainsString('<li class="academic-programs-facts__item academic-programs-facts__item--degree list-group-item">', $card);
+            $this->assertStringContainsString('<ul class="ace-list ace-attributes">', $card);
+            $this->assertSame(1, preg_match('#<li\s+class="ace-list-item ace-attribute"\s+data-academic-programs-fact="degree"\s*>#', $card));
             $this->assertRenderedInOrder($card, 'Degree', 'Bachelor of Science');
             $this->assertStringNotContainsString('6 semesters', $card);
             $this->assertStringNotContainsString('Campus A', $card);
@@ -432,10 +432,10 @@ final class ProgramFactsTest extends AbstractAcademicProgramsTestCase
         $card = $this->programCard($this->renderFrontendPage(self::LIST_PAGE), 'Applied Physics');
 
         $prerequisites = $this->factItem($card, 'prerequisites');
-        $this->assertStringContainsString('<span class="ce-bodytext">', $prerequisites);
+        $this->assertStringContainsString('<span class="ace-value ce-bodytext">', $prerequisites);
         $this->assertStringContainsString('<p>General qualification for university entrance.</p>', $prerequisites);
         foreach (['degree', 'creditPoints'] as $identifier) {
-            $this->assertStringContainsString('<span>', $this->factItem($card, $identifier));
+            $this->assertStringContainsString('<span class="ace-value">', $this->factItem($card, $identifier));
             $this->assertStringNotContainsString('ce-bodytext', $this->factItem($card, $identifier));
         }
         $this->assertStringNotContainsString('class=""', $card);
@@ -450,12 +450,12 @@ final class ProgramFactsTest extends AbstractAcademicProgramsTestCase
         ];
         foreach ($richText as $identifier => $value) {
             $item = $this->factItem($content, $identifier);
-            $this->assertStringContainsString('<span class="ce-bodytext">', $item);
+            $this->assertStringContainsString('<span class="ace-value ce-bodytext">', $item);
             $this->assertStringContainsString($value, $item);
         }
         foreach (['degree', 'creditPoints'] as $identifier) {
             $item = $this->factItem($content, $identifier);
-            $this->assertStringContainsString('<span>', $item);
+            $this->assertStringContainsString('<span class="ace-value">', $item);
             $this->assertStringNotContainsString('ce-bodytext', $item);
         }
         $this->assertStringNotContainsString('class=""', $content);
@@ -466,7 +466,7 @@ final class ProgramFactsTest extends AbstractAcademicProgramsTestCase
      */
     private function factItem(string $content, string $identifier): string
     {
-        $pattern = '#<li class="academic-programs-facts__item academic-programs-facts__item--' . preg_quote($identifier, '#') . '[ "].*?</li>#s';
+        $pattern = '#<li\s+class="[^"]*"\s+data-academic-programs-fact="' . preg_quote($identifier, '#') . '"\s*>.*?</li>#s';
         $this->assertSame(1, preg_match($pattern, $content, $matches), sprintf('No fact "%s" is rendered.', $identifier));
         return $matches[0];
     }
@@ -476,7 +476,7 @@ final class ProgramFactsTest extends AbstractAcademicProgramsTestCase
      */
     private function programCard(string $content, string $title): string
     {
-        foreach (explode('academic-programs-item ', $content) as $card) {
+        foreach (explode('<div class="col-12 col-md-6 col-lg-4 col-xl-3">', $content) as $card) {
             if (str_contains($card, '>' . $title . '</a>')) {
                 return $card;
             }

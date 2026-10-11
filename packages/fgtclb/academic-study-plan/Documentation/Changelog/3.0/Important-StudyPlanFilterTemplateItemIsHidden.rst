@@ -38,8 +38,8 @@ script runs:
 ..  code-block:: html
     :caption: After
 
-    <ul class="filter">
-        <li hidden><button data-category-id="category-id-placeholder">category-label-placeholder</button></li>
+    <ul class="ace-list">
+        <li class="ace-list-item" hidden><button data-category-id="category-id-placeholder">category-label-placeholder</button></li>
     </ul>
 
 Where the shipped script runs, the rendered filter is unchanged: the clones it

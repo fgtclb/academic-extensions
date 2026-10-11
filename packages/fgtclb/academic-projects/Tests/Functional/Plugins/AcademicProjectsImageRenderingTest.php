@@ -25,6 +25,11 @@ final class AcademicProjectsImageRenderingTest extends AbstractAcademicProjectsT
     use ResponsiveImageAssertionTrait;
     use SiteBasedTestTrait;
 
+    /**
+     * The items of the list.
+     */
+    private const ITEMS = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]//div[contains(concat(" ", normalize-space(@class), " "), " ace-itemlist ")]/div[@class="row"]/div/article[contains(concat(" ", normalize-space(@class), " "), " ace-item ")]';
+
     private const FIXTURES = __DIR__ . '/Fixtures/AcademicProjectsImage/';
 
     private const CARD_SOURCES = 4;
@@ -82,7 +87,7 @@ final class AcademicProjectsImageRenderingTest extends AbstractAcademicProjectsT
     private function items(\DOMXPath $xpath): array
     {
         $items = [];
-        foreach ($this->nodesMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-projects-item ')]") as $item) {
+        foreach ($this->nodesMatching($xpath, self::ITEMS) as $item) {
             $this->assertInstanceOf(\DOMElement::class, $item);
             $items[] = $item;
         }
@@ -103,7 +108,7 @@ final class AcademicProjectsImageRenderingTest extends AbstractAcademicProjectsT
             $withImage,
             self::CARD_SOURCES,
             self::CARD_FALLBACK_WIDTH,
-            'card-img-top img-fluid',
+            '',
             'The laboratory of the quantum research project',
         );
     }
@@ -115,7 +120,7 @@ final class AcademicProjectsImageRenderingTest extends AbstractAcademicProjectsT
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/home'));
         [, $withoutImage] = $this->items($xpath);
-        $this->assertRendersNoImage($xpath, $withoutImage, 'card-img-top img-fluid');
+        $this->assertRendersNoImage($xpath, $withoutImage, '');
     }
 
     /**
@@ -160,6 +165,6 @@ final class AcademicProjectsImageRenderingTest extends AbstractAcademicProjectsT
         $this->assertStringNotContainsString('<picture', $content);
         // The item partial of the extension is still found, although the only configured
         // partial root path is the one of the project.
-        $this->assertStringContainsString('academic-projects-item', $content);
+        $this->assertSame(2, $this->countNodesMatching($this->parseRenderedPage($content), self::ITEMS));
     }
 }

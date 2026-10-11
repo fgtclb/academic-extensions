@@ -17,34 +17,32 @@
     when a trigger carries no `data-dialog-id`.
 </f:comment>
 
-<dialog id="popup-{module.uid}" data-study-plan-dialog>
-    <div class="wrapper">
-        <div>
-            <span class="h6" aria-hidden="true"><b>{module.label}</b></span>
+<dialog id="popup-{module.uid}" class="ace-dialog" data-study-plan-dialog>
+    <header class="ace-header">
+        <span class="ace-title" aria-hidden="true"><b>{module.label}</b></span>
 
-            <f:if condition="{module.credit_points}">
-                <span class="credits small" aria-hidden="true">
-                    {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
-                </span>
-            </f:if>
-        </div>
+        <f:if condition="{module.credit_points}">
+            <span class="ace-dialog-credits" aria-hidden="true">
+                {module.credit_points} {f:translate(key: 'credits', extensionName: 'AcademicStudyPlan')}
+            </span>
+        </f:if>
 
-        <button aria-label="{f:translate(key: 'modal.close', extensionName: 'AcademicStudyPlan')}">
+        <button class="ace-close" aria-label="{f:translate(key: 'modal.close', extensionName: 'AcademicStudyPlan')}">
             <ab:icon identifier="tx-academicbase-action-close" alternativeMarkupIdentifier="inline" />
         </button>
-    </div>
+    </header>
 
     <f:if condition="{module.note}">
-        <span class="note small text-muted" aria-hidden="true">{module.note}</span>
+        <span class="ace-dialog-note" aria-hidden="true">{module.note}</span>
     </f:if>
 
     <f:if condition="{module.description}">
-        <p><f:format.nl2br>{module.description}</f:format.nl2br></p>
+        <p class="ace-dialog-description"><f:format.nl2br>{module.description}</f:format.nl2br></p>
     </f:if>
 
     <f:if condition="{module.audioFiles}">
         <f:for each="{module.audioFiles}" as="audioFile">
-            <audio controls aria-label="{f:translate(key: 'modal.audio', extensionName: 'AcademicStudyPlan')}: {module.label}">
+            <audio class="ace-dialog-audio" controls aria-label="{f:translate(key: 'modal.audio', extensionName: 'AcademicStudyPlan')}: {module.label}">
                 <source src="{audioFile.publicUrl}" type="{audioFile.mimeType}">
             </audio>
         </f:for>

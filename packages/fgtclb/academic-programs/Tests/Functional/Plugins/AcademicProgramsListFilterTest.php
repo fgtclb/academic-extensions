@@ -30,7 +30,7 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
     use SiteBasedTestTrait;
 
     private const LIST_NAMESPACE = 'tx_academicprograms_programlist';
-    private const FORM_CLASS = 'academic-programs-filtersorting';
+    private const FORM = '//form[@name="demand"]';
 
     protected const LANGUAGE_PRESETS = [
         'EN' => ['id' => 0, 'title' => 'English', 'locale' => 'en_US.UTF8', 'iso' => 'en', 'hrefLang' => 'en-US', 'direction' => ''],
@@ -164,9 +164,9 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $this->assertSame(
             ['visible' => ['costs', 'degree', 'location', 'program_type'], 'more' => [], 'disclosure' => 'none', 'summary' => null],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
-        $this->assertSame(self::DEFAULT_FILTER_CELLS, $this->categoryFilterCellMarkup($content, self::FORM_CLASS));
+        $this->assertSame(self::DEFAULT_FILTER_CELLS, $this->categoryFilterCellMarkup($content, self::FORM));
     }
 
     #[Test]
@@ -176,7 +176,7 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $content = $this->renderFrontendPage('https://www.acme.com/home');
 
-        $this->assertSame(['location', 'degree'], $this->renderedCategoryFilters($content, self::FORM_CLASS)['visible']);
+        $this->assertSame(['location', 'degree'], $this->renderedCategoryFilters($content, self::FORM)['visible']);
     }
 
     /**
@@ -192,7 +192,7 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $this->assertSame(
             ['visible' => ['location'], 'more' => ['degree', 'program_type'], 'disclosure' => 'closed', 'summary' => 'More filters'],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
     }
 
@@ -205,7 +205,7 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $this->assertSame(
             ['visible' => ['costs', 'degree', 'location', 'program_type'], 'more' => [], 'disclosure' => 'none', 'summary' => null],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
     }
 
@@ -230,7 +230,7 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $content = $this->renderFilteredList($filterCollection);
 
-        $this->assertSame($disclosure, $this->renderedCategoryFilters($content, self::FORM_CLASS)['disclosure']);
+        $this->assertSame($disclosure, $this->renderedCategoryFilters($content, self::FORM)['disclosure']);
     }
 
     /**
@@ -273,8 +273,8 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $content = $this->renderFrontendPage('https://www.acme.com/home');
 
-        $this->assertSame($degreeLabel, $this->categoryFilterOptions($content, self::FORM_CLASS, 'degree')[0] ?? null);
-        $this->assertSame($locationLabel, $this->categoryFilterOptions($content, self::FORM_CLASS, 'location')[0] ?? null);
+        $this->assertSame($degreeLabel, $this->categoryFilterOptions($content, self::FORM, 'degree')[0] ?? null);
+        $this->assertSame($locationLabel, $this->categoryFilterOptions($content, self::FORM, 'location')[0] ?? null);
     }
 
     /**
@@ -300,8 +300,8 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $content = $this->renderFrontendPage($url);
 
-        $this->assertSame(['All degrees', 'Bachelor of Science', 'Master of Science'], $this->categoryFilterOptions($content, self::FORM_CLASS, 'degree'));
-        $this->assertSame(['All options', 'Berlin', 'Potsdam'], $this->categoryFilterOptions($content, self::FORM_CLASS, 'location'));
+        $this->assertSame(['All degrees', 'Bachelor of Science', 'Master of Science'], $this->categoryFilterOptions($content, self::FORM, 'degree'));
+        $this->assertSame(['All options', 'Berlin', 'Potsdam'], $this->categoryFilterOptions($content, self::FORM, 'location'));
     }
 
     /**
@@ -316,7 +316,7 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $content = $this->renderFrontendPage('https://www.acme.com/home');
 
-        $this->assertSame(['All options'], $this->categoryFilterOptions($content, self::FORM_CLASS, 'costs'));
+        $this->assertSame(['All options'], $this->categoryFilterOptions($content, self::FORM, 'costs'));
     }
 
     #[Test]
@@ -332,9 +332,9 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $this->assertSame(
             ['visible' => ['location'], 'more' => ['costs'], 'disclosure' => 'closed', 'summary' => 'More filters'],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
-        $this->assertSame(['All options'], $this->categoryFilterOptions($content, self::FORM_CLASS, 'costs'));
+        $this->assertSame(['All options'], $this->categoryFilterOptions($content, self::FORM, 'costs'));
     }
 
     /**
@@ -351,18 +351,18 @@ final class AcademicProgramsListFilterTest extends AbstractAcademicProgramsTestC
 
         $this->assertSame(
             ['visible' => ['costs', 'degree', 'location', 'program_type'], 'more' => [], 'disclosure' => 'none', 'summary' => null],
-            $this->renderedCategoryFilters($content, self::FORM_CLASS),
+            $this->renderedCategoryFilters($content, self::FORM),
         );
-        $this->assertSame(self::DEFAULT_FILTER_CELLS, $this->categoryFilterCellMarkup($content, self::FORM_CLASS));
+        $this->assertSame(self::DEFAULT_FILTER_CELLS, $this->categoryFilterCellMarkup($content, self::FORM));
     }
 
     /**
      * The cells of the filters before the settings existed.
      */
     private const DEFAULT_FILTER_CELLS = [
-        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="costs" class="form-label"> Costs </label><select data-academic-programs-list-select="" id="costs" class="form-select" name="tx_academicprograms_programlist[demand][filterCollection][costs]"><option value="">All options</option><option value="7" class="level-0" disabled>Tuition fee</option></select></div>',
-        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="degree" class="form-label"> Degree </label><select data-academic-programs-list-select="" id="degree" class="form-select" name="tx_academicprograms_programlist[demand][filterCollection][degree]"><option value="">All options</option><option value="1" class="level-0">Bachelor of Science</option><option value="2" class="level-0">Master of Science</option></select></div>',
-        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="location" class="form-label"> Location </label><select data-academic-programs-list-select="" id="location" class="form-select" name="tx_academicprograms_programlist[demand][filterCollection][location]"><option value="">All options</option><option value="5" class="level-0">Berlin</option><option value="6" class="level-0">Potsdam</option></select></div>',
-        '<div class="col-12 col-md-6 col-lg-4 col-xl-3"><label for="program_type" class="form-label"> Type of program </label><select data-academic-programs-list-select="" id="program_type" class="form-select" name="tx_academicprograms_programlist[demand][filterCollection][program_type]"><option value="">All options</option><option value="3" class="level-0">Full-time</option></select></div>',
+        '<div class="ace-filter ace-field ace-select-wrap"><label class="ace-label" for="costs"> Costs </label><select data-academic-programs-list-select="" class="ace-control ace-select" id="costs" name="tx_academicprograms_programlist[demand][filterCollection][costs]"><option value="">All options</option><option value="7" class="level-0" disabled>Tuition fee</option></select></div>',
+        '<div class="ace-filter ace-field ace-select-wrap"><label class="ace-label" for="degree"> Degree </label><select data-academic-programs-list-select="" class="ace-control ace-select" id="degree" name="tx_academicprograms_programlist[demand][filterCollection][degree]"><option value="">All options</option><option value="1" class="level-0">Bachelor of Science</option><option value="2" class="level-0">Master of Science</option></select></div>',
+        '<div class="ace-filter ace-field ace-select-wrap"><label class="ace-label" for="location"> Location </label><select data-academic-programs-list-select="" class="ace-control ace-select" id="location" name="tx_academicprograms_programlist[demand][filterCollection][location]"><option value="">All options</option><option value="5" class="level-0">Berlin</option><option value="6" class="level-0">Potsdam</option></select></div>',
+        '<div class="ace-filter ace-field ace-select-wrap"><label class="ace-label" for="program_type"> Type of program </label><select data-academic-programs-list-select="" class="ace-control ace-select" id="program_type" name="tx_academicprograms_programlist[demand][filterCollection][program_type]"><option value="">All options</option><option value="3" class="level-0">Full-time</option></select></div>',
     ];
 }

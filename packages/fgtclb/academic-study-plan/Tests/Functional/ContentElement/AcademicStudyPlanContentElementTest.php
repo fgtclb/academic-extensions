@@ -242,7 +242,8 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $this->assertSame(
             ['30 CP', '2.5 CP', '2.5 CP', '12.75 CP', '12.75 CP'],
-            $this->textsOf($this->renderHomePage(), '//span[contains(@class, "credits")]'),
+            // A credit points span holds the number and the unit and nothing else.
+            $this->textsOf($this->renderHomePage(), '//span[not(*)][substring(normalize-space(), string-length(normalize-space()) - 2) = " CP"]'),
         );
     }
 
@@ -292,7 +293,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     {
         return array_map(
             static fn(string $text): string => preg_replace('#\\s+#', ' ', $text) ?? '',
-            $this->textsOf($html, '//button[contains(@class, "modal-trigger")]/span'),
+            $this->textsOf($html, '//button[@data-study-plan-dialog-trigger]/span'),
         );
     }
 
@@ -390,7 +391,9 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertSame(['Study plan B.Sc.'], $this->textsOf($html, '//div[@id="c1"]/header/h2'));
         $this->assertSame(
             [],
-            $this->textsOf($html, '//div[contains(@class, "academic-study-plan")]//header'),
+            // The dialogs of the modules carry headers of their own, the ace-header, a header
+            // of the content element would be another one.
+            $this->textsOf($html, '//div[contains(@class, "academic-study-plan")]//header[not(contains(concat(" ", normalize-space(@class), " "), " ace-header "))]'),
         );
     }
 
@@ -437,8 +440,8 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $html = $this->renderHomePage();
 
-        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@class="filter"]/li'));
-        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@class="filter"]/li[@hidden]'));
+        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li'));
+        $this->assertSame(1, $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li[@hidden]'));
         // The placeholders themselves stay: they are what the module substitutes.
         $this->assertStringContainsString('category-label-placeholder', $html);
     }
@@ -469,10 +472,10 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
             $this->nodeCountOf($html, '//ul[@data-study-plan-filter]/li[@data-study-plan-filter-template]'),
         );
         // Two semesters, each with its header.
-        $this->assertSame(2, $this->nodeCountOf($html, '//li[@data-study-plan-semester]'));
+        $this->assertSame(2, $this->nodeCountOf($html, '//div[@data-study-plan]/div[contains(concat(" ", normalize-space(@class), " "), " ace-semesters ")]/div[@role="list"]/div[@role="listitem"][@data-study-plan-semester]'));
         $this->assertSame(
             2,
-            $this->nodeCountOf($html, '//li[@data-study-plan-semester]/div[@data-study-plan-semester-header]'),
+            $this->nodeCountOf($html, '//div[@data-study-plan-semester]/div[@data-study-plan-semester-header]'),
         );
         // Three modules, of which the two with content carry a trigger and a dialog.
         $this->assertSame(3, $this->nodeCountOf($html, '//li[@data-study-plan-module]'));
@@ -487,14 +490,13 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     }
 
     /**
-     * The split into partials and the attributes added with it are the whole change:
-     * what a visitor reads and what a stylesheet selects are the same as before. Both
-     * halves are pinned against the output of the unsplit template, recorded from this
-     * very fixture, so a partial that loses an element or a class fails here rather than
-     * in an installation.
+     * What a visitor reads is pinned against the output of the unsplit template, recorded
+     * from this very fixture, and what a stylesheet selects against the classes the
+     * templates render, so a partial that loses an element or a class fails here rather
+     * than in an installation.
      */
     #[Test]
-    public function contentElementRendersTheSameTextAndClassesAsTheUnsplitTemplate(): void
+    public function contentElementRendersTheTextOfTheUnsplitTemplateAndItsClasses(): void
     {
         $this->setUpTestCase('studyPlanPage');
 
@@ -511,42 +513,59 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         );
         $this->assertSame(
             [
-                'filter',
-                'semesters row',
-                'col',
-                'header',
-                'wrapper',
-                'h6',
-                'credits small',
-                'note small text-muted',
-                'module clickable',
-                'h6',
-                'credits small',
-                'note small text-muted',
-                'modal-trigger',
+                'ace-filter',
+                'ace-list',
+                'ace-list-item',
+                'ace-control',
+                'ace-semesters',
+                'row',
+                'ace-semester col',
+                'ace-semester-header',
+                'ace-semester-content',
+                'ace-semester-heading',
+                'ace-title',
+                'ace-semester-credits',
+                'ace-actions',
+                'ace-semester-note',
+                'ace-list ace-modules',
+                'ace-list-item ace-module ace-interactive',
+                'ace-title',
+                'ace-module-credits',
+                'ace-module-note',
+                'ace-module-trigger',
                 'visually-hidden',
-                'wrapper',
-                'h6',
-                'credits small',
-                'note small text-muted',
+                'ace-dialog',
+                'ace-header',
+                'ace-title',
+                'ace-dialog-credits',
+                'ace-close',
+                'ace-dialog-note',
+                'ace-dialog-description',
                 // The module without content: the trailing space is what the condition
-                // that adds `clickable` leaves behind, and it was there before as well.
-                'module ',
-                'h6',
-                'credits small',
-                'col',
-                'header',
-                'wrapper',
-                'h6',
-                'credits small',
-                'module clickable',
-                'h6',
-                'credits small',
-                'modal-trigger',
+                // that adds `ace-interactive` leaves behind.
+                'ace-list-item ace-module ',
+                'ace-title',
+                'ace-module-credits',
+                'ace-semester col',
+                'ace-semester-header',
+                'ace-semester-content',
+                'ace-semester-heading',
+                'ace-title',
+                'ace-semester-credits',
+                'ace-actions',
+                'ace-list ace-modules',
+                'ace-list-item ace-module ace-interactive',
+                'ace-title',
+                'ace-module-credits',
+                'ace-module-trigger',
                 'visually-hidden',
-                'wrapper',
-                'h6',
-                'credits small',
+                'ace-dialog',
+                'ace-header',
+                'ace-title',
+                'ace-dialog-credits',
+                'ace-close',
+                'ace-dialog-description',
+                'ce-bodytext',
             ],
             $this->classInventoryOf($html),
         );
@@ -559,9 +578,9 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
 
         $content = $this->renderHomePage();
         // A module with a description is clickable and gets its own dialog.
-        $this->assertStringContainsString('<dialog id="popup-1" data-study-plan-dialog>', $content);
+        $this->assertStringContainsString('<dialog id="popup-1" class="ace-dialog" data-study-plan-dialog>', $content);
         $this->assertStringContainsString('Linear algebra and analysis.', $content);
-        $this->assertStringContainsString('class="module clickable"', $content);
+        $this->assertStringContainsString('class="ace-list-item ace-module ace-interactive"', $content);
     }
 
     #[Test]
@@ -649,9 +668,9 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
             GeneralUtility::getFileAbsFileName('EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css')
         );
 
-        $this->assertStringContainsString('.col .icon-tx-academicbase-action-collapse {', $css);
-        $this->assertStringContainsString('.col.open .icon-tx-academicbase-action-expand {', $css);
-        $this->assertStringContainsString('.col.open .icon-tx-academicbase-action-collapse {', $css);
+        $this->assertStringContainsString('.ace-semester .icon-tx-academicbase-action-collapse {', $css);
+        $this->assertStringContainsString('.ace-semester.open .icon-tx-academicbase-action-expand {', $css);
+        $this->assertStringContainsString('.ace-semester.open .icon-tx-academicbase-action-collapse {', $css);
         $this->assertMatchesRegularExpression(
             '#\.academic-study-plan \.icon \{[^}]*\bwidth: 1\.25rem;[^}]*\bheight: 1\.25rem;#',
             $css,
@@ -692,6 +711,68 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
                 $this->assertSame(1, $glyphs->count(), sprintf('A semester header renders not exactly one "%s" glyph.', $glyphClass));
             }
         }
+    }
+
+    /**
+     * The shipped stylesheet styles the plan through the classes the templates render,
+     * and a selector of a class that nothing renders styles nothing. Neither PHP suite
+     * nor jsdom computes a style, so a template that renames a class leaves its rule
+     * behind without a failing test, which is how the stylesheet came to select the
+     * classes of the markup before ACE-818. Every class a selector of the compiled
+     * stylesheet names is therefore rendered by the fixture, or is one of the classes
+     * the script writes, which are named here and looked up in the compiled module.
+     */
+    #[Test]
+    public function contentElementRendersEveryClassTheShippedStylesheetSelects(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $scriptClasses = ['ace-toggle', 'highlighted', 'open'];
+        $script = (string)file_get_contents(__DIR__ . '/../../../Resources/Public/JavaScript/frontend/academic-study-plan.js');
+        foreach ($scriptClasses as $scriptClass) {
+            $this->assertMatchesRegularExpression(
+                '#["\']' . preg_quote($scriptClass, '#') . '["\']#',
+                $script,
+                sprintf('The module does not write the class "%s".', $scriptClass),
+            );
+        }
+
+        $nodes = $this->parseHtml($this->renderHomePage())
+            ->query('//div[contains(@class, "academic-study-plan")]/descendant-or-self::*[@class]');
+        $this->assertInstanceOf(\DOMNodeList::class, $nodes);
+        $rendered = $scriptClasses;
+        foreach ($nodes as $node) {
+            $this->assertInstanceOf(\DOMElement::class, $node);
+            $rendered = [
+                ...$rendered,
+                ...(preg_split('#\\s+#', trim($node->getAttribute('class')), -1, PREG_SPLIT_NO_EMPTY) ?: []),
+            ];
+        }
+
+        $selected = $this->classesSelectedBy(
+            (string)file_get_contents(__DIR__ . '/../../../Resources/Public/Css/frontend/academic-study-plan.css'),
+        );
+        $this->assertSame([], array_values(array_diff($selected, $rendered)));
+    }
+
+    /**
+     * @return string[] Every class name the selectors of a compiled stylesheet name, once.
+     */
+    private function classesSelectedBy(string $css): array
+    {
+        $css = preg_replace('#/\*.*?\*/#s', '', $css) ?? '';
+        preg_match_all('#([^{};]+)\{#', $css, $preludes);
+
+        $classes = [];
+        foreach ($preludes[1] as $prelude) {
+            if (str_starts_with(trim($prelude), '@')) {
+                continue;
+            }
+            preg_match_all('#\.(-?[_a-zA-Z][_a-zA-Z0-9-]*)#', $prelude, $names);
+            $classes = [...$classes, ...$names[1]];
+        }
+
+        return array_values(array_unique($classes));
     }
 
     #[Test]
@@ -757,6 +838,7 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $content = $this->renderHomePage();
         // The element still renders, only the semester list is skipped.
         $this->assertStringContainsString('academic-study-plan', $content);
-        $this->assertStringNotContainsString('<ul class="semesters row">', $content);
+        $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]/div[contains(concat(" ", normalize-space(@class), " "), " ace-semesters ")]'));
+        $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]//div[@role="list"]'));
     }
 }

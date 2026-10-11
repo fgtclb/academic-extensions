@@ -15,8 +15,8 @@ namespace FGTCLB\TestingHelper\FunctionalTestCase;
  * test has to tell the two places apart: a string assertion on the page passes for a filter
  * in either place, and for a disclosure that is open when it should be closed.
  *
- * Every helper takes the class of the form, `academic-<extension>-filtersorting`, so a page
- * with two lists is read one form at a time.
+ * Every helper takes an XPath expression selecting the form, so a page with two lists is
+ * read one form at a time.
  */
 trait CategoryFilterFormAssertionTrait
 {
@@ -27,9 +27,9 @@ trait CategoryFilterFormAssertionTrait
      *
      * @return array{visible: list<string>, more: list<string>, disclosure: 'none'|'open'|'closed', summary: string|null}
      */
-    private function renderedCategoryFilters(string $html, string $formClass): array
+    private function renderedCategoryFilters(string $html, string $formQuery): array
     {
-        [$xpath, $form] = $this->categoryFilterForm($html, $formClass);
+        [$xpath, $form] = $this->categoryFilterForm($html, $formQuery);
 
         $filters = ['visible' => [], 'more' => []];
         foreach ($this->categoryFilterQuery($xpath, './/select[contains(@name, "[demand][filterCollection]")]', $form) as $select) {
@@ -59,9 +59,9 @@ trait CategoryFilterFormAssertionTrait
      *
      * @return list<string>
      */
-    private function categoryFilterOptions(string $html, string $formClass, string $typeIdentifier): array
+    private function categoryFilterOptions(string $html, string $formQuery, string $typeIdentifier): array
     {
-        [$xpath, $form] = $this->categoryFilterForm($html, $formClass);
+        [$xpath, $form] = $this->categoryFilterForm($html, $formQuery);
         $selects = [];
         foreach ($this->categoryFilterQuery($xpath, './/select[contains(@name, "[demand][filterCollection]")]', $form) as $select) {
             $this->assertInstanceOf(\DOMElement::class, $select);
@@ -87,9 +87,9 @@ trait CategoryFilterFormAssertionTrait
      *
      * @return list<string>
      */
-    private function categoryFilterCellMarkup(string $html, string $formClass): array
+    private function categoryFilterCellMarkup(string $html, string $formQuery): array
     {
-        [$xpath, $form] = $this->categoryFilterForm($html, $formClass);
+        [$xpath, $form] = $this->categoryFilterForm($html, $formQuery);
 
         $cells = [];
         foreach ($this->categoryFilterQuery($xpath, './/select[contains(@name, "[demand][filterCollection]")]/..', $form) as $cell) {
@@ -110,18 +110,15 @@ trait CategoryFilterFormAssertionTrait
     /**
      * @return array{0: \DOMXPath, 1: \DOMElement}
      */
-    private function categoryFilterForm(string $html, string $formClass): array
+    private function categoryFilterForm(string $html, string $formQuery): array
     {
         $document = new \DOMDocument();
         // The prefix makes libxml read a page without a charset declaration as UTF-8
         // rather than ISO-8859-1.
         $document->loadHTML('<?xml encoding="UTF-8">' . $html, LIBXML_NOERROR);
         $xpath = new \DOMXPath($document);
-        $forms = $this->categoryFilterQuery(
-            $xpath,
-            sprintf('//form[contains(concat(" ", normalize-space(@class), " "), " %s ")]', $formClass),
-        );
-        $this->assertSame(1, $forms->length, sprintf('The page renders %d forms of the class "%s".', $forms->length, $formClass));
+        $forms = $this->categoryFilterQuery($xpath, $formQuery);
+        $this->assertSame(1, $forms->length, sprintf('The page renders %d forms "%s".', $forms->length, $formQuery));
         $form = $forms->item(0);
         $this->assertInstanceOf(\DOMElement::class, $form);
 

@@ -178,7 +178,7 @@ final class AcademicProgramPageTemplateTest extends AbstractAcademicProgramsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/applied-physics');
 
-        $this->assertStringContainsString('academic-programs-detail', $content);
+        $this->assertStringContainsString('academic-programs-page', $content);
         $this->assertStringNotContainsString('site-package-default-template', $content);
     }
 
@@ -193,13 +193,13 @@ final class AcademicProgramPageTemplateTest extends AbstractAcademicProgramsTest
         $this->setUpTestCase();
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/applied-physics'));
-        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-programs-detail ')]");
+        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-programs-page ')]");
         $this->assertRendersResponsivePicture(
             $xpath,
             $detail,
             3,
             800,
-            'img-fluid',
+            '',
             'The laboratory of the Applied Physics programme',
         );
     }
@@ -240,13 +240,13 @@ final class AcademicProgramPageTemplateTest extends AbstractAcademicProgramsTest
         $this->setUpPageViewTestCase();
 
         $xpath = $this->parseRenderedPage($this->renderFrontendPage('https://www.acme.com/applied-physics'));
-        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-programs-detail ')]");
+        $detail = $this->elementMatching($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-programs-page ')]");
         $this->assertRendersResponsivePicture(
             $xpath,
             $detail,
             3,
             800,
-            'img-fluid',
+            '',
             'The laboratory of the Applied Physics programme',
         );
     }
@@ -402,7 +402,7 @@ final class AcademicProgramPageTemplateTest extends AbstractAcademicProgramsTest
 
         $content = $this->renderFrontendPage('https://www.acme.com/applied-physics');
 
-        $this->assertStringContainsString('<h1>Applied Physics</h1>', $content);
+        $this->assertStringContainsString('<h1 class="ace-title">Applied Physics</h1>', $content);
         $this->assertMainColumnInManualOrder($content);
         $this->assertStringNotContainsString('A note in the side column.', $content);
     }

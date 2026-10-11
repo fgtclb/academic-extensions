@@ -31,7 +31,12 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
     use FrontendPluginRenderingTrait;
     use SiteBasedTestTrait;
 
-    private const PREFIX = 'academic-projects';
+    /**
+     * The list, the elements of the active filters and of the result count below it.
+     */
+    private const LIST = '//div[contains(concat(" ", normalize-space(@class), " "), " academic-projects-list ")]';
+    private const ACTIVE_FILTERS = self::LIST . '//div[contains(concat(" ", normalize-space(@class), " "), " ace-filters ")][not(ancestor::form)]';
+    private const RESULT_COUNT = self::LIST . '//p[contains(concat(" ", normalize-space(@class), " "), " ace-count ")]';
     private const LIST_NAMESPACE = 'tx_academicprojects_projectlist';
     private const SELECTED_NAMESPACE = 'tx_academicprojects_projectlistsingle';
     private const ALL_ON = "plugin.tx_academicprojects.filter.showActiveFilters = 1\n"
@@ -63,15 +68,15 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
 
         $content = $this->renderFrontendPage($this->listUrl('/home', '1,3', 'all'));
 
-        $tags = $this->activeFilterTags($content, self::PREFIX);
+        $tags = $this->activeFilterTags($content, self::ACTIVE_FILTERS);
         $this->assertSame(['Quantum Physics', 'Industry'], array_keys($tags));
         $this->assertSame(
             ['activeState' => 'all', 'filterCollection' => ['categories' => '3'], 'sortingDirection' => 'desc', 'sortingField' => 'title'],
             $this->activeFiltersDemand($tags['Quantum Physics']['href'], self::LIST_NAMESPACE),
         );
         $this->assertSame('Remove filter: Industry', $tags['Industry']['label']);
-        $this->assertSame('/home', $this->activeFiltersResetLink($content, self::PREFIX));
-        $this->assertSame('1 project found', $this->activeFiltersResultCount($content, self::PREFIX));
+        $this->assertSame('/home', $this->activeFiltersResetLink($content, self::ACTIVE_FILTERS));
+        $this->assertSame('1 project found', $this->activeFiltersResultCount($content, self::RESULT_COUNT));
     }
 
     /**
@@ -85,7 +90,7 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
 
         $content = $this->renderFrontendPage($this->listUrl('/home', '1', 'completed'));
 
-        $tags = $this->activeFilterTags($content, self::PREFIX);
+        $tags = $this->activeFilterTags($content, self::ACTIVE_FILTERS);
         $this->assertSame(['Quantum Physics', 'Completed'], array_keys($tags));
         $this->assertSame(
             ['activeState' => 'all', 'filterCollection' => ['categories' => '1'], 'sortingDirection' => 'desc', 'sortingField' => 'title'],
@@ -95,11 +100,11 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
             ['activeState' => 'completed', 'sortingDirection' => 'desc', 'sortingField' => 'title'],
             $this->activeFiltersDemand($tags['Quantum Physics']['href'], self::LIST_NAMESPACE),
         );
-        $this->assertSame('1 project found', $this->activeFiltersResultCount($content, self::PREFIX));
+        $this->assertSame('1 project found', $this->activeFiltersResultCount($content, self::RESULT_COUNT));
 
         $allQuantumPhysics = $this->renderFrontendPage('https://www.acme.com' . $tags['Completed']['href']);
-        $this->assertSame(['Quantum Physics'], array_keys($this->activeFilterTags($allQuantumPhysics, self::PREFIX)));
-        $this->assertSame('2 projects found', $this->activeFiltersResultCount($allQuantumPhysics, self::PREFIX));
+        $this->assertSame(['Quantum Physics'], array_keys($this->activeFilterTags($allQuantumPhysics, self::ACTIVE_FILTERS)));
+        $this->assertSame('2 projects found', $this->activeFiltersResultCount($allQuantumPhysics, self::RESULT_COUNT));
     }
 
     /**
@@ -112,8 +117,8 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
 
         $content = $this->renderFrontendPage($this->listUrl('/home', '', 'all'));
 
-        $this->assertStringNotContainsString('academic-projects-active-filters', $content);
-        $this->assertSame('3 projects found', $this->activeFiltersResultCount($content, self::PREFIX));
+        $this->assertSame(0, $this->activeFiltersQuery($content, self::ACTIVE_FILTERS)->length);
+        $this->assertSame('3 projects found', $this->activeFiltersResultCount($content, self::RESULT_COUNT));
     }
 
     #[Test]
@@ -123,7 +128,7 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
 
         $content = $this->renderFrontendPage($this->listUrl('/home', '2', 'active'));
 
-        $this->assertSame('0 projects found', $this->activeFiltersResultCount($content, self::PREFIX));
+        $this->assertSame('0 projects found', $this->activeFiltersResultCount($content, self::RESULT_COUNT));
     }
 
     /**
@@ -137,18 +142,18 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
         $this->setUpSite(self::ALL_ON);
 
         $preset = $this->renderFrontendPage('https://www.acme.com/completed');
-        $this->assertSame(['Completed'], array_keys($this->activeFilterTags($preset, self::PREFIX)));
-        $this->assertNull($this->activeFiltersResetLink($preset, self::PREFIX));
-        $this->assertSame('2 projects found', $this->activeFiltersResultCount($preset, self::PREFIX));
+        $this->assertSame(['Completed'], array_keys($this->activeFilterTags($preset, self::ACTIVE_FILTERS)));
+        $this->assertNull($this->activeFiltersResetLink($preset, self::ACTIVE_FILTERS));
+        $this->assertSame('2 projects found', $this->activeFiltersResultCount($preset, self::RESULT_COUNT));
 
-        $allStates = $this->renderFrontendPage('https://www.acme.com' . $this->activeFilterTags($preset, self::PREFIX)['Completed']['href']);
-        $this->assertSame([], $this->activeFilterTags($allStates, self::PREFIX));
-        $this->assertSame('/completed', $this->activeFiltersResetLink($allStates, self::PREFIX));
-        $this->assertSame('3 projects found', $this->activeFiltersResultCount($allStates, self::PREFIX));
+        $allStates = $this->renderFrontendPage('https://www.acme.com' . $this->activeFilterTags($preset, self::ACTIVE_FILTERS)['Completed']['href']);
+        $this->assertSame([], $this->activeFilterTags($allStates, self::ACTIVE_FILTERS));
+        $this->assertSame('/completed', $this->activeFiltersResetLink($allStates, self::ACTIVE_FILTERS));
+        $this->assertSame('3 projects found', $this->activeFiltersResultCount($allStates, self::RESULT_COUNT));
 
         $selected = $this->renderFrontendPage($this->listUrl('/completed', '1', 'all'));
-        $this->assertSame(['Quantum Physics'], array_keys($this->activeFilterTags($selected, self::PREFIX)));
-        $this->assertSame('/completed', $this->activeFiltersResetLink($selected, self::PREFIX));
+        $this->assertSame(['Quantum Physics'], array_keys($this->activeFilterTags($selected, self::ACTIVE_FILTERS)));
+        $this->assertSame('/completed', $this->activeFiltersResetLink($selected, self::ACTIVE_FILTERS));
     }
 
     /**
@@ -161,7 +166,7 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
 
         $content = $this->renderFrontendPage($this->listUrl('/state-hidden', '1', 'completed'));
 
-        $tags = $this->activeFilterTags($content, self::PREFIX);
+        $tags = $this->activeFilterTags($content, self::ACTIVE_FILTERS);
         $this->assertSame(['Quantum Physics'], array_keys($tags));
         $this->assertSame('completed', $this->activeFiltersDemand($tags['Quantum Physics']['href'], self::LIST_NAMESPACE)['activeState']);
     }
@@ -176,10 +181,10 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
 
         $content = $this->renderFrontendPage($this->listUrl('/category-hidden', '1', 'completed'));
 
-        $tags = $this->activeFilterTags($content, self::PREFIX);
+        $tags = $this->activeFilterTags($content, self::ACTIVE_FILTERS);
         $this->assertSame(['Completed'], array_keys($tags));
         $this->assertSame(['categories' => '1'], $this->activeFiltersDemand($tags['Completed']['href'], self::LIST_NAMESPACE)['filterCollection'] ?? null);
-        $this->assertSame('/category-hidden', $this->activeFiltersResetLink($content, self::PREFIX));
+        $this->assertSame('/category-hidden', $this->activeFiltersResetLink($content, self::ACTIVE_FILTERS));
     }
 
     #[Test]
@@ -189,12 +194,12 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
 
         $content = $this->renderFrontendPage($this->listUrl('/selected', '1', 'completed', self::SELECTED_NAMESPACE));
 
-        $tags = $this->activeFilterTags($content, self::PREFIX);
+        $tags = $this->activeFilterTags($content, self::ACTIVE_FILTERS);
         $this->assertSame(['Quantum Physics', 'Completed'], array_keys($tags));
         $this->assertSame('/selected', parse_url($tags['Completed']['href'], PHP_URL_PATH));
         $this->assertSame(['categories' => '1'], $this->activeFiltersDemand($tags['Completed']['href'], self::SELECTED_NAMESPACE)['filterCollection'] ?? null);
-        $this->assertSame('/selected', $this->activeFiltersResetLink($content, self::PREFIX));
-        $this->assertSame('1 project found', $this->activeFiltersResultCount($content, self::PREFIX));
+        $this->assertSame('/selected', $this->activeFiltersResetLink($content, self::ACTIVE_FILTERS));
+        $this->assertSame('1 project found', $this->activeFiltersResultCount($content, self::RESULT_COUNT));
     }
 
     /**
@@ -209,8 +214,8 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
         foreach (['/home' => self::LIST_NAMESPACE, '/selected' => self::SELECTED_NAMESPACE] as $path => $namespace) {
             $content = $this->renderFrontendPage($this->listUrl($path, '1,3', 'completed', $namespace));
 
-            $this->assertStringNotContainsString('academic-projects-active-filters', $content, $path);
-            $this->assertStringNotContainsString('academic-projects-result-count', $content, $path);
+            $this->assertSame(0, $this->activeFiltersQuery($content, self::ACTIVE_FILTERS)->length, $path);
+            $this->assertSame(0, $this->activeFiltersQuery($content, self::RESULT_COUNT)->length, $path);
         }
     }
 
@@ -247,9 +252,9 @@ final class AcademicProjectsActiveFiltersTest extends AbstractAcademicProjectsTe
 
         $content = $this->renderFrontendPage($this->listUrl('/home', '1,3', 'all'));
 
-        $this->assertSame(['Quantum Physics', 'Industry'], array_keys($this->activeFilterTags($content, self::PREFIX)));
-        $this->assertSame('/home', $this->activeFiltersResetLink($content, self::PREFIX));
-        $this->assertSame('1 project found', $this->activeFiltersResultCount($content, self::PREFIX));
+        $this->assertSame(['Quantum Physics', 'Industry'], array_keys($this->activeFilterTags($content, self::ACTIVE_FILTERS)));
+        $this->assertSame('/home', $this->activeFiltersResetLink($content, self::ACTIVE_FILTERS));
+        $this->assertSame('1 project found', $this->activeFiltersResultCount($content, self::RESULT_COUNT));
     }
 
     /**

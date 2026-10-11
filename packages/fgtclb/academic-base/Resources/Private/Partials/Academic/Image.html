@@ -27,19 +27,22 @@
     <f:then>
         <f:comment>An Extbase file reference wraps the core one, which carries the metadata.</f:comment>
         <f:variable name="resource" value="{f:if(condition: image.originalResource, then: image.originalResource, else: image)}" />
+
         <f:comment>Array access, because getProperty() throws for a field that does not exist.</f:comment>
         <f:variable name="caption" value="{f:if(condition: showCaption, then: resource.description)}" />
         <f:variable name="copyright" value="{f:if(condition: showCopyright, then: resource.properties.copyright)}" />
+
         <f:if condition="{caption} || {copyright}">
             <f:then>
-                <figure class="academic-image">
+                <figure class="ace-figure">
                     <f:render section="Image" arguments="{_all}" />
-                    <figcaption class="academic-image__caption">
+
+                    <figcaption class="ace-caption">
                         <f:if condition="{caption}">
-                            <span class="academic-image__description">{caption}</span>
+                            <span class="ace-description">{caption}</span>
                         </f:if>
                         <f:if condition="{copyright}">
-                            <small class="academic-image__copyright">© {copyright}</small>
+                            <small class="ace-copyright">© {copyright}</small>
                         </f:if>
                     </figcaption>
                 </figure>
@@ -50,7 +53,7 @@
         </f:if>
     </f:then>
     <f:else if="{placeholder}">
-        <f:image src="{placeholder}" alt="{alt}" class="{class}" loading="lazy" />
+        <f:image src="{placeholder}" alt="{alt}" class="ace-image {class}" loading="lazy" />
     </f:else>
 </f:if>
 
@@ -61,12 +64,12 @@
             <img
                 src="{resource.publicUrl}"
                 alt="{f:if(condition: alt, then: alt, else: resource.alternative)}"
-                class="{class}"
+                class="ace-image {class}"
                 loading="lazy"
             />
         </f:then>
         <f:else>
-            <picture>
+            <picture class="ace-picture">
                 <f:render section="Preset-{preset}" arguments="{_all}" />
             </picture>
         </f:else>
@@ -102,7 +105,7 @@
 </f:section>
 
 <f:section name="Fallback">
-    <f:image image="{image}" cropVariant="{cropVariant}" maxWidth="{maxWidth}" alt="{alt}" class="{class}" loading="lazy" />
+    <f:image image="{image}" cropVariant="{cropVariant}" maxWidth="{maxWidth}" alt="{alt}" class="ace-image {class}" loading="lazy" />
 </f:section>
 
 </html>

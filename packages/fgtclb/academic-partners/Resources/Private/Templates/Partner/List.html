@@ -5,19 +5,22 @@
 >
 
 <div class="academic-partners-list">
+
     <f:if condition="{settings.renderContentElementHeader}">
         <f:render partial="Header/All" arguments="{_all}" />
     </f:if>
 
-    <f:render
-        partial="Partner/SortingAndFilters"
-        arguments="{_all}"
-    />
+    <div class="ace-content">
+        <f:render
+            partial="Partner/SortingAndFilters"
+            arguments="{_all}"
+        />
 
-    <f:render
-        partial="Partner/ItemList"
-        arguments="{_all}"
-    />
+        <f:render
+            partial="Partner/ItemList"
+            arguments="{_all}"
+        />
+    </div>
 </div>
 
 </html>

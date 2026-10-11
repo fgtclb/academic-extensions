@@ -152,28 +152,26 @@ The section renders `Program/Page/Header`, `Media`, `CallToAction`, `Facts` and
 `Content`, the rule of [Overridable partials](overridable-partials.md) applied
 to a page template: a project that changes one part overrides one file.
 `Facts` renders `Program/Facts`, which the details content element and the
-program card render as well. The header
-renders one element of its own (`academic-programs-detail__header`), because it
-sits in a reversed flex column with the media and several siblings there would
-be reordered.
+program card render as well. The header renders one element of its own,
+`<header class="ace-header">`, which sits next to the media in the element
+`ace-hero`. The page template renders the link back to the list after that
+element, as it belongs to the page and not to the heading.
 
-`CallToAction` renders the application link of the page (ACE-777) after that
-column, not inside the header: a project that overrides the header keeps the
-link. Like the link back to the list in the header, it resolves the URL first
+`CallToAction` renders the application link of the page (ACE-777) after the
+link back to the list, not inside the header: a project that overrides the
+header keeps the link. Like the link back to the list, it resolves the URL first
 and renders nothing when the target cannot be linked, because
 `f:link.typolink` would leave the bare label on the page. It reads nothing but
-`program`, so a list item override renders the same partial, and its class is
-therefore the block `academic-programs-application` rather than an element of
-`academic-programs-detail`, see
-[Classes are added, never moved](overridable-partials.md#classes-are-added-never-moved).
+`program`, so a list item override renders the same partial. The link keeps
+the button classes of Bootstrap and carries `ace-apply` next to them,
+`btn btn-primary ace-apply`, which tells it from the link back to the list.
+It has no element of its own around it.
 
 The partner page renders `Partner/Page/Header`, `Media`, `Categories`,
 `Address` and `Content`, the project page `Project/Page/Header`, `Media`,
 `Categories`, `Facts` and `Content`, in the order the single templates had
-before. Their headers are one element for the same reason
-(`academic-partners-detail__header`, `academic-projects-detail__header`), and
-both render the subtitle of the page below the heading. The partner heading
-gained that wrapper with ACE-785, the project heading had one already.
+before. Their headers are one `<header class="ace-header">` as well, and both
+render the subtitle of the page below the heading, `ace-subtitle`.
 
 ## Tests
 

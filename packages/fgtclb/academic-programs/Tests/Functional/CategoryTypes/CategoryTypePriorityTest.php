@@ -159,7 +159,7 @@ final class CategoryTypePriorityTest extends AbstractAcademicProgramsTestCase
      */
     private function factsList(string $content): string
     {
-        $start = strpos($content, '<ul class="academic-programs-facts');
+        $start = strpos($content, '<ul class="ace-list ace-attributes"');
         $this->assertIsInt($start, 'The page renders no facts list.');
         $end = strpos($content, '</ul>', $start);
         $this->assertIsInt($end);
@@ -178,7 +178,7 @@ final class CategoryTypePriorityTest extends AbstractAcademicProgramsTestCase
         $document = new \DOMDocument();
         $this->assertTrue(@$document->loadHTML($content));
         $selects = (new \DOMXPath($document))->query(
-            '//form[contains(@class, "academic-programs-filtersorting")]//select[contains(@name, "[demand][filterCollection]")]'
+            '//form[@name="demand"]//select[contains(@name, "[demand][filterCollection]")]'
         );
         $this->assertInstanceOf(\DOMNodeList::class, $selects);
 

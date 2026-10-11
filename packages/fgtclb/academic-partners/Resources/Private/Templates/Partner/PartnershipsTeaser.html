@@ -5,6 +5,7 @@
 >
 
 <div class="academic-partnerships-teaser">
+
     <f:if condition="{settings.renderContentElementHeader}">
         <f:render partial="Header/All" arguments="{_all}" />
     </f:if>
@@ -12,48 +13,52 @@
     <f:if condition="{partnershipRoles}">
         <f:then>
             <f:for each="{partnershipRoles}" as="role">
-                <div class="row">
-                    <f:render
-                        partial="Partner/Header"
-                        arguments="{
-                            header: '{role.name}',
-                            layout: '{data.header_layout}',
-                            subheader: '{data.subheader}'
-                        }"
-                    />
+                <div class="ace-itemlist">
+                    <div class="row">
+                        <f:render
+                            partial="Partner/Header"
+                            arguments="{
+                                header: '{role.name}',
+                                layout: '{data.header_layout}',
+                                subheader: '{data.subheader}'
+                            }"
+                        />
 
-                    <f:for each="{partnerships}" as="partnership">
-                        <f:if condition="{partnership.role} == {role}">
-                            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                                <f:render
-                                    partial="Partnerships/Teaser/Item"
-                                    arguments="{
-                                        partner: partnership.partner,
-                                        data: data,
-                                        settings: settings,
-                                        grouped: 'true'
-                                    }"
-                                />
-                            </div>
-                        </f:if>
-                    </f:for>
+                        <f:for each="{partnerships}" as="partnership">
+                            <f:if condition="{partnership.role} == {role}">
+                                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                                    <f:render
+                                        partial="Partnerships/Teaser/Item"
+                                        arguments="{
+                                            partner: partnership.partner,
+                                            data: data,
+                                            settings: settings,
+                                            grouped: 'true'
+                                        }"
+                                    />
+                                </div>
+                            </f:if>
+                        </f:for>
+                    </div>
                 </div>
             </f:for>
         </f:then>
         <f:else>
-            <div class="row">
-                <f:for each="{partnerships}" as="partnership">
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <f:render
-                            partial="Partnerships/Teaser/Item"
-                            arguments="{
-                                partner: partnership.partner,
-                                data: data,
-                                settings: settings
-                            }"
-                        />
-                    </div>
-                </f:for>
+            <div class="ace-itemlist">
+                <div class="row">
+                    <f:for each="{partnerships}" as="partnership">
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                            <f:render
+                                partial="Partnerships/Teaser/Item"
+                                arguments="{
+                                    partner: partnership.partner,
+                                    data: data,
+                                    settings: settings
+                                }"
+                            />
+                        </div>
+                    </f:for>
+                </div>
             </div>
         </f:else>
     </f:if>
