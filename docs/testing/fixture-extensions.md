@@ -29,7 +29,7 @@ They sit next to the tests that use them, under
 | `test_category_types_summary_override` | `tests/category-types-summary-override` | `typo3-category-types` | A page TSconfig override of the page module category summary template.   |
 | `test_frontend_readonly`               | `tests/test-frontend-readonly`          | `academic-persons`     | A `validations` map locking four fields for the frontend editor only.    |
 | `test_hidden_content_types`            | `tests/hidden-content-types`            | `academic-base`        | Page TSconfig and TCA hiding content types, for the wizard tests.        |
-| `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`        | `ext_tables.sql` and TCA for a legacy table an upgrade wizard migrates.  |
+| `test_jobcontact_schema`               | `tests/test-jobcontact-schema`          | `academic-jobs`        | `ext_tables.sql` only, for a removed table an upgrade wizard reads.      |
 | `test_language_files`                  | `tests/language-files`                  | `academic-persons`     | An XLF pair with awkward label keys (dots, dashes).                      |
 | `test_messy_profile_factory`           | `tests/test-messy-profile-factory`      | `academic-persons`     | A deliberately misbehaving profile factory and two event listeners.      |
 | `test_partners_stub`                   | `tests/test-partners-stub`              | `academic-partners`    | An `ext_localconf.php` replacing the Guzzle handler stack.               |
@@ -216,9 +216,13 @@ going to be renamed for cosmetics.
 
 The existing ones show the cases that justify one:
 
-- **Schema and TCA.** `test_jobcontact_schema` ships `ext_tables.sql` and TCA for
-  a table the upgrade wizard tests migrate away from. The table has to exist when
-  the instance is built.
+- **Schema.** `test_jobcontact_schema` ships an `ext_tables.sql` for the table
+  and the field the upgrade wizard tests migrate away from. They have to exist
+  when the instance is built. It deliberately ships no TCA for them: an
+  installation has none for a removed table, and TCA would let the default
+  restrictions of the query builder reach the table and hide what the wizard
+  does there, see
+  [A migration reads every record](../architecture/database-queries.md#a-migration-reads-every-record-and-a-removed-table-has-no-restrictions).
 - **Dependency injection.** `test_base_dependency_injection` and
   `test_messy_profile_factory` ship `Services.yaml` plus classes, so the
   container really wires them. `test_profile_query_constraints` is the same
