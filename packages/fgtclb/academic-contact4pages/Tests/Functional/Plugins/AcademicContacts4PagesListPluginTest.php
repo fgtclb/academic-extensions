@@ -130,8 +130,8 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
     }
 
     /**
-     * The role headings of the grouped list: `Profile/Header` renders them with an empty
-     * class attribute, as no position class is passed.
+     * The role headings of the grouped list: `Profile/Header` renders them with its own
+     * `ace-title` class only, as no further class is passed.
      *
      * @return list<string>
      */
@@ -140,7 +140,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $document = new \DOMDocument();
         $document->loadHTML($content, LIBXML_NOERROR);
         $headings = [];
-        foreach ($this->nodes(new \DOMXPath($document), "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6][not(@class) or normalize-space(@class) = '']") as $heading) {
+        foreach ($this->nodes(new \DOMXPath($document), "//div[contains(concat(' ', normalize-space(@class), ' '), ' academic-contacts4pages-list ')]//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6][normalize-space(@class) = 'ace-title']") as $heading) {
             $headings[] = trim($heading->textContent);
         }
 
@@ -271,7 +271,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         // below the `Profile/Header` an ungrouped one gets. Asserting the level is what
         // proves `groupedProfiles` arrives in the partial.
         $this->assertMatchesRegularExpression(
-            '#<h3 class="academic-persons-item__name card-title">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h3>#',
+            '#<h3 class="ace-title ace-name">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h3>#',
             $this->renderHomePage(),
         );
     }
@@ -289,7 +289,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         // Without a role the flat branch renders, which uses `Profile/Header` and
         // therefore one heading level higher.
         $this->assertMatchesRegularExpression(
-            '#<h2 class="academic-persons-item__name card-title">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h2>#',
+            '#<h2 class="ace-title ace-name">\s*<a href="[^"]*">Max\s+Müllermann</a>\s*</h2>#',
             $content,
         );
     }
@@ -336,7 +336,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         // `Profile/SectionHeader`, so a role-less contact keeps the higher heading level
         // it has on a page with no roles at all - the two branches stay consistent.
         $this->assertMatchesRegularExpression(
-            '#<h2 class="academic-persons-item__name card-title">\s*<a href="[^"]*">Erika\s+Beispiel</a>\s*</h2>#',
+            '#<h2 class="ace-title ace-name">\s*<a href="[^"]*">Erika\s+Beispiel</a>\s*</h2>#',
             $this->renderHomePage(),
         );
     }
@@ -522,7 +522,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $this->assertSame(1, substr_count($content, '<div class="row">'));
         // Not grouped, so every name renders one heading level up, as a role-less contact does.
         $this->assertMatchesRegularExpression(
-            '#<h2 class="academic-persons-item__name card-title">\s*<a href="[^"]*">Horst\s+Huber</a>\s*</h2>#',
+            '#<h2 class="ace-title ace-name">\s*<a href="[^"]*">Horst\s+Huber</a>\s*</h2>#',
             $content,
         );
     }
@@ -669,8 +669,8 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
     }
 
     /**
-     * One card per rendered contact, counted through the class the `Profile/Item` partial
-     * of `EXT:academic_persons` wraps every contact in.
+     * One card per rendered contact, counted through the `article` the `Profile/Item`
+     * partial of `EXT:academic_persons` wraps every contact in.
      */
     private function countProfileCards(string $content): int
     {
@@ -679,7 +679,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
 
         return $this->countNodes(
             new \DOMXPath($document),
-            "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-persons-item ')]",
+            "//article[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]",
         );
     }
 
@@ -821,7 +821,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         // This extension has no "nothing found" label; the plugin still has to render
         // rather than fail.
         $this->assertStringContainsString('academic-contacts4pages', $content);
-        $this->assertStringNotContainsString('academic-persons-item', $content);
+        $this->assertStringNotContainsString('<article class="ace-item">', $content);
     }
 
     /**
@@ -840,7 +840,7 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $document = new \DOMDocument();
         $document->loadHTML($this->renderHomePage(), LIBXML_NOERROR);
         $xpath = new \DOMXPath($document);
-        $cards = $this->nodes($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-persons-item ')]");
+        $cards = $this->nodes($xpath, "//article[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]");
         $this->assertSame(2, $cards->length);
 
         $withImage = $cards->item(0);
@@ -894,10 +894,10 @@ final class AcademicContacts4PagesListPluginTest extends AbstractAcademicContact
         $document = new \DOMDocument();
         $document->loadHTML($this->renderHomePage(), LIBXML_NOERROR);
         $xpath = new \DOMXPath($document);
-        $cards = $this->nodes($xpath, "//*[contains(concat(' ', normalize-space(@class), ' '), ' academic-persons-item ')]");
+        $cards = $this->nodes($xpath, "//article[contains(concat(' ', normalize-space(@class), ' '), ' ace-item ')]");
         $this->assertSame(2, $cards->length);
 
-        $imageQuery = './/img[contains(concat(\' \', normalize-space(@class), \' \'), \' academic-persons-item__image \')]';
+        $imageQuery = './/img[contains(concat(\' \', normalize-space(@class), \' \'), \' ace-image \')]';
         $image = $this->nodes($xpath, $imageQuery, $cards->item(0))->item(0);
         $this->assertInstanceOf(\DOMElement::class, $image);
         $this->assertSame(['600', '600'], [$image->getAttribute('width'), $image->getAttribute('height')]);
