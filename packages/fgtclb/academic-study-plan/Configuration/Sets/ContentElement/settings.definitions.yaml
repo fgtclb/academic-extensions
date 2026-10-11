@@ -8,7 +8,7 @@
 # value - a boolean site setting reaches the constants as "1" or as the empty string.
 #
 # The definitions sit with the component set rather than with the aggregate because this
-# extension ships exactly one component, and both settings belong to it. Every set that
+# extension ships exactly one component, and the settings belong to it. Every set that
 # delivers the content element depends on this one, so every site that renders the element
 # can set them.
 categories:
@@ -19,12 +19,6 @@ categories:
     parent: academic
 
 settings:
-  plugin.tx_academicstudyplan.assets.css:
-    label: 'Load the stylesheet of the content element'
-    description: 'Off for an installation that styles the study plan itself. The markup is unchanged either way.'
-    category: academic.studyPlan
-    type: bool
-    default: true
   plugin.tx_academicstudyplan.assets.js:
     label: 'Load the script of the content element'
     description: 'Off for an installation that brings its own script. Without one the filter, the module dialogs and the mobile accordion do nothing.'

@@ -467,8 +467,11 @@ The `/legacy/` tree therefore gets no theme. It names
 object that puts the content of a page on the page, shipped by the seed package
 in both delivery forms and described in
 [its README](../../packages-dev/dev-site/README.md). The consequence to know
-about is visual only: `/legacy/` renders unstyled, and its pages'
-`backend_layout` values name layouts that tree does not define.
+about is visual only: `/legacy/` renders without the theme, and its pages'
+`backend_layout` values name layouts that tree does not define. The stylesheet
+of the instances, which styles the markup of the academic extensions, reaches
+it all the same, through the same static template, see
+[Frontend assets](../development/frontend-assets.md#the-stylesheet-of-the-development-instances).
 
 One rendering definition of the seed package reaches both trees through neither
 mechanism: the content element of the icon overview page (ACE-594) is added in

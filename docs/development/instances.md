@@ -340,6 +340,37 @@ database template — so a fresh clone gets the database and the files it points
 at together. See
 [Seed files, and how they reach an instance](environment.md#seed-files-and-how-they-reach-an-instance).
 
+## The stylesheet of the instances
+
+The academic extensions ship no stylesheet, and the instances bring one of
+their own, as a site package would: `academic-extensions.css` of
+`packages-dev/dev-site`, compiled from one SCSS partial per extension, two for
+the persons. It is linked on every page of both trees, in both instances:
+
+- the `/` tree gets it from the set `fgtclb/academics-dev-site-stylesheet`,
+  which `core-*/config/sites/academics/config.yaml` names last, after the theme;
+- the `/legacy/` tree gets it from the static template of `academics_dev_site`,
+  which its root `sys_template` record already includes.
+
+It is what makes the study plan, the partner map, the profiles and the profile
+editor of the instances look and work as intended: without it the map has no
+height, the semester and fold-out headers show both of their glyphs, regions
+the profile editor hides stay on screen and its image cropper cannot be
+dragged. A change to it is a
+change to the SCSS, followed by `buildJs` and a commit of the compiled file.
+
+To check that it reaches a page, look for it in the source, and fetch it:
+
+```bash
+cd core-13
+curl -sk "$(ddev describe -j | jq -r '.raw.primary_url')/study-plan" \
+    | grep -o 'href="[^"]*academic-extensions\.css[^"]*"'
+```
+
+The layout of the sources, the delivery and the test that asserts it are
+described in
+[Frontend assets](frontend-assets.md#the-stylesheet-of-the-development-instances).
+
 ## Mail and site constants
 
 Both instances send mail over SMTP to `127.0.0.1:1025`
@@ -403,3 +434,5 @@ with them: [Seed verification](../testing/seed-verification.md).
 - [Icons](../architecture/icons.md) — the rules the icons on `/icons` follow.
 - [Seed verification](../testing/seed-verification.md) — the checks that keep the
   seed definition, the committed snapshots and the manifest in agreement.
+- [Frontend assets](frontend-assets.md#the-stylesheet-of-the-development-instances)
+  — the stylesheet of the instances, its sources and its delivery.

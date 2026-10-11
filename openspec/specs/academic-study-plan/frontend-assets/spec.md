@@ -1,32 +1,31 @@
 # academic-study-plan/frontend-assets Specification
 
 ## Purpose
-Defines which stylesheet and script the study plan content element brings to
-a page, and how an integrator switches either of them off.
+Defines which script the study plan content element brings to a page, how an
+integrator switches it off, and that the element brings no stylesheet.
 
 ## Requirements
 
 ### Requirement: The element brings its assets by default
-A page that carries a study plan element SHALL load the element's stylesheet
-and its script when neither switch is configured. A page without the element
-SHALL load neither.
+A page that carries a study plan element SHALL load the element's script when
+its switch is not configured, and SHALL NOT load a stylesheet of the element in
+any configuration. A page without the element SHALL NOT load the script.
 
 #### Scenario: Default configuration
 - **WHEN** a page carries a study plan element and the site configures
   nothing
-- **THEN** the page loads the study plan stylesheet and the study plan script
+- **THEN** the page loads the study plan script and no stylesheet of the
+  element
 
 #### Scenario: Page without the element
 - **WHEN** a page of the same site carries no study plan element
-- **THEN** the page loads neither of them
+- **THEN** the page does not load the study plan script
 
-### Requirement: The stylesheet can be switched off
-When the integrator switches the stylesheet off, a page carrying the element
-SHALL NOT load the study plan stylesheet and SHALL still load the script.
-
-#### Scenario: Stylesheet switched off in the site settings
-- **WHEN** the site setting for the stylesheet is off
-- **THEN** the page loads the study plan script and not the stylesheet
+#### Scenario: A leftover stylesheet setting
+- **WHEN** a site still configures the stylesheet setting that earlier
+  development versions of 3.0 offered
+- **THEN** the page loads the study plan script and no stylesheet of the
+  element, as without the setting
 
 ### Requirement: The script can be switched off
 When the integrator switches the script off, a page carrying the element
@@ -54,12 +53,18 @@ shipped, and it does not depend on the stylesheet.
 - **THEN** the page shows one filter button per category its modules carry,
   all of them visible
 
-### Requirement: The switches work without site sets
+### Requirement: The switch works without site sets
 An installation that includes the static template instead of the site set
-SHALL be able to switch off either asset through TypoScript constants of the
-same names as the site settings.
+SHALL be able to switch off the script through the TypoScript constant of the
+same name as the site setting, and SHALL get no stylesheet of the element
+either way.
 
 #### Scenario: Static template installation
-- **WHEN** a site includes the static template and sets the stylesheet
-  constant to off
-- **THEN** the page does not load the study plan stylesheet
+- **WHEN** a site includes the static template and sets the script constant
+  to off
+- **THEN** the page does not load the study plan script
+
+#### Scenario: Static template without an override
+- **WHEN** a site includes the static template and configures nothing
+- **THEN** the page loads the study plan script and no stylesheet of the
+  element

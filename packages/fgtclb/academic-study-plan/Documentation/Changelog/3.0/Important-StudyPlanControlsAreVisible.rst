@@ -15,8 +15,12 @@ wrapper is loaded in the backend alone. The close button of a module dialog
 was therefore invisible, and the semester headers of the narrow accordion
 layout showed no marker.
 
-The stylesheet of the content element now sizes the icons of a study plan, and
-gives the close button of a module dialog a target of its own. A click on the
+The icons carry a size of their own now, and the stylesheet of the site sizes
+the icons of a study plan and gives the close button of a module dialog a
+target of its own. The extension ships no stylesheet in 3.0, see
+:ref:`breaking-study-plan-ships-no-stylesheet`. The stylesheet of the
+development instances of the mono repository carries those rules as an
+example. A click on the
 backdrop of an open module dialog closes it as well, as the close button and
 the :kbd:`Escape` key already did. A click inside the dialog, and a text
 selection that is released over the backdrop, leave it open.
@@ -36,10 +40,12 @@ Affected Installations
 ======================
 
 Every installation that renders the study plan content element with the
-shipped stylesheet and script. Nothing has to be done on update.
+shipped script. On update, take the rules for the icons and the close button
+into the stylesheet of the site package, from the example linked in
+:ref:`breaking-study-plan-ships-no-stylesheet`.
 
-A site package that sized the icons itself keeps working: the new rules are
-scoped to :html:`.academic-study-plan .icon`, and a rule of the site package
+A site package that sized the icons itself keeps working: the example scopes
+its rules to :html:`.academic-study-plan .icon`, and a rule of the site package
 with a higher specificity, or loaded later with the same one, still wins.
 
 ..  index:: Frontend, JavaScript, ext:academic_study_plan

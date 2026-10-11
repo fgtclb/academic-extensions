@@ -7,17 +7,16 @@ Breaking: The map assets are built and loaded as a module
 Description
 ===========
 
-The stylesheet and the script of the partner map are now compiled from sources
-in the repository. Both moved into a :file:`frontend/` subdirectory, and the
-script became an **ES module**:
+The script of the partner map is now compiled from sources in the repository.
+It moved into a :file:`frontend/` subdirectory and became an **ES module**:
 
 ..  code-block:: text
 
-    EXT:academic_partners/Resources/Public/Css/map.css
-    ->  EXT:academic_partners/Resources/Public/Css/frontend/map.css
-
     EXT:academic_partners/Resources/Public/JavaScript/map.js
     ->  EXT:academic_partners/Resources/Public/JavaScript/frontend/map.js
+
+The stylesheet of the map, :file:`Resources/Public/Css/map.css`, is not shipped
+any more, see :ref:`breaking-partner-map-ships-no-stylesheet`.
 
 The vendored Leaflet library, its marker cluster plugin and their stylesheets
 are **unchanged**. They are third party files without sources here, they keep
@@ -42,11 +41,11 @@ Installations that override :file:`Templates/Partner/Map.html` or reference
 Migration
 =========
 
-In an overridden template, replace the two references:
+In an overridden template, replace the reference to the script and drop the
+one to :file:`map.css`:
 
 ..  code-block:: html
 
-    <f:asset.css identifier="partnerC2" href="EXT:academic_partners/Resources/Public/Css/frontend/map.css" />
     <f:asset.module identifier="@fgtclb/academic-partners/frontend/map.js" />
 
-The three Leaflet lines around them stay exactly as they are.
+The three Leaflet lines around it stay exactly as they are.

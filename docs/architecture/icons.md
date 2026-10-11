@@ -905,13 +905,14 @@ contact block, through the helpers of `JobContactIconAssertionTrait`, and
 `listPluginRendersAResolvableIconForEveryProperty()` and
 `detailPluginRendersAResolvableIconForEveryProperty()` for the twelve property
 icons, on a job that carries every property, each of them inlined in
-`currentColor`. The glyphs of the study plan carry one more contract: the
-shipped stylesheet switches them through the `icon-tx-academicbase-action-expand`
-and `-collapse` classes of their wrappers, which
+`currentColor`. The glyphs of the study plan carry one more contract: a site
+stylesheet switches them, as the one of the development instances does, through
+the `icon-tx-academicbase-action-expand` and `-collapse` classes of their
+wrappers, which
 `contentElementGivesTheGlyphsTheClassesTheStylesheetSelects()` asserts in every
-semester header, and `stylesheetSelectsTheRenderedControlIcons()` pins those
-selectors and the `1em` size of `.academic-study-plan .icon svg` in the
-compiled stylesheet.
+semester header, and `StudyPlanControlIconRulesTest` of `packages-dev/dev-site`
+pins those selectors and the size of `.academic-study-plan .icon` in the
+compiled stylesheet of the instances.
 
 These mistakes are caught for every literal identifier before anything is
 rendered. `FrontendTemplateIconTest` of `packages-dev/monorepo-shared` fails a

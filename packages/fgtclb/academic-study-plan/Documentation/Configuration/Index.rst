@@ -146,18 +146,58 @@ Edit the page record of the site root, tab :guilabel:`Resources`, field
 
 The setting is inherited by every page below the one it is set on.
 
+..  _styling:
+
+Style the element
+=================
+
+The extension ships no stylesheet. The content element renders the classes and
+data attributes :ref:`Templates <templates>` documents, and the stylesheet of
+the site package styles them.
+
+The mono repository the extension is developed in carries an example to start
+from, the stylesheet of its development instances:
+`_academic-study-plan.scss of EXT:academics_dev_site
+<https://github.com/fgtclb/academic-extensions/blob/main/packages-dev/dev-site/Resources/Private/Scss/frontend/_academic-study-plan.scss>`__.
+It is never shipped with an extension, copy what the site needs.
+
+Three parts of the element depend on rules of that stylesheet, beyond its
+appearance:
+
+*   A semester header renders an expand and a collapse glyph, and the
+    stylesheet shows one of them, see
+    :ref:`The glyphs of a semester header <templates-glyphs>`.
+*   The collapsed filter needs
+    :css:`.ace-filter .ace-list[hidden] { display: none }`, see
+    :ref:`Collapse the category filter <collapsible-filter>`.
+*   The accordion of a narrow viewport and the highlighting of a category are
+    classes the script writes and the stylesheet gives an effect: :html:`open`
+    and :html:`highlighted`.
+
+The shipped icons carry a size of their own, `1em`. The example sizes every
+icon of the element to `1.25rem`, which is also what keeps a replacement
+drawing without a width and a height of its own visible, see
+:ref:`The glyphs of a semester header <templates-glyphs>`.
+
+The label of a dialog trigger is only read out. It carries Bootstrap's
+:html:`visually-hidden`, which a site that brings Bootstrap hides already.
+
+Before version 3.0 the extension shipped this stylesheet itself. The setting
+:yaml:`plugin.tx_academicstudyplan.assets.css` that switched it off during the
+development of 3.0 is gone with it, see
+:ref:`breaking-study-plan-ships-no-stylesheet`.
+
 ..  _asset-switches:
 
-Skip the stylesheet or the script
-=================================
+Skip the script
+===============
 
-The content element brings two assets to every page that carries it: the
-stylesheet :file:`academic-study-plan.css` and the ES module
-:js:`@fgtclb/academic-study-plan/frontend/academic-study-plan.js`. A page
-without the element loads neither.
+The content element brings one asset to every page that carries it: the ES
+module :js:`@fgtclb/academic-study-plan/frontend/academic-study-plan.js`. A
+page without the element does not load it.
 
-Both can be switched off per site — for an installation that styles the element
-itself, or that brings its own script:
+It can be switched off per site, for an installation that brings its own
+script:
 
 ..  list-table::
     :header-rows: 1
@@ -165,15 +205,12 @@ itself, or that brings its own script:
     *   -   Setting
         -   Default
         -   Off means
-    *   -   :yaml:`plugin.tx_academicstudyplan.assets.css`
-        -   :yaml:`true`
-        -   The page does not load the stylesheet.
     *   -   :yaml:`plugin.tx_academicstudyplan.assets.js`
         -   :yaml:`true`
         -   The page does not load the script.
 
-With the site set, they are site settings: edit them in the backend, in the
-settings editor of that site, or write them by hand. The editor is the same one
+With the site set, it is a site setting: edit it in the backend, in the
+settings editor of that site, or write it by hand. The editor is the same one
 on both TYPO3 versions and only sits elsewhere —
 :guilabel:`Site Management > Settings` on TYPO3 v13, and
 :guilabel:`Sites > Setup` on TYPO3 v14, which merged it into the module that
@@ -182,15 +219,15 @@ edits the site itself.
 ..  code-block:: yaml
     :caption: config/sites/my-site/settings.yaml
 
-    plugin.tx_academicstudyplan.assets.css: false
+    plugin.tx_academicstudyplan.assets.js: false
 
-With the static template, they are TypoScript constants of the same names,
+With the static template, it is a TypoScript constant of the same name,
 :guilabel:`Constants` of the root :sql:`sys_template` record:
 
 ..  code-block:: typoscript
     :caption: Constants of the root sys_template record
 
-    plugin.tx_academicstudyplan.assets.css = 0
+    plugin.tx_academicstudyplan.assets.js = 0
 
 ..  warning::
 
@@ -256,13 +293,11 @@ worse than none. Two consequences follow:
     :html:`data-filter-label`, which is the translation of
     :html:`filter.label`. An override that drops that attribute gets no toggle
     at all rather than an unnamed button, and the filter stays expanded.
-*   The collapsed state is the :html:`hidden` attribute, and the shipped
-    stylesheet is what gives it an effect
+*   The collapsed state is the :html:`hidden` attribute, and the stylesheet of
+    the site has to give it an effect
     (:css:`.ace-filter .ace-list[hidden] { display: none }`) - the browser's own
-    rule for it loses to any author rule that gives the list a :css:`display`. An
-    installation that switches
-    :typoscript:`plugin.tx_academicstudyplan.assets.css` off needs that rule in
-    its own stylesheet.
+    rule for it loses to any author rule that gives the list a :css:`display`.
+    See :ref:`Style the element <styling>`.
 
 ..  _one-mechanism-per-site:
 
@@ -274,8 +309,8 @@ files twice. The site set is applied before the :sql:`sys_template` record, so
 the second read happens after the site settings and after
 :file:`config/sites/<site>/constants.typoscript` — and it resets every constant
 the extension ships a default for back to that default. For this extension those
-are the three Fluid root paths of the content element, the two switches of
-:ref:`Skip the stylesheet or the script <asset-switches>` and the switch of
+are the three Fluid root paths of the content element, the switch of
+:ref:`Skip the script <asset-switches>` and the switch of
 :ref:`Collapse the category filter <collapsible-filter>`.
 
 Nothing else is damaged: the :guilabel:`Constants` and :guilabel:`Setup` fields

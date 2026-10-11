@@ -1,0 +1,266 @@
+// The interactive study plan of academic_study_plan.
+//
+// Written with native nesting, which SCSS understands unchanged — this file was
+// a plain stylesheet before it moved into the build and needed no rewriting.
+// The colours a category filter applies come in as custom properties set by the
+// script ("--category-color", "--highlight-color").
+
+.academic-study-plan {
+    @media screen and (max-width: 767px) {
+        &.highlighted {
+            .ace-semester:not(.highlighted) {
+                display: none;
+            }
+        }
+    }
+
+    // The collapsible filter is hidden with the "hidden" attribute, which only
+    // the user agent stylesheet gives an effect - and "display: flex" below is
+    // author origin, so it wins over the user agent unconditionally. Without
+    // this rule the toggle would say "collapsed" while the filter stays on
+    // screen. It has to sit next to the rule it undoes.
+    .ace-filter .ace-list[hidden] {
+        display: none;
+    }
+
+    // The toggle the script inserts in front of the filter when the site asked
+    // for the collapsible filter. It is a control of the same family as the
+    // filter buttons, so it looks like one.
+    .ace-toggle {
+        background: #fff;
+        border: 1px solid black;
+        padding: 0.45rem 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+
+        &[aria-expanded='true'] {
+            margin-bottom: 0.6rem;
+        }
+    }
+
+    // The control icons, rendered inline by the icon ViewHelper of academic_base
+    // as a span around a span around the svg. The core stylesheet that sizes the
+    // wrapper exists in the backend alone, and a file that replaces a shipped one
+    // may carry a viewBox but no size, which draws it 0 x 0 in the frontend. These
+    // rules give every icon of the element one size, shipped or replaced.
+    .icon {
+        display: inline-block;
+        flex-shrink: 0;
+        width: 1.25rem;
+        height: 1.25rem;
+        line-height: 0;
+
+        .icon-markup,
+        svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .ace-filter .ace-list {
+        display: flex;
+        justify-content: flex-start;
+        gap: 0.6rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        width: 100%;
+        padding-left: 0;
+        list-style-type: none;
+
+        .ace-control {
+            background: #fff;
+            border: 1px solid black;
+            padding: 0.45rem 1rem;
+            border-radius: 999px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                border-color: var(--category-color);
+                transform: scale(1.05);
+            }
+
+            &.highlighted {
+                background: var(--highlight-color);
+                border-color: var(--category-color);
+            }
+        }
+    }
+
+    .ace-semesters {
+        // The semesters are the items of the element with the role "list"
+        // inside the wrapper. It carries the grid class "row" as well, which
+        // lays them out only where a theme styles it, so the columns are set up
+        // here.
+        > [role='list'] {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: hidden;
+
+            @media screen and (max-width: 767px) {
+                flex-direction: column;
+            }
+        }
+
+        .ace-semester {
+            .icon-tx-academicbase-action-collapse {
+                display: none;
+            }
+
+            &.open {
+                .icon-tx-academicbase-action-expand {
+                    display: none;
+                }
+
+                .icon-tx-academicbase-action-collapse {
+                    display: block;
+                }
+
+                .ace-modules {
+                    display: block;
+                }
+            }
+
+            @media screen and (max-width: 767px) {
+                &.highlighted {
+                    .ace-module:not(.highlighted) {
+                        display: none;
+                    }
+                }
+            }
+
+            .ace-semester-note,
+            .ace-module-note,
+            .ace-dialog-note {
+                display: block;
+            }
+
+            .ace-title {
+                display: block;
+                margin-bottom: 0;
+            }
+
+            .ace-module-trigger {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                background: transparent;
+                border: 1px solid rgba(128, 128, 128, 0.25);
+                border-top: none;
+            }
+
+            .ace-semester-header {
+                text-align: left;
+                border-bottom: 3px solid goldenrod;
+                padding: 0.5rem;
+                display: flex;
+                flex-direction: column-reverse;
+
+                @media screen and (min-width: 768px) {
+                    text-align: center;
+                }
+
+                .ace-semester-content {
+                    margin-top: 0.5rem;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 0.5rem;
+
+                    // The wrapper of the glyphs lays them out as the flex
+                    // items they were before it existed.
+                    .ace-actions {
+                        display: flex;
+                    }
+
+                    @media screen and (min-width: 768px) {
+                        display: block;
+
+                        .icon {
+                            display: none;
+                        }
+                    }
+                }
+            }
+
+            .ace-modules {
+                padding-left: 0;
+                list-style-type: none;
+
+                @media screen and (max-width: 767px) {
+                    display: none;
+                }
+
+                .ace-module {
+                    padding: 0.5rem;
+                    position: relative;
+
+                    &:has(.ace-module-trigger) {
+                        &:hover,
+                        &:focus {
+                            background: rgba(218, 165, 32, 0.25);
+
+                            &.highlighted {
+                                background: var(--highlight-color);
+                            }
+                        }
+                    }
+
+                    &:not(:has(.ace-module-trigger)) {
+                        border: 1px solid rgba(128, 128, 128, 0.25);
+                        border-top: none;
+                    }
+
+                    &.highlighted {
+                        background: var(--highlight-color);
+                    }
+
+                    .ace-module-credits,
+                    .ace-dialog-credits {
+                        margin-bottom: 0.5rem;
+                        display: block;
+                    }
+
+                    .ace-dialog {
+                        border: none;
+                        max-width: 50rem;
+
+                        // The name and the credit points of the module on the
+                        // left, one below the other, and the close button on
+                        // the right, next to both.
+                        .ace-header {
+                            display: grid;
+                            grid-template-columns: 1fr auto;
+                            align-items: start;
+                        }
+
+                        .ace-close {
+                            grid-column: 2;
+                            grid-row: 1 / span 2;
+                            margin-left: 1rem;
+                            padding: 0.25rem;
+                            background: none;
+                            border: none;
+                            color: inherit;
+                            line-height: 0;
+                            cursor: pointer;
+                        }
+
+                        .ace-dialog-description {
+                            margin-top: 0.5rem;
+                            margin-bottom: 0.5rem;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

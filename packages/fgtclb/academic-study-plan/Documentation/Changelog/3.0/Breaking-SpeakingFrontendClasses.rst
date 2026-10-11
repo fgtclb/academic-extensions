@@ -16,7 +16,8 @@ extensions: `ace-item`, `ace-list`, `ace-attribute`, `ace-label`, `ace-value`,
 plugin. The classes of Bootstrap that a site builds on stay on purpose where
 the templates render them: the grid classes `row` and `col-*`, the button
 classes `btn` and `btn-*` and `visually-hidden`. No other theme class is
-rendered any more. The stylesheet the extension ships selects the new classes.
+rendered any more. The extension ships no stylesheet, see
+:ref:`breaking-study-plan-ships-no-stylesheet`.
 
 The script finds the parts of the plan by their :html:`data-study-plan-*`
 attributes, which are unchanged, and writes `highlighted` and `open` as
@@ -63,12 +64,10 @@ Impact
 ======
 
 *   A site stylesheet that styles the plan through the classes of the column
-    *Before* no longer matches. The shipped stylesheet selects the new classes.
+    *Before* no longer matches.
 *   The collapsed filter is hidden by the rule
-    :css:`.ace-filter .ace-list[hidden] { display: none }` of the shipped
-    stylesheet. An installation that switches
-    :typoscript:`plugin.tx_academicstudyplan.assets.css` off brings that rule
-    in its own stylesheet.
+    :css:`.ace-filter .ace-list[hidden] { display: none }`. The site
+    stylesheet brings that rule.
 *   An override of a study plan partial keeps working with the script as long
     as it keeps the data attributes.
 

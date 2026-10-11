@@ -104,8 +104,9 @@ being one of them.
 
 `Configuration/TypoScript/` and `Configuration/Sets/PageObject/` ship one page
 object twice — as a static template folder and as the site set
-`fgtclb/academics-dev-site-page-object`, whose `setup.typoscript` imports the
-static one.
+`fgtclb/academics-dev-site-page-object`. Both import
+`Configuration/TypoScript/PageObject.typoscript`; the static template imports
+the stylesheet below as well.
 
 It exists because the `/legacy/` tree cannot be themed. EXT:bootstrap_package
 delivers everything it has through site sets and nothing through a static
@@ -136,6 +137,37 @@ the package requires `fgtclb/academic-base`. The lists are read when the page
 renders, so an icon an extension adds is on the page without a change here. See
 [The icon overview page](../../docs/development/instances.md#the-icon-overview-page)
 for what the page shows and what to look for on it.
+
+## The stylesheet
+
+The academic extensions ship no stylesheet of their own: their markup is styled
+by the site package. This package is that part of the development instances.
+`Resources/Private/Scss/frontend/academic-extensions.scss` pulls in one partial
+per extension, two for `academic_persons`, and the frontend build compiles it
+into `Resources/Public/Css/frontend/academic-extensions.css`, which is
+committed:
+
+| Partial                       | Styles                                                                   |
+|-------------------------------|--------------------------------------------------------------------------|
+| `_academic-partners.scss`     | The partner map: its height, its stacking and the map images.            |
+| `_academic-persons.scss`      | The public profile of `academic_persons`.                                |
+| `_academic-persons-list.scss` | The list, card, selected profiles and selected contracts of the same.    |
+| `_academic-persons-edit.scss` | The profile editor of `academic_persons_edit`, the cropper too.          |
+| `_academic-study-plan.scss`   | The study plan content element.                                          |
+
+`Configuration/TypoScript/Stylesheet.typoscript` adds the file to every page.
+The `/legacy/` tree gets it through the static template of this package, the
+`/` tree through the set `fgtclb/academics-dev-site-stylesheet`, which the site
+configuration of both instances names after the theme. The manual of each
+extension links its partial as the example to copy from.
+`Tests/Functional/StylesheetClassesTest.php` keeps the partials of the study
+plan, the public profile and the profile lists in step with the markup of their
+extension and the map partial with the stylesheets of Leaflet. The partial of
+the profile editor is not checked: the editor needs a logged in owner, its partial also corrects classes of the
+theme, and it styles the widget CropperJS builds and the transition classes
+the editor derives from a prefix, none of which a template or a module names
+as written. See
+[Frontend assets](../../docs/development/frontend-assets.md#the-stylesheet-of-the-development-instances).
 
 ## See also
 

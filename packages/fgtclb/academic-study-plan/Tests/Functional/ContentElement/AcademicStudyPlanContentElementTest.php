@@ -9,7 +9,6 @@ use FGTCLB\TestingHelper\FunctionalTestCase\FrontendPluginRenderingTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use SBUERK\TYPO3\Testing\SiteHandling\SiteBasedTestTrait;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Renders the `academic_study_plan` content element in the frontend.
@@ -635,7 +634,8 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
      * of a semester and inside the shrink-to-fit close button of the dialog, which is how
      * the three controls were invisible before 3.0. Asserted on the rendered page: the
      * icon is inlined, drawn in the text colour, and carries a size of its own. The
-     * stylesheet sizes it as well, see `stylesheetSelectsTheRenderedControlIcons()`.
+     * extension ships no stylesheet, the one of the development instances sizes it as
+     * well.
      */
     #[Test]
     #[DataProvider('controlIconIdentifiers')]
@@ -656,37 +656,12 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
     }
 
     /**
-     * The stylesheet selects the accordion glyphs by the class the icon markup derives from
-     * the identifier, so a renamed identifier leaves the stylesheet selecting nothing: both
-     * glyphs show, or neither. It also sizes every inlined icon of the element, so a site
-     * that registers a drawing without a size does not bring the 0 px icons back.
-     */
-    #[Test]
-    public function stylesheetSelectsTheRenderedControlIcons(): void
-    {
-        $css = (string)file_get_contents(
-            GeneralUtility::getFileAbsFileName('EXT:academic_study_plan/Resources/Public/Css/frontend/academic-study-plan.css')
-        );
-
-        $this->assertStringContainsString('.ace-semester .icon-tx-academicbase-action-collapse {', $css);
-        $this->assertStringContainsString('.ace-semester.open .icon-tx-academicbase-action-expand {', $css);
-        $this->assertStringContainsString('.ace-semester.open .icon-tx-academicbase-action-collapse {', $css);
-        $this->assertMatchesRegularExpression(
-            '#\.academic-study-plan \.icon \{[^}]*\bwidth: 1\.25rem;[^}]*\bheight: 1\.25rem;#',
-            $css,
-        );
-        $this->assertMatchesRegularExpression(
-            '#\.academic-study-plan \.icon svg \{[^}]*\bwidth: 100%;[^}]*\bheight: 100%;#',
-            $css,
-        );
-    }
-
-    /**
-     * The shipped stylesheet switches the glyphs of a semester header through the classes
-     * of their wrappers: `.icon-tx-academicbase-action-collapse` is hidden in a closed
-     * semester, `.icon-tx-academicbase-action-expand` in an open one, and every `.icon` of
-     * the header on a wide viewport. The script never looks at them, so nothing else
-     * notices when the classes are gone.
+     * A site stylesheet switches the glyphs of a semester header through the classes of
+     * their wrappers, as the stylesheet of the development instances does:
+     * `.icon-tx-academicbase-action-collapse` is hidden in a closed semester,
+     * `.icon-tx-academicbase-action-expand` in an open one, and every `.icon` of the header
+     * on a wide viewport. The script never looks at them, so nothing else notices when the
+     * classes are gone.
      */
     #[Test]
     public function contentElementGivesTheGlyphsTheClassesTheStylesheetSelects(): void
@@ -711,68 +686,6 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
                 $this->assertSame(1, $glyphs->count(), sprintf('A semester header renders not exactly one "%s" glyph.', $glyphClass));
             }
         }
-    }
-
-    /**
-     * The shipped stylesheet styles the plan through the classes the templates render,
-     * and a selector of a class that nothing renders styles nothing. Neither PHP suite
-     * nor jsdom computes a style, so a template that renames a class leaves its rule
-     * behind without a failing test, which is how the stylesheet came to select the
-     * classes of the markup before ACE-818. Every class a selector of the compiled
-     * stylesheet names is therefore rendered by the fixture, or is one of the classes
-     * the script writes, which are named here and looked up in the compiled module.
-     */
-    #[Test]
-    public function contentElementRendersEveryClassTheShippedStylesheetSelects(): void
-    {
-        $this->setUpTestCase('studyPlanPage');
-
-        $scriptClasses = ['ace-toggle', 'highlighted', 'open'];
-        $script = (string)file_get_contents(__DIR__ . '/../../../Resources/Public/JavaScript/frontend/academic-study-plan.js');
-        foreach ($scriptClasses as $scriptClass) {
-            $this->assertMatchesRegularExpression(
-                '#["\']' . preg_quote($scriptClass, '#') . '["\']#',
-                $script,
-                sprintf('The module does not write the class "%s".', $scriptClass),
-            );
-        }
-
-        $nodes = $this->parseHtml($this->renderHomePage())
-            ->query('//div[contains(@class, "academic-study-plan")]/descendant-or-self::*[@class]');
-        $this->assertInstanceOf(\DOMNodeList::class, $nodes);
-        $rendered = $scriptClasses;
-        foreach ($nodes as $node) {
-            $this->assertInstanceOf(\DOMElement::class, $node);
-            $rendered = [
-                ...$rendered,
-                ...(preg_split('#\\s+#', trim($node->getAttribute('class')), -1, PREG_SPLIT_NO_EMPTY) ?: []),
-            ];
-        }
-
-        $selected = $this->classesSelectedBy(
-            (string)file_get_contents(__DIR__ . '/../../../Resources/Public/Css/frontend/academic-study-plan.css'),
-        );
-        $this->assertSame([], array_values(array_diff($selected, $rendered)));
-    }
-
-    /**
-     * @return string[] Every class name the selectors of a compiled stylesheet name, once.
-     */
-    private function classesSelectedBy(string $css): array
-    {
-        $css = preg_replace('#/\*.*?\*/#s', '', $css) ?? '';
-        preg_match_all('#([^{};]+)\{#', $css, $preludes);
-
-        $classes = [];
-        foreach ($preludes[1] as $prelude) {
-            if (str_starts_with(trim($prelude), '@')) {
-                continue;
-            }
-            preg_match_all('#\.(-?[_a-zA-Z][_a-zA-Z0-9-]*)#', $prelude, $names);
-            $classes = [...$classes, ...$names[1]];
-        }
-
-        return array_values(array_unique($classes));
     }
 
     #[Test]
