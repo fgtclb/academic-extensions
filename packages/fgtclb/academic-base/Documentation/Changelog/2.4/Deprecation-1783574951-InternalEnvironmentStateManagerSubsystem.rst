@@ -8,7 +8,7 @@ Description
 ===========
 
 The environment, state-manager and environment-builder subsystem that
-:php:`EXT:academic_base` shipped internally under the namespaces
+EXT:academic_base shipped internally under the namespaces
 :php:`\FGTCLB\AcademicBase\Environment`,
 :php:`\FGTCLB\AcademicBase\Core12\Environment` and
 :php:`\FGTCLB\AcademicBase\Core13\Environment` has been extracted into the
@@ -17,8 +17,8 @@ standalone public extension `fgtclb/environment-state-manager` (namespace
 environment handling.
 
 The internal classes were always flagged :php:`@internal` and were never part of
-the public API of :php:`EXT:academic_base`. They are now **deprecated** and will
-be removed with :php:`EXT:academic_base` 3.0.0. Use the
+the public API of EXT:academic_base. They are now **deprecated** and will
+be removed with EXT:academic_base 3.0.0. Use the
 :php:`\FGTCLB\EnvironmentStateManager` classes instead.
 
 The deprecated classes, interfaces and traits stay in place and keep working
@@ -49,7 +49,7 @@ that is carried **by type** through the public PSR-14 event
 :php:`\FGTCLB\AcademicPersons\Service\Event\ModifyProfileCommandEnvironmentStateBuildContextForFrontendUserEvent`.
 Shipping a second, distinct class with the same purpose would break that event's
 type contract for existing listeners. This one class has therefore been
-**removed** from :php:`EXT:academic_base` and registered as a deprecated
+**removed** from EXT:academic_base and registered as a deprecated
 **class alias** of :php:`\FGTCLB\EnvironmentStateManager\StateBuildContext`
 through the `typo3/class-alias-loader` composer plugin
 (:file:`Migrations/Code/ClassAliasMap.php`). The old name keeps resolving to the

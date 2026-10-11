@@ -36,12 +36,16 @@ Affected Installations
 
 Installations upgraded from 1.x that already ran the wizard. It is recorded as
 done there and is not offered again by itself. Mark it undone and run it, in
-:guilabel:`Admin Tools > Upgrade > Upgrade Wizard` or on the command line:
+:guilabel:`Admin Tools > Upgrade > Upgrade Wizard` or, on TYPO3 v13, on the
+command line:
 
 ..  code-block:: bash
 
     vendor/bin/typo3 upgrade:mark:undone academicProjects_flexFormUpgradeWizard
     vendor/bin/typo3 upgrade:run academicProjects_flexFormUpgradeWizard
+
+TYPO3 v12 has no command to mark a wizard undone. There it is marked undone in
+the Install Tool, and `upgrade:run` runs it afterwards.
 
 Saving a project list in the backend keeps a stored setting the form no longer
 shows, so a list saved in 2.x carries the old setting next to the new one. Such
