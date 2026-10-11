@@ -24,8 +24,18 @@ is used as it is given.
 Impact
 ======
 
-Code that calls the trait passes the extension key as before; nothing has to
-change there. On TYPO3 v12 and v13, a label override of the items under the
-underscored path no longer has an effect and moves to the documented one.
+Code that calls the trait passes the extension key as before, nothing has to
+change there. A label override of the items under the underscored path no
+longer has an effect. Move it to the path without underscores, or to the path
+of the one plugin it is meant for:
+
+..  code-block:: typoscript
+
+    # Before
+    plugin.tx_academic_jobs._LOCAL_LANG.default.tx_academicjobs_domain_model_job.jobtype.job = Position
+
+    # After
+    plugin.tx_academicjobs._LOCAL_LANG.default.tx_academicjobs_domain_model_job.jobtype.job = Position
+    plugin.tx_academicjobs_newjobform._LOCAL_LANG.default.tx_academicjobs_domain_model_job.jobtype.job = Position
 
 ..  index:: Frontend, PHP-API, TypoScript, ext:academic_base

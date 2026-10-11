@@ -14,9 +14,16 @@ array is meant to look like the one FormEngine passes, and in one entry it did
 not: :php:`$parameters['TSconfig']` held the complete page TSconfig tree of the
 current page.
 
-FormEngine passes something narrower there - the content of the field's
+FormEngine passes something narrower there: the content of the field's
 :typoscript:`itemsProcFunc.` page TSconfig, with that key already stripped, and
 :php:`null` when the field has none. The helper now passes the same.
+
+..  code-block:: typoscript
+
+    # The part a handler receives in $parameters['TSconfig']
+    TCEFORM.tx_academicjobs_domain_model_job.type.itemsProcFunc {
+        mySetting = 1
+    }
 
 Impact
 ======
@@ -26,9 +33,18 @@ found nothing when it was called through this helper, and works now. No handler
 of these extensions read that entry before, so nothing this package ships
 changes behaviour.
 
-A project handler that compensated for the old shape - by descending through
-:php:`$parameters['TSconfig']['TCEFORM.']` itself - has to be adjusted: it now
-receives the subtree directly, or :php:`null`.
+A project handler that compensated for the old shape, by descending through
+:php:`$parameters['TSconfig']['TCEFORM.']` itself, has to be adjusted: it now
+receives the subtree directly, or :php:`null`. A handler that also serves the
+backend form already expects that shape, because FormEngine always passed it.
+
+..  code-block:: php
+
+    // Before, only through this helper
+    $mySetting = $parameters['TSconfig']['TCEFORM.'][$table . '.'][$field . '.']['itemsProcFunc.']['mySetting'] ?? null;
+
+    // After, the same as in FormEngine
+    $mySetting = $parameters['TSconfig']['mySetting'] ?? null;
 
 Affected Installations
 ======================
