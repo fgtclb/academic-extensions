@@ -15,7 +15,7 @@ same :sql:`sorting` column.
 being saved 1..n in the order of its form, so saving a contract or a contacts
 role renumbered its contacts *across every page that owns one of them*. An
 editor who had arranged the contacts on a page saw that arrangement replaced by
-the order of an unrelated form - in the backend and, since a page renders its
+the order of an unrelated form, in the backend and, since a page renders its
 contacts in :sql:`sorting` order, in the frontend as well.
 
 The contract relation and the contacts role relation now have sort columns of
@@ -28,30 +28,45 @@ Impact
 
 Saving a contract or a contacts role no longer changes the order of any page,
 and a page no longer changes the order those forms show. All three
-arrangements are kept side by side.
+arrangements are kept side by side. TYPO3 v12 and v13 behave alike here.
 
 A contact that joins a contract or a contacts role afterwards is appended to
 the end of that record's list, whether it was created there, given the relation
 in the contact form on a page, copied or localized. Changing the relation moves
-it to the end of the new one; clearing it removes the contact from that list
+it to the end of the new one. Clearing it removes the contact from that list
 altogether.
 
-The new columns are added by :file:`ext_tables.sql`: **run the database
-analyzer once after updating**. Every contact that existed before carries
-:sql:`0` in them, so the upgrade wizard *Seed the contact sort order of
-contracts and contacts roles* fills them with the order those forms show today
-- the current :sql:`sorting` of each contact, with :sql:`uid` settling ties.
-Run it once; it reports nothing to do afterwards. Until it has run, a contact saved in the backend keeps no position of its own:
-the wizard is the one that knows the order the contracts and contacts roles show today, so a contact
-whose list is still unseeded is left to it. Running the wizard again is
-harmless:
-it appends what has no position yet and never renumbers what has one, so an
-arrangement made in one of those forms is not reset by it.
+Every contact that existed before the update carries :sql:`0` in the new
+columns. Until the upgrade wizard below has run, a contact saved in the backend
+keeps no position of its own in those lists. The wizard is the one that knows
+the order the contracts and contacts roles show today, so a contact whose list
+is still unseeded is left to it.
 
 Affected Installations
 ======================
 
 Every installation of this extension that assigns contacts to contracts or to
 contacts roles.
+
+Migration
+=========
+
+Add the new columns, which come with :file:`ext_tables.sql`, in
+:guilabel:`Admin Tools > Maintenance > Analyze Database Structure` or with
+:bash:`vendor/bin/typo3 extension:setup`.
+
+Then run the upgrade wizard :guilabel:`Seed the contact sort order of contracts
+and contacts roles`, in :guilabel:`Admin Tools > Upgrade > Upgrade Wizard` or
+on the command line:
+
+..  code-block:: bash
+
+    vendor/bin/typo3 upgrade:run academicContact4pages_seedContactSecondarySorting
+
+It fills the new columns with the order those forms show today, the current
+:sql:`sorting` of each contact, with :sql:`uid` settling ties. It reports
+nothing to do afterwards. Running it again is harmless: it appends what has no
+position yet and never renumbers what has one, so an arrangement made in one of
+those forms is not reset by it.
 
 .. index:: Backend, Database, TCA, ext:academic_contacts4pages

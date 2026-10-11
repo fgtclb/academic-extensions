@@ -56,10 +56,10 @@ translation of their role. This query lists them:
     records that repair the others.
 
 Localizing a contacts role, or copying it into a language, no longer localizes
-its contacts either. Core still localizes every inline child of a localized
+its contacts either. TYPO3 still localizes every inline child of a localized
 record, and no configuration prevents that, so the contacts it created are
 deleted again when the localization ends. For a contact that is translated
-already, core still reports that its localization failed, while nothing is
+already, TYPO3 still reports that its localization failed, while nothing is
 created. A plain copy of a contacts role keeps copying its contacts.
 
 Affected Installations

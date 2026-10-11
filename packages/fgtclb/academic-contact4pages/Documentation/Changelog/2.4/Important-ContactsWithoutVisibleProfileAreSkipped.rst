@@ -13,7 +13,7 @@ a relation with fresh query settings: a hidden contract, or a profile that is
 hidden, outside its start and end time or restricted to a frontend user group
 the visitor does not belong to, resolved to nothing instead of raising an error.
 The contact record itself was still visible, so the contacts of a page rendered
-an empty card below its role heading - a person who had left the institution
+an empty card below its role heading. A person who had left the institution
 kept a slot on the page.
 
 The contacts content element and the data processor
@@ -33,7 +33,7 @@ Impact
 - The plugin option :guilabel:`Show hidden records` is unchanged in meaning: it
   shows hidden *contact records*, and never a hidden contract or profile. A
   hidden contact pointing at a visible person is still shown with the option
-  enabled; a visible contact pointing at a hidden person is not.
+  enabled. A visible contact pointing at a hidden person is not.
 - The view variable :html:`{contacts}` and the processed key ``contacts`` are
   now a plain list instead of a query result. :html:`<f:for>` and
   :html:`<f:count>` behave identically, but a template reading
@@ -42,10 +42,12 @@ Impact
 - :php:`ContactsProcessor` is published as a service and takes its collaborator
   through the constructor. A project that *subclasses* the processor and names
   the subclass in TypoScript has to let its own :file:`Services.yaml` autowire
-  that subclass; otherwise TYPO3 instantiates it without arguments.
+  that subclass. Otherwise TYPO3 instantiates it without arguments, and the
+  page fails with a PHP error.
 
 Nothing has to be configured, and no data is migrated. Making a person visible
-again restores every contact pointing at it.
+again restores every contact pointing at it. TYPO3 v12 and v13 behave alike
+here.
 
 Affected Installations
 ======================

@@ -11,9 +11,10 @@ The :guilabel:`Contacts for this page` content element has a new option,
 :guilabel:`Group by role` (:typoscript:`settings.groupByRole`), on the
 :guilabel:`Configuration` tab. It is switched on by default:
 
-*   **On** – the contacts are listed below a heading per role, followed by the
-    contacts without a role. This is the output the content element always had.
-*   **Off** – all contacts of the page are listed in one list, in the order the
+*   **On**: the contacts are listed below a heading per role, followed by the
+    contacts without a role, see
+    :ref:`important-ace-322-academic-contacts4pages`. This is the default.
+*   **Off**: all contacts of the page are listed in one list, in the order the
     editor sorted them on the page. A contact with a role shows its role name
     above its card.
 
@@ -55,5 +56,15 @@ drop the grouping or to change the card, switch the option off or override
 A project that already ships a partial named :file:`Contacts/Item.html` in a
 partial root path of this plugin now has it rendered for every contact. Check
 for one before updating.
+
+TYPO3 v12 and v13 behave alike here.
+
+Affected Installations
+======================
+
+Every installation using the :guilabel:`Contacts for this page` content
+element. The output stays the same unless an editor switches the option off, or
+the installation overrides :file:`Contacts/List.html`, replaces the shipped
+TypoScript setup, or ships a partial :file:`Contacts/Item.html` of its own.
 
 .. index:: Backend, FlexForm, Fluid, Frontend, Template, TypoScript, ext:academic_contacts4pages

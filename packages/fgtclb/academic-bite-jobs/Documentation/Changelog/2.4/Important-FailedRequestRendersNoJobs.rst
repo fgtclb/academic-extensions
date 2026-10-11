@@ -16,8 +16,16 @@ The service keeps nothing between two requests any more. A job list whose
 request fails shows the message that no jobs are available, and the error is
 logged as before.
 
-Only pages with more than one job list are affected, and only while the B-ITE
-API does not answer one of their requests. The behaviour is the same on TYPO3
-v12 and v13.
+Impact
+======
+
+A job list shows only the postings of its own request. The behaviour is the
+same on TYPO3 v12 and v13. Nothing has to be configured.
+
+Affected Installations
+======================
+
+Installations with more than one :guilabel:`Bite Jobs List` content element on
+a page, and only while the B-ITE API does not answer one of their requests.
 
 ..  index:: Frontend, NotScanned, ext:academic_bite_jobs

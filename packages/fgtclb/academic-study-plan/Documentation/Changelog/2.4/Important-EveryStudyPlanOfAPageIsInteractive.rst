@@ -9,7 +9,7 @@ Description
 
 The script of the study plan content element starts one instance per plan, and
 kept the instances it had started in a map keyed by the **value** of
-:html:`data-study-plan` - the uid of the content element.
+:html:`data-study-plan`, the uid of the content element.
 
 Two plans of one page that carry the same value therefore collapsed onto one
 instance, and only the first of them was ever started: no category filter, no
@@ -23,13 +23,13 @@ is started.
 Impact
 ======
 
-A page that renders the same study plan twice - through an
-:guilabel:`Insert records` element or a shortcut - now has two working plans
+A page that renders the same study plan twice, through an
+:guilabel:`Insert records` element or a shortcut, now has two working plans
 instead of one working and one inert. A page with one plan is unaffected.
 
-The resize handler is affected in the same way: it iterates the instances, so a
+The resize handler is affected in the same way. It iterates the instances, so a
 plan that never entered the map was never levelled again on a viewport change
-either.
+either. TYPO3 v12 and v13 behave alike here.
 
 Affected Installations
 ======================

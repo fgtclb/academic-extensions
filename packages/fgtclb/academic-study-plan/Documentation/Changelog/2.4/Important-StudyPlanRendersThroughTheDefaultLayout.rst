@@ -16,10 +16,10 @@ link pointing at it landed on the page and not on the element, and a
 The cause was the template. :file:`AcademicStudyPlan.html` rendered its markup
 directly, and the :file:`Header/All` partial with it, without a Fluid layout.
 The frame wrapper, the spacing classes, the anchor and the footer link are
-rendered by the :file:`Layouts/Default.html` layout of whichever package provides
-:typoscript:`lib.contentElement` - `EXT:fluid_styled_content`, or a site package
-such as :composer:`bk2k/bootstrap-package`, which renders a frame of its own. A
-template without that layout gets none of them.
+rendered by the :file:`Layouts/Default.html` layout of whichever package
+provides :typoscript:`lib.contentElement`: :guilabel:`EXT:fluid_styled_content`,
+or a site package such as :composer:`bk2k/bootstrap-package`, which renders a
+frame of its own. A template without that layout gets none of them.
 
 The template now starts with :html:`<f:layout name="Default" />` and wraps its
 markup in an :html:`<f:section name="Main">`. The explicit render of
@@ -57,8 +57,8 @@ moved out of :html:`.academic-study-plan` to above it.
 installation whose editors used that tab some of them were configured long ago:
 
 *   :guilabel:`Layout`, :guilabel:`Frame`, :guilabel:`Space Before` and
-    :guilabel:`Space After` - the four fields of the :guilabel:`frames` palette
-    - now render their classes, so rulers and spacing appear where they were
+    :guilabel:`Space After`, the four fields of the :guilabel:`frames` palette,
+    now render their classes, so rulers and spacing appear where they were
     chosen and a layout variant reaches the stylesheet as
     :html:`frame-layout-<n>`.
 *   The element carries its :html:`id="c<uid>"`, so a link to it jumps to it.
@@ -94,16 +94,16 @@ Affected Installations
 ======================
 
 Every installation that renders the study plan content element with the shipped
-template, on TYPO3 v12 and v13 alike - the :file:`Layouts/Default.html` of
-`EXT:fluid_styled_content` is identical on both. An installation that ships its
-own copy of :file:`AcademicStudyPlan.html` keeps rendering that copy and is
-unaffected - including a copy that was made to add the layout in the first
-place, which can be dropped once nothing else in it was changed.
+template, on TYPO3 v12 and v13 alike. The :file:`Layouts/Default.html` of
+:guilabel:`EXT:fluid_styled_content` is identical on both. An installation that
+ships its own copy of :file:`AcademicStudyPlan.html` keeps rendering that copy
+and is unaffected. That includes a copy that was made to add the layout in the
+first place, which can be dropped once nothing else in it was changed.
 
 One case is worth naming because the header does not move there but disappears:
 a site package that provides its own :typoscript:`lib.contentElement` whose
 :file:`Default` layout renders no :html:`Header` section at all. Such a layout
 suppresses the header of every core content element as well, so it is a choice
-that site made; the study plan now simply follows it.
+that site made. The study plan now follows it.
 
 .. index:: Frontend, Fluid, ext:academic_study_plan
