@@ -12,9 +12,9 @@ The environment, state-manager and environment-builder subsystem that
 :php:`\FGTCLB\AcademicBase\Environment`,
 :php:`\FGTCLB\AcademicBase\Core12\Environment` and
 :php:`\FGTCLB\AcademicBase\Core13\Environment` has been extracted into the
-dedicated, standalone public extension `fgtclb/environment-state-manager`
-(namespace :php:`\FGTCLB\EnvironmentStateManager`), which additionally provides
-backend environment handling.
+standalone public extension `fgtclb/environment-state-manager` (namespace
+:php:`\FGTCLB\EnvironmentStateManager`), which additionally provides backend
+environment handling.
 
 The internal classes were always flagged :php:`@internal` and were never part of
 the public API of :php:`EXT:academic_base`. They are now **deprecated** and will
@@ -22,7 +22,7 @@ be removed with :php:`EXT:academic_base` 3.0.0. Use the
 :php:`\FGTCLB\EnvironmentStateManager` classes instead.
 
 The deprecated classes, interfaces and traits stay in place and keep working
-until 3.0.0, so their TYPO3 core-version aware dependency injection continues to
+until then, so their TYPO3 core-version aware dependency injection continues to
 resolve to the correct implementation:
 
 *  :php:`\FGTCLB\AcademicBase\Environment\EnvironmentBuilderInterface`
@@ -42,20 +42,19 @@ resolve to the correct implementation:
    :php:`StateManager`, :php:`State`)
 
 Special case: :php:`StateBuildContext`
-======================================
+--------------------------------------
 
 :php:`\FGTCLB\AcademicBase\Environment\StateBuildContext` is a plain value object
 that is carried **by type** through the public PSR-14 event
 :php:`\FGTCLB\AcademicPersons\Service\Event\ModifyProfileCommandEnvironmentStateBuildContextForFrontendUserEvent`.
 Shipping a second, distinct class with the same purpose would break that event's
-type contract for existing listeners. Therefore this class - and only this class -
-has been **removed** from :php:`EXT:academic_base` and re-registered as a
-deprecated **class alias** onto
-:php:`\FGTCLB\EnvironmentStateManager\StateBuildContext` via the
-`typo3/class-alias-loader` composer plugin
-(:file:`Migrations/Code/ClassAliasMap.php`). The old name therefore keeps
-resolving to the new class - they are the same class at runtime - until the alias
-is removed in 3.0.0.
+type contract for existing listeners. This one class has therefore been
+**removed** from :php:`EXT:academic_base` and registered as a deprecated
+**class alias** of :php:`\FGTCLB\EnvironmentStateManager\StateBuildContext`
+through the `typo3/class-alias-loader` composer plugin
+(:file:`Migrations/Code/ClassAliasMap.php`). The old name keeps resolving to the
+new class, they are the same class at runtime, until the alias is removed in
+3.0.0.
 
 Impact
 ======
@@ -63,32 +62,41 @@ Impact
 Referencing any of the deprecated class names keeps working: the remaining
 classes are still shipped, and :php:`StateBuildContext` resolves through the class
 alias. Because the classes were :php:`@internal`, no runtime deprecation is
-triggered. Everything is removed in :php:`EXT:academic_base` 3.0.0.
+triggered.
 
-Note that :php:`\FGTCLB\EnvironmentStateManager\StateBuildContext` gained optional
-constructor arguments (backend user and workspace) and that the base
-:php:`StateInterface` moved its TypoScriptFrontendController accessors to the
-core-version specific :php:`Core*\ExtendedStateInterface`, because the
-TypoScriptFrontendController is deprecated in TYPO3 v13 and removed in v14.
+The new classes differ from the deprecated ones in two places:
 
-Affected installations
+*   :php:`\FGTCLB\EnvironmentStateManager\StateBuildContext` gained two optional
+    constructor arguments, :php:`$backendUserId` and :php:`$workspaceId`.
+*   :php:`\FGTCLB\EnvironmentStateManager\StateInterface` no longer declares
+    :php:`withTypoScriptFrontendController()` and
+    :php:`typoScriptFrontendController()`. They moved to the core-version
+    specific :php:`ExtendedStateInterface` of the namespaces
+    :php:`\FGTCLB\EnvironmentStateManager\Core12` and
+    :php:`\FGTCLB\EnvironmentStateManager\Core13`, because the
+    TypoScriptFrontendController is deprecated in TYPO3 v13. The interface also
+    gained :php:`withLanguageService()` and :php:`languageService()`.
+
+Affected Installations
 ======================
 
-Only installations that reference the internal environment / state-manager
-classes directly are affected. Within the academic extensions this concerned only
-:php:`EXT:academic_persons` and :php:`EXT:academic_programs`, which have already
-been switched to `fgtclb/environment-state-manager`.
+Only installations whose own code references the internal environment /
+state-manager classes directly. The academic extensions themselves use
+`fgtclb/environment-state-manager` already.
 
 Migration
 =========
 
 Require the new extension and replace the namespace prefix
-:php:`\FGTCLB\AcademicBase\Environment` with :php:`\FGTCLB\EnvironmentStateManager`
-(respectively :php:`\FGTCLB\AcademicBase\Core12\Environment` /
+:php:`\FGTCLB\AcademicBase\Environment` with :php:`\FGTCLB\EnvironmentStateManager`.
+For the core-version specific classes replace
+:php:`\FGTCLB\AcademicBase\Core12\Environment` with
+:php:`\FGTCLB\EnvironmentStateManager\Core12`, and
 :php:`\FGTCLB\AcademicBase\Core13\Environment` with
-:php:`\FGTCLB\EnvironmentStateManager\Core12` /
-:php:`\FGTCLB\EnvironmentStateManager\Core13`). Class names, method signatures and
-behaviour are compatible.
+:php:`\FGTCLB\EnvironmentStateManager\Core13`. The class names stay the same.
+Code that calls the TypoScriptFrontendController accessors on a
+:php:`StateInterface` has to type against the :php:`ExtendedStateInterface` of
+the running core version instead, see Impact.
 
 ..  code-block:: bash
 
@@ -103,3 +111,5 @@ behaviour are compatible.
     // After
     use FGTCLB\EnvironmentStateManager\StateManagerInterface;
     use FGTCLB\EnvironmentStateManager\StateBuildContext;
+
+..  index:: PHP-API, ext:academic_base
