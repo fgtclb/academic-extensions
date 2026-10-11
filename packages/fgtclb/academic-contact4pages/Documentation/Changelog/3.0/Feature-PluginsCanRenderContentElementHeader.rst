@@ -46,4 +46,12 @@ A project that replaced the list template only to render the header, as
 :ref:`important-contacts4pages-plugin-assigns-record-view-variable` describes,
 can switch it on and drop the copy.
 
+A site package that imports the setup of this extension by path, from
+:file:`Configuration/TypoScript/List/` or from the deprecated
+:file:`Configuration/TypoScript/`, has to import the
+:file:`constants.typoscript` of the same folder as well. Without it the setting
+keeps the unresolved :typoscript:`{$plugin.tx_academiccontacts4pages.renderContentElementHeader}`
+value, which is not empty, so the templates render the header as if it were
+switched on.
+
 .. index:: Frontend, Fluid, TypoScript, ext:academic_contacts4pages
