@@ -7,13 +7,13 @@ Important: The job list groups only on request and reads old view values
 Description
 ===========
 
-Version 2.1 removed the grouping setting of the :guilabel:`Job list` content
-element and renamed its view values, but the list template and the stored
-content elements were not adapted. Since then:
+Version 2.1 removed the grouping setting of the :guilabel:`Bite Jobs List`
+content element and renamed its view values, but the list template and the
+stored content elements were not adapted. Since then:
 
 *   every job list was rendered as one unnamed group, so every job title was one
-    heading level lower than the header layout of the content element asks for —
-    an `<h3>` instead of an `<h2>` for layout 1, for example;
+    heading level lower than the header layout of the content element asks for,
+    an :html:`<h3>` instead of an :html:`<h2>` for layout 1, for example.
 *   a content element saved with 2.0 stores `ListView`, `CardView` or
     `TableView`, names a partial that does not exist and fails to render. So
     does a content element without a view value.
@@ -21,6 +21,7 @@ content elements were not adapted. Since then:
 The job list is now grouped only when TypoScript names a grouping field:
 
 ..  code-block:: typoscript
+    :caption: TypoScript setup
 
     plugin.tx_academicbitejobs.settings.jobs.groupBy = department
 
@@ -41,41 +42,49 @@ of every job list content element, hidden ones included, to `List`, `Card` or
 It also removes the two settings version 2.1 removed from the plugin,
 `settings.jobs.groupBy` and `settings.jobs.custom.zuordnung`. They stayed in the
 stored FlexForms, and a stored grouping setting is still merged into the plugin
-settings — so until the wizard has run, a content element saved with 2.0 and the
-grouping option :guilabel:`thema` keeps being grouped by a field the job
-postings no longer carry. Every other setting is left as it is.
+settings. Until the wizard has run, a content element saved with 2.0 with the
+grouping option :guilabel:`thema` therefore keeps being grouped by a field the
+job postings no longer carry. Every other setting is left as it is.
 
 Impact
 ======
 
 Job titles of every job list that does not configure a grouping field move up
-one heading level. Content elements saved with 2.0 render again — those that
-stored the grouping option of 2.0 once the upgrade wizard has run.
+one heading level. Content elements saved with 2.0 render again. Those that
+stored the grouping option of 2.0 render ungrouped once the upgrade wizard has
+run.
 
 Affected Installations
 ======================
 
-Every installation using the :guilabel:`Job list` content element. Installations
-with content elements saved with 2.0 are additionally affected by the view
-values.
+Every installation using the :guilabel:`Bite Jobs List` content element.
+Installations with content elements saved with 2.0 are additionally affected by
+the view values.
 
 Content elements created with 1.x are a plugin of the list content type and are
-not rendered by this version at all; neither the list nor the upgrade wizard
+not rendered by this version at all. Neither the list nor the upgrade wizard
 covers them.
 
 Migration
 =========
 
-Run the upgrade wizard after the update. It makes the backend form of old
-content elements show the view the frontend renders, and it removes the
-grouping setting of 2.0, which would otherwise keep those lists grouped. Until
-it has run, the frontend reads the old view values anyway.
+Run the upgrade wizard after the update, in :guilabel:`Admin Tools > Upgrade >
+Upgrade Wizard` or on the command line:
+
+..  code-block:: bash
+
+    vendor/bin/typo3 upgrade:run academicBiteJobs_listViewFlexFormUpgradeWizard
+
+It makes the backend form of old content elements show the view the frontend
+renders, and it removes the grouping setting of 2.0, which would otherwise keep
+those lists grouped. Until it has run, the frontend reads the old view values
+anyway.
 
 Check the heading styles of job lists. An installation that relied on the
 lower heading level adapts its styles or overrides the
 :file:`Partials/BiteJobs/Header.html` partial.
 
 An installation that adds a grouping field to the job postings sets
-`plugin.tx_academicbitejobs.settings.jobs.groupBy` to that field.
+:typoscript:`plugin.tx_academicbitejobs.settings.jobs.groupBy` to that field.
 
-..  index:: Fluid, FlexForm, Frontend, TypoScript, NotScanned
+..  index:: Fluid, FlexForm, Frontend, TypoScript, NotScanned, ext:academic_bite_jobs
