@@ -86,12 +86,16 @@ Migration
 
 Run the upgrade wizard again. An installation that already executed it has it
 recorded as done, so it has to be marked undone first, in
-:guilabel:`Admin Tools > Upgrade > Upgrade Wizard` or on the command line:
+:guilabel:`Admin Tools > Upgrade > Upgrade Wizard` or, on TYPO3 v13, on the
+command line:
 
 ..  code-block:: bash
 
     vendor/bin/typo3 upgrade:mark:undone academicProjects_flexFormUpgradeWizard
     vendor/bin/typo3 upgrade:run academicProjects_flexFormUpgradeWizard
+
+TYPO3 v12 has no command to mark a wizard undone. There it is marked undone in
+the Install Tool, and `upgrade:run` runs it afterwards.
 
 Running it again is safe: the wizard only rewrites a FlexForm that still
 contains one of the old setting names and leaves every other record untouched.

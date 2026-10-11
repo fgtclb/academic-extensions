@@ -22,7 +22,7 @@ that page tree are stored on:
 
 The items of the field are built by :composer:`fgtclb/academic-persons`, which
 ships the setting and documents it, including the longer path of the second
-field it serves, the :guilabel:`Selected contracts` of its content element.
+field it serves, the :guilabel:`Selected Contracts` of its content element.
 
 Impact
 ======

@@ -19,7 +19,7 @@ therefore rendered as they were, and a German page listed the English titles
 of its projects.
 
 The query now switches the overlay on for such a selection before it drops the
-language restriction, the same way :guilabel:`EXT:academic_persons` treats a
+language restriction, the same way EXT:academic_persons treats a
 selection of profiles. A selected project is rendered in the language of the
 page.
 

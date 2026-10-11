@@ -18,8 +18,7 @@ The trait now turns an extension key into the extension name,
 :php:`'AcademicJobs'`, before it translates. The labels read
 :typoscript:`plugin.tx_academicjobs` and
 :typoscript:`plugin.tx_academicjobs_<plugin>`, the paths the TYPO3
-documentation names and TYPO3 v14 reads anyway. A name without an underscore
-is used as it is given.
+documentation names. A name without an underscore is used as it is given.
 
 Impact
 ======

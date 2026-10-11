@@ -9,7 +9,7 @@ Description
 
 A :guilabel:`Bite Jobs List` content element renders through the content
 element layout of the site, like any other content element. The layouts of
-:guilabel:`EXT:fluid_styled_content` and of the bootstrap package render the
+EXT:fluid_styled_content and of the bootstrap package render the
 header and the subheader an editor enters, and the template of the plugin
 rendered them a second time:
 
@@ -33,7 +33,7 @@ It is off by default.
 
 The plugin settings now also carry :typoscript:`settings.defaultHeaderType`,
 mapped from the constant :typoscript:`styles.content.defaultHeaderType` of
-:guilabel:`EXT:fluid_styled_content`, so with the switch on the header layout
+EXT:fluid_styled_content, so with the switch on the header layout
 :guilabel:`Default` renders a heading. See
 :ref:`configuration-general-content-element-header`.
 

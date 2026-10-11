@@ -7,7 +7,7 @@ Important: Contacts without a visible profile are skipped
 Description
 ===========
 
-A contact of a page points at a contract of :guilabel:`EXT:academic_persons`,
+A contact of a page points at a contract of EXT:academic_persons,
 and that contract points at a profile. Both are relations, and Extbase resolves
 a relation with fresh query settings: a hidden contract, or a profile that is
 hidden, outside its start and end time or restricted to a frontend user group
