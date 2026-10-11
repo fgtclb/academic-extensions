@@ -4668,6 +4668,146 @@ entities:
                         space_before_class: 'medium'
                         tx_academicstudyplan_semesters: '501,502,503,504,505,506'
                         tx_academicstudyplan_footer_note: 'Änderungen vorbehalten. Verbindlich ist das Modulhandbuch.'
+          # Several study plans on one page: two elements with plans of their own,
+          # sharing the categories of the storage folder, and two "Insert records"
+          # elements that render the first of them again. Every copy carries the
+          # same content element and module uids, so each "Insert records" element
+          # prefixes the dialog ids of its copy with its own uid (ACE-894).
+          children:
+            - self:
+                  id: 241
+                  title: 'Several study plans'
+                  slug: '/study-plan/several-plans'
+                  backend_layout: 'pagets__default'
+              languageVariants:
+                - self:
+                      id: 741
+                      language: 1
+                      title: 'Mehrere Studienpläne'
+                      slug: '/studienplan/mehrere-plaene'
+                      backend_layout: 'pagets__default'
+              entities:
+                semester:
+                  - self:
+                        id: 9
+                        label: 'Semester 1'
+                        credit_points: 12
+                        modules: '25,26'
+                    languageVariants:
+                      - self:
+                            id: 509
+                            language: 1
+                            label: '1. Semester'
+                            modules: '525,526'
+                  - self:
+                        id: 10
+                        label: 'Semester 1'
+                        credit_points: 10
+                        modules: '27,28'
+                    languageVariants:
+                      - self:
+                            id: 510
+                            language: 1
+                            label: '1. Semester'
+                            modules: '527,528'
+                module:
+                  - self:
+                        id: 25
+                        label: 'Signals and systems'
+                        credit_points: 6
+                        description: '<p>Linear systems, convolution, Fourier analysis.</p>'
+                        categories: '1'
+                    languageVariants:
+                      - self:
+                            id: 525
+                            language: 1
+                            label: 'Signale und Systeme'
+                            description: '<p>Lineare Systeme, Faltung, Fourier-Analyse.</p>'
+                  - self:
+                        id: 26
+                        label: 'Technical English'
+                        credit_points: 6
+                        categories: '2'
+                    languageVariants:
+                      - self:
+                            id: 526
+                            language: 1
+                            label: 'Technisches Englisch'
+                  - self:
+                        id: 27
+                        label: 'Didactics'
+                        credit_points: 5
+                        description: '<p>Planning and evaluating lessons.</p>'
+                        categories: '1'
+                    languageVariants:
+                      - self:
+                            id: 527
+                            language: 1
+                            label: 'Didaktik'
+                            description: '<p>Unterricht planen und auswerten.</p>'
+                  - self:
+                        id: 28
+                        label: 'School law'
+                        credit_points: 5
+                        categories: '3'
+                    languageVariants:
+                      - self:
+                            id: 528
+                            language: 1
+                            label: 'Schulrecht'
+                content:
+                  - self:
+                        id: 67
+                        CType: 'academic_study_plan'
+                        header: 'Electrical engineering, first semester'
+                        header_layout: 2
+                        tx_academicstudyplan_semesters: '9'
+                    languageVariants:
+                      - self:
+                            id: 567
+                            language: 1
+                            CType: 'academic_study_plan'
+                            header: 'Elektrotechnik, erstes Semester'
+                            header_layout: 2
+                            tx_academicstudyplan_semesters: '509'
+                  - self:
+                        id: 68
+                        CType: 'academic_study_plan'
+                        header: 'Teacher training, first semester'
+                        header_layout: 2
+                        tx_academicstudyplan_semesters: '10'
+                    languageVariants:
+                      - self:
+                            id: 568
+                            language: 1
+                            CType: 'academic_study_plan'
+                            header: 'Lehramt, erstes Semester'
+                            header_layout: 2
+                            tx_academicstudyplan_semesters: '510'
+                  - self:
+                        id: 69
+                        CType: 'shortcut'
+                        header: 'Electrical engineering again, as inserted records'
+                        records: 'tt_content_67'
+                    languageVariants:
+                      - self:
+                            id: 569
+                            language: 1
+                            CType: 'shortcut'
+                            header: 'Elektrotechnik noch einmal, als Datensatz eingefügt'
+                            records: 'tt_content_67'
+                  - self:
+                        id: 70
+                        CType: 'shortcut'
+                        header: 'Electrical engineering a third time'
+                        records: 'tt_content_67'
+                    languageVariants:
+                      - self:
+                            id: 570
+                            language: 1
+                            CType: 'shortcut'
+                            header: 'Elektrotechnik ein drittes Mal'
+                            records: 'tt_content_67'
         # "settings.sorting" must never be written empty. "DemandFactory" guards it
         # with isset(), which is true for an empty string, then splits it on a space
         # and reads the second element - so an empty value raises rather than falling

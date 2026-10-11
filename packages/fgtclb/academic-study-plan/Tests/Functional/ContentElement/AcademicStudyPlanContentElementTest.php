@@ -754,4 +754,76 @@ final class AcademicStudyPlanContentElementTest extends AbstractAcademicStudyPla
         $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]/div[contains(concat(" ", normalize-space(@class), " "), " ace-semesters ")]'));
         $this->assertSame(0, $this->nodeCountOf($content, '//div[@data-study-plan]//div[@role="list"]'));
     }
+
+    /**
+     * The dialog ids of every study plan container of the page, container by
+     * container in document order, and the ids its triggers name.
+     *
+     * @return list<array{dialogs: string[], triggers: string[]}>
+     */
+    private function dialogIdsPerPlan(string $html): array
+    {
+        $xpath = $this->parseHtml($html);
+        $containers = $xpath->query('//div[@data-study-plan]');
+        $this->assertInstanceOf(\DOMNodeList::class, $containers);
+
+        $plans = [];
+        foreach ($containers as $container) {
+            $dialogs = [];
+            foreach ($xpath->query('.//dialog[@data-study-plan-dialog]', $container) ?: [] as $dialog) {
+                $this->assertInstanceOf(\DOMElement::class, $dialog);
+                $dialogs[] = $dialog->getAttribute('id');
+            }
+            $triggers = [];
+            foreach ($xpath->query('.//*[@data-study-plan-dialog-trigger]', $container) ?: [] as $trigger) {
+                $this->assertInstanceOf(\DOMElement::class, $trigger);
+                $triggers[] = $trigger->getAttribute('data-dialog-id');
+            }
+            $plans[] = ['dialogs' => $dialogs, 'triggers' => $triggers];
+        }
+
+        return $plans;
+    }
+
+    /**
+     * A plan placed on the page renders the dialog ids it always rendered, so an
+     * installation that addresses a dialog by id sees no change.
+     */
+    #[Test]
+    public function planOnThePageKeepsItsDialogIds(): void
+    {
+        $this->setUpTestCase('studyPlanPage');
+
+        $this->assertSame(
+            [['dialogs' => ['popup-1', 'popup-3'], 'triggers' => ['popup-1', 'popup-3']]],
+            $this->dialogIdsPerPlan($this->renderHomePage()),
+        );
+    }
+
+    /**
+     * An "Insert records" element renders the same content element again, with the
+     * same module uids. Each copy it renders prefixes its dialog ids with the
+     * "Insert records" element, so no dialog id repeats on the page and every
+     * trigger names the dialog of its own copy.
+     */
+    #[Test]
+    public function planInsertedTwiceRendersDialogIdsOfItsOwnPerCopy(): void
+    {
+        $this->setUpTestCase('studyPlanPage_insertedTwice');
+
+        $html = $this->renderHomePage();
+        $plans = $this->dialogIdsPerPlan($html);
+
+        $this->assertSame(
+            [
+                ['dialogs' => ['popup-1', 'popup-3'], 'triggers' => ['popup-1', 'popup-3']],
+                ['dialogs' => ['popup-c2-1', 'popup-c2-3'], 'triggers' => ['popup-c2-1', 'popup-c2-3']],
+                ['dialogs' => ['popup-c3-1', 'popup-c3-3'], 'triggers' => ['popup-c3-1', 'popup-c3-3']],
+            ],
+            $plans,
+        );
+
+        $dialogIds = array_merge(...array_column($plans, 'dialogs'));
+        $this->assertSame($dialogIds, array_values(array_unique($dialogIds)), 'A dialog id repeats on the page');
+    }
 }
