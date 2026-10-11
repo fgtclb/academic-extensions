@@ -1,4 +1,4 @@
-.. _important-ace-847-academic-projects:
+..  _important-ace-847-academic-projects:
 
 ===================================================================
 Important: FlexForm upgrade wizard migrates the setting name of 1.x
@@ -35,7 +35,8 @@ Affected Installations
 ======================
 
 Installations upgraded from 1.x that already ran the wizard. It is recorded as
-done there and is not offered again by itself. Mark it undone and run it:
+done there and is not offered again by itself. Mark it undone and run it, in
+:guilabel:`Admin Tools > Upgrade > Upgrade Wizard` or on the command line:
 
 ..  code-block:: bash
 
@@ -49,4 +50,4 @@ a list keeps its stored 2.x value, ``settings.activeState``,
 setting. A list that was not saved since the upgrade gets the meaning the
 setting had in 1.x.
 
-.. index:: Backend, FlexForm, ext:academic_projects
+..  index:: Backend, FlexForm, ext:academic_projects
