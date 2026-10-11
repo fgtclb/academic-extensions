@@ -86,7 +86,10 @@ single partner, together with :guilabel:`Show on map` (ACE-770,
 ..  code-block:: html
     :caption: EXT:my_sitepackage/Resources/Private/Templates/Pages/AcademicPartner.html
 
-    <f:render partial="Partner/Map" arguments="{partner: partner, map: mapSettings}" />
+    <f:render partial="Partner/Map" arguments="{partner: partner, map: mapSettings, assets: mapAssets}" />
+
+:html:`{mapAssets}` is the switch of the map script, see
+:ref:`feature-1791566502`.
 
 It is deliberately not called "geo located":
 :php:`Domain\Repository\PartnerRepository::findGeoLocated()` also requires a
