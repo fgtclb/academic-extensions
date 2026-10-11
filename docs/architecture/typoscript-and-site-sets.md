@@ -175,7 +175,7 @@ Four of the five extensions with a shared block kept their old path for free:
 the shared folder is the one they always registered. The fifth,
 `academic-partners`, registered its entry under the wrong extension key up to
 2.3, see its
-[`Important-StaticTemplateAndBackendLayoutRegistration.rst`](../../packages/fgtclb/academic-partners/Documentation/Changelog/3.0/Important-StaticTemplateAndBackendLayoutRegistration.rst).
+[`Important-StaticTemplateAndBackendLayoutRegistration.rst`](../../packages/fgtclb/academic-partners/Documentation/Changelog/2.4/Important-StaticTemplateAndBackendLayoutRegistration.rst).
 The other four extensions moved their only TypoScript into a component folder,
 and keep the path of version 2.3 alive on purpose (ACE-745), deprecated since
 2.4 and removed in 4.0:

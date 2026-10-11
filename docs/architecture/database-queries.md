@@ -144,7 +144,7 @@ and `1701857905`.
 exists here — `main` supports v13 and v14 only — so the statement that v12 has
 no guard at all, and the per-DBMS behaviour of a literal `IN ()`, are taken
 from the ACE-349 analysis recorded in
-`packages/fgtclb/typo3-category-types/Documentation/Changelog/3.0/Important-CategoryRepositoryEmptyUidList.rst`
+`packages/fgtclb/typo3-category-types/Documentation/Changelog/2.4/Important-CategoryRepositoryEmptyUidList.rst`
 and not re-checked against a v12 installation. The same applies to the claim
 that both helpers exist since TYPO3 v11.5: only v13.4.34 and v14.3.6 were
 inspected. The v12 case still matters for branch `2`, which supports v12 and
@@ -801,13 +801,13 @@ other asserting that the empty result still has the shape a template expects.
 
 - `AGENTS.md`, section *Database queries* — the condensed form of all three
   rules.
-- `packages/fgtclb/typo3-category-types/Documentation/Changelog/3.0/Important-CategoryRepositoryEmptyUidList.rst`
+- `packages/fgtclb/typo3-category-types/Documentation/Changelog/2.4/Important-CategoryRepositoryEmptyUidList.rst`
   — the ACE-349 changelog entry, including the per-DBMS analysis for TYPO3 v12.
-- `packages/fgtclb/academic-projects/Documentation/Changelog/3.0/Important-FlexFormUpgradeWizardMigratesRecords.rst`
+- `packages/fgtclb/academic-projects/Documentation/Changelog/2.4/Important-FlexFormUpgradeWizardMigratesRecords.rst`
   — the ACE-356 changelog entry, including how to re-run the repaired wizard.
-- `packages/fgtclb/academic-jobs/Documentation/Changelog/3.0/Important-JobContactWizardMigratesInvisibleJobs.rst`:
+- `packages/fgtclb/academic-jobs/Documentation/Changelog/2.4/Important-JobContactWizardMigratesInvisibleJobs.rst`:
   the ACE-887 changelog entry, including how to run the repaired wizard again.
-- `packages/fgtclb/academic-jobs/Documentation/Changelog/3.0/Important-JobContactWizardFindsRenamedTable.rst`:
+- `packages/fgtclb/academic-jobs/Documentation/Changelog/2.4/Important-JobContactWizardFindsRenamedTable.rst`:
   the ACE-895 changelog entry, for installations that let the analyzer rename
   the old contact table first.
 - `.Build/vendor/typo3/cms-core/Classes/Database/Query/QueryBuilder.php` and
