@@ -8,8 +8,8 @@ Description
 ===========
 
 A new boolean plugin option **Show hidden records**
-(:typoscript:`settings.showHiddenRecords`, checkbox/toggle, default off)
-was added to the following plugins:
+(:typoscript:`settings.showHiddenRecords`, a toggle, off by default) was added
+to the following plugins:
 
 * **Projects** (:php:`academicprojects_projectlist`)
 * **Projects (selected)** (:php:`academicprojects_projectlistsingle`)
@@ -18,8 +18,8 @@ Both plugins share the single
 :file:`Configuration/FlexForms/ProjectSettings.xml` data structure.
 
 When the option is enabled, the frontend project listing includes hidden
-(disabled) records, also for visitors without a preview of hidden records.
-Only the `hidden` enable column (`disabled`) is ignored; the `deleted`,
+(disabled) records, also for visitors without a preview of hidden records. Only
+the `hidden` enable column (`disabled`) is ignored. The `deleted`,
 `starttime`/`endtime` and `fe_group` restrictions stay in effect.
 
 On a translated page the listing shows the translation of a hidden record,

@@ -8,34 +8,33 @@ Description
 ===========
 
 The extensions of this set spelled their page TSconfig directory in three
-different ways — :file:`TsConfig`, :file:`TSconfig` and :file:`TSConfig`. They now
-all use :file:`TSconfig`, which is how TYPO3 spells the term and what the core
-documentation uses.
+different ways: :file:`TsConfig`, :file:`TSconfig` and :file:`TSConfig`. They
+now all use :file:`TSconfig`, which is how TYPO3 spells the term and what the
+core documentation uses.
 
 In this extension the directory was :file:`Configuration/TsConfig`.
 
-Nothing was broken before, because every import matched the directory it
-pointed at. The reason to change it is that a filesystem is case sensitive on
-Linux and case insensitive on macOS and Windows, so a path copied between two
-of these extensions resolved on one machine and silently not on another — and
-a page TSconfig :typoscript:`@import` that does not resolve raises no error, the
-configuration is simply absent.
+Nothing was broken before, because every import matched the directory it pointed
+at. The reason to change it is that a filesystem is case sensitive on Linux and
+case insensitive on macOS and Windows, so a path copied between two of these
+extensions resolved on one machine and silently not on another. A page TSconfig
+:typoscript:`@import` that does not resolve raises no error, the configuration
+is simply absent.
 
 This extension additionally registers a selectable static page TSconfig include,
 through :php:`ExtensionManagementUtility::registerPageTSConfigFile()`. The
-registration was updated with the directory — and reorganised again in the same
-release, which changed both its label and the value a page record stores.
+registration was updated with the directory and reorganised in the same release,
+which changed both its label and the value a page record stores.
 
 ..  warning::
 
-    That value is not code, it is **data**: an integrator selected it in the page
-    field :guilabel:`Page TSconfig`, and TYPO3 stored the path in
+    That value is not code, it is **data**: an integrator selected it in the
+    page field :guilabel:`Page TSconfig`, and TYPO3 stored the path in
     :sql:`pages.tsconfig_includes`. The stored path is not rewritten by an
-    update, it simply stops resolving — and an unresolved page TSconfig include
+    update, it simply stops resolving. An unresolved page TSconfig include
     raises nothing at all, so the content element quietly stops being selectable
-    on that page tree. Every page record that selected
-    :guilabel:`Academic StudyPlan (Default) (academic_study_plan)` has to be
-    edited once. See
+    on that page tree. Every page record that selected :guilabel:`Academic
+    StudyPlan (Default) (academic_study_plan)` has to be edited once. See
     :ref:`breaking-site-sets-and-static-templates-restructured` for what to
     select instead.
 
@@ -49,7 +48,7 @@ installs the extension has nothing to do.
 **An integrator who references these paths from their own configuration has to
 update them**, because the old path no longer exists. The files below the
 directory were reorganised in the same release, so the new path is not the old
-one with the spelling corrected — take it from the table in
+one with the spelling corrected. Take it from the table in
 :ref:`breaking-site-sets-and-static-templates-restructured`:
 
 ..  code-block:: typoscript

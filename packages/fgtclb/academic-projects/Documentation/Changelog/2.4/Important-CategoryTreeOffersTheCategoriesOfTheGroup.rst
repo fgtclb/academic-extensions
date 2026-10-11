@@ -10,10 +10,10 @@ Description
 The :guilabel:`Categories` field of the project list and selected projects
 plugins offered every category that had a type, including the categories of
 other extensions, such as degrees or the regions of partners. The plugins only
-ever use the categories of the :php:`projects` group and silently ignored any
+ever use the categories of the :yaml:`projects` group and silently ignored any
 other selection.
 
-The tree now offers the categories that carry a type of the :php:`projects`
+The tree now offers the categories that carry a type of the :yaml:`projects`
 group, and the categories above them, so a category of the group below a parent
 of another type or of none is still reachable. Such a parent can be selected
 and is ignored, as before. Types an integrator adds to the group are offered
