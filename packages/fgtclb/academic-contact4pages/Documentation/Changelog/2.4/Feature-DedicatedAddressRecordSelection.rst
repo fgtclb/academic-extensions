@@ -33,21 +33,21 @@ Each select offers two options besides the address records themselves:
 The narrowing is applied by the contact record itself, so it takes effect in
 the :guilabel:`Contacts for this page` plugin, in the page based rendering
 through :php:`ContactsProcessor` and in project templates built on either of
-them - they all reach the address records through
+them. They all reach the address records through
 :php:`Contact::getContract()`. :php:`Contact::getUnfilteredContract()` returns
 the contract with all of its address records.
 
 Only default language records are offered: the selection is shared by all
 translations of a contact, and the frontend resolves the language overlay of
 the address records itself. Deleted records are not offered. Hidden ones are,
-marked with a :guilabel:`[Hidden]` prefix - whether they reach the frontend is
+marked with a :guilabel:`[Hidden]` prefix. Whether they reach the frontend is
 decided by the plugin, see below.
 
 Impact
 ======
 
 Editors can restrict a page contact to a single email address, phone number
-and physical address of the contract, or suppress a kind completely - for
+and physical address of the contract, or suppress a kind completely, for
 example to publish the office phone number of a person on one page and the
 private one on another, from the same contract.
 
@@ -57,8 +57,8 @@ Hidden address records reach the frontend only through the
 is enabled, the same option that decides about hidden contacts. That covers both
 ways of displaying them: with the option enabled a hidden record is part of
 :guilabel:`Display all` and can be selected as the single one to display.
-Everywhere else - the page based rendering through :php:`ContactsProcessor`
-included - hidden records are left out, and a selection pointing at one behaves
+Everywhere else, the page based rendering through :php:`ContactsProcessor`
+included, hidden records are left out, and a selection pointing at one behaves
 like :guilabel:`Do not display`.
 
 A selection that cannot be resolved at all behaves the same way and renders
@@ -71,9 +71,11 @@ publishing nothing.
 Affected Installations
 ======================
 
-All installations using the `EXT:academic_contacts4pages` extension starting
-with version 2.4. The three new columns default to :guilabel:`Display all`, so
-existing contact records keep their current frontend output and no migration
-is required. A database compare has to be applied for the new columns.
+All installations of `EXT:academic_contacts4pages`. The three new columns
+default to :guilabel:`Display all`, so existing contact records keep their
+current frontend output and no data migration is required. Apply the database
+compare in :guilabel:`Admin Tools > Maintenance > Analyze Database Structure`,
+or with :bash:`vendor/bin/typo3 extension:setup`, to add the new columns.
+TYPO3 v12 and v13 behave alike here.
 
 .. index:: Backend, Frontend, Database, ext:academic_contacts4pages

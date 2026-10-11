@@ -1,4 +1,4 @@
-.. _important-project-rich-text-uses-parse-func:
+.. _important-project-rich-text-uses-parse-func-3-0:
 
 ========================================================
 Important: The rich text of a project resolves its links

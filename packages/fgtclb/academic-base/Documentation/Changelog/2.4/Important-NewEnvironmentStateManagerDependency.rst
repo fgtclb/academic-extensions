@@ -7,35 +7,35 @@ Important: New required dependency `fgtclb/environment-state-manager`
 Description
 ===========
 
-:php:`EXT:academic_base` now depends on the standalone extension
-`fgtclb/environment-state-manager` and declares it consistently in both
-:file:`composer.json` (:php:`"fgtclb/environment-state-manager": "^1.0"`) and
-:file:`ext_emconf.php` (:php:`'environment_state_manager' => '1.0.0-1.99.99'`).
+EXT:academic_base now depends on the standalone extension
+:composer:`fgtclb/environment-state-manager` and declares it in both
+:file:`composer.json` (`"fgtclb/environment-state-manager": "^1.0"`) and
+:file:`ext_emconf.php` (`'environment_state_manager' => '1.0.0-1.99.99'`).
 
 The dependency is the counterpart of the deprecation
 :ref:`deprecation-1783574951`: the environment, state-manager and
-environment-builder subsystem that :php:`EXT:academic_base` shipped internally
-was extracted into that extension, and the deprecated
-:php:`\FGTCLB\AcademicBase\Environment` classes now delegate to it. Requiring
-the extension therefore is mandatory for the deprecated subsystem to keep
-resolving until it is removed in :php:`EXT:academic_base` 3.0.0.
+environment-builder subsystem that EXT:academic_base shipped internally was
+extracted into that extension, and the deprecated
+:php:`\FGTCLB\AcademicBase\Environment` classes now delegate to it. The
+extension is therefore required for the deprecated subsystem to keep working
+until it is removed in version 3.0.
 
 Impact
 ======
 
-Composer-managed installations pull `fgtclb/environment-state-manager` in
-automatically when :php:`EXT:academic_base` is updated to 2.4; no action is
+Composer-managed installations pull :composer:`fgtclb/environment-state-manager`
+in automatically when EXT:academic_base is updated to 2.4. No action is
 required.
 
-Classic, non-composer installations (TER / extension manager) must install the
-`environment_state_manager` extension in addition to :php:`EXT:academic_base`,
-otherwise the extension cannot be activated.
+Classic, non-Composer installations (TER, extension manager) must install the
+extension `environment_state_manager` in addition to EXT:academic_base.
+Otherwise the extension cannot be activated.
 
 Affected Installations
 ======================
 
-Only non-composer installations updating to :php:`EXT:academic_base` 2.4 need
-to install the additional extension manually. Composer-managed installations
-are unaffected.
+Only non-Composer installations updating EXT:academic_base to 2.4 need to
+install the additional extension manually. Composer-managed installations are
+unaffected.
 
 .. index:: PHP, ext:academic_base

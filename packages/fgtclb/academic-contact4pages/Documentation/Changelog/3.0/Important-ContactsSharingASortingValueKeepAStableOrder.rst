@@ -1,4 +1,4 @@
-.. _important-contacts-sharing-a-sorting-value-keep-a-stable-order:
+.. _important-contacts-sharing-a-sorting-value-keep-a-stable-order-3-0:
 
 ===============================================================
 Important: Contacts sharing a sorting value keep a stable order

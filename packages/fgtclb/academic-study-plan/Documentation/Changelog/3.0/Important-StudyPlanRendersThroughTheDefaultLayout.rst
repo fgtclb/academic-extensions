@@ -1,4 +1,4 @@
-..  _important-study-plan-renders-through-the-default-layout:
+..  _important-study-plan-renders-through-the-default-layout-3-0:
 
 ============================================================
 Important: The study plan renders through the Default layout

@@ -12,7 +12,7 @@ static template read :file:`Configuration/TypoScript/`, and the site set
 :yaml:`fgtclb/academic-projects` shipped its own :file:`constants.typoscript`
 and :file:`setup.typoscript`, each of them a single :typoscript:`@import` of
 that folder. The page TSconfig existed only as the wizard file
-:file:`Configuration/TSconfig/Wizards/NewContentElement.tsconfig` and was not
+:file:`Configuration/TsConfig/Wizards/NewContentElement.tsconfig` and was not
 selectable on a page at all.
 
 Both mechanisms now read one physical copy of every file, and both of them
@@ -25,8 +25,8 @@ deliver the extension per component instead of as one block:
     a one-line :file:`include_static_file.txt`.
 *   :file:`Configuration/TypoScript/ProjectList/` and
     :file:`Configuration/TypoScript/ProjectListSingle/` are the two component
-    folders — what the static template registers *and* what the matching set
-    points its :yaml:`typoscript` key at.
+    folders. They are what the static template registers *and* what the matching
+    set points its :yaml:`typoscript` key at.
 *   :file:`Configuration/TSconfig/<Component>/page.tsconfig` holds the page
     TSconfig of a component and is what the page field :guilabel:`Page TSconfig`
     offers *and* what the set points its :yaml:`pagets` key at.
@@ -34,13 +34,17 @@ deliver the extension per component instead of as one block:
     :file:`Configuration/TSconfig/Full/page.tsconfig` are the aggregates for
     installations that do not use site sets.
 
+The directory :file:`Configuration/TsConfig/` is now spelled
+:file:`Configuration/TSconfig/`, the spelling TYPO3 itself uses for the term.
+Every path below it changed with it, and the migration table lists them.
+
 The content elements are now **hidden by default**. The always-included
-:file:`Configuration/page.tsconfig` removes both content element types from
-the selectable ones, and the page TSconfig of a component adds its own back — so
-an element is offered where it is wanted instead of on every page of every
-installation. The TCA registration itself did not move, so the frontend renders
-existing records exactly as before. Editing such a record in the backend is a
-different matter — read the warning below before upgrading.
+:file:`Configuration/page.tsconfig` removes both content element types from the
+selectable ones, and the page TSconfig of a component adds its own back. An
+element is therefore offered where it is wanted instead of on every page of
+every installation. The TCA registration itself did not move, so the frontend
+renders existing records exactly as before. Editing such a record in the backend
+needs care. Read the warning below before upgrading.
 
 The :typoscript:`styles.content.getContent` override that
 :file:`Configuration/TypoScript/setup.typoscript` used to import unconditionally
@@ -80,9 +84,8 @@ page field :guilabel:`Page TSconfig`.
     adds for a stored value it does not know, and the stored value is dropped
     from the form data as well. The field :guilabel:`Type` therefore comes up
     with nothing selected, and **saving the record writes whatever the browser
-    preselected into** :sql:`CType` — the record silently becomes another
-    content element. The frontend keeps rendering it correctly until that
-    happens.
+    preselected into** :sql:`CType`. The record silently becomes another content
+    element. The frontend keeps rendering it correctly until that happens.
 
     Include the page TSconfig of the component on every page tree that holds
     such records, and do it before editing them.
@@ -98,6 +101,14 @@ page field :guilabel:`Page TSconfig`.
 
 The set :yaml:`fgtclb/academic-projects` keeps its name and keeps delivering
 everything, so a site configuration that depends on it needs no change.
+
+Site sets arrived in TYPO3 v13.1 and do nothing at all on TYPO3 v12: the core
+has no set API there and the folder :file:`Configuration/Sets/` is never read.
+Everything above about the static templates and the page field :guilabel:`Page
+TSconfig` therefore applies to both TYPO3 versions this extension supports, and
+everything about sets applies to TYPO3 v13 only. An installation on v12 has to
+add the page TSconfig entry described under :guilabel:`Migration`, and has no
+alternative to it.
 
 Affected Installations
 ======================
@@ -126,10 +137,14 @@ Adjust every :typoscript:`@import` in an own site package:
         -   `EXT:academic_projects/Configuration/TypoScript/ContentLoad/setup.typoscript`
     *   -   `EXT:academic_projects/Configuration/TypoScript/Content/`
         -   `EXT:academic_projects/Configuration/TypoScript/ContentLoad/`
-    *   -   `EXT:academic_projects/Configuration/TSconfig/Wizards/NewContentElement.tsconfig`
+    *   -   `EXT:academic_projects/Configuration/TsConfig/Wizards/NewContentElement.tsconfig`
         -   `EXT:academic_projects/Configuration/TSconfig/Full/page.tsconfig`
-    *   -   `EXT:academic_projects/Configuration/TSconfig/Wizards/*.tsconfig`
+    *   -   `EXT:academic_projects/Configuration/TsConfig/Wizards/*.tsconfig`
         -   `EXT:academic_projects/Configuration/TSconfig/Full/page.tsconfig`
+    *   -   `EXT:academic_projects/Configuration/TsConfig/BackendLayouts/AcademicProject.tsconfig`
+        -   `EXT:academic_projects/Configuration/TSconfig/BackendLayouts/AcademicProject.tsconfig`
+    *   -   `EXT:academic_projects/Configuration/TsConfig/BackendLayouts/*.tsconfig`
+        -   `EXT:academic_projects/Configuration/TSconfig/BackendLayouts/*.tsconfig`
     *   -   `EXT:academic_projects/Configuration/Sets/AcademicProjects/constants.typoscript`
         -   Removed. It was a one-line :typoscript:`@import` of the file above
             it in this table.
@@ -147,7 +162,7 @@ label:
     *   -   :guilabel:`Academic Projects (academic_projects)`,
             stored as `EXT:academic_projects/Configuration/TypoScript/`
         -   :guilabel:`Academic Projects: Shared plugin settings and page
-            rendering (academic_projects)`, same stored value — or
+            rendering (academic_projects)`, same stored value, or
             :guilabel:`Academic Projects: All components (academic_projects)`,
             stored as `EXT:academic_projects/Configuration/TypoScript/Full`,
             which also carries the content load override.
@@ -159,10 +174,11 @@ the site root, tab :guilabel:`Resources`, field :guilabel:`Page TSconfig`:
 the content elements are not selectable any more, and existing records of them
 lose their :sql:`CType` when they are saved from the backend form.
 
-Sites that use the site set instead need no migration — but they must not use
-both mechanisms at once, see the :guilabel:`Configuration` chapter.
+Sites that use the site set instead need no migration. They must not use both
+mechanisms at once, see the :guilabel:`Configuration` chapter.
 
-A site configuration may name the new component sets instead of the aggregate:
+A site configuration on TYPO3 v13 may name the new component sets instead of
+the aggregate:
 
 ..  list-table::
     :header-rows: 1
@@ -177,7 +193,7 @@ A site configuration may name the new component sets instead of the aggregate:
         -   The :guilabel:`Projects (selected)` content element only.
     *   -   `fgtclb/academic-projects-content-load`
         -   The :typoscript:`styles.content.getContent` override only. The
-            aggregate depends on it; name the component sets above without it to
+            aggregate depends on it. Name the component sets above without it to
             opt out.
 
 ..  index:: TypoScript, TSConfig, Backend, ext:academic_projects

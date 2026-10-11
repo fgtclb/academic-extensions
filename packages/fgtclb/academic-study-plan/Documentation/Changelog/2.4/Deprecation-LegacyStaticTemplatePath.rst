@@ -21,12 +21,8 @@ path gets what :guilabel:`Academic Study Plan: All components
 (academic_study_plan)` delivers, and an import of the two files gets what an
 import of the files in :file:`Configuration/TypoScript/ContentElement/` gets.
 
-In version 2.3 the folder also added the stylesheet and the script of the
-content element to every page. The content element template registers them
-itself now, switchable with
-:typoscript:`plugin.tx_academicstudyplan.assets.css` and
-:typoscript:`plugin.tx_academicstudyplan.assets.js`, so the path does not add
-them to the page.
+The stylesheet and the script of the content element are added to the page
+object by the setup of the component, as the folder of version 2.3 did.
 
 The path is offered in the static template list again, as :guilabel:`Academic
 Study Plan: Path up to 2.3 (deprecated, use All components)
@@ -41,7 +37,7 @@ will be removed in version 4.0.
     :file:`EXT:academic_study_plan/Configuration/TypoScript/Default/setup.typoscript`
     has to import
     :file:`EXT:academic_study_plan/Configuration/TypoScript/Default/constants.typoscript`
-    into its constants as well — otherwise the template paths stay unresolved,
+    into its constants as well. Otherwise the template paths stay unresolved,
     and the content element cannot find its template.
 
 Impact
@@ -54,9 +50,7 @@ or imports its files, keeps its content element configuration.
 A site that depends on the site set and still stores the path of version 2.3 in
 its :sql:`sys_template` record, or imports its files, reads the TypoScript
 twice, as it did in version 2.3. See :ref:`one-mechanism-per-site` for what
-that costs. From version 3.0 on, the command :bash:`academic:upgrade:check`
-reports a site that combines the site set with a static template of the same
-extension.
+that costs.
 
 Affected Installations
 ======================
@@ -71,11 +65,11 @@ Migration
 =========
 
 Select :guilabel:`Academic Study Plan: All components (academic_study_plan)` in
-the :sql:`sys_template` record instead of the path up to 2.3, or depend on the
-set :yaml:`fgtclb/academic-study-plan` in the site configuration.
+the :sql:`sys_template` record instead of the path up to 2.3, or, on TYPO3 v13,
+depend on the set :yaml:`fgtclb/academic-study-plan` in the site configuration.
 
 Replace an import of the old files with the files in
 `EXT:academic_study_plan/Configuration/TypoScript/ContentElement/`, or remove
-it when the site depends on the site set.
+it when the site depends on the site set on TYPO3 v13.
 
 ..  index:: TypoScript, ext:academic_study_plan

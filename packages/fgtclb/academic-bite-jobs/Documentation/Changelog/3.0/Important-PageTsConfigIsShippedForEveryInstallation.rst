@@ -1,4 +1,4 @@
-.. _important-1787054400:
+.. _important-1787054400-3-0:
 
 ===================================================================
 Important: The extension ships page TSconfig for every installation

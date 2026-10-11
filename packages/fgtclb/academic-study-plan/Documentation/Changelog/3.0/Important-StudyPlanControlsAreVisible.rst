@@ -1,4 +1,4 @@
-..  _important-study-plan-controls-are-visible:
+..  _important-study-plan-controls-are-visible-3-0:
 
 ==============================================
 Important: The study plan controls are visible

@@ -1,4 +1,4 @@
-..  _important-items-proc-func-helper-passes-the-field-ts-config:
+..  _important-items-proc-func-helper-passes-the-field-ts-config-3-0:
 
 ===========================================================
 Important: The select item helper passes the field TSconfig

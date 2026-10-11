@@ -19,7 +19,8 @@ demand pipeline gained a new transport flag:
   demand object.
 * :php:`\FGTCLB\AcademicProjects\Domain\Repository\ProjectRepository::findByDemand()`
   honours the flag: when it is :php:`true`, the query ignores only the
-  `disabled` (`hidden`) enable field via the Extbase query settings.
+  :php:`disabled` enable field, the :sql:`hidden` column, through the
+  Extbase query settings.
 
 The public method signatures of :php:`DemandFactory::createDemandObject()`
 and :php:`ProjectRepository::findByDemand()` are unchanged.
@@ -39,4 +40,4 @@ Only installations that extend or replace the :php:`ProjectDemand` DTO,
 the :php:`DemandFactory` or the :php:`ProjectRepository` need to take the
 added flag into account. All other installations are unaffected.
 
-.. index:: PHP, ext:academic_projects
+.. index:: PHP-API, ext:academic_projects

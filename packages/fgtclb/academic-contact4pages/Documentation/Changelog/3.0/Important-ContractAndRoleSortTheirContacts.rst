@@ -1,4 +1,4 @@
-.. _important-contract-and-role-sort-their-contacts:
+.. _important-contract-and-role-sort-their-contacts-3-0:
 
 ========================================================================
 Important: Contracts and contacts roles sort their contacts on their own

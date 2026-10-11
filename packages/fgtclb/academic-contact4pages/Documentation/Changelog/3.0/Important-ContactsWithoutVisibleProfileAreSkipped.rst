@@ -1,4 +1,4 @@
-.. _important-contacts-without-visible-profile-are-skipped:
+.. _important-contacts-without-visible-profile-are-skipped-3-0:
 
 =========================================================
 Important: Contacts without a visible profile are skipped

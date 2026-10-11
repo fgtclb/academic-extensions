@@ -1,4 +1,4 @@
-..  _feature-restrict-the-contract-select:
+..  _feature-restrict-the-contract-select-3-0:
 
 =====================================
 Feature: Restrict the contract select
