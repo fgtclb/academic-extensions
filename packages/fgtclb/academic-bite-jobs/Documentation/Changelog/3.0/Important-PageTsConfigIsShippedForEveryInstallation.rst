@@ -1,55 +1,33 @@
-.. _important-1787054400-3-0:
+.. _important-ace-458-academic-bite-jobs-wizard-show:
 
-===================================================================
-Important: The extension ships page TSconfig for every installation
-===================================================================
+==================================================================
+Important: The wizard entry no longer lists the element under show
+==================================================================
 
 Description
 ===========
 
-The page TSconfig of this extension used to be reachable through the site set
-:yaml:`fgtclb/academic-bite-jobs` and through nothing else: the new content
-element wizard entry lived in
-:file:`Configuration/TSconfig/Wizards/NewContentElement.tsconfig`, and the only
-file importing it was :file:`Configuration/Sets/AcademicBiteJobs/page.tsconfig`.
-On a site that did not enable that set, the page TSconfig of this extension was
-never read at all.
+Version 2.4 moved the entry of the content element in the new content element
+wizard into :file:`Configuration/TSconfig/List/page.tsconfig`, together with the
+line :typoscript:`show := addToList(academicbitejobs_list)` that TYPO3 v12 needs
+to offer it, see :ref:`important-1787054400`.
 
-:file:`Configuration/page.tsconfig` of an extension is auto-included for the
-whole installation since TYPO3 v12.0 (Feature: #96614), and this extension
-shipped no such file — the only one of these extensions that ships page TSconfig
-and did not. It ships one now, so what has to hold on every installation no
-longer depends on the site configuration.
-
-What that file carries is the hide-by-default half of the configuration: it
-removes :typoscript:`academicbitejobs_list` from the selectable content element
-types for the whole installation. The wizard entry and the matching re-enable
-moved to :file:`Configuration/TSconfig/List/page.tsconfig`, which a site reaches
-through the site set :yaml:`fgtclb/academic-bite-jobs-list` or through the page
-field :guilabel:`Page TSconfig` — so the content element is offered where it is
-wanted rather than everywhere, and the decision no longer depends on whether a
-site happens to enable a set.
+That line is dropped. TYPO3 v13 and v14 build the wizard from TCA (Feature:
+#102834), and :php:`NewContentElementController` has no reader for the
+:typoscript:`show` list on either version. Both drop an element whose value
+appears in :typoscript:`TCEFORM.tt_content.CType.removeItems` before rendering,
+so the component page TSconfig still decides where the element is offered.
 
 Impact
 ======
 
-On TYPO3 v13 and v14 the wizard entry is not what makes the content element
-selectable: the wizard is built from TCA since Feature: #102834, and both
-versions drop an element whose value appears in
-:typoscript:`TCEFORM.tt_content.CType.removeItems` before rendering. The
-:typoscript:`show := addToList()` line the file used to carry was dropped with
-this release — :php:`NewContentElementController` has no reader for it on either
-supported version.
-
-Where the content element is offered, and what an installation has to do about
-it, is described in
-:ref:`breaking-site-sets-and-static-templates-restructured`.
+None. The content element is offered where the page TSconfig of its component
+is included, as before.
 
 Affected Installations
 ======================
 
-All installations of this extension. What to do is in the Breaking entry
-referenced above; this entry only records that the extension now ships a page
-TSconfig file that is read without any site configuration.
+None have to act. A site package that copied the :typoscript:`show` line can
+drop it.
 
 .. index:: TSConfig, Backend, ext:academic_bite_jobs

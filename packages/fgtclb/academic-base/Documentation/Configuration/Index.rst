@@ -75,7 +75,7 @@ enabled on its page.
 This covers every content element in the :guilabel:`Academic` group, without
 any configuration. Content types of other extensions keep the behaviour of
 TYPO3, which selects the first available option instead. See
-:ref:`important-1789465200`.
+:ref:`important-ace-666-academic-base`.
 
 ..  _site-set:
 

@@ -43,7 +43,7 @@ Migration
 
 Remove the subclass, and the :php:`configurePlugin()` call or the XCLASS
 registration that points at it, so the shipped controller serves the plugin
-again. Move each override to its replacement, see :ref:`feature-1790774400`:
+again. Move each override to its replacement, see :ref:`feature-1790774401`:
 
 *   Changing the request to B-ITE, its filter, channel, locale, sorting or
     paging: a listener of

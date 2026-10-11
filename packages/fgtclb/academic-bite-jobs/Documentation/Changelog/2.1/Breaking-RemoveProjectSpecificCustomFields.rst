@@ -67,24 +67,24 @@ fields and options
 Migration
 =========
 
-The settings stay in the stored FlexForm of a content element. From version 3.0
+The settings stay in the stored FlexForm of a content element. From version 2.4
 on the upgrade wizard `academicBiteJobs_listViewFlexFormUpgradeWizard` removes
 them; until then `settings.jobs.groupBy` still reaches the plugin and groups the
 list by a field the job postings no longer carry.
 
 The same version renamed the view values `ListView`, `CardView` and `TableView`
 of the plugin settings to `List`, `Card` and `Table` without migrating them, so
-a content element saved with 2.0 failed to render. From version 3.0 on the old
+a content element saved with 2.0 failed to render. From version 2.4 on the old
 values render again, and the upgrade wizard
 `academicBiteJobs_listViewFlexFormUpgradeWizard` rewrites them, see
-:ref:`important-1789660800`.
+:ref:`important-1789660801`.
 
-The grouping of the job list is configured in TypoScript since version 3.0,
+The grouping of the job list is configured in TypoScript since version 2.4,
 with `plugin.tx_academicbitejobs.settings.jobs.groupBy`, see
 :ref:`configuration-general-group-by`.
 
 The filter by a custom field and the grouping by its value are possible again
-since version 3.0, with two event listeners of the project and the TypoScript
-setting above, see :ref:`feature-1790774400` and :ref:`developers-example`.
+since version 2.4, with two event listeners of the project and the TypoScript
+setting above, see :ref:`feature-1790774401` and :ref:`developers-example`.
 
 .. index:: FlexForm, Fluid, Frontend

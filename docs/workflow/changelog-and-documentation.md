@@ -326,7 +326,7 @@ still change every page an installation serves: a list that comes out in a
 different order, a link target that is suddenly dialable, a row that used to
 render empty. Somebody sees that after an update and goes looking for what caused
 it, and the changelog is where they look.
-`academic-persons/Documentation/Changelog/3.0/Important-PaginatedSelectionKeepsItsOrder.rst`
+`academic-persons/Documentation/Changelog/2.4/Important-PaginatedSelectionKeepsItsOrder.rst`
 is that shape exactly: a controller fix, no surface touched, one `Important`
 entry.
 
