@@ -47,10 +47,12 @@ here because a small override makes it easy to forget the second line.
 Impact
 ======
 
-The heading of every contact carries the class
-`academic-persons-item__name` next to the `card-title` it had, and the image
-carries `academic-persons-item__image` next to its existing classes. No class
-was removed.
+The heading of every contact carries the classes `ace-title ace-name`, and the
+image `ace-image`, the speaking classes of the profile item of
+`EXT:academic_persons`. The class `academic-persons-item` and the classes of
+the Bootstrap card, `card`, `card-title` and `card-img-top`, are gone. The
+classes of the item are listed in the chapter :guilabel:`Styling` of
+`EXT:academic_persons`.
 
 Affected Installations
 ======================

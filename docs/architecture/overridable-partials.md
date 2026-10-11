@@ -84,15 +84,15 @@ so it renders that one and is not affected either way.)
 
 ## Classes are added, never moved
 
-Every new partial that renders an element of its own gets a class next to the
-classes that were already there, never instead of one, because project
-stylesheets build on them. The frontend partials of jobs, b-ite jobs, contacts,
-partners, programs, projects and the study plan carry speaking classes with the
+The frontend partials of every extension carry speaking classes with the
 prefix `ace-`, named after what an element is (`ace-item`, `ace-list`,
-`ace-attribute`, `ace-label`, `ace-value`), the persons partials their BEM
-classes and `card`, `card-title` and `card-img-top`. A partial that renders no
-element, a value partial or an empty hook, gets no class, because a wrapper
-element would be a markup change.
+`ace-attribute`, `ace-label`, `ace-value`). They replaced the theme and block
+classes of all templates once, with ACE-818, before the 3.0 release. From that
+release on, every new partial that renders an element of its own gets a class
+next to the classes that are already there, never instead of one, because
+project stylesheets build on them. A partial that renders no element, a value
+partial or an empty hook, gets no class, because a wrapper element would be a
+markup change.
 
 Four systems of Bootstrap stay in the speaking markup on purpose, because a
 site builds on them and has nothing to gain from a renamed copy: the
@@ -103,17 +103,19 @@ speaking class sits next to them where an element needs telling apart, such as
 `ace-status visually-hidden` on the status line of the program finder. A site
 without Bootstrap provides these classes itself.
 
-The block the class names is the block the element is **in**, which is not
-always the partial's folder. `Profile/List/Items.html` and
-`Profile/List/EmptyState.html` live under `List/` but render inside the list,
-the card, the selected profiles and the selected contracts alike, so they are
-blocks of their own (`academic-persons-grid`, `academic-persons-empty-state`)
-rather than `academic-persons-list__…`. A class is a published contract from the
-release on, so this is decided before it ships, not after.
+The class names the element, not the folder of its partial or the plugin it
+renders in. `Profile/List/Items.html` and `Profile/List/EmptyState.html` live
+under `List/` but render inside the list, the card, the selected profiles and
+the selected contracts alike, and they carry `ace-itemlist` and `ace-empty` in
+all of them. What tells the plugins apart is the outermost element alone,
+`academic-persons-list`, `academic-persons-card` and so on. A class is a
+published contract from the release on, so this is decided before it ships,
+not after.
 
 Where a class belongs to a heading that a shared partial renders, it is passed
 through that partial's existing `class` argument rather than wrapped in
-a new element.
+a new element, `ace-name` on the name of a profile and `ace-group-header` on
+the heading of a group of the profile list for example.
 
 ## An empty partial is a legitimate partial
 
@@ -186,3 +188,7 @@ and that second registration gets a test of its own in that extension.
   plugin's output.
 - [Fixture extensions](../testing/fixture-extensions.md) — how an override
   fixture is wired.
+- [Styling](../../packages/fgtclb/academic-base/Documentation/Styling/Index.rst)
+  in the manual of `academic_base`: the class system of the frontend markup
+  for integrators, with a chapter of the same name in the manual of every
+  extension that renders frontend markup.

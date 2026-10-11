@@ -18,8 +18,9 @@ the templates render them: the grid classes `row` and `col-*`, the button
 classes `btn` and `btn-*` and `visually-hidden`. No other theme class is
 rendered any more, and the extension ships no styles for the new classes.
 
-The card of a contact is the profile card of `EXT:academic_persons`, which
-keeps its classes.
+The card of a contact is the profile item of `EXT:academic_persons`, which
+carries the speaking classes of that extension, see the chapter
+:guilabel:`Styling` of its manual.
 
 ..  list-table::
     :header-rows: 1

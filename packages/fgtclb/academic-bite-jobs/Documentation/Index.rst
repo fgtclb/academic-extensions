@@ -69,6 +69,10 @@ advertisements are also available in the plugin.
 
         Override and customise the frontend templates.
 
+    ..  card:: :ref:`Styling <styling>`
+
+        The classes of the job list and how a site package styles it.
+
     ..  card:: :ref:`For developers <developers>`
 
         Change the request to B-ITE and the postings it returns with event
@@ -92,6 +96,7 @@ advertisements are also available in the plugin.
     Installation/Index
     Configuration/Index
     Templates/Index
+    Styling/Index
     Developers/Index
     KnownProblems/Index
     Changelog/Changelog-3

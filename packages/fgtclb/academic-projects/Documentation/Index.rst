@@ -66,6 +66,11 @@ project managers, research participants or cooperation partners.
 
         Override and customise the frontend templates.
 
+    ..  card:: :ref:`Styling <styling>`
+
+        The classes of the project list and the project page, and how a site
+        package styles them.
+
     ..  card:: :ref:`For developers <developers>`
 
         The events both project list plugins dispatch, and what a listener
@@ -89,6 +94,7 @@ project managers, research participants or cooperation partners.
     Installation/Index
     Configuration/Index
     Templates/Index
+    Styling/Index
     Developers/Index
     KnownProblems/Index
     Changelog/Changelog-3

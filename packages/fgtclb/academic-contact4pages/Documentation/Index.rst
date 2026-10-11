@@ -59,6 +59,10 @@ for all academic extensions on the `extension points page of academic_base
 
         Configure the extension and its plugin for your installation.
 
+    ..  card:: :ref:`Styling <styling>`
+
+        The classes of the contact list and how a site package styles it.
+
     ..  card:: :ref:`For developers <developers>`
 
         Change which contacts a page shows with an event listener.
@@ -80,6 +84,7 @@ for all academic extensions on the `extension points page of academic_base
     Introduction/Index
     Installation/Index
     Configuration/Index
+    Styling/Index
     Developers/Index
     KnownProblems/Index
     Changelog/Changelog-3
