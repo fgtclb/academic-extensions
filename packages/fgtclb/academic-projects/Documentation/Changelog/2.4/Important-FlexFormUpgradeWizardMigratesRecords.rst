@@ -1,4 +1,4 @@
-.. _important-1785796200:
+..  _important-1785796200:
 
 =======================================================
 Important: The FlexForm upgrade wizard migrates records
@@ -25,9 +25,9 @@ statement on the query builder of the enclosing `SELECT`:
         ->executeStatement();
 
 A named parameter is bound to the query builder that created it, so the
-statement carried a placeholder whose value was never bound to it — while
-`set()` had created a placeholder of its own on the update builder, holding the
-new FlexForm XML. The first record therefore ran
+statement carried a placeholder whose value was never bound to it. At the same
+time :php:`set()` had created a placeholder of its own on the update builder,
+holding the new FlexForm XML. The first record therefore ran
 
 ..  code-block:: sql
 
@@ -85,8 +85,8 @@ Migration
 =========
 
 Run the upgrade wizard again. An installation that already executed it has it
-recorded as done, so it has to be marked undone first — in the Install Tool
-under :guilabel:`Upgrade > Upgrade Wizard`, or on the command line:
+recorded as done, so it has to be marked undone first, in
+:guilabel:`Admin Tools > Upgrade > Upgrade Wizard` or on the command line:
 
 ..  code-block:: bash
 
@@ -96,4 +96,4 @@ under :guilabel:`Upgrade > Upgrade Wizard`, or on the command line:
 Running it again is safe: the wizard only rewrites a FlexForm that still
 contains one of the old setting names and leaves every other record untouched.
 
-.. index:: Database, FlexForm, Backend, NotScanned
+..  index:: Database, FlexForm, Backend, NotScanned, ext:academic_projects
