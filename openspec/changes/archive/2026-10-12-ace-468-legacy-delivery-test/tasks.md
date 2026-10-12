@@ -84,7 +84,7 @@
 
 ## 5. Recorded durations
 
-- [ ] 5.1 After the first green CI run of the pull request, refresh the four
+- [x] 5.1 After the first green CI run of the pull request, refresh the four
   `Build/phpunit/FunctionalTestTimes-<dbms>.json` from its v13 JUnit
   artifacts of one PHP version with `-s recordFunctionalTestTimes`, as
   `docs/development/environment.md` describes (decision 3). Verify that the
@@ -100,8 +100,8 @@
   `functional -j auto` on SQLite, `-d postgres -b docker -j 8` and
   `-d mariadb -j 8` green with `-t 13`, and the class alone with `-d mysql`.
 - [x] 6.4 `lintMarkdown -n` green.
-- [ ] 6.5 The red run of 1.2, the cause check of 1.3 and the failure proofs of
+- [x] 6.5 The red run of 1.2, the cause check of 1.3 and the failure proofs of
   2.3 and 2.4 are written down in the pull request description.
 - [x] 6.6 Commit message in TYPO3 Core format, `[TASK] ACE-468: ...`, footer
   `Resolves: ACE-468`, no attribution of any kind.
-- [ ] 6.7 Archive the change as the last commit of the same pull request.
+- [x] 6.7 Archive the change as the last commit of the same pull request.
