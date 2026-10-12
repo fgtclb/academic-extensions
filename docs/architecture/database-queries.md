@@ -194,7 +194,7 @@ $queryBuilder->expr()->in(
 
 That is the form used in
 `packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php:337-340`,
-and in `academic-persons/Classes/Upgrades/ListTypeToCTypeUpgradeWizard.php:129-132`
+and in `academic-persons/Classes/Upgrades/ListTypeToCTypeUpgradeWizard.php:131-134`
 with `PARAM_STR_ARRAY`. Doctrine expands an array parameter when the statement
 is prepared, and an empty one becomes the literal `NULL` — in DBAL 4.4.4 at
 `.Build/vendor/doctrine/dbal/src/ExpandArrayParameters.php:99-103`, and in DBAL
@@ -251,7 +251,7 @@ as broken as it was.
 
 There is one legitimate caller-side condition, and it is a different thing: a
 check that decides whether a constraint applies **at all**. In
-`packages/fgtclb/academic-persons/Classes/Provider/FrontendUserProvider.php:84-99`
+`packages/fgtclb/academic-persons/Classes/Provider/FrontendUserProvider.php:89-104`
 an empty include or exclude list means "do not narrow the query", so the whole
 `andWhere()` is skipped — and the list is still quoted with the helper when it
 is added. The rule is about how a list becomes SQL, not about whether a
@@ -267,26 +267,38 @@ $queryBuilder->expr()->in('sys_category.sys_language_uid', [0, -1]),
 
 That form appears five times in
 `packages/fgtclb/typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`
-(lines 69, 111, 155, 207 and 250) and three times in
+(lines 69, 117, 165, 221 and 270) and three times in
 `packages/fgtclb/academic-study-plan/Classes/Service/StudyPlanService.php`
-(lines 218, 235 and 254), and is correct as written. The rule targets lists
+(lines 235, 252 and 271), and is correct as written. The rule targets lists
 whose length comes from outside the function — request data, a repository
 result, a configuration value.
 
+Re-derive both:
+
+```bash
+grep -rn "expr()->\(not\)\?[iI]n(.*\[[^]]*\])" --include='*.php' packages/fgtclb/*/Classes/
+```
+
 ### Call sites to copy from
 
-Nine classes under `packages/fgtclb/*/Classes/` use the quoting helpers, 17
-call sites in total. A representative selection, all paths relative to
-`packages/fgtclb/`:
+Seventeen classes under `packages/fgtclb/*/Classes/` use the quoting helpers,
+24 call sites in total:
+
+```bash
+grep -rln "quoteArrayBasedValueListTo" packages/fgtclb/*/Classes/ | wc -l
+grep -rn  "quoteArrayBasedValueListTo" packages/fgtclb/*/Classes/ | wc -l
+```
+
+A representative selection, all paths relative to `packages/fgtclb/`:
 
 | File                                                                       | Line    | Form                                              |
 |----------------------------------------------------------------------------|---------|---------------------------------------------------|
-| `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`    | 156-159 | `...ToIntegerList()` with `in()`, the ACE-349 fix |
-| `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`    | 317-320 | `createNamedParameter()` array parameter          |
-| `academic-persons/Classes/Provider/FrontendUserProvider.php`               | 86-89   | `...ToIntegerList()` with `notIn()`               |
+| `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`    | 166-169 | `...ToIntegerList()` with `in()`, the ACE-349 fix |
+| `typo3-category-types/Classes/Domain/Repository/CategoryRepository.php`    | 337-340 | `createNamedParameter()` array parameter          |
+| `academic-persons/Classes/Provider/FrontendUserProvider.php`               | 91-94   | `...ToIntegerList()` with `notIn()`               |
 | `academic-contact4pages/Classes/Backend/FormEngine/AddressRecordItems.php` | 158-161 | `...ToIntegerList()` on a literal list            |
-| `academic-projects/Classes/Upgrades/FlexFormUpgradeWizard.php`             | 51-54   | `...ToStringList()` with `in()`                   |
-| `academic-jobs/Classes/Upgrades/PluginUpgradeWizard.php`                   | 62-65   | `...ToStringList()` with `in()`                   |
+| `academic-projects/Classes/Upgrades/FlexFormUpgradeWizard.php`             | 112-115 | `...ToStringList()` with `in()`                   |
+| `academic-jobs/Classes/Upgrades/PluginUpgradeWizard.php`                   | 64-67   | `...ToStringList()` with `in()`                   |
 
 The fourth row quotes the constant `[-1, 0]`, which the previous section marks
 as not strictly needing it. That is harmless and arguably preferable: it keeps
@@ -369,7 +381,7 @@ builder's counter kept advancing while the fresh update builder's did not.
 
 The wizard reported success and migrated nothing. The correct form keeps
 expression, parameter and execution on the same object
-(`packages/fgtclb/academic-projects/Classes/Upgrades/FlexFormUpgradeWizard.php:80-91`,
+(`packages/fgtclb/academic-projects/Classes/Upgrades/FlexFormUpgradeWizard.php:56-67`,
 using `eq()` because the value is a single uid):
 
 ```php

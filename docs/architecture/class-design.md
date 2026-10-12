@@ -2,27 +2,36 @@
 
 Conventions for classes under `packages/fgtclb/*/Classes/` and
 `packages-dev/*/Classes/`. Where the codebase is inconsistent this page says so
-rather than describing an intention as a rule. 256 PHP files declaring 228
-classes, 15 interfaces, 9 traits and 5 enums do not follow one style yet.
+rather than describing an intention as a rule. 298 PHP files declaring 266
+classes, 15 interfaces, 12 traits and 5 enums do not follow one style yet.
+
+The counts on this page are measured over `packages/fgtclb/*/Classes/` and
+`packages-dev/*/Classes/` together, unless a section says otherwise:
+
+```bash
+find packages/fgtclb/*/Classes packages-dev/*/Classes -name '*.php' | wc -l
+grep -rhoP '^(?:(?:final|abstract|readonly)\s+)*class\b' --include='*.php' \
+  packages/fgtclb/*/Classes packages-dev/*/Classes | sort | uniq -c
+```
 
 ## `final` by default, and where it is impossible
 
-106 of the 228 classes are `final` (46 %). The distribution is not random: it
+144 of the 266 classes are `final` (54 %). The distribution is not random: it
 tracks whether the framework instantiates the class or the container does.
 
 | Directory                                  | final   | plain   | abstract | % final  |
 |--------------------------------------------|---------|---------|----------|----------|
-| `Classes/Upgrades/`                        | 10      | 0       | 0        | 100 %    |
+| `Classes/Upgrades/`                        | 15      | 0       | 0        | 100 %    |
 | `Classes/Core12/` and `Classes/Core13/`    | 6       | 0       | 0        | 100 %    |
-| `Classes/Service/` and `Classes/Services/` | 11      | 3       | 0        | 79 %     |
-| `Classes/EventListener/`                   | 2       | 1       | 0        | 67 %     |
+| `Classes/Service/` and `Classes/Services/` | 14      | 3       | 0        | 82 %     |
+| `Classes/EventListener/`                   | 9       | 1       | 0        | 90 %     |
 | `Classes/Controller/`                      | 9       | 5       | 1        | 60 %     |
-| `Classes/Domain/Model/Dto/`                | 5       | 10      | 1        | 31 %     |
-| `Classes/ViewHelpers/`                     | 2       | 8       | 0        | 20 %     |
+| `Classes/Domain/Model/Dto/`                | 6       | 10      | 1        | 35 %     |
+| `Classes/ViewHelpers/`                     | 4       | 8       | 0        | 33 %     |
 | `Classes/Domain/Model/` (excluding `Dto/`) | 0       | 23      | 0        | 0 %      |
 | `Classes/Domain/Repository/`               | 0       | 16      | 0        | 0 %      |
-| Everything else                            | 61      | 50      | 4        | 53 %     |
-| **Total**                                  | **106** | **116** | **6**    | **46 %** |
+| Everything else                            | 81      | 50      | 4        | 60 %     |
+| **Total**                                  | **144** | **116** | **6**    | **54 %** |
 
 Make a new class `final` unless something concrete prevents it. Services are
 replaced through the container, not through inheritance, so extensibility is
@@ -284,7 +293,7 @@ be set.
 
 ## Strict types
 
-244 of the 251 files declare `strict_types=1` — here counted over
+283 of the 290 files declare `strict_types=1`, here counted over
 `packages/fgtclb/` only. New files must. Measured with
 `find packages/fgtclb/*/Classes -name '*.php' | wc -l` against
 `grep -rl 'declare(strict_types=1)' --include='*.php' packages/fgtclb/*/Classes | wc -l`;

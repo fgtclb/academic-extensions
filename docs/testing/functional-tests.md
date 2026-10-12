@@ -236,10 +236,10 @@ is what builds the instance.
 | [`academic-base/Tests/Functional/Tca/TableConfigurationTest.php`](../../packages/fgtclb/academic-base/Tests/Functional/Tca/TableConfigurationTest.php)                                   | Mutating `$GLOBALS['TCA']` safely, via `TcaHelperMethodsTrait`.                                                                                                                                                                                                                                                                                                                                |
 
 Records come from CSV fixtures next to the test, imported with
-`importCSVDataSet()` (used in 41 files) and, where the test writes, asserted back
-with `assertCSVDataSet()` (14 call sites). Fixtures of a plugin test live in a
-`Fixtures/<TestClassName>/` folder beside it, one file per scenario, which keeps
-a fixture from being quietly reused by a test it was not written for.
+`importCSVDataSet()` (used in 195 files) and, where the test writes, asserted
+back with `assertCSVDataSet()` (63 call sites). Fixtures of a plugin test live
+in a `Fixtures/<TestClassName>/` folder beside it, one file per scenario, which
+keeps a fixture from being quietly reused by a test it was not written for.
 
 ## A mail that cannot be sent
 
