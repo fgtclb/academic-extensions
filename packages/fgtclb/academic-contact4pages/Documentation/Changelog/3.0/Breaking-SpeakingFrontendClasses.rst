@@ -33,7 +33,8 @@ carries the speaking classes of that extension, see the chapter
         -   `academic-contacts4pages-list`, the contacts in an `ace-content`
     *   -   Group of contacts
         -   a `row` of grid columns
-        -   `ace-itemlist` around the `row`, every card in an `ace-item` inside its column
+        -   `ace-itemlist` around the `row`, the columns keep their `col-*` and
+            hold the :html:`<article class="ace-item">` of the profile item
     *   -   Role of a contact
         -   `academic-contacts4pages__role`
         -   `ace-role`
