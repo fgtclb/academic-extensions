@@ -569,12 +569,13 @@ function pageTsConfigIncludes(): string
     // ships page TSconfig only - the CType group and the hide/re-enable pair of
     // ACE-458 live there.
     //
-    // The backend layouts of EXT:bootstrap_package are NOT in this list, and the
-    // "backend_layout" values of the mirrored pages therefore name layouts the
-    // legacy tree does not define. That is the same finding as in the static
-    // template list above: version 16 of that extension delivers its page
-    // TSconfig through site sets and dropped the registerPageTSConfigFile()
-    // calls, so there is no pre-site-set path to it any more.
+    // The backend layouts of EXT:bootstrap_package are not in this list, and they
+    // do not have to be. Version 15, the one both instances of this branch run,
+    // ships "Configuration/page.tsconfig", which TYPO3 v12 and v13 load for every
+    // page, and that file imports the backend layouts unless the extension
+    // setting "disablePageTsBackendLayouts" is set. Both instances leave it at
+    // "0", so the "backend_layout" values of the mirrored pages name layouts the
+    // legacy tree knows without an entry here.
     return implode(',', [
         'EXT:academic_base/Configuration/TSconfig/Full/page.tsconfig',
         'EXT:academic_bite_jobs/Configuration/TSconfig/Full/page.tsconfig',

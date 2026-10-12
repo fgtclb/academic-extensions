@@ -25,8 +25,8 @@ use TYPO3\CMS\Core\Information\Typo3Version;
  * Nothing here is imported. The snapshot is read as a file, through PDO, and
  * measured with exactly the reduction {@see SeedManifest} was generated with.
  *
- * The check is per core version, because the artifact is: `-t 13` measures
- * `core-13.sqlite` and `-t 14` measures `core-14.sqlite`, and a run only ever
+ * The check is per core version, because the artifact is: `-t 12` measures
+ * `core-12.sqlite` and `-t 13` measures `core-13.sqlite`, and a run only ever
  * looks at the one it was configured for.
  */
 final class SnapshotManifestTest extends FunctionalTestCase
