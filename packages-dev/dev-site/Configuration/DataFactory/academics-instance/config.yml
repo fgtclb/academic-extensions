@@ -1,23 +1,25 @@
 # The seed set the development instances are built from.
 #
 # Imported with "vendor/bin/typo3 data-factory:import academics-instance" in
-# "core-13/" and "core-14/", which is the only way those instances get content:
-# they are set up from nothing and import no example data.
+# "core-12/", which is the only way that instance gets content: it is set up
+# from nothing and imports no example data.
 #
-# One set serves both core versions. Everything it declares is identical on
-# TYPO3 v13 and v14, so a second set would be two definitions to keep in sync
-# and no difference to express.
+# It is the shape that works on both core versions of this branch. The
+# "core-13" instance imports "academics-instance-sets" instead, which
+# "Build/Scripts/generateLegacyScenario.php" derives from this set, so there is
+# still one definition to edit.
 #
 # The set is written from scenario files listed under "scenarios". They are
 # composed into one scenario before anything is written, so a record of one
 # file may name a record of another, and "entitySettings" is declared in
 # "Scenario.yaml" alone - the composer merges the files with
 # ArrayUtility::mergeRecursiveWithOverrule() and every further file inherits
-# them. "ScenarioLegacy.yaml", the "/legacy/" tree that is delivered through a
-# root "sys_template" record instead of through site sets, is appended to that
-# list.
+# them. This set lists "Scenario.yaml" alone. "ScenarioLegacy.yaml", the
+# "/legacy/" tree that is delivered through a root "sys_template" record, exists
+# in the generated set only, which lists both files.
 #
-# "files" and "references" live here, once, for both scenarios. A file
+# "files" and "references" live here, once, for both sets. The generator copies
+# them and adds a reference for every mirrored record that carries one. A file
 # reference is the one relation the scenario format cannot express: a
 # "sys_file_reference" points at its file through "uid_local", and that uid is
 # handed out by the FAL indexer while the file is being placed, so nobody can
@@ -31,8 +33,8 @@
 identifier: academics-instance
 title: 'Academic extensions development instance'
 description: >-
-  The two page trees, the content elements, the shared record storage and the
-  German translations of the "core-13" and "core-14" development instances of
+  The page trees, the content elements, the shared record storage and the
+  German translations of the "core-12" and "core-13" development instances of
   the fgtclb/academic-extensions mono repository.
 
 scenarios:

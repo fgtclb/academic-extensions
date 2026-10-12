@@ -9,7 +9,7 @@
 # one tree worth having.
 identifier: academics-instance-sets
 title: 'Academic extensions development instance (site sets)'
-description: 'The two page trees, the content elements, the shared record storage and the German translations of the "core-13" and "core-14" development instances of the fgtclb/academic-extensions mono repository.'
+description: 'The page trees, the content elements, the shared record storage and the German translations of the "core-12" and "core-13" development instances of the fgtclb/academic-extensions mono repository.'
 scenarios:
   - 'EXT:academics_dev_site/Configuration/DataFactory/academics-instance-sets/Scenario.yaml'
   - 'EXT:academics_dev_site/Configuration/DataFactory/academics-instance-sets/ScenarioLegacy.yaml'

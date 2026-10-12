@@ -1,9 +1,10 @@
 {
     "README": [
         "This file is generated. See FGTCLB\\AcademicsDevSite\\Tests\\Functional\\Support\\SeedManifest for the command that writes it.",
-        "It belongs to one TYPO3 core version - the two initialise a column the seed does",
-        "not name differently - and there is a second file next to it for the other one.",
-        "It is the measurement of one real import of the seed set \"academics-instance\":",
+        "It belongs to one TYPO3 core version, and there is a second file next to it for",
+        "the other one, because the two versions import different seed sets.",
+        "It is the measurement of one real import of the seed set of that version,",
+        "\"academics-instance\" on TYPO3 v12 and \"academics-instance-sets\" on TYPO3 v13:",
         "the number of rows the set wrote per table, the columns the set states a value",
         "for, and a checksum over those columns of those rows.",
         "A row is addressed by the uid the seed declares, except in \"sys_file\" and",

@@ -23,18 +23,18 @@ use TYPO3\CMS\Core\Information\Typo3Version;
  *
  * Regenerate it with:
  *
- *   Build/Scripts/runTests.sh -t 13 -s seedManifest
+ *   Build/Scripts/runTests.sh -t 12 -s seedManifest
  *
- * and once more with `-t 14`, after the `composerUpdate` of that version.
+ * and once more with `-t 13`, after the `composerUpdate` of that version.
  *
- * There is one file per core version, and that is not symmetry for its own
- * sake: the two cores initialise a column the seed does not name differently.
- * TYPO3 v13 writes the schema default into `pages.geocode_status` (`open`) and
- * `tt_content.imagewidth` (`0`) where v14 leaves both `NULL`, on 218 and 236
- * rows respectively. Folding that away would mean dropping the two columns from
- * the projection - hiding a difference that is real - and the artifact the
- * manifest is checked against, `sqlite-databases/core-NN.sqlite`, is per core
- * version anyway.
+ * There is one file per core version, because the two cores import different
+ * seed sets ({@see SeedDefinition::configFile()}): TYPO3 v12 imports
+ * `academics-instance`, TYPO3 v13 the generated `academics-instance-sets`,
+ * which adds the `/legacy/` mirror. Both files measure the same tables and
+ * columns. The tables the mirror repeats hold more rows on v13: pages, content
+ * elements, their file references, page contacts, partnerships and the study
+ * plan modules and semesters. The artifact the manifest is checked against,
+ * `sqlite-databases/core-NN.sqlite`, is per core version anyway.
  */
 final class SeedManifest
 {
@@ -152,9 +152,10 @@ final class SeedManifest
         $payload = [
             'README' => [
                 'This file is generated. See ' . self::class . ' for the command that writes it.',
-                'It belongs to one TYPO3 core version - the two initialise a column the seed does',
-                'not name differently - and there is a second file next to it for the other one.',
-                'It is the measurement of one real import of the seed set "academics-instance":',
+                'It belongs to one TYPO3 core version, and there is a second file next to it for',
+                'the other one, because the two versions import different seed sets.',
+                'It is the measurement of one real import of the seed set of that version,',
+                '"academics-instance" on TYPO3 v12 and "academics-instance-sets" on TYPO3 v13:',
                 'the number of rows the set wrote per table, the columns the set states a value',
                 'for, and a checksum over those columns of those rows.',
                 'A row is addressed by the uid the seed declares, except in "sys_file" and',

@@ -32,22 +32,25 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestCon
  *
  * WHAT IS SUBSTITUTED, AND WHY IT IS SUBSTITUTED ON BOTH SIDES
  *
- * The `/` tree of a development instance is themed by EXT:bootstrap_package and
- * the `/legacy/` tree cannot be, because that extension delivers through site
- * sets only from version 16 on. Comparing the two trees as they stand in an
- * instance would therefore compare two themes. So the theme is replaced here -
- * on both sides, by the same text: the `/` site gets the site set
- * `fgtclb/academics-dev-site-page-object` where its committed configuration
+ * In the `core-13` instance both trees are themed by EXT:bootstrap_package 15,
+ * the `/` tree through its site set `bootstrap-package/full` and the `/legacy/`
+ * tree through its static template. The harness does not have the theme: the
+ * functional suite loads the packages of this repository and not
+ * `bk2k/bootstrap-package`, which only the instances require. So the theme is
+ * replaced here, on both sides, by the same text: the `/` site gets the site
+ * set `fgtclb/academics-dev-site-page-object` where its committed configuration
  * names `bootstrap-package/full`, and the legacy tree keeps the static template
- * of the same package that its `sys_template` record already names. Everything
- * academic is delivered exactly as the seed declares it, through both
- * mechanisms, which is what the comparison is about.
+ * of the same package, which its `sys_template` record names before the theme,
+ * whose entry resolves to nothing here. Neither side renders a theme, so the
+ * comparison never compares two of them. Everything academic is delivered
+ * exactly as the seed declares it, through both mechanisms, which is what the
+ * comparison is about.
  *
  * The site configuration of the `/` tree is read from the committed
  * `core-NN/config/sites/academics/` rather than written here, so a set added
  * there is part of this test the day it is added.
  *
- * TYPO3 v12 only: it is skipped there, because the `core-12` instance has one
+ * Not on TYPO3 v12: it is excluded there, because the `core-12` instance has one
  * tree and not two. Site sets arrived in v13.1, so on v12 there is only one way
  * to deliver TypoScript and nothing to compare a second tree against - which is
  * why that instance imports the seed set `academics-instance` and this one

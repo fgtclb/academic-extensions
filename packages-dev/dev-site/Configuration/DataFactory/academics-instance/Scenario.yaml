@@ -1,7 +1,9 @@
 # The records of the seed set "academics-instance", in the scenario format of
-# sbuerk/data-factory. This file holds the "/" tree; "ScenarioLegacy.yaml"
-# holds "/legacy/", and declares no "entitySettings" of its own because the two
-# files are merged into one scenario before anything is built.
+# sbuerk/data-factory. This file holds the "/" tree. The generated set
+# "academics-instance-sets" of the "core-13" instance adds "/legacy/" in its
+# "ScenarioLegacy.yaml". That file declares only the "template" entity, the one
+# its generated "Scenario.yaml" drops, because the two files are merged into one
+# scenario before anything is built.
 #
 # Uids are declared throughout, and the numbering is a rule rather than a
 # sequence:

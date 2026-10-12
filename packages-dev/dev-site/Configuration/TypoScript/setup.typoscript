@@ -1,29 +1,31 @@
-# The page object of the "/legacy/" tree.
+# The page object of the seed package.
 #
-# WHY THIS EXISTS AT ALL
+# WHAT IT IS FOR ON THIS BRANCH
 #
-# The "/" tree is themed by EXT:bootstrap_package, which delivers everything it
-# has through site sets and nothing through a static template: version 15 still
-# shipped "Configuration/TypoScript/" and registered it with addStaticFile(),
-# version 16 removed both ("[!!!][TASK] Migrate TypoScript configuration to site
-# sets"). The "core-13" instance runs 15 and the "core-14" instance runs 16, so a
-# "sys_template" record naming the theme renders one instance and renders nothing
-# at all in the other.
+# Both instances run EXT:bootstrap_package 15, which delivers its theme twice:
+# as the site set "bootstrap-package/full" and as the static template
+# "Configuration/TypoScript/" it registers with addStaticFile(). Every tree of
+# the instances is therefore themed. The "/" tree of "core-13" gets the theme
+# through the site set, its "/legacy/" tree and the one tree of "core-12"
+# through the static template their root "sys_template" record names.
 #
-# The "/legacy/" tree therefore cannot be themed. It is delivered the way an
-# installation that predates site sets is delivered, and there is no pre-site-set
-# delivery of that theme any more. What it gets instead is this: the smallest
-# page object that puts the content of a page on the page, so the tree renders
-# and the content elements and plugins of the academic extensions can be compared
-# with the ones the site set driven tree renders.
+# Those records name this static template first and the theme right after it,
+# so in those trees the theme replaces this page object. Of this file only the
+# "config" flags "contentObjectExceptionHandler" and "disablePrefixComment"
+# stay in effect there, the theme sets neither. It is the smallest page object
+# that puts the content of a page on the page, and it renders where the theme
+# is not installed: the functional suite loads the packages of this repository
+# and not "bk2k/bootstrap-package", which only the instances require. There the
+# theme entry resolves to nothing, and without this page object the seeded
+# pages would render nothing at all.
 #
-# It is shipped twice, in the two forms a development instance needs it in - as
-# this static template folder, named by the "include_static_file" of the legacy
-# root "sys_template" record, and as the site set "fgtclb/academics-dev-site-page-object",
-# whose "setup.typoscript" imports this file. The set is what
-# "LegacyDeliveryTest" puts in the place of the theme on the "/" side, so that
-# both trees are rendered by the same text and a difference the test reports is a
-# difference in what the academic extensions deliver.
+# It is shipped twice, as this static template folder, named by the
+# "include_static_file" of the root "sys_template" records, and as the site set
+# "fgtclb/academics-dev-site-page-object", whose "setup.typoscript" imports this
+# file. The set is what "LegacyDeliveryTest" puts in the place of the theme on
+# the "/" side, so that inside the harness both trees are rendered by the same
+# text and a difference the test reports is a difference in what the academic
+# extensions deliver.
 
 page = PAGE
 page {
