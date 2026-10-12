@@ -81,9 +81,9 @@
   change, and `README.md` and `CONTRIBUTING.md` still only summarize and link.
 - [x] 5.5 Every test of group 2 was shown red on the unchanged query, as
   recorded there.
-- [ ] 5.6 Commit in TYPO3 Core format as
+- [x] 5.6 Commit in TYPO3 Core format as
   `[BUGFIX] ACE-433: Treat a NULL end date as active`, body wrapped at 72,
   footer `Resolves: ACE-433`, no attribution of any kind.
-- [ ] 5.7 Archive the change as the last commit of the same pull request and
+- [x] 5.7 Archive the change as the last commit of the same pull request and
   verify the modified requirement landed in
   `openspec/specs/academic-projects/project-active-state/spec.md`.
