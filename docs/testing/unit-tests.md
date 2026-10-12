@@ -5,8 +5,8 @@ database, no site, no request. Everything the subject needs is passed to it or
 stubbed. That makes the suite fast enough to run on every save, and it makes a
 failure point at one class instead of at a stack.
 
-There are 91 unit test classes: 79 across the twelve extensions, two in
-`packages-dev/dev-site`, five in `packages-dev/monorepo-shared` and five in
+There are 101 unit test classes: 86 across the twelve extensions, four in
+`packages-dev/dev-site`, six in `packages-dev/monorepo-shared` and five in
 `packages-dev/testing-helper`. Twelve of them are the one-line version
 compatibility test every extension carries (see
 [below](#the-version-compatibility-test)). Measured with
@@ -103,14 +103,15 @@ reports nothing rather than an error.
 
 ## Conventions
 
-These are read off the existing classes, not prescribed from outside. All 31 of
+These are read off the existing classes, not prescribed from outside. All of
 them follow the shape below.
 
 **Every test class is `final`, declares `strict_types`, and extends
 `TYPO3\TestingFramework\Core\Unit\UnitTestCase`.** There is no local abstract
-unit test case, and no unit test extends another test class. The five below
-`packages-dev/` are the exception to the base class: they need nothing of
-TYPO3 and extend PHPUnit's `TestCase` directly.
+unit test case, and no unit test extends another test class. The fifteen below
+`packages-dev/` and `ClassAliasMapTest` of `academic_base` are the exception to
+the base class: they need nothing of the TYPO3 testing framework and extend
+PHPUnit's `TestCase` directly.
 
 **The namespace mirrors the path, which mirrors `Classes/`.**
 `FGTCLB\AcademicPersons\Tests\Unit\Domain\Model\EmailTest` tests

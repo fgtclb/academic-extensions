@@ -771,6 +771,14 @@ ddev exec vendor/bin/typo3 upgrade:run <identifier> --no-interaction
 ddev composer sqlite:backup
 ```
 
+The unit suite enforces the rule. `TemplateUpgradeWizardsTest` of
+`packages-dev/dev-site` reads both templates and fails for every registered,
+non-repeatable wizard of the extensions that one of them does not mark as done,
+naming the template, the class and these commands with the identifier filled
+in. A wizard that carries Symfony's `#[Exclude]` is not registered, and the test
+does not expect it either. See
+[The upgrade wizards of the snapshots](../testing/seed-verification.md#the-upgrade-wizards-of-the-snapshots).
+
 On the seed the wizard is expected to find nothing to do. `upgrade:run` then
 skips the update, marks the wizard done and says so: `Wizard <identifier> does
 not need to make changes. Marking wizard as done.` If it runs its update

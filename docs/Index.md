@@ -52,6 +52,7 @@ such manual per extension; this tree is the single, repository-wide counterpart.
 | [Functional tests](testing/functional-tests.md)           | Databases, why SQLite alone is not enough, loading extensions.                        |
 | [Fixture extensions](testing/fixture-extensions.md)       | Test-only extensions and how they are wired.                                          |
 | [Testing helper](testing/testing-helper.md)               | The shared traits in `packages-dev/testing-helper/` and the trap each one exists for. |
+| [Seed verification](testing/seed-verification.md)         | The seed manifest and the checks that keep the YAML and the snapshots together.       |
 
 ## [Workflow](workflow/Index.md)
 
