@@ -35,8 +35,11 @@ So a value is written only when **both** hold:
    `shouldApplyProperty()` is `wasPropertySentInRequest() || hasPropertyOverride()`.
 
 The order matters and is deliberate: the validation configuration wins over
-everything, including an override. A listener cannot write a property the
-configuration locks.
+everything, including an override.
+
+On this branch nothing registers an override. The store of `AbstractFormData`
+has no caller outside the tests, and the extension dispatches no event that
+hands a form data object to a listener.
 
 ## Rule 1 — `disabled` and `readOnly` protect persisted data
 

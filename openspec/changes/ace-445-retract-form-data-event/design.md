@@ -1,6 +1,7 @@
 ## Context
 
-Measured on branch `2` at `7ebded7b8` by reading:
+Measured on branch `2` at `7ebded7b8` by reading, and confirmed unchanged on
+`8e174da11` before the rewording:
 
 - `Classes/` of `academic_persons_edit` has no `Event/` directory, and no
   `->dispatch(` or `EventDispatcherInterface` anywhere. Its two classes in
@@ -72,7 +73,8 @@ repeat the same promise, and
 bring the event. Left alone, they contradict the reworded entry and the next
 reader takes them for the truth. Recommended: reword them in the same
 change, comments only. The test bodies and their assertions stay untouched.
-Confirm with the maintainer before editing.
+
+Confirmed by the maintainer on 2026-10-12: reworded in the same change.
 
 ### What the `Important` entry says
 
@@ -99,6 +101,9 @@ commit after the merge (2.4.0 is unreleased, so it is still editable), or
 leave `main` as it is. Recommended: mirror it, so the folders stay identical
 as ACE-896 left them, and so `main` does not keep documenting a 2.4 event
 promise either. It is not part of this change.
+
+Confirmed by the maintainer on 2026-10-12: mirror it to `main` after the
+merge, as a `[3.x]` change of its own.
 
 A mirror is a plain copy of the file. The entry has no `:ref:` and its
 anchor is referenced nowhere on `main`, and `main` cites it from
