@@ -482,9 +482,16 @@ function templateRecord(int $offset): array
         // their own, and the theme assigns "page.10.templateName.cObject".
         // Included after them, the theme puts its cObject back and every
         // program, project and partner page dies with an
-        // InvalidTemplateResourceException. An entry of an extension that is
-        // not loaded - the theme in the functional suite - is skipped on its
-        // own and costs no other entry.
+        // InvalidTemplateResourceException.
+        //
+        // An entry of an extension that is not loaded, such as the theme in the
+        // functional suite, is skipped on its own and costs no other entry of
+        // this list, but it costs what the theme brings with it. It is the only
+        // content rendering template the record names: it defines the core
+        // content elements, and a "sys_template" tree receives the plugin
+        // TypoScript of the extensions only right after such a template. So
+        // "LegacyDeliveryTest" puts the static template of fluid_styled_content
+        // in its place.
         'EXT:bootstrap_package/Configuration/TypoScript',
         // The nine academic extensions that ship TypoScript, each through the
         // aggregate folder that names every component of the extension.

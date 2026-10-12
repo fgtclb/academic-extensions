@@ -36,6 +36,25 @@ it is the first task.
   seconds in all four files, because it was skipped when they were written. On
   `main` it is the heaviest functional class, some 2 minutes on SQLite.
 
+Re-checked on `origin/2` `853045d2b`, with the harness on TYPO3 13.4.36 after
+`-t 13 -s composerUpdate`. The core lines above are unchanged there (the
+`addTypoScript()` call of `configurePlugin()` ends at line 93, the two
+`SysTemplateTreeBuilder` lines are 199 and 581 to 583), and the archive of
+EXT:bootstrap_package 15.0.4 registers `bootstrappackage/Configuration/TypoScript/`
+in `ext_localconf.php:13`. Two facts the reading did not show came out of the
+first run:
+
+- The class could never have run on this branch. Since it was ported in
+  0b3cf286f (ACE-460) it uses `self::BASE`, `self::LEGACY_SEGMENT`,
+  `self::PAGE_OFFSET` and `self::PROFILE_DETAIL_PAGE` without declaring them.
+  `main` declares them since 09c84f789. The skip in `setUp()` hid it, and
+  phpstan does not analyse `packages-dev/`.
+- The status test expects `200` for page 209, the profile detail of hidden
+  profiles that ACE-834 added to the seed, and for page 233, the job detail,
+  which answers `404` without a job since ACE-839. Both trees answer `404` for
+  both pages, which is the behaviour those changes introduced. `main` expects
+  `404` for the three detail pages 205, 209 and 233 since f3348abce.
+
 ## Goals / Non-Goals
 
 **Goals:**
@@ -102,6 +121,19 @@ share. The four files are refreshed with `recordFunctionalTestTimes` from the
 JUnit artifacts of the pull request's first green CI run, TYPO3 v13, one PHP
 version, as `docs/development/environment.md` describes. Rejected: editing the
 four values by hand, which mixes measurements of different runs in one file.
+
+### 4. Repair what rotted while the class was skipped
+
+The two facts found by the first run are fixed in the same commit, because
+without them the class cannot run at all. `BASE`, `LEGACY_SEGMENT` and
+`PAGE_OFFSET` are declared as `main` declares them, and `PROFILE_DETAIL_PAGE`
+gives way to `DETAIL_PAGES`, the three detail pages that answer `404` without
+a record, as on `main`. Both
+are repairs of the test, not of the seed: every one of those pages answers the
+same in both trees.
+
+Rejected: a commit or an issue of its own. The repairs make the unskip
+possible, they have no meaning apart from it.
 
 ## Risks / Trade-offs
 

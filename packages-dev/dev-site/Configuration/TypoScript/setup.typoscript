@@ -23,9 +23,11 @@
 # "include_static_file" of the root "sys_template" records, and as the site set
 # "fgtclb/academics-dev-site-page-object", whose "setup.typoscript" imports this
 # file. The set is what "LegacyDeliveryTest" puts in the place of the theme on
-# the "/" side, so that inside the harness both trees are rendered by the same
-# text and a difference the test reports is a difference in what the academic
-# extensions deliver.
+# the "/" side, together with fluid_styled_content, which the set depends on.
+# On the "/legacy/" side the test keeps this static template and puts the one of
+# fluid_styled_content in the theme's place, so that inside the harness both
+# trees are rendered by the same text and a difference the test reports is a
+# difference in what the academic extensions deliver.
 
 page = PAGE
 page {

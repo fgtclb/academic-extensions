@@ -10,11 +10,12 @@ since (the TCA cache and `addStaticFile()`).
 The actual cause is in the harness. The legacy root record names
 `EXT:bootstrap_package/Configuration/TypoScript` as its only content rendering
 template, and the functional suite does not install that theme. The entry
-resolves to nothing, so the legacy tree never receives the content rendering
-TypoScript the core appends after a content rendering template: no plugin
-definition and no core content element definition. The `/` side of the test
-already replaces the theme set with a set that depends on
-`typo3/fluid-styled-content`, so only the legacy side loses its replacement.
+resolves to nothing, so the legacy tree gets neither the definitions of the
+core content elements, which a content rendering template brings, nor the
+plugin definitions, which the core appends only right after such a template.
+The `/` side of the test already replaces the theme set with a set that
+depends on `typo3/fluid-styled-content`, so only the legacy side loses its
+replacement.
 
 ## What Changes
 
@@ -24,11 +25,16 @@ already replaces the theme set with a set that depends on
   mirroring the substitution on the `/` side. It fails loudly when the seed no
   longer names the theme entry.
 - The skip is removed. Both test methods run again on TYPO3 v13.
+- Two defects the skip had hidden are repaired with it: the class declares the
+  constants it uses, and the status test expects `404` for the three
+  detail pages of the seed (design.md, decision 4).
 - The stale explanations are corrected: the class docblock and the skip comment
   of the test, the `LegacyDeliveryTest` section of
-  `docs/testing/seed-verification.md`, and the comment above the theme entry in
+  `docs/testing/seed-verification.md`, the comment above the theme entry in
   `Build/Scripts/generateLegacyScenario.php`, which claims that an unloaded
-  entry costs nothing else.
+  entry costs nothing else, and the comment of the seed package's page object.
+- `docs/development/environment.md` names the class as the heaviest functional
+  class of this branch.
 
 No extension under `packages/fgtclb/` changes. The affected package is
 `packages-dev/dev-site` (extension key `academics_dev_site`), which is never
@@ -47,8 +53,9 @@ None.
 
 ### Modified Capabilities
 
-None. The change sets `skip_specs: true`: it touches a functional test, a
-comment of a build script and developer documentation. Nothing an editor,
+None. The change sets `skip_specs: true`: it touches a functional test,
+comments of a build script and of the seed package, the recorded test
+durations and developer documentation. Nothing an editor,
 integrator or visitor observes changes, and the seed, the generated
 `ScenarioLegacy.yaml`, the SQLite templates and the seed manifests stay as
 they are.
@@ -58,7 +65,11 @@ they are.
 - `packages-dev/dev-site/Tests/Functional/LegacyDeliveryTest.php`
 - `Build/Scripts/generateLegacyScenario.php` (comment only, so the generated
   file is unchanged and `--check` stays clean)
+- `packages-dev/dev-site/Configuration/TypoScript/setup.typoscript` (comment
+  only)
 - `docs/testing/seed-verification.md`
+- `docs/development/environment.md`
+- `Build/phpunit/FunctionalTestTimes-<dbms>.json`, the recorded durations
 
 ## Non-goals
 

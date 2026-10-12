@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Core\Configuration\SiteWriter;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -37,14 +38,26 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestCon
  * tree through its static template. The harness does not have the theme: the
  * functional suite loads the packages of this repository and not
  * `bk2k/bootstrap-package`, which only the instances require. So the theme is
- * replaced here, on both sides, by the same text: the `/` site gets the site
- * set `fgtclb/academics-dev-site-page-object` where its committed configuration
- * names `bootstrap-package/full`, and the legacy tree keeps the static template
- * of the same package, which its `sys_template` record names before the theme,
- * whose entry resolves to nothing here. Neither side renders a theme, so the
- * comparison never compares two of them. Everything academic is delivered
- * exactly as the seed declares it, through both mechanisms, which is what the
- * comparison is about.
+ * replaced here, on both sides, by the same two things: the page object of
+ * this package and fluid_styled_content. The `/` site gets the site set
+ * `fgtclb/academics-dev-site-page-object` where its committed configuration
+ * names `bootstrap-package/full`, and that set depends on
+ * `typo3/fluid-styled-content`. The legacy tree keeps the static template of
+ * the same package, which its `sys_template` record names before the theme,
+ * and gets `EXT:fluid_styled_content/Configuration/TypoScript` in the theme's
+ * place.
+ *
+ * The second half is not cosmetic. The definitions of the core content
+ * elements are the content rendering template itself, fluid_styled_content or,
+ * in the instance, the theme. The TypoScript Extbase registers for every
+ * plugin reaches a `sys_template` tree only right after such a template, while
+ * a site set tree receives it without any condition. The theme is the only
+ * content rendering template the record names, so with its entry resolving to
+ * nothing, every content element of the legacy tree, core element or plugin,
+ * reports that it has no rendering definition. Neither side renders a theme,
+ * so the comparison never compares two of them. Everything academic is
+ * delivered exactly as the seed declares it, through both mechanisms, which is
+ * what the comparison is about.
  *
  * The site configuration of the `/` tree is read from the committed
  * `core-NN/config/sites/academics/` rather than written here, so a set added
@@ -59,6 +72,34 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestCon
 #[Group('not-core-12')]
 final class LegacyDeliveryTest extends AbstractSeedTestCase
 {
+    private const BASE = 'https://academics.test';
+
+    private const LEGACY_SEGMENT = '/legacy';
+
+    /**
+     * The uid offset of the mirror, as `ScenarioLegacy.yaml` declares it and
+     * `Build/Scripts/generateLegacyScenario.php` writes it.
+     */
+    private const PAGE_OFFSET = 1000;
+
+    /**
+     * The profile and the job detail pages of the seed, which host their
+     * detail plugin and nothing else: the profile detail of every profile list,
+     * the one of the hidden profiles, and the job detail.
+     */
+    private const DETAIL_PAGES = [205, 209, 233];
+
+    /**
+     * The static template of the theme, which the legacy root template names
+     * and the harness does not have.
+     */
+    private const THEME_STATIC_TEMPLATE = 'EXT:bootstrap_package/Configuration/TypoScript';
+
+    /**
+     * The static template the legacy root template gets in the theme's place.
+     */
+    private const CONTENT_RENDERING_SUBSTITUTE = 'EXT:fluid_styled_content/Configuration/TypoScript';
+
     /**
      * The strings the two sites are *supposed* to disagree about, as
      * `search => replacement`. Filled while the site configurations are written,
@@ -78,26 +119,6 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
 
     protected function setUp(): void
     {
-        // Skipped on this branch, and loudly rather than by deleting the class.
-        //
-        // The comparison reports 84 of 104 page pairs differing here, and the seed
-        // is not what is wrong with it: the real "core-13" instance renders both
-        // trees correctly, with no "no rendering definition" anywhere. Inside the
-        // harness the mirror loses the plugin definitions of the "Full" aggregates
-        // while keeping its page object, which points at the nested static include
-        // chain and the addStaticFile() calls that a functional test with a warm
-        // TCA cache never executes - the shape of ACE-462, and a defect of the
-        // harness rather than of the seed.
-        //
-        // ACE-468 carries the measurement and what was already ruled out. The other
-        // four checks of the seed run and pass on both core versions, so the seed
-        // itself stays covered while this one is out.
-        $this->markTestSkipped(
-            'ACE-468: the static template tree does not receive the plugin TypoScript'
-            . ' inside the functional harness, although a real instance renders it.',
-        );
-
-        // @phpstan-ignore-next-line deadCode.unreachable
         $this->configurationToUseInTestInstance = [
             'SYS' => [
                 'encryptionKey' => '2ce9b1a02b0e3aca2b64b1b0d0b39cbbcbe4e2df4bd9a0d0eb31e4c4c1e11b31',
@@ -124,6 +145,7 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
     public function bothTreesDeliverTheSameMarkupForEveryMirroredPage(): void
     {
         $this->importSeed();
+        $this->substituteTheThemeInTheLegacyTemplate();
         $this->writeSiteConfigurations();
 
         $differences = [];
@@ -181,15 +203,16 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
      * render at all, and it is separate so that the two failures read
      * differently.
      *
-     * `200`, except for the two pages the seed puts behind a frontend user
-     * group, which answer `403` to a visitor who is not logged in - that is
-     * what those pages are in the seed for - and the profile detail page, which
-     * answers `404`, for the reason given at {@see self::mirroredPages()}.
+     * `200`, with two kinds of exception. The two pages the seed puts behind a
+     * frontend user group answer `403` to a visitor who is not logged in,
+     * which is what those pages are in the seed for. The three detail pages
+     * answer `404`, for the reason given at {@see self::mirroredPages()}.
      */
     #[Test]
     public function everyMirroredPageAnswersItsExpectedStatusInBothTrees(): void
     {
         $this->importSeed();
+        $this->substituteTheThemeInTheLegacyTemplate();
         $this->writeSiteConfigurations();
 
         $failures = [];
@@ -273,10 +296,10 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
                 'status' => trim((string)$row['fe_group'], ' ,0') !== '' ? 403 : 200,
             ];
 
-            // The profile detail page, asked without a profile. The plugin
-            // ends the request with the "page not found" handling of the site
-            // in that case, on TYPO3 v12 and v13 alike.
-            if ($uid === self::PROFILE_DETAIL_PAGE) {
+            // A detail page, asked without a record. The plugins of profiles
+            // and jobs end the request with the "page not found" handling of
+            // the site in that case, on TYPO3 v12 and v13 alike.
+            if (in_array($uid, self::DETAIL_PAGES, true)) {
                 $pages[$uid]['status'] = 404;
             }
         }
@@ -389,6 +412,66 @@ final class LegacyDeliveryTest extends AbstractSeedTestCase
         }
 
         return '';
+    }
+
+    /**
+     * The theme entry of the legacy root template, replaced by the static
+     * template of fluid_styled_content in the same position.
+     *
+     * The legacy half of the substitution the class comment describes, the
+     * counterpart of the set swap in {@see self::writeSiteConfigurations()}.
+     * The record is changed after the import, and not in the seed or in
+     * {@see AbstractSeedTestCase::importSeed()}: the instance has the theme,
+     * and the manifest tests measure the record as the seed declares it. When
+     * the record no longer looks the way this assumes, the test fails here
+     * rather than compare two trees that both lack something.
+     */
+    private function substituteTheThemeInTheLegacyTemplate(): void
+    {
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('sys_template');
+        $queryBuilder = $connection->createQueryBuilder();
+        $queryBuilder->getRestrictions()->removeAll();
+
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $queryBuilder
+            ->select('uid', 'include_static_file')
+            ->from('sys_template')
+            ->where($queryBuilder->expr()->eq(
+                'pid',
+                $queryBuilder->createNamedParameter(self::PAGE_OFFSET + 1, Connection::PARAM_INT),
+            ))
+            ->orderBy('uid')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $this->assertCount(
+            1,
+            $rows,
+            'The legacy tree is expected to have exactly one root template. Revisit the substitution'
+            . ' of the theme in this test when the seed changes that.',
+        );
+        $staticFiles = GeneralUtility::trimExplode(',', (string)$rows[0]['include_static_file'], true);
+        $this->assertSame(
+            1,
+            count(array_keys($staticFiles, self::THEME_STATIC_TEMPLATE, true)),
+            sprintf(
+                'The legacy root template is expected to name "%s" once. Revisit the substitution of'
+                . ' the theme in this test when the seed changes that.',
+                self::THEME_STATIC_TEMPLATE,
+            ),
+        );
+
+        $staticFiles = array_map(
+            static fn(string $file): string => $file === self::THEME_STATIC_TEMPLATE
+                ? self::CONTENT_RENDERING_SUBSTITUTE
+                : $file,
+            $staticFiles,
+        );
+        $connection->update(
+            'sys_template',
+            ['include_static_file' => implode(',', $staticFiles)],
+            ['uid' => (int)$rows[0]['uid']],
+        );
     }
 
     /**

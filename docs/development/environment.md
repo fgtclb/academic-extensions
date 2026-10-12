@@ -174,11 +174,16 @@ running (ACE-696):
 | mysql 8.0 | 27:00  | —      | 12:51  | 11:07   |
 
 **No chunk can be faster than the heaviest test class**, because a class is never
-split. On this branch that is `SeedManifestTest` or `DeliveryRegistrationTest`,
-some 40 seconds each on SQLite, so SQLite still gains at 16 chunks. On `main`,
-whose `LegacyDeliveryTest` takes some 2 minutes, it stops at 8. The real databases
-gain less from each additional chunk, because a chunk waits on its own database
-far more than on the CPU.
+split. On this branch that is `LegacyDeliveryTest`, which runs on TYPO3 v13 only:
+128 seconds on SQLite, 150 on MariaDB and 176 on PostgreSQL, measured in local
+`-j` runs (ACE-468). `SeedManifestTest` and `DeliveryRegistrationTest` follow at
+some 40 seconds each on SQLite. So no v13 run on SQLite finishes in much under
+2 minutes, whatever the chunk count, and the SQLite figures of the parallel
+runs in the table above, measured while the class was still skipped, no longer
+hold for v13. On TYPO3 v12 the two seed classes are still the heaviest,
+and SQLite still gains at 16 chunks. The real databases gain less from each
+additional chunk, because a chunk waits on its own database far more than on
+the CPU.
 
 ### A pseudo TTY only when there is a terminal
 
